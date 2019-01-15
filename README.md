@@ -1,2 +1,2 @@
-# neuron
-CKB Wallet
+# Neuron
+Nervos CKB Wallet
