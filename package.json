@@ -1,5 +1,6 @@
 {
   "name": "neuron",
+  "description": "CKB Neuron Wallet",
   "version": "0.1.0",
   "private": true,
   "author": {
@@ -20,7 +21,8 @@
     "clean": "lerna run clean",
     "lint": "lerna run lint",
     "test": "lerna run test",
-    "start:react": "cd packages/react-app && yarn start"
+    "start:react": "cd packages/react-app && yarn start",
+    "start:electron": "cd packages/electron-app && yarn start"
   },
   "devDependencies": {
     "lerna": "^3.10.5"
