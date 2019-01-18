@@ -8,7 +8,8 @@
         "max-line-length": {
             "options": [120]
         },
-        "semicolon": [true, "never"]
+        "semicolon": [true, "never"],
+        "quotemark": [true, "single"]
     },
     "jsRules": {
         "max-line-length": {

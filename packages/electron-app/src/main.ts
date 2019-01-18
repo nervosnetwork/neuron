@@ -10,10 +10,10 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: __dirname + "/../AppIcon.icns"
+    icon: __dirname + '/../AppIcon.icns'
   })
 
-  mainWindow.loadURL("http://localhost:3000")
+  mainWindow.loadURL('http://localhost:3000')
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
