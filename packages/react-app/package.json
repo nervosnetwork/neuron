@@ -34,7 +34,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "electron": "^4.0.1",
     "react-app-rewired": "^2.0.2"
   }
 }

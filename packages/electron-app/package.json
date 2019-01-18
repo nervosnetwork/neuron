@@ -9,14 +9,18 @@
     "url": "https://github.com/nervosnetwork/neuron"
   },
   "license": "MIT",
-  "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "yarn run build && electron ./dist/main.js"
   },
   "dependencies": {
     "neuron-react-app": "0.1.0"
   },
   "devDependencies": {
-    "electron": "^4.0.1"
+    "electron": "^4.0.1",
+    "typescript": "^3.2.2",
+    "tslint": "^5.12.1"
   }
 }
