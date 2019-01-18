@@ -17,13 +17,19 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "lerna run clean",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "start:react": "cd packages/react-app && yarn start",
-    "start:electron": "cd packages/electron-app && yarn start"
+    "start:electron": "cd packages/electron-app && yarn start",
+    "start": "yarn run start:react && yarn run start:electron"
   },
   "devDependencies": {
-    "lerna": "^3.10.5"
+    "lerna": "^3.10.5",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^3.2.2",
+    "typescript-tslint-plugin": "^0.2.1"
   }
 }

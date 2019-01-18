@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "lint": "tslint -p .",
     "start": "yarn run build && electron ./dist/main.js"
   },
   "dependencies": {
