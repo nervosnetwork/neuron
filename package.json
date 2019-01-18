@@ -1,0 +1,37 @@
+{
+  "name": "neuron",
+  "description": "CKB Neuron Wallet",
+  "version": "0.1.0",
+  "private": true,
+  "author": {
+    "name": "Nervos Core Dev",
+    "email": "dev@nervos.org",
+    "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10.15",
+    "yarn": ">= 1.12"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "lerna run lint",
+    "test": "lerna run test",
+    "start:react": "cd packages/react-app && yarn start",
+    "start:electron": "cd packages/electron-app && yarn start",
+    "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\""
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "lerna": "^3.10.5",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^3.2.2",
+    "typescript-tslint-plugin": "^0.2.1",
+    "wait-on": "^3.2.0"
+  }
+}
