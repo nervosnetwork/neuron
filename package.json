@@ -21,7 +21,11 @@
     "test": "lerna run test",
     "start:react": "cd packages/react-app && yarn start",
     "start:electron": "cd packages/electron-app && yarn start",
-    "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\""
+    "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "packages/*/src/**/*.{ts,tsx}": ["eslint --fix", "git add"]
   },
   "devDependencies": {
     "@cryptape/sdk-ts-config": "0.0.1",
