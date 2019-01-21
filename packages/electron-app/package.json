@@ -19,8 +19,8 @@
     "neuron-react-app": "0.1.0"
   },
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "electron": "^4.0.1",
-    "typescript": "^3.2.2",
     "tslint": "^5.12.1"
   }
 }

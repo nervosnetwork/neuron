@@ -24,7 +24,9 @@
     "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\""
   },
   "devDependencies": {
+    "@cryptape/sdk-ts-config": "0.0.1",
     "concurrently": "^4.1.0",
+    "cz-conventional-changelog": "^2.1.0",
     "lerna": "^3.10.5",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
@@ -33,5 +35,11 @@
     "typescript": "^3.2.2",
     "typescript-tslint-plugin": "^0.2.1",
     "wait-on": "^3.2.0"
+  },
+  "dependencies": {},
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
