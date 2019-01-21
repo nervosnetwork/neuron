@@ -38,6 +38,8 @@
     "typescript": "3.2.2"
   },
   "devDependencies": {
+    "eslint-config-react-app": "^3.0.6",
+    "eslint-plugin-flowtype": "^3.2.1",
     "react-app-rewired": "^2.0.2"
   }
 }
