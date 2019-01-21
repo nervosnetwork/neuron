@@ -4,7 +4,8 @@ node_js:
   - '10.15'
 
 install:
-  - travis_retry make ci-install
+  - yarn install
+  - yarn lerna bootstrap
 
 script:
   - yarn test
