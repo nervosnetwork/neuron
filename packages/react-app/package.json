@@ -21,7 +21,7 @@
   "scripts": {
     "start": "BROWSER=none react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
+    "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "tslint -p ."
   },
