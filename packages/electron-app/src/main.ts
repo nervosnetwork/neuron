@@ -1,9 +1,15 @@
 // Modules to control application life and create native browser window
 import { app, BrowserWindow } from 'electron'
+import * as path from 'path'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: Electron.BrowserWindow | null
+const { NODE_ENV } = process.env
+const ENTRY = {
+  DEV: 'http://localhost:3000',
+  PROD: `file://${path.join(__dirname, '../pages/index.html')}`,
+}
 
 function createWindow() {
   // Create the browser window.
@@ -11,9 +17,13 @@ function createWindow() {
     width: 800,
     height: 600,
     icon: `${__dirname}/../AppIcon.icns`,
+    webPreferences: {
+      devTools: NODE_ENV === 'development',
+    },
   })
 
-  mainWindow.loadURL('http://localhost:3000')
+  mainWindow.loadURL(NODE_ENV === 'development' ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.webContents.openDevTools()
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

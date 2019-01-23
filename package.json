@@ -21,7 +21,9 @@
     "test": "lerna run test",
     "start:react": "cd packages/react-app && yarn start",
     "start:electron": "cd packages/electron-app && yarn start",
-    "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
+    "start": "NODE_ENV=development concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
+    "pack": "lerna run --scope neuron pack",
+    "dist": "lerna run --scope neuron dist",
     "precommit": "lint-staged"
   },
   "lint-staged": {
