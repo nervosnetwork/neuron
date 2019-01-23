@@ -11,6 +11,9 @@ module.exports = {
       "imports": "always-multiline",
       "exports": "always-multiline",
       "functions": "ignore"
+    }],
+    "import/no-extraneous-dependencies": [2, {
+      "devDependencies": true
     }]
   },
   "env": {
