@@ -20,9 +20,11 @@
     "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
     "test": "lerna run test",
-    "start:react": "cd packages/react-app && yarn start",
-    "start:electron": "cd packages/electron-app && yarn start",
-    "start": "concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
+    "start:react": "lerna run --scope=neuron-react-app start",
+    "start:electron": "lerna run --scope=neuron start",
+    "start": "cross-env NODE_ENV=development concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
+    "pack": "lerna run --scope neuron pack",
+    "dist": "lerna run --scope neuron dist",
     "precommit": "lint-staged"
   },
   "lint-staged": {
@@ -35,6 +37,7 @@
     "@cryptape/sdk-ts-config": "0.0.1",
     "@typescript-eslint/parser": "^1.0.0",
     "concurrently": "^4.1.0",
+    "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "5.6.0",
     "eslint-config-airbnb": "^17.1.0",

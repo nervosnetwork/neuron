@@ -7,6 +7,8 @@
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
   },
+  "homepage": "./",
+  "main": "./build",
   "license": "MIT",
   "scripts": {
     "start": "cross-env BROWSER=none react-app-rewired start",
