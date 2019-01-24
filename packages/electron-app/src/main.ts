@@ -23,10 +23,6 @@ function createWindow() {
   })
 
   mainWindow.loadURL(NODE_ENV === 'development' ? ENTRY.DEV : ENTRY.PROD)
-  mainWindow.webContents.openDevTools()
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
