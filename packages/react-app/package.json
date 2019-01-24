@@ -11,7 +11,7 @@
   "main": "./build",
   "license": "MIT",
   "scripts": {
-    "start": "BROWSER=none react-app-rewired start",
+    "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject",
