@@ -12,8 +12,8 @@ before_install:
   - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
-  - yarn install
-  - yarn lerna bootstrap
+  - travis_retry yarn install
+  - travis_retry yarn lerna bootstrap
 
 script:
   - yarn test
