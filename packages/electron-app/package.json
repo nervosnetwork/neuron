@@ -11,7 +11,7 @@
   "main": "./dist/main.js",
   "license": "MIT",
   "scripts": {
-    "cp:pages": "cp -r ../react-app/build ./pages",
+    "cp:pages": "rm -rf ./pages && cp -r ../react-app/build ./pages",
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "tslint -p .",
