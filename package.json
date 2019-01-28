@@ -17,6 +17,7 @@
     "packages/*"
   ],
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "start:react": "lerna run --scope=neuron-react-app start",
