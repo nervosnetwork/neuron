@@ -21,6 +21,7 @@
   },
   "build": {
     "appId": "nervos_dev",
+    "productName": "Neuron",
     "mac": {
       "category": "blockchain_wallet"
     },
