@@ -8,7 +8,6 @@
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
   },
-  "main": "./dist/main.js",
   "license": "MIT",
   "scripts": {
     "cp:pages": "rm -rf ./pages && cp -r ../react-app/build ./pages",
@@ -17,19 +16,8 @@
     "lint": "tslint -p .",
     "start": "yarn run build && electron .",
     "pack": "rm -rf 'dist/mac' && electron-builder --dir",
-    "dist": "rm -rf 'dist/mac' && electron-builder"
-  },
-  "build": {
-    "appId": "nervos_dev",
-    "productName": "Neuron",
-    "mac": {
-      "category": "blockchain_wallet"
-    },
-    "files": [
-      "./dist/**/*",
-      "./pages/**/*"
-    ],
-    "asar": false
+    "dist": "rm -rf 'dist/mac' && electron-builder",
+    "package-win": "electron-builder --win --x64  --project ../../ -c packages/electron-app/electron-builder.yml -c.extraMetadata.main=packages/electron-app/dist/main.js"
   },
   "dependencies": {},
   "devDependencies": {

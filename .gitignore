@@ -12,7 +12,7 @@ node_modules
 build
 dist
 pages
-/release
+release
 
 # misc
 .DS_Store

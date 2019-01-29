@@ -16,7 +16,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "main": "packages/electron-app/dist/main.js",
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
@@ -29,7 +28,7 @@
     "build:cp-pages": "lerna run --scope=neuron cp:pages",
 
     "build": "cross-env NODE_ENV=production concurrently \"yarn build:react\" \"yarn build:electron\"",
-    "package-win": "yarn build && electron-builder --win --x64",
+    "package-win": "yarn build && lerna run --scope=neuron package-win",
 
     "pack": "lerna run --scope=neuron pack",
     "dist": "lerna run --scope=neuron dist",
