@@ -1,5 +1,7 @@
 import React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
+import { Grid, Row, Col } from '@smooth-ui/core-sc'
+import Sidebar from './Sidebar'
 import logo from '../logo.svg'
 
 const AppHeader = styled.header`
@@ -13,31 +15,30 @@ const AppHeader = styled.header`
   color: black;
 `
 
-const appLogoSpin = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-`
-
 const AppLogo = styled.img.attrs({
   src: logo,
 })`
-  height: 40vmin;
-  animation: ${appLogoSpin} infinite 20s linear;
+  height: 20vmin;
+`
+
+const AppContainer = styled.div`
+  display: flex;
 `
 
 const App = () => (
-  <div>
-    <AppHeader>
-      <AppLogo />
-      <p>Neuron is running...</p>
-    </AppHeader>
-  </div>
+  <AppContainer>
+    <Sidebar />
+    <Grid fluid>
+      <Row>
+        <Col lg={12}>
+          <AppHeader>
+            <AppLogo />
+            <p>Neuron is running...</p>
+          </AppHeader>
+        </Col>
+      </Row>
+    </Grid>
+  </AppContainer>
 )
 
 export default App

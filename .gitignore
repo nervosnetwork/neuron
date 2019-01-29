@@ -27,3 +27,4 @@ yarn-error.log*
 # deps lock
 # yarn-lock.json
 package-lock.json
+lerna-debug.log
