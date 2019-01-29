@@ -1,0 +1,24 @@
+appId: com.nervos.neuron
+copyright: Nervos Foundation
+productName: Neuron
+
+asar: false
+
+directories:
+  buildResources: packages/electron-app
+  output: packages/electron-app/release
+
+files:
+  - packages/electron-app/package.json
+  - packages/react-app/build/
+  - packages/electron-app/dist/
+win:
+  target: nsis
+mac:
+  category: blockchain_wallet
+linux:
+  category: Development
+  target:
+    - "AppImage"
+    - "deb"
+    - "rpm"
