@@ -8,7 +8,7 @@ let mainWindow: Electron.BrowserWindow | null
 const { NODE_ENV } = process.env
 const ENTRY = {
   DEV: 'http://localhost:3000',
-  PROD: `file://${path.join(__dirname, '../pages/index.html')}`,
+  PROD: `file://${path.join(__dirname, '../../react-app/build/index.html')}`,
 }
 
 function createWindow() {
@@ -16,7 +16,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: `${__dirname}/../build/icon.icns`,
+    // icon: `${__dirname}/../build/icon.icns`,
     webPreferences: {
       devTools: NODE_ENV === 'development',
     },
