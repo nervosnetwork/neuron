@@ -29,6 +29,8 @@
 
     "build": "cross-env NODE_ENV=production concurrently \"yarn build:react\" \"yarn build:electron\"",
     "package-win": "yarn build && lerna run --scope=neuron package-win",
+    "package-mac": "yarn build && lerna run --scope=neuron package-mac",
+    "package-linux": "yarn build && lerna run --scope=neuron package-linux",
 
     "pack": "lerna run --scope=neuron pack",
     "dist": "lerna run --scope=neuron dist",

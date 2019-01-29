@@ -16,3 +16,9 @@ win:
   target: nsis
 mac:
   category: blockchain_wallet
+linux:
+  category: Development
+  target:
+    - "AppImage"
+    - "deb"
+    - "rpm"
