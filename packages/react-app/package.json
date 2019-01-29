@@ -30,6 +30,7 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "@bootstrap-styled/v4": "^2.0.17",
     "@types/jest": "23.3.12",
     "@types/node": "10.12.18",
     "@types/react": "16.7.18",

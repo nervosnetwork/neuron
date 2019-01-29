@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
-import logo from './logo.svg'
+import logo from '../logo.svg'
 
 const AppHeader = styled.header`
   background-color: white;
