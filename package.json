@@ -23,8 +23,18 @@
     "start:react": "lerna run --scope=neuron-react-app start",
     "start:electron": "lerna run --scope=neuron start",
     "start": "cross-env NODE_ENV=development concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
-    "pack": "lerna run --scope neuron pack",
-    "dist": "lerna run --scope neuron dist",
+    "build:react": "lerna run --scope=neuron-react-app build",
+    "build:electron": "lerna run --scope=neuron build",
+    "build:cp-pages": "lerna run --scope=neuron cp:pages",
+
+    "build": "cross-env NODE_ENV=production concurrently \"yarn build:react\" \"yarn build:electron\"",
+    "package-win": "yarn build && lerna run --scope=neuron package-win",
+    "package-mac": "yarn build && lerna run --scope=neuron package-mac",
+    "package-linux": "yarn build && lerna run --scope=neuron package-linux",
+
+    "pack": "lerna run --scope=neuron pack",
+    "dist": "lerna run --scope=neuron dist",
+    "build:clean": "rm -rf packages/react-app/build && rm -rf packages/electron-app/dist",
     "precommit": "lint-staged"
   },
   "lint-staged": {
