@@ -29,3 +29,6 @@ yarn-error.log*
 # yarn-lock.json
 package-lock.json
 lerna-debug.log
+
+#docs
+docs
