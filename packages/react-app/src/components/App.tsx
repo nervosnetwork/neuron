@@ -1,43 +1,27 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Grid, Row, Col } from '@smooth-ui/core-sc'
 import Sidebar from './Sidebar'
-import logo from '../logo.svg'
-
-const AppHeader = styled.header`
-  background-color: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: black;
-`
-
-const AppLogo = styled.img.attrs({
-  src: logo,
-})`
-  height: 20vmin;
-`
+import Header from './Header'
 
 const AppContainer = styled.div`
   display: flex;
+  height: 100%;
+`
+
+const MainContainer = styled.div`
+  flex: 1;
+  padding: 20px 40px;
 `
 
 const App = () => (
   <AppContainer>
     <Sidebar />
-    <Grid fluid>
-      <Row>
-        <Col lg={12}>
-          <AppHeader>
-            <AppLogo />
-            <p>Neuron is running...</p>
-          </AppHeader>
-        </Col>
-      </Row>
-    </Grid>
+    <MainContainer>
+      <Header />
+      <div>
+        <p>Main Content goes here</p>
+      </div>
+    </MainContainer>
   </AppContainer>
 )
 
