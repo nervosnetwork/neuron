@@ -1,14 +1,13 @@
-import { } from "@smooth-ui/core-sc";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import NetworkStatusContent from './Content';
-import NetworkStatusModel from './Model';
+import { NetworkStatus, NetworkStatusModel } from './Model';
 
 const Status = styled.div`
     width: 8px;
     height: 8px;
-    background: ${(props: {status: boolean}) => props.status ? 'green' : 'red'};
+    background: ${(props: {status: NetworkStatus}) => props.status == NetworkStatus.connectionSucceeded ? 'green' : 'red'};
     border-radius: 50%;
     vertical-align: middle;
     transform: translate(-6px, 6px);
@@ -18,7 +17,7 @@ const FlexDiv = styled.div`
     display: flex;
 `;
 
-class NetworkStatus extends React.Component {
+class NetworkStatusHeader extends React.Component {
     updateInterval?: NodeJS.Timeout = undefined;
     state: NetworkStatusModel
 
@@ -26,7 +25,7 @@ class NetworkStatus extends React.Component {
         super(props);
         this.state = {
             node: "127.0.0.1:8114",
-            status: false,
+            status: NetworkStatus.unknown,
             date: ""
         };
     }
@@ -56,7 +55,7 @@ class NetworkStatus extends React.Component {
         // getTipBlockNumber
         this.setState({
             tipBlockNumbe: this.state.tipBlockNumbe! + Math.floor(Math.random()*3),
-            status: false,
+            status: NetworkStatus.unknown,
             date: Date()
         });
         this.updateContent()
@@ -87,4 +86,4 @@ class NetworkStatus extends React.Component {
     }
 }
 
-export default NetworkStatus;
+export default NetworkStatusHeader;

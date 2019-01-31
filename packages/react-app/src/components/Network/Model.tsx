@@ -1,8 +1,12 @@
-interface NetworkStatusModel {
-  node: string
-  tipBlockNumbe?: number
-  status: boolean
-  date: string
+export enum NetworkStatus {
+  unknown = 'unknown',
+  connectionSucceeded = 'Connection succeeded',
+  connectionfailed = 'Connection failed',
 }
 
-export default NetworkStatusModel
+export interface NetworkStatusModel {
+  node: string
+  tipBlockNumbe?: number
+  status: NetworkStatus
+  date: string
+}
