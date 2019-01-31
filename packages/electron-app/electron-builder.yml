@@ -12,12 +12,18 @@ files:
   - packages/electron-app/package.json
   - packages/react-app/build/
   - packages/electron-app/dist/
+
 win:
   target: nsis
+  icon: packages/electron-app/assets/images/icon.ico
+
 mac:
   category: blockchain_wallet
+  icon: packages/electron-app/assets/images/icon.icns
+
 linux:
   category: Development
+  icon: packages/electron-app/assets/images/icon.ico
   target:
     - "AppImage"
     - "deb"

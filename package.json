@@ -32,8 +32,6 @@
     "package-mac": "yarn build && lerna run --scope=neuron package-mac",
     "package-linux": "yarn build && lerna run --scope=neuron package-linux",
 
-    "pack": "lerna run --scope=neuron pack",
-    "dist": "lerna run --scope=neuron dist",
     "build:clean": "rm -rf packages/react-app/build && rm -rf packages/electron-app/dist",
     "precommit": "lint-staged"
   },
