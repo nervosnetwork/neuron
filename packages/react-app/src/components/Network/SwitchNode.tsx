@@ -97,7 +97,7 @@ class SwitchNode extends React.Component<SwitchNodeProps> {
   }
 }
 
-function IsURL(str_url: string) {
+function ssURL(strUrl: string) {
   const strRegex = '^((https|http|ftp|rtsp|mms)?://)'
   '?(([0-9a-z_!~*().&=+$%-]+: )?[0-9a-z_!~*().&=+$%-]+@)?' +
     '(([0-9]{1,3}.){3}[0-9]{1,3}' +
