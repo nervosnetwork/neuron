@@ -18,7 +18,7 @@ const App = () => (
     <Sidebar />
     <MainContainer>
       <Header />
-      <div>
+      <div id="MainContent">
         <p>Main Content goes here</p>
       </div>
     </MainContainer>

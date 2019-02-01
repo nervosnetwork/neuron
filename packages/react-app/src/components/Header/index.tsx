@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import NetworkStatusHeader from '../Network'
 
 const AppHeader = styled.div`
   display: flex;
@@ -11,7 +12,7 @@ const AppHeader = styled.div`
 const Header = () => (
   <AppHeader>
     <div>Header goes here</div>
-    <div>* Network status</div>
+    <NetworkStatusHeader />
     <div>Misc</div>
   </AppHeader>
 )
