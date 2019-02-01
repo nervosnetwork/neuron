@@ -1,7 +1,7 @@
 export enum NetworkStatus {
   unknown = 'unknown',
   connectionSucceeded = 'Connection succeeded',
-  connectionfailed = 'Connection failed',
+  connectionFailed = 'Connection failed',
 }
 
 export interface NetworkStatusModel {
