@@ -1,7 +1,12 @@
 import { createContext } from 'react'
 
-const electron = (window as any).require('electron')
-const { ipcRenderer } = electron
+declare global {
+  interface Window {
+    require: any
+  }
+}
+
+const { ipcRenderer } = window.require('electron')
 
 const ipc = {
   getLiveCell: (outpoint: any) => ipcRenderer.send('getLiveCell', outpoint),
