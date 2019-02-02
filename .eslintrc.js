@@ -24,7 +24,8 @@ module.exports = {
     }],
     "import/no-extraneous-dependencies": [2, {
       "devDependencies": true
-    }]
+    }],
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
   "env": {
     "jest": true,
