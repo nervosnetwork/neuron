@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import * as path from 'path'
-// import { getCells } from './service'
+
+import { MSG } from './utils/const'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -10,14 +11,6 @@ const ENTRY = {
   DEV: 'http://localhost:3000',
   PROD: `file://${path.join(__dirname, '../../react-app/build/index.html')}`,
 }
-
-/* eslint-disable no-unused-vars */
-enum MSG {
-  SEND_CAPACITY = 'sendCapacity',
-  GET_LIVE_CELL = 'getLiveCell',
-  GET_CELLS_BY_TYPE_HASH = 'getCellsByTypeHash',
-}
-/* eslint-enable no-unused-vars */
 
 ipcMain.on(MSG.SEND_CAPACITY, (e: Electron.Event, ...args: string[]) => {
   e.sender.send(MSG.SEND_CAPACITY, args)
