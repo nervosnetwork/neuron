@@ -1,9 +1,7 @@
 module.exports = {
   "extends": [
-     "plugin:import/errors",
-     "plugin:import/warnings",
-     "prettier"
-    ],
+     "airbnb"
+   ],
   "parser": "@typescript-eslint/parser",
   "plugins": [
      "prettier",
