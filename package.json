@@ -57,12 +57,7 @@
     "lerna": "^3.10.5",
     "lint-staged": "^8.1.0",
     "prettier": "^1.16.0",
-    "tslint": "^5.12.1",
-    "tslint-config-prettier": "^1.17.0",
-    "tslint-microsoft-contrib": "^6.0.0",
-    "tslint-react": "^3.6.0",
     "typescript": "^3.2.2",
-    "typescript-tslint-plugin": "^0.2.1",
     "wait-on": "^3.2.0"
   },
   "dependencies": {},

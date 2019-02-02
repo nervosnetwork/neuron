@@ -13,10 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
-    "plugins": [{
-      "name": "typescript-tslint-plugin"
-    }],
+    "jsx": "preserve"
   },
   "include": [
     "src"

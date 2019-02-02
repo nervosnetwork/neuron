@@ -15,7 +15,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject",
-    "lint": "tslint -p ."
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
