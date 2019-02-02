@@ -6,7 +6,19 @@ declare global {
   }
 }
 
-const { ipcRenderer } = window.require('electron')
+const ipcRenderer = (() => {
+  if (window.require) {
+    return window.require('electron').ipcRenderer
+  }
+  return {
+    send: (channel: string, msg: any) => {
+      console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
+    },
+    on: (channel: string, cb: Function) => {
+      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not laoded`)
+    },
+  }
+})()
 
 const ipc = {
   getLiveCell: (outpoint: any) => ipcRenderer.send('getLiveCell', outpoint),
