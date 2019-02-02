@@ -3,7 +3,9 @@ module.exports = {
   "parser": "@typescript-eslint/parser",
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": ["error", {
+      "printWidth": 120
+    }],
     "semi": [2, "never"],
     "comma-dangle": [2, {
       "arrays": "always-multiline",
