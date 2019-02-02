@@ -23,6 +23,13 @@ module.exports = {
       "devDependencies": true
     }]
   },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true
+    }
+  },
   "env": {
     "jest": true,
     "browser": true,

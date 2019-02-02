@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { NetworkStatusModel } from './Model'
-import { Button, Box, Grommet, TextInput, Text, Grid } from "grommet";
+import { Button, Box, Grommet, TextInput, Text, Grid } from 'grommet'
 
 const NetworkStatusContainer = styled.div`
   padding: 20px 0px;
@@ -25,19 +25,19 @@ interface NetworkStatusContentState {
 const Theme = {
   button: {
     border: {
-      radius: "6px",
-      color: "#4cbc8e"
+      radius: '6px',
+      color: '#4cbc8e',
     },
     primary: {
-      color: "#4cbc8e"
+      color: '#4cbc8e',
     },
-    color: "#ffffff"
-  }
+    color: '#ffffff',
+  },
 }
 
 class NetworkStatusContent extends React.Component<NetworkStatusContentProps> {
   state: NetworkStatusContentState = {
-    style: Style.normal
+    style: Style.normal,
   }
   nodeInputRef = React.createRef()
 
@@ -76,7 +76,7 @@ class NetworkStatusContent extends React.Component<NetworkStatusContentProps> {
             ? <Button label="Switch node" primary onClick={this.onClickSwitchNode.bind(this)} />
             : <Grid fill="horizontal" gap="small" columns={{
               count: 2,
-              size: "xsmall"
+              size: 'xsmall',
             }}>
               <Button label="Save" onClick={this.onClickSave.bind(this)} primary />
               <Button label="Cancel" color="dark-5" onClick={this.onClickCancel.bind(this)} primary />
@@ -89,14 +89,14 @@ class NetworkStatusContent extends React.Component<NetworkStatusContentProps> {
 
   onClickSwitchNode() {
     this.setState({
-      style: Style.edit
-    });
+      style: Style.edit,
+    })
   }
 
   onClickCancel() {
     this.setState({
       style: Style.normal,
-      inputErrorMessage: undefined
+      inputErrorMessage: undefined,
     })
   }
 
@@ -108,7 +108,7 @@ class NetworkStatusContent extends React.Component<NetworkStatusContentProps> {
       this.onClickCancel()
     } else {
       this.setState({
-        inputErrorMessage: "Please enter a valid node address."
+        inputErrorMessage: 'Please enter a valid node address.',
       })
     }
   }
