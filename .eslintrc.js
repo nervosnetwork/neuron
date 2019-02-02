@@ -13,6 +13,7 @@ module.exports = {
      "react"
   ],
   "rules": {
+    "quotes": ["error", "single"],
     "semi": [2, "never"],
     "comma-dangle": [2, {
       "arrays": "always-multiline",
