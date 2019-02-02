@@ -23,6 +23,11 @@ insert_final_newline = ignore
 indent_size = 2
 max_line_length = 80
 
+# The TypeScript file
+[*.{ts,tsx}]
+indent_size = 2
+trim_trailing_whitespace = true
+
 # Minified JavaScript files shouldn't be changed
 [**.min.js]
 indent_style = ignore
