@@ -1,89 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import styled from 'styled-components';
-import NetworkStatusContent from './Content';
-import { NetworkStatus, NetworkStatusModel } from './Model';
+import React, { useContext } from 'react'
+import styled from 'styled-components'
+import { NETWORK_STATUS } from '../../utils/const'
+import chainCtx from '../../contexts/chain'
 
 const Status = styled.div`
-    width: 8px;
-    height: 8px;
-    background: ${(props: {status: NetworkStatus}) => props.status == NetworkStatus.connectionSucceeded ? 'green' : 'red'};
-    border-radius: 50%;
-    vertical-align: middle;
-    transform: translate(-6px, 6px);
-`;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+  transform: translate(-6px, 6px);
+  background: currentColor;
+`
 
 const FlexDiv = styled.div`
-    display: flex;
-`;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  height: 30px;
+`
 
-class NetworkStatusHeader extends React.Component {
-    updateInterval?: NodeJS.Timeout = undefined;
-    state: NetworkStatusModel
-
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            node: "127.0.0.1:8114",
-            status: NetworkStatus.unknown,
-            date: ""
-        };
-    }
-
-    componentDidMount() {
-        this.updateInterval = setInterval(() => this.update(), 1000);
-    }
-
-    componentWillUnmount() {
-        if (this.updateInterval != undefined) {
-            clearInterval(this.updateInterval!);
-        }
-    }
-
-    public render() {
-        return (
-            <FlexDiv>
-                <Status status={this.state.status}/>
-                <div onClick={() => this.displayContent()}>
-                    Network status
-                </div>
-            </FlexDiv>
-        );
-    }
-
-    update() {
-        // getTipBlockNumber
-        this.setState({
-            tipBlockNumbe: this.state.tipBlockNumbe! + Math.floor(Math.random()*3),
-            status: NetworkStatus.unknown,
-            date: Date()
-        });
-        this.updateContent()
-    }
-
-    displayContent() {
-        ReactDOM.render(this.getContentElement(), document.getElementById('MainContent'))
-    }
-
-    updateContent() {
-        if (document.getElementById("NetworkStatusContent") != null) {
-            ReactDOM.render(this.getContentElement(), document.getElementById('MainContent'));
-        }
-    }
-
-    getContentElement() {
-        return <NetworkStatusContent 
-            model={this.state} 
-            didUpdateNodeUrl={this.didUpdateNodeUrl.bind(this)}
-        />
-    }
-
-    didUpdateNodeUrl(nodeUrl: string) {
-        this.setState({
-            node: nodeUrl
-        })
-        this.updateContent()
-    }
+const NetworkStatusHeader = () => {
+  const chain = useContext(chainCtx)
+  return (
+    <FlexDiv>
+      <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
+      <div>Network status</div>
+      <h3>Node: </h3>
+      <span>{chain.network.ip || 'Not Connected'}</span>
+      <h3>Status: </h3>
+      <span>{chain.network.status}</span>
+    </FlexDiv>
+  )
 }
 
-export default NetworkStatusHeader;
+export default NetworkStatusHeader

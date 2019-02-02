@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Transfer from './Transfer'
+import Cells from './Cells'
 
 const AppContainer = styled.div`
   display: flex;
@@ -21,6 +22,7 @@ const App = () => (
       <Header />
       <div id="MainContent">
         <Transfer />
+        <Cells />
         <p>Main Content goes here</p>
       </div>
     </MainContainer>

@@ -1621,19 +1621,19 @@
   resolved "https://registry.npmjs.org/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
   integrity sha512-42zEJkBpNfMEAvWR5WlwtTH22oDzcMjFsL9gDGExwF8X8WvAiw7Vwop7hPw03QT8TKfec83LwbHj6SvpqM4ELQ==
 
-"@typescript-eslint/parser@^1.0.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-1.1.0.tgz#cce0e0951e6543d6ab7ef87a3e020335bf8c5999"
-  integrity sha512-Cs8ZPIcJBFmwSTXS+Qk7wiOC2i2jmj8Nuutk3/l7kqzYeQwDKYo4n0XHpodvUOqFnEcQt+SVfdUg90BfjuQdbg==
+"@typescript-eslint/parser@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-1.2.0.tgz#256de163b7cb0d79d0388266a5bfb5585bccb1ff"
+  integrity sha512-IXXiXgs6ocKTmtbzJjGyUvRHZFLuk2mYXyk+ayEql1woh1+rYS/Uct8b4jGtfHG8ZRUBZ12zjzsrDKFYC2pbrQ==
   dependencies:
-    "@typescript-eslint/typescript-estree" "1.1.0"
+    "@typescript-eslint/typescript-estree" "1.2.0"
     eslint-scope "^4.0.0"
     eslint-visitor-keys "^1.0.0"
 
-"@typescript-eslint/typescript-estree@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-1.1.0.tgz#31f19e7197814cb3e609f2822ad6003b6e326470"
-  integrity sha512-eABnKqJVv0Mm5uYon8Xw61SXldvOhWKDQdoZqsJ/YqEa9XvWV1URXdRvTOW8GLsKo4X3Un7pHKqKZhfbbUEGww==
+"@typescript-eslint/typescript-estree@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-1.2.0.tgz#d9043a407d5e0f07db2b4a80d86852f7826c34f0"
+  integrity sha512-YGh4egbiCfUObvi6fnQNzJAMmScMGCjG5cRHaapW7GpwujWYQymLlids88imnhcTbOx8Mlz1OXFIuxyPBXK6Ig==
   dependencies:
     lodash.unescape "4.0.1"
     semver "5.5.0"
@@ -4583,6 +4583,15 @@ electron@*, electron@^4.0.1:
   version "4.0.2"
   resolved "https://registry.npmjs.org/electron/-/electron-4.0.2.tgz#b5e074c149841490825d0785aa2bc4f5e29bbea4"
   integrity sha512-H0pmSvOVuC+Mq/+cYNXbCDBmqq5d1xYUVdBOjqGJuwuwJeP7qDHF35JA3cq+ARzq/CbwlXq98zdW6i6+x3U24g==
+  dependencies:
+    "@types/node" "^10.12.18"
+    electron-download "^4.1.0"
+    extract-zip "^1.0.3"
+
+electron@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-4.0.3.tgz#0d45a4bcfb63b3e39daf44aeb599b89e95d2a055"
+  integrity sha512-wOBYnlv3Xgbwh9DAHBktP3sQcbCBuXMQi1NzPH3EMnbdYNqj+FnTzVLq0RYp0uSzdjR3fhAZ/E6wFSMLaAc5iw==
   dependencies:
     "@types/node" "^10.12.18"
     electron-download "^4.1.0"

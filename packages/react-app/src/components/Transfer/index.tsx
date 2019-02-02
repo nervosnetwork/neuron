@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import styled from 'styled-components'
+import ipcCtx from '../../contexts/ipc'
 
 const TransferPanel = styled.div`
   display: flex;
@@ -7,8 +8,9 @@ const TransferPanel = styled.div`
 `
 
 const Transfer: React.SFC = () => {
+  const ipc = useContext(ipcCtx)
   const [addr, setAddr] = useState('')
-  const [amount, setAmount] = useState('')
+  const [capacity, setCapacity] = useState('')
   return (
     <TransferPanel>
       <input
@@ -20,12 +22,14 @@ const Transfer: React.SFC = () => {
       />
       <input
         type="number"
-        value={amount}
+        value={capacity}
         onChange={({ target: { value } }) => {
-          setAmount(`${value}`)
+          setCapacity(`${value}`)
         }}
       />
-      <button type="submit">Submit</button>
+      <button type="submit" onClick={() => ipc.sendCapacity(addr, capacity)}>
+        Submit
+      </button>
     </TransferPanel>
   )
 }
