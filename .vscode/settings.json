@@ -1,0 +1,12 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "directory": "packages/electron-app",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "packages/react-app",
+      "changeProcessCWD": true
+    }
+  ]
+}
