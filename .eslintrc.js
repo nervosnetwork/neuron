@@ -1,14 +1,11 @@
 module.exports = {
   "extends": [
-     "plugin:@typescript-eslint/recommended",
      "plugin:import/errors",
      "plugin:import/warnings",
-     "prettier",
-     "prettier/@typescript-eslint"
+     "prettier"
     ],
   "parser": "@typescript-eslint/parser",
   "plugins": [
-     "@typescript-eslint",
      "prettier",
      "react"
   ],
@@ -24,11 +21,7 @@ module.exports = {
     }],
     "import/no-extraneous-dependencies": [2, {
       "devDependencies": true
-    }],
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-member-accessibility": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-use-before-define": "off"
+    }]
   },
   "env": {
     "jest": true,
