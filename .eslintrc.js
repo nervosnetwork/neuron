@@ -1,9 +1,18 @@
 module.exports = {
-  "extends": "airbnb",
+  "extends": [
+     "plugin:@typescript-eslint/recommended",
+     "plugin:import/errors",
+     "plugin:import/warnings",
+     "prettier",
+     "prettier/@typescript-eslint"
+    ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["prettier"],
+  "plugins": [
+     "@typescript-eslint",
+     "prettier",
+     "react"
+  ],
   "rules": {
-    "prettier/prettier": "error",
     "semi": [2, "never"],
     "comma-dangle": [2, {
       "arrays": "always-multiline",

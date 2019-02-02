@@ -1,6 +1,9 @@
 module.exports = {
   "extends": [
-    "../../.eslintrc.js"
+    "../../.eslintrc.js",
+    "plugin:react/recommended",
+    "plugin:import/react",
+    "prettier/react"
   ],
   "settings": {
     "react": {
