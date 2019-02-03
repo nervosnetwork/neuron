@@ -41,5 +41,5 @@ ipcRenderer.on('sendCapacity', (_: any, args: any) => {
   console.log(args)
 })
 
-const ipcCtx = createContext(ipc)
-export default ipcCtx
+const IPCContext = createContext(ipc)
+export default IPCContext

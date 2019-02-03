@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import styled from 'styled-components'
-import ipcCtx from '../../contexts/ipc'
+import IPCContext from '../../contexts/ipc'
 
 const TransferPanel = styled.div`
   display: flex;
@@ -8,7 +8,7 @@ const TransferPanel = styled.div`
 `
 
 const Transfer: React.SFC = () => {
-  const ipc = useContext(ipcCtx)
+  const ipc = useContext(IPCContext)
   const [addr, setAddr] = useState('')
   const [capacity, setCapacity] = useState('')
   return (

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { NETWORK_STATUS } from '../../utils/const'
-import chainCtx from '../../contexts/chain'
+import ChainContext from '../../contexts/chain'
 
 const Status = styled.div`
   width: 8px;
@@ -21,7 +21,7 @@ const FlexDiv = styled.div`
 `
 
 const NetworkStatusHeader = () => {
-  const chain = useContext(chainCtx)
+  const chain = useContext(ChainContext)
   return (
     <FlexDiv>
       <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
