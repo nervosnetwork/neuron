@@ -36,6 +36,7 @@
     "@types/react-dom": "16.0.11",
     "@types/styled-components": "^4.1.6",
     "cross-env": "^5.2.0",
+    "electron": "^4.0.3",
     "grommet": "^2.3.1",
     "node-sass": "^4.11.0",
     "react": "^16.8.0-alpha.0",
