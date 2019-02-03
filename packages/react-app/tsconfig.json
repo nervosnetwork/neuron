@@ -14,9 +14,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "plugins": [{
-      "name": "typescript-tslint-plugin"
-    }],
     "typeRoots": ["./types", "node_modules"]
   },
   "include": [
