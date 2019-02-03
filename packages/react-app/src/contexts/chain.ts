@@ -9,5 +9,5 @@ const chain = {
   },
 }
 
-const chainCtx = createContext(chain)
-export default chainCtx
+const ChainContext = createContext(chain)
+export default ChainContext

@@ -21,7 +21,6 @@ ipcMain.on(MSG.GET_LIVE_CELL, (e: Electron.Event, ...args: string[]) => {
 })
 
 ipcMain.on(MSG.GET_CELLS_BY_TYPE_HASH, (e: Electron.Event, ...args: string[]) => {
-  console.log('here')
   setTimeout(() => {
     e.sender.send(MSG.GET_CELLS_BY_TYPE_HASH, args)
   }, 1000)
