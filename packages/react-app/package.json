@@ -13,7 +13,7 @@
   "scripts": {
     "start": "cross-env BROWSER=none react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test --env=jsdom --watchAll=false",
+    "test": "react-app-rewired test --env=jsdom --color",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
   },
