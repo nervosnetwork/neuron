@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import withProviders from './Providers'
+import Notification from './Notification'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Transfer from './Transfer'
@@ -19,6 +21,7 @@ const App = () => (
   <AppContainer>
     <Sidebar />
     <MainContainer>
+      <Notification />
       <Header />
       <div id="MainContent">
         <Transfer />
@@ -29,4 +32,4 @@ const App = () => (
   </AppContainer>
 )
 
-export default App
+export default withProviders(App)

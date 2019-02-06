@@ -1,10 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
-import IPCContext from '../../contexts/ipc'
 import ChainContext from '../../contexts/chain'
+import ipc from '../../utils/ipc'
 
 const Cells = () => {
   const [typeHash] = useState('')
-  const ipc = useContext(IPCContext)
   const chain = useContext(ChainContext)
   useEffect(() => {
     ipc.getCellsByTypeHash(typeHash)

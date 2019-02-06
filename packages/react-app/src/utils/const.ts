@@ -3,6 +3,7 @@ export enum NETWORK_STATUS {
   OFFLINE = 'offline',
 }
 
-export default {
-  NETWORK_STATUS,
+export enum IPC_CHANNEL {
+  SEND_CAPACITY = 'sendCapacity',
+  GET_CELLS_BY_TYPE_HASH = 'getCellsByTypeHash',
 }
