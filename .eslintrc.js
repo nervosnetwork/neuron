@@ -22,6 +22,9 @@ module.exports = {
       "vars": "local",
       "args": "after-used",
       "ignoreRestSiblings": false
+    }],
+    "max-len": [2, {
+      "code": 120
     }]
   },
   "env": {
