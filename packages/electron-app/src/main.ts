@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 
-import { MSG } from './utils/const'
+import listenToChannel from './IPCChannel'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -12,20 +12,7 @@ const ENTRY = {
   PROD: `file://${path.join(__dirname, '../../react-app/build/index.html')}`,
 }
 
-ipcMain.on(MSG.SEND_CAPACITY, (e: Electron.Event, ...args: string[]) => {
-  e.sender.send(MSG.SEND_CAPACITY, args)
-})
-
-ipcMain.on(MSG.GET_LIVE_CELL, (e: Electron.Event, ...args: string[]) => {
-  e.sender.send(MSG.GET_LIVE_CELL, args)
-})
-
-ipcMain.on(MSG.GET_CELLS_BY_TYPE_HASH, (e: Electron.Event, ...args: string[]) => {
-  setTimeout(() => {
-    e.sender.send(MSG.GET_CELLS_BY_TYPE_HASH, args)
-  }, 1000)
-})
-
+listenToChannel()
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -49,7 +36,3 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-export default {
-  MSG,
-}
