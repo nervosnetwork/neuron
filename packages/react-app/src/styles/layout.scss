@@ -1,0 +1,23 @@
+body {
+  display: grid;
+  grid-template:
+    'header header header'40px 'sidebar mainContainer mainContainer'1fr 'sidebar mainContainer mainContainer'1fr 'sidebar mainContainer mainContainer'1fr / 240px 1fr 1fr;
+
+  height: 100vh;
+}
+
+header {
+  grid-area: header;
+}
+
+aside {
+  grid-area: sidebar;
+}
+
+.mainContainer {
+  grid-area: mainContainer;
+}
+
+.notification {
+  grid-area: 4/3/5/4;
+}
