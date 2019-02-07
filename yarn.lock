@@ -1646,7 +1646,7 @@
   resolved "https://registry.npmjs.org/@types/tapable/-/tapable-1.0.2.tgz#e13182e1b69871a422d7863e11a4a6f5b814a4bd"
   integrity sha512-42zEJkBpNfMEAvWR5WlwtTH22oDzcMjFsL9gDGExwF8X8WvAiw7Vwop7hPw03QT8TKfec83LwbHj6SvpqM4ELQ==
 
-"@typescript-eslint/eslint-plugin@^1.2.1":
+"@typescript-eslint/eslint-plugin@1.2.1-alpha.22":
   version "1.2.1-alpha.22"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-1.2.1-alpha.22.tgz#4fd74fc86330969b1afd63c60cf1908d74fbf54c"
   integrity sha512-MAo/asYlfxgGndjlTaggwBOoDbv7HYhJvA/8WN9BVmzLaNrbNVtoGpuq01TPGczfHw6n1fBTdNb+i+cRpvLqEg==
@@ -1655,7 +1655,7 @@
     requireindex "^1.2.0"
     tsutils "^3.7.0"
 
-"@typescript-eslint/parser@1.2.1-alpha.22+fc50167", "@typescript-eslint/parser@^1.2.1":
+"@typescript-eslint/parser@1.2.1-alpha.22", "@typescript-eslint/parser@1.2.1-alpha.22+fc50167":
   version "1.2.1-alpha.22"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-1.2.1-alpha.22.tgz#7a59222e7822dc17eb546694e56879d96ae07243"
   integrity sha512-iqikS7OHAo9V/qWusg+FWUM6FPDFQD37Ii0Fg+5yj7RD3mBse0laoMnTI+7LOSqzOi6na54/qkB8fyMoITE2HA==
