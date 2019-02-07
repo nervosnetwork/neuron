@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react'
-import ChainContext from '../../contexts/chain'
+import ChainContext, { ICell } from '../../contexts/chain'
 import ipc from '../../utils/ipc'
+
+const headers = ['outPoint', 'reference', 'args', 'signedArgs', 'version']
 
 const Cells = () => {
   const [typeHash] = useState('')
@@ -11,16 +13,24 @@ const Cells = () => {
   return (
     <div>
       Cells
-      {chain.cells.map(cell => (
-        <button
-          key={cell}
-          onClick={() => ipc.getLiveCell({ hash: '1', index: 1 })}
-          onKeyDown={() => ipc.getLiveCell({ hash: '1', index: 1 })}
-          type="button"
-        >
-          {cell}
-        </button>
-      ))}
+      <table>
+        <thead>
+          <tr>
+            {headers.map(header => (
+              <th key={header}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {chain.cells.map(cell => (
+            <tr key={JSON.stringify(cell.outPoint)}>
+              {headers.map(header => (
+                <td key={header}>{JSON.stringify(cell[header as keyof ICell])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

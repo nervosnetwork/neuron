@@ -4,7 +4,7 @@ interface IWallet {
   msg: string
 }
 
-export const initWallet = {
+export const initWallet: IWallet = {
   msg: '',
 }
 

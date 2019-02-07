@@ -1,15 +1,32 @@
 import { createContext } from 'react'
 import { NETWORK_STATUS } from '../utils/const'
 
-interface IChain {
-  cells: any[]
+export interface ICell {
+  capacity: number
+  data: Uint8Array
+  lock: string
+  type?: {
+    version: number
+    args: Uint8Array[]
+    signedArgs: Uint8Array[]
+    reference: string
+    binary: Uint8Array
+  }
+  outPoint: {
+    hash: string
+    index: number
+  }
+}
+
+export interface IChain {
+  cells: ICell[]
   network: {
     ip: string
     status: NETWORK_STATUS
   }
 }
 
-const initChain = {
+export const initChain: IChain = {
   cells: [],
   network: {
     ip: '',
