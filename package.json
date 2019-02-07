@@ -19,7 +19,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
-    "test": "lerna run test",
+    "test": "lerna run --parallel test",
     "start:react": "lerna run --scope=neuron-react-app start",
     "start:electron": "lerna run --scope=neuron start",
     "start": "cross-env NODE_ENV=development concurrently \"yarn run start:react\" \"wait-on http://localhost:3000 && yarn run start:electron\"",
