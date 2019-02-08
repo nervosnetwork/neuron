@@ -1,11 +1,11 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import NetworkStatusHeader from '../Network'
 
 const AppHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  height: 40px;
+  width: 100%;
+  background: #ccc;
   border-bottom: solid 1px #ccc;
 `
 
@@ -16,5 +16,6 @@ const Header = () => (
     <div>Misc</div>
   </AppHeader>
 )
+const Container = () => createPortal(<Header />, document.querySelector('header') as HTMLElement)
 
-export default Header
+export default Container

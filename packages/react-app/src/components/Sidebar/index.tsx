@@ -1,11 +1,13 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 
-const SidebarAside = styled.aside`
-  flex: 0 0 240px;
-  padding: 20px;
-  width: 240px;
+const SidebarAside = styled.div`
   background-color: #4cbc8e;
+  height: 100%;
+  h2 {
+    margin: 0;
+  }
 `
 
 const Sidebar = () => (
@@ -14,4 +16,6 @@ const Sidebar = () => (
   </SidebarAside>
 )
 
-export default Sidebar
+const Container = () => createPortal(<Sidebar />, document.querySelector('aside') as HTMLElement)
+
+export default Container
