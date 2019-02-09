@@ -1,0 +1,30 @@
+appId: com.nervos.neuron
+copyright: Nervos Foundation
+productName: Neuron
+
+asar: false
+
+directories:
+  buildResources: packages/neuron-wallet
+  output: packages/neuron-wallet/release
+
+files:
+  - packages/neuron-wallet/package.json
+  - packages/neuron-ui/build/
+  - packages/neuron-wallet/dist/
+
+win:
+  target: nsis
+  icon: packages/neuron-wallet/assets/images/icon.ico
+
+mac:
+  category: blockchain_wallet
+  icon: packages/neuron-wallet/assets/images/icon.icns
+
+linux:
+  category: Development
+  icon: packages/neuron-wallet/assets/images/icon.ico
+  target:
+    - "AppImage"
+    - "deb"
+    - "rpm"

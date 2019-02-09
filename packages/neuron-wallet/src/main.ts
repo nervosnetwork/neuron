@@ -9,7 +9,7 @@ const { NODE_ENV } = process.env
 
 const ENTRY = {
   DEV: 'http://localhost:3000',
-  PROD: `file://${path.join(__dirname, '../../react-app/build/index.html')}`,
+  PROD: `file://${path.join(__dirname, '../../neuron-ui/build/index.html')}`,
 }
 
 listenToChannel()
