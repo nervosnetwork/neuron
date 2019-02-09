@@ -25,7 +25,9 @@ module.exports = {
     }],
     "max-len": [2, {
       "code": 120
-    }]
+    }],
+    "operator-linebreak": [2, "after"],
+    "arrow-parens": [2, "as-needed"]
   },
   "env": {
     "jest": true,
