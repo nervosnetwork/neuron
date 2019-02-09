@@ -1,11 +1,11 @@
 {
   "eslint.workingDirectories": [
     {
-      "directory": "packages/electron-app",
+      "directory": "packages/neuron-wallet",
       "changeProcessCWD": true
     },
     {
-      "directory": "packages/react-app",
+      "directory": "packages/neuron-ui",
       "changeProcessCWD": true
     }
   ],

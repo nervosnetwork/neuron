@@ -1,5 +1,5 @@
 {
-  "name": "neuron",
+  "name": "@nervosnetwork/neuron-wallet",
   "description": "CKB Neuron Wallet",
   "version": "0.1.0",
   "private": true,
@@ -11,16 +11,13 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "cp:pages": "rm -rf ./pages && cp -r ../react-app/build ./pages",
     "build": "tsc",
     "watch": "concurrently \"tsc -w\" \"nodemon ./dist/main.js --exec ./node_modules/.bin/electron .\"",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "start": "yarn run build && electron .",
-    "package-win": "electron-builder --win --x64  --project ../../ -c packages/electron-app/electron-builder.yml -c.extraMetadata.main=packages/electron-app/dist/main.js",
-    "package-mac": "electron-builder --mac --project ../../ -c packages/electron-app/electron-builder.yml -c.extraMetadata.main=packages/electron-app/dist/main.js",
-    "package-linux": "electron-builder --linux --project ../../ -c packages/electron-app/electron-builder.yml -c.extraMetadata.main=packages/electron-app/dist/main.js"
-
-
+    "package-win": "electron-builder --win --x64  --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
+    "package-mac": "electron-builder --mac --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
+    "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js"
   },
   "dependencies": {},
   "devDependencies": {
