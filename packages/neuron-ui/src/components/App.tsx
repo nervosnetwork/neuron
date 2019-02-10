@@ -1,22 +1,7 @@
 import React from 'react'
 import withProviders from './Providers'
-import Notification from './Notification'
-import Sidebar from './Sidebar'
-import Header from './Header'
-import Transfer from './Transfer'
-import Cells from './Cells'
+import Router from './Router'
 
-const App = () => (
-  <>
-    <Header />
-    <Sidebar />
-    <Notification />
-    <>
-      <Transfer />
-      <Cells />
-      <p>Main Content goes here</p>
-    </>
-  </>
-)
+const App = () => <Router />
 
 export default withProviders(App)
