@@ -23,7 +23,7 @@ Installs all dependencies.
 Runs the app in the development mode.<br>
 Neuron will start as a desktop app.
 
-### `test test`
+### `yarn test`
 
 Launches the test runner in the watch mode.
 
