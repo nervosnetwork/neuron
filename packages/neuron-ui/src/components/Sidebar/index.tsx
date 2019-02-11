@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { sidebarRoutes } from '../Router'
+import WalletContext from '../../contexts/wallet'
 
 const SidebarAside = styled.div`
   ul {
@@ -30,20 +31,23 @@ const SidebarAside = styled.div`
   }
 `
 
-const Sidebar = () => (
-  <SidebarAside>
-    <ul>
-      {sidebarRoutes.map(route => (
-        <li key={route.name}>
-          <NavLink to={route.path}>
-            {route.icon ? <route.icon size="20px" /> : null}
-            <span>{route.name}</span>
-          </NavLink>
-        </li>
-      ))}
-    </ul>
-  </SidebarAside>
-)
+const Sidebar = () => {
+  const wallet = useContext(WalletContext)
+  return (
+    <SidebarAside>
+      <ul>
+        {sidebarRoutes.map(route => (
+          <li key={route.name}>
+            <NavLink to={route.path}>
+              {route.icon ? <route.icon size="20px" /> : null}
+              <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </SidebarAside>
+  )
+}
 
 const Container = () => createPortal(<Sidebar />, document.querySelector('aside') as HTMLElement)
 
