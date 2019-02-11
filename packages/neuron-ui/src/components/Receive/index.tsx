@@ -1,3 +1,3 @@
 import React from 'react'
 
-export default () => <div>Receive</div>
+export default () => <h1>Receive</h1>

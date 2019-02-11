@@ -1,3 +1,3 @@
 import React from 'react'
 
-export default () => <div>History</div>
+export default () => <h1>History</h1>

@@ -1,12 +1,13 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
-import { routes } from '../Router'
+import { sidebarRoutes } from '../Router'
 
 const SidebarAside = styled.div`
   ul {
-    margin: 0;
+    margin: 40px 0 0 0;
+    padding: 0 32px;
     list-style: none;
     li {
       margin: 10px 0;
@@ -14,11 +15,16 @@ const SidebarAside = styled.div`
     a {
       display: flex;
       align-items: center;
-      padding: 5px;
+      padding: 8px 12px;
+      border-radius: 4px;
       text-decoration: none;
       color: #666666;
       span {
         padding-left: 10px;
+      }
+      &.active {
+        background-color: #eee;
+        font-weight: 600;
       }
     }
   }
@@ -27,17 +33,14 @@ const SidebarAside = styled.div`
 const Sidebar = () => (
   <SidebarAside>
     <ul>
-      <h2>My Wallet #1</h2>
-      {routes
-        .filter(route => route.showInSidebar)
-        .map(route => (
-          <li key={route.name}>
-            <Link to={route.path}>
-              {route.icon ? <route.icon size="20px" /> : null}
-              <span>{route.name}</span>
-            </Link>
-          </li>
-        ))}
+      {sidebarRoutes.map(route => (
+        <li key={route.name}>
+          <NavLink to={route.path}>
+            {route.icon ? <route.icon size="20px" /> : null}
+            <span>{route.name}</span>
+          </NavLink>
+        </li>
+      ))}
     </ul>
   </SidebarAside>
 )

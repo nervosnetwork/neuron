@@ -1,3 +1,3 @@
 import React from 'react'
 
-export default () => <div>Settings</div>
+export default () => <h1>Settings</h1>
