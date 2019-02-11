@@ -24,6 +24,7 @@ export interface IChain {
     ip: string
     status: NETWORK_STATUS
   }
+  tipBlockNumber?: number
 }
 
 export const initChain: IChain = {
@@ -32,6 +33,7 @@ export const initChain: IChain = {
     ip: '',
     status: NETWORK_STATUS.OFFLINE,
   },
+  tipBlockNumber: undefined,
 }
 
 const ChainContext = createContext<IChain>(initChain)
