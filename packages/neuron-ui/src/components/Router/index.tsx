@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import {
   Icon,
+  CreditCard as IconWallet,
   Upload as IconSend,
   Download as IconReceive,
   History as IconHistory,
@@ -13,6 +14,7 @@ import Sidebar from '../Sidebar'
 import Header from '../Header'
 // import Transfer from '../Transfer'
 // import Cells from '../Cells'
+import CurrentWallet from '../CurrentWallet'
 import Send from '../Send'
 import Receive from '../Receive'
 import History from '../History'
@@ -23,7 +25,6 @@ interface CustomRoute {
   path: string
   name: string
   icon?: Icon
-  showInSidebar?: boolean
   exact?: boolean
   component: React.ComponentType
 }
@@ -31,22 +32,26 @@ interface CustomRoute {
 export const routes: CustomRoute[] = [
   {
     name: 'Header',
-    showInSidebar: false,
     path: '/',
     exact: false,
     component: Header,
   },
   {
     name: 'Sidebar',
-    showInSidebar: false,
     path: '/',
     exact: false,
     component: Sidebar,
   },
   {
+    name: '[CurrentWallet]',
+    icon: IconWallet,
+    path: '/wallet',
+    exact: false,
+    component: CurrentWallet,
+  },
+  {
     name: 'Send',
     icon: IconSend,
-    showInSidebar: true,
     path: '/send',
     exact: false,
     component: Send,
@@ -54,7 +59,6 @@ export const routes: CustomRoute[] = [
   {
     name: 'Receive',
     icon: IconReceive,
-    showInSidebar: true,
     path: '/receive',
     exact: false,
     component: Receive,
@@ -62,7 +66,6 @@ export const routes: CustomRoute[] = [
   {
     name: 'History',
     icon: IconHistory,
-    showInSidebar: true,
     path: '/history',
     exact: false,
     component: History,
@@ -70,7 +73,6 @@ export const routes: CustomRoute[] = [
   {
     name: 'Addresses',
     icon: IconAddresses,
-    showInSidebar: true,
     path: '/addresses',
     exact: false,
     component: Addresses,
@@ -78,19 +80,23 @@ export const routes: CustomRoute[] = [
   {
     name: 'Settings',
     icon: IconSettings,
-    showInSidebar: true,
     path: '/settings',
     exact: false,
     component: Settings,
   },
   {
     name: 'Notification',
-    showInSidebar: false,
     path: '/',
     exact: false,
     component: Notification,
   },
 ]
+
+const sidebarRouteNames = ['[CurrentWallet]', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
+export const sidebarRoutes: CustomRoute[] = sidebarRouteNames.map(name => {
+  const entry = routes.find(route => route.name === name)!
+  return entry
+})
 
 export default () => (
   <Router>
