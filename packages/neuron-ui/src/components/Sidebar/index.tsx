@@ -5,21 +5,40 @@ import styled from 'styled-components'
 import { routes } from '../Router'
 
 const SidebarAside = styled.div`
-  display: grid;
-  background-color: #4cbc8e;
-  height: 100%;
-  h2 {
+  ul {
     margin: 0;
+    list-style: none;
+    li {
+      margin: 10px 0;
+    }
+    a {
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      text-decoration: none;
+      color: #666666;
+      span {
+        padding-left: 10px;
+      }
+    }
   }
 `
 
 const Sidebar = () => (
   <SidebarAside>
-    {routes
-      .filter(route => route.showInSidebar)
-      .map(route => (
-        <Link to={route.path}>{route.name}</Link>
-      ))}
+    <ul>
+      <h2>My Wallet #1</h2>
+      {routes
+        .filter(route => route.showInSidebar)
+        .map(route => (
+          <li key={route.name}>
+            <Link to={route.path}>
+              {route.icon ? <route.icon size="20px" /> : null}
+              <span>{route.name}</span>
+            </Link>
+          </li>
+        ))}
+    </ul>
   </SidebarAside>
 )
 

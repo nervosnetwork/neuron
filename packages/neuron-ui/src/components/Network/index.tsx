@@ -25,10 +25,7 @@ const NetworkStatusHeader = () => {
   return (
     <FlexDiv>
       <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
-      <div>Network status</div>
-      <h3>Node: </h3>
       <span>{chain.network.ip || 'Not Connected'}</span>
-      <h3>Status: </h3>
       <span>{chain.network.status}</span>
     </FlexDiv>
   )
