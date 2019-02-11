@@ -8,25 +8,32 @@ const Status = styled.div`
   height: 8px;
   border-radius: 50%;
   vertical-align: middle;
-  transform: translate(-6px, 6px);
   background: currentColor;
 `
 
 const FlexDiv = styled.div`
   display: flex;
-  width: 100%;
   justify-content: space-around;
+  height: 100%;
+  float: right;
+`
+
+const Span = styled.span`
+  display: flex;
+  height: 100%;
+  margin-left: 12px;
   align-items: center;
-  height: 30px;
 `
 
 const NetworkStatusHeader = () => {
   const chain = useContext(ChainContext)
   return (
     <FlexDiv>
-      <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
-      <span>{chain.network.ip || 'Not Connected'}</span>
-      <span>{chain.network.status}</span>
+      <Span>
+        <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
+      </Span>
+      <Span>{chain.network.ip || 'Not Connected'}</Span>
+      <Span style={{ display: chain.tipBlockNumber ? '' : 'none' }}>{chain.tipBlockNumber || null}</Span>
     </FlexDiv>
   )
 }
