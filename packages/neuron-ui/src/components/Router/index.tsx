@@ -1,5 +1,13 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
+import {
+  Icon,
+  Upload as IconSend,
+  Download as IconReceive,
+  History as IconHistory,
+  Database as IconAddresses,
+  Performance as IconSettings,
+} from 'grommet-icons'
 import Notification from '../Notification'
 import Sidebar from '../Sidebar'
 import Header from '../Header'
@@ -14,6 +22,7 @@ import Settings from '../Settings'
 interface CustomRoute {
   path: string
   name: string
+  icon?: Icon
   showInSidebar?: boolean
   exact?: boolean
   component: React.ComponentType
@@ -36,6 +45,7 @@ export const routes: CustomRoute[] = [
   },
   {
     name: 'Send',
+    icon: IconSend,
     showInSidebar: true,
     path: '/send',
     exact: false,
@@ -43,6 +53,7 @@ export const routes: CustomRoute[] = [
   },
   {
     name: 'Receive',
+    icon: IconReceive,
     showInSidebar: true,
     path: '/receive',
     exact: false,
@@ -50,6 +61,7 @@ export const routes: CustomRoute[] = [
   },
   {
     name: 'History',
+    icon: IconHistory,
     showInSidebar: true,
     path: '/history',
     exact: false,
@@ -57,6 +69,7 @@ export const routes: CustomRoute[] = [
   },
   {
     name: 'Addresses',
+    icon: IconAddresses,
     showInSidebar: true,
     path: '/addresses',
     exact: false,
@@ -64,6 +77,7 @@ export const routes: CustomRoute[] = [
   },
   {
     name: 'Settings',
+    icon: IconSettings,
     showInSidebar: true,
     path: '/settings',
     exact: false,

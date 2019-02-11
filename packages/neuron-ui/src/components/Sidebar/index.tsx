@@ -2,7 +2,6 @@ import React from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { Disc } from 'grommet-icons'
 import { routes } from '../Router'
 
 const SidebarAside = styled.div`
@@ -15,7 +14,12 @@ const SidebarAside = styled.div`
     a {
       display: flex;
       align-items: center;
+      padding: 5px;
       text-decoration: none;
+      color: #666666;
+      span {
+        padding-left: 10px;
+      }
     }
   }
 `
@@ -27,10 +31,10 @@ const Sidebar = () => (
       {routes
         .filter(route => route.showInSidebar)
         .map(route => (
-          <li>
+          <li key={route.name}>
             <Link to={route.path}>
-              <Disc />
-              {route.name}
+              {route.icon ? <route.icon size="20px" /> : null}
+              <span>{route.name}</span>
             </Link>
           </li>
         ))}
