@@ -17,6 +17,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       devTools: NODE_ENV === 'development',
     },
