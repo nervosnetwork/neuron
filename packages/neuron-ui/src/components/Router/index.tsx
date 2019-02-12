@@ -43,7 +43,7 @@ export const routes: CustomRoute[] = [
     component: Sidebar,
   },
   {
-    name: '[CurrentWallet]',
+    name: 'Wallet',
     icon: IconWallet,
     path: '/wallet',
     exact: false,
@@ -92,7 +92,7 @@ export const routes: CustomRoute[] = [
   },
 ]
 
-const sidebarRouteNames = ['[CurrentWallet]', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
+const sidebarRouteNames = ['Wallet', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
 export const sidebarRoutes: CustomRoute[] = sidebarRouteNames.map(name => {
   const entry = routes.find(route => route.name === name)!
   return entry
