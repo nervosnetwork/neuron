@@ -1,12 +1,30 @@
-import React, { useState } from 'react'
+import React, { useState, useReducer } from 'react'
 import ChainContext, { initChain, ICell } from '../../contexts/chain'
 import WalletContext, { initWallet } from '../../contexts/wallet'
+
+import ModalContext, { initModal, modalReducer, MODAL_ACTION_TYPES } from '../../contexts/modal'
+
 import { ipcRenderer } from '../../utils/ipc'
 import { IPC_CHANNEL } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
+
+  const [modal, dispatch] = useReducer(modalReducer, initModal)
+
+  const modalValue = {
+    ...modal,
+    actions: {
+      hideModal: () => {
+        dispatch({ type: MODAL_ACTION_TYPES.HIDE })
+      },
+      showModal: (ui: any) => {
+        dispatch({ type: MODAL_ACTION_TYPES.SHOW, value: ui })
+      },
+    },
+  }
+
   ipcRenderer.on(IPC_CHANNEL.SEND_CAPACITY, (_e: any, args: { status: number; msg: string }) => {
     setWallet({ ...wallet, msg: args.msg })
   })
@@ -17,13 +35,15 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
       setChain({ ...chain, cells: args.result })
     }
   })
-
+  // console.log(modalValue);
   return (
-    <ChainContext.Provider value={chain}>
-      <WalletContext.Provider value={wallet}>
-        <Comp {...props} />
-      </WalletContext.Provider>
-    </ChainContext.Provider>
+    <ModalContext.Provider value={modalValue}>
+      <ChainContext.Provider value={chain}>
+        <WalletContext.Provider value={wallet}>
+          <Comp {...props} />
+        </WalletContext.Provider>
+      </ChainContext.Provider>
+    </ModalContext.Provider>
   )
 }
 
