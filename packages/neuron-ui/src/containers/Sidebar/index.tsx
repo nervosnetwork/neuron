@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
-import { sidebarRoutes } from '../Router'
+import { sidebarRoutes } from '../../components/Router'
 import WalletContext from '../../contexts/wallet'
 
 const SidebarAside = styled.div`

@@ -9,9 +9,10 @@ import {
   Database as IconAddresses,
   Performance as IconSettings,
 } from 'grommet-icons'
-import Notification from '../Notification'
-import Sidebar from '../Sidebar'
-import Header from '../Header'
+import MainContent from '../../containers/MainContent'
+import Notification from '../../containers/Notification'
+import Sidebar from '../../containers/Sidebar'
+import Header from '../../containers/Header'
 // import Transfer from '../Transfer'
 // import Cells from '../Cells'
 import CurrentWallet from '../CurrentWallet'
@@ -29,7 +30,7 @@ interface CustomRoute {
   component: React.ComponentType
 }
 
-export const routes: CustomRoute[] = [
+export const containers: CustomRoute[] = [
   {
     name: 'Header',
     path: '/',
@@ -42,6 +43,15 @@ export const routes: CustomRoute[] = [
     exact: false,
     component: Sidebar,
   },
+  {
+    name: 'Notification',
+    path: '/',
+    exact: false,
+    component: Notification,
+  },
+]
+
+export const mainContents: CustomRoute[] = [
   {
     name: 'Wallet',
     icon: IconWallet,
@@ -84,26 +94,27 @@ export const routes: CustomRoute[] = [
     exact: false,
     component: Settings,
   },
-  {
-    name: 'Notification',
-    path: '/',
-    exact: false,
-    component: Notification,
-  },
 ]
 
 const sidebarRouteNames = ['Wallet', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
 export const sidebarRoutes: CustomRoute[] = sidebarRouteNames.map(name => {
-  const entry = routes.find(route => route.name === name)!
+  const entry = mainContents.find(route => route.name === name)!
   return entry
 })
 
-export default () => (
+const renderComp = (route: CustomRoute) => <Route key={route.name} {...route} />
+
+const CustomRouter = () => (
   <Router>
     <>
-      {routes.map(route => (
-        <Route key={route.name} {...route} />
-      ))}
+      {containers.map(renderComp)}
+      <MainContent>
+        <>{mainContents.map(renderComp)}</>
+      </MainContent>
     </>
   </Router>
 )
+
+CustomRouter.displayName = 'CustomRouter'
+
+export default CustomRouter
