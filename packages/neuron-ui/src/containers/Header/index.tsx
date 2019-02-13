@@ -1,7 +1,7 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
-import NetworkStatusHeader from '../Network'
+import NetworkStatusHeader from '../../components/Network'
 
 const AppHeader = styled.div`
   height: 100%;
