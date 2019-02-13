@@ -21,6 +21,7 @@ import Receive from '../Receive'
 import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
+import Modal from '../Modal'
 
 interface CustomRoute {
   path: string
@@ -31,6 +32,12 @@ interface CustomRoute {
 }
 
 export const containers: CustomRoute[] = [
+  {
+    name: 'Modal',
+    path: '/',
+    exact: false,
+    component: Modal,
+  },
   {
     name: 'Header',
     path: '/',
