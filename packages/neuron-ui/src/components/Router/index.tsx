@@ -13,8 +13,6 @@ import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
 import Header from '../../containers/Header'
-// import Transfer from '../Transfer'
-// import Cells from '../Cells'
 import CurrentWallet from '../CurrentWallet'
 import Send from '../Send'
 import Receive from '../Receive'
@@ -23,7 +21,6 @@ import Addresses from '../Addresses'
 import Settings from '../Settings'
 import SettingsImport from '../Settings/importWallet'
 import SettingsCreate from '../Settings/createWallet'
-import Modal from '../Modal'
 
 interface CustomRoute {
   path: string
@@ -34,12 +31,6 @@ interface CustomRoute {
 }
 
 export const containers: CustomRoute[] = [
-  {
-    name: 'Modal',
-    path: '/',
-    exact: false,
-    component: Modal,
-  },
   {
     name: 'Header',
     path: '/',
