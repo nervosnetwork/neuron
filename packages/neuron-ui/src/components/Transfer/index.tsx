@@ -64,6 +64,7 @@ const Transfer = () => {
 
   return (
     <TransferPanel>
+      <h1>Send</h1>
       <input type="text" value={state.addr || ''} onChange={handleAction(TRANSFER_ACTION_TYPES.ADDR)} />
       <input type="number" value={state.capacity || 0} onChange={handleAction(TRANSFER_ACTION_TYPES.CAPACITY)} />
       <button type="submit" onClick={handleAction(TRANSFER_ACTION_TYPES.SUBMIT)}>
