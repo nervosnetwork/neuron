@@ -7,7 +7,7 @@ const WalletDetail = () => (
       wallet && (
         <>
           <h1>{wallet.name}</h1>
-          <div style={{ height: "1200px" }}>Simulate long content...</div>
+          <div style={{ height: '1200px' }}>Simulate long content...</div>
         </>
       )
     }

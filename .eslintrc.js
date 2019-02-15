@@ -18,6 +18,7 @@ module.exports = {
       "devDependencies": true
     }],
     "no-unused-vars": "off",
+    "implicit-arrow-linebreak": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
       "vars": "local",
       "args": "after-used",
