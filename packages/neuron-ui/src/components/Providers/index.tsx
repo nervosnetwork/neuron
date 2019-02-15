@@ -3,6 +3,7 @@ import ChainContext, { initChain, ICell } from '../../contexts/chain'
 import WalletContext, { initWallet } from '../../contexts/wallet'
 
 import ModalContext, { initModal, modalReducer, MODAL_ACTION_TYPES } from '../../contexts/modal'
+import SettingsContext, { initSettings } from '../../contexts/settings'
 
 import { ipcRenderer } from '../../utils/ipc'
 import { IPC_CHANNEL } from '../../utils/const'
@@ -10,7 +11,7 @@ import { IPC_CHANNEL } from '../../utils/const'
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
-
+  const [settings] = useState(initSettings)
   const [modal, dispatch] = useReducer(modalReducer, initModal)
 
   const modalValue = {
@@ -38,11 +39,13 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   // console.log(modalValue);
   return (
     <ModalContext.Provider value={modalValue}>
-      <ChainContext.Provider value={chain}>
-        <WalletContext.Provider value={wallet}>
-          <Comp {...props} />
-        </WalletContext.Provider>
-      </ChainContext.Provider>
+      <SettingsContext.Provider value={settings}>
+        <ChainContext.Provider value={chain}>
+          <WalletContext.Provider value={wallet}>
+            <Comp {...props} />
+          </WalletContext.Provider>
+        </ChainContext.Provider>
+      </SettingsContext.Provider>
     </ModalContext.Provider>
   )
 }

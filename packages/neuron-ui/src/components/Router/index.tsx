@@ -21,6 +21,8 @@ import Receive from '../Receive'
 import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
+import SettingsImport from '../Settings/importWallet'
+import SettingsCreate from '../Settings/createWallet'
 import Modal from '../Modal'
 
 interface CustomRoute {
@@ -100,6 +102,18 @@ export const mainContents: CustomRoute[] = [
     path: '/settings',
     exact: false,
     component: Settings,
+  },
+  {
+    name: 'SettingsCreate',
+    path: '/settings/createWallet',
+    exact: false,
+    component: SettingsCreate,
+  },
+  {
+    name: 'SettingsImport',
+    path: '/settings/importWallet',
+    exact: false,
+    component: SettingsImport,
   },
 ]
 
