@@ -1,14 +1,11 @@
 import { createContext } from 'react'
 
-interface IWallet {
+interface Wallet {
   name: string
   msg: string
 }
 
-export const initWallet: IWallet = {
-  name: 'CurrentWallet',
-  msg: '',
-}
+export const initWallet: Wallet | null = null
 
-const WalletContext = createContext<IWallet>(initWallet)
+const WalletContext = createContext<Wallet | null>(null)
 export default WalletContext

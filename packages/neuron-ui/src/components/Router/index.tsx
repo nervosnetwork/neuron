@@ -13,7 +13,7 @@ import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
 import Header from '../../containers/Header'
-import CurrentWallet from '../CurrentWallet'
+import WalletDetail from '../WalletDetail'
 import Send from '../Send'
 import Receive from '../Receive'
 import History from '../History'
@@ -57,7 +57,7 @@ export const mainContents: CustomRoute[] = [
     icon: IconWallet,
     path: '/wallet',
     exact: false,
-    component: CurrentWallet,
+    component: WalletDetail,
   },
   {
     name: 'Send',
