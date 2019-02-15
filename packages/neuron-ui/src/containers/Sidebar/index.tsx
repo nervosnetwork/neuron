@@ -33,17 +33,27 @@ const SidebarAside = styled.div`
 
 const Sidebar = () => {
   const wallet = useContext(WalletContext)
+  if (wallet) {
+    return (
+      <SidebarAside>
+        <ul>
+          {sidebarRoutes.map(route => (
+            <li key={route.name}>
+              <NavLink to={route.path}>
+                {route.icon ? <route.icon size="20px" /> : null}
+                <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </SidebarAside>
+    )
+  }
+
   return (
     <SidebarAside>
       <ul>
-        {sidebarRoutes.map(route => (
-          <li key={route.name}>
-            <NavLink to={route.path}>
-              {route.icon ? <route.icon size="20px" /> : null}
-              <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
-            </NavLink>
-          </li>
-        ))}
+        <li>No Wallet Found</li>
       </ul>
     </SidebarAside>
   )
