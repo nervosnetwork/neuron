@@ -4,8 +4,6 @@ import styled from 'styled-components'
 
 import ModalContext from '../../contexts/modal'
 
-import { getGuidedFlag } from '../../utils/storage'
-
 const AppModal = styled.div`
   position: absolute;
   top: 0;
@@ -39,8 +37,6 @@ const AppModal = styled.div`
       }
     }
   }
-
-
 `
 
 const Modal = () => (
@@ -82,31 +78,25 @@ const Modal = () => (
   </ModalContext.Consumer>
 )
 
-let openGuider: boolean = !getGuidedFlag()
-
 const Container = (props: any) => {
   const modalContext = useContext(ModalContext)
-  // console.log(props)
-  if (openGuider) {
-    modalContext.actions.showModal(
-      <div style={{ width: '30vw', height: '20vh', textAlign: 'center' }}>
-        <p>Welcome to use the CKB wallet!!! </p>
-        <button
-          type="button"
-          onKeyPress={() => {
-            //   for users with physical disabilities who cannot use a mouse
-          }}
-          onClick={() => {
-            modalContext.actions.hideModal()
-            props.history.push('/addresses')
-          }}
-        >
-          go create!
-        </button>
-      </div>,
-    )
-  }
-  openGuider = false
+  modalContext.actions.showModal(
+    <div style={{ width: '30vw', height: '20vh', textAlign: 'center' }}>
+      <p>Welcome to use the CKB wallet!!! </p>
+      <button
+        type="button"
+        onKeyPress={() => {
+          //   for users with physical disabilities who cannot use a mouse
+        }}
+        onClick={() => {
+          modalContext.actions.hideModal()
+          props.history.push('/addresses')
+        }}
+      >
+        go create!
+      </button>
+    </div>,
+  )
   return createPortal(<Modal />, document.querySelector('.modal') as HTMLElement)
 }
 
