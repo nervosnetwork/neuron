@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Launch } from 'grommet-icons'
+import { Routes } from '../../utils/const'
 import ImportWallet from './importWallet'
 import CreateWallet from './createWallet'
 
@@ -31,7 +32,7 @@ export default (props: any) => (
             //   for users with physical disabilities who cannot use a mouse
           }}
           onClick={() => {
-            props.history.push('/wallets/new')
+            props.history.push(Routes.CreateWallet)
           }}
         >
           Create New Wallet
@@ -43,7 +44,7 @@ export default (props: any) => (
             //   for users with physical disabilities who cannot use a mouse
           }}
           onClick={() => {
-            props.history.push('/wallets/import')
+            props.history.push(Routes.ImportWallet)
           }}
         >
           Import Wallet
