@@ -2,13 +2,13 @@ import React, { useContext } from 'react'
 import styled from 'styled-components'
 import SettingsContext from '../../contexts/settings'
 
-import { FullView } from './index'
+import FullScreenView from '../../widgets/FullScreenView'
 import ActionFlow, { ActionStep } from '../ActionFlow'
 import ActionB from './actionB'
 import ActionC from './actionC'
 import ActionD from './actionD'
 
-const CreateWalletDiv = styled(FullView)`
+const CreateWalletDiv = styled(FullScreenView)`
   padding-top: 20px;
 `
 

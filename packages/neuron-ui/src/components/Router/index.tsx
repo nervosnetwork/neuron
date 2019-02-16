@@ -19,8 +19,7 @@ import Receive from '../Receive'
 import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
-import SettingsImport from '../Settings/importWallet'
-import SettingsCreate from '../Settings/createWallet'
+import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 
 interface CustomRoute {
   path: string
@@ -95,16 +94,22 @@ export const mainContents: CustomRoute[] = [
     component: Settings,
   },
   {
-    name: 'SettingsCreate',
-    path: '/settings/createWallet',
+    name: 'CreateWallet',
+    path: '/wallets/new',
     exact: false,
-    component: SettingsCreate,
+    component: CreateWallet,
   },
   {
-    name: 'SettingsImport',
-    path: '/settings/importWallet',
+    name: 'ImportWallet',
+    path: '/wallets/import',
     exact: false,
-    component: SettingsImport,
+    component: ImportWallet,
+  },
+  {
+    name: 'WalletWizard',
+    path: '/wallets/wizard',
+    exact: false,
+    component: WalletWizard,
   },
 ]
 
