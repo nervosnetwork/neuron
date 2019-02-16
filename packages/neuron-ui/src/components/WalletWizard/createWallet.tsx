@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
 import SettingsContext from '../../contexts/settings'
+import { Routes } from '../../utils/const'
 
 import FullScreenView from '../../widgets/FullScreenView'
 import ActionFlow, { ActionStep } from '../ActionFlow'
@@ -36,7 +37,7 @@ export default (props: any) => {
           title="wallet"
           onAfterNext={() => {
             settingsContext.passwordValid = false
-            props.history.push('/settings')
+            props.history.push(Routes.Settings)
           }}
         >
           <ActionD />

@@ -9,6 +9,7 @@ import {
   Database as IconAddresses,
   Performance as IconSettings,
 } from 'grommet-icons'
+import { Routes } from '../../utils/const'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
@@ -54,60 +55,60 @@ export const mainContents: CustomRoute[] = [
   {
     name: 'Wallet',
     icon: IconWallet,
-    path: '/wallet',
+    path: Routes.Wallet,
     exact: false,
     component: WalletDetail,
   },
   {
     name: 'Send',
     icon: IconSend,
-    path: '/send',
+    path: Routes.Send,
     exact: false,
     component: Send,
   },
   {
     name: 'Receive',
     icon: IconReceive,
-    path: '/receive',
+    path: Routes.Receive,
     exact: false,
     component: Receive,
   },
   {
     name: 'History',
     icon: IconHistory,
-    path: '/history',
+    path: Routes.History,
     exact: false,
     component: History,
   },
   {
     name: 'Addresses',
     icon: IconAddresses,
-    path: '/addresses',
+    path: Routes.Addresses,
     exact: false,
     component: Addresses,
   },
   {
     name: 'Settings',
     icon: IconSettings,
-    path: '/settings',
+    path: Routes.Settings,
     exact: false,
     component: Settings,
   },
   {
     name: 'CreateWallet',
-    path: '/wallets/new',
+    path: Routes.CreateWallet,
     exact: false,
     component: CreateWallet,
   },
   {
     name: 'ImportWallet',
-    path: '/wallets/import',
+    path: Routes.ImportWallet,
     exact: false,
     component: ImportWallet,
   },
   {
     name: 'WalletWizard',
-    path: '/wallets/wizard',
+    path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
   },
