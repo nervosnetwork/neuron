@@ -1,14 +1,5 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
-import {
-  Icon,
-  CreditCard as IconWallet,
-  Upload as IconSend,
-  Download as IconReceive,
-  History as IconHistory,
-  Database as IconAddresses,
-  Performance as IconSettings,
-} from 'grommet-icons'
 import { Routes } from '../../utils/const'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
@@ -26,7 +17,6 @@ import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 interface CustomRoute {
   path: string
   name: string
-  icon?: Icon
   exact?: boolean
   component: React.ComponentType
 }
@@ -55,49 +45,42 @@ export const containers: CustomRoute[] = [
 export const mainContents: CustomRoute[] = [
   {
     name: 'Dashboard',
-    icon: IconWallet,
     path: Routes.Dashboard,
     exact: false,
     component: Dashboard,
   },
   {
     name: 'Wallet',
-    icon: IconWallet,
     path: Routes.Wallet,
     exact: false,
     component: WalletDetail,
   },
   {
     name: 'Send',
-    icon: IconSend,
     path: Routes.Send,
     exact: false,
     component: Send,
   },
   {
     name: 'Receive',
-    icon: IconReceive,
     path: Routes.Receive,
     exact: false,
     component: Receive,
   },
   {
     name: 'History',
-    icon: IconHistory,
     path: Routes.History,
     exact: false,
     component: History,
   },
   {
     name: 'Addresses',
-    icon: IconAddresses,
     path: Routes.Addresses,
     exact: false,
     component: Addresses,
   },
   {
     name: 'Settings',
-    icon: IconSettings,
     path: Routes.Settings,
     exact: false,
     component: Settings,
@@ -121,12 +104,6 @@ export const mainContents: CustomRoute[] = [
     component: WalletWizard,
   },
 ]
-
-const sidebarRouteNames = ['Wallet', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
-export const sidebarRoutes: CustomRoute[] = sidebarRouteNames.map(name => {
-  const entry = mainContents.find(route => route.name === name)!
-  return entry
-})
 
 const renderComp = (route: CustomRoute) => <Route key={route.name} {...route} />
 
