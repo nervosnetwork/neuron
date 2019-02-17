@@ -9,7 +9,8 @@ export enum IPC_CHANNEL {
 }
 
 export enum Routes {
-  Wallet = '/',
+  Dashboard = '/',
+  Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
   History = '/history',
