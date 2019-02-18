@@ -1,31 +1,22 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
-import {
-  Icon,
-  CreditCard as IconWallet,
-  Upload as IconSend,
-  Download as IconReceive,
-  History as IconHistory,
-  Database as IconAddresses,
-  Performance as IconSettings,
-} from 'grommet-icons'
+import { Routes } from '../../utils/const'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
 import Header from '../../containers/Header'
+import Home from '../Home'
 import WalletDetail from '../WalletDetail'
 import Send from '../Transfer'
 import Receive from '../Receive'
 import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
-import SettingsImport from '../Settings/importWallet'
-import SettingsCreate from '../Settings/createWallet'
+import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 
 interface CustomRoute {
   path: string
   name: string
-  icon?: Icon
   exact?: boolean
   component: React.ComponentType
 }
@@ -53,66 +44,66 @@ export const containers: CustomRoute[] = [
 
 export const mainContents: CustomRoute[] = [
   {
+    name: 'Home',
+    path: Routes.Home,
+    exact: true,
+    component: Home,
+  },
+  {
     name: 'Wallet',
-    icon: IconWallet,
-    path: '/wallet',
+    path: Routes.Wallet,
     exact: false,
     component: WalletDetail,
   },
   {
     name: 'Send',
-    icon: IconSend,
-    path: '/send',
+    path: Routes.Send,
     exact: false,
     component: Send,
   },
   {
     name: 'Receive',
-    icon: IconReceive,
-    path: '/receive',
+    path: Routes.Receive,
     exact: false,
     component: Receive,
   },
   {
     name: 'History',
-    icon: IconHistory,
-    path: '/history',
+    path: Routes.History,
     exact: false,
     component: History,
   },
   {
     name: 'Addresses',
-    icon: IconAddresses,
-    path: '/addresses',
+    path: Routes.Addresses,
     exact: false,
     component: Addresses,
   },
   {
     name: 'Settings',
-    icon: IconSettings,
-    path: '/settings',
+    path: Routes.Settings,
     exact: false,
     component: Settings,
   },
   {
-    name: 'SettingsCreate',
-    path: '/settings/createWallet',
+    name: 'CreateWallet',
+    path: Routes.CreateWallet,
     exact: false,
-    component: SettingsCreate,
+    component: CreateWallet,
   },
   {
-    name: 'SettingsImport',
-    path: '/settings/importWallet',
+    name: 'ImportWallet',
+    path: Routes.ImportWallet,
     exact: false,
-    component: SettingsImport,
+    component: ImportWallet,
+  },
+  {
+    name: 'WalletWizard',
+    path: Routes.WalletWizard,
+    exact: false,
+    component: WalletWizard,
   },
 ]
-
-const sidebarRouteNames = ['Wallet', 'Send', 'Receive', 'History', 'Addresses', 'Settings']
-export const sidebarRoutes: CustomRoute[] = sidebarRouteNames.map(name => {
-  const entry = mainContents.find(route => route.name === name)!
-  return entry
-})
 
 const renderComp = (route: CustomRoute) => <Route key={route.name} {...route} />
 

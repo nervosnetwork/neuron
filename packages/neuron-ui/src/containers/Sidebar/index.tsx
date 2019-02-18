@@ -2,7 +2,15 @@ import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
-import { sidebarRoutes } from '../../components/Router'
+import {
+  CreditCard as IconWallet,
+  Upload as IconSend,
+  Download as IconReceive,
+  History as IconHistory,
+  Database as IconAddresses,
+  Performance as IconSettings,
+} from 'grommet-icons'
+import { mainContents } from '../../components/Router'
 import WalletContext from '../../contexts/wallet'
 
 const SidebarAside = styled.div`
@@ -31,30 +39,37 @@ const SidebarAside = styled.div`
   }
 `
 
+const walletMenuItems = [
+  ['Wallet', IconWallet],
+  ['Send', IconSend],
+  ['Receive', IconReceive],
+  ['History', IconHistory],
+  ['Addresses', IconAddresses],
+  ['Settings', IconSettings],
+]
+
 const Sidebar = () => {
   const wallet = useContext(WalletContext)
+
+  const walletRoutes = walletMenuItems.map(item => {
+    const entry = mainContents.find(route => route.name === item[0])!
+    return { icon: item[1], ...entry }
+  })
+  let menu
   if (wallet) {
-    return (
-      <SidebarAside>
-        <ul>
-          {sidebarRoutes.map(route => (
-            <li key={route.name}>
-              <NavLink to={route.path}>
-                {route.icon ? <route.icon size="20px" /> : null}
-                <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </SidebarAside>
-    )
+    menu = walletRoutes.map(route => (
+      <li key={route.name}>
+        <NavLink to={route.path}>
+          {<route.icon size="20px" />}
+          <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
+        </NavLink>
+      </li>
+    ))
   }
 
   return (
     <SidebarAside>
-      <ul>
-        <li>No Wallet Found</li>
-      </ul>
+      <ul>{menu}</ul>
     </SidebarAside>
   )
 }
