@@ -6,7 +6,7 @@ import ModalContext, { initModal, modalReducer, MODAL_ACTION_TYPES } from '../..
 import SettingsContext, { initSettings } from '../../contexts/settings'
 
 import { ipcRenderer } from '../../utils/ipc'
-import { IPC_CHANNEL } from '../../utils/const'
+import { IPCChannel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
@@ -26,17 +26,16 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     },
   }
 
-  ipcRenderer.on(IPC_CHANNEL.SEND_CAPACITY, (_e: any, args: { status: number; msg: string }) => {
+  ipcRenderer.on(IPCChannel.SendCapacity, (_e: any, args: { status: number; msg: string }) => {
     console.debug(args.msg)
   })
 
-  ipcRenderer.on(IPC_CHANNEL.GET_CELLS_BY_TYPE_HASH, (_e: Event, args: { status: number; result: ICell[] }) => {
+  ipcRenderer.on(IPCChannel.GetCellsByTypeHash, (_e: Event, args: { status: number; result: ICell[] }) => {
     // TODO:
     if (args.status) {
       setChain({ ...chain, cells: args.result })
     }
   })
-
   return (
     <ModalContext.Provider value={modalValue}>
       <SettingsContext.Provider value={settings}>
