@@ -5,6 +5,7 @@ import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
 import Header from '../../containers/Header'
+import Home from '../Home'
 import WalletDetail from '../WalletDetail'
 import Send from '../Transfer'
 import Receive from '../Receive'
@@ -42,6 +43,12 @@ export const containers: CustomRoute[] = [
 ]
 
 export const mainContents: CustomRoute[] = [
+  {
+    name: 'Home',
+    path: Routes.Home,
+    exact: true,
+    component: Home,
+  },
   {
     name: 'Wallet',
     path: Routes.Wallet,

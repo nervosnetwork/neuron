@@ -5,5 +5,5 @@ interface Wallet {
   msg: string
 }
 
-const WalletContext = createContext<Wallet | null>(null)
+const WalletContext = createContext<Wallet | null>({ name: 'My First #1', msg: '' })
 export default WalletContext

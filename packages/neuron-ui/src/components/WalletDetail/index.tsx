@@ -1,13 +1,8 @@
 import React, { useContext } from 'react'
-import { Redirect } from 'react-router-dom'
 import WalletContext from '../../contexts/wallet'
-import { Routes } from '../../utils/const'
 
 const WalletDetail = () => {
-  const wallet = useContext(WalletContext)
-  if (!wallet) {
-    return <Redirect to={Routes.WalletWizard} />
-  }
+  const wallet = useContext(WalletContext)!
 
   return (
     <>
