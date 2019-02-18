@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import * as path from 'path'
 import listenToChannel from './IPCChannel'
-import menuTemplate from './utils/menuTemplate'
+import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -24,7 +24,7 @@ function createWindow() {
     },
   })
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
+  Menu.setApplicationMenu(menu)
 
   mainWindow.loadURL(NODE_ENV === 'development' ? ENTRY.DEV : ENTRY.PROD)
 

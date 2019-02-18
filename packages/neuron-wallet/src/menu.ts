@@ -1,10 +1,10 @@
-import { BrowserWindow, MenuItem, MenuItemConstructorOptions } from 'electron'
+import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions } from 'electron'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
 
-export default [
+const menuTemplate = [
   {
     label: 'Neuron',
     submenu: [
@@ -78,3 +78,5 @@ export default [
     ],
   },
 ]
+
+export default Menu.buildFromTemplate(menuTemplate)
