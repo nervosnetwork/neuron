@@ -14,6 +14,12 @@ module.exports = {
       "exports": "always-multiline",
       "functions": "ignore"
     }],
+    "object-curly-newline": ["error", {
+      "ObjectExpression": "always",
+      "ObjectPattern": { "multiline": true },
+      "ImportDeclaration": "never",
+      "ExportDeclaration": { "multiline": true, "minProperties": 4 }
+    }],
     "import/no-extraneous-dependencies": [2, {
       "devDependencies": true
     }],
