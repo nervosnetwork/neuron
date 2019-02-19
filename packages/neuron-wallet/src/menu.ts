@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions } from 'electron'
+import { app, shell, Menu, MenuItemConstructorOptions } from 'electron'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -6,17 +6,14 @@ const separator: MenuItemConstructorOptions = {
 
 const menuTemplate = [
   {
-    label: 'Neuron',
+    label: app.getName(),
     submenu: [
       {
-        label: 'About Neuron',
-        click: () => {
-          // TODO: show about dialog
-        },
+        role: 'about',
       },
       separator,
       {
-        label: 'Preferences',
+        label: 'Preferences...',
         accelerator: 'CmdOrCtrl+,',
         click: () => {
           // TODO: show preferences view
@@ -24,8 +21,6 @@ const menuTemplate = [
       },
       separator,
       {
-        label: 'Quit Neuron',
-        accelerator: 'CmdOrCtrl+Q',
         role: 'quit',
       },
     ],
@@ -34,49 +29,54 @@ const menuTemplate = [
     label: 'Edit',
     submenu: [
       {
-        label: 'Cut',
-        accelerator: 'CmdOrCtrl+X',
         role: 'cut',
       },
       {
-        label: 'Copy',
-        accelerator: 'CmdOrCtrl+C',
         role: 'copy',
       },
       {
-        label: 'Paste',
-        accelerator: 'CmdOrCtrl+V',
         role: 'paste',
-      },
-      {
-        label: 'Select All',
-        accelerator: 'CmdOrCtrl+A',
-        role: 'selectAll',
       },
     ],
   },
   {
-    label: 'Window',
+    role: 'windowMenu',
+  },
+  {
+    role: 'help',
     submenu: [
       {
-        label: 'Close Window',
-        accelerator: 'CmdOrCtrl+W',
-        role: 'close',
+        label: 'Nervos',
+        click: () => {
+          shell.openExternal('https://www.nervos.org/')
+        },
       },
       {
-        label: 'Minimize',
-        accelerator: 'CmdOrCtrl+M',
-        role: 'minimize',
-      },
-      separator,
-      {
-        label: 'Bring All to Front',
-        click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-          browserWindow.focus()
+        label: 'Source Code',
+        click: () => {
+          shell.openExternal('https://github.com/nervosnetwork/neuron')
         },
       },
     ],
   },
 ]
+
+const { NODE_ENV } = process.env
+if (NODE_ENV === 'development') {
+  menuTemplate.push({
+    label: 'Develop',
+    submenu: [
+      {
+        role: 'reload',
+      },
+      {
+        role: 'forceReload',
+      },
+      {
+        role: 'toggleDevTools',
+      },
+    ],
+  })
+}
 
 export default Menu.buildFromTemplate(menuTemplate)
