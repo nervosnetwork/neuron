@@ -1,6 +1,11 @@
 import { ipcMain } from 'electron'
+import Core from '../../../node_modules/ckb-sdk-js/packages/ckb-sdk-core'
 import { IPCChannel } from './utils/const'
 import { cell } from './mock'
+
+const remote = 'http://localhost:8114'
+const ckbCore = new Core(remote)
+const asw = ckbCore.wallet.newASW()
 
 const listenToChannel = () => {
   // chain
@@ -90,14 +95,24 @@ const listenToChannel = () => {
    * @name GetCellsByTypeHash
    * @description channel to get cells by typehash
    */
-  ipcMain.on(IPCChannel.GetCellsByTypeHash, (e: Electron.Event, ...args: string[]) => {
-    console.info(`get cells by type hash ${args[0]}`)
-    setTimeout(() => {
-      e.sender.send(IPCChannel.GetCellsByTypeHash, {
-        status: 1,
-        result: [cell],
-      })
-    }, 1000)
+  ipcMain.on(
+    IPCChannel.GetCellsByTypeHash,
+    (e: Electron.Event, ...args: string[]) => {
+      console.info(`get cells by type hash ${args[0]}`)
+      setTimeout(() => {
+        e.sender.send(IPCChannel.GetCellsByTypeHash, {
+          status: 1,
+          result: [cell],
+        })
+      }, 1000)
+    },
+  )
+
+  ipcMain.on('ASW', (e: Electron.Event) => {
+    e.sender.send('ASW', {
+      status: 1,
+      result: asw,
+    })
   })
 
   /**
@@ -146,15 +161,27 @@ const listenToChannel = () => {
    * @name SendCapacity
    * @description channel to send capacity
    */
-  ipcMain.on(IPCChannel.SendCapacity, (e: Electron.Event, { addr, capacity }: { addr: string; capacity: number }) => {
-    console.info(`Send Capacity to CKB with ${JSON.stringify({ addr, capacity }, null, 2)}`)
-    setTimeout(() => {
-      e.sender.send(IPCChannel.SendCapacity, {
-        status: 1,
-        msg: `Send ${capacity} Capacity to ${addr} Successfully`,
-      })
-    }, 1000)
-  })
+  ipcMain.on(
+    IPCChannel.SendCapacity,
+    (
+      e: Electron.Event,
+      { addr, capacity }: { addr: string; capacity: number },
+    ) => {
+      console.info(
+        `Send Capacity to CKB with ${JSON.stringify(
+          { addr, capacity },
+          null,
+          2,
+        )}`,
+      )
+      setTimeout(() => {
+        e.sender.send(IPCChannel.SendCapacity, {
+          status: 1,
+          msg: `Send ${capacity} Capacity to ${addr} Successfully`,
+        })
+      }, 1000)
+    },
+  )
 
   /**
    * @name SendTransaction
