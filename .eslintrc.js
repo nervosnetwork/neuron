@@ -1,11 +1,8 @@
 module.exports = {
-  "extends": "airbnb",
+  "extends": ["airbnb", "plugin:prettier/recommended"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["prettier", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
-    "prettier/prettier": ["error", {
-      "printWidth": 120
-    }],
     "semi": [2, "never"],
     "comma-dangle": [2, {
       "arrays": "always-multiline",
@@ -29,9 +26,6 @@ module.exports = {
       "vars": "local",
       "args": "after-used",
       "ignoreRestSiblings": false
-    }],
-    "max-len": [2, {
-      "code": 120
     }],
     "operator-linebreak": [2, "after"],
     "arrow-parens": [2, "as-needed"]
