@@ -34,6 +34,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name ImportWallet
    * @description channel to import wallet
@@ -46,6 +47,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name ExportWallet
    * @description channel to export wallets
@@ -59,6 +61,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name SwitchWallet
    * @description channel to switch wallet
@@ -72,6 +75,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name GetBalance
    * @description channel to get balance
@@ -85,6 +89,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   // channel to get cells by type hash
   /**
    * @name GetCellsByTypeHash
@@ -109,6 +114,7 @@ const listenToChannel = () => {
       result: asw,
     })
   })
+
   /**
    * @name GetUnspentCells
    * @description channel to get unspent cells
@@ -122,6 +128,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name GetTransactions
    * @description get transactions
@@ -135,6 +142,7 @@ const listenToChannel = () => {
       })
     })
   })
+
   /**
    * @name Get GetWallets
    * @description channel to get wallets
@@ -148,6 +156,7 @@ const listenToChannel = () => {
       })
     })
   })
+
   /**
    * @name SendCapacity
    * @description channel to send capacity
@@ -173,6 +182,7 @@ const listenToChannel = () => {
       }, 1000)
     },
   )
+
   /**
    * @name SendTransaction
    * @description channel to send transaction
@@ -188,6 +198,7 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
   /**
    * @name sign
    * @description channel to sign msg
