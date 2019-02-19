@@ -17,7 +17,11 @@ body {
 .main-content {
   grid-area: content;
   overflow: auto;
+  &.full-screen {
+    grid-area: 1/1/4/4;
+  }
 }
+
 
 .notification {
   grid-area: 4/3/5/4;
