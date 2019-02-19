@@ -3,9 +3,9 @@ export enum NETWORK_STATUS {
   OFFLINE = 'offline',
 }
 
-export enum IPC_CHANNEL {
-  SEND_CAPACITY = 'sendCapacity',
-  GET_CELLS_BY_TYPE_HASH = 'getCellsByTypeHash',
+export enum IPCChannel {
+  SendCapacity = 'sendCapacity',
+  GetCellsByTypeHash = 'getCellsByTypeHash',
 }
 
 export enum Routes {
