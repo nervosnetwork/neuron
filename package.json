@@ -61,7 +61,9 @@
     "typescript": "^3.3.1",
     "wait-on": "^3.2.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ckb-sdk-js": "https://github.com/Keith-CY/ckb-sdk-js/"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

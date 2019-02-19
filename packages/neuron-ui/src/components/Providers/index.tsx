@@ -26,6 +26,10 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     },
   }
 
+  ipcRenderer.on('ASW', (_e: any, args: { status: number; result: any }) => {
+    console.log(args.result)
+  })
+
   ipcRenderer.on(IPC_CHANNEL.SEND_CAPACITY, (_e: any, args: { status: number; msg: string }) => {
     console.debug(args.msg)
   })

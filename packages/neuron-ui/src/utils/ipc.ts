@@ -20,6 +20,7 @@ export const ipcRenderer = (() => {
   }
 })()
 
+const asw = () => ipcRenderer.send('ASW')
 const getLiveCell = (outpoint: any) => ipcRenderer.send('getLiveCell', outpoint)
 const getCellsByTypeHash = (typeHash: string) => {
   ipcRenderer.send(IPC_CHANNEL.GET_CELLS_BY_TYPE_HASH, typeHash)
@@ -32,6 +33,7 @@ const sendCapacity = (addr: string, capacity: string) => {
 }
 
 export default {
+  asw,
   getLiveCell,
   getCellsByTypeHash,
   sendCapacity,

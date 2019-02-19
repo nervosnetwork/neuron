@@ -1,6 +1,11 @@
 import { ipcMain } from 'electron'
+import Core from '../../../node_modules/ckb-sdk-js/packages/ckb-sdk-core'
 import { IPC_CHANNEL } from './utils/const'
 import { cell } from './mock'
+
+const remote = 'http://localhost:8114'
+const ckbCore = new Core(remote)
+const asw = ckbCore.wallet.newASW()
 
 const listenToChannel = () => {
   // channel to send capacity
@@ -28,6 +33,13 @@ const listenToChannel = () => {
         result: [cell],
       })
     }, 1000)
+  })
+
+  ipcMain.on('ASW', (e: Electron.Event) => {
+    e.sender.send('ASW', {
+      status: 1,
+      result: asw,
+    })
   })
 }
 
