@@ -63,10 +63,10 @@ const listenToChannel = () => {
    * @name SwitchWallet
    * @description channel to switch wallet
    */
-  ipcMain.on(IPCChannel.SwitchAccount, (e: Electron.Event) => {
+  ipcMain.on(IPCChannel.SwitchWallet, (e: Electron.Event) => {
     console.info('switch wallet')
     setTimeout(() => {
-      e.sender.send(IPCChannel.SwitchAccount, {
+      e.sender.send(IPCChannel.SwitchWallet, {
         status: 1,
         wallet: 'wallet',
       })
