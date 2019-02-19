@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
-import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import WalletContext from '../../contexts/wallet'
 
-const Panel = styled.div`
+const Panel = styled.div.attrs(({ className }) => ({
+  className,
+}))`
   position: absolute;
   right: 0;
   bottom: 0;
@@ -12,9 +13,11 @@ const Panel = styled.div`
 
 const Notice = () => {
   const wallet = useContext(WalletContext)
-  return <Panel>{wallet ? 'New message coming: {wallet.msg}' : ''}</Panel>
+  return (
+    <Panel className="notification">
+      {wallet ? 'New message coming: {wallet.msg}' : ''}
+    </Panel>
+  )
 }
 
-const Notification = () => createPortal(<Notice />, document.querySelector('#notification') as HTMLElement)
-
-export default Notification
+export default Notice

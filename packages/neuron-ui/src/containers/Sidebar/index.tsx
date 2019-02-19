@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import {
@@ -10,10 +9,12 @@ import {
   Database as IconAddresses,
   Performance as IconSettings,
 } from 'grommet-icons'
-import { mainContents } from '../../components/Router'
+import { authViews } from '../../components/Router'
 import WalletContext from '../../contexts/wallet'
 
-const SidebarAside = styled.div`
+const SidebarAside = styled.div.attrs(({ className }) => ({
+  className,
+}))`
   ul {
     margin: 40px 0 0 0;
     padding: 0 32px;
@@ -52,7 +53,7 @@ const Sidebar = () => {
   const wallet = useContext(WalletContext)
 
   const walletRoutes = walletMenuItems.map(item => {
-    const entry = mainContents.find(route => route.name === item[0])!
+    const entry = authViews.find(route => route.name === item[0])!
     return { icon: item[1], ...entry }
   })
   let menu
@@ -68,12 +69,10 @@ const Sidebar = () => {
   }
 
   return (
-    <SidebarAside>
+    <SidebarAside className="sidebar">
       <ul>{menu}</ul>
     </SidebarAside>
   )
 }
 
-const Container = () => createPortal(<Sidebar />, document.querySelector('aside') as HTMLElement)
-
-export default Container
+export default Sidebar

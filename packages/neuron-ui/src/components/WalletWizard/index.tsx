@@ -9,7 +9,7 @@ const Wizard = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 80px;
+  padding-top: 80px;
   .buttonGroup {
     button {
       height: 40px;

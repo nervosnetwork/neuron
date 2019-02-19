@@ -16,6 +16,7 @@ export enum Routes {
   History = '/history',
   Addresses = '/addresses',
   Settings = '/settings',
+  Wizard = '/wizard',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',

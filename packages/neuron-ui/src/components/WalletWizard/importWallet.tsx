@@ -3,14 +3,16 @@ import styled from 'styled-components'
 import SettingsContext from '../../contexts/settings'
 import { Routes } from '../../utils/const'
 
-import FullScreenView from '../../widgets/FullScreenView'
 import ActionFlow, { ActionStep } from '../ActionFlow'
 import ActionB from './actionB'
 import ActionC from './actionC'
 import ActionD from './actionD'
 
-const CreateWalletDiv = styled(FullScreenView)`
+const CreateWalletDiv = styled.div`
   padding-top: 20px;
+  height: 100%;
+  background-color: white;
+  box-sizing: border-box;
 `
 
 export default (props: any) => {
@@ -23,11 +25,13 @@ export default (props: any) => {
           onAfterBack={() => {
             props.history.goBack()
           }}
-          onBeforeNext={(): boolean => settingsContext.seedsValid}
         >
           <ActionB />
         </ActionStep>
-        <ActionStep title="password" onBeforeNext={() => settingsContext.passwordValid}>
+        <ActionStep
+          title="password"
+          onBeforeNext={() => settingsContext.passwordValid}
+        >
           <ActionC />
         </ActionStep>
         <ActionStep
