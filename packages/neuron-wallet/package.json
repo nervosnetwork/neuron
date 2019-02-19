@@ -20,7 +20,9 @@
     "package-mac": "electron-builder --mac --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
     "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "electron-window-state": "^5.0.3"
+  },
   "devDependencies": {
     "@types/electron": "^1.6.10",
     "electron": "^4.0.1",
