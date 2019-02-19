@@ -19,6 +19,7 @@ function createWindow() {
     height: 600,
     minWidth: 800,
     minHeight: 600,
+    show: false,
     webPreferences: {
       devTools: NODE_ENV === 'development',
     },
@@ -30,6 +31,11 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+  })
+
+  mainWindow.on('ready-to-show', () => {
+    mainWindow!.show()
+    mainWindow!.focus()
   })
 }
 
