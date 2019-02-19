@@ -13,7 +13,7 @@ export enum IPCChannel {
   CreateWallet = 'createWallet',
   ImportWallet = 'importWallet',
   ExportWallet = 'exportWallet',
-  SwitchAccount = 'switchAccount',
+  SwitchWallet = 'switchWallet',
   GetBalance = 'getBalance',
   GetCellsByTypeHash = 'getCellsByTypeHash',
   GetUnspentCells = 'getUnspentCells',
