@@ -4,7 +4,7 @@ import WalletContext, { initWallet } from '../../contexts/wallet'
 import SettingsContext, { initSettings } from '../../contexts/settings'
 
 import ipc, { ipcRenderer } from '../../utils/ipc'
-import { IPCChannel } from '../../utils/const'
+import { Channel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType) => (
   props: React.Props<any>,
@@ -22,14 +22,14 @@ const withProviders = (Comp: React.ComponentType) => (
   })
 
   ipcRenderer.on(
-    IPCChannel.SendCapacity,
+    Channel.SendCapacity,
     (_e: any, args: { status: number; msg: string }) => {
       console.debug(args.msg)
     },
   )
 
   ipcRenderer.on(
-    IPCChannel.GetCellsByTypeHash,
+    Channel.GetCellsByTypeHash,
     (_e: Event, args: { status: number; result: ICell[] }) => {
       // TODO:
       if (args.status) {

@@ -1,6 +1,7 @@
 import { createContext } from 'react'
-import { NETWORK_STATUS } from '../utils/const'
+import { NetworkStatus } from '../utils/const'
 
+// these will be introduced by sdk
 export interface ICell {
   capacity: number
   data: Uint8Array
@@ -22,7 +23,7 @@ export interface IChain {
   cells: ICell[]
   network: {
     ip: string
-    status: NETWORK_STATUS
+    status: NetworkStatus
   }
   tipBlockNumber?: number
 }
@@ -31,7 +32,7 @@ export const initChain: IChain = {
   cells: [],
   network: {
     ip: '',
-    status: NETWORK_STATUS.OFFLINE,
+    status: NetworkStatus.Offline,
   },
   tipBlockNumber: undefined,
 }
