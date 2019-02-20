@@ -1,12 +1,12 @@
 import { createContext } from 'react'
 
-interface ITransfer {
+interface Transfer {
   fee: number
 }
 
-export const initTransfer: ITransfer = {
+export const initTransfer: Transfer = {
   fee: 10,
 }
 
-const TransferContext = createContext<ITransfer>(initTransfer)
+const TransferContext = createContext<Transfer>(initTransfer)
 export default TransferContext
