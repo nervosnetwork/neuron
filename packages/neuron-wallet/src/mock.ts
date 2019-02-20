@@ -10,4 +10,6 @@ export const cell = {
   },
 }
 
-export default { cell }
+export default {
+  cell,
+}

@@ -95,18 +95,15 @@ const listenToChannel = () => {
    * @name GetCellsByTypeHash
    * @description channel to get cells by typehash
    */
-  ipcMain.on(
-    Channel.GetCellsByTypeHash,
-    (e: Electron.Event, ...args: string[]) => {
-      console.info(`get cells by type hash ${args[0]}`)
-      setTimeout(() => {
-        e.sender.send(Channel.GetCellsByTypeHash, {
-          status: 1,
-          result: [cell],
-        })
-      }, 1000)
-    },
-  )
+  ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event, ...args: string[]) => {
+    console.info(`get cells by type hash ${args[0]}`)
+    setTimeout(() => {
+      e.sender.send(Channel.GetCellsByTypeHash, {
+        status: 1,
+        result: [cell],
+      })
+    }, 1000)
+  })
 
   ipcMain.on('ASW', (e: Electron.Event) => {
     e.sender.send('ASW', {
@@ -163,14 +160,14 @@ const listenToChannel = () => {
    */
   ipcMain.on(
     Channel.SendCapacity,
-    (
-      e: Electron.Event,
-      { address, capacity }: { address: string; capacity: number },
-    ) => {
+    (e: Electron.Event, { address, capacity }: { address: string; capacity: number }) => {
       const notification = new Notification({
         title: 'Send Capacity',
         body: `Send Capacity to CKB with ${JSON.stringify(
-          { address, capacity },
+          {
+            address,
+            capacity,
+          },
           null,
           2,
         )}`,

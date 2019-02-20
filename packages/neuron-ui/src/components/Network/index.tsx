@@ -32,13 +32,16 @@ const NetworkStatusHeader = () => {
       <Span>
         <Status
           style={{
-            color:
-              chain.network.status === NetworkStatus.Online ? 'green' : 'red',
+            color: chain.network.status === NetworkStatus.Online ? 'green' : 'red',
           }}
         />
       </Span>
       <Span>{chain.network.ip || 'Not Connected'}</Span>
-      <Span style={{ display: chain.tipBlockNumber ? '' : 'none' }}>
+      <Span
+        style={{
+          display: chain.tipBlockNumber ? '' : 'none',
+        }}
+      >
         {chain.tipBlockNumber || null}
       </Span>
     </FlexDiv>

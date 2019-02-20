@@ -13,17 +13,9 @@ const Dialog = styled.dialog.attrs({
   background-color: rgba(0, 0, 0, 0.7);
 `
 
-export default ({
-  children,
-  open,
-}: {
-  children?: React.ReactNode | string
-  open?: boolean
-}) => {
+export default ({ children, open }: { children?: React.ReactNode | string; open?: boolean }) => {
   if (open && children) {
-    return createPortal(<Dialog>{children}</Dialog>, document.querySelector(
-      '.modal',
-    ) as HTMLElement)
+    return createPortal(<Dialog>{children}</Dialog>, document.querySelector('.modal') as HTMLElement)
   }
   return null
 }

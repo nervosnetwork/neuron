@@ -34,12 +34,18 @@ export default (props: any) => {
   }, [wallet && wallet.name])
   return (
     <Wizard>
-      <div style={{ textAlign: 'center' }}>
+      <div
+        style={{
+          textAlign: 'center',
+        }}
+      >
         <Launch size="large" />
         <h1>Create or import your first wallet</h1>
         <div className="buttonGroup">
           <button
-            style={{ float: 'left' }}
+            style={{
+              float: 'left',
+            }}
             type="button"
             onKeyPress={() => {
               //   for users with physical disabilities who cannot use a mouse
@@ -51,7 +57,9 @@ export default (props: any) => {
             Create New Wallet
           </button>
           <button
-            style={{ float: 'right' }}
+            style={{
+              float: 'right',
+            }}
             type="button"
             onKeyPress={() => {
               //   for users with physical disabilities who cannot use a mouse
