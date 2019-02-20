@@ -5,6 +5,7 @@ import WalletContext from '../../contexts/wallet'
 import { Routes } from '../../utils/const'
 import ImportWallet from './importWallet'
 import CreateWallet from './createWallet'
+import Typography from '../../widgets/Typegraphy'
 
 const Wizard = styled.div`
   display: flex;
@@ -36,7 +37,7 @@ export default (props: any) => {
     <Wizard>
       <div style={{ textAlign: 'center' }}>
         <Launch size="large" />
-        <h1>Create or import your first wallet</h1>
+        <Typography variant="h1">Create or import your first wallet</Typography>
         <div className="buttonGroup">
           <button
             style={{ float: 'left' }}
@@ -48,7 +49,7 @@ export default (props: any) => {
               props.history.push(Routes.CreateWallet)
             }}
           >
-            Create New Wallet
+            <Typography> Create New Wallet </Typography>
           </button>
           <button
             style={{ float: 'right' }}
@@ -60,7 +61,7 @@ export default (props: any) => {
               props.history.push(Routes.ImportWallet)
             }}
           >
-            Import Wallet
+            <Typography> Import Wallet </Typography>
           </button>
         </div>
       </div>
