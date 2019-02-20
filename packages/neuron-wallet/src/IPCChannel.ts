@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, Notification } from 'electron'
 import Core from '../../../node_modules/ckb-sdk-js/packages/ckb-sdk-core'
 import { IPCChannel } from './utils/const'
 import { cell } from './mock'
@@ -167,13 +167,15 @@ const listenToChannel = () => {
       e: Electron.Event,
       { addr, capacity }: { addr: string; capacity: number },
     ) => {
-      console.info(
-        `Send Capacity to CKB with ${JSON.stringify(
+      const notification = new Notification({
+        title: 'Send Capacity',
+        body: `Send Capacity to CKB with ${JSON.stringify(
           { addr, capacity },
           null,
           2,
         )}`,
-      )
+      })
+      notification.show()
       setTimeout(() => {
         e.sender.send(IPCChannel.SendCapacity, {
           status: 1,
@@ -188,7 +190,11 @@ const listenToChannel = () => {
    * @description channel to send transaction
    */
   ipcMain.on(IPCChannel.SendTransaction, (e: Electron.Event) => {
-    console.info('send transaction')
+    const notification = new Notification({
+      title: 'Send Transaction',
+      body: 'transaction detail',
+    })
+    notification.show()
     setTimeout(() => {
       e.sender.send(IPCChannel.SendTransaction, {
         status: 1,

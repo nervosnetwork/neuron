@@ -22,7 +22,7 @@
     "lint": "lerna run lint",
     "test": "lerna run --parallel test",
     "start:ui": "lerna run --scope=@nervosnetwork/neuron-ui start",
-    "start:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet start",
+    "start:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet watch",
     "start": "cross-env NODE_ENV=development concurrently \"yarn run start:ui\" \"wait-on http://localhost:3000 && yarn run start:wallet\"",
     "build:ui": "lerna run --scope=@nervosnetwork/neuron-ui build",
     "build:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet build",
