@@ -23,7 +23,7 @@ mac:
 
 linux:
   category: Development
-  icon: packages/neuron-wallet/assets/images/icon.ico
+  icon: packages/neuron-wallet/assets/images/icon.png
   target:
     - "AppImage"
     - "deb"
