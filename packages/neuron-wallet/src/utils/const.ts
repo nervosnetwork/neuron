@@ -1,9 +1,29 @@
-export enum IPC_CHANNEL {
-  SEND_CAPACITY = 'sendCapacity',
-  GET_LIVE_CELL = 'getLiveCell',
-  GET_CELLS_BY_TYPE_HASH = 'getCellsByTypeHash',
+export enum IPCChannel {
+  // Chain
+  GetBlock = 'getBlock',
+  GetTransaction = 'getTransaction',
+  GetLiveCell = 'getLiveCell',
+  GetTipHeader = 'getTipHeader',
+  GetTipBlockNumber = 'getTipBlockNumber',
+  GetLocalNodeId = 'getLocalNodeId',
+  GetNetwork = 'getNetwork',
+  GwitchNetwork = 'switchNetwork',
+
+  // Wallet
+  CreateWallet = 'createWallet',
+  ImportWallet = 'importWallet',
+  ExportWallet = 'exportWallet',
+  SwitchWallet = 'switchWallet',
+  GetBalance = 'getBalance',
+  GetCellsByTypeHash = 'getCellsByTypeHash',
+  GetUnspentCells = 'getUnspentCells',
+  GetTransactions = 'getTransactions',
+  GetWallets = 'getWallets',
+  SendCapacity = 'sendCapacity',
+  SendTransaction = 'sendTransaction',
+  Sign = 'sign',
 }
 
 export default {
-  IPC_CHANNEL,
+  IPCChannel,
 }
