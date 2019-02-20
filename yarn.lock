@@ -1741,28 +1741,29 @@
     "@types/unist" "*"
     "@types/vfile-message" "*"
 
-"@typescript-eslint/eslint-plugin@1.2.1-alpha.22":
-  version "1.2.1-alpha.22"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-1.2.1-alpha.22.tgz#4fd74fc86330969b1afd63c60cf1908d74fbf54c"
-  integrity sha512-MAo/asYlfxgGndjlTaggwBOoDbv7HYhJvA/8WN9BVmzLaNrbNVtoGpuq01TPGczfHw6n1fBTdNb+i+cRpvLqEg==
+"@typescript-eslint/eslint-plugin@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-1.4.0.tgz#d37e8731a1fddfb2955c1acabac674c533294511"
+  integrity sha512-LXLxWdq7nwGrJhMB78EKV+PJw4uWLyQLePRbJjbz6klItPaTa+5zxAr3+GGPaKlhTHKdoCsUaIGfCLjopUA65w==
   dependencies:
-    "@typescript-eslint/parser" "1.2.1-alpha.22+fc50167"
+    "@typescript-eslint/parser" "1.4.0"
+    "@typescript-eslint/typescript-estree" "1.4.0"
     requireindex "^1.2.0"
     tsutils "^3.7.0"
 
-"@typescript-eslint/parser@1.2.1-alpha.22", "@typescript-eslint/parser@1.2.1-alpha.22+fc50167":
-  version "1.2.1-alpha.22"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-1.2.1-alpha.22.tgz#7a59222e7822dc17eb546694e56879d96ae07243"
-  integrity sha512-iqikS7OHAo9V/qWusg+FWUM6FPDFQD37Ii0Fg+5yj7RD3mBse0laoMnTI+7LOSqzOi6na54/qkB8fyMoITE2HA==
+"@typescript-eslint/parser@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-1.4.0.tgz#44f29af2d97f635a8aedb295eb32ada099cf457f"
+  integrity sha512-OvXhpgFCKLxuvoGgtFHQP5gvJvqKGpGjarSPg27E07+OPIcZJ3EpZDdELZuY+0hCA4wqnQ9JzHoTBhdEOMo9Pg==
   dependencies:
-    "@typescript-eslint/typescript-estree" "1.2.1-alpha.22+fc50167"
+    "@typescript-eslint/typescript-estree" "1.4.0"
     eslint-scope "^4.0.0"
     eslint-visitor-keys "^1.0.0"
 
-"@typescript-eslint/typescript-estree@1.2.1-alpha.22+fc50167":
-  version "1.2.1-alpha.22"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-1.2.1-alpha.22.tgz#76c923efddddecacbac227c088ec256dbc177e5c"
-  integrity sha512-aGRuuFvybqXx8itT1JWMYAu3GF/MBSaXBCCCgDT6BE3s265B7Rz2xmQFDbriNkzGXSQMdwdh8ebHDcxL1RS/9g==
+"@typescript-eslint/typescript-estree@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-1.4.0.tgz#d49f6506c4e0ce37c8a5022240d6a440ecf4008f"
+  integrity sha512-s0Y1/nMSRwIRK+8umAkvUoKsP12Ze8QMAdjVSYLZbrWy8NlsrTLLhpTR5rPEEW7uCnmJtv40kr51PrYAyaJVOw==
   dependencies:
     lodash.unescape "4.0.1"
     semver "5.5.0"
