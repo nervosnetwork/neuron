@@ -17,7 +17,7 @@ const Address = styled.div`
 `
 
 const Receive = () => {
-  const address: string = '0xcf078d66b3614C4c32B018ceF9100A39FaE7DC0D'
+  const address: string = '0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674'
   return (
     <ReceivePanel>
       <h1>Receive</h1>

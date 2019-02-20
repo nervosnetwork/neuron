@@ -1,7 +1,6 @@
 import React, { useState, useContext, useReducer } from 'react'
 import ChainContext, { initChain, ICell } from '../../contexts/chain'
 import WalletContext from '../../contexts/wallet'
-import TransferContext, { initTransfer } from '../../contexts/transfer'
 
 import ModalContext, { initModal, modalReducer, MODAL_ACTION_TYPES } from '../../contexts/modal'
 import SettingsContext, { initSettings } from '../../contexts/settings'
@@ -14,7 +13,6 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   const wallet = useContext(WalletContext)
   const [settings] = useState(initSettings)
   const [modal, dispatch] = useReducer(modalReducer, initModal)
-  const [transfer] = useState(initTransfer)
 
   const modalValue = {
     ...modal,
@@ -44,9 +42,7 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
       <SettingsContext.Provider value={settings}>
         <ChainContext.Provider value={chain}>
           <WalletContext.Provider value={wallet}>
-            <TransferContext.Provider value={transfer}>
-              <Comp {...props} />
-            </TransferContext.Provider>
+            <Comp {...props} />
           </WalletContext.Provider>
         </ChainContext.Provider>
       </SettingsContext.Provider>
