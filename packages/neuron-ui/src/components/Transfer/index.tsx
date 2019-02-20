@@ -106,7 +106,7 @@ const Transfer = () => {
         <div>To: </div>
         <input
           type="text"
-          value={state.addr || ''}
+          defaultValue={state.addr || ''}
           placeholder="eg: 0xcf078d66b3614C4c32B018ceF9100A39FaE7DC0D"
           onChange={() => {
             handleAction(TRANSFER_ACTION_TYPES.ADDR)
@@ -117,7 +117,7 @@ const Transfer = () => {
         <div>Capacity: </div>
         <input
           type="text"
-          value={state.capacity || ''}
+          defaultValue={state.capacity || ''}
           placeholder="eg: 100"
           onChange={() => {
             handleAction(TRANSFER_ACTION_TYPES.CAPACITY)
