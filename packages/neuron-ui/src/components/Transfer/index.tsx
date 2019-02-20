@@ -55,19 +55,25 @@ interface Transfer {
   submitting: boolean
 }
 
-const reducer = (
-  state: Transfer,
-  action: { type: TransferActionTypes; value?: any },
-) => {
+const reducer = (state: Transfer, action: { type: TransferActionTypes; value?: any }) => {
   switch (action.type) {
     case TransferActionTypes.Address: {
-      return { ...state, address: action.value }
+      return {
+        ...state,
+        address: action.value,
+      }
     }
     case TransferActionTypes.Capacity: {
-      return { ...state, capacity: action.value }
+      return {
+        ...state,
+        capacity: action.value,
+      }
     }
     case TransferActionTypes.Submit: {
-      return { ...state, submitting: true }
+      return {
+        ...state,
+        submitting: true,
+      }
     }
     default: {
       return state
@@ -82,26 +88,27 @@ const initState: Transfer = {
   submitting: false,
 }
 
-function isMouseEvent(
-  e: React.ChangeEvent | React.MouseEvent,
-): e is React.MouseEvent {
+function isMouseEvent(e: React.ChangeEvent | React.MouseEvent): e is React.MouseEvent {
   return e.type === 'click'
 }
 
 const Transfer = () => {
   const [state, dispatch] = useReducer(reducer, initState)
   const handleAction = (type: TransferActionTypes) => (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.MouseEvent<HTMLButtonElement>,
+    e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     if (type === TransferActionTypes.Submit) {
       ipc.sendCapacity(state.address, state.capacity.toString(16))
     }
     if (isMouseEvent(e)) {
-      dispatch({ type })
+      dispatch({
+        type,
+      })
     } else {
-      dispatch({ type, value: e.target.value ? e.target.value : '' })
+      dispatch({
+        type,
+        value: e.target.value ? e.target.value : '',
+      })
     }
   }
 

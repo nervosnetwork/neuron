@@ -53,7 +53,10 @@ const Sidebar = () => {
 
   const walletRoutes = walletMenuItems.map(item => {
     const entry = mainContents.find(route => route.name === item[0])!
-    return { icon: item[1], ...entry }
+    return {
+      icon: item[1],
+      ...entry,
+    }
   })
   let menu
   if (wallet) {
