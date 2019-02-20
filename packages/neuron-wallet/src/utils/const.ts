@@ -1,4 +1,4 @@
-export enum IPCChannel {
+export enum Channel {
   // Chain
   GetBlock = 'getBlock',
   GetTransaction = 'getTransaction',
@@ -25,5 +25,5 @@ export enum IPCChannel {
 }
 
 export default {
-  IPCChannel,
+  Channel,
 }

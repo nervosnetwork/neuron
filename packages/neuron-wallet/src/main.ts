@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import * as path from 'path'
-import listenToChannel from './IPCChannel'
+import listenToChannel from './Channel'
 import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null

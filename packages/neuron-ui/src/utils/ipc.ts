@@ -1,4 +1,4 @@
-import { IPCChannel } from './const'
+import { Channel } from './const'
 
 declare global {
   interface Window {
@@ -27,11 +27,11 @@ export const ipcRenderer = (() => {
 const asw = () => ipcRenderer.send('ASW')
 const getLiveCell = (outpoint: any) => ipcRenderer.send('getLiveCell', outpoint)
 const getCellsByTypeHash = (typeHash: string) => {
-  ipcRenderer.send(IPCChannel.GetCellsByTypeHash, typeHash)
+  ipcRenderer.send(Channel.GetCellsByTypeHash, typeHash)
 }
-const sendCapacity = (addr: string, capacity: string) => {
-  ipcRenderer.send(IPCChannel.SendCapacity, {
-    addr,
+const sendCapacity = (address: string, capacity: string) => {
+  ipcRenderer.send(Channel.SendCapacity, {
+    address,
     capacity,
   })
 }
