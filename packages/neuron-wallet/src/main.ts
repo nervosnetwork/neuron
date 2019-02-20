@@ -1,7 +1,8 @@
 import { app, BrowserWindow, Menu } from 'electron'
+import windowStateKeeper from 'electron-window-state'
 import * as path from 'path'
 import listenToChannel from './IPCChannel'
-import menuTemplate from './utils/menuTemplate'
+import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -14,26 +15,47 @@ const ENTRY = {
 
 listenToChannel()
 function createWindow() {
+  const windowState = windowStateKeeper({
+    defaultWidth: 1366,
+    defaultHeight: 768,
+  })
+
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    x: windowState.x,
+    y: windowState.y,
+    width: windowState.width,
+    height: windowState.height,
     minWidth: 800,
     minHeight: 600,
+    show: false,
     webPreferences: {
       devTools: NODE_ENV === 'development',
     },
   })
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
+  windowState.manage(mainWindow)
+
+  Menu.setApplicationMenu(menu)
 
   mainWindow.loadURL(NODE_ENV === 'development' ? ENTRY.DEV : ENTRY.PROD)
 
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  mainWindow.on('ready-to-show', () => {
+    mainWindow!.show()
+    mainWindow!.focus()
+  })
 }
 
 app.on('ready', createWindow)
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
 
 app.on('activate', () => {
   if (mainWindow === null) {
