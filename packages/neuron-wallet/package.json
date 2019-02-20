@@ -13,7 +13,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "watch": "concurrently \"tsc -w\" \"nodemon ./dist/main.js --exec ./node_modules/.bin/electron .\"",
+    "watch": "tsc -w && nodemon ./dist/main.js --exec ./node_modules/.bin/electron .",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "start": "yarn run build && electron .",
     "package-win": "electron-builder --win --x64  --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
@@ -21,6 +21,7 @@
     "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js"
   },
   "dependencies": {
+    "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.1",
     "electron-window-state": "^5.0.3"
   },
   "devDependencies": {

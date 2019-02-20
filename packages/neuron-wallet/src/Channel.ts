@@ -1,5 +1,5 @@
 import { ipcMain, Notification } from 'electron'
-import Core from '../../../node_modules/ckb-sdk-js/packages/ckb-sdk-core'
+import Core from '@nervosnetwork/ckb-sdk-core'
 import { Channel } from './utils/const'
 import { cell } from './mock'
 
