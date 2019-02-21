@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
-import WalletContext from '../../contexts/wallet'
+import WalletContext from '../../contexts/Wallet'
 import { Routes } from '../../utils/const'
 
 const Home = () => {

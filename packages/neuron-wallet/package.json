@@ -25,6 +25,7 @@
     "electron-window-state": "^5.0.3"
   },
   "devDependencies": {
+    "@nervosnetwork/ckb-types": "^0.0.1-alpha.1",
     "@types/electron": "^1.6.10",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.5",

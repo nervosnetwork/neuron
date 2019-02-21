@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import { Launch } from 'grommet-icons'
-import WalletContext from '../../contexts/wallet'
+import WalletContext from '../../contexts/Wallet'
 import { Routes } from '../../utils/const'
 import ImportWallet from './importWallet'
 import CreateWallet from './createWallet'
