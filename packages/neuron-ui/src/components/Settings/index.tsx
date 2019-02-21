@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Tab, Tabs } from 'grommet'
+import { Tab, Tabs, RadioButton } from 'grommet'
 
 const SettingsPanel = styled.div`
   width: 800px;
@@ -13,8 +13,11 @@ const ContentPanel = styled.div`
   align-items: left;
   margin: 30px;
 `
-
 const ItemPanel = styled.li`
+  margin-top: 30px;
+`
+
+const NetworkItem = styled.div`
   margin-top: 30px;
 `
 
@@ -27,10 +30,10 @@ const Settings = () => {
     'Wallet Name4',
     'Wallet Name5',
     'Wallet Name6',
-    'Wallet Name7',
-    'Wallet Name8',
   ]
-  const networks: string[] = ['mainnet', 'testnet']
+  const networks: string[] = ['Mainnet', 'Testnet']
+  const [selected, setSelected] = useState(networks[0])
+
   return (
     <SettingsPanel>
       <Tabs flex="grow" alignSelf="center">
@@ -38,7 +41,9 @@ const Settings = () => {
           <ContentPanel>
             <ItemPanel>Photo Setting</ItemPanel>
             <ItemPanel>Password Setting</ItemPanel>
-            <ItemPanel>Finger Setting</ItemPanel>
+            <ItemPanel>Language Setting</ItemPanel>
+            <ItemPanel>About Neuron</ItemPanel>
+            <ItemPanel>Contact Us</ItemPanel>
           </ContentPanel>
         </Tab>
         <Tab title={tabs[1]}>
@@ -51,7 +56,16 @@ const Settings = () => {
         <Tab title={tabs[2]}>
           <ContentPanel>
             {networks.map(network => (
-              <ItemPanel>{network}</ItemPanel>
+              <NetworkItem>
+                <RadioButton
+                  name="network"
+                  checked={selected === network}
+                  label={network}
+                  onChange={() => {
+                    setSelected(network)
+                  }}
+                />
+              </NetworkItem>
             ))}
           </ContentPanel>
         </Tab>
