@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { NetworkStatus } from '../../utils/const'
-import ChainContext from '../../contexts/chain'
+import ChainContext from '../../contexts/Chain'
 
 const Status = styled.div`
   width: 8px;
