@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
-import SettingsContext from '../../contexts/settings'
+import SettingsContext from '../../contexts/Settings'
 import { Routes } from '../../utils/const'
 
 import FullScreenView from '../../widgets/FullScreenView'

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import ChainContext, { ICell } from '../../contexts/chain'
+import ChainContext, { ICell } from '../../contexts/Chain'
 import ipc from '../../utils/ipc'
 
 const headers = ['outPoint', 'reference', 'args', 'signedArgs', 'version']

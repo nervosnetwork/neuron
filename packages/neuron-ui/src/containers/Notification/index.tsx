@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
-import WalletContext from '../../contexts/wallet'
+import WalletContext from '../../contexts/Wallet'
 
 const Panel = styled.div`
   position: absolute;
