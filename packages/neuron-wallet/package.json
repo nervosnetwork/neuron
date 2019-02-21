@@ -18,7 +18,8 @@
     "start": "yarn run build && electron .",
     "package-win": "electron-builder --win --x64  --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
     "package-mac": "electron-builder --mac --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
-    "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js"
+    "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
+    "postinstall": "npm rebuild tiny-secp256k1"
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.1",

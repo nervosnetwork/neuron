@@ -15,7 +15,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom --color",
     "eject": "react-scripts eject",
-    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "postinstall": "npm rebuild tiny-secp256k1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

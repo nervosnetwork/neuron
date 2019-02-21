@@ -31,7 +31,8 @@
     "package-win": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-win",
     "package-mac": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-mac",
     "package-linux": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-linux",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "postinstall": "npm rebuild tiny-secp256k1 && lerna run postinstall"
   },
   "lint-staged": {
     "packages/*/src/**/*.{ts,tsx}": [
