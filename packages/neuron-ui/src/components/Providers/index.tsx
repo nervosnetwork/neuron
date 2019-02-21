@@ -4,11 +4,9 @@ import WalletContext, { initWallet } from '../../contexts/wallet'
 import SettingsContext, { initSettings } from '../../contexts/settings'
 
 import ipc, { ipcRenderer } from '../../utils/ipc'
-import { IPCChannel } from '../../utils/const'
+import { Channel } from '../../utils/const'
 
-const withProviders = (Comp: React.ComponentType) => (
-  props: React.Props<any>,
-) => {
+const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
   const [settings] = useState(initSettings)
@@ -18,25 +16,26 @@ const withProviders = (Comp: React.ComponentType) => (
   }, [])
 
   ipcRenderer.on('ASW', (_e: any, args: { status: number; result: any }) => {
-    setWallet({ ...wallet, name: 'asw', wallet: args.result })
+    setWallet({
+      ...wallet,
+      name: 'asw',
+      wallet: args.result,
+    })
   })
 
-  ipcRenderer.on(
-    IPCChannel.SendCapacity,
-    (_e: any, args: { status: number; msg: string }) => {
-      console.debug(args.msg)
-    },
-  )
+  ipcRenderer.on(Channel.SendCapacity, (_e: any, args: { status: number; msg: string }) => {
+    console.debug(args.msg)
+  })
 
-  ipcRenderer.on(
-    IPCChannel.GetCellsByTypeHash,
-    (_e: Event, args: { status: number; result: ICell[] }) => {
-      // TODO:
-      if (args.status) {
-        setChain({ ...chain, cells: args.result })
-      }
-    },
-  )
+  ipcRenderer.on(Channel.GetCellsByTypeHash, (_e: Event, args: { status: number; result: ICell[] }) => {
+    // TODO:
+    if (args.status) {
+      setChain({
+        ...chain,
+        cells: args.result,
+      })
+    }
+  })
   return (
     <SettingsContext.Provider value={settings}>
       <ChainContext.Provider value={chain}>

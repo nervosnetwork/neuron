@@ -1,9 +1,9 @@
-export enum NETWORK_STATUS {
-  ONLINE = 'online',
-  OFFLINE = 'offline',
+export enum NetworkStatus {
+  Online = 'online',
+  Offline = 'offline',
 }
 
-export enum IPCChannel {
+export enum Channel {
   SendCapacity = 'sendCapacity',
   GetCellsByTypeHash = 'getCellsByTypeHash',
 }

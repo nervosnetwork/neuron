@@ -68,7 +68,13 @@ ActionStep.displayName = 'ActionStep'
 
 const renderHeader = (child: ActionStep, i: number) => (
   <ActionFlowHeaderStyle key={i}>
-    <div style={{ margin: '0 auto' }}>{i}</div>
+    <div
+      style={{
+        margin: '0 auto',
+      }}
+    >
+      {i}
+    </div>
     <div>{child.props.title}</div>
   </ActionFlowHeaderStyle>
 )
@@ -83,7 +89,9 @@ const ActionFlow = ({ children }: { children: Array<ActionStep> }) => {
       <div className="actionFlowBody">{children[step - 1]}</div>
       <div className="actionFlowFooter">
         <button
-          style={{ float: 'left' }}
+          style={{
+            float: 'left',
+          }}
           type="button"
           onKeyPress={() => {
             //   for users with physical disabilities who cannot use a mouse
@@ -100,7 +108,9 @@ const ActionFlow = ({ children }: { children: Array<ActionStep> }) => {
           Back
         </button>
         <button
-          style={{ float: 'right' }}
+          style={{
+            float: 'right',
+          }}
           type="button"
           onKeyPress={() => {
             //   for users with physical disabilities who cannot use a mouse

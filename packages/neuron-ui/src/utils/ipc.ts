@@ -1,4 +1,4 @@
-import { IPCChannel } from './const'
+import { Channel } from './const'
 
 declare global {
   interface Window {
@@ -12,14 +12,10 @@ export const ipcRenderer = (() => {
   }
   return {
     send: (channel: string, msg: any) => {
-      console.warn(
-        `Message: ${msg} to channel ${channel} failed due to Electron not loaded`,
-      )
+      console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
     on: (channel: string, cb: Function) => {
-      console.warn(
-        `Channel ${channel} and Function ${cb.toString()} failed due to Electron not laoded`,
-      )
+      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not laoded`)
     },
   }
 })()
@@ -27,11 +23,11 @@ export const ipcRenderer = (() => {
 const asw = () => ipcRenderer.send('ASW')
 const getLiveCell = (outpoint: any) => ipcRenderer.send('getLiveCell', outpoint)
 const getCellsByTypeHash = (typeHash: string) => {
-  ipcRenderer.send(IPCChannel.GetCellsByTypeHash, typeHash)
+  ipcRenderer.send(Channel.GetCellsByTypeHash, typeHash)
 }
-const sendCapacity = (addr: string, capacity: string) => {
-  ipcRenderer.send(IPCChannel.SendCapacity, {
-    addr,
+const sendCapacity = (address: string, capacity: string) => {
+  ipcRenderer.send(Channel.SendCapacity, {
+    address,
     capacity,
   })
 }

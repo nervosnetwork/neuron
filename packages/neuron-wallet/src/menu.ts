@@ -1,7 +1,16 @@
-import { app, shell, Menu, MenuItemConstructorOptions } from 'electron'
+import { app, shell, Menu, MenuItemConstructorOptions, dialog } from 'electron'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
+}
+
+const options = {
+  type: 'info',
+  title: app.getName(),
+  message: app.getName(),
+  detail: app.getVersion(),
+  buttons: ['OK'],
+  cancelId: 0,
 }
 
 const menuTemplate = [
@@ -10,6 +19,9 @@ const menuTemplate = [
     submenu: [
       {
         role: 'about',
+        click: () => {
+          dialog.showMessageBox(options)
+        },
       },
       separator,
       {

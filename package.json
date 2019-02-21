@@ -42,8 +42,8 @@
   "devDependencies": {
     "@cryptape/sdk-ts-config": "0.0.1",
     "@types/jest": "^24.0.0",
-    "@typescript-eslint/eslint-plugin": "1.2.1-alpha.22",
-    "@typescript-eslint/parser": "1.2.1-alpha.22",
+    "@typescript-eslint/eslint-plugin": "1.4.0",
+    "@typescript-eslint/parser": "1.4.0",
     "concurrently": "^4.1.0",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
@@ -62,9 +62,7 @@
     "typescript": "^3.3.1",
     "wait-on": "^3.2.0"
   },
-  "dependencies": {
-    "ckb-sdk-js": "https://github.com/Keith-CY/ckb-sdk-js/"
-  },
+  "dependencies": {},
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

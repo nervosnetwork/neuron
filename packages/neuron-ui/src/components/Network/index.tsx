@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
-import { NETWORK_STATUS } from '../../utils/const'
+import { NetworkStatus } from '../../utils/const'
 import ChainContext from '../../contexts/chain'
 
 const Status = styled.div`
@@ -30,10 +30,20 @@ const NetworkStatusHeader = () => {
   return (
     <FlexDiv>
       <Span>
-        <Status style={{ color: chain.network.status === NETWORK_STATUS.ONLINE ? 'green' : 'red' }} />
+        <Status
+          style={{
+            color: chain.network.status === NetworkStatus.Online ? 'green' : 'red',
+          }}
+        />
       </Span>
       <Span>{chain.network.ip || 'Not Connected'}</Span>
-      <Span style={{ display: chain.tipBlockNumber ? '' : 'none' }}>{chain.tipBlockNumber || null}</Span>
+      <Span
+        style={{
+          display: chain.tipBlockNumber ? '' : 'none',
+        }}
+      >
+        {chain.tipBlockNumber || null}
+      </Span>
     </FlexDiv>
   )
 }

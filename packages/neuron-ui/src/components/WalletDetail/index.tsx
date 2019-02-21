@@ -7,7 +7,11 @@ const WalletDetail = () => {
   return wallet.name ? (
     <>
       <h1>{wallet.name}</h1>
-      <div style={{ height: '1200px' }}>
+      <div
+        style={{
+          height: '1200px',
+        }}
+      >
         Simulate long content...
         <div>{JSON.stringify(wallet)}</div>
       </div>

@@ -42,29 +42,38 @@ const RangeLayout = styled.div`
   }
 `
 
-enum TRANSFER_ACTION_TYPES {
-  ADDR,
-  CAPACITY,
-  SUBMIT,
+enum TransferActionTypes {
+  Address,
+  Capacity,
+  Submit,
 }
 
 interface Transfer {
-  addr: string
+  address: string
   capacity: number
   fee: number
   submitting: boolean
 }
 
-const reducer = (state: Transfer, action: { type: TRANSFER_ACTION_TYPES; value?: any }) => {
+const reducer = (state: Transfer, action: { type: TransferActionTypes; value?: any }) => {
   switch (action.type) {
-    case TRANSFER_ACTION_TYPES.ADDR: {
-      return { ...state, addr: action.value }
+    case TransferActionTypes.Address: {
+      return {
+        ...state,
+        address: action.value,
+      }
     }
-    case TRANSFER_ACTION_TYPES.CAPACITY: {
-      return { ...state, capacity: action.value }
+    case TransferActionTypes.Capacity: {
+      return {
+        ...state,
+        capacity: action.value,
+      }
     }
-    case TRANSFER_ACTION_TYPES.SUBMIT: {
-      return { ...state, submitting: true }
+    case TransferActionTypes.Submit: {
+      return {
+        ...state,
+        submitting: true,
+      }
     }
     default: {
       return state
@@ -73,7 +82,7 @@ const reducer = (state: Transfer, action: { type: TRANSFER_ACTION_TYPES; value?:
 }
 
 const initState: Transfer = {
-  addr: '',
+  address: '',
   capacity: 0,
   fee: 0,
   submitting: false,
@@ -85,16 +94,21 @@ function isMouseEvent(e: React.ChangeEvent | React.MouseEvent): e is React.Mouse
 
 const Transfer = () => {
   const [state, dispatch] = useReducer(reducer, initState)
-  const handleAction = (type: TRANSFER_ACTION_TYPES) => (
+  const handleAction = (type: TransferActionTypes) => (
     e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
-    if (type === TRANSFER_ACTION_TYPES.SUBMIT) {
-      ipc.sendCapacity(state.addr, state.capacity.toString(16))
+    if (type === TransferActionTypes.Submit) {
+      ipc.sendCapacity(state.address, state.capacity.toString(16))
     }
     if (isMouseEvent(e)) {
-      dispatch({ type })
+      dispatch({
+        type,
+      })
     } else {
-      dispatch({ type, value: e.target.value ? e.target.value : '' })
+      dispatch({
+        type,
+        value: e.target.value ? e.target.value : '',
+      })
     }
   }
 
@@ -106,10 +120,10 @@ const Transfer = () => {
         <div>To: </div>
         <input
           type="text"
-          defaultValue={state.addr || ''}
+          defaultValue={state.address || ''}
           placeholder="eg: 0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674"
           onChange={() => {
-            handleAction(TRANSFER_ACTION_TYPES.ADDR)
+            handleAction(TransferActionTypes.Address)
           }}
         />
       </InputDiv>
@@ -120,7 +134,7 @@ const Transfer = () => {
           defaultValue={state.capacity || ''}
           placeholder="eg: 100"
           onChange={() => {
-            handleAction(TRANSFER_ACTION_TYPES.CAPACITY)
+            handleAction(TransferActionTypes.Capacity)
           }}
         />
       </InputDiv>
@@ -137,7 +151,7 @@ const Transfer = () => {
           }}
         />
       </RangeLayout>
-      <SendButton type="submit" onClick={handleAction(TRANSFER_ACTION_TYPES.SUBMIT)}>
+      <SendButton type="submit" onClick={handleAction(TransferActionTypes.Submit)}>
         Send
       </SendButton>
     </TransferPanel>

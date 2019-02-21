@@ -1,6 +1,6 @@
 import { ipcMain, Notification } from 'electron'
-import Core from '../../../node_modules/ckb-sdk-js/packages/ckb-sdk-core'
-import { IPCChannel } from './utils/const'
+import Core from '@nervosnetwork/ckb-sdk-core'
+import { Channel } from './utils/const'
 import { cell } from './mock'
 
 const remote = 'http://localhost:8114'
@@ -13,8 +13,8 @@ const listenToChannel = () => {
    * @name GetLiveCell
    * @description channel to get live cell
    */
-  ipcMain.on(IPCChannel.GetLiveCell, (e: Electron.Event, ...args: string[]) => {
-    e.sender.send(IPCChannel.GetLiveCell, args)
+  ipcMain.on(Channel.GetLiveCell, (e: Electron.Event, ...args: string[]) => {
+    e.sender.send(Channel.GetLiveCell, args)
   })
 
   // wallet
@@ -22,14 +22,14 @@ const listenToChannel = () => {
    * @name CreateWallet
    * @description channel to create wallet
    */
-  ipcMain.on(IPCChannel.CreateWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.CreateWallet, (e: Electron.Event) => {
     console.info('create a wallet')
     setTimeout(() => {
-      e.sender.send(IPCChannel.CreateWallet, {
+      e.sender.send(Channel.CreateWallet, {
         status: 1,
         result: {
           name: 'wallet name',
-          addr: 'wallet addr',
+          address: 'wallet address',
         },
       })
     }, 1000)
@@ -39,10 +39,10 @@ const listenToChannel = () => {
    * @name ImportWallet
    * @description channel to import wallet
    */
-  ipcMain.on(IPCChannel.ImportWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
     console.info('import a wallet')
     setTimeout(() => {
-      e.sender.send(IPCChannel.ImportWallet, {
+      e.sender.send(Channel.ImportWallet, {
         status: 1,
       })
     }, 1000)
@@ -52,10 +52,10 @@ const listenToChannel = () => {
    * @name ExportWallet
    * @description channel to export wallets
    */
-  ipcMain.on(IPCChannel.ExportWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
     console.info('export wallets')
     setTimeout(() => {
-      e.sender.send(IPCChannel.ExportWallet, {
+      e.sender.send(Channel.ExportWallet, {
         status: 1,
         result: 'wallets',
       })
@@ -66,10 +66,10 @@ const listenToChannel = () => {
    * @name SwitchWallet
    * @description channel to switch wallet
    */
-  ipcMain.on(IPCChannel.SwitchWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.SwitchWallet, (e: Electron.Event) => {
     console.info('switch wallet')
     setTimeout(() => {
-      e.sender.send(IPCChannel.SwitchWallet, {
+      e.sender.send(Channel.SwitchWallet, {
         status: 1,
         wallet: 'wallet',
       })
@@ -80,10 +80,10 @@ const listenToChannel = () => {
    * @name GetBalance
    * @description channel to get balance
    */
-  ipcMain.on(IPCChannel.GetBalance, (e: Electron.Event) => {
+  ipcMain.on(Channel.GetBalance, (e: Electron.Event) => {
     console.info('get balance')
     setTimeout(() => {
-      e.sender.send(IPCChannel.GetBalance, {
+      e.sender.send(Channel.GetBalance, {
         status: 1,
         result: 'balance',
       })
@@ -95,18 +95,15 @@ const listenToChannel = () => {
    * @name GetCellsByTypeHash
    * @description channel to get cells by typehash
    */
-  ipcMain.on(
-    IPCChannel.GetCellsByTypeHash,
-    (e: Electron.Event, ...args: string[]) => {
-      console.info(`get cells by type hash ${args[0]}`)
-      setTimeout(() => {
-        e.sender.send(IPCChannel.GetCellsByTypeHash, {
-          status: 1,
-          result: [cell],
-        })
-      }, 1000)
-    },
-  )
+  ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event, ...args: string[]) => {
+    console.info(`get cells by type hash ${args[0]}`)
+    setTimeout(() => {
+      e.sender.send(Channel.GetCellsByTypeHash, {
+        status: 1,
+        result: [cell],
+      })
+    }, 1000)
+  })
 
   ipcMain.on('ASW', (e: Electron.Event) => {
     e.sender.send('ASW', {
@@ -119,10 +116,10 @@ const listenToChannel = () => {
    * @name GetUnspentCells
    * @description channel to get unspent cells
    */
-  ipcMain.on(IPCChannel.GetUnspentCells, (e: Electron.Event) => {
+  ipcMain.on(Channel.GetUnspentCells, (e: Electron.Event) => {
     console.info('get unspent cells')
     setTimeout(() => {
-      e.sender.send(IPCChannel.GetUnspentCells, {
+      e.sender.send(Channel.GetUnspentCells, {
         status: 1,
         result: ['cells'],
       })
@@ -133,10 +130,10 @@ const listenToChannel = () => {
    * @name GetTransactions
    * @description get transactions
    */
-  ipcMain.on(IPCChannel.GetTransactions, (e: Electron.Event) => {
+  ipcMain.on(Channel.GetTransactions, (e: Electron.Event) => {
     console.info('get transactions')
     setTimeout(() => {
-      e.sender.send(IPCChannel.GetTransactions, {
+      e.sender.send(Channel.GetTransactions, {
         status: 1,
         result: ['transaction'],
       })
@@ -147,10 +144,10 @@ const listenToChannel = () => {
    * @name Get GetWallets
    * @description channel to get wallets
    */
-  ipcMain.on(IPCChannel.GetWallets, (e: Electron.Event) => {
+  ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
     console.info('get wallets')
     setTimeout(() => {
-      e.sender.send(IPCChannel.GetWallets, {
+      e.sender.send(Channel.GetWallets, {
         status: 1,
         result: ['wallet'],
       })
@@ -162,24 +159,24 @@ const listenToChannel = () => {
    * @description channel to send capacity
    */
   ipcMain.on(
-    IPCChannel.SendCapacity,
-    (
-      e: Electron.Event,
-      { addr, capacity }: { addr: string; capacity: number },
-    ) => {
+    Channel.SendCapacity,
+    (e: Electron.Event, { address, capacity }: { address: string; capacity: number }) => {
       const notification = new Notification({
         title: 'Send Capacity',
         body: `Send Capacity to CKB with ${JSON.stringify(
-          { addr, capacity },
+          {
+            address,
+            capacity,
+          },
           null,
           2,
         )}`,
       })
       notification.show()
       setTimeout(() => {
-        e.sender.send(IPCChannel.SendCapacity, {
+        e.sender.send(Channel.SendCapacity, {
           status: 1,
-          msg: `Send ${capacity} Capacity to ${addr} Successfully`,
+          msg: `Send ${capacity} Capacity to ${address} Successfully`,
         })
       }, 1000)
     },
@@ -189,14 +186,14 @@ const listenToChannel = () => {
    * @name SendTransaction
    * @description channel to send transaction
    */
-  ipcMain.on(IPCChannel.SendTransaction, (e: Electron.Event) => {
+  ipcMain.on(Channel.SendTransaction, (e: Electron.Event) => {
     const notification = new Notification({
       title: 'Send Transaction',
       body: 'transaction detail',
     })
     notification.show()
     setTimeout(() => {
-      e.sender.send(IPCChannel.SendTransaction, {
+      e.sender.send(Channel.SendTransaction, {
         status: 1,
         result: {
           hash: 'transaction hash',
@@ -209,10 +206,10 @@ const listenToChannel = () => {
    * @name sign
    * @description channel to sign msg
    */
-  ipcMain.on(IPCChannel.Sign, (e: Electron.Event) => {
+  ipcMain.on(Channel.Sign, (e: Electron.Event) => {
     console.info('sign message')
     setTimeout(() => {
-      e.sender.send(IPCChannel.Sign, {
+      e.sender.send(Channel.Sign, {
         status: 1,
         result: 'signed msg',
       })
