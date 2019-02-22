@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import ChainContext, { initChain, ICell } from '../../contexts/chain'
-import WalletContext, { initWallet } from '../../contexts/wallet'
-import SettingsContext, { initSettings } from '../../contexts/settings'
+import ChainContext, { initChain, ICell } from '../../contexts/Chain'
+import WalletContext, { initWallet } from '../../contexts/Wallet'
+import SettingsContext, { initSettings } from '../../contexts/Settings'
 
 import ipc, { ipcRenderer } from '../../utils/ipc'
 import { Channel } from '../../utils/const'

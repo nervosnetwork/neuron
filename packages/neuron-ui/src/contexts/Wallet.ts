@@ -2,12 +2,15 @@ import { createContext } from 'react'
 
 interface Wallet {
   name: string
-  wallet: any
+  wallet: { address: string; publicKey: Uint8Array }
   msg: string
 }
-export const initWallet = {
+export const initWallet: Wallet = {
   name: 'My First #1',
-  wallet: {},
+  wallet: {
+    address: '',
+    publicKey: new Uint8Array(0),
+  },
   msg: '',
 }
 

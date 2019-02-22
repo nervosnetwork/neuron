@@ -18,12 +18,11 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "lint": "lerna run lint",
-    "test": "lerna run --parallel test",
     "start:ui": "lerna run --scope=@nervosnetwork/neuron-ui start",
-    "start:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet watch",
+    "start:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet start",
+    "watch:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet watch",
     "start": "cross-env NODE_ENV=development concurrently \"yarn run start:ui\" \"wait-on http://localhost:3000 && yarn run start:wallet\"",
+    "watch": "cross-env NODE_ENV=development concurrently -c blue,cyan -n ui,wallet \"cd packages/neuron-ui && yarn run start\" \"wait-on http://localhost:3000 && cd packages/neuron-wallet && yarn run watch\"",
     "build:ui": "lerna run --scope=@nervosnetwork/neuron-ui build",
     "build:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet build",
     "build": "cross-env NODE_ENV=production concurrently \"yarn build:ui\" \"yarn build:wallet\"",
@@ -31,6 +30,9 @@
     "package-win": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-win",
     "package-mac": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-mac",
     "package-linux": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-linux",
+    "bootstrap": "lerna bootstrap",
+    "lint": "lerna run lint",
+    "test": "lerna run --parallel test",
     "precommit": "lint-staged",
     "postinstall": "npm rebuild tiny-secp256k1 && lerna run postinstall"
   },
