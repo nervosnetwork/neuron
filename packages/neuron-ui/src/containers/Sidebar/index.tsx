@@ -11,7 +11,7 @@ import {
   Performance as IconSettings,
 } from 'grommet-icons'
 import { mainContents } from '../../components/Router'
-import WalletContext from '../../contexts/wallet'
+import WalletContext from '../../contexts/Wallet'
 
 const SidebarAside = styled.div`
   ul {

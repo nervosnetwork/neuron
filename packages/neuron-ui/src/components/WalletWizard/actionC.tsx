@@ -1,6 +1,6 @@
 import React, { useRef, useContext } from 'react'
 import styled from 'styled-components'
-import SettingsContext from '../../contexts/settings'
+import SettingsContext from '../../contexts/Settings'
 
 const InputDiv = styled.div`
   input {
