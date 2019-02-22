@@ -15,7 +15,7 @@ export enum Routes {
   Receive = '/receive',
   History = '/history',
   Addresses = '/addresses',
-  Settings = '/settings/general',
+  Settings = '/settings',
   SettingsGeneral = '/settings/general',
   SettingsWallets = '/settings/wallets',
   SettingsNetwork = '/settings/network',

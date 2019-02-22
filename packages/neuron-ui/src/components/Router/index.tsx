@@ -13,9 +13,9 @@ import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
-import General from '../Settings/general'
-import Wallets from '../Settings/wallets'
-import Network from '../Settings/network'
+import General from '../Settings/General'
+import Wallets from '../Settings/Wallets'
+import Network from '../Settings/Network'
 
 interface CustomRoute {
   path: string
