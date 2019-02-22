@@ -1,30 +1,46 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Tab, Tabs } from 'grommet'
-import General from './general'
-import Wallets from './wallets'
-import Network from './network'
+import { Routes } from '../../utils/const'
 
 const SettingsPanel = styled.div`
   width: 800px;
 `
 
-const Settings = () => {
-  const tabs: string[] = ['General', 'Wallets', 'Network']
+const TabBar = styled.div`
+  display: flex;
+  flex-direction: row;
+`
 
+const TabItem = styled.button`
+  width: 200px;
+`
+
+const Settings = (props: any) => {
   return (
     <SettingsPanel>
-      <Tabs flex="grow" alignSelf="center">
-        <Tab title={tabs[0]}>
-          <General />
-        </Tab>
-        <Tab title={tabs[1]}>
-          <Wallets />
-        </Tab>
-        <Tab title={tabs[2]}>
-          <Network />
-        </Tab>
-      </Tabs>
+      <TabBar>
+        <TabItem
+          onClick={() => {
+            props.history.push(Routes.SettingsGeneral)
+          }}
+        >
+          General
+        </TabItem>
+        <TabItem
+          onClick={() => {
+            props.history.push(Routes.SettingsWallets)
+          }}
+        >
+          Wallets
+        </TabItem>
+        <TabItem
+          onClick={() => {
+            props.history.push(Routes.SettingsNetwork)
+          }}
+        >
+          Network
+        </TabItem>
+      </TabBar>
     </SettingsPanel>
   )
 }
