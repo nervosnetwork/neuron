@@ -1,7 +1,7 @@
 appId: com.nervos.neuron
 copyright: Copyright (C) 2019 Nervos Foundation. All rights reserved
 productName: Neuron
-artifactName: "${productName}-${version}.${ext}"
+
 
 asar: false
 
@@ -15,14 +15,20 @@ files:
   - packages/neuron-wallet/dist/
 
 win:
-  target: nsis
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   icon: packages/neuron-wallet/assets/images/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
 
 mac:
+  artifactName: "${productName}-${version}-${os}.${ext}"
   category: blockchain_wallet
   icon: packages/neuron-wallet/assets/images/icon.icns
 
 linux:
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   category: Development
   icon: packages/neuron-wallet/assets/images/icon.png
   target:
