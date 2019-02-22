@@ -33,7 +33,8 @@
     "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
     "test": "lerna run --parallel test",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "postinstall": "npm rebuild tiny-secp256k1 && lerna run postinstall"
   },
   "lint-staged": {
     "packages/*/src/**/*.{ts,tsx}": [
