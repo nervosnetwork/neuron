@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">= 10.15",
+    "node": ">= 11.10",
     "yarn": ">= 1.12"
   },
   "workspaces": [
