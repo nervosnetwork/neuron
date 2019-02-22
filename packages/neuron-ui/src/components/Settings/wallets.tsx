@@ -64,9 +64,10 @@ const General = () => {
   const [walletSelected, setWalletSelected] = useState(wallets[0])
   const [walletsState, setWalletsState] = useState(wallets)
 
-  const deleteWallet = (walletName: string) => {
+  const deleteWallet = () => {
     const temps = walletsState
-    const index = temps.indexOf(walletName)
+    const temp = walletSelected
+    const index = temps.indexOf(temp)
     if (index > -1) {
       temps.splice(index, 1)
     }
@@ -123,7 +124,7 @@ const General = () => {
         </UpdateWallet>
         <DeleteWallet
           onClick={() => {
-            deleteWallet(walletSelected)
+            deleteWallet()
           }}
         >
           Delete
