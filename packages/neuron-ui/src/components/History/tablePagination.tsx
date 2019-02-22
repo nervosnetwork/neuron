@@ -52,7 +52,7 @@ const TablePagination = (props: TablePaginationProps) => {
     pages = [-2, -1, 0, 1, 2].map(i => i + idx)
   }
 
-  const callback = (idx: number) => {
+  const changePage = (idx: number) => {
     if (page !== idx && idx >= 0 && idx < totalPage) {
       onChange(idx)
     }
@@ -68,26 +68,26 @@ const TablePagination = (props: TablePaginationProps) => {
             </Text>
           </Box>
           <Separator />
-          <Button label="<<" color={page === 0 ? 'light-3' : 'light-2'} onClick={() => callback(0)} primary />
-          <Button label="<" color={page === 0 ? 'light-3' : 'light-2'} onClick={() => callback(page - 1)} primary />
+          <Button label="<<" color={page === 0 ? 'light-3' : 'light-2'} onClick={() => changePage(0)} primary />
+          <Button label="<" color={page === 0 ? 'light-3' : 'light-2'} onClick={() => changePage(page - 1)} primary />
           {pages.map(idx => (
             <Button
               label={(idx + 1).toString()}
               color={idx === page ? 'light-6' : 'light-2'}
-              onClick={() => callback(idx)}
+              onClick={() => changePage(idx)}
               primary
             />
           ))}
           <Button
             label=">"
             color={page + 1 === totalPage ? 'light-3' : 'light-2'}
-            onClick={() => callback(page + 1)}
+            onClick={() => changePage(page + 1)}
             primary
           />
           <Button
             label=">>"
             color={page + 1 === totalPage ? 'light-3' : 'light-2'}
-            onClick={() => callback(totalPage - 1)}
+            onClick={() => changePage(totalPage - 1)}
             primary
           />
         </Box>
