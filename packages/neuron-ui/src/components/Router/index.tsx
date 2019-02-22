@@ -1,6 +1,8 @@
 import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom'
 import { Routes } from '../../utils/const'
+
+import RoutesWithProps from './RoutesWithProps'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
 import Sidebar from '../../containers/Sidebar'
@@ -14,7 +16,7 @@ import Addresses from '../Addresses'
 import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 
-interface CustomRoute {
+export interface CustomRoute {
   path: string
   name: string
   exact?: boolean
@@ -105,14 +107,12 @@ export const mainContents: CustomRoute[] = [
   },
 ]
 
-const renderComp = (route: CustomRoute) => <Route key={route.name} {...route} />
-
 const CustomRouter = () => (
   <Router>
     <>
-      {containers.map(renderComp)}
+      <RoutesWithProps contents={containers} />
       <MainContent>
-        <>{mainContents.map(renderComp)}</>
+        <RoutesWithProps contents={mainContents} />
       </MainContent>
     </>
   </Router>

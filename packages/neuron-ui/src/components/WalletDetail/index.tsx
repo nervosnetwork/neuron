@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import WalletContext from '../../contexts/Wallet'
+import { ContentProps } from '../../containers/MainContent'
 
-const WalletDetail = () => {
+const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentProps>> = () => {
   const wallet = useContext(WalletContext)
 
   return wallet.name ? (
