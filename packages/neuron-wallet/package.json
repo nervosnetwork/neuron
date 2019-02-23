@@ -12,15 +12,16 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "electron .",
+    "start": "tsc && electron .",
     "build": "tsc",
     "watch:run": "nodemon ./dist/main.js --exec ./node_modules/.bin/electron .",
     "watch:build": "tsc -w",
     "watch": "concurrently -c cyan,cyan -n build,run \"yarn run watch:build\" \"yarn run watch:run\"",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "package-win": "electron-builder --win --x64  --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
-    "package-mac": "electron-builder --mac --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
-    "package-linux": "electron-builder --linux --project ../../ -c packages/neuron-wallet/electron-builder.yml -c.extraMetadata.main=packages/neuron-wallet/dist/main.js",
+    "package-mwl": "electron-builder -mwl",
+    "package-win": "electron-builder --win --x64",
+    "package-mac": "electron-builder --mac",
+    "package-linux": "electron-builder --linux",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.1",
+    "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/electron": "^1.6.10",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.5",
