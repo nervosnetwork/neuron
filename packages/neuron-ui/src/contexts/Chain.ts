@@ -33,7 +33,10 @@ export interface Chain {
     status: NetworkStatus
   }
   tipBlockNumber?: number
-  transactions: Transaction[]
+  transactions: {
+    count: number
+    items: Transaction[]
+  }
 }
 
 export const initChain: Chain = {
@@ -43,7 +46,10 @@ export const initChain: Chain = {
     status: NetworkStatus.Offline,
   },
   tipBlockNumber: undefined,
-  transactions: [],
+  transactions: {
+    count: 0,
+    items: [],
+  },
 }
 
 const ChainContext = createContext<Chain>(initChain)

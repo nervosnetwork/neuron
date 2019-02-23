@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { DataTable, Text } from 'grommet'
 import styled from 'styled-components'
-import TablePagination from './tablePagination'
+import TablePagination from './TablePagination'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 
@@ -29,7 +29,6 @@ const History = () => {
   const chain = useContext(ChainContext)
   const pageSize = 14
   const [page, setPage] = useState(0)
-  const total = 200
 
   useEffect(() => {
     // This should be moved to the top level
@@ -41,6 +40,7 @@ const History = () => {
       <h1>History</h1>
       <DataTable
         id="list"
+        primaryKey="key"
         columns={[
           {
             header: 'Date',
@@ -61,13 +61,18 @@ const History = () => {
             render: (transaction: Transaction) => <Text>{transaction.hash}</Text>,
           },
         ]}
-        data={transactionsToHistory(chain.transactions)}
+        data={transactionsToHistory(chain.transactions.items)}
         margin={{
           bottom: 'xsmall',
         }}
       />
       <FooterDiv>
-        <TablePagination page={page} pageSize={pageSize} total={total} onChange={idx => setPage(idx)} />
+        <TablePagination
+          page={page}
+          pageSize={pageSize}
+          total={chain.transactions.count}
+          onChange={idx => setPage(idx)}
+        />
       </FooterDiv>
     </div>
   )

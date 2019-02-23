@@ -55,12 +55,15 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
 
   ipcRenderer.on(
     Channel.GetTransactions,
-    (_e: Event, args: Response<{ total: number; transactions: Transaction[] }>) => {
+    (_e: Event, args: Response<{ count: number; transactions: Transaction[] }>) => {
       // TODO:
       if (args.status) {
         setChain({
           ...chain,
-          transactions: args.result.transactions,
+          transactions: {
+            count: args.result.count,
+            items: args.result.transactions,
+          },
         })
       }
     },

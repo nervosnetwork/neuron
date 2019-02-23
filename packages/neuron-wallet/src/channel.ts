@@ -135,7 +135,7 @@ const listenToChannel = () => {
     e.sender.send(Channel.GetTransactions, {
       status: 1,
       result: {
-        totoal: transactions.length * 2,
+        count: transactions.length * 2,
         transactions: transactions.map(tx => ({
           ...tx,
           value: tx.value * page,
