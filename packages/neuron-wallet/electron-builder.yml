@@ -6,17 +6,19 @@ productName: Neuron
 asar: false
 
 directories:
-  buildResources: packages/neuron-wallet
-  output: packages/neuron-wallet/release
+  buildResources: .
+  output: ./release
 
 files:
-  - packages/neuron-wallet/package.json
-  - packages/neuron-ui/build/
-  - packages/neuron-wallet/dist/
+  - ./package.json
+  - ./dist/
+  -
+    from: ./node_modules/@nervosnetwork/neuron-ui/build/
+    to: ./ui
 
 win:
   artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
-  icon: packages/neuron-wallet/assets/images/icon.ico
+  icon: ./assets/images/icon.ico
   target:
     - target: nsis
       arch:
@@ -25,12 +27,12 @@ win:
 mac:
   artifactName: "${productName}-${version}-${os}.${ext}"
   category: blockchain_wallet
-  icon: packages/neuron-wallet/assets/images/icon.icns
+  icon: ./assets/images/icon.icns
 
 linux:
   artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   category: Development
-  icon: packages/neuron-wallet/assets/images/icon.png
+  icon: ./assets/images/icon.png
   target:
     - "AppImage"
     - "deb"
