@@ -51,7 +51,6 @@ const DeleteWallet = styled(WalletButton)`
 const UpdateWallet = styled(WalletButton)`
   margin: 30px 0 0 50px;
 `
-
 const General = () => {
   const wallets: string[] = [
     'Wallet Name1',

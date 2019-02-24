@@ -9,7 +9,6 @@ const ContentPanel = styled.div`
   align-items: left;
   margin: 30px;
 `
-
 const NetworkItem = styled.div`
   margin-top: 30px;
 `

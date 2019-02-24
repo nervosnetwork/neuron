@@ -12,7 +12,6 @@ const ContentPanel = styled.div`
 const ItemPanel = styled.li`
   margin-top: 30px;
 `
-
 const General = () => {
   return (
     <ContentPanel>
