@@ -1,7 +1,7 @@
 import { ipcMain, Notification } from 'electron'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { Channel } from './utils/const'
-import { cell } from './mock'
+import { cell, transactions, transactionCount } from './mock'
 
 const remote = 'http://localhost:8114'
 export const ckbCore = new Core(remote)
@@ -130,13 +130,17 @@ const listenToChannel = () => {
    * @name GetTransactions
    * @description get transactions
    */
-  ipcMain.on(Channel.GetTransactions, (e: Electron.Event) => {
-    console.info('get transactions')
-    setTimeout(() => {
-      e.sender.send(Channel.GetTransactions, {
-        status: 1,
-        result: ['transaction'],
-      })
+  ipcMain.on(Channel.GetTransactions, (e: Electron.Event, { page, pageSize }: { page: number; pageSize: number }) => {
+    console.info(`get transactions in page: ${page}, pageSize: ${pageSize}`)
+    e.sender.send(Channel.GetTransactions, {
+      status: 1,
+      result: {
+        count: transactionCount,
+        transactions: transactions.map(tx => ({
+          ...tx,
+          value: tx.value * page,
+        })),
+      },
     })
   })
 
@@ -151,7 +155,7 @@ const listenToChannel = () => {
         status: 1,
         result: ['wallet'],
       })
-    })
+    }, 1000)
   })
 
   /**

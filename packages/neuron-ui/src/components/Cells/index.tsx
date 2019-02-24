@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import ChainContext, { ICell } from '../../contexts/Chain'
+import ChainContext, { Cell } from '../../contexts/Chain'
 import ipc from '../../utils/ipc'
 
 const headers = ['outPoint', 'reference', 'args', 'signedArgs', 'version']
@@ -25,7 +25,7 @@ const Cells = () => {
           {chain.cells.map(cell => (
             <tr key={JSON.stringify(cell.outPoint)}>
               {headers.map(header => (
-                <td key={header}>{JSON.stringify(cell[header as keyof ICell])}</td>
+                <td key={header}>{JSON.stringify(cell[header as keyof Cell])}</td>
               ))}
             </tr>
           ))}
