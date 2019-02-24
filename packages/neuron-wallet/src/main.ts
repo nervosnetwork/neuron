@@ -1,7 +1,8 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import * as path from 'path'
-import listenToChannel from './Channel'
+import listenToChannel from './channel'
+import monitorChain from './monitor'
 import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
@@ -47,6 +48,11 @@ function createWindow() {
     mainWindow!.show()
     mainWindow!.focus()
   })
+  /**
+   * @monitorChain
+   * @description monitor network
+   */
+  monitorChain(mainWindow.webContents)
 }
 
 app.on('ready', createWindow)

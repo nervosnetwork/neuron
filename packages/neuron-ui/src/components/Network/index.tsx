@@ -36,7 +36,8 @@ const NetworkStatusHeader = () => {
           }}
         />
       </Span>
-      <Span>{chain.network.ip || 'Not Connected'}</Span>
+      <Span>{chain.network.ip}</Span>
+      <Span>{chain.network.status}</Span>
       <Span
         style={{
           display: chain.tipBlockNumber ? '' : 'none',
