@@ -10,7 +10,7 @@ Nervos CKB Wallet
 
 ### Prerequisites
 
-You will need `node >= 10.15` and `yarn >= 1.12` to build and run this Neuron.
+You will need `node >= 11.10` and `yarn >= 1.12` to build and run this Neuron.
 
 In the project directory, you can run:
 

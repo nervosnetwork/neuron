@@ -122,9 +122,7 @@ const Transfer = () => {
           type="text"
           defaultValue={state.address || ''}
           placeholder="eg: 0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674"
-          onChange={() => {
-            handleAction(TransferActionTypes.Address)
-          }}
+          onChange={handleAction(TransferActionTypes.Address)}
         />
       </InputDiv>
       <InputDiv>
@@ -133,9 +131,7 @@ const Transfer = () => {
           type="text"
           defaultValue={state.capacity || ''}
           placeholder="eg: 100"
-          onChange={() => {
-            handleAction(TransferActionTypes.Capacity)
-          }}
+          onChange={handleAction(TransferActionTypes.Capacity)}
         />
       </InputDiv>
       <RangeLayout>

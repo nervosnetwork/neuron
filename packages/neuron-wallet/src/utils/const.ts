@@ -7,7 +7,7 @@ export enum Channel {
   GetTipBlockNumber = 'getTipBlockNumber',
   GetLocalNodeId = 'getLocalNodeId',
   GetNetwork = 'getNetwork',
-  GwitchNetwork = 'switchNetwork',
+  SwitchNetwork = 'switchNetwork',
 
   // Wallet
   CreateWallet = 'createWallet',
