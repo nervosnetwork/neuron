@@ -1,4 +1,7 @@
 @import './layout.scss';
+* {
+  user-select: none;
+}
 
 html {
   height: 100%;
