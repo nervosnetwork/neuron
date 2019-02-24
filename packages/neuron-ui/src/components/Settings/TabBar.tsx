@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Routes } from '../../utils/const'
 
-const TabBarPenal = styled.div`
+const TabBarPanel = styled.div`
   display: flex;
   flex-direction: row;
 `
@@ -17,7 +17,7 @@ const TabItem = styled.div`
 `
 const TabBar = (props: any) => {
   return (
-    <TabBarPenal>
+    <TabBarPanel>
       <TabItem
         onClick={() => {
           props.history.push(Routes.SettingsGeneral)
@@ -39,7 +39,7 @@ const TabBar = (props: any) => {
       >
         Network
       </TabItem>
-    </TabBarPenal>
+    </TabBarPanel>
   )
 }
 
