@@ -15,6 +15,9 @@ import History from '../History'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
+import General from '../Settings/General'
+import Wallets from '../Settings/Wallets'
+import Network from '../Settings/Network'
 
 export interface CustomRoute {
   path: string
@@ -86,6 +89,24 @@ export const mainContents: CustomRoute[] = [
     path: Routes.Settings,
     exact: false,
     component: Settings,
+  },
+  {
+    name: 'SettingsGeneral',
+    path: Routes.SettingsGeneral,
+    exact: false,
+    component: General,
+  },
+  {
+    name: 'SettingsWallets',
+    path: Routes.SettingsWallets,
+    exact: false,
+    component: Wallets,
+  },
+  {
+    name: 'SettingsNetwork',
+    path: Routes.SettingsNetwork,
+    exact: false,
+    component: Network,
   },
   {
     name: 'CreateWallet',

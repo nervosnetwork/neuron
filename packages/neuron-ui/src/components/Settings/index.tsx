@@ -1,3 +1,8 @@
 import React from 'react'
+import TabBar from './TabBar'
 
-export default () => <h1>Settings</h1>
+const Settings = (props: any) => {
+  return <TabBar {...props} />
+}
+
+export default Settings
