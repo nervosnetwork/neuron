@@ -4,7 +4,7 @@ import { Channel } from './utils/const'
 import { cell } from './mock'
 
 const remote = 'http://localhost:8114'
-const ckbCore = new Core(remote)
+export const ckbCore = new Core(remote)
 const asw = ckbCore.wallet.newASW()
 
 const listenToChannel = () => {
