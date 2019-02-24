@@ -22,7 +22,12 @@
     "package-win": "electron-builder --win --x64",
     "package-mac": "electron-builder --mac",
     "package-linux": "electron-builder --linux",
-    "postinstall": "npm rebuild tiny-secp256k1"
+    "postinstall": "npm rebuild tiny-secp256k1",
+    "test": "jest"
+  },
+  "jest": {
+    "moduleFileExtensions": ["ts", "js"],
+    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(ts?|js?)$"
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.1",
@@ -34,6 +39,7 @@
     "@types/electron": "^1.6.10",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.5",
+    "spectron": "^5.0.0",
     "tslint": "^5.12.1"
   }
 }
