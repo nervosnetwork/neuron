@@ -18,7 +18,10 @@ export const transactions = Array.from({
   hash: Math.round(Math.random() * 10000000000000000),
 }))
 
+export const transactionCount = 500
+
 export default {
   cell,
   transactions,
+  transactionCount,
 }

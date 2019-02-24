@@ -1,7 +1,7 @@
 import { ipcMain, Notification } from 'electron'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { Channel } from './utils/const'
-import { cell, transactions } from './mock'
+import { cell, transactions, transactionCount } from './mock'
 
 const remote = 'http://localhost:8114'
 export const ckbCore = new Core(remote)
@@ -135,7 +135,7 @@ const listenToChannel = () => {
     e.sender.send(Channel.GetTransactions, {
       status: 1,
       result: {
-        count: transactions.length * 2,
+        count: transactionCount,
         transactions: transactions.map(tx => ({
           ...tx,
           value: tx.value * page,

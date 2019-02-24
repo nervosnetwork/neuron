@@ -31,7 +31,7 @@ const sendCapacity = (address: string, capacity: string) => {
     capacity,
   })
 }
-const getHistory = (page: number, pageSize: number) => {
+const getTransactions = (page: number, pageSize: number) => {
   ipcRenderer.send(Channel.GetTransactions, {
     page,
     pageSize,
@@ -43,5 +43,5 @@ export default {
   getLiveCell,
   getCellsByTypeHash,
   sendCapacity,
-  getHistory,
+  getTransactions,
 }

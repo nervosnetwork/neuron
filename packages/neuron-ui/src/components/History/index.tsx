@@ -32,7 +32,7 @@ const History = () => {
 
   useEffect(() => {
     // This should be moved to the top level
-    ipc.getHistory(page, pageSize)
+    ipc.getTransactions(page, pageSize)
   }, [page, pageSize])
 
   return (
