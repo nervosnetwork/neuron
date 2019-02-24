@@ -23,7 +23,7 @@
     "package-mac": "electron-builder --mac",
     "package-linux": "electron-builder --linux",
     "postinstall": "npm rebuild tiny-secp256k1",
-    "test": "jest"
+    "test": "jest --color"
   },
   "jest": {
     "moduleFileExtensions": ["ts", "js"],
