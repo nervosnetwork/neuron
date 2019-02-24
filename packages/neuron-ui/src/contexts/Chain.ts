@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { NetworkStatus } from '../utils/const'
 
 // these will be introduced by sdk
-export interface ICell {
+export interface Cell {
   capacity: number
   data: Uint8Array
   lock: string
@@ -19,23 +19,32 @@ export interface ICell {
   }
 }
 
-export interface IChain {
-  cells: ICell[]
+// will be introduced by sdk
+export interface Transaction {
+  date: Date
+  value: string
+  hash: string
+}
+
+export interface Chain {
+  cells: Cell[]
   network: {
     ip: string
     status: NetworkStatus
   }
   tipBlockNumber?: number
+  transactions: Transaction[]
 }
 
-export const initChain: IChain = {
+export const initChain: Chain = {
   cells: [],
   network: {
     ip: '',
     status: NetworkStatus.Offline,
   },
   tipBlockNumber: undefined,
+  transactions: [],
 }
 
-const ChainContext = createContext<IChain>(initChain)
+const ChainContext = createContext<Chain>(initChain)
 export default ChainContext

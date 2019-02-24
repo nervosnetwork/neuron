@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import ChainContext, { initChain, ICell } from '../../contexts/Chain'
+import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
 import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
 
 import ipc, { ipcRenderer } from '../../utils/ipc'
 import { Channel, NetworkStatus } from '../../utils/const'
+
+interface Response<T> {
+  status: number
+  result: T
+  msg?: string
+}
 
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
@@ -15,7 +21,7 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     ipc.asw()
   }, [])
 
-  ipcRenderer.on('ASW', (_e: any, args: { status: number; result: any }) => {
+  ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({
       ...wallet,
       name: 'asw',
@@ -23,24 +29,21 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     })
   })
 
-  ipcRenderer.on(
-    Channel.GetNetwork,
-    (_e: Event, args: { status: number; result: { remote: { url: string }; connected: boolean } }) => {
-      setChain({
-        ...chain,
-        network: {
-          ip: args.result.remote.url,
-          status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-        },
-      })
-    },
-  )
+  ipcRenderer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
+    setChain({
+      ...chain,
+      network: {
+        ip: args.result.remote.url,
+        status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
+      },
+    })
+  })
 
-  ipcRenderer.on(Channel.SendCapacity, (_e: any, args: { status: number; msg: string }) => {
+  ipcRenderer.on(Channel.SendCapacity, (_e: any, args: Response<any>) => {
     console.debug(args.msg)
   })
 
-  ipcRenderer.on(Channel.GetCellsByTypeHash, (_e: Event, args: { status: number; result: ICell[] }) => {
+  ipcRenderer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
     // TODO:
     if (args.status) {
       setChain({
@@ -49,6 +52,20 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
       })
     }
   })
+
+  ipcRenderer.on(
+    Channel.GetTransactions,
+    (_e: Event, args: Response<{ total: number; transactions: Transaction[] }>) => {
+      // TODO:
+      if (args.status) {
+        setChain({
+          ...chain,
+          transactions: args.result.transactions,
+        })
+      }
+    },
+  )
+
   return (
     <SettingsContext.Provider value={settings}>
       <ChainContext.Provider value={chain}>

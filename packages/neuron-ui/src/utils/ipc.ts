@@ -31,10 +31,17 @@ const sendCapacity = (address: string, capacity: string) => {
     capacity,
   })
 }
+const getHistory = (page: number, pageSize: number) => {
+  ipcRenderer.send(Channel.GetTransactions, {
+    page,
+    pageSize,
+  })
+}
 
 export default {
   asw,
   getLiveCell,
   getCellsByTypeHash,
   sendCapacity,
+  getHistory,
 }
