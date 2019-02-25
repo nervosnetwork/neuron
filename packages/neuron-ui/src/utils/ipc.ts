@@ -15,7 +15,7 @@ export const ipcRenderer = (() => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
     on: (channel: string, cb: Function) => {
-      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not laoded`)
+      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
     },
   }
 })()
