@@ -9,8 +9,8 @@ import CreateWallet from './createWallet'
 const Wizard = styled.div`
   .full-screen & {
     background-color: white;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
   }
   display: flex;
   align-items: center;
