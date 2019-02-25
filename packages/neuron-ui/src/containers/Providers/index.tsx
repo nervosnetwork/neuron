@@ -20,13 +20,14 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   useEffect(() => {
     ipc.asw()
   }, [])
-
   ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
-    setWallet({
-      ...wallet,
-      name: 'asw',
-      wallet: args.result,
-    })
+    if (wallet) {
+      setWallet({
+        ...wallet,
+        name: 'asw',
+        wallet: args.result,
+      })
+    }
   })
 
   ipcRenderer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {

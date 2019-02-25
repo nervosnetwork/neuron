@@ -6,7 +6,7 @@ interface Wallet {
   wallet: { address: string; publicKey: Uint8Array }
   msg: string
 }
-export const initWallet: Wallet = {
+export const initWallet: Wallet | null = {
   name: 'My First #1',
   balance: 0,
   wallet: {
@@ -16,5 +16,5 @@ export const initWallet: Wallet = {
   msg: '',
 }
 
-const WalletContext = createContext<Wallet>(initWallet)
+const WalletContext = createContext<Wallet | null>(initWallet)
 export default WalletContext
