@@ -12,7 +12,7 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && cross-env NODE_ENV=development electron .",
+    "start": "tsc && electron .",
     "build": "tsc",
     "watch:run": "nodemon ./dist/main.js --exec ./node_modules/.bin/electron .",
     "watch:build": "tsc -w",
