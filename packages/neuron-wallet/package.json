@@ -26,7 +26,10 @@
     "test": "jest --color"
   },
   "jest": {
-    "moduleFileExtensions": ["ts", "js"],
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    },
+    "moduleFileExtensions": ["ts", "js", "json", "node"],
     "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(ts?|js?)$"
   },
   "dependencies": {
