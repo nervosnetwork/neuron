@@ -2,8 +2,9 @@ import { Application } from 'spectron'
 
 describe('Setup tests', () => {
   let app: Application
+  const delay = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
-  beforeEach(() => {
+  beforeAll(async () => {
     app = new Application({
       path: 'node_modules/.bin/electron',
       args: ['dist/main.js'],
@@ -14,7 +15,7 @@ describe('Setup tests', () => {
     return app.start()
   })
 
-  afterEach(() => {
+  afterAll(() => {
     if (app.isRunning) {
       return app.stop()
     }
@@ -25,6 +26,7 @@ describe('Setup tests', () => {
     const { client, browserWindow } = app
 
     await client.waitUntilWindowLoaded()
+    await delay(500)
     const title = await browserWindow.getTitle()
 
     expect(title).toBe('Electron')
