@@ -30,7 +30,8 @@
       "^.+\\.ts?$": "ts-jest"
     },
     "moduleFileExtensions": ["ts", "js", "json", "node"],
-    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(ts?|js?)$"
+    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(ts?|js?)$",
+    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.1",
