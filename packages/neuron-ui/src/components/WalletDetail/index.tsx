@@ -14,7 +14,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
         }}
       >
         Simulate long content...
-        <div>{JSON.stringify(wallet)}</div>
+        <div>{`balance: ${wallet.balance}`}</div>
       </div>
     </>
   ) : (

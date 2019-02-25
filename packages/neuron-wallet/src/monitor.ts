@@ -1,32 +1,47 @@
+import { interval } from 'rxjs'
+import { map, distinctUntilChanged, flatMap } from 'rxjs/operators'
 import { Channel } from './utils/const'
 import { ckbCore } from './channel'
 
-let network = {
-  remote: {
-    url: '',
-  },
-  connected: false,
-}
+const numbers = interval(1000)
+const asw = ckbCore.wallet.newASW()
 
-const monitorNetwork = (wenContents: Electron.WebContents) => {
-  const result = {
-    remote: ckbCore.node,
-    connected: false,
-  }
-  // TODO: add connected property in sdk
-  if (network.remote.url !== result.remote.url || network.connected !== result.connected) {
-    network = result
-    wenContents.send(Channel.GetNetwork, {
-      status: 1,
-      result,
-    })
-  }
+const monitorNetwork = () => ({
+  remote: ckbCore.node,
+  connected: false,
+})
+
+const monitorBalance = async () => {
+  return asw.getBalance()
 }
 
 const monitorChain = (webContents: Electron.WebContents) => {
-  setInterval(() => {
-    monitorNetwork(webContents)
-  }, 3000)
+  numbers
+    .pipe(map(() => monitorNetwork()))
+    .pipe(
+      distinctUntilChanged((x, y) => {
+        return x.connected === y.connected && x.remote.url === y.remote.url
+      }),
+    )
+    .subscribe(result => {
+      console.info(`network updated to ${JSON.stringify(result, null, 2)}`)
+      webContents.send(Channel.GetNetwork, {
+        status: 1,
+        result,
+      })
+    })
+
+  numbers
+    .pipe(flatMap(monitorBalance))
+    .pipe(distinctUntilChanged())
+    .subscribe(result => {
+      console.info(`get balance of ${asw.address}: ${result}`)
+      if (!webContents) return
+      webContents.send(Channel.GetBalance, {
+        status: 1,
+        result,
+      })
+    })
 }
 
 export default monitorChain
