@@ -7,6 +7,8 @@ describe('Setup tests', () => {
     app = new Application({
       path: 'node_modules/.bin/electron',
       args: ['dist/main.js'],
+      startTimeout: 10_000,
+      waitTimeout: 10_000,
     })
 
     return app.start()

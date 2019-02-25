@@ -1,3 +1,3 @@
-jest.setTimeout(10000)
+jest.setTimeout(30_000)
 
 export default undefined
