@@ -1,5 +1,5 @@
-import React from 'react'
-import { BrowserRouter as Router } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { Routes } from '../../utils/const'
 
 import RoutesWithProps from './RoutesWithProps'
@@ -18,6 +18,8 @@ import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 import General from '../Settings/General'
 import Wallets from '../Settings/Wallets'
 import Network from '../Settings/Network'
+
+import WalletContext from '../../contexts/Wallet'
 
 export interface CustomRoute {
   path: string
@@ -128,16 +130,35 @@ export const mainContents: CustomRoute[] = [
   },
 ]
 
-const CustomRouter = () => (
-  <Router>
-    <>
-      <RoutesWithProps contents={containers} />
-      <MainContent>
-        <RoutesWithProps contents={mainContents} />
-      </MainContent>
-    </>
-  </Router>
-)
+const CustomRouter = () => {
+  const wallet = useContext(WalletContext)
+  return (
+    <Router>
+      <Route
+        render={() => {
+          if (!wallet) {
+            return (
+              <Switch>
+                <Route path={Routes.WalletWizard} component={WalletWizard} />
+                <Route path={Routes.ImportWallet} component={ImportWallet} />
+                <Route path={Routes.CreateWallet} component={CreateWallet} />
+                <Redirect path="*" to={Routes.WalletWizard} />
+              </Switch>
+            )
+          }
+          return (
+            <>
+              <RoutesWithProps contents={containers} />
+              <MainContent>
+                <RoutesWithProps contents={mainContents} />
+              </MainContent>
+            </>
+          )
+        }}
+      />
+    </Router>
+  )
+}
 
 CustomRouter.displayName = 'CustomRouter'
 
