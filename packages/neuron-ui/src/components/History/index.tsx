@@ -1,15 +1,25 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { DataTable, Text } from 'grommet'
-import styled from 'styled-components'
+import { Container, Row, Col, Table } from 'react-bootstrap'
 import TablePagination from './TablePagination'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 
 import ipc from '../../utils/ipc'
 
-const FooterDiv = styled.div`
-  height: 80px;
-`
+const cols = [
+  {
+    label: 'date',
+    index: 'date',
+  },
+  {
+    label: 'amount(ckb)',
+    index: 'value',
+  },
+  {
+    label: 'transaction hash',
+    index: 'hash',
+  },
+]
 
 const formatterDate = (time: Date) => {
   const date = new Date(time)
@@ -36,45 +46,37 @@ const History = () => {
   }, [page, pageSize])
 
   return (
-    <div>
+    <Container>
       <h1>History</h1>
-      <DataTable
-        id="list"
-        primaryKey="key"
-        columns={[
-          {
-            header: 'Date',
-            property: 'date',
-            align: 'start',
-            render: (transaction: Transaction) => <Text>{transaction.date}</Text>,
-          },
-          {
-            header: 'Amount (CKB)',
-            property: 'value',
-            align: 'start',
-            render: (transaction: Transaction) => <Text>{transaction.value}</Text>,
-          },
-          {
-            header: 'Transaction Hash',
-            property: 'hash',
-            align: 'start',
-            render: (transaction: Transaction) => <Text>{transaction.hash}</Text>,
-          },
-        ]}
-        data={transactionsToHistory(chain.transactions.items)}
-        margin={{
-          bottom: 'xsmall',
-        }}
-      />
-      <FooterDiv>
-        <TablePagination
-          page={page}
-          pageSize={pageSize}
-          total={chain.transactions.count}
-          onChange={idx => setPage(idx)}
-        />
-      </FooterDiv>
-    </div>
+      <Table striped bordered>
+        <thead>
+          <tr>
+            {cols.map(col => (
+              <th key={col.index}>{col.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {transactionsToHistory(chain.transactions.items).map((txHistory: { [index: string]: string | number }) => (
+            <tr key={txHistory.hash}>
+              {cols.map(col => (
+                <td key={col.index}>{txHistory[col.index]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Row>
+        <Col>
+          <TablePagination
+            page={page}
+            pageSize={pageSize}
+            total={chain.transactions.count}
+            onChange={pageNo => setPage(pageNo)}
+          />
+        </Col>
+      </Row>
+    </Container>
   )
 }
 
