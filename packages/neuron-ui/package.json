@@ -12,10 +12,10 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env BROWSER=none react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test --env=jsdom --color",
-    "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "test": "react-app-rewired test --env=jsdom --color",
+    "build": "react-app-rewired build",
+    "clean": "rm -rf build/*",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "publishConfig": {

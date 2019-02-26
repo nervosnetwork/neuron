@@ -14,6 +14,7 @@
   "scripts": {
     "start": "tsc && electron .",
     "build": "tsc",
+    "clean": "rm -rf dist/*",
     "watch:run": "nodemon ./dist/main.js --exec ./node_modules/.bin/electron .",
     "watch:build": "tsc -w",
     "watch": "concurrently -c cyan,cyan -n build,run \"yarn run watch:build\" \"yarn run watch:run\"",
