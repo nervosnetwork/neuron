@@ -7,7 +7,7 @@ import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
 
-const isDevelopentMode = !app.isPackaged
+const isDevelopmentMode = !app.isPackaged
 
 listenToChannel()
 function createWindow() {
@@ -25,7 +25,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     webPreferences: {
-      devTools: isDevelopentMode,
+      devTools: isDevelopmentMode,
     },
   })
 
@@ -37,7 +37,7 @@ function createWindow() {
     DEV: 'http://localhost:3000',
     PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
   }
-  mainWindow.loadURL(isDevelopentMode ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.loadURL(isDevelopmentMode ? ENTRY.DEV : ENTRY.PROD)
 
   mainWindow.on('closed', () => {
     mainWindow = null
