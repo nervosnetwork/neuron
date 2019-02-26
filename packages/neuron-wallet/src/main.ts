@@ -28,7 +28,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     webPreferences: {
-      devTools: app.isPackaged,
+      devTools: !app.isPackaged,
     },
   })
 
