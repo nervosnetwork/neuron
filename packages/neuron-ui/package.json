@@ -11,7 +11,7 @@
   "main": "./build",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env react-app-rewired start",
+    "start": "react-app-rewired start",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "test": "react-app-rewired test --env=jsdom --color",
     "build": "react-app-rewired build",
