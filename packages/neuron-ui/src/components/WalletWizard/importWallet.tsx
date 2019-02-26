@@ -59,7 +59,7 @@ export default (props: any) => {
           title="wallet"
           onAfterNext={() => {
             settingsContext.passwordValid = false
-            props.history.push(Routes.WalletWizard)
+            props.history.push(Routes.Wallet)
           }}
         >
           <ActionD />
