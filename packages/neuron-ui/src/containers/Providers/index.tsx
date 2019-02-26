@@ -40,10 +40,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
 
   ipcRenderer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
     if (args.status) {
-      setWallet({
-        ...wallet,
-        balance: args.result,
-      })
+      if (wallet)
+        setWallet({
+          ...wallet,
+          balance: args.result,
+        })
     }
   })
 
