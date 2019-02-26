@@ -21,13 +21,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     ipc.asw()
   }, [])
   ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
-    if (wallet) {
-      setWallet({
-        ...wallet,
-        name: 'asw',
-        wallet: args.result,
-      })
-    }
+    setWallet({
+      ...wallet,
+      name: 'asw',
+      ...args.result,
+    })
   })
 
   ipcRenderer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
@@ -42,11 +40,10 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
 
   ipcRenderer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
     if (args.status) {
-      if (wallet)
-        setWallet({
-          ...wallet,
-          balance: args.result,
-        })
+      setWallet({
+        ...wallet,
+        balance: args.result,
+      })
     }
   })
 

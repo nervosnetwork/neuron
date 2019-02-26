@@ -136,14 +136,16 @@ const CustomRouter = () => {
     <Router>
       <Route
         render={() => {
-          if (!wallet) {
+          if (!wallet.address) {
             return (
-              <Switch>
-                <Route path={Routes.WalletWizard} component={WalletWizard} />
-                <Route path={Routes.ImportWallet} component={ImportWallet} />
-                <Route path={Routes.CreateWallet} component={CreateWallet} />
-                <Redirect path="*" to={Routes.WalletWizard} />
-              </Switch>
+              <MainContent>
+                <Switch>
+                  <Route path={Routes.WalletWizard} component={WalletWizard} />
+                  <Route path={Routes.ImportWallet} component={ImportWallet} />
+                  <Route path={Routes.CreateWallet} component={CreateWallet} />
+                  <Redirect path="*" to={Routes.WalletWizard} />
+                </Switch>
+              </MainContent>
             )
           }
           return (

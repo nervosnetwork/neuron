@@ -28,7 +28,7 @@ export default (props: any) => {
   const wallet = useContext(WalletContext)
   useEffect(() => {
     const content = document.querySelector('.main-content')
-    if (content && !wallet) {
+    if (content && !wallet.address) {
       content.classList.add('full-screen')
       return () => {
         content.classList.remove('full-screen')
