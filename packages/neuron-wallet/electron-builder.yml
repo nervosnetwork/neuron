@@ -26,12 +26,12 @@ win:
 
 mac:
   artifactName: "${productName}-${version}-${os}.${ext}"
-  category: blockchain_wallet
+  category: public.app-category.finance
   icon: ./assets/images/icon.icns
 
 linux:
   artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
-  category: Development
+  category: Finance
   icon: ./assets/images/icon.png
   target:
     - "AppImage"
