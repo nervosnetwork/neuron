@@ -35,7 +35,7 @@ export default (props: any) => {
       }
     }
     return () => {}
-  }, [wallet && wallet.name])
+  }, [wallet.address])
   return (
     <Wizard>
       <div

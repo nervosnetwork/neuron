@@ -5,7 +5,7 @@ import { ContentProps } from '../../containers/MainContent'
 const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentProps>> = () => {
   const wallet = useContext(WalletContext)
 
-  return wallet && wallet.name ? (
+  return wallet.name ? (
     <>
       <h1>{wallet.name}</h1>
       <div
