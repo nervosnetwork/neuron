@@ -36,7 +36,7 @@ function createWindow() {
 
   Menu.setApplicationMenu(menu)
 
-  mainWindow.loadURL(app.isPackaged ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.loadURL(app.isPackaged ? ENTRY.PROD : ENTRY.DEV)
 
   mainWindow.on('closed', () => {
     mainWindow = null

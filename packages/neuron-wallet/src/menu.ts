@@ -73,7 +73,7 @@ const menuTemplate = [
   },
 ]
 
-if (app.isPackaged) {
+if (!app.isPackaged) {
   menuTemplate.push({
     label: 'Develop',
     submenu: [
