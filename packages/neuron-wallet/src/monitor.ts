@@ -29,7 +29,7 @@ const monitorChain = (webContents: Electron.WebContents) => {
         status: 1,
         result,
       })
-    })
+    }, console.error)
 
   numbers
     .pipe(flatMap(monitorBalance))
@@ -41,7 +41,7 @@ const monitorChain = (webContents: Electron.WebContents) => {
         status: 1,
         result,
       })
-    })
+    }, console.error)
 }
 
 export default monitorChain
