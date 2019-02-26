@@ -73,8 +73,7 @@ const menuTemplate = [
   },
 ]
 
-const { NODE_ENV } = process.env
-if (NODE_ENV === 'development') {
+if (!app.isPackaged) {
   menuTemplate.push({
     label: 'Develop',
     submenu: [

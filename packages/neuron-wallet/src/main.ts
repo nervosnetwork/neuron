@@ -7,8 +7,6 @@ import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
 
-const { NODE_ENV } = process.env
-
 const ENTRY = {
   DEV: 'http://localhost:3000',
   PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
@@ -30,7 +28,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     webPreferences: {
-      devTools: NODE_ENV === 'development',
+      devTools: !app.isPackaged,
     },
   })
 
@@ -38,7 +36,7 @@ function createWindow() {
 
   Menu.setApplicationMenu(menu)
 
-  mainWindow.loadURL(NODE_ENV === 'development' ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.loadURL(app.isPackaged ? ENTRY.PROD : ENTRY.DEV)
 
   mainWindow.on('closed', () => {
     mainWindow = null
