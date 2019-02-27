@@ -14,9 +14,14 @@ You will need `node >= 11.10` and `yarn >= 1.12` to build and run this Neuron.
 
 In the project directory, you can run:
 
-### `yarn install`
+### `yarn install && yarn bootstrap`
 
 Installs all dependencies.
+
+### `yarn start:ui`
+
+Runs the UI app in the development and watch mode.<br>
+Neuron UI will start and open in browser (`http://localhost3000`).
 
 ### `yarn start`
 

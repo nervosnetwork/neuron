@@ -7,10 +7,7 @@ import menu from './menu'
 
 let mainWindow: Electron.BrowserWindow | null
 
-const ENTRY = {
-  DEV: 'http://localhost:3000',
-  PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
-}
+const isDevelopmentMode = !app.isPackaged
 
 listenToChannel()
 function createWindow() {
@@ -28,7 +25,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     webPreferences: {
-      devTools: !app.isPackaged,
+      devTools: isDevelopmentMode,
     },
   })
 
@@ -36,7 +33,11 @@ function createWindow() {
 
   Menu.setApplicationMenu(menu)
 
-  mainWindow.loadURL(app.isPackaged ? ENTRY.PROD : ENTRY.DEV)
+  const ENTRY = {
+    DEV: 'http://localhost:3000',
+    PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
+  }
+  mainWindow.loadURL(isDevelopmentMode ? ENTRY.DEV : ENTRY.PROD)
 
   mainWindow.on('closed', () => {
     mainWindow = null
