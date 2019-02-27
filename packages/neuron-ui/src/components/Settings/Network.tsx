@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { RadioButton } from 'grommet'
+import { Form } from 'react-bootstrap'
 
 const ContentPanel = styled.div`
   display: flex;
@@ -19,18 +19,21 @@ const Network = () => {
 
   return (
     <ContentPanel>
-      {networks.map(network => (
-        <NetworkItem>
-          <RadioButton
-            name="network"
-            checked={networkSelected === network}
-            label={network}
-            onChange={() => {
-              setNetworkSelected(network)
-            }}
-          />
-        </NetworkItem>
-      ))}
+      <Form>
+        {networks.map(network => (
+          <NetworkItem key={network}>
+            <Form.Check
+              inline
+              label={network}
+              type="radio"
+              checked={network === networkSelected}
+              onChange={() => {
+                setNetworkSelected(network)
+              }}
+            />
+          </NetworkItem>
+        ))}
+      </Form>
     </ContentPanel>
   )
 }

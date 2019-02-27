@@ -2,6 +2,7 @@
   "name": "@nervosnetwork/neuron-wallet",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
+  "homepage": "https://www.nervos.org/",
   "version": "0.1.0",
   "private": true,
   "author": {
