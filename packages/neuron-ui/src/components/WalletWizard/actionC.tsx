@@ -19,7 +19,7 @@ export default () => {
 
   const checking = () => {
     if (!refP1.current || !refP2.current || !refName.current) return
-    if (refP1.current.value.length < 8 || refP2.current.value.length < 8) {
+    if (refP1.current.value.length < 2 || refP2.current.value.length < 2) {
       settingsContext.passwordValid = false
       return
     }
@@ -27,6 +27,7 @@ export default () => {
       settingsContext.passwordValid = false
       return
     }
+    settingsContext.name = refName.current.value
     if (!refName.current.value) {
       settingsContext.passwordValid = false
       return
@@ -41,7 +42,7 @@ export default () => {
         <input
           type="password"
           ref={refP1}
-          placeholder="ge 8"
+          placeholder="ge 2"
           onChange={() => {
             checking()
           }}
@@ -52,7 +53,7 @@ export default () => {
         <input
           type="password"
           ref={refP2}
-          placeholder="ge 8"
+          placeholder="ge 2"
           onChange={() => {
             checking()
           }}

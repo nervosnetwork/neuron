@@ -2,6 +2,7 @@
   "name": "@nervosnetwork/neuron-wallet",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
+  "homepage": "https://www.nervos.org/",
   "version": "0.1.0",
   "private": true,
   "author": {
@@ -12,18 +13,17 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && electron .",
+    "start": "cross-env electron .",
+    "start:dev": "tsc && cross-env electron .",
     "build": "tsc",
-    "watch:run": "nodemon ./dist/main.js --exec ./node_modules/.bin/electron .",
-    "watch:build": "tsc -w",
-    "watch": "concurrently -c cyan,cyan -n build,run \"yarn run watch:build\" \"yarn run watch:run\"",
+    "clean": "rm -rf dist/*",
+    "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package-mwl": "electron-builder -mwl",
     "package-win": "electron-builder --win --x64",
     "package-mac": "electron-builder --mac",
     "package-linux": "electron-builder --linux",
-    "postinstall": "npm rebuild tiny-secp256k1",
-    "test": "jest --color"
+    "postinstall": "npm rebuild tiny-secp256k1"
   },
   "jest": {
     "transform": {

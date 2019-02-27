@@ -7,10 +7,14 @@ import ImportWallet from './importWallet'
 import CreateWallet from './createWallet'
 
 const Wizard = styled.div`
+  .full-screen & {
+    background-color: white;
+    width: 100%;
+    height: 100%;
+  }
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 80px;
   .buttonGroup {
     button {
       height: 40px;
@@ -24,14 +28,14 @@ export default (props: any) => {
   const wallet = useContext(WalletContext)
   useEffect(() => {
     const content = document.querySelector('.main-content')
-    if (content) {
+    if (content && !wallet.address) {
       content.classList.add('full-screen')
       return () => {
         content.classList.remove('full-screen')
       }
     }
     return () => {}
-  }, [wallet && wallet.name])
+  }, [wallet.address])
   return (
     <Wizard>
       <div
@@ -39,7 +43,9 @@ export default (props: any) => {
           textAlign: 'center',
         }}
       >
-        <Launch size="large" />
+        <h1>
+          <Launch size="large" />
+        </h1>
         <h1>Create or import your first wallet</h1>
         <div className="buttonGroup">
           <button

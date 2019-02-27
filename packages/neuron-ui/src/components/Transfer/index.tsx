@@ -1,6 +1,5 @@
 import React, { useReducer } from 'react'
 import styled from 'styled-components'
-import { RangeInput } from 'grommet'
 
 import ipc from '../../utils/ipc'
 
@@ -31,20 +30,10 @@ const SendButton = styled.button`
   width: 300px;
 `
 
-const RangeLayout = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 600px;
-  margin-top: 30px;
-
-  div {
-    margin-bottom: 15px;
-  }
-`
-
 enum TransferActionTypes {
   Address,
   Capacity,
+  Fee,
   Submit,
 }
 
@@ -67,6 +56,12 @@ const reducer = (state: Transfer, action: { type: TransferActionTypes; value?: a
       return {
         ...state,
         capacity: action.value,
+      }
+    }
+    case TransferActionTypes.Fee: {
+      return {
+        ...state,
+        fee: action.value,
       }
     }
     case TransferActionTypes.Submit: {
@@ -134,19 +129,13 @@ const Transfer = () => {
           onChange={handleAction(TransferActionTypes.Capacity)}
         />
       </InputDiv>
-      <RangeLayout>
-        <div>Transfer Fee: </div>
-        <RangeInput
-          type="text"
-          defaultValue={state.fee.toString()}
-          min={0}
-          max={100}
-          step={1}
-          onChange={(event: any) => {
-            state.fee = event.target.value
-          }}
-        />
-      </RangeLayout>
+      <InputDiv>
+        <div>
+          Transer Fee:
+          {state.fee}
+        </div>
+        <input type="range" onChange={handleAction(TransferActionTypes.Fee)} value={state.fee} />
+      </InputDiv>
       <SendButton type="submit" onClick={handleAction(TransferActionTypes.Submit)}>
         Send
       </SendButton>
