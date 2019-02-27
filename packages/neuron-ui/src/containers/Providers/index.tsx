@@ -15,11 +15,17 @@ interface Response<T> {
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
-  const [settings] = useState(initSettings)
+  const [settings, setSettings] = useState(initSettings)
 
   useEffect(() => {
     ipc.asw()
   }, [])
+  settings.switchLanguage = (language: string) => {
+    setSettings({
+      ...settings,
+      language,
+    })
+  }
   ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({
       ...wallet,

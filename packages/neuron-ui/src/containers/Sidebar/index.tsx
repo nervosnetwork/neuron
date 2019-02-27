@@ -10,6 +10,7 @@ import {
   Database as IconAddresses,
   Performance as IconSettings,
 } from 'grommet-icons'
+import { FormattedMessage } from 'react-intl'
 import { mainContents } from '../../components/Router'
 import WalletContext from '../../contexts/Wallet'
 
@@ -64,7 +65,7 @@ const Sidebar = () => {
       <li key={route.name}>
         <NavLink to={route.path}>
           {<route.icon size="20px" />}
-          <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
+          <span>{route.name === 'Wallet' ? wallet.name : <FormattedMessage id={`Sidebar.${route.name}`} />}</span>
         </NavLink>
       </li>
     ))
