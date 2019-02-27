@@ -22,6 +22,9 @@ export enum Channel {
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',
   Sign = 'sign',
+
+  // Page
+  GotoSettings = 'gotoSettings',
 }
 
 export default {
