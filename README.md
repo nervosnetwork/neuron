@@ -21,7 +21,7 @@ Installs all dependencies.
 ### `yarn start:ui`
 
 Runs the UI app in the development and watch mode.<br>
-Neuron UI will start and open in browser (`http://localhost3000`).
+Neuron UI will start and open in browser (`http://localhost:3000`).
 
 ### `yarn start`
 
