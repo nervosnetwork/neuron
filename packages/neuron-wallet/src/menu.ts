@@ -1,4 +1,5 @@
-import { app, shell, Menu, MenuItemConstructorOptions, dialog } from 'electron'
+import { app, shell, Menu, MenuItem, MenuItemConstructorOptions, dialog, BrowserWindow } from 'electron'
+import { Channel, Routes } from './utils/const'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -27,8 +28,14 @@ const menuTemplate = [
       {
         label: 'Preferences...',
         accelerator: 'CmdOrCtrl+,',
-        click: () => {
-          // TODO: show preferences view
+        click: (menuItem: MenuItem, browserWindow: BrowserWindow, event: Event) => {
+          console.debug(`NavTo ${menuItem.label} ${event.target} ${browserWindow.webContents}`)
+          browserWindow.webContents.send(Channel.NavTo, {
+            status: 1,
+            result: {
+              router: Routes.Settings,
+            },
+          })
         },
       },
       separator,

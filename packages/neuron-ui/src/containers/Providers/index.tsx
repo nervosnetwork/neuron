@@ -77,6 +77,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     },
   )
 
+  ipcRenderer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
+    console.info(`nav to ${args.result.router}}`)
+    window.location.href = args.result.router
+  })
+
   return (
     <SettingsContext.Provider value={settings}>
       <ChainContext.Provider value={chain}>

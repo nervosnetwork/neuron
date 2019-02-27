@@ -27,6 +27,9 @@ export enum Channel {
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',
   Sign = 'sign',
+
+  // Page
+  NavTo = 'navTo',
 }
 
 export enum Routes {

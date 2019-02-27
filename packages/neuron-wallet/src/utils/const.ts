@@ -22,6 +22,25 @@ export enum Channel {
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',
   Sign = 'sign',
+
+  // Page
+  NavTo = 'navTo',
+}
+
+export enum Routes {
+  Home = '/',
+  Wallet = '/wallet',
+  Send = '/send',
+  Receive = '/receive',
+  History = '/history',
+  Addresses = '/addresses',
+  Settings = '/settings',
+  SettingsGeneral = '/settings/general',
+  SettingsWallets = '/settings/wallets',
+  SettingsNetwork = '/settings/network',
+  CreateWallet = '/wallets/new',
+  ImportWallet = '/wallets/import',
+  WalletWizard = '/wallets/wizard',
 }
 
 export default {
