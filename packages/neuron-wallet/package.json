@@ -22,7 +22,7 @@
     "package-mwl": "electron-builder -mwl",
     "package-win": "electron-builder --win --x64",
     "package-mac": "electron-builder --mac",
-    "package-linux": "electron-builder --linux",
+    "package-linux": "./script/installrpm.sh && electron-builder --linux",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "jest": {
