@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Routes } from '../../utils/const'
 
@@ -15,34 +15,46 @@ const TabItem = styled.div`
   line-height: 60px;
   color: black;
 `
+
+const SelectedTabItem = styled(TabItem)`
+  color: blue;
+`
+
 const TabBar = (props: any) => {
+  const tabs = [Routes.SettingsGeneral, Routes.SettingsWallets, Routes.SettingsNetwork]
+  const contents = ['General', 'Wallets', 'Network']
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
   useEffect(() => {
-    props.history.push(Routes.SettingsGeneral)
+    props.history.push(tabs[0])
   }, [])
+
+  const handleAction = (index: number) => {
+    setSelectedIndex(index)
+    props.history.push(tabs[index])
+  }
 
   return (
     <TabBarPanel>
-      <TabItem
-        onClick={() => {
-          props.history.push(Routes.SettingsGeneral)
-        }}
-      >
-        General
-      </TabItem>
-      <TabItem
-        onClick={() => {
-          props.history.push(Routes.SettingsWallets)
-        }}
-      >
-        Wallets
-      </TabItem>
-      <TabItem
-        onClick={() => {
-          props.history.push(Routes.SettingsNetwork)
-        }}
-      >
-        Network
-      </TabItem>
+      {contents.map((content, index) => {
+        return selectedIndex === index ? (
+          <SelectedTabItem
+            onClick={() => {
+              handleAction(index)
+            }}
+          >
+            {content}
+          </SelectedTabItem>
+        ) : (
+          <TabItem
+            onClick={() => {
+              handleAction(index)
+            }}
+          >
+            {content}
+          </TabItem>
+        )
+      })}
     </TabBarPanel>
   )
 }
