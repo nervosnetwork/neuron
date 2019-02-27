@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { Routes } from '../../utils/const'
 
@@ -16,6 +16,10 @@ const TabItem = styled.div`
   color: black;
 `
 const TabBar = (props: any) => {
+  useEffect(() => {
+    props.history.push(Routes.SettingsGeneral)
+  }, [])
+
   return (
     <TabBarPanel>
       <TabItem
