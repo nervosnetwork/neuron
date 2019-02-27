@@ -39,6 +39,7 @@ const TabBar = (props: any) => {
       {contents.map((content, index) => {
         return selectedIndex === index ? (
           <SelectedTabItem
+            key={index.toString()}
             onClick={() => {
               handleAction(index)
             }}
@@ -47,6 +48,7 @@ const TabBar = (props: any) => {
           </SelectedTabItem>
         ) : (
           <TabItem
+            key={index.toString()}
             onClick={() => {
               handleAction(index)
             }}

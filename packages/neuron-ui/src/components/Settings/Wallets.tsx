@@ -92,12 +92,13 @@ const General = () => {
 
   return (
     <ContentPanel>
-      {walletsState.map((wallet: string) => {
+      {walletsState.map((wallet, index) => {
         if (walletSelected === wallet) {
-          return <WalletSelectedItem>{wallet}</WalletSelectedItem>
+          return <WalletSelectedItem key={index.toString()}>{wallet}</WalletSelectedItem>
         }
         return (
           <WalletItem
+            key={index.toString()}
             onClick={() => {
               setWalletSelected(wallet)
             }}

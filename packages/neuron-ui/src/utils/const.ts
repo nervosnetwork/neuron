@@ -29,7 +29,7 @@ export enum Channel {
   Sign = 'sign',
 
   // Page
-  GotoSettings = 'gotoSettings',
+  NavTo = 'navTo',
 }
 
 export enum Routes {

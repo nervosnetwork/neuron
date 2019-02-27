@@ -19,8 +19,8 @@ const Network = () => {
 
   return (
     <ContentPanel>
-      {networks.map(network => (
-        <NetworkItem>
+      {networks.map((network, index) => (
+        <NetworkItem key={index.toString()}>
           <RadioButton
             name="network"
             checked={networkSelected === network}

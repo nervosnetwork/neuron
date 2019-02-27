@@ -4,7 +4,7 @@ import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
 
 import ipc, { ipcRenderer } from '../../utils/ipc'
-import { Channel, NetworkStatus, Routes } from '../../utils/const'
+import { Channel, NetworkStatus } from '../../utils/const'
 
 interface Response<T> {
   status: number
@@ -78,9 +78,9 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     },
   )
 
-  ipcRenderer.on(Channel.GotoSettings, (_e: Event, args: Response<any>) => {
-    console.info(`goto settings ${args.msg} ${JSON.stringify(props)}`)
-    window.location.href = Routes.Settings
+  ipcRenderer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
+    console.info(`nav to ${args.result.router}}`)
+    window.location.href = args.result.router
   })
 
   return (
