@@ -20,12 +20,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   useEffect(() => {
     ipc.asw()
   }, [])
-
   ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({
       ...wallet,
       name: 'asw',
-      wallet: args.result,
+      ...args.result,
     })
   })
 

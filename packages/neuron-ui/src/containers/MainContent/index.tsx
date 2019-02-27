@@ -1,10 +1,14 @@
 import React from 'react'
+import styled from 'styled-components'
 import ipc from '../../utils/ipc'
 
 export interface ContentProps {
   sendCapacity: (address: string, capacity: string) => void
 }
-
+const Main = styled.main`
+  height: 100%;
+  width: 100%;
+`
 const MainContent = ({ children }: { children?: any }) => {
   // content props passed to main contents
   const contentProps = {
@@ -14,7 +18,7 @@ const MainContent = ({ children }: { children?: any }) => {
       ipc.sendCapacity(address, capacity)
     },
   }
-  return <main>{React.Children.map(children, child => child && React.cloneElement(child, contentProps))}</main>
+  return <Main>{React.Children.map(children, child => child && React.cloneElement(child, contentProps))}</Main>
 }
 
 MainContent.displayName = 'MainContent'
