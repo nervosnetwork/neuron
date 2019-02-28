@@ -28,8 +28,7 @@ const menuTemplate = [
       {
         label: 'Preferences...',
         accelerator: 'CmdOrCtrl+,',
-        click: (menuItem: MenuItem, browserWindow: BrowserWindow, event: Event) => {
-          console.debug(`NavTo ${menuItem.label} ${event.target} ${browserWindow.webContents}`)
+        click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
           browserWindow.webContents.send(Channel.NavTo, {
             status: 1,
             result: {

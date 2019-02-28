@@ -23,7 +23,6 @@ const listenToChannel = () => {
    * @description channel to create wallet
    */
   ipcMain.on(Channel.CreateWallet, (e: Electron.Event) => {
-    console.info('create a wallet')
     setTimeout(() => {
       e.sender.send(Channel.CreateWallet, {
         status: 1,
@@ -40,7 +39,6 @@ const listenToChannel = () => {
    * @description channel to import wallet
    */
   ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
-    console.info('import a wallet')
     setTimeout(() => {
       e.sender.send(Channel.ImportWallet, {
         status: 1,
@@ -53,7 +51,6 @@ const listenToChannel = () => {
    * @description channel to export wallets
    */
   ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
-    console.info('export wallets')
     setTimeout(() => {
       e.sender.send(Channel.ExportWallet, {
         status: 1,
@@ -67,7 +64,6 @@ const listenToChannel = () => {
    * @description channel to switch wallet
    */
   ipcMain.on(Channel.SwitchWallet, (e: Electron.Event) => {
-    console.info('switch wallet')
     setTimeout(() => {
       e.sender.send(Channel.SwitchWallet, {
         status: 1,
@@ -81,7 +77,6 @@ const listenToChannel = () => {
    * @description channel to get balance
    */
   ipcMain.on(Channel.GetBalance, (e: Electron.Event) => {
-    console.info('get balance')
     setTimeout(() => {
       e.sender.send(Channel.GetBalance, {
         status: 1,
@@ -95,8 +90,7 @@ const listenToChannel = () => {
    * @name GetCellsByTypeHash
    * @description channel to get cells by typehash
    */
-  ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event, ...args: string[]) => {
-    console.info(`get cells by type hash ${args[0]}`)
+  ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event) => {
     setTimeout(() => {
       e.sender.send(Channel.GetCellsByTypeHash, {
         status: 1,
@@ -117,7 +111,6 @@ const listenToChannel = () => {
    * @description channel to get unspent cells
    */
   ipcMain.on(Channel.GetUnspentCells, (e: Electron.Event) => {
-    console.info('get unspent cells')
     setTimeout(() => {
       e.sender.send(Channel.GetUnspentCells, {
         status: 1,
@@ -131,14 +124,13 @@ const listenToChannel = () => {
    * @description get transactions
    */
   ipcMain.on(Channel.GetTransactions, (e: Electron.Event, { page, pageSize }: { page: number; pageSize: number }) => {
-    console.info(`get transactions in page: ${page}, pageSize: ${pageSize}`)
     e.sender.send(Channel.GetTransactions, {
       status: 1,
       result: {
         count: transactionCount,
         transactions: transactions.map(tx => ({
           ...tx,
-          value: tx.value * page,
+          value: tx.value * page * pageSize,
         })),
       },
     })
@@ -149,7 +141,6 @@ const listenToChannel = () => {
    * @description channel to get wallets
    */
   ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
-    console.info('get wallets')
     setTimeout(() => {
       e.sender.send(Channel.GetWallets, {
         status: 1,
@@ -211,7 +202,6 @@ const listenToChannel = () => {
    * @description channel to sign msg
    */
   ipcMain.on(Channel.Sign, (e: Electron.Event) => {
-    console.info('sign message')
     setTimeout(() => {
       e.sender.send(Channel.Sign, {
         status: 1,
