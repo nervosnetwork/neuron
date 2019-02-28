@@ -1,11 +1,7 @@
 import { ipcMain, Notification } from 'electron'
-import Core from '@nervosnetwork/ckb-sdk-core'
 import { Channel } from './utils/const'
 import { cell, transactions, transactionCount } from './mock'
-
-const remote = 'http://localhost:8114'
-export const ckbCore = new Core(remote)
-const asw = ckbCore.wallet.newASW()
+import asw from './wallets/asw'
 
 const listenToChannel = () => {
   // chain

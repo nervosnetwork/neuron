@@ -8,9 +8,9 @@ interface Wallet {
   msg: string
 }
 export const initWallet: Wallet = {
-  name: 'My First #1',
+  name: '',
   balance: 0,
-  address: 'test address',
+  address: '',
   publicKey: new Uint8Array(0),
   msg: '',
 }

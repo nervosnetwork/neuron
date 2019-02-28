@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+
+// import WalletContext from '../../contexts/Wallet'
 import { sendCapacity } from '../../services/UILayer'
 
 export interface ContentProps {
@@ -10,6 +12,7 @@ const Main = styled.main`
   width: 100%;
 `
 const MainContent = ({ children }: { children?: any }) => {
+  // const wallet = useContext(WalletContext)
   // content props passed to main contents
   const contentProps = {
     sendCapacity: (address: string, capacity: string) => {

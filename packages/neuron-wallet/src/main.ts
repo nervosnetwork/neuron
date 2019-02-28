@@ -3,11 +3,20 @@ import windowStateKeeper from 'electron-window-state'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
+import asw from './wallets/asw'
 import env from './env'
 
 let mainWindow: Electron.BrowserWindow | null
 
+const initUILayer = (win: BrowserWindow) => {
+  win.webContents.send('ASW', {
+    status: 1,
+    result: asw,
+  })
+}
+
 listenToChannel()
+
 function createWindow() {
   const windowState = windowStateKeeper({
     defaultWidth: 1366,
@@ -41,6 +50,7 @@ function createWindow() {
     mainWindow!.show()
     mainWindow!.focus()
   })
+  initUILayer(mainWindow)
   /**
    * @monitorChain
    * @description monitor network
