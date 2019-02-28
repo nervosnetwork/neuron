@@ -1,5 +1,6 @@
 import { app, shell, Menu, MenuItem, MenuItemConstructorOptions, dialog, BrowserWindow } from 'electron'
 import { Channel, Routes } from './utils/const'
+import env from './env'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -80,7 +81,7 @@ const menuTemplate = [
   },
 ]
 
-if (!app.isPackaged) {
+if (env.isDevMode) {
   menuTemplate.push({
     label: 'Develop',
     submenu: [
