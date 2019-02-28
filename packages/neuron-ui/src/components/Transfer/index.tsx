@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react'
 import styled from 'styled-components'
 
-import ipc from '../../utils/ipc'
+import { sendCapacity } from '../../services/UILayer'
 
 const TransferPanel = styled.div`
   display: flex;
@@ -93,7 +93,7 @@ const Transfer = () => {
     e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     if (type === TransferActionTypes.Submit) {
-      ipc.sendCapacity(state.address, state.capacity.toString(16))
+      sendCapacity(state.address, state.capacity.toString(16))
     }
     if (isMouseEvent(e)) {
       dispatch({

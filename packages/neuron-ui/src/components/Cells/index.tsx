@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import ChainContext, { Cell } from '../../contexts/Chain'
-import ipc from '../../utils/ipc'
+import { getCellsByTypeHash } from '../../services/UILayer'
 
 const headers = ['outPoint', 'reference', 'args', 'signedArgs', 'version']
 
@@ -8,7 +8,7 @@ const Cells = () => {
   const [typeHash] = useState('')
   const chain = useContext(ChainContext)
   useEffect(() => {
-    ipc.getCellsByTypeHash(typeHash)
+    getCellsByTypeHash(typeHash)
   }, [typeHash])
   return (
     <div>

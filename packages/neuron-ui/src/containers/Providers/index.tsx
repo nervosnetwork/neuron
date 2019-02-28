@@ -3,7 +3,7 @@ import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain
 import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
 
-import ipc, { ipcRenderer } from '../../utils/ipc'
+import UILayer, { asw } from '../../services/UILayer'
 import { Channel, NetworkStatus } from '../../utils/const'
 
 interface Response<T> {
@@ -18,9 +18,10 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   const [settings] = useState(initSettings)
 
   useEffect(() => {
-    ipc.asw()
+    asw()
   }, [])
-  ipcRenderer.on('ASW', (_e: any, args: Response<any>) => {
+
+  UILayer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({
       ...wallet,
       name: 'asw',
@@ -28,17 +29,19 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     })
   })
 
-  ipcRenderer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
-    setChain({
-      ...chain,
-      network: {
-        ip: args.result.remote.url,
-        status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-      },
-    })
+  UILayer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
+    if (args.status) {
+      setChain({
+        ...chain,
+        network: {
+          ip: args.result.remote.url,
+          status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
+        },
+      })
+    }
   })
 
-  ipcRenderer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
+  UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
     if (args.status) {
       setWallet({
         ...wallet,
@@ -47,11 +50,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  ipcRenderer.on(Channel.SendCapacity, (_e: Event, args: Response<any>) => {
+  UILayer.on(Channel.SendCapacity, (_e: Event, args: Response<any>) => {
     console.debug(args.msg)
   })
 
-  ipcRenderer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
+  UILayer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
     // TODO:
     if (args.status) {
       setChain({
@@ -61,23 +64,20 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  ipcRenderer.on(
-    Channel.GetTransactions,
-    (_e: Event, args: Response<{ count: number; transactions: Transaction[] }>) => {
-      // TODO:
-      if (args.status) {
-        setChain({
-          ...chain,
-          transactions: {
-            count: args.result.count,
-            items: args.result.transactions,
-          },
-        })
-      }
-    },
-  )
+  UILayer.on(Channel.GetTransactions, (_e: Event, args: Response<{ count: number; transactions: Transaction[] }>) => {
+    // TODO:
+    if (args.status) {
+      setChain({
+        ...chain,
+        transactions: {
+          count: args.result.count,
+          items: args.result.transactions,
+        },
+      })
+    }
+  })
 
-  ipcRenderer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
+  UILayer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
     console.info(`nav to ${args.result.router}}`)
     window.location.href = args.result.router
   })

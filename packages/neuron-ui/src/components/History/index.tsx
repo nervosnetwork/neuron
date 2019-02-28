@@ -4,7 +4,7 @@ import TablePagination from './TablePagination'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 
-import ipc from '../../utils/ipc'
+import { getTransactions } from '../../services/UILayer'
 
 const cols = [
   {
@@ -42,7 +42,7 @@ const History = () => {
 
   useEffect(() => {
     // This should be moved to the top level
-    ipc.getTransactions(page, pageSize)
+    getTransactions(page, pageSize)
   }, [page, pageSize])
 
   return (
