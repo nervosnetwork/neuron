@@ -1,13 +1,11 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import * as path from 'path'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
+import env from './env'
 
 let mainWindow: Electron.BrowserWindow | null
-
-const isDevelopmentMode = !app.isPackaged
 
 listenToChannel()
 function createWindow() {
@@ -25,7 +23,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     webPreferences: {
-      devTools: isDevelopmentMode,
+      devTools: env.isDevMode,
     },
   })
 
@@ -33,11 +31,7 @@ function createWindow() {
 
   Menu.setApplicationMenu(menu)
 
-  const ENTRY = {
-    DEV: 'http://localhost:3000',
-    PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
-  }
-  mainWindow.loadURL(isDevelopmentMode ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.loadURL(env.mainURL)
 
   mainWindow.on('closed', () => {
     mainWindow = null
