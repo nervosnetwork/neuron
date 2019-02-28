@@ -24,7 +24,6 @@ const monitorChain = (webContents: Electron.WebContents) => {
       }),
     )
     .subscribe(result => {
-      console.info(`network updated to ${JSON.stringify(result, null, 2)}`)
       webContents.send(Channel.GetNetwork, {
         status: 1,
         result,
@@ -35,7 +34,6 @@ const monitorChain = (webContents: Electron.WebContents) => {
     .pipe(flatMap(monitorBalance))
     .pipe(distinctUntilChanged())
     .subscribe(result => {
-      console.info(`get balance of ${asw.address}: ${result}`)
       if (!webContents) return
       webContents.send(Channel.GetBalance, {
         status: 1,

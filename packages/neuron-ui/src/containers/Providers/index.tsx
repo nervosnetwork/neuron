@@ -50,8 +50,8 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  UILayer.on(Channel.SendCapacity, (_e: Event, args: Response<any>) => {
-    console.debug(args.msg)
+  UILayer.on(Channel.SendCapacity, () => {
+    // TODO
   })
 
   UILayer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
@@ -78,7 +78,6 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   })
 
   UILayer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
-    console.info(`nav to ${args.result.router}}`)
     window.location.href = args.result.router
   })
 
