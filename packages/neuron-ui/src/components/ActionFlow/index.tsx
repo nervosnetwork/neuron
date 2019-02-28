@@ -23,6 +23,12 @@ const ActionFlowStyle = styled.div`
     display: flex;
     justify-content: center;
     padding-top: 20px;
+    & > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
   }
   .actionFlowFooter {
     border-top: 2px solid lightgrey;
@@ -34,6 +40,7 @@ const ActionFlowStyle = styled.div`
     }
   }
 `
+
 const ActionFlowHeaderStyle = styled.div`
   text-align: center;
   > div:nth-child(1) {

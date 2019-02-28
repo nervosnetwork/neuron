@@ -44,24 +44,24 @@ interface Transfer {
   submitting: boolean
 }
 
-const reducer = (state: Transfer, action: { type: TransferActionTypes; value?: any }) => {
+const reducer = (state: Transfer, action: { type: TransferActionTypes; payload?: any }) => {
   switch (action.type) {
     case TransferActionTypes.Address: {
       return {
         ...state,
-        address: action.value,
+        address: action.payload,
       }
     }
     case TransferActionTypes.Capacity: {
       return {
         ...state,
-        capacity: action.value,
+        capacity: action.payload,
       }
     }
     case TransferActionTypes.Fee: {
       return {
         ...state,
-        fee: action.value,
+        fee: action.payload,
       }
     }
     case TransferActionTypes.Submit: {
@@ -102,7 +102,7 @@ const Transfer = () => {
     } else {
       dispatch({
         type,
-        value: e.target.value ? e.target.value : '',
+        payload: e.target.value ? e.target.value : '',
       })
     }
   }

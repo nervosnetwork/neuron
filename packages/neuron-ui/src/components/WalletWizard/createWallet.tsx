@@ -1,7 +1,9 @@
 import React, { useContext, useEffect } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import SettingsContext from '../../contexts/Settings'
 import WalletContext from '../../contexts/Wallet'
+import { ContentProps } from '../../containers/MainContent'
 
 import { Routes } from '../../utils/const'
 
@@ -19,20 +21,20 @@ const CreateWalletDiv = styled.div`
   width: 100%;
 `
 
-export default (props: any) => {
-  const settingsContext = useContext(SettingsContext)
-  const walletContext = useContext(WalletContext)
+export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+  const settings = useContext(SettingsContext)
+  const wallet = useContext(WalletContext)
 
   useEffect(() => {
     const content = document.querySelector('.main-content')
-    if (content) {
+    if (content && !wallet.address) {
       content.classList.add('full-screen')
       return () => {
         content.classList.remove('full-screen')
       }
     }
     return () => {}
-  }, [])
+  }, [wallet.address])
   return (
     <CreateWalletDiv>
       <ActionFlow>
@@ -44,16 +46,21 @@ export default (props: any) => {
         >
           <ActionA />
         </ActionStep>
-        <ActionStep title="seed" onBeforeNext={() => settingsContext.seedsValid}>
+        <ActionStep title="seed" onBeforeNext={() => settings.seedsValid}>
           <ActionB />
         </ActionStep>
         <ActionStep
           title="password"
-          onBeforeNext={() => settingsContext.passwordValid}
+          onBeforeNext={() => settings.passwordValid}
           onAfterNext={() => {
             // temp logic for simulate creation
-            walletContext.name = settingsContext.name
-            walletContext.address = settingsContext.seeds
+            props.dispatch(
+              props.actionCreators.createWallet({
+                name: settings.name,
+                mnemonic: '',
+                password: '',
+              }),
+            )
           }}
         >
           <ActionC />
@@ -61,7 +68,7 @@ export default (props: any) => {
         <ActionStep
           title="wallet"
           onAfterNext={() => {
-            settingsContext.passwordValid = false
+            settings.passwordValid = false
             props.history.push(Routes.WalletWizard)
           }}
         >
