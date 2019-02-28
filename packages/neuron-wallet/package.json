@@ -19,10 +19,7 @@
     "clean": "rm -rf dist/*",
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "package-mwl": "electron-builder -mwl",
-    "package-win": "electron-builder --win --x64",
-    "package-mac": "electron-builder --mac",
-    "package-linux": "./script/installrpm.sh && electron-builder --linux",
+    "package": "./script/package.sh",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "jest": {

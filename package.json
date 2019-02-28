@@ -24,10 +24,7 @@
     "build": "lerna run build",
     "clean": "lerna run clean",
 
-    "package-mwl": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-mwl",
-    "package-win": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-win",
-    "package-mac": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-mac",
-    "package-linux": "yarn build && lerna run --scope=@nervosnetwork/neuron-wallet package-linux",
+    "package": "yarn build && ./packages/neuron-wallet/script/package.sh",
 
     "bootstrap": "lerna bootstrap && lerna link",
     "lint": "lerna run lint",
