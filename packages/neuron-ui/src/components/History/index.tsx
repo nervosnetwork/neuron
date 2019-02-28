@@ -1,22 +1,33 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Container, Row, Col, Table } from 'react-bootstrap'
-import TablePagination from './TablePagination'
-
+import { Container, Table } from 'react-bootstrap'
 import ChainContext, { Transaction } from '../../contexts/Chain'
-
 import { getTransactions } from '../../services/UILayer'
 
-const cols = [
+interface ColProps {
+  label: string
+  index: string
+  width?: string
+  align?: 'left' | 'center' | 'right' | 'justify' | 'char'
+}
+
+interface TxHistory {
+  [index: string]: string | number
+}
+
+const cols: ColProps[] = [
   {
-    label: 'date',
+    label: 'Date',
     index: 'date',
+    width: '200px',
   },
   {
-    label: 'amount(ckb)',
+    label: 'Amount(ckb)',
     index: 'value',
+    width: '200px',
+    align: 'right',
   },
   {
-    label: 'transaction hash',
+    label: 'Transaction hash',
     index: 'hash',
   },
 ]
@@ -36,19 +47,38 @@ const transactionsToHistory = (transactions: Transaction[]) =>
   }))
 
 const History = () => {
-  const chain = useContext(ChainContext)
   const pageSize = 14
+  const initTransactions: TxHistory[] = []
+
+  const chain = useContext(ChainContext)
   const [page, setPage] = useState(0)
+  const [items, setItems] = useState(initTransactions)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     // This should be moved to the top level
     getTransactions(page, pageSize)
-  }, [page, pageSize])
+  }, [page])
+
+  useEffect(() => {
+    const newItems = transactionsToHistory(chain.transactions.items)
+    setItems(page === 0 ? newItems : items.concat(newItems))
+    setLoading(false)
+  }, [chain])
+
+  const onMore = () => {
+    const element = document.getElementById('root') as HTMLElement
+    const scrollBottom = element.scrollHeight - element.offsetHeight - element.scrollTop
+    if (scrollBottom < element.offsetHeight && !loading && items.length < chain.transactions.count) {
+      setLoading(true)
+      setPage(page + 1)
+    }
+  }
 
   return (
-    <Container>
+    <Container fluid>
       <h1>History</h1>
-      <Table striped bordered>
+      <Table striped bordered onWheel={onMore}>
         <thead>
           <tr>
             {cols.map(col => (
@@ -57,25 +87,24 @@ const History = () => {
           </tr>
         </thead>
         <tbody>
-          {transactionsToHistory(chain.transactions.items).map((txHistory: { [index: string]: string | number }) => (
+          {items.map(txHistory => (
             <tr key={txHistory.hash}>
               {cols.map(col => (
-                <td key={col.index}>{txHistory[col.index]}</td>
+                <td
+                  style={{
+                    width: col.width,
+                  }}
+                  align={col.align}
+                  key={col.index}
+                >
+                  {txHistory[col.index]}
+                </td>
               ))}
             </tr>
           ))}
         </tbody>
       </Table>
-      <Row>
-        <Col>
-          <TablePagination
-            page={page}
-            pageSize={pageSize}
-            total={chain.transactions.count}
-            onChange={pageNo => setPage(pageNo)}
-          />
-        </Col>
-      </Row>
+      {loading ? <p>loading...</p> : <div />}
     </Container>
   )
 }

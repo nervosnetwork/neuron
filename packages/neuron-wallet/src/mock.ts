@@ -11,14 +11,14 @@ export const cell = {
 }
 
 export const transactions = Array.from({
-  length: 200,
+  length: 20,
 }).map(() => ({
   date: new Date(),
   value: Math.random(),
   hash: Math.round(Math.random() * 10000000000000000),
 }))
 
-export const transactionCount = 500
+export const transactionCount = 200
 
 export default {
   cell,
