@@ -47,7 +47,6 @@
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.1",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/electron": "^1.6.10",
-    "dotenv": "^6.2.0",
     "electron": "^4.0.1",
     "electron-builder": "^20.38.5",
     "spectron": "^5.0.0",

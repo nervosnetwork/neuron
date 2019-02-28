@@ -1,12 +1,10 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
+import env from './env'
 
-require('dotenv').config()
-
-const { env } = process
-if (!env.REMOTE) {
+if (!env.remote) {
   throw new Error(`REMOTE is not set in .env`)
 }
 
-const ckbCore = new Core(env.REMOTE)
+const ckbCore = new Core(env.remote)
 
 export default ckbCore

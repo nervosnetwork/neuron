@@ -1,10 +1,11 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
+
+import env from './env'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
 import asw from './wallets/asw'
-import env from './env'
 
 let mainWindow: Electron.BrowserWindow | null
 
