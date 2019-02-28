@@ -1,6 +1,5 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import * as path from 'path'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
@@ -32,11 +31,7 @@ function createWindow() {
 
   Menu.setApplicationMenu(menu)
 
-  const ENTRY = {
-    DEV: 'http://localhost:3000',
-    PROD: `file://${path.join(__dirname, '../ui/index.html')}`,
-  }
-  mainWindow.loadURL(env.isDevMode ? ENTRY.DEV : ENTRY.PROD)
+  mainWindow.loadURL(env.mainURL)
 
   mainWindow.on('closed', () => {
     mainWindow = null
