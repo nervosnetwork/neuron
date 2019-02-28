@@ -24,6 +24,7 @@ function createWindow() {
     show: false,
     webPreferences: {
       devTools: env.isDevMode,
+      nodeIntegration: false,
     },
   })
 
