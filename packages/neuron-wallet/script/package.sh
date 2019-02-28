@@ -1,10 +1,10 @@
-function getplatform() {
+function get_platform() {
     case $1 in
-        linux|mwl)
-        checkandinstallrpm $1
+        mac|win)
+        package $1        
         ;;
         *)
-        package $1
+        check_rpm $1
         ;;
     esac
 }
@@ -24,36 +24,36 @@ function package() {
         electron-builder -mwl
         ;;
         *)
-        echo "Please add platform parameters like 'mac' 'win' 'linux' 'mwl' ."
+        electron-builder -mwl
         ;;
         esac
 }
 
-function checkandinstallrpm() {
-    echo "Check rpm..."
+function check_rpm() {
+    echo "Check rpm ..."
     if ! [ -x "$(command -v rpm)" ] ; then 
         OS=`uname -s`
         if [ ${OS} == "Darwin"  ];then
-            echo "Please run 'brew install rpm' " 
+            echo "Please run 'brew install rpm' to install rpm." 
         elif [ ${OS} == "Linux"  ];then
         source /etc/os-release
         case $ID in
             debian|ubuntu|devuan)
-                echo "Please run 'apt-get install rpm' to install rpm"
+                echo "Please run 'apt-get install rpm' to install rpm."
                 ;;
             centos|fedora|rhel)
                 yumdnf="yum"
                 if test "$(echo "$VERSION_ID >= 22" | bc)" -ne 0; then
                     yumdnf="dnf"
                 fi
-                echo "Please run '$yumdnf install -y rpm' to intall rpm"
+                echo "Please run '$yumdnf install -y rpm' to intall rpm."
                 ;;
                 *)
-                exit 1
+                echo "Please install 'rpm'."
                 ;;
             esac
         else
-            echo "Other OS: ${OS}"
+            echo "Please install 'rpm'."
         fi
     else
         package $1
@@ -61,4 +61,4 @@ function checkandinstallrpm() {
 }
 
 cd packages/neuron-wallet/
-getplatform $1
+get_platform $1
