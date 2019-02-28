@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-interface Wallet {
+export interface Wallet {
   name: string
   balance: number
   address: string

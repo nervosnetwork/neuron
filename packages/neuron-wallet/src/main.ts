@@ -12,7 +12,11 @@ let mainWindow: Electron.BrowserWindow | null
 const initUILayer = (win: BrowserWindow) => {
   win.webContents.send('ASW', {
     status: 1,
-    result: asw,
+    result: {
+      name: 'asw',
+      address: asw.address,
+      publicKey: asw.publicKey,
+    },
   })
 }
 
@@ -51,7 +55,14 @@ function createWindow() {
     mainWindow!.show()
     mainWindow!.focus()
   })
-  initUILayer(mainWindow)
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    /**
+     * @initUILayer
+     * @desc send current wallet to UILayer
+     */
+    initUILayer(mainWindow!)
+  })
   /**
    * @monitorChain
    * @description monitor network

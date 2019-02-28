@@ -18,15 +18,37 @@ const listenToChannel = () => {
    * @name CreateWallet
    * @description channel to create wallet
    */
-  ipcMain.on(Channel.CreateWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: { name: string; mnemonic: any; password: string }) => {
+    const notification = new Notification({
+      title: 'Create Wallet',
+      body: JSON.stringify(wallet),
+    })
+    notification.show()
+    e.sender.send(Channel.CreateWallet, {
+      status: 1,
+      result: {
+        name: wallet.name,
+        address: 'wallet address',
+        publicKey: 'asdfasfasdf',
+      },
+    })
+  })
+
+  /**
+   * @name DeleteWallet
+   */
+  ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, address: string) => {
+    const notification = new Notification({
+      title: 'Delete Wallet',
+      body: address,
+    })
+    notification.show()
     setTimeout(() => {
-      e.sender.send(Channel.CreateWallet, {
+      e.sender.send(Channel.DeleteWallet, {
         status: 1,
-        result: {
-          name: 'wallet name',
-          address: 'wallet address',
-        },
+        result: `wallet of ${address} deleted`,
       })
+      // should send current wallets to UILayer
     }, 1000)
   })
 
@@ -34,23 +56,34 @@ const listenToChannel = () => {
    * @name ImportWallet
    * @description channel to import wallet
    */
-  ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
+  ipcMain.on(Channel.ImportWallet, (e: Electron.Event, wallet: { name: string; mnemonic: any; password: string }) => {
+    const notification = new Notification({
+      title: 'Import Wallet',
+      body: JSON.stringify(wallet),
+    })
+    notification.show()
     setTimeout(() => {
       e.sender.send(Channel.ImportWallet, {
         status: 1,
+        result: `wallet imported`,
       })
     }, 1000)
   })
 
   /**
    * @name ExportWallet
-   * @description channel to export wallets
+   * @description channel to export wallet
    */
   ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
+    const notification = new Notification({
+      title: 'Export Wallet',
+      body: '',
+    })
+    notification.show()
     setTimeout(() => {
       e.sender.send(Channel.ExportWallet, {
         status: 1,
-        result: 'wallets',
+        result: 'wallet exported',
       })
     }, 1000)
   })

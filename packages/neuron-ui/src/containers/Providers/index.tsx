@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
 import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
 
-import UILayer, { asw } from '../../services/UILayer'
+import UILayer from '../../services/UILayer'
 import { Channel, NetworkStatus } from '../../utils/const'
 
 interface Response<T> {
@@ -17,16 +17,26 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   const [wallet, setWallet] = useState(initWallet)
   const [settings] = useState(initSettings)
 
-  useEffect(() => {
-    asw()
-  }, [])
-
   UILayer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({
       ...wallet,
-      name: 'asw',
       ...args.result,
     })
+  })
+
+  UILayer.on(
+    Channel.CreateWallet,
+    (_e: Event, args: Response<{ name: string; address: string; publicKey: Uint8Array }>) => {
+      if (args.status) {
+        // TODO: handle created wallet
+      }
+    },
+  )
+
+  UILayer.on(Channel.DeleteWallet, (_e: Event, args: Response<string>) => {
+    if (args.status) {
+      // TODO: handle wallet deleted
+    }
   })
 
   UILayer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
