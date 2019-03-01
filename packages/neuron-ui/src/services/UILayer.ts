@@ -4,12 +4,13 @@ import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
 declare global {
   interface Window {
     require: any
+    bridge: any
   }
 }
 
 const UILayer = (() => {
-  if (window.require) {
-    return new SyntheticEventEmitter(window.require('electron').ipcRenderer)
+  if (window.bridge) {
+    return new SyntheticEventEmitter(window.bridge.ipcRenderer)
   }
   return {
     send: (channel: string, msg: any = '') => {

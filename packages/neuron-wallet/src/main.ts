@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-
+import path from 'path'
 import env from './env'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
@@ -38,6 +38,8 @@ function createWindow() {
     show: false,
     webPreferences: {
       devTools: env.isDevMode,
+      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.js'),
     },
   })
 
