@@ -10,6 +10,8 @@ import {
   Database as IconAddresses,
   Performance as IconSettings,
 } from 'grommet-icons'
+import { useTranslation } from 'react-i18next'
+
 import { mainContents } from '../../components/Router'
 import WalletContext from '../../contexts/Wallet'
 
@@ -50,6 +52,7 @@ const walletMenuItems = [
 
 const Sidebar = () => {
   const wallet = useContext(WalletContext)
+  const [t] = useTranslation()
 
   const walletRoutes = walletMenuItems.map(item => {
     const entry = mainContents.find(route => route.name === item[0])!
@@ -64,7 +67,7 @@ const Sidebar = () => {
       <li key={route.name}>
         <NavLink to={route.path}>
           {<route.icon size="20px" />}
-          <span>{route.name === 'Wallet' ? wallet.name : route.name}</span>
+          <span>{route.name === 'Wallet' ? wallet.name : t(route.name)}</span>
         </NavLink>
       </li>
     ))

@@ -48,3 +48,7 @@ export enum Routes {
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
 }
+export enum Languages {
+  EN = 'en',
+  ZH = 'zh',
+}
