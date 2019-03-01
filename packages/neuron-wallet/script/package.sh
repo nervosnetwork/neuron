@@ -20,9 +20,6 @@ function package() {
         linux)
         electron-builder --linux
         ;;
-        mwl)
-        electron-builder -mwl
-        ;;
         *)
         electron-builder -mwl
         ;;
