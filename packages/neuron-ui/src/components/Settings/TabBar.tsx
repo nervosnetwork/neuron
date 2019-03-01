@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { Routes } from '../../utils/const'
 
 const TabBarPanel = styled.div`
@@ -21,6 +22,7 @@ const SelectedTabItem = styled(TabItem)`
 `
 
 const TabBar = (props: any) => {
+  const [t] = useTranslation()
   const tabs = [Routes.SettingsGeneral, Routes.SettingsWallets, Routes.SettingsNetwork]
   const contents = ['General', 'Wallets', 'Network']
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -44,7 +46,7 @@ const TabBar = (props: any) => {
               handleAction(index)
             }}
           >
-            {content}
+            {t(content)}
           </SelectedTabItem>
         ) : (
           <TabItem
@@ -53,7 +55,7 @@ const TabBar = (props: any) => {
               handleAction(index)
             }}
           >
-            {content}
+            {t(content)}
           </TabItem>
         )
       })}
