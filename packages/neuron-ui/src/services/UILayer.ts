@@ -9,9 +9,6 @@ declare global {
 }
 
 const UILayer = (() => {
-  if (window.require) {
-    return new SyntheticEventEmitter(window.require('electron').ipcRenderer)
-  }
   if (window.bridge) {
     return new SyntheticEventEmitter(window.bridge.ipcRenderer)
   }
