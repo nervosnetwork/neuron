@@ -1,7 +1,9 @@
+#!/bin/bash
+
 function get_platform() {
     case $1 in
         mac|win)
-        package $1        
+        package $1
         ;;
         *)
         check_rpm $1
@@ -10,7 +12,7 @@ function get_platform() {
 }
 
 function package() {
-    case $1 in 
+    case $1 in
         mac)
         electron-builder --mac
         ;;
@@ -28,10 +30,10 @@ function package() {
 
 function check_rpm() {
     echo "Check rpm ..."
-    if ! [ -x "$(command -v rpm)" ] ; then 
+    if ! [ -x "$(command -v rpm)" ] ; then
         OS=`uname -s`
         if [ ${OS} == "Darwin"  ];then
-            echo "Please run 'brew install rpm' to install rpm." 
+            echo "Please run 'brew install rpm' to install rpm."
         elif [ ${OS} == "Linux"  ];then
         source /etc/os-release
         case $ID in
