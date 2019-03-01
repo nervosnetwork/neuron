@@ -1,10 +1,10 @@
 import { interval } from 'rxjs'
 import { map, distinctUntilChanged, flatMap } from 'rxjs/operators'
 import { Channel } from './utils/const'
-import { ckbCore } from './channel'
+import ckbCore from './core'
+import asw from './wallets/asw'
 
 const numbers = interval(1000)
-const asw = ckbCore.wallet.newASW()
 
 const monitorNetwork = () => ({
   remote: ckbCore.node,

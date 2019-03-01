@@ -6,7 +6,7 @@ export default () => (
     <textarea
       readOnly
       style={{
-        width: '80vw',
+        width: '80%',
         height: 200,
         borderRadius: '2px 2px',
         backgroundColor: 'lightgrey',

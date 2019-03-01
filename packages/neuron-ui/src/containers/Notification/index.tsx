@@ -12,7 +12,7 @@ const Panel = styled.div`
 
 const Notice = () => {
   const wallet = useContext(WalletContext)
-  return <Panel>{wallet ? 'New message coming: {wallet.msg}' : ''}</Panel>
+  return wallet.msg ? <Panel>{'New message coming: {wallet.msg}'}</Panel> : null
 }
 
 const Notification = () => createPortal(<Notice />, document.querySelector('#notification') as HTMLElement)

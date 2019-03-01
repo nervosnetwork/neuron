@@ -1,14 +1,27 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
+import env from './env'
 import listenToChannel from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
-import env from './env'
+import asw from './wallets/asw'
 
 let mainWindow: Electron.BrowserWindow | null
 
+const initUILayer = (win: BrowserWindow) => {
+  win.webContents.send('ASW', {
+    status: 1,
+    result: {
+      name: 'asw',
+      address: asw.address,
+      publicKey: asw.publicKey,
+    },
+  })
+}
+
 listenToChannel()
+
 function createWindow() {
   const windowState = windowStateKeeper({
     defaultWidth: 1366,
@@ -43,6 +56,14 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow!.show()
     mainWindow!.focus()
+  })
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    /**
+     * @initUILayer
+     * @desc send current wallet to UILayer
+     */
+    initUILayer(mainWindow!)
   })
   /**
    * @monitorChain

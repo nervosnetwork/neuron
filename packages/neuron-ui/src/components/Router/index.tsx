@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { Routes } from '../../utils/const'
 
 import RoutesWithProps from './RoutesWithProps'
@@ -25,7 +25,7 @@ export interface CustomRoute {
   path: string
   name: string
   exact?: boolean
-  component: React.ComponentType
+  component: React.FunctionComponent<any>
 }
 
 export const containers: CustomRoute[] = [
@@ -135,28 +135,14 @@ const CustomRouter = () => {
   return (
     <Router>
       <Route
-        render={() => {
-          if (!wallet.address) {
-            return (
-              <MainContent>
-                <Switch>
-                  <Route path={Routes.WalletWizard} component={WalletWizard} />
-                  <Route path={Routes.ImportWallet} component={ImportWallet} />
-                  <Route path={Routes.CreateWallet} component={CreateWallet} />
-                  <Redirect path="*" to={Routes.WalletWizard} />
-                </Switch>
-              </MainContent>
-            )
-          }
-          return (
-            <>
-              <RoutesWithProps contents={containers} />
-              <MainContent>
-                <RoutesWithProps contents={mainContents} />
-              </MainContent>
-            </>
-          )
-        }}
+        render={() => (
+          <>
+            {wallet.address ? <RoutesWithProps contents={containers} /> : null}
+            <MainContent>
+              <RoutesWithProps contents={mainContents} />
+            </MainContent>
+          </>
+        )}
       />
     </Router>
   )

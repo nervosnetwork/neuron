@@ -8,7 +8,7 @@ export default () => {
       <h1>Input your seed</h1>
       <textarea
         style={{
-          width: '80vw',
+          width: '80%',
           height: 200,
           borderRadius: '2px 2px',
           backgroundColor: 'white',

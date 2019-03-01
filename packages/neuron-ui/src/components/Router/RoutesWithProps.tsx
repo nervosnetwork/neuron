@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, RouteComponentProps } from 'react-router-dom'
 import { CustomRoute } from '.'
 
 /**
@@ -13,7 +13,7 @@ const RoutesWithProps = ({ contents, ...rest }: { contents: CustomRoute[] }) => 
         <Route
           key={restContent.name}
           {...restContent}
-          render={(routeProps: any) => <Component {...routeProps} {...rest} />}
+          render={(routeProps: RouteComponentProps<{}>) => <Component {...routeProps} {...rest} />}
         />
       )
     })}
