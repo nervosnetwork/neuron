@@ -4,6 +4,8 @@ export enum NetworkStatus {
 }
 
 export enum Channel {
+  // App
+  SetLanguage = 'setLanguage',
   // Chain
   GetBlock = 'getBlock',
   GetTransaction = 'getTransaction',
@@ -47,8 +49,4 @@ export enum Routes {
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
-}
-export enum Languages {
-  EN = 'en',
-  ZH = 'zh',
 }

@@ -1,18 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
-import { Languages } from '../../utils/const'
-
-const languages = [
-  {
-    label: 'English',
-    lng: Languages.EN,
-  },
-  {
-    label: '中文',
-    lng: Languages.ZH,
-  },
-]
 
 const ContentPanel = styled.div`
   display: flex;
@@ -27,12 +14,6 @@ const ItemPanel = styled.li`
 `
 
 const General = () => {
-  const [, i18n] = useTranslation()
-
-  const changeLanguage = (lng: Languages) => () => {
-    i18n.changeLanguage(lng)
-  }
-
   return (
     <ContentPanel>
       <ItemPanel>Photo Setting</ItemPanel>
@@ -40,16 +21,6 @@ const General = () => {
       <ItemPanel>Language Setting</ItemPanel>
       <ItemPanel>About Neuron</ItemPanel>
       <ItemPanel>Contact Us</ItemPanel>
-      <ItemPanel>
-        Language Switch:
-        {languages.map(language => {
-          return (
-            <button type="button" key={language.lng} onClick={changeLanguage(language.lng)}>
-              {language.label}
-            </button>
-          )
-        })}
-      </ItemPanel>
     </ContentPanel>
   )
 }
