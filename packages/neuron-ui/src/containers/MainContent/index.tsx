@@ -26,14 +26,14 @@ export enum MainActions {
   SetPage,
 }
 
-const reducers = (state: typeof initState, action: { type: MainActions; value: any }) => {
+const reducers = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
     case MainActions.UpdateTempWallet: {
       return {
         ...state,
         tempWallet: {
           ...state.tempWallet,
-          ...action.value,
+          ...action.payload,
         },
       }
     }
