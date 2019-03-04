@@ -18,7 +18,7 @@ const initUILayer = (win: BrowserWindow) => {
       publicKey: asw.publicKey,
     },
   })
-  // switch language according to locale
+
   setLanguage(win, app.getLocale())
 }
 
