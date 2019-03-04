@@ -22,6 +22,8 @@ export enum MainActions {
   DeleteWallet,
   ImportWallet,
   ExportWallet,
+  GetTransactions,
+  SetPage,
 }
 
 const reducers = (state: typeof initState, action: { type: MainActions; value: any }) => {

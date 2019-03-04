@@ -30,6 +30,7 @@
     "jsx": "preserve",
     "typeRoots": [
       "./types",
+      "node_modules/@nervosnetwork/ckb-types",
       "node_modules/@types",
     ]
   },
