@@ -41,7 +41,7 @@
     "cross-env": "^5.2.0",
     "electron": "^4.0.3",
     "grommet-icons": "^4.2.0",
-    "i18next": "^15.0.4",
+    "i18next": "^15.0.5",
     "node-sass": "^4.11.0",
     "qrcode.react": "0.9.3",
     "react": "^16.8.1",
