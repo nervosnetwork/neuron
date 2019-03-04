@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from './env'
-import listenToChannel from './channel'
+import listenToChannel, { setLanguage } from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
 import asw from './wallets/asw'
@@ -18,6 +18,8 @@ const initUILayer = (win: BrowserWindow) => {
       publicKey: asw.publicKey,
     },
   })
+  // switch language according to locale
+  setLanguage(win, app.getLocale())
 }
 
 listenToChannel()

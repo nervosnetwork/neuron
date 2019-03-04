@@ -240,4 +240,8 @@ const listenToChannel = () => {
   })
 }
 
+export const setLanguage = (win: Electron.BrowserWindow, lng: string) => {
+  win.webContents.send(Channel.SetLanguage, lng)
+}
+
 export default listenToChannel

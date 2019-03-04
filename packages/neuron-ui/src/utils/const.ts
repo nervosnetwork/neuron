@@ -4,6 +4,8 @@ export enum NetworkStatus {
 }
 
 export enum Channel {
+  // App
+  SetLanguage = 'setLanguage',
   // Chain
   GetBlock = 'getBlock',
   GetTransaction = 'getTransaction',

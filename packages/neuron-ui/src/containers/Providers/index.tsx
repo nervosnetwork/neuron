@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
 import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
@@ -16,6 +17,13 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
   const [settings] = useState(initSettings)
+  const [, i18n] = useTranslation()
+
+  UILayer.on(Channel.SetLanguage, (_e: Event, lng: string) => {
+    if (lng !== i18n.language) {
+      i18n.changeLanguage(lng)
+    }
+  })
 
   UILayer.on('ASW', (_e: any, args: Response<any>) => {
     setWallet({

@@ -1,5 +1,7 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
+
 import { NetworkStatus } from '../../utils/const'
 import ChainContext from '../../contexts/Chain'
 
@@ -27,6 +29,7 @@ const Span = styled.span`
 
 const NetworkStatusHeader = () => {
   const chain = useContext(ChainContext)
+  const [t] = useTranslation()
   return (
     <FlexDiv>
       <Span>
@@ -37,7 +40,7 @@ const NetworkStatusHeader = () => {
         />
       </Span>
       <Span>{chain.network.ip}</Span>
-      <Span>{chain.network.status}</Span>
+      <Span>{t(chain.network.status)}</Span>
       <Span
         style={{
           display: chain.tipBlockNumber ? '' : 'none',
