@@ -1,6 +1,7 @@
 import { app, shell, Menu, MenuItem, MenuItemConstructorOptions, dialog, BrowserWindow } from 'electron'
 import { Channel, Routes } from './utils/const'
 import env from './env'
+import i18n from './i18n'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -27,7 +28,7 @@ const menuTemplate = [
       },
       separator,
       {
-        label: 'Preferences...',
+        label: i18n.t('mainmenu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
         click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
           browserWindow.webContents.send(Channel.NavTo, {
@@ -45,7 +46,7 @@ const menuTemplate = [
     ],
   },
   {
-    label: 'Edit',
+    label: i18n.t('mainmenu.edit'),
     submenu: [
       {
         role: 'cut',

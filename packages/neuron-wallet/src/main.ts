@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from './env'
+import i18n from './i18n'
 import listenToChannel, { setLanguage } from './channel'
 import monitorChain from './monitor'
 import menu from './menu'
@@ -47,6 +48,10 @@ function createWindow() {
 
   windowState.manage(mainWindow)
 
+  const lng = app.getLocale()
+  if (lng !== i18n.language) {
+    i18n.changeLanguage(lng)
+  }
   Menu.setApplicationMenu(menu)
 
   mainWindow.loadURL(env.mainURL)

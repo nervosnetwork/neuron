@@ -1,16 +1,18 @@
 import i18n from 'i18next'
-import zh from './locale/zh'
-import en from './locale/en'
+import zh from './locales/zh'
+import en from './locales/en'
 
-i18n.init({
-  resources: {
-    en,
-    zh,
-  },
-  fallbackLng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
-})
+if (!i18n.isInitialized) {
+  i18n.init({
+    resources: {
+      en,
+      zh,
+    },
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false,
+    },
+  })
+}
 
 export default i18n
