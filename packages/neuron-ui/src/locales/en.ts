@@ -1,5 +1,5 @@
 export default {
-  transaction: {
+  translation: {
     'Create Wallet': 'Create Wallet',
     'Delete Wallet': 'Delete Wallet',
     'Import Wallet': 'Import Wallet',

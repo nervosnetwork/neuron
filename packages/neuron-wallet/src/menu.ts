@@ -2,88 +2,117 @@ import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from '
 import env from './env'
 import dispatch from './commands/dispatcher'
 import Command from './commands/commands'
+import i18n from './i18n'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
 
-const menuTemplate = [
-  {
-    label: app.getName(),
-    submenu: [
-      {
-        role: 'about',
-        click: () => {
-          dispatch(Command.ShowAbout)
+const getMenuTemplate = () => {
+  const menuTemplate: MenuItemConstructorOptions[] = [
+    {
+      label: app.getName(),
+      submenu: [
+        {
+          label: i18n.t('mainmenu.neuron.about', {
+            app: app.getName(),
+          }),
+          role: 'about',
+          click: () => {
+            dispatch(Command.ShowAbout)
+          },
         },
-      },
-      separator,
-      {
-        label: 'Preferences...',
-        accelerator: 'CmdOrCtrl+,',
-        click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-          dispatch(Command.ShowPreferences, {
-            window: browserWindow,
-          })
+        separator,
+        {
+          label: i18n.t('mainmenu.neuron.preferences'),
+          accelerator: 'CmdOrCtrl+,',
+          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
+            dispatch(Command.ShowPreferences, {
+              window: browserWindow,
+            })
+          },
         },
-      },
-      separator,
-      {
-        role: 'quit',
-      },
-    ],
-  },
-  {
-    label: 'Edit',
-    submenu: [
-      {
-        role: 'cut',
-      },
-      {
-        role: 'copy',
-      },
-      {
-        role: 'paste',
-      },
-    ],
-  },
-  {
-    role: 'windowMenu',
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Nervos',
-        click: () => {
-          dispatch(Command.OpenNervosWebsite)
+        separator,
+        {
+          label: i18n.t('mainmenu.neuron.quit', {
+            app: app.getName(),
+          }),
+          role: 'quit',
         },
-      },
-      {
-        label: 'Source Code',
-        click: () => {
-          dispatch(Command.OpenSourceCodeReposity)
+      ],
+    },
+    {
+      label: i18n.t('mainmenu.edit.label'),
+      role: 'editMenu',
+      submenu: [
+        {
+          label: i18n.t('mainmenu.edit.cut'),
+          role: 'cut',
         },
-      },
-    ],
-  },
-]
+        {
+          label: i18n.t('mainmenu.edit.copy'),
+          role: 'copy',
+        },
+        {
+          label: i18n.t('mainmenu.edit.paste'),
+          role: 'paste',
+        },
+      ],
+    },
+    {
+      label: i18n.t('mainmenu.window.label'),
+      role: 'windowMenu',
+      submenu: [
+        {
+          label: i18n.t('mainmenu.window.minimize'),
+          role: 'minimize',
+        },
+        {
+          label: i18n.t('mainmenu.window.close'),
+          role: 'close',
+        },
+      ],
+    },
+    {
+      label: i18n.t('mainmenu.help.label'),
+      role: 'help',
+      submenu: [
+        {
+          label: 'Nervos',
+          click: () => {
+            dispatch(Command.OpenNervosWebsite)
+          },
+        },
+        {
+          label: 'Source Code',
+          click: () => {
+            dispatch(Command.OpenSourceCodeReposity)
+          },
+        },
+      ],
+    },
+  ]
 
-if (env.isDevMode) {
-  menuTemplate.push({
-    label: 'Develop',
-    submenu: [
-      {
-        role: 'reload',
-      },
-      {
-        role: 'forceReload',
-      },
-      {
-        role: 'toggleDevTools',
-      },
-    ],
-  })
+  if (env.isDevMode) {
+    menuTemplate.push({
+      label: 'Develop',
+      submenu: [
+        {
+          role: 'reload',
+        },
+        {
+          role: 'forceReload',
+        },
+        {
+          role: 'toggleDevTools',
+        },
+      ],
+    })
+  }
+
+  return menuTemplate
 }
 
-export default Menu.buildFromTemplate(menuTemplate)
+export default (): Menu => {
+  return Menu.buildFromTemplate(getMenuTemplate())
+}

@@ -4,7 +4,8 @@ import path from 'path'
 import env from './env'
 import listenToChannel, { sendTransactionHistory } from './channel'
 import monitorChain from './monitor'
-import menu from './menu'
+import i18n from './i18n'
+import mainmenu from './menu'
 import asw from './wallets/asw'
 import dispatch, { Command } from './commands/dispatcher'
 
@@ -54,7 +55,8 @@ function createWindow() {
 
   windowState.manage(mainWindow)
 
-  Menu.setApplicationMenu(menu)
+  i18n.changeLanguage(app.getLocale())
+  Menu.setApplicationMenu(mainmenu())
 
   mainWindow.loadURL(env.mainURL)
 
