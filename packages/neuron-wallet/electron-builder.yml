@@ -32,7 +32,7 @@ mac:
 linux:
   artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   category: Finance
-  icon: ./assets/images/icon.png
+  icon: ./assets/images/
   target:
     - "AppImage"
     - "deb"
