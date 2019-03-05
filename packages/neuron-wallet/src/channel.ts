@@ -248,7 +248,7 @@ const listenToChannel = () => {
 export const setLanguage = (win: Electron.BrowserWindow, lng: string) => {
   win.webContents.send(Channel.SetLanguage, lng)
 }
-export const sendTransactions = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {
+export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {
   win.webContents.send(Channel.GetTransactions, {
     status: 1,
     result: {
