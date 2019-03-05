@@ -42,7 +42,7 @@ const rendererMessageHandler: Handler = (command, info) => {
       window.webContents.send(Channel.NavTo, {
         status: 1,
         result: {
-          router: '/settings',
+          router: '/settings/general',
         },
       })
       break

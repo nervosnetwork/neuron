@@ -27,16 +27,20 @@ const TabBar = (props: any) => {
   const contents = ['General', 'Wallets', 'Network']
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const { location } = props
-  const { pathname } = location
-  useEffect(() => {
-    setSelectedIndex(tabs.indexOf(pathname))
-  }, [pathname])
-
   const handleAction = (index: number) => {
     setSelectedIndex(index)
     props.history.push(tabs[index])
   }
+
+  const { location } = props
+  const { pathname } = location
+  useEffect(() => {
+    if (pathname === Routes.Settings) {
+      handleAction(0)
+    } else {
+      setSelectedIndex(tabs.indexOf(pathname))
+    }
+  }, [pathname])
 
   return (
     <TabBarPanel>
