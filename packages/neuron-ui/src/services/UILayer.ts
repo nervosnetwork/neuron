@@ -19,6 +19,9 @@ const UILayer = (() => {
     on: (channel: string, cb: Function) => {
       console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
     },
+    removeAllListeners: (channel?: string) => {
+      console.warn(`Channel ${channel} cannot removed due to Electron not loaded`)
+    },
   }
 })()
 
@@ -40,9 +43,9 @@ export const sendCapacity = (address: string, capacity: string) => {
     capacity,
   })
 }
-export const getTransactions = (page: number, pageSize: number) => {
+export const getTransactions = (pageNo: number, pageSize: number) => {
   UILayer.send(Channel.GetTransactions, {
-    page,
+    pageNo,
     pageSize,
   })
 }

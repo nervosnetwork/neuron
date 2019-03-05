@@ -34,7 +34,9 @@ export interface Chain {
   }
   tipBlockNumber?: number
   transactions: {
-    count: number
+    pageNo: number
+    pageSize: number
+    totalCount: number
     items: Transaction[]
   }
 }
@@ -47,7 +49,9 @@ export const initChain: Chain = {
   },
   tipBlockNumber: undefined,
   transactions: {
-    count: 0,
+    pageNo: 0,
+    pageSize: 15,
+    totalCount: 0,
     items: [],
   },
 }

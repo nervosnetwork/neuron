@@ -19,6 +19,7 @@ const bridge = {
     on: (channel: string, cb: Function) => {
       ipcRenderer.on(channel, cb)
     },
+    removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel),
   },
 }
 

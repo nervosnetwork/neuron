@@ -7,12 +7,6 @@ import SettingsContext, { initSettings } from '../../contexts/Settings'
 import UILayer from '../../services/UILayer'
 import { Channel, NetworkStatus } from '../../utils/const'
 
-interface Response<T> {
-  status: number
-  result: T
-  msg?: string
-}
-
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
@@ -82,22 +76,18 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  UILayer.on(Channel.GetTransactions, (_e: Event, args: Response<{ count: number; transactions: Transaction[] }>) => {
-    // TODO:
-    if (args.status) {
-      setChain({
-        ...chain,
-        transactions: {
-          count: args.result.count,
-          items: args.result.transactions,
-        },
-      })
-    }
-  })
-
-  UILayer.on(Channel.NavTo, (_e: Event, args: Response<any>) => {
-    window.location.href = args.result.router
-  })
+  UILayer.on(
+    Channel.GetTransactions,
+    (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
+      // TODO:
+      if (args.status) {
+        setChain({
+          ...chain,
+          transactions: args.result,
+        })
+      }
+    },
+  )
 
   return (
     <SettingsContext.Provider value={settings}>
