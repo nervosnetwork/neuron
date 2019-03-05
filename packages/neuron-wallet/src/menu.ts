@@ -1,7 +1,6 @@
 import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from 'electron'
 import env from './env'
-import dispatch from './commands/dispatcher'
-import Command from './commands/commands'
+import dispatch, { Command } from './commands/dispatcher'
 import i18n from './i18n'
 
 const separator: MenuItemConstructorOptions = {
