@@ -1,6 +1,6 @@
 import { app, dialog, shell, BrowserWindow } from 'electron'
 import Command from './commands'
-import { Channel, Routes } from '../utils/const'
+import { Channel } from '../utils/const'
 
 export interface CommandInfo {
   window?: BrowserWindow
@@ -42,7 +42,7 @@ const rendererMessageHandler: Handler = (command, info) => {
       window.webContents.send(Channel.NavTo, {
         status: 1,
         result: {
-          router: Routes.Settings,
+          router: '/settings',
         },
       })
       break
