@@ -24,7 +24,7 @@
     "build": "lerna run build",
     "clean": "lerna run clean",
 
-    "package": "yarn build && ./packages/neuron-wallet/script/package.sh",
+    "package": "yarn clean && yarn build && ./packages/neuron-wallet/script/package.sh",
 
     "bootstrap": "lerna bootstrap && lerna link",
     "lint": "lerna run lint",
