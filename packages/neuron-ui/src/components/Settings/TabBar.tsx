@@ -27,9 +27,11 @@ const TabBar = (props: any) => {
   const contents = ['General', 'Wallets', 'Network']
   const [selectedIndex, setSelectedIndex] = useState(0)
 
+  const { location } = props
+  const { pathname } = location
   useEffect(() => {
-    props.history.push(tabs[0])
-  }, [])
+    setSelectedIndex(tabs.indexOf(pathname))
+  }, [pathname])
 
   const handleAction = (index: number) => {
     setSelectedIndex(index)
