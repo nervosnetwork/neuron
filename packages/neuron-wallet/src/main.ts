@@ -24,7 +24,7 @@ const initUILayer = (win: BrowserWindow) => {
   dispatch(Command.SetUILocale, {
     window: win,
     extra: {
-      locale: app.getLocale,
+      locale: app.getLocale(),
     },
   })
   sendTransactionHistory(win, 0, 15)
