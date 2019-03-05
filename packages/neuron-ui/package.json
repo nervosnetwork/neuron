@@ -32,7 +32,6 @@
   ],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
-    "@nervosnetwork/ckb-sdk-rpc": "0.0.1-alpha.3",
     "@types/jest": "23.3.12",
     "@types/node": "10.12.18",
     "@types/react": "16.8.2",

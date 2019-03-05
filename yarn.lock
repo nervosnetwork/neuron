@@ -1536,7 +1536,7 @@
     "@nervosnetwork/ckb-sdk-wallet" "^0.0.1-alpha.3"
     "@nervosnetwork/ckb-types" "^0.0.1-alpha.3"
 
-"@nervosnetwork/ckb-sdk-rpc@0.0.1-alpha.3", "@nervosnetwork/ckb-sdk-rpc@^0.0.1-alpha.3":
+"@nervosnetwork/ckb-sdk-rpc@^0.0.1-alpha.3":
   version "0.0.1-alpha.3"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.0.1-alpha.3.tgz#164b2ac4c4b46b3b19fe2505750542ea4d51d457"
   integrity sha512-wGHjT2tZ6wriKx9G48VeQo2P8ZA387L23wKHK3H1MRsxq1NK2ClUP9YWalZbqgLETnbs6DxofhyarAXmrvPMkQ==
