@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
-import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import {
   CreditCard as IconWallet,
@@ -22,20 +21,23 @@ const SidebarAside = styled.div`
     list-style: none;
     li {
       margin: 10px 0;
-    }
-    a {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 4px;
-      text-decoration: none;
-      color: #666666;
-      span {
-        padding-left: 10px;
-      }
-      &.active {
-        background-color: #eee;
-        font-weight: 600;
+      div {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #666666;
+        span {
+          padding-left: 10px;
+        }
+        &.active {
+          background-color: #eee;
+          font-weight: 600;
+        }
+        &:focus {
+          outline: none;
+        }
       }
     }
   }
@@ -50,7 +52,7 @@ const walletMenuItems = [
   ['Settings', IconSettings],
 ]
 
-const Sidebar = () => {
+const Sidebar = (props: any) => {
   const wallet = useContext(WalletContext)
   const [t] = useTranslation()
 
@@ -63,14 +65,23 @@ const Sidebar = () => {
   })
   let menu
   if (wallet) {
-    menu = walletRoutes.map(route => (
-      <li key={route.name}>
-        <NavLink to={route.path}>
-          {<route.icon size="20px" />}
-          <span>{route.name === 'Wallet' ? wallet.name : t(route.name)}</span>
-        </NavLink>
-      </li>
-    ))
+    menu = walletRoutes.map(route => {
+      const className = props.history.location.pathname.startsWith(route.path) ? 'active' : ''
+      return (
+        <li key={route.name}>
+          <div
+            className={className}
+            role="menu"
+            tabIndex={0}
+            onClick={() => props.history.push(route.path)}
+            onKeyPress={() => props.history.push(route.path)}
+          >
+            {<route.icon size="20px" />}
+            <span>{route.name === 'Wallet' ? wallet.name : t(route.name)}</span>
+          </div>
+        </li>
+      )
+    })
   }
 
   return (
@@ -80,6 +91,6 @@ const Sidebar = () => {
   )
 }
 
-const Container = () => createPortal(<Sidebar />, document.querySelector('aside') as HTMLElement)
+const Container = (props: any) => createPortal(<Sidebar {...props} />, document.querySelector('aside') as HTMLElement)
 
 export default Container
