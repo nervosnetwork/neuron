@@ -1,6 +1,8 @@
 import React, { useContext } from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { Routes } from '../../utils/const'
+import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { Routes, Channel } from '../../utils/const'
+
+import UILayer from '../../services/UILayer'
 
 import RoutesWithProps from './RoutesWithProps'
 import MainContent from '../../containers/MainContent'
@@ -132,17 +134,24 @@ export const mainContents: CustomRoute[] = [
 
 const CustomRouter = () => {
   const wallet = useContext(WalletContext)
+
   return (
     <Router>
       <Route
-        render={() => (
-          <>
-            {wallet.address ? <RoutesWithProps contents={containers} /> : null}
-            <MainContent>
-              <RoutesWithProps contents={mainContents} />
-            </MainContent>
-          </>
-        )}
+        render={(props: RouteComponentProps<{}>) => {
+          UILayer.on(Channel.NavTo, (_e: Event, args: Response<{ router: string }>) => {
+            props.history.push(args.result.router)
+          })
+
+          return (
+            <>
+              {wallet.address ? <RoutesWithProps contents={containers} /> : null}
+              <MainContent>
+                <RoutesWithProps contents={mainContents} />
+              </MainContent>
+            </>
+          )
+        }}
       />
     </Router>
   )

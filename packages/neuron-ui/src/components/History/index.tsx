@@ -1,9 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { Container, Row, Col, Table } from 'react-bootstrap'
+
 import TablePagination from './TablePagination'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
-
 import { getTransactions } from '../../services/UILayer'
 
 const cols = [
@@ -37,13 +37,7 @@ const transactionsToHistory = (transactions: Transaction[]) =>
 
 const History = () => {
   const chain = useContext(ChainContext)
-  const pageSize = 14
-  const [page, setPage] = useState(0)
-
-  useEffect(() => {
-    // This should be moved to the top level
-    getTransactions(page, pageSize)
-  }, [page, pageSize])
+  const { pageNo, pageSize, totalCount, items } = chain.transactions
 
   return (
     <Container>
@@ -57,7 +51,7 @@ const History = () => {
           </tr>
         </thead>
         <tbody>
-          {transactionsToHistory(chain.transactions.items).map((txHistory: { [index: string]: string | number }) => (
+          {transactionsToHistory(items).map((txHistory: { [index: string]: string | number }) => (
             <tr key={txHistory.hash}>
               {cols.map(col => (
                 <td key={col.index}>{txHistory[col.index]}</td>
@@ -69,10 +63,10 @@ const History = () => {
       <Row>
         <Col>
           <TablePagination
-            page={page}
+            page={pageNo}
             pageSize={pageSize}
-            total={chain.transactions.count}
-            onChange={pageNo => setPage(pageNo)}
+            total={totalCount}
+            onChange={page => getTransactions(page, pageSize)}
           />
         </Col>
       </Row>

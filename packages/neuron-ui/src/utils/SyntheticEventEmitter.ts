@@ -10,11 +10,17 @@ class SyntheticEventEmitter {
   }
 
   on = (channel: string, cb: Function) => {
+    this.removeAllListeners(channel)
     return this.handlers.map(handler => {
+      return handler.on(channel, cb)
+    })
+  }
+
+  removeAllListeners = (channel: string) => {
+    this.handlers.forEach(handler => {
       if ('removeAllListeners' in handler) {
         handler.removeAllListeners(channel)
       }
-      return handler.on(channel, cb)
     })
   }
 }

@@ -152,18 +152,23 @@ const listenToChannel = () => {
    * @name GetTransactions
    * @description get transactions
    */
-  ipcMain.on(Channel.GetTransactions, (e: Electron.Event, { page, pageSize }: { page: number; pageSize: number }) => {
-    e.sender.send(Channel.GetTransactions, {
-      status: 1,
-      result: {
-        count: transactionCount,
-        transactions: transactions.map(tx => ({
-          ...tx,
-          value: tx.value * page * pageSize,
-        })),
-      },
-    })
-  })
+  ipcMain.on(
+    Channel.GetTransactions,
+    (e: Electron.Event, { pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
+      e.sender.send(Channel.GetTransactions, {
+        status: 1,
+        result: {
+          pageNo,
+          pageSize,
+          totalCount: transactionCount,
+          items: transactions.map(tx => ({
+            ...tx,
+            value: tx.value * pageNo * pageSize,
+          })),
+        },
+      })
+    },
+  )
 
   /**
    * @name Get GetWallets
@@ -242,6 +247,20 @@ const listenToChannel = () => {
 
 export const setLanguage = (win: Electron.BrowserWindow, lng: string) => {
   win.webContents.send(Channel.SetLanguage, lng)
+}
+export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {
+  win.webContents.send(Channel.GetTransactions, {
+    status: 1,
+    result: {
+      pageNo,
+      pageSize,
+      totalCount: transactionCount,
+      items: transactions.map(tx => ({
+        ...tx,
+        value: tx.value * pageNo * pageSize,
+      })),
+    },
+  })
 }
 
 export default listenToChannel
