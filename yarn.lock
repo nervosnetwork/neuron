@@ -1569,7 +1569,7 @@
     "@nervosnetwork/ckb-sdk-rpc" "^0.0.1-alpha.3"
     "@nervosnetwork/ckb-sdk-utils" "^0.0.1-alpha.3"
 
-"@nervosnetwork/ckb-types@^0.0.1-alpha.1", "@nervosnetwork/ckb-types@^0.0.1-alpha.3":
+"@nervosnetwork/ckb-types@^0.0.1-alpha.3":
   version "0.0.1-alpha.3"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.0.1-alpha.3.tgz#e2a98b6b7d32a466073a04632305a9aa1f9afddd"
   integrity sha512-9aKqsADOkGTQON2E30I+YlbfGnfAvK+sYTsZl25qg+FGzRPGEGzDWwSg0Y9In2wAzOtepzAIsAq+Fe8n08IvhA==
