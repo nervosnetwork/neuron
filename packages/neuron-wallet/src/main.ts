@@ -4,7 +4,8 @@ import path from 'path'
 import env from './env'
 import listenToChannel, { setLanguage } from './channel'
 import monitorChain from './monitor'
-import menu from './menu'
+import i18n from './i18n'
+import mainmenu from './menu'
 import asw from './wallets/asw'
 
 let mainWindow: Electron.BrowserWindow | null
@@ -47,7 +48,8 @@ function createWindow() {
 
   windowState.manage(mainWindow)
 
-  Menu.setApplicationMenu(menu)
+  i18n.changeLanguage(app.getLocale())
+  Menu.setApplicationMenu(mainmenu())
 
   mainWindow.loadURL(env.mainURL)
 
