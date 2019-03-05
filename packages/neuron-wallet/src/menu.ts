@@ -1,19 +1,10 @@
-import { app, shell, Menu, MenuItem, MenuItemConstructorOptions, dialog, BrowserWindow } from 'electron'
-import { Channel, Routes } from './utils/const'
+import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from 'electron'
 import env from './env'
+import dispatch, { Command } from './commands/dispatcher'
 import i18n from './i18n'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
-}
-
-const options = {
-  type: 'info',
-  title: app.getName(),
-  message: app.getName(),
-  detail: app.getVersion(),
-  buttons: ['OK'],
-  cancelId: 0,
 }
 
 const getMenuTemplate = () => {
@@ -27,7 +18,7 @@ const getMenuTemplate = () => {
           }),
           role: 'about',
           click: () => {
-            dialog.showMessageBox(options)
+            dispatch(Command.ShowAbout)
           },
         },
         separator,
@@ -35,11 +26,8 @@ const getMenuTemplate = () => {
           label: i18n.t('mainmenu.neuron.preferences'),
           accelerator: 'CmdOrCtrl+,',
           click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-            browserWindow.webContents.send(Channel.NavTo, {
-              status: 1,
-              result: {
-                router: Routes.Settings,
-              },
+            dispatch(Command.ShowPreferences, {
+              window: browserWindow,
             })
           },
         },
@@ -91,13 +79,13 @@ const getMenuTemplate = () => {
         {
           label: 'Nervos',
           click: () => {
-            shell.openExternal('https://www.nervos.org/')
+            dispatch(Command.OpenNervosWebsite)
           },
         },
         {
           label: 'Source Code',
           click: () => {
-            shell.openExternal('https://github.com/nervosnetwork/neuron')
+            dispatch(Command.OpenSourceCodeReposity)
           },
         },
       ],

@@ -2,11 +2,12 @@ import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from './env'
-import listenToChannel, { setLanguage, sendTransactionHistory } from './channel'
+import listenToChannel, { sendTransactionHistory } from './channel'
 import monitorChain from './monitor'
 import i18n from './i18n'
 import mainmenu from './menu'
 import asw from './wallets/asw'
+import dispatch, { Command } from './commands/dispatcher'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -20,7 +21,12 @@ const initUILayer = (win: BrowserWindow) => {
     },
   })
 
-  setLanguage(win, app.getLocale())
+  dispatch(Command.SetUILocale, {
+    window: win,
+    extra: {
+      locale: app.getLocale,
+    },
+  })
   sendTransactionHistory(win, 0, 15)
 }
 
