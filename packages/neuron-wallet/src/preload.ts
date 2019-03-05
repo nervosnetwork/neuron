@@ -1,4 +1,4 @@
-import { ipcMain, ipcRenderer, WebContents } from 'electron'
+import { ipcRenderer } from 'electron'
 
 declare global {
   interface Window {
@@ -7,13 +7,6 @@ declare global {
 }
 
 const bridge = {
-  ipcMain: {
-    send: (webContents: WebContents, channel: any, data: any) => webContents.send(channel, data),
-    on: (channel: any, cb: Function) => {
-      ipcMain.on(channel, cb)
-    },
-  },
-
   ipcRenderer: {
     send: (channel: string, args: any = '') => ipcRenderer.send(channel, args),
     on: (channel: string, cb: Function) => {
