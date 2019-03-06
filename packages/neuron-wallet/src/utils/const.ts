@@ -28,6 +28,14 @@ export enum Channel {
 
   // Page
   NavTo = 'navTo',
+
+  // Store
+  SaveWalletStore = 'saveWalletStore',
+  GetWalletNameListStore = 'getWalletNameListStore',
+  GetWalletStore = 'getWalletStore',
+  DeleteWalletStore = 'deleteWalletStore',
+  OtherStore = 'otherStore',
+  RenameWalletStore = 'renameWalletStore',
 }
 
 export default {
