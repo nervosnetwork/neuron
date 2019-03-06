@@ -21,7 +21,7 @@
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
     "postinstall": "npm rebuild tiny-secp256k1",
-    "testStore": "ava"
+    "teststore": "ava"
   },
   "jest": {
     "transform": {
