@@ -43,7 +43,7 @@ test.serial('test getWallet', async t => {
   fs.unlinkSync(storagePath)
 })
 
-test.serial('test getAllWallet', async t => {
+test.serial('test getAllWallets', async t => {
   const storagePath = await run('test/wallet-store-tests/get-all-wallets.js')
   t.deepEqual(JSON.parse(fs.readFileSync(storagePath, 'utf8')), [
     {

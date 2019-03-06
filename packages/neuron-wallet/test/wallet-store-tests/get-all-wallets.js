@@ -25,7 +25,7 @@ walletStore.saveWallet('wallet3', {
   keystore: 'sadqwe',
 })
 
-const allWallets = walletStore.getAllWallet()
+const allWallets = walletStore.getAllWallets()
 walletStore.clear()
 walletStore.storeAll(allWallets)
 

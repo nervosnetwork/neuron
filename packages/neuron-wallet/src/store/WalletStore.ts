@@ -40,7 +40,7 @@ export default class WalletStore extends BaseStore {
     }
   }
 
-  getAllWallet(): Wallet[] {
+  getAllWallets(): Wallet[] {
     const walletList: Wallet[] = []
     const nameList = this.getWalletNameList()
     nameList.forEach(name => walletList.push(this.getWallet(name)))
