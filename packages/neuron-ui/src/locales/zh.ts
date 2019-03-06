@@ -9,7 +9,6 @@ export default {
     Send: '转账',
     Receive: '收款',
     History: '交易历史',
-    UnspentCells: '未使用Cells',
     Addresses: '地址管理',
     Settings: '设置',
     // netowrk

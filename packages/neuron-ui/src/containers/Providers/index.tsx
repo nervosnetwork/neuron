@@ -76,16 +76,6 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  UILayer.on(Channel.GetUnspentCells, (_e: Event, args: Response<any>) => {
-    // TODO:
-    if (args.status) {
-      setChain({
-        ...chain,
-        cells: args.result,
-      })
-    }
-  })
-
   UILayer.on(
     Channel.GetTransactions,
     (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
