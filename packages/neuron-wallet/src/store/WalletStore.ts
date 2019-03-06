@@ -1,6 +1,6 @@
 import BaseStore from './store'
 
-const walletDBName = 'NeuronWalletDB'
+const walletDBName = 'WalletDB'
 
 const keyWalletName = 'WalletName'
 
@@ -71,5 +71,9 @@ export default class WalletStore extends BaseStore {
 
   path() {
     return this.store.path
+  }
+
+  storeAll(data: any) {
+    this.store.store = data
   }
 }
