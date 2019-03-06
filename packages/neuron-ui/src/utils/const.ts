@@ -41,6 +41,7 @@ export enum Routes {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  UnspentCells = '/unspent_cells',
   Addresses = '/addresses',
   Settings = '/settings',
   SettingsGeneral = '/settings/general',

@@ -8,6 +8,7 @@ import {
   History as IconHistory,
   Database as IconAddresses,
   Performance as IconSettings,
+  Money as IconMoney,
 } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
@@ -59,6 +60,10 @@ const walletMenuItems = [
   {
     name: 'History',
     icon: IconHistory,
+  },
+  {
+    name: 'UnspentCells',
+    icon: IconMoney,
   },
   {
     name: 'Addresses',

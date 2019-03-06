@@ -14,6 +14,7 @@ import WalletDetail from '../WalletDetail'
 import Send from '../Transfer'
 import Receive from '../Receive'
 import History from '../History'
+import Cells from '../Cells'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
@@ -81,6 +82,12 @@ export const mainContents: CustomRoute[] = [
     path: Routes.History,
     exact: false,
     component: History,
+  },
+  {
+    name: 'UnspentCells',
+    path: Routes.UnspentCells,
+    exact: false,
+    component: Cells,
   },
   {
     name: 'Addresses',
