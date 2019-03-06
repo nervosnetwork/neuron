@@ -20,6 +20,7 @@ import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 import General from '../Settings/General'
 import Wallets from '../Settings/Wallets'
 import Network from '../Settings/Network'
+import Terminal from '../Terminal'
 
 import WalletContext from '../../contexts/Wallet'
 
@@ -129,6 +130,12 @@ export const mainContents: CustomRoute[] = [
     path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
+  },
+  {
+    name: 'Terminal',
+    path: Routes.Terminal,
+    exact: true,
+    component: Terminal,
   },
 ]
 

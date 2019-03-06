@@ -33,6 +33,8 @@ export enum Channel {
 
   // Page
   NavTo = 'navTo',
+  // Terminal
+  Terminal = 'terminal',
 }
 
 export enum Routes {
@@ -49,4 +51,5 @@ export enum Routes {
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
+  Terminal = '/terminal',
 }
