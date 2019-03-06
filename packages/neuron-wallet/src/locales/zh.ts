@@ -20,6 +20,9 @@ export default {
       help: {
         label: '帮助',
       },
+      develop: {
+        terminal: '终端',
+      },
     },
   },
 }

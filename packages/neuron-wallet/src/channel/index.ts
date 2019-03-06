@@ -1,7 +1,8 @@
 import { ipcMain, Notification } from 'electron'
-import { Channel } from './utils/const'
-import { transactions, transactionCount } from './mock'
-import asw from './wallets/asw'
+
+import { Channel } from '../utils/const'
+import { transactions, transactionCount } from '../mock'
+import asw from '../wallets/asw'
 
 const listenToChannel = () => {
   // chain
@@ -24,6 +25,7 @@ const listenToChannel = () => {
       body: JSON.stringify(wallet),
     })
     notification.show()
+    setTimeout(() => notification.close(), 3000)
     e.sender.send(Channel.CreateWallet, {
       status: 1,
       result: {
@@ -43,6 +45,7 @@ const listenToChannel = () => {
       body: address,
     })
     notification.show()
+    setTimeout(() => notification.close(), 3000)
     setTimeout(() => {
       e.sender.send(Channel.DeleteWallet, {
         status: 1,
@@ -62,6 +65,7 @@ const listenToChannel = () => {
       body: JSON.stringify(wallet),
     })
     notification.show()
+    setTimeout(() => notification.close(), 3000)
     setTimeout(() => {
       e.sender.send(Channel.ImportWallet, {
         status: 1,
@@ -80,6 +84,7 @@ const listenToChannel = () => {
       body: '',
     })
     notification.show()
+    setTimeout(() => notification.close(), 3000)
     setTimeout(() => {
       e.sender.send(Channel.ExportWallet, {
         status: 1,

@@ -47,6 +47,15 @@ const rendererMessageHandler: Handler = (command, info) => {
       })
       break
     }
+    case Command.ShowTerminal: {
+      window.webContents.send(Channel.NavTo, {
+        status: 1,
+        result: {
+          router: '/terminal',
+        },
+      })
+      break
+    }
     case Command.SetUILocale: {
       window.webContents.send(Channel.SetLanguage, info!.extra!.locale)
       break
