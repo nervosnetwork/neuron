@@ -28,6 +28,8 @@ export enum Channel {
 
   // Page
   NavTo = 'navTo',
+  // Terminal
+  Terminal = 'terminal',
 }
 
 export default {

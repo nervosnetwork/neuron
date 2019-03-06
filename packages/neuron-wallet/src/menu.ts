@@ -105,6 +105,15 @@ const getMenuTemplate = () => {
         {
           role: 'toggleDevTools',
         },
+        {
+          label: i18n.t('mainmenu.develop.terminal'),
+          accelerator: 'Cmd+Shift+t',
+          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
+            dispatch(Command.ShowTerminal, {
+              window: browserWindow,
+            })
+          },
+        },
       ],
     })
   }

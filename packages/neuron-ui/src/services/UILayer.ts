@@ -37,12 +37,14 @@ export const getLiveCell = (outpoint: any) => UILayer.send('getLiveCell', outpoi
 export const getCellsByTypeHash = (typeHash: string) => {
   UILayer.send(Channel.GetCellsByTypeHash, typeHash)
 }
+
 export const sendCapacity = (address: string, capacity: string) => {
   UILayer.send(Channel.SendCapacity, {
     address,
     capacity,
   })
 }
+
 export const getTransactions = (pageNo: number, pageSize: number) => {
   UILayer.send(Channel.GetTransactions, {
     pageNo,

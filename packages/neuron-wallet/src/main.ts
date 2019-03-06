@@ -8,6 +8,7 @@ import i18n from './i18n'
 import mainmenu from './menu'
 import asw from './wallets/asw'
 import dispatch, { Command } from './commands/dispatcher'
+import TerminalChannel from './channel/terminal'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -81,6 +82,8 @@ function createWindow() {
    * @description monitor network
    */
   monitorChain(mainWindow.webContents)
+  const terminalChannel = new TerminalChannel(mainWindow.webContents)
+  terminalChannel.start()
 }
 
 app.on('ready', createWindow)
