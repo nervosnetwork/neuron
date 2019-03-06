@@ -3,7 +3,7 @@ import { map, distinctUntilChanged, flatMap } from 'rxjs/operators'
 import { Channel } from './utils/const'
 import ckbCore from './core'
 import asw from './wallets/asw'
-import getUnspentCells from './cell'
+import { getUnspentCells } from './cell'
 
 const numbers = interval(1000)
 
