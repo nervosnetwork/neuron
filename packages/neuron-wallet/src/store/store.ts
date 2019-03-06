@@ -1,10 +1,3 @@
-/*
- * @Author: BaojunCZ
- * @LastEditors: your name
- * @Description: store base
- * @Date: 2019-03-05 19:50:40
- * @LastEditTime: 2019-03-06 12:31:34
- */
 import Store from 'electron-store'
 
 // const encryptKey = 'Neuron'

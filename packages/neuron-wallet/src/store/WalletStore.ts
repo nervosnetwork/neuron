@@ -1,10 +1,3 @@
-/*
- * @Author: BaojunCZ
- * @LastEditors: your name
- * @Description: store wallet name and keystore
- * @Date: 2019-03-05 19:50:41
- * @LastEditTime: 2019-03-06 13:15:34
- */
 import BaseStore from './store'
 
 const walletDBName = 'NeuronWalletDB'
@@ -32,7 +25,7 @@ export default class WalletStore extends BaseStore {
     })
   }
 
-  getWalletNameList(): string[] {
+  private getWalletNameList(): string[] {
     return this.get(keyWalletName, [])
   }
 
@@ -45,6 +38,13 @@ export default class WalletStore extends BaseStore {
       nameList = nameList.concat(walletName)
       this.save(keyWalletName, nameList)
     }
+  }
+
+  getAllWallet(): Wallet[] {
+    const walletList: Wallet[] = []
+    const nameList = this.getWalletNameList()
+    nameList.forEach(name => walletList.push(this.getWallet(name)))
+    return walletList
   }
 
   getWallet(walletName: string): Wallet {
@@ -63,5 +63,13 @@ export default class WalletStore extends BaseStore {
     const nameList = this.getWalletNameList()
     nameList.splice(nameList.indexOf(walletName), 1)
     this.save(keyWalletName, nameList)
+  }
+
+  clear() {
+    this.store.clear()
+  }
+
+  path() {
+    return this.store.path
   }
 }

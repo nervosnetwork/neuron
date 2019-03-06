@@ -31,7 +31,7 @@ export enum Channel {
 
   // Store
   SaveWalletStore = 'saveWalletStore',
-  GetWalletNameListStore = 'getWalletNameListStore',
+  GetAllWalletStore = 'getAllWalletStore',
   GetWalletStore = 'getWalletStore',
   DeleteWalletStore = 'deleteWalletStore',
   OtherStore = 'otherStore',

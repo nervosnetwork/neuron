@@ -3,10 +3,8 @@ import { Channel } from './utils/const'
 import { cell, transactions, transactionCount } from './mock'
 import asw from './wallets/asw'
 import WalletStore, { Wallet } from './store/WalletStore'
-import OtherStore from './store/otherStore'
 
 const walletStore = new WalletStore()
-const otherStore = new OtherStore()
 
 const listenToChannel = () => {
   // chain
@@ -291,14 +289,14 @@ ipcMain.on(
  * @name saveWalletStore
  * @description channel to get wallet name list
  */
-ipcMain.on(Channel.GetWalletNameListStore, (e: Electron.Event) => {
+ipcMain.on(Channel.GetAllWalletStore, (e: Electron.Event) => {
   try {
-    e.sender.send(Channel.GetWalletNameListStore, {
+    e.sender.send(Channel.GetAllWalletStore, {
       status: 1,
-      result: walletStore.getWalletNameList(),
+      result: walletStore.getAllWallet(),
     })
   } catch (error) {
-    e.sender.send(Channel.GetWalletNameListStore, {
+    e.sender.send(Channel.GetAllWalletStore, {
       status: 0,
       result: error,
     })
@@ -362,13 +360,5 @@ ipcMain.on(
     }
   },
 )
-
-ipcMain.on(Channel.OtherStore, (e: Electron.Event, { key, value }: { key: string; value: string }) => {
-  otherStore.save(key, value)
-  e.sender.send(Channel.OtherStore, {
-    status: 1,
-    result: 'saved',
-  })
-})
 
 export default listenToChannel
