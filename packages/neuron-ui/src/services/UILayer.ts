@@ -1,5 +1,4 @@
 import { Channel } from '../utils/const'
-import { Wallet } from '../../../neuron-wallet/src/store/WalletStore'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
 
 declare global {
@@ -48,33 +47,6 @@ export const getTransactions = (pageNo: number, pageSize: number) => {
   UILayer.send(Channel.GetTransactions, {
     pageNo,
     pageSize,
-  })
-}
-export const saveWalletStore = (walletName: string, wallet: Wallet) => {
-  UILayer.send(Channel.SaveWalletStore, {
-    walletName,
-    wallet,
-  })
-}
-
-export const getWalletNameListStore = () => {
-  UILayer.send(Channel.GetWalletNameListStore)
-}
-
-export const getWalletStore = (walletName: string) =>
-  UILayer.send(Channel.GetWalletStore, {
-    walletName,
-  })
-
-export const deleteWalletStore = (walletName: string) =>
-  UILayer.send(Channel.DeleteWalletStore, {
-    walletName,
-  })
-
-export const renameWalletStore = (newWalletName: string, oldWalletName: string) => {
-  UILayer.send(Channel.RenameWalletStore, {
-    newWalletName,
-    oldWalletName,
   })
 }
 

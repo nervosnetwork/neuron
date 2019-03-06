@@ -33,14 +33,6 @@ export enum Channel {
 
   // Page
   NavTo = 'navTo',
-
-  // Store
-  SaveWalletStore = 'saveWalletStore',
-  GetWalletNameListStore = 'getAllWalletStore',
-  GetWalletStore = 'getWalletStore',
-  DeleteWalletStore = 'deleteWalletStore',
-  OtherStore = 'otherStore',
-  RenameWalletStore = 'renameWalletStore',
 }
 
 export enum Routes {

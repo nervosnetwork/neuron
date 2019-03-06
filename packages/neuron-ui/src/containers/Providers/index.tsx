@@ -3,16 +3,14 @@ import { useTranslation } from 'react-i18next'
 import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
 import WalletContext, { initWallet } from '../../contexts/Wallet'
 import SettingsContext, { initSettings } from '../../contexts/Settings'
-import WalletNamesContext, { initWalletNames } from '../../contexts/WalletNames'
 
-import UILayer, { getWalletNameListStore } from '../../services/UILayer'
+import UILayer from '../../services/UILayer'
 import { Channel, NetworkStatus } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [chain, setChain] = useState(initChain)
   const [wallet, setWallet] = useState(initWallet)
   const [settings] = useState(initSettings)
-  const [walletNames, setWalletNames] = useState(initWalletNames)
   const [, i18n] = useTranslation()
 
   UILayer.on(Channel.SetLanguage, (_e: Event, lng: string) => {
@@ -91,39 +89,11 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     },
   )
 
-  UILayer.on(Channel.GetWalletNameListStore, (_e: Event, args: Response<any>) => {
-    if (args.status) {
-      setWalletNames({
-        name: args.result,
-      })
-    }
-  })
-
-  UILayer.on(Channel.SaveWalletStore, (_e: Event, args: Response<any>) => {
-    if (args.status) {
-      getWalletNameListStore()
-    }
-  })
-
-  UILayer.on(Channel.DeleteWalletStore, (_e: Event, args: Response<any>) => {
-    if (args.status) {
-      getWalletNameListStore()
-    }
-  })
-
-  UILayer.on(Channel.RenameWalletStore, (_e: Event, args: Response<any>) => {
-    if (args.status) {
-      getWalletNameListStore()
-    }
-  })
-
   return (
     <SettingsContext.Provider value={settings}>
       <ChainContext.Provider value={chain}>
         <WalletContext.Provider value={wallet}>
-          <WalletNamesContext.Provider value={walletNames}>
-            <Comp {...props} />
-          </WalletNamesContext.Provider>
+          <Comp {...props} />
         </WalletContext.Provider>
       </ChainContext.Provider>
     </SettingsContext.Provider>

@@ -2,9 +2,6 @@ import { ipcMain, Notification } from 'electron'
 import { Channel } from './utils/const'
 import { cell, transactions, transactionCount } from './mock'
 import asw from './wallets/asw'
-import WalletStore, { Wallet } from './store/WalletStore'
-
-const walletStore = new WalletStore()
 
 const listenToChannel = () => {
   // chain
@@ -262,103 +259,5 @@ export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: numb
     },
   })
 }
-
-/**
- * @name saveWalletStore
- * @description channel to add or update wallet
- */
-ipcMain.on(
-  Channel.SaveWalletStore,
-  (e: Electron.Event, { walletName, wallet }: { walletName: string; wallet: Wallet }) => {
-    try {
-      walletStore.saveWallet(walletName, wallet)
-      e.sender.send(Channel.SaveWalletStore, {
-        status: 1,
-        result: 'saved wallet',
-      })
-    } catch (error) {
-      e.sender.send(Channel.SaveWalletStore, {
-        status: 0,
-        result: error,
-      })
-    }
-  },
-)
-
-/**
- * @name saveWalletStore
- * @description channel to get wallet name list
- */
-ipcMain.on(Channel.GetAllWalletStore, (e: Electron.Event) => {
-  try {
-    e.sender.send(Channel.GetAllWalletStore, {
-      status: 1,
-      result: walletStore.getAllWallet(),
-    })
-  } catch (error) {
-    e.sender.send(Channel.GetAllWalletStore, {
-      status: 0,
-      result: error,
-    })
-  }
-})
-
-/**
- * @name saveWalletStore
- * @description channel to get wallet name list
- */
-ipcMain.on(Channel.GetWalletStore, (e: Electron.Event, { walletName }: { walletName: string }) => {
-  try {
-    e.sender.send(Channel.GetWalletStore, {
-      status: 1,
-      result: walletStore.getWallet(walletName),
-    })
-  } catch (error) {
-    e.sender.send(Channel.GetWalletStore, {
-      status: 0,
-      result: error,
-    })
-  }
-})
-
-/**
- * @name saveWalletStore
- * @description channel to get wallet name list
- */
-ipcMain.on(Channel.DeleteWalletStore, (e: Electron.Event, { walletName }: { walletName: string }) => {
-  try {
-    e.sender.send(Channel.DeleteWalletStore, {
-      status: 1,
-      result: walletStore.deleteWallet(walletName),
-    })
-  } catch (error) {
-    e.sender.send(Channel.DeleteWalletStore, {
-      status: 0,
-      result: error,
-    })
-  }
-})
-
-/**
- * @name saveWalletStore
- * @description channel to get wallet name list
- */
-ipcMain.on(
-  Channel.RenameWalletStore,
-  (e: Electron.Event, { newWalletName, oldWalletName }: { newWalletName: string; oldWalletName: string }) => {
-    try {
-      walletStore.renameWallet(newWalletName, oldWalletName)
-      e.sender.send(Channel.RenameWalletStore, {
-        status: 1,
-        result: 'saved wallet',
-      })
-    } catch (error) {
-      e.sender.send(Channel.RenameWalletStore, {
-        status: 0,
-        result: error,
-      })
-    }
-  },
-)
 
 export default listenToChannel
