@@ -47,7 +47,8 @@ module.exports = {
         "multiline": true,
         "minProperties": 3
       }
-    }]
+    }],
+    "no-plusplus": [0]
   },
   "env": {
     "jest": true,

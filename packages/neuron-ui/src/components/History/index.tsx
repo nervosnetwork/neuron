@@ -63,7 +63,7 @@ const History = () => {
       <Row>
         <Col>
           <TablePagination
-            page={pageNo}
+            currentPage={pageNo}
             pageSize={pageSize}
             total={totalCount}
             onChange={page => getTransactions(page, pageSize)}
