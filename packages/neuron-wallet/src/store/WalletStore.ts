@@ -1,6 +1,5 @@
 import BaseStore from './store'
-
-const walletDBName = 'WalletDB'
+import env from '../env'
 
 const keyWalletName = 'WalletName'
 
@@ -22,7 +21,7 @@ export interface KeyStore {
 export default class WalletStore extends BaseStore {
   constructor() {
     super({
-      name: walletDBName,
+      name: env.walletDBName,
     })
   }
 

@@ -1,6 +1,7 @@
 import Store from 'electron-store'
+import env from '../env'
 
-// const encryptKey = 'Neuron'
+const encryptKey = 'Neuron'
 
 interface Options {
   name?: string
@@ -13,7 +14,9 @@ export default class BaseStore {
 
   constructor(options: Options) {
     const myOptions = options
-    // myOptions.encryptionKey = encryptKey
+    if (!env.isDevMode) {
+      myOptions.encryptionKey = encryptKey
+    }
     this.store = new Store(myOptions)
   }
 
