@@ -5,16 +5,17 @@ const walletDBName = 'WalletDB'
 const keyWalletName = 'WalletName'
 
 // wallet name is exist
-const WalletStoreError = {
-  ExistKey: 'There is wallet named ',
+enum WalletStoreError {
+  ExistWallet,
+  NoWallet,
 }
 
 export interface Wallet {
   name: string
-  keystore: keyStore
+  keystore: KeyStore
 }
 
-export interface keyStore {
+export interface KeyStore {
   // TODO
 }
 
@@ -31,7 +32,7 @@ export default class WalletStore extends BaseStore {
 
   saveWallet = (walletName: string, wallet: Wallet) => {
     if (this.store.has(walletName)) {
-      throw new Error(WalletStoreError.ExistKey + walletName)
+      throw WalletStoreError.ExistWallet
     } else {
       let nameList = this.getWalletNameList()
       this.save(walletName, wallet)
@@ -40,25 +41,29 @@ export default class WalletStore extends BaseStore {
     }
   }
 
-  getAllWallets(): Wallet[] {
+  getAllWallets = (): Wallet[] => {
     const walletList: Wallet[] = []
     const nameList = this.getWalletNameList()
     nameList.forEach(name => walletList.push(this.getWallet(name)))
     return walletList
   }
 
-  getWallet(walletName: string): Wallet {
+  getWallet = (walletName: string): Wallet => {
+    const wallet = this.get(walletName, null)
+    if (!wallet) {
+      throw WalletStoreError.ExistWallet
+    }
     return this.get(walletName)
   }
 
-  renameWallet(newName: string, oldName: string) {
+  renameWallet = (newName: string, oldName: string) => {
     const wallet = this.getWallet(oldName)
     wallet.name = newName
     this.saveWallet(newName, wallet)
     this.deleteWallet(oldName)
   }
 
-  deleteWallet(walletName: string) {
+  deleteWallet = (walletName: string) => {
     this.delete(walletName)
     const nameList = this.getWalletNameList()
     nameList.splice(nameList.indexOf(walletName), 1)
