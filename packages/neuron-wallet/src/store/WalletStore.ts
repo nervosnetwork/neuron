@@ -1,4 +1,5 @@
 import BaseStore from './store'
+import { KeyStore } from '../keys/keystore'
 import env from '../env'
 
 const keyWalletName = 'WalletName'
@@ -12,10 +13,6 @@ enum WalletStoreError {
 export interface Wallet {
   name: string
   keystore: KeyStore
-}
-
-export interface KeyStore {
-  // TODO
 }
 
 export default class WalletStore extends BaseStore {
