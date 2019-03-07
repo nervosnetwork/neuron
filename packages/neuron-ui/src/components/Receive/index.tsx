@@ -1,6 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
+import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import QRCode from 'qrcode.react'
+
+declare global {
+  interface Window {
+    clipboard: any
+  }
+}
 
 const ReceivePanel = styled.div`
   display: flex;
@@ -24,7 +31,9 @@ const Receive = () => {
       <QRCodePanel>
         <QRCode value={address} />
       </QRCodePanel>
-      <Address>{address}</Address>
+      <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">Click to copy</Tooltip>}>
+        <Address onClick={() => window.clipboard.writeText(address)}>{address}</Address>
+      </OverlayTrigger>
     </ReceivePanel>
   )
 }

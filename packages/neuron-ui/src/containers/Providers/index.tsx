@@ -41,17 +41,21 @@ const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) =
     }
   })
 
-  UILayer.on(Channel.GetNetwork, (_e: Event, args: Response<{ remote: { url: string }; connected: boolean }>) => {
-    if (args.status) {
-      setChain({
-        ...chain,
-        network: {
-          ip: args.result.remote.url,
-          status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-        },
-      })
-    }
-  })
+  UILayer.on(
+    Channel.GetNetwork,
+    (_e: Event, args: Response<{ remote: { name: string; url: string }; connected: boolean }>) => {
+      if (args.status) {
+        setChain({
+          ...chain,
+          network: {
+            name: args.result.remote.name,
+            remote: args.result.remote.url,
+            status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
+          },
+        })
+      }
+    },
+  )
 
   UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
     if (args.status) {

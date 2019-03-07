@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from 'react'
+import { Button } from 'react-bootstrap'
 import styled from 'styled-components'
 import { Launch } from 'grommet-icons'
 import WalletContext from '../../contexts/Wallet'
@@ -17,12 +18,33 @@ const Wizard = styled.div`
   justify-content: center;
   .buttonGroup {
     button {
-      height: 40px;
-      width: 140px;
       cursor: pointer;
     }
   }
 `
+
+const NavButton = ({
+  label,
+  position,
+  onSubmit,
+}: {
+  label: string
+  position: 'left' | 'right'
+  onSubmit: (e: any) => void
+}) => (
+  <Button
+    key={label}
+    style={{
+      float: position,
+    }}
+    size="lg"
+    type="button"
+    onKeyPress={onSubmit}
+    onClick={onSubmit}
+  >
+    {label}
+  </Button>
+)
 
 export default (props: any) => {
   const wallet = useContext(WalletContext)
@@ -36,6 +58,18 @@ export default (props: any) => {
     }
     return () => {}
   }, [wallet.address])
+  const buttons = [
+    {
+      label: 'Create New Wallet',
+      position: 'left' as 'left',
+      onSubmit: () => props.history.push(Routes.CreateWallet),
+    },
+    {
+      label: 'Import Wallet',
+      position: 'right' as 'right',
+      onSubmit: () => props.history.push(Routes.ImportWallet),
+    },
+  ]
   return (
     <Wizard>
       <div
@@ -48,34 +82,9 @@ export default (props: any) => {
         </h1>
         <h1>Create or import your first wallet</h1>
         <div className="buttonGroup">
-          <button
-            style={{
-              float: 'left',
-            }}
-            type="button"
-            onKeyPress={() => {
-              //   for users with physical disabilities who cannot use a mouse
-            }}
-            onClick={() => {
-              props.history.push(Routes.CreateWallet)
-            }}
-          >
-            Create New Wallet
-          </button>
-          <button
-            style={{
-              float: 'right',
-            }}
-            type="button"
-            onKeyPress={() => {
-              //   for users with physical disabilities who cannot use a mouse
-            }}
-            onClick={() => {
-              props.history.push(Routes.ImportWallet)
-            }}
-          >
-            Import Wallet
-          </button>
+          {buttons.map(button => (
+            <NavButton {...button} key={button.label} />
+          ))}
         </div>
       </div>
     </Wizard>

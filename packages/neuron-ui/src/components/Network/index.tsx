@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 
-import { NetworkStatus } from '../../utils/const'
-import ChainContext from '../../contexts/Chain'
+import Dropdown from '../../widgets/Dropdown'
+import { NetworkStatus, Routes } from '../../utils/const'
+import ChainContext, { Network } from '../../contexts/Chain'
+import { HeaderActionsCreators } from '../../containers/Header'
 
 const Status = styled.div`
   width: 8px;
@@ -14,10 +15,15 @@ const Status = styled.div`
 `
 
 const FlexDiv = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-around;
   height: 100%;
-  float: right;
+  &:hover {
+    & > div {
+      display: flex !important;
+    }
+  }
 `
 
 const Span = styled.span`
@@ -27,9 +33,33 @@ const Span = styled.span`
   align-items: center;
 `
 
-const NetworkStatusHeader = () => {
+const NetworkStatusHeader = ({
+  networks,
+  navTo,
+  dispatch,
+  actionCreators,
+}: {
+  networks: Network[]
+  dispatch: React.Dispatch<{ type: string; payload?: any }>
+  navTo: Function
+  actionCreators: HeaderActionsCreators
+}) => {
   const chain = useContext(ChainContext)
-  const [t] = useTranslation()
+
+  const tipNumber = chain.tipBlockNumber === undefined ? undefined : `#${(+chain.tipBlockNumber).toLocaleString()}`
+  const networkItems = [
+    ...networks.map(network => ({
+      label: network.name || network.remote,
+      onClick: () => {
+        dispatch(actionCreators.setNetowrk(network))
+      },
+    })),
+    {
+      label: 'Mangement',
+      onClick: () => navTo(Routes.SettingsNetwork),
+    },
+  ]
+
   return (
     <FlexDiv>
       <Span>
@@ -39,15 +69,17 @@ const NetworkStatusHeader = () => {
           }}
         />
       </Span>
-      <Span>{chain.network.ip}</Span>
-      <Span>{t(chain.network.status)}</Span>
-      <Span
+      <Span>{chain.network.name || chain.network.remote || 'test'}</Span>
+      {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}
+      <Dropdown
+        items={networkItems}
         style={{
-          display: chain.tipBlockNumber ? '' : 'none',
+          position: 'absolute',
+          top: '100%',
+          zIndex: '999',
+          display: 'none',
         }}
-      >
-        {chain.tipBlockNumber || null}
-      </Span>
+      />
     </FlexDiv>
   )
 }

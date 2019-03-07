@@ -1,6 +1,8 @@
 @import './layout.scss';
+
 * {
   user-select: none;
+  outline: none;
 }
 
 html {

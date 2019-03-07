@@ -25,10 +25,10 @@ const PageNos = ({
     <Pagination.Prev disabled={currentPage === 0} onClick={() => onChange(currentPage - 1)} />
     {pageNos.map(pageNo => {
       if (pageNo < 0) {
-        return <Pagination.Ellipsis disabled />
+        return <Pagination.Ellipsis key={Math.random()} disabled />
       }
       return (
-        <Pagination.Item key={Math.random()} active={pageNo === currentPage} onClick={() => onChange(pageNo)}>
+        <Pagination.Item key={pageNo} active={pageNo === currentPage} onClick={() => onChange(pageNo)}>
           {pageNo + 1}
         </Pagination.Item>
       )

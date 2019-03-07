@@ -248,6 +248,22 @@ const listenToChannel = () => {
       })
     }, 1000)
   })
+
+  /**
+   * @name setNetwork
+   */
+  ipcMain.on(Channel.SetNetwork, (e: Electron.Event, network: { name: string; remote: string }) => {
+    // TODO:
+    e.sender.send(Channel.GetNetwork, {
+      status: 1,
+      result: {
+        remote: {
+          ...network,
+          connected: false,
+        },
+      },
+    })
+  })
 }
 
 export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {

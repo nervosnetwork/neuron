@@ -4,20 +4,22 @@ import { Channel } from './utils/const'
 import ckbCore from './core'
 import asw from './wallets/asw'
 
+import console = require('console')
+
 const numbers = interval(1000)
-
-const monitorNetwork = () => ({
-  remote: ckbCore.node,
-  connected: false,
-})
-
-const monitorBalance = async () => {
-  return asw.getBalance()
+const monitors = {
+  network: () => ({
+    name: 'TestNet',
+    remote: ckbCore.node,
+    connected: false,
+  }),
+  balance: asw.getBalance,
+  tipBlockNumber: ckbCore.rpc.getTipBlockNumber,
 }
 
 const monitorChain = (webContents: Electron.WebContents) => {
   numbers
-    .pipe(map(() => monitorNetwork()))
+    .pipe(map(() => monitors.network()))
     .pipe(
       distinctUntilChanged((x, y) => {
         return x.connected === y.connected && x.remote.url === y.remote.url
@@ -31,7 +33,19 @@ const monitorChain = (webContents: Electron.WebContents) => {
     }, console.error)
 
   numbers
-    .pipe(flatMap(monitorBalance))
+    .pipe(flatMap(monitors.tipBlockNumber))
+    .pipe(distinctUntilChanged())
+    .subscribe(result => {
+      if (!webContents) return
+      console.log(result)
+      webContents.send(Channel.GetTipBlockNumber, {
+        status: 1,
+        result,
+      })
+    }, console.error)
+
+  numbers
+    .pipe(flatMap(monitors.balance))
     .pipe(distinctUntilChanged())
     .subscribe(result => {
       if (!webContents) return

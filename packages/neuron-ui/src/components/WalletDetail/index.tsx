@@ -1,24 +1,25 @@
 import React, { useContext } from 'react'
+import { Card, ListGroup, Alert } from 'react-bootstrap'
 import WalletContext from '../../contexts/Wallet'
 import { ContentProps } from '../../containers/MainContent'
 
 const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentProps>> = () => {
   const wallet = useContext(WalletContext)
 
+  const items = ['Simulate long content...', `balance: ${wallet.balance}`]
+
   return wallet.name ? (
-    <>
-      <h1>{wallet.name}</h1>
-      <div
-        style={{
-          height: '1200px',
-        }}
-      >
-        Simulate long content...
-        <div>{`balance: ${wallet.balance}`}</div>
-      </div>
-    </>
+    <Card>
+      <Card.Header>{wallet.name}</Card.Header>
+      <Card.Body />
+      <ListGroup>
+        {items.map(item => (
+          <ListGroup.Item key={item}>{item}</ListGroup.Item>
+        ))}
+      </ListGroup>
+    </Card>
   ) : (
-    <div>No Wallet</div>
+    <Alert variant="warning">No Wallet</Alert>
   )
 }
 
