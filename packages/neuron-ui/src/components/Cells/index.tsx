@@ -1,15 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import ChainContext, { Cell } from '../../contexts/Chain'
-import { getCellsByTypeHash } from '../../services/UILayer'
 
-const headers = ['outPoint', 'reference', 'args', 'signedArgs', 'version']
+const headers = ['capacity']
 
 const Cells = () => {
-  const [typeHash] = useState('')
   const chain = useContext(ChainContext)
-  useEffect(() => {
-    getCellsByTypeHash(typeHash)
-  }, [typeHash])
+
   return (
     <div>
       Cells

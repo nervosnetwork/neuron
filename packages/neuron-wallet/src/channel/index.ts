@@ -1,6 +1,7 @@
 import { ipcMain, Notification } from 'electron'
+
 import { Channel } from '../utils/const'
-import { cell, transactions, transactionCount } from '../mock'
+import { transactions, transactionCount } from '../mock'
 import asw from '../wallets/asw'
 
 const listenToChannel = () => {
@@ -127,7 +128,7 @@ const listenToChannel = () => {
     setTimeout(() => {
       e.sender.send(Channel.GetCellsByTypeHash, {
         status: 1,
-        result: [cell],
+        result: ['cells'],
       })
     }, 1000)
   })
