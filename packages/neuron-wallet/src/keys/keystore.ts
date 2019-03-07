@@ -1,17 +1,16 @@
 export interface Master {
-  seed: string
-  privkey: string
+  privateKey: string
   chainCode: string
 }
 
 export interface Child {
   path: string
   depth: number
-  privkey: string
+  privateKey: string
   chainCode: string
 }
 
 export interface KeyStore {
   master: Master
-  children: Child[]
+  children?: Child[]
 }
