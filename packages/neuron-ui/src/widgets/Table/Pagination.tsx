@@ -50,7 +50,13 @@ const TablePagination = ({ total, currentPage, pageSize, displayCount = 5, onCha
     for (let i = 0; i < displayCount; i++) {
       pageNos.push(i)
     }
+    if (pageCount > displayCount) {
+      pageNos.push(-1)
+    }
   } else if (currentPage >= pageCount - range) {
+    if (pageCount > displayCount) {
+      pageNos.push(-1)
+    }
     for (let i = pageCount - displayCount; i < pageCount; i++) {
       pageNos.push(i)
     }

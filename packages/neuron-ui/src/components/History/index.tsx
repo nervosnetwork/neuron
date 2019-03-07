@@ -1,23 +1,22 @@
-import React, { useContext } from 'react'
-import { Container, Row, Col, Table } from 'react-bootstrap'
+import React, { useContext, useCallback } from 'react'
+import { Container } from 'react-bootstrap'
 
-import TablePagination from './TablePagination'
-
+import Table from '../../widgets/Table'
 import ChainContext, { Transaction } from '../../contexts/Chain'
 import { getTransactions } from '../../services/UILayer'
 
-const cols = [
+const headers = [
   {
     label: 'date',
-    index: 'date',
+    key: 'date',
   },
   {
     label: 'amount(ckb)',
-    index: 'value',
+    key: 'value',
   },
   {
     label: 'transaction hash',
-    index: 'hash',
+    key: 'hash',
   },
 ]
 
@@ -32,44 +31,28 @@ const formatterDate = (time: Date) => {
 const transactionsToHistory = (transactions: Transaction[]) =>
   transactions.map((tx: Transaction) => ({
     ...tx,
+    key: tx.hash,
     date: formatterDate(tx.date),
   }))
 
 const History = () => {
   const chain = useContext(ChainContext)
   const { pageNo, pageSize, totalCount, items } = chain.transactions
+  const onPageChange = useCallback((page: number) => {
+    getTransactions(page, pageSize)
+  }, [])
 
   return (
     <Container>
       <h1>History</h1>
-      <Table striped bordered>
-        <thead>
-          <tr>
-            {cols.map(col => (
-              <th key={col.index}>{col.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {transactionsToHistory(items).map((txHistory: { [index: string]: string | number }) => (
-            <tr key={txHistory.hash}>
-              {cols.map(col => (
-                <td key={col.index}>{txHistory[col.index]}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Row>
-        <Col>
-          <TablePagination
-            currentPage={pageNo}
-            pageSize={pageSize}
-            total={totalCount}
-            onChange={page => getTransactions(page, pageSize)}
-          />
-        </Col>
-      </Row>
+      <Table
+        headers={headers}
+        items={transactionsToHistory(items)}
+        pageNo={pageNo}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={onPageChange}
+      />
     </Container>
   )
 }
