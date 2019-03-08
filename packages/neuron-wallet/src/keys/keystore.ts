@@ -10,7 +10,7 @@ export interface Child {
   chainCode: string
 }
 
-export interface KeyStore {
+export interface Keystore {
   master: Master
   children?: Child[]
 }

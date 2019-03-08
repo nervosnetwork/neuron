@@ -1,12 +1,12 @@
-import { KeyStore } from './keystore'
+import { Keystore } from './keystore'
 import Key from './key'
 
 export default interface Action {
-  fromKeyStoreJson(json: string): Key
-  fromKeyStore(keystore: KeyStore): Key
+  fromKeystoreJson(json: string): Key
+  fromKeystore(keystore: Keystore): Key
   fromMnemonic(mnemonic: string, derive: boolean): Key
-  getKeyStore(): KeyStore
-  getKeyStoreJson(): string
+  getKeystore(): Keystore
+  getKeystoreJson(): string
   getMnemonic(): string
   generateKey(): Key
 }

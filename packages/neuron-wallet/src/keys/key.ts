@@ -1,29 +1,29 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
-import { KeyStore, Child } from './keystore'
+import { Keystore, Child } from './keystore'
 import Action from './action'
 
 export default class Key implements Action {
-  private keystore: KeyStore
+  private keystore: Keystore
 
   private mnemonic: string
 
-  constructor(keystore: KeyStore, mnemonic: string) {
+  constructor(keystore: Keystore, mnemonic: string) {
     this.keystore = keystore
     this.mnemonic = mnemonic
   }
 
-  fromKeyStore = (keystore: KeyStore) => {
+  fromKeystore = (keystore: Keystore) => {
     return new Key(keystore, '')
   }
 
-  fromKeyStoreJson = (json: string) => {
+  fromKeystoreJson = (json: string) => {
     return new Key(JSON.parse(json), '')
   }
 
-  getKeyStore = () => this.keystore
+  getKeystore = () => this.keystore
 
-  getKeyStoreJson = () => JSON.stringify(this.keystore)
+  getKeystoreJson = () => JSON.stringify(this.keystore)
 
   getMnemonic = () => this.mnemonic
 
@@ -39,7 +39,7 @@ export default class Key implements Action {
       privateKey: root.privateKey.toString('hex'),
       chainCode: root.chainCode.toString('hex'),
     }
-    const keystore: KeyStore = {
+    const keystore: Keystore = {
       master,
     }
     if (derive) {
