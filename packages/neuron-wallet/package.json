@@ -20,8 +20,7 @@
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "postinstall": "npm rebuild tiny-secp256k1",
-    "teststore": "ava"
+    "postinstall": "npm rebuild tiny-secp256k1"
   },
   "jest": {
     "transform": {
