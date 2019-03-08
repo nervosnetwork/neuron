@@ -27,5 +27,6 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
+  - git diff --exit-code yarn.lock
   - yarn build
   - yarn test
