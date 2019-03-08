@@ -1,9 +1,8 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
 import { Keystore, Child } from './keystore'
-import Action from './action'
 
-export default class Key implements Action {
+export default class Key {
   private keystore: Keystore
 
   private mnemonic: string
@@ -13,11 +12,11 @@ export default class Key implements Action {
     this.mnemonic = mnemonic
   }
 
-  fromKeystore = (keystore: Keystore) => {
+  public static fromKeystore = (keystore: Keystore) => {
     return new Key(keystore, '')
   }
 
-  fromKeystoreJson = (json: string) => {
+  public static fromKeystoreJson = (json: string) => {
     return new Key(JSON.parse(json), '')
   }
 
@@ -27,12 +26,12 @@ export default class Key implements Action {
 
   getMnemonic = () => this.mnemonic
 
-  generateKey = () => {
+  public static generateKey = () => {
     const mnemonic = bip39.generateMnemonic()
-    return this.fromMnemonic(mnemonic, false)
+    return Key.fromMnemonic(mnemonic, false)
   }
 
-  fromMnemonic = (mnemonic: string, derive: boolean) => {
+  public static fromMnemonic = (mnemonic: string, derive: boolean) => {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     const master = {
@@ -43,13 +42,13 @@ export default class Key implements Action {
       master,
     }
     if (derive) {
-      keystore.children = this.fetchUsedAddress()
+      keystore.children = Key.fetchUsedAddress()
     }
     return new Key(keystore, mnemonic)
   }
 
   // search vaild child private key and chain code
-  private searchIterationForAddress = (
+  private static searchIterationForAddress = (
     index: number,
     maxUsedIndex: number = 0,
     minUnusedIndex: number = 100500100,
@@ -72,11 +71,11 @@ export default class Key implements Action {
       if (txs2.length === 0) return indexTemp + 1
       indexTemp = Math.round((minUnusedIndexTemp - indexTemp) / 2 + indexTemp)
     }
-    return this.searchIterationForAddress(indexTemp, maxUsedIndexTemp, minUnusedIndexTemp, depth + 1)
+    return Key.searchIterationForAddress(indexTemp, maxUsedIndexTemp, minUnusedIndexTemp, depth + 1)
   }
 
-  private fetchUsedAddress = (): Child[] => {
-    const depth = this.searchIterationForAddress(0)
+  private static fetchUsedAddress = (): Child[] => {
+    const depth = Key.searchIterationForAddress(0)
     const children: Child[] = []
     for (let index = 0; index < depth; index++) {
       children.concat({
