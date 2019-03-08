@@ -1,23 +1,36 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
 import { KeyStore, Child } from './keystore'
+import Action from './action'
 
-export default class Key {
+export default class Key implements Action {
   private keystore: KeyStore
 
-  private children: Child[] = []
+  private mnemonic: string
 
-  constructor(keystore: KeyStore) {
+  constructor(keystore: KeyStore, mnemonic: string) {
     this.keystore = keystore
+    this.mnemonic = mnemonic
+  }
+
+  fromKeyStore = (keystore: KeyStore) => {
+    return new Key(keystore, '')
   }
 
   fromKeyStoreJson = (json: string) => {
-    this.keystore = JSON.parse(json)
+    return new Key(JSON.parse(json), '')
   }
 
-  toKeyStore = () => this.keystore
+  getKeyStore = () => this.keystore
 
-  toKeyStoreJson = () => JSON.stringify(this.keystore)
+  getKeyStoreJson = () => JSON.stringify(this.keystore)
+
+  getMnemonic = () => this.mnemonic
+
+  generateKey = () => {
+    const mnemonic = bip39.generateMnemonic()
+    return this.fromMnemonic(mnemonic, false)
+  }
 
   fromMnemonic = (mnemonic: string, derive: boolean) => {
     const seed = bip39.mnemonicToSeed(mnemonic)
@@ -26,10 +39,13 @@ export default class Key {
       privateKey: root.privateKey.toString('hex'),
       chainCode: root.chainCode.toString('hex'),
     }
-    this.keystore.master = master
-    if (derive) {
-      this.children = this.fetchUsedAddress()
+    const keystore: KeyStore = {
+      master,
     }
+    if (derive) {
+      keystore.children = this.fetchUsedAddress()
+    }
+    return new Key(keystore, mnemonic)
   }
 
   // search vaild child private key and chain code
@@ -47,12 +63,6 @@ export default class Key {
     const txs = ['fetch transactions of the address(index)']
     if (txs.length === 0) {
       if (indexTemp === 0) return 0
-      this.children.concat({
-        path: 'path',
-        depth,
-        privateKey: 'privateKey',
-        chainCode: 'chainCode',
-      })
       minUnusedIndexTemp = Math.min(minUnusedIndexTemp, indexTemp)
       indexTemp = Math.floor((indexTemp - maxUsedIndexTemp) / 2 + maxUsedIndexTemp)
     } else {
@@ -60,12 +70,6 @@ export default class Key {
       // TODO
       const txs2 = ['fetch transactions of the address(index+1)']
       if (txs2.length === 0) return indexTemp + 1
-      this.children.concat({
-        path: 'path',
-        depth,
-        privateKey: 'privateKey',
-        chainCode: 'chainCode',
-      })
       indexTemp = Math.round((minUnusedIndexTemp - indexTemp) / 2 + indexTemp)
     }
     return this.searchIterationForAddress(indexTemp, maxUsedIndexTemp, minUnusedIndexTemp, depth + 1)
