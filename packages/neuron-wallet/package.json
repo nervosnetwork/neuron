@@ -20,8 +20,7 @@
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "postinstall": "npm rebuild tiny-secp256k1",
-    "teststore": "ava"
+    "postinstall": "npm rebuild tiny-secp256k1"
   },
   "jest": {
     "transform": {
@@ -33,7 +32,7 @@
       "json",
       "node"
     ],
-    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(ts?|js?)$",
+    "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
     "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
   },
   "dependencies": {
@@ -56,6 +55,6 @@
     "spectron": "^5.0.0",
     "tslint": "^5.12.1",
     "execa": "^1.0.0",
-    "ava": "^1.3.1"
+    "@types/execa": "^0.9.0"
   }
 }
