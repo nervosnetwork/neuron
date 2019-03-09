@@ -4,13 +4,11 @@ import { Channel } from './utils/const'
 import ckbCore from './core'
 import asw from './wallets/asw'
 
-import console = require('console')
-
 const numbers = interval(1000)
 const monitors = {
   network: () => ({
-    name: 'TestNet',
-    remote: ckbCore.node,
+    name: (ckbCore as any).node.name,
+    remote: ckbCore.node.url,
     connected: false,
   }),
   balance: asw.getBalance,
@@ -20,11 +18,11 @@ const monitors = {
 const monitorChain = (webContents: Electron.WebContents) => {
   numbers
     .pipe(map(() => monitors.network()))
-    .pipe(
-      distinctUntilChanged((x, y) => {
-        return x.connected === y.connected && x.remote.url === y.remote.url
-      }),
-    )
+    // .pipe(
+    //   distinctUntilChanged((x, y) => {
+    //     return x.connected === y.connected && x.remote.url === y.remote.url
+    //   }),
+    // )
     .subscribe(result => {
       webContents.send(Channel.GetNetwork, {
         status: 1,

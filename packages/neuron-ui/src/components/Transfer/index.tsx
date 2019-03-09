@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react'
 import { Container, Card, Form, Button } from 'react-bootstrap'
 
-import InlineInput from '../../widgets/InlineInput'
+import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { sendCapacity } from '../../services/UILayer'
 
 enum PlaceHolder {
@@ -15,7 +15,7 @@ enum TooltipText {
   Fee = 'Transaction Fee in this transaction',
 }
 
-enum TransferActionTypes {
+enum TransferActionType {
   Address,
   Capacity,
   Fee,
@@ -29,27 +29,27 @@ interface Transfer {
   submitting: boolean
 }
 
-const reducer = (state: Transfer, action: { type: TransferActionTypes; payload?: any }) => {
+const reducer = (state: Transfer, action: { type: TransferActionType; payload?: any }) => {
   switch (action.type) {
-    case TransferActionTypes.Address: {
+    case TransferActionType.Address: {
       return {
         ...state,
         address: action.payload,
       }
     }
-    case TransferActionTypes.Capacity: {
+    case TransferActionType.Capacity: {
       return {
         ...state,
         capacity: action.payload,
       }
     }
-    case TransferActionTypes.Fee: {
+    case TransferActionType.Fee: {
       return {
         ...state,
         fee: action.payload,
       }
     }
-    case TransferActionTypes.Submit: {
+    case TransferActionType.Submit: {
       return {
         ...state,
         submitting: true,
@@ -72,22 +72,14 @@ function isMouseEvent(e: React.ChangeEvent | React.MouseEvent): e is React.Mouse
   return e.type === 'click'
 }
 
-interface InputProps {
-  label: string
-  value: string
-  onChange: (event: React.FormEvent<React.PropsWithoutRef<any>>) => void
-  tooltip?: string
-  placeholder?: string
-}
-
 const Transfer = () => {
   const [state, dispatch] = useReducer(reducer, initState)
-  const handleAction = (type: TransferActionTypes) => (
+  const handleAction = (type: TransferActionType) => (
     e: any,
     // & React.ChangeEvent<HTMLInputElement>
     // | React.MouseEvent<HTMLButtonElement>,
   ) => {
-    if (type === TransferActionTypes.Submit) {
+    if (type === TransferActionType.Submit) {
       sendCapacity(state.address, state.capacity.toString(16))
     }
     if (isMouseEvent(e)) {
@@ -106,21 +98,21 @@ const Transfer = () => {
     {
       label: 'address',
       value: state.address,
-      onChange: handleAction(TransferActionTypes.Address),
+      onChange: handleAction(TransferActionType.Address),
       tooltip: TooltipText.Address,
       placeholder: PlaceHolder.Address,
     },
     {
       label: 'capacity',
       value: state.capacity,
-      onChange: handleAction(TransferActionTypes.Capacity),
+      onChange: handleAction(TransferActionType.Capacity),
       tooltip: TooltipText.Capacity,
       placeholder: PlaceHolder.Capacity,
     },
     {
       label: 'transaction fee',
       value: state.fee,
-      onChange: handleAction(TransferActionTypes.Fee),
+      onChange: handleAction(TransferActionType.Fee),
       tooltip: TooltipText.Fee,
       placeholder: PlaceHolder.Fee,
     },
@@ -136,7 +128,7 @@ const Transfer = () => {
               <InlineInput {...inputProps} key={inputProps.label} />
             ))}
           </Form>
-          <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionTypes.Submit)}>
+          <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionType.Submit)}>
             Send
           </Button>
         </Card.Body>

@@ -23,6 +23,11 @@ class SyntheticEventEmitter {
       }
     })
   }
+
+  addEventListener = (event: string, cb: EventListenerOrEventListenerObject) => {
+    window.removeEventListener(event, cb)
+    window.addEventListener(event, cb)
+  }
 }
 
 export default SyntheticEventEmitter

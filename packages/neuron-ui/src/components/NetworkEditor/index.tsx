@@ -1,0 +1,104 @@
+import React, { useEffect, useContext } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
+import { Card, Form, Button, Alert } from 'react-bootstrap'
+import { MainActions } from '../../containers/MainContent/reducer'
+import { ContentProps } from '../../containers/MainContent'
+import InlineInput, { InputProps } from '../../widgets/InlineInput'
+import SettingsContext from '../../contexts/Settings'
+
+enum PlaceHolder {
+  Name = 'My Custom Node',
+  URL = 'http://localhost:8114',
+}
+enum TooltipText {
+  Name = 'Alias for the node',
+  URL = 'Address of the node',
+}
+
+export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ name: string }>>) => {
+  const { networkEditor, dispatch, actionCreators, errorMsgs, match } = props
+  const settings = useContext(SettingsContext)
+  const { params } = match
+
+  // idx of the network to update, -1 means create
+  const idx = settings.networks.map(n => n.name).indexOf(params.name)
+
+  useEffect(() => {
+    if (idx > -1) {
+      dispatch({
+        type: MainActions.UpdateNetworkEditor,
+        payload: settings.networks[idx],
+      })
+    }
+    return () => {
+      // clean props of editor
+      dispatch({
+        type: MainActions.UpdateNetworkEditor,
+        payload: {
+          name: '',
+          remote: '',
+        },
+      })
+      dispatch({
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: '',
+        },
+      })
+    }
+  }, [params.name])
+
+  const inputs: InputProps[] = [
+    {
+      label: 'RPC URL',
+      value: networkEditor.remote,
+      onChange: e =>
+        dispatch({
+          type: MainActions.UpdateNetworkEditor,
+          payload: {
+            remote: e.currentTarget.value,
+          },
+        }),
+      tooltip: TooltipText.URL,
+      placeholder: PlaceHolder.URL,
+    },
+    {
+      label: 'name',
+      value: networkEditor.name,
+      onChange: e =>
+        dispatch({
+          type: MainActions.UpdateNetworkEditor,
+          payload: {
+            name: e.currentTarget.value,
+          },
+        }),
+      tooltip: TooltipText.Name,
+      placeholder: PlaceHolder.Name,
+    },
+  ]
+
+  return (
+    <Card>
+      <Card.Header>{idx === -1 ? 'Add Network' : params.name}</Card.Header>
+      {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
+      <Card.Body>
+        <Form>
+          {inputs.map(inputProps => (
+            <InlineInput {...inputProps} key={inputProps.label} />
+          ))}
+        </Form>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          block
+          onClick={() => {
+            dispatch(actionCreators.saveNetworks(idx, settings.networks, networkEditor, props.history.push))
+          }}
+        >
+          Save
+        </Button>
+      </Card.Body>
+    </Card>
+  )
+}

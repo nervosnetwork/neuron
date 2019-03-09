@@ -23,6 +23,7 @@ const UILayer = (() => {
     removeAllListeners: (channel?: string) => {
       console.warn(`Channel ${channel} cannot removed due to Electron not loaded`)
     },
+    addEventListener: (event: string, cb: EventListenerOrEventListenerObject) => window.addEventListener(event, cb),
   }
 })()
 

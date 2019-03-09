@@ -28,7 +28,7 @@ export interface Transaction {
 export interface Network {
   name: string
   remote: string
-  status: NetworkStatus
+  status?: NetworkStatus
 }
 
 export interface Chain {

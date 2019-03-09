@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Dropdown from '../../widgets/Dropdown'
 import { NetworkStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
-import { HeaderActionsCreators } from '../../containers/Header'
+import { HeaderActionsCreators, HeaderActions } from '../../containers/Header'
 
 const Status = styled.div`
   width: 8px;
@@ -40,7 +40,7 @@ const NetworkStatusHeader = ({
   actionCreators,
 }: {
   networks: Network[]
-  dispatch: React.Dispatch<{ type: string; payload?: any }>
+  dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
   navTo: Function
   actionCreators: HeaderActionsCreators
 }) => {
@@ -61,26 +61,28 @@ const NetworkStatusHeader = ({
   ]
 
   return (
-    <FlexDiv>
-      <Span>
-        <Status
+    <>
+      <FlexDiv>
+        <Span>
+          <Status
+            style={{
+              color: chain.network.status === NetworkStatus.Online ? 'green' : 'red',
+            }}
+          />
+        </Span>
+        <Span>{chain.network.name || chain.network.remote}</Span>
+        {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}
+        <Dropdown
+          items={networkItems}
           style={{
-            color: chain.network.status === NetworkStatus.Online ? 'green' : 'red',
+            position: 'absolute',
+            top: '100%',
+            zIndex: '999',
+            display: 'none',
           }}
         />
-      </Span>
-      <Span>{chain.network.name || chain.network.remote || 'test'}</Span>
-      {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}
-      <Dropdown
-        items={networkItems}
-        style={{
-          position: 'absolute',
-          top: '100%',
-          zIndex: '999',
-          display: 'none',
-        }}
-      />
-    </FlexDiv>
+      </FlexDiv>
+    </>
   )
 }
 

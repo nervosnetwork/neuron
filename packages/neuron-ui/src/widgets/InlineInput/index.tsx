@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap'
 
-interface InputProps {
+export interface InputProps {
   label: string
   value: string
   onChange: (event: React.FormEvent<React.PropsWithoutRef<any>>) => void

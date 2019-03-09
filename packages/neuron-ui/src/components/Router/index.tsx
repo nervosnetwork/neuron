@@ -20,6 +20,7 @@ import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 import General from '../Settings/General'
 import Wallets from '../Settings/Wallets'
 import Network from '../Settings/Network'
+import NetworkEditor from '../NetworkEditor'
 import Terminal from '../Terminal'
 
 import WalletContext from '../../contexts/Wallet'
@@ -54,85 +55,91 @@ export const containers: CustomRoute[] = [
 
 export const mainContents: CustomRoute[] = [
   {
-    name: 'Home',
+    name: `Home`,
     path: Routes.Home,
     exact: true,
     component: Home,
   },
   {
-    name: 'Wallet',
+    name: `Wallet`,
     path: Routes.Wallet,
     exact: false,
     component: WalletDetail,
   },
   {
-    name: 'Send',
+    name: `Send`,
     path: Routes.Send,
     exact: false,
     component: Send,
   },
   {
-    name: 'Receive',
+    name: `Receive`,
     path: Routes.Receive,
     exact: false,
     component: Receive,
   },
   {
-    name: 'History',
+    name: `History`,
     path: Routes.History,
     exact: false,
     component: History,
   },
   {
-    name: 'Addresses',
+    name: `Addresses`,
     path: Routes.Addresses,
     exact: false,
     component: Addresses,
   },
   {
-    name: 'Settings',
+    name: `Settings`,
     path: Routes.Settings,
     exact: false,
     component: Settings,
   },
   {
-    name: 'SettingsGeneral',
+    name: `SettingsGeneral`,
     path: Routes.SettingsGeneral,
     exact: false,
     component: General,
   },
   {
-    name: 'SettingsWallets',
+    name: `SettingsWallets`,
     path: Routes.SettingsWallets,
     exact: false,
     component: Wallets,
   },
   {
-    name: 'SettingsNetwork',
+    name: `SettingsNetwork`,
     path: Routes.SettingsNetwork,
-    exact: false,
+    exact: true,
     component: Network,
   },
   {
-    name: 'CreateWallet',
+    name: `NetorkEditor`,
+    path: `${Routes.NetworkEditor}/:name`,
+    exact: true,
+    component: NetworkEditor,
+  },
+  {
+    name: `CreateWallet`,
     path: Routes.CreateWallet,
     exact: false,
     component: CreateWallet,
   },
   {
-    name: 'ImportWallet',
+    name: `ImportWallet`,
     path: Routes.ImportWallet,
     exact: false,
     component: ImportWallet,
   },
   {
-    name: 'WalletWizard',
+    name: `WalletWizard`,
     path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
   },
   {
-    name: 'Terminal',
+    name: `Terminal`,
     path: Routes.Terminal,
     exact: true,
     component: Terminal,

@@ -53,4 +53,9 @@ export enum Routes {
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
   Terminal = '/terminal',
+  NetworkEditor = '/network',
+}
+
+export enum LocalStorage {
+  Networks = 'networks',
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from 'react'
+import React, { useEffect, useCallback, useReducer, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { setNetwork } from '../../services/UILayer'
 import NetworkStatusHeader from '../../components/Network'
 import { Network } from '../../contexts/Chain'
+import SettingsContext from '../../contexts/Settings'
 
 const AppHeader = styled.div`
   height: 100%;
@@ -13,17 +14,14 @@ const AppHeader = styled.div`
   display: flex;
   justify-content: flex-end;
 `
-const defaultNetworks = (() => {
-  const { REACT_APP_NETWORKS } = process.env
-  if (REACT_APP_NETWORKS) {
-    return JSON.parse(REACT_APP_NETWORKS)
-  }
-  return []
-})()
 
-const reducer = (state: any, action: { type: string; payload?: any }) => {
+export enum HeaderActions {
+  SetNetwork,
+}
+
+const reducer = (state: any, action: { type: HeaderActions; payload?: any }) => {
   switch (action.type) {
-    case 'setNetworks': {
+    case HeaderActions.SetNetwork: {
       return {
         ...state,
         netowrk: action.payload,
@@ -39,16 +37,20 @@ const actionCreators = {
   setNetowrk: (network: Network) => {
     setNetwork(network)
     return {
-      type: 'setNetwork',
+      type: HeaderActions.SetNetwork,
+      payload: network,
     }
   },
 }
+
 export type HeaderActionsCreators = typeof actionCreators
 export type HeaderDispatch = React.Dispatch<{ type: string; payload?: any }>
 
 const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
+  const settings = useContext(SettingsContext)
+
   const [header, dispatch] = useReducer(reducer, {
-    networks: defaultNetworks,
+    networks: settings.networks,
   })
 
   const navTo = useCallback((path: string) => {
@@ -62,7 +64,7 @@ const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
         cachedNetowrks = JSON.parse(cachedNetowrks)
         if (cachedNetowrks && cachedNetowrks.length) {
           dispatch({
-            type: 'setNetworks',
+            type: HeaderActions.SetNetwork,
             payload: [...new Set([...header.networks, ...cachedNetowrks])],
           })
         }
@@ -75,7 +77,7 @@ const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
   return (
     <AppHeader>
       <NetworkStatusHeader
-        networks={header.networks}
+        networks={settings.networks}
         navTo={navTo}
         dispatch={dispatch}
         actionCreators={actionCreators}
