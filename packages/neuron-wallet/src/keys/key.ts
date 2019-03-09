@@ -42,49 +42,32 @@ export default class Key {
       master,
     }
     if (derive) {
-      keystore.children = Key.fetchUsedAddress()
+      keystore.children = Key.searchUsedAddress()
     }
     return new Key(keystore, mnemonic)
   }
 
-  // search vaild child private key and chain code
-  private static searchIterationForAddress = (
-    index: number,
-    maxUsedIndex: number = 0,
-    minUnusedIndex: number = 100500100,
-    depth: number = 0,
-  ): number => {
-    if (depth >= 20) return maxUsedIndex + 1
-    let minUnusedIndexTemp = minUnusedIndex
-    let maxUsedIndexTemp = maxUsedIndex
-    let indexTemp = index
-    // TODO
-    const txs = ['fetch transactions of the address(index)']
-    if (txs.length === 0) {
-      if (indexTemp === 0) return 0
-      minUnusedIndexTemp = Math.min(minUnusedIndexTemp, indexTemp)
-      indexTemp = Math.floor((indexTemp - maxUsedIndexTemp) / 2 + maxUsedIndexTemp)
-    } else {
-      maxUsedIndexTemp = Math.max(maxUsedIndexTemp, indexTemp)
-      // TODO
-      const txs2 = ['fetch transactions of the address(index+1)']
-      if (txs2.length === 0) return indexTemp + 1
-      indexTemp = Math.round((minUnusedIndexTemp - indexTemp) / 2 + indexTemp)
-    }
-    return Key.searchIterationForAddress(indexTemp, maxUsedIndexTemp, minUnusedIndexTemp, depth + 1)
-  }
-
-  private static fetchUsedAddress = (): Child[] => {
-    const depth = Key.searchIterationForAddress(0)
+  private static searchUsedAddress() {
     const children: Child[] = []
-    for (let index = 0; index < depth; index++) {
-      children.concat({
-        path: 'path',
-        depth: index,
-        privateKey: 'privateKey',
-        chainCode: 'chainCode',
-      })
+    for (let depth = 0; depth < 4; depth++) {
+      // TODO: refactor search logic to reduce loop
+      for (let index = 0; index < 4; index++) {
+        const isUsed = Key.isUsedAddressFromDepthIndex(depth, index)
+        if (isUsed) {
+          children.push({
+            path: `m/${depth}/${index}`,
+            depth,
+            privateKey: 'privateKey',
+            chainCode: 'chainCode',
+          })
+        }
+      }
     }
     return children
+  }
+
+  private static isUsedAddressFromDepthIndex(depth: number, index: number) {
+    // TODO: check address(depth, index) whether used nor not
+    return depth < 2 && index < 2
   }
 }
