@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Dropdown from '../../widgets/Dropdown'
 import { NetworkStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
-import { HeaderActionsCreators, HeaderActions } from '../../containers/Header'
+import { HeaderActionsCreators, HeaderActions, actionCreators } from '../../containers/Header'
 
 const Status = styled.div`
   width: 8px;
@@ -20,7 +20,7 @@ const FlexDiv = styled.div`
   justify-content: space-around;
   height: 100%;
   &:hover {
-    & > div {
+    & > ul {
       display: flex !important;
     }
   }
@@ -37,7 +37,6 @@ const NetworkStatusHeader = ({
   networks,
   navTo,
   dispatch,
-  actionCreators,
 }: {
   networks: Network[]
   dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
@@ -51,12 +50,12 @@ const NetworkStatusHeader = ({
     ...networks.map(network => ({
       label: network.name || network.remote,
       onClick: () => {
-        dispatch(actionCreators.setNetowrk(network))
+        dispatch(actionCreators.setNetwork(network))
       },
     })),
     {
       label: 'Mangement',
-      onClick: () => navTo(Routes.SettingsNetwork),
+      onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
 
@@ -70,13 +69,13 @@ const NetworkStatusHeader = ({
             }}
           />
         </Span>
-        <Span>{chain.network.name || chain.network.remote}</Span>
+        <Span>{`${(chain.network.name && chain.network.name.slice(0, 30)) || chain.network.remote} - `}</Span>
         {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}
         <Dropdown
           items={networkItems}
           style={{
-            position: 'absolute',
             top: '100%',
+            left: '0',
             zIndex: '999',
             display: 'none',
           }}

@@ -26,7 +26,6 @@ const MainContent = ({ children }: React.PropsWithoutRef<{ children?: any }>) =>
           React.cloneElement(child, {
             ...state,
             dispatch,
-            actionCreators,
           }),
       )}
       <Dialog

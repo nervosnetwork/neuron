@@ -48,7 +48,11 @@ module.exports = {
         "minProperties": 3
       }
     }],
-    "no-plusplus": [0]
+    "no-plusplus": [0],
+    // disabled until test recovered
+    // "no-console": [2, {
+    //   "allow": ["warn", "error"]
+    // }]
   },
   "env": {
     "jest": true,

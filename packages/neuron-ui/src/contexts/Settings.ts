@@ -3,7 +3,7 @@ import { loadNetworks } from '../utils/localStorage'
 
 import { Network } from './Chain'
 
-const defaultNetworks = (() => {
+export const defaultNetworks = (() => {
   const cachedNetworks = loadNetworks()
   if (cachedNetworks.length) {
     return cachedNetworks
@@ -14,7 +14,6 @@ const defaultNetworks = (() => {
   }
   return []
 })()
-console.log(defaultNetworks)
 
 interface WalletSettings {
   seeds: string

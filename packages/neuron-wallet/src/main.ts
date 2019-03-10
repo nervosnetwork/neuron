@@ -84,9 +84,6 @@ function createWindow() {
   monitorChain(mainWindow.webContents)
   const terminalChannel = new TerminalChannel(mainWindow.webContents)
   terminalChannel.start()
-  BrowserWindow.addDevToolsExtension(
-    '/Users/ChenYu/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0',
-  )
 }
 
 app.on('ready', createWindow)

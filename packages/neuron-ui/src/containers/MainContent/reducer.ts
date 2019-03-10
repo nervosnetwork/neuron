@@ -1,7 +1,10 @@
 import { createWallet, deleteWallet, importWallet, exportWallet, setNetwork } from '../../services/UILayer'
 import { Network } from '../../contexts/Chain'
+import { defaultNetworks } from '../../contexts/Settings'
 import { saveNetworks, loadNetworks } from '../../utils/localStorage'
 import { Routes } from '../../utils/const'
+
+const Testnet = defaultNetworks[0].name
 
 export enum MainActions {
   UpdateTempWallet,
@@ -59,7 +62,7 @@ export const actionCreators = {
       type: MainActions.ExportWallet,
     }
   },
-  setNetowrk: (network: Network) => {
+  setNetwork: (network: Network) => {
     setNetwork(network)
     return {
       type: MainActions.SetNetwork,
@@ -72,6 +75,14 @@ export const actionCreators = {
         type: MainActions.ErrorMessage,
         payload: {
           networks: 'Name is required',
+        },
+      }
+    }
+    if (editorNetwork.name.length > 28) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: 'Name should be less than or equal to 28',
         },
       }
     }
@@ -105,16 +116,24 @@ export const actionCreators = {
     // temp solution, better to remove
     saveNetworks(ns)
     window.dispatchEvent(new Event('NetworksUpdate'))
-    navTo(Routes.SettingsNetwork)
+    navTo(Routes.SettingsNetworks)
     return {
       type: MainActions.SaveNetworks,
       payload: ns,
     }
   },
-  deleteNetwork: (idx: number) => {
+  deleteNetwork: (name: string) => {
+    if (name === Testnet) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: `${Testnet} is unremovable`,
+        },
+      }
+    }
     const networks = loadNetworks()
-    networks.splice(idx, 1)
-    saveNetworks(networks)
+    const newNetworks = networks.filter((n: Network) => n.name !== name)
+    saveNetworks(newNetworks)
     window.dispatchEvent(new Event('NetworksUpdate'))
     return {
       type: MainActions.SetDialog,

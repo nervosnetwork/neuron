@@ -1,9 +1,12 @@
 import React, { useEffect, useContext } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
-import { MainActions } from '../../containers/MainContent/reducer'
+
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
+
+import ChainContext from '../../contexts/Chain'
 import SettingsContext from '../../contexts/Settings'
 
 enum PlaceHolder {
@@ -16,8 +19,9 @@ enum TooltipText {
 }
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ name: string }>>) => {
-  const { networkEditor, dispatch, actionCreators, errorMsgs, match } = props
+  const { networkEditor, dispatch, errorMsgs, match } = props
   const settings = useContext(SettingsContext)
+  const chain = useContext(ChainContext)
   const { params } = match
 
   // idx of the network to update, -1 means create
@@ -93,6 +97,9 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           size="lg"
           block
           onClick={() => {
+            if (chain.network.name === params.name) {
+              dispatch(actionCreators.setNetwork(networkEditor))
+            }
             dispatch(actionCreators.saveNetworks(idx, settings.networks, networkEditor, props.history.push))
           }}
         >

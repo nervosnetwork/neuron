@@ -19,7 +19,7 @@ import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 import General from '../Settings/General'
 import Wallets from '../Settings/Wallets'
-import Network from '../Settings/Network'
+import Network from '../Settings/Networks'
 import NetworkEditor from '../NetworkEditor'
 import Terminal from '../Terminal'
 
@@ -110,7 +110,7 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `SettingsNetwork`,
-    path: Routes.SettingsNetwork,
+    path: Routes.SettingsNetworks,
     exact: true,
     component: Network,
   },

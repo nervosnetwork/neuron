@@ -18,11 +18,11 @@ const monitors = {
 const monitorChain = (webContents: Electron.WebContents) => {
   numbers
     .pipe(map(() => monitors.network()))
-    // .pipe(
-    //   distinctUntilChanged((x, y) => {
-    //     return x.connected === y.connected && x.remote.url === y.remote.url
-    //   }),
-    // )
+    .pipe(
+      distinctUntilChanged((x, y) => {
+        return x.connected === y.connected && x.remote === y.remote
+      }),
+    )
     .subscribe(result => {
       webContents.send(Channel.GetNetwork, {
         status: 1,
@@ -35,7 +35,6 @@ const monitorChain = (webContents: Electron.WebContents) => {
     .pipe(distinctUntilChanged())
     .subscribe(result => {
       if (!webContents) return
-      console.log(result)
       webContents.send(Channel.GetTipBlockNumber, {
         status: 1,
         result,

@@ -48,7 +48,7 @@ export enum Routes {
   Settings = '/settings',
   SettingsGeneral = '/settings/general',
   SettingsWallets = '/settings/wallets',
-  SettingsNetwork = '/settings/network',
+  SettingsNetworks = '/settings/networks',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',

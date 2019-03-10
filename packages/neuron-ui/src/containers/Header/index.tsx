@@ -33,8 +33,8 @@ const reducer = (state: any, action: { type: HeaderActions; payload?: any }) => 
   }
 }
 
-const actionCreators = {
-  setNetowrk: (network: Network) => {
+export const actionCreators = {
+  setNetwork: (network: Network) => {
     setNetwork(network)
     return {
       type: HeaderActions.SetNetwork,
