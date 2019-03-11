@@ -1,8 +1,9 @@
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, clipboard } from 'electron'
 
 declare global {
   interface Window {
     bridge: any
+    clipboard: Electron.Clipboard
   }
 }
 
@@ -25,4 +26,5 @@ if (process.env.NODE_ENV === 'development') {
   })
 }
 
+window.clipboard = clipboard
 window.bridge = window.bridge || bridge

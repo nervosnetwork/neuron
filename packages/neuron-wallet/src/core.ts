@@ -6,5 +6,8 @@ if (!env.remote) {
 }
 
 const ckbCore = new Core(env.remote)
+Object.defineProperty(ckbCore.node, 'name', {
+  value: 'Default Remote',
+})
 
 export default ckbCore

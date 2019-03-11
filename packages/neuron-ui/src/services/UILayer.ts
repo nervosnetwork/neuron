@@ -1,5 +1,6 @@
 import { Channel } from '../utils/const'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
+import { Network } from '../contexts/Chain'
 
 declare global {
   interface Window {
@@ -22,6 +23,7 @@ const UILayer = (() => {
     removeAllListeners: (channel?: string) => {
       console.warn(`Channel ${channel} cannot removed due to Electron not loaded`)
     },
+    addEventListener: (event: string, cb: EventListenerOrEventListenerObject) => window.addEventListener(event, cb),
   }
 })()
 
@@ -43,6 +45,9 @@ export const sendCapacity = (address: string, capacity: string) => {
     address,
     capacity,
   })
+}
+export const setNetwork = (network: Network) => {
+  UILayer.send(Channel.SetNetwork, network)
 }
 
 export const getTransactions = (pageNo: number, pageSize: number) => {

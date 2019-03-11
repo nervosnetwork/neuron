@@ -5,7 +5,7 @@ import { Routes } from '../../utils/const'
 
 const TabBar = (props: any) => {
   const [t] = useTranslation()
-  const tabs = [Routes.SettingsGeneral, Routes.SettingsWallets, Routes.SettingsNetwork]
+  const tabs = [Routes.SettingsGeneral, Routes.SettingsWallets, Routes.SettingsNetworks]
   const contents = ['General', 'Wallets', 'Network']
   const [selectedIndex, setSelectedIndex] = useState(0)
 

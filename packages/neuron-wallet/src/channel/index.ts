@@ -3,6 +3,7 @@ import { ipcMain, Notification } from 'electron'
 import { Channel } from '../utils/const'
 import { transactions, transactionCount } from '../mock'
 import asw from '../wallets/asw'
+import ckbCore from '../core'
 
 const listenToChannel = () => {
   // chain
@@ -247,6 +248,26 @@ const listenToChannel = () => {
         result: 'signed msg',
       })
     }, 1000)
+  })
+
+  /**
+   * @name setNetwork
+   */
+  ipcMain.on(Channel.SetNetwork, (e: Electron.Event, network: { name: string; remote: string }) => {
+    // TODO:
+    ckbCore.setNode({
+      url: network.remote,
+    })
+    Object.defineProperty(ckbCore.node, 'name', {
+      value: network.name,
+    })
+    e.sender.send(Channel.GetNetwork, {
+      status: 1,
+      result: {
+        ...network,
+        connected: false,
+      },
+    })
   })
 }
 

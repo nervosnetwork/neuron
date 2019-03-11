@@ -1,6 +1,13 @@
 @import './layout.scss';
+
 * {
   user-select: none;
+  outline: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
 }
 
 html {
