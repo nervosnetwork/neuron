@@ -1,25 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
+import { Tabs, Tab } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import { Routes } from '../../utils/const'
-
-const TabBarPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-`
-
-const TabItem = styled.div`
-  width: 200px;
-  height: 40px;
-  border-radius: 10px;
-  text-align: center;
-  line-height: 60px;
-  color: black;
-`
-
-const SelectedTabItem = styled(TabItem)`
-  color: blue;
-`
 
 const TabBar = (props: any) => {
   const [t] = useTranslation()
@@ -35,37 +17,20 @@ const TabBar = (props: any) => {
   const { location } = props
   const { pathname } = location
   useEffect(() => {
-    if (pathname === Routes.Settings) {
-      handleAction(0)
-    } else {
-      setSelectedIndex(tabs.indexOf(pathname))
-    }
+    handleAction(pathname === Routes.Settings ? 0 : tabs.indexOf(pathname))
   }, [pathname])
 
   return (
-    <TabBarPanel>
-      {contents.map((content, index) => {
-        return selectedIndex === index ? (
-          <SelectedTabItem
-            key={content}
-            onClick={() => {
-              handleAction(index)
-            }}
-          >
-            {t(content)}
-          </SelectedTabItem>
-        ) : (
-          <TabItem
-            key={content}
-            onClick={() => {
-              handleAction(index)
-            }}
-          >
-            {t(content)}
-          </TabItem>
-        )
+    <Tabs
+      id="settings-tabs"
+      defaultActiveKey={contents[selectedIndex]}
+      activeKey={contents[selectedIndex]}
+      onSelect={(content: any) => handleAction(contents.indexOf(content))}
+    >
+      {contents.map(content => {
+        return <Tab title={t(content)} eventKey={content} key={content} />
       })}
-    </TabBarPanel>
+    </Tabs>
   )
 }
 
