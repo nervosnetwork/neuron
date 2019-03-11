@@ -1,6 +1,5 @@
 import electron from 'electron'
 import execa from 'execa'
-import fs from 'fs'
 
 const run = async (file: string) => {
   const result = await execa.stdout(electron.toString(), [file], {
@@ -15,20 +14,19 @@ const run = async (file: string) => {
 }
 
 test('test setWallet', async () => {
-  const storagePath = await run('tests/wallet_store/save-wallet.js')
-  expect(JSON.parse(fs.readFileSync(storagePath, 'utf8'))).toMatchObject({
+  const wallet = await run('tests/wallet_store/save-wallet.js')
+  expect(JSON.parse(wallet)).toMatchObject({
     wallet1: {
       name: 'wallet1',
       keystore: 'qazwsx',
     },
     WalletName: ['wallet1'],
   })
-  fs.unlinkSync(storagePath)
 })
 
 test('test getWallet', async () => {
-  const storagePath = await run('tests/wallet_store/get-wallet.js')
-  expect(JSON.parse(fs.readFileSync(storagePath, 'utf8'))).toMatchObject({
+  const wallet = await run('tests/wallet_store/get-wallet.js')
+  expect(JSON.parse(wallet)).toMatchObject({
     wallet1: {
       name: 'wallet1',
       keystore: 'qwerty',
@@ -39,12 +37,11 @@ test('test getWallet', async () => {
       keystore: 'qwerty',
     },
   })
-  fs.unlinkSync(storagePath)
 })
 
 test('test getAllWallets', async () => {
-  const storagePath = await run('tests/wallet_store/get-all-wallets.js')
-  expect(JSON.parse(fs.readFileSync(storagePath, 'utf8'))).toMatchObject([
+  const wallet = await run('tests/wallet_store/get-all-wallets.js')
+  expect(JSON.parse(wallet)).toMatchObject([
     {
       name: 'wallet1',
       keystore: 'qazwsx',
@@ -58,24 +55,22 @@ test('test getAllWallets', async () => {
       keystore: 'sadqwe',
     },
   ])
-  fs.unlinkSync(storagePath)
 })
 
 test('test renameWallet', async () => {
-  const storagePath = await run('tests/wallet_store/rename-wallet.js')
-  expect(JSON.parse(fs.readFileSync(storagePath, 'utf8'))).toMatchObject({
+  const wallet = await run('tests/wallet_store/rename-wallet.js')
+  expect(JSON.parse(wallet)).toMatchObject({
     wallet2: {
       name: 'wallet2',
       keystore: 'qazwsx',
     },
     WalletName: ['wallet2'],
   })
-  fs.unlinkSync(storagePath)
 })
 
 test('test delete wallet', async () => {
-  const storagePath = await run('tests/wallet_store/delete-wallet.js')
-  expect(JSON.parse(fs.readFileSync(storagePath, 'utf8'))).toMatchObject({
+  const wallet = await run('tests/wallet_store/delete-wallet.js')
+  expect(JSON.parse(wallet)).toMatchObject({
     WalletName: ['wallet1', 'wallet3'],
     wallet1: {
       name: 'wallet1',
@@ -86,5 +81,4 @@ test('test delete wallet', async () => {
       keystore: 'sadqwe',
     },
   })
-  fs.unlinkSync(storagePath)
 })

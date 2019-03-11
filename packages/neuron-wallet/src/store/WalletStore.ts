@@ -77,4 +77,9 @@ export default class WalletStore extends BaseStore {
   storeAll(data: any) {
     this.store.store = data
   }
+
+  // get whole store data
+  getStore() {
+    return this.store.store
+  }
 }

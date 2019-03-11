@@ -27,6 +27,6 @@ walletStore.saveWallet('wallet3', {
 
 walletStore.deleteWallet('wallet2')
 
-console.log(walletStore.path())
+console.log(JSON.stringify(walletStore.getStore()))
 
 electron.app.quit()

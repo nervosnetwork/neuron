@@ -17,6 +17,6 @@ walletStore.saveWallet('wallet1', {
 
 walletStore.renameWallet('wallet2', 'wallet1')
 
-console.log(walletStore.path())
+console.log(JSON.stringify(walletStore.getStore()))
 
 electron.app.quit()

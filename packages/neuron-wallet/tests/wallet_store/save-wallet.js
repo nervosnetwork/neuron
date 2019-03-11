@@ -15,6 +15,6 @@ walletStore.saveWallet('wallet1', {
   keystore: 'qazwsx',
 })
 
-console.log(walletStore.path())
+console.log(JSON.stringify(walletStore.getStore()))
 
 electron.app.quit()

@@ -29,6 +29,6 @@ const allWallets = walletStore.getAllWallets()
 walletStore.clear()
 walletStore.storeAll(allWallets)
 
-console.log(walletStore.path())
+console.log(JSON.stringify(allWallets))
 
 electron.app.quit()

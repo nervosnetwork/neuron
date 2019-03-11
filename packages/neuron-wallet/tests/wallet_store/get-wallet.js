@@ -19,6 +19,6 @@ const wallet1 = walletStore.getWallet('wallet1')
 wallet1.name = 'wallet2'
 walletStore.saveWallet('wallet2', wallet1)
 
-console.log(walletStore.path())
+console.log(JSON.stringify(walletStore.getStore()))
 
 electron.app.quit()
