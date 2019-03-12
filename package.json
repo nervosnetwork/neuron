@@ -28,7 +28,7 @@
 
     "bootstrap": "lerna bootstrap && lerna link",
     "lint": "lerna run lint",
-    "test": "lerna run teststore && lerna run --parallel test",
+    "test": "lerna run --parallel test && lerna run teststore",
     "precommit": "lint-staged",
     "postinstall": "npm rebuild tiny-secp256k1 && lerna run postinstall"
   },

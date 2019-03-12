@@ -3,11 +3,9 @@ import { v4 } from 'uuid'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 
-const encryptKey = 'Neuron'
-
 const WalletIDKey = 'WalletID'
 
-enum WalletStoreError {
+export enum WalletStoreError {
   NoWallet,
 }
 
@@ -28,7 +26,7 @@ export default class WalletStore {
   constructor() {
     const idOptions: Options = {
       name: env.walletIDName,
-      encryptionKey: encryptKey,
+      encryptionKey: env.storeEncryptKey,
     }
     this.walletIDStore = new Store(idOptions)
   }
@@ -44,7 +42,7 @@ export default class WalletStore {
   private getWalletStore = (id: string): Store => {
     const options: Options = {
       name: id,
-      encryptionKey: encryptKey,
+      encryptionKey: env.storeEncryptKey,
     }
     return new Store(options)
   }
@@ -91,5 +89,13 @@ export default class WalletStore {
     idList.splice(idList.indexOf(walletId), 1)
     this.setIDList(idList)
     this.getWalletStore(walletId).clear()
+  }
+
+  clearAll = () => {
+    const idList = this.getIDList()
+    idList.forEach(id => {
+      this.getWalletStore(id).clear()
+    })
+    this.walletIDStore.clear()
   }
 }
