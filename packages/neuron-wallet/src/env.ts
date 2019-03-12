@@ -9,6 +9,7 @@ const env = {
   remote: 'http://localhost:8114',
   storeEncryptKey: 'Neuron',
   storePath: isDevMode ? `${myApp.getPath('userData')}/dev` : myApp.getPath('userData'),
+  storeWalletIDsName: 'WalletID',
 }
 
 export default env

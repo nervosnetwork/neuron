@@ -3,8 +3,6 @@ import { v4 } from 'uuid'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 
-const WalletIDKey = 'WalletID'
-
 export enum WalletStoreError {
   NoWallet,
 }
@@ -20,6 +18,8 @@ interface Options {
   cwd?: string
   encryptionKey?: string | Buffer
 }
+
+const WalletIDKey = env.storeWalletIDsName
 
 export default class WalletStore {
   walletIDStore: Store
@@ -100,9 +100,5 @@ export default class WalletStore {
       this.getWalletStore(id).clear()
     })
     this.walletIDStore.clear()
-  }
-
-  getPath = () => {
-    return this.walletIDStore.path
   }
 }
