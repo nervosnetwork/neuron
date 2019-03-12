@@ -1,279 +1,348 @@
-import { ipcMain, Notification } from 'electron'
+import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
 import { transactions, transactionCount } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
-const listenToChannel = () => {
-  // chain
+enum ResponseStatus {
+  Fail,
+  Success,
+}
+
+interface Wallet {
+  name: string
+  mnemonic: string
+  password: string
+}
+const NOTIFICATION_FADE_TIME = 3000
+
+export class Listeners {
+  static start = (
+    methods: string[] = [
+      'getLiveCell',
+      'createWallet',
+      'deleteWallet',
+      'importWallet',
+      'exportWallet',
+      'switchWallet',
+      'getBalance',
+      'getCellsByTypeHash',
+      'asw',
+      'getUnspentCells',
+      'getTransactions',
+      'getWallets',
+      'sendCapacity',
+      'sendTransaction',
+      'sign',
+      'setNetwork',
+    ],
+  ) => {
+    methods.forEach(method => {
+      const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
+      if (descriptor) {
+        descriptor.value()
+      }
+    })
+  }
+
   /**
-   * @name GetLiveCell
-   * @description channel to get live cell
+   * @static getLiveCell
+   * @memberof ChannelListeners
+   * @description listen to get live cell channel
    */
-  ipcMain.on(Channel.GetLiveCell, (e: Electron.Event, ...args: string[]) => {
-    e.sender.send(Channel.GetLiveCell, args)
-  })
+  static getLiveCell = () => {
+    return ipcMain.on(Channel.GetLiveCell, (e: Electron.Event, ...args: string[]) => {
+      e.sender.send(Channel.GetLiveCell, args)
+    })
+  }
 
   // wallet
   /**
-   * @name CreateWallet
+   * @static createWallet
+   * @memberof ChannelListeners
    * @description channel to create wallet
    */
-  ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: { name: string; mnemonic: any; password: string }) => {
-    const notification = new Notification({
-      title: 'Create Wallet',
-      body: JSON.stringify(wallet),
-    })
-    notification.show()
-    setTimeout(() => notification.close(), 3000)
-    e.sender.send(Channel.CreateWallet, {
-      status: 1,
-      result: {
-        name: wallet.name,
-        address: 'wallet address',
-        publicKey: 'asdfasfasdf',
-      },
-    })
-  })
-
-  /**
-   * @name DeleteWallet
-   */
-  ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, address: string) => {
-    const notification = new Notification({
-      title: 'Delete Wallet',
-      body: address,
-    })
-    notification.show()
-    setTimeout(() => notification.close(), 3000)
-    setTimeout(() => {
-      e.sender.send(Channel.DeleteWallet, {
-        status: 1,
-        result: `wallet of ${address} deleted`,
-      })
-      // should send current wallets to UILayer
-    }, 1000)
-  })
-
-  /**
-   * @name ImportWallet
-   * @description channel to import wallet
-   */
-  ipcMain.on(Channel.ImportWallet, (e: Electron.Event, wallet: { name: string; mnemonic: any; password: string }) => {
-    const notification = new Notification({
-      title: 'Import Wallet',
-      body: JSON.stringify(wallet),
-    })
-    notification.show()
-    setTimeout(() => notification.close(), 3000)
-    setTimeout(() => {
-      e.sender.send(Channel.ImportWallet, {
-        status: 1,
-        result: `wallet imported`,
-      })
-    }, 1000)
-  })
-
-  /**
-   * @name ExportWallet
-   * @description channel to export wallet
-   */
-  ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
-    const notification = new Notification({
-      title: 'Export Wallet',
-      body: '',
-    })
-    notification.show()
-    setTimeout(() => notification.close(), 3000)
-    setTimeout(() => {
-      e.sender.send(Channel.ExportWallet, {
-        status: 1,
-        result: 'wallet exported',
-      })
-    }, 1000)
-  })
-
-  /**
-   * @name SwitchWallet
-   * @description channel to switch wallet
-   */
-  ipcMain.on(Channel.SwitchWallet, (e: Electron.Event) => {
-    setTimeout(() => {
-      e.sender.send(Channel.SwitchWallet, {
-        status: 1,
-        wallet: 'wallet',
-      })
-    }, 1000)
-  })
-
-  /**
-   * @name GetBalance
-   * @description channel to get balance
-   */
-  ipcMain.on(Channel.GetBalance, (e: Electron.Event) => {
-    setTimeout(() => {
-      e.sender.send(Channel.GetBalance, {
-        status: 1,
-        result: 'balance',
-      })
-    }, 1000)
-  })
-
-  // channel to get cells by type hash
-  /**
-   * @name GetCellsByTypeHash
-   * @description channel to get cells by typehash
-   */
-  ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event) => {
-    setTimeout(() => {
-      e.sender.send(Channel.GetCellsByTypeHash, {
-        status: 1,
-        result: ['cells'],
-      })
-    }, 1000)
-  })
-
-  ipcMain.on('ASW', (e: Electron.Event) => {
-    e.sender.send('ASW', {
-      status: 1,
-      result: asw,
-    })
-  })
-
-  /**
-   * @name GetUnspentCells
-   * @description channel to get unspent cells
-   */
-  ipcMain.on(Channel.GetUnspentCells, (e: Electron.Event) => {
-    setTimeout(() => {
-      e.sender.send(Channel.GetUnspentCells, {
-        status: 1,
-        result: ['cells'],
-      })
-    }, 1000)
-  })
-
-  /**
-   * @name GetTransactions
-   * @description get transactions
-   */
-  ipcMain.on(
-    Channel.GetTransactions,
-    (e: Electron.Event, { pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
-      e.sender.send(Channel.GetTransactions, {
-        status: 1,
-        result: {
-          pageNo,
-          pageSize,
-          totalCount: transactionCount,
-          items: transactions.map(tx => ({
-            ...tx,
-            value: tx.value * pageNo * pageSize,
-          })),
-        },
-      })
-    },
-  )
-
-  /**
-   * @name Get GetWallets
-   * @description channel to get wallets
-   */
-  ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
-    setTimeout(() => {
-      e.sender.send(Channel.GetWallets, {
-        status: 1,
-        result: ['wallet'],
-      })
-    }, 1000)
-  })
-
-  /**
-   * @name SendCapacity
-   * @description channel to send capacity
-   */
-  ipcMain.on(
-    Channel.SendCapacity,
-    (e: Electron.Event, { address, capacity }: { address: string; capacity: number }) => {
+  static createWallet = () => {
+    return ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: Wallet) => {
       const notification = new Notification({
-        title: 'Send Capacity',
-        body: `Send Capacity to CKB with ${JSON.stringify(
-          {
-            address,
-            capacity,
-          },
-          null,
-          2,
-        )}`,
+        title: 'Create Wallet',
+        body: JSON.stringify(wallet),
       })
       notification.show()
-      setTimeout(() => {
-        e.sender.send(Channel.SendCapacity, {
-          status: 1,
-          msg: `Send ${capacity} Capacity to ${address} Successfully`,
-        })
-      }, 1000)
-    },
-  )
+      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
+      e.sender.send(Channel.CreateWallet, {
+        status: ResponseStatus.Success,
+        result: {
+          name: wallet.name,
+          address: 'wallet address',
+          publicKey: 'public key',
+        },
+      })
+    })
+  }
 
   /**
-   * @name SendTransaction
+   * @static deleteWallet
+   * @memberof ChannelListeners
+   * @description channel to delete wallet
+   */
+  static deleteWallet = () => {
+    return ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, address: string) => {
+      const notification = new Notification({
+        title: 'Delete Wallet',
+        body: address,
+      })
+      notification.show()
+      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
+      e.sender.send(Channel.DeleteWallet, {
+        status: ResponseStatus.Success,
+        reult: `wallet of ${address} deleted`,
+      })
+    })
+  }
+
+  /**
+   * @static importWallet
+   * @memberof ChannelListeners
+   * @description channel to import a wallet
+   */
+  static importWallet = () => {
+    return ipcMain.on(Channel.ImportWallet, (e: Electron.Event, wallet: Wallet) => {
+      const notification = new Notification({
+        title: 'Import Wallet',
+        body: JSON.stringify(wallet),
+      })
+      notification.show()
+      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
+      e.sender.send(Channel.ImportWallet, {
+        status: ResponseStatus.Success,
+        result: `wallet imported`,
+      })
+    })
+  }
+
+  /**
+   * @static exportWallet
+   * @memberof ChannelListeners
+   * @description channel to export wallet
+   */
+  static exportWallet = () => {
+    return ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
+      const notification = new Notification({
+        title: 'Export Wallet',
+        body: '',
+      })
+      notification.show()
+      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
+      e.sender.send(Channel.ExportWallet, {
+        status: ResponseStatus.Success,
+        result: `wallet exported`,
+      })
+    })
+  }
+
+  /**
+   * @static switchWallet
+   * @memberof ChannelListeners
+   * @description channel to switch wallet
+   */
+  static switchWallet = () => {
+    return ipcMain.on(Channel.SwitchWallet, (e: Electron.Event, wallet: Wallet) => {
+      e.sender.send(Channel.SwitchWallet, {
+        status: ResponseStatus.Success,
+        result: wallet.name,
+      })
+    })
+  }
+
+  /**
+   * @static getBalance
+   * @memberof ChannelListeners
+   * @description channel to get balance
+   */
+  static getBalance = () => {
+    return ipcMain.on(Channel.GetBalance, (e: Electron.Event) => {
+      e.sender.send(Channel.GetBalance, {
+        status: ResponseStatus.Success,
+        result: `balance`,
+      })
+    })
+  }
+
+  /**
+   * @static getCellsByTypeHash
+   * @memberof ChannelListeners
+   * @description channel to get cells by type hash
+   */
+  static getCellsByTypeHash = () => {
+    return ipcMain.on(Channel.GetCellsByTypeHash, (e: Electron.Event) => {
+      e.sender.send(Channel.GetCellsByTypeHash, {
+        status: ResponseStatus.Success,
+        result: [`cell`],
+      })
+    })
+  }
+
+  /**
+   * @static asw
+   * @memberof ChannelListeners
+   * @description channel to get asw
+   */
+  static asw = () => {
+    return ipcMain.on(`ASW`, (e: Electron.Event) => {
+      e.sender.send(`ASW`, {
+        status: ResponseStatus.Success,
+        result: asw,
+      })
+    })
+  }
+
+  /**
+   * @static getUnspentCells
+   * @memberof ChannelListeners
+   * @description channel to get unspent cells
+   */
+  static getUnspentCells = () => {
+    return ipcMain.on(Channel.GetUnspentCells, (e: Electron.Event) => {
+      e.sender.send(Channel.GetUnspentCells, {
+        status: ResponseStatus.Success,
+        result: [`cell`],
+      })
+    })
+  }
+
+  /**
+   * @static getTransactions
+   * @memberof ChannelListeners
+   * @description get transactions
+   */
+  static getTransactions = () => {
+    return ipcMain.on(
+      Channel.GetTransactions,
+      (e: Electron.Event, { pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
+        e.sender.send(Channel.GetTransactions, {
+          status: ResponseStatus.Success,
+          result: {
+            pageNo,
+            pageSize,
+            totalCount: transactionCount,
+            items: transactions.map(tx => ({
+              ...tx,
+              value: tx.value * pageNo * pageSize,
+            })),
+          },
+        })
+      },
+    )
+  }
+
+  /**
+   * @static getWallets
+   * @memberof ChannelListeners
+   * @description channel to get wallets
+   */
+  static getWallets = () => {
+    return ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
+      e.sender.send(Channel.GetWallets, {
+        status: ResponseStatus.Success,
+        result: ['wallet'],
+      })
+    })
+  }
+
+  /**
+   * @static sendCapacity
+   * @memberof ChannelListeners
+   * @description channel to send capacity
+   */
+  static sendCapacity = () => {
+    return ipcMain.on(
+      Channel.SendCapacity,
+      (e: Electron.Event, { address, capacity }: { address: string; capacity: number }) => {
+        const notification = new Notification({
+          title: `Send Capacity`,
+          body: `Send Capacity to CKB with ${JSON.stringify(
+            {
+              address,
+              capacity,
+            },
+            null,
+            2,
+          )}`,
+        })
+        notification.show()
+        e.sender.send(Channel.SendCapacity, {
+          status: ResponseStatus.Success,
+          msg: `Send ${capacity} Capacity to ${address} Successfully`,
+        })
+      },
+    )
+  }
+
+  /**
+   * @static sendTransaction
+   * @memberof ChannelListeners
    * @description channel to send transaction
    */
-  ipcMain.on(Channel.SendTransaction, (e: Electron.Event) => {
-    const notification = new Notification({
-      title: 'Send Transaction',
-      body: 'transaction detail',
-    })
-    notification.show()
-    setTimeout(() => {
+  static sendTransaction = () => {
+    return ipcMain.on(Channel.SendTransaction, (e: Electron.Event) => {
+      const notification = new Notification({
+        title: `Send Transaction`,
+        body: `transaction detail`,
+      })
+      notification.show()
       e.sender.send(Channel.SendTransaction, {
-        status: 1,
+        status: ResponseStatus.Success,
         result: {
           hash: 'transaction hash',
         },
       })
-    }, 1000)
-  })
+    })
+  }
 
   /**
-   * @name sign
+   * @static sign
+   * @memberof ChannelListeners
    * @description channel to sign msg
    */
-  ipcMain.on(Channel.Sign, (e: Electron.Event) => {
-    setTimeout(() => {
+  static sign = () => {
+    return ipcMain.on(Channel.Sign, (e: Electron.Event) => {
       e.sender.send(Channel.Sign, {
-        status: 1,
-        result: 'signed msg',
+        status: ResponseStatus.Success,
+        result: `signed msg`,
       })
-    }, 1000)
-  })
+    })
+  }
 
   /**
-   * @name setNetwork
+   * @static setNetwork
+   * @memberof ChannelListeners
+   * @description channel to set network
    */
-  ipcMain.on(Channel.SetNetwork, (e: Electron.Event, network: { name: string; remote: string }) => {
-    // TODO:
-    ckbCore.setNode({
-      url: network.remote,
+  static setNetwork = () => {
+    return ipcMain.on(Channel.SetNetwork, (e: Electron.Event, network: { name: string; remote: string }) => {
+      // TODO:
+      ckbCore.setNode({
+        url: network.remote,
+      })
+      Object.defineProperty(ckbCore.node, 'name', {
+        value: network.name,
+      })
+      e.sender.send(Channel.GetNetwork, {
+        status: ResponseStatus.Success,
+        result: {
+          ...network,
+          connected: false,
+        },
+      })
     })
-    Object.defineProperty(ckbCore.node, 'name', {
-      value: network.name,
-    })
-    e.sender.send(Channel.GetNetwork, {
-      status: 1,
-      result: {
-        ...network,
-        connected: false,
-      },
-    })
-  })
+  }
 }
 
 export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {
   win.webContents.send(Channel.GetTransactions, {
-    status: 1,
+    status: ResponseStatus.Success,
     result: {
       pageNo,
       pageSize,
@@ -286,4 +355,56 @@ export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: numb
   })
 }
 
-export default listenToChannel
+export default class WalletChannel extends Listeners {
+  public win: BrowserWindow
+
+  constructor(window: BrowserWindow) {
+    super()
+    this.win = window
+  }
+
+  public sendWallet = (
+    wallet: any = {
+      name: 'asw',
+      address: asw.address,
+      publicKey: asw.publicKey,
+    },
+  ) => {
+    this.win.webContents.send(Channel.GetWallet, {
+      status: ResponseStatus.Success,
+      result: wallet,
+    })
+  }
+
+  public setUILocale = (locale: string) => {
+    this.win.webContents.send(Channel.SetLanguage, {
+      status: ResponseStatus.Success,
+      result: locale,
+    })
+  }
+
+  public navTo = (route: string) => {
+    this.win.webContents.send(Channel.NavTo, {
+      status: ResponseStatus.Success,
+      result: {
+        router: route,
+      },
+    })
+  }
+
+  public sendTransactionHistory = (pageNo: number, pageSize: number) => {
+    this.win.webContents.send(Channel.GetTransactions, {
+      status: ResponseStatus.Success,
+      result: {
+        pageNo,
+        pageSize,
+        totalCount: transactionCount,
+        items: transactions.map(tx => ({
+          ...tx,
+          value: tx.value * pageNo * pageSize,
+        })),
+      },
+    })
+  }
+}
+// TOOD: replace with response status

@@ -1,37 +1,41 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
+
 import env from './env'
-import listenToChannel, { sendTransactionHistory } from './channel'
+import WalletChannel from './channel'
+import TerminalChannel from './channel/terminal'
 import monitorChain from './monitor'
 import i18n from './i18n'
 import mainmenu from './menu'
-import asw from './wallets/asw'
 import dispatch, { Command } from './commands/dispatcher'
-import TerminalChannel from './channel/terminal'
 
 let mainWindow: Electron.BrowserWindow | null
+// start listening
+WalletChannel.start()
 
 const initUILayer = (win: BrowserWindow) => {
-  win.webContents.send('ASW', {
-    status: 1,
-    result: {
-      name: 'asw',
-      address: asw.address,
-      publicKey: asw.publicKey,
-    },
+  const channel = new WalletChannel(win)
+
+  dispatch(Command.SendWallet, {
+    channel,
   })
 
   dispatch(Command.SetUILocale, {
-    window: win,
+    channel,
     extra: {
       locale: app.getLocale(),
     },
   })
-  sendTransactionHistory(win, 0, 15)
-}
 
-listenToChannel()
+  dispatch(Command.SendTransactionHistory, {
+    channel,
+    extra: {
+      pageNo: '0',
+      pageSize: '15',
+    },
+  })
+}
 
 function createWindow() {
   const windowState = windowStateKeeper({

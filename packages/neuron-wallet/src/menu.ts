@@ -2,6 +2,7 @@ import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from '
 import env from './env'
 import dispatch, { Command } from './commands/dispatcher'
 import i18n from './i18n'
+import WalletChannel from './channel'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -27,7 +28,7 @@ const getMenuTemplate = () => {
           accelerator: 'CmdOrCtrl+,',
           click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
             dispatch(Command.ShowPreferences, {
-              window: browserWindow,
+              channel: new WalletChannel(browserWindow),
             })
           },
         },
@@ -110,7 +111,7 @@ const getMenuTemplate = () => {
           accelerator: 'Cmd+Shift+t',
           click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
             dispatch(Command.ShowTerminal, {
-              window: browserWindow,
+              channel: new WalletChannel(browserWindow),
             })
           },
         },

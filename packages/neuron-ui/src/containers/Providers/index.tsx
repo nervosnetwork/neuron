@@ -15,13 +15,15 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   const [providers, dispatch] = useReducer(reducer, initProviders)
   const [, i18n] = useTranslation()
   useEffect(() => {
-    UILayer.on(Channel.SetLanguage, (_e: Event, lng: string) => {
-      if (lng !== i18n.language) {
-        i18n.changeLanguage(lng)
+    UILayer.on(Channel.SetLanguage, (_e: Event, args: Response<string>) => {
+      if (args.status) {
+        if (args.result !== i18n.language) {
+          i18n.changeLanguage(args.result)
+        }
       }
     })
 
-    UILayer.on('ASW', (_e: any, args: Response<any>) => {
+    UILayer.on(Channel.GetWallet, (_e: any, args: Response<any>) => {
       dispatch({
         type: ProviderActions.Wallet,
         payload: {
