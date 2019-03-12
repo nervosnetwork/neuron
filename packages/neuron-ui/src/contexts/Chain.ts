@@ -25,13 +25,15 @@ export interface Transaction {
   value: string
   hash: string
 }
+export interface Network {
+  name: string
+  remote: string
+  status?: NetworkStatus
+}
 
 export interface Chain {
   cells: Cell[]
-  network: {
-    ip: string
-    status: NetworkStatus
-  }
+  network: Network
   tipBlockNumber?: number
   transactions: {
     pageNo: number
@@ -44,7 +46,8 @@ export interface Chain {
 export const initChain: Chain = {
   cells: [],
   network: {
-    ip: '',
+    name: '',
+    remote: '',
     status: NetworkStatus.Offline,
   },
   tipBlockNumber: undefined,

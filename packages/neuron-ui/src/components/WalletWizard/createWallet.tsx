@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import SettingsContext from '../../contexts/Settings'
 import WalletContext from '../../contexts/Wallet'
 import { ContentProps } from '../../containers/MainContent'
+import { actionCreators } from '../../containers/MainContent/reducer'
 
 import { Routes } from '../../utils/const'
 
@@ -55,7 +56,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
           onAfterNext={() => {
             // temp logic for simulate creation
             props.dispatch(
-              props.actionCreators.createWallet({
+              actionCreators.createWallet({
                 name: settings.name,
                 mnemonic: '',
                 password: '',

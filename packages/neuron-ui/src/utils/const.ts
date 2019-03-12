@@ -14,6 +14,7 @@ export enum Channel {
   GetTipBlockNumber = 'getTipBlockNumber',
   GetLocalNodeId = 'getLocalNodeId',
   GetNetwork = 'getNetwork',
+  SetNetwork = 'setNetwork',
   SwitchNetwork = 'switchNetwork',
 
   // Wallet
@@ -47,9 +48,14 @@ export enum Routes {
   Settings = '/settings',
   SettingsGeneral = '/settings/general',
   SettingsWallets = '/settings/wallets',
-  SettingsNetwork = '/settings/network',
+  SettingsNetworks = '/settings/networks',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
   Terminal = '/terminal',
+  NetworkEditor = '/network',
+}
+
+export enum LocalStorage {
+  Networks = 'networks',
 }
