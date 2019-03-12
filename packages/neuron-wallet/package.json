@@ -20,7 +20,8 @@
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "postinstall": "npm rebuild tiny-secp256k1"
+    "postinstall": "npm rebuild tiny-secp256k1",
+    "teststore":"electron-mocha --renderer ./tests/store"
   },
   "jest": {
     "transform": {
@@ -59,8 +60,7 @@
     "electron-devtools-installer": "^2.2.4",
     "spectron": "^5.0.0",
     "tslint": "^5.12.1",
-    "execa": "^1.0.0",
-    "@types/execa": "^0.9.0",
-    "@types/uuid": "^3.4.4"
+    "@types/uuid": "^3.4.4",
+    "electron-mocha": "^6.0.4"
   }
 }

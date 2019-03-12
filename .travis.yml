@@ -30,3 +30,4 @@ script:
   - git diff --exit-code yarn.lock
   - yarn build
   - yarn test
+  - yarn teststore

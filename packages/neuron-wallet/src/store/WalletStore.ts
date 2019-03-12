@@ -49,7 +49,7 @@ export default class WalletStore {
     return new Store(options)
   }
 
-  saveWallet = (walletName: string, walletKeystore: Keystore) => {
+  saveWallet = (walletName: string, walletKeystore: Keystore): string => {
     const walletId = v4()
     let idList = this.getIDList()
     const walletData = {
@@ -60,6 +60,7 @@ export default class WalletStore {
     idList = idList.concat(walletId)
     this.setIDList(idList)
     this.getWalletStore(walletId).set(walletId, walletData)
+    return walletId
   }
 
   getWallet = (walletId: string): WalletData => {
