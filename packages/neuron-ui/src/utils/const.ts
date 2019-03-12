@@ -27,6 +27,7 @@ export enum Channel {
   GetCellsByTypeHash = 'getCellsByTypeHash',
   GetUnspentCells = 'getUnspentCells',
   GetTransactions = 'getTransactions',
+  GetWallet = 'getWallet',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',

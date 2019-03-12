@@ -1,10 +1,11 @@
 import { app, dialog, shell, BrowserWindow } from 'electron'
 import Command from './commands'
-import { Channel } from '../utils/const'
+import WalletChannel from '../channel'
 
 export interface CommandInfo {
+  channel: WalletChannel
   window?: BrowserWindow
-  extra?: any
+  extra?: { [index: string]: string }
 }
 type Handler = (command: Command | null, info: CommandInfo | null) => void
 
@@ -36,28 +37,36 @@ const externalUrlHandler: Handler = command => {
 }
 
 const rendererMessageHandler: Handler = (command, info) => {
-  const window: BrowserWindow = info!.window!
   switch (command) {
     case Command.ShowPreferences: {
-      window.webContents.send(Channel.NavTo, {
-        status: 1,
-        result: {
-          router: '/settings/general',
-        },
-      })
+      if (info) {
+        info.channel.navTo('/settings/general')
+      }
       break
     }
     case Command.ShowTerminal: {
-      window.webContents.send(Channel.NavTo, {
-        status: 1,
-        result: {
-          router: '/terminal',
-        },
-      })
+      if (info) {
+        info.channel.navTo('/terminal')
+      }
+
       break
     }
     case Command.SetUILocale: {
-      window.webContents.send(Channel.SetLanguage, info!.extra!.locale)
+      if (info) {
+        info.channel.setUILocale(info!.extra!.locale)
+      }
+      break
+    }
+    case Command.SendWallet: {
+      if (info) {
+        info.channel.sendWallet()
+      }
+      break
+    }
+    case Command.SendTransactionHistory: {
+      if (info && info.extra && info.extra.pageNo && info.extra.pageSize) {
+        info.channel.sendTransactionHistory(+info.extra.pageNo, +info.extra.pageSize)
+      }
       break
     }
     default:
