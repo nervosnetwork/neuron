@@ -17,6 +17,7 @@ export interface WalletData {
 
 interface Options {
   name?: string
+  cwd?: string
   encryptionKey?: string | Buffer
 }
 
@@ -25,7 +26,8 @@ export default class WalletStore {
 
   constructor() {
     const idOptions: Options = {
-      name: env.walletIDName,
+      name: WalletIDKey,
+      cwd: env.storePath,
       encryptionKey: env.storeEncryptKey,
     }
     this.walletIDStore = new Store(idOptions)
@@ -42,6 +44,7 @@ export default class WalletStore {
   private getWalletStore = (id: string): Store => {
     const options: Options = {
       name: id,
+      cwd: env.storePath,
       encryptionKey: env.storeEncryptKey,
     }
     return new Store(options)
@@ -97,5 +100,9 @@ export default class WalletStore {
       this.getWalletStore(id).clear()
     })
     this.walletIDStore.clear()
+  }
+
+  getPath = () => {
+    return this.walletIDStore.path
   }
 }
