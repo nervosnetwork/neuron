@@ -17,7 +17,7 @@
     "start:dev": "tsc && cross-env electron .",
     "build": "tsc",
     "clean": "rm -rf dist/*",
-    "test": "jest --color",
+    "test": "jest --color && electron-mocha --renderer ./tests/store",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
     "postinstall": "npm rebuild tiny-secp256k1",
