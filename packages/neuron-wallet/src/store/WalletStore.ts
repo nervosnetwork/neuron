@@ -1,85 +1,104 @@
-import BaseStore from './store'
+import Store from 'electron-store'
+import { v4 } from 'uuid'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 
-const keyWalletName = 'WalletName'
-
-// wallet name is exist
-enum WalletStoreError {
-  ExistWallet,
+export enum WalletStoreError {
   NoWallet,
 }
 
-export interface Wallet {
+export interface WalletData {
+  id: string
   name: string
   keystore: Keystore
 }
 
-export default class WalletStore extends BaseStore {
+interface Options {
+  name?: string
+  cwd?: string
+  encryptionKey?: string | Buffer
+}
+
+const WalletIDKey = env.storeWalletIDsName
+
+export default class WalletStore {
+  walletIDStore: Store
+
   constructor() {
-    super({
-      name: env.walletDBName,
-    })
-  }
-
-  private getWalletNameList(): string[] {
-    return this.get(keyWalletName, [])
-  }
-
-  saveWallet = (walletName: string, wallet: Wallet) => {
-    if (this.store.has(walletName)) {
-      throw WalletStoreError.ExistWallet
-    } else {
-      let nameList = this.getWalletNameList()
-      this.save(walletName, wallet)
-      nameList = nameList.concat(walletName)
-      this.save(keyWalletName, nameList)
+    const idOptions: Options = {
+      name: WalletIDKey,
+      cwd: env.storePath,
+      encryptionKey: env.storeEncryptKey,
     }
+    this.walletIDStore = new Store(idOptions)
   }
 
-  getAllWallets = (): Wallet[] => {
-    const walletList: Wallet[] = []
-    const nameList = this.getWalletNameList()
-    nameList.forEach(name => walletList.push(this.getWallet(name)))
+  private getIDList = (): string[] => {
+    return this.walletIDStore.get(WalletIDKey, [])
+  }
+
+  private setIDList = (list: string[]) => {
+    this.walletIDStore.set(WalletIDKey, list)
+  }
+
+  private getWalletStore = (id: string): Store => {
+    const options: Options = {
+      name: id,
+      cwd: env.storePath,
+      encryptionKey: env.storeEncryptKey,
+    }
+    return new Store(options)
+  }
+
+  saveWallet = (walletName: string, walletKeystore: Keystore): string => {
+    const walletId = v4()
+    let idList = this.getIDList()
+    const walletData = {
+      id: walletId,
+      name: walletName,
+      keystore: walletKeystore,
+    }
+    idList = idList.concat(walletId)
+    this.setIDList(idList)
+    this.getWalletStore(walletId).set(walletId, walletData)
+    return walletId
+  }
+
+  getWallet = (walletId: string): WalletData => {
+    const wallet = this.getWalletStore(walletId).get(walletId, null)
+    if (!wallet) {
+      throw WalletStoreError.NoWallet
+    }
+    return wallet
+  }
+
+  getAllWallets = (): WalletData[] => {
+    const walletList: WalletData[] = []
+    const idList = this.getIDList()
+    idList.forEach(id => {
+      walletList.push(this.getWallet(id))
+    })
     return walletList
   }
 
-  getWallet = (walletName: string): Wallet => {
-    const wallet = this.get(walletName, null)
-    if (!wallet) {
-      throw WalletStoreError.ExistWallet
-    }
-    return this.get(walletName)
+  renameWallet = (walletId: string, name: string) => {
+    const wallet = this.getWallet(walletId)
+    wallet.name = name
+    this.getWalletStore(walletId).set(walletId, wallet)
   }
 
-  renameWallet = (newName: string, oldName: string) => {
-    const wallet = this.getWallet(oldName)
-    wallet.name = newName
-    this.saveWallet(newName, wallet)
-    this.deleteWallet(oldName)
+  deleteWallet = (walletId: string) => {
+    const idList = this.getIDList()
+    idList.splice(idList.indexOf(walletId), 1)
+    this.setIDList(idList)
+    this.getWalletStore(walletId).clear()
   }
 
-  deleteWallet = (walletName: string) => {
-    this.delete(walletName)
-    const nameList = this.getWalletNameList()
-    nameList.splice(nameList.indexOf(walletName), 1)
-    this.save(keyWalletName, nameList)
-  }
-
-  clear() {
-    this.store.clear()
-  }
-
-  path() {
-    return this.store.path
-  }
-
-  storeAll(data: any) {
-    this.store.store = data
-  }
-
-  // get whole store data
-  getStore() {
-    return this.store.store
+  clearAll = () => {
+    const idList = this.getIDList()
+    idList.forEach(id => {
+      this.getWalletStore(id).clear()
+    })
+    this.walletIDStore.clear()
   }
 }

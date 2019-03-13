@@ -1,12 +1,15 @@
-import { app } from 'electron'
+import { remote, app } from 'electron'
 import * as path from 'path'
 
-const isDevMode = !app.isPackaged
+const myApp = app || remote.app
+const isDevMode = !myApp.isPackaged
 const env = {
   isDevMode,
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
-  walletDBName: isDevMode ? 'WalletDBDev' : 'WalletDB',
+  storeEncryptKey: 'Neuron',
+  storePath: isDevMode ? `${myApp.getPath('userData')}/dev` : myApp.getPath('userData'),
+  storeWalletIDsName: 'WalletID',
 }
 
 export default env
