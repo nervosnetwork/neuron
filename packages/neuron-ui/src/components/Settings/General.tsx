@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 const ContentPanel = styled.div`
   display: flex;
@@ -14,13 +15,14 @@ const ItemPanel = styled.li`
 `
 
 const General = () => {
+  const [t] = useTranslation()
   return (
     <ContentPanel>
-      <ItemPanel>Photo Setting</ItemPanel>
-      <ItemPanel>Password Setting</ItemPanel>
-      <ItemPanel>Language Setting</ItemPanel>
-      <ItemPanel>About Neuron</ItemPanel>
-      <ItemPanel>Contact Us</ItemPanel>
+      <ItemPanel>{t('Photo Setting')}</ItemPanel>
+      <ItemPanel>{t('Password Setting')}</ItemPanel>
+      <ItemPanel>{t('Language Setting')}</ItemPanel>
+      <ItemPanel>{t('About Neuron')}</ItemPanel>
+      <ItemPanel>{t('Contact Us')}</ItemPanel>
     </ContentPanel>
   )
 }
