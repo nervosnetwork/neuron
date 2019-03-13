@@ -57,4 +57,8 @@ export const getTransactions = (pageNo: number, pageSize: number) => {
   })
 }
 
+export const getWallets = () => {
+  UILayer.send(Channel.GetWallets)
+}
+
 export default UILayer

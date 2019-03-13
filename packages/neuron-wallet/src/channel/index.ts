@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount } from '../mock'
+import { transactions, transactionCount, wallets } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -246,7 +246,7 @@ export class Listeners {
     return ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
       e.sender.send(Channel.GetWallets, {
         status: ResponseStatus.Success,
-        result: ['wallet'],
+        result: wallets,
       })
     })
   }
