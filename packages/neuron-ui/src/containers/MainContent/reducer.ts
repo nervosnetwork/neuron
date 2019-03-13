@@ -190,4 +190,6 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
     }
   }
 }
+
+export type MainActionCreators = typeof actionCreators
 export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>

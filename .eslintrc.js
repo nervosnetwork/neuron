@@ -49,10 +49,9 @@ module.exports = {
       }
     }],
     "no-plusplus": [0],
-    // disabled until test recovered
-    // "no-console": [2, {
-    //   "allow": ["warn", "error"]
-    // }]
+    "no-console": [2, {
+      "allow": ["warn", "error"]
+    }]
   },
   "env": {
     "jest": true,

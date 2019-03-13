@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Dropdown from '../../widgets/Dropdown'
 import { NetworkStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
-import { HeaderActionsCreators, HeaderActions, actionCreators } from '../../containers/Header'
+import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
 
 const Status = styled.div`
   width: 8px;
@@ -41,7 +41,6 @@ const NetworkStatusHeader = ({
   networks: Network[]
   dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
   navTo: Function
-  actionCreators: HeaderActionsCreators
 }) => {
   const chain = useContext(ChainContext)
 
