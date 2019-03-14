@@ -1,6 +1,7 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
-import { Keystore, Child } from './keystore'
+import { Keystore } from './keystore'
+import Tool from './tool'
 
 export default class Key {
   private keystore: Keystore
@@ -16,13 +17,13 @@ export default class Key {
     return new Key(keystore, '')
   }
 
-  public static fromKeystoreJson = (json: string) => {
+  public static fromKeystoreString = (json: string) => {
     return new Key(JSON.parse(json), '')
   }
 
   getKeystore = () => this.keystore
 
-  getKeystoreJson = () => JSON.stringify(this.keystore)
+  getKeystoreString = () => JSON.stringify(this.keystore)
 
   getMnemonic = () => this.mnemonic
 
@@ -42,32 +43,8 @@ export default class Key {
       master,
     }
     if (derive) {
-      keystore.children = Key.searchUsedAddress()
+      keystore.children = Tool.searchUsedChildKeys(root)
     }
     return new Key(keystore, mnemonic)
-  }
-
-  private static searchUsedAddress() {
-    const children: Child[] = []
-    for (let depth = 0; depth < 4; depth++) {
-      // TODO: refactor search logic to reduce loop
-      for (let index = 0; index < 4; index++) {
-        const isUsed = Key.isUsedAddressFromDepthIndex(depth, index)
-        if (isUsed) {
-          children.push({
-            path: `m/${depth}/${index}`,
-            depth,
-            privateKey: 'privateKey',
-            chainCode: 'chainCode',
-          })
-        }
-      }
-    }
-    return children
-  }
-
-  private static isUsedAddressFromDepthIndex(depth: number, index: number) {
-    // TODO: check address(depth, index) whether used nor not
-    return depth < 2 && index < 2
   }
 }
