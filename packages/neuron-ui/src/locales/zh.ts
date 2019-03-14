@@ -1,5 +1,25 @@
 export default {
   translation: {
+    // common
+    address: '地址',
+    capacity: '价值',
+    send: '发送',
+    balance: '余额',
+    date: '时间',
+    'transaction fee': '交易费',
+    'Send Capacity': '转账',
+    'No Wallet': '没有钱包',
+    'Click to copy': '点击复制',
+    'amount(ckb)': '价值(ckb)',
+    'transaction hash': '交易哈希',
+    add: '新增',
+    update: '更新',
+    delete: '删除',
+    network: '网络',
+    select: '选择',
+    edit: '编辑',
+    remove: '移除',
+    management: '管理',
     // wallet mng
     'Create Wallet': '创建钱包',
     'Delete Wallet': '删除钱包',
@@ -18,5 +38,11 @@ export default {
     General: '通用',
     Wallets: '钱包',
     Network: '网络',
+    'Photo Setting': '设置头像',
+    'Password Setting': '设置密码',
+    'Language Setting': '设置语言',
+    'About Neuron': '关于 Neuron',
+    'Contact Us': '联系我们',
+    'Add Network': '新增网络',
   },
 }

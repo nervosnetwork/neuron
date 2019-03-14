@@ -84,7 +84,7 @@ const getMenuTemplate = () => {
           },
         },
         {
-          label: 'Source Code',
+          label: i18n.t('mainmenu.help.sourceCode'),
           click: () => {
             dispatch(Command.OpenSourceCodeReposity)
           },
@@ -95,15 +95,18 @@ const getMenuTemplate = () => {
 
   if (env.isDevMode) {
     menuTemplate.push({
-      label: 'Develop',
+      label: i18n.t('mainmenu.develop.develop'),
       submenu: [
         {
+          label: i18n.t('mainmenu.develop.reload'),
           role: 'reload',
         },
         {
+          label: i18n.t('mainmenu.develop.forceReload'),
           role: 'forceReload',
         },
         {
+          label: i18n.t('mainmenu.develop.toggleDevTools'),
           role: 'toggleDevTools',
         },
         {

@@ -1,12 +1,14 @@
 import React, { useContext } from 'react'
 import { Card, ListGroup, Alert } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 import WalletContext from '../../contexts/Wallet'
 import { ContentProps } from '../../containers/MainContent'
 
 const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentProps>> = () => {
   const wallet = useContext(WalletContext)
+  const [t] = useTranslation()
 
-  const items = ['Simulate long content...', `balance: ${wallet.balance}`]
+  const items = ['Simulate long content...', `${t('balance')}: ${wallet.balance}`]
 
   return wallet.name ? (
     <Card>
@@ -19,7 +21,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
       </ListGroup>
     </Card>
   ) : (
-    <Alert variant="warning">No Wallet</Alert>
+    <Alert variant="warning">{t('No Wallet')}</Alert>
   )
 }
 

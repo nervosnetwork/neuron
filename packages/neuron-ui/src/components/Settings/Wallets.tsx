@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 const WalletItem = styled.div`
   margin-top: 15px;
@@ -41,25 +42,31 @@ const WalletButton = styled.div`
 `
 
 const AddWallet = styled(WalletButton)`
+  text-transform: capitalize;
   margin: 30px 0 0 50px;
 `
 
 const DeleteWallet = styled(WalletButton)`
+  text-transform: capitalize;
   margin: 30px 0 0 50px;
 `
 
 const UpdateWallet = styled(WalletButton)`
+  text-transform: capitalize;
   margin: 30px 0 0 50px;
 `
+
+const wallets: string[] = [
+  'Wallet Name1',
+  'Wallet Name2',
+  'Wallet Name3',
+  'Wallet Name4',
+  'Wallet Name5',
+  'Wallet Name6',
+]
+
 const General = () => {
-  const wallets: string[] = [
-    'Wallet Name1',
-    'Wallet Name2',
-    'Wallet Name3',
-    'Wallet Name4',
-    'Wallet Name5',
-    'Wallet Name6',
-  ]
+  const [t] = useTranslation()
   const [walletSelected, setWalletSelected] = useState(wallets[0])
   const [walletsState, setWalletsState] = useState(wallets)
 
@@ -83,7 +90,7 @@ const General = () => {
     const temps = walletsState
     const temp = walletSelected
     const index = temps.indexOf(walletSelected)
-    const name = prompt('Please enter your wallet name', temp)
+    const name = prompt(t('Please enter your wallet name'), temp)
     if (index > -1 && name != null && name !== '') {
       temps.splice(index, 1, name)
     }
@@ -113,21 +120,21 @@ const General = () => {
             addWallet()
           }}
         >
-          Add
+          {t('add')}
         </AddWallet>
         <UpdateWallet
           onClick={() => {
             updateWallet()
           }}
         >
-          Update
+          {t('update')}
         </UpdateWallet>
         <DeleteWallet
           onClick={() => {
             deleteWallet()
           }}
         >
-          Delete
+          {t('delete')}
         </DeleteWallet>
       </WalletButtonPanel>
     </ContentPanel>

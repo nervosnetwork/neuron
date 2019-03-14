@@ -1,5 +1,6 @@
 import React, { useContext, useCallback } from 'react'
 import { Container } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 import Table from '../../widgets/Table'
 import ChainContext, { Transaction } from '../../contexts/Chain'
@@ -37,6 +38,7 @@ const transactionsToHistory = (transactions: Transaction[]) =>
 
 const History = () => {
   const chain = useContext(ChainContext)
+  const [t] = useTranslation()
   const { pageNo, pageSize, totalCount, items } = chain.transactions
   const onPageChange = useCallback((page: number) => {
     getTransactions(page, pageSize)
@@ -44,9 +46,12 @@ const History = () => {
 
   return (
     <Container>
-      <h1>History</h1>
+      <h1>{t('History')}</h1>
       <Table
-        headers={headers}
+        headers={headers.map(header => ({
+          ...header,
+          label: t(header.label),
+        }))}
         items={transactionsToHistory(items)}
         pageNo={pageNo}
         pageSize={pageSize}
