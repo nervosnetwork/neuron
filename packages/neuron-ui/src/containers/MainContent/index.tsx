@@ -2,7 +2,7 @@ import React, { useReducer } from 'react'
 import styled from 'styled-components'
 
 import Dialog from '../../widgets/Dialog'
-import { MainDispatch, InitState, initState, reducer, actionCreators, MainActions } from './reducer'
+import { initState, reducer, MainDispatch, InitState, MainActions } from './reducer'
 
 const Main = styled.main`
   height: 100%;
@@ -11,7 +11,6 @@ const Main = styled.main`
 
 export interface ContentProps extends InitState {
   dispatch: MainDispatch
-  actionCreators: typeof actionCreators
 }
 
 const MainContent = ({ children }: React.PropsWithoutRef<{ children?: any }>) => {
