@@ -3,12 +3,12 @@ import { Child } from './keystore'
 
 // BIP44: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 enum Constant {
-  PURPOSE = "44'",
+  Purpose = "44'",
   // 360 is tentative value
-  COIN_TYPE_TESTNET = "360'",
-  ACCOUNT = "0'",
+  CoinTypeTestnet = "360'",
+  Account = "0'",
   // external address
-  CHANGE = 0,
+  Change = 0,
 }
 
 export default class Tool {
@@ -34,7 +34,7 @@ export default class Tool {
   }
 
   private static getPath(index: number): string {
-    return `m/${Constant.PURPOSE}/${Constant.COIN_TYPE_TESTNET}/${Constant.ACCOUNT}/${Constant.CHANGE}/${index}`
+    return `m/${Constant.Purpose}/${Constant.CoinTypeTestnet}/${Constant.Account}/${Constant.Change}/${index}`
   }
 
   private static isUsedAddress(address: string) {
