@@ -7,11 +7,11 @@ export interface InputProps {
   onChange: (event: React.FormEvent<React.PropsWithoutRef<any>>) => void
   tooltip?: string
   placeholder?: string
-  inputtype?: string
+  inputType?: string
   maxLength?: number
 }
 
-const InlineInput = ({ label, value, onChange, tooltip, placeholder, inputtype, maxLength }: InputProps) => (
+const InlineInput = ({ label, value, onChange, tooltip, placeholder, inputType, maxLength }: InputProps) => (
   <Form.Group as={Row} controlId={label}>
     <Form.Label
       column
@@ -29,7 +29,7 @@ const InlineInput = ({ label, value, onChange, tooltip, placeholder, inputtype, 
           overlay={<Tooltip id={`tooltip-${label}`}>{tooltip}</Tooltip>}
         >
           <Form.Control
-            type={inputtype || 'text'}
+            type={inputType || 'text'}
             value={value}
             placeholder={placeholder}
             onChange={onChange}
@@ -38,7 +38,7 @@ const InlineInput = ({ label, value, onChange, tooltip, placeholder, inputtype, 
         </OverlayTrigger>
       ) : (
         <Form.Control
-          type={inputtype || 'text'}
+          type={inputType || 'text'}
           value={value}
           placeholder={placeholder}
           onChange={onChange}

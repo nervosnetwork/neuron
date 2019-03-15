@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions } from '../../containers/MainContent/reducer'
@@ -20,7 +21,7 @@ const InputWalletPswDialog = ({
 }) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
-
+  const [t] = useTranslation()
   const handleSubmit = () => {
     if (password) {
       dispatch({
@@ -60,7 +61,7 @@ const InputWalletPswDialog = ({
       <Card.Footer className="text-muted">
         <ButtonDiv>
           <Button variant="danger" onClick={handleSubmit}>
-            Confirm
+            {t('Confirm')}
           </Button>
           <Button
             variant="light"
@@ -71,7 +72,7 @@ const InputWalletPswDialog = ({
               })
             }
           >
-            Cancel
+            {t('Cancel')}
           </Button>
         </ButtonDiv>
       </Card.Footer>

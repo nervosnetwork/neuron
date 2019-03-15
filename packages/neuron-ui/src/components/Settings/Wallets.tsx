@@ -59,7 +59,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       },
     },
     {
-      label: 'Backup',
+      label: t('backup'),
       onClick: () => {
         // props.history.push(`${Routes.NetworkEditor}/${network.name}`)
       },
@@ -115,7 +115,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
         }}
       >
         <Link to={`${Routes.CreateWallet}/new`} className="btn btn-primary">
-          Create Wallet
+          {t('Create Wallet')}
         </Link>
         <Link
           to={`${Routes.ImportWallet}/new`}
@@ -124,7 +124,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
             marginLeft: 30,
           }}
         >
-          Import Wallet
+          {t('Import Wallet')}
         </Link>
       </Container>
     </>

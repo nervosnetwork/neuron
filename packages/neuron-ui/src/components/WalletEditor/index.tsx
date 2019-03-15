@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 import { Routes } from '../../utils/const'
 import InputWalletPswDialog from '../Settings/InputWalletPswDialog'
@@ -8,15 +9,10 @@ import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
 
-enum PlaceHolder {
-  Name = 'My Wallet',
-  Password = 'Password',
-  ConfirmPassword = 'ConfirmPassword',
-}
-
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ name: string }>>) => {
   const { match } = props
   const { params } = match
+  const [t] = useTranslation()
 
   const [walletName, setWalletName] = useState(params.name)
   const [password, setPassword] = useState('')
@@ -25,25 +21,25 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   const inputs: InputProps[] = [
     {
-      label: 'Wallet Name',
+      label: t('Wallet Name'),
       value: walletName,
       onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: PlaceHolder.Name,
+      placeholder: t('Wallet Name'),
       maxLength: 20,
     },
     {
-      label: 'Password',
+      label: t('Password'),
       value: password,
       onChange: e => setPassword(e.currentTarget.value),
-      placeholder: PlaceHolder.Password,
-      inputtype: 'password',
+      placeholder: t('Password'),
+      inputType: 'password',
     },
     {
-      label: 'ConfirmPassword',
+      label: t('Confirm Password'),
       value: confirmPassword,
       onChange: e => setConfirmPassword(e.currentTarget.value),
-      placeholder: PlaceHolder.ConfirmPassword,
-      inputtype: 'password',
+      placeholder: t('Confirm Password'),
+      inputType: 'password',
     },
   ]
 
@@ -70,7 +66,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>Edit Wallet</Card.Header>
+      <Card.Header>{t('Edit Wallet')}</Card.Header>
       {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>
@@ -79,7 +75,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           ))}
         </Form>
         <Button type="submit" variant="primary" size="lg" block onClick={() => handleSubmit()}>
-          Save
+          {t('Save')}
         </Button>
       </Card.Body>
     </Card>
