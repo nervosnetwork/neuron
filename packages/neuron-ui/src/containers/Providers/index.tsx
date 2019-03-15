@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import ChainContext, { Cell, Transaction } from '../../contexts/Chain'
 import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
-import WalletsContext from '../../contexts/Wallets'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
 import UILayer from '../../services/UILayer'
@@ -35,9 +34,9 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
 
     UILayer.on(Channel.GetWallets, (_e: any, args: Response<any>) => {
       dispatch({
-        type: ProviderActions.Wallets,
+        type: ProviderActions.Settings,
         payload: {
-          items: args.result,
+          wallets: args.result,
         },
       })
     })
@@ -131,9 +130,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     <SettingsContext.Provider value={providers.settings}>
       <ChainContext.Provider value={providers.chain}>
         <WalletContext.Provider value={providers.wallet}>
-          <WalletsContext.Provider value={providers.wallets}>
-            <Comp {...props} providerDispatch={dispatch} />
-          </WalletsContext.Provider>
+          <Comp {...props} providerDispatch={dispatch} />
         </WalletContext.Provider>
       </ChainContext.Provider>
     </SettingsContext.Provider>

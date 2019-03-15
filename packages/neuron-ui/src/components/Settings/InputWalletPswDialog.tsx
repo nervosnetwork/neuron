@@ -19,7 +19,7 @@ const InputWalletPswDialog = ({
   handle?: any
 }) => {
   const [errorMsg, setErrorMsg] = useState('')
-  const [password, stePassword] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleSubmit = () => {
     if (password) {
@@ -50,7 +50,7 @@ const InputWalletPswDialog = ({
             <Form.Control
               type="password"
               placeholder="password"
-              onChange={(e: any) => stePassword(e.currentTarget.value)}
+              onChange={(e: any) => setPassword(e.currentTarget.value)}
               isInvalid={errorMsg !== ''}
             />
             <Form.Control.Feedback type="invalid">{errorMsg}</Form.Control.Feedback>

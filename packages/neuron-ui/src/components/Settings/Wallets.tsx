@@ -4,8 +4,7 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { ListGroup, Form, Container } from 'react-bootstrap'
 import { Configure } from 'grommet-icons'
 import { Routes } from '../../utils/const'
-import WalletsContext from '../../contexts/Wallets'
-import { Wallet } from '../../contexts/Wallet'
+import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { getWallets } from '../../services/UILayer'
@@ -43,7 +42,7 @@ const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionI
 }
 
 const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const wallets: Wallet[] = useContext(WalletsContext).items
+  const { wallets } = useContext(WalletContext)
 
   const [walletSelected, setWalletSelected] = useState(() => {
     getWallets()

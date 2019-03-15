@@ -2,6 +2,7 @@ import { createContext } from 'react'
 import { loadNetworks } from '../utils/localStorage'
 
 import { Network } from './Chain'
+import { Wallet } from './Wallet'
 
 export const defaultNetworks = (() => {
   const cachedNetworks = loadNetworks()
@@ -21,6 +22,7 @@ interface WalletSettings {
   seedsValid: boolean
   passwordValid: boolean
   networks: Network[]
+  wallets: Wallet[]
 }
 
 export const initSettings: WalletSettings = {
@@ -29,6 +31,7 @@ export const initSettings: WalletSettings = {
   seedsValid: false,
   passwordValid: false,
   networks: defaultNetworks,
+  wallets: [],
 }
 
 const WalletContext = createContext<WalletSettings>(initSettings)
