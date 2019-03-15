@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { Configure } from 'grommet-icons'
+import { useTranslation } from 'react-i18next'
 
 import ChainContext, { Network } from '../../contexts/Chain'
 import SettingsContext, { defaultNetworks } from '../../contexts/Settings'
@@ -40,6 +41,10 @@ const NetworkActions = ({ isDefault, actionItems }: { isDefault: boolean; action
           zIndex: '999',
           display: 'none',
         }}
+        itemsStyle={{
+          textTransform: 'capitalize',
+          boxShadow: '0px 1px 3px rgb(120, 120, 120)',
+        }}
       />
     </Popover>
   )
@@ -48,24 +53,25 @@ const NetworkActions = ({ isDefault, actionItems }: { isDefault: boolean; action
 const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const chain = useContext(ChainContext)
   const settings = useContext(SettingsContext)
+  const [t] = useTranslation()
 
   const actionItems = (network: Network, isDefault: boolean, isChecked: boolean) => [
     {
-      label: 'Select',
+      label: t('select'),
       onClick: () => {
         props.dispatch(actionCreators.setNetwork(network))
       },
       disabled: isChecked || isDefault,
     },
     {
-      label: 'Edit',
+      label: t('edit'),
       onClick: () => {
         props.history.push(`${Routes.NetworkEditor}/${network.name}`)
       },
       disabled: isDefault,
     },
     {
-      label: 'Remove',
+      label: t('remove'),
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
@@ -108,7 +114,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         })}
       </ListGroup>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
-        Add Network
+        {t('Add Network')}
       </Link>
     </>
   )

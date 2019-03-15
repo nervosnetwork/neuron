@@ -34,7 +34,6 @@ const Dropdown = ({
       minWidth: '100px',
       display: 'flex',
       flexDirection: 'column',
-      // boxShadow: 1px
       ...style,
     }}
     role="menu"
