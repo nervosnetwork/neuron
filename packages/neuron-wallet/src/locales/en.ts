@@ -19,6 +19,14 @@ export default {
       },
       help: {
         label: 'Help',
+        sourceCode: 'Source Code',
+      },
+      develop: {
+        terminal: 'Terminal',
+        develop: 'Develop',
+        forceReload: 'forceReload',
+        reload: 'reload',
+        toggleDevTools: 'toggleDevTools',
       },
     },
   },

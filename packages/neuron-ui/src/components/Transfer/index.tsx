@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react'
 import { Container, Card, Form, Button } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { sendCapacity } from '../../services/UILayer'
@@ -74,6 +75,7 @@ function isMouseEvent(e: React.ChangeEvent | React.MouseEvent): e is React.Mouse
 
 const Transfer = () => {
   const [state, dispatch] = useReducer(reducer, initState)
+  const { t } = useTranslation()
   const handleAction = (type: TransferActionType) => (
     e: any,
     // & React.ChangeEvent<HTMLInputElement>
@@ -96,21 +98,21 @@ const Transfer = () => {
 
   const inputs: InputProps[] = [
     {
-      label: 'address',
+      label: t('address'),
       value: state.address,
       onChange: handleAction(TransferActionType.Address),
       tooltip: TooltipText.Address,
       placeholder: PlaceHolder.Address,
     },
     {
-      label: 'capacity',
+      label: t('capacity'),
       value: state.capacity,
       onChange: handleAction(TransferActionType.Capacity),
       tooltip: TooltipText.Capacity,
       placeholder: PlaceHolder.Capacity,
     },
     {
-      label: 'transaction fee',
+      label: t('transaction fee'),
       value: state.fee,
       onChange: handleAction(TransferActionType.Fee),
       tooltip: TooltipText.Fee,
@@ -121,7 +123,7 @@ const Transfer = () => {
   return (
     <Container>
       <Card>
-        <Card.Header>Send Capcity</Card.Header>
+        <Card.Header>{t('Send Capacity')}</Card.Header>
         <Card.Body>
           <Form>
             {inputs.map(inputProps => (
@@ -129,7 +131,7 @@ const Transfer = () => {
             ))}
           </Form>
           <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionType.Submit)}>
-            Send
+            {t('Send')}
           </Button>
         </Card.Body>
       </Card>

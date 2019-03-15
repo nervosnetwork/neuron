@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { ListGroup, Form, Container } from 'react-bootstrap'
 import { Configure } from 'grommet-icons'
+import { useTranslation } from 'react-i18next'
 import { Routes } from '../../utils/const'
 import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
@@ -43,6 +44,7 @@ const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionI
 
 const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const { wallets } = useContext(WalletContext)
+  const [t] = useTranslation()
 
   const [walletSelected, setWalletSelected] = useState(() => {
     getWallets()
@@ -51,7 +53,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
 
   const actionItems = (index: number) => [
     {
-      label: 'Select',
+      label: t('select'),
       onClick: () => {
         setWalletSelected(index)
       },
@@ -63,13 +65,13 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       },
     },
     {
-      label: 'Edit',
+      label: t('edit'),
       onClick: () => {
         props.history.push(`${Routes.WalletEditor}/${wallets[walletSelected].name}`)
       },
     },
     {
-      label: 'Remove',
+      label: t('remove'),
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,

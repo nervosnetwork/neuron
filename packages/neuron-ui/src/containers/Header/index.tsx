@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { setNetwork } from '../../services/UILayer'
 import NetworkStatusHeader from '../../components/Network'
-import { Network } from '../../contexts/Chain'
 import SettingsContext from '../../contexts/Settings'
+import { initState, reducer, HeaderActions } from './reducer'
 
 const AppHeader = styled.div`
   height: 100%;
@@ -15,41 +14,11 @@ const AppHeader = styled.div`
   justify-content: flex-end;
 `
 
-export enum HeaderActions {
-  SetNetwork,
-}
-
-const reducer = (state: any, action: { type: HeaderActions; payload?: any }) => {
-  switch (action.type) {
-    case HeaderActions.SetNetwork: {
-      return {
-        ...state,
-        netowrk: action.payload,
-      }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-export const actionCreators = {
-  setNetwork: (network: Network) => {
-    setNetwork(network)
-    return {
-      type: HeaderActions.SetNetwork,
-      payload: network,
-    }
-  },
-}
-
-export type HeaderActionsCreators = typeof actionCreators
-export type HeaderDispatch = React.Dispatch<{ type: string; payload?: any }>
-
 const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
   const settings = useContext(SettingsContext)
 
   const [header, dispatch] = useReducer(reducer, {
+    ...initState,
     networks: settings.networks,
   })
 
@@ -76,12 +45,7 @@ const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
 
   return (
     <AppHeader>
-      <NetworkStatusHeader
-        networks={settings.networks}
-        navTo={navTo}
-        dispatch={dispatch}
-        actionCreators={actionCreators}
-      />
+      <NetworkStatusHeader networks={settings.networks} navTo={navTo} dispatch={dispatch} />
     </AppHeader>
   )
 }

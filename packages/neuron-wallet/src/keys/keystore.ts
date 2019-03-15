@@ -5,7 +5,6 @@ export interface Master {
 
 export interface Child {
   path: string
-  depth: number
   privateKey: string
   chainCode: string
 }

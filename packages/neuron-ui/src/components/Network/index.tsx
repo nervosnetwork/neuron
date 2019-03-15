@@ -1,10 +1,11 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 import Dropdown from '../../widgets/Dropdown'
 import { NetworkStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
-import { HeaderActionsCreators, HeaderActions, actionCreators } from '../../containers/Header'
+import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
 
 const Status = styled.div`
   width: 8px;
@@ -41,8 +42,8 @@ const NetworkStatusHeader = ({
   networks: Network[]
   dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
   navTo: Function
-  actionCreators: HeaderActionsCreators
 }) => {
+  const [t] = useTranslation()
   const chain = useContext(ChainContext)
 
   const tipNumber = chain.tipBlockNumber === undefined ? undefined : `#${(+chain.tipBlockNumber).toLocaleString()}`
@@ -54,7 +55,7 @@ const NetworkStatusHeader = ({
       },
     })),
     {
-      label: 'Mangement',
+      label: t('management'),
       onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
@@ -74,10 +75,15 @@ const NetworkStatusHeader = ({
         <Dropdown
           items={networkItems}
           style={{
+            position: 'absolute',
             top: '100%',
             left: '0',
             zIndex: '999',
             display: 'none',
+          }}
+          itemsStyle={{
+            textTransform: 'capitalize',
+            boxShadow: '0px 1px 3px rgb(120, 120, 120)',
           }}
         />
       </FlexDiv>

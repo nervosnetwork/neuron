@@ -19,9 +19,14 @@ export default {
       },
       help: {
         label: '帮助',
+        sourceCode: '源代码',
       },
       develop: {
         terminal: '终端',
+        develop: '开发',
+        forceReload: '强制刷新',
+        reload: '刷新',
+        toggleDevTools: '开发者工具',
       },
     },
   },
