@@ -66,7 +66,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     {
       label: 'Edit',
       onClick: () => {
-        // props.history.push(`${Routes.NetworkEditor}/${network.name}`)
+        props.history.push(`${Routes.WalletEditor}/${wallets[walletSelected].name}`)
       },
     },
     {
@@ -74,7 +74,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
-          payload: <InputWalletPswDialog wallet={wallets[walletSelected]} dispatch={props.dispatch} />,
+          payload: <InputWalletPswDialog walletName={wallets[walletSelected].name} dispatch={props.dispatch} />,
         })
       },
     },

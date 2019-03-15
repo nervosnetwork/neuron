@@ -1,9 +1,23 @@
 import React, { useState } from 'react'
+import styled from 'styled-components'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
-import { MainActions } from '../../containers/MainContent/reducer'
-import { Wallet } from '../../contexts/Wallet'
 
-const InputWalletPswDialog = ({ wallet, dispatch }: { wallet: Wallet; dispatch: any }) => {
+import { MainActions } from '../../containers/MainContent/reducer'
+
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const InputWalletPswDialog = ({
+  walletName,
+  dispatch,
+  handle,
+}: {
+  walletName: string
+  dispatch: any
+  handle?: any
+}) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [password, stePassword] = useState('')
 
@@ -13,6 +27,7 @@ const InputWalletPswDialog = ({ wallet, dispatch }: { wallet: Wallet; dispatch: 
         type: MainActions.SetDialog,
         payload: null,
       })
+      handle()
     } else {
       setErrorMsg('Please enter password')
     }
@@ -28,7 +43,7 @@ const InputWalletPswDialog = ({ wallet, dispatch }: { wallet: Wallet; dispatch: 
         width: '40%',
       }}
     >
-      <Card.Header>{`Please Enter ${wallet.name} Password`}</Card.Header>
+      <Card.Header>{`Please Enter ${walletName} Password`}</Card.Header>
       <Card.Body>
         <Form.Group as={Row} controlId="formPlaintextPassword">
           <Col>
@@ -43,12 +58,7 @@ const InputWalletPswDialog = ({ wallet, dispatch }: { wallet: Wallet; dispatch: 
         </Form.Group>
       </Card.Body>
       <Card.Footer className="text-muted">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
+        <ButtonDiv>
           <Button variant="danger" onClick={handleSubmit}>
             Confirm
           </Button>
@@ -63,7 +73,7 @@ const InputWalletPswDialog = ({ wallet, dispatch }: { wallet: Wallet; dispatch: 
           >
             Cancel
           </Button>
-        </div>
+        </ButtonDiv>
       </Card.Footer>
     </Card>
   )
