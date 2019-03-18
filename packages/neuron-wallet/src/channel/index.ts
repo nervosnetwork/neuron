@@ -32,6 +32,7 @@ export class Listeners {
       'getUnspentCells',
       'getTransactions',
       'getWallets',
+      'checkWalletPassword',
       'sendCapacity',
       'sendTransaction',
       'sign',
@@ -246,8 +247,23 @@ export class Listeners {
     return ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
       e.sender.send(Channel.GetWallets, {
         status: ResponseStatus.Success,
-        result: wallets,
+        result: wallets(),
       })
+    })
+  }
+
+  /**
+   * @static getWallets
+   * @memberof ChannelListeners
+   * @description channel to get wallets
+   */
+  static checkWalletPassword = () => {
+    return ipcMain.on(Channel.CheckWalletPassword, (e: Electron.Event, { password }: { password: string }) => {
+      e.sender.send(Channel.CheckWalletPassword, {
+        status: ResponseStatus.Success,
+        result: password === '1qaz',
+      })
+      // e.returnValue = password === '1qaz'
     })
   }
 

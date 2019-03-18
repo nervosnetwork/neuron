@@ -4,7 +4,7 @@ import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { Routes } from '../../utils/const'
-import InputWalletPswDialog from '../Settings/InputWalletPswDialog'
+import InputWalletPasswordDialog from '../Settings/InputWalletPswDialog'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
@@ -54,7 +54,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
       props.dispatch({
         type: MainActions.SetDialog,
         payload: (
-          <InputWalletPswDialog
+          <InputWalletPasswordDialog
             walletName={walletName}
             dispatch={props.dispatch}
             handle={() => props.history.push(`${Routes.SettingsWallets}`)}

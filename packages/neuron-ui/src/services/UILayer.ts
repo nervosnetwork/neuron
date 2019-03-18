@@ -61,4 +61,13 @@ export const getWallets = () => {
   UILayer.send(Channel.GetWallets)
 }
 
+export const checkPassword = (password: string, valid: any) => {
+  UILayer.on(Channel.CheckWalletPassword, (_e: any, args: Response<string>) => {
+    valid(args.result)
+  })
+  UILayer.send(Channel.CheckWalletPassword, {
+    password,
+  })
+}
+
 export default UILayer

@@ -8,6 +8,14 @@ export const transactions = Array.from({
 
 export const transactionCount = 500
 
+interface Wallet {
+  name: string
+  balance: number
+  address: string
+  publicKey: Uint8Array
+  msg: string
+}
+
 const generateWallet = () => {
   return {
     name: `wallet${parseInt((Math.random() * 1000).toString(), 10)}`,
@@ -18,14 +26,14 @@ const generateWallet = () => {
   }
 }
 
-export const wallets = [
-  generateWallet(),
-  generateWallet(),
-  generateWallet(),
-  generateWallet(),
-  generateWallet(),
-  generateWallet(),
-]
+let list: Wallet[] = []
+
+export const wallets = () => {
+  if (list.length === 0) {
+    list = [generateWallet(), generateWallet(), generateWallet(), generateWallet(), generateWallet()]
+  }
+  return list
+}
 
 export default {
   transactions,

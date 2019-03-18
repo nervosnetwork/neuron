@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions } from '../../containers/MainContent/reducer'
+import { checkPassword } from '../../services/UILayer'
 
 const ButtonDiv = styled.div`
   display: flex;
   justify-content: space-between;
 `
 
-const InputWalletPswDialog = ({
+const InputWalletPasswordDialog = ({
   walletName,
   dispatch,
   handle,
@@ -22,16 +23,24 @@ const InputWalletPswDialog = ({
   const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
+
   const handleSubmit = () => {
-    if (password) {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: null,
-      })
-      handle()
-    } else {
+    if (!password) {
       setErrorMsg('Please enter password')
     }
+    checkPassword(password, (passwordValid: boolean) => {
+      if (passwordValid) {
+        dispatch({
+          type: MainActions.SetDialog,
+          payload: null,
+        })
+        if (handle) {
+          handle()
+        }
+      } else {
+        setErrorMsg('Wrong password')
+      }
+    })
   }
 
   return (
@@ -80,4 +89,4 @@ const InputWalletPswDialog = ({
   )
 }
 
-export default InputWalletPswDialog
+export default InputWalletPasswordDialog
