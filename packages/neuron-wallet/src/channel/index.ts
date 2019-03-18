@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets, MockWallet } from '../mock'
+import { transactions, transactionCount, wallets, Wallet } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -10,11 +10,6 @@ enum ResponseStatus {
   Success,
 }
 
-interface Wallet {
-  name: string
-  mnemonic: string
-  password: string
-}
 const NOTIFICATION_FADE_TIME = 3000
 
 export class Listeners {
@@ -262,7 +257,7 @@ export class Listeners {
       Channel.CheckWalletPassword,
       (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
         let valid = false
-        wallets().forEach((value: MockWallet) => {
+        wallets().forEach((value: Wallet) => {
           if (value.id === walletID && value.password === password) {
             valid = true
           }

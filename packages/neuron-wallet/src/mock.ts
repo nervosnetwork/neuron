@@ -8,7 +8,7 @@ export const transactions = Array.from({
 
 export const transactionCount = 500
 
-export interface MockWallet {
+export interface Wallet {
   name: string
   id: string
   balance: number
@@ -16,6 +16,7 @@ export interface MockWallet {
   publicKey: Uint8Array
   msg: string
   password: string
+  mnemonic: string
 }
 
 const generateWallet = () => {
@@ -28,10 +29,11 @@ const generateWallet = () => {
     publicKey: new Uint8Array(0),
     msg: '',
     password: '1qaz',
+    mnemonic: '',
   }
 }
 
-let list: MockWallet[] = []
+let list: Wallet[] = []
 
 export const wallets = () => {
   if (list.length === 0) {
