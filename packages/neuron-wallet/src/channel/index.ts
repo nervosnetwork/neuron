@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets } from '../mock'
+import { transactions, transactionCount, wallets, MockWallet } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -258,13 +258,21 @@ export class Listeners {
    * @description channel to get wallets
    */
   static checkWalletPassword = () => {
-    return ipcMain.on(Channel.CheckWalletPassword, (e: Electron.Event, { password }: { password: string }) => {
-      e.sender.send(Channel.CheckWalletPassword, {
-        status: ResponseStatus.Success,
-        result: password === '1qaz',
-      })
-      // e.returnValue = password === '1qaz'
-    })
+    return ipcMain.on(
+      Channel.CheckWalletPassword,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        let valid = false
+        wallets().forEach((value: MockWallet) => {
+          if (value.id === walletID && value.password === password) {
+            valid = true
+          }
+        })
+        e.sender.send(Channel.CheckWalletPassword, {
+          status: ResponseStatus.Success,
+          result: valid,
+        })
+      },
+    )
   }
 
   /**

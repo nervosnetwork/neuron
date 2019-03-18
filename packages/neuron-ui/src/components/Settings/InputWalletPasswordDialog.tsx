@@ -5,21 +5,20 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions } from '../../containers/MainContent/reducer'
 import { checkPassword } from '../../services/UILayer'
+import { Wallet } from '../../contexts/Wallet'
+
+interface InputPasswordProps {
+  wallet: Wallet
+  dispatch: any
+  handle?: any
+}
 
 const ButtonDiv = styled.div`
   display: flex;
   justify-content: space-between;
 `
 
-const InputWalletPasswordDialog = ({
-  walletName,
-  dispatch,
-  handle,
-}: {
-  walletName: string
-  dispatch: any
-  handle?: any
-}) => {
+const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordProps) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
@@ -28,7 +27,7 @@ const InputWalletPasswordDialog = ({
     if (!password) {
       setErrorMsg('Please enter password')
     }
-    checkPassword(password, (passwordValid: boolean) => {
+    checkPassword(wallet.name, password, (passwordValid: boolean) => {
       if (passwordValid) {
         dispatch({
           type: MainActions.SetDialog,
@@ -53,7 +52,7 @@ const InputWalletPasswordDialog = ({
         width: '40%',
       }}
     >
-      <Card.Header>{`Please Enter ${walletName} Password`}</Card.Header>
+      <Card.Header>{`Please Enter ${wallet.name} Password`}</Card.Header>
       <Card.Body>
         <Form.Group as={Row} controlId="formPlaintextPassword">
           <Col>

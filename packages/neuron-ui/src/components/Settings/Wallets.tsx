@@ -9,7 +9,7 @@ import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { getWallets } from '../../services/UILayer'
-import InputWalletPasswordDialog from './InputWalletPswDialog'
+import InputWalletPasswordDialog from './InputWalletPasswordDialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
 const Popover = styled.div`
@@ -67,7 +67,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     {
       label: t('edit'),
       onClick: () => {
-        props.history.push(`${Routes.WalletEditor}/${wallets[walletSelected].name}`)
+        props.history.push(`${Routes.WalletEditor}/${JSON.stringify(wallets[index])}`)
       },
     },
     {
@@ -75,7 +75,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
-          payload: <InputWalletPasswordDialog walletName={wallets[walletSelected].name} dispatch={props.dispatch} />,
+          payload: <InputWalletPasswordDialog wallet={wallets[walletSelected]} dispatch={props.dispatch} />,
         })
       },
     },

@@ -123,7 +123,7 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `WalletEditor`,
-    path: `${Routes.WalletEditor}/:name`,
+    path: `${Routes.WalletEditor}/:wallet`,
     exact: true,
     component: WalletEditor,
   },

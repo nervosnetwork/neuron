@@ -4,17 +4,19 @@ import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { Routes } from '../../utils/const'
-import InputWalletPasswordDialog from '../Settings/InputWalletPswDialog'
+import InputWalletPasswordDialog from '../Settings/InputWalletPasswordDialog'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
+import { Wallet } from '../../contexts/Wallet'
 
-export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ name: string }>>) => {
+export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
   const { match } = props
   const { params } = match
   const [t] = useTranslation()
 
-  const [walletName, setWalletName] = useState(params.name)
+  const myWallet: Wallet = JSON.parse(params.wallet)
+  const [walletName, setWalletName] = useState(myWallet.name)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
@@ -55,7 +57,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
         type: MainActions.SetDialog,
         payload: (
           <InputWalletPasswordDialog
-            walletName={walletName}
+            wallet={myWallet}
             dispatch={props.dispatch}
             handle={() => props.history.push(`${Routes.SettingsWallets}`)}
           />
