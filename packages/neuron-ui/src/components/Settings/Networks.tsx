@@ -11,6 +11,7 @@ import { ContentProps } from '../../containers/MainContent'
 import { Routes } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
+import Dialog from '../../widgets/Dialog'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
@@ -54,6 +55,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
   const chain = useContext(ChainContext)
   const settings = useContext(SettingsContext)
   const [t] = useTranslation()
+  const { dispatch, dialog } = props
 
   const actionItems = (network: Network, isDefault: boolean, isChecked: boolean) => [
     {
@@ -75,7 +77,11 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
-          payload: <RemoveNetworkDialog isChecked={isChecked} network={network} dispatch={props.dispatch} />,
+          payload: {
+            open: true,
+            isChecked,
+            network,
+          },
         })
       },
       disabled: isDefault,
@@ -116,6 +122,19 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
         {t('settings.network.addnetwork')}
       </Link>
+      <Dialog
+        open={dialog.open}
+        onClick={() =>
+          dispatch({
+            type: MainActions.SetDialog,
+            payload: {
+              open: false,
+            },
+          })
+        }
+      >
+        <RemoveNetworkDialog isChecked={dialog.isChecked as boolean} network={dialog.network} dispatch={dispatch} />
+      </Dialog>
     </>
   )
 }
