@@ -256,16 +256,25 @@ export class Listeners {
     return ipcMain.on(
       Channel.CheckWalletPassword,
       (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        let valid = false
-        wallets().forEach((value: Wallet) => {
-          if (value.id === walletID && value.password === password) {
-            valid = true
-          }
-        })
-        e.sender.send(Channel.CheckWalletPassword, {
-          status: ResponseStatus.Success,
-          result: valid,
-        })
+        const myWallet = wallets().find(wallet => wallet.id === walletID)
+        if (!myWallet) {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: 'Wallet not find',
+          })
+        } else if (myWallet.password === password) {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: true,
+          })
+        } else {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: 'Wrong password',
+          })
+        }
       },
     )
   }
