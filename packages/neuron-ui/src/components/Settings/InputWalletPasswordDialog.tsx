@@ -71,7 +71,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
       <Card.Footer className="text-muted">
         <ButtonDiv>
           <Button variant="danger" onClick={handleSubmit}>
-            {t('Confirm')}
+            {t('Common.Confirm')}
           </Button>
           <Button
             variant="light"
@@ -82,7 +82,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
               })
             }
           >
-            {t('Cancel')}
+            {t('Common.Cancel')}
           </Button>
         </ButtonDiv>
       </Card.Footer>

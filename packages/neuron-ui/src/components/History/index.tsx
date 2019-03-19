@@ -46,7 +46,7 @@ const History = () => {
 
   return (
     <Container>
-      <h1>{t('History')}</h1>
+      <h1>{t('Siderbar.History')}</h1>
       <Table
         headers={headers.map(header => ({
           ...header,

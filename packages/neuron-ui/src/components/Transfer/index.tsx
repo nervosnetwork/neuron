@@ -131,7 +131,7 @@ const Transfer = () => {
             ))}
           </Form>
           <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionType.Submit)}>
-            {t('Send')}
+            {t('Siderbar.Send')}
           </Button>
         </Card.Body>
       </Card>

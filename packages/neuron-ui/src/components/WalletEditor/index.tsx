@@ -23,24 +23,24 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   const inputs: InputProps[] = [
     {
-      label: t('Wallet Name'),
+      label: t('Setting.WalletManger.EditWallet.WalletName'),
       value: walletName,
       onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: t('Wallet Name'),
+      placeholder: t('Setting.WalletManger.EditWallet.WalletName'),
       maxLength: 20,
     },
     {
-      label: t('Password'),
+      label: t('Setting.WalletManger.EditWallet.Password'),
       value: password,
       onChange: e => setPassword(e.currentTarget.value),
-      placeholder: t('Password'),
+      placeholder: t('Setting.WalletManger.EditWallet.Password'),
       inputType: 'password',
     },
     {
-      label: t('Confirm Password'),
+      label: t('Setting.WalletManger.EditWallet.ConfirmPassword'),
       value: confirmPassword,
       onChange: e => setConfirmPassword(e.currentTarget.value),
-      placeholder: t('Confirm Password'),
+      placeholder: t('Setting.WalletManger.EditWallet.ConfirmPassword'),
       inputType: 'password',
     },
   ]
@@ -68,7 +68,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>{t('Edit Wallet')}</Card.Header>
+      <Card.Header>{t('Setting.WalletManger.EditWallet.EditWallet')}</Card.Header>
       {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>
@@ -77,7 +77,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           ))}
         </Form>
         <Button type="submit" variant="primary" size="lg" block onClick={() => handleSubmit()}>
-          {t('Save')}
+          {t('Common.Save')}
         </Button>
       </Card.Body>
     </Card>
