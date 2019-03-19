@@ -3,6 +3,7 @@ import { map, distinctUntilChanged, flatMap } from 'rxjs/operators'
 import { Channel } from './utils/const'
 import ckbCore from './core'
 import asw from './wallets/asw'
+import logger from './utils/logger'
 
 const numbers = interval(1000)
 const monitors = {
@@ -23,34 +24,56 @@ const monitorChain = (webContents: Electron.WebContents) => {
         return x.connected === y.connected && x.remote === y.remote
       }),
     )
-    .subscribe(result => {
-      webContents.send(Channel.GetNetwork, {
-        status: 1,
-        result,
-      })
-    }, console.error)
+    .subscribe(
+      result => {
+        webContents.send(Channel.GetNetwork, {
+          status: 1,
+          result,
+        })
+      },
+      (err: Error) => {
+        logger.log({
+          level: 'error',
+          message: err.message,
+        })
+      },
+    )
 
   numbers
     .pipe(flatMap(monitors.tipBlockNumber))
     .pipe(distinctUntilChanged())
-    .subscribe(result => {
-      if (!webContents) return
-      webContents.send(Channel.GetTipBlockNumber, {
-        status: 1,
-        result,
-      })
-    }, console.error)
+    .subscribe(
+      result => {
+        if (!webContents) return
+        webContents.send(Channel.GetTipBlockNumber, {
+          status: 1,
+          result,
+        })
+      },
+      (err: Error) =>
+        logger.log({
+          level: 'error',
+          message: err.message,
+        }),
+    )
 
   numbers
     .pipe(flatMap(monitors.balance))
     .pipe(distinctUntilChanged())
-    .subscribe(result => {
-      if (!webContents) return
-      webContents.send(Channel.GetBalance, {
-        status: 1,
-        result,
-      })
-    }, console.error)
+    .subscribe(
+      result => {
+        if (!webContents) return
+        webContents.send(Channel.GetBalance, {
+          status: 1,
+          result,
+        })
+      },
+      (err: Error) =>
+        logger.log({
+          level: 'error',
+          message: err.message,
+        }),
+    )
 }
 
 export default monitorChain
