@@ -28,6 +28,7 @@ export enum Channel {
   GetUnspentCells = 'getUnspentCells',
   GetTransactions = 'getTransactions',
   GetWallet = 'getWallet',
+  CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',
@@ -55,6 +56,7 @@ export enum Routes {
   WalletWizard = '/wallets/wizard',
   Terminal = '/terminal',
   NetworkEditor = '/network',
+  WalletEditor = '/editwallet',
 }
 
 export enum LocalStorage {

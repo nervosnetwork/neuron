@@ -1,144 +1,134 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import styled from 'styled-components'
+import { Link, RouteComponentProps } from 'react-router-dom'
+import { ListGroup, Form, Container } from 'react-bootstrap'
+import { Configure } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+import { Routes } from '../../utils/const'
+import WalletContext from '../../contexts/Settings'
+import { ContentProps } from '../../containers/MainContent'
+import { MainActions } from '../../containers/MainContent/reducer'
+import { getWallets } from '../../services/UILayer'
+import InputWalletPasswordDialog from './InputWalletPasswordDialog'
+import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
-const WalletItem = styled.div`
-  margin-top: 15px;
-  width: 500px;
-  height: 60px;
-  border-radius: 10px;
-  text-align: center;
-  line-height: 60px;
-  background: #ffffff;
-  box-shadow: 1px 1px 3px #999999;
-`
-
-const ContentPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: left;
-  margin: 30px;
-`
-
-const WalletSelectedItem = styled(WalletItem)`
-  background: #81fced;
-`
-
-const WalletButtonPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-`
-
-const WalletButton = styled.div`
-  width: 80px;
-  height: 40px;
-  align-items: left;
-  background: blue;
-  color: white;
-  text-align: center;
-  line-height: 40px;
-  border-radius: 5px;
-`
-
-const AddWallet = styled(WalletButton)`
-  text-transform: capitalize;
-  margin: 30px 0 0 50px;
-`
-
-const DeleteWallet = styled(WalletButton)`
-  text-transform: capitalize;
-  margin: 30px 0 0 50px;
-`
-
-const UpdateWallet = styled(WalletButton)`
-  text-transform: capitalize;
-  margin: 30px 0 0 50px;
-`
-
-const wallets: string[] = [
-  'Wallet Name1',
-  'Wallet Name2',
-  'Wallet Name3',
-  'Wallet Name4',
-  'Wallet Name5',
-  'Wallet Name6',
-]
-
-const General = () => {
-  const [t] = useTranslation()
-  const [walletSelected, setWalletSelected] = useState(wallets[0])
-  const [walletsState, setWalletsState] = useState(wallets)
-
-  const deleteWallet = () => {
-    const temps = walletsState
-    const temp = walletSelected
-    const index = temps.indexOf(temp)
-    if (index > -1) {
-      temps.splice(index, 1)
+const Popover = styled.div`
+  position: relative;
+  &:hover {
+    & > ul {
+      display: block !important;
     }
-    setWalletSelected(temps[0])
-    setWalletsState(temps)
   }
+`
 
-  const addWallet = () => {
-    const temps = walletsState
-    setWalletsState(temps.concat(`Wallet Name${temps.length + 1}`))
+const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionItems: DropDownItem[] }) => {
+  if (isDefault) {
+    actionItems.splice(0, 1)
   }
-
-  const updateWallet = () => {
-    const temps = walletsState
-    const temp = walletSelected
-    const index = temps.indexOf(walletSelected)
-    const name = prompt(t('Please enter your wallet name'), temp)
-    if (index > -1 && name != null && name !== '') {
-      temps.splice(index, 1, name)
-    }
-    setWalletsState(temps)
-  }
-
   return (
-    <ContentPanel>
-      {walletsState.map(wallet => {
-        if (walletSelected === wallet) {
-          return <WalletSelectedItem key={wallet}>{wallet}</WalletSelectedItem>
-        }
-        return (
-          <WalletItem
-            key={wallet}
-            onClick={() => {
-              setWalletSelected(wallet)
-            }}
-          >
-            {wallet}
-          </WalletItem>
-        )
-      })}
-      <WalletButtonPanel>
-        <AddWallet
-          onClick={() => {
-            addWallet()
-          }}
-        >
-          {t('add')}
-        </AddWallet>
-        <UpdateWallet
-          onClick={() => {
-            updateWallet()
-          }}
-        >
-          {t('update')}
-        </UpdateWallet>
-        <DeleteWallet
-          onClick={() => {
-            deleteWallet()
-          }}
-        >
-          {t('delete')}
-        </DeleteWallet>
-      </WalletButtonPanel>
-    </ContentPanel>
+    <Popover>
+      <Configure />
+      <Dropdown
+        items={actionItems}
+        style={{
+          position: 'absolute',
+          top: '100%',
+          right: '0',
+          zIndex: '999',
+          display: 'none',
+        }}
+      />
+    </Popover>
   )
 }
 
-export default General
+const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+  const { wallets } = useContext(WalletContext)
+  const [t] = useTranslation()
+
+  const [walletSelected, setWalletSelected] = useState(() => {
+    getWallets()
+    return 0
+  })
+
+  const actionItems = (index: number) => [
+    {
+      label: t('select'),
+      onClick: () => {
+        setWalletSelected(index)
+      },
+    },
+    {
+      label: t('backup'),
+      onClick: () => {
+        // props.history.push(`${Routes.NetworkEditor}/${network.name}`)
+      },
+    },
+    {
+      label: t('edit'),
+      onClick: () => {
+        props.history.push(`${Routes.WalletEditor}/${JSON.stringify(wallets[index])}`)
+      },
+    },
+    {
+      label: t('remove'),
+      onClick: () => {
+        props.dispatch({
+          type: MainActions.SetDialog,
+          payload: <InputWalletPasswordDialog wallet={wallets[walletSelected]} dispatch={props.dispatch} />,
+        })
+      },
+    },
+  ]
+
+  return (
+    <>
+      <ListGroup>
+        {wallets.map((wallet, index) => {
+          const isChecked = index === walletSelected
+          return (
+            <ListGroup.Item
+              key={wallet.name}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Form.Check
+                inline
+                label={wallet.name}
+                type="radio"
+                checked={isChecked}
+                disabled={isChecked}
+                onChange={() => {
+                  setWalletSelected(index)
+                }}
+              />
+              <WalletActions isDefault={isChecked} actionItems={actionItems(index)} />
+            </ListGroup.Item>
+          )
+        })}
+      </ListGroup>
+      <Container
+        style={{
+          marginTop: 30,
+        }}
+      >
+        <Link to={`${Routes.CreateWallet}/new`} className="btn btn-primary">
+          {t('Create Wallet')}
+        </Link>
+        <Link
+          to={`${Routes.ImportWallet}/new`}
+          className="btn btn-primary"
+          style={{
+            marginLeft: 30,
+          }}
+        >
+          {t('Import Wallet')}
+        </Link>
+      </Container>
+    </>
+  )
+}
+
+export default Wallets

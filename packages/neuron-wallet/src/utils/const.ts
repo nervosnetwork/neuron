@@ -23,6 +23,7 @@ export enum Channel {
   GetUnspentCells = 'getUnspentCells',
   GetTransactions = 'getTransactions',
   GetWallet = 'getWallet',
+  CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
   SendTransaction = 'sendTransaction',

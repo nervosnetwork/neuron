@@ -32,6 +32,15 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       })
     })
 
+    UILayer.on(Channel.GetWallets, (_e: any, args: Response<any>) => {
+      dispatch({
+        type: ProviderActions.Settings,
+        payload: {
+          wallets: args.result,
+        },
+      })
+    })
+
     UILayer.on(
       Channel.CreateWallet,
       (_e: Event, args: Response<{ name: string; address: string; publicKey: Uint8Array }>) => {

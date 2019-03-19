@@ -21,6 +21,7 @@ import General from '../Settings/General'
 import Wallets from '../Settings/Wallets'
 import Network from '../Settings/Networks'
 import NetworkEditor from '../NetworkEditor'
+import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
 
 import WalletContext from '../../contexts/Wallet'
@@ -119,6 +120,12 @@ export const mainContents: CustomRoute[] = [
     path: `${Routes.NetworkEditor}/:name`,
     exact: true,
     component: NetworkEditor,
+  },
+  {
+    name: `WalletEditor`,
+    path: `${Routes.WalletEditor}/:wallet`,
+    exact: true,
+    component: WalletEditor,
   },
   {
     name: `CreateWallet`,

@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount } from '../mock'
+import { transactions, transactionCount, wallets, Wallet } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -10,11 +10,6 @@ enum ResponseStatus {
   Success,
 }
 
-interface Wallet {
-  name: string
-  mnemonic: string
-  password: string
-}
 const NOTIFICATION_FADE_TIME = 3000
 
 export class Listeners {
@@ -32,6 +27,7 @@ export class Listeners {
       'getUnspentCells',
       'getTransactions',
       'getWallets',
+      'checkWalletPassword',
       'sendCapacity',
       'sendTransaction',
       'sign',
@@ -246,9 +242,41 @@ export class Listeners {
     return ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
       e.sender.send(Channel.GetWallets, {
         status: ResponseStatus.Success,
-        result: ['wallet'],
+        result: wallets(),
       })
     })
+  }
+
+  /**
+   * @static getWallets
+   * @memberof ChannelListeners
+   * @description channel to get wallets
+   */
+  static checkWalletPassword = () => {
+    return ipcMain.on(
+      Channel.CheckWalletPassword,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        const myWallet = wallets().find(wallet => wallet.id === walletID)
+        if (!myWallet) {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: 'Wallet not find',
+          })
+        } else if (myWallet.password === password) {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: true,
+          })
+        } else {
+          e.sender.send(Channel.CheckWalletPassword, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: 'Wrong password',
+          })
+        }
+      },
+    )
   }
 
   /**
