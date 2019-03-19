@@ -6,11 +6,11 @@ export interface OutPoint {
   index: number
 }
 
-interface TypeScript {
+interface Script {
   version: number
   args: string[]
   signedArgs: string[]
-  reference: string | null
+  reference?: string | null
   binary?: string
 }
 
@@ -18,7 +18,7 @@ export interface Cell {
   capacity: number
   data: string
   lock: string
-  type?: TypeScript | null
+  type?: Script | null
   outPoint?: OutPoint
 }
 

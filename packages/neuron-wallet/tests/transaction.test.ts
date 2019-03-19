@@ -2,7 +2,7 @@ import { getTransactions } from '../src/transaction'
 
 describe('Transaction tests', () => {
   it('getTransactions with out addresses', async () => {
-    const result = await getTransactions(null, 1, 2)
+    const result = await getTransactions(undefined, 1, 2)
     expect(result.totalCount).toBe(2)
   })
 

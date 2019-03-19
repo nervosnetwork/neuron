@@ -10,7 +10,7 @@ export interface Transaction {
 }
 
 // if addresses set to null, should be all transactions
-export const getTransactions = async (addresses: string[] | null, page: number, perPage: number) => {
+export const getTransactions = async (addresses: string[] | undefined, page: number, perPage: number) => {
   const transaction: Transaction = mockedTransaction
 
   return {
