@@ -98,21 +98,21 @@ const Transfer = () => {
 
   const inputs: InputProps[] = [
     {
-      label: t('address'),
+      label: t('Send.Address'),
       value: state.address,
       onChange: handleAction(TransferActionType.Address),
       tooltip: TooltipText.Address,
       placeholder: PlaceHolder.Address,
     },
     {
-      label: t('capacity'),
+      label: t('Send.Capacity'),
       value: state.capacity,
       onChange: handleAction(TransferActionType.Capacity),
       tooltip: TooltipText.Capacity,
       placeholder: PlaceHolder.Capacity,
     },
     {
-      label: t('transaction fee'),
+      label: t('Send.TransactionFee'),
       value: state.fee,
       onChange: handleAction(TransferActionType.Fee),
       tooltip: TooltipText.Fee,
@@ -123,7 +123,7 @@ const Transfer = () => {
   return (
     <Container>
       <Card>
-        <Card.Header>{t('Send Capacity')}</Card.Header>
+        <Card.Header>{t('Siderbar.Send')}</Card.Header>
         <Card.Body>
           <Form>
             {inputs.map(inputProps => (
@@ -131,7 +131,7 @@ const Transfer = () => {
             ))}
           </Form>
           <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionType.Submit)}>
-            {t('Siderbar.Send')}
+            {t('Send.Send')}
           </Button>
         </Card.Body>
       </Card>

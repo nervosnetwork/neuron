@@ -8,7 +8,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
   const wallet = useContext(WalletContext)
   const [t] = useTranslation()
 
-  const items = ['Simulate long content...', `${t('balance')}: ${wallet.balance}`]
+  const items = ['Simulate long content...', `${t('Settings.WalletManger.WalletDetail.Balance')}: ${wallet.balance}`]
 
   return wallet.name ? (
     <Card>
@@ -21,7 +21,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
       </ListGroup>
     </Card>
   ) : (
-    <Alert variant="warning">{t('No Wallet')}</Alert>
+    <Alert variant="warning">{t('Settings.WalletManger.WalletDetail.NoWallet')}</Alert>
   )
 }
 

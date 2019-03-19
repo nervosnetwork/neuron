@@ -8,15 +8,15 @@ import { getTransactions } from '../../services/UILayer'
 
 const headers = [
   {
-    label: 'date',
+    label: 'History.Date',
     key: 'date',
   },
   {
-    label: 'amount(ckb)',
+    label: 'History.Amount',
     key: 'value',
   },
   {
-    label: 'transaction hash',
+    label: 'History.TransactionHash',
     key: 'hash',
   },
 ]

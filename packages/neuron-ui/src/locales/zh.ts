@@ -1,17 +1,5 @@
 export default {
   translation: {
-    // common
-    address: '地址',
-    capacity: '价值',
-    send: '发送',
-    balance: '余额',
-    date: '时间',
-    'transaction fee': '交易费',
-    'Send Capacity': '转账',
-    'No Wallet': '没有钱包',
-    'Click to copy': '点击复制',
-    'amount(ckb)': '价值(ckb)',
-    'transaction hash': '交易哈希',
     Siderbar: {
       Wallet: '钱包',
       Send: '转账',
@@ -19,6 +7,18 @@ export default {
       History: '交易历史',
       Addresses: '地址管理',
       Settings: '设置',
+    },
+    Send: {
+      Address: '地址',
+      Capacity: '价值',
+      Send: '发送',
+      TransactionFee: '交易费',
+      SendCapacity: '转账',
+    },
+    History: {
+      Date: '时间',
+      Amount: '价值(ckb)',
+      TransactionHash: '交易哈希',
     },
     Addresses: {
       DeleteWallet: '删除钱包',
@@ -49,10 +49,14 @@ export default {
           ConfirmPassword: '确认密码',
           EditWallet: '编辑钱包',
         },
+        WalletDetail: {
+          Balance: '余额',
+          NoWallet: '没有钱包',
+        },
       },
       Network: {
-        online: '在线',
-        offline: '离线',
+        Online: '在线',
+        Offline: '离线',
         AddNetwork: '新增网络',
       },
     },
@@ -72,6 +76,7 @@ export default {
       Confirm: '确认',
       Cancel: '取消',
       Save: '保存',
+      ClickCopy: '点击复制',
     },
   },
 }

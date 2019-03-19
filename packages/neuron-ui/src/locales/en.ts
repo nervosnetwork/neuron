@@ -8,6 +8,18 @@ export default {
       Addresses: 'Addresses',
       Settings: 'Settings',
     },
+    Send: {
+      Address: 'address',
+      Capacity: 'capacity',
+      Send: 'Send',
+      TransactionFee: 'transaction fee',
+      SendCapacity: 'Send Capacity',
+    },
+    History: {
+      Date: 'date',
+      Amount: 'amount(ckb)',
+      TransactionHash: 'transaction hash',
+    },
     Addresses: {
       DeleteWallet: 'Delete Wallet',
       ExportWallet: 'Export Wallet',
@@ -37,10 +49,14 @@ export default {
           ConfirmPassword: 'Confirm Password',
           EditWallet: 'Edit Wallet',
         },
+        WalletDetail: {
+          Balance: 'balance',
+          NoWallet: 'No Wallet',
+        },
       },
       Network: {
-        online: 'online',
-        offline: 'offline',
+        Online: 'online',
+        Offline: 'offline',
         AddNetwork: 'Add Network',
       },
     },
@@ -60,6 +76,7 @@ export default {
       Confirm: 'Confirm',
       Cancel: 'Cancel',
       Save: 'Save',
+      ClickCopy: 'Click to copy',
     },
   },
 }

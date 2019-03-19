@@ -34,7 +34,7 @@ const Receive = () => {
           <QRCodePanel>
             <QRCode value={address} size={256} />
           </QRCodePanel>
-          <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Click to copy')}</Tooltip>}>
+          <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Common.ClickCopy')}</Tooltip>}>
             <Address onClick={() => window.clipboard.writeText(address)}>{address}</Address>
           </OverlayTrigger>
         </Card.Body>
