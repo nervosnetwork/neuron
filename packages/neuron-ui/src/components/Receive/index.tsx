@@ -28,7 +28,7 @@ const Receive = () => {
     <Container>
       <Card>
         <Card.Header>
-          <h2>{t('Siderbar.Receive')}</h2>
+          <h2>{t('siderbar.receive')}</h2>
         </Card.Header>
         <Card.Body>
           <QRCodePanel>

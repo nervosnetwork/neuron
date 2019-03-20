@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import { ContentProps } from '../../containers/MainContent'
@@ -23,6 +24,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   const settings = useContext(SettingsContext)
   const chain = useContext(ChainContext)
   const { params } = match
+  const [t] = useTranslation()
 
   // idx of the network to update, -1 means create
   const idx = settings.networks.map(n => n.name).indexOf(params.name)
@@ -54,7 +56,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   const inputs: InputProps[] = [
     {
-      label: 'RPC URL',
+      label: t('settings.network.editnetwork.rpcurl'),
       value: networkEditor.remote,
       onChange: e =>
         dispatch({
@@ -67,7 +69,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
       placeholder: PlaceHolder.URL,
     },
     {
-      label: 'name',
+      label: t('settings.network.editnetwork.name'),
       value: networkEditor.name,
       onChange: e =>
         dispatch({
@@ -83,7 +85,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>{idx === -1 ? 'Add Network' : params.name}</Card.Header>
+      <Card.Header>{idx === -1 ? t('settings.network.editnetwork.title') : params.name}</Card.Header>
       {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
       <Card.Body>
         <Form>

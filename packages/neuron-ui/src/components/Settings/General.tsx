@@ -18,11 +18,11 @@ const General = () => {
   const [t] = useTranslation()
   return (
     <ContentPanel>
-      <ItemPanel>{t('Settings.General.PhotoSetting')}</ItemPanel>
-      <ItemPanel>{t('Settings.General.PasswordSetting')}</ItemPanel>
-      <ItemPanel>{t('Settings.General.LanguageSetting')}</ItemPanel>
-      <ItemPanel>{t('Settings.General.AboutNeuron')}</ItemPanel>
-      <ItemPanel>{t('Settings.General.ContactUs')}</ItemPanel>
+      <ItemPanel>{t('settings.general.photosetting')}</ItemPanel>
+      <ItemPanel>{t('settings.general.passwordsetting')}</ItemPanel>
+      <ItemPanel>{t('settings.general.languagesetting')}</ItemPanel>
+      <ItemPanel>{t('settings.general.aboutneuron')}</ItemPanel>
+      <ItemPanel>{t('settings.general.contactus')}</ItemPanel>
     </ContentPanel>
   )
 }

@@ -45,32 +45,32 @@ const SidebarAside = styled.div`
 
 const walletMenuItems = [
   {
-    name: 'Siderbar.Wallet',
+    name: 'siderbar.wallet',
     route: 'Wallet',
     icon: IconWallet,
   },
   {
-    name: 'Siderbar.Send',
+    name: 'siderbar.send',
     route: 'Send',
     icon: IconSend,
   },
   {
-    name: 'Siderbar.Receive',
+    name: 'siderbar.receive',
     route: 'Receive',
     icon: IconReceive,
   },
   {
-    name: 'Siderbar.History',
+    name: 'siderbar.history',
     route: 'History',
     icon: IconHistory,
   },
   {
-    name: 'Siderbar.Addresses',
+    name: 'siderbar.addresses',
     route: 'Addresses',
     icon: IconAddresses,
   },
   {
-    name: 'Siderbar.Settings',
+    name: 'siderbar.settings',
     route: 'Settings',
     icon: IconSettings,
   },

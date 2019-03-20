@@ -23,24 +23,24 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   const inputs: InputProps[] = [
     {
-      label: t('Setting.WalletManger.EditWallet.WalletName'),
+      label: t('settings.walletmanger.editwallet.walletname'),
       value: walletName,
       onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: t('Setting.WalletManger.EditWallet.WalletName'),
+      placeholder: t('settings.walletmanger.editwallet.walletname'),
       maxLength: 20,
     },
     {
-      label: t('Setting.WalletManger.EditWallet.Password'),
+      label: t('settings.walletmanger.editwallet.password'),
       value: password,
       onChange: e => setPassword(e.currentTarget.value),
-      placeholder: t('Setting.WalletManger.EditWallet.Password'),
+      placeholder: t('settings.walletmanger.editwallet.password'),
       inputType: 'password',
     },
     {
-      label: t('Setting.WalletManger.EditWallet.ConfirmPassword'),
+      label: t('settings.walletmanger.editwallet.confirmpassword'),
       value: confirmPassword,
       onChange: e => setConfirmPassword(e.currentTarget.value),
-      placeholder: t('Setting.WalletManger.EditWallet.ConfirmPassword'),
+      placeholder: t('settings.walletmanger.editwallet.confirmpassword'),
       inputType: 'password',
     },
   ]
@@ -68,7 +68,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>{t('Setting.WalletManger.EditWallet.EditWallet')}</Card.Header>
+      <Card.Header>{t('settings.walletmanger.editwallet.editwallet')}</Card.Header>
       {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>
@@ -77,7 +77,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           ))}
         </Form>
         <Button type="submit" variant="primary" size="lg" block onClick={() => handleSubmit()}>
-          {t('Common.Save')}
+          {t('common.save')}
         </Button>
       </Card.Body>
     </Card>

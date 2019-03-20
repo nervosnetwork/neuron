@@ -1,66 +1,71 @@
 export default {
   translation: {
-    Siderbar: {
-      Wallet: '钱包',
-      Send: '转账',
-      Receive: '收款',
-      History: '交易历史',
-      Addresses: '地址管理',
-      Settings: '设置',
+    siderbar: {
+      wallet: '钱包',
+      send: '转账',
+      receive: '收款',
+      history: '交易历史',
+      addresses: '地址管理',
+      settings: '设置',
     },
-    Send: {
-      Address: '地址',
-      Capacity: '价值',
-      Send: '发送',
-      TransactionFee: '交易费',
-      SendCapacity: '转账',
+    send: {
+      address: '地址',
+      capacity: '价值',
+      send: '发送',
+      transactionfee: '交易费',
+      sendcapacity: '转账',
     },
-    History: {
-      Date: '时间',
-      Amount: '价值(ckb)',
-      TransactionHash: '交易哈希',
+    history: {
+      date: '时间',
+      amount: '价值(ckb)',
+      transactionhash: '交易哈希',
     },
-    Addresses: {
-      DeleteWallet: '删除钱包',
-      ExportWallet: '导出钱包',
-      CreateWallet: '创建钱包',
-      ImportWallet: '导入钱包',
+    addresses: {
+      deletewallet: '删除钱包',
+      exportwallet: '导出钱包',
+      createwallet: '创建钱包',
+      importwallet: '导入钱包',
     },
-    Settings: {
-      SettingTabs: {
-        General: '通用',
-        Wallets: '钱包',
-        Network: '网络',
+    settings: {
+      settingtabs: {
+        general: '通用',
+        wallets: '钱包',
+        network: '网络',
       },
-      General: {
-        PhotoSetting: '设置头像',
-        PasswordSetting: '设置密码',
-        LanguageSetting: '设置语言',
-        AboutNeuron: '关于 Neuron',
-        ContactUs: '联系我们',
-        AddNetwork: '新增网络',
+      general: {
+        photosetting: '设置头像',
+        passwordsetting: '设置密码',
+        languagesetting: '设置语言',
+        aboutneuron: '关于 Neuron',
+        contactus: '联系我们',
+        addnetwork: '新增网络',
       },
-      WalletManger: {
-        CreateWallet: '创建钱包',
-        ImportWallet: '导入钱包',
-        EditWallet: {
-          WalletName: '钱包名称',
-          Password: '密码',
-          ConfirmPassword: '确认密码',
-          EditWallet: '编辑钱包',
+      walletmanger: {
+        createwallet: '创建钱包',
+        importwallet: '导入钱包',
+        editwallet: {
+          walletname: '钱包名称',
+          password: '密码',
+          confirmpassword: '确认密码',
+          editwallet: '编辑钱包',
         },
-        WalletDetail: {
-          Balance: '余额',
-          NoWallet: '没有钱包',
+        walletdetail: {
+          balance: '余额',
+          nowallet: '没有钱包',
         },
       },
-      Network: {
-        Online: '在线',
-        Offline: '离线',
-        AddNetwork: '新增网络',
+      network: {
+        online: '在线',
+        offline: '离线',
+        addnetwork: '新增网络',
+        editnetwork: {
+          title: '新增网络',
+          rpcurl: 'RPC地址',
+          name: '名字',
+        },
       },
     },
-    MenuItem: {
+    menuitem: {
       add: '新增',
       update: '更新',
       delete: '删除',
@@ -72,11 +77,11 @@ export default {
       Save: '保存',
       management: '管理',
     },
-    Common: {
-      Confirm: '确认',
-      Cancel: '取消',
-      Save: '保存',
-      ClickCopy: '点击复制',
+    common: {
+      confirm: '确认',
+      cancel: '取消',
+      save: '保存',
+      clickcopy: '点击复制',
     },
   },
 }

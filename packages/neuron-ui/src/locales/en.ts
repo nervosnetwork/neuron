@@ -1,66 +1,71 @@
 export default {
   translation: {
-    Siderbar: {
-      Wallet: 'Wallet',
-      Send: 'Send',
-      Receive: 'Receive',
-      History: 'History',
-      Addresses: 'Addresses',
-      Settings: 'Settings',
+    siderbar: {
+      wallet: 'Wallet',
+      send: 'Send',
+      receive: 'Receive',
+      history: 'History',
+      addresses: 'Addresses',
+      settings: 'Settings',
     },
-    Send: {
-      Address: 'address',
-      Capacity: 'capacity',
-      Send: 'Send',
-      TransactionFee: 'transaction fee',
-      SendCapacity: 'Send Capacity',
+    send: {
+      address: 'address',
+      capacity: 'capacity',
+      send: 'Send',
+      transactionfee: 'transaction fee',
+      sendcapacity: 'Send Capacity',
     },
-    History: {
-      Date: 'date',
-      Amount: 'amount(ckb)',
-      TransactionHash: 'transaction hash',
+    history: {
+      date: 'date',
+      amount: 'amount(ckb)',
+      transactionhash: 'transaction hash',
     },
-    Addresses: {
-      DeleteWallet: 'Delete Wallet',
-      ExportWallet: 'Export Wallet',
-      CreateWallet: 'Creat eWallet',
-      ImportWallet: 'Import Wallet',
+    addresses: {
+      deletewallet: 'Delete Wallet',
+      exportwallet: 'Export Wallet',
+      createwallet: 'Creat eWallet',
+      importwallet: 'Import Wallet',
     },
-    Setting: {
-      SettingTabs: {
-        General: 'General',
-        Wallets: 'Wallets',
-        Network: 'Network',
+    setting: {
+      settingtabs: {
+        general: 'General',
+        wallets: 'Wallets',
+        network: 'Network',
       },
-      General: {
-        PhotoSetting: 'Photo Setting',
-        PasswordSetting: 'Password Setting',
-        LanguageSetting: 'Language Setting',
-        AboutNeuron: 'About Neuron',
-        ContactUs: 'Contact Us',
-        AddNetwork: 'Add Network',
+      general: {
+        photosetting: 'Photo Setting',
+        passwordsetting: 'Password Setting',
+        languagesetting: 'Language Setting',
+        aboutneuron: 'About Neuron',
+        contactus: 'Contact Us',
+        addnetwork: 'Add Network',
       },
-      WalletManger: {
-        CreateWallet: 'Create Wallet',
-        ImportWallet: 'Import Wallet',
-        EditWallet: {
-          WalletName: 'Wallet Name',
-          Password: 'Password',
-          ConfirmPassword: 'Confirm Password',
-          EditWallet: 'Edit Wallet',
+      walletmanger: {
+        createwallet: 'Create Wallet',
+        importwallet: 'Import Wallet',
+        editwallet: {
+          walletname: 'Wallet Name',
+          password: 'Password',
+          confirmpassword: 'Confirm Password',
+          editwallet: 'Edit Wallet',
         },
-        WalletDetail: {
-          Balance: 'balance',
-          NoWallet: 'No Wallet',
+        walletdetail: {
+          balance: 'balance',
+          nowallet: 'No Wallet',
         },
       },
-      Network: {
-        Online: 'online',
-        Offline: 'offline',
-        AddNetwork: 'Add Network',
+      network: {
+        online: 'online',
+        offline: 'offline',
+        addnetwork: 'Add Network',
+        editnetwork: {
+          title: 'Add Network',
+          rpcurl: 'RPC URL',
+          name: 'Name',
+        },
       },
     },
-    MenuItem: {
+    menuitem: {
       add: 'add',
       update: 'update',
       delete: 'delete',
@@ -69,14 +74,14 @@ export default {
       edit: 'edit',
       backup: 'backup',
       remove: 'remove',
-      Save: 'Save',
+      save: 'Save',
       management: 'management',
     },
-    Common: {
-      Confirm: 'Confirm',
-      Cancel: 'Cancel',
-      Save: 'Save',
-      ClickCopy: 'Click to copy',
+    common: {
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      save: 'Save',
+      clickcopy: 'Click to copy',
     },
   },
 }

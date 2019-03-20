@@ -8,7 +8,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
   const wallet = useContext(WalletContext)
   const [t] = useTranslation()
 
-  const items = ['Simulate long content...', `${t('Settings.WalletManger.WalletDetail.Balance')}: ${wallet.balance}`]
+  const items = ['Simulate long content...', `${t('settings.walletmanger.walletdetail.balance')}: ${wallet.balance}`]
 
   return wallet.name ? (
     <Card>

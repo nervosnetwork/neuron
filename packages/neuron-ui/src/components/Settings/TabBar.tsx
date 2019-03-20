@@ -6,7 +6,7 @@ import { Routes } from '../../utils/const'
 const TabBar = (props: any) => {
   const [t] = useTranslation()
   const tabs = [Routes.SettingsGeneral, Routes.SettingsWallets, Routes.SettingsNetworks]
-  const contents = ['Settings.SettingTabs.General', 'Settings.SettingTabs.Wallets', 'Settings.SettingTabs.Network']
+  const contents = ['settings.settingtabs.general', 'settings.settingtabs.wallets', 'settings.settingtabs.network']
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   const handleAction = (index: number) => {
