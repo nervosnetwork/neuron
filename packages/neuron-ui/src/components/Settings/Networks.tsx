@@ -57,21 +57,21 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
 
   const actionItems = (network: Network, isDefault: boolean, isChecked: boolean) => [
     {
-      label: t('select'),
+      label: t('menuitem.select'),
       onClick: () => {
         props.dispatch(actionCreators.setNetwork(network))
       },
       disabled: isChecked || isDefault,
     },
     {
-      label: t('edit'),
+      label: t('menuitem.edit'),
       onClick: () => {
         props.history.push(`${Routes.NetworkEditor}/${network.name}`)
       },
       disabled: isDefault,
     },
     {
-      label: t('remove'),
+      label: t('menuitem.remove'),
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
@@ -114,7 +114,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         })}
       </ListGroup>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
-        {t('Add Network')}
+        {t('settings.network.addnetwork')}
       </Link>
     </>
   )

@@ -11,19 +11,19 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
   return (
     <>
       <div>
-        <Link to={Routes.CreateWallet}>{t('Create Wallet')}</Link>
+        <Link to={Routes.CreateWallet}>{t('addresses.createwallet')}</Link>
       </div>
       <div>
-        <Link to={Routes.ImportWallet}>{t('Import Wallet')}</Link>
+        <Link to={Routes.ImportWallet}>{t('addresses.importwallet')}</Link>
       </div>
       <div>
         <button type="submit" onClick={() => props.dispatch(actionCreators.deleteWallet('target address'))}>
-          {t('Delete Wallet')}
+          {t('addresses.deletewallet')}
         </button>
       </div>
       <div>
         <button type="submit" onClick={() => props.dispatch(actionCreators.exportWallet())}>
-          {t('Export Wallet')}
+          {t('addresses.exportwallet')}
         </button>
       </div>
     </>

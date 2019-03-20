@@ -28,13 +28,13 @@ const Receive = () => {
     <Container>
       <Card>
         <Card.Header>
-          <h2>{t('Receive')}</h2>
+          <h2>{t('siderbar.receive')}</h2>
         </Card.Header>
         <Card.Body>
           <QRCodePanel>
             <QRCode value={address} size={256} />
           </QRCodePanel>
-          <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Click to copy')}</Tooltip>}>
+          <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Common.ClickCopy')}</Tooltip>}>
             <Address onClick={() => window.clipboard.writeText(address)}>{address}</Address>
           </OverlayTrigger>
         </Card.Body>

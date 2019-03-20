@@ -53,25 +53,25 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
 
   const actionItems = (index: number) => [
     {
-      label: t('select'),
+      label: t('menuitem.select'),
       onClick: () => {
         setWalletSelected(index)
       },
     },
     {
-      label: t('backup'),
+      label: t('menuitem.backup'),
       onClick: () => {
         // props.history.push(`${Routes.NetworkEditor}/${network.name}`)
       },
     },
     {
-      label: t('edit'),
+      label: t('menuitem.edit'),
       onClick: () => {
         props.history.push(`${Routes.WalletEditor}/${JSON.stringify(wallets[index])}`)
       },
     },
     {
-      label: t('remove'),
+      label: t('menuitem.remove'),
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
@@ -115,7 +115,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
         }}
       >
         <Link to={`${Routes.CreateWallet}/new`} className="btn btn-primary">
-          {t('Create Wallet')}
+          {t('settings.walletmanger.createwallet')}
         </Link>
         <Link
           to={`${Routes.ImportWallet}/new`}
@@ -124,7 +124,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
             marginLeft: 30,
           }}
         >
-          {t('Import Wallet')}
+          {t('settings.walletmanger.importwallet')}
         </Link>
       </Container>
     </>
