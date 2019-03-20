@@ -6,6 +6,22 @@ export interface OutPoint {
   index: number
 }
 
+interface Script {
+  version: number
+  args: string[]
+  signedArgs: string[]
+  reference?: string | null
+  binary?: string
+}
+
+export interface Cell {
+  capacity: number
+  data: string
+  lock: string
+  type?: Script | null
+  outPoint?: OutPoint
+}
+
 export const getUnspentCells = async () => {
   const cells = await asw.getUnspentCells()
   return cells
