@@ -34,7 +34,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
           payload: null,
         })
         if (handle) {
-          handle()
+          handle(wallet.id, password)
         }
       } else if (args.msg) {
         setErrorMsg(args.msg)

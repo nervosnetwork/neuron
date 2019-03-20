@@ -31,7 +31,11 @@ export const asw = () => UILayer.send('ASW')
 export const createWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.CreateWallet, wallet)
 
-export const deleteWallet = (address: string) => UILayer.send(Channel.DeleteWallet, address)
+export const deleteWallet = (walletID: string, password: string) =>
+  UILayer.send(Channel.DeleteWallet, {
+    walletID,
+    password,
+  })
 export const importWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.ImportWallet, wallet)
 export const exportWallet = () => UILayer.send(Channel.ExportWallet)

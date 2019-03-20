@@ -50,8 +50,8 @@ export const actionCreators = {
       type: MainActions.ImportWallet,
     }
   },
-  deleteWallet: (address: string) => {
-    deleteWallet(address)
+  deleteWallet: (walletID: string, password: string) => {
+    deleteWallet(walletID, password)
     return {
       type: MainActions.DeleteWallet,
     }

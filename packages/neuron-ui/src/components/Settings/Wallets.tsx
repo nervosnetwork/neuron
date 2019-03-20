@@ -8,7 +8,7 @@ import { Routes } from '../../utils/const'
 import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
-import { getWallets } from '../../services/UILayer'
+import { getWallets, deleteWallet } from '../../services/UILayer'
 import InputWalletPasswordDialog from './InputWalletPasswordDialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
@@ -75,7 +75,13 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       onClick: () => {
         props.dispatch({
           type: MainActions.SetDialog,
-          payload: <InputWalletPasswordDialog wallet={wallets[walletSelected]} dispatch={props.dispatch} />,
+          payload: (
+            <InputWalletPasswordDialog
+              wallet={wallets[walletSelected]}
+              dispatch={props.dispatch}
+              handle={(walletID: string, password: string) => deleteWallet(walletID, password)}
+            />
+          ),
         })
       },
     },

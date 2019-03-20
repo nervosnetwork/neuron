@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets, Wallet } from '../mock'
+import { transactions, transactionCount, wallets, Wallet, updateWallets } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -84,18 +84,37 @@ export class Listeners {
    * @description channel to delete wallet
    */
   static deleteWallet = () => {
-    return ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, address: string) => {
-      const notification = new Notification({
-        title: 'Delete Wallet',
-        body: address,
-      })
-      notification.show()
-      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
-      e.sender.send(Channel.DeleteWallet, {
-        status: ResponseStatus.Success,
-        reult: `wallet of ${address} deleted`,
-      })
-    })
+    return ipcMain.on(
+      Channel.DeleteWallet,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        try {
+          const walletList = wallets()
+          const index = walletList.findIndex(wallet => wallet.id === walletID)
+          const wallet = walletList[index]
+          let notificationBody = ''
+          if (!wallet) {
+            notificationBody = 'Wallet not find'
+          } else if (wallet.password === password) {
+            walletList.splice(index, 1)
+            updateWallets(walletList)
+            e.sender.send(Channel.GetWallets, {
+              status: ResponseStatus.Success,
+              result: wallets(),
+            })
+            notificationBody = `wallet of ${wallet.name} deleted`
+          } else {
+            notificationBody = 'Wrong password'
+          }
+          const notification = new Notification({
+            title: 'Delete Wallet',
+            body: notificationBody,
+          })
+          notification.show()
+        } catch (error) {
+          console.error(error)
+        }
+      },
+    )
   }
 
   /**
