@@ -16,7 +16,7 @@
     "start": "cross-env electron .",
     "start:dev": "yarn clean && tsc && cross-env electron .",
     "build": "tsc",
-    "clean": "rm -rf dist/*",
+    "clean": "rm -rf dist/* && rmdir /s/q dist",
     "test": "jest --color && electron-mocha --renderer ./tests/store",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
