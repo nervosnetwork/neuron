@@ -45,27 +45,33 @@ const SidebarAside = styled.div`
 
 const walletMenuItems = [
   {
-    name: 'Wallet',
+    name: 'siderbar.wallet',
+    route: 'Wallet',
     icon: IconWallet,
   },
   {
-    name: 'Send',
+    name: 'siderbar.send',
+    route: 'Send',
     icon: IconSend,
   },
   {
-    name: 'Receive',
+    name: 'siderbar.receive',
+    route: 'Receive',
     icon: IconReceive,
   },
   {
-    name: 'History',
+    name: 'siderbar.history',
+    route: 'History',
     icon: IconHistory,
   },
   {
-    name: 'Addresses',
+    name: 'siderbar.addresses',
+    route: 'Addresses',
     icon: IconAddresses,
   },
   {
-    name: 'Settings',
+    name: 'siderbar.settings',
+    route: 'Settings',
     icon: IconSettings,
   },
 ]
@@ -75,7 +81,7 @@ const Sidebar = (props: any) => {
   const [t] = useTranslation()
 
   const walletRoutes = walletMenuItems.map(item => {
-    const entry = mainContents.find(route => route.name === item.name)!
+    const entry = mainContents.find(route => route.name === item.route)!
     return {
       icon: item.icon,
       ...entry,

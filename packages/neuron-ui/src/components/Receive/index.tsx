@@ -51,7 +51,7 @@ const Receive = ({ address }: { address: string }) => {
     <Container>
       <Card>
         <Card.Header>
-          <h2>{t('Receive')}</h2>
+          <h2>{t('siderbar.receive')}</h2>
         </Card.Header>
         <Card.Body>
           <Form.Group>
@@ -68,6 +68,7 @@ const Receive = ({ address }: { address: string }) => {
           <QRCodePanel onClick={() => setShowLargeQRCode(true)}>
             <QRCode value={accountAddress} size={256} />
           </QRCodePanel>
+
           <Modal centered show={showLargeQRCode} onHide={() => setShowLargeQRCode(false)}>
             <Modal.Header closeButton>
               <Modal.Title id="contained-modal-title-vcenter">{t('Address QRCode')}</Modal.Title>

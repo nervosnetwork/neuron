@@ -8,15 +8,15 @@ import { getTransactions } from '../../services/UILayer'
 
 const headers = [
   {
-    label: 'date',
+    label: 'history.date',
     key: 'date',
   },
   {
-    label: 'amount(ckb)',
+    label: 'history.amount',
     key: 'value',
   },
   {
-    label: 'transaction hash',
+    label: 'history.transactionhash',
     key: 'hash',
   },
 ]
@@ -46,7 +46,7 @@ const History = () => {
 
   return (
     <Container>
-      <h1>{t('History')}</h1>
+      <h1>{t('siderbar.history')}</h1>
       <Table
         headers={headers.map(header => ({
           ...header,
