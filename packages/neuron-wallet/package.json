@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env electron .",
-    "start:dev": "tsc && cross-env electron .",
+    "start:dev": "yarn clean && tsc && cross-env electron .",
     "build": "tsc",
     "clean": "rm -rf dist/*",
     "test": "jest --color && electron-mocha --renderer ./tests/store",
