@@ -4,8 +4,9 @@ import styled from 'styled-components'
 const ActionFlowStyle = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: 100px;
   width: 100%;
-  height: 100%;
+  min-height: 500px;
   .actionFlowHeader {
     height: 80px;
     display: flex;
@@ -22,7 +23,6 @@ const ActionFlowStyle = styled.div`
     flex: 1;
     display: flex;
     justify-content: center;
-    padding-top: 20px;
     & > div {
       display: flex;
       flex-direction: column;
@@ -41,23 +41,6 @@ const ActionFlowStyle = styled.div`
   }
 `
 
-const ActionFlowHeaderStyle = styled.div`
-  text-align: center;
-  > div:nth-child(1) {
-    border-radius: 50% 50%;
-    width: 20px;
-    height: 20px;
-    border: 1px solid grey;
-    background-color: lightyellow;
-    color: lightgrey;
-    line-height: 20px;
-  }
-  div:nth-child(2) {
-    margin-top: 10px;
-    font-size: 30px;
-  }
-`
-
 const ActionStep: React.SFC<{
   title: string
   onBeforeBack?: Function
@@ -73,26 +56,12 @@ ActionStep.defaultProps = {
 
 ActionStep.displayName = 'ActionStep'
 
-const renderHeader = (child: ActionStep, i: number) => (
-  <ActionFlowHeaderStyle key={i}>
-    <div
-      style={{
-        margin: '0 auto',
-      }}
-    >
-      {i}
-    </div>
-    <div>{child.props.title}</div>
-  </ActionFlowHeaderStyle>
-)
-
 const ActionFlow = ({ children }: { children: Array<ActionStep> }) => {
   const [step, setStep] = useState(1)
   useEffect(() => {}, [step])
 
   return (
     <ActionFlowStyle step={step}>
-      <div className="actionFlowHeader">{children.map(renderHeader)}</div>
       <div className="actionFlowBody">{children[step - 1]}</div>
       <div className="actionFlowFooter">
         <button
