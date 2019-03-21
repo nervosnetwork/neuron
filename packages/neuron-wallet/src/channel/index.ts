@@ -10,8 +10,6 @@ enum ResponseStatus {
   Success,
 }
 
-const NOTIFICATION_FADE_TIME = 3000
-
 export class Listeners {
   static start = (
     methods: string[] = [
@@ -61,12 +59,6 @@ export class Listeners {
    */
   static createWallet = () => {
     return ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: Wallet) => {
-      const notification = new Notification({
-        title: 'Create Wallet',
-        body: JSON.stringify(wallet),
-      })
-      notification.show()
-      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
       e.sender.send(Channel.CreateWallet, {
         status: ResponseStatus.Success,
         result: {
@@ -123,13 +115,7 @@ export class Listeners {
    * @description channel to import a wallet
    */
   static importWallet = () => {
-    return ipcMain.on(Channel.ImportWallet, (e: Electron.Event, wallet: Wallet) => {
-      const notification = new Notification({
-        title: 'Import Wallet',
-        body: JSON.stringify(wallet),
-      })
-      notification.show()
-      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
+    return ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
       e.sender.send(Channel.ImportWallet, {
         status: ResponseStatus.Success,
         result: `wallet imported`,
@@ -144,12 +130,6 @@ export class Listeners {
    */
   static exportWallet = () => {
     return ipcMain.on(Channel.ExportWallet, (e: Electron.Event) => {
-      const notification = new Notification({
-        title: 'Export Wallet',
-        body: '',
-      })
-      notification.show()
-      setTimeout(notification.close, NOTIFICATION_FADE_TIME)
       e.sender.send(Channel.ExportWallet, {
         status: ResponseStatus.Success,
         result: `wallet exported`,
