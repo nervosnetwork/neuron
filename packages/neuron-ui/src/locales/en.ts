@@ -26,7 +26,7 @@ export default {
       createwallet: 'Creat eWallet',
       importwallet: 'Import Wallet',
     },
-    setting: {
+    settings: {
       settingtabs: {
         general: 'General',
         wallets: 'Wallets',
