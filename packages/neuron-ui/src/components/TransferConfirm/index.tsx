@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next'
 const TransferConfirm = ({
   title,
   message,
-  psw,
+  password,
   onChange,
   onSubmit,
   onCancel,
 }: {
   title: string
   message: string | React.ReactNode
-  psw: string
+  password: string
   onChange: any
   onSubmit: any
   onCancel: any
@@ -30,7 +30,7 @@ const TransferConfirm = ({
         <Card.Text>{`${t('send.thistransferwillsend')}: `}</Card.Text>
         {typeof message === 'string' ? <Card.Text>{message}</Card.Text> : message}
         <InputGroup>
-          <FormControl placeholder={t('send.inputpasswordtoconfirm') as string} value={psw} onChange={onChange} />
+          <FormControl placeholder={t('send.inputpasswordtoconfirm') as string} value={password} onChange={onChange} />
         </InputGroup>
       </Card.Body>
       <Card.Footer className="text-muted">

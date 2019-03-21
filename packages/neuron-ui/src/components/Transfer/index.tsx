@@ -167,7 +167,7 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         <TransferConfirm
           title={t('send.confirmpassword')}
           message={<TransferItemList items={transfer.items} />}
-          psw={password}
+          password={password}
           onChange={onPswChange}
           onSubmit={onConfirm(transfer.items, password)}
           onCancel={onCancel}
