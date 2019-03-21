@@ -20,6 +20,7 @@ export enum Channel {
   // Wallet
   CreateWallet = 'createWallet',
   DeleteWallet = 'deleteWallet',
+  EditWallet = 'editWallet',
   ImportWallet = 'importWallet',
   ExportWallet = 'exportWallet',
   SwitchWallet = 'switchWallet',

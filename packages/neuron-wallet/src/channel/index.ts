@@ -16,6 +16,7 @@ export class Listeners {
       'getLiveCell',
       'createWallet',
       'deleteWallet',
+      'editWallet',
       'importWallet',
       'exportWallet',
       'switchWallet',
@@ -102,6 +103,55 @@ export class Listeners {
             body: notificationBody,
           })
           notification.show()
+        } catch (error) {
+          console.error(error)
+        }
+      },
+    )
+  }
+
+  /**
+   * @static editWallet
+   * @memberof ChannelListeners
+   * @description channel to efit wallet
+   */
+  static editWallet = () => {
+    return ipcMain.on(
+      Channel.EditWallet,
+      (
+        e: Electron.Event,
+        {
+          walletID,
+          walletName,
+          password,
+          newPassword,
+        }: { walletID: string; walletName: string; password: string; newPassword: string },
+      ) => {
+        try {
+          const walletList = wallets()
+          const index = wallets().findIndex(wallet => wallet.id === walletID)
+          const wallet = walletList[index]
+          let notificationBody = ''
+          if (!wallet) {
+            notificationBody = 'Wallet not find'
+          } else if (wallet.password === password) {
+            wallet.name = walletName
+            wallet.id = walletName
+            wallet.password = newPassword
+            e.sender.send(Channel.GetWallets, {
+              status: ResponseStatus.Success,
+              result: wallets(),
+            })
+          } else {
+            notificationBody = 'Wrong password'
+          }
+          if (notificationBody) {
+            const notification = new Notification({
+              title: 'Delete Wallet',
+              body: notificationBody,
+            })
+            notification.show()
+          }
         } catch (error) {
           console.error(error)
         }

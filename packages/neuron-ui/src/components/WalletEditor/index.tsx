@@ -9,6 +9,7 @@ import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { Wallet } from '../../contexts/Wallet'
+import { editWallet } from '../../services/UILayer'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
   const { match } = props
@@ -59,7 +60,10 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           <InputWalletPasswordDialog
             wallet={myWallet}
             dispatch={props.dispatch}
-            handle={() => props.history.push(`${Routes.SettingsWallets}`)}
+            handle={(walletID: string, oldPassword: string) => {
+              editWallet(walletID, walletName, oldPassword, password)
+              props.history.push(`${Routes.SettingsWallets}`)
+            }}
           />
         ),
       })

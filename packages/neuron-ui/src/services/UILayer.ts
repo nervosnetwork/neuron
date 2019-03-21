@@ -36,6 +36,13 @@ export const deleteWallet = (walletID: string, password: string) =>
     walletID,
     password,
   })
+export const editWallet = (walletID: string, walletName: string, password: string, newPassword: string) =>
+  UILayer.send(Channel.EditWallet, {
+    walletID,
+    walletName,
+    password,
+    newPassword,
+  })
 export const importWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.ImportWallet, wallet)
 export const exportWallet = () => UILayer.send(Channel.ExportWallet)
