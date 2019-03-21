@@ -21,10 +21,11 @@ export default {
       transactionhash: 'transaction hash',
     },
     addresses: {
-      deletewallet: 'Delete Wallet',
-      exportwallet: 'Export Wallet',
-      createwallet: 'Creat eWallet',
-      importwallet: 'Import Wallet',
+      addresses: 'Addresses',
+      type: 'Type',
+      address: 'Address',
+      balance: 'Balance',
+      transactions: 'Transactions',
     },
     setting: {
       settingtabs: {
