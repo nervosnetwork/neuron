@@ -36,13 +36,12 @@ export const getWallets = () => {
 export const createWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.CreateWallet, wallet)
 
-export const deleteWallet = (walletID: string, password: string, valid: any) => {
+export const deleteWallet = (walletID: string, password: string, callback: any) => {
   UILayer.on(Channel.DeleteWallet, (_e: any, args: Response<string>) => {
-    console.error(args)
     if (args.result) {
       getWallets()
     }
-    valid(args)
+    callback(args)
   })
   UILayer.send(Channel.DeleteWallet, {
     walletID,
@@ -50,13 +49,18 @@ export const deleteWallet = (walletID: string, password: string, valid: any) => 
   })
 }
 
-export const editWallet = (walletID: string, walletName: string, password: string, newPassword: string, valid: any) => {
+export const editWallet = (
+  walletID: string,
+  walletName: string,
+  password: string,
+  newPassword: string,
+  callback: any,
+) => {
   UILayer.on(Channel.EditWallet, (_e: any, args: Response<string>) => {
-    console.error(args)
     if (args.result) {
       getWallets()
     }
-    valid(args)
+    callback(args)
   })
 
   UILayer.send(Channel.EditWallet, {
@@ -92,9 +96,9 @@ export const getTransactions = (pageNo: number, pageSize: number) => {
   })
 }
 
-export const checkPassword = (walletID: string, password: string, valid: any) => {
+export const checkPassword = (walletID: string, password: string, callback: any) => {
   UILayer.on(Channel.CheckWalletPassword, (_e: any, args: Response<string>) => {
-    valid(args)
+    callback(args)
   })
   UILayer.send(Channel.CheckWalletPassword, {
     walletID,

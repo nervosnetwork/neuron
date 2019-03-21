@@ -10,6 +10,28 @@ enum ResponseStatus {
   Success,
 }
 
+const checkPassword = (walletID: string, password: string) => {
+  const myWallet = wallets().find(wallet => wallet.id === walletID)
+  if (!myWallet) {
+    return {
+      status: ResponseStatus.Success,
+      result: false,
+      msg: 'Wallet not find',
+    }
+  }
+  if (myWallet.password === password) {
+    return {
+      status: ResponseStatus.Success,
+      result: true,
+    }
+  }
+  return {
+    status: ResponseStatus.Success,
+    result: false,
+    msg: 'Wrong password',
+  }
+}
+
 export class Listeners {
   static start = (
     methods: string[] = [
@@ -71,38 +93,16 @@ export class Listeners {
     })
   }
 
-  static checkPassword = (walletID: string, password: string) => {
-    const myWallet = wallets().find(wallet => wallet.id === walletID)
-    if (!myWallet) {
-      return {
-        status: ResponseStatus.Success,
-        result: false,
-        msg: 'Wallet not find',
-      }
-    }
-    if (myWallet.password === password) {
-      return {
-        status: ResponseStatus.Success,
-        result: true,
-      }
-    }
-    return {
-      status: ResponseStatus.Success,
-      result: false,
-      msg: 'Wrong password',
-    }
-  }
-
   /**
-   * @static getWallets
+   * @static checkWalletPassword
    * @memberof ChannelListeners
-   * @description channel to get wallets
+   * @description channel to check wallets password
    */
   static checkWalletPassword = () => {
     return ipcMain.on(
       Channel.CheckWalletPassword,
       (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        e.sender.send(Channel.CheckWalletPassword, Listeners.checkPassword(walletID, password))
+        e.sender.send(Channel.CheckWalletPassword, checkPassword(walletID, password))
       },
     )
   }
@@ -116,14 +116,14 @@ export class Listeners {
     return ipcMain.on(
       Channel.DeleteWallet,
       (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        const result = Listeners.checkPassword(walletID, password)
-        if (result.result) {
+        const args = checkPassword(walletID, password)
+        if (args.result) {
           const walletList = wallets()
           const index = walletList.findIndex(wallet => wallet.id === walletID)
           walletList.splice(index, 1)
           updateWallets(walletList)
         }
-        e.sender.send(Channel.DeleteWallet, result)
+        e.sender.send(Channel.DeleteWallet, args)
       },
     )
   }
@@ -131,7 +131,7 @@ export class Listeners {
   /**
    * @static editWallet
    * @memberof ChannelListeners
-   * @description channel to efit wallet
+   * @description channel to edit wallet
    */
   static editWallet = () => {
     return ipcMain.on(
@@ -145,15 +145,15 @@ export class Listeners {
           newPassword,
         }: { walletID: string; walletName: string; password: string; newPassword: string },
       ) => {
-        const result = Listeners.checkPassword(walletID, password)
-        if (result.result) {
+        const args = checkPassword(walletID, password)
+        if (args.result) {
           const wallet = wallets().find(item => item.id === walletID)
           if (wallet) {
             wallet.name = walletName
             wallet.password = newPassword
           }
         }
-        e.sender.send(Channel.EditWallet, result)
+        e.sender.send(Channel.EditWallet, args)
       },
     )
   }
