@@ -28,7 +28,6 @@ export default class WalletStore {
     const idOptions: Options = {
       name: WalletIDKey,
       cwd: env.storePath,
-      encryptionKey: env.storeEncryptKey,
     }
     this.walletIDStore = new Store(idOptions)
   }
@@ -45,7 +44,6 @@ export default class WalletStore {
     const options: Options = {
       name: id,
       cwd: env.storePath,
-      encryptionKey: env.storeEncryptKey,
     }
     return new Store(options)
   }

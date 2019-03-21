@@ -7,7 +7,6 @@ const env = {
   isDevMode,
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
-  storeEncryptKey: 'Neuron',
   storePath: isDevMode ? `${myApp.getPath('userData')}/dev` : myApp.getPath('userData'),
   storeWalletIDsName: 'WalletID',
 }
