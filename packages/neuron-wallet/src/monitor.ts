@@ -26,6 +26,7 @@ const monitorChain = (webContents: Electron.WebContents) => {
     )
     .subscribe(
       result => {
+        if (!webContents) return
         webContents.send(Channel.GetNetwork, {
           status: 1,
           result,
