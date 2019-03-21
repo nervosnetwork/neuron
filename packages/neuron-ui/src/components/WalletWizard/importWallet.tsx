@@ -17,7 +17,6 @@ import ActionD from './actionD'
 
 const CreateWalletDiv = styled.div`
   box-sizing: border-box;
-  padding-top: 20px;
   background-color: white;
   height: 100%;
   width: 100%;
