@@ -1,4 +1,4 @@
-import { createWallet, deleteWallet, importWallet, exportWallet, setNetwork } from '../../services/UILayer'
+import { createWallet, importWallet, exportWallet, setNetwork } from '../../services/UILayer'
 import { Network } from '../../contexts/Chain'
 import { defaultNetworks } from '../../contexts/Settings'
 import { saveNetworks, loadNetworks } from '../../utils/localStorage'
@@ -48,12 +48,6 @@ export const actionCreators = {
     importWallet(wallet)
     return {
       type: MainActions.ImportWallet,
-    }
-  },
-  deleteWallet: (walletID: string, password: string) => {
-    deleteWallet(walletID, password)
-    return {
-      type: MainActions.DeleteWallet,
     }
   },
   exportWallet: () => {

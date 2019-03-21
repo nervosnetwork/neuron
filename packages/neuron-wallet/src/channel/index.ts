@@ -71,6 +71,42 @@ export class Listeners {
     })
   }
 
+  static checkPassword = (walletID: string, password: string) => {
+    const myWallet = wallets().find(wallet => wallet.id === walletID)
+    if (!myWallet) {
+      return {
+        status: ResponseStatus.Success,
+        result: false,
+        msg: 'Wallet not find',
+      }
+    }
+    if (myWallet.password === password) {
+      return {
+        status: ResponseStatus.Success,
+        result: true,
+      }
+    }
+    return {
+      status: ResponseStatus.Success,
+      result: false,
+      msg: 'Wrong password',
+    }
+  }
+
+  /**
+   * @static getWallets
+   * @memberof ChannelListeners
+   * @description channel to get wallets
+   */
+  static checkWalletPassword = () => {
+    return ipcMain.on(
+      Channel.CheckWalletPassword,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        e.sender.send(Channel.CheckWalletPassword, Listeners.checkPassword(walletID, password))
+      },
+    )
+  }
+
   /**
    * @static deleteWallet
    * @memberof ChannelListeners
@@ -80,32 +116,14 @@ export class Listeners {
     return ipcMain.on(
       Channel.DeleteWallet,
       (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        try {
+        const result = Listeners.checkPassword(walletID, password)
+        if (result.result) {
           const walletList = wallets()
           const index = walletList.findIndex(wallet => wallet.id === walletID)
-          const wallet = walletList[index]
-          let notificationBody = ''
-          if (!wallet) {
-            notificationBody = 'Wallet not find'
-          } else if (wallet.password === password) {
-            walletList.splice(index, 1)
-            updateWallets(walletList)
-            e.sender.send(Channel.GetWallets, {
-              status: ResponseStatus.Success,
-              result: wallets(),
-            })
-            notificationBody = `wallet of ${wallet.name} deleted`
-          } else {
-            notificationBody = 'Wrong password'
-          }
-          const notification = new Notification({
-            title: 'Delete Wallet',
-            body: notificationBody,
-          })
-          notification.show()
-        } catch (error) {
-          console.error(error)
+          walletList.splice(index, 1)
+          updateWallets(walletList)
         }
+        e.sender.send(Channel.DeleteWallet, result)
       },
     )
   }
@@ -127,34 +145,15 @@ export class Listeners {
           newPassword,
         }: { walletID: string; walletName: string; password: string; newPassword: string },
       ) => {
-        try {
-          const walletList = wallets()
-          const index = wallets().findIndex(wallet => wallet.id === walletID)
-          const wallet = walletList[index]
-          let notificationBody = ''
-          if (!wallet) {
-            notificationBody = 'Wallet not find'
-          } else if (wallet.password === password) {
+        const result = Listeners.checkPassword(walletID, password)
+        if (result.result) {
+          const wallet = wallets().find(item => item.id === walletID)
+          if (wallet) {
             wallet.name = walletName
-            wallet.id = walletName
             wallet.password = newPassword
-            e.sender.send(Channel.GetWallets, {
-              status: ResponseStatus.Success,
-              result: wallets(),
-            })
-          } else {
-            notificationBody = 'Wrong password'
           }
-          if (notificationBody) {
-            const notification = new Notification({
-              title: 'Delete Wallet',
-              body: notificationBody,
-            })
-            notification.show()
-          }
-        } catch (error) {
-          console.error(error)
         }
+        e.sender.send(Channel.EditWallet, result)
       },
     )
   }
@@ -294,38 +293,6 @@ export class Listeners {
         result: wallets(),
       })
     })
-  }
-
-  /**
-   * @static getWallets
-   * @memberof ChannelListeners
-   * @description channel to get wallets
-   */
-  static checkWalletPassword = () => {
-    return ipcMain.on(
-      Channel.CheckWalletPassword,
-      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        const myWallet = wallets().find(wallet => wallet.id === walletID)
-        if (!myWallet) {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: false,
-            msg: 'Wallet not find',
-          })
-        } else if (myWallet.password === password) {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: true,
-          })
-        } else {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: false,
-            msg: 'Wrong password',
-          })
-        }
-      },
-    )
   }
 
   /**

@@ -8,8 +8,8 @@ import { Routes } from '../../utils/const'
 import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
-import { getWallets, deleteWallet } from '../../services/UILayer'
-import InputWalletPasswordDialog from './InputWalletPasswordDialog'
+import { getWallets } from '../../services/UILayer'
+import InputWalletPasswordDialog, { CheckType } from './InputWalletPasswordDialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
 const Popover = styled.div`
@@ -79,7 +79,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
             <InputWalletPasswordDialog
               wallet={wallets[index]}
               dispatch={props.dispatch}
-              handle={(walletID: string, password: string) => deleteWallet(walletID, password)}
+              checkType={CheckType.DeleteWallet}
             />
           ),
         })

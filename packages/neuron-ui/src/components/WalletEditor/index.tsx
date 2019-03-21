@@ -4,12 +4,11 @@ import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { Routes } from '../../utils/const'
-import InputWalletPasswordDialog from '../Settings/InputWalletPasswordDialog'
+import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { Wallet } from '../../contexts/Wallet'
-import { editWallet } from '../../services/UILayer'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
   const { match } = props
@@ -60,10 +59,10 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           <InputWalletPasswordDialog
             wallet={myWallet}
             dispatch={props.dispatch}
-            handle={(walletID: string, oldPassword: string) => {
-              editWallet(walletID, walletName, oldPassword, password)
-              props.history.push(`${Routes.SettingsWallets}`)
-            }}
+            checkType={CheckType.EditWallet}
+            handle={() => props.history.push(`${Routes.SettingsWallets}`)}
+            newWalletName={walletName}
+            newPassword={password}
           />
         ),
       })

@@ -17,9 +17,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
         <Link to={Routes.ImportWallet}>{t('addresses.importwallet')}</Link>
       </div>
       <div>
-        <button type="submit" onClick={() => props.dispatch(actionCreators.deleteWallet('walletidID', 'password'))}>
-          {t('addresses.deletewallet')}
-        </button>
+        <button type="submit">{t('addresses.deletewallet')}</button>
       </div>
       <div>
         <button type="submit" onClick={() => props.dispatch(actionCreators.exportWallet())}>

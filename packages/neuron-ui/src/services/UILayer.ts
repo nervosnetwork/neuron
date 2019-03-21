@@ -28,21 +28,45 @@ const UILayer = (() => {
 })()
 
 export const asw = () => UILayer.send('ASW')
+
+export const getWallets = () => {
+  UILayer.send(Channel.GetWallets)
+}
+
 export const createWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.CreateWallet, wallet)
 
-export const deleteWallet = (walletID: string, password: string) =>
+export const deleteWallet = (walletID: string, password: string, valid: any) => {
+  UILayer.on(Channel.DeleteWallet, (_e: any, args: Response<string>) => {
+    console.error(args)
+    if (args.result) {
+      getWallets()
+    }
+    valid(args)
+  })
   UILayer.send(Channel.DeleteWallet, {
     walletID,
     password,
   })
-export const editWallet = (walletID: string, walletName: string, password: string, newPassword: string) =>
+}
+
+export const editWallet = (walletID: string, walletName: string, password: string, newPassword: string, valid: any) => {
+  UILayer.on(Channel.EditWallet, (_e: any, args: Response<string>) => {
+    console.error(args)
+    if (args.result) {
+      getWallets()
+    }
+    valid(args)
+  })
+
   UILayer.send(Channel.EditWallet, {
     walletID,
     walletName,
     password,
     newPassword,
   })
+}
+
 export const importWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.ImportWallet, wallet)
 export const exportWallet = () => UILayer.send(Channel.ExportWallet)
@@ -66,10 +90,6 @@ export const getTransactions = (pageNo: number, pageSize: number) => {
     pageNo,
     pageSize,
   })
-}
-
-export const getWallets = () => {
-  UILayer.send(Channel.GetWallets)
 }
 
 export const checkPassword = (walletID: string, password: string, valid: any) => {
