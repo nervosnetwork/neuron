@@ -118,7 +118,7 @@ export const actionCreators = {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: 'URL is required',
+          networks: Message.URLIsRequired,
         },
       }
     }

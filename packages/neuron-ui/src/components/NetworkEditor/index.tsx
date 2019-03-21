@@ -86,7 +86,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   return (
     <Card>
       <Card.Header>{idx === -1 ? t('settings.network.editnetwork.title') : params.name}</Card.Header>
-      {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
+      {errorMsgs.networks ? <Alert variant="warning">{t(`messages.${errorMsgs.networks}`)}</Alert> : null}
       <Card.Body>
         <Form>
           {inputs.map(inputProps => (

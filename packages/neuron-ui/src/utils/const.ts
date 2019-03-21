@@ -84,12 +84,13 @@ export const Tooltips = {
 }
 
 export enum Message {
-  NameIsRequired = 'name is required',
-  URLIsRequired = 'url is required',
-  NameShouldBeLessThanOrEqualTo28Characters = 'name should be less than or equal to 28 characters',
-  NetworkNameExist = 'network name exists',
-  AtLeastOneAddressNeeded = 'at least one address needed',
-  InvalidAddress = 'invalid address',
-  InvalidCapacity = 'invalid capacity',
-  CapacityNotEnough = 'capacity is not enough',
+  NameIsRequired = 'name-is-required',
+  URLIsRequired = 'url-is-required',
+  NameShouldBeLessThanOrEqualTo28Characters = 'name-should-be-less-than-or-equal-to-28-characters',
+  NetworkNameExist = 'network-name-exists',
+  AtLeastOneAddressNeeded = 'at-least-one-address-needed',
+  InvalidAddress = 'invalid-address',
+  InvalidCapacity = 'invalid-capacity',
+  CapacityNotEnough = 'capacity-is-not-enough',
+  IsUnremovable = 'is-unremovable',
 }

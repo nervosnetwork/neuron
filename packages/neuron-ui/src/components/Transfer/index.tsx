@@ -128,7 +128,7 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
                           }}
                         >
                           <QRScanner
-                            title={t('send.scantogetaddress')}
+                            title={t('send.scan-to-get-address')}
                             label={t('send.address')}
                             onConfirm={(data: string) => updateTransferItem('address')(idx)(data)}
                           />

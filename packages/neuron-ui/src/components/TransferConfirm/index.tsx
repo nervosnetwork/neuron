@@ -27,10 +27,14 @@ const TransferConfirm = ({
     >
       <Card.Header>{title}</Card.Header>
       <Card.Body>
-        <Card.Text>{`${t('send.thistransferwillsend')}: `}</Card.Text>
+        <Card.Text>{`${t('send.this-transfer-will-send')}: `}</Card.Text>
         {typeof message === 'string' ? <Card.Text>{message}</Card.Text> : message}
         <InputGroup>
-          <FormControl placeholder={t('send.inputpasswordtoconfirm') as string} value={password} onChange={onChange} />
+          <FormControl
+            placeholder={t('send.input-password-to-confirm') as string}
+            value={password}
+            onChange={onChange}
+          />
         </InputGroup>
       </Card.Body>
       <Card.Footer className="text-muted">
