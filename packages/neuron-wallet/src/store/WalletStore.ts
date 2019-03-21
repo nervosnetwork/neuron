@@ -1,3 +1,4 @@
+import { remote, app } from 'electron'
 import Store from 'electron-store'
 import { v4 } from 'uuid'
 import { Keystore } from '../keys/keystore'
@@ -19,7 +20,9 @@ interface Options {
   encryptionKey?: string | Buffer
 }
 
-const WalletIDKey = env.storeWalletIDsName
+const userDataPath = (app || remote.app).getPath('userData')
+const storePath = env.isDevMode ? `${userDataPath}/dev` : userDataPath
+const WalletIDKey = 'WalletID'
 
 export default class WalletStore {
   walletIDStore: Store
@@ -27,8 +30,7 @@ export default class WalletStore {
   constructor() {
     const idOptions: Options = {
       name: WalletIDKey,
-      cwd: env.storePath,
-      encryptionKey: env.storeEncryptKey,
+      cwd: storePath,
     }
     this.walletIDStore = new Store(idOptions)
   }
@@ -44,8 +46,7 @@ export default class WalletStore {
   private getWalletStore = (id: string): Store => {
     const options: Options = {
       name: id,
-      cwd: env.storePath,
-      encryptionKey: env.storeEncryptKey,
+      cwd: storePath,
     }
     return new Store(options)
   }
