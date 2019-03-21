@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { Card, ListGroup, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
+
 import WalletContext from '../../contexts/Wallet'
 import { ContentProps } from '../../containers/MainContent'
 
@@ -21,7 +22,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
       </ListGroup>
     </Card>
   ) : (
-    <Alert variant="warning">{t('Settings.WalletManger.WalletDetail.NoWallet')}</Alert>
+    <Alert variant="warning">{t('settings.walletmanger.walletdetail.nowallet')}</Alert>
   )
 }
 

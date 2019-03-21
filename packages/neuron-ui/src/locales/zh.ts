@@ -14,6 +14,11 @@ export default {
       send: '发送',
       transactionfee: '交易费',
       sendcapacity: '转账',
+      confirmpassword: '确认密码',
+      to: '至',
+      inputpasswordtoconfirm: '输入密码以确认本次交易',
+      thistransferwillsend: '本次交易将发送',
+      scantogetaddress: '扫码二维码以获取地址',
     },
     history: {
       date: '时间',
@@ -82,6 +87,16 @@ export default {
       cancel: '取消',
       save: '保存',
       clickcopy: '点击复制',
+    },
+    messages: {
+      'at least one address needed': '需要至少一个地址',
+      'name is required': '缺少名称',
+      'url is required': '缺少 URL',
+      'name should be less than or equal to 28 characters': '名称应大于等于2字符',
+      'network name exists': '节点名称已存在',
+      'invalid address': '无效的地址',
+      'invalid capacity': '无效的价值',
+      'capacity is not enough': '余额不足',
     },
   },
 }

@@ -10,6 +10,7 @@ import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { getWallets } from '../../services/UILayer'
 import InputWalletPasswordDialog from './InputWalletPasswordDialog'
+import Dialog from '../../widgets/Dialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
 const Popover = styled.div`
@@ -44,6 +45,7 @@ const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionI
 
 const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const { wallets } = useContext(WalletContext)
+  const { dispatch, dialog } = props
   const [t] = useTranslation()
 
   const [walletSelected, setWalletSelected] = useState(() => {
@@ -73,9 +75,12 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     {
       label: t('menuitem.remove'),
       onClick: () => {
-        props.dispatch({
+        dispatch({
           type: MainActions.SetDialog,
-          payload: <InputWalletPasswordDialog wallet={wallets[walletSelected]} dispatch={props.dispatch} />,
+          payload: {
+            open: true,
+            wallet: wallets[walletSelected],
+          },
         })
       },
     },
@@ -127,6 +132,19 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           {t('settings.walletmanger.importwallet')}
         </Link>
       </Container>
+      <Dialog
+        open={dialog.open}
+        onClick={() => {
+          dispatch({
+            type: MainActions.SetDialog,
+            payload: {
+              open: false,
+            },
+          })
+        }}
+      >
+        <InputWalletPasswordDialog wallet={dialog.wallet} dispatch={dispatch} />
+      </Dialog>
     </>
   )
 }

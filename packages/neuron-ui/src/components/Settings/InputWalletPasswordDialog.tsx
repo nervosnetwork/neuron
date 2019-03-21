@@ -31,7 +31,9 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
       if (args.result) {
         dispatch({
           type: MainActions.SetDialog,
-          payload: null,
+          payload: {
+            open: false,
+          },
         })
         if (handle) {
           handle()
@@ -78,7 +80,9 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
             onClick={() =>
               dispatch({
                 type: MainActions.SetDialog,
-                payload: null,
+                payload: {
+                  open: false,
+                },
               })
             }
           >
