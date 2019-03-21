@@ -77,7 +77,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           type: MainActions.SetDialog,
           payload: (
             <InputWalletPasswordDialog
-              wallet={wallets[walletSelected]}
+              wallet={wallets[index]}
               dispatch={props.dispatch}
               handle={(walletID: string, password: string) => deleteWallet(walletID, password)}
             />

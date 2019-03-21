@@ -1,3 +1,5 @@
+import { v4 } from 'uuid'
+
 export const transactions = Array.from({
   length: 200,
 }).map(() => ({
@@ -20,9 +22,10 @@ export interface Wallet {
 }
 
 const generateWallet = () => {
-  const walletID = `wallet${parseInt((Math.random() * 1000).toString(), 10)}`
+  const walletName = `wallet${parseInt((Math.random() * 1000).toString(), 10)}`
+  const walletID = v4()
   return {
-    name: walletID,
+    name: walletName,
     id: walletID,
     balance: 0,
     address: '',

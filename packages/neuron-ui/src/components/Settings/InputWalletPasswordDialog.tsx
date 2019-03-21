@@ -27,7 +27,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordPr
     if (!password) {
       setErrorMsg('Please enter password')
     }
-    checkPassword(wallet.name, password, (args: Response<string>) => {
+    checkPassword(wallet.id, password, (args: Response<string>) => {
       if (args.result) {
         dispatch({
           type: MainActions.SetDialog,
