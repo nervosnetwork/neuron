@@ -75,7 +75,7 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `Receive`,
-    path: Routes.Receive,
+    path: `${Routes.Receive}/:address`,
     exact: false,
     component: Receive,
   },

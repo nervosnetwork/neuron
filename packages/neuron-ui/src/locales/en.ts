@@ -26,6 +26,12 @@ export default {
       address: 'Address',
       balance: 'Balance',
       transactions: 'Transactions',
+      actions: {
+        copyaddress: 'Copy address',
+        requestpayment: 'Request Payment',
+        spendfrom: 'Spend From',
+        viewonexplorer: 'View On Explorer',
+      },
     },
     setting: {
       settingtabs: {

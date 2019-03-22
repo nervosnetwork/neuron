@@ -1,8 +1,18 @@
 import React, { useCallback } from 'react'
 import { Container } from 'react-bootstrap'
+import styled from 'styled-components'
+import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Table from '../../widgets/Table'
+import Dropdown from '../../widgets/Dropdown'
+import { Routes } from '../../utils/const'
 import { mockAddresses } from './mock'
+
+declare global {
+  interface Window {
+    clipboard: any
+  }
+}
 
 const headers = [
   {
@@ -38,9 +48,71 @@ const getTransactionsForAddress = (address: string) => {
   return address.length
 }
 
-const fetchHDAddresses = () => {
+const Popover = styled.div`
+  position: relative;
+  &:hover {
+    & > ul {
+      display: block !important;
+    }
+  }
+`
+const AddressPanel = ({ address, history }: { address: string; history: any }) => {
+  const [t] = useTranslation()
+  const actionItems = [
+    {
+      label: t('addresses.actions.copyaddress'),
+      onClick: () => {
+        window.clipboard.writeText(address)
+      },
+      disabled: false,
+    },
+    {
+      label: t('addresses.actions.requestpayment'),
+      onClick: () => {
+        history.push(`${Routes.Receive}/${address}`)
+      },
+      disabled: false,
+    },
+    {
+      label: t('addresses.actions.spendfrom'),
+      onClick: () => {
+        // TODO: navigate to send page with address
+      },
+      disabled: false,
+    },
+    {
+      label: t('addresses.actions.viewonexplorer'),
+      onClick: () => {
+        // TODO: view on ckb explorer
+      },
+      disabled: false,
+    },
+  ]
+  return (
+    <Popover>
+      <div>{address}</div>
+      <Dropdown
+        items={actionItems}
+        style={{
+          position: 'absolute',
+          top: '100%',
+          right: '0',
+          zIndex: '999',
+          display: 'none',
+        }}
+        itemsStyle={{
+          textTransform: 'capitalize',
+          boxShadow: '0px 1px 3px rgb(120, 120, 120)',
+        }}
+      />
+    </Popover>
+  )
+}
+
+const fetchHDAddresses = (history: any) => {
   const addresses = generateHDAddresses().map(address => ({
-    ...address,
+    type: address.type,
+    address: <AddressPanel address={address.address} history={history} />,
     balance: getBalanceForAddress(address.address),
     transactions: getTransactionsForAddress(address.address),
     key: address.address,
@@ -48,10 +120,11 @@ const fetchHDAddresses = () => {
   return addresses
 }
 
-export default () => {
+const Addresses = (props: React.PropsWithoutRef<RouteComponentProps>) => {
   const [t] = useTranslation()
   const [pageNo, pageSize, totalCount] = [0, 20, 20]
   const onPageChange = useCallback(() => {}, [])
+  const { history } = props
 
   return (
     <Container>
@@ -61,7 +134,7 @@ export default () => {
           ...header,
           label: t(header.label),
         }))}
-        items={fetchHDAddresses()}
+        items={fetchHDAddresses(history)}
         pageNo={pageNo}
         pageSize={pageSize}
         totalCount={totalCount}
@@ -70,3 +143,5 @@ export default () => {
     </Container>
   )
 }
+
+export default Addresses
