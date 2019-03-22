@@ -63,3 +63,35 @@ export enum Routes {
 export enum LocalStorage {
   Networks = 'networks',
 }
+
+export enum CapacityUnit {
+  CKB = 'ckb',
+  CKKB = 'ckkb',
+  CKGB = 'ckgb',
+}
+
+export const PlaceHolders = {
+  transfer: {
+    Address: 'eg: 0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674',
+    Capacity: 'eg: 100',
+  },
+}
+
+export const Tooltips = {
+  transfer: {
+    Address: 'Address to send capacity',
+    Capacity: 'Capacity to send',
+  },
+}
+
+export enum Message {
+  NameIsRequired = 'name-is-required',
+  URLIsRequired = 'url-is-required',
+  NameShouldBeLessThanOrEqualTo28Characters = 'name-should-be-less-than-or-equal-to-28-characters',
+  NetworkNameExist = 'network-name-exists',
+  AtLeastOneAddressNeeded = 'at-least-one-address-needed',
+  InvalidAddress = 'invalid-address',
+  InvalidCapacity = 'invalid-capacity',
+  CapacityNotEnough = 'capacity-is-not-enough',
+  IsUnremovable = 'is-unremovable',
+}

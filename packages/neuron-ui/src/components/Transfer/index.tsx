@@ -1,140 +1,178 @@
-import React, { useReducer } from 'react'
-import { Container, Card, Form, Button } from 'react-bootstrap'
+import React, { useCallback } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
+import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import InlineInput, { InputProps } from '../../widgets/InlineInput'
-import { sendCapacity } from '../../services/UILayer'
+import { ContentProps } from '../../containers/MainContent'
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import TransferConfirm from '../TransferConfirm'
+import TransferItemList from '../TransferItemList'
+import Dialog from '../../widgets/Dialog'
+import QRScanner from '../../widgets/QRScanner'
+import InlineInputWithDropdown from '../../widgets/InlineInput/InlineInputWithDropdown'
+import { Spinner } from '../../widgets/Loading'
 
-enum PlaceHolder {
-  Address = 'eg: 0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674',
-  Capacity = 'eg: 100',
-  Fee = 'eg: 100',
-}
-enum TooltipText {
-  Address = 'Address to send capacity',
-  Capacity = 'Capacity to send',
-  Fee = 'Transaction Fee in this transaction',
-}
+import { TransferItem } from '../../services/UILayer'
+import { CapacityUnit, PlaceHolders } from '../../utils/const'
 
-enum TransferActionType {
-  Address,
-  Capacity,
-  Fee,
-  Submit,
-}
-
-interface Transfer {
-  address: string
-  capacity: number
-  fee: number
-  submitting: boolean
-}
-
-const reducer = (state: Transfer, action: { type: TransferActionType; payload?: any }) => {
-  switch (action.type) {
-    case TransferActionType.Address: {
-      return {
-        ...state,
-        address: action.payload,
-      }
-    }
-    case TransferActionType.Capacity: {
-      return {
-        ...state,
-        capacity: action.payload,
-      }
-    }
-    case TransferActionType.Fee: {
-      return {
-        ...state,
-        fee: action.payload,
-      }
-    }
-    case TransferActionType.Submit: {
-      return {
-        ...state,
-        submitting: true,
-      }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-const initState: Transfer = {
-  address: '',
-  capacity: 0,
-  fee: 0,
-  submitting: false,
-}
-
-function isMouseEvent(e: React.ChangeEvent | React.MouseEvent): e is React.MouseEvent {
-  return e.type === 'click'
-}
-
-const Transfer = () => {
-  const [state, dispatch] = useReducer(reducer, initState)
+const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const { t } = useTranslation()
-  const handleAction = (type: TransferActionType) => (
-    e: any,
-    // & React.ChangeEvent<HTMLInputElement>
-    // | React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    if (type === TransferActionType.Submit) {
-      sendCapacity(state.address, state.capacity.toString(16))
-    }
-    if (isMouseEvent(e)) {
-      dispatch({
-        type,
-      })
-    } else {
-      dispatch({
-        type,
-        payload: e.target.value ? e.target.value : '',
-      })
-    }
+  const { transfer, dispatch, password, dialog, errorMsgs } = props
+
+  const updateTransferItem = (field: string) => (idx: number) => (value: string) => {
+    dispatch({
+      type: MainActions.UpdateItemInTransfer,
+      payload: {
+        idx,
+        item: {
+          [field]: value,
+        },
+      },
+    })
   }
 
-  const inputs: InputProps[] = [
-    {
-      label: t('send.address'),
-      value: state.address,
-      onChange: handleAction(TransferActionType.Address),
-      tooltip: TooltipText.Address,
-      placeholder: PlaceHolder.Address,
+  const onSubmit = useCallback(
+    (items: TransferItem[]) => () => {
+      dispatch(actionCreators.submitTransfer(items))
     },
-    {
-      label: t('send.capacity'),
-      value: state.capacity,
-      onChange: handleAction(TransferActionType.Capacity),
-      tooltip: TooltipText.Capacity,
-      placeholder: PlaceHolder.Capacity,
+    [],
+  )
+
+  const onPswChange = useCallback((e: React.SyntheticEvent<HTMLInputElement>) => {
+    dispatch({
+      type: MainActions.UpdatePassword,
+      payload: e.currentTarget.value,
+    })
+  }, [])
+
+  const onConfirm = useCallback(
+    (items: TransferItem[], pwd: string) => () => {
+      props.dispatch({
+        type: MainActions.UpdateTransfer,
+        payload: {
+          submitting: true,
+        },
+      })
+      props.dispatch({
+        type: MainActions.SetDialog,
+        payload: {
+          open: false,
+        },
+      })
+      props.dispatch({
+        type: MainActions.UpdatePassword,
+        payload: '',
+      })
+      setTimeout(() => {
+        props.dispatch(
+          actionCreators.confirmTransfer({
+            items,
+            password: pwd,
+          }),
+        )
+      }, 10)
     },
-    {
-      label: t('send.transactionfee'),
-      value: state.fee,
-      onChange: handleAction(TransferActionType.Fee),
-      tooltip: TooltipText.Fee,
-      placeholder: PlaceHolder.Fee,
-    },
-  ]
+    [],
+  )
+
+  const onCancel = useCallback(() => {
+    props.dispatch({
+      type: MainActions.SetDialog,
+      payload: {
+        open: false,
+      },
+    })
+  }, [])
+
+  const onItemChange = (field: string, idx: number) => (e: React.FormEvent<{ value: string }>) => {
+    updateTransferItem(field)(idx)(e.currentTarget.value)
+  }
+
+  const dropdownItems = useCallback(
+    (idx: number) =>
+      Object.values(CapacityUnit)
+        .filter(unit => typeof unit === 'string')
+        .map((unit: string) => ({
+          label: unit.toUpperCase(),
+          key: unit,
+          onClick: () => updateTransferItem('unit')(idx)(unit),
+        })),
+    [],
+  )
+
+  const disabled = transfer.submitting && !errorMsgs.transfer
 
   return (
     <Container>
       <Card>
         <Card.Header>{t('siderbar.send')}</Card.Header>
         <Card.Body>
+          {errorMsgs.transfer ? <Alert variant="warning">{t(`messages.${errorMsgs.transfer}`)}</Alert> : null}
           <Form>
-            {inputs.map(inputProps => (
-              <InlineInput {...inputProps} key={inputProps.label} />
+            {transfer.items.map((item, idx) => (
+              <div key={`capacity-${idx * 1}`}>
+                <Form.Group as={Row}>
+                  <Form.Label column>{t('send.address')}</Form.Label>
+                  <Col sm={10}>
+                    <InputGroup>
+                      <Form.Control
+                        disabled={disabled}
+                        value={item.address || ''}
+                        onChange={onItemChange('address', idx)}
+                        placeholder={PlaceHolders.transfer.Address}
+                      />
+                      <InputGroup.Append>
+                        <InputGroup.Text
+                          style={{
+                            padding: 0,
+                          }}
+                        >
+                          <QRScanner
+                            title={t('send.scan-to-get-address')}
+                            label={t('send.address')}
+                            onConfirm={(data: string) => updateTransferItem('address')(idx)(data)}
+                          />
+                        </InputGroup.Text>
+                      </InputGroup.Append>
+                    </InputGroup>
+                  </Col>
+                </Form.Group>
+                <InlineInputWithDropdown
+                  label={t('send.capacity')}
+                  disabled={disabled}
+                  value={item.capacity}
+                  placeholder={PlaceHolders.transfer.Capacity}
+                  onChange={onItemChange('capacity', idx)}
+                  dropDown={{
+                    title: item.unit,
+                    items: dropdownItems(idx),
+                  }}
+                />
+              </div>
             ))}
           </Form>
-          <Button type="submit" variant="primary" size="lg" block onClick={handleAction(TransferActionType.Submit)}>
-            {t('send.send')}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            block
+            disabled={disabled}
+            onClick={onSubmit(transfer.items)}
+          >
+            {disabled ? <Spinner /> : t('send.send')}
           </Button>
         </Card.Body>
       </Card>
+      <Dialog open={dialog.open} onClick={onCancel}>
+        <TransferConfirm
+          title={t('send.confirmpassword')}
+          message={<TransferItemList items={transfer.items} />}
+          password={password}
+          onChange={onPswChange}
+          onSubmit={onConfirm(transfer.items, password)}
+          onCancel={onCancel}
+        />
+      </Dialog>
     </Container>
   )
 }

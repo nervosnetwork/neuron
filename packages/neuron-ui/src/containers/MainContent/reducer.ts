@@ -1,8 +1,16 @@
-import { createWallet, importWallet, exportWallet, setNetwork } from '../../services/UILayer'
+import {
+  createWallet,
+  importWallet,
+  exportWallet,
+  setNetwork,
+  sendCapacity,
+  TransferItem,
+} from '../../services/UILayer'
 import { Network } from '../../contexts/Chain'
 import { defaultNetworks } from '../../contexts/Settings'
 import { saveNetworks, loadNetworks } from '../../utils/localStorage'
-import { Routes } from '../../utils/const'
+import { Routes, CapacityUnit, Message } from '../../utils/const'
+import { verifyAddress } from '../../utils/validators'
 
 const Testnet = defaultNetworks[0].name
 
@@ -20,6 +28,11 @@ export enum MainActions {
   DeleteNetwork,
   ErrorMessage,
   SetDialog,
+  AddItemInTransfer,
+  RemoveItemInTransfer,
+  UpdateItemInTransfer,
+  UpdateTransfer,
+  UpdatePassword,
 }
 export const initState = {
   tempWallet: {
@@ -27,14 +40,28 @@ export const initState = {
     password: '',
     mnemonic: '',
   },
+  transfer: {
+    items: [
+      {
+        address: '',
+        capacity: '',
+        unit: CapacityUnit.CKB,
+      },
+    ],
+    submitting: false,
+  },
   networkEditor: {
     name: '',
     remote: '',
   },
   errorMsgs: {
     networks: '',
+    transfer: '',
   },
-  dialog: null as React.ReactNode,
+  password: '',
+  dialog: {
+    open: false,
+  } as { open: boolean; [index: string]: any },
 }
 export type InitState = typeof initState
 export const actionCreators = {
@@ -68,7 +95,7 @@ export const actionCreators = {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: 'Name is required',
+          networks: Message.NameIsRequired,
         },
       }
     }
@@ -76,7 +103,7 @@ export const actionCreators = {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: 'Name should be less than or equal to 28',
+          networks: Message.NameShouldBeLessThanOrEqualTo28Characters,
         },
       }
     }
@@ -84,7 +111,7 @@ export const actionCreators = {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: 'URL is required',
+          networks: Message.URLIsRequired,
         },
       }
     }
@@ -97,7 +124,7 @@ export const actionCreators = {
         return {
           type: MainActions.ErrorMessage,
           payload: {
-            networks: 'Network name exists',
+            networks: Message.NetworkNameExist,
           },
         }
       }
@@ -116,6 +143,7 @@ export const actionCreators = {
       payload: ns,
     }
   },
+
   deleteNetwork: (name: string) => {
     if (name === Testnet) {
       return {
@@ -131,12 +159,72 @@ export const actionCreators = {
     window.dispatchEvent(new Event('NetworksUpdate'))
     return {
       type: MainActions.SetDialog,
-      payload: null,
+      payload: {
+        open: false,
+      },
     }
+  },
+
+  submitTransfer: (items: TransferItem[]) => {
+    // TODO: verification
+    const errorAction = {
+      type: MainActions.ErrorMessage,
+      payload: {
+        transfer: Message.AtLeastOneAddressNeeded as string,
+      },
+    }
+    if (!items.length || !items[0].address) {
+      return errorAction
+    }
+    const invalid = items.some(
+      (item): boolean => {
+        if (!verifyAddress(item.address)) {
+          errorAction.payload.transfer = Message.InvalidAddress
+          return true
+        }
+        if (+item.capacity < 0) {
+          errorAction.payload.transfer = Message.InvalidCapacity
+          return true
+        }
+        return false
+      },
+    )
+    if (invalid) {
+      return errorAction
+    }
+    return {
+      type: MainActions.SetDialog,
+      payload: {
+        open: true,
+        items,
+      },
+    }
+  },
+
+  confirmTransfer: ({ items, password }: { items: TransferItem[]; password: string }) => {
+    const response = sendCapacity(items, password)
+    if (response && response[0]) {
+      if (response[0].status) {
+        return {
+          type: MainActions.UpdateTransfer,
+          payload: {
+            submitting: false,
+          },
+        }
+      }
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          transfer: response[0].msg,
+        },
+      }
+    }
+    throw new Error('No Response')
   },
 }
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
+    // wallet
     case MainActions.UpdateTempWallet: {
       return {
         ...state,
@@ -146,6 +234,7 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
+    // network
     case MainActions.UpdateNetworkEditor: {
       return {
         ...state,
@@ -164,12 +253,87 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
+    // transfer
+    case MainActions.AddItemInTransfer: {
+      return {
+        ...state,
+        errorMsgs: {
+          ...state.errorMsgs,
+          transfer: '',
+        },
+        transfer: {
+          items: [
+            ...state.transfer.items,
+            {
+              address: '',
+              capacity: '',
+              unit: CapacityUnit.CKB,
+            },
+          ],
+          submitting: false,
+        },
+      }
+    }
+    case MainActions.RemoveItemInTransfer: {
+      return {
+        ...state,
+        errorMsgs: {
+          ...state.errorMsgs,
+          transfer: '',
+        },
+        transfer: {
+          items: [...state.transfer.items].splice(action.payload),
+          submitting: false,
+        },
+      }
+    }
+    case MainActions.UpdateItemInTransfer: {
+      const items = [...state.transfer.items]
+      items[action.payload.idx] = {
+        ...items[action.payload.idx],
+        ...action.payload.item,
+      }
+      return {
+        ...state,
+        errorMsgs: {
+          ...state.errorMsgs,
+          transfer: '',
+        },
+        transfer: {
+          items,
+        },
+      }
+    }
+    case MainActions.UpdateTransfer: {
+      return {
+        ...state,
+        errorMsgs: {
+          ...state.errorMsgs,
+          transfer: '',
+        },
+        transfer: {
+          ...state.transfer,
+          submitting: false,
+          ...action.payload,
+        },
+      }
+    }
+    case MainActions.UpdatePassword: {
+      return {
+        ...state,
+        password: action.payload,
+      }
+    }
     case MainActions.ErrorMessage: {
       return {
         ...state,
         errorMsgs: {
           ...state.errorMsgs,
           ...action.payload,
+        },
+        transfer: {
+          ...state.transfer,
+          submitting: action.payload.transfer ? false : state.transfer.submitting,
         },
       }
     }

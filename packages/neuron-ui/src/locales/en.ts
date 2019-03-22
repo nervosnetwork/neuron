@@ -14,6 +14,11 @@ export default {
       send: 'Send',
       transactionfee: 'transaction fee',
       sendcapacity: 'Send Capacity',
+      confirmpassword: 'Confirm Password',
+      to: 'to',
+      'input-password-to-confirm': 'input password to confirm',
+      'this-transfer-will-send': 'This transfer will send',
+      'scan-to-get-address': 'scan the qrcode to get address',
     },
     history: {
       date: 'date',
@@ -26,7 +31,7 @@ export default {
       createwallet: 'Creat eWallet',
       importwallet: 'Import Wallet',
     },
-    setting: {
+    settings: {
       settingtabs: {
         general: 'General',
         wallets: 'Wallets',
@@ -82,6 +87,17 @@ export default {
       cancel: 'Cancel',
       save: 'Save',
       clickcopy: 'Click to copy',
+    },
+    messages: {
+      'at-least-one-address-needed': 'at least one address needed',
+      'name-is-required': 'name is required',
+      'url-is-required': 'url is required',
+      'name-should-be-less-than-or-equal-to-28-characters': 'name should be less than or equal to 28 characters',
+      'network-name-exists': 'network name exists',
+      'invalid-address': 'invalid address',
+      'invalid-capacity': 'invalid capacity',
+      'capacity-is-not-enough': 'capacity is not enough',
+      'is unremovable': 'is unremovable',
     },
   },
 }

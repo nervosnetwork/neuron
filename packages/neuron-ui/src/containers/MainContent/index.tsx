@@ -1,8 +1,7 @@
 import React, { useReducer } from 'react'
 import styled from 'styled-components'
 
-import Dialog from '../../widgets/Dialog'
-import { initState, reducer, MainDispatch, InitState, MainActions } from './reducer'
+import { initState, reducer, MainDispatch, InitState } from './reducer'
 
 const Main = styled.main`
   height: 100%;
@@ -27,17 +26,6 @@ const MainContent = ({ children }: React.PropsWithoutRef<{ children?: any }>) =>
             dispatch,
           }),
       )}
-      <Dialog
-        open={!!state.dialog}
-        onClick={() => {
-          dispatch({
-            type: MainActions.SetDialog,
-            payload: null,
-          })
-        }}
-      >
-        {state.dialog}
-      </Dialog>
     </Main>
   )
 }

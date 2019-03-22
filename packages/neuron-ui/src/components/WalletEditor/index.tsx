@@ -9,9 +9,10 @@ import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { Wallet } from '../../contexts/Wallet'
+import Dialog from '../../widgets/Dialog'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
-  const { match } = props
+  const { match, dialog, dispatch } = props
   const { params } = match
   const [t] = useTranslation()
 
@@ -53,18 +54,11 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     } else if (confirmPassword !== password) {
       setErrorMsg('Password inconsistent')
     } else {
-      props.dispatch({
+      dispatch({
         type: MainActions.SetDialog,
-        payload: (
-          <InputWalletPasswordDialog
-            wallet={myWallet}
-            dispatch={props.dispatch}
-            checkType={CheckType.EditWallet}
-            handle={() => props.history.push(`${Routes.SettingsWallets}`)}
-            newWalletName={walletName}
-            newPassword={password}
-          />
-        ),
+        payload: {
+          open: true,
+        },
       })
     }
   }
@@ -83,6 +77,26 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           {t('common.save')}
         </Button>
       </Card.Body>
+      <Dialog
+        open={dialog.open}
+        onClick={() => {
+          dispatch({
+            type: MainActions.SetDialog,
+            payload: {
+              open: false,
+            },
+          })
+        }}
+      >
+        <InputWalletPasswordDialog
+          wallet={myWallet}
+          dispatch={dispatch}
+          checkType={CheckType.EditWallet}
+          handle={() => props.history.push(`${Routes.SettingsWallets}`)}
+          newWalletName={walletName}
+          newPassword={password}
+        />
+      </Dialog>
     </Card>
   )
 }
