@@ -235,7 +235,7 @@ export class Listeners {
           e.sender.send(Channel.CheckWalletPassword, {
             status: ResponseStatus.Success,
             result: false,
-            msg: 'Wallet not find',
+            msg: 'Wallet not found',
           })
         } else if (myWallet.password === password) {
           e.sender.send(Channel.CheckWalletPassword, {
@@ -261,23 +261,37 @@ export class Listeners {
   static sendCapacity = () => {
     return ipcMain.on(
       Channel.SendCapacity,
-      (e: Electron.Event, { address, capacity }: { address: string; capacity: number }) => {
-        const notification = new Notification({
-          title: `Send Capacity`,
-          body: `Send Capacity to CKB with ${JSON.stringify(
-            {
-              address,
-              capacity,
-            },
-            null,
-            2,
-          )}`,
-        })
-        notification.show()
-        e.sender.send(Channel.SendCapacity, {
-          status: ResponseStatus.Success,
-          msg: `Send ${capacity} Capacity to ${address} Successfully`,
-        })
+      (
+        e: Electron.Event,
+        { items, password }: { items: { address: string; capacity: string; unit: string }[]; password: string },
+      ) => {
+        setTimeout(() => {
+          if (!items.length || !items[0].address) {
+            e.returnValue = {
+              status: ResponseStatus.Fail,
+              msg: 'Address not specified',
+            }
+            return
+          }
+          // TODO: verify password
+          // TODO: verify capacity
+          const notification = new Notification({
+            title: `Send Capacity`,
+            body: `Send Capacity to CKB with ${JSON.stringify(
+              {
+                items,
+                password,
+              },
+              null,
+              2,
+            )}`,
+          })
+          notification.show()
+          e.returnValue = {
+            status: ResponseStatus.Success,
+            msg: `Send Successfully`,
+          }
+        }, 3000)
       },
     )
   }

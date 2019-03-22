@@ -1,4 +1,4 @@
-import { Channel } from '../utils/const'
+import { Channel, CapacityUnit } from '../utils/const'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
 import { Network } from '../contexts/Chain'
 
@@ -9,12 +9,21 @@ declare global {
   }
 }
 
+export interface TransferItem {
+  address: string
+  capacity: string
+  unit: CapacityUnit
+}
+
 const UILayer = (() => {
   if (window.bridge) {
     return new SyntheticEventEmitter(window.bridge.ipcRenderer)
   }
   return {
     send: (channel: string, msg: any = '') => {
+      console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
+    },
+    sendSync: (channel: string, msg: any = '') => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
     on: (channel: string, cb: Function) => {
@@ -40,10 +49,10 @@ export const getCellsByTypeHash = (typeHash: string) => {
   UILayer.send(Channel.GetCellsByTypeHash, typeHash)
 }
 
-export const sendCapacity = (address: string, capacity: string) => {
-  UILayer.send(Channel.SendCapacity, {
-    address,
-    capacity,
+export const sendCapacity = (items: TransferItem[], password: string) => {
+  return UILayer.sendSync(Channel.SendCapacity, {
+    items,
+    password,
   })
 }
 export const setNetwork = (network: Network) => {

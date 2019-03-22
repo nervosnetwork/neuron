@@ -14,7 +14,15 @@ const Dialog = styled.dialog.attrs({
   z-index: 999;
 `
 
-export default ({ children, open, onClick }: { children?: React.ReactNode | string; open?: boolean; onClick: any }) => {
+export default ({
+  children,
+  open,
+  onClick,
+}: {
+  children?: React.ReactNode | string
+  open?: boolean
+  onClick?: any
+}) => {
   if (open && children) {
     return createPortal(<Dialog onClick={onClick}>{children}</Dialog>, document.querySelector('#dialog') as HTMLElement)
   }

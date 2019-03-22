@@ -9,6 +9,10 @@ class SyntheticEventEmitter {
     this.handlers.forEach(handler => handler.send(channel, args))
   }
 
+  sendSync = (channel: string, args: any = '') => {
+    return this.handlers.map(handler => handler.sendSync && handler.sendSync(channel, args))
+  }
+
   on = (channel: string, cb: Function) => {
     this.removeAllListeners(channel)
     return this.handlers.map(handler => {
