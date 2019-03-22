@@ -9,8 +9,9 @@ export interface Transaction {
   outputs?: Cell[]
 }
 
-// if addresses set to null, should be all transactions
-export const getTransactions = async (addresses: string[] | undefined, page: number, perPage: number) => {
+// if addresses set to undefined, should be all transactions
+/* eslint @typescript-eslint/no-unused-vars: "warn" */
+export const getTransactions = async (page: number, perPage: number, _addresses?: string[] | undefined) => {
   const transaction: Transaction = mockedTransaction
 
   return {
@@ -18,7 +19,6 @@ export const getTransactions = async (addresses: string[] | undefined, page: num
     transactions: Array.from({
       length: perPage,
     }).map(() => transaction),
-    addresses,
   }
 }
 
