@@ -36,12 +36,12 @@ export const getWallets = () => {
 export const createWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
   UILayer.send(Channel.CreateWallet, wallet)
 
-export const deleteWallet = (walletID: string, password: string, callback: any) => {
+export const deleteWallet = (walletID: string, password: string, handleResult: any) => {
   UILayer.on(Channel.DeleteWallet, (_e: any, args: Response<string>) => {
     if (args.result) {
       getWallets()
     }
-    callback(args)
+    handleResult(args)
   })
   UILayer.send(Channel.DeleteWallet, {
     walletID,
@@ -54,13 +54,13 @@ export const editWallet = (
   walletName: string,
   password: string,
   newPassword: string,
-  callback: any,
+  handleResult: any,
 ) => {
   UILayer.on(Channel.EditWallet, (_e: any, args: Response<string>) => {
     if (args.result) {
       getWallets()
     }
-    callback(args)
+    handleResult(args)
   })
 
   UILayer.send(Channel.EditWallet, {
@@ -96,9 +96,9 @@ export const getTransactions = (pageNo: number, pageSize: number) => {
   })
 }
 
-export const checkPassword = (walletID: string, password: string, callback: any) => {
+export const checkPassword = (walletID: string, password: string, handleResult: any) => {
   UILayer.on(Channel.CheckWalletPassword, (_e: any, args: Response<string>) => {
-    callback(args)
+    handleResult(args)
   })
   UILayer.send(Channel.CheckWalletPassword, {
     walletID,

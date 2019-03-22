@@ -49,6 +49,13 @@ export const updateWallets = (newWallets: Wallet[]) => {
   list = newWallets
 }
 
+export const validatePassword = (wallet: Wallet, password: string) => {
+  if (wallet.password === password) {
+    return true
+  }
+  return false
+}
+
 export const mockedTransaction = {
   hash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
   version: 0,

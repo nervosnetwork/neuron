@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets, Wallet, updateWallets } from '../mock'
+import { transactions, transactionCount, wallets, Wallet, updateWallets, validatePassword } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -16,10 +16,10 @@ const checkPassword = (walletID: string, password: string) => {
     return {
       status: ResponseStatus.Success,
       result: false,
-      msg: 'Wallet not find',
+      msg: 'Wallet not found',
     }
   }
-  if (myWallet.password === password) {
+  if (validatePassword(myWallet, password)) {
     return {
       status: ResponseStatus.Success,
       result: true,
