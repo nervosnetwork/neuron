@@ -164,7 +164,7 @@ export const mainContents: CustomRoute[] = [
   },
 ]
 
-const CustomRouter = () => {
+const CustomRouter = (appProps: any) => {
   const wallet = useContext(WalletContext)
 
   return (
@@ -178,7 +178,7 @@ const CustomRouter = () => {
           return (
             <>
               {wallet.address ? <RoutesWithProps contents={containers} /> : null}
-              <MainContent>
+              <MainContent {...appProps}>
                 <RoutesWithProps contents={mainContents} />
               </MainContent>
             </>

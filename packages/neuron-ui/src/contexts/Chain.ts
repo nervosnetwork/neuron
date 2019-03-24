@@ -61,7 +61,7 @@ export const initChain: Chain = {
     date: new Date(0),
   },
   transactions: {
-    pageNo: 0,
+    pageNo: -1,
     pageSize: 15,
     totalCount: 0,
     items: [],

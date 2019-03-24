@@ -5,32 +5,20 @@ export default {
   getTransaction: (hash: string) => {
     getTransaction(hash)
     return {
-      type: MainActions.GetTransaction,
+      type: MainActions.UpdateLoading,
       payload: {
-        hash,
+        transaction: true,
       },
     }
-    // TODO:  to make sure if loading is necessary in pushing-mode
-    // return {
-    //   type: MainActions.UpdateLoading,
-    //   payload: {
-    //     transaction: true,
-    //   },
-    // }
   },
 
   getTransactions: (params: GetTransactionsParams) => {
     getTransactions(params)
     return {
-      type: MainActions.GetTransactions,
-      payload: params,
+      type: MainActions.UpdateLoading,
+      payload: {
+        transactions: true,
+      },
     }
-    // TODO: to make sure if loading is necessary in pushing-mode
-    // return {
-    //   type: MainActions.UpdateLoading,
-    //   payload: {
-    //     transactions: true,
-    //   },
-    // }
   },
 }

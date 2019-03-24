@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next'
 
 import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
+import { ProviderActions } from '../../containers/Providers/reducer'
 
 import ChainContext from '../../contexts/Chain'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
-  const { match, errorMsgs, dispatch } = props
+  const { match, errorMsgs, dispatch, providerDispatch, loadings } = props
   const chain = useContext(ChainContext)
   const [t] = useTranslation()
   const { transaction } = chain
@@ -18,6 +19,9 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
     // TODO: verify hash
     dispatch(actionCreators.getTransaction(match.params.hash))
     return () => {
+      providerDispatch({
+        type: ProviderActions.CleanTransaction,
+      })
       dispatch({
         type: MainActions.ErrorMessage,
         payload: {
@@ -27,7 +31,8 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
     }
   }, [match.params.hash])
 
-  const loading = match.params.hash !== transaction.hash
+  const loading = loadings.transaction
+
   return (
     <Card>
       <Card.Header>

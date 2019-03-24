@@ -9,6 +9,7 @@ import Pagination from '../../widgets/Table/Pagination'
 
 import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
+import { ProviderActions } from '../../containers/Providers/reducer'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 import { queryParsers } from '../../utils/parser'
@@ -104,7 +105,7 @@ const groupHistory = (items: Transaction[]) => {
 }
 
 const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const { location, history, loadings, errorMsgs, dispatch } = props
+  const { location, history, loadings, errorMsgs, dispatch, providerDispatch } = props
   const chain = useContext(ChainContext)
   const { pageNo, pageSize, totalCount, items, addresses } = chain.transactions
 
@@ -132,6 +133,9 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
 
   useEffect(() => {
     const params = queryParsers.history(location.search)
+    providerDispatch({
+      type: ProviderActions.CleanTransactions,
+    })
     dispatch(actionCreators.getTransactions(params))
     return () => {
       dispatch({
