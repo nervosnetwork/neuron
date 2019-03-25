@@ -1,9 +1,11 @@
 import { setNetwork } from '../../../services/UILayer'
 import { Network } from '../../../contexts/Chain'
-import { Routes, Message } from '../../../utils/const'
-import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
-import { MainActions } from '../reducer'
 import { defaultNetworks } from '../../../contexts/Settings'
+import { MainActions } from '../reducer'
+
+import { Routes, Message, MAX_NETWORK_NAME_LENGTH } from '../../../utils/const'
+import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
+import i18n from '../../../utils/i18n'
 
 const Testnet = defaultNetworks[0].name
 
@@ -28,7 +30,7 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.NameShouldBeLessThanOrEqualTo28Characters,
+          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
         },
       }
     }
