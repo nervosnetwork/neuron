@@ -1,3 +1,17 @@
+export const MAX_NETWORK_NAME_LENGTH = 28
+export const EXPLORER = 'http://localhost:3000'
+
+export const DEFAULT_NETWORKS = [
+  {
+    name: 'Testnet',
+    remote: 'http://localhost:8114',
+  },
+  {
+    name: 'Localhost',
+    remote: 'http://localhost:8114',
+  },
+]
+
 export enum NetworkStatus {
   Online = 'online',
   Offline = 'offline',
@@ -47,6 +61,7 @@ export enum Routes {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  Transaction = '/transaction',
   Addresses = '/addresses',
   Settings = '/settings',
   SettingsGeneral = '/settings/general',
@@ -87,11 +102,17 @@ export const Tooltips = {
 export enum Message {
   NameIsRequired = 'name-is-required',
   URLIsRequired = 'url-is-required',
-  NameShouldBeLessThanOrEqualTo28Characters = 'name-should-be-less-than-or-equal-to-28-characters',
+  LengthOfNameShouldBeLessThanOrEqualTo = 'length-of-name-should-be-less-than-or-equal-to',
   NetworkNameExist = 'network-name-exists',
   AtLeastOneAddressNeeded = 'at-least-one-address-needed',
   InvalidAddress = 'invalid-address',
   InvalidCapacity = 'invalid-capacity',
   CapacityNotEnough = 'capacity-is-not-enough',
   IsUnremovable = 'is-unremovable',
+}
+
+export enum TransactionType {
+  Sent,
+  Received,
+  Other,
 }

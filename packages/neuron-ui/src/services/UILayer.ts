@@ -14,6 +14,11 @@ export interface TransferItem {
   capacity: string
   unit: CapacityUnit
 }
+export interface GetTransactionsParams {
+  pageNo: number
+  pageSize: number
+  addresses: string[]
+}
 
 const UILayer = (() => {
   if (window.bridge) {
@@ -98,10 +103,17 @@ export const setNetwork = (network: Network) => {
   UILayer.send(Channel.SetNetwork, network)
 }
 
-export const getTransactions = (pageNo: number, pageSize: number) => {
+export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: GetTransactionsParams) => {
   UILayer.send(Channel.GetTransactions, {
     pageNo,
     pageSize,
+    addresses,
+  })
+}
+
+export const getTransaction = (hash: string) => {
+  UILayer.send(Channel.GetTransaction, {
+    hash,
   })
 }
 

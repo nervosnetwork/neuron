@@ -2,11 +2,14 @@ import { v4 } from 'uuid'
 
 export const transactions = Array.from({
   length: 200,
-}).map(() => ({
-  date: new Date(),
-  value: Math.random(),
-  hash: Math.round(Math.random() * 10000000000000000),
-}))
+})
+  .map(() => ({
+    date: new Date().getTime() - Math.round(Math.random() * 100000000),
+    value: Math.random(),
+    hash: Math.round(Math.random() * 10000000000000000),
+    type: Math.round(Math.random() * 2),
+  }))
+  .sort((p, n) => +n.date - +p.date)
 
 export const transactionCount = 500
 
@@ -85,9 +88,15 @@ export const mockedTransaction = {
   ],
 }
 
+const transaction = {
+  date: new Date(),
+  amount: Math.round(Math.random() * 10000),
+}
+
 export default {
   transactions,
   transactionCount,
   wallets,
   mockedTransaction,
+  transaction,
 }

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { NetworkStatus } from '../utils/const'
+import { NetworkStatus, TransactionType } from '../utils/const'
 
 // these will be introduced by sdk
 export interface Cell {
@@ -21,6 +21,7 @@ export interface Cell {
 
 // will be introduced by sdk
 export interface Transaction {
+  type: TransactionType
   date: Date
   value: string
   hash: string
@@ -35,11 +36,13 @@ export interface Chain {
   cells: Cell[]
   network: Network
   tipBlockNumber?: number
+  transaction: Transaction
   transactions: {
     pageNo: number
     pageSize: number
     totalCount: number
     items: Transaction[]
+    addresses: string[]
   }
 }
 
@@ -51,11 +54,18 @@ export const initChain: Chain = {
     status: NetworkStatus.Offline,
   },
   tipBlockNumber: undefined,
+  transaction: {
+    value: '',
+    hash: '',
+    type: TransactionType.Other,
+    date: new Date(0),
+  },
   transactions: {
-    pageNo: 0,
+    pageNo: -1,
     pageSize: 15,
     totalCount: 0,
     items: [],
+    addresses: [],
   },
 }
 

@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ChainContext, { Cell, Transaction } from '../../contexts/Chain'
+import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
 import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
@@ -101,6 +101,24 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
+    UILayer.on(Channel.GetTransaction, (_e: Event, args: Response<Transaction>) => {
+      if (args.status) {
+        dispatch({
+          type: ProviderActions.Chain,
+          payload: {
+            transaction: args.result,
+          },
+        })
+      } else {
+        dispatch({
+          type: ProviderActions.Chain,
+          payload: {
+            transaction: initChain.transaction,
+          },
+        })
+      }
+    })
+
     UILayer.on(
       Channel.GetTransactions,
       (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
@@ -110,6 +128,13 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             type: ProviderActions.Chain,
             payload: {
               transactions: args.result,
+            },
+          })
+        } else {
+          dispatch({
+            type: ProviderActions.Chain,
+            payload: {
+              transactions: initChain.transactions,
             },
           })
         }

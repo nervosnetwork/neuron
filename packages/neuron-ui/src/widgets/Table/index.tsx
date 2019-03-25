@@ -10,7 +10,6 @@ interface TableHeader {
 
 interface TableItem {
   key: string
-  type?: string
   [index: string]: any
 }
 

@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import { loadNetworks } from '../utils/localStorage'
+import { DEFAULT_NETWORKS } from '../utils/const'
 
 import { Network } from './Chain'
 import { Wallet } from './Wallet'
@@ -9,11 +10,7 @@ export const defaultNetworks = (() => {
   if (cachedNetworks.length) {
     return cachedNetworks
   }
-  const { REACT_APP_NETWORKS } = process.env
-  if (REACT_APP_NETWORKS) {
-    return JSON.parse(REACT_APP_NETWORKS)
-  }
-  return []
+  return DEFAULT_NETWORKS
 })()
 
 interface WalletSettings {

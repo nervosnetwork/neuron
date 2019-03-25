@@ -27,14 +27,6 @@ const initUILayer = (win: BrowserWindow) => {
       locale: app.getLocale(),
     },
   })
-
-  dispatch(Command.SendTransactionHistory, {
-    channel,
-    extra: {
-      pageNo: '0',
-      pageSize: '15',
-    },
-  })
 }
 
 function createWindow() {
