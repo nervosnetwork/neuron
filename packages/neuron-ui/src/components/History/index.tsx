@@ -13,7 +13,7 @@ import { ProviderActions } from '../../containers/Providers/reducer'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 import { queryParsers } from '../../utils/parser'
-import { TransactionType } from '../../utils/const'
+import { TransactionType, EXPLORER } from '../../utils/const'
 import { dateFormatter } from '../../utils/formatters'
 import i18n from '../../utils/i18n'
 
@@ -89,7 +89,7 @@ const groupHistory = (items: Transaction[]) => {
                 <Dropdown.Toggle variant="light" id={cur.hash} />
                 <Dropdown.Menu>
                   <DropdownItem to={`/transaction/${cur.hash}`}>Detail</DropdownItem>
-                  <Dropdown.Item href={`${process.env.REACT_EXPLORER}`} target="_blank">
+                  <Dropdown.Item href={EXPLORER} target="_blank">
                     Explorer
                   </Dropdown.Item>
                 </Dropdown.Menu>

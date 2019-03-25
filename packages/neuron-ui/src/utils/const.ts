@@ -1,4 +1,5 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
+export const EXPLORER = 'http://localhost:3000'
 
 export const DEFAULT_NETWORKS = [
   {
