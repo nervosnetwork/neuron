@@ -1,4 +1,16 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
+
+export const DEFAULT_NETWORKS = [
+  {
+    name: 'Testnet',
+    remote: 'http://localhost:8114',
+  },
+  {
+    name: 'Localhost',
+    remote: 'http://localhost:8114',
+  },
+]
+
 export enum NetworkStatus {
   Online = 'online',
   Offline = 'offline',
