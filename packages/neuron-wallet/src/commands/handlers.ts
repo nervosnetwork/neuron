@@ -5,7 +5,7 @@ import WalletChannel from '../channel'
 export interface CommandInfo {
   channel: WalletChannel
   window?: BrowserWindow
-  extra?: { [index: string]: string }
+  extra?: { [index: string]: any }
 }
 type Handler = (command: Command | null, info: CommandInfo | null) => void
 
@@ -64,8 +64,12 @@ const rendererMessageHandler: Handler = (command, info) => {
       break
     }
     case Command.SendTransactionHistory: {
-      if (info && info.extra && info.extra.pageNo && info.extra.pageSize) {
-        info.channel.sendTransactionHistory(+info.extra.pageNo, +info.extra.pageSize)
+      if (info && info.extra && info.extra.pageNo && info.extra.pageSize && info.extra.addresses) {
+        info.channel.sendTransactionHistory({
+          pageNo: +info.extra.pageNo,
+          pageSize: +info.extra.pageSize,
+          addresses: info.extra.addresses,
+        })
       }
       break
     }

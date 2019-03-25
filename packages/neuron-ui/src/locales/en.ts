@@ -21,9 +21,13 @@ export default {
       'scan-to-get-address': 'scan the qrcode to get address',
     },
     history: {
+      type: 'type',
       date: 'date',
       amount: 'amount(ckb)',
-      transactionhash: 'transaction hash',
+      'transaction-hash': 'transaction hash',
+      sent: 'sent',
+      received: 'received',
+      other: 'other',
     },
     addresses: {
       addresses: 'Addresses',

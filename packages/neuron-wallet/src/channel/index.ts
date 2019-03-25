@@ -23,6 +23,7 @@ export class Listeners {
       'getCellsByTypeHash',
       'asw',
       'getUnspentCells',
+      'getTransaction',
       'getTransactions',
       'getWallets',
       'checkWalletPassword',
@@ -183,6 +184,28 @@ export class Listeners {
   }
 
   /**
+   * @static getTransaction
+   * @memberof ChannelListeners
+   * @description get transaction by hash
+   */
+  static getTransaction = () => {
+    return ipcMain.on(Channel.GetTransaction, (e: Electron.Event, { hash }: { hash: string }) => {
+      const transaction = transactions.find(tx => `${tx.hash}` === hash)
+      if (transaction) {
+        e.sender.send(Channel.GetTransaction, {
+          status: ResponseStatus.Success,
+          result: transaction,
+        })
+      } else {
+        e.sender.send(Channel.GetTransaction, {
+          status: ResponseStatus.Fail,
+          msg: `Transaction of ${hash} is not found`,
+        })
+      }
+    })
+  }
+
+  /**
    * @static getTransactions
    * @memberof ChannelListeners
    * @description get transactions
@@ -190,10 +213,14 @@ export class Listeners {
   static getTransactions = () => {
     return ipcMain.on(
       Channel.GetTransactions,
-      (e: Electron.Event, { pageNo, pageSize }: { pageNo: number; pageSize: number }) => {
+      (
+        e: Electron.Event,
+        { pageNo, pageSize, addresses }: { pageNo: number; pageSize: number; addresses: string[] },
+      ) => {
         e.sender.send(Channel.GetTransactions, {
           status: ResponseStatus.Success,
           result: {
+            addresses,
             pageNo,
             pageSize,
             totalCount: transactionCount,
@@ -356,21 +383,6 @@ export class Listeners {
   }
 }
 
-export const sendTransactionHistory = (win: Electron.BrowserWindow, pageNo: number, pageSize: number) => {
-  win.webContents.send(Channel.GetTransactions, {
-    status: ResponseStatus.Success,
-    result: {
-      pageNo,
-      pageSize,
-      totalCount: transactionCount,
-      items: transactions.map(tx => ({
-        ...tx,
-        value: tx.value * pageNo * pageSize,
-      })),
-    },
-  })
-}
-
 export default class WalletChannel extends Listeners {
   public win: BrowserWindow
 
@@ -408,10 +420,19 @@ export default class WalletChannel extends Listeners {
     })
   }
 
-  public sendTransactionHistory = (pageNo: number, pageSize: number) => {
+  public sendTransactionHistory = ({
+    pageNo,
+    pageSize,
+    addresses,
+  }: {
+    pageNo: number
+    pageSize: number
+    addresses: string[]
+  }) => {
     this.win.webContents.send(Channel.GetTransactions, {
       status: ResponseStatus.Success,
       result: {
+        addresses,
         pageNo,
         pageSize,
         totalCount: transactionCount,
@@ -423,4 +444,3 @@ export default class WalletChannel extends Listeners {
     })
   }
 }
-// TOOD: replace with response status

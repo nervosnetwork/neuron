@@ -59,6 +59,7 @@ export enum Routes {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  Transaction = '/transaction',
   Addresses = '/addresses',
   Settings = '/settings',
   SettingsGeneral = '/settings/general',
@@ -106,4 +107,10 @@ export enum Message {
   InvalidCapacity = 'invalid-capacity',
   CapacityNotEnough = 'capacity-is-not-enough',
   IsUnremovable = 'is-unremovable',
+}
+
+export enum TransactionType {
+  Sent,
+  Received,
+  Other,
 }

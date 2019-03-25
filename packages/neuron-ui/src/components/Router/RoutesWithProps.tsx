@@ -13,6 +13,7 @@ const RoutesWithProps = ({ contents, ...rest }: { contents: CustomRoute[] }) => 
         <Route
           key={restContent.name}
           {...restContent}
+          path={restContent.path + (restContent.params || '')}
           render={(routeProps: RouteComponentProps<{}>) => <Component {...routeProps} {...rest} />}
         />
       )

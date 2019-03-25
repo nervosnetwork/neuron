@@ -7,12 +7,13 @@ import { NetworkStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
 import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
 
-const Status = styled.div`
+const Status = styled.div<{ online: boolean }>`
   width: 8px;
   height: 8px;
   border-radius: 50%;
   vertical-align: middle;
   background: currentColor;
+  color: ${props => (props.online ? 'green' : 'red')};
 `
 
 const FlexDiv = styled.div`
@@ -64,11 +65,7 @@ const NetworkStatusHeader = ({
     <>
       <FlexDiv>
         <Span>
-          <Status
-            style={{
-              color: chain.network.status === NetworkStatus.Online ? 'green' : 'red',
-            }}
-          />
+          <Status online={chain.network.status === NetworkStatus.Online} />
         </Span>
         <Span>{`${(chain.network.name && chain.network.name.slice(0, 30)) || chain.network.remote} - `}</Span>
         {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}

@@ -21,9 +21,13 @@ export default {
       'scan-to-get-address': '扫码二维码以获取地址',
     },
     history: {
+      type: '类型',
       date: '时间',
       amount: '价值(ckb)',
-      transactionhash: '交易哈希',
+      'transaction-hash': '交易哈希',
+      sent: '发出',
+      received: '收入',
+      other: '其他',
     },
     addresses: {
       deletewallet: '删除钱包',

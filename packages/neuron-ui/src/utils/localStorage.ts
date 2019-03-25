@@ -7,7 +7,7 @@ export const saveNetworks = (networks: Network[]) => {
 
 export const loadNetworks = () => {
   try {
-    return JSON.parse(window.localStorage.getItem(LocalStorage.Networks) || '')
+    return JSON.parse(window.localStorage.getItem(LocalStorage.Networks) || '{}')
   } catch (e) {
     console.warn(e)
   }
