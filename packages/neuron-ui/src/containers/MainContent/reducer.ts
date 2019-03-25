@@ -10,8 +10,9 @@ import {
 import { Network } from '../../contexts/Chain'
 import { defaultNetworks } from '../../contexts/Settings'
 import { saveNetworks, loadNetworks } from '../../utils/localStorage'
-import { Routes, CapacityUnit, Message } from '../../utils/const'
+import { Routes, CapacityUnit, Message, MAX_NETWORK_NAME_LENGTH } from '../../utils/const'
 import { verifyAddress } from '../../utils/validators'
+import i18n from '../../utils/i18n'
 
 const Testnet = defaultNetworks[0].name
 
@@ -106,11 +107,11 @@ export const actionCreators = {
         },
       }
     }
-    if (editorNetwork.name.length > 28) {
+    if (editorNetwork.name.length > MAX_NETWORK_NAME_LENGTH) {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.NameShouldBeLessThanOrEqualTo28Characters,
+          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
         },
       }
     }
