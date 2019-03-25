@@ -92,7 +92,7 @@ export default {
       'at-least-one-address-needed': '需要至少一个地址',
       'name-is-required': '缺少名称',
       'url-is-required': '缺少 URL',
-      'name-should-be-less-than-or-equal-to-28-characters': '名称应大于等于2字符',
+      'length-of-name-should-be-less-than-or-equal-to': '名称长度应不大于',
       'network-name-exists': '节点名称已存在',
       'invalid-address': '无效的地址',
       'invalid-capacity': '无效的价值',
