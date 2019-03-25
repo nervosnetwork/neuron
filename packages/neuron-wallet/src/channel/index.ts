@@ -1,7 +1,7 @@
 import { ipcMain, Notification, BrowserWindow } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets, Wallet } from '../mock'
+import { transactions, transactionCount, wallets, Wallet, updateWallets, validatePassword } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
 
@@ -10,12 +10,35 @@ enum ResponseStatus {
   Success,
 }
 
+const checkPassword = (walletID: string, password: string) => {
+  const myWallet = wallets().find(wallet => wallet.id === walletID)
+  if (!myWallet) {
+    return {
+      status: ResponseStatus.Success,
+      result: false,
+      msg: 'Wallet not found',
+    }
+  }
+  if (validatePassword(myWallet, password)) {
+    return {
+      status: ResponseStatus.Success,
+      result: true,
+    }
+  }
+  return {
+    status: ResponseStatus.Success,
+    result: false,
+    msg: 'Wrong password',
+  }
+}
+
 export class Listeners {
   static start = (
     methods: string[] = [
       'getLiveCell',
       'createWallet',
       'deleteWallet',
+      'editWallet',
       'importWallet',
       'exportWallet',
       'switchWallet',
@@ -72,17 +95,68 @@ export class Listeners {
   }
 
   /**
+   * @static checkWalletPassword
+   * @memberof ChannelListeners
+   * @description channel to check wallets password
+   */
+  static checkWalletPassword = () => {
+    return ipcMain.on(
+      Channel.CheckWalletPassword,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        e.sender.send(Channel.CheckWalletPassword, checkPassword(walletID, password))
+      },
+    )
+  }
+
+  /**
    * @static deleteWallet
    * @memberof ChannelListeners
    * @description channel to delete wallet
    */
   static deleteWallet = () => {
-    return ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, address: string) => {
-      e.sender.send(Channel.DeleteWallet, {
-        status: ResponseStatus.Success,
-        reult: `wallet of ${address} deleted`,
-      })
-    })
+    return ipcMain.on(
+      Channel.DeleteWallet,
+      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
+        const args = checkPassword(walletID, password)
+        if (args.result) {
+          const walletList = wallets()
+          const index = walletList.findIndex(wallet => wallet.id === walletID)
+          walletList.splice(index, 1)
+          updateWallets(walletList)
+        }
+        e.sender.send(Channel.DeleteWallet, args)
+      },
+    )
+  }
+
+  /**
+   * @static editWallet
+   * @memberof ChannelListeners
+   * @description channel to edit wallet
+   */
+  static editWallet = () => {
+    return ipcMain.on(
+      Channel.EditWallet,
+      (
+        e: Electron.Event,
+        {
+          walletID,
+          walletName,
+          password,
+          newPassword,
+        }: { walletID: string; walletName: string; password: string; newPassword: string },
+      ) => {
+        const args = checkPassword(walletID, password)
+        if (args.result) {
+          const wallet = wallets().find(item => item.id === walletID)
+          if (wallet) {
+            wallet.name = walletName
+            wallet.password = newPassword
+          }
+        }
+        e.sender.send(Channel.EditWallet, args)
+      },
+    )
   }
 
   /**
@@ -246,38 +320,6 @@ export class Listeners {
         result: wallets(),
       })
     })
-  }
-
-  /**
-   * @static getWallets
-   * @memberof ChannelListeners
-   * @description channel to get wallets
-   */
-  static checkWalletPassword = () => {
-    return ipcMain.on(
-      Channel.CheckWalletPassword,
-      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        const myWallet = wallets().find(wallet => wallet.id === walletID)
-        if (!myWallet) {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: false,
-            msg: 'Wallet not found',
-          })
-        } else if (myWallet.password === password) {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: true,
-          })
-        } else {
-          e.sender.send(Channel.CheckWalletPassword, {
-            status: ResponseStatus.Success,
-            result: false,
-            msg: 'Wrong password',
-          })
-        }
-      },
-    )
   }
 
   /**

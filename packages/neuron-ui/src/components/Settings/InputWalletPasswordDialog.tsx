@@ -4,13 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions } from '../../containers/MainContent/reducer'
-import { checkPassword } from '../../services/UILayer'
+import { checkPassword, deleteWallet, editWallet } from '../../services/UILayer'
 import { Wallet } from '../../contexts/Wallet'
+
+export enum CheckType {
+  CheckPassword,
+  EditWallet,
+  DeleteWallet,
+}
 
 interface InputPasswordProps {
   wallet: Wallet
   dispatch: any
+  checkType: CheckType
   handle?: any
+  newWalletName?: string
+  newPassword?: string
 }
 
 const ButtonDiv = styled.div`
@@ -18,32 +27,53 @@ const ButtonDiv = styled.div`
   justify-content: space-between;
 `
 
-const InputWalletPasswordDialog = ({ wallet, dispatch, handle }: InputPasswordProps) => {
+const InputWalletPasswordDialog = ({
+  wallet,
+  dispatch,
+  checkType,
+  handle,
+  newWalletName,
+  newPassword,
+}: InputPasswordProps) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
+
+  const handleResult = (args: Response<string>) => {
+    if (args.result) {
+      dispatch({
+        type: MainActions.SetDialog,
+        payload: {
+          open: false,
+        },
+      })
+      if (handle) {
+        handle(wallet.id, password)
+      }
+    } else if (args.msg) {
+      setErrorMsg(args.msg)
+    } else {
+      setErrorMsg('Wrong password')
+    }
+  }
 
   const handleSubmit = () => {
     if (!password) {
       setErrorMsg('Please enter password')
     }
-    checkPassword(wallet.name, password, (args: Response<string>) => {
-      if (args.result) {
-        dispatch({
-          type: MainActions.SetDialog,
-          payload: {
-            open: false,
-          },
-        })
-        if (handle) {
-          handle()
+    switch (checkType) {
+      case CheckType.EditWallet:
+        if (newWalletName && newPassword) {
+          editWallet(wallet.id, newWalletName, password, newPassword, handleResult)
         }
-      } else if (args.msg) {
-        setErrorMsg(args.msg)
-      } else {
-        setErrorMsg('Wrong password')
-      }
-    })
+        break
+      case CheckType.DeleteWallet:
+        deleteWallet(wallet.id, password, handleResult)
+        break
+      case CheckType.CheckPassword:
+      default:
+        checkPassword(wallet.id, password, handleResult)
+    }
   }
 
   return (

@@ -9,7 +9,7 @@ import WalletContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { getWallets } from '../../services/UILayer'
-import InputWalletPasswordDialog from './InputWalletPasswordDialog'
+import InputWalletPasswordDialog, { CheckType } from './InputWalletPasswordDialog'
 import Dialog from '../../widgets/Dialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
@@ -143,7 +143,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           })
         }}
       >
-        <InputWalletPasswordDialog wallet={dialog.wallet} dispatch={dispatch} />
+        <InputWalletPasswordDialog wallet={dialog.wallet} dispatch={dispatch} checkType={CheckType.DeleteWallet} />
       </Dialog>
     </>
   )

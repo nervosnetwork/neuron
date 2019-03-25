@@ -1,3 +1,5 @@
+import { v4 } from 'uuid'
+
 export const transactions = Array.from({
   length: 200,
 })
@@ -23,9 +25,10 @@ export interface Wallet {
 }
 
 const generateWallet = () => {
-  const walletID = `wallet${parseInt((Math.random() * 1000).toString(), 10)}`
+  const walletName = `wallet${parseInt((Math.random() * 1000).toString(), 10)}`
+  const walletID = v4()
   return {
-    name: walletID,
+    name: walletName,
     id: walletID,
     balance: 0,
     address: '',
@@ -43,6 +46,17 @@ export const wallets = () => {
     list = [generateWallet(), generateWallet(), generateWallet(), generateWallet(), generateWallet()]
   }
   return list
+}
+
+export const updateWallets = (newWallets: Wallet[]) => {
+  list = newWallets
+}
+
+export const validatePassword = (wallet: Wallet, password: string) => {
+  if (wallet.password === password) {
+    return true
+  }
+  return false
 }
 
 export const mockedTransaction = {
