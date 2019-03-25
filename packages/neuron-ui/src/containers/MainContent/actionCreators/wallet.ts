@@ -1,5 +1,5 @@
 import { initState, MainActions } from '../reducer'
-import { createWallet, deleteWallet, importWallet, exportWallet } from '../../../services/UILayer'
+import { createWallet, importWallet, exportWallet } from '../../../services/UILayer'
 
 export default {
   createWallet: (wallet: typeof initState.tempWallet) => {
@@ -12,12 +12,6 @@ export default {
     importWallet(wallet)
     return {
       type: MainActions.ImportWallet,
-    }
-  },
-  deleteWallet: (address: string) => {
-    deleteWallet(address)
-    return {
-      type: MainActions.DeleteWallet,
     }
   },
   exportWallet: () => {
