@@ -21,6 +21,7 @@ export default {
       'scan-to-get-address': 'scan the qrcode to get address',
     },
     history: {
+      meta: 'meta',
       type: 'type',
       date: 'date',
       amount: 'amount(ckb)',
@@ -28,6 +29,12 @@ export default {
       sent: 'sent',
       received: 'received',
       other: 'other',
+      'more-actions': 'more actions',
+      detail: 'detail',
+      explorer: 'explorer',
+    },
+    transaction: {
+      goBack: 'go back',
     },
     addresses: {
       addresses: 'Addresses',

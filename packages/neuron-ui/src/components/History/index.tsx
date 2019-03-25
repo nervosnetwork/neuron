@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import { Container, Row, Col, Badge, ListGroup, ListGroupItem, Dropdown, Alert } from 'react-bootstrap'
+import { Container, Row, Col, Badge, Table, Dropdown, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import { Close as CloseIcon } from 'grommet-icons'
 
@@ -17,8 +17,9 @@ import { TransactionType, EXPLORER } from '../../utils/const'
 import { dateFormatter } from '../../utils/formatters'
 import i18n from '../../utils/i18n'
 
-const TimeHeader = styled(ListGroupItem)`
-  background-color: #eee;
+const MetaData = styled.td`
+  display: flex;
+  flex-direction: column;
 `
 
 const AddressBadge = styled(Badge)`
@@ -31,6 +32,20 @@ const DropdownItem = styled(Link).attrs({
 })`
   cursor: initial;
 `
+
+const HistoryItemActions = ({ history }: { history: Transaction }) => (
+  <td>
+    <Dropdown>
+      <Dropdown.Toggle variant="outline-dark" id={history.hash} />
+      <Dropdown.Menu>
+        <DropdownItem to={`/transaction/${history.hash}`}>{i18n.t('history.detail')}</DropdownItem>
+        <Dropdown.Item href={EXPLORER} target="_blank">
+          {i18n.t('history.explorer')}
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  </td>
+)
 
 const headers = [
   {
@@ -45,6 +60,10 @@ const headers = [
     label: 'history.amount',
     key: 'value',
   },
+  {
+    label: 'history.more-actions',
+    key: 'actions',
+  },
 ]
 
 const queryGen = (params: { [index: string]: any }) => {
@@ -55,53 +74,20 @@ const queryGen = (params: { [index: string]: any }) => {
   return newQuery
 }
 
-const transactionsToHistory = (transactions: Transaction[]) =>
-  transactions.map((tx: Transaction) => {
-    const { date, time } = dateFormatter(tx.date)
-    return {
-      ...tx,
-      meta: (
-        <>
-          <div>{i18n.t(`history.${TransactionType[tx.type as TransactionType]}`.toLowerCase())}</div>
-          <div>{time}</div>
-        </>
-      ),
-      key: tx.hash,
-      date,
-    }
-  })
-
 const groupHistory = (items: Transaction[]) => {
-  const listItems: JSX.Element[] = []
-  transactionsToHistory(items).reduce((acc: string | null, cur) => {
-    if (cur.date !== acc) {
-      listItems.push(<TimeHeader key={cur.date}>{cur.date}</TimeHeader>)
+  return items.reduce((acc: Transaction[][], cur: Transaction) => {
+    if (!acc.length) {
+      acc.push([cur])
+      return acc
     }
-    listItems.push(
-      <ListGroup.Item key={cur.hash}>
-        <Container>
-          <Row>
-            {headers.map(header => (
-              <Col key={header.key}>{cur[header.key as keyof typeof cur]}</Col>
-            ))}
-            <Col>
-              <Dropdown>
-                <Dropdown.Toggle variant="light" id={cur.hash} />
-                <Dropdown.Menu>
-                  <DropdownItem to={`/transaction/${cur.hash}`}>Detail</DropdownItem>
-                  <Dropdown.Item href={EXPLORER} target="_blank">
-                    Explorer
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Col>
-          </Row>
-        </Container>
-      </ListGroup.Item>,
-    )
-    return cur.date
-  }, null)
-  return listItems
+    const lastGroup = acc[acc.length - 1]
+    if (dateFormatter(cur.date).date === dateFormatter(lastGroup[0].date).date) {
+      lastGroup.push(cur)
+      return acc
+    }
+    acc.push([cur])
+    return acc
+  }, [])
 }
 
 const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
@@ -161,7 +147,33 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
         </AddressBadge>
       ))}
-      <ListGroup variant="flush">{groupHistory(items).map(item => item)}</ListGroup>
+      {groupHistory(items).map(group => (
+        <Table key={dateFormatter(group[0].date).date} striped>
+          <thead>
+            <tr>
+              <th colSpan={headers.length}>{dateFormatter(group[0].date).date}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {group.map((historyItem: Transaction) => (
+              <tr key={historyItem.hash}>
+                {headers.map(header => {
+                  if (header.key === headers[0].key)
+                    return (
+                      <MetaData key={headers[0].key}>
+                        <span>{t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}</span>
+                        <span>{dateFormatter(historyItem.date).date}</span>
+                      </MetaData>
+                    )
+                  if (header.key === headers[headers.length - 1].key)
+                    return <HistoryItemActions key={headers[headers.length - 1].key} history={historyItem} />
+                  return <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ))}
       <Row>
         <Col>
           <Pagination currentPage={pageNo} pageSize={pageSize} total={totalCount} onChange={onPageChange} />

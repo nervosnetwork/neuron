@@ -21,6 +21,7 @@ export default {
       'scan-to-get-address': '扫码二维码以获取地址',
     },
     history: {
+      meta: '元信息',
       type: '类型',
       date: '时间',
       amount: '价值(ckb)',
@@ -28,6 +29,12 @@ export default {
       sent: '发出',
       received: '收入',
       other: '其他',
+      'more-actions': '更多操作',
+      detail: '详情',
+      explorer: '浏览器',
+    },
+    transaction: {
+      goBack: '返回',
     },
     addresses: {
       deletewallet: '删除钱包',

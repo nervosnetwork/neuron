@@ -1,6 +1,6 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Card, Alert } from 'react-bootstrap'
+import { Card, Alert, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { ContentProps } from '../../containers/MainContent'
@@ -10,7 +10,7 @@ import { ProviderActions } from '../../containers/Providers/reducer'
 import ChainContext from '../../contexts/Chain'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
-  const { match, errorMsgs, dispatch, providerDispatch, loadings } = props
+  const { match, errorMsgs, dispatch, providerDispatch, loadings, history } = props
   const chain = useContext(ChainContext)
   const [t] = useTranslation()
   const { transaction } = chain
@@ -31,6 +31,10 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
     }
   }, [match.params.hash])
 
+  const goBack = useCallback(() => {
+    history.goBack()
+  }, [])
+
   const loading = loadings.transaction
 
   return (
@@ -47,12 +51,15 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
           <b>{`${t('history.amount')}: `}</b>
           {loading ? 'Loading' : transaction.value}
         </Card.Text>
-      </Card.Body>
-      <Card.Footer>
         <Card.Text>
           <b>{`${t('history.date')}: `}</b>
           {loading ? 'Loading' : new Date(transaction.date).toLocaleString()}
         </Card.Text>
+      </Card.Body>
+      <Card.Footer>
+        <Button variant="primary" onClick={goBack} onKeyPress={goBack}>
+          {t('transaction.goBack')}
+        </Button>
       </Card.Footer>
     </Card>
   )
