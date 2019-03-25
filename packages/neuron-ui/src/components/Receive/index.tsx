@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Container, Card, OverlayTrigger, Tooltip, Modal, Form } from 'react-bootstrap'
 import QRCode from 'qrcode.react'
+import { RouteComponentProps } from 'react-router-dom'
 import { Copy } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
@@ -34,15 +35,17 @@ const QRCodeModal = styled.div`
   text-align: center;
 `
 
-const Receive = ({ address }: { address: string }) => {
+const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: string }>>) => {
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
+  const { match } = props
+  const { params } = match
   const generateNewAddress = () => {
     // TODO: generate new address
     return '0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674'
   }
 
-  const accountAddress = address === undefined ? generateNewAddress() : address
+  const accountAddress = !params.address.startsWith('0x') ? generateNewAddress() : params.address
   const copyAddress = () => {
     window.clipboard.writeText(accountAddress)
   }
