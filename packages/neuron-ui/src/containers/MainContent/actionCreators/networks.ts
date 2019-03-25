@@ -5,7 +5,6 @@ import { MainActions } from '../reducer'
 
 import { Routes, Message, MAX_NETWORK_NAME_LENGTH } from '../../../utils/const'
 import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
-import i18n from '../../../utils/i18n'
 
 const Testnet = defaultNetworks[0].name
 
@@ -26,11 +25,11 @@ export default {
         },
       }
     }
-    if (editorNetwork.name.length > 28) {
+    if (editorNetwork.name.length > MAX_NETWORK_NAME_LENGTH) {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
+          networks: Message.LengthOfNameShouldBeLessThanOrEqualTo,
         },
       }
     }

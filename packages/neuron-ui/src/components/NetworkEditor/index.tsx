@@ -9,6 +9,7 @@ import InlineInput, { InputProps } from '../../widgets/InlineInput'
 
 import ChainContext from '../../contexts/Chain'
 import SettingsContext from '../../contexts/Settings'
+import { MAX_NETWORK_NAME_LENGTH } from '../../utils/const'
 
 enum PlaceHolder {
   Name = 'My Custom Node',
@@ -86,7 +87,13 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   return (
     <Card>
       <Card.Header>{idx === -1 ? t('settings.network.editnetwork.title') : params.name}</Card.Header>
-      {errorMsgs.networks ? <Alert variant="warning">{t(`messages.${errorMsgs.networks}`)}</Alert> : null}
+      {errorMsgs.networks ? (
+        <Alert variant="warning">
+          {t(`messages.${errorMsgs.networks}`, {
+            length: MAX_NETWORK_NAME_LENGTH,
+          })}
+        </Alert>
+      ) : null}
       <Card.Body>
         <Form>
           {inputs.map(inputProps => (

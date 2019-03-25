@@ -110,7 +110,7 @@ export default {
       'at-least-one-address-needed': 'at least one address needed',
       'name-is-required': 'name is required',
       'url-is-required': 'url is required',
-      'length-of-name-should-be-less-than-or-equal-to': 'length-of-name-should-be-less-than-or-equal-to',
+      'length-of-name-should-be-less-than-or-equal-to': 'length-of-name-should-be-less-than-or-equal-to {{length}}',
       'network-name-exists': 'network name exists',
       'invalid-address': 'invalid address',
       'invalid-capacity': 'invalid capacity',
