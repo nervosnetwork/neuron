@@ -6,6 +6,8 @@ export enum ProviderActions {
   Chain,
   Wallet,
   Settings,
+  CleanTransaction,
+  CleanTransactions,
 }
 
 export const initProviders = {
@@ -42,6 +44,24 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
         chain: {
           ...state.chain,
           ...action.payload,
+        },
+      }
+    }
+    case ProviderActions.CleanTransaction: {
+      return {
+        ...state,
+        chain: {
+          ...state.chain,
+          transaction: initChain.transaction,
+        },
+      }
+    }
+    case ProviderActions.CleanTransactions: {
+      return {
+        ...state,
+        chain: {
+          ...state.chain,
+          transactions: initChain.transactions,
         },
       }
     }

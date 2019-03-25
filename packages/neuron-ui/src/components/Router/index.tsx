@@ -14,6 +14,7 @@ import WalletDetail from '../WalletDetail'
 import Send from '../Transfer'
 import Receive from '../Receive'
 import History from '../History'
+import Transaction from '../Transaction'
 import Addresses from '../Addresses'
 import Settings from '../Settings'
 import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
@@ -29,6 +30,7 @@ import WalletContext from '../../contexts/Wallet'
 export interface CustomRoute {
   path: string
   name: string
+  params?: string
   exact?: boolean
   component: React.FunctionComponent<any>
 }
@@ -86,6 +88,13 @@ export const mainContents: CustomRoute[] = [
     component: History,
   },
   {
+    name: `Transaction`,
+    path: Routes.Transaction,
+    params: '/:hash',
+    exact: false,
+    component: Transaction,
+  },
+  {
     name: `Addresses`,
     path: Routes.Addresses,
     exact: false,
@@ -117,13 +126,15 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `NetorkEditor`,
-    path: `${Routes.NetworkEditor}/:name`,
+    path: Routes.NetworkEditor,
+    params: '/:name',
     exact: true,
     component: NetworkEditor,
   },
   {
     name: `WalletEditor`,
-    path: `${Routes.WalletEditor}/:wallet`,
+    path: Routes.WalletEditor,
+    params: '/:wallet',
     exact: true,
     component: WalletEditor,
   },
@@ -153,7 +164,7 @@ export const mainContents: CustomRoute[] = [
   },
 ]
 
-const CustomRouter = () => {
+const CustomRouter = (appProps: any) => {
   const wallet = useContext(WalletContext)
 
   return (
@@ -167,7 +178,7 @@ const CustomRouter = () => {
           return (
             <>
               {wallet.address ? <RoutesWithProps contents={containers} /> : null}
-              <MainContent>
+              <MainContent {...appProps}>
                 <RoutesWithProps contents={mainContents} />
               </MainContent>
             </>

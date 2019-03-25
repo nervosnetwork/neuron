@@ -50,7 +50,7 @@ module.exports = {
     }],
     "no-plusplus": [0],
     "no-console": [2, {
-      "allow": ["warn", "error"]
+      "allow": ["warn", "error", "info"]
     }]
   },
   "env": {

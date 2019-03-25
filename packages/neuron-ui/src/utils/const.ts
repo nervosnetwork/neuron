@@ -1,4 +1,5 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
+export const EXPLORER = 'http://localhost:3000'
 
 export const DEFAULT_NETWORKS = [
   {
@@ -59,6 +60,7 @@ export enum Routes {
   Send = '/send',
   Receive = '/receive',
   History = '/history',
+  Transaction = '/transaction',
   Addresses = '/addresses',
   Settings = '/settings',
   SettingsGeneral = '/settings/general',
@@ -106,4 +108,10 @@ export enum Message {
   InvalidCapacity = 'invalid-capacity',
   CapacityNotEnough = 'capacity-is-not-enough',
   IsUnremovable = 'is-unremovable',
+}
+
+export enum TransactionType {
+  Sent,
+  Received,
+  Other,
 }
