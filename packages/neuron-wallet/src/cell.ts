@@ -6,14 +6,15 @@ export interface OutPoint {
   index: number
 }
 
-interface Script {
+export interface Script {
   version: number
-  args: string[]
+  args?: string[]
   signedArgs: string[]
   reference?: string | null
   binary?: string
 }
 
+// FIXME: should update capacity to string
 export interface Cell {
   capacity: number
   data: string
