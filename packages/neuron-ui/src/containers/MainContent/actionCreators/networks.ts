@@ -22,15 +22,17 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.NameIsRequired,
+          networks: i18n.t(`messages.${Message.NameIsRequired}`),
         },
       }
     }
-    if (editorNetwork.name.length > 28) {
+    if (editorNetwork.name.length > MAX_NETWORK_NAME_LENGTH) {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
+          networks: i18n.t(`messages.${Message.LengthOfNameShouldBeLessThanOrEqualTo}`, {
+            length: MAX_NETWORK_NAME_LENGTH,
+          }),
         },
       }
     }
@@ -38,7 +40,7 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.URLIsRequired,
+          networks: i18n.t(`messages.${Message.URLIsRequired}`),
         },
       }
     }
@@ -51,7 +53,7 @@ export default {
         return {
           type: MainActions.ErrorMessage,
           payload: {
-            networks: Message.NetworkNameExist,
+            networks: i18n.t(`messages.${Message.NetworkNameExist}`),
           },
         }
       }
@@ -76,7 +78,9 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: `${Testnet} is unremovable`,
+          networks: i18n.t(`messages.is-unremovable`, {
+            target: Testnet,
+          }),
         },
       }
     }
