@@ -108,7 +108,7 @@ export default {
       'invalid-address': '无效的地址',
       'invalid-capacity': '无效的价值',
       'capacity-is-not-enough': '余额不足',
-      'is unremovable': '不可删除',
+      'is-unremovable': '{{target}}不可删除',
     },
   },
 }

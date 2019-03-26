@@ -115,7 +115,7 @@ export default {
       'invalid-address': 'invalid address',
       'invalid-capacity': 'invalid capacity',
       'capacity-is-not-enough': 'capacity is not enough',
-      'is unremovable': 'is unremovable',
+      'is-unremovable': '{{target}} is unremovable',
     },
   },
 }

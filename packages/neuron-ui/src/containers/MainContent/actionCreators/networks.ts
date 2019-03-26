@@ -5,6 +5,7 @@ import { MainActions } from '../reducer'
 
 import { Routes, Message, MAX_NETWORK_NAME_LENGTH } from '../../../utils/const'
 import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
+import i18n from '../../../utils/i18n'
 
 const Testnet = defaultNetworks[0].name
 
@@ -21,7 +22,7 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.NameIsRequired,
+          networks: i18n.t(`messages.${Message.NameIsRequired}`),
         },
       }
     }
@@ -29,7 +30,9 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.LengthOfNameShouldBeLessThanOrEqualTo,
+          networks: i18n.t(`messages.${Message.LengthOfNameShouldBeLessThanOrEqualTo}`, {
+            length: MAX_NETWORK_NAME_LENGTH,
+          }),
         },
       }
     }
@@ -37,7 +40,7 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: Message.URLIsRequired,
+          networks: i18n.t(`messages.${Message.URLIsRequired}`),
         },
       }
     }
@@ -50,7 +53,7 @@ export default {
         return {
           type: MainActions.ErrorMessage,
           payload: {
-            networks: Message.NetworkNameExist,
+            networks: i18n.t(`messages.${Message.NetworkNameExist}`),
           },
         }
       }
@@ -75,7 +78,9 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: `${Testnet} is unremovable`,
+          networks: i18n.t(`messages.is-unremovable`, {
+            target: Testnet,
+          }),
         },
       }
     }
