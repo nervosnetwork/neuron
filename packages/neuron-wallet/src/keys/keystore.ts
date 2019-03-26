@@ -12,4 +12,5 @@ export interface Child {
 export interface Keystore {
   master: Master
   children?: Child[]
+  password: string
 }

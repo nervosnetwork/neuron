@@ -84,16 +84,17 @@ export class Listeners {
    * @description channel to create wallet
    */
   static createWallet = () => {
-    return ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: Wallet) => {
-      e.sender.send(Channel.CreateWallet, {
-        status: ResponseStatus.Success,
-        result: {
-          name: wallet.name,
-          address: 'wallet address',
-          publicKey: 'public key',
-        },
-      })
-    })
+    return ipcMain.on(
+      Channel.CreateWallet,
+      (e: Electron.Event, { walletName, password }: { walletName: string; password: string }) => {
+        const walletStore = new WalletStore()
+        const walletID = walletStore.saveWallet(walletName, Key.generateKey(password).getKeystore())
+        e.sender.send(Channel.CreateWallet, {
+          status: ResponseStatus.Success,
+          result: walletID,
+        })
+      },
+    )
   }
 
   /**
@@ -173,18 +174,18 @@ export class Listeners {
         e: Electron.Event,
         {
           walletName,
+          password,
           mnemonic,
-          derive,
           keystore,
-        }: { walletName: string; mnemonic: string; derive: boolean; keystore: string },
+        }: { walletName: string; password: string; mnemonic: string; keystore: string },
       ) => {
         try {
           const walletStore = new WalletStore()
           let storedKeystore
           if (mnemonic) {
-            storedKeystore = Key.fromMnemonic(mnemonic, derive).getKeystore()
+            storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystore()
           } else if (keystore) {
-            storedKeystore = Key.fromKeystoreString(keystore).getKeystore()
+            storedKeystore = Key.fromKeystoreString(keystore, password).getKeystore()
           }
           if (storedKeystore) {
             walletStore.saveWallet(walletName, storedKeystore)

@@ -2,7 +2,7 @@ import { initState, MainActions } from '../reducer'
 import { createWallet, importWallet, exportWallet } from '../../../services/UILayer'
 
 export default {
-  createWallet: (wallet: typeof initState.tempWallet) => {
+  createWallet: (wallet: typeof initState.createWallet) => {
     createWallet(wallet)
     return {
       type: MainActions.CreateWallet,

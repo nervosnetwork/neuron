@@ -13,12 +13,19 @@ export default class Key {
     this.mnemonic = mnemonic
   }
 
-  public static fromKeystore = (keystore: Keystore) => {
+  public static fromKeystore = (keystore: Keystore, password: string) => {
+    if (!Key.checkPassword(keystore, password)) {
+      throw new Error('Wrong password')
+    }
     return new Key(keystore, '')
   }
 
-  public static fromKeystoreString = (json: string) => {
-    return new Key(JSON.parse(json), '')
+  public static fromKeystoreString = (json: string, password: string) => {
+    return Key.fromKeystore(JSON.parse(json), password)
+  }
+
+  public static checkPassword(keystore: Keystore, password: string) {
+    return keystore.password === password
   }
 
   getKeystore = () => this.keystore
@@ -27,12 +34,12 @@ export default class Key {
 
   getMnemonic = () => this.mnemonic
 
-  public static generateKey = () => {
+  public static generateKey = (password: string) => {
     const mnemonic = bip39.generateMnemonic()
-    return Key.fromMnemonic(mnemonic, false)
+    return Key.fromMnemonic(mnemonic, false, password)
   }
 
-  public static fromMnemonic = (mnemonic: string, derive: boolean) => {
+  public static fromMnemonic = (mnemonic: string, derive: boolean, password: string) => {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }
@@ -44,6 +51,7 @@ export default class Key {
     }
     const keystore: Keystore = {
       master,
+      password,
     }
     if (derive) {
       keystore.children = Tool.searchUsedChildKeys(root)

@@ -2,9 +2,14 @@ import { CapacityUnit } from '../../utils/const'
 
 export const initState = {
   tempWallet: {
-    name: '',
+    walletName: '',
     password: '',
     mnemonic: '',
+    keystore: '',
+  },
+  createWallet: {
+    walletName: '',
+    password: '',
   },
   transfer: {
     items: [

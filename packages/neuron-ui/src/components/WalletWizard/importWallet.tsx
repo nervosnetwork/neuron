@@ -55,9 +55,10 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
             // temp logic for simulate creation
             props.dispatch(
               actionCreators.importWallet({
-                name: settings.name,
+                walletName: settings.name,
                 mnemonic: settings.seeds,
                 password: '',
+                keystore: '',
               }),
             )
           }}
