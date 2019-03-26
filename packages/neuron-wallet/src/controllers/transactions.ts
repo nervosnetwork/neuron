@@ -1,6 +1,6 @@
-import TransactionsService, { Transaction, TransactionsParams } from '../services/transactions'
 import { ResponseCode, Response } from '.'
 import WalletChannel from '../channel/wallet'
+import TransactionsService, { Transaction, TransactionsParams } from '../services/transactions'
 
 export default class TransactionsController {
   public channel: WalletChannel

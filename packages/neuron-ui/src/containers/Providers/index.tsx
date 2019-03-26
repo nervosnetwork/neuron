@@ -5,7 +5,7 @@ import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
-import UILayer from '../../services/UILayer'
+import UILayer, { NetworksMethod, TransactionsMethod } from '../../services/UILayer'
 import { Channel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
@@ -87,10 +87,10 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.Transactions, (_e: Event, method: 'index' | 'show', args: Response<any>) => {
+    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: Response<any>) => {
       if (args.status) {
         switch (method) {
-          case 'index': {
+          case TransactionsMethod.Index: {
             dispatch({
               type: ProviderActions.Chain,
               payload: {
@@ -99,7 +99,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case 'show': {
+          case TransactionsMethod.Show: {
             dispatch({
               type: ProviderActions.Chain,
               payload: {
@@ -117,52 +117,44 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(
-      Channel.Networks,
-      (
-        _e: Event,
-        method: 'index' | 'show' | 'create' | 'delete' | 'update' | 'activeNetwork' | 'setActive',
-        args: Response<any>,
-      ) => {
-        if (args.status) {
-          switch (method) {
-            case 'index': {
-              // handle new network list
-              dispatch({
-                type: ProviderActions.Settings,
-                payload: {
-                  networks: args.result,
-                },
-              })
-              break
-            }
-            case 'activeNetwork': {
-              dispatch({
-                type: ProviderActions.Chain,
-                payload: {
-                  network: args.result,
-                },
-              })
-              break
-            }
-            case 'setActive': {
-              dispatch({
-                type: ProviderActions.Chain,
-                payload: {
-                  network: args.result,
-                },
-              })
-              break
-            }
-            default: {
-              break
-            }
+    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: Response<any>) => {
+      if (args.status) {
+        switch (method) {
+          case NetworksMethod.Index: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: {
+                networks: args.result,
+              },
+            })
+            break
           }
-        } else {
-          // TODO: handle error
+          case NetworksMethod.ActiveNetwork: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                network: args.result,
+              },
+            })
+            break
+          }
+          case NetworksMethod.SetActive: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                network: args.result,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
         }
-      },
-    )
+      } else {
+        // TODO: handle error
+      }
+    })
   }, [])
 
   return (

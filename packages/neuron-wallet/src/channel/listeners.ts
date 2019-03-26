@@ -1,7 +1,7 @@
 import { ipcMain, Notification } from 'electron'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount, wallets, validatePassword, updateWallets, Wallet } from '../mock'
+import { wallets, validatePassword, updateWallets, Wallet } from '../mock'
 import asw from '../wallets/asw'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/netowrks'
@@ -29,7 +29,6 @@ const checkPassword = (walletID: string, password: string) => {
   }
 }
 
-// controll styled code
 export default class Listeners {
   static start = (
     methods: string[] = [
@@ -38,13 +37,9 @@ export default class Listeners {
       'switchWallet',
       'getBalance',
       'asw',
-      'getUnspentCells',
-      'getTransaction',
-      'getTransactions',
       'getWallets',
       'checkWalletPassword',
       'sendCapacity',
-      // controller style code
       'networks',
       'transactions',
     ],
@@ -167,71 +162,6 @@ export default class Listeners {
   }
 
   /**
-   * @static getUnspentCells
-   * @memberof ChannelListeners
-   * @description channel to get unspent cells
-   */
-  static getUnspentCells = () => {
-    return ipcMain.on(Channel.GetUnspentCells, (e: Electron.Event) => {
-      e.sender.send(Channel.GetUnspentCells, {
-        status: ResponseCode.Success,
-        result: [`cell`],
-      })
-    })
-  }
-
-  /**
-   * @static getTransaction
-   * @memberof ChannelListeners
-   * @description get transaction by hash
-   */
-  static getTransaction = () => {
-    return ipcMain.on(Channel.GetTransaction, (e: Electron.Event, { hash }: { hash: string }) => {
-      const transaction = transactions.find(tx => `${tx.hash}` === hash)
-      if (transaction) {
-        e.sender.send(Channel.GetTransaction, {
-          status: ResponseCode.Success,
-          result: transaction,
-        })
-      } else {
-        e.sender.send(Channel.GetTransaction, {
-          status: ResponseCode.Fail,
-          msg: `Transaction of ${hash} is not found`,
-        })
-      }
-    })
-  }
-
-  /**
-   * @static getTransactions
-   * @memberof ChannelListeners
-   * @description get transactions
-   */
-  static getTransactions = () => {
-    return ipcMain.on(
-      Channel.GetTransactions,
-      (
-        e: Electron.Event,
-        { pageNo, pageSize, addresses }: { pageNo: number; pageSize: number; addresses: string[] },
-      ) => {
-        e.sender.send(Channel.GetTransactions, {
-          status: ResponseCode.Success,
-          result: {
-            addresses,
-            pageNo,
-            pageSize,
-            totalCount: transactionCount,
-            items: transactions.map(tx => ({
-              ...tx,
-              value: +tx.value * pageNo * pageSize,
-            })),
-          },
-        })
-      },
-    )
-  }
-
-  /**
    * @static getWallets
    * @memberof ChannelListeners
    * @description channel to get wallets
@@ -288,13 +218,22 @@ export default class Listeners {
     )
   }
 
-  // controller style code
+  /**
+   * @method networks
+   * @memberof ChannelListeners
+   * @description listen to Channel.Networks and invoke corresponding method of networksController
+   */
   public static networks = () => {
     return ipcMain.on(Channel.Networks, (e: Electron.Event, method: keyof typeof NetworksController, params: any) => {
       e.sender.send(Channel.Networks, method, (NetworksController[method] as Function)(params))
     })
   }
 
+  /**
+   * @method transactions
+   * @memberof ChannelListeners
+   * @description listen to Channel.Transactions and invoke corresponding method of transactionsController
+   */
   public static transactions = () => {
     return ipcMain.on(
       Channel.Transactions,

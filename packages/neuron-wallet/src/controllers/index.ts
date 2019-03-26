@@ -7,6 +7,5 @@ export interface Response<T = any> {
   msg?: string
   result?: T
 }
-class Controller {}
 
-export default Controller
+export default undefined

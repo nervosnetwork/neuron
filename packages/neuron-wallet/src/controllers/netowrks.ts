@@ -1,9 +1,18 @@
-import { Channel } from '../utils/const'
 import { ResponseCode, Response } from '.'
-import NetowrkService, { Network } from '../services/networks'
-import WalletChannel from '../channel/wallet'
 import windowManage from '../main'
+import WalletChannel from '../channel/wallet'
+import NetowrkService, { Network } from '../services/networks'
+import { Channel } from '../utils/const'
 
+export enum NetworksMethod {
+  Index = 'index',
+  Show = 'show',
+  Create = 'create',
+  Update = 'update',
+  Delete = 'delete',
+  ActiveNetwork = 'activeNetwork',
+  SetActive = 'setActive',
+}
 class NetworksController {
   public channel: WalletChannel
 
@@ -48,7 +57,7 @@ class NetworksController {
     if (network.name && network.remote) {
       const newNetwork = NetworksController.service.create(network.name, network.remote)
       // TODO: sync
-      windowManage.broad(Channel.Networks, 'index', NetworksController.index())
+      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: newNetwork,
@@ -65,7 +74,7 @@ class NetworksController {
     const success = NetworksController.service.update(network)
     if (success) {
       // TODO: sync
-      windowManage.broad(Channel.Networks, 'index', NetworksController.index())
+      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: true,
@@ -92,10 +101,10 @@ class NetworksController {
       // check if deleted network is current network, switch to default network if true
       if (activeNetwork && activeNetwork.id === id) {
         NetworksController.service.setActive(defaultNetwork.id)
-        windowManage.broad(Channel.Networks, 'activeNetwork', NetworksController.activeNetwork())
+        windowManage.broad(Channel.Networks, NetworksMethod.ActiveNetwork, NetworksController.activeNetwork())
       }
       // TODO: sync
-      windowManage.broad(Channel.Networks, 'index', NetworksController.index())
+      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: true,

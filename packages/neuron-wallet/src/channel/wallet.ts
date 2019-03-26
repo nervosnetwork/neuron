@@ -1,14 +1,14 @@
 import { BrowserWindow } from 'electron'
-import { Network } from '../services/networks'
+
+import Listeners from './listeners'
 import { Response } from '../controllers'
+import NetworksController, { NetworksMethod } from '../controllers/netowrks'
+import { Network } from '../services/networks'
+
+import asw from '../wallets/asw'
 
 import { Channel } from '../utils/const'
 import { transactions, transactionCount } from '../mock'
-import asw from '../wallets/asw'
-import Listeners from './listeners'
-
-// controll styled code
-import NetworksController from '../controllers/netowrks'
 
 export enum ResponseCode {
   Fail,
@@ -86,13 +86,14 @@ export default class WalletChannel extends Listeners {
   }) => {
     if (!this.win) return
     if (params.networks) {
-      this.win.webContents.send(Channel.Networks, 'index', params.networks)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.Index, params.networks)
     }
     if (params.active) {
-      this.win.webContents.send(Channel.Networks, 'activeNetwork', params.active)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveNetwork, params.active)
     }
-    if (params.status) {
-      this.win.webContents.send(Channel.Networks, 'status', params.status)
-    }
+    // TODO: status handler
+    // if (params.status) {
+    //   this.win.webContents.send(Channel.Networks, 'status', params.status)
+    // }
   }
 }

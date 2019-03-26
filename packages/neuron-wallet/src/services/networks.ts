@@ -6,6 +6,7 @@ export interface Network {
   remote: string
 }
 
+// this should come from config or db
 export const defaultNetowrks: Network[] = [
   {
     id: '0',

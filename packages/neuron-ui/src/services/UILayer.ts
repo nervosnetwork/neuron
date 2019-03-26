@@ -1,12 +1,26 @@
 import { Channel, CapacityUnit } from '../utils/const'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
-import { Network } from '../contexts/Chain'
 
 declare global {
   interface Window {
     require: any
     bridge: any
   }
+}
+
+export enum NetworksMethod {
+  Index = 'index',
+  Show = 'show',
+  Create = 'create',
+  Update = 'update',
+  Delete = 'delete',
+  ActiveNetwork = 'activeNetwork',
+  SetActive = 'setActive',
+}
+
+export enum TransactionsMethod {
+  Index = 'index',
+  Show = 'show',
 }
 
 export interface TransferItem {
@@ -92,31 +106,12 @@ export const importWallet = (wallet: { walletName: string; password: string; mne
   UILayer.send(Channel.ImportWallet, wallet)
 
 export const exportWallet = () => UILayer.send(Channel.ExportWallet)
-export const getLiveCell = (outpoint: any) => UILayer.send('getLiveCell', outpoint)
-export const getCellsByTypeHash = (typeHash: string) => {
-  UILayer.send(Channel.GetCellsByTypeHash, typeHash)
-}
 
 export const sendCapacity = (items: TransferItem[], password: string) => {
   return UILayer.sendSync(Channel.SendCapacity, {
     items,
     password,
   })
-}
-export const setNetwork = (network: Network) => {
-  UILayer.send(Channel.Networks, 'setActive', network.id)
-}
-
-export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: GetTransactionsParams) => {
-  UILayer.send(Channel.Transactions, 'index', {
-    pageNo,
-    pageSize,
-    addresses,
-  })
-}
-
-export const getTransaction = (hash: string) => {
-  UILayer.send(Channel.Transactions, 'show', hash)
 }
 
 export const checkPassword = (walletID: string, password: string, handleResult: any) => {
@@ -131,6 +126,9 @@ export const checkPassword = (walletID: string, password: string, handleResult: 
 
 export const networks = (method: string, params: any) => {
   UILayer.send(Channel.Networks, method, params)
+}
+export const transactions = (method: string, params: GetTransactionsParams | string) => {
+  UILayer.send(Channel.Transactions, method, params)
 }
 
 export default UILayer

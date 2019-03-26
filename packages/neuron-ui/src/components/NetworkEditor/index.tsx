@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -18,10 +18,17 @@ enum TooltipText {
 }
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
-  const { networkEditor, dispatch, errorMsgs, match } = props
+  const { networkEditor, dispatch, errorMsgs, match, history } = props
   const { params } = match
   const [t] = useTranslation()
   const settings = useContext(SettingsContext)
+
+  const currentNetwork = settings.networks.find(n => n.id === params.id)
+
+  const ref = useRef({
+    count: settings.networks.length,
+    detail: currentNetwork,
+  })
 
   useEffect(() => {
     if (params.id === 'new') {
@@ -47,6 +54,18 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
       // TODO: clean
     }
   }, [params.id])
+
+  useEffect(() => {
+    if (
+      ref.current.count !== settings.networks.length ||
+      JSON.stringify(ref.current.detail) !== JSON.stringify(currentNetwork)
+    ) {
+      history.goBack()
+    }
+    return () => {
+      // TODO: clean
+    }
+  }, [settings.networks.length, JSON.stringify(currentNetwork)])
 
   const inputs: InputProps[] = [
     {
@@ -80,7 +99,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   return (
     <Card>
       <Card.Header>{params.id === 'new' ? t('settings.network.editnetwork.title') : 'name'}</Card.Header>
-      {errorMsgs.networks ? <Alert variant="warning">{t(`messages.${errorMsgs.networks}`)}</Alert> : null}
+      {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
       <Card.Body>
         <Form>
           {inputs.map(inputProps => (

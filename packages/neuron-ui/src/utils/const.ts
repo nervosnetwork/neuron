@@ -20,31 +20,21 @@ export enum NetworkStatus {
 }
 
 export enum Channel {
-  // App
   SetLanguage = 'setLanguage',
-
-  // Wallet
   CreateWallet = 'createWallet',
   DeleteWallet = 'deleteWallet',
   EditWallet = 'editWallet',
   ImportWallet = 'importWallet',
   ExportWallet = 'exportWallet',
-  SwitchWallet = 'switchWallet',
   GetBalance = 'getBalance',
-  GetCellsByTypeHash = 'getCellsByTypeHash',
-  GetTransactions = 'getTransactions',
   GetWallet = 'getWallet',
   CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
 
-  // Page
   NavTo = 'navTo',
-  // Terminal
   Terminal = 'terminal',
-  // promise style channel
   Networks = 'networks',
-  //
   Transactions = 'transactions',
   Wallet = 'wallet',
 }

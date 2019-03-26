@@ -1,13 +1,13 @@
-import { setNetwork, networks } from '../../../services/UILayer'
+import { networks, NetworksMethod } from '../../../services/UILayer'
 import { Network } from '../../../contexts/Chain'
 import { MainActions } from '../reducer'
 
-import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId } from '../../../utils/const'
+import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId, UnremovableNetwork } from '../../../utils/const'
 import i18n from '../../../utils/i18n'
 
 export default {
   getNetwork: (id: string) => {
-    networks('show', id)
+    networks(NetworksMethod.Show, id)
     return {
       type: MainActions.UpdateLoading,
       payload: {
@@ -16,13 +16,39 @@ export default {
     }
   },
   createOrUpdateNetowrk: ({ id, name, remote }: { id?: string; name: string; remote: string }) => {
+    if (!name) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: i18n.t(`messages.${Message.NameIsRequired}`),
+        },
+      }
+    }
+    if (name.length > MAX_NETWORK_NAME_LENGTH) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: i18n.t(`messages.${Message.LengthOfNameShouldBeLessThanOrEqualTo}`, {
+            length: MAX_NETWORK_NAME_LENGTH,
+          }),
+        },
+      }
+    }
+    if (!remote) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: i18n.t(`messages.${Message.URLIsRequired}`),
+        },
+      }
+    }
     if (id === 'new') {
-      networks('create', {
+      networks(NetworksMethod.Create, {
         name,
         remote,
       })
     } else {
-      networks('update', {
+      networks(NetworksMethod.Update, {
         id,
         name,
         remote,
@@ -41,11 +67,13 @@ export default {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: `This netowrk is unremovable`,
+          networks: i18n.t(`messages.is-unremovable`, {
+            target: UnremovableNetwork,
+          }),
         },
       }
     }
-    networks('delete', id)
+    networks(NetworksMethod.Delete, id)
     return {
       type: MainActions.SetDialog,
       payload: {
@@ -53,11 +81,8 @@ export default {
       },
     }
   },
-  //
-  //
-  //
   setNetwork: (network: Network) => {
-    setNetwork(network)
+    networks(NetworksMethod.SetActive, network.id)
     return {
       type: MainActions.Netowrks,
       payload: network,

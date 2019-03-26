@@ -20,7 +20,6 @@ WalletChannel.start()
 
 const initUILayer = (win: BrowserWindow) => {
   const channel = new WalletChannel(win)
-  // const netowrksController = new NetowrksController(channel)
 
   dispatch(Command.SendWallet, {
     channel,
