@@ -73,7 +73,7 @@ export default class WalletChannel extends Listeners {
         totalCount: transactionCount,
         items: transactions.map(tx => ({
           ...tx,
-          value: tx.value * pageNo * pageSize,
+          value: +tx.value * pageNo * pageSize,
         })),
       },
     })

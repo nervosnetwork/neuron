@@ -100,6 +100,12 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             break
           }
           case 'show': {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                transaction: args.result,
+              },
+            })
             break
           }
           default: {
@@ -130,22 +136,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
               })
               break
             }
-            // case 'show': {
-            //   // handle single network
-            //   dispatch({
-            //     type: ProviderActions.Settings,
-            //     payload: {
-            //       transaction: args.result,
-            //     },
-            //   })
-            //   break
-            // }
-            // case 'create': {
-            //   break
-            // }
-            // case 'delete': {
-            //   break
-            // }
             case 'activeNetwork': {
               dispatch({
                 type: ProviderActions.Chain,

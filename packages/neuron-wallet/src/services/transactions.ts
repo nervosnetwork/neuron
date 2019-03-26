@@ -1,11 +1,22 @@
+import { transactions } from '../mock'
+
 export interface Transaction {
   hash: string
   type: number
+  date: number
   value: string
 }
-let currentTransaction: Transaction[] = []
+export interface TransactionsParams {
+  pageNo: number
+  pageSize: number
+  addresses: string[]
+}
+let currentTransaction: Transaction[] = transactions
 export default class TransactionsService {
-  public static index = (): Transaction[] => {
+  public static index = (params?: TransactionsParams): Transaction[] => {
+    if (params) {
+      // TODO
+    }
     return currentTransaction
   }
 

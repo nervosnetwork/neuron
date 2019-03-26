@@ -1,4 +1,4 @@
-import TransactionsService, { Transaction } from '../services/transactions'
+import TransactionsService, { Transaction, TransactionsParams } from '../services/transactions'
 import { ResponseCode, Response } from '.'
 import WalletChannel from '../channel/wallet'
 
@@ -11,12 +11,24 @@ export default class TransactionsController {
     this.channel = channel
   }
 
-  public static index = (): Response<Transaction[]> => {
-    const transactions = TransactionsService.index()
+  public static index = (
+    params?: TransactionsParams,
+  ): Response<{ pageNo: number; pageSize: number; totalCount: number; items: Transaction[] } | Transaction[]> => {
+    const transactions = TransactionsService.index(params)
     if (transactions) {
+      if (!params) {
+        return {
+          status: ResponseCode.Success,
+          result: transactions,
+        }
+      }
       return {
         status: ResponseCode.Success,
-        result: transactions,
+        result: {
+          ...params,
+          totalCount: TransactionsService.index().length,
+          items: transactions,
+        },
       }
     }
     return {

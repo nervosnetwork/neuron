@@ -46,6 +46,7 @@ export default class Listeners {
       'sendCapacity',
       // controller style code
       'networks',
+      'transactions',
     ],
   ) => {
     methods.forEach(method => {
@@ -222,7 +223,7 @@ export default class Listeners {
             totalCount: transactionCount,
             items: transactions.map(tx => ({
               ...tx,
-              value: tx.value * pageNo * pageSize,
+              value: +tx.value * pageNo * pageSize,
             })),
           },
         })

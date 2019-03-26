@@ -5,8 +5,8 @@ export const transactions = Array.from({
 })
   .map(() => ({
     date: new Date().getTime() - Math.round(Math.random() * 100000000),
-    value: Math.random(),
-    hash: Math.round(Math.random() * 10000000000000000),
+    value: `${Math.random()}`,
+    hash: `${Math.round(Math.random() * 10000000000000000)}`,
     type: Math.round(Math.random() * 2),
   }))
   .sort((p, n) => +n.date - +p.date)

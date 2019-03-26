@@ -108,7 +108,7 @@ export const setNetwork = (network: Network) => {
 }
 
 export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: GetTransactionsParams) => {
-  UILayer.send(Channel.GetTransactions, {
+  UILayer.send(Channel.Transactions, 'index', {
     pageNo,
     pageSize,
     addresses,
@@ -116,9 +116,7 @@ export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: G
 }
 
 export const getTransaction = (hash: string) => {
-  UILayer.send(Channel.GetTransaction, {
-    hash,
-  })
+  UILayer.send(Channel.Transactions, 'show', hash)
 }
 
 export const checkPassword = (walletID: string, password: string, handleResult: any) => {
@@ -131,18 +129,8 @@ export const checkPassword = (walletID: string, password: string, handleResult: 
   })
 }
 
-// promise style channel
 export const networks = (method: string, params: any) => {
-  // return new Promise((resolve: Function, reject: Function) => {
   UILayer.send(Channel.Networks, method, params)
-  // UILayer.once(Channel.Networks, (_e: Event, args: Response<any>) => {
-  //   if (args.status) {
-  //     resolve(args.result)
-  //   } else {
-  //     reject(args.msg)
-  //   }
-  // })
-  // })
 }
 
 export default UILayer
