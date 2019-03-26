@@ -8,9 +8,6 @@ export enum Channel {
   GetTipHeader = 'getTipHeader',
   GetTipBlockNumber = 'getTipBlockNumber',
   GetLocalNodeId = 'getLocalNodeId',
-  GetNetwork = 'getNetwork',
-  SetNetwork = 'setNetwork',
-  SwitchNetwork = 'switchNetwork',
 
   // Wallet
   CreateWallet = 'createWallet',
@@ -34,6 +31,10 @@ export enum Channel {
   NavTo = 'navTo',
   // Terminal
   Terminal = 'terminal',
+  // controller style code
+  Networks = 'networks',
+  Wallet = 'wallet',
+  Transactions = 'transactions',
 }
 
 export default {

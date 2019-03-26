@@ -1,5 +1,9 @@
 import { interval } from 'rxjs'
-import { map, distinctUntilChanged, flatMap } from 'rxjs/operators'
+import {
+  // map,
+  distinctUntilChanged,
+  flatMap,
+} from 'rxjs/operators'
 import { Channel } from './utils/const'
 import ckbCore from './core'
 import asw from './wallets/asw'
@@ -17,28 +21,28 @@ const monitors = {
 }
 
 const monitorChain = (webContents: Electron.WebContents) => {
-  numbers
-    .pipe(map(() => monitors.network()))
-    .pipe(
-      distinctUntilChanged((x, y) => {
-        return x.connected === y.connected && x.remote === y.remote
-      }),
-    )
-    .subscribe(
-      result => {
-        if (!webContents) return
-        webContents.send(Channel.GetNetwork, {
-          status: 1,
-          result,
-        })
-      },
-      (err: Error) => {
-        logger.log({
-          level: 'error',
-          message: err.message,
-        })
-      },
-    )
+  // numbers
+  //   .pipe(map(() => monitors.network()))
+  //   .pipe(
+  //     distinctUntilChanged((x, y) => {
+  //       return x.connected === y.connected && x.remote === y.remote
+  //     }),
+  //   )
+  //   .subscribe(
+  //     result => {
+  //       if (!webContents) return
+  //       webContents.send(Channel.Networks, {
+  //         status: 1,
+  //         result,
+  //       })
+  //     },
+  //     (err: Error) => {
+  //       logger.log({
+  //         level: 'error',
+  //         message: err.message,
+  //       })
+  //     },
+  //   )
 
   numbers
     .pipe(flatMap(monitors.tipBlockNumber))

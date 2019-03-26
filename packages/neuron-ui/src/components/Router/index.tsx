@@ -127,8 +127,8 @@ export const mainContents: CustomRoute[] = [
   {
     name: `NetorkEditor`,
     path: Routes.NetworkEditor,
-    params: '/:name',
-    exact: true,
+    params: '/:id',
+    exact: false,
     component: NetworkEditor,
   },
   {

@@ -7,7 +7,6 @@ export enum MainActions {
   GetTransaction,
   GetTransactions,
   SetPage,
-  SetNetwork,
   UpdateNetworkEditor,
   SaveNetworks,
   DeleteNetwork,
@@ -19,6 +18,7 @@ export enum MainActions {
   UpdateTransfer,
   UpdatePassword,
   UpdateLoading,
+  Netowrks,
 }
 
 export default MainActions

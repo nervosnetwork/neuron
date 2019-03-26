@@ -25,13 +25,16 @@ const UILayer = (() => {
     return new SyntheticEventEmitter(window.bridge.ipcRenderer)
   }
   return {
-    send: (channel: string, msg: any = '') => {
+    send: (channel: string, ...msg: any[]) => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
-    sendSync: (channel: string, msg: any = '') => {
+    sendSync: (channel: string, ...msg: any[]) => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
     on: (channel: string, cb: Function) => {
+      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
+    },
+    once: (channel: string, cb: Function) => {
       console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
     },
     removeAllListeners: (channel?: string) => {
@@ -101,7 +104,7 @@ export const sendCapacity = (items: TransferItem[], password: string) => {
   })
 }
 export const setNetwork = (network: Network) => {
-  UILayer.send(Channel.SetNetwork, network)
+  UILayer.send(Channel.Networks, 'setActive', network.id)
 }
 
 export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: GetTransactionsParams) => {
@@ -126,6 +129,20 @@ export const checkPassword = (walletID: string, password: string, handleResult: 
     walletID,
     password,
   })
+}
+
+// promise style channel
+export const networks = (method: string, params: any) => {
+  // return new Promise((resolve: Function, reject: Function) => {
+  UILayer.send(Channel.Networks, method, params)
+  // UILayer.once(Channel.Networks, (_e: Event, args: Response<any>) => {
+  //   if (args.status) {
+  //     resolve(args.result)
+  //   } else {
+  //     reject(args.msg)
+  //   }
+  // })
+  // })
 }
 
 export default UILayer

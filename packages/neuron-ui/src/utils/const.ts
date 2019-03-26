@@ -1,5 +1,7 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
 export const EXPLORER = 'http://localhost:3000'
+export const UnremovableNetwork = 'Testnet'
+export const UnremovableNetworkId = '0'
 
 export const DEFAULT_NETWORKS = [
   {
@@ -20,16 +22,7 @@ export enum NetworkStatus {
 export enum Channel {
   // App
   SetLanguage = 'setLanguage',
-  // Chain
-  GetBlock = 'getBlock',
   GetTransaction = 'getTransaction',
-  GetLiveCell = 'getLiveCell',
-  GetTipHeader = 'getTipHeader',
-  GetTipBlockNumber = 'getTipBlockNumber',
-  GetLocalNodeId = 'getLocalNodeId',
-  GetNetwork = 'getNetwork',
-  SetNetwork = 'setNetwork',
-  SwitchNetwork = 'switchNetwork',
 
   // Wallet
   CreateWallet = 'createWallet',
@@ -40,19 +33,21 @@ export enum Channel {
   SwitchWallet = 'switchWallet',
   GetBalance = 'getBalance',
   GetCellsByTypeHash = 'getCellsByTypeHash',
-  GetUnspentCells = 'getUnspentCells',
   GetTransactions = 'getTransactions',
   GetWallet = 'getWallet',
   CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
-  SendTransaction = 'sendTransaction',
-  Sign = 'sign',
 
   // Page
   NavTo = 'navTo',
   // Terminal
   Terminal = 'terminal',
+  // promise style channel
+  Networks = 'networks',
+  //
+  Transactions = 'transactions',
+  Wallet = 'wallet',
 }
 
 export enum Routes {

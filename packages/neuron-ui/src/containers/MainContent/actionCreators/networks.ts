@@ -1,98 +1,96 @@
-import { setNetwork } from '../../../services/UILayer'
+import { setNetwork, networks } from '../../../services/UILayer'
 import { Network } from '../../../contexts/Chain'
-import { defaultNetworks } from '../../../contexts/Settings'
 import { MainActions } from '../reducer'
 
-import { Routes, Message, MAX_NETWORK_NAME_LENGTH } from '../../../utils/const'
-import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
+import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId } from '../../../utils/const'
 import i18n from '../../../utils/i18n'
 
-const Testnet = defaultNetworks[0].name
-
 export default {
-  setNetwork: (network: Network) => {
-    setNetwork(network)
+  getNetwork: (id: string) => {
+    networks('show', id)
     return {
-      type: MainActions.SetNetwork,
-      payload: network,
+      type: MainActions.UpdateLoading,
+      payload: {
+        networks: true,
+      },
     }
   },
-  saveNetworks: (idx: number, networks: Network[], editorNetwork: Network, navTo: (path: string) => void) => {
-    if (!editorNetwork.name) {
-      return {
-        type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.NameIsRequired}`),
-        },
-      }
-    }
-    if (editorNetwork.name.length > MAX_NETWORK_NAME_LENGTH) {
-      return {
-        type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.LengthOfNameShouldBeLessThanOrEqualTo}`, {
-            length: MAX_NETWORK_NAME_LENGTH,
-          }),
-        },
-      }
-    }
-    if (!editorNetwork.remote) {
-      return {
-        type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.URLIsRequired}`),
-        },
-      }
-    }
-    const ns = [...networks]
-
-    if (idx === -1) {
-      // create
-      if (ns.map(n => n.name).indexOf(editorNetwork.name) > -1) {
-        // exist
-        return {
-          type: MainActions.ErrorMessage,
-          payload: {
-            networks: i18n.t(`messages.${Message.NetworkNameExist}`),
-          },
-        }
-      }
-      ns.push(editorNetwork)
+  createOrUpdateNetowrk: ({ id, name, remote }: { id?: string; name: string; remote: string }) => {
+    if (id === 'new') {
+      networks('create', {
+        name,
+        remote,
+      })
     } else {
-      // edit
-      ns[idx] = editorNetwork
+      networks('update', {
+        id,
+        name,
+        remote,
+      })
     }
-
-    // temp solution, better to remove
-    saveNetworks(ns)
-    window.dispatchEvent(new Event('NetworksUpdate'))
-    navTo(Routes.SettingsNetworks)
     return {
-      type: MainActions.SaveNetworks,
-      payload: ns,
+      type: MainActions.UpdateLoading,
+      payload: {
+        network: true,
+      },
     }
   },
-
-  deleteNetwork: (name: string) => {
-    if (name === Testnet) {
+  deleteNetwork: (id?: string) => {
+    if (id === undefined) throw new Error('No network id found')
+    if (id === UnremovableNetworkId) {
       return {
         type: MainActions.ErrorMessage,
         payload: {
-          networks: i18n.t(`messages.is-unremovable`, {
-            target: Testnet,
-          }),
+          networks: `This netowrk is unremovable`,
         },
       }
     }
-    const networks = loadNetworks()
-    const newNetworks = networks.filter((n: Network) => n.name !== name)
-    saveNetworks(newNetworks)
-    window.dispatchEvent(new Event('NetworksUpdate'))
+    networks('delete', id)
     return {
       type: MainActions.SetDialog,
       payload: {
         open: false,
       },
+    }
+  },
+  //
+  //
+  //
+  setNetwork: (network: Network) => {
+    setNetwork(network)
+    return {
+      type: MainActions.Netowrks,
+      payload: network,
+    }
+  },
+  saveNetwork: (params: { id: string; name: string; remote: string }) => {
+    if (!params.name) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: Message.NameIsRequired,
+        },
+      }
+    }
+    if (params.name.length > 28) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
+        },
+      }
+    }
+    if (!params.remote) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: Message.URLIsRequired,
+        },
+      }
+    }
+    return {
+      type: MainActions.Netowrks,
+      payload: params,
     }
   },
 }

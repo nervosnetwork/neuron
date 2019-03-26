@@ -1,13 +1,12 @@
 import React, { useReducer, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
+import ChainContext from '../../contexts/Chain'
 import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
 import UILayer from '../../services/UILayer'
-import { Channel, NetworkStatus } from '../../utils/const'
-import { loadNetworks } from '../../utils/localStorage'
+import { Channel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -56,24 +55,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(
-      Channel.GetNetwork,
-      (_e: Event, args: Response<{ name: string; remote: string; connected: boolean }>) => {
-        if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              network: {
-                name: args.result.name,
-                remote: args.result.remote,
-                status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-              },
-            },
-          })
-        }
-      },
-    )
-
     UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
       if (args.status) {
         dispatch({
@@ -85,70 +66,113 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.SendCapacity, () => {
-      // TODO
-    })
-
-    UILayer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
-      // TODO:
+    UILayer.on(Channel.Wallet, (_e: Event, method: 'activeWallet', args: Response<any>) => {
       if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            cells: args.result,
-          },
-        })
+        switch (method) {
+          case 'activeWallet': {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: {
+                ...args.result,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } else {
+        // TODO: handle error
       }
     })
 
-    UILayer.on(Channel.GetTransaction, (_e: Event, args: Response<Transaction>) => {
+    UILayer.on(Channel.Transactions, (_e: Event, method: 'index' | 'show', args: Response<any>) => {
       if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: args.result,
-          },
-        })
+        switch (method) {
+          case 'index': {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                transactions: args.result,
+              },
+            })
+            break
+          }
+          case 'show': {
+            break
+          }
+          default: {
+            break
+          }
+        }
       } else {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: initChain.transaction,
-          },
-        })
+        // TODO: handle error
       }
     })
 
     UILayer.on(
-      Channel.GetTransactions,
-      (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
-        // TODO:
+      Channel.Networks,
+      (
+        _e: Event,
+        method: 'index' | 'show' | 'create' | 'delete' | 'update' | 'activeNetwork' | 'setActive',
+        args: Response<any>,
+      ) => {
         if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: args.result,
-            },
-          })
+          switch (method) {
+            case 'index': {
+              // handle new network list
+              dispatch({
+                type: ProviderActions.Settings,
+                payload: {
+                  networks: args.result,
+                },
+              })
+              break
+            }
+            // case 'show': {
+            //   // handle single network
+            //   dispatch({
+            //     type: ProviderActions.Settings,
+            //     payload: {
+            //       transaction: args.result,
+            //     },
+            //   })
+            //   break
+            // }
+            // case 'create': {
+            //   break
+            // }
+            // case 'delete': {
+            //   break
+            // }
+            case 'activeNetwork': {
+              dispatch({
+                type: ProviderActions.Chain,
+                payload: {
+                  network: args.result,
+                },
+              })
+              break
+            }
+            case 'setActive': {
+              dispatch({
+                type: ProviderActions.Chain,
+                payload: {
+                  network: args.result,
+                },
+              })
+              break
+            }
+            default: {
+              break
+            }
+          }
         } else {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: initChain.transactions,
-            },
-          })
+          // TODO: handle error
         }
       },
     )
-    UILayer.addEventListener('NetworksUpdate', () => {
-      const networks = loadNetworks()
-      dispatch({
-        type: ProviderActions.Settings,
-        payload: {
-          networks,
-        },
-      })
-    })
   }, [])
 
   return (

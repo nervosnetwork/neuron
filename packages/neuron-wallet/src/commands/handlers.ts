@@ -1,6 +1,6 @@
 import { app, dialog, shell, BrowserWindow } from 'electron'
 import Command from './commands'
-import WalletChannel from '../channel'
+import WalletChannel from '../channel/wallet'
 
 export interface CommandInfo {
   channel: WalletChannel
@@ -60,6 +60,12 @@ const rendererMessageHandler: Handler = (command, info) => {
     case Command.SendWallet: {
       if (info) {
         info.channel.sendWallet()
+      }
+      break
+    }
+    case Command.SyncNetworks: {
+      if (info) {
+        info.channel.syncNetworks(info.extra! as any)
       }
       break
     }

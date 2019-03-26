@@ -2,6 +2,7 @@
 // In many cases a command comes from the app shell and is sent to renderer process with channel.
 enum Command {
   SendWallet = 'send-wallet', // default to asw for now
+  SyncNetworks = 'sync-network',
   SendTransactionHistory = 'send-transaction-history',
   ShowAbout = 'show-about',
   ShowPreferences = 'show-preferences',

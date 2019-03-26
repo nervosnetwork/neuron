@@ -5,6 +5,7 @@ const maps = {
   [Command.ShowAbout as string]: handlers.aboutHandler,
   [Command.ShowPreferences as string]: handlers.rendererMessageHandler,
   [Command.SendWallet as string]: handlers.rendererMessageHandler,
+  [Command.SyncNetworks as string]: handlers.rendererMessageHandler,
   [Command.ShowTerminal as string]: handlers.rendererMessageHandler,
   [Command.SendTransactionHistory as string]: handlers.rendererMessageHandler,
   [Command.SetUILocale as string]: handlers.rendererMessageHandler,

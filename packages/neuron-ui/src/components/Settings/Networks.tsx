@@ -6,16 +6,14 @@ import { Configure } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
 import ChainContext, { Network } from '../../contexts/Chain'
-import SettingsContext, { defaultNetworks } from '../../contexts/Settings'
+import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
-import { Routes } from '../../utils/const'
+import { Routes, UnremovableNetwork } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
 import Dialog from '../../widgets/Dialog'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
-
-const Testnet = defaultNetworks[0].name
 
 const Popover = styled.div`
   position: relative;
@@ -68,7 +66,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
     {
       label: t('menuitem.edit'),
       onClick: () => {
-        props.history.push(`${Routes.NetworkEditor}/${network.name}`)
+        props.history.push(`${Routes.NetworkEditor}/${network.id}`)
       },
       disabled: isDefault,
     },
@@ -95,7 +93,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           const isChecked =
             // chain.network.remote === network.remote && // it will make things too complex
             chain.network.name === network.name
-          const isDefault = network.name === Testnet
+          const isDefault = network.name === UnremovableNetwork
           return (
             <ListGroup.Item
               key={network.name || network.remote}
