@@ -4,6 +4,8 @@ import { Channel } from '../utils/const'
 import { transactions, transactionCount, wallets, Wallet, updateWallets, validatePassword } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
+import Key from '../keys/key'
+import WalletStore from '../store/WalletStore'
 
 enum ResponseStatus {
   Fail,
@@ -82,16 +84,17 @@ export class Listeners {
    * @description channel to create wallet
    */
   static createWallet = () => {
-    return ipcMain.on(Channel.CreateWallet, (e: Electron.Event, wallet: Wallet) => {
-      e.sender.send(Channel.CreateWallet, {
-        status: ResponseStatus.Success,
-        result: {
-          name: wallet.name,
-          address: 'wallet address',
-          publicKey: 'public key',
-        },
-      })
-    })
+    return ipcMain.on(
+      Channel.CreateWallet,
+      (e: Electron.Event, { walletName, password }: { walletName: string; password: string }) => {
+        const walletStore = new WalletStore()
+        const walletID = walletStore.saveWallet(walletName, Key.generateKey(password).getKeystore())
+        e.sender.send(Channel.CreateWallet, {
+          status: ResponseStatus.Success,
+          result: walletID,
+        })
+      },
+    )
   }
 
   /**
@@ -165,12 +168,47 @@ export class Listeners {
    * @description channel to import a wallet
    */
   static importWallet = () => {
-    return ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
-      e.sender.send(Channel.ImportWallet, {
-        status: ResponseStatus.Success,
-        result: `wallet imported`,
-      })
-    })
+    return ipcMain.on(
+      Channel.ImportWallet,
+      (
+        e: Electron.Event,
+        {
+          walletName,
+          password,
+          mnemonic,
+          keystore,
+        }: { walletName: string; password: string; mnemonic: string; keystore: string },
+      ) => {
+        try {
+          const walletStore = new WalletStore()
+          let storedKeystore
+          if (mnemonic) {
+            storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystore()
+          } else if (keystore) {
+            storedKeystore = Key.fromKeystoreString(keystore, password).getKeystore()
+          }
+          if (storedKeystore) {
+            walletStore.saveWallet(walletName, storedKeystore)
+            e.sender.send(Channel.ImportWallet, {
+              status: ResponseStatus.Success,
+              result: true,
+            })
+          } else {
+            e.sender.send(Channel.ImportWallet, {
+              status: ResponseStatus.Success,
+              result: false,
+              msg: 'Error',
+            })
+          }
+        } catch (error) {
+          e.sender.send(Channel.ImportWallet, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: error.message,
+          })
+        }
+      },
+    )
   }
 
   /**

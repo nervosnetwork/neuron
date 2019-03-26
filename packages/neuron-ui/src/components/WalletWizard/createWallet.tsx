@@ -56,8 +56,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
             // temp logic for simulate creation
             props.dispatch(
               actionCreators.createWallet({
-                name: settings.name,
-                mnemonic: '',
+                walletName: settings.name,
                 password: '',
               }),
             )

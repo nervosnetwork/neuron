@@ -47,7 +47,7 @@ export const getWallets = () => {
   UILayer.send(Channel.GetWallets)
 }
 
-export const createWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
+export const createWallet = (wallet: { walletName: string; password: string }) =>
   UILayer.send(Channel.CreateWallet, wallet)
 
 export const deleteWallet = (walletID: string, password: string, handleResult: any) => {
@@ -85,8 +85,9 @@ export const editWallet = (
   })
 }
 
-export const importWallet = (wallet: { name: string; mnemonic: any; password: string }) =>
+export const importWallet = (wallet: { walletName: string; password: string; mnemonic: string; keystore: string }) =>
   UILayer.send(Channel.ImportWallet, wallet)
+
 export const exportWallet = () => UILayer.send(Channel.ExportWallet)
 export const getLiveCell = (outpoint: any) => UILayer.send('getLiveCell', outpoint)
 export const getCellsByTypeHash = (typeHash: string) => {
