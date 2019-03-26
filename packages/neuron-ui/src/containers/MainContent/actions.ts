@@ -19,6 +19,7 @@ export enum MainActions {
   UpdatePassword,
   UpdateLoading,
   Netowrks,
+  Wallet,
 }
 
 export default MainActions

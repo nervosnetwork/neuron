@@ -1,11 +1,12 @@
 import { ipcMain, Notification } from 'electron'
 
 import { Channel } from '../utils/const'
-import { wallets, validatePassword, updateWallets, Wallet } from '../mock'
+import { wallets, verifyPassword, updateWallets, Wallet } from '../mock'
 import asw from '../wallets/asw'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/netowrks'
 import TransactionsController from '../controllers/transactions'
+import WalletsController from '../controllers/wallets'
 
 const checkPassword = (walletID: string, password: string) => {
   const myWallet = wallets().find(wallet => wallet.id === walletID)
@@ -16,7 +17,7 @@ const checkPassword = (walletID: string, password: string) => {
       msg: 'Wallet not found',
     }
   }
-  if (validatePassword(myWallet, password)) {
+  if (verifyPassword(myWallet, password)) {
     return {
       status: ResponseCode.Success,
       result: true,
@@ -243,13 +244,14 @@ export default class Listeners {
     )
   }
 
-  // TODO: add wallet controller and service
-  // public wallet = () => {
-  //   return ipcMain.on(
-  //     Channel.Wallet,
-  //     (e: Electron.Event, { method, params }: { method: keyof typeof NetworksController; params: any }) => {
-  //       e.sender.send(Channel.Networks, (NetworksController[method] as Function)(params))
-  //     },
-  //   )
-  // }
+  /**
+   * @method wallet
+   * @memberof ChannelListeners
+   * @description listen to Channel.Wallet and invoke corresponding method of WalletsController
+   */
+  public static wallet = () => {
+    return ipcMain.on(Channel.Wallets, (e: Electron.Event, method: keyof typeof WalletsController, params: any) => {
+      e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(params))
+    })
+  }
 }

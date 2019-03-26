@@ -13,7 +13,7 @@ export enum Channel {
   NavTo = 'navTo',
   Terminal = 'terminal',
   Networks = 'networks',
-  Wallet = 'wallet',
+  Wallets = 'wallets',
   Transactions = 'transactions',
 }
 

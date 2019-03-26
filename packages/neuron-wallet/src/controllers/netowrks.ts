@@ -1,7 +1,7 @@
 import { ResponseCode, Response } from '.'
 import windowManage from '../main'
 import WalletChannel from '../channel/wallet'
-import NetowrkService, { Network } from '../services/networks'
+import NetowrksService, { Network } from '../services/networks'
 import { Channel } from '../utils/const'
 
 export enum NetworksMethod {
@@ -10,17 +10,16 @@ export enum NetworksMethod {
   Create = 'create',
   Update = 'update',
   Delete = 'delete',
-  ActiveNetwork = 'activeNetwork',
+  Active = 'active',
   SetActive = 'setActive',
 }
 class NetworksController {
   public channel: WalletChannel
 
-  static service = new NetowrkService()
+  static service = new NetowrksService()
 
   constructor(channel: WalletChannel) {
     this.channel = channel
-    NetworksController.service = new NetowrkService()
   }
 
   public static index = (): Response<Network[]> => {
@@ -34,7 +33,7 @@ class NetworksController {
 
     return {
       status: ResponseCode.Fail,
-      msg: 'networks not found',
+      msg: 'Networks not found',
     }
   }
 
@@ -57,7 +56,7 @@ class NetworksController {
     if (network.name && network.remote) {
       const newNetwork = NetworksController.service.create(network.name, network.remote)
       // TODO: sync
-      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
+      windowManage.broadcast(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: newNetwork,
@@ -74,7 +73,7 @@ class NetworksController {
     const success = NetworksController.service.update(network)
     if (success) {
       // TODO: sync
-      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
+      windowManage.broadcast(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: true,
@@ -101,10 +100,10 @@ class NetworksController {
       // check if deleted network is current network, switch to default network if true
       if (activeNetwork && activeNetwork.id === id) {
         NetworksController.service.setActive(defaultNetwork.id)
-        windowManage.broad(Channel.Networks, NetworksMethod.ActiveNetwork, NetworksController.activeNetwork())
+        windowManage.broadcast(Channel.Networks, NetworksMethod.Active, NetworksController.active())
       }
       // TODO: sync
-      windowManage.broad(Channel.Networks, NetworksMethod.Index, NetworksController.index())
+      windowManage.broadcast(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
         status: ResponseCode.Success,
         result: true,
@@ -116,7 +115,7 @@ class NetworksController {
     }
   }
 
-  public static activeNetwork = () => ({
+  public static active = () => ({
     status: ResponseCode.Success,
     result: NetworksController.service.active,
   })

@@ -20,7 +20,7 @@ export const defaultNetowrks: Network[] = [
   },
 ]
 
-export default class NetworkService {
+export default class NetworksService {
   public networks: Network[] = []
 
   public active: Network | undefined = undefined

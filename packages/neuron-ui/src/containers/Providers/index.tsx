@@ -5,7 +5,7 @@ import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
-import UILayer, { NetworksMethod, TransactionsMethod } from '../../services/UILayer'
+import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
 import { Channel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
@@ -66,27 +66,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.Wallet, (_e: Event, method: 'activeWallet', args: Response<any>) => {
-      if (args.status) {
-        switch (method) {
-          case 'activeWallet': {
-            dispatch({
-              type: ProviderActions.Wallet,
-              payload: {
-                ...args.result,
-              },
-            })
-            break
-          }
-          default: {
-            break
-          }
-        }
-      } else {
-        // TODO: handle error
-      }
-    })
-
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: Response<any>) => {
       if (args.status) {
         switch (method) {
@@ -117,6 +96,32 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
+    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: Response<any>) => {
+      if (args.status) {
+        switch (method) {
+          case WalletsMethod.Index: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: {
+                wallets: args.result,
+              },
+            })
+            break
+          }
+          case WalletsMethod.Active: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: args.result,
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      }
+    })
+
     UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: Response<any>) => {
       if (args.status) {
         switch (method) {
@@ -129,7 +134,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case NetworksMethod.ActiveNetwork: {
+          case NetworksMethod.Active: {
             dispatch({
               type: ProviderActions.Chain,
               payload: {

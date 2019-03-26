@@ -12,8 +12,7 @@ class WindowManage {
     this.windows.push(win)
   }
 
-  // public remove = ()
-  public broad = (channel: Channel, method: string, params: any) => {
+  public broadcast = (channel: Channel, method: string, params: any) => {
     this.windows.forEach(window => {
       if (window) {
         window.webContents.send(channel, method, params)

@@ -4,6 +4,7 @@ import Listeners from './listeners'
 import { Response } from '../controllers'
 import NetworksController, { NetworksMethod } from '../controllers/netowrks'
 import { Network } from '../services/networks'
+import { WalletsMethod } from '../controllers/wallets'
 
 import asw from '../wallets/asw'
 
@@ -33,7 +34,7 @@ export default class WalletChannel extends Listeners {
       publicKey: asw.publicKey,
     },
   ) => {
-    this.win.webContents.send(Channel.Wallet, 'activeWallet', {
+    this.win.webContents.send(Channel.Wallets, 'activeWallet', {
       status: ResponseCode.Success,
       result: wallet,
     })
@@ -79,6 +80,16 @@ export default class WalletChannel extends Listeners {
     })
   }
 
+  public syncWallets = (params: { active?: Response<any>; wallets?: Response<any> }) => {
+    if (!this.win) return
+    if (params.active) {
+      this.win.webContents.send(Channel.Wallets, WalletsMethod.Active, params.active)
+    }
+    if (params.wallets) {
+      this.win.webContents.send(Channel.Wallets, WalletsMethod.Index, params.wallets)
+    }
+  }
+
   public syncNetworks = (params: {
     active?: Response<Network>
     networks?: Response<Network[]>
@@ -89,7 +100,7 @@ export default class WalletChannel extends Listeners {
       this.win.webContents.send(Channel.Networks, NetworksMethod.Index, params.networks)
     }
     if (params.active) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveNetwork, params.active)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.Active, params.active)
     }
     // TODO: status handler
     // if (params.status) {

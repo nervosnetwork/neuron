@@ -82,7 +82,8 @@ export default {
     }
   },
   setNetwork: (network: Network) => {
-    networks(NetworksMethod.SetActive, network.id)
+    // TODO: verification
+    networks(NetworksMethod.SetActive, network.id!)
     return {
       type: MainActions.Netowrks,
       payload: network,

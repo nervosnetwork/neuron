@@ -134,7 +134,7 @@ export const mainContents: CustomRoute[] = [
   {
     name: `WalletEditor`,
     path: Routes.WalletEditor,
-    params: '/:wallet',
+    params: '/:id',
     exact: true,
     component: WalletEditor,
   },

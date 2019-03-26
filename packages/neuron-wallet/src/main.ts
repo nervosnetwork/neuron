@@ -11,24 +11,28 @@ import mainmenu from './menu'
 import dispatch, { Command } from './commands/dispatcher'
 import NetowrksController from './controllers/netowrks'
 import WindowManage from './utils/windowManage'
+import WalletsController from './controllers/wallets'
 
 const windowManage = new WindowManage()
 
 let mainWindow: Electron.BrowserWindow | null
-// start listening
 WalletChannel.start()
 
 const initUILayer = (win: BrowserWindow) => {
   const channel = new WalletChannel(win)
 
-  dispatch(Command.SendWallet, {
+  dispatch(Command.SyncWallets, {
     channel,
+    extra: {
+      active: WalletsController.active(),
+      wallets: WalletsController.index(),
+    },
   })
 
   dispatch(Command.SyncNetworks, {
     channel,
     extra: {
-      active: NetowrksController.activeNetwork(),
+      active: NetowrksController.active(),
       networks: NetowrksController.index(),
       connected: {
         status: 1,

@@ -36,7 +36,7 @@ export enum Channel {
   Terminal = 'terminal',
   Networks = 'networks',
   Transactions = 'transactions',
-  Wallet = 'wallet',
+  Wallets = 'wallets',
 }
 
 export enum Routes {

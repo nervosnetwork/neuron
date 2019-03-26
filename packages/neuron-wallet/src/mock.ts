@@ -52,7 +52,7 @@ export const updateWallets = (newWallets: Wallet[]) => {
   list = newWallets
 }
 
-export const validatePassword = (wallet: Wallet, password: string) => {
+export const verifyPassword = (wallet: Wallet, password: string) => {
   if (wallet.password === password) {
     return true
   }

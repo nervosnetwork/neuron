@@ -1,4 +1,4 @@
-export const verifyPassword = (_address: string, password: string): boolean => {
+export const verifyPassword = (_wallet: any, password: string): boolean => {
   if (password === '123456') {
     return true
   }

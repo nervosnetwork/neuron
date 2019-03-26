@@ -57,9 +57,9 @@ const rendererMessageHandler: Handler = (command, info) => {
       }
       break
     }
-    case Command.SendWallet: {
+    case Command.SyncWallets: {
       if (info) {
-        info.channel.sendWallet()
+        info.channel.syncWallets(info.extra! as any)
       }
       break
     }
