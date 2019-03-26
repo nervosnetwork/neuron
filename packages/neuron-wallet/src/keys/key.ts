@@ -33,6 +33,9 @@ export default class Key {
   }
 
   public static fromMnemonic = (mnemonic: string, derive: boolean) => {
+    if (!bip39.validateMnemonic(mnemonic)) {
+      throw new Error('Wrong Mnemonic')
+    }
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     const master = {

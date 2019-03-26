@@ -4,6 +4,8 @@ import { Channel } from '../utils/const'
 import { transactions, transactionCount, wallets, Wallet, updateWallets, validatePassword } from '../mock'
 import asw from '../wallets/asw'
 import ckbCore from '../core'
+import Key from '../keys/key'
+import WalletStore from '../store/WalletStore'
 
 enum ResponseStatus {
   Fail,
@@ -165,12 +167,47 @@ export class Listeners {
    * @description channel to import a wallet
    */
   static importWallet = () => {
-    return ipcMain.on(Channel.ImportWallet, (e: Electron.Event) => {
-      e.sender.send(Channel.ImportWallet, {
-        status: ResponseStatus.Success,
-        result: `wallet imported`,
-      })
-    })
+    return ipcMain.on(
+      Channel.ImportWallet,
+      (
+        e: Electron.Event,
+        {
+          walletName,
+          mnemonic,
+          derive,
+          keystore,
+        }: { walletName: string; mnemonic: string; derive: boolean; keystore: string },
+      ) => {
+        try {
+          const walletStore = new WalletStore()
+          let storedKeystore
+          if (mnemonic) {
+            storedKeystore = Key.fromMnemonic(mnemonic, derive).getKeystore()
+          } else if (keystore) {
+            storedKeystore = Key.fromKeystoreString(keystore).getKeystore()
+          }
+          if (storedKeystore) {
+            walletStore.saveWallet(walletName, storedKeystore)
+            e.sender.send(Channel.ImportWallet, {
+              status: ResponseStatus.Success,
+              result: true,
+            })
+          } else {
+            e.sender.send(Channel.ImportWallet, {
+              status: ResponseStatus.Success,
+              result: false,
+              msg: 'Error',
+            })
+          }
+        } catch (error) {
+          e.sender.send(Channel.ImportWallet, {
+            status: ResponseStatus.Success,
+            result: false,
+            msg: error.message,
+          })
+        }
+      },
+    )
   }
 
   /**
