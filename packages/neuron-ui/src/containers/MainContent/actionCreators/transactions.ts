@@ -1,9 +1,9 @@
 import { MainActions } from '../reducer'
-import { transactions, GetTransactionsParams, TransactionsMethod } from '../../../services/UILayer'
+import { transactionsCall, GetTransactionsParams } from '../../../services/UILayer'
 
 export default {
   getTransaction: (hash: string) => {
-    transactions(TransactionsMethod.Show, hash)
+    transactionsCall.show(hash)
     return {
       type: MainActions.UpdateLoading,
       payload: {
@@ -13,7 +13,7 @@ export default {
   },
 
   getTransactions: (params: GetTransactionsParams) => {
-    transactions(TransactionsMethod.Index, params)
+    transactionsCall.index(params)
     return {
       type: MainActions.UpdateLoading,
       payload: {
