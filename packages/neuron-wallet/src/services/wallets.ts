@@ -7,8 +7,8 @@ const walletStore = new WalletStore()
 export interface Wallet {
   id: string
   name: string
-  address: string
-  publicKey: Uint8Array
+  address?: string
+  publicKey?: Uint8Array
 }
 
 // this should come from config or db
@@ -30,6 +30,7 @@ export default class WalletService {
     this.create(
       {
         name: 'asw',
+        keystore: '',
         address: asw.address,
         publicKey: asw.publicKey,
       },
@@ -52,10 +53,15 @@ export default class WalletService {
   }
 
   public create = (
-    { name, address, publicKey }: { name: string; address: string; publicKey: Uint8Array },
+    {
+      name,
+      keystore,
+      address,
+      publicKey,
+    }: { name: string; keystore: string; address?: string; publicKey?: Uint8Array },
     password: string,
   ): Wallet => {
-    const id = walletStore.saveWallet(name, Key.generateKey(password).getKeystore())
+    const id = walletStore.saveWallet(name, Key.fromKeystoreString(keystore, password).getKeystore())
     if (id) {
       const storedWallet = walletStore.getWallet(id)
       return {

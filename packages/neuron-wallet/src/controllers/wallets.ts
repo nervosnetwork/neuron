@@ -5,6 +5,7 @@ import { Response, ResponseCode } from '.'
 import asw from '../wallets/asw'
 import windowManage from '../main'
 import { Channel } from '../utils/const'
+import Key from '../keys/key'
 
 const activeWallet = asw
 
@@ -66,9 +67,11 @@ class WalletsController {
     publicKey: Uint8Array
     password: string
   }): Response<Wallet> => {
+    const keystore = Key.generateKey(password).getKeystoreString()
     const wallet = WalletsController.service.create(
       {
         name,
+        keystore,
         address,
         publicKey,
       },
@@ -86,38 +89,43 @@ class WalletsController {
     }
   }
 
-  // TODO: import wallet
-  // public static import = ({
-  //   name,
-  //   password,
-  //   mnemonic,
-  //   keystore,
-  // }: {
-  //   name: string
-  //   password: string
-  //   mnemonic: string
-  //   keystore: string
-  // }): Response<boolean> => {
-  //   // generate wallet for service
-  //   const walletStore = new WalletStore()
-  //   let storedKeystore
-  //   if (mnemonic) {
-  //     storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystore()
-  //   } else if (keystore) {
-  //     storedKeystore = Key.fromKeystoreString(keystore, password).getKeystore()
-  //   }
-  //   if (storedKeystore) {
-  //     walletStore.saveWallet(name, storedKeystore)
-  //     return {
-  //       status: ResponseCode.Success,
-  //       result: true,
-  //     }
-  //   }
-  //   return {
-  //     status: ResponseCode.Fail,
-  //     msg: 'Failed to import wallet',
-  //   }
-  // }
+  public static import = ({
+    name,
+    password,
+    mnemonic,
+    keystore,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+    keystore: string
+  }): Response<Wallet> => {
+    let storedKeystore
+    if (mnemonic) {
+      storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
+    } else if (keystore) {
+      storedKeystore = Key.fromKeystoreString(keystore, password).getKeystoreString()
+    }
+    if (storedKeystore) {
+      const wallet = WalletsController.service.create(
+        {
+          name,
+          keystore: storedKeystore,
+        },
+        password,
+      )
+      if (wallet) {
+        return {
+          status: ResponseCode.Success,
+          result: wallet,
+        }
+      }
+    }
+    return {
+      status: ResponseCode.Fail,
+      msg: 'Failed to import wallet',
+    }
+  }
 
   // TODO: implement service.update
   // public static update = ({
