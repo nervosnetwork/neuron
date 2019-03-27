@@ -1,12 +1,38 @@
+import { Network } from '../contexts/Chain'
 import { Channel, CapacityUnit } from '../utils/const'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
-import { Network } from '../contexts/Chain'
 
 declare global {
   interface Window {
     require: any
     bridge: any
   }
+}
+
+export enum NetworksMethod {
+  Index = 'index',
+  Show = 'show',
+  Create = 'create',
+  Update = 'update',
+  Delete = 'delete',
+  Active = 'active',
+  SetActive = 'setActive',
+}
+
+export enum TransactionsMethod {
+  Index = 'index',
+  Show = 'show',
+}
+export enum WalletsMethod {
+  Index = 'index',
+  Create = 'create',
+  Import = 'import',
+  Update = 'update',
+  Delete = 'delete',
+  Export = 'export',
+  Active = 'active',
+  SetActive = 'setActive',
+  Backup = 'backup',
 }
 
 export interface TransferItem {
@@ -25,13 +51,16 @@ const UILayer = (() => {
     return new SyntheticEventEmitter(window.bridge.ipcRenderer)
   }
   return {
-    send: (channel: string, msg: any = '') => {
+    send: (channel: string, ...msg: any[]) => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
-    sendSync: (channel: string, msg: any = '') => {
+    sendSync: (channel: string, ...msg: any[]) => {
       console.warn(`Message: ${msg} to channel ${channel} failed due to Electron not loaded`)
     },
     on: (channel: string, cb: Function) => {
+      console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
+    },
+    once: (channel: string, cb: Function) => {
       console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
     },
     removeAllListeners: (channel?: string) => {
@@ -47,74 +76,10 @@ export const getWallets = () => {
   UILayer.send(Channel.GetWallets)
 }
 
-export const createWallet = (wallet: { walletName: string; password: string }) =>
-  UILayer.send(Channel.CreateWallet, wallet)
-
-export const deleteWallet = (walletID: string, password: string, handleResult: any) => {
-  UILayer.on(Channel.DeleteWallet, (_e: any, args: Response<string>) => {
-    if (args.result) {
-      getWallets()
-    }
-    handleResult(args)
-  })
-  UILayer.send(Channel.DeleteWallet, {
-    walletID,
-    password,
-  })
-}
-
-export const editWallet = (
-  walletID: string,
-  walletName: string,
-  password: string,
-  newPassword: string,
-  handleResult: any,
-) => {
-  UILayer.on(Channel.EditWallet, (_e: any, args: Response<string>) => {
-    if (args.result) {
-      getWallets()
-    }
-    handleResult(args)
-  })
-
-  UILayer.send(Channel.EditWallet, {
-    walletID,
-    walletName,
-    password,
-    newPassword,
-  })
-}
-
-export const importWallet = (wallet: { walletName: string; password: string; mnemonic: string; keystore: string }) =>
-  UILayer.send(Channel.ImportWallet, wallet)
-
-export const exportWallet = () => UILayer.send(Channel.ExportWallet)
-export const getLiveCell = (outpoint: any) => UILayer.send('getLiveCell', outpoint)
-export const getCellsByTypeHash = (typeHash: string) => {
-  UILayer.send(Channel.GetCellsByTypeHash, typeHash)
-}
-
 export const sendCapacity = (items: TransferItem[], password: string) => {
   return UILayer.sendSync(Channel.SendCapacity, {
     items,
     password,
-  })
-}
-export const setNetwork = (network: Network) => {
-  UILayer.send(Channel.SetNetwork, network)
-}
-
-export const getTransactions = ({ pageNo = 0, pageSize = 15, addresses = [] }: GetTransactionsParams) => {
-  UILayer.send(Channel.GetTransactions, {
-    pageNo,
-    pageSize,
-    addresses,
-  })
-}
-
-export const getTransaction = (hash: string) => {
-  UILayer.send(Channel.GetTransaction, {
-    hash,
   })
 }
 
@@ -126,6 +91,27 @@ export const checkPassword = (walletID: string, password: string, handleResult: 
     walletID,
     password,
   })
+}
+
+export const networks = (method: NetworksMethod, params: string | Network) => {
+  UILayer.send(Channel.Networks, method, params)
+}
+export const transactions = (method: TransactionsMethod, params: GetTransactionsParams | string) => {
+  UILayer.send(Channel.Transactions, method, params)
+}
+
+export const wallets = (
+  method: WalletsMethod,
+  params:
+    | undefined
+    | string
+    | { name: string; password: string }
+    | { keystore: string; password: string }
+    | { mnemonic: string; password: string }
+    | { id: string; password: string }
+    | { id: string; name?: string; password: string; newPassword?: string },
+) => {
+  UILayer.send(Channel.Wallets, method, params)
 }
 
 export default UILayer

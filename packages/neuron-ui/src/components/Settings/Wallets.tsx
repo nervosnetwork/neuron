@@ -1,14 +1,15 @@
-import React, { useState, useContext } from 'react'
-import styled from 'styled-components'
+import React, { useContext } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { ListGroup, Form, Container } from 'react-bootstrap'
-import { Configure } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { Configure } from 'grommet-icons'
+
 import { Routes } from '../../utils/const'
-import WalletContext from '../../contexts/Settings'
+import WalletContext from '../../contexts/Wallet'
+import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
-import { MainActions } from '../../containers/MainContent/reducer'
-import { getWallets } from '../../services/UILayer'
+import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
 import InputWalletPasswordDialog, { CheckType } from './InputWalletPasswordDialog'
 import Dialog from '../../widgets/Dialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
@@ -44,32 +45,28 @@ const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionI
 }
 
 const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const { wallets } = useContext(WalletContext)
-  const { dispatch, dialog } = props
+  const activeWallet = useContext(WalletContext)
+  const { wallets } = useContext(SettingsContext)
+  const { dispatch, dialog, history } = props
   const [t] = useTranslation()
 
-  const [walletSelected, setWalletSelected] = useState(() => {
-    getWallets()
-    return 0
-  })
-
-  const actionItems = (index: number) => [
+  const actionItems = (id: string) => [
     {
       label: t('menuitem.select'),
       onClick: () => {
-        setWalletSelected(index)
+        dispatch(actionCreators.setActiveWallet(id))
       },
     },
     {
       label: t('menuitem.backup'),
       onClick: () => {
-        // props.history.push(`${Routes.NetworkEditor}/${network.name}`)
+        dispatch(actionCreators.backupWallet(id))
       },
     },
     {
       label: t('menuitem.edit'),
       onClick: () => {
-        props.history.push(`${Routes.WalletEditor}/${JSON.stringify(wallets[index])}`)
+        history.push(`${Routes.WalletEditor}/${id}}`)
       },
     },
     {
@@ -79,7 +76,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           type: MainActions.SetDialog,
           payload: {
             open: true,
-            wallet: wallets[walletSelected],
+            wallet: wallets.find(wallet => wallet.id === id),
           },
         })
       },
@@ -89,11 +86,11 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   return (
     <>
       <ListGroup>
-        {wallets.map((wallet, index) => {
-          const isChecked = index === walletSelected
+        {wallets.map(wallet => {
+          const isChecked = wallet.id === activeWallet.id
           return (
             <ListGroup.Item
-              key={wallet.name}
+              key={wallet.id}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -106,10 +103,11 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
                 checked={isChecked}
                 disabled={isChecked}
                 onChange={() => {
-                  setWalletSelected(index)
+                  // setWalletSelected(index)
+                  dispatch(actionCreators.setActiveWallet(wallet.id))
                 }}
               />
-              <WalletActions isDefault={isChecked} actionItems={actionItems(index)} />
+              <WalletActions isDefault={isChecked} actionItems={actionItems(wallet.id)} />
             </ListGroup.Item>
           )
         })}

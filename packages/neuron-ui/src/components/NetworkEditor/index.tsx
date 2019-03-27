@@ -1,13 +1,11 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import { MainActions, actionCreators, initState } from '../../containers/MainContent/reducer'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
-
-import ChainContext from '../../contexts/Chain'
 import SettingsContext from '../../contexts/Settings'
 
 enum PlaceHolder {
@@ -19,40 +17,55 @@ enum TooltipText {
   URL = 'Address of the node',
 }
 
-export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ name: string }>>) => {
-  const { networkEditor, dispatch, errorMsgs, match } = props
-  const settings = useContext(SettingsContext)
-  const chain = useContext(ChainContext)
+export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
+  const { networkEditor, dispatch, errorMsgs, match, history } = props
   const { params } = match
   const [t] = useTranslation()
+  const settings = useContext(SettingsContext)
 
-  // idx of the network to update, -1 means create
-  const idx = settings.networks.map(n => n.name).indexOf(params.name)
+  const currentNetwork = settings.networks.find(n => n.id === params.id)
+
+  const ref = useRef({
+    count: settings.networks.length,
+    detail: currentNetwork,
+  })
 
   useEffect(() => {
-    if (idx > -1) {
+    if (params.id === 'new') {
       dispatch({
         type: MainActions.UpdateNetworkEditor,
-        payload: settings.networks[idx],
+        payload: initState.networkEditor,
       })
+    } else {
+      const network = settings.networks.find(n => n.id === params.id)
+      if (network) {
+        dispatch({
+          type: MainActions.UpdateNetworkEditor,
+          payload: {
+            name: network.name,
+            remote: network.remote,
+          },
+        })
+      } else {
+        // TODO: handle error
+      }
     }
     return () => {
-      // clean props of editor
-      dispatch({
-        type: MainActions.UpdateNetworkEditor,
-        payload: {
-          name: '',
-          remote: '',
-        },
-      })
-      dispatch({
-        type: MainActions.ErrorMessage,
-        payload: {
-          networks: '',
-        },
-      })
+      // TODO: clean
     }
-  }, [params.name])
+  }, [params.id])
+
+  useEffect(() => {
+    if (
+      ref.current.count !== settings.networks.length ||
+      JSON.stringify(ref.current.detail) !== JSON.stringify(currentNetwork)
+    ) {
+      history.goBack()
+    }
+    return () => {
+      // TODO: clean
+    }
+  }, [settings.networks.length, JSON.stringify(currentNetwork)])
 
   const inputs: InputProps[] = [
     {
@@ -85,7 +98,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>{idx === -1 ? t('settings.network.editnetwork.title') : params.name}</Card.Header>
+      <Card.Header>{params.id === 'new' ? t('settings.network.editnetwork.title') : 'name'}</Card.Header>
       {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
       <Card.Body>
         <Form>
@@ -99,10 +112,12 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           size="lg"
           block
           onClick={() => {
-            if (chain.network.name === params.name) {
-              dispatch(actionCreators.setNetwork(networkEditor))
-            }
-            dispatch(actionCreators.saveNetworks(idx, settings.networks, networkEditor, props.history.push))
+            dispatch(
+              actionCreators.createOrUpdateNetowrk({
+                id: params.id,
+                ...networkEditor,
+              }),
+            )
           }}
         >
           Save

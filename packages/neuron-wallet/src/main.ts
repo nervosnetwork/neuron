@@ -3,22 +3,42 @@ import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 
 import env from './env'
-import WalletChannel from './channel'
+import WalletChannel from './channel/wallet'
 import TerminalChannel from './channel/terminal'
 import monitorChain from './monitor'
 import i18n from './i18n'
 import mainmenu from './menu'
 import dispatch, { Command } from './commands/dispatcher'
+import NetowrksController from './controllers/netowrks'
+import WindowManage from './utils/windowManage'
+import WalletsController from './controllers/wallets'
+
+const windowManage = new WindowManage()
 
 let mainWindow: Electron.BrowserWindow | null
-// start listening
 WalletChannel.start()
 
 const initUILayer = (win: BrowserWindow) => {
   const channel = new WalletChannel(win)
 
-  dispatch(Command.SendWallet, {
+  dispatch(Command.SyncWallets, {
     channel,
+    extra: {
+      active: WalletsController.active(),
+      wallets: WalletsController.index(),
+    },
+  })
+
+  dispatch(Command.SyncNetworks, {
+    channel,
+    extra: {
+      active: NetowrksController.active(),
+      networks: NetowrksController.index(),
+      connected: {
+        status: 1,
+        result: 1,
+      },
+    },
   })
 
   dispatch(Command.SetUILocale, {
@@ -80,6 +100,8 @@ function createWindow() {
   monitorChain(mainWindow.webContents)
   const terminalChannel = new TerminalChannel(mainWindow.webContents)
   terminalChannel.start()
+
+  windowManage.add(mainWindow)
 }
 
 app.on('ready', createWindow)
@@ -95,3 +117,5 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+export default windowManage

@@ -1,13 +1,12 @@
 import React, { useReducer, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
+import ChainContext from '../../contexts/Chain'
 import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
-import UILayer from '../../services/UILayer'
-import { Channel, NetworkStatus } from '../../utils/const'
-import { loadNetworks } from '../../utils/localStorage'
+import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
+import { Channel } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -56,24 +55,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(
-      Channel.GetNetwork,
-      (_e: Event, args: Response<{ name: string; remote: string; connected: boolean }>) => {
-        if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              network: {
-                name: args.result.name,
-                remote: args.result.remote,
-                status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-              },
-            },
-          })
-        }
-      },
-    )
-
     UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
       if (args.status) {
         dispatch({
@@ -85,69 +66,99 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.SendCapacity, () => {
-      // TODO
-    })
-
-    UILayer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
-      // TODO:
+    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: Response<any>) => {
       if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            cells: args.result,
-          },
-        })
-      }
-    })
-
-    UILayer.on(Channel.GetTransaction, (_e: Event, args: Response<Transaction>) => {
-      if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: args.result,
-          },
-        })
-      } else {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: initChain.transaction,
-          },
-        })
-      }
-    })
-
-    UILayer.on(
-      Channel.GetTransactions,
-      (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
-        // TODO:
-        if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: args.result,
-            },
-          })
-        } else {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: initChain.transactions,
-            },
-          })
+        switch (method) {
+          case TransactionsMethod.Index: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                transactions: args.result,
+              },
+            })
+            break
+          }
+          case TransactionsMethod.Show: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                transaction: args.result,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
         }
-      },
-    )
-    UILayer.addEventListener('NetworksUpdate', () => {
-      const networks = loadNetworks()
-      dispatch({
-        type: ProviderActions.Settings,
-        payload: {
-          networks,
-        },
-      })
+      } else {
+        // TODO: handle error
+      }
+    })
+
+    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: Response<any>) => {
+      if (args.status) {
+        switch (method) {
+          case WalletsMethod.Index: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: {
+                wallets: args.result,
+              },
+            })
+            break
+          }
+          case WalletsMethod.Active: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: args.result,
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      }
+    })
+
+    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: Response<any>) => {
+      if (args.status) {
+        switch (method) {
+          case NetworksMethod.Index: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: {
+                networks: args.result,
+              },
+            })
+            break
+          }
+          case NetworksMethod.Active: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                network: args.result,
+              },
+            })
+            break
+          }
+          case NetworksMethod.SetActive: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                network: args.result,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } else {
+        // TODO: handle error
+      }
     })
   }, [])
 

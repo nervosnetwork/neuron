@@ -1,4 +1,3 @@
-
 import { CapacityUnit } from '../../utils/const'
 import actionCreators from './actionCreators'
 import MainActions from './actions'
@@ -14,15 +13,15 @@ export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
     // wallet
-    case MainActions.UpdateTempWallet: {
-      return {
-        ...state,
-        tempWallet: {
-          ...state.tempWallet,
-          ...action.payload,
-        },
-      }
-    }
+    // case MainActions.UpdateTempWallet: {
+    //   return {
+    //     ...state,
+    //     tempWallet: {
+    //       ...state.tempWallet,
+    //       ...action.payload,
+    //     },
+    //   }
+    // }
     // network
     case MainActions.UpdateNetworkEditor: {
       return {

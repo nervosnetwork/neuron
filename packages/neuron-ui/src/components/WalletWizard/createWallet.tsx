@@ -55,10 +55,14 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>
           onAfterNext={() => {
             // temp logic for simulate creation
             props.dispatch(
-              actionCreators.createWallet({
-                walletName: settings.name,
-                password: '',
-              }),
+              actionCreators.createOrUpdateWallet(
+                {
+                  name: settings.name,
+                  address: 'temp address',
+                  publicKey: new Uint8Array([1]),
+                },
+                '',
+              ),
             )
           }}
         >

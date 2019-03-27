@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
-import { MainActions } from '../../containers/MainContent/reducer'
-import { checkPassword, deleteWallet, editWallet } from '../../services/UILayer'
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import { checkPassword } from '../../services/UILayer'
 import { Wallet } from '../../contexts/Wallet'
 
 export enum CheckType {
@@ -64,11 +64,19 @@ const InputWalletPasswordDialog = ({
     switch (checkType) {
       case CheckType.EditWallet:
         if (newWalletName && newPassword) {
-          editWallet(wallet.id, newWalletName, password, newPassword, handleResult)
+          dispatch(
+            actionCreators.createOrUpdateWallet(
+              {
+                id: wallet.id,
+                name: newWalletName,
+              },
+              password,
+            ),
+          )
         }
         break
       case CheckType.DeleteWallet:
-        deleteWallet(wallet.id, password, handleResult)
+        dispatch(actionCreators.deleteWallet(wallet.id, password))
         break
       case CheckType.CheckPassword:
       default:

@@ -27,6 +27,7 @@ export interface Transaction {
   hash: string
 }
 export interface Network {
+  id?: string
   name: string
   remote: string
   status?: NetworkStatus

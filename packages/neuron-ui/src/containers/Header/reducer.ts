@@ -1,4 +1,4 @@
-import { setNetwork } from '../../services/UILayer'
+import { networks, NetworksMethod } from '../../services/UILayer'
 import { Network } from '../../contexts/Chain'
 
 export enum HeaderActions {
@@ -28,7 +28,7 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
 
 export const actionCreators = {
   setNetwork: (network: Network) => {
-    setNetwork(network)
+    networks(NetworksMethod.SetActive, network.id!)
     return {
       type: HeaderActions.SetNetwork,
       payload: network,
