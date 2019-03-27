@@ -1,4 +1,5 @@
 export enum MainActions {
+  UpdateMnemonic,
   UpdateTempWallet,
   CreateWallet,
   DeleteWallet,

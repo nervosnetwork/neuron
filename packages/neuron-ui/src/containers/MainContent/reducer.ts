@@ -12,6 +12,16 @@ export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>
 export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
+    // mnemonic
+    case MainActions.UpdateMnemonic: {
+      return {
+        ...state,
+        mnemonic: {
+          ...state.mnemonic,
+          ...action.payload,
+        },
+      }
+    }
     // wallet
     // case MainActions.UpdateTempWallet: {
     //   return {
@@ -87,9 +97,7 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
           ...state.errorMsgs,
           transfer: '',
         },
-        transfer: {
-          items,
-        },
+        transfer: { items },
       }
     }
     case MainActions.UpdateTransfer: {

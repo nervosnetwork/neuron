@@ -1,4 +1,6 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
+export const ADDRESS_LENGTH = 40
+export const PAGE_SIZE = 15
 export const EXPLORER = 'http://localhost:3000'
 export const UnremovableNetwork = 'Testnet'
 export const UnremovableNetworkId = '0'
@@ -41,6 +43,7 @@ export enum Channel {
 
 export enum Routes {
   Home = '/',
+  Mnemonic = '/mnemonic',
   Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
@@ -54,9 +57,11 @@ export enum Routes {
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
+  WalletSubmission = '/wallets/submission',
   Terminal = '/terminal',
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
+  Prompt = '/prompt',
 }
 
 export enum LocalStorage {
@@ -99,4 +104,10 @@ export enum TransactionType {
   Sent,
   Received,
   Other,
+}
+
+export enum MnemonicAction {
+  Create = 'create',
+  Verify = 'verify',
+  Import = 'import',
 }
