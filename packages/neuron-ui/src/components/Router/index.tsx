@@ -182,7 +182,7 @@ const CustomRouter = (appProps: any) => {
     <Router>
       <Route
         render={(props: RouteComponentProps<{}>) => {
-          UILayer.on(Channel.NavTo, (_e: Event, args: Response<{ router: string }>) => {
+          UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
             props.history.push(args.result.router)
           })
 

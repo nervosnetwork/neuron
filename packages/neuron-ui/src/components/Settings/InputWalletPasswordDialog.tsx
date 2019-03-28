@@ -39,7 +39,7 @@ const InputWalletPasswordDialog = ({
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
 
-  const handleResult = (args: Response<string>) => {
+  const handleResult = (args: ChannelResponse<string>) => {
     if (args.result) {
       dispatch({
         type: MainActions.SetDialog,

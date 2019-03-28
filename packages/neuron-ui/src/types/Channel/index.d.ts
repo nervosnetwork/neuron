@@ -1,4 +1,4 @@
-declare interface Response<T> {
+interface ChannelResponse<T> {
   status: number
   result: T
   msg?: string

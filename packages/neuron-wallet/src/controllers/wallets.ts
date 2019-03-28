@@ -1,7 +1,7 @@
 import WalletChannel from '../channel/wallet'
 import WalletsService, { Wallet } from '../services/wallets'
 import { verifyPassword } from '../utils/validators'
-import { Response, ResponseCode } from '.'
+import { ChannelResponse, ResponseCode } from '.'
 import asw from '../wallets/asw'
 import windowManage from '../main'
 import { Channel } from '../utils/const'
@@ -29,7 +29,7 @@ class WalletsController {
     this.channel = channel
   }
 
-  public static index = (): Response<Wallet[]> => {
+  public static index = (): ChannelResponse<Wallet[]> => {
     const wallets = WalletsController.service.index()
     if (wallets) {
       return {
@@ -43,7 +43,7 @@ class WalletsController {
     }
   }
 
-  public static show = (id: string): Response<Wallet> => {
+  public static show = (id: string): ChannelResponse<Wallet> => {
     const wallet = WalletsController.service.show(id)
     if (wallet) {
       return {
@@ -67,7 +67,7 @@ class WalletsController {
     address: string
     publicKey: Uint8Array
     password: string
-  }): Response<Wallet> => {
+  }): ChannelResponse<Wallet> => {
     const keystore = Key.generateKey(password).getKeystoreString()
     const wallet = WalletsController.service.create(
       {
@@ -98,7 +98,7 @@ class WalletsController {
     name: string
     password: string
     mnemonic: string
-  }): Response<Wallet> => {
+  }): ChannelResponse<Wallet> => {
     const storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
     if (storedKeystore) {
       const wallet = WalletsController.service.create(
@@ -129,7 +129,7 @@ class WalletsController {
     name: string
     password: string
     keystore: string
-  }): Response<Wallet> => {
+  }): ChannelResponse<Wallet> => {
     const storedKeystore = Key.fromKeystoreString(keystore, password).getKeystoreString()
     if (storedKeystore) {
       const wallet = WalletsController.service.create(
@@ -165,7 +165,7 @@ class WalletsController {
   //   address?: string
   //   publicKey?: Uint8Array
   //   password: string
-  // }): Response<boolean> => {
+  // }): ChannelResponse<boolean> => {
   //   const wallet = WalletsController.service.show(id)
   //   const isPermitted = verifyPassword(wallet, password)
   //   if (!isPermitted) {
@@ -193,7 +193,7 @@ class WalletsController {
   //   }
   // }
 
-  public static delete = ({ id, password }: { id: string; password: string }): Response<boolean> => {
+  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
     const wallet = WalletsController.service.show(id)
     const isPermitted = verifyPassword(wallet, password)
     if (!isPermitted) {

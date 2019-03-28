@@ -8,12 +8,6 @@ import Dropdown from '../../widgets/Dropdown'
 import { Routes } from '../../utils/const'
 import { mockAddresses } from './mock'
 
-declare global {
-  interface Window {
-    clipboard: any
-  }
-}
-
 const headers = [
   {
     label: 'addresses.type',

@@ -1,4 +1,4 @@
-import { ResponseCode, Response } from '.'
+import { ResponseCode, ChannelResponse } from '.'
 import windowManage from '../main'
 import WalletChannel from '../channel/wallet'
 import NetowrksService, { Network } from '../services/networks'
@@ -22,7 +22,7 @@ class NetworksController {
     this.channel = channel
   }
 
-  public static index = (): Response<Network[]> => {
+  public static index = (): ChannelResponse<Network[]> => {
     const networks = NetworksController.service.index()
     if (networks) {
       return {
@@ -37,7 +37,7 @@ class NetworksController {
     }
   }
 
-  public static show = (id: string): Response<Network> => {
+  public static show = (id: string): ChannelResponse<Network> => {
     const network = NetworksController.service.show(id)
     if (network) {
       return {
@@ -51,7 +51,7 @@ class NetworksController {
     }
   }
 
-  public static create = (network: Partial<Network>): Response<Network> => {
+  public static create = (network: Partial<Network>): ChannelResponse<Network> => {
     // TODO: validation
     if (network.name && network.remote) {
       const newNetwork = NetworksController.service.create(network.name, network.remote)
@@ -68,7 +68,7 @@ class NetworksController {
     }
   }
 
-  public static update = (network: Network): Response<boolean> => {
+  public static update = (network: Network): ChannelResponse<boolean> => {
     // TODO: verification
     const success = NetworksController.service.update(network)
     if (success) {
@@ -85,7 +85,7 @@ class NetworksController {
     }
   }
 
-  public static delete = (id: string): Response<boolean> => {
+  public static delete = (id: string): ChannelResponse<boolean> => {
     // regard the first network as the default one, which is not allowed to be deleted
     const defaultNetwork = NetworksController.service.index()[0]
     const activeNetwork = NetworksController.service.active
@@ -120,7 +120,7 @@ class NetworksController {
     result: NetworksController.service.active,
   })
 
-  public static setActive = (id: string): Response<Network> => {
+  public static setActive = (id: string): ChannelResponse<Network> => {
     const success = NetworksController.service.setActive(id)
 
     if (success) {

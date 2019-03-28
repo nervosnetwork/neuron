@@ -14,7 +14,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   const [providers, dispatch] = useReducer(reducer, initProviders)
   const [, i18n] = useTranslation()
   useEffect(() => {
-    UILayer.on(Channel.SetLanguage, (_e: Event, args: Response<string>) => {
+    UILayer.on(Channel.SetLanguage, (_e: Event, args: ChannelResponse<string>) => {
       if (args.status) {
         if (args.result !== i18n.language) {
           i18n.changeLanguage(args.result)
@@ -22,14 +22,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.GetWallet, (_e: any, args: Response<any>) => {
+    UILayer.on(Channel.GetWallet, (_e: any, args: ChannelResponse<any>) => {
       dispatch({
         type: ProviderActions.Wallet,
         payload: { ...args.result },
       })
     })
 
-    UILayer.on(Channel.GetWallets, (_e: any, args: Response<any>) => {
+    UILayer.on(Channel.GetWallets, (_e: any, args: ChannelResponse<any>) => {
       dispatch({
         type: ProviderActions.Settings,
         payload: { wallets: args.result },
@@ -38,20 +38,20 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
 
     UILayer.on(
       Channel.CreateWallet,
-      (_e: Event, args: Response<{ name: string; address: string; publicKey: Uint8Array }>) => {
+      (_e: Event, args: ChannelResponse<{ name: string; address: string; publicKey: Uint8Array }>) => {
         if (args.status) {
           // TODO: handle created wallet
         }
       },
     )
 
-    UILayer.on(Channel.DeleteWallet, (_e: Event, args: Response<string>) => {
+    UILayer.on(Channel.DeleteWallet, (_e: Event, args: ChannelResponse<string>) => {
       if (args.status) {
         // TODO: handle wallet deleted
       }
     })
 
-    UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
+    UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
         dispatch({
           type: ProviderActions.Wallet,
@@ -60,7 +60,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: Response<any>) => {
+    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
           case TransactionsMethod.Index: {
@@ -86,7 +86,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: Response<any>) => {
+    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
           case WalletsMethod.Index: {
@@ -110,7 +110,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: Response<any>) => {
+    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
           case NetworksMethod.Index: {

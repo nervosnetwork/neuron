@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
-import { Response } from '../controllers'
+import { ChannelResponse } from '../controllers'
 import NetworksController, { NetworksMethod } from '../controllers/netowrks'
 import { Network } from '../services/networks'
 import { WalletsMethod } from '../controllers/wallets'
@@ -80,7 +80,7 @@ export default class WalletChannel extends Listeners {
     })
   }
 
-  public syncWallets = (params: { active?: Response<any>; wallets?: Response<any> }) => {
+  public syncWallets = (params: { active?: ChannelResponse<any>; wallets?: ChannelResponse<any> }) => {
     if (!this.win) return
     if (params.active) {
       this.win.webContents.send(Channel.Wallets, WalletsMethod.Active, params.active)
@@ -91,9 +91,9 @@ export default class WalletChannel extends Listeners {
   }
 
   public syncNetworks = (params: {
-    active?: Response<Network>
-    networks?: Response<Network[]>
-    status?: Response<number>
+    active?: ChannelResponse<Network>
+    networks?: ChannelResponse<Network[]>
+    status?: ChannelResponse<number>
   }) => {
     if (!this.win) return
     if (params.networks) {

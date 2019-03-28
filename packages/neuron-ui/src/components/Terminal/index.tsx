@@ -67,7 +67,7 @@ const Terminal = () => {
   const wallet = useContext(WalletContext)
 
   useEffect(() => {
-    TerminalChannel.on((_e: Event, args: Response<{ msg: string }>) => {
+    TerminalChannel.on((_e: Event, args: ChannelResponse<{ msg: string }>) => {
       if (args.status) {
         setTerminal((t: TerminalState) => {
           return {
