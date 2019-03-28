@@ -1,4 +1,4 @@
-import { ResponseCode, Response } from '.'
+import { ResponseCode, ChannelResponse } from '.'
 import WalletChannel from '../channel/wallet'
 import TransactionsService, { Transaction, TransactionsParams } from '../services/transactions'
 
@@ -13,7 +13,9 @@ export default class TransactionsController {
 
   public static index = (
     params?: TransactionsParams,
-  ): Response<{ pageNo: number; pageSize: number; totalCount: number; items: Transaction[] } | Transaction[]> => {
+  ): ChannelResponse<
+    { pageNo: number; pageSize: number; totalCount: number; items: Transaction[] } | Transaction[]
+  > => {
     const transactions = TransactionsService.index(params)
     if (transactions) {
       if (!params) {
@@ -37,7 +39,7 @@ export default class TransactionsController {
     }
   }
 
-  public static show = (hash: string): Response<Transaction> => {
+  public static show = (hash: string): ChannelResponse<Transaction> => {
     const network = TransactionsService.show(hash)
     if (network) {
       return {
@@ -51,7 +53,7 @@ export default class TransactionsController {
     }
   }
 
-  public static create = (transaction: Transaction): Response<Transaction> => {
+  public static create = (transaction: Transaction): ChannelResponse<Transaction> => {
     const success = TransactionsService.create(transaction)
     if (success) {
       return {
@@ -65,7 +67,7 @@ export default class TransactionsController {
     }
   }
 
-  public static delete = (hash: string): Response<boolean> => {
+  public static delete = (hash: string): ChannelResponse<boolean> => {
     const success = TransactionsService.delete(hash)
     if (success) {
       return {

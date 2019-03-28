@@ -2,7 +2,7 @@ export enum ResponseCode {
   Fail,
   Success,
 }
-export interface Response<T = any> {
+export interface ChannelResponse<T = any> {
   status: ResponseCode
   msg?: string
   result?: T
