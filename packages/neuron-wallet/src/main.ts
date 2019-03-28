@@ -1,6 +1,6 @@
+import path from 'path'
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-import path from 'path'
 
 import env from './env'
 import WalletChannel from './channel/wallet'
@@ -43,9 +43,7 @@ const initUILayer = (win: BrowserWindow) => {
 
   dispatch(Command.SetUILocale, {
     channel,
-    extra: {
-      locale: app.getLocale(),
-    },
+    extra: { locale: app.getLocale() },
   })
 }
 

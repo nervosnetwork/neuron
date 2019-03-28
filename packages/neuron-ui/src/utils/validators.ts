@@ -1,5 +1,22 @@
+import { ADDRESS_LENGTH } from './const'
+
 export const verifyAddress = (address: string): boolean => {
-  return address.replace(/^0x/, '').length === 40
+  // TODO: verify address
+  return address.replace(/^0x/, '').length === ADDRESS_LENGTH
+}
+export const verifyWalletSubmission = ({
+  password,
+  confirmPassword,
+  name,
+}: {
+  password: string
+  confirmPassword: string
+  name: string
+}) => {
+  return password && name && password === confirmPassword
 }
 
-export default undefined
+export default {
+  verifyAddress,
+  verifyWalletSubmission,
+}

@@ -8,6 +8,19 @@ export default {
       addresses: 'Addresses',
       settings: 'Settings',
     },
+    wizard: {
+      'create-or-import-your-first-wallet': 'Create or import your first wallet',
+      'create-new-wallet': 'Create New Walelt',
+      'import-wallet': 'Import Wallet',
+      next: 'Next',
+      back: 'Back',
+      name: 'Name',
+      'your-wallet-seed-is': 'Your wallet seed is',
+      'input-your-seed': 'Input your seed',
+      password: 'Password',
+      'confirm-password': 'Confirm Password',
+      'set-a-strong-password-to-protect-your-wallet': 'Set a strong password to protect your wallet',
+    },
     send: {
       address: 'address',
       capacity: 'capacity',
@@ -33,9 +46,7 @@ export default {
       detail: 'detail',
       explorer: 'explorer',
     },
-    transaction: {
-      goBack: 'go back',
-    },
+    transaction: { goBack: 'go back' },
     addresses: {
       addresses: 'Addresses',
       type: 'Type',
@@ -116,6 +127,7 @@ export default {
       'invalid-capacity': 'invalid capacity',
       'capacity-is-not-enough': 'capacity is not enough',
       'is-unremovable': '{{target}} is unremovable',
+      'create-wallet-success': "You have created wallet '{{name}}' successfully",
     },
   },
 }

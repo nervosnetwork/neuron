@@ -6,6 +6,8 @@ import { initState, reducer, MainDispatch, InitState } from './reducer'
 import MainActions from './actions'
 
 const Main = styled.main`
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
 `
@@ -27,18 +29,14 @@ const MainContent = ({
   useEffect(() => {
     dispatch({
       type: MainActions.UpdateLoading,
-      payload: {
-        transaction: false,
-      },
+      payload: { transaction: false },
     })
   }, [transaction.hash])
 
   useEffect(() => {
     dispatch({
       type: MainActions.UpdateLoading,
-      payload: {
-        transactions: false,
-      },
+      payload: { transactions: false },
     })
   }, [pageNo, pageSize, addresses.join(','), items.map(item => item.hash).join(',')])
 

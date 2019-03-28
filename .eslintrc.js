@@ -36,9 +36,11 @@ module.exports = {
       "ignoreRegExpLiterals": true,
     }],
     "object-curly-newline": ["error", {
-      "ObjectExpression": "always",
+      "ObjectExpression": {
+        "consistent": true
+      },
       "ObjectPattern": {
-        "multiline": true
+        "consistent": true
       },
       "ImportDeclaration": {
         "consistent": true,
