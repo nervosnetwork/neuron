@@ -1,4 +1,4 @@
-import { networks, NetworksMethod } from '../../../services/UILayer'
+import { networksCall } from '../../../services/UILayer'
 import { Network } from '../../../contexts/Chain'
 import { MainActions } from '../reducer'
 
@@ -7,21 +7,17 @@ import i18n from '../../../utils/i18n'
 
 export default {
   getNetwork: (id: string) => {
-    networks(NetworksMethod.Show, id)
+    networksCall.show(id)
     return {
       type: MainActions.UpdateLoading,
-      payload: {
-        networks: true,
-      },
+      payload: { networks: true },
     }
   },
   createOrUpdateNetowrk: ({ id, name, remote }: { id?: string; name: string; remote: string }) => {
     if (!name) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.NameIsRequired}`),
-        },
+        payload: { networks: i18n.t(`messages.${Message.NameIsRequired}`) },
       }
     }
     if (name.length > MAX_NETWORK_NAME_LENGTH) {
@@ -37,18 +33,16 @@ export default {
     if (!remote) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.URLIsRequired}`),
-        },
+        payload: { networks: i18n.t(`messages.${Message.URLIsRequired}`) },
       }
     }
     if (id === 'new') {
-      networks(NetworksMethod.Create, {
+      networksCall.create({
         name,
         remote,
       })
     } else {
-      networks(NetworksMethod.Update, {
+      networksCall.update({
         id,
         name,
         remote,
@@ -56,9 +50,7 @@ export default {
     }
     return {
       type: MainActions.UpdateLoading,
-      payload: {
-        network: true,
-      },
+      payload: { network: true },
     }
   },
   deleteNetwork: (id?: string) => {
@@ -66,24 +58,18 @@ export default {
     if (id === UnremovableNetworkId) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.is-unremovable`, {
-            target: UnremovableNetwork,
-          }),
-        },
+        payload: { networks: i18n.t(`messages.is-unremovable`, { target: UnremovableNetwork }) },
       }
     }
-    networks(NetworksMethod.Delete, id)
+    networksCall.delete(id)
     return {
       type: MainActions.SetDialog,
-      payload: {
-        open: false,
-      },
+      payload: { open: false },
     }
   },
   setNetwork: (network: Network) => {
     // TODO: verification
-    networks(NetworksMethod.SetActive, network.id!)
+    networksCall.setActive(network.id!)
     return {
       type: MainActions.Netowrks,
       payload: network,
@@ -93,25 +79,20 @@ export default {
     if (!params.name) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: Message.NameIsRequired,
-        },
+        payload: { networks: Message.NameIsRequired },
       }
     }
     if (params.name.length > 28) {
+      const message = `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`,
-        },
+        payload: { networks: message },
       }
     }
     if (!params.remote) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: Message.URLIsRequired,
-        },
+        payload: { networks: Message.URLIsRequired },
       }
     }
     return {

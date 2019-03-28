@@ -14,7 +14,7 @@ class WindowManage {
 
   public broadcast = (channel: Channel, method: string, params: any) => {
     this.windows.forEach(window => {
-      if (window) {
+      if (window && window.webContents) {
         window.webContents.send(channel, method, params)
       }
     })

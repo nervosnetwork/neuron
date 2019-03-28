@@ -25,18 +25,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.GetWallet, (_e: any, args: Response<any>) => {
       dispatch({
         type: ProviderActions.Wallet,
-        payload: {
-          ...args.result,
-        },
+        payload: { ...args.result },
       })
     })
 
     UILayer.on(Channel.GetWallets, (_e: any, args: Response<any>) => {
       dispatch({
         type: ProviderActions.Settings,
-        payload: {
-          wallets: args.result,
-        },
+        payload: { wallets: args.result },
       })
     })
 
@@ -59,9 +55,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       if (args.status) {
         dispatch({
           type: ProviderActions.Wallet,
-          payload: {
-            balance: args.result,
-          },
+          payload: { balance: args.result },
         })
       }
     })
@@ -72,18 +66,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           case TransactionsMethod.Index: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: {
-                transactions: args.result,
-              },
+              payload: { transactions: args.result },
             })
             break
           }
           case TransactionsMethod.Show: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: {
-                transaction: args.result,
-              },
+              payload: { transaction: args.result },
             })
             break
           }
@@ -102,9 +92,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           case WalletsMethod.Index: {
             dispatch({
               type: ProviderActions.Settings,
-              payload: {
-                wallets: args.result,
-              },
+              payload: { wallets: args.result },
             })
             break
           }
@@ -128,27 +116,21 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           case NetworksMethod.Index: {
             dispatch({
               type: ProviderActions.Settings,
-              payload: {
-                networks: args.result,
-              },
+              payload: { networks: args.result },
             })
             break
           }
           case NetworksMethod.Active: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: {
-                network: args.result,
-              },
+              payload: { network: args.result },
             })
             break
           }
           case NetworksMethod.SetActive: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: {
-                network: args.result,
-              },
+              payload: { network: args.result },
             })
             break
           }

@@ -1,16 +1,16 @@
 import { initState, MainActions } from '../reducer'
-import { wallets, WalletsMethod } from '../../../services/UILayer'
+import { walletsCall } from '../../../services/UILayer'
 
 export default {
   setActiveWallet: (id: string) => {
-    wallets(WalletsMethod.SetActive, id)
+    walletsCall.setActive(id)
     return {
       type: MainActions.Wallet,
       payload: id,
     }
   },
   backupWallet: (id: string) => {
-    wallets(WalletsMethod.Backup, id)
+    walletsCall.backup(id)
     return {
       type: MainActions.Wallet,
       payload: id,
@@ -25,16 +25,13 @@ export default {
     // verification
     if ('id' in params) {
       // update
-      wallets(WalletsMethod.Update, {
+      walletsCall.update({
         ...params,
         password,
       })
     } else {
       // create
-      wallets(WalletsMethod.Create, {
-        ...params,
-        password,
-      })
+      // walletsCall.create({ ...params, password })
     }
     return {
       type: MainActions.Wallet,
@@ -42,7 +39,7 @@ export default {
     }
   },
   deleteWallet: (id: string, password: string) => {
-    wallets(WalletsMethod.Delete, {
+    walletsCall.delete({
       id,
       password,
     })
@@ -53,16 +50,16 @@ export default {
   },
   importWallet: (isKeystore: boolean, params: typeof initState.tempWallet) => {
     if (isKeystore) {
-      wallets(WalletsMethod.ImportKeystore, params)
+      walletsCall.importKeystore(params)
     } else {
-      wallets(WalletsMethod.ImportMnemonic, params)
+      walletsCall.importMnemonic(params)
     }
     return {
       type: MainActions.Wallet,
     }
   },
   exportWallet: (id: string) => {
-    wallets(WalletsMethod.Export, id)
+    walletsCall.export(id)
     return {
       type: MainActions.Wallet,
     }
