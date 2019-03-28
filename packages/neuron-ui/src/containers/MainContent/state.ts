@@ -9,13 +9,13 @@ export const initState = {
     confirmPassword: '',
   },
   tempWallet: {
-    walletName: '',
+    name: '',
     password: '',
     mnemonic: '',
     keystore: '',
   },
   createWallet: {
-    walletName: '',
+    name: '',
     password: '',
   },
   transfer: {

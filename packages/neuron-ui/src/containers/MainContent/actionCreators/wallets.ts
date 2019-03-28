@@ -48,8 +48,12 @@ export default {
       payload: id,
     }
   },
-  importWallet: (params: typeof initState.tempWallet) => {
-    walletsCall.import(params)
+  importWallet: (isKeystore: boolean, params: typeof initState.tempWallet) => {
+    if (isKeystore) {
+      walletsCall.importKeystore(params)
+    } else {
+      walletsCall.importMnemonic(params)
+    }
     return {
       type: MainActions.Wallet,
     }
