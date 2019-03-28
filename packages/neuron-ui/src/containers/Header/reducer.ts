@@ -1,4 +1,4 @@
-import { networks, NetworksMethod } from '../../services/UILayer'
+import { networksCall } from '../../services/UILayer'
 import { Network } from '../../contexts/Chain'
 
 export enum HeaderActions {
@@ -8,9 +8,8 @@ export enum HeaderActions {
 export interface InitState {
   networks: Network[]
 }
-export const initState: InitState = {
-  networks: [],
-}
+
+export const initState: InitState = { networks: [] }
 
 export const reducer = (state: any, action: { type: HeaderActions; payload?: any }) => {
   switch (action.type) {
@@ -28,7 +27,7 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
 
 export const actionCreators = {
   setNetwork: (network: Network) => {
-    networks(NetworksMethod.SetActive, network.id!)
+    networksCall.setActive(network.id!)
     return {
       type: HeaderActions.SetNetwork,
       payload: network,
