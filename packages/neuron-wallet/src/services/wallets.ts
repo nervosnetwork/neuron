@@ -30,7 +30,7 @@ export default class WalletService {
     this.create(
       {
         name: 'asw',
-        keystore: '',
+        keystore: '{"master":{"privateKey":"","chainCode":""},"password":"0"}',
         address: asw.address,
         publicKey: asw.publicKey,
       },

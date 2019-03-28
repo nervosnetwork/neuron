@@ -12,7 +12,8 @@ const activeWallet = asw
 export enum WalletsMethod {
   Index = 'index',
   Create = 'create',
-  Import = 'import',
+  ImportMnemonic = 'importMnemonic',
+  ImportKeystore = 'importKeystore',
   Update = 'update',
   Delete = 'delete',
   Active = 'active',
@@ -89,23 +90,47 @@ class WalletsController {
     }
   }
 
-  public static import = ({
+  public static importMnemonic = ({
     name,
     password,
     mnemonic,
-    keystore,
   }: {
     name: string
     password: string
     mnemonic: string
+  }): Response<Wallet> => {
+    const storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
+    if (storedKeystore) {
+      const wallet = WalletsController.service.create(
+        {
+          name,
+          keystore: storedKeystore,
+        },
+        password,
+      )
+      if (wallet) {
+        return {
+          status: ResponseCode.Success,
+          result: wallet,
+        }
+      }
+    }
+    return {
+      status: ResponseCode.Fail,
+      msg: 'Failed to import wallet',
+    }
+  }
+
+  public static importKeystore = ({
+    name,
+    password,
+    keystore,
+  }: {
+    name: string
+    password: string
     keystore: string
   }): Response<Wallet> => {
-    let storedKeystore
-    if (mnemonic) {
-      storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
-    } else if (keystore) {
-      storedKeystore = Key.fromKeystoreString(keystore, password).getKeystoreString()
-    }
+    const storedKeystore = Key.fromKeystoreString(keystore, password).getKeystoreString()
     if (storedKeystore) {
       const wallet = WalletsController.service.create(
         {

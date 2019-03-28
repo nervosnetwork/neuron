@@ -26,7 +26,8 @@ export enum TransactionsMethod {
 export enum WalletsMethod {
   Index = 'index',
   Create = 'create',
-  Import = 'import',
+  ImportMnemonic = 'importMnemonic',
+  ImportKeystore = 'importKeystore',
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
