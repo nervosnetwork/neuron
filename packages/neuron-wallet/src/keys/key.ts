@@ -18,15 +18,9 @@ export default class Key {
     }
   }
 
-  public static getAddressFromPrivateKey(privateKey: string) {
-    // TODO: generate address from private key
-    return `address_${privateKey}`
-  }
-
   public static toKeystore(key: string, password: string) {
     const salt = crypto.randomBytes(32)
     const iv = crypto.randomBytes(16)
-
     const kdf = 'scrypt'
     const params = {
       n: 8192,
@@ -51,7 +45,6 @@ export default class Key {
       .digest()
       .toString('hex')
       .replace('0x', '')
-
     return {
       version: 0,
       id: v4(),
@@ -124,5 +117,35 @@ export default class Key {
       privateKey,
       chainCode,
     }
+  }
+
+  public static getAddressFromPrivateKey(privateKey: string) {
+    // TODO: generate address from private key
+    return `address_${privateKey}`
+  }
+
+  public static checkPassword(keystore: Keystore, password: string) {
+    if (password === undefined) {
+      throw new Error('No password given.')
+    }
+    const { kdfparams } = keystore.crypto
+
+    const derivedKey = scryptsy(
+      Buffer.from(password),
+      Buffer.from(kdfparams.salt, 'hex'),
+      kdfparams.n,
+      kdfparams.r,
+      kdfparams.p,
+      kdfparams.dklen,
+    )
+
+    const ciphertext = Buffer.from(keystore.crypto.ciphertext, 'hex')
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+    return mac === keystore.crypto.mac
   }
 }
