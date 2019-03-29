@@ -1,3 +1,4 @@
+export const EXPLORER = 'http://localhost:3000'
 export enum Channel {
   SetLanguage = 'setLanguage',
   GetTipBlockNumber = 'getTipBlockNumber',
@@ -15,6 +16,7 @@ export enum Channel {
   Networks = 'networks',
   Wallets = 'wallets',
   Transactions = 'transactions',
+  ContextMenu = 'contextMenu',
 }
 
 export default {

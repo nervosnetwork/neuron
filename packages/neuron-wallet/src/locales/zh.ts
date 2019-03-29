@@ -29,5 +29,9 @@ export default {
         toggleDevTools: '开发者工具',
       },
     },
+    contextmenu: {
+      details: '查看详情',
+      explorer: '浏览器',
+    },
   },
 }

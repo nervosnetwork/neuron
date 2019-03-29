@@ -1,6 +1,7 @@
-declare module global {
+import { Clipboard } from 'electron'
+
+declare global {
   interface Window {
-    clipboard: any
-    remote: any
+    clipboard: Clipboard
   }
 }

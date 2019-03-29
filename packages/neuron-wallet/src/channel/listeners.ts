@@ -1,12 +1,13 @@
-import { ipcMain, Notification } from 'electron'
+import { ipcMain, Notification, Menu, MenuItem, BrowserWindow } from 'electron'
 
-import { Channel } from '../utils/const'
+import { Channel, EXPLORER } from '../utils/const'
 import { wallets, verifyPassword, updateWallets, Wallet } from '../mock'
 import asw from '../wallets/asw'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/netowrks'
 import TransactionsController from '../controllers/transactions'
 import WalletsController from '../controllers/wallets'
+import i18n from '../i18n'
 
 const checkPassword = (walletID: string, password: string) => {
   const myWallet = wallets().find(wallet => wallet.id === walletID)
@@ -43,6 +44,7 @@ export default class Listeners {
       'sendCapacity',
       'networks',
       'transactions',
+      'contextMenu',
     ],
   ) => {
     methods.forEach(method => {
@@ -252,6 +254,51 @@ export default class Listeners {
   public static wallet = () => {
     return ipcMain.on(Channel.Wallets, (e: Electron.Event, method: keyof typeof WalletsController, params: any) => {
       e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(params))
+    })
+  }
+
+  public static contextMenu = () => {
+    return ipcMain.on(Channel.ContextMenu, (e: Electron.Event, target: string, params: any) => {
+      const menu = new Menu()
+      switch (target) {
+        case 'history': {
+          menu.append(
+            new MenuItem({
+              label: i18n.t('contextmenu.details'),
+              click: () => {
+                e.sender.send(Channel.NavTo, {
+                  status: ResponseCode.Success,
+                  result: { router: `/transaction/${params}` },
+                })
+              },
+            }),
+          )
+          menu.append(
+            new MenuItem({
+              label: i18n.t('contextmenu.explorer'),
+              click: () => {
+                const win = new BrowserWindow({
+                  minWidth: 800,
+                  minHeight: 600,
+                  show: false,
+                  frame: false,
+                  titleBarStyle: 'hidden',
+                  webPreferences: {
+                    nodeIntegration: false,
+                  },
+                })
+                win.loadURL(EXPLORER)
+                win.show()
+              },
+            }),
+          )
+          break
+        }
+        default: {
+          break
+        }
+      }
+      menu.popup()
     })
   }
 }

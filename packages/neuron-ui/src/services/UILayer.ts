@@ -49,6 +49,10 @@ export interface GetTransactionsParams {
   addresses: string[]
 }
 
+export enum ContextMenu {
+  History = 'history',
+}
+
 const UILayer = (() => {
   if (window.bridge) {
     return new SyntheticEventEmitter(window.bridge.ipcRenderer)
@@ -137,6 +141,13 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   active: () => void
   setActive: (id: string) => void
   backup: (id: string) => void
+}
+
+export const contextMenus = (target: string, params: any) => {
+  UILayer.send(Channel.ContextMenu, target, params)
+}
+export const contextMenusCall = instantiateMethodCall(contextMenus) as {
+  [index: string]: (id: string) => void
 }
 
 export default UILayer

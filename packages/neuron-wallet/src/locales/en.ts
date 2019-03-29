@@ -24,10 +24,14 @@ export default {
       develop: {
         terminal: 'Terminal',
         develop: 'Develop',
-        forceReload: 'forceReload',
-        reload: 'reload',
-        toggleDevTools: 'toggleDevTools',
+        forceReload: 'Force Reload',
+        reload: 'Reload',
+        toggleDevTools: 'Toggle DevTools',
       },
+    },
+    contextmenu: {
+      details: 'Inspect Details',
+      explorer: 'Open in Explorer',
     },
   },
 }

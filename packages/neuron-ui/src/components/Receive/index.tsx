@@ -6,15 +6,8 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Copy } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
-declare global {
-  interface Window {
-    clipboard: any
-  }
-}
-
 const AddressPanel = styled.div`
-  dispaly: flex;
-  display: -webkit-flex; /* Safari */
+  display: flex;
   flex-direction: row;
   margin: 10px 0 0 0;
 `
