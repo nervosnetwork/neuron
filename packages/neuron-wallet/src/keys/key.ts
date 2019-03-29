@@ -4,6 +4,7 @@ import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
 import { v4 } from 'uuid'
+import Address from './address'
 import { Keystore, KdfParams } from './keystore'
 
 export default class Key {
@@ -12,7 +13,7 @@ export default class Key {
     const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
     const keystore = Key.toKeystore(JSON.stringify(key), password)
     return {
-      address: Key.getAddressFromPrivateKey(key.privateKey),
+      address: Address.getAddressFromPrivateKey(key.privateKey),
       mnemonic,
       keystore: JSON.stringify(keystore),
     }
@@ -103,7 +104,7 @@ export default class Key {
     const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
     const keystore = Key.toKeystore(JSON.stringify(key), password)
     return {
-      address: Key.getAddressFromPrivateKey(JSON.stringify(key)),
+      address: Address.getAddressFromPrivateKey(JSON.stringify(key)),
       keystore,
     }
   }
@@ -117,11 +118,6 @@ export default class Key {
       privateKey,
       chainCode,
     }
-  }
-
-  public static getAddressFromPrivateKey(privateKey: string) {
-    // TODO: generate address from private key
-    return `address_${privateKey}`
   }
 
   public static checkPassword(keystore: Keystore, password: string) {
