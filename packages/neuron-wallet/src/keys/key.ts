@@ -4,7 +4,7 @@ import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
 import { v4 } from 'uuid'
-import { KdfParams } from './keystore'
+import { Keystore, KdfParams } from './keystore'
 
 export default class Key {
   public static createKey(password: string) {
@@ -28,27 +28,23 @@ export default class Key {
     const iv = crypto.randomBytes(16)
 
     const kdf = 'scrypt'
-    const kdfparams: KdfParams = {
-      dklen: 32,
-      salt: salt.toString('hex'),
+    const params = {
       n: 8192,
       r: 8,
       p: 1,
     }
-
-    const params: scryptsy.Params = {
-      N: 8192,
-      r: 8,
-      p: 1,
+    const kdfparams: KdfParams = {
+      dklen: 32,
+      salt: salt.toString('hex'),
+      ...params,
     }
-    const derivedKey = scryptsy.hashSync(Buffer.from(password), params, kdfparams.dklen, kdfparams.salt)
+    const derivedKey = scryptsy(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
 
     const cipher = crypto.createCipheriv('aes-128-ctr', derivedKey.slice(0, 16), iv)
     if (!cipher) {
       throw new Error('Unsupported cipher')
     }
-
-    const ciphertext = Buffer.concat([cipher.update(Buffer.from(key.replace('0x', ''), 'hex')), cipher.final()])
+    const ciphertext = Buffer.concat([cipher.update(Buffer.from(key, 'utf8')), cipher.final()])
     const hash = new SHA3(256)
     const mac = hash
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
@@ -60,9 +56,9 @@ export default class Key {
       version: 0,
       id: v4(),
       crypto: {
-        ciphertext,
+        ciphertext: ciphertext.toString('hex'),
         cipherparams: {
-          iv,
+          iv: iv.toString('hex'),
         },
         cipher: 'aes-128-ctr',
         kdf,
@@ -72,6 +68,41 @@ export default class Key {
     }
   }
 
+  public static fromKeystore = (keystore: Keystore, password: string) => {
+    if (password === undefined) {
+      throw new Error('No password given.')
+    }
+    const { kdfparams } = keystore.crypto
+
+    const derivedKey = scryptsy(
+      Buffer.from(password),
+      Buffer.from(kdfparams.salt, 'hex'),
+      kdfparams.n,
+      kdfparams.r,
+      kdfparams.p,
+      kdfparams.dklen,
+    )
+
+    const ciphertext = Buffer.from(keystore.crypto.ciphertext, 'hex')
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+    if (mac !== keystore.crypto.mac) {
+      throw new Error('Key derivation failed - possibly wrong password')
+    }
+
+    const decipher = crypto.createDecipheriv(
+      keystore.crypto.cipher,
+      derivedKey.slice(0, 16),
+      Buffer.from(keystore.crypto.cipherparams.iv, 'hex'),
+    )
+    const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
+    return Buffer.from(seed.replace('0x', ''), 'hex').toString()
+  }
+
   public static fromMnemonic = (mnemonic: string, password: string) => {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
@@ -79,12 +110,12 @@ export default class Key {
     const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
     const keystore = Key.toKeystore(JSON.stringify(key), password)
     return {
-      address: Key.getAddressFromPrivateKey(key.privateKey),
-      keystore: JSON.stringify(keystore),
+      address: Key.getAddressFromPrivateKey(JSON.stringify(key)),
+      keystore,
     }
   }
 
-  private static generatePrivateKeyFromMnemonic(mnemonic: string) {
+  public static generatePrivateKeyFromMnemonic(mnemonic: string) {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     const privateKey = root.privateKey.toString('hex')

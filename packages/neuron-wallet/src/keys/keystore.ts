@@ -22,7 +22,7 @@ export interface KdfParams {
 }
 
 export interface Crypto {
-  ciper: string
+  cipher: string
   cipherparams: CipherParams
   ciphertext: string
   kdf: string
