@@ -1,6 +1,5 @@
 import WalletChannel from '../channel/wallet'
 import WalletsService, { Wallet } from '../services/wallets'
-import { verifyPassword } from '../utils/validators'
 import { ChannelResponse, ResponseCode } from '.'
 import asw from '../wallets/asw'
 import windowManage from '../main'
@@ -194,26 +193,37 @@ class WalletsController {
   // }
 
   public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
-    const wallet = WalletsController.service.show(id)
-    const isPermitted = verifyPassword(wallet, password)
-    if (!isPermitted) {
+    if (WalletsController.service.validate({ id, password })) {
+      const success = WalletsController.service.delete(id)
+      if (success) {
+        // TODO: details, what to do when active wallet deleted
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.index())
+        return {
+          status: ResponseCode.Success,
+          result: true,
+        }
+      }
       return {
         status: ResponseCode.Fail,
-        msg: 'Incorrect password',
-      }
-    }
-    const success = WalletsController.service.delete(id)
-    if (success) {
-      // TODO: details, what to do when active wallet deleted
-      windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.index())
-      return {
-        status: ResponseCode.Success,
-        result: true,
+        msg: 'Failed to delete wallet',
       }
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Failed to delete wallet',
+      msg: 'Incorrect password',
+    }
+  }
+
+  public static export = ({ id, password }: { id: string; password: string }): ChannelResponse<string> => {
+    if (WalletsController.service.validate({ id, password })) {
+      return {
+        status: ResponseCode.Success,
+        result: JSON.stringify(WalletsController.service.show(id)),
+      }
+    }
+    return {
+      status: ResponseCode.Fail,
+      msg: 'Incorrect password',
     }
   }
 

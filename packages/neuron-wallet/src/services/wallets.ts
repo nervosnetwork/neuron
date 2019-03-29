@@ -74,6 +74,12 @@ export default class WalletService {
     throw new Error('Failed to create wallet')
   }
 
+  public validate = ({ id, password }: { id: string; password: string }) => {
+    const wallet = walletStore.getWallet(id)
+    Key.checkPassword(wallet.keystore, password)
+    return Key.checkPassword(wallet.keystore, password)
+  }
+
   // TODO: update wallet
   // public update = ({
   //   id,
@@ -106,6 +112,7 @@ export default class WalletService {
     const wallet = this.show(id)
     if (wallet) {
       this.wallets = this.wallets.filter(w => w.id !== id)
+      walletStore.deleteWallet(id)
       return true
     }
     return false
