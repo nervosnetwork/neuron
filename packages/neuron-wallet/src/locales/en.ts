@@ -30,6 +30,9 @@ export default {
       },
     },
     contextmenu: {
+      select: 'Select',
+      edit: 'Edit',
+      delete: 'Delete',
       details: 'Inspect Details',
       explorer: 'Open in Explorer',
     },

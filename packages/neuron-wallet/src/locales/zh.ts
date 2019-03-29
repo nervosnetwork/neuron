@@ -30,6 +30,9 @@ export default {
       },
     },
     contextmenu: {
+      select: '选择',
+      edit: '编辑',
+      delete: '删除',
       details: '查看详情',
       explorer: '浏览器',
     },

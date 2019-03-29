@@ -1,53 +1,18 @@
-import React, { useContext } from 'react'
-import styled from 'styled-components'
+import React, { useContext, useCallback } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
-import { Configure } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
-import ChainContext, { Network } from '../../contexts/Chain'
+import ChainContext from '../../contexts/Chain'
 import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
-import { Routes, UnremovableNetwork } from '../../utils/const'
+import { Routes } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
 import Dialog from '../../widgets/Dialog'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
-import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
 
-const Popover = styled.div`
-  position: relative;
-  &:hover {
-    & > ul {
-      display: block !important;
-    }
-  }
-`
-
-const NetworkActions = ({ isDefault, actionItems }: { isDefault: boolean; actionItems: DropDownItem[] }) => {
-  if (isDefault) {
-    return null
-  }
-  return (
-    <Popover>
-      <Configure />
-      <Dropdown
-        items={actionItems}
-        style={{
-          position: 'absolute',
-          top: '100%',
-          right: '0',
-          zIndex: '999',
-          display: 'none',
-        }}
-        itemsStyle={{
-          textTransform: 'capitalize',
-          boxShadow: '0px 1px 3px rgb(120, 120, 120)',
-        }}
-      />
-    </Popover>
-  )
-}
+import { contextMenusCall } from '../../services/UILayer'
 
 const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const chain = useContext(ChainContext)
@@ -55,36 +20,12 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
   const [t] = useTranslation()
   const { dispatch, dialog } = props
 
-  const actionItems = (network: Network, isDefault: boolean, isChecked: boolean) => [
-    {
-      label: t('menuitem.select'),
-      onClick: () => {
-        props.dispatch(actionCreators.setNetwork(network))
-      },
-      disabled: isChecked || isDefault,
+  const onContextMenu = useCallback(
+    (id: string) => () => {
+      contextMenusCall.networksSetting(id)
     },
-    {
-      label: t('menuitem.edit'),
-      onClick: () => {
-        props.history.push(`${Routes.NetworkEditor}/${network.id}`)
-      },
-      disabled: isDefault,
-    },
-    {
-      label: t('menuitem.remove'),
-      onClick: () => {
-        props.dispatch({
-          type: MainActions.SetDialog,
-          payload: {
-            open: true,
-            isChecked,
-            network,
-          },
-        })
-      },
-      disabled: isDefault,
-    },
-  ]
+    [settings.networks.length],
+  )
 
   return (
     <>
@@ -93,7 +34,6 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           const isChecked =
             // chain.network.remote === network.remote && // it will make things too complex
             chain.network.name === network.name
-          const isDefault = network.name === UnremovableNetwork
           return (
             <ListGroup.Item
               key={network.name || network.remote}
@@ -101,6 +41,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
                 display: 'flex',
                 justifyContent: 'space-between',
               }}
+              onContextMenu={onContextMenu(network.id!)}
             >
               <Form.Check
                 inline
@@ -112,7 +53,6 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
                   props.dispatch(actionCreators.setNetwork(network))
                 }}
               />
-              <NetworkActions isDefault={isDefault} actionItems={actionItems(network, isDefault, isChecked)} />
             </ListGroup.Item>
           )
         })}

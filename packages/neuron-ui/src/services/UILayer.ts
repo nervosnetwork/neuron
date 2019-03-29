@@ -51,6 +51,7 @@ export interface GetTransactionsParams {
 
 export enum ContextMenu {
   History = 'history',
+  NetworksSetting = 'networksSetting',
 }
 
 const UILayer = (() => {
@@ -146,8 +147,6 @@ export const walletsCall = instantiateMethodCall(wallets) as {
 export const contextMenus = (target: string, params: any) => {
   UILayer.send(Channel.ContextMenu, target, params)
 }
-export const contextMenusCall = instantiateMethodCall(contextMenus) as {
-  [index: string]: (id: string) => void
-}
+export const contextMenusCall = instantiateMethodCall(contextMenus) as { [index in ContextMenu]: (id: string) => void }
 
 export default UILayer

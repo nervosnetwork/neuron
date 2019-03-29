@@ -122,6 +122,7 @@ class NetworksController {
 
   public static setActive = (id: string): ChannelResponse<Network> => {
     const success = NetworksController.service.setActive(id)
+    windowManage.broadcast(Channel.Networks, NetworksMethod.Active, NetworksController.active())
 
     if (success) {
       return {

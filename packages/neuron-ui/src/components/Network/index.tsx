@@ -56,7 +56,7 @@ const NetworkStatusHeader = ({
       },
     })),
     {
-      label: t('MenuItem.management'),
+      label: t('menuitem.management'),
       onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
