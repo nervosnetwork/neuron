@@ -1,39 +1,40 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
-import { Keystore } from './keystore'
-import Tool from './tool'
+import crypto from 'crypto-browserify'
 
 export default class Key {
-  private keystore: Keystore
-
-  private mnemonic: string
-
-  constructor(keystore: Keystore, mnemonic: string) {
-    this.keystore = keystore
-    this.mnemonic = mnemonic
-  }
-
-  public static fromKeystore = (keystore: Keystore) => {
-    return new Key(keystore, '')
-  }
-
-  public static fromKeystoreString = (json: string) => {
-    return Key.fromKeystore(JSON.parse(json))
-  }
-
-  checkPassword = (password: string) => {
-    return this.keystore.password === password
-  }
-
-  getKeystore = () => this.keystore
-
-  getKeystoreString = () => JSON.stringify(this.keystore)
-
-  getMnemonic = () => this.mnemonic
-
-  public static generateKey = (password: string) => {
+  public static createKey(password: string) {
     const mnemonic = bip39.generateMnemonic()
-    return Key.fromMnemonic(mnemonic, false, password)
+    const seed = bip39.mnemonicToSeed(mnemonic)
+    const root = bip32.fromSeed(seed)
+    const privateKey = root.privateKey.toString('hex')
+    const chainCode = root.chainCode.toString('hex')
+    const key = { privateKey, chainCode }
+    const keystore = Key.toKeystore(JSON.stringify(key), password)
+    return {
+      address: Key.getAddressFromPrivateKey(privateKey),
+      keystore: JSON.stringify(keystore),
+    }
+  }
+
+  public static getAddressFromPrivateKey(privateKey: string) {
+    // TODO: generate address from private key
+    return `address_${privateKey}`
+  }
+
+  public static toKeystore(key: string, password: string) {
+    return {
+      version: 0,
+      id: crypto.randomBytes(16),
+      crypto: {
+        ciphertext: `${key}_${password}`,
+        cipherparams: {
+          iv: crypto.randomBytes(16),
+        },
+        cipher: 'aes-128-ctr',
+        mac: crypto.randomBytes(16),
+      },
+    }
   }
 
   public static fromMnemonic = (mnemonic: string, derive: boolean, password: string) => {
@@ -42,17 +43,13 @@ export default class Key {
     }
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
-    const master = {
-      privateKey: root.privateKey.toString('hex'),
-      chainCode: root.chainCode.toString('hex'),
+    const privateKey = root.privateKey.toString('hex')
+    const chainCode = root.chainCode.toString('hex')
+    const key = { privateKey, chainCode }
+    const keystore = Key.toKeystore(JSON.stringify(key), password)
+    return {
+      address: Key.getAddressFromPrivateKey(privateKey),
+      keystore: JSON.stringify(keystore),
     }
-    const keystore: Keystore = {
-      master,
-      password,
-    }
-    if (derive) {
-      keystore.children = Tool.searchUsedChildKeys(root)
-    }
-    return new Key(keystore, mnemonic)
   }
 }

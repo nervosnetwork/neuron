@@ -2,7 +2,7 @@ import { BIP32 } from 'bip32'
 import { Child } from './keystore'
 
 // BIP44: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-enum Constant {
+enum BIP44Params {
   Purpose = "44'",
   // 360 is tentative value
   CoinTypeTestnet = "360'",
@@ -34,7 +34,9 @@ export default class Tool {
   }
 
   private static getPath(index: number): string {
-    return `m/${Constant.Purpose}/${Constant.CoinTypeTestnet}/${Constant.Account}/${Constant.Change}/${index}`
+    return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${
+      BIP44Params.Change
+    }/${index}`
   }
 
   private static isUsedAddress(address: string) {
