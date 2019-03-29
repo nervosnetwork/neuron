@@ -12723,6 +12723,13 @@ sha3@^2.0.0:
   dependencies:
     buffer "5.2.1"
 
+sha3@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/sha3/-/sha3-2.0.1.tgz#8b111766d26994ab27a659af0dd73326fa19965d"
+  integrity sha512-jFxj019H14keifhzBnwjydSjQyipKuNah4wUeq0RwKePlGUg2ye/gm92qswWuy26qYk0dDiiOKOA/oVp1jSucQ==
+  dependencies:
+    buffer "5.2.1"
+
 shallow-clone@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/shallow-clone/-/shallow-clone-0.1.2.tgz#5909e874ba77106d73ac414cfec1ffca87d97060"

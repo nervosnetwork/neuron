@@ -1,18 +1,19 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
 import crypto from 'crypto-browserify'
+import scryptsy from 'scrypt.js'
+import SHA3 from 'sha3'
+import { v4 } from 'uuid'
+import { KdfParams } from './keystore'
 
 export default class Key {
   public static createKey(password: string) {
     const mnemonic = bip39.generateMnemonic()
-    const seed = bip39.mnemonicToSeed(mnemonic)
-    const root = bip32.fromSeed(seed)
-    const privateKey = root.privateKey.toString('hex')
-    const chainCode = root.chainCode.toString('hex')
-    const key = { privateKey, chainCode }
+    const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
     const keystore = Key.toKeystore(JSON.stringify(key), password)
     return {
-      address: Key.getAddressFromPrivateKey(privateKey),
+      address: Key.getAddressFromPrivateKey(key.privateKey),
+      mnemonic,
       keystore: JSON.stringify(keystore),
     }
   }
@@ -23,33 +24,74 @@ export default class Key {
   }
 
   public static toKeystore(key: string, password: string) {
+    const salt = crypto.randomBytes(32)
+    const iv = crypto.randomBytes(16)
+
+    const kdf = 'scrypt'
+    const kdfparams: KdfParams = {
+      dklen: 32,
+      salt: salt.toString('hex'),
+      n: 8192,
+      r: 8,
+      p: 1,
+    }
+
+    const params: scryptsy.Params = {
+      N: 8192,
+      r: 8,
+      p: 1,
+    }
+    const derivedKey = scryptsy.hashSync(Buffer.from(password), params, kdfparams.dklen, kdfparams.salt)
+
+    const cipher = crypto.createCipheriv('aes-128-ctr', derivedKey.slice(0, 16), iv)
+    if (!cipher) {
+      throw new Error('Unsupported cipher')
+    }
+
+    const ciphertext = Buffer.concat([cipher.update(Buffer.from(key.replace('0x', ''), 'hex')), cipher.final()])
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+
     return {
       version: 0,
-      id: crypto.randomBytes(16),
+      id: v4(),
       crypto: {
-        ciphertext: `${key}_${password}`,
+        ciphertext,
         cipherparams: {
-          iv: crypto.randomBytes(16),
+          iv,
         },
         cipher: 'aes-128-ctr',
-        mac: crypto.randomBytes(16),
+        kdf,
+        kdfparams,
+        mac,
       },
     }
   }
 
-  public static fromMnemonic = (mnemonic: string, derive: boolean, password: string) => {
+  public static fromMnemonic = (mnemonic: string, password: string) => {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }
+    const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
+    const keystore = Key.toKeystore(JSON.stringify(key), password)
+    return {
+      address: Key.getAddressFromPrivateKey(key.privateKey),
+      keystore: JSON.stringify(keystore),
+    }
+  }
+
+  private static generatePrivateKeyFromMnemonic(mnemonic: string) {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     const privateKey = root.privateKey.toString('hex')
     const chainCode = root.chainCode.toString('hex')
-    const key = { privateKey, chainCode }
-    const keystore = Key.toKeystore(JSON.stringify(key), password)
     return {
-      address: Key.getAddressFromPrivateKey(privateKey),
-      keystore: JSON.stringify(keystore),
+      privateKey,
+      chainCode,
     }
   }
 }

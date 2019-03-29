@@ -7,15 +7,19 @@ declare module 'scrypt.js' {
     p: number
   }
 
-  export function params(): any
   export function paramsSync(maxtime: number, maxmem?: number, maxmemfrac?: number): Params
 
-  export function kdf(): any
+  export function kdf(key: string | Buffer, paramsObject: Params): Promise<Buffer>
   export function kdfSync(key: string | Buffer, paramsObject: Params): Buffer
 
   export function verifyKdf(): any
   export function verifyKdfSync(): any
 
-  export function hash(): any
-  export function hashSync(): any
+  export function hash(
+    key: string | Buffer,
+    params: Params,
+    outputLength: number,
+    salt: string | Buffer,
+  ): Promise<Buffer>
+  export function hashSync(key: string | Buffer, params: Params, outputLength: number, salt: string | Buffer): Buffer
 }
