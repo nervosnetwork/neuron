@@ -14,8 +14,12 @@ import { ProviderActions } from '../../containers/Providers/reducer'
 
 import ChainContext, { Transaction } from '../../contexts/Chain'
 import { queryParsers } from '../../utils/parser'
-import { TransactionType, EXPLORER } from '../../utils/const'
+import { TransactionType, Routes, EXPLORER } from '../../utils/const'
 import { dateFormatter, queryFormatter } from '../../utils/formatters'
+
+interface MenuItemParams {
+  hash: string
+}
 
 const MetaData = styled.td`
   display: flex;
@@ -82,13 +86,13 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     return [
       {
         label: t('history.detail'),
-        click: (params: { hash: string }) => () => {
-          history.push(`/transaction/${params.hash}`)
+        click: (params: MenuItemParams) => {
+          history.push(`${Routes.Transaction}/${params.hash}`)
         },
       },
       {
         label: t('history.explorer'),
-        click: () => () => {
+        click: () => {
           window.open(EXPLORER)
         },
       },

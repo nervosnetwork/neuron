@@ -50,6 +50,7 @@ export interface Chain {
 export const initChain: Chain = {
   cells: [],
   network: {
+    id: '',
     name: '',
     remote: '',
     status: NetworkStatus.Offline,

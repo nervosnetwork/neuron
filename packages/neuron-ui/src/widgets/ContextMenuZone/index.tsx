@@ -6,6 +6,7 @@ const MenuContainer = styled.div<{ x: number; y: number }>`
   position: absolute;
   top: ${props => `${props.y}px`};
   left: ${props => `${props.x}px`};
+  z-index: 999;
 `
 
 interface MenuState {
@@ -18,6 +19,7 @@ interface MenuState {
 interface MenuItem {
   label: string
   click?: Function
+  isDisabled?: Function
 }
 
 const initState: MenuState = {
@@ -29,8 +31,8 @@ const initState: MenuState = {
 
 const Menu = ({ items, params }: { items: MenuItem[]; params?: object }) => (
   <ListGroup>
-    {items.map(({ label, click }) => (
-      <ListGroup.Item action key={label} onClick={click && click(params)}>
+    {items.map(({ label, click, isDisabled }) => (
+      <ListGroup.Item disabled={isDisabled && isDisabled(params)} action key={label} onClick={click && click(params)}>
         {label}
       </ListGroup.Item>
     ))}
@@ -71,7 +73,18 @@ const ContextMenuZone = ({
         <Overlay target={attachRef.current} show={state.show} rootClose onHide={onHide}>
           {() => (
             <MenuContainer x={state.x} y={state.y}>
-              <Menu items={menuItems} params={state.params} />
+              <Menu
+                items={menuItems.map(menuItem => ({
+                  ...menuItem,
+                  click: (params: any) => () => {
+                    if (menuItem.click) {
+                      menuItem.click(params)
+                    }
+                    onHide()
+                  },
+                }))}
+                params={state.params}
+              />
             </MenuContainer>
           )}
         </Overlay>

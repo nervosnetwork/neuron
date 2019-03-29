@@ -26,11 +26,11 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
 }
 
 export const actionCreators = {
-  setNetwork: (network: Network) => {
-    networksCall.setActive(network.id!)
+  setNetwork: (id: string) => {
+    networksCall.setActive(id)
     return {
       type: HeaderActions.SetNetwork,
-      payload: network,
+      payload: id,
     }
   },
 }

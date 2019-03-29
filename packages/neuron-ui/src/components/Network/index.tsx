@@ -52,11 +52,11 @@ const NetworkStatusHeader = ({
     ...networks.map(network => ({
       label: network.name || network.remote,
       onClick: () => {
-        dispatch(actionCreators.setNetwork(network))
+        dispatch(actionCreators.setNetwork(network.id!))
       },
     })),
     {
-      label: t('MenuItem.management'),
+      label: t('menuitem.management'),
       onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
