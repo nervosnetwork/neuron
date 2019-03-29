@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useCallback } from 'react'
+import React, { useContext, useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
-import { Link, RouteComponentProps } from 'react-router-dom'
-import { Container, Row, Col, Badge, Table, Dropdown, Alert } from 'react-bootstrap'
+import { RouteComponentProps } from 'react-router-dom'
+import { Container, Row, Col, Badge, Table, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import { Close as CloseIcon } from 'grommet-icons'
 
+import ContextMenuZone from '../../widgets/ContextMenuZone'
 import Pagination from '../../widgets/Table/Pagination'
 
 import { ContentProps } from '../../containers/MainContent'
@@ -14,8 +15,7 @@ import { ProviderActions } from '../../containers/Providers/reducer'
 import ChainContext, { Transaction } from '../../contexts/Chain'
 import { queryParsers } from '../../utils/parser'
 import { TransactionType, EXPLORER } from '../../utils/const'
-import { dateFormatter } from '../../utils/formatters'
-import i18n from '../../utils/i18n'
+import { dateFormatter, queryFormatter } from '../../utils/formatters'
 
 const MetaData = styled.td`
   display: flex;
@@ -27,52 +27,11 @@ const AddressBadge = styled(Badge)`
   margin-bottom: 15px;
 `
 
-const DropdownItem = styled(Link).attrs({
-  className: 'dropdown-item',
-})`
-  cursor: initial;
-`
-
-const HistoryItemActions = ({ history }: { history: Transaction }) => (
-  <td>
-    <Dropdown>
-      <Dropdown.Toggle variant="outline-dark" id={history.hash} />
-      <Dropdown.Menu>
-        <DropdownItem to={`/transaction/${history.hash}`}>{i18n.t('history.detail')}</DropdownItem>
-        <Dropdown.Item href={EXPLORER} target="_blank">
-          {i18n.t('history.explorer')}
-        </Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  </td>
-)
-
 const headers = [
-  {
-    label: 'history.meta',
-    key: 'meta',
-  },
-  {
-    label: 'history.transaction-hash',
-    key: 'hash',
-  },
-  {
-    label: 'history.amount',
-    key: 'value',
-  },
-  {
-    label: 'history.more-actions',
-    key: 'actions',
-  },
+  { label: 'history.meta', key: 'meta' },
+  { label: 'history.transaction-hash', key: 'hash' },
+  { label: 'history.amount', key: 'value' },
 ]
-
-const queryGen = (params: { [index: string]: any }) => {
-  const newQuery = new URLSearchParams()
-  Object.entries(params).forEach(([key, value]) => {
-    newQuery.set(key, `${value}`)
-  })
-  return newQuery
-}
 
 const groupHistory = (items: Transaction[]) => {
   return items.reduce((acc: Transaction[][], cur: Transaction) => {
@@ -91,34 +50,20 @@ const groupHistory = (items: Transaction[]) => {
 }
 
 const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const { location, history, loadings, errorMsgs, dispatch, providerDispatch } = props
+  const {
+    location: { search, pathname },
+    history,
+    loadings,
+    errorMsgs,
+    dispatch,
+    providerDispatch,
+  } = props
   const chain = useContext(ChainContext)
+  const [t] = useTranslation()
   const { pageNo, pageSize, totalCount, items, addresses } = chain.transactions
 
-  const [t] = useTranslation()
-
-  const onPageChange = useCallback(
-    (page: number) => {
-      const params = queryParsers.history(location.search)
-      params.pageNo = page
-      const newQuery = queryGen(params)
-      history.push(`${location.pathname}?${newQuery.toString()}`)
-    },
-    [location.search],
-  )
-
-  const onAddressRemove = useCallback(
-    (address: string) => () => {
-      const params = queryParsers.history(location.search)
-      params.addresses = params.addresses.filter((addr: string) => addr !== address)
-      const newQuery = queryGen(params)
-      history.push(`${location.pathname}?${newQuery.toString()}`)
-    },
-    [location.search],
-  )
-
   useEffect(() => {
-    const params = queryParsers.history(location.search)
+    const params = queryParsers.history(search)
     providerDispatch({
       type: ProviderActions.CleanTransactions,
     })
@@ -131,7 +76,44 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
         },
       })
     }
-  }, [location.search])
+  }, [search])
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        label: t('history.detail'),
+        click: (params: { hash: string }) => () => {
+          history.push(`/transaction/${params.hash}`)
+        },
+      },
+      {
+        label: t('history.explorer'),
+        click: () => () => {
+          window.open(EXPLORER)
+        },
+      },
+    ]
+  }, [])
+
+  const onPageChange = useCallback(
+    (page: number) => {
+      const params = queryParsers.history(search)
+      params.pageNo = page
+      const newQuery = queryFormatter(params)
+      history.push(`${pathname}?${newQuery.toString()}`)
+    },
+    [search],
+  )
+
+  const onAddressRemove = useCallback(
+    (address: string) => () => {
+      const params = queryParsers.history(search)
+      params.addresses = params.addresses.filter((addr: string) => addr !== address)
+      const newQuery = queryFormatter(params)
+      history.push(`${pathname}?${newQuery.toString()}`)
+    },
+    [search],
+  )
 
   if (loadings.transactions) {
     return <div>Loading</div>
@@ -147,33 +129,41 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
         </AddressBadge>
       ))}
-      {groupHistory(items).map(group => (
-        <Table key={dateFormatter(group[0].date).date} striped>
-          <thead>
-            <tr>
-              <th colSpan={headers.length}>{dateFormatter(group[0].date).date}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.map((historyItem: Transaction) => (
-              <tr key={historyItem.hash}>
-                {headers.map(header => {
-                  if (header.key === headers[0].key)
-                    return (
-                      <MetaData key={headers[0].key}>
-                        <span>{t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}</span>
-                        <span>{dateFormatter(historyItem.date).date}</span>
-                      </MetaData>
-                    )
-                  if (header.key === headers[headers.length - 1].key)
-                    return <HistoryItemActions key={headers[headers.length - 1].key} history={historyItem} />
-                  return <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
-                })}
+      <ContextMenuZone menuItems={menuItems}>
+        {groupHistory(items).map(group => (
+          <Table key={dateFormatter(group[0].date).date} striped>
+            <thead>
+              <tr>
+                <th colSpan={headers.length}>{dateFormatter(group[0].date).date}</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-      ))}
+            </thead>
+            <tbody>
+              {group.map((historyItem: Transaction) => (
+                <tr key={historyItem.hash}>
+                  {headers.map(header => {
+                    if (header.key === headers[0].key)
+                      return (
+                        <MetaData key={headers[0].key}>
+                          <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
+                            {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
+                          </span>
+                          <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
+                            {dateFormatter(historyItem.date).date}
+                          </span>
+                        </MetaData>
+                      )
+                    return (
+                      <td key={header.key} data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
+                        {historyItem[header.key as keyof Transaction]}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ))}
+      </ContextMenuZone>
       <Row>
         <Col>
           <Pagination currentPage={pageNo} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
