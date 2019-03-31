@@ -1,12 +1,13 @@
 import styled from 'styled-components'
 import { Jumbotron } from 'react-bootstrap'
 
-const Screen = styled(Jumbotron)<{ full: boolean }>`
-  position: ${props => (props.full ? 'absolute' : 'relative')};
-  right: ${props => (props.full ? 0 : 'auto')};
-  bottom: ${props => (props.full ? 0 : 'auto')};
-  width: ${props => (props.full ? '100%' : 'auto')};
-  height: ${props => (props.full ? '100vh' : 'auto')};
+type Mode = 'fullscreen' | 'responsive'
+const Screen = styled(Jumbotron)<{ mode: Mode }>`
+  position: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 'absolute' : 'relative')};
+  right: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 0 : 'auto')};
+  bottom: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 0 : 'auto')};
+  width: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? '100%' : 'auto')};
+  height: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? '100vh' : 'auto')};
   flex: 1;
   margin: 0;
   display: flex;

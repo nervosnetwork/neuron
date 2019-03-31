@@ -1,11 +1,10 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import Screen from '../../widgets/Screen'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
-import WalletContext from '../../contexts/Wallet'
 import { Routes, MnemonicAction } from '../../utils/const'
 
 const buttons = [
@@ -14,11 +13,10 @@ const buttons = [
 ]
 
 const Wizard = () => {
-  const { address } = useContext(WalletContext)
   const [t] = useTranslation()
   const message = 'wizard.create-or-import-your-first-wallet'
   return (
-    <Screen full={!address}>
+    <Screen>
       <div>
         <h1>{t(message)}</h1>
         <ScreenButtonRow>

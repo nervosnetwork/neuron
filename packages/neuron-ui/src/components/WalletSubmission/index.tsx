@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useContext } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import Screen from '../../widgets/Screen'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
-import WalletContext from '../../contexts/Wallet'
 import initState from '../../containers/MainContent/state'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
@@ -21,7 +20,6 @@ const inptus = [
 ]
 
 const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const { address } = useContext(WalletContext)
   const [t] = useTranslation()
 
   const { dispatch, mnemonic, history } = props
@@ -66,7 +64,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
   const disableNext = !verifyWalletSubmission(mnemonic)
 
   return (
-    <Screen full={!address}>
+    <Screen>
       <div>
         <h1>{t(message)}</h1>
         {inptus.map(input => (
