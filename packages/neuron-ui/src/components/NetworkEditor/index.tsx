@@ -52,6 +52,16 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     }
     return () => {
       // TODO: clean
+      dispatch({
+        type: MainActions.UpdateNetworkEditor,
+        payload: initState.networkEditor,
+      })
+      dispatch({
+        type: MainActions.ErrorMessage,
+        payload: {
+          networks: '',
+        },
+      })
     }
   }, [params.id])
 

@@ -1,5 +1,4 @@
 import { networksCall } from '../../../services/UILayer'
-import { Network } from '../../../contexts/Chain'
 import { MainActions } from '../reducer'
 
 import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId, UnremovableNetwork } from '../../../utils/const'
@@ -67,12 +66,12 @@ export default {
       payload: { open: false },
     }
   },
-  setNetwork: (network: Network) => {
+  setNetwork: (id: string) => {
     // TODO: verification
-    networksCall.setActive(network.id!)
+    networksCall.setActive(id)
     return {
       type: MainActions.Netowrks,
-      payload: network,
+      payload: id,
     }
   },
   saveNetwork: (params: { id: string; name: string; remote: string }) => {

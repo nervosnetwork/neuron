@@ -72,6 +72,9 @@ class NetworksController {
     // TODO: verification
     const success = NetworksController.service.update(network)
     if (success) {
+      if (NetworksController.service.active && NetworksController.service.active.id === network.id) {
+        windowManage.broadcast(Channel.Networks, NetworksMethod.Active, NetworksController.active())
+      }
       // TODO: sync
       windowManage.broadcast(Channel.Networks, NetworksMethod.Index, NetworksController.index())
       return {
@@ -122,6 +125,7 @@ class NetworksController {
 
   public static setActive = (id: string): ChannelResponse<Network> => {
     const success = NetworksController.service.setActive(id)
+    windowManage.broadcast(Channel.Networks, NetworksMethod.Active, NetworksController.active())
 
     if (success) {
       return {

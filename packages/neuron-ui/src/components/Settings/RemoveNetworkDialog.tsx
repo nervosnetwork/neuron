@@ -12,7 +12,7 @@ const RemoveNetworkDialog = ({
   dispatch,
 }: {
   isChecked: boolean
-  network: Network
+  network?: Network
   dispatch: any
 }) => {
   const [t] = useTranslation()
@@ -23,43 +23,49 @@ const RemoveNetworkDialog = ({
         e.stopPropagation()
       }}
     >
-      <Card.Header>{`${t('Remove Address')}: ${network.name || network.remote}`}</Card.Header>
-      <Card.Body>
-        {`Network of name: ${network.name}, address: ${network.remote} will be removed.`}
-        {isChecked ? (
-          <p>{`It's the active network, removing it will make reconnect to ${UnremovableNetwork}`}</p>
-        ) : null}
-      </Card.Body>
-      <Card.Footer className="text-muted">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Button
-            variant="danger"
-            onClick={() => {
-              dispatch(actionCreators.deleteNetwork(network.id))
-            }}
-          >
-            {t('Confirm')}
-          </Button>
-          <Button
-            variant="light"
-            onClick={() =>
-              dispatch({
-                type: MainActions.SetDialog,
-                payload: {
-                  open: false,
-                },
-              })
-            }
-          >
-            {t('Cancel')}
-          </Button>
-        </div>
-      </Card.Footer>
+      {network ? (
+        <>
+          <Card.Header>{`${t('Remove Address')}: ${network.name || network.remote}`}</Card.Header>
+          <Card.Body>
+            {`Network of name: ${network.name}, address: ${network.remote} will be removed.`}
+            {isChecked ? (
+              <p>{`It's the active network, removing it will make reconnect to ${UnremovableNetwork}`}</p>
+            ) : null}
+          </Card.Body>
+          <Card.Footer className="text-muted">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button
+                variant="danger"
+                onClick={() => {
+                  dispatch(actionCreators.deleteNetwork(network.id))
+                }}
+              >
+                {t('Confirm')}
+              </Button>
+              <Button
+                variant="light"
+                onClick={() =>
+                  dispatch({
+                    type: MainActions.SetDialog,
+                    payload: {
+                      open: false,
+                    },
+                  })
+                }
+              >
+                {t('Cancel')}
+              </Button>
+            </div>
+          </Card.Footer>
+        </>
+      ) : (
+        <div>Network not found</div>
+      )}
     </Card>
   )
 }
