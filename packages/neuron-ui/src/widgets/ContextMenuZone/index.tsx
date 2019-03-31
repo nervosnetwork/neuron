@@ -55,7 +55,7 @@ const ContextMenuZone = ({
         console.error('Invalid data-menuitem')
       }
     }
-    setState({ show: true, x: e.nativeEvent.pageX, y: e.nativeEvent.pageY, params })
+    setState({ show: true, x: e.nativeEvent.clientX, y: e.nativeEvent.clientY, params })
   }, [])
 
   const onHide = useCallback(() => {
