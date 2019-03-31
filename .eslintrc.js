@@ -55,6 +55,9 @@ module.exports = {
       "allow": ["warn", "error", "info"]
     }]
   },
+  "globals": {
+    "BigInt": "readonly"
+  },
   "env": {
     "jest": true,
     "browser": true,
