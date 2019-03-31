@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Alert, Button, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import Screen from '../../widgets/Screen'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
-import WalletContext from '../../contexts/Wallet'
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import mnemonicUtils from '../../utils/mnemonic'
@@ -23,7 +22,6 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
     history,
   } = props
 
-  const { address } = useContext(WalletContext)
   const [t] = useTranslation()
 
   const isCreate = type === MnemonicAction.Create
@@ -84,7 +82,7 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
 
   return (
-    <Screen full={!address}>
+    <Screen>
       <div>
         <h1>{t(message)}</h1>
         <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
