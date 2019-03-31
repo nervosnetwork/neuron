@@ -13,19 +13,16 @@ export default class Key {
     this.mnemonic = mnemonic
   }
 
-  public static fromKeystore = (keystore: Keystore, password: string) => {
-    if (!Key.checkPassword(keystore, password)) {
-      throw new Error('Wrong password')
-    }
+  public static fromKeystore = (keystore: Keystore) => {
     return new Key(keystore, '')
   }
 
-  public static fromKeystoreString = (json: string, password: string) => {
-    return Key.fromKeystore(JSON.parse(json), password)
+  public static fromKeystoreString = (json: string) => {
+    return Key.fromKeystore(JSON.parse(json))
   }
 
-  public static checkPassword(keystore: Keystore, password: string) {
-    return keystore.password === password
+  checkPassword = (password: string) => {
+    return this.keystore.password === password
   }
 
   getKeystore = () => this.keystore

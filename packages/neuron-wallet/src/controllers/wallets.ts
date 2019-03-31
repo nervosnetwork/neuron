@@ -68,15 +68,12 @@ class WalletsController {
     password: string
   }): ChannelResponse<Wallet> => {
     const keystore = Key.generateKey(password).getKeystoreString()
-    const wallet = WalletsController.service.create(
-      {
-        name,
-        keystore,
-        address,
-        publicKey,
-      },
-      password,
-    )
+    const wallet = WalletsController.service.create({
+      name,
+      keystore,
+      address,
+      publicKey,
+    })
     if (wallet) {
       return {
         status: ResponseCode.Success,
@@ -100,13 +97,10 @@ class WalletsController {
   }): ChannelResponse<Wallet> => {
     const storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
     if (storedKeystore) {
-      const wallet = WalletsController.service.create(
-        {
-          name,
-          keystore: storedKeystore,
-        },
-        password,
-      )
+      const wallet = WalletsController.service.create({
+        name,
+        keystore: storedKeystore,
+      })
       if (wallet) {
         return {
           status: ResponseCode.Success,
@@ -129,20 +123,21 @@ class WalletsController {
     password: string
     keystore: string
   }): ChannelResponse<Wallet> => {
-    const storedKeystore = Key.fromKeystoreString(keystore, password).getKeystoreString()
-    if (storedKeystore) {
-      const wallet = WalletsController.service.create(
-        {
-          name,
-          keystore: storedKeystore,
-        },
-        password,
-      )
-      if (wallet) {
-        return {
-          status: ResponseCode.Success,
-          result: wallet,
-        }
+    const key = Key.fromKeystoreString(keystore)
+    if (!key.checkPassword(password)) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Wrong password',
+      }
+    }
+    const wallet = WalletsController.service.create({
+      name,
+      keystore,
+    })
+    if (wallet) {
+      return {
+        status: ResponseCode.Success,
+        result: wallet,
       }
     }
     return {
