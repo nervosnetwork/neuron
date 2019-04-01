@@ -29,7 +29,6 @@ export default class WalletService {
       name: 'asw',
       keystore: '{"master":{"privateKey":"","chainCode":""},"password":"0"}',
       address: asw.address,
-      publicKey: asw.publicKey,
     })
     this.setActive(walletStore.getAllWallets()[0].id)
   }
@@ -52,25 +51,13 @@ export default class WalletService {
     return this.wallets.find(wallet => wallet.id === id)
   }
 
-  public create = ({
-    name,
-    keystore,
-    address,
-    publicKey,
-  }: {
-    name: string
-    keystore: string
-    address?: string
-    publicKey?: Uint8Array
-  }): Wallet => {
-    const id = walletStore.saveWallet(name, Key.fromKeystoreString(keystore).getKeystore())
+  public create = ({ name, keystore }: { name: string; keystore: string }): Wallet => {
+    const id = walletStore.saveWallet(name, JSON.parse(keystore))
     if (id) {
       const storedWallet = walletStore.getWallet(id)
       return {
         id,
         name: storedWallet.name,
-        address,
-        publicKey,
       }
     }
     throw new Error('Failed to create wallet')
@@ -78,7 +65,7 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = walletStore.getWallet(id)
-    const keystore = Key.fromKeystore(wallet.keystore)
+    const keystore = Key.fromKeystore(wallet.keystore, password)
     return keystore.checkPassword(password)
   }
 

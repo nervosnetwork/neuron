@@ -56,23 +56,11 @@ class WalletsController {
     }
   }
 
-  public static create = ({
-    name,
-    address,
-    publicKey,
-    password,
-  }: {
-    name: string
-    address: string
-    publicKey: Uint8Array
-    password: string
-  }): ChannelResponse<Wallet> => {
-    const keystore = Key.generateKey(password).getKeystoreString()
+  public static create = ({ name, password }: { name: string; password: string }): ChannelResponse<Wallet> => {
+    const { keystore } = Key.generateKey(password)
     const wallet = WalletsController.service.create({
       name,
       keystore,
-      address,
-      publicKey,
     })
     if (wallet) {
       return {
@@ -95,7 +83,7 @@ class WalletsController {
     password: string
     mnemonic: string
   }): ChannelResponse<Wallet> => {
-    const storedKeystore = Key.fromMnemonic(mnemonic, true, password).getKeystoreString()
+    const storedKeystore = Key.fromMnemonic(mnemonic, password).keystore
     if (storedKeystore) {
       const wallet = WalletsController.service.create({
         name,
@@ -123,8 +111,7 @@ class WalletsController {
     password: string
     keystore: string
   }): ChannelResponse<Wallet> => {
-    const key = Key.fromKeystoreString(keystore)
-    if (!key.checkPassword(password)) {
+    if (!Key.checkPassword(keystore, password)) {
       return {
         status: ResponseCode.Fail,
         msg: 'Wrong password',
