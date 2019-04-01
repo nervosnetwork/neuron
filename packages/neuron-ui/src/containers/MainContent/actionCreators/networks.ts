@@ -1,12 +1,18 @@
 import { networksCall } from '../../../services/UILayer'
 import { MainActions } from '../reducer'
 
-import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId, UnremovableNetwork } from '../../../utils/const'
+import {
+  Message,
+  MAX_NETWORK_NAME_LENGTH,
+  UnremovableNetworkId,
+  UnremovableNetwork,
+  NetworkType,
+} from '../../../utils/const'
 import i18n from '../../../utils/i18n'
 
 export default {
   getNetwork: (id: string) => {
-    networksCall.show(id)
+    networksCall.get(id)
     return {
       type: MainActions.UpdateLoading,
       payload: { networks: true },
@@ -39,10 +45,10 @@ export default {
       networksCall.create({
         name,
         remote,
+        type: NetworkType.Normal,
       })
     } else {
-      networksCall.update({
-        id,
+      networksCall.update(id!, {
         name,
         remote,
       })
@@ -68,7 +74,7 @@ export default {
   },
   setNetwork: (id: string) => {
     // TODO: verification
-    networksCall.setActive(id)
+    networksCall.activate(id)
     return {
       type: MainActions.Netowrks,
       payload: id,

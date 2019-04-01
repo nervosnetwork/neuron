@@ -75,7 +75,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     return () => {
       // TODO: clean
     }
-  }, [settings.networks.length, JSON.stringify(currentNetwork)])
+  }, [settings.networks.length])
 
   const inputs: InputProps[] = [
     {
@@ -106,6 +106,10 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     },
   ]
 
+  const invalidParams = networkEditor.name === '' || networkEditor.remote === ''
+  const notUpdated =
+    currentNetwork && currentNetwork.name === networkEditor.name && currentNetwork.remote === networkEditor.remote
+
   return (
     <Card>
       <Card.Header>{params.id === 'new' ? t('settings.network.editnetwork.title') : 'name'}</Card.Header>
@@ -121,6 +125,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           variant="primary"
           size="lg"
           block
+          disabled={invalidParams || notUpdated}
           onClick={() => {
             dispatch(
               actionCreators.createOrUpdateNetowrk({
@@ -131,6 +136,9 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           }}
         >
           Save
+        </Button>
+        <Button type="reset" variant="primary" size="lg" block onClick={() => history.goBack()}>
+          Cancel
         </Button>
       </Card.Body>
     </Card>

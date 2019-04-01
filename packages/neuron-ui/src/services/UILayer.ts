@@ -24,13 +24,13 @@ export enum WalletsMethod {
 }
 
 export enum NetworksMethod {
-  Index = 'index',
-  Show = 'show',
+  GetAll = 'getAll',
+  Get = 'get',
   Create = 'create',
   Update = 'update',
   Delete = 'delete',
-  Active = 'active',
-  SetActive = 'setActive',
+  Activate = 'activate',
+  ActiveOne = 'activeOne',
 }
 
 export enum TransactionsMethod {
@@ -94,13 +94,13 @@ export const networks = (method: NetworksMethod, params: string | Network) => {
   UILayer.send(Channel.Networks, method, params)
 }
 export const networksCall = instantiateMethodCall(networks) as {
-  index: () => void
-  show: (id: string) => void
-  create: (network: Network) => void
-  update: (network: Network) => void
+  getAll: () => void
+  get: (id: string) => void
+  create: (network: { name: string; remote: string; type: 0 | 1 }) => void
+  update: (id: string, options: Partial<Network>) => void
   delete: (id: string) => void
-  active: () => void
-  setActive: (id: string) => void
+  activeOne: () => void
+  activate: (id: string) => void
 }
 
 export const transactions = (method: TransactionsMethod, params: string | GetTransactionsParams) => {

@@ -1,6 +1,8 @@
 import path from 'path'
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
+// db
+import 'reflect-metadata'
 
 import env from './env'
 import WalletChannel from './channel/wallet'
@@ -18,7 +20,7 @@ const windowManage = new WindowManage()
 let mainWindow: Electron.BrowserWindow | null
 WalletChannel.start()
 
-const initUILayer = (win: BrowserWindow) => {
+const initUILayer = async (win: BrowserWindow) => {
   const channel = new WalletChannel(win)
 
   dispatch(Command.SyncWallets, {
@@ -32,8 +34,8 @@ const initUILayer = (win: BrowserWindow) => {
   dispatch(Command.SyncNetworks, {
     channel,
     extra: {
-      active: NetowrksController.active(),
-      networks: NetowrksController.index(),
+      active: await NetowrksController.activeOne(),
+      networks: await NetowrksController.getAll(),
       connected: {
         status: 1,
         result: 1,
