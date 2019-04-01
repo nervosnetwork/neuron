@@ -19,23 +19,18 @@ export const defaultWallet: Wallet = {
   publicKey: asw.publicKey,
 }
 
-const defaultPassword = '0'
-
 export default class WalletService {
   public wallets: Wallet[] = []
 
   public active: Wallet | undefined = undefined
 
   constructor() {
-    this.create(
-      {
-        name: 'asw',
-        keystore: '{"master":{"privateKey":"","chainCode":""},"password":"0"}',
-        address: asw.address,
-        publicKey: asw.publicKey,
-      },
-      defaultPassword,
-    )
+    this.create({
+      name: 'asw',
+      keystore: '{"master":{"privateKey":"","chainCode":""},"password":"0"}',
+      address: asw.address,
+      publicKey: asw.publicKey,
+    })
     this.setActive(walletStore.getAllWallets()[0].id)
   }
 
@@ -52,16 +47,18 @@ export default class WalletService {
     return this.wallets.find(wallet => wallet.id === id)
   }
 
-  public create = (
-    {
-      name,
-      keystore,
-      address,
-      publicKey,
-    }: { name: string; keystore: string; address?: string; publicKey?: Uint8Array },
-    password: string,
-  ): Wallet => {
-    const id = walletStore.saveWallet(name, Key.fromKeystoreString(keystore, password).getKeystore())
+  public create = ({
+    name,
+    keystore,
+    address,
+    publicKey,
+  }: {
+    name: string
+    keystore: string
+    address?: string
+    publicKey?: Uint8Array
+  }): Wallet => {
+    const id = walletStore.saveWallet(name, Key.fromKeystoreString(keystore).getKeystore())
     if (id) {
       const storedWallet = walletStore.getWallet(id)
       return {
@@ -72,6 +69,12 @@ export default class WalletService {
       }
     }
     throw new Error('Failed to create wallet')
+  }
+
+  public validate = ({ id, password }: { id: string; password: string }) => {
+    const wallet = walletStore.getWallet(id)
+    const keystore = Key.fromKeystore(wallet.keystore)
+    return keystore.checkPassword(password)
   }
 
   // TODO: update wallet
@@ -106,6 +109,7 @@ export default class WalletService {
     const wallet = this.show(id)
     if (wallet) {
       this.wallets = this.wallets.filter(w => w.id !== id)
+      walletStore.deleteWallet(id)
       return true
     }
     return false
