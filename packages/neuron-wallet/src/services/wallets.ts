@@ -34,13 +34,18 @@ export default class WalletService {
     this.setActive(walletStore.getAllWallets()[0].id)
   }
 
-  public index = (): Wallet[] => {
-    return walletStore.getAllWallets().map(w => ({
-      id: w.id,
-      name: w.name,
-      address: `address of ${w.id}`,
-      publicKey: Buffer.from(`address of ${w.id}`),
-    }))
+  public index = (
+    { pageNo = 0, pageSize = 15 }: { pageNo: number; pageSize: number } = { pageNo: 0, pageSize: 15 },
+  ): Wallet[] => {
+    return walletStore
+      .getAllWallets()
+      .slice(pageNo * pageSize, (pageNo + 1) * pageSize)
+      .map(w => ({
+        id: w.id,
+        name: w.name,
+        address: `address of ${w.id}`,
+        publicKey: Buffer.from(`address of ${w.id}`),
+      }))
   }
 
   public show = (id: string): Wallet | undefined => {

@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import { ListGroup, Form, Container } from 'react-bootstrap'
+import { Col, Row, ListGroup, Form, Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { Configure } from 'grommet-icons'
 
-import { Routes } from '../../utils/const'
+import { Routes, MnemonicAction } from '../../utils/const'
 import WalletContext from '../../contexts/Wallet'
 import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
@@ -22,6 +22,11 @@ const Popover = styled.div`
     }
   }
 `
+
+const buttons = [
+  { label: 'wizard.create-new-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Create}` },
+  { label: 'wizard.import-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Import}` },
+]
 
 const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionItems: DropDownItem[] }) => {
   if (isDefault) {
@@ -117,18 +122,15 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           marginTop: 30,
         }}
       >
-        <Link to={`${Routes.CreateWallet}/new`} className="btn btn-primary">
-          {t('settings.walletmanger.createwallet')}
-        </Link>
-        <Link
-          to={`${Routes.ImportWallet}/new`}
-          className="btn btn-primary"
-          style={{
-            marginLeft: 30,
-          }}
-        >
-          {t('settings.walletmanger.importwallet')}
-        </Link>
+        <Row>
+          {buttons.map(({ label, href }) => (
+            <Col key={label}>
+              <Link className="btn btn-primary" to={href}>
+                {t(label)}
+              </Link>
+            </Col>
+          ))}
+        </Row>
       </Container>
       <Dialog
         open={dialog.open}
