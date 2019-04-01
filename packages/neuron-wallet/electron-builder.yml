@@ -16,6 +16,16 @@ files:
   - '!**/*.map'
   - '!**/src/'
 
+  - '!node_modules/chalk'
+  - '!node_modules/ansi-styles'
+  - '!node_modules/escape-string-regexp'
+  - from: '../../node_modules/chalk'
+    to: 'node_modules/chalk'
+  - from: '../../node_modules/ansi-styles'
+    to: 'node_modules/ansi-styles'
+  - from: '../../node_modules/escape-string-regexp'
+    to: 'node_modules/escape-string-regexp'
+
 win:
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}'
   icon: assets/images/icon.ico
