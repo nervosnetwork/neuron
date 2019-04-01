@@ -7,6 +7,9 @@ enum BIP44Params {
   // 360 is tentative value
   CoinTypeTestnet = "360'",
   Account = "0'",
+}
+
+enum AddressType {
   Receive = 0,
   Change = 1,
 }
@@ -23,10 +26,10 @@ const HD = {
       Buffer.from(keysData.chainCode, 'hex'),
     )
     for (let index = 0; index < receiveNumber; index++) {
-      receiveAddresses.push(HD.getAddressFromHDIndex(root, index, BIP44Params.Receive))
+      receiveAddresses.push(HD.getAddressFromHDIndex(root, index, AddressType.Receive))
     }
     for (let index = 0; index < changeNumber; index++) {
-      changeAddresses.push(HD.getAddressFromHDIndex(root, index, BIP44Params.Change))
+      changeAddresses.push(HD.getAddressFromHDIndex(root, index, AddressType.Change))
     }
     return {
       receive: receiveAddresses,
@@ -47,7 +50,7 @@ const HD = {
     const children: Child[] = []
     const nextUnusedIndex = HD.searchAddress(root, 20)
     for (let index = 0; index < nextUnusedIndex; index++) {
-      const path = HD.getPath(BIP44Params.Receive, index)
+      const path = HD.getPath(AddressType.Receive, index)
       const { privateKey, chainCode } = root.derivePath(path)
       if (Address.isUsedAddress(Address.getAddressFromPrivateKey(privateKey.toString('hex')))) {
         children.push({
@@ -60,11 +63,11 @@ const HD = {
     return children
   },
 
-  getPath: (type: BIP44Params, index: number) => {
+  getPath: (type: AddressType, index: number) => {
     return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${type}/${index}`
   },
 
-  getAddressFromHDIndex: (root: BIP32, index: number, type = BIP44Params.Receive) => {
+  getAddressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receive) => {
     const path = HD.getPath(type, index)
     const { privateKey } = root.derivePath(path)
     return Address.getAddressFromPrivateKey(privateKey.toString('hex'))
@@ -73,7 +76,7 @@ const HD = {
   // TODO: refactor me
   searchAddress: (root: BIP32, index: number, maxUsedIndex = 0, minUnusedIndex = 100, depth = 0): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isUsedAddress(HD.getAddressFromHDIndex(root, BIP44Params.Receive, index))) {
+    if (!Address.isUsedAddress(HD.getAddressFromHDIndex(root, AddressType.Receive, index))) {
       if (index === 0) {
         return 0
       }
