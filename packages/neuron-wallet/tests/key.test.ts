@@ -1,4 +1,6 @@
 import Key from '../src/keys/key'
+import HD from '../src/keys/hd'
+import { KeysData } from '../src/keys/keystore'
 
 describe('Key tests', () => {
   const mnemonic = 'mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier'
@@ -17,5 +19,14 @@ describe('Key tests', () => {
     const keyStr = Key.fromKeystore(JSON.parse(keystoreJson), '1qaz.2wsx')
     const key = JSON.parse(keyStr)
     expect(privateKey).toBe(key.privateKey)
+  })
+
+  it('generate receive and change addresses', async () => {
+    const keyStr = Key.fromKeystore(JSON.parse(keystoreJson), '1qaz.2wsx')
+    const keysData: KeysData = JSON.parse(keyStr)
+    const addresses = HD.generateReceiveAndChangeAddresses(keysData, 17, 3)
+    expect(addresses.receive.length).toEqual(17)
+    expect(addresses.change.length).toEqual(3)
+    expect(addresses.receive[0]).not.toBe(undefined)
   })
 })

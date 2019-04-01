@@ -7,8 +7,8 @@ import { v4 } from 'uuid'
 import Address from './address'
 import { Keystore, KdfParams } from './keystore'
 
-export default class Key {
-  public static createKey(password: string) {
+const Key = {
+  createKey: (password: string) => {
     const mnemonic = bip39.generateMnemonic()
     const key = Key.generatePrivateKeyFromMnemonic(mnemonic)
     const keystore = Key.toKeystore(JSON.stringify(key), password)
@@ -17,9 +17,9 @@ export default class Key {
       mnemonic,
       keystore: JSON.stringify(keystore),
     }
-  }
+  },
 
-  public static toKeystore(key: string, password: string) {
+  toKeystore: (encryptedData: string, password: string) => {
     const salt = crypto.randomBytes(32)
     const iv = crypto.randomBytes(16)
     const kdf = 'scrypt'
@@ -39,7 +39,7 @@ export default class Key {
     if (!cipher) {
       throw new Error('Unsupported cipher')
     }
-    const ciphertext = Buffer.concat([cipher.update(Buffer.from(key, 'utf8')), cipher.final()])
+    const ciphertext = Buffer.concat([cipher.update(Buffer.from(encryptedData, 'utf8')), cipher.final()])
     const hash = new SHA3(256)
     const mac = hash
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
@@ -60,9 +60,9 @@ export default class Key {
         mac,
       },
     }
-  }
+  },
 
-  public static fromKeystore = (keystore: Keystore, password: string) => {
+  fromKeystore: (keystore: Keystore, password: string) => {
     if (password === undefined) {
       throw new Error('No password given.')
     }
@@ -95,9 +95,9 @@ export default class Key {
     )
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     return Buffer.from(seed.replace('0x', ''), 'hex').toString()
-  }
+  },
 
-  public static fromMnemonic = (mnemonic: string, password: string) => {
+  fromMnemonic: (mnemonic: string, password: string) => {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }
@@ -107,9 +107,9 @@ export default class Key {
       address: Address.getAddressFromPrivateKey(JSON.stringify(key)),
       keystore,
     }
-  }
+  },
 
-  public static generatePrivateKeyFromMnemonic(mnemonic: string) {
+  generatePrivateKeyFromMnemonic: (mnemonic: string) => {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     const privateKey = root.privateKey.toString('hex')
@@ -118,9 +118,9 @@ export default class Key {
       privateKey,
       chainCode,
     }
-  }
+  },
 
-  public static checkPassword(keystore: Keystore, password: string) {
+  checkPassword: (keystore: Keystore, password: string) => {
     if (password === undefined) {
       throw new Error('No password given.')
     }
@@ -143,5 +143,7 @@ export default class Key {
       .toString('hex')
       .replace('0x', '')
     return mac === keystore.crypto.mac
-  }
+  },
 }
+
+export default Key
