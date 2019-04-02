@@ -20,12 +20,9 @@
   "scripts": {
     "start:ui": "lerna run --scope=@nervosnetwork/neuron-ui start",
     "start": "concurrently \"cross-env BROWSER=none yarn run start:ui\" \"wait-on http://localhost:3000 && cd packages/neuron-wallet && yarn run start:dev\"",
-
     "build": "lerna run build",
     "clean": "lerna run clean",
-
     "package": "yarn clean && yarn build && ./packages/neuron-wallet/script/package.sh",
-
     "bootstrap": "lerna bootstrap && lerna link",
     "lint": "lerna run lint",
     "test": "lerna run --parallel test",
@@ -59,7 +56,7 @@
     "nodemon": "^1.18.9",
     "prettier": "^1.16.0",
     "ts-jest": "^24.0.0",
-    "typescript": "^3.3.1",
+    "typescript": "^3.4.1",
     "wait-on": "^3.2.0"
   },
   "dependencies": {},
