@@ -67,7 +67,7 @@ export const loadCellsFromChain = async () => {
 }
 
 // different wallet has different cells and txs
-export const getCellsByWallet = async (page: number, perPage: number, walletID: string) => {
+export const getCellsByWallet = async (_page: number, _perPage: number, _walletID: string) => {
   const cells = storeCells
 
   return {
