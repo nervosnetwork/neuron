@@ -47,7 +47,7 @@
     "uuid": "^3.3.2",
     "winston": "^3.2.1",
     "crypto-browserify": "3.12.0",
-    "scrypt.js": "0.2.0",
+    "scrypt.js": "0.3.0",
     "sha3": "^2.0.1"
   },
   "devDependencies": {
