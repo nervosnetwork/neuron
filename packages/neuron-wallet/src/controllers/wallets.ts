@@ -116,7 +116,7 @@ class WalletsController {
     }
     const wallet = WalletsController.service.create({
       name,
-      keystore: key.getKeystore()!!,
+      keystore: key.getKeystore()!,
     })
     if (wallet) {
       return {

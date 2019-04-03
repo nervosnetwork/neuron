@@ -117,7 +117,7 @@ export default class Key {
     if (password === undefined) {
       throw new Error('No password given.')
     }
-    const { kdfparams } = this.keystore!!.crypto
+    const { kdfparams } = this.keystore!.crypto
     const derivedKey = scryptsy(
       Buffer.from(password),
       Buffer.from(kdfparams.salt, 'hex'),
@@ -126,14 +126,14 @@ export default class Key {
       kdfparams.p,
       kdfparams.dklen,
     )
-    const ciphertext = Buffer.from(this.keystore!!.crypto.ciphertext, 'hex')
+    const ciphertext = Buffer.from(this.keystore!.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)
     const mac = hash
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
       .digest()
       .toString('hex')
       .replace('0x', '')
-    return mac === this.keystore!!.crypto.mac
+    return mac === this.keystore!.crypto.mac
   }
 
   public getLatestUnusedAddress = () => {
