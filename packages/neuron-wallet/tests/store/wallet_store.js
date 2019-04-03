@@ -20,7 +20,7 @@ describe('wallet store', () => {
     keystore: {
       version: 0,
       id: '1',
-      crypto: { cipher: 'wallet1', cipherparams: null, ciphertext: 'wallet2', kdf: '2', kdfparams: null, mac: '2' },
+      crypto: { cipher: 'wallet2', cipherparams: null, ciphertext: 'wallet2', kdf: '2', kdfparams: null, mac: '2' },
     },
   }
   const wallet3 = {
@@ -29,7 +29,7 @@ describe('wallet store', () => {
     keystore: {
       version: 0,
       id: '1',
-      crypto: { cipher: 'wallet1', cipherparams: null, ciphertext: 'wallet3', kdf: '3', kdfparams: null, mac: '3' },
+      crypto: { cipher: 'wallet3', cipherparams: null, ciphertext: 'wallet3', kdf: '3', kdfparams: null, mac: '3' },
     },
   }
 
@@ -55,7 +55,6 @@ describe('wallet store', () => {
   })
 
   it('get not exist wallet', () => {
-    walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet1)
     try {
       walletStore.getWallet('1111111111')
