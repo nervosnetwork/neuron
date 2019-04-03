@@ -13,13 +13,13 @@ export interface Addresses {
 }
 
 export default class Key {
-  private mnemonic?: string
+  public mnemonic?: string
 
-  private keystore?: Keystore
+  public keystore?: Keystore
 
-  private keysData?: KeysData
+  public keysData?: KeysData
 
-  private addresses?: Addresses
+  public addresses?: Addresses
 
   constructor({
     mnemonic,
@@ -36,25 +36,6 @@ export default class Key {
     this.keystore = keystore
     this.keysData = keysData
     this.addresses = addresses
-  }
-
-  public getMnemonic = () => {
-    return this.mnemonic
-  }
-
-  public getKeystore = () => {
-    return this.keystore
-  }
-
-  public getPrivateKey = () => {
-    if (this.keysData) {
-      return this.keysData.privateKey
-    }
-    return ''
-  }
-
-  public getAddresses = () => {
-    return this.addresses
   }
 
   static generateMnemonic = () => {
@@ -117,7 +98,10 @@ export default class Key {
     if (password === undefined) {
       throw new Error('No password given.')
     }
-    const { kdfparams } = this.keystore!.crypto
+    if (this.keystore === undefined) {
+      throw new Error('Keystore is undefined.')
+    }
+    const { kdfparams } = this.keystore.crypto
     const derivedKey = scryptsy(
       Buffer.from(password),
       Buffer.from(kdfparams.salt, 'hex'),
@@ -126,17 +110,17 @@ export default class Key {
       kdfparams.p,
       kdfparams.dklen,
     )
-    const ciphertext = Buffer.from(this.keystore!.crypto.ciphertext, 'hex')
+    const ciphertext = Buffer.from(this.keystore.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)
     const mac = hash
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
       .digest()
       .toString('hex')
       .replace('0x', '')
-    return mac === this.keystore!.crypto.mac
+    return mac === this.keystore.crypto.mac
   }
 
-  public getLatestUnusedAddress = () => {
+  public latestUnusedAddress = () => {
     if (this.keysData) {
       return HD.getLatestUnusedAddress(this.keysData)
     }

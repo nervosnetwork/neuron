@@ -26,10 +26,10 @@ const HD = {
       Buffer.from(keysData.chainCode, 'hex'),
     )
     for (let index = 0; index < receiveNumber; index++) {
-      receiveAddresses.push(HD.getAddressFromHDIndex(root, index, AddressType.Receive))
+      receiveAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Receive))
     }
     for (let index = 0; index < changeNumber; index++) {
-      changeAddresses.push(HD.getAddressFromHDIndex(root, index, AddressType.Change))
+      changeAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Change))
     }
     return {
       receive: receiveAddresses,
@@ -37,20 +37,20 @@ const HD = {
     }
   },
 
-  getLatestUnusedAddress: (keysData: KeysData) => {
+  latestUnusedAddress: (keysData: KeysData) => {
     const root: BIP32 = bip32.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
     const latestUnusedIndex = HD.searchAddress(root, 20)
-    return HD.getAddressFromHDIndex(root, latestUnusedIndex)
+    return HD.addressFromHDIndex(root, latestUnusedIndex)
   },
 
   searchUsedChildKeys: (root: BIP32) => {
     const children: Child[] = []
     const nextUnusedIndex = HD.searchAddress(root, 20)
     for (let index = 0; index < nextUnusedIndex; index++) {
-      const path = HD.getPath(AddressType.Receive, index)
+      const path = HD.path(AddressType.Receive, index)
       const { privateKey, chainCode } = root.derivePath(path)
       if (Address.isUsedAddress(Address.getAddressFromPrivateKey(privateKey.toString('hex')))) {
         children.push({
@@ -63,12 +63,12 @@ const HD = {
     return children
   },
 
-  getPath: (type: AddressType, index: number) => {
+  path: (type: AddressType, index: number) => {
     return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${type}/${index}`
   },
 
-  getAddressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receive) => {
-    const path = HD.getPath(type, index)
+  addressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receive) => {
+    const path = HD.path(type, index)
     const { privateKey } = root.derivePath(path)
     return Address.getAddressFromPrivateKey(privateKey.toString('hex'))
   },
@@ -76,7 +76,7 @@ const HD = {
   // TODO: refactor me
   searchAddress: (root: BIP32, index: number, maxUsedIndex = 0, minUnusedIndex = 100, depth = 0): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isUsedAddress(HD.getAddressFromHDIndex(root, AddressType.Receive, index))) {
+    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receive, index))) {
       if (index === 0) {
         return 0
       }
@@ -88,7 +88,7 @@ const HD = {
         depth + 1,
       )
     }
-    if (!Address.isUsedAddress(HD.getAddressFromHDIndex(root, index + 1))) {
+    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, index + 1))) {
       return index + 1
     }
     return HD.searchAddress(
