@@ -60,7 +60,7 @@ const HD = {
     for (let index = 0; index < nextUnusedIndex; index++) {
       const path = HD.path(AddressType.Receive, index)
       const { privateKey, chainCode } = root.derivePath(path)
-      if (Address.isUsedAddress(Address.getAddressFromPrivateKey(privateKey.toString('hex')))) {
+      if (Address.isUsedAddress(Address.addressFromPrivateKey(privateKey.toString('hex')))) {
         children.push({
           path,
           privateKey: privateKey.toString('hex'),
@@ -78,7 +78,7 @@ const HD = {
   addressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receive) => {
     const path = HD.path(type, index)
     const { privateKey } = root.derivePath(path)
-    return Address.getAddressFromPrivateKey(privateKey.toString('hex'))
+    return Address.addressFromPrivateKey(privateKey.toString('hex'))
   },
 
   // TODO: refactor me

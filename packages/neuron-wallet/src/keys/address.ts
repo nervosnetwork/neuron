@@ -4,7 +4,7 @@ const Address = {
     return address.includes('ckb')
   },
 
-  getAddressFromPrivateKey: (privateKey: string) => {
+  addressFromPrivateKey: (privateKey: string) => {
     // TODO: generate address from private key
     return `ckb${privateKey}`
   },
