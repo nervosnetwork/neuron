@@ -1,6 +1,5 @@
 import { remote, app } from 'electron'
 import Store from 'electron-store'
-import { v4 } from 'uuid'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 
@@ -51,18 +50,12 @@ export default class WalletStore {
     return new Store(options)
   }
 
-  saveWallet = (walletName: string, walletKeystore: Keystore): string => {
-    const walletId = v4()
+  saveWallet = (walletData: WalletData): string => {
     let idList = this.getIDList()
-    const walletData = {
-      id: walletId,
-      name: walletName,
-      keystore: walletKeystore,
-    }
-    idList = idList.concat(walletId)
+    idList = idList.concat(walletData.id)
     this.setIDList(idList)
-    this.getWalletStore(walletId).set(walletId, walletData)
-    return walletId
+    this.getWalletStore(walletData.id).set(walletData.id, walletData)
+    return walletData.id
   }
 
   getWallet = (walletId: string): WalletData => {

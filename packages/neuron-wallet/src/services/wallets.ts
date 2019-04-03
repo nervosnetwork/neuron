@@ -1,3 +1,4 @@
+import { v4 } from 'uuid'
 import asw from '../wallets/asw'
 import WalletStore from '../store/WalletStore'
 import Key from '../keys/key'
@@ -55,7 +56,7 @@ export default class WalletService {
   }
 
   public create = ({ name, keystore }: { name: string; keystore: Keystore }): Wallet => {
-    const id = walletStore.saveWallet(name, keystore)
+    const id = walletStore.saveWallet({ id: v4(), name, keystore })
     if (id) {
       const storedWallet = walletStore.getWallet(id)
       return {
