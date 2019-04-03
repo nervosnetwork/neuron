@@ -34,8 +34,8 @@ const initUILayer = async (win: BrowserWindow) => {
   dispatch(Command.SyncNetworks, {
     channel,
     extra: {
-      active: await NetowrksController.active(),
-      networks: await NetowrksController.index(),
+      active: await NetowrksController.activeOne(),
+      networks: await NetowrksController.getAll(),
       connected: {
         status: 1,
         result: 1,
@@ -91,9 +91,7 @@ function createWindow() {
      * @initUILayer
      * @desc send current wallet to UILayer
      */
-    setTimeout(() => {
-      initUILayer(mainWindow!)
-    }, 1000)
+    initUILayer(mainWindow!)
   })
   /**
    * @monitorChain

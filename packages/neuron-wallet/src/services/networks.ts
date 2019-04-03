@@ -1,96 +1,91 @@
-import path from 'path'
-import { createConnection, Repository } from 'typeorm'
-import NetworkEntity from '../entity/Network'
-import env from '../env'
+import { v4 } from 'uuid'
+import store, {
+  NetworkName,
+  NetworkRemote,
+  NetworkType,
+  NetworkID,
+  NetworkWithID,
+  Network,
+  NetworksKey,
+} from '../store/NetworksStore'
 
-const { defaultNetworks, dbName } = env
-
-const REPOSITTORY_NOT_READY = 'Repository is not ready'
-const NETWORK_NOT_FOUND = 'Network is not found'
-
-export interface Network {
-  id: number
-  name: string
-  remote: string
-}
+import windowManage from '../main'
+import { ResponseCode } from '../controllers'
+import { NetworksMethod } from '../controllers/netowrks'
+import { Channel } from '../utils/const'
 
 export default class NetworksService {
-  public networks: Network[] = []
-
-  public repository?: Repository<NetworkEntity>
-
-  public active: Network | undefined = undefined
+  public store: typeof store = store
 
   constructor() {
-    this.connect(dbName)
-      .then(this.loadDefaultNetworks)
-      .then(() => this.setActive(1))
-  }
-
-  public connect = async (name: string) => {
-    const connection = await createConnection({
-      type: 'sqlite',
-      database: path.join(__dirname, name),
-      entities: [NetworkEntity],
-      synchronize: true,
-      logging: env.isDevMode,
+    store.onDidChange(NetworksKey.List, newValue => {
+      windowManage.broadcast(Channel.Networks, NetworksMethod.GetAll, {
+        status: ResponseCode.Success,
+        result: newValue,
+      })
     })
-    const repository = connection.getRepository(NetworkEntity)
-    this.repository = repository
-    return repository
+
+    store.onDidChange(NetworksKey.Active, newValue => {
+      windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveOne, {
+        status: ResponseCode.Success,
+        result: newValue,
+      })
+    })
   }
 
-  public loadDefaultNetworks = async () => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    const count = await this.repository.count()
-    if (!count) {
-      defaultNetworks.forEach(network => this.create(network.name, network.remote))
+  public getAll = (): NetworkWithID[] => {
+    return this.store.get(NetworksKey.List) || []
+  }
+
+  public get = (id: NetworkID) => {
+    return this.getAll().find(item => item.id === id)
+  }
+
+  public create = (name: NetworkName, remote: NetworkRemote, type: NetworkType = NetworkType.Normal) => {
+    const networks = this.getAll()
+    if (networks.some(item => item.name === name)) {
+      throw new Error('Network name exists')
     }
-    return true
-  }
-
-  public index = () => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    return this.repository.find()
-  }
-
-  public show = (id: number) => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    return this.repository.findOne(id)
-  }
-
-  public update = async ({ id, name, remote }: Partial<Network>) => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    const network = await this.repository.findOne(id)
-    if (!network) throw new Error(NETWORK_NOT_FOUND)
-    const updatedNetwork = { ...network, name, remote }
-    await this.repository.save(updatedNetwork)
-    return true
-  }
-
-  public create = (name: string, remote: string) => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    // TODO: verification
-    const network = new NetworkEntity()
-    network.name = name
-    network.remote = remote
-    return this.repository.save(network)
-  }
-
-  public delete = async (id: number) => {
-    if (!this.repository) throw new Error(REPOSITTORY_NOT_READY)
-    const network = await this.repository.findOne(id)
-    if (!network) throw new Error(NETWORK_NOT_FOUND)
-    await this.repository.remove(network)
-    return true
-  }
-
-  public setActive = async (id: number) => {
-    const network = await this.show(id)
-    if (network) {
-      this.active = network
-      return true
+    const newNetwork = {
+      id: v4(),
+      name,
+      remote,
+      type,
     }
-    return false
+    this.updateAll([...networks, newNetwork])
+    return newNetwork
   }
+
+  public update = (id: NetworkID, options: Partial<Network>) => {
+    const networks = this.getAll()
+    const network = networks.find(item => item.id === id)
+    if (!network) {
+      throw new Error(`Network with id ${id} is not found`)
+    }
+    Object.assign(network, options)
+    this.updateAll(networks)
+    return true
+  }
+
+  public updateAll = (networks: NetworkWithID[]) => {
+    this.store.set(NetworksKey.List, networks)
+    return true
+  }
+
+  public delete = (id: NetworkID) => {
+    this.updateAll(this.getAll().filter(item => item.id !== id))
+    return true
+  }
+
+  public activate = (id: NetworkID) => {
+    const network = this.get(id)
+    if (!network) {
+      throw new Error(`Network of ${id} is not found`)
+    }
+    this.store.set(NetworksKey.Active, network)
+  }
+
+  public activeOne = (): NetworkWithID | undefined => this.store.get(NetworksKey.Active)
+
+  public defaultOne = (): NetworkWithID | undefined => this.getAll().find(item => item.type === NetworkType.Default)
 }

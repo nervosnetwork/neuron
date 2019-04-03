@@ -1,144 +1,150 @@
 import { ResponseCode, ChannelResponse } from '.'
-import windowManage from '../main'
 import WalletChannel from '../channel/wallet'
-import NetowrksService, { Network } from '../services/networks'
-import { Channel } from '../utils/const'
+import NetworksService from '../services/networks'
+import { NetworkType, NetworkID, NetworkWithID, Network } from '../store/NetworksStore'
+import env from '../env'
 
-const DEFAULT_NETWORK_ID = 1
+const { defaultNetworks } = env
 
 export enum NetworksMethod {
-  Index = 'index',
-  Show = 'show',
+  GetAll = 'getAll',
+  Get = 'get',
   Create = 'create',
   Update = 'update',
   Delete = 'delete',
-  Active = 'active',
-  SetActive = 'setActive',
+  Activate = 'activate',
+  ActiveOne = 'activeOne',
 }
 
 class NetworksController {
   public channel: WalletChannel
 
-  static service = new NetowrksService()
+  static service = new NetworksService()
 
   constructor(channel: WalletChannel) {
     this.channel = channel
-    // use typeorm hooks in the future
-    // NetworksController.index().then(res => {
-    //   windowManage.broadcast(Channel.Networks, NetworksMethod.Index, res)
-    // })
+    const networks = NetworksController.getAll().result
+    if (!networks || !networks.length) {
+      defaultNetworks.forEach(network => NetworksController.create(network))
+    }
   }
 
-  public static index = (): Promise<ChannelResponse<Network[]>> =>
-    NetworksController.service
-      .index()
-      .then(networks => ({
+  public static getAll = (): ChannelResponse<NetworkWithID[]> => {
+    return {
+      status: ResponseCode.Success,
+      result: NetworksController.service.getAll(),
+    }
+  }
+
+  public static get = (id: NetworkID): ChannelResponse<NetworkWithID> => {
+    const network = NetworksController.service.get(id)
+    if (network) {
+      return {
         status: ResponseCode.Success,
-        result: networks,
-      }))
-      .catch(err => ({
-        status: ResponseCode.Fail,
-        msg: err.message,
-      }))
-
-  public static show = (id: number): Promise<ChannelResponse<Network>> =>
-    NetworksController.service
-      .show(id)
-      .then(network => ({ status: ResponseCode.Success, result: network }))
-      .catch(err => ({ status: ResponseCode.Fail, msg: err.message }))
-
-  public static create = async ({ name, remote }: Partial<Network>): Promise<ChannelResponse<Network>> => {
-    if (name && remote) {
-      return NetworksController.service
-        .create(name, remote)
-        .then(savedNetwork => {
-          NetworksController.index().then(res => {
-            // use typeorm hooks in the future
-            windowManage.broadcast(Channel.Networks, NetworksMethod.Index, res)
-          })
-          return {
-            status: ResponseCode.Success,
-            result: savedNetwork,
-          }
-        })
-        .catch(err => ({
-          status: ResponseCode.Fail,
-          msg: err.message,
-        }))
+        result: network,
+      }
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Invalid network',
+      msg: `Network of id ${id} is not found`,
     }
   }
 
-  public static update = async (network: Partial<Network>): Promise<ChannelResponse<boolean>> =>
-    NetworksController.service
-      .update(network)
-      .then(success => {
-        if (success) {
-          NetworksController.index().then(res => windowManage.broadcast(Channel.Networks, NetworksMethod.Index, res))
-          return {
-            status: ResponseCode.Success,
-            result: true,
-          }
-        }
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Unable to update network',
-        }
-      })
-      .catch(err => ({ status: ResponseCode.Fail, msg: err.message }))
+  public static create = ({ name, remote, type = NetworkType.Normal }: Network): ChannelResponse<NetworkWithID> => {
+    if (!name || !remote) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Name and remote are required',
+      }
+    }
+    try {
+      const created = NetworksController.service.create(name, remote, type)
+      return {
+        status: ResponseCode.Success,
+        result: created,
+      }
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: err.message,
+      }
+    }
+  }
 
-  public static delete = async (id: number): Promise<ChannelResponse<boolean>> => {
+  public static update = (id: NetworkID, options: Partial<Network>): ChannelResponse<boolean> => {
+    try {
+      NetworksController.service.update(id, options)
+      return {
+        status: ResponseCode.Success,
+        result: true,
+      }
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: err.message,
+      }
+    }
+  }
+
+  public static delete = (id: NetworkID): ChannelResponse<boolean> => {
     // regard the network of id 1 as the default one, which is not allowed to be deleted
-    if (id === DEFAULT_NETWORK_ID) {
+    const defaultNetowrk = NetworksController.service.defaultOne()
+    if (defaultNetowrk && defaultNetowrk.id === id) {
       return {
         status: ResponseCode.Fail,
         msg: 'Default network is unremovable',
       }
     }
-    const activeNetwork = NetworksController.service.active
-    const success = await NetworksController.service.delete(id)
-    if (success) {
-      // check if deleted network is current network, switch to default network if true
+    try {
+      const activeNetwork = NetworksController.service.activeOne()
       if (activeNetwork && activeNetwork.id === id) {
-        await NetworksController.service.setActive(DEFAULT_NETWORK_ID)
-        windowManage.broadcast(Channel.Networks, NetworksMethod.Active, NetworksController.active())
+        if (!defaultNetowrk) {
+          return {
+            status: ResponseCode.Fail,
+            msg: 'Default network is not set, cannot delete active network',
+          }
+        }
+        NetworksController.delete(id)
+        NetworksController.activate(defaultNetowrk.id)
       }
-      windowManage.broadcast(Channel.Networks, NetworksMethod.Index, await NetworksController.index())
+      NetworksController.delete(id)
       return {
         status: ResponseCode.Success,
         result: true,
       }
-    }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'Network not found',
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: err.message,
+      }
     }
   }
 
-  public static active = () => ({
-    status: ResponseCode.Success,
-    result: NetworksController.service.active,
-  })
+  public static activeOne = () => {
+    const activeOne = NetworksController.service.activeOne()
+    if (activeOne) {
+      return {
+        status: ResponseCode.Success,
+        result: activeOne,
+      }
+    }
+    return {
+      status: ResponseCode.Fail,
+      msg: 'Active network is not set',
+    }
+  }
 
-  public static setActive = (id: number): Promise<ChannelResponse<Network>> =>
-    NetworksController.service
-      .setActive(id)
-      .then(success => {
-        if (success) {
-          return {
-            status: ResponseCode.Success,
-            result: NetworksController.service.active,
-          }
-        }
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Unable to set network active',
-        }
-      })
-      .catch(err => ({ status: ResponseCode.Fail, msg: err.message }))
+  public static activate = (id: NetworkID) => {
+    try {
+      NetworksController.service.activate(id)
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: err.message,
+      }
+    }
+    return NetworksController.activeOne()
+  }
 
   public static status = () => {
     return false

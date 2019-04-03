@@ -11,10 +11,12 @@ const env = {
     {
       name: 'Testnet',
       remote: 'http://localhost:8114',
+      type: 0,
     },
     {
       name: 'Local',
       remote: 'http://localhost:8114',
+      type: 1,
     },
   ],
   dbName: 'neuron.db.local',

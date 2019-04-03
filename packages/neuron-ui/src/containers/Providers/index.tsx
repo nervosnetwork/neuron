@@ -113,21 +113,21 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case NetworksMethod.Index: {
+          case NetworksMethod.GetAll: {
             dispatch({
               type: ProviderActions.Settings,
               payload: { networks: args.result },
             })
             break
           }
-          case NetworksMethod.Active: {
+          case NetworksMethod.ActiveOne: {
             dispatch({
               type: ProviderActions.Chain,
               payload: { network: args.result },
             })
             break
           }
-          case NetworksMethod.SetActive: {
+          case NetworksMethod.Activate: {
             dispatch({
               type: ProviderActions.Chain,
               payload: { network: args.result },
