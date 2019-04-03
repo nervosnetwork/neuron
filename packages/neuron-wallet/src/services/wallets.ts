@@ -68,8 +68,8 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = walletStore.getWallet(id)
-    const keystore = Key.fromKeystore(JSON.stringify(wallet.keystore), password, 17, 3)
-    return keystore.checkPassword(password)
+    const key = new Key({ keystore: wallet.keystore })
+    return key.checkPassword(password)
   }
 
   // TODO: update wallet

@@ -42,7 +42,7 @@ export default class Key {
     return bip39.generateMnemonic()
   }
 
-  static fromKeystore(keystore: string, password: string, receiveNumber: number, changeNumber: number) {
+  static fromKeystore(keystore: string, password: string, receiveAddressNumber: number, changeAddressNumber: number) {
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
     key.keystore = keystoreObject
@@ -78,18 +78,27 @@ export default class Key {
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
     key.keysData = JSON.parse(keysData)
-    key.addresses = HD.generateReceiveAndChangeAddresses(JSON.parse(keysData), receiveNumber, changeNumber)
+    key.addresses = HD.generateReceiveAndChangeAddresses(
+      JSON.parse(keysData),
+      receiveAddressNumber,
+      changeAddressNumber,
+    )
     return key
   }
 
-  public static fromMnemonic(mnemonic: string, password: string, receiveNumber: number, changeNumber: number) {
+  public static fromMnemonic(
+    mnemonic: string,
+    password: string,
+    receiveAddressNumber: number,
+    changeAddressNumber: number,
+  ) {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }
     const key = new Key()
     const keysData = key.generatePrivateKeyFromMnemonic(mnemonic)
     key.keysData = keysData
-    key.addresses = HD.generateReceiveAndChangeAddresses(keysData, receiveNumber, changeNumber)
+    key.addresses = HD.generateReceiveAndChangeAddresses(keysData, receiveAddressNumber, changeAddressNumber)
     key.keystore = key.toKeystore(JSON.stringify(keysData), password)
     return key
   }
@@ -122,7 +131,7 @@ export default class Key {
 
   public latestUnusedAddress = () => {
     if (this.keysData) {
-      return HD.getLatestUnusedAddress(this.keysData)
+      return HD.latestUnusedAddress(this.keysData)
     }
     return ''
   }

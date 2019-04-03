@@ -14,9 +14,17 @@ enum AddressType {
   Change = 1,
 }
 
+const MaxAddressNumber = 20
+
 const HD = {
-  generateReceiveAndChangeAddresses: (keysData: KeysData, receiveNumber: number, changeNumber: number) => {
-    if (receiveNumber < 1 || changeNumber < 1) {
+  generateReceiveAndChangeAddresses: (
+    keysData: KeysData,
+    receiveAddressNumber: number,
+    changeAddressNumber: number,
+  ) => {
+    if (receiveAddressNumber < 1 || changeAddressNumber < 1) {
+      throw new Error('Address number error.')
+    } else if (receiveAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
       throw new Error('Address number error.')
     }
     const receiveAddresses = []
@@ -25,10 +33,10 @@ const HD = {
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
-    for (let index = 0; index < receiveNumber; index++) {
+    for (let index = 0; index < receiveAddressNumber; index++) {
       receiveAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Receive))
     }
-    for (let index = 0; index < changeNumber; index++) {
+    for (let index = 0; index < changeAddressNumber; index++) {
       changeAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Change))
     }
     return {

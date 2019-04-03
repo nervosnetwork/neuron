@@ -12,7 +12,7 @@ declare global {
 }
 export enum WalletsMethod {
   Index = 'index',
-  Create = 'create',
+  GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
   Update = 'update',
@@ -128,7 +128,7 @@ export const wallets = (
 
 export const walletsCall = instantiateMethodCall(wallets) as {
   index: () => void
-  create: (params: { mnemonic: string; password: string }) => void
+  generateMnemonic: () => void
   importKeystore: (params: { name: string; keystore: string; password: string }) => void
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
   update: (params: { id: string; name?: string; password: string; newPassword?: string }) => void

@@ -10,7 +10,7 @@ const activeWallet = asw
 
 export enum WalletsMethod {
   Index = 'index',
-  Create = 'create',
+  GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
   Update = 'update',
@@ -56,7 +56,7 @@ class WalletsController {
     }
   }
 
-  public static create = (): ChannelResponse<string> => {
+  public static generateMnemonic = (): ChannelResponse<string> => {
     const mnemonic = Key.generateMnemonic()
     if (mnemonic) {
       return {
@@ -74,12 +74,16 @@ class WalletsController {
     name,
     password,
     mnemonic,
+    receiveAddressNumber = 17,
+    changeAddressNumber = 3,
   }: {
     name: string
     password: string
     mnemonic: string
+    receiveAddressNumber: number
+    changeAddressNumber: number
   }): ChannelResponse<Wallet> => {
-    const storedKeystore = Key.fromMnemonic(mnemonic, password, 17, 3).keystore
+    const storedKeystore = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber).keystore
     if (storedKeystore) {
       const wallet = WalletsController.service.create({
         name,
@@ -102,12 +106,16 @@ class WalletsController {
     name,
     password,
     keystore,
+    receiveAddressNumber = 17,
+    changeAddressNumber = 3,
   }: {
     name: string
     password: string
     keystore: string
+    receiveAddressNumber: number
+    changeAddressNumber: number
   }): ChannelResponse<Wallet> => {
-    const key = Key.fromKeystore(keystore, password, 17, 3)
+    const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
     if (key.keystore) {
       if (!key.checkPassword(password)) {
         return {
