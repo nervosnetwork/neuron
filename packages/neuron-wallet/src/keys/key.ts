@@ -1,58 +1,193 @@
 import bip32 from 'bip32'
 import bip39 from 'bip39'
-import { Keystore } from './keystore'
-import Tool from './tool'
+import crypto from 'crypto-browserify'
+import scryptsy from 'scrypt.js'
+import SHA3 from 'sha3'
+import { v4 } from 'uuid'
+import HD from './hd'
+import { Keystore, KdfParams, KeysData } from './keystore'
+
+export interface Addresses {
+  receive: string[]
+  change: string[]
+}
 
 export default class Key {
-  private keystore: Keystore
+  public mnemonic?: string
 
-  private mnemonic: string
+  public keystore?: Keystore
 
-  constructor(keystore: Keystore, mnemonic: string) {
-    this.keystore = keystore
+  public keysData?: KeysData
+
+  public addresses?: Addresses
+
+  constructor({
+    mnemonic,
+    keystore,
+    keysData,
+    addresses,
+  }: {
+    mnemonic?: string
+    keystore?: Keystore
+    keysData?: KeysData
+    addresses?: Addresses
+  } = {}) {
     this.mnemonic = mnemonic
+    this.keystore = keystore
+    this.keysData = keysData
+    this.addresses = addresses
   }
 
-  public static fromKeystore = (keystore: Keystore) => {
-    return new Key(keystore, '')
+  static generateMnemonic = () => {
+    return bip39.generateMnemonic()
   }
 
-  public static fromKeystoreString = (json: string) => {
-    return Key.fromKeystore(JSON.parse(json))
+  static fromKeystore(keystore: string, password: string, receiveAddressNumber: number, changeAddressNumber: number) {
+    const keystoreObject: Keystore = JSON.parse(keystore)
+    const key = new Key()
+    key.keystore = keystoreObject
+    if (password === undefined) {
+      throw new Error('No password given.')
+    } else if (!key.checkPassword(password)) {
+      throw new Error('Password error.')
+    }
+    const { kdfparams } = keystoreObject.crypto
+    const derivedKey = scryptsy(
+      Buffer.from(password),
+      Buffer.from(kdfparams.salt, 'hex'),
+      kdfparams.n,
+      kdfparams.r,
+      kdfparams.p,
+      kdfparams.dklen,
+    )
+    const ciphertext = Buffer.from(keystoreObject.crypto.ciphertext, 'hex')
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+    if (mac !== keystoreObject.crypto.mac) {
+      throw new Error('Key derivation failed - possibly wrong password')
+    }
+    const decipher = crypto.createDecipheriv(
+      keystoreObject.crypto.cipher,
+      derivedKey.slice(0, 16),
+      Buffer.from(keystoreObject.crypto.cipherparams.iv, 'hex'),
+    )
+    const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
+    const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
+    key.keysData = JSON.parse(keysData)
+    key.addresses = HD.generateReceiveAndChangeAddresses(
+      JSON.parse(keysData),
+      receiveAddressNumber,
+      changeAddressNumber,
+    )
+    return key
   }
 
-  checkPassword = (password: string) => {
-    return this.keystore.password === password
-  }
-
-  getKeystore = () => this.keystore
-
-  getKeystoreString = () => JSON.stringify(this.keystore)
-
-  getMnemonic = () => this.mnemonic
-
-  public static generateKey = (password: string) => {
-    const mnemonic = bip39.generateMnemonic()
-    return Key.fromMnemonic(mnemonic, false, password)
-  }
-
-  public static fromMnemonic = (mnemonic: string, derive: boolean, password: string) => {
+  public static fromMnemonic(
+    mnemonic: string,
+    password: string,
+    receiveAddressNumber: number,
+    changeAddressNumber: number,
+  ) {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }
+    const key = new Key()
+    const keysData = key.generatePrivateKeyFromMnemonic(mnemonic)
+    key.keysData = keysData
+    key.addresses = HD.generateReceiveAndChangeAddresses(keysData, receiveAddressNumber, changeAddressNumber)
+    key.keystore = key.toKeystore(JSON.stringify(keysData), password)
+    return key
+  }
+
+  public checkPassword = (password: string) => {
+    if (password === undefined) {
+      throw new Error('No password given.')
+    }
+    if (this.keystore === undefined) {
+      throw new Error('Keystore is undefined.')
+    }
+    const { kdfparams } = this.keystore.crypto
+    const derivedKey = scryptsy(
+      Buffer.from(password),
+      Buffer.from(kdfparams.salt, 'hex'),
+      kdfparams.n,
+      kdfparams.r,
+      kdfparams.p,
+      kdfparams.dklen,
+    )
+    const ciphertext = Buffer.from(this.keystore.crypto.ciphertext, 'hex')
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+    return mac === this.keystore.crypto.mac
+  }
+
+  public latestUnusedAddress = () => {
+    if (this.keysData) {
+      return HD.latestUnusedAddress(this.keysData)
+    }
+    return ''
+  }
+
+  private generatePrivateKeyFromMnemonic = (mnemonic: string) => {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
-    const master = {
-      privateKey: root.privateKey.toString('hex'),
-      chainCode: root.chainCode.toString('hex'),
+    const privateKey = root.privateKey.toString('hex')
+    const chainCode = root.chainCode.toString('hex')
+    const keysData: KeysData = {
+      privateKey,
+      chainCode,
     }
-    const keystore: Keystore = {
-      master,
-      password,
+    return keysData
+  }
+
+  private toKeystore = (encryptedData: string, password: string) => {
+    const salt = crypto.randomBytes(32)
+    const iv = crypto.randomBytes(16)
+    const kdf = 'scrypt'
+    const params = {
+      n: 8192,
+      r: 8,
+      p: 1,
     }
-    if (derive) {
-      keystore.children = Tool.searchUsedChildKeys(root)
+    const kdfparams: KdfParams = {
+      dklen: 32,
+      salt: salt.toString('hex'),
+      ...params,
     }
-    return new Key(keystore, mnemonic)
+    const derivedKey = scryptsy(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
+
+    const cipher = crypto.createCipheriv('aes-128-ctr', derivedKey.slice(0, 16), iv)
+    if (!cipher) {
+      throw new Error('Unsupported cipher')
+    }
+    const ciphertext = Buffer.concat([cipher.update(Buffer.from(encryptedData, 'utf8')), cipher.final()])
+    const hash = new SHA3(256)
+    const mac = hash
+      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
+      .digest()
+      .toString('hex')
+      .replace('0x', '')
+    return {
+      version: 0,
+      id: v4(),
+      crypto: {
+        ciphertext: ciphertext.toString('hex'),
+        cipherparams: {
+          iv: iv.toString('hex'),
+        },
+        cipher: 'aes-128-ctr',
+        kdf,
+        kdfparams,
+        mac,
+      },
+    }
   }
 }

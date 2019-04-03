@@ -45,7 +45,10 @@
     "i18next": "^15.0.5",
     "rxjs": "^6.4.0",
     "uuid": "^3.3.2",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "crypto-browserify": "3.12.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.0.1"
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
