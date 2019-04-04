@@ -38,8 +38,14 @@ export default class WalletStore {
     return this.walletIDStore.get(WalletIDKey, [])
   }
 
-  private setIDList = (list: string[]) => {
-    this.walletIDStore.set(WalletIDKey, list)
+  private addWalletID = (id: string) => {
+    this.walletIDStore.set(WalletIDKey, this.getIDList().concat(id))
+  }
+
+  private removeWalletID = (id: string) => {
+    const idList = this.getIDList()
+    idList.splice(idList.indexOf(id), 1)
+    this.walletIDStore.set(WalletIDKey, idList)
   }
 
   private getWalletStore = (id: string): Store => {
@@ -50,12 +56,9 @@ export default class WalletStore {
     return new Store(options)
   }
 
-  saveWallet = (walletData: WalletData): string => {
-    let idList = this.getIDList()
-    idList = idList.concat(walletData.id)
-    this.setIDList(idList)
+  saveWallet = (walletData: WalletData) => {
+    this.addWalletID(walletData.id)
     this.getWalletStore(walletData.id).set(walletData.id, walletData)
-    return walletData.id
   }
 
   getWallet = (walletId: string): WalletData => {
@@ -82,9 +85,7 @@ export default class WalletStore {
   }
 
   deleteWallet = (walletId: string) => {
-    const idList = this.getIDList()
-    idList.splice(idList.indexOf(walletId), 1)
-    this.setIDList(idList)
+    this.removeWalletID(walletId)
     this.getWalletStore(walletId).clear()
   }
 

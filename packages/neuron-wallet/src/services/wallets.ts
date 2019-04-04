@@ -56,15 +56,13 @@ export default class WalletService {
   }
 
   public create = ({ name, keystore }: { name: string; keystore: Keystore }): Wallet => {
-    const id = walletStore.saveWallet({ id: v4(), name, keystore })
-    if (id) {
-      const storedWallet = walletStore.getWallet(id)
-      return {
-        id,
-        name: storedWallet.name,
-      }
+    const id = v4()
+    walletStore.saveWallet({ id, name, keystore })
+    const storedWallet = walletStore.getWallet(id)
+    return {
+      id,
+      name: storedWallet.name,
     }
-    throw new Error('Failed to create wallet')
   }
 
   public validate = ({ id, password }: { id: string; password: string }) => {
