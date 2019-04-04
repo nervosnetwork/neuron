@@ -44,16 +44,6 @@ describe('wallet store', () => {
     assert.deepEqual(wallet, wallet1)
   })
 
-  it('save same wallet', () => {
-    const walletId1 = walletStore.saveWallet(wallet1)
-    const walletId2 = walletStore.saveWallet(wallet2)
-    const wallet1Store = walletStore.getWallet(walletId1)
-    const wallet2Store = walletStore.getWallet(walletId2)
-    assert.notEqual(walletId1, walletId2)
-    assert.deepEqual(wallet1, wallet1Store)
-    assert.deepEqual(wallet2, wallet2Store)
-  })
-
   it('get not exist wallet', () => {
     walletStore.saveWallet(wallet1)
     try {
@@ -72,10 +62,10 @@ describe('wallet store', () => {
   })
 
   it('rename wallet', () => {
-    const walletId = walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
     walletStore.renameWallet(wallet1.id, wallet2.name)
-    const wallet = walletStore.getWallet(walletId)
+    const wallet = walletStore.getWallet(wallet1.id)
     assert.deepEqual(wallet, {
       id: wallet1.id,
       name: wallet2.name,
