@@ -13,6 +13,10 @@ describe('wallet store', () => {
       id: '0',
       crypto: { cipher: 'wallet1', cipherparams: null, ciphertext: 'wallet1', kdf: '1', kdfparams: null, mac: '1' },
     },
+    addresses: {
+      receive: ['address1', 'address2', 'address3'],
+      change: ['address1', 'address2', 'address3'],
+    },
   }
   const wallet2 = {
     id: uuid.v4(),
@@ -22,6 +26,10 @@ describe('wallet store', () => {
       id: '1',
       crypto: { cipher: 'wallet2', cipherparams: null, ciphertext: 'wallet2', kdf: '2', kdfparams: null, mac: '2' },
     },
+    addresses: {
+      receive: ['address1', 'address2', 'address3'],
+      change: ['address1', 'address2', 'address3'],
+    },
   }
   const wallet3 = {
     id: uuid.v4(),
@@ -30,6 +38,10 @@ describe('wallet store', () => {
       version: 0,
       id: '1',
       crypto: { cipher: 'wallet3', cipherparams: null, ciphertext: 'wallet3', kdf: '3', kdfparams: null, mac: '3' },
+    },
+    addresses: {
+      receive: ['address1', 'address2', 'address3'],
+      change: ['address1', 'address2', 'address3'],
     },
   }
 
@@ -70,6 +82,7 @@ describe('wallet store', () => {
       id: wallet1.id,
       name: wallet2.name,
       keystore: wallet1.keystore,
+      addresses: wallet1.addresses,
     })
   })
 

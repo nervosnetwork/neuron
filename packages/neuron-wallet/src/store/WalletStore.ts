@@ -2,6 +2,7 @@ import { remote, app } from 'electron'
 import Store from 'electron-store'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
+import { Addresses } from '../keys/key'
 
 export enum WalletStoreError {
   NoWallet,
@@ -11,6 +12,7 @@ export interface WalletData {
   id: string
   name: string
   keystore: Keystore
+  addresses: Addresses
 }
 
 interface Options {

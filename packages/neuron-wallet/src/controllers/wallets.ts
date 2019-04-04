@@ -1,5 +1,6 @@
 import WalletChannel from '../channel/wallet'
-import WalletsService, { Wallet } from '../services/wallets'
+import WalletsService from '../services/wallets'
+import { WalletData } from '../store/WalletStore'
 import { ChannelResponse, ResponseCode } from '.'
 import asw from '../wallets/asw'
 import windowManage from '../main'
@@ -28,7 +29,7 @@ class WalletsController {
     this.channel = channel
   }
 
-  public static index = (): ChannelResponse<Wallet[]> => {
+  public static index = (): ChannelResponse<WalletData[]> => {
     const wallets = WalletsController.service.index()
     if (wallets) {
       return {
@@ -42,7 +43,7 @@ class WalletsController {
     }
   }
 
-  public static show = (id: string): ChannelResponse<Wallet> => {
+  public static show = (id: string): ChannelResponse<WalletData> => {
     const wallet = WalletsController.service.show(id)
     if (wallet) {
       return {
@@ -82,28 +83,23 @@ class WalletsController {
     mnemonic: string
     receiveAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<Wallet> => {
-    const storedKeystore = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber).keystore
-    if (storedKeystore) {
-      try {
-        const wallet = WalletsController.service.create({
-          name,
-          keystore: storedKeystore,
-        })
-        return {
-          status: ResponseCode.Success,
-          result: wallet,
-        }
-      } catch (e) {
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Failed to save wallet',
-        }
+  }): ChannelResponse<WalletData> => {
+    try {
+      const key = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber)
+      const wallet = WalletsController.service.create({
+        name,
+        keystore: key.keystore!,
+        addresses: key.addresses!,
+      })
+      return {
+        status: ResponseCode.Success,
+        result: wallet,
       }
-    }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'Failed to import wallet',
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.message,
+      }
     }
   }
 
@@ -119,7 +115,7 @@ class WalletsController {
     keystore: string
     receiveAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<Wallet> => {
+  }): ChannelResponse<WalletData> => {
     const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
     if (key.keystore) {
       if (!key.checkPassword(password)) {
@@ -131,6 +127,7 @@ class WalletsController {
       const wallet = WalletsController.service.create({
         name,
         keystore: key.keystore,
+        addresses: key.addresses!,
       })
       if (wallet) {
         return {
