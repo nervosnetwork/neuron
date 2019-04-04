@@ -10,6 +10,7 @@ const Main = styled.main`
   flex-direction: column;
   height: 100%;
   width: 100%;
+  padding-top: 50px;
 `
 
 export interface ContentProps extends InitState {
