@@ -85,14 +85,19 @@ class WalletsController {
   }): ChannelResponse<Wallet> => {
     const storedKeystore = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber).keystore
     if (storedKeystore) {
-      const wallet = WalletsController.service.create({
-        name,
-        keystore: storedKeystore,
-      })
-      if (wallet) {
+      try {
+        const wallet = WalletsController.service.create({
+          name,
+          keystore: storedKeystore,
+        })
         return {
           status: ResponseCode.Success,
           result: wallet,
+        }
+      } catch (e) {
+        return {
+          status: ResponseCode.Fail,
+          msg: 'Failed to save wallet',
         }
       }
     }
