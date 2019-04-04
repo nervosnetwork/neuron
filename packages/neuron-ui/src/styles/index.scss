@@ -2,8 +2,17 @@
 
 * {
   user-select: none;
-  outline: none;
+  outline: none !important;
+  -webkit-tap-highlight-color: none !important;
   cursor: default !important;
+}
+
+[type=button],
+[type=reset],
+[type=submit],
+button,
+input {
+  -webkit-appearance: none !important;
 }
 
 ul {
@@ -14,6 +23,8 @@ ul {
 html {
   height: 100%;
 }
+
+
 
 body {
   margin: 0;
@@ -28,4 +39,12 @@ body {
 
 .sidebar {
   background-color: white;
+}
+
+.form-control,
+.btn {
+
+  &:focus {
+    box-shadow: none !important;
+  }
 }
