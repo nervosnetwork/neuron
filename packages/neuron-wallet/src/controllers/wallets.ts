@@ -116,29 +116,22 @@ class WalletsController {
     receiveAddressNumber: number
     changeAddressNumber: number
   }): ChannelResponse<WalletData> => {
-    const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
-    if (key.keystore) {
-      if (!key.checkPassword(password)) {
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Wrong password',
-        }
-      }
+    try {
+      const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
-        keystore: key.keystore,
+        keystore: key.keystore!,
         addresses: key.addresses!,
       })
-      if (wallet) {
-        return {
-          status: ResponseCode.Success,
-          result: wallet,
-        }
+      return {
+        status: ResponseCode.Success,
+        result: wallet,
       }
-    }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'Failed to import wallet',
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.message,
+      }
     }
   }
 
