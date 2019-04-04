@@ -9,25 +9,25 @@ directories:
   output: release
 
 files:
-  - from: '../../node_modules/@nervosnetwork/neuron-ui/build'
+  - from: "../../node_modules/@nervosnetwork/neuron-ui/build"
     to: ui
   - package.json
   - dist
-  - '!**/*.map'
-  - '!**/src/'
+  - "!**/*.map"
+  - "!**/src/"
 
-  - '!node_modules/chalk'
-  - '!node_modules/ansi-styles'
-  - '!node_modules/escape-string-regexp'
-  - from: '../../node_modules/chalk'
-    to: 'node_modules/chalk'
-  - from: '../../node_modules/ansi-styles'
-    to: 'node_modules/ansi-styles'
-  - from: '../../node_modules/escape-string-regexp'
-    to: 'node_modules/escape-string-regexp'
+  - "!node_modules/chalk"
+  - "!node_modules/ansi-styles"
+  - "!node_modules/escape-string-regexp"
+  - from: "../../node_modules/chalk"
+    to: "node_modules/chalk"
+  - from: "../../node_modules/ansi-styles"
+    to: "node_modules/ansi-styles"
+  - from: "../../node_modules/escape-string-regexp"
+    to: "node_modules/escape-string-regexp"
 
 win:
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}'
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   icon: assets/images/icon.ico
   target:
     - target: nsis
@@ -35,15 +35,15 @@ win:
         - x64
 
 mac:
-  artifactName: '${productName}-${version}-${os}.${ext}'
+  artifactName: "${productName}-${version}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/images/icon.icns
 
 linux:
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}'
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
   category: Finance
   icon: assets/images/
   target:
-    - 'AppImage'
-    - 'deb'
-    - 'rpm'
+    - "AppImage"
+    - "deb"
+    - "rpm"
