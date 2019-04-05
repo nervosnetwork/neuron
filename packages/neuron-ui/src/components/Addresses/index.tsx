@@ -109,6 +109,10 @@ const Addresses = (props: React.PropsWithoutRef<RouteComponentProps>) => {
         pageSize={pageSize}
         totalCount={totalCount}
         onPageChange={onPageChange}
+        tableAttrs={{
+          bordered: false,
+          striped: true,
+        }}
       />
     </Container>
   )
