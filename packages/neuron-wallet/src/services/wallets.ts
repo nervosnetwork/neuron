@@ -7,8 +7,6 @@ import { Keystore } from '../keys/keystore'
 const walletStore = new WalletStore()
 
 export default class WalletService {
-  public wallets: WalletData[] = []
-
   public active: WalletData | undefined = undefined
 
   constructor() {
@@ -20,11 +18,10 @@ export default class WalletService {
       keystore: JSON.parse(keystoreJson),
       addresses,
     })
-    this.wallets = walletStore.getAllWallets()
-    this.setActive(this.wallets[0].id)
+    this.setActive(walletStore.getAllWallets()[0].id)
   }
 
-  public index = (
+  public getAll = (
     { pageNo = 0, pageSize = 15 }: { pageNo: number; pageSize: number } = {
       pageNo: 0,
       pageSize: 15,
@@ -33,8 +30,8 @@ export default class WalletService {
     return walletStore.getAllWallets().slice(pageNo * pageSize, (pageNo + 1) * pageSize)
   }
 
-  public show = (id: string): WalletData | undefined => {
-    return this.wallets.find(wallet => wallet.id === id)
+  public get = (id: string): WalletData | undefined => {
+    return this.getAll().find(wallet => wallet.id === id)
   }
 
   public create = ({
@@ -48,7 +45,6 @@ export default class WalletService {
   }): WalletData => {
     const id = v4()
     walletStore.saveWallet({ id, name, keystore, addresses })
-    this.wallets = walletStore.getAllWallets()
     return { id, name, keystore, addresses }
   }
 
@@ -87,9 +83,8 @@ export default class WalletService {
   // }
 
   public delete = (id: string): boolean => {
-    const wallet = this.show(id)
+    const wallet = this.get(id)
     if (wallet) {
-      this.wallets = this.wallets.filter(w => w.id !== id)
       walletStore.deleteWallet(id)
       return true
     }
@@ -97,7 +92,7 @@ export default class WalletService {
   }
 
   public setActive = (id: string): boolean => {
-    const wallet = this.show(id)
+    const wallet = this.get(id)
     if (wallet) {
       this.active = wallet
       return true

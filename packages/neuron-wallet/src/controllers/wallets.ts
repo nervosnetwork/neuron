@@ -29,8 +29,8 @@ class WalletsController {
     this.channel = channel
   }
 
-  public static index = (): ChannelResponse<WalletData[]> => {
-    const wallets = WalletsController.service.index()
+  public static getAll = (): ChannelResponse<WalletData[]> => {
+    const wallets = WalletsController.service.getAll()
     if (wallets) {
       return {
         status: ResponseCode.Success,
@@ -43,8 +43,8 @@ class WalletsController {
     }
   }
 
-  public static show = (id: string): ChannelResponse<WalletData> => {
-    const wallet = WalletsController.service.show(id)
+  public static get = (id: string): ChannelResponse<WalletData> => {
+    const wallet = WalletsController.service.get(id)
     if (wallet) {
       return {
         status: ResponseCode.Success,
@@ -181,7 +181,7 @@ class WalletsController {
       const success = WalletsController.service.delete(id)
       if (success) {
         // TODO: details, what to do when active wallet deleted
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.index())
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.getAll())
         return {
           status: ResponseCode.Success,
           result: true,
@@ -202,7 +202,7 @@ class WalletsController {
     if (WalletsController.service.validate({ id, password })) {
       return {
         status: ResponseCode.Success,
-        result: JSON.stringify(WalletsController.service.show(id)),
+        result: JSON.stringify(WalletsController.service.get(id)),
       }
     }
     return {
