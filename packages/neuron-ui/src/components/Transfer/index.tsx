@@ -1,23 +1,51 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import TransferConfirm from '../TransferConfirm'
 import TransferItemList from '../TransferItemList'
+
 import Dialog from '../../widgets/Dialog'
 import QRScanner from '../../widgets/QRScanner'
 import InlineInputWithDropdown from '../../widgets/InlineInput/InlineInputWithDropdown'
 import { Spinner } from '../../widgets/Loading'
 
-import { TransferItem } from '../../services/UILayer'
-import { CapacityUnit, PlaceHolders } from '../../utils/const'
+import { ContentProps } from '../../containers/MainContent'
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import initState from '../../containers/MainContent/state'
+import UILayer, { TransferItem } from '../../services/UILayer'
+import { CapacityUnit, PlaceHolders, Channel, Routes } from '../../utils/const'
 
 const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const { t } = useTranslation()
-  const { transfer, dispatch, password, dialog, errorMsgs } = props
+  const { transfer, dispatch, password, dialog, errorMsgs, history } = props
+
+  useEffect(() => {
+    UILayer.on(Channel.SendCapacity, (_e: Event, args: ChannelResponse<string>) => {
+      if (args.status) {
+        history.push(`${Routes.Transaction}/${args.result}`)
+      } else {
+        dispatch({
+          type: MainActions.UpdateTransfer,
+          payload: {
+            submitting: false,
+          },
+        })
+        dispatch({
+          type: MainActions.ErrorMessage,
+          payload: { transfer: args.msg },
+        })
+      }
+    })
+    return () => {
+      UILayer.removeAllListeners(Channel.SendCapacity)
+      dispatch({
+        type: MainActions.UpdateTransfer,
+        payload: initState.transfer,
+      })
+    }
+  }, [])
 
   const updateTransferItem = (field: string) => (idx: number) => (value: string) => {
     dispatch({
@@ -47,12 +75,6 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
 
   const onConfirm = useCallback(
     (items: TransferItem[], pwd: string) => () => {
-      props.dispatch({
-        type: MainActions.UpdateTransfer,
-        payload: {
-          submitting: true,
-        },
-      })
       props.dispatch({
         type: MainActions.SetDialog,
         payload: {

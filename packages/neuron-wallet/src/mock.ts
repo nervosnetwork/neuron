@@ -93,10 +93,13 @@ const transaction = {
   amount: Math.round(Math.random() * 10000),
 }
 
+export const transactionHashGen = () => `0x${Math.round(Math.random() * 100)}`
+
 export default {
   transactions,
   transactionCount,
   wallets,
   mockedTransaction,
   transaction,
+  transactionHashGen,
 }
