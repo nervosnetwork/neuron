@@ -25,7 +25,7 @@ const initUILayer = (win: BrowserWindow) => {
     channel,
     extra: {
       active: WalletsController.active(),
-      wallets: WalletsController.index(),
+      wallets: WalletsController.getAll(),
     },
   })
 

@@ -1,5 +1,6 @@
 import WalletChannel from '../channel/wallet'
-import WalletsService, { Wallet } from '../services/wallets'
+import WalletsService from '../services/wallets'
+import { WalletData } from '../store/WalletStore'
 import { ChannelResponse, ResponseCode } from '.'
 import asw from '../wallets/asw'
 import windowManage from '../main'
@@ -28,8 +29,8 @@ class WalletsController {
     this.channel = channel
   }
 
-  public static index = (): ChannelResponse<Wallet[]> => {
-    const wallets = WalletsController.service.index()
+  public static getAll = (): ChannelResponse<WalletData[]> => {
+    const wallets = WalletsController.service.getAll()
     if (wallets) {
       return {
         status: ResponseCode.Success,
@@ -42,8 +43,8 @@ class WalletsController {
     }
   }
 
-  public static show = (id: string): ChannelResponse<Wallet> => {
-    const wallet = WalletsController.service.show(id)
+  public static get = (id: string): ChannelResponse<WalletData> => {
+    const wallet = WalletsController.service.get(id)
     if (wallet) {
       return {
         status: ResponseCode.Success,
@@ -82,28 +83,23 @@ class WalletsController {
     mnemonic: string
     receiveAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<Wallet> => {
-    const storedKeystore = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber).keystore
-    if (storedKeystore) {
-      try {
-        const wallet = WalletsController.service.create({
-          name,
-          keystore: storedKeystore,
-        })
-        return {
-          status: ResponseCode.Success,
-          result: wallet,
-        }
-      } catch (e) {
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Failed to save wallet',
-        }
+  }): ChannelResponse<WalletData> => {
+    try {
+      const key = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber)
+      const wallet = WalletsController.service.create({
+        name,
+        keystore: key.keystore!,
+        addresses: key.addresses!,
+      })
+      return {
+        status: ResponseCode.Success,
+        result: wallet,
       }
-    }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'Failed to import wallet',
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.message,
+      }
     }
   }
 
@@ -119,29 +115,23 @@ class WalletsController {
     keystore: string
     receiveAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<Wallet> => {
-    const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
-    if (key.keystore) {
-      if (!key.checkPassword(password)) {
-        return {
-          status: ResponseCode.Fail,
-          msg: 'Wrong password',
-        }
-      }
+  }): ChannelResponse<WalletData> => {
+    try {
+      const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
-        keystore: key.keystore,
+        keystore: key.keystore!,
+        addresses: key.addresses!,
       })
-      if (wallet) {
-        return {
-          status: ResponseCode.Success,
-          result: wallet,
-        }
+      return {
+        status: ResponseCode.Success,
+        result: wallet,
       }
-    }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'Failed to import wallet',
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.message,
+      }
     }
   }
 
@@ -191,7 +181,7 @@ class WalletsController {
       const success = WalletsController.service.delete(id)
       if (success) {
         // TODO: details, what to do when active wallet deleted
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.index())
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.getAll())
         return {
           status: ResponseCode.Success,
           result: true,
@@ -212,7 +202,7 @@ class WalletsController {
     if (WalletsController.service.validate({ id, password })) {
       return {
         status: ResponseCode.Success,
-        result: JSON.stringify(WalletsController.service.show(id)),
+        result: JSON.stringify(WalletsController.service.get(id)),
       }
     }
     return {
