@@ -121,6 +121,8 @@ export default {
       'capacity-is-not-enough': '余额不足',
       'is-unremovable': '{{target}}不可删除',
       'create-wallet-success': "您已成功创建钱包 '{{name}}' ",
+      'network-is-not-found': '未找到节点信息',
+      'name-has-been-used': '名称已被使用',
     },
   },
 }

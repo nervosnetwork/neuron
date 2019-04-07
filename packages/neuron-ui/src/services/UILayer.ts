@@ -1,4 +1,5 @@
 import { Network } from '../contexts/Chain'
+import { RawNetwork } from '../components/NetworkEditor'
 
 import { Channel, CapacityUnit } from '../utils/const'
 import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
@@ -67,7 +68,7 @@ const UILayer = (() => {
       console.warn(`Channel ${channel} and Function ${cb.toString()} failed due to Electron not loaded`)
     },
     removeAllListeners: (channel?: string) => {
-      console.warn(`Channel ${channel} cannot removed due to Electron not loaded`)
+      console.warn(`Channel ${channel} cannot be removed due to Electron not loaded`)
     },
     addEventListener: (event: string, cb: EventListenerOrEventListenerObject) => window.addEventListener(event, cb),
   }
@@ -96,7 +97,7 @@ export const networks = (method: NetworksMethod, params: string | Network) => {
 export const networksCall = instantiateMethodCall(networks) as {
   index: () => void
   show: (id: string) => void
-  create: (network: Network) => void
+  create: (network: RawNetwork) => void
   update: (network: Network) => void
   delete: (id: string) => void
   active: () => void

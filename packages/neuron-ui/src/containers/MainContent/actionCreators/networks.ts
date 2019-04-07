@@ -1,3 +1,4 @@
+import { Network } from '../../../contexts/Chain'
 import { networksCall } from '../../../services/UILayer'
 import { MainActions } from '../reducer'
 
@@ -12,7 +13,7 @@ export default {
       payload: { networks: true },
     }
   },
-  createOrUpdateNetowrk: ({ id, name, remote }: { id?: string; name: string; remote: string }) => {
+  createOrUpdateNetowrk: ({ id, name, remote }: Network, networks: Network[]) => {
     if (!name) {
       return {
         type: MainActions.ErrorMessage,
@@ -35,12 +36,29 @@ export default {
         payload: { networks: i18n.t(`messages.${Message.URLIsRequired}`) },
       }
     }
+    // verification, for now, only name is unique
     if (id === 'new') {
+      if (networks.some(network => network.name === name)) {
+        return {
+          type: MainActions.ErrorMessage,
+          payload: {
+            networks: i18n.t(`messages.name-has-been-used`),
+          },
+        }
+      }
       networksCall.create({
         name,
         remote,
       })
     } else {
+      if (networks.some(network => network.name === name || network.id !== id)) {
+        return {
+          type: MainActions.ErrorMessage,
+          payload: {
+            networks: i18n.t(`messages.name-has-been-used`),
+          },
+        }
+      }
       networksCall.update({
         id,
         name,
@@ -72,31 +90,6 @@ export default {
     return {
       type: MainActions.Netowrks,
       payload: id,
-    }
-  },
-  saveNetwork: (params: { id: string; name: string; remote: string }) => {
-    if (!params.name) {
-      return {
-        type: MainActions.ErrorMessage,
-        payload: { networks: Message.NameIsRequired },
-      }
-    }
-    if (params.name.length > 28) {
-      const message = `${i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo)} ${MAX_NETWORK_NAME_LENGTH}`
-      return {
-        type: MainActions.ErrorMessage,
-        payload: { networks: message },
-      }
-    }
-    if (!params.remote) {
-      return {
-        type: MainActions.ErrorMessage,
-        payload: { networks: Message.URLIsRequired },
-      }
-    }
-    return {
-      type: MainActions.Netowrks,
-      payload: params,
     }
   },
 }

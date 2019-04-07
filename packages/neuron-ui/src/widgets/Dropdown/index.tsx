@@ -15,6 +15,7 @@ const Item = styled.div<{ disabled?: boolean }>`
 
 export interface DropDownItem {
   label: string
+  key: string
   onClick: React.EventHandler<React.MouseEvent | React.KeyboardEvent>
   disabled?: boolean
 }
@@ -44,7 +45,7 @@ const Dropdown = ({
         <Item
           role="menuitem"
           tabIndex={idx}
-          key={item.label}
+          key={item.key}
           onClick={item.onClick}
           onKeyUp={item.onClick}
           disabled={item.disabled}

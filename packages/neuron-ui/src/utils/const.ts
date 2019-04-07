@@ -16,7 +16,7 @@ export const DEFAULT_NETWORKS = [
   },
 ]
 
-export enum NetworkStatus {
+export enum ConnectStatus {
   Online = 'online',
   Offline = 'offline',
 }

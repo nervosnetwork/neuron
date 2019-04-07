@@ -1,5 +1,6 @@
 import { createContext } from 'react'
-import { NetworkStatus, TransactionType } from '../utils/const'
+import { ConnectStatus, TransactionType } from '../utils/const'
+import { RawNetwork } from '../components/NetworkEditor'
 
 // these will be introduced by sdk
 export interface Cell {
@@ -26,16 +27,15 @@ export interface Transaction {
   value: string
   hash: string
 }
-export interface Network {
-  id?: string
-  name: string
-  remote: string
-  status?: NetworkStatus
+
+export interface Network extends RawNetwork {
+  id: string
 }
 
 export interface Chain {
   cells: Cell[]
   network: Network
+  connectStatus: ConnectStatus
   tipBlockNumber?: number
   transaction: Transaction
   transactions: {
@@ -53,8 +53,8 @@ export const initChain: Chain = {
     id: '',
     name: '',
     remote: '',
-    status: NetworkStatus.Offline,
   },
+  connectStatus: ConnectStatus.Offline,
   tipBlockNumber: undefined,
   transaction: {
     value: '',
