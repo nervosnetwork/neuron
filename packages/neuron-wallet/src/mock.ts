@@ -4,12 +4,12 @@ export const transactions = Array.from({
   length: 200,
 })
   .map(() => ({
-    date: new Date().getTime() - Math.round(Math.random() * 100000000),
+    time: new Date().getTime() - Math.round(Math.random() * 100000000),
     value: `${Math.random()}`,
     hash: `${Math.round(Math.random() * 10000000000000000)}`,
-    type: Math.round(Math.random() * 2),
+    version: 0,
   }))
-  .sort((p, n) => +n.date - +p.date)
+  .sort((p, n) => +n.time - +p.time)
 
 export const transactionCount = 500
 
@@ -86,6 +86,8 @@ export const mockedTransaction = {
       type: null,
     },
   ],
+  time: 1545992487397,
+  value: '1000',
 }
 
 const transaction = {

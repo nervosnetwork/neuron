@@ -1,6 +1,11 @@
 import { ResponseCode, ChannelResponse } from '.'
 import WalletChannel from '../channel/wallet'
-import TransactionsService, { Transaction, TransactionsParams } from '../services/transactions'
+import TransactionsService, {
+  Transaction,
+  TransactionsByAddressesParam,
+  PaginationResult,
+  TransactionsByLockHashesParam,
+} from '../services/transactions'
 
 export default class TransactionsController {
   public channel: WalletChannel
@@ -11,26 +16,31 @@ export default class TransactionsController {
     this.channel = channel
   }
 
-  public static index = (
-    params?: TransactionsParams,
-  ): ChannelResponse<
-    { pageNo: number; pageSize: number; totalCount: number; items: Transaction[] } | Transaction[]
-  > => {
-    const transactions = TransactionsService.index(params)
-    if (transactions) {
-      if (!params) {
-        return {
-          status: ResponseCode.Success,
-          result: transactions,
-        }
+  public static getAll = (params: TransactionsByLockHashesParam): ChannelResponse<PaginationResult<Transaction>> => {
+    const transactions = TransactionsService.getAll(params)
+
+    if (!transactions) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Transactions not found',
       }
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: transactions,
+    }
+  }
+
+  public static getAllByAddresses = (
+    params: TransactionsByAddressesParam,
+  ): ChannelResponse<PaginationResult<Transaction>> => {
+    const transactions = TransactionsService.getAllByAddresses(params)
+
+    if (transactions) {
       return {
         status: ResponseCode.Success,
-        result: {
-          ...params,
-          totalCount: TransactionsService.index().length,
-          items: transactions,
-        },
+        result: transactions,
       }
     }
     return {
@@ -39,17 +49,17 @@ export default class TransactionsController {
     }
   }
 
-  public static show = (hash: string): ChannelResponse<Transaction> => {
-    const network = TransactionsService.show(hash)
-    if (network) {
+  public static get = (hash: string): ChannelResponse<Transaction> => {
+    const transaction = TransactionsService.get(hash)
+    if (!transaction) {
       return {
-        status: ResponseCode.Success,
-        result: network,
+        status: ResponseCode.Fail,
+        msg: 'Transaction not found',
       }
     }
     return {
-      status: ResponseCode.Fail,
-      msg: 'Transaction not found',
+      status: ResponseCode.Success,
+      result: transaction,
     }
   }
 
