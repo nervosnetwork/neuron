@@ -15,6 +15,7 @@ export interface Input {
   previousOutput: OutPoint
   unlock: Script
 }
+
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
@@ -27,12 +28,18 @@ export interface TransactionsByLockHashesParam {
   lockHashes: string[]
 }
 
+export interface TransactionsByPubkeysParams {
+  pageNo: number
+  pageSize: number
+  pubkeys: string[]
+}
+
 export interface PaginationResult<T = any> {
   totalCount: number
   items: T[]
 }
 
-let currentTransaction: any[] = transactions
+let currentTransaction: Transaction[] = transactions
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = (params: TransactionsByLockHashesParam): PaginationResult<Transaction> => {
@@ -42,7 +49,15 @@ export default class TransactionsService {
     }
   }
 
-  public static getAllByAddresses = (params: TransactionsByAddressesParam) => {
+  public static getAllByAddresses = (params: TransactionsByAddressesParam): PaginationResult<Transaction> => {
+    return TransactionsService.getAll({
+      pageNo: params.pageNo,
+      pageSize: params.pageSize,
+      lockHashes: [],
+    })
+  }
+
+  public static getAllByPubkeys = (params: TransactionsByPubkeysParams): PaginationResult<Transaction> => {
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
