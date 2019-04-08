@@ -4,7 +4,7 @@ import { Cell, Script, OutPoint } from '../cell'
 export interface Transaction {
   hash: string
   version: number
-  deps: OutPoint[]
+  deps?: OutPoint[]
   inputs?: any
   outputs?: Cell[]
   time?: number
@@ -36,13 +36,9 @@ let currentTransaction: any[] = transactions
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = (params: TransactionsByLockHashesParam): PaginationResult<Transaction> => {
-    const transaction: Transaction = mockedTransaction
-
     return {
       totalCount: params.pageNo * params.pageSize,
-      items: Array.from({
-        length: params.pageSize,
-      }).map(() => transaction),
+      items: transactions,
     }
   }
 
@@ -54,8 +50,8 @@ export default class TransactionsService {
     })
   }
 
-  public static get = (_hash: string) => {
-    return mockedTransaction
+  public static get = (hash: string): Transaction | undefined => {
+    return transactions.find(tx => tx.hash === hash)
   }
 
   public static create = (transaction: Transaction): Transaction => {
