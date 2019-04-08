@@ -69,7 +69,7 @@ export default class TransactionsService {
     return transactions.find(tx => tx.hash === hash)
   }
 
-  // check weather the address has history transactions
+  // check whether the address has history transactions
   public static isExist = (_address: string): boolean => {
     return Math.random() > 0.5
   }
