@@ -86,6 +86,22 @@ describe('wallet store', () => {
     })
   })
 
+  it('update addresses', () => {
+    walletStore.saveWallet(wallet1)
+    const addresses = {
+      receive: ['address1', 'address2', 'address3'],
+      change: ['address1', 'address2', 'address3'],
+    }
+    walletStore.updateAddresses(wallet1.id, addresses)
+    const wallet = walletStore.getWallet(wallet1.id)
+    assert.deepEqual(wallet, {
+      id: wallet1.id,
+      name: wallet1.name,
+      keystore: wallet1.keystore,
+      addresses,
+    })
+  })
+
   it('delete wallet', () => {
     const walletId = walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
