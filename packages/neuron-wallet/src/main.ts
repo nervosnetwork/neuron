@@ -1,7 +1,6 @@
 import path from 'path'
 import { app, BrowserWindow, Menu } from 'electron'
 import windowStateKeeper from 'electron-window-state'
-// db
 import 'reflect-metadata'
 
 import env from './env'
