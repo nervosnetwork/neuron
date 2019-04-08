@@ -86,6 +86,8 @@ export const mockedTransaction = {
       type: null,
     },
   ],
+  time: 1545992487397,
+  value: '1000',
 }
 
 const transaction = {
