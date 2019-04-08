@@ -1,4 +1,4 @@
-import { transactions, mockedTransaction } from '../mock'
+import { transactions } from '../mock'
 import { Cell, Script, OutPoint } from '../cell'
 
 export interface Transaction {
