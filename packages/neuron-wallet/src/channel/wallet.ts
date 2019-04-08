@@ -2,8 +2,8 @@ import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
 import { ChannelResponse } from '../controllers'
-import NetworksController, { NetworksMethod } from '../controllers/netowrks'
-import { Network } from '../services/networks'
+import NetworksController, { NetworksMethod } from '../controllers/networks'
+import { NetworkWithID } from '../store/NetworksStore'
 import { WalletsMethod } from '../controllers/wallets'
 
 import asw from '../wallets/asw'
@@ -19,12 +19,12 @@ export enum ResponseCode {
 export default class WalletChannel extends Listeners {
   public win: BrowserWindow
 
-  public netowrksController: any
+  public networksController: any
 
   constructor(window: BrowserWindow) {
     super()
     this.win = window
-    this.netowrksController = new NetworksController(this)
+    this.networksController = new NetworksController(this)
   }
 
   public sendWallet = (
@@ -91,16 +91,16 @@ export default class WalletChannel extends Listeners {
   }
 
   public syncNetworks = (params: {
-    active?: ChannelResponse<Network>
-    networks?: ChannelResponse<Network[]>
+    active?: ChannelResponse<NetworkWithID>
+    networks?: ChannelResponse<NetworkWithID[]>
     status?: ChannelResponse<number>
   }) => {
     if (!this.win) return
     if (params.networks) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.Index, params.networks)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.GetAll, params.networks)
     }
     if (params.active) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.Active, params.active)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveOne, params.active)
     }
     // TODO: status handler
     // if (params.status) {

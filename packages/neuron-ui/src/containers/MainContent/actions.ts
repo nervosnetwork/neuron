@@ -19,7 +19,7 @@ export enum MainActions {
   UpdateTransfer,
   UpdatePassword,
   UpdateLoading,
-  Netowrks,
+  Networks,
   Wallet,
 }
 
