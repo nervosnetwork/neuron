@@ -58,24 +58,28 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   const actionItems = (id: string) => [
     {
       label: t('menuitem.select'),
+      key: 'select',
       onClick: () => {
         dispatch(actionCreators.setActiveWallet(id))
       },
     },
     {
       label: t('menuitem.backup'),
+      key: 'backup',
       onClick: () => {
         dispatch(actionCreators.backupWallet(id))
       },
     },
     {
       label: t('menuitem.edit'),
+      key: 'edit',
       onClick: () => {
         history.push(`${Routes.WalletEditor}/${id}}`)
       },
     },
     {
       label: t('menuitem.remove'),
+      key: 'remove',
       onClick: () => {
         dispatch({
           type: MainActions.SetDialog,

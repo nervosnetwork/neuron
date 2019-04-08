@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import Dropdown from '../../widgets/Dropdown'
-import { NetworkStatus, Routes } from '../../utils/const'
+import { ConnectStatus, Routes } from '../../utils/const'
 import ChainContext, { Network } from '../../contexts/Chain'
 import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
 
@@ -35,7 +35,7 @@ const Span = styled.span`
   align-items: center;
 `
 
-const NetworkStatusHeader = ({
+const ConnectStatusHeader = ({
   networks,
   navTo,
   dispatch,
@@ -51,12 +51,14 @@ const NetworkStatusHeader = ({
   const networkItems = [
     ...networks.map(network => ({
       label: network.name || network.remote,
+      key: network.id,
       onClick: () => {
         dispatch(actionCreators.setNetwork(network.id!))
       },
     })),
     {
       label: t('menuitem.management'),
+      key: 'management',
       onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
@@ -65,7 +67,7 @@ const NetworkStatusHeader = ({
     <>
       <FlexDiv>
         <Span>
-          <Status online={chain.network.status === NetworkStatus.Online} />
+          <Status online={chain.connectStatus === ConnectStatus.Online} />
         </Span>
         <Span>{`${(chain.network.name && chain.network.name.slice(0, 30)) || chain.network.remote} - `}</Span>
         {tipNumber === undefined ? null : <Span>{tipNumber}</Span>}
@@ -88,4 +90,4 @@ const NetworkStatusHeader = ({
   )
 }
 
-export default NetworkStatusHeader
+export default ConnectStatusHeader

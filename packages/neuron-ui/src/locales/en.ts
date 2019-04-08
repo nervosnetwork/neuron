@@ -128,6 +128,8 @@ export default {
       'capacity-is-not-enough': 'capacity is not enough',
       'is-unremovable': '{{target}} is unremovable',
       'create-wallet-success': "You have created wallet '{{name}}' successfully",
+      'network-is-not-found': 'Network is not found',
+      'name-has-been-used': 'Name has been used',
     },
   },
 }
