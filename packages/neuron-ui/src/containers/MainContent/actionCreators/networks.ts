@@ -7,13 +7,13 @@ import i18n from '../../../utils/i18n'
 
 export default {
   getNetwork: (id: string) => {
-    networksCall.show(id)
+    networksCall.get(id)
     return {
       type: MainActions.UpdateLoading,
       payload: { networks: true },
     }
   },
-  createOrUpdateNetowrk: ({ id, name, remote }: Network, networks: Network[]) => {
+  createOrUpdateNetwork: ({ id, name, remote }: Network, networks: Network[]) => {
     if (!name) {
       return {
         type: MainActions.ErrorMessage,
@@ -51,7 +51,7 @@ export default {
         remote,
       })
     } else {
-      if (networks.some(network => network.name === name || network.id !== id)) {
+      if (networks.some(network => network.name === name && network.id !== id)) {
         return {
           type: MainActions.ErrorMessage,
           payload: {
@@ -59,8 +59,7 @@ export default {
           },
         }
       }
-      networksCall.update({
-        id,
+      networksCall.update(id!, {
         name,
         remote,
       })
@@ -86,9 +85,9 @@ export default {
   },
   setNetwork: (id: string) => {
     // TODO: verification
-    networksCall.setActive(id)
+    networksCall.activate(id)
     return {
-      type: MainActions.Netowrks,
+      type: MainActions.Networks,
       payload: id,
     }
   },

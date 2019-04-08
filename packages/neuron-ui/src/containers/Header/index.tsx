@@ -27,18 +27,18 @@ const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
   }, [])
 
   useEffect(() => {
-    let cachedNetowrks = window.localStorage.getItem('networks')
-    if (cachedNetowrks) {
+    let cachedNetworks = window.localStorage.getItem('networks')
+    if (cachedNetworks) {
       try {
-        cachedNetowrks = JSON.parse(cachedNetowrks)
-        if (cachedNetowrks && cachedNetowrks.length) {
+        cachedNetworks = JSON.parse(cachedNetworks)
+        if (cachedNetworks && cachedNetworks.length) {
           dispatch({
             type: HeaderActions.SetNetwork,
-            payload: [...new Set([...header.networks, ...cachedNetowrks])],
+            payload: [...new Set([...header.networks, ...cachedNetworks])],
           })
         }
       } catch (err) {
-        console.error('Invalid Cached Netowrks')
+        console.error('Invalid Cached Networks')
       }
     }
   }, [])

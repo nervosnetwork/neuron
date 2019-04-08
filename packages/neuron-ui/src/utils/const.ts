@@ -20,6 +20,10 @@ export enum ConnectStatus {
   Online = 'online',
   Offline = 'offline',
 }
+export enum NetworkType {
+  Default,
+  Normal,
+}
 
 export enum Channel {
   SetLanguage = 'setLanguage',

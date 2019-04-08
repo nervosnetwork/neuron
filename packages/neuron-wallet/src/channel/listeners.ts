@@ -1,10 +1,9 @@
 import { ipcMain, Notification } from 'electron'
-
 import { Channel } from '../utils/const'
 import { wallets, verifyPassword, updateWallets, Wallet, transactionHashGen } from '../mock'
 import asw from '../wallets/asw'
 import { ResponseCode } from './wallet'
-import NetworksController from '../controllers/netowrks'
+import NetworksController from '../controllers/networks'
 import TransactionsController from '../controllers/transactions'
 import WalletsController from '../controllers/wallets'
 
@@ -226,9 +225,12 @@ export default class Listeners {
    * @description listen to Channel.Networks and invoke corresponding method of networksController
    */
   public static networks = () => {
-    return ipcMain.on(Channel.Networks, (e: Electron.Event, method: keyof typeof NetworksController, params: any) => {
-      e.sender.send(Channel.Networks, method, (NetworksController[method] as Function)(params))
-    })
+    return ipcMain.on(
+      Channel.Networks,
+      async (e: Electron.Event, method: keyof typeof NetworksController, ...params: any[]) => {
+        e.sender.send(Channel.Networks, method, await (NetworksController[method] as Function)(...params))
+      },
+    )
   }
 
   /**
@@ -239,8 +241,8 @@ export default class Listeners {
   public static transactions = () => {
     return ipcMain.on(
       Channel.Transactions,
-      (e: Electron.Event, method: keyof typeof TransactionsController, params: any) => {
-        e.sender.send(Channel.Transactions, method, (TransactionsController[method] as Function)(params))
+      async (e: Electron.Event, method: keyof typeof TransactionsController, ...params: any[]) => {
+        e.sender.send(Channel.Transactions, method, await (TransactionsController[method] as Function)(...params))
       },
     )
   }
@@ -251,8 +253,11 @@ export default class Listeners {
    * @description listen to Channel.Wallet and invoke corresponding method of WalletsController
    */
   public static wallet = () => {
-    return ipcMain.on(Channel.Wallets, (e: Electron.Event, method: keyof typeof WalletsController, params: any) => {
-      e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(params))
-    })
+    return ipcMain.on(
+      Channel.Wallets,
+      async (e: Electron.Event, method: keyof typeof WalletsController, ...params: any[]) => {
+        e.sender.send(Channel.Wallets, method, await (WalletsController[method] as Function)(...params))
+      },
+    )
   }
 }

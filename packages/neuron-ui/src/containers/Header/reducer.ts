@@ -16,7 +16,7 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
     case HeaderActions.SetNetwork: {
       return {
         ...state,
-        netowrk: action.payload,
+        network: action.payload,
       }
     }
     default: {
@@ -27,7 +27,7 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
 
 export const actionCreators = {
   setNetwork: (id: string) => {
-    networksCall.setActive(id)
+    networksCall.activate(id)
     return {
       type: HeaderActions.SetNetwork,
       payload: id,

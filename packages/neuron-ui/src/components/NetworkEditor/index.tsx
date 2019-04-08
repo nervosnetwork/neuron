@@ -36,6 +36,7 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
   const [t] = useTranslation()
   const { networks } = useContext(SettingsContext)
   const cachedNetworks = useRef(networks)
+  const cachedNetwork = cachedNetworks.current.find(network => network.id === params.id)
 
   const initiateFields = useCallback((network: RawNetwork) => {
     dispatch({
@@ -83,7 +84,6 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
     if (cachedNetworks.current.length !== networks.length) {
       history.push(Routes.SettingsNetworks)
     } else if (params.id !== 'new') {
-      const cachedNetwork = cachedNetworks.current.find(network => network.id === params.id)
       const currentNetwork = networks.find(network => network.id === params.id)
       if (!cachedNetwork || !currentNetwork) {
         dispatch({
@@ -118,6 +118,10 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
     }
   }, [params.id])
 
+  const invalidParams = !networkEditor.name || !networkEditor.remote
+  const notUpdated =
+    cachedNetwork && (cachedNetwork.name === networkEditor.name && cachedNetwork.remote === networkEditor.remote)
+
   return (
     <Card>
       <Card.Header>{params.id === 'new' ? t('settings.network.editnetwork.title') : 'name'}</Card.Header>
@@ -133,11 +137,15 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
           variant="primary"
           size="lg"
           block
+          disabled={invalidParams || notUpdated}
           onClick={() => {
-            dispatch(actionCreators.createOrUpdateNetowrk({ id: params.id, ...networkEditor }, networks))
+            dispatch(actionCreators.createOrUpdateNetwork({ id: params.id, ...networkEditor }, networks))
           }}
         >
           Save
+        </Button>
+        <Button type="reset" variant="primary" size="lg" block onClick={() => history.goBack()}>
+          Cancel
         </Button>
       </Card.Body>
     </Card>
