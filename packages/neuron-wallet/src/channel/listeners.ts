@@ -1,7 +1,7 @@
 import { ipcMain, Notification } from 'electron'
 
 import { Channel } from '../utils/const'
-import { wallets, verifyPassword, updateWallets, Wallet } from '../mock'
+import { wallets, verifyPassword, updateWallets, Wallet, transactionHashGen } from '../mock'
 import asw from '../wallets/asw'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/netowrks'
@@ -189,11 +189,12 @@ export default class Listeners {
         { items, password }: { items: { address: string; capacity: string; unit: string }[]; password: string },
       ) => {
         setTimeout(() => {
+          const hash = transactionHashGen()
           if (!items.length || !items[0].address) {
-            e.returnValue = {
+            e.sender.send(Channel.SendCapacity, {
               status: ResponseCode.Fail,
               msg: 'Address not specified',
-            }
+            })
             return
           }
           // TODO: verify password
@@ -210,10 +211,10 @@ export default class Listeners {
             )}`,
           })
           notification.show()
-          e.returnValue = {
+          e.sender.send(Channel.SendCapacity, {
             status: ResponseCode.Success,
-            msg: `Send Successfully`,
-          }
+            result: hash,
+          })
         }, 3000)
       },
     )

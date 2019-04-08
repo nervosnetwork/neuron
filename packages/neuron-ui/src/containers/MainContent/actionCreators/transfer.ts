@@ -43,23 +43,12 @@ export default {
   },
 
   confirmTransfer: ({ items, password }: { items: TransferItem[]; password: string }) => {
-    const response = sendCapacity(items, password)
-    if (response && response[0]) {
-      if (response[0].status) {
-        return {
-          type: MainActions.UpdateTransfer,
-          payload: {
-            submitting: false,
-          },
-        }
-      }
-      return {
-        type: MainActions.ErrorMessage,
-        payload: {
-          transfer: response[0].msg,
-        },
-      }
+    sendCapacity(items, password)
+    return {
+      type: MainActions.UpdateTransfer,
+      payload: {
+        submitting: true,
+      },
     }
-    throw new Error('No Response')
   },
 }
