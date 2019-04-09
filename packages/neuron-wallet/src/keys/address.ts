@@ -1,7 +1,8 @@
+import TransactionsService from '../services/transactions'
+
 const Address = {
   isUsedAddress: (address: string) => {
-    // TODO: check whether the address has history transactions
-    return address.includes('ckb')
+    return TransactionsService.hasTransactions(address)
   },
 
   addressFromPrivateKey: (privateKey: string) => {

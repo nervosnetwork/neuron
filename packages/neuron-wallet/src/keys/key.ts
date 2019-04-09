@@ -12,6 +12,11 @@ export interface Addresses {
   change: string[]
 }
 
+enum DefaultAddressNumber {
+  Receive = 17,
+  Change = 3,
+}
+
 export default class Key {
   public mnemonic?: string
 
@@ -42,7 +47,12 @@ export default class Key {
     return bip39.generateMnemonic()
   }
 
-  static fromKeystore(keystore: string, password: string, receiveAddressNumber: number, changeAddressNumber: number) {
+  static fromKeystore(
+    keystore: string,
+    password: string,
+    receiveAddressNumber = DefaultAddressNumber.Receive,
+    changeAddressNumber = DefaultAddressNumber.Change,
+  ) {
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
     key.keystore = keystoreObject
@@ -89,8 +99,8 @@ export default class Key {
   public static fromMnemonic(
     mnemonic: string,
     password: string,
-    receiveAddressNumber: number,
-    changeAddressNumber: number,
+    receiveAddressNumber = DefaultAddressNumber.Receive,
+    changeAddressNumber = DefaultAddressNumber.Change,
   ) {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
