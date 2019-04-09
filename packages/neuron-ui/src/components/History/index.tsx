@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Badge, Table, Alert } from 'react-bootstrap'
@@ -12,7 +12,8 @@ import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
 import { ProviderActions } from '../../containers/Providers/reducer'
 
-import ChainContext, { Transaction } from '../../contexts/Chain'
+import { useNeuronWallet } from '../../utils/hooks'
+import { Transaction } from '../../contexts/NeuronWallet'
 import { queryParsers } from '../../utils/parser'
 import { TransactionType, Routes, EXPLORER } from '../../utils/const'
 import { dateFormatter, queryFormatter } from '../../utils/formatters'
@@ -62,7 +63,7 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     dispatch,
     providerDispatch,
   } = props
-  const chain = useContext(ChainContext)
+  const { chain } = useNeuronWallet()
   const [t] = useTranslation()
   const { pageNo, pageSize, totalCount, items, addresses } = chain.transactions
 

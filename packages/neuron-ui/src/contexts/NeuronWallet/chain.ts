@@ -1,26 +1,6 @@
-import { createContext } from 'react'
-import { ConnectStatus, TransactionType } from '../utils/const'
-import { RawNetwork } from '../components/NetworkEditor'
+import { ConnectStatus, TransactionType } from '../../utils/const'
+import { RawNetwork } from '../../components/NetworkEditor'
 
-// these will be introduced by sdk
-export interface Cell {
-  capacity: number
-  data: Uint8Array
-  lock: string
-  type?: {
-    version: number
-    args: Uint8Array[]
-    signedArgs: Uint8Array[]
-    reference: string
-    binary: Uint8Array
-  }
-  outPoint: {
-    hash: string
-    index: number
-  }
-}
-
-// will be introduced by sdk
 export interface Transaction {
   type: TransactionType
   date: Date
@@ -33,7 +13,6 @@ export interface Network extends RawNetwork {
 }
 
 export interface Chain {
-  cells: Cell[]
   network: Network
   connectStatus: ConnectStatus
   tipBlockNumber?: number
@@ -47,8 +26,7 @@ export interface Chain {
   }
 }
 
-export const initChain: Chain = {
-  cells: [],
+const chainState: Chain = {
   network: {
     id: '',
     name: '',
@@ -71,5 +49,4 @@ export const initChain: Chain = {
   },
 }
 
-const ChainContext = createContext<Chain>(initChain)
-export default ChainContext
+export default chainState

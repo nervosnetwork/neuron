@@ -1,10 +1,10 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Redirect } from 'react-router-dom'
-import WalletContext from '../../contexts/Wallet'
 import { Routes } from '../../utils/const'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Home = () => {
-  const wallet = useContext(WalletContext)
+  const { wallet } = useNeuronWallet()
   if (wallet) {
     return <Redirect to={Routes.Wallet} />
   }

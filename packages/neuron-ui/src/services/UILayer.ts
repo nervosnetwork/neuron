@@ -1,4 +1,4 @@
-import { Network } from '../contexts/Chain'
+import { Network } from '../contexts/NeuronWallet'
 import { RawNetwork } from '../components/NetworkEditor'
 
 import { Channel, CapacityUnit } from '../utils/const'

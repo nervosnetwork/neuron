@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
+import NeuronWalletContext from '../contexts/NeuronWallet'
 
 export const useFullscreen = (fullscreen: boolean) => {
   useEffect(() => {
@@ -12,4 +13,6 @@ export const useFullscreen = (fullscreen: boolean) => {
   }, [fullscreen])
 }
 
-export default { useFullscreen }
+export const useNeuronWallet = () => useContext(NeuronWalletContext)
+
+export default { useFullscreen, useNeuronWallet }

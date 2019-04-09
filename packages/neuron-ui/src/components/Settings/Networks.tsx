@@ -1,10 +1,8 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import ChainContext from '../../contexts/Chain'
-import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { Routes } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
@@ -12,14 +10,17 @@ import { MainActions, actionCreators } from '../../containers/MainContent/reduce
 import Dialog from '../../widgets/Dialog'
 import ContextMenuZone from '../../widgets/ContextMenuZone'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
+import { useNeuronWallet } from '../../utils/hooks'
 
 interface MenuItemParams {
   id: string
 }
 
 const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const chain = useContext(ChainContext)
-  const { networks } = useContext(SettingsContext)
+  const {
+    chain,
+    settings: { networks },
+  } = useNeuronWallet()
   const [t] = useTranslation()
   const { dispatch, dialog, history } = props
 

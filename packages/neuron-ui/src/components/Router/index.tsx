@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
 
 import RoutesWithProps from './RoutesWithProps'
@@ -25,10 +25,9 @@ import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
 import Prompt from '../Prompt'
 
-import WalletContext from '../../contexts/Wallet'
-
 import UILayer from '../../services/UILayer'
 import { Routes, Channel } from '../../utils/const'
+import { useNeuronWallet } from '../../utils/hooks'
 
 export interface CustomRoute {
   name: string
@@ -176,7 +175,7 @@ export const mainContents: CustomRoute[] = [
 ]
 
 const CustomRouter = (appProps: any) => {
-  const wallet = useContext(WalletContext)
+  const { wallet } = useNeuronWallet()
 
   return (
     <Router>
