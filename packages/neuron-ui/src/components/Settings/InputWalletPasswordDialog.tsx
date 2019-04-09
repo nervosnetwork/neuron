@@ -5,7 +5,7 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import { checkPassword } from '../../services/UILayer'
-import { Wallet } from '../../contexts/Wallet'
+import { Wallet } from '../../contexts/NeuronWallet'
 
 export enum CheckType {
   CheckPassword,

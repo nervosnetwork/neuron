@@ -1,8 +1,6 @@
 import React, { useReducer, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ChainContext from '../../contexts/Chain'
-import WalletContext from '../../contexts/Wallet'
-import SettingsContext from '../../contexts/Settings'
+import NeuronWalletContext from '../../contexts/NeuronWallet'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
 import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
@@ -145,13 +143,9 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   }, [])
 
   return (
-    <SettingsContext.Provider value={providers.settings}>
-      <ChainContext.Provider value={providers.chain}>
-        <WalletContext.Provider value={providers.wallet}>
-          <Comp {...props} providerDispatch={dispatch} />
-        </WalletContext.Provider>
-      </ChainContext.Provider>
-    </SettingsContext.Provider>
+    <NeuronWalletContext.Provider value={providers}>
+      <Comp {...props} providerDispatch={dispatch} />
+    </NeuronWalletContext.Provider>
   )
 }
 

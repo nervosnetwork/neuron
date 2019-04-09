@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Col, Row, ListGroup, Form, Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -6,13 +6,12 @@ import styled from 'styled-components'
 import { Configure } from 'grommet-icons'
 
 import { Routes, MnemonicAction } from '../../utils/const'
-import WalletContext from '../../contexts/Wallet'
-import SettingsContext from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
 import InputWalletPasswordDialog, { CheckType } from './InputWalletPasswordDialog'
 import Dialog from '../../widgets/Dialog'
 import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Popover = styled.div`
   position: relative;
@@ -50,8 +49,10 @@ const WalletActions = ({ isDefault, actionItems }: { isDefault: boolean; actionI
 }
 
 const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const activeWallet = useContext(WalletContext)
-  const { wallets } = useContext(SettingsContext)
+  const {
+    wallet: activeWallet,
+    settings: { wallets },
+  } = useNeuronWallet()
   const { dispatch, dialog, history } = props
   const [t] = useTranslation()
 

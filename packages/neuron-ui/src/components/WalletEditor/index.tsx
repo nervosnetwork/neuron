@@ -8,7 +8,7 @@ import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPas
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
-import { Wallet } from '../../contexts/Wallet'
+import { Wallet } from '../../contexts/NeuronWallet'
 import Dialog from '../../widgets/Dialog'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
