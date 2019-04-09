@@ -19,7 +19,7 @@ const env = {
       type: 1,
     },
   ],
-  dbName: 'neuron.db.local',
+  dbPath: path.join(myApp.getPath('userData'), 'cell.sqlite'),
 }
 
 export default env
