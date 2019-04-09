@@ -69,6 +69,11 @@ export default class TransactionsService {
     return transactions.find(tx => tx.hash === hash)
   }
 
+  // check whether the address has history transactions
+  public static hasTransactions = (_address: string): boolean => {
+    return Math.random() >= 0.5
+  }
+
   public static create = (transaction: Transaction): Transaction => {
     const sameTransaction = TransactionsService.get(transaction.hash)
     if (sameTransaction) {
