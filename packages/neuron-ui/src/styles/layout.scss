@@ -1,6 +1,10 @@
 body {
   display: grid;
-  grid-template: 'sidebar header' 60px 'sidebar content' 1fr 'sidebar content' 1fr / 240px 1fr;
+  grid-template: 
+    'sidebar header header header' 60px 
+    'sidebar content content content' 1fr 
+    'sidebar content content content' 1fr / 
+    240px 1fr 1fr 1fr;
   column-gap: 40px;
 
   height: 100vh;
@@ -17,12 +21,8 @@ body {
 .main-content {
   grid-area: content;
   overflow: auto;
-  &.full-screen {
-    grid-area: 1/1/4/4;
-  }
 }
 
-
 .notification {
-  grid-area: 4/3/5/4;
+  grid-area: 2/4/3/5;
 }
