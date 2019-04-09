@@ -70,8 +70,8 @@ export default class TransactionsService {
   }
 
   // check whether the address has history transactions
-  public static isExist = (_address: string): boolean => {
-    return Math.random() > 0.5
+  public static hasTransactions = (_address: string): boolean => {
+    return Math.random() >= 0.5
   }
 
   public static create = (transaction: Transaction): Transaction => {
