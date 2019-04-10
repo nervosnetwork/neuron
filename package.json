@@ -27,7 +27,7 @@
     "lint": "lerna run lint",
     "test": "lerna run --parallel test",
     "precommit": "lint-staged",
-    "postinstall": "npm rebuild tiny-secp256k1 && lerna run postinstall"
+    "postinstall": "npm rebuild tiny-secp256k1 && lerna run rebuild:nativemodules"
   },
   "lint-staged": {
     "packages/*/src/**/*.{ts,tsx}": [
