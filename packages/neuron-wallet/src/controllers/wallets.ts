@@ -75,17 +75,17 @@ class WalletsController {
     name,
     password,
     mnemonic,
-    receiveAddressNumber = 17,
+    receivingAddressNumber: receivingAddressNumber = 17,
     changeAddressNumber = 3,
   }: {
     name: string
     password: string
     mnemonic: string
-    receiveAddressNumber: number
+    receivingAddressNumber: number
     changeAddressNumber: number
   }): ChannelResponse<WalletData> => {
     try {
-      const key = Key.fromMnemonic(mnemonic, password, receiveAddressNumber, changeAddressNumber)
+      const key = Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
         keystore: key.keystore!,
@@ -107,17 +107,17 @@ class WalletsController {
     name,
     password,
     keystore,
-    receiveAddressNumber = 17,
+    receivingAddressNumber = 17,
     changeAddressNumber = 3,
   }: {
     name: string
     password: string
     keystore: string
-    receiveAddressNumber: number
+    receivingAddressNumber: number
     changeAddressNumber: number
   }): ChannelResponse<WalletData> => {
     try {
-      const key = Key.fromKeystore(keystore, password, receiveAddressNumber, changeAddressNumber)
+      const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
         keystore: key.keystore!,

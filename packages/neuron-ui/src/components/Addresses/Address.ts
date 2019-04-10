@@ -1,5 +1,5 @@
 export const Change = 'Change'
-export const Receive = 'Receive'
+export const Receiving = 'Receiving'
 
 export interface Address {
   type: string
