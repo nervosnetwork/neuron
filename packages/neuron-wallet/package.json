@@ -20,7 +20,7 @@
     "test": "jest --color && electron-mocha --renderer ./tests/store",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "postinstall": "electron-builder install-app-deps",
+    "rebuild:nativemodules": "electron-builder install-app-deps",
     "teststore": "electron-mocha --renderer ./tests/store"
   },
   "jest": {
