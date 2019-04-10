@@ -1,6 +1,6 @@
 import asw from './wallets/asw'
 import ckbCore from './core'
-import { getCellChanges, storeCells } from './mock_rpc'
+import { storeCells } from './mock_rpc'
 
 export interface OutPoint {
   hash: string
@@ -8,22 +8,18 @@ export interface OutPoint {
 }
 
 export interface Script {
-  version: number
   args?: string[]
-  signedArgs: string[]
-  reference?: string | null
-  binary?: string
+  binaryHash?: string | null
 }
 
 // FIXME: should update capacity to string
 export interface Cell {
-  capacity: number
+  capacity: string
   data: string
-  lock: string
+  lock: Script
   type?: Script | null
   outPoint?: OutPoint
   state?: string
-  stateChange?: string
 }
 
 export const getUnspentCells = async () => {
@@ -54,26 +50,10 @@ export const markCellSpent = async (cell: Cell) => {
 }
 
 // get cells changes from chain and save to db
-export const loadCellsFromChain = async () => {
-  const cells = await getCellChanges()
-  cells.forEach(cell => {
-    if (cell.stateChange === 'created') {
-      saveCell(cell)
-    } else if (cell.stateChange === 'spent') {
-      markCellSpent(cell)
-    }
-    // any stateChange else would be ignored
-  })
-}
+export const loadCellsFromChain = async (): Promise<void> => {}
 
-// different wallet has different cells and txs
-export const getCellsByWallet = async (_page: number, _perPage: number, _walletID: string) => {
-  const cells = storeCells
-
-  return {
-    totalCount: cells.length,
-    cells,
-  }
+export const getCellsByLockHashes = async (_lockHashes: string[]): Promise<Cell[]> => {
+  return storeCells
 }
 
 export default {
