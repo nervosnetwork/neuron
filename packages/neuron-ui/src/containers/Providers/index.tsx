@@ -61,17 +61,17 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case TransactionsMethod.Index: {
+          case TransactionsMethod.GetAll: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { transactions: args.result },
+              payload: { transactions: { ...providers.chain.transactions, ...args.result } },
             })
             break
           }
-          case TransactionsMethod.Show: {
+          case TransactionsMethod.Get: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { transaction: args.result },
+              payload: { transaction: { ...providers.chain.transaction, ...args.result } },
             })
             break
           }

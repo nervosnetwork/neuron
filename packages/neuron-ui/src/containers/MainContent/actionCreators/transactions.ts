@@ -3,7 +3,7 @@ import { transactionsCall, GetTransactionsParams } from '../../../services/UILay
 
 export default {
   getTransaction: (hash: string) => {
-    transactionsCall.show(hash)
+    transactionsCall.get(hash)
     return {
       type: MainActions.UpdateLoading,
       payload: {
@@ -13,7 +13,7 @@ export default {
   },
 
   getTransactions: (params: GetTransactionsParams) => {
-    transactionsCall.index(params)
+    transactionsCall.getAll(params)
     return {
       type: MainActions.UpdateLoading,
       payload: {

@@ -3,7 +3,7 @@ import { RawNetwork } from '../../components/NetworkEditor'
 
 export interface Transaction {
   type: TransactionType
-  date: Date
+  time: number
   value: string
   hash: string
 }
@@ -38,7 +38,7 @@ const chainState: Chain = {
     value: '',
     hash: '',
     type: TransactionType.Other,
-    date: new Date(0),
+    time: +new Date(0),
   },
   transactions: {
     pageNo: -1,

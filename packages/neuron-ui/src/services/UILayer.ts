@@ -35,8 +35,8 @@ export enum NetworksMethod {
 }
 
 export enum TransactionsMethod {
-  Index = 'index',
-  Show = 'show',
+  GetAll = 'getAll',
+  Get = 'get',
 }
 
 export interface TransferItem {
@@ -110,8 +110,8 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 }
 
 export const transactionsCall = instantiateMethodCall(transactions) as {
-  index: (params: GetTransactionsParams) => void
-  show: (hash: string) => void
+  getAll: (params: GetTransactionsParams) => void
+  get: (hash: string) => void
 }
 
 export const wallets = (

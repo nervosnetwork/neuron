@@ -28,7 +28,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: transactions,
+      result: { ...params, ...transactions },
     }
   }
 

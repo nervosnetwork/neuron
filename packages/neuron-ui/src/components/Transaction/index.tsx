@@ -8,8 +8,6 @@ import { actionCreators, MainActions } from '../../containers/MainContent/reduce
 import { ProviderActions } from '../../containers/Providers/reducer'
 import { useNeuronWallet } from '../../utils/hooks'
 
-// import ChainContext from '../../contexts/Chain'
-
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
   const { match, errorMsgs, dispatch, providerDispatch, history } = props
   const [t] = useTranslation()
@@ -53,7 +51,7 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
         </Card.Text>
         <Card.Text>
           <b>{`${t('history.date')}: `}</b>
-          {new Date(transaction.date).toLocaleString()}
+          {new Date(transaction.time).toLocaleString()}
         </Card.Text>
       </Card.Body>
       <Card.Footer>
@@ -66,4 +64,5 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
 }
 
 Transaction.displayName = 'Transaction'
+
 export default Transaction
