@@ -15,7 +15,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "test": "react-app-rewired test --env=jsdom --color",
     "build": "react-app-rewired build",
-    "clean": "rm -rf build/*",
+    "clean": "rimraf build/*",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "publishConfig": {
@@ -64,6 +64,7 @@
     "eslint-plugin-react-hooks": "^1.0.1",
     "jest-styled-components": "^6.3.1",
     "jsqr": "^1.2.0",
-    "react-app-rewired": "^2.0.2"
+    "react-app-rewired": "^2.0.2",
+    "rimraf": "^2.6.3"
   }
 }
