@@ -48,10 +48,8 @@ export default class Transaction extends BaseEntity {
   })
   timestamp!: number
 
-  // TODO: check bigint is enough or not
-  // TODO: string:bigint => bigint:bigint
   @Column({
-    type: 'bigint',
+    type: 'varchar',
   })
   value!: string
 }

@@ -13,11 +13,10 @@ export default class Cell extends BaseEntity {
   })
   outPointIndex!: number
 
-  // TODO: check bigint is enough or not
   @Column({
-    type: 'bigint',
+    type: 'varchar',
   })
-  capacity!: bigint
+  capacity!: string
 
   @Column({
     type: 'text',
