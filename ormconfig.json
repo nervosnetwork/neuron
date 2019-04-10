@@ -1,0 +1,19 @@
+{
+  "type": "sqlite",
+  "synchronize": true,
+  "logging": true,
+  "entities": [
+     "packages/neuron-wallet/src/entities/**/*.ts"
+  ],
+  "migrations": [
+     "packages/neuron-wallet/src/migration/**/*.ts"
+  ],
+  "subscribers": [
+     "packages/neuron-wallet/src/subscriber/**/*.ts"
+  ],
+  "cli": {
+     "entitiesDir": "packages/neuron-wallet/src/entities",
+     "migrationsDir": "packages/neuron-wallet/src/migration",
+     "subscribersDir": "packages/neuron-wallet/src/subscriber"
+  }
+}

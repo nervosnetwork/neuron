@@ -18,7 +18,6 @@ const env = {
       type: 1,
     },
   ],
-  dbName: 'neuron.db.local',
 }
 
 export default env
