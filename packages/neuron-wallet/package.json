@@ -17,13 +17,14 @@
     "start:dev": "tsc && cross-env electron .",
     "build": "tsc",
     "clean": "rimraf dist/*",
-    "test": "jest --color && electron-mocha --renderer ./tests/store",
+    "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "rebuild:nativemodules": "electron-builder install-app-deps",
-    "teststore": "electron-mocha --renderer ./tests/store"
+    "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "jest": {
+    "runner": "@jest-runner/electron",
+    "testEnvironment": "@jest-runner/electron/environment",
     "transform": {
       "^.+\\.ts?$": "ts-jest"
     },
@@ -33,7 +34,7 @@
       "json",
       "node"
     ],
-    "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
+    "testRegex": "(/tests/.*.(electron))\\.(ts?|js?)$",
     "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
   },
   "dependencies": {
@@ -55,6 +56,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@jest-runner/electron": "0.2.2",
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/bip32": "^1.0.1",
