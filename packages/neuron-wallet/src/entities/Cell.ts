@@ -1,4 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
+import { Script } from '../cell'
 
 @Entity()
 export default class Cell extends BaseEntity {
@@ -12,6 +13,7 @@ export default class Cell extends BaseEntity {
   })
   outPointIndex!: number
 
+  // TODO: check bigint is enough or not
   @Column({
     type: 'bigint',
   })
@@ -22,16 +24,14 @@ export default class Cell extends BaseEntity {
   })
   data!: string
 
-  // JSON.stringify
   @Column({
-    type: 'text',
+    type: 'simple-json',
   })
-  lockScript!: string
+  lockScript!: Script
 
-  // JSON.stringify
   @Column({
-    type: 'text',
+    type: 'simple-json',
     nullable: true,
   })
-  typeScript: string | null = null
+  typeScript: Script | null = null
 }

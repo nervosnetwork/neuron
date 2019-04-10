@@ -2,12 +2,13 @@ import { createConnection, getConnectionOptions } from 'typeorm'
 import env from './env'
 
 import Cell from './entities/Cell'
+import Transaction from './entities/Transaction'
 
 const connectOptions = async () => {
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
     database: env.dbPath,
-    entities: [Cell],
+    entities: [Cell, Transaction],
   })
 
   return connectionOptions
@@ -20,8 +21,8 @@ export const generateConnection = async (
   const connectionOptions = await connectOptions()
 
   createConnection(connectionOptions)
-    .then(async () => {
-      await func()
+    .then(async (connection: any) => {
+      await func(connection)
     })
     .catch(errorFunc())
 }
