@@ -75,7 +75,7 @@ class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber: receivingAddressNumber = 17,
+    receivingAddressNumber = 17,
     changeAddressNumber = 3,
   }: {
     name: string
