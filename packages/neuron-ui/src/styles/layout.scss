@@ -1,10 +1,10 @@
 body {
   display: grid;
-  grid-template: 
-    'sidebar header header header' 60px 
-    'sidebar content content content' 1fr 
-    'sidebar content content content' 1fr / 
-    240px 1fr 1fr 240px;
+  grid-template:
+    'sidebar header header header' 60px
+    'sidebar content content content' 1fr
+    'sidebar content content content' 1fr /
+    240px 1fr 1fr 340px;
   column-gap: 40px;
 
   height: 100vh;
@@ -25,4 +25,5 @@ body {
 
 .notification {
   grid-area: 2/4/3/5;
+  z-index: 1;
 }

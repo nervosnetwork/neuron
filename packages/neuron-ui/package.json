@@ -39,6 +39,7 @@
     "@types/styled-components": "^4.1.6",
     "bootstrap": "^4.3.1",
     "cross-env": "^5.2.0",
+    "dayjs": "^1.8.12",
     "electron": "^4.0.3",
     "grommet-icons": "^4.2.0",
     "i18next": "^15.0.5",

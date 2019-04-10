@@ -141,7 +141,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         dispatch({
           type: ProviderActions.AddMessage,
           payload: {
-            type: 'error',
+            category: 'error',
             title: 'Networks',
             content: args.msg,
             time,

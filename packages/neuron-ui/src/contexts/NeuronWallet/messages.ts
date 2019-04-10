@@ -1,7 +1,7 @@
 export interface GlobalMessage {
-  type: 'error' | 'notice'
+  category: 'error' | 'notice'
   title: string
-  time: string
+  time: number
   content: string
   actions: { label: string; action: React.MouseEventHandler | string }[]
   dismiss: React.MouseEventHandler
