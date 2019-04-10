@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
-import { Script } from '../cell'
+import { Script, OutPoint } from '../cell'
 
 @Entity()
 export default class Cell extends BaseEntity {
@@ -33,4 +33,16 @@ export default class Cell extends BaseEntity {
     nullable: true,
   })
   typeScript: Script | null = null
+
+  @Column({
+    type: 'varchar',
+  })
+  status!: string
+
+  public outPoint(): OutPoint {
+    return {
+      hash: this.outPointHash,
+      index: this.outPointIndex,
+    }
+  }
 }
