@@ -4,6 +4,8 @@ export enum ProviderActions {
   Chain = 'chain',
   Wallet = 'wallet',
   Settings = 'settings',
+  AddMessage = 'addMessage',
+  DismissMessage = 'dismissMessage',
   CleanTransaction = 'cleanTransaction',
   CleanTransactions = 'cleanTransactions',
 }
@@ -32,6 +34,18 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
           ...state.chain,
           transaction: initNeuronWallet.chain.transaction,
         },
+      }
+    }
+    case ProviderActions.AddMessage: {
+      return {
+        ...state,
+        messages: [...state.messages, action.payload],
+      }
+    }
+    case ProviderActions.DismissMessage: {
+      return {
+        ...state,
+        messages: state.messages.filter(({ time }) => time !== action.payload),
       }
     }
     case ProviderActions.CleanTransactions: {

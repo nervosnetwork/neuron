@@ -57,6 +57,13 @@ class NetworksController {
         msg: 'Name and remote are required',
       }
     }
+    // example for return error
+    if (name === 'error') {
+      return {
+        status: ResponseCode.Fail,
+        msg: `Name cannot be "error"`,
+      }
+    }
     try {
       const created = NetworksController.service.create(name, remote, type)
       return {
