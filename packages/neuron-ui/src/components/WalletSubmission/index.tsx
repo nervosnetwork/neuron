@@ -14,9 +14,9 @@ import { verifyWalletSubmission } from '../../utils/validators'
 import { Routes } from '../../utils/const'
 
 const inptus = [
-  { label: 'password', key: 'password' },
-  { label: 'confirm-password', key: 'confirmPassword' },
-  { label: 'name', key: 'name' },
+  { label: 'password', key: 'password', type: 'password' },
+  { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
+  { label: 'name', key: 'name', type: 'text' },
 ]
 
 const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
@@ -72,7 +72,11 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
             <InputGroup.Prepend>
               <InputGroup.Text>{t(`wizard.${input.label}`)}</InputGroup.Text>
             </InputGroup.Prepend>
-            <FormControl value={mnemonic[input.key as MnemonicKey]} onChange={onChange(input.key as MnemonicKey)} />
+            <FormControl
+              type={input.type}
+              value={mnemonic[input.key as MnemonicKey]}
+              onChange={onChange(input.key as MnemonicKey)}
+            />
           </InputGroup>
         ))}
         <ScreenButtonRow>
