@@ -14,7 +14,7 @@ describe('wallet store', () => {
       crypto: { cipher: 'wallet1', cipherparams: null, ciphertext: 'wallet1', kdf: '1', kdfparams: null, mac: '1' },
     },
     addresses: {
-      receive: ['address1', 'address2', 'address3'],
+      receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     },
   }
@@ -27,7 +27,7 @@ describe('wallet store', () => {
       crypto: { cipher: 'wallet2', cipherparams: null, ciphertext: 'wallet2', kdf: '2', kdfparams: null, mac: '2' },
     },
     addresses: {
-      receive: ['address1', 'address2', 'address3'],
+      receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     },
   }
@@ -40,7 +40,7 @@ describe('wallet store', () => {
       crypto: { cipher: 'wallet3', cipherparams: null, ciphertext: 'wallet3', kdf: '3', kdfparams: null, mac: '3' },
     },
     addresses: {
-      receive: ['address1', 'address2', 'address3'],
+      receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     },
   }
@@ -89,7 +89,7 @@ describe('wallet store', () => {
   it('update addresses', () => {
     walletStore.saveWallet(wallet1)
     const addresses = {
-      receive: ['address1', 'address2', 'address3'],
+      receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     }
     walletStore.updateAddresses(wallet1.id, addresses)

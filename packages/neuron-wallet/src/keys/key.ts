@@ -8,12 +8,12 @@ import HD from './hd'
 import { Keystore, KdfParams, KeysData } from './keystore'
 
 export interface Addresses {
-  receive: string[]
+  receiving: string[]
   change: string[]
 }
 
 enum DefaultAddressNumber {
-  Receive = 17,
+  Receiving = 17,
   Change = 3,
 }
 
@@ -50,7 +50,7 @@ export default class Key {
   static fromKeystore(
     keystore: string,
     password: string,
-    receiveAddressNumber = DefaultAddressNumber.Receive,
+    receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
     const keystoreObject: Keystore = JSON.parse(keystore)
@@ -88,18 +88,14 @@ export default class Key {
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
     key.keysData = JSON.parse(keysData)
-    key.addresses = HD.generateReceiveAndChangeAddresses(
-      JSON.parse(keysData),
-      receiveAddressNumber,
-      changeAddressNumber,
-    )
+    key.addresses = HD.generateAddresses(JSON.parse(keysData), receivingAddressNumber, changeAddressNumber)
     return key
   }
 
   public static fromMnemonic(
     mnemonic: string,
     password: string,
-    receiveAddressNumber = DefaultAddressNumber.Receive,
+    receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
     if (!bip39.validateMnemonic(mnemonic)) {
@@ -108,7 +104,7 @@ export default class Key {
     const key = new Key()
     const keysData = key.generatePrivateKeyFromMnemonic(mnemonic)
     key.keysData = keysData
-    key.addresses = HD.generateReceiveAndChangeAddresses(keysData, receiveAddressNumber, changeAddressNumber)
+    key.addresses = HD.generateAddresses(keysData, receivingAddressNumber, changeAddressNumber)
     key.keystore = key.toKeystore(JSON.stringify(keysData), password)
     return key
   }

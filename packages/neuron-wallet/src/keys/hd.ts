@@ -10,37 +10,34 @@ enum BIP44Params {
 }
 
 enum AddressType {
-  Receive = 0,
+  Receiving = 0,
   Change = 1,
 }
 
 const MaxAddressNumber = 20
 
 const HD = {
-  generateReceiveAndChangeAddresses: (
-    keysData: KeysData,
-    receiveAddressNumber: number,
-    changeAddressNumber: number,
-  ) => {
-    if (receiveAddressNumber < 1 || changeAddressNumber < 1) {
+  // Generate both receiving and change addresses
+  generateAddresses: (keysData: KeysData, receivingAddressNumber: number, changeAddressNumber: number) => {
+    if (receivingAddressNumber < 1 || changeAddressNumber < 1) {
       throw new Error('Address number error.')
-    } else if (receiveAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
+    } else if (receivingAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
       throw new Error('Address number error.')
     }
-    const receiveAddresses = []
+    const receivingAddresses = []
     const changeAddresses = []
     const root: BIP32 = bip32.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
-    for (let index = 0; index < receiveAddressNumber; index++) {
-      receiveAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Receive))
+    for (let index = 0; index < receivingAddressNumber; index++) {
+      receivingAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Receiving))
     }
     for (let index = 0; index < changeAddressNumber; index++) {
       changeAddresses.push(HD.addressFromHDIndex(root, index, AddressType.Change))
     }
     return {
-      receive: receiveAddresses,
+      receiving: receivingAddresses,
       change: changeAddresses,
     }
   },
@@ -58,7 +55,7 @@ const HD = {
     const children: Child[] = []
     const nextUnusedIndex = HD.searchAddress(root, 20)
     for (let index = 0; index < nextUnusedIndex; index++) {
-      const path = HD.path(AddressType.Receive, index)
+      const path = HD.path(AddressType.Receiving, index)
       const { privateKey, chainCode } = root.derivePath(path)
       if (Address.isUsedAddress(Address.addressFromPrivateKey(privateKey.toString('hex')))) {
         children.push({
@@ -75,7 +72,7 @@ const HD = {
     return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${type}/${index}`
   },
 
-  addressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receive) => {
+  addressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receiving) => {
     const path = HD.path(type, index)
     const { privateKey } = root.derivePath(path)
     return Address.addressFromPrivateKey(privateKey.toString('hex'))
@@ -84,7 +81,7 @@ const HD = {
   // TODO: refactor me
   searchAddress: (root: BIP32, index: number, maxUsedIndex = 0, minUnusedIndex = 100, depth = 0): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receive, index))) {
+    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receiving, index))) {
       if (index === 0) {
         return 0
       }

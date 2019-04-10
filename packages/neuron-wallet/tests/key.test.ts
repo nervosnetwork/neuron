@@ -9,16 +9,16 @@ describe('Key tests', () => {
   it('import key from mnemonic', async () => {
     const key = Key.fromMnemonic(mnemonic, '1qaz.2wsx', 17, 3)
     expect(privateKey).toBe(key.keysData!.privateKey)
-    expect(key.addresses!.receive.length).toEqual(17)
+    expect(key.addresses!.receiving.length).toEqual(17)
     expect(key.addresses!.change.length).toEqual(3)
-    expect(key.addresses!.receive[0]).not.toBe(undefined)
+    expect(key.addresses!.receiving[0]).not.toBe(undefined)
   })
 
   it('import key from keystore', async () => {
     const key = Key.fromKeystore(keystoreJson, '1qaz.2wsx', 17, 3)
     expect(privateKey).toBe(key.keysData!.privateKey)
-    expect(key.addresses!.receive.length).toEqual(17)
+    expect(key.addresses!.receiving.length).toEqual(17)
     expect(key.addresses!.change.length).toEqual(3)
-    expect(key.addresses!.receive[0]).not.toBe(undefined)
+    expect(key.addresses!.receiving[0]).not.toBe(undefined)
   })
 })
