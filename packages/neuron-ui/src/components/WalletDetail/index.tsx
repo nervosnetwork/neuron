@@ -9,7 +9,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
   const { wallet } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const items = ['Simulate long content...', `${t('settings.walletmanger.walletdetail.balance')}: ${wallet.balance}`]
+  const items = [`${t('settings.walletmanger.walletdetail.balance')}: ${wallet.balance}`]
 
   return wallet.name ? (
     <Card>
