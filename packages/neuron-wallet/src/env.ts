@@ -1,8 +1,7 @@
-import { remote, app } from 'electron'
 import * as path from 'path'
+import app from './app'
 
-const myApp = app || remote.app
-const isDevMode = !myApp.isPackaged
+const isDevMode = !app.isPackaged
 const env = {
   isDevMode,
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,

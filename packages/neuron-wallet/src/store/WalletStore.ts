@@ -1,8 +1,8 @@
-import { remote, app } from 'electron'
 import Store from 'electron-store'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 import { Addresses } from '../keys/key'
+import app from '../app'
 
 export enum WalletStoreError {
   NoWallet,
@@ -21,7 +21,7 @@ interface Options {
   encryptionKey?: string | Buffer
 }
 
-const userDataPath = (app || remote.app).getPath('userData')
+const userDataPath = app.getPath('userData')
 const storePath = env.isDevMode ? `${userDataPath}/dev` : userDataPath
 const WalletIDKey = 'WalletID'
 
