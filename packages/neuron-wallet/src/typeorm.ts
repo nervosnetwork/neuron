@@ -1,13 +1,16 @@
 import { createConnection, getConnectionOptions } from 'typeorm'
-import env from './env'
+import * as path from 'path'
+import app from './app'
 
 import Cell from './entities/Cell'
 import Transaction from './entities/Transaction'
 
+const dbPath = path.join(app.getPath('userData'), 'cell.sqlite')
+
 const connectOptions = async () => {
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
-    database: env.dbPath,
+    database: dbPath,
     entities: [Cell, Transaction],
   })
 

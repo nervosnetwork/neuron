@@ -18,7 +18,6 @@ const env = {
       type: 1,
     },
   ],
-  dbPath: path.join(myApp.getPath('userData'), 'cell.sqlite'),
 }
 
 export default env
