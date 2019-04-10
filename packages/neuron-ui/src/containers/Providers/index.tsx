@@ -4,7 +4,7 @@ import NeuronWalletContext from '../../contexts/NeuronWallet'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
 import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
-import { Channel } from '../../utils/const'
+import { Channel, Routes } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -137,7 +137,28 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           }
         }
       } else {
-        // TODO: handle error
+        const time = new Date().getTime()
+        dispatch({
+          type: ProviderActions.AddMessage,
+          payload: {
+            type: 'error',
+            title: 'Networks',
+            content: args.msg,
+            time,
+            actions: [
+              {
+                label: 'view',
+                action: Routes.SettingsNetworks,
+              },
+            ],
+            dismiss: () => {
+              dispatch({
+                type: ProviderActions.DismissMessage,
+                payload: time,
+              })
+            },
+          },
+        })
       }
     })
   }, [])
