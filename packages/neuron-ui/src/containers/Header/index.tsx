@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 
-import NetworkStatusHeader from '../../components/Network'
+import NetworkStatusHeader from '../../components/NetworkStatus'
 import { initState, reducer, HeaderActions } from './reducer'
 import { useNeuronWallet } from '../../utils/hooks'
 
