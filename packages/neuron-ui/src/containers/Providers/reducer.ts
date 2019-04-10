@@ -1,48 +1,26 @@
-import { initChain } from '../../contexts/Chain'
-import { initWallet } from '../../contexts/Wallet'
-import { initSettings } from '../../contexts/Settings'
+import { initNeuronWallet } from '../../contexts/NeuronWallet'
 
 export enum ProviderActions {
-  Chain,
-  Wallet,
-  Settings,
-  CleanTransaction,
-  CleanTransactions,
+  Chain = 'chain',
+  Wallet = 'wallet',
+  Settings = 'settings',
+  CleanTransaction = 'cleanTransaction',
+  CleanTransactions = 'cleanTransactions',
 }
 
-export const initProviders = {
-  chain: initChain,
-  wallet: initWallet,
-  settings: initSettings,
-}
+export const initProviders = initNeuronWallet
 
 export type ProviderDispatch = React.Dispatch<{ type: ProviderActions; payload: typeof initProviders }>
 
 export const reducer = (state: typeof initProviders, action: { type: ProviderActions; payload: any }) => {
   switch (action.type) {
-    case ProviderActions.Settings: {
-      return {
-        ...state,
-        settings: {
-          ...state.settings,
-          ...action.payload,
-        },
-      }
-    }
-    case ProviderActions.Wallet: {
-      return {
-        ...state,
-        wallet: {
-          ...state.wallet,
-          ...action.payload,
-        },
-      }
-    }
+    case ProviderActions.Settings:
+    case ProviderActions.Wallet:
     case ProviderActions.Chain: {
       return {
         ...state,
-        chain: {
-          ...state.chain,
+        [action.type]: {
+          ...state[action.type],
           ...action.payload,
         },
       }
@@ -52,7 +30,7 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
         ...state,
         chain: {
           ...state.chain,
-          transaction: initChain.transaction,
+          transaction: initNeuronWallet.chain.transaction,
         },
       }
     }
@@ -61,7 +39,7 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
         ...state,
         chain: {
           ...state.chain,
-          transactions: initChain.transactions,
+          transactions: initNeuronWallet.chain.transactions,
         },
       }
     }

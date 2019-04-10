@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Alert, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -6,14 +6,16 @@ import { useTranslation } from 'react-i18next'
 import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
 import { ProviderActions } from '../../containers/Providers/reducer'
+import { useNeuronWallet } from '../../utils/hooks'
 
-import ChainContext from '../../contexts/Chain'
+// import ChainContext from '../../contexts/Chain'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
   const { match, errorMsgs, dispatch, providerDispatch, history } = props
-  const chain = useContext(ChainContext)
   const [t] = useTranslation()
-  const { transaction } = chain
+  const {
+    chain: { transaction },
+  } = useNeuronWallet()
 
   useEffect(() => {
     // TODO: verify hash

@@ -1,11 +1,12 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import Dropdown from '../../widgets/Dropdown'
 import { ConnectStatus, Routes } from '../../utils/const'
-import ChainContext, { Network } from '../../contexts/Chain'
+import { Network } from '../../contexts/NeuronWallet'
 import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Status = styled.div<{ online: boolean }>`
   width: 8px;
@@ -44,8 +45,8 @@ const ConnectStatusHeader = ({
   dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
   navTo: Function
 }) => {
+  const { chain } = useNeuronWallet()
   const [t] = useTranslation()
-  const chain = useContext(ChainContext)
 
   const tipNumber = chain.tipBlockNumber === undefined ? undefined : `#${(+chain.tipBlockNumber).toLocaleString()}`
   const networkItems = [

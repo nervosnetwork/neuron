@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
-import WalletContext from '../../contexts/Wallet'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Container = styled.div`
   position: relative;
@@ -62,7 +62,9 @@ const NotificationContainer = ({
 )
 
 const NoticeContent = () => {
-  const { msg: message } = useContext(WalletContext)
+  const {
+    wallet: { message },
+  } = useNeuronWallet()
   return message ? (
     <NotificationContainer type="error" title="Wallet Notification" time="now" message={message} actions="actions" />
   ) : null

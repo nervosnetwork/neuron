@@ -1,4 +1,4 @@
-import { Network } from '../../../contexts/Chain'
+import { Network } from '../../../contexts/NeuronWallet'
 import { networksCall } from '../../../services/UILayer'
 import { MainActions } from '../reducer'
 

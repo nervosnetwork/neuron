@@ -1,11 +1,11 @@
-import React, { useEffect, useCallback, useReducer, useContext } from 'react'
+import React, { useEffect, useCallback, useReducer } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 
 import NetworkStatusHeader from '../../components/Network'
-import SettingsContext from '../../contexts/Settings'
 import { initState, reducer, HeaderActions } from './reducer'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const AppHeader = styled.div`
   height: 100%;
@@ -15,7 +15,7 @@ const AppHeader = styled.div`
 `
 
 const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
-  const settings = useContext(SettingsContext)
+  const { settings } = useNeuronWallet()
 
   const [header, dispatch] = useReducer(reducer, {
     ...initState,

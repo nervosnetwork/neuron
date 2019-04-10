@@ -1,14 +1,14 @@
-import React, { useEffect, useContext, useRef, useCallback } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { MainActions, actionCreators, initState } from '../../containers/MainContent/reducer'
 import { ContentProps } from '../../containers/MainContent'
-import SettingsContext from '../../contexts/Settings'
 
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { Routes } from '../../utils/const'
+import { useNeuronWallet } from '../../utils/hooks'
 
 export interface RawNetwork {
   name: string
@@ -34,7 +34,9 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
     history,
   } = props
   const [t] = useTranslation()
-  const { networks } = useContext(SettingsContext)
+  const {
+    settings: { networks },
+  } = useNeuronWallet()
   const cachedNetworks = useRef(networks)
   const cachedNetwork = cachedNetworks.current.find(network => network.id === params.id)
 

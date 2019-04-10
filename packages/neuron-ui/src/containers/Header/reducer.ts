@@ -1,5 +1,5 @@
 import { networksCall } from '../../services/UILayer'
-import { Network } from '../../contexts/Chain'
+import { Network } from '../../contexts/NeuronWallet'
 
 export enum HeaderActions {
   SetNetwork,
