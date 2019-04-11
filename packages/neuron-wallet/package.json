@@ -23,19 +23,38 @@
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "jest": {
-    "runner": "@jest-runner/electron",
-    "testEnvironment": "@jest-runner/electron/environment",
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "testRegex": "(/tests/.*.(electron))\\.(ts?|js?)$",
-    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+    "projects": [
+      {
+        "displayName": "electron",
+        "runner": "@jest-runner/electron",
+        "testEnvironment": "@jest-runner/electron/environment",
+        "testRegex": "(/tests/.*.(electron))\\.(ts?|js?)$",
+        "transform": {
+          "^.+\\.ts?$": "ts-jest"
+        },
+        "moduleFileExtensions": [
+          "ts",
+          "js",
+          "json",
+          "node"
+        ],
+        "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+      },
+      {
+        "displayName": "node",
+        "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
+        "transform": {
+          "^.+\\.ts?$": "ts-jest"
+        },
+        "moduleFileExtensions": [
+          "ts",
+          "js",
+          "json",
+          "node"
+        ],
+        "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+      }
+    ]
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
@@ -69,7 +88,6 @@
     "electron": "4.0.3",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "^2.2.4",
-    "electron-mocha": "^6.0.4",
     "rimraf": "^2.6.3",
     "spectron": "^5.0.0",
     "tslint": "^5.12.1"
