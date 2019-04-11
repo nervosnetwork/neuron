@@ -44,9 +44,9 @@ export default class Transaction extends BaseEntity {
   outputs!: Cell[]
 
   @Column({
-    type: 'bigint',
+    type: 'varchar',
   })
-  timestamp!: number
+  timestamp!: string
 
   @Column({
     type: 'varchar',
