@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Badge, Table, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import { Close as CloseIcon } from 'grommet-icons'
+import dayjs from 'dayjs'
 
 import ContextMenuZone from '../../widgets/ContextMenuZone'
 import Pagination from '../../widgets/Table/Pagination'
@@ -16,8 +17,10 @@ import { useNeuronWallet } from '../../utils/hooks'
 import { Transaction } from '../../contexts/NeuronWallet'
 import { queryParsers } from '../../utils/parser'
 import { TransactionType, Routes, EXPLORER } from '../../utils/const'
-import { dateFormatter, queryFormatter } from '../../utils/formatters'
+import { queryFormatter } from '../../utils/formatters'
 
+const FormatOfDay = 'YYYY-MM-DD'
+const FormatOfTime = 'HH:mm'
 interface MenuItemParams {
   hash: string
 }
@@ -45,7 +48,7 @@ const groupHistory = (items: Transaction[]) => {
       return acc
     }
     const lastGroup = acc[acc.length - 1]
-    if (dateFormatter(cur.date).date === dateFormatter(lastGroup[0].date).date) {
+    if (dayjs(cur.time).format(FormatOfDay) === dayjs(lastGroup[0].time).format(FormatOfDay)) {
       lastGroup.push(cur)
       return acc
     }
@@ -136,10 +139,10 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       ))}
       <ContextMenuZone menuItems={menuItems}>
         {groupHistory(items).map(group => (
-          <Table key={dateFormatter(group[0].date).date} striped>
+          <Table key={dayjs(group[0].time).format(FormatOfDay)} striped>
             <thead>
               <tr>
-                <th colSpan={headers.length}>{dateFormatter(group[0].date).date}</th>
+                <th colSpan={headers.length}>{dayjs(group[0].time).format(FormatOfDay)}</th>
               </tr>
             </thead>
             <tbody>
@@ -153,7 +156,7 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
                             {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
                           </span>
                           <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                            {dateFormatter(historyItem.date).date}
+                            {dayjs(historyItem.time).format(FormatOfTime)}
                           </span>
                         </MetaData>
                       )

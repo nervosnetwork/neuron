@@ -8,6 +8,7 @@ export const transactions = Array.from({
     value: `${Math.random()}`,
     hash: `${Math.round(Math.random() * 10000000000000000)}`,
     version: 0,
+    type: Math.round(Math.random()),
   }))
   .sort((p, n) => +n.time - +p.time)
 
