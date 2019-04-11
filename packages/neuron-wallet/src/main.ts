@@ -14,6 +14,8 @@ import NetworksController from './controllers/networks'
 import WindowManage from './utils/windowManage'
 import WalletsController from './controllers/wallets'
 
+import initConnection from './typeorm'
+
 const windowManage = new WindowManage()
 
 let mainWindow: Electron.BrowserWindow | null
@@ -103,7 +105,13 @@ function createWindow() {
   windowManage.add(mainWindow)
 }
 
-app.on('ready', createWindow)
+const onReady = () => {
+  createWindow()
+  // sync database
+  initConnection().then()
+}
+
+app.on('ready', onReady)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
