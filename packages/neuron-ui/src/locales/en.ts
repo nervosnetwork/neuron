@@ -66,14 +66,6 @@ export default {
         wallets: 'Wallets',
         network: 'Network',
       },
-      general: {
-        photosetting: 'Photo Setting',
-        passwordsetting: 'Password Setting',
-        languagesetting: 'Language Setting',
-        aboutneuron: 'About Neuron',
-        contactus: 'Contact Us',
-        addnetwork: 'Add Network',
-      },
       walletmanger: {
         createwallet: 'Create Wallet',
         importwallet: 'Import Wallet',

@@ -59,14 +59,6 @@ export default {
         wallets: '钱包',
         network: '网络',
       },
-      general: {
-        photosetting: '设置头像',
-        passwordsetting: '设置密码',
-        languagesetting: '设置语言',
-        aboutneuron: '关于 Neuron',
-        contactus: '联系我们',
-        addnetwork: '新增网络',
-      },
       walletmanger: {
         createwallet: '创建钱包',
         importwallet: '导入钱包',
