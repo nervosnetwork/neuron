@@ -1,19 +1,19 @@
 import { transactions } from '../mock'
-import { Cell, Script, OutPoint } from '../cell'
+import { Cell, OutPoint } from '../cell'
+
+export interface Input {
+  previousOutput: OutPoint
+  args: string[]
+}
 
 export interface Transaction {
   hash: string
   version: number
   deps?: OutPoint[]
-  inputs?: any
+  inputs?: Input[]
   outputs?: Cell[]
-  time?: number
+  time?: string
   value?: string
-}
-
-export interface Input {
-  previousOutput: OutPoint
-  unlock: Script
 }
 
 export interface TransactionsByAddressesParam {

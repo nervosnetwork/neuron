@@ -4,7 +4,7 @@ export const transactions = Array.from({
   length: 200,
 })
   .map(() => ({
-    time: new Date().getTime() - Math.round(Math.random() * 100000000),
+    time: `${new Date().getTime() - Math.round(Math.random() * 100000000)}`,
     value: `${Math.random()}`,
     hash: `${Math.round(Math.random() * 10000000000000000)}`,
     version: 0,
@@ -63,31 +63,35 @@ export const verifyPassword = (wallet: Wallet, password: string) => {
 export const mockedTransaction = {
   hash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
   version: 0,
-  deps: [],
+  deps: [
+    {
+      hash: '0x8d37f0856ebb70c12871830667d82224e6619896c7f12bb73a14dd9329af9c8d',
+      index: 0,
+    },
+  ],
   inputs: [
     {
-      previous_output: {
+      previousOutput: {
         hash: '0x0000000000000000000000000000000000000000000000000000000000000000',
         index: 4294967295,
       },
-      unlock: {
-        args: [],
-        binary: '0x0100000000000000',
-        reference: null,
-        signed_args: [],
-        version: 0,
-      },
+      args: [],
     },
   ],
   outputs: [
     {
-      capacity: 5000000,
+      capacity: '5000000',
       data: '0x',
-      lock: '0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674',
+      lock: {
+        args: [
+          '0x65323139336466353164373834313136303137393662333562313762346638663263643835626430616461383834326166323365303836633136396133316432',
+        ],
+        binaryHash: '0x8bddddc3ae2e09c13106634d012525aa32fc47736456dba11514d352845e561d',
+      },
       type: null,
     },
   ],
-  time: 1545992487397,
+  time: '1545992487397',
   value: '1000',
 }
 
