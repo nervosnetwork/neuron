@@ -1,5 +1,6 @@
 import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm'
 import { Cell } from '../cell'
+import { Witness } from '../services/transactions'
 
 interface OutPoint {
   hash: string
@@ -31,7 +32,7 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  witnesses!: object[]
+  witnesses!: Witness[]
 
   @Column({
     type: 'simple-json',
@@ -62,4 +63,9 @@ export default class Transaction extends BaseEntity {
     type: 'varchar',
   })
   blockHash!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  type!: string
 }
