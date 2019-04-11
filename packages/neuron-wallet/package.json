@@ -17,24 +17,44 @@
     "start:dev": "tsc && cross-env electron .",
     "build": "tsc",
     "clean": "rimraf dist/*",
-    "test": "jest --color && electron-mocha --renderer ./tests/store",
+    "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "rebuild:nativemodules": "electron-builder install-app-deps",
-    "teststore": "electron-mocha --renderer ./tests/store"
+    "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "jest": {
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
-    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+    "projects": [
+      {
+        "displayName": "electron",
+        "runner": "@jest-runner/electron",
+        "testEnvironment": "@jest-runner/electron/environment",
+        "testRegex": "(/tests/.*.(electron))\\.(ts?|js?)$",
+        "transform": {
+          "^.+\\.ts?$": "ts-jest"
+        },
+        "moduleFileExtensions": [
+          "ts",
+          "js",
+          "json",
+          "node"
+        ],
+        "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+      },
+      {
+        "displayName": "node",
+        "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
+        "transform": {
+          "^.+\\.ts?$": "ts-jest"
+        },
+        "moduleFileExtensions": [
+          "ts",
+          "js",
+          "json",
+          "node"
+        ],
+        "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+      }
+    ]
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
@@ -55,6 +75,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@jest-runner/electron": "0.2.2",
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/bip32": "^1.0.1",
@@ -67,7 +88,6 @@
     "electron": "4.0.3",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "^2.2.4",
-    "electron-mocha": "^6.0.4",
     "rimraf": "^2.6.3",
     "spectron": "^5.0.0",
     "tslint": "^5.12.1"

@@ -1,43 +1,83 @@
-const assert = require('assert')
-const uuid = require('uuid')
-const WalletStore = require('../../dist/store/WalletStore').default
+import { v4 } from 'uuid'
+import assert from 'assert'
+import WalletStore, { WalletData } from '../src/store/WalletStore'
 
 describe('wallet store', () => {
   const walletStore = new WalletStore()
 
-  const wallet1 = {
-    id: uuid.v4(),
+  const wallet1: WalletData = {
+    id: v4(),
     name: 'wallet1',
     keystore: {
       version: 0,
       id: '0',
-      crypto: { cipher: 'wallet1', cipherparams: null, ciphertext: 'wallet1', kdf: '1', kdfparams: null, mac: '1' },
+      crypto: {
+        cipher: 'wallet1',
+        cipherparams: { iv: 'walle1' },
+        ciphertext: 'wallet1',
+        kdf: '1',
+        kdfparams: {
+          dklen: 1,
+          n: 1,
+          r: 1,
+          p: 1,
+          salt: '1',
+        },
+        mac: '1',
+      },
     },
     addresses: {
       receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     },
   }
-  const wallet2 = {
-    id: uuid.v4(),
+
+  const wallet2: WalletData = {
+    id: v4(),
     name: 'wallet2',
     keystore: {
       version: 0,
       id: '1',
-      crypto: { cipher: 'wallet2', cipherparams: null, ciphertext: 'wallet2', kdf: '2', kdfparams: null, mac: '2' },
+      crypto: {
+        cipher: 'wallet2',
+        cipherparams: { iv: 'walle2' },
+        ciphertext: 'wallet2',
+        kdf: '2',
+        kdfparams: {
+          dklen: 1,
+          n: 1,
+          r: 1,
+          p: 1,
+          salt: '1',
+        },
+        mac: '2',
+      },
     },
     addresses: {
       receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     },
   }
-  const wallet3 = {
-    id: uuid.v4(),
+  const wallet3: WalletData = {
+    id: v4(),
     name: 'wallet3',
     keystore: {
       version: 0,
       id: '1',
-      crypto: { cipher: 'wallet3', cipherparams: null, ciphertext: 'wallet3', kdf: '3', kdfparams: null, mac: '3' },
+      crypto: {
+        cipher: 'wallet3',
+        cipherparams: { iv: 'walle1' },
+        ciphertext: 'wallet3',
+        kdf: '3',
+        kdfparams: {
+          dklen: 1,
+          n: 1,
+          r: 1,
+          p: 1,
+          salt: '1',
+        },
+        mac: '3',
+      },
     },
     addresses: {
       receiving: ['address1', 'address2', 'address3'],
@@ -51,7 +91,6 @@ describe('wallet store', () => {
 
   it('save wallet', () => {
     walletStore.saveWallet(wallet1)
-    walletStore.saveWallet(wallet2)
     const wallet = walletStore.getWallet(wallet1.id)
     assert.deepEqual(wallet, wallet1)
   })
@@ -103,11 +142,11 @@ describe('wallet store', () => {
   })
 
   it('delete wallet', () => {
-    const walletId = walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
-    walletStore.deleteWallet(walletId)
+    walletStore.deleteWallet(wallet1.id)
     try {
-      walletStore.getWallet(walletId)
+      walletStore.getWallet(wallet1.id)
     } catch (e) {
       assert.deepEqual(e, 0)
     }
