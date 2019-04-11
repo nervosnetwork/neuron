@@ -60,20 +60,42 @@ export const getLiveCells = async () => {
   return cells
 }
 
+const randomHexChar = (): string => {
+  const i = Math.round(Math.random() * 14)
+  return i.toString(16)
+}
+
+export const randomHexString = (size: number = 64): string => {
+  return Array.from({
+    length: size,
+  })
+    .map(() => randomHexChar())
+    .join('')
+}
+
+/* eslint @typescript-eslint/no-unused-vars: "warn" */
 // WIP
 // mock an interface: get history transactions from chain
 // related address may in inputs or outputs(such as input and return change)
-// params: [addresses]
-export const getHistoryTransactions = async () => {
-  return [
-    {
-      deps: [],
-      hash: '0x03027d3cec6ba03a5c363879b20af806bdf955e17d75bc81cde5a91b56c13f17',
-      inputs: [],
-      outputs: [],
-      version: 0,
-      blockHash: '0xdbe33b04110a87ad72d1ba8aaada764bbdbc635a0944debd3c1c2fedde1685d1',
-      timestamp: '1545992487397',
-    },
-  ]
+// params: [lockHashes, fromBlock, toBlock]
+export const getHistoryTransactions = async (_lockHashes: string[], _from: string, _to: string) => {
+  const length = 100
+  const currentTimestamp = new Date().getTime()
+
+  const transactions = Array.from({
+    length,
+  }).map((_, index) => ({
+    timestamp: `${currentTimestamp - (length - index) * 100000000}`,
+    hash: `0x${randomHexString()}`,
+    version: 0,
+    type: Math.round(Math.random()),
+    blockNumber: index.toString(),
+    blockHash: `0x${randomHexString()}`,
+    inputs: [],
+    outputs: [],
+    deps: [],
+    witnesses: [],
+  }))
+
+  return transactions
 }

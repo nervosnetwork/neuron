@@ -30,4 +30,12 @@ export const generateConnection = async (
     .catch(errorFunc())
 }
 
-export default generateConnection
+export const initConnection = async () => {
+  const connectionOptions = await connectOptions()
+
+  createConnection(connectionOptions)
+    .then()
+    .catch((error: any) => console.error(error))
+}
+
+export default initConnection

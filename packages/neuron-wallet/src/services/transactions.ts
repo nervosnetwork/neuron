@@ -1,9 +1,15 @@
-import { transactions } from '../mock'
+import { transactions as mockedTransactions } from '../mock'
 import { Cell, OutPoint } from '../cell'
+import TransactionEntity from '../entities/Transaction'
+import { getHistoryTransactions } from '../mock_rpc'
 
 export interface Input {
   previousOutput: OutPoint
   args: string[]
+}
+
+export interface Witness {
+  data: string[]
 }
 
 export interface Transaction {
@@ -12,8 +18,11 @@ export interface Transaction {
   deps?: OutPoint[]
   inputs?: Input[]
   outputs?: Cell[]
-  time?: string
+  timestamp?: string
   value?: string
+  blockNumber?: string
+  blockHash?: string
+  witnesses?: Witness[]
 }
 
 export interface TransactionsByAddressesParam {
@@ -39,13 +48,12 @@ export interface PaginationResult<T = any> {
   items: T[]
 }
 
-let currentTransaction: Transaction[] = transactions
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = (params: TransactionsByLockHashesParam): PaginationResult<Transaction> => {
     return {
       totalCount: params.pageNo * params.pageSize,
-      items: transactions,
+      items: mockedTransactions,
     }
   }
 
@@ -66,7 +74,7 @@ export default class TransactionsService {
   }
 
   public static get = (hash: string): Transaction | undefined => {
-    return transactions.find(tx => tx.hash === hash)
+    return mockedTransactions.find(tx => tx.hash === hash)
   }
 
   // check whether the address has history transactions
@@ -74,21 +82,53 @@ export default class TransactionsService {
     return Math.random() >= 0.5
   }
 
-  public static create = (transaction: Transaction): Transaction => {
-    const sameTransaction = TransactionsService.get(transaction.hash)
-    if (sameTransaction) {
-      throw new Error('Transaction exists')
-    }
-    currentTransaction.push(transaction)
-    return transaction
+  public static create = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const tx = new TransactionEntity()
+    tx.hash = transaction.hash
+    tx.version = transaction.version
+    tx.deps = transaction.deps!
+    tx.inputs = transaction.inputs!
+    tx.outputs = transaction.outputs!
+    tx.timestamp = transaction.timestamp!
+    tx.value = transaction.value!
+    tx.blockHash = transaction.blockHash!
+    tx.blockNumber = transaction.blockNumber!
+    tx.witnesses = transaction.witnesses!
+    const txEntity = await tx.save()
+    return txEntity
   }
 
-  public static delete = (hash: string): boolean => {
-    const transaction = TransactionsService.get(hash)
-    if (transaction) {
-      currentTransaction = currentTransaction.filter(tx => tx.hash !== hash)
-      return true
+  /* eslint no-await-in-loop: "warn" */
+  // NO parallel
+  public static loadTransactionsHistoryFromChain = async (lockHashes: string[]) => {
+    // TODO: to => get_tip_block_number
+    const to = 1000
+    let currentFrom = 0
+    let currentTo = to
+    while (currentFrom <= to) {
+      currentTo = Math.min(currentFrom + 100, to)
+      const txs = await getHistoryTransactions(lockHashes, currentFrom.toString(), currentTo.toString())
+      await TransactionsService.convertTransactions(txs)
+      currentFrom = currentTo + 1
     }
-    return false
+  }
+
+  public static convertTransactions = async (transactions: Transaction[]): Promise<TransactionEntity[]> => {
+    const txEntities: TransactionEntity[] = []
+
+    transactions.forEach(async tx => {
+      const txEntity = await TransactionsService.convertTransactionAndCreate(tx)
+      txEntities.push(txEntity)
+    })
+
+    return txEntities
+  }
+
+  public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const tx: Transaction = transaction
+    // TODO: calculate value, sum of not return charge output
+    tx.value = Math.round(Math.random() * 10000).toString()
+    const txEntity = await TransactionsService.create(transaction)
+    return txEntity
   }
 }

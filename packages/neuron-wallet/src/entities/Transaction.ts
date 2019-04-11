@@ -52,4 +52,14 @@ export default class Transaction extends BaseEntity {
     type: 'varchar',
   })
   value!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  blockNumber!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  blockHash!: string
 }
