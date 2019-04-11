@@ -108,16 +108,16 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
       <Container>
         <h1>{t(message)}</h1>
         <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
-        {isCreate
-          ? null
-          : generated
+        {type === MnemonicAction.Verify
+          ? generated
               .split(' ')
               .sort()
               .map(word => (
                 <MnemonicWord pill variant="info" key={word}>
                   {word}
                 </MnemonicWord>
-              ))}
+              ))
+          : null}
         {wizard ? <Alert variant="warning">{t(wizard)}</Alert> : null}
         <ScreenButtonRow>
           <Button role="button" onClick={onBack} onKeyPress={onBack}>

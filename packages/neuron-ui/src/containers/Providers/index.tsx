@@ -58,6 +58,26 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
+          case WalletsMethod.ImportMnemonic: {
+            const time = new Date().getTime()
+            dispatch({
+              type: ProviderActions.AddMessage,
+              payload: {
+                category: 'notice',
+                title: 'Wallet Created',
+                content: args.result.name,
+                time,
+                actions: [],
+                dismiss: () => {
+                  dispatch({
+                    type: ProviderActions.DismissMessage,
+                    payload: time,
+                  })
+                },
+              },
+            })
+            break
+          }
           case WalletsMethod.GetAll: {
             dispatch({
               type: ProviderActions.Settings,

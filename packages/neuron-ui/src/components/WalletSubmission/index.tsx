@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -22,12 +22,9 @@ const inptus = [
 
 const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const {
-    settings: { wallets },
-  } = useNeuronWallet()
+  const { messages } = useNeuronWallet()
 
   const { dispatch, mnemonic, history } = props
-  const cachedWalletsCount = useRef(wallets.length)
 
   useEffect(() => {
     dispatch({
@@ -37,15 +34,15 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
   }, [])
 
   useEffect(() => {
-    if (cachedWalletsCount.current !== wallets.length) {
+    const message = messages[messages.length - 1]
+    if (message && message.title === 'Wallet Created') {
       dispatch({
         type: MainActions.UpdateMnemonic,
         payload: initState.mnemonic,
       })
-      // TODO: send message to neuron-wallet and listen to response
       history.push(`${Routes.Prompt}/create-wallet-success?name=${mnemonic.name.replace(/\s/g, '%20')}`)
     }
-  }, [wallets.length])
+  }, [messages.length])
 
   const onChange = useCallback(
     (field: keyof typeof mnemonic) => (e: React.FormEvent<{ value: string }>) => {

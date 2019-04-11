@@ -168,7 +168,7 @@ export default class Listeners {
   /**
    * @method helpers
    * @memberof ChannelListeners
-   * @description provide helper method to UI layer
+   * @description provide helper methods to UI layer
    */
   public static helpers = () => {
     return ipcMain.on(

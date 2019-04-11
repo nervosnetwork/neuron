@@ -57,12 +57,6 @@ export const containers: CustomRoute[] = [
 ]
 
 export const mainContents: CustomRoute[] = [
-  // {
-  //   name: `Home`,
-  //   path: Routes.Home,
-  //   exact: true,
-  //   component: Home,
-  // },
   {
     name: `Wallet`,
     path: Routes.Wallet,
