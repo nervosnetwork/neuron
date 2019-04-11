@@ -6,6 +6,7 @@ import app from '../app'
 
 export enum WalletStoreError {
   NoWallet,
+  NoActiveWallet,
 }
 
 export interface WalletData {
@@ -62,6 +63,9 @@ export default class WalletStore {
   saveWallet = (walletData: WalletData) => {
     this.addWalletID(walletData.id)
     this.getWalletStore(walletData.id).set(walletData.id, walletData)
+    if (this.getIDList().length === 1) {
+      this.setActiveWallet(walletData.id)
+    }
   }
 
   getWallet = (walletId: string): WalletData => {
@@ -72,17 +76,21 @@ export default class WalletStore {
     return wallet
   }
 
-  setActiveWallet = (walletId: string) => {
+  setActiveWallet = (walletId: string): boolean => {
     const index = this.getIDList().findIndex(id => id === walletId)
     if (index === -1) {
-      throw WalletStoreError.NoWallet
+      return false
     }
     this.walletIDStore.set(ActiveWalletID, walletId)
+    return true
   }
 
   getActiveWallet = (): WalletData => {
     const walletId = this.walletIDStore.get(ActiveWalletID, null)
-    return this.getWallet(walletId)
+    if (walletId) {
+      return this.getWallet(walletId)
+    }
+    throw WalletStoreError.NoActiveWallet
   }
 
   getAllWallets = (): WalletData[] => {
@@ -107,8 +115,13 @@ export default class WalletStore {
   }
 
   deleteWallet = (walletId: string) => {
+    const activeId = this.getActiveWallet().id
     this.removeWalletID(walletId)
     this.getWalletStore(walletId).clear()
+    const idList = this.getIDList()
+    if (idList.length > 0 && activeId === walletId) {
+      this.setActiveWallet(idList[0])
+    }
   }
 
   clearAll = () => {

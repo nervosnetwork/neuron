@@ -92,11 +92,10 @@ export default class WalletService {
   }
 
   public setActive = (id: string): boolean => {
-    const wallet = this.get(id)
-    if (wallet) {
-      this.active = wallet
-      return true
-    }
-    return false
+    return walletStore.setActiveWallet(id)
+  }
+
+  public getActive = (): WalletData => {
+    return walletStore.getActiveWallet()
   }
 }

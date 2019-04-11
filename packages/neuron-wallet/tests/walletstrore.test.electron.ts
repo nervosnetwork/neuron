@@ -146,25 +146,47 @@ describe('wallet store', () => {
     walletStore.saveWallet(wallet2)
     walletStore.deleteWallet(wallet1.id)
     try {
-      walletStore.getWallet(wallet1.id)
+      assert.notDeepEqual(walletStore.getWallet(wallet1.id), wallet1)
     } catch (e) {
-      assert.deepEqual(e, 0)
+      assert.equal(e, 0)
     }
   })
 
-  it('set active wallet', () => {
+  it('get and set active wallet', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
-    walletStore.setActiveWallet(wallet1.id)
+    let result = walletStore.setActiveWallet(wallet1.id)
+    assert.equal(result, true)
+    let activeWallet = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet, wallet1)
+    result = walletStore.setActiveWallet(wallet2.id)
+    assert.equal(result, true)
+    activeWallet = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet, wallet2)
+    result = walletStore.setActiveWallet(wallet1.id)
+    assert.equal(result, true)
+  })
+
+  it('first wallet is active wallet', () => {
+    walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet2)
     const activeWallet = walletStore.getActiveWallet()
     assert.deepEqual(activeWallet, wallet1)
-    walletStore.setActiveWallet(wallet2.id)
-    const activeWallet2 = walletStore.getActiveWallet()
-    assert.deepEqual(activeWallet2, wallet2)
-    try {
-      walletStore.setActiveWallet(wallet1.id)
-    } catch (e) {
-      assert.deepEqual(e, 0)
-    }
+  })
+
+  it('delete active wallet', () => {
+    walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet2)
+    walletStore.deleteWallet(wallet1.id)
+    const activeWallet = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet, wallet2)
+  })
+
+  it('delete inactive wallet', () => {
+    walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet2)
+    walletStore.deleteWallet(wallet2.id)
+    const activeWallet = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet, wallet1)
   })
 })
