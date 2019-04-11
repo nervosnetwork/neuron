@@ -1,4 +1,4 @@
-import bip32, { BIP32 } from 'bip32'
+import * as bip32 from 'bip32'
 import { Child, KeysData } from './keystore'
 import Address from './address'
 
@@ -26,7 +26,7 @@ const HD = {
     }
     const receivingAddresses = []
     const changeAddresses = []
-    const root: BIP32 = bip32.fromPrivateKey(
+    const root: bip32.BIP32Interface = bip32.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
@@ -43,7 +43,7 @@ const HD = {
   },
 
   latestUnusedAddress: (keysData: KeysData) => {
-    const root: BIP32 = bip32.fromPrivateKey(
+    const root: bip32.BIP32Interface = bip32.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
@@ -51,18 +51,22 @@ const HD = {
     return HD.addressFromHDIndex(root, latestUnusedIndex)
   },
 
-  searchUsedChildKeys: (root: BIP32) => {
+  searchUsedChildKeys: (root: bip32.BIP32Interface) => {
     const children: Child[] = []
     const nextUnusedIndex = HD.searchAddress(root, 20)
     for (let index = 0; index < nextUnusedIndex; index++) {
       const path = HD.path(AddressType.Receiving, index)
       const { privateKey, chainCode } = root.derivePath(path)
-      if (Address.isUsedAddress(Address.addressFromPrivateKey(privateKey.toString('hex')))) {
-        children.push({
-          path,
-          privateKey: privateKey.toString('hex'),
-          chainCode: chainCode.toString('hex'),
-        })
+      if (privateKey) {
+        if (Address.isUsedAddress(Address.addressFromPrivateKey(privateKey.toString('hex')))) {
+          children.push({
+            path,
+            privateKey: privateKey.toString('hex'),
+            chainCode: chainCode.toString('hex'),
+          })
+        }
+      } else {
+        throw new Error('Empty private key')
       }
     }
     return children
@@ -72,14 +76,23 @@ const HD = {
     return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${type}/${index}`
   },
 
-  addressFromHDIndex: (root: BIP32, index: number, type = AddressType.Receiving) => {
+  addressFromHDIndex: (root: bip32.BIP32Interface, index: number, type = AddressType.Receiving) => {
     const path = HD.path(type, index)
     const { privateKey } = root.derivePath(path)
-    return Address.addressFromPrivateKey(privateKey.toString('hex'))
+    if (privateKey) {
+      return Address.addressFromPrivateKey(privateKey.toString('hex'))
+    }
+    throw new Error('Empty private key')
   },
 
   // TODO: refactor me
-  searchAddress: (root: BIP32, index: number, maxUsedIndex = 0, minUnusedIndex = 100, depth = 0): any => {
+  searchAddress: (
+    root: bip32.BIP32Interface,
+    index: number,
+    maxUsedIndex = 0,
+    minUnusedIndex = 100,
+    depth = 0,
+  ): any => {
     if (depth >= 10) return maxUsedIndex + 1
     if (!Address.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receiving, index))) {
       if (index === 0) {
