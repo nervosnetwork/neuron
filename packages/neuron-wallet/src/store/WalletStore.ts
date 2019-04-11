@@ -24,6 +24,7 @@ interface Options {
 const userDataPath = app.getPath('userData')
 const storePath = env.isDevMode ? `${userDataPath}/dev` : userDataPath
 const WalletIDKey = 'WalletID'
+const ActiveWalletID = 'ActiveID'
 
 export default class WalletStore {
   walletIDStore: Store
@@ -69,6 +70,19 @@ export default class WalletStore {
       throw WalletStoreError.NoWallet
     }
     return wallet
+  }
+
+  setActiveWallet = (walletId: string) => {
+    const index = this.getIDList().findIndex(id => id === walletId)
+    if (index === -1) {
+      throw WalletStoreError.NoWallet
+    }
+    this.walletIDStore.set(ActiveWalletID, walletId)
+  }
+
+  getActiveWallet = (): WalletData => {
+    const walletId = this.walletIDStore.get(ActiveWalletID, null)
+    return this.getWallet(walletId)
   }
 
   getAllWallets = (): WalletData[] => {

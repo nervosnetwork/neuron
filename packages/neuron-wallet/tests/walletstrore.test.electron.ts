@@ -151,4 +151,20 @@ describe('wallet store', () => {
       assert.deepEqual(e, 0)
     }
   })
+
+  it('set active wallet', () => {
+    walletStore.saveWallet(wallet1)
+    walletStore.saveWallet(wallet2)
+    walletStore.setActiveWallet(wallet1.id)
+    const activeWallet = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet, wallet1)
+    walletStore.setActiveWallet(wallet2.id)
+    const activeWallet2 = walletStore.getActiveWallet()
+    assert.deepEqual(activeWallet2, wallet2)
+    try {
+      walletStore.setActiveWallet(wallet1.id)
+    } catch (e) {
+      assert.deepEqual(e, 0)
+    }
+  })
 })
