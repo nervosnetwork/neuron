@@ -7,7 +7,7 @@ import store, {
   NetworkWithID,
   Network,
   NetworksKey,
-} from '../store/NetworksStore'
+} from '../store/networksStore'
 
 import windowManage from '../main'
 import { ResponseCode } from '../controllers'

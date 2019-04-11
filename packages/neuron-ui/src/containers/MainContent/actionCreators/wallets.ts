@@ -2,8 +2,8 @@ import { initState, MainActions } from '../reducer'
 import { walletsCall } from '../../../services/UILayer'
 
 export default {
-  setActiveWallet: (id: string) => {
-    walletsCall.setActive(id)
+  activateWallet: (id: string) => {
+    walletsCall.activate(id)
     return {
       type: MainActions.Wallet,
       payload: id,
@@ -14,6 +14,18 @@ export default {
     return {
       type: MainActions.Wallet,
       payload: id,
+    }
+  },
+  importMnemonic: (params: { name: string; password: string; mnemonic: string }) => {
+    walletsCall.importMnemonic(params)
+    return {
+      type: MainActions.Wallet,
+    }
+  },
+  importKeystore: (params: { name: string; keystore: string; password: string }) => {
+    walletsCall.importKeystore(params)
+    return {
+      type: MainActions.Wallet,
     }
   },
   createOrUpdateWallet: (

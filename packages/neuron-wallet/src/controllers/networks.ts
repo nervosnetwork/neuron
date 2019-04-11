@@ -1,7 +1,7 @@
 import { ResponseCode, ChannelResponse } from '.'
 import WalletChannel from '../channel/wallet'
 import NetworksService from '../services/networks'
-import { NetworkType, NetworkID, NetworkWithID, Network } from '../store/NetworksStore'
+import { NetworkType, NetworkID, NetworkWithID, Network } from '../store/networksStore'
 import env from '../env'
 
 const { defaultNetworks } = env

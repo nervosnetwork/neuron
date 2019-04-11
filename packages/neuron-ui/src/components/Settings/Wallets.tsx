@@ -61,7 +61,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       label: t('menuitem.select'),
       key: 'select',
       onClick: () => {
-        dispatch(actionCreators.setActiveWallet(id))
+        dispatch(actionCreators.activateWallet(id))
       },
     },
     {
@@ -114,7 +114,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
                 disabled={isChecked}
                 onChange={() => {
                   // setWalletSelected(index)
-                  dispatch(actionCreators.setActiveWallet(wallet.id))
+                  dispatch(actionCreators.activateWallet(wallet.id))
                 }}
               />
               <WalletActions isDefault={isChecked} actionItems={actionItems(wallet.id)} />

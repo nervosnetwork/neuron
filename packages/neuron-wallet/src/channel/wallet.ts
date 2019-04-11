@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron'
 import Listeners from './listeners'
 import { ChannelResponse } from '../controllers'
 import NetworksController, { NetworksMethod } from '../controllers/networks'
-import { NetworkWithID } from '../store/NetworksStore'
+import { NetworkWithID } from '../store/networksStore'
 import { WalletsMethod } from '../controllers/wallets'
 
 import asw from '../wallets/asw'
@@ -80,13 +80,13 @@ export default class WalletChannel extends Listeners {
     })
   }
 
-  public syncWallets = (params: { active?: ChannelResponse<any>; wallets?: ChannelResponse<any> }) => {
+  public syncWallets = (params: { activeOne?: ChannelResponse<any>; wallets?: ChannelResponse<any> }) => {
     if (!this.win) return
-    if (params.active) {
-      this.win.webContents.send(Channel.Wallets, WalletsMethod.Active, params.active)
+    if (params.activeOne) {
+      this.win.webContents.send(Channel.Wallets, WalletsMethod.ActiveOne, params.activeOne)
     }
     if (params.wallets) {
-      this.win.webContents.send(Channel.Wallets, WalletsMethod.Index, params.wallets)
+      this.win.webContents.send(Channel.Wallets, WalletsMethod.GetAll, params.wallets)
     }
   }
 

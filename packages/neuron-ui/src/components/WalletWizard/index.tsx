@@ -7,6 +7,8 @@ import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
 import { Routes, MnemonicAction } from '../../utils/const'
 
+import { walletsCall } from '../../services/UILayer'
+
 const buttons = [
   { label: 'wizard.create-new-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Create}` },
   { label: 'wizard.import-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Import}` },
@@ -14,6 +16,7 @@ const buttons = [
 
 const Wizard = () => {
   const [t] = useTranslation()
+  walletsCall.generateMnemonic()
   const message = 'wizard.create-or-import-your-first-wallet'
   return (
     <Screen>

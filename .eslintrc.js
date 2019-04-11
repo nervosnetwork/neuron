@@ -24,7 +24,6 @@ module.exports = {
       "args": "after-used",
       "ignoreRestSiblings": false
     }],
-    "operator-linebreak": [2, "after"],
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
       "code": 120,
