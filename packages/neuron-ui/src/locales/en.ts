@@ -122,6 +122,7 @@ export default {
       'create-wallet-success': "You have created wallet '{{name}}' successfully",
       'network-is-not-found': 'Network is not found',
       'name-has-been-used': 'Name has been used',
+      'failed-to-initiate,-please-reopen-Neuron': 'Failed to initiate, please reopen Neuron',
     },
   },
 }

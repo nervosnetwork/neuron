@@ -31,3 +31,12 @@ body {
   grid-area: notification;
   z-index: 1;
 }
+
+.dialog{
+  grid-area: 1/1/5/5;
+  dialog {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+}

@@ -1,5 +1,4 @@
 import { ResponseCode, ChannelResponse } from '.'
-import WalletChannel from '../channel/wallet'
 import TransactionsService, {
   Transaction,
   TransactionsByAddressesParam,
@@ -8,13 +7,7 @@ import TransactionsService, {
 } from '../services/transactions'
 
 export default class TransactionsController {
-  public channel: WalletChannel
-
   static service = new TransactionsService()
-
-  constructor(channel: WalletChannel) {
-    this.channel = channel
-  }
 
   public static getAll = async (
     params: TransactionsByLockHashesParam,

@@ -1,10 +1,6 @@
 import { ResponseCode, ChannelResponse } from '.'
-import WalletChannel from '../channel/wallet'
 import NetworksService from '../services/networks'
 import { NetworkType, NetworkID, NetworkWithID, Network } from '../store/networksStore'
-import env from '../env'
-
-const { defaultNetworks } = env
 
 export enum NetworksMethod {
   GetAll = 'getAll',
@@ -17,17 +13,7 @@ export enum NetworksMethod {
 }
 
 class NetworksController {
-  public channel: WalletChannel
-
   static service = new NetworksService()
-
-  constructor(channel: WalletChannel) {
-    this.channel = channel
-    const networks = NetworksController.getAll().result
-    if (!networks || !networks.length) {
-      defaultNetworks.forEach(network => NetworksController.create(network))
-    }
-  }
 
   public static getAll = (): ChannelResponse<NetworkWithID[]> => {
     return {

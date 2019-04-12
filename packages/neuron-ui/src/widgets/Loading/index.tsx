@@ -22,8 +22,8 @@ export const Spinner = styled.div<{
   border-width: ${props => props.bandSize || '3px'};
   border-top-color: ${props => props.frontColor || '#fff'};
   border-right-color: ${props => props.frontColor || '#fff'};
-  border-bottom-color: ${props => props.frontColor || 'rgba(255, 255, 255, 0.5)'};
-  border-left-color: ${props => props.frontColor || 'rgba(255, 255, 255, 0.5)'};
+  border-bottom-color: ${props => props.backgroundColor || 'rgba(255, 255, 255, 0.5)'};
+  border-left-color: ${props => props.backgroundColor || 'rgba(255, 255, 255, 0.5)'};
   animation: ${rotate} 1s linear infinite;
 `
 

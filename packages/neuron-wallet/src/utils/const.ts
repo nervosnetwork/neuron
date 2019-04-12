@@ -1,4 +1,5 @@
 export enum Channel {
+  Initiate = 'initiate',
   SetLanguage = 'setLanguage',
   GetTipBlockNumber = 'getTipBlockNumber',
 

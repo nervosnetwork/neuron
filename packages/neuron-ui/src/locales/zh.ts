@@ -115,6 +115,7 @@ export default {
       'create-wallet-success': "您已成功创建钱包 '{{name}}' ",
       'network-is-not-found': '未找到节点信息',
       'name-has-been-used': '名称已被使用',
+      'failed-to-initiate,-please-reopen-Neuron': '初始化失败, 请新打开 Neuron',
     },
   },
 }

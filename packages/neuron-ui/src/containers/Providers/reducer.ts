@@ -1,6 +1,7 @@
 import { initNeuronWallet } from '../../contexts/NeuronWallet'
 
 export enum ProviderActions {
+  Initiate = 'initiate',
   Chain = 'chain',
   Wallet = 'wallet',
   Settings = 'settings',
@@ -16,6 +17,22 @@ export type ProviderDispatch = React.Dispatch<{ type: ProviderActions; payload: 
 
 export const reducer = (state: typeof initProviders, action: { type: ProviderActions; payload: any }) => {
   switch (action.type) {
+    case ProviderActions.Initiate: {
+      const { networks, network, wallets, wallet } = action.payload
+      return {
+        ...state,
+        wallet: wallet || state.wallet,
+        chain: {
+          ...state.chain,
+          network,
+        },
+        settings: {
+          ...state.settings,
+          wallets,
+          networks,
+        },
+      }
+    }
     case ProviderActions.Settings:
     case ProviderActions.Wallet:
     case ProviderActions.Chain: {

@@ -1,8 +1,7 @@
-import WalletChannel from '../channel/wallet'
 import WalletsService from '../services/wallets'
 import { WalletData } from '../store/WalletStore'
 import { ChannelResponse, ResponseCode } from '.'
-import windowManage from '../main'
+import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
 import Key from '../keys/key'
 
@@ -19,13 +18,7 @@ export enum WalletsMethod {
 }
 
 class WalletsController {
-  public channel: WalletChannel
-
   static service = new WalletsService()
-
-  constructor(channel: WalletChannel) {
-    this.channel = channel
-  }
 
   public static getAll = (): ChannelResponse<WalletData[]> => {
     const wallets = WalletsController.service.getAll()
