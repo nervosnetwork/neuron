@@ -1,6 +1,6 @@
 import WalletChannel from '../channel/wallet'
 import WalletsService from '../services/wallets'
-import { WalletData } from '../store/WalletStore'
+import { WalletData } from '../store/walletStore'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../main'
 import { Channel } from '../utils/const'
@@ -29,7 +29,7 @@ class WalletsController {
 
   public static getAll = (): ChannelResponse<WalletData[]> => {
     const wallets = WalletsController.service.getAll()
-    if (wallets) {
+    if (wallets.length > 0) {
       return {
         status: ResponseCode.Success,
         result: wallets,
