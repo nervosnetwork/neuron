@@ -12,6 +12,8 @@ Nervos CKB Wallet
 
 You will need `node >= 11.10` and `yarn >= 1.12` to build and run this Neuron.
 
+Please be noted that Neuron depends on [node-gyp](https://github.com/nodejs/node-gyp) to build native NPM modules. Follow [this](https://github.com/nodejs/node-gyp#installation) to install node-gyp dependencies.
+
 In the project directory, you can run:
 
 ### `yarn install && yarn bootstrap`
