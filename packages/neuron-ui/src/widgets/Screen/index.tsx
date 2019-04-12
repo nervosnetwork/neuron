@@ -8,6 +8,7 @@ const Screen = styled(Jumbotron)<{ mode: Mode }>`
   bottom: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 0 : 'auto')};
   width: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? '100%' : 'auto')};
   height: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? '100vh' : 'auto')};
+  z-index: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 999 : 1)};
   flex: 1;
   margin: 0;
   display: flex;

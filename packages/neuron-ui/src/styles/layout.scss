@@ -1,11 +1,14 @@
+$column-gap: 40px;
+
 body {
   display: grid;
   grid-template:
     'sidebar header header header' 60px
+    'sidebar notification notification notification' auto
     'sidebar content content content' 1fr
     'sidebar content content content' 1fr /
     240px 1fr 1fr 340px;
-  column-gap: 40px;
+  column-gap: $column-gap;
 
   height: 100vh;
 }
@@ -21,9 +24,10 @@ body {
 .main-content {
   grid-area: content;
   overflow: auto;
+  padding-right: $column-gap;
 }
 
 .notification {
-  grid-area: 2/4/3/5;
+  grid-area: notification;
   z-index: 1;
 }
