@@ -10,7 +10,7 @@ export default {
     },
     wizard: {
       'create-or-import-your-first-wallet': 'Create or import your first wallet',
-      'create-new-wallet': 'Create New Walelt',
+      'create-new-wallet': 'Create New Wallet',
       'import-wallet': 'Import Wallet',
       next: 'Next',
       back: 'Back',

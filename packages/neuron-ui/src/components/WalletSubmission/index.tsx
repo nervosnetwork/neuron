@@ -4,6 +4,7 @@ import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import Screen from '../../widgets/Screen'
+import ScreenMessages from '../ScreenMessages'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
 import { ContentProps } from '../../containers/MainContent'
@@ -74,6 +75,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
 
   return (
     <Screen>
+      <ScreenMessages messages={messages} />
       <div>
         <h1>{t(message)}</h1>
         {inptus.map(input => (

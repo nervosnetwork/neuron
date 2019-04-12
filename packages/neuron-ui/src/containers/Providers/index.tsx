@@ -63,7 +63,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             dispatch({
               type: ProviderActions.AddMessage,
               payload: {
-                category: 'notice',
+                category: 'success',
                 title: 'Wallet Created',
                 content: args.result.name,
                 time,
@@ -106,7 +106,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         dispatch({
           type: ProviderActions.AddMessage,
           payload: {
-            category: 'error',
+            category: 'danger',
             title: 'Wallet',
             content: args.msg,
             time,
@@ -155,7 +155,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         dispatch({
           type: ProviderActions.AddMessage,
           payload: {
-            category: 'error',
+            category: 'danger',
             title: 'Networks',
             content: args.msg,
             time,

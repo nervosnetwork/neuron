@@ -5,11 +5,13 @@ import { Alert, Button, FormControl, Badge } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import Screen from '../../widgets/Screen'
+import ScreenMessages from '../ScreenMessages'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
 import { ContentProps } from '../../containers/MainContent'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { MnemonicAction, Routes } from '../../utils/const'
+import { useNeuronWallet } from '../../utils/hooks'
 import { helpersCall } from '../../services/UILayer'
 
 const Container = styled.div`
@@ -22,6 +24,7 @@ const MnemonicWord = styled(Badge)`
   padding: 5px 15px;
 `
 const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ type: MnemonicAction }>>) => {
+  const { messages } = useNeuronWallet()
   const {
     match: {
       params: { type },
@@ -105,6 +108,7 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
 
   return (
     <Screen>
+      <ScreenMessages messages={messages} />
       <Container>
         <h1>{t(message)}</h1>
         <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
