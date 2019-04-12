@@ -51,24 +51,17 @@ export interface PaginationResult<T = any> {
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
-  public static getAll = (params: TransactionsByLockHashesParam): PaginationResult<Transaction> => {
+  public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
     // TODO: calculate lockHashes when saving transactions
-    let totalCount: number | undefined
-    TransactionEntity.count().then(n => {
-      totalCount = n
-    })
+    const totalCount = await TransactionEntity.count()
     const connection = getConnection()
-    let transactions: TransactionEntity[]
     const skip = (params.pageNo - 1) * params.pageSize
-    connection
+    const transactions = await connection
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
       .skip(skip)
       .take(params.pageSize)
       .getMany()
-      .then(n => {
-        transactions = n
-      })
 
     const txs: Transaction[] = transactions!.map(tx => ({
       timestamp: tx.timestamp,
@@ -84,7 +77,9 @@ export default class TransactionsService {
     }
   }
 
-  public static getAllByAddresses = (params: TransactionsByAddressesParam): PaginationResult<Transaction> => {
+  public static getAllByAddresses = async (
+    params: TransactionsByAddressesParam,
+  ): Promise<PaginationResult<Transaction>> => {
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
@@ -92,7 +87,9 @@ export default class TransactionsService {
     })
   }
 
-  public static getAllByPubkeys = (params: TransactionsByPubkeysParams): PaginationResult<Transaction> => {
+  public static getAllByPubkeys = async (
+    params: TransactionsByPubkeysParams,
+  ): Promise<PaginationResult<Transaction>> => {
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
@@ -100,11 +97,8 @@ export default class TransactionsService {
     })
   }
 
-  public static get = (hash: string): Transaction | undefined => {
-    let transaction
-    TransactionEntity.findOne(hash).then(tx => {
-      transaction = tx
-    })
+  public static get = async (hash: string): Promise<Transaction | undefined> => {
+    const transaction = await TransactionEntity.findOne(hash)
     return transaction
   }
 
