@@ -83,7 +83,7 @@ export default class WalletChannel extends Listeners {
   public syncWallets = (params: { activeOne?: ChannelResponse<any>; wallets?: ChannelResponse<any> }) => {
     if (!this.win) return
     if (params.activeOne) {
-      this.win.webContents.send(Channel.Wallets, WalletsMethod.ActiveOne, params.activeOne)
+      this.win.webContents.send(Channel.Wallets, WalletsMethod.GetActive, params.activeOne)
     }
     if (params.wallets) {
       this.win.webContents.send(Channel.Wallets, WalletsMethod.GetAll, params.wallets)

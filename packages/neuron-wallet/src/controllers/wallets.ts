@@ -14,7 +14,7 @@ export enum WalletsMethod {
   ImportKeystore = 'importKeystore',
   Update = 'update',
   Delete = 'delete',
-  ActiveOne = 'activeOne',
+  GetActive = 'getActive',
   Activate = 'activate',
 }
 
@@ -168,7 +168,7 @@ class WalletsController {
     }
   }
 
-  public static activeOne = () => {
+  public static getActive = () => {
     // if (activeWallet) {
     //   return {
     //     status: ResponseCode.Success,

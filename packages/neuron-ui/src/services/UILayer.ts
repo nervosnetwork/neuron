@@ -20,7 +20,7 @@ export enum WalletsMethod {
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
-  ActiveOne = 'activeOne',
+  GetActive = 'getActive',
   Activate = 'activate',
   Backup = 'backup',
 }
@@ -142,7 +142,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   update: (params: { id: string; name?: string; password: string; newPassword?: string }) => void
   delete: (params: { id: string; password: string }) => void
   export: (id: string) => void
-  activeOne: () => void
+  getActive: () => void
   activate: (id: string) => void
   backup: (id: string) => void
 }

@@ -85,7 +85,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case WalletsMethod.ActiveOne: {
+          case WalletsMethod.GetActive: {
             dispatch({
               type: ProviderActions.Wallet,
               payload: args.result,
@@ -98,7 +98,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         }
       } else {
         const time = new Date().getTime()
-        if (method === WalletsMethod.ActiveOne) {
+        if (method === WalletsMethod.GetActive) {
           // don't show this error in wizard view
           return
         }

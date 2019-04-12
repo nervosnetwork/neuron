@@ -27,7 +27,7 @@ const initUILayer = async (win: BrowserWindow) => {
   dispatch(Command.SyncWallets, {
     channel,
     extra: {
-      activeOne: WalletsController.activeOne(),
+      activeOne: WalletsController.getActive(),
       wallets: WalletsController.getAll(),
     },
   })
@@ -76,7 +76,7 @@ function createWindow() {
   i18n.changeLanguage(app.getLocale())
   Menu.setApplicationMenu(mainmenu())
 
-  const url = WalletsController.activeOne().status ? env.mainURL : `${env.mainURL}/wallets/wizard`
+  const url = WalletsController.getActive().status ? env.mainURL : `${env.mainURL}/wallets/wizard`
   mainWindow.loadURL(url)
 
   mainWindow.on('closed', () => {
