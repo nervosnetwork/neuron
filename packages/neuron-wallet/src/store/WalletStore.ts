@@ -6,6 +6,7 @@ import app from '../app'
 
 export enum WalletStoreError {
   NoWallet,
+  NoActiveWallet,
 }
 
 export interface WalletData {
@@ -24,6 +25,7 @@ interface Options {
 const userDataPath = app.getPath('userData')
 const storePath = env.isDevMode ? `${userDataPath}/dev` : userDataPath
 const WalletIDKey = 'WalletID'
+const ActiveWalletID = 'ActiveID'
 
 export default class WalletStore {
   walletIDStore: Store
@@ -61,6 +63,9 @@ export default class WalletStore {
   saveWallet = (walletData: WalletData) => {
     this.addWalletID(walletData.id)
     this.getWalletStore(walletData.id).set(walletData.id, walletData)
+    if (this.getIDList().length === 1) {
+      this.setActiveWallet(walletData.id)
+    }
   }
 
   getWallet = (walletId: string): WalletData => {
@@ -69,6 +74,23 @@ export default class WalletStore {
       throw WalletStoreError.NoWallet
     }
     return wallet
+  }
+
+  setActiveWallet = (walletId: string): boolean => {
+    const index = this.getIDList().findIndex(id => id === walletId)
+    if (index === -1) {
+      return false
+    }
+    this.walletIDStore.set(ActiveWalletID, walletId)
+    return true
+  }
+
+  getActiveWallet = (): WalletData => {
+    const walletId = this.walletIDStore.get(ActiveWalletID, null)
+    if (walletId) {
+      return this.getWallet(walletId)
+    }
+    throw WalletStoreError.NoActiveWallet
   }
 
   getAllWallets = (): WalletData[] => {
@@ -93,8 +115,13 @@ export default class WalletStore {
   }
 
   deleteWallet = (walletId: string) => {
+    const activeId = this.getActiveWallet().id
     this.removeWalletID(walletId)
     this.getWalletStore(walletId).clear()
+    const idList = this.getIDList()
+    if (idList.length > 0 && activeId === walletId) {
+      this.setActiveWallet(idList[0])
+    }
   }
 
   clearAll = () => {

@@ -36,7 +36,7 @@
       "json",
       "node"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+    "setupFilesAfterEnv": ["<rootDir>/setupTests.ts"]
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
@@ -57,7 +57,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@jest-runner/electron": "0.2.2",
+    "@jest-runner/electron": "^1.1.1",
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/bip39": "^2.4.2",
