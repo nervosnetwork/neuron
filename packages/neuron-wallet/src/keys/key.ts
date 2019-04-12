@@ -1,4 +1,4 @@
-import bip32 from 'bip32'
+import * as bip32 from 'bip32'
 import bip39 from 'bip39'
 import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
@@ -145,13 +145,16 @@ export default class Key {
   private generatePrivateKeyFromMnemonic = (mnemonic: string) => {
     const seed = bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
-    const privateKey = root.privateKey.toString('hex')
-    const chainCode = root.chainCode.toString('hex')
-    const keysData: KeysData = {
-      privateKey,
-      chainCode,
+    if (root.privateKey) {
+      const privateKey = root.privateKey.toString('hex')
+      const chainCode = root.chainCode.toString('hex')
+      const keysData: KeysData = {
+        privateKey,
+        chainCode,
+      }
+      return keysData
     }
-    return keysData
+    throw new Error('Wrong mnemonic')
   }
 
   private toKeystore = (encryptedData: string, password: string) => {
