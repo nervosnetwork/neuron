@@ -1,5 +1,10 @@
-import { remote, app as electronApp } from 'electron'
+import { app as electronApp } from 'electron'
 
-const app = electronApp || remote.app
+const fakeApp = {
+  getPath(path: string): string {
+    return path
+  },
+}
+const app = electronApp || fakeApp
 
 export default app

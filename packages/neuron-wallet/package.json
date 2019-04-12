@@ -24,8 +24,6 @@
   },
   "jest": {
     "displayName": "electron",
-    "runner": "@jest-runner/electron",
-    "testEnvironment": "@jest-runner/electron/environment",
     "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
     "transform": {
       "^.+\\.ts?$": "ts-jest"
@@ -57,7 +55,6 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@jest-runner/electron": "^1.1.1",
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/bip39": "^2.4.2",
