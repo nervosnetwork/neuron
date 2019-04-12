@@ -79,9 +79,14 @@ function createWindow() {
   const url = WalletsController.getActive().status ? env.mainURL : `${env.mainURL}/wallets/wizard`
   mainWindow.loadURL(url)
 
+  mainWindow.on('close', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      windowManage.remove(mainWindow.id)
+    }
+  })
+
   mainWindow.on('closed', () => {
     if (mainWindow) {
-      windowManage.remove(mainWindow.id)
       mainWindow = null
     }
   })
