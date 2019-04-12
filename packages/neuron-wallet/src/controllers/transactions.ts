@@ -16,8 +16,10 @@ export default class TransactionsController {
     this.channel = channel
   }
 
-  public static getAll = (params: TransactionsByLockHashesParam): ChannelResponse<PaginationResult<Transaction>> => {
-    const transactions = TransactionsService.getAll(params)
+  public static getAll = async (
+    params: TransactionsByLockHashesParam,
+  ): Promise<ChannelResponse<PaginationResult<Transaction>>> => {
+    const transactions = await TransactionsService.getAll(params)
 
     if (!transactions) {
       return {
@@ -32,10 +34,10 @@ export default class TransactionsController {
     }
   }
 
-  public static getAllByAddresses = (
+  public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
-  ): ChannelResponse<PaginationResult<Transaction>> => {
-    const transactions = TransactionsService.getAllByAddresses(params)
+  ): Promise<ChannelResponse<PaginationResult<Transaction>>> => {
+    const transactions = await TransactionsService.getAllByAddresses(params)
 
     if (transactions) {
       return {
@@ -49,8 +51,8 @@ export default class TransactionsController {
     }
   }
 
-  public static get = (hash: string): ChannelResponse<Transaction> => {
-    const transaction = TransactionsService.get(hash)
+  public static get = async (hash: string): Promise<ChannelResponse<Transaction>> => {
+    const transaction = await TransactionsService.get(hash)
     if (!transaction) {
       return {
         status: ResponseCode.Fail,

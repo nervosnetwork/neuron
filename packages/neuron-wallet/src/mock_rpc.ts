@@ -88,7 +88,6 @@ export const getHistoryTransactions = async (_lockHashes: string[], _from: strin
     timestamp: `${currentTimestamp - (length - index) * 100000000}`,
     hash: `0x${randomHexString()}`,
     version: 0,
-    type: Math.round(Math.random()),
     blockNumber: index.toString(),
     blockHash: `0x${randomHexString()}`,
     inputs: [],
