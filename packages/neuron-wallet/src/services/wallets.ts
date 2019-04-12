@@ -18,7 +18,6 @@ export default class WalletService {
       keystore: JSON.parse(keystoreJson),
       addresses,
     })
-    this.setActive(walletStore.getAllWallets()[0].id)
   }
 
   public getAll = (

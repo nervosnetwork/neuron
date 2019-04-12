@@ -12,15 +12,16 @@ declare global {
   }
 }
 export enum WalletsMethod {
-  Index = 'index',
+  GetAll = 'getAll',
+  Get = 'get',
   GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
-  Active = 'active',
-  SetActive = 'setActive',
+  GetActive = 'getActive',
+  Activate = 'activate',
   Backup = 'backup',
 }
 
@@ -37,6 +38,10 @@ export enum NetworksMethod {
 export enum TransactionsMethod {
   GetAll = 'getAll',
   Get = 'get',
+}
+
+export enum HelpersMethod {
+  GenerateMnemonic = 'generateMnemonic',
 }
 
 export interface TransferItem {
@@ -129,16 +134,34 @@ export const wallets = (
 }
 
 export const walletsCall = instantiateMethodCall(wallets) as {
-  index: () => void
+  getAll: () => void
+  get: (id: string) => void
   generateMnemonic: () => void
   importKeystore: (params: { name: string; keystore: string; password: string }) => void
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
   update: (params: { id: string; name?: string; password: string; newPassword?: string }) => void
   delete: (params: { id: string; password: string }) => void
   export: (id: string) => void
-  active: () => void
-  setActive: (id: string) => void
+  getActive: () => void
+  activate: (id: string) => void
   backup: (id: string) => void
+}
+
+export const helpers = (method: HelpersMethod, ...params: any) => {
+  return new Promise((res, rej) => {
+    UILayer.send(Channel.Helpers, method, ...params)
+    UILayer.once(Channel.Helpers, (_e: Event, _method: HelpersMethod, args: ChannelResponse<any>) => {
+      if (args.status) {
+        res(args.result)
+      } else {
+        rej(args.msg)
+      }
+    })
+  })
+}
+
+export const helpersCall = instantiateMethodCall(helpers) as {
+  generateMnemonic: () => Promise<string>
 }
 
 export default UILayer

@@ -1,11 +1,11 @@
 import { ipcMain, Notification } from 'electron'
 import { Channel } from '../utils/const'
-import { wallets, verifyPassword, updateWallets, Wallet, transactionHashGen } from '../mock'
-import asw from '../wallets/asw'
+import { wallets, verifyPassword, transactionHashGen } from '../mock'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/networks'
 import TransactionsController from '../controllers/transactions'
 import WalletsController from '../controllers/wallets'
+import HelpersController from '../controllers/helpers'
 
 const checkPassword = (walletID: string, password: string) => {
   const myWallet = wallets().find(wallet => wallet.id === walletID)
@@ -32,16 +32,13 @@ const checkPassword = (walletID: string, password: string) => {
 export default class Listeners {
   static start = (
     methods: string[] = [
-      'deleteWallet',
-      'editWallet',
-      'switchWallet',
       'getBalance',
-      'asw',
-      'getWallets',
       'checkWalletPassword',
       'sendCapacity',
       'networks',
+      'wallets',
       'transactions',
+      'helpers',
     ],
   ) => {
     methods.forEach(method => {
@@ -69,71 +66,6 @@ export default class Listeners {
   }
 
   /**
-   * @static deleteWallet
-   * @memberof ChannelListeners
-   * @description channel to delete wallet
-   */
-  static deleteWallet = () => {
-    return ipcMain.on(
-      Channel.DeleteWallet,
-      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        const args = checkPassword(walletID, password)
-        if (args.result) {
-          const walletList = wallets()
-          const index = walletList.findIndex(wallet => wallet.id === walletID)
-          walletList.splice(index, 1)
-          updateWallets(walletList)
-        }
-        e.sender.send(Channel.DeleteWallet, args)
-      },
-    )
-  }
-
-  /**
-   * @static editWallet
-   * @memberof ChannelListeners
-   * @description channel to edit wallet
-   */
-  static editWallet = () => {
-    return ipcMain.on(
-      Channel.EditWallet,
-      (
-        e: Electron.Event,
-        {
-          walletID,
-          walletName,
-          password,
-          newPassword,
-        }: { walletID: string; walletName: string; password: string; newPassword: string },
-      ) => {
-        const args = checkPassword(walletID, password)
-        if (args.result) {
-          const wallet = wallets().find(item => item.id === walletID)
-          if (wallet) {
-            wallet.name = walletName
-            wallet.password = newPassword
-          }
-        }
-        e.sender.send(Channel.EditWallet, args)
-      },
-    )
-  }
-
-  /**
-   * @static switchWallet
-   * @memberof ChannelListeners
-   * @description channel to switch wallet
-   */
-  static switchWallet = () => {
-    return ipcMain.on(Channel.SwitchWallet, (e: Electron.Event, wallet: Wallet) => {
-      e.sender.send(Channel.SwitchWallet, {
-        status: ResponseCode.Success,
-        result: wallet.name,
-      })
-    })
-  }
-
-  /**
    * @static getBalance
    * @memberof ChannelListeners
    * @description channel to get balance
@@ -143,34 +75,6 @@ export default class Listeners {
       e.sender.send(Channel.GetBalance, {
         status: ResponseCode.Success,
         result: `balance`,
-      })
-    })
-  }
-
-  /**
-   * @static asw
-   * @memberof ChannelListeners
-   * @description channel to get asw
-   */
-  static asw = () => {
-    return ipcMain.on(`ASW`, (e: Electron.Event) => {
-      e.sender.send(`ASW`, {
-        status: ResponseCode.Success,
-        result: asw,
-      })
-    })
-  }
-
-  /**
-   * @static getWallets
-   * @memberof ChannelListeners
-   * @description channel to get wallets
-   */
-  static getWallets = () => {
-    return ipcMain.on(Channel.GetWallets, (e: Electron.Event) => {
-      e.sender.send(Channel.GetWallets, {
-        status: ResponseCode.Success,
-        result: wallets(),
       })
     })
   }
@@ -252,11 +156,25 @@ export default class Listeners {
    * @memberof ChannelListeners
    * @description listen to Channel.Wallet and invoke corresponding method of WalletsController
    */
-  public static wallet = () => {
+  public static wallets = () => {
     return ipcMain.on(
       Channel.Wallets,
-      async (e: Electron.Event, method: keyof typeof WalletsController, ...params: any[]) => {
-        e.sender.send(Channel.Wallets, method, await (WalletsController[method] as Function)(...params))
+      (e: Electron.Event, method: keyof typeof WalletsController, ...params: any[]) => {
+        e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(...params))
+      },
+    )
+  }
+
+  /**
+   * @method helpers
+   * @memberof ChannelListeners
+   * @description provide helper methods to UI layer
+   */
+  public static helpers = () => {
+    return ipcMain.on(
+      Channel.Helpers,
+      (e: Electron.Event, method: keyof typeof HelpersController, ...params: any[]) => {
+        e.sender.send(Channel.Helpers, method, (HelpersController[method] as Function)(...params))
       },
     )
   }

@@ -2,22 +2,20 @@ import WalletChannel from '../channel/wallet'
 import WalletsService from '../services/wallets'
 import { WalletData } from '../store/WalletStore'
 import { ChannelResponse, ResponseCode } from '.'
-import asw from '../wallets/asw'
 import windowManage from '../main'
 import { Channel } from '../utils/const'
 import Key from '../keys/key'
 
-const activeWallet = asw
-
 export enum WalletsMethod {
-  Index = 'index',
+  GetAll = 'getAll',
+  Get = 'get',
   GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
   Update = 'update',
   Delete = 'delete',
-  Active = 'active',
-  SetActive = 'setActive',
+  GetActive = 'getActive',
+  Activate = 'activate',
 }
 
 class WalletsController {
@@ -67,7 +65,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Failed to create wallet',
+      msg: 'Failed to create mnemonic',
     }
   }
 
@@ -135,53 +133,12 @@ class WalletsController {
     }
   }
 
-  // TODO: implement service.update
-  // public static update = ({
-  //   id,
-  //   name,
-  //   address,
-  //   publicKey,
-  //   password,
-  // }: {
-  //   id: string
-  //   name?: string
-  //   address?: string
-  //   publicKey?: Uint8Array
-  //   password: string
-  // }): ChannelResponse<boolean> => {
-  //   const wallet = WalletsController.service.show(id)
-  //   const isPermitted = verifyPassword(wallet, password)
-  //   if (!isPermitted) {
-  //     return {
-  //       status: ResponseCode.Fail,
-  //       msg: 'Incorrect password',
-  //     }
-  //   }
-  //   const success = WalletsController.service.update({
-  //     id,
-  //     name,
-  //     address,
-  //     publicKey,
-  //   })
-  //   if (success) {
-  //     windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.index())
-  //     return {
-  //       status: ResponseCode.Success,
-  //       result: true,
-  //     }
-  //   }
-  //   return {
-  //     status: ResponseCode.Fail,
-  //     msg: 'Failed to update wallet',
-  //   }
-  // }
-
   public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
     if (WalletsController.service.validate({ id, password })) {
       const success = WalletsController.service.delete(id)
       if (success) {
         // TODO: details, what to do when active wallet deleted
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.Index, WalletsController.getAll())
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
         return {
           status: ResponseCode.Success,
           result: true,
@@ -211,24 +168,24 @@ class WalletsController {
     }
   }
 
-  public static active = () => {
-    if (activeWallet) {
-      return {
-        status: ResponseCode.Success,
-        result: {
-          name: 'active wallet',
-          address: activeWallet.address,
-          publicKey: activeWallet.publicKey,
-        },
-      }
-    }
+  public static getActive = () => {
+    // if (activeWallet) {
+    //   return {
+    //     status: ResponseCode.Success,
+    //     result: {
+    //       name: 'active wallet',
+    //       address: activeWallet.address,
+    //       publicKey: activeWallet.publicKey,
+    //     },
+    //   }
+    // }
     return {
       status: ResponseCode.Fail,
       msg: 'No active wallet',
     }
   }
 
-  public static setActive = (id: string) => {
+  public static activate = (id: string) => {
     const success = WalletsController.service.setActive(id)
     if (success) {
       return {

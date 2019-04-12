@@ -20,35 +20,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       }
     })
 
-    UILayer.on(Channel.GetWallet, (_e: any, args: ChannelResponse<any>) => {
-      dispatch({
-        type: ProviderActions.Wallet,
-        payload: { ...args.result },
-      })
-    })
-
-    UILayer.on(Channel.GetWallets, (_e: any, args: ChannelResponse<any>) => {
-      dispatch({
-        type: ProviderActions.Settings,
-        payload: { wallets: args.result },
-      })
-    })
-
-    UILayer.on(
-      Channel.CreateWallet,
-      (_e: Event, args: ChannelResponse<{ name: string; address: string; publicKey: Uint8Array }>) => {
-        if (args.status) {
-          // TODO: handle created wallet
-        }
-      },
-    )
-
-    UILayer.on(Channel.DeleteWallet, (_e: Event, args: ChannelResponse<string>) => {
-      if (args.status) {
-        // TODO: handle wallet deleted
-      }
-    })
-
     UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
         dispatch({
@@ -87,14 +58,34 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case WalletsMethod.Index: {
+          case WalletsMethod.ImportMnemonic: {
+            const time = new Date().getTime()
+            dispatch({
+              type: ProviderActions.AddMessage,
+              payload: {
+                category: 'notice',
+                title: 'Wallet Created',
+                content: args.result.name,
+                time,
+                actions: [],
+                dismiss: () => {
+                  dispatch({
+                    type: ProviderActions.DismissMessage,
+                    payload: time,
+                  })
+                },
+              },
+            })
+            break
+          }
+          case WalletsMethod.GetAll: {
             dispatch({
               type: ProviderActions.Settings,
               payload: { wallets: args.result },
             })
             break
           }
-          case WalletsMethod.Active: {
+          case WalletsMethod.GetActive: {
             dispatch({
               type: ProviderActions.Wallet,
               payload: args.result,
@@ -105,6 +96,29 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             break
           }
         }
+      } else {
+        const time = new Date().getTime()
+        if (method === WalletsMethod.GetActive) {
+          // don't show this error in wizard view
+          return
+        }
+
+        dispatch({
+          type: ProviderActions.AddMessage,
+          payload: {
+            category: 'error',
+            title: 'Wallet',
+            content: args.msg,
+            time,
+            actions: [],
+            dismiss: () => {
+              dispatch({
+                type: ProviderActions.DismissMessage,
+                payload: time,
+              })
+            },
+          },
+        })
       }
     })
 

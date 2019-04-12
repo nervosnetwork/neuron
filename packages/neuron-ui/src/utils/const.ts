@@ -27,11 +27,6 @@ export enum NetworkType {
 
 export enum Channel {
   SetLanguage = 'setLanguage',
-  CreateWallet = 'createWallet',
-  DeleteWallet = 'deleteWallet',
-  EditWallet = 'editWallet',
-  ImportWallet = 'importWallet',
-  ExportWallet = 'exportWallet',
   GetBalance = 'getBalance',
   GetWallet = 'getWallet',
   CheckWalletPassword = 'checkWalletPassword',
@@ -43,6 +38,7 @@ export enum Channel {
   Networks = 'networks',
   Transactions = 'transactions',
   Wallets = 'wallets',
+  Helpers = 'helpers',
 }
 
 export enum Routes {

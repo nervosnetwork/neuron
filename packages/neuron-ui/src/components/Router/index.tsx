@@ -6,7 +6,6 @@ import Header from '../../containers/Header'
 import Sidebar from '../../containers/Sidebar'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
-import Home from '../Home'
 import WalletWizard from '../WalletWizard'
 import Mnemonic from '../Mnemonic'
 import WalletSubmission from '../WalletSubmission'
@@ -27,7 +26,6 @@ import Prompt from '../Prompt'
 
 import UILayer from '../../services/UILayer'
 import { Routes, Channel } from '../../utils/const'
-import { useNeuronWallet } from '../../utils/hooks'
 
 export interface CustomRoute {
   name: string
@@ -59,12 +57,6 @@ export const containers: CustomRoute[] = [
 ]
 
 export const mainContents: CustomRoute[] = [
-  {
-    name: `Home`,
-    path: Routes.Home,
-    exact: true,
-    component: Home,
-  },
   {
     name: `Wallet`,
     path: Routes.Wallet,
@@ -175,8 +167,6 @@ export const mainContents: CustomRoute[] = [
 ]
 
 const CustomRouter = (appProps: any) => {
-  const { wallet } = useNeuronWallet()
-
   return (
     <Router>
       <Route
@@ -184,10 +174,9 @@ const CustomRouter = (appProps: any) => {
           UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
             props.history.push(args.result.router)
           })
-
           return (
             <>
-              {wallet.address ? <RoutesWithProps contents={containers} /> : null}
+              <RoutesWithProps contents={containers} />
               <MainContent {...appProps}>
                 <RoutesWithProps contents={mainContents} />
               </MainContent>

@@ -6,12 +6,13 @@ import { useTranslation } from 'react-i18next'
 import Screen from '../../widgets/Screen'
 import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
-import initState from '../../containers/MainContent/state'
 import { ContentProps } from '../../containers/MainContent'
-import { MainActions } from '../../containers/MainContent/reducer'
+import { initState } from '../../containers/MainContent/state'
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
-import { verifyWalletSubmission } from '../../utils/validators'
 import { Routes } from '../../utils/const'
+import { verifyWalletSubmission } from '../../utils/validators'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const inptus = [
   { label: 'password', key: 'password', type: 'password' },
@@ -21,9 +22,9 @@ const inptus = [
 
 const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const { messages } = useNeuronWallet()
 
   const { dispatch, mnemonic, history } = props
-  const { name } = mnemonic
 
   useEffect(() => {
     dispatch({
@@ -31,6 +32,17 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
       payload: { name: `wallet @${Math.round(Math.random() * 100)}` },
     })
   }, [])
+
+  useEffect(() => {
+    const message = messages[messages.length - 1]
+    if (message && message.title === 'Wallet Created') {
+      dispatch({
+        type: MainActions.UpdateMnemonic,
+        payload: initState.mnemonic,
+      })
+      history.push(`${Routes.Prompt}/create-wallet-success?name=${mnemonic.name.replace(/\s/g, '%20')}`)
+    }
+  }, [messages.length])
 
   const onChange = useCallback(
     (field: keyof typeof mnemonic) => (e: React.FormEvent<{ value: string }>) => {
@@ -48,13 +60,10 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
   }, [])
 
   const onNext = useCallback(
-    (walletName: string) => () => {
-      dispatch({
-        type: MainActions.UpdateMnemonic,
-        payload: initState.mnemonic,
-      })
-      // TODO: send message to neuron-wallet and listen to response
-      history.push(`${Routes.Prompt}/create-wallet-success?name=${walletName.replace(/\s/g, '%20')}`)
+    (params: { name: string; password: string; imported: string }) => () => {
+      dispatch(
+        actionCreators.importMnemonic({ name: params.name, password: params.password, mnemonic: params.imported }),
+      )
     },
     [],
   )
@@ -83,8 +92,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
           <Button role="button" onClick={onBack} onKeyPress={onBack}>
             {t('wizard.back')}
           </Button>
-
-          <Button role="button" onClick={onNext(name)} onKeyPress={onNext(name)} disabled={disableNext}>
+          <Button role="button" onClick={onNext(mnemonic)} onKeyPress={onNext(mnemonic)} disabled={disableNext}>
             {t('wizard.next')}
           </Button>
         </ScreenButtonRow>
@@ -94,4 +102,5 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
 }
 
 WalletSubmission.displayName = 'WalletSubmission'
+
 export default WalletSubmission
