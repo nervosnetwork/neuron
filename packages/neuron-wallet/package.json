@@ -69,7 +69,6 @@
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "^2.2.4",
     "rimraf": "^2.6.3",
-    "spectron": "^5.0.0",
-    "tslint": "^5.12.1"
+    "spectron": "^5.0.0"
   }
 }
