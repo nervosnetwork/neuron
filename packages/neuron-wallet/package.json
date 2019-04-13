@@ -13,8 +13,8 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env electron .",
-    "start:dev": "tsc && cross-env electron .",
+    "start": "electron .",
+    "start:dev": "tsc && electron .",
     "build": "tsc",
     "clean": "rimraf dist/*",
     "test": "jest --color",
