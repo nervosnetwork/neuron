@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
 
 import RoutesWithProps from './RoutesWithProps'
 import Header from '../../containers/Header'
