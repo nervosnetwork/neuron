@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
-import { Alert, Button, FormControl, Badge } from 'react-bootstrap'
+import { Alert, Button, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import Screen from '../../widgets/Screen'
@@ -17,12 +17,11 @@ import { helpersCall } from '../../services/UILayer'
 const Container = styled.div`
   text-align: center;
   width: 736px;
+  textarea {
+    resize: none;
+  }
 `
 
-const MnemonicWord = styled(Badge)`
-  margin: 15px;
-  padding: 5px 15px;
-`
 const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ type: MnemonicAction }>>) => {
   const { messages } = useNeuronWallet()
   const {
@@ -112,16 +111,6 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
       <Container>
         <h1>{t(message)}</h1>
         <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
-        {type === MnemonicAction.Verify
-          ? generated
-              .split(' ')
-              .sort()
-              .map(word => (
-                <MnemonicWord pill variant="info" key={word}>
-                  {word}
-                </MnemonicWord>
-              ))
-          : null}
         {wizard ? <Alert variant="warning">{t(wizard)}</Alert> : null}
         <ScreenButtonRow>
           <Button role="button" onClick={onBack} onKeyPress={onBack}>
