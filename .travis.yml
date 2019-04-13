@@ -28,5 +28,5 @@ before_script:
 
 script:
   - git diff --exit-code yarn.lock
-  - yarn build
+  - CI=false yarn build
   - yarn test

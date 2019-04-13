@@ -13,8 +13,8 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env electron .",
-    "start:dev": "tsc && cross-env electron .",
+    "start": "electron .",
+    "start:dev": "tsc && electron .",
     "build": "tsc",
     "clean": "rimraf dist/*",
     "test": "jest --color",
@@ -24,8 +24,6 @@
   },
   "jest": {
     "displayName": "electron",
-    "runner": "@jest-runner/electron",
-    "testEnvironment": "@jest-runner/electron/environment",
     "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
     "transform": {
       "^.+\\.ts?$": "ts-jest"
@@ -36,7 +34,9 @@
       "json",
       "node"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.ts"
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupTests.ts"
+    ]
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
@@ -57,7 +57,6 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@jest-runner/electron": "0.2.2",
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
     "@nervosnetwork/neuron-ui": "^0.1.0",
     "@types/bip39": "^2.4.2",
@@ -66,11 +65,10 @@
     "@types/sqlite3": "^3.1.5",
     "@types/uuid": "^3.4.4",
     "devtron": "^1.4.0",
-    "electron": "4.0.4",
+    "electron": "4.1.4",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "^2.2.4",
     "rimraf": "^2.6.3",
-    "spectron": "^5.0.0",
-    "tslint": "^5.12.1"
+    "spectron": "^5.0.0"
   }
 }
