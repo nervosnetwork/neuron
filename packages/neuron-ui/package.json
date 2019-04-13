@@ -38,7 +38,6 @@
     "@types/styled-components": "^4.1.6",
     "bootstrap": "^4.3.1",
     "dayjs": "^1.8.12",
-    "electron": "4.1.4",
     "grommet-icons": "^4.2.0",
     "i18next": "^15.0.5",
     "node-sass": "^4.11.0",
