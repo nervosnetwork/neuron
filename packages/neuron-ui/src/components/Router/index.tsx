@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
 
 import RoutesWithProps from './RoutesWithProps'
 import Header from '../../containers/Header'
@@ -23,6 +23,7 @@ import NetworkEditor from '../NetworkEditor'
 import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
 import Prompt from '../Prompt'
+import LaunchScreen from '../LaunchScreen'
 
 import UILayer from '../../services/UILayer'
 import { Routes, Channel } from '../../utils/const'
@@ -57,6 +58,12 @@ export const containers: CustomRoute[] = [
 ]
 
 export const mainContents: CustomRoute[] = [
+  {
+    name: 'launch',
+    path: Routes.Launch,
+    exact: true,
+    component: LaunchScreen,
+  },
   {
     name: `Wallet`,
     path: Routes.Wallet,

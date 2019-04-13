@@ -26,6 +26,7 @@ export enum NetworkType {
 }
 
 export enum Channel {
+  Initiate = 'initiate',
   SetLanguage = 'setLanguage',
   GetBalance = 'getBalance',
   GetWallet = 'getWallet',
@@ -42,7 +43,7 @@ export enum Channel {
 }
 
 export enum Routes {
-  Home = '/',
+  Launch = '/',
   Mnemonic = '/mnemonic',
   Wallet = '/wallet',
   Send = '/send',

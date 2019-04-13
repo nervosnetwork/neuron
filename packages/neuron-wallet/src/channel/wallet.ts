@@ -2,7 +2,7 @@ import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
 import { ChannelResponse } from '../controllers'
-import NetworksController, { NetworksMethod } from '../controllers/networks'
+import { NetworksMethod } from '../controllers/networks'
 import { NetworkWithID } from '../store/networksStore'
 import { WalletsMethod } from '../controllers/wallets'
 
@@ -19,12 +19,9 @@ export enum ResponseCode {
 export default class WalletChannel extends Listeners {
   public win: BrowserWindow
 
-  public networksController: any
-
   constructor(window: BrowserWindow) {
     super()
     this.win = window
-    this.networksController = new NetworksController(this)
   }
 
   public sendWallet = (

@@ -9,7 +9,7 @@ import store, {
   NetworksKey,
 } from '../store/networksStore'
 
-import windowManage from '../main'
+import windowManage from '../utils/windowManage'
 import { ResponseCode } from '../controllers'
 import { NetworksMethod } from '../controllers/networks'
 import { Channel } from '../utils/const'

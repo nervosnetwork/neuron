@@ -12,13 +12,39 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   const [providers, dispatch] = useReducer(reducer, initProviders)
   const [, i18n] = useTranslation()
   useEffect(() => {
-    UILayer.on(Channel.SetLanguage, (_e: Event, args: ChannelResponse<string>) => {
-      if (args.status) {
-        if (args.result !== i18n.language) {
-          i18n.changeLanguage(args.result)
+    UILayer.on(
+      Channel.Initiate,
+      (
+        _e: Event,
+        args: ChannelResponse<{ networks: any; activeNetwork: any; wallets: any; activeWallet: any; locale: string }>,
+      ) => {
+        if (args.status) {
+          const { locale, networks, activeNetwork: network, wallets, activeWallet: wallet } = args.result
+          if (locale !== i18n.language) {
+            i18n.changeLanguage(locale)
+          }
+          if (networks.length) {
+            dispatch({
+              type: ProviderActions.Initiate,
+              payload: { networks, network, wallet, wallets },
+            })
+          }
+        } else {
+          // TODO: better prompt
+          window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
+          window.close()
         }
-      }
-    })
+      },
+    )
+
+    // TODO: this method is useless if manually switch is not supported
+    // UILayer.on(Channel.SetLanguage, (_e: Event, args: ChannelResponse<string>) => {
+    //   if (args.status) {
+    //     if (args.result !== i18n.language) {
+    //       i18n.changeLanguage(args.result)
+    //     }
+    //   }
+    // })
 
     UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
