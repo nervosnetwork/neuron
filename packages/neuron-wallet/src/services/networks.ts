@@ -25,10 +25,11 @@ export default class NetworksService {
       })
     })
 
-    store.onDidChange(NetworksKey.Active, newValue => {
+    store.onDidChange(NetworksKey.Active, () => {
+      const network = this.activeOne()
       windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveOne, {
         status: ResponseCode.Success,
-        result: newValue,
+        result: network,
       })
     })
   }
@@ -86,10 +87,13 @@ export default class NetworksService {
     if (!network) {
       throw new Error(`Network of ${id} is not found`)
     }
-    this.store.set(NetworksKey.Active, network)
+    this.store.set(NetworksKey.Active, id)
   }
 
-  public activeOne = (): NetworkWithID | undefined => this.store.get(NetworksKey.Active)
+  public activeOne = (): NetworkWithID | undefined => {
+    const activeId = this.store.get(NetworksKey.Active)
+    return this.getAll().find(item => item.id === activeId)
+  }
 
   public defaultOne = (): NetworkWithID | undefined => this.getAll().find(item => item.type === NetworkType.Default)
 }
