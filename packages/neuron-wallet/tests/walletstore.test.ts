@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import assert from 'assert'
-import WalletStore, { WalletData } from '../src/store/WalletStore'
+import WalletStore, { WalletData } from '../src/store/walletStore'
 
 // TODO: re-enable tests after removing electron dependency
 describe.skip('wallet store', () => {
