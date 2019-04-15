@@ -6,6 +6,7 @@ import { getHistoryTransactions } from '../mock_rpc'
 export interface Input {
   previousOutput: OutPoint
   args: string[]
+  validSince?: number
 }
 
 export interface Witness {
@@ -157,5 +158,53 @@ export default class TransactionsService {
     tx.type = ['send', 'receive', 'unknown'][Math.round(Math.random() * 2)]
     const txEntity = await TransactionsService.create(transaction)
     return txEntity
+  }
+
+  public static generateTx = async () => {
+    const inputs: Input[] = [
+      {
+        previousOutput: {
+          hash: '0xb2becaa4e71e43abc75d1a87280b63df4dceaae1716540faf65e38925d2f641d',
+          index: 0,
+        },
+        args: [],
+        validSince: 0,
+      },
+    ]
+
+    const outputs = [
+      {
+        capacity: '1000',
+        data: '',
+        lock: {
+          binary_hash: '0x8bddddc3ae2e09c13106634d012525aa32fc47736456dba11514d352845e561d',
+          args: [
+            '0x65323139336466353164373834313136303137393662333562313762346638663263643835626430616461383834326166323365303836633136396133316432',
+          ],
+        },
+      },
+      {
+        capacity: '49000',
+        data: '',
+        lock: {
+          binary_hash: '0x8bddddc3ae2e09c13106634d012525aa32fc47736456dba11514d352845e561d',
+          args: [
+            '0x33366333323965643633306436636537353037313261343737353433363732616461623537663463366664333661373134393633303534353662623239386462',
+          ],
+        },
+      },
+    ]
+
+    return {
+      version: 0,
+      deps: [
+        {
+          hash: '0x8d37f0856ebb70c12871830667d82224e6619896c7f12bb73a14dd9329af9c8d',
+          index: 0,
+        },
+      ],
+      inputs,
+      outputs,
+    }
   }
 }
