@@ -8,6 +8,12 @@ export default {
       type: MainActions.Wallet,
     }
   },
+  getActiveWallet: () => {
+    walletsCall.getActive()
+    return {
+      type: MainActions.Wallet,
+    }
+  },
   activateWallet: (id: string) => {
     walletsCall.activate(id)
     return {

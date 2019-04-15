@@ -58,6 +58,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
 
   useEffect(() => {
     dispatch(actionCreators.getAll())
+    dispatch(actionCreators.getActiveWallet())
   }, [])
 
   const actionItems = (id: string) => [
