@@ -1,9 +1,11 @@
 import NetworksController from '../controllers/networks'
 import WalletChannel from '../channel/wallet'
 import initConnection from '../typeorm'
+import nodeService from '../services/node'
 import env from '../env'
 
 const initApp = () => {
+  nodeService.start()
   initConnection().then()
   WalletChannel.start()
   const activeNetworkRes = NetworksController.activeOne()
