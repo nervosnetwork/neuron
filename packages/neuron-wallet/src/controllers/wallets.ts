@@ -183,7 +183,7 @@ class WalletsController {
     if (success) {
       return {
         status: ResponseCode.Success,
-        result: WalletsController.service.active,
+        result: WalletsController.service.getActive(),
       }
     }
     return {
