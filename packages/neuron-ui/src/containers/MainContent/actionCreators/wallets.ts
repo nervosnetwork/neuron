@@ -2,6 +2,12 @@ import { initState, MainActions } from '../reducer'
 import { walletsCall } from '../../../services/UILayer'
 
 export default {
+  getAll: () => {
+    walletsCall.getAll()
+    return {
+      type: MainActions.Wallet,
+    }
+  },
   activateWallet: (id: string) => {
     walletsCall.activate(id)
     return {
