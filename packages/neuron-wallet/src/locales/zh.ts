@@ -29,5 +29,9 @@ export default {
         toggleDevTools: '开发者工具',
       },
     },
+    messages: {
+      'failed-to-load-networks': '加载节点失败',
+      'Networks-will-be-reset': '节点列表将被重置',
+    },
   },
 }

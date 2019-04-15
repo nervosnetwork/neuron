@@ -10,6 +10,7 @@ export enum NetworksMethod {
   Delete = 'delete',
   Activate = 'activate',
   ActiveOne = 'activeOne',
+  Clear = 'clear',
 }
 
 class NetworksController {
@@ -141,6 +142,10 @@ class NetworksController {
 
   public static status = () => {
     return false
+  }
+
+  public static clear = () => {
+    return NetworksController.service.clear()
   }
 }
 

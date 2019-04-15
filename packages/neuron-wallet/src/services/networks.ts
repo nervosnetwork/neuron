@@ -96,4 +96,6 @@ export default class NetworksService {
   }
 
   public defaultOne = (): NetworkWithID | undefined => this.getAll().find(item => item.type === NetworkType.Default)
+
+  public clear = () => this.store.clear()
 }

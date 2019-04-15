@@ -29,5 +29,9 @@ export default {
         toggleDevTools: 'toggleDevTools',
       },
     },
+    messages: {
+      'failed-to-load-networks': 'Failed to load networks',
+      'Networks-will-be-reset': 'Networks will be reset',
+    },
   },
 }
