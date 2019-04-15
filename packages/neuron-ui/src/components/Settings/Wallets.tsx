@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Col, Row, ListGroup, Form, Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -55,6 +55,11 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   } = useNeuronWallet()
   const { dispatch, dialog, history } = props
   const [t] = useTranslation()
+
+  useEffect(() => {
+    dispatch(actionCreators.getAll())
+    dispatch(actionCreators.getActiveWallet())
+  }, [])
 
   const actionItems = (id: string) => [
     {

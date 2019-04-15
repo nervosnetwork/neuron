@@ -162,19 +162,16 @@ class WalletsController {
   }
 
   public static getActive = () => {
-    // if (activeWallet) {
-    //   return {
-    //     status: ResponseCode.Success,
-    //     result: {
-    //       name: 'active wallet',
-    //       address: activeWallet.address,
-    //       publicKey: activeWallet.publicKey,
-    //     },
-    //   }
-    // }
-    return {
-      status: ResponseCode.Fail,
-      msg: 'No active wallet',
+    try {
+      return {
+        status: ResponseCode.Success,
+        result: WalletsController.service.getActive(),
+      }
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'No active wallet',
+      }
     }
   }
 
