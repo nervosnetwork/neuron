@@ -1,5 +1,5 @@
 import WalletsService from '../services/wallets'
-import { WalletData } from '../store/WalletStore'
+import { WalletData } from '../store/walletStore'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
@@ -183,7 +183,7 @@ class WalletsController {
     if (success) {
       return {
         status: ResponseCode.Success,
-        result: WalletsController.service.active,
+        result: WalletsController.service.getActive(),
       }
     }
     return {
