@@ -50,6 +50,11 @@ export interface PaginationResult<T = any> {
   items: T[]
 }
 
+export interface TargetOutput {
+  address: string
+  capacity: string
+}
+
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
@@ -160,7 +165,7 @@ export default class TransactionsService {
     return txEntity
   }
 
-  public static generateTx = async () => {
+  public static generateTx = async (_lockHashes: string[], _targetOutputs: TargetOutput[]) => {
     const inputs: Input[] = [
       {
         previousOutput: {
