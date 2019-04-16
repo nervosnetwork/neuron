@@ -11,6 +11,7 @@ declare global {
     bridge: any
   }
 }
+
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -49,6 +50,7 @@ export interface TransferItem {
   capacity: string
   unit: CapacityUnit
 }
+
 export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
@@ -105,7 +107,6 @@ export const networksCall = instantiateMethodCall(networks) as {
   get: (id: string) => void
   create: (network: RawNetwork) => void
   update: (id: string, options: Partial<Network>) => void
-  delete: (id: string) => void
   activeOne: () => void
   activate: (id: string) => void
 }
@@ -140,11 +141,20 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   importKeystore: (params: { name: string; keystore: string; password: string }) => void
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
   update: (params: { id: string; name?: string; password: string; newPassword?: string }) => void
-  delete: (params: { id: string; password: string }) => void
   export: (id: string) => void
   getActive: () => void
   activate: (id: string) => void
   backup: (id: string) => void
+}
+
+export const deleteWallet = (id: string, password: string, handleResult: any) => {
+  UILayer.send(Channel.DeleteWallet, {
+    id,
+    password,
+  })
+  UILayer.once(Channel.DeleteWallet, (_e: any, args: ChannelResponse<string>) => {
+    handleResult(args)
+  })
 }
 
 export const helpers = (method: HelpersMethod, ...params: any) => {

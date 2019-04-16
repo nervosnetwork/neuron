@@ -37,9 +37,6 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     () => [
       {
         label: t('menuitem.select'),
-        isDisabled: ({ id }: MenuItemParams) => {
-          return id === activeWallet.id
-        },
         click: ({ id }: MenuItemParams) => {
           dispatch(actionCreators.activateWallet(id))
         },
@@ -63,7 +60,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
             type: MainActions.SetDialog,
             payload: {
               open: true,
-              wallet: wallets.find(wallet => wallet.id === id),
+              id,
             },
           })
         },
@@ -128,7 +125,11 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           })
         }}
       >
-        <InputWalletPasswordDialog wallet={dialog.wallet} dispatch={dispatch} checkType={CheckType.DeleteWallet} />
+        <InputWalletPasswordDialog
+          wallet={wallets.find(wallet => wallet.id === dialog.id)}
+          dispatch={dispatch}
+          checkType={CheckType.DeleteWallet}
+        />
       </Dialog>
     </>
   )

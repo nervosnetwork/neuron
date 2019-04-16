@@ -37,6 +37,7 @@ export default class Listeners {
       'sendCapacity',
       'networks',
       'wallets',
+      'deleteWallet',
       'transactions',
       'helpers',
     ],
@@ -163,6 +164,12 @@ export default class Listeners {
         e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(...params))
       },
     )
+  }
+
+  public static deleteWallet = () => {
+    return ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, { id, password }: { id: string; password: string }) => {
+      e.sender.send(Channel.DeleteWallet, WalletsController.delete({ id, password }))
+    })
   }
 
   /**

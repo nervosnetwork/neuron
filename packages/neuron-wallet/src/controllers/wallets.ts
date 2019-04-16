@@ -130,7 +130,6 @@ class WalletsController {
     if (WalletsController.service.validate({ id, password })) {
       const success = WalletsController.service.delete(id)
       if (success) {
-        // TODO: details, what to do when active wallet deleted
         windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
         return {
           status: ResponseCode.Success,
