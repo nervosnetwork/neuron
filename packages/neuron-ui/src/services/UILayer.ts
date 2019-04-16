@@ -107,6 +107,7 @@ export const networksCall = instantiateMethodCall(networks) as {
   get: (id: string) => void
   create: (network: RawNetwork) => void
   update: (id: string, options: Partial<Network>) => void
+  delete: (id: string) => void
   activeOne: () => void
   activate: (id: string) => void
 }

@@ -121,7 +121,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, checkType, newWalletName,
           </Card.Footer>
         </>
       ) : (
-        <div>Network not found</div>
+        <div>Wallet not found</div>
       )}
     </Card>
   )

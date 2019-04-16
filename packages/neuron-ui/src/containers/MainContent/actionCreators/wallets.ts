@@ -62,16 +62,6 @@ export default {
       payload: params,
     }
   },
-  deleteWallet: (id: string, password: string) => {
-    walletsCall.delete({
-      id,
-      password,
-    })
-    return {
-      type: MainActions.Wallet,
-      payload: id,
-    }
-  },
   importWallet: (isKeystore: boolean, params: typeof initState.tempWallet) => {
     if (isKeystore) {
       walletsCall.importKeystore(params)
