@@ -24,6 +24,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   const {
     wallet: activeWallet,
     settings: { wallets },
+    messages: errorMessage,
   } = useNeuronWallet()
   const { dispatch, dialog, history } = props
   const [t] = useTranslation()
@@ -128,6 +129,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
         <InputWalletPasswordDialog
           wallet={wallets.find(wallet => wallet.id === dialog.id)}
           dispatch={dispatch}
+          errorMessage={errorMessage.length > 0 ? errorMessage[errorMessage.length - 1].content : ''}
           checkType={CheckType.DeleteWallet}
         />
       </Dialog>

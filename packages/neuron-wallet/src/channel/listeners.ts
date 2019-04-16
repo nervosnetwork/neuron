@@ -166,12 +166,6 @@ export default class Listeners {
     )
   }
 
-  public static deleteWallet = () => {
-    return ipcMain.on(Channel.DeleteWallet, (e: Electron.Event, { id, password }: { id: string; password: string }) => {
-      e.sender.send(Channel.DeleteWallet, WalletsController.delete({ id, password }))
-    })
-  }
-
   /**
    * @method helpers
    * @memberof ChannelListeners

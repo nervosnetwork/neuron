@@ -93,6 +93,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           dispatch={dispatch}
           checkType={CheckType.EditWallet}
           // handle={() => props.history.push(`${Routes.SettingsWallets}`)}
+          errorMessage=""
           newWalletName={walletName}
           newPassword={password}
         />

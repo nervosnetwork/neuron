@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import { checkPassword, deleteWallet } from '../../services/UILayer'
+import { checkPassword } from '../../services/UILayer'
 import { Wallet } from '../../contexts/NeuronWallet'
 
 export enum CheckType {
@@ -16,6 +16,7 @@ export enum CheckType {
 interface InputPasswordProps {
   wallet?: Wallet
   dispatch: any
+  errorMessage: string
   checkType: CheckType
   newWalletName?: string
   newPassword?: string
@@ -26,8 +27,14 @@ const ButtonDiv = styled.div`
   justify-content: space-between;
 `
 
-const InputWalletPasswordDialog = ({ wallet, dispatch, checkType, newWalletName, newPassword }: InputPasswordProps) => {
-  const [errorMsg, setErrorMsg] = useState('')
+const InputWalletPasswordDialog = ({
+  wallet,
+  dispatch,
+  checkType,
+  errorMessage,
+  newWalletName,
+  newPassword,
+}: InputPasswordProps) => {
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
 
@@ -39,17 +46,10 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, checkType, newWalletName,
           open: false,
         },
       })
-    } else if (args.msg) {
-      setErrorMsg(args.msg)
-    } else {
-      setErrorMsg('Wrong password')
     }
   }
 
   const handleSubmit = (id: string) => {
-    if (!password) {
-      setErrorMsg('Please enter password')
-    }
     switch (checkType) {
       case CheckType.EditWallet:
         if (newWalletName && newPassword) {
@@ -65,7 +65,7 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, checkType, newWalletName,
         }
         break
       case CheckType.DeleteWallet:
-        deleteWallet(id, password, handleResult)
+        dispatch(actionCreators.deleteWallet({ id, password }))
         break
       case CheckType.CheckPassword:
       default:
@@ -93,15 +93,15 @@ const InputWalletPasswordDialog = ({ wallet, dispatch, checkType, newWalletName,
                   type="password"
                   placeholder="password"
                   onChange={(e: any) => setPassword(e.currentTarget.value)}
-                  isInvalid={errorMsg !== ''}
+                  isInvalid={errorMessage !== ''}
                 />
-                <Form.Control.Feedback type="invalid">{errorMsg}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
               </Col>
             </Form.Group>
           </Card.Body>
           <Card.Footer className="text-muted">
             <ButtonDiv>
-              <Button variant="danger" onClick={() => handleSubmit(wallet.id)}>
+              <Button variant="danger" onClick={() => handleSubmit(wallet.id)} disabled={password === ''}>
                 {t('common.confirm')}
               </Button>
               <Button

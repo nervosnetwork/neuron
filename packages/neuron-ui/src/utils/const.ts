@@ -33,7 +33,6 @@ export enum Channel {
   CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
-  DeleteWallet = 'deleteWallet',
 
   NavTo = 'navTo',
   Terminal = 'terminal',

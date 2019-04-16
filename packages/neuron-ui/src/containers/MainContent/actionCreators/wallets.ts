@@ -21,6 +21,12 @@ export default {
       payload: id,
     }
   },
+  deleteWallet(params: { id: string; password: string }) {
+    walletsCall.delete(params)
+    return {
+      type: MainActions.Wallet,
+    }
+  },
   backupWallet: (id: string) => {
     walletsCall.backup(id)
     return {
