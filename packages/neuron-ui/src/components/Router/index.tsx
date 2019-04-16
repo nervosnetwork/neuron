@@ -1,35 +1,36 @@
-import React, { useContext } from 'react'
-import { BrowserRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
-import { Routes, Channel } from '../../utils/const'
-
-import UILayer from '../../services/UILayer'
+import React from 'react'
+import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
 
 import RoutesWithProps from './RoutesWithProps'
+import Header from '../../containers/Header'
+import Sidebar from '../../containers/Sidebar'
 import MainContent from '../../containers/MainContent'
 import Notification from '../../containers/Notification'
-import Sidebar from '../../containers/Sidebar'
-import Header from '../../containers/Header'
-import Home from '../Home'
+import WalletWizard from '../WalletWizard'
+import Mnemonic from '../Mnemonic'
+import WalletSubmission from '../WalletSubmission'
 import WalletDetail from '../WalletDetail'
 import Send from '../Transfer'
 import Receive from '../Receive'
 import History from '../History'
 import Transaction from '../Transaction'
-import Addresses from '../Addresses'
 import Settings from '../Settings'
-import WalletWizard, { ImportWallet, CreateWallet } from '../WalletWizard'
 import General from '../Settings/General'
+import Addresses from '../Addresses'
 import Wallets from '../Settings/Wallets'
 import Network from '../Settings/Networks'
 import NetworkEditor from '../NetworkEditor'
 import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
+import Prompt from '../Prompt'
+import LaunchScreen from '../LaunchScreen'
 
-import WalletContext from '../../contexts/Wallet'
+import UILayer from '../../services/UILayer'
+import { Routes, Channel } from '../../utils/const'
 
 export interface CustomRoute {
-  path: string
   name: string
+  path: string
   params?: string
   exact?: boolean
   component: React.FunctionComponent<any>
@@ -58,10 +59,10 @@ export const containers: CustomRoute[] = [
 
 export const mainContents: CustomRoute[] = [
   {
-    name: `Home`,
-    path: Routes.Home,
+    name: 'launch',
+    path: Routes.Launch,
     exact: true,
-    component: Home,
+    component: LaunchScreen,
   },
   {
     name: `Wallet`,
@@ -90,7 +91,7 @@ export const mainContents: CustomRoute[] = [
   {
     name: `Transaction`,
     path: Routes.Transaction,
-    params: '/:hash',
+    params: `/:hash`,
     exact: false,
     component: Transaction,
   },
@@ -127,28 +128,16 @@ export const mainContents: CustomRoute[] = [
   {
     name: `NetorkEditor`,
     path: Routes.NetworkEditor,
-    params: '/:name',
-    exact: true,
+    params: '/:id',
+    exact: false,
     component: NetworkEditor,
   },
   {
     name: `WalletEditor`,
     path: Routes.WalletEditor,
-    params: '/:wallet',
+    params: '/:id',
     exact: true,
     component: WalletEditor,
-  },
-  {
-    name: `CreateWallet`,
-    path: Routes.CreateWallet,
-    exact: false,
-    component: CreateWallet,
-  },
-  {
-    name: `ImportWallet`,
-    path: Routes.ImportWallet,
-    exact: false,
-    component: ImportWallet,
   },
   {
     name: `WalletWizard`,
@@ -157,27 +146,44 @@ export const mainContents: CustomRoute[] = [
     component: WalletWizard,
   },
   {
+    name: `Mnemonic`,
+    path: Routes.Mnemonic,
+    params: `/:type`,
+    exact: false,
+    component: Mnemonic,
+  },
+  {
+    name: `WalletSubmission`,
+    path: Routes.WalletSubmission,
+    exact: true,
+    component: WalletSubmission,
+  },
+  {
     name: `Terminal`,
     path: Routes.Terminal,
     exact: true,
     component: Terminal,
   },
+  {
+    name: `Prompt`,
+    path: Routes.Prompt,
+    params: '/:event',
+    exact: false,
+    component: Prompt,
+  },
 ]
 
 const CustomRouter = (appProps: any) => {
-  const wallet = useContext(WalletContext)
-
   return (
     <Router>
       <Route
         render={(props: RouteComponentProps<{}>) => {
-          UILayer.on(Channel.NavTo, (_e: Event, args: Response<{ router: string }>) => {
+          UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
             props.history.push(args.result.router)
           })
-
           return (
             <>
-              {wallet.address ? <RoutesWithProps contents={containers} /> : null}
+              <RoutesWithProps contents={containers} />
               <MainContent {...appProps}>
                 <RoutesWithProps contents={mainContents} />
               </MainContent>

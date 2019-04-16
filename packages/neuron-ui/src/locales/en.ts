@@ -8,6 +8,19 @@ export default {
       addresses: 'Addresses',
       settings: 'Settings',
     },
+    wizard: {
+      'create-or-import-your-first-wallet': 'Create or import your first wallet',
+      'create-new-wallet': 'Create New Wallet',
+      'import-wallet': 'Import Wallet',
+      next: 'Next',
+      back: 'Back',
+      name: 'Name',
+      'your-wallet-seed-is': 'Your wallet seed is',
+      'input-your-seed': 'Input your seed',
+      password: 'Password',
+      'confirm-password': 'Confirm Password',
+      'set-a-strong-password-to-protect-your-wallet': 'Set a strong password to protect your wallet',
+    },
     send: {
       address: 'address',
       capacity: 'capacity',
@@ -33,9 +46,7 @@ export default {
       detail: 'detail',
       explorer: 'explorer',
     },
-    transaction: {
-      goBack: 'go back',
-    },
+    transaction: { goBack: 'go back' },
     addresses: {
       addresses: 'Addresses',
       type: 'Type',
@@ -54,14 +65,6 @@ export default {
         general: 'General',
         wallets: 'Wallets',
         network: 'Network',
-      },
-      general: {
-        photosetting: 'Photo Setting',
-        passwordsetting: 'Password Setting',
-        languagesetting: 'Language Setting',
-        aboutneuron: 'About Neuron',
-        contactus: 'Contact Us',
-        addnetwork: 'Add Network',
       },
       walletmanger: {
         createwallet: 'Create Wallet',
@@ -116,6 +119,10 @@ export default {
       'invalid-capacity': 'invalid capacity',
       'capacity-is-not-enough': 'capacity is not enough',
       'is-unremovable': '{{target}} is unremovable',
+      'create-wallet-success': "You have created wallet '{{name}}' successfully",
+      'network-is-not-found': 'Network is not found',
+      'name-has-been-used': 'Name has been used',
+      'failed-to-initiate,-please-reopen-Neuron': 'Failed to initiate, please reopen Neuron',
     },
   },
 }

@@ -1,8 +1,8 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 
-import WalletContext from '../../contexts/Wallet'
 import TerminalChannel from '../../services/Terminal'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const prompt = '=>'
 enum Hightlight {
@@ -64,10 +64,10 @@ const initTerminal = {
 
 const Terminal = () => {
   const [terminal, setTerminal] = useState<TerminalState>(initTerminal)
-  const wallet = useContext(WalletContext)
+  const { wallet } = useNeuronWallet()
 
   useEffect(() => {
-    TerminalChannel.on((_e: Event, args: Response<{ msg: string }>) => {
+    TerminalChannel.on((_e: Event, args: ChannelResponse<{ msg: string }>) => {
       if (args.status) {
         setTerminal((t: TerminalState) => {
           return {

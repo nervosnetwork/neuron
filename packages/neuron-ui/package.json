@@ -15,7 +15,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "test": "react-app-rewired test --env=jsdom --color",
     "build": "react-app-rewired build",
-    "clean": "rm -rf build/*",
+    "clean": "rimraf build/*",
     "postinstall": "npm rebuild tiny-secp256k1"
   },
   "publishConfig": {
@@ -32,14 +32,12 @@
   ],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.0.1-alpha.3",
-    "@types/jest": "23.3.12",
     "@types/node": "10.12.18",
     "@types/react": "16.8.2",
     "@types/react-dom": "16.8.0",
     "@types/styled-components": "^4.1.6",
     "bootstrap": "^4.3.1",
-    "cross-env": "^5.2.0",
-    "electron": "^4.0.3",
+    "dayjs": "^1.8.12",
     "grommet-icons": "^4.2.0",
     "i18next": "^15.0.5",
     "node-sass": "^4.11.0",
@@ -49,9 +47,8 @@
     "react-dom": "^16.8.1",
     "react-i18next": "^10.2.0",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.5",
-    "styled-components": "^4.1.3",
-    "typescript": "3.2.2"
+    "react-scripts": "3.0.0-next.b0cbf2ca",
+    "styled-components": "^4.1.3"
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "^0.0.1-alpha.3",
@@ -64,6 +61,7 @@
     "eslint-plugin-react-hooks": "^1.0.1",
     "jest-styled-components": "^6.3.1",
     "jsqr": "^1.2.0",
-    "react-app-rewired": "^2.0.2"
+    "react-app-rewired": "^2.0.2",
+    "rimraf": "^2.6.3"
   }
 }

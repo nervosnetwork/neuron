@@ -1,32 +1,26 @@
-import { setNetwork } from '../../../services/UILayer'
-import { Network } from '../../../contexts/Chain'
-import { defaultNetworks } from '../../../contexts/Settings'
+import { Network } from '../../../contexts/NeuronWallet'
+import { networksCall } from '../../../services/UILayer'
 import { MainActions } from '../reducer'
 
-import { Routes, Message, MAX_NETWORK_NAME_LENGTH } from '../../../utils/const'
-import { saveNetworks, loadNetworks } from '../../../utils/localStorage'
+import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId, UnremovableNetwork } from '../../../utils/const'
 import i18n from '../../../utils/i18n'
 
-const Testnet = defaultNetworks[0].name
-
 export default {
-  setNetwork: (network: Network) => {
-    setNetwork(network)
+  getNetwork: (id: string) => {
+    networksCall.get(id)
     return {
-      type: MainActions.SetNetwork,
-      payload: network,
+      type: MainActions.UpdateLoading,
+      payload: { networks: true },
     }
   },
-  saveNetworks: (idx: number, networks: Network[], editorNetwork: Network, navTo: (path: string) => void) => {
-    if (!editorNetwork.name) {
+  createOrUpdateNetwork: ({ id, name, remote }: Network, networks: Network[]) => {
+    if (!name) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.NameIsRequired}`),
-        },
+        payload: { networks: i18n.t(`messages.${Message.NameIsRequired}`) },
       }
     }
-    if (editorNetwork.name.length > MAX_NETWORK_NAME_LENGTH) {
+    if (name.length > MAX_NETWORK_NAME_LENGTH) {
       return {
         type: MainActions.ErrorMessage,
         payload: {
@@ -36,63 +30,65 @@ export default {
         },
       }
     }
-    if (!editorNetwork.remote) {
+    if (!remote) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.${Message.URLIsRequired}`),
-        },
+        payload: { networks: i18n.t(`messages.${Message.URLIsRequired}`) },
       }
     }
-    const ns = [...networks]
-
-    if (idx === -1) {
-      // create
-      if (ns.map(n => n.name).indexOf(editorNetwork.name) > -1) {
-        // exist
+    // verification, for now, only name is unique
+    if (id === 'new') {
+      if (networks.some(network => network.name === name)) {
         return {
           type: MainActions.ErrorMessage,
           payload: {
-            networks: i18n.t(`messages.${Message.NetworkNameExist}`),
+            networks: i18n.t(`messages.name-has-been-used`),
           },
         }
       }
-      ns.push(editorNetwork)
+      networksCall.create({
+        name,
+        remote,
+      })
     } else {
-      // edit
-      ns[idx] = editorNetwork
+      if (networks.some(network => network.name === name && network.id !== id)) {
+        return {
+          type: MainActions.ErrorMessage,
+          payload: {
+            networks: i18n.t(`messages.name-has-been-used`),
+          },
+        }
+      }
+      networksCall.update(id!, {
+        name,
+        remote,
+      })
     }
-
-    // temp solution, better to remove
-    saveNetworks(ns)
-    window.dispatchEvent(new Event('NetworksUpdate'))
-    navTo(Routes.SettingsNetworks)
     return {
-      type: MainActions.SaveNetworks,
-      payload: ns,
+      type: MainActions.UpdateLoading,
+      payload: { network: true },
     }
   },
-
-  deleteNetwork: (name: string) => {
-    if (name === Testnet) {
+  deleteNetwork: (id?: string) => {
+    if (id === undefined) throw new Error('No network id found')
+    if (id === UnremovableNetworkId) {
       return {
         type: MainActions.ErrorMessage,
-        payload: {
-          networks: i18n.t(`messages.is-unremovable`, {
-            target: Testnet,
-          }),
-        },
+        payload: { networks: i18n.t(`messages.is-unremovable`, { target: UnremovableNetwork }) },
       }
     }
-    const networks = loadNetworks()
-    const newNetworks = networks.filter((n: Network) => n.name !== name)
-    saveNetworks(newNetworks)
-    window.dispatchEvent(new Event('NetworksUpdate'))
+    networksCall.delete(id)
     return {
       type: MainActions.SetDialog,
-      payload: {
-        open: false,
-      },
+      payload: { open: false },
+    }
+  },
+  setNetwork: (id: string) => {
+    // TODO: verification
+    networksCall.activate(id)
+    return {
+      type: MainActions.Networks,
+      payload: id,
     }
   },
 }

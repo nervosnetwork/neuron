@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Alert, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -6,14 +6,14 @@ import { useTranslation } from 'react-i18next'
 import { ContentProps } from '../../containers/MainContent'
 import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
 import { ProviderActions } from '../../containers/Providers/reducer'
-
-import ChainContext from '../../contexts/Chain'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
-  const { match, errorMsgs, dispatch, providerDispatch, loadings, history } = props
-  const chain = useContext(ChainContext)
+  const { match, errorMsgs, dispatch, providerDispatch, history } = props
   const [t] = useTranslation()
-  const { transaction } = chain
+  const {
+    chain: { transaction },
+  } = useNeuronWallet()
 
   useEffect(() => {
     // TODO: verify hash
@@ -35,25 +35,23 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
     history.goBack()
   }, [])
 
-  const loading = loadings.transaction
-
   return (
     <Card>
       <Card.Header>
         <Card.Text>
           <b>{`${t('history.transaction-hash')}: `}</b>
-          {loading ? 'Loading' : transaction.hash}
+          {transaction.hash}
         </Card.Text>
       </Card.Header>
       <Card.Body>
         {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transaction}`)}</Alert> : null}
         <Card.Text>
           <b>{`${t('history.amount')}: `}</b>
-          {loading ? 'Loading' : transaction.value}
+          {transaction.value}
         </Card.Text>
         <Card.Text>
           <b>{`${t('history.date')}: `}</b>
-          {loading ? 'Loading' : new Date(transaction.date).toLocaleString()}
+          {new Date(transaction.time).toLocaleString()}
         </Card.Text>
       </Card.Body>
       <Card.Footer>
@@ -66,4 +64,5 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
 }
 
 Transaction.displayName = 'Transaction'
+
 export default Transaction

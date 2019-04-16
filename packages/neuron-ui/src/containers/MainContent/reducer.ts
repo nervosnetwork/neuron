@@ -1,4 +1,3 @@
-
 import { CapacityUnit } from '../../utils/const'
 import actionCreators from './actionCreators'
 import MainActions from './actions'
@@ -13,17 +12,15 @@ export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>
 export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
-    // wallet
-    case MainActions.UpdateTempWallet: {
+    case MainActions.UpdateMnemonic: {
       return {
         ...state,
-        tempWallet: {
-          ...state.tempWallet,
+        mnemonic: {
+          ...state.mnemonic,
           ...action.payload,
         },
       }
     }
-    // network
     case MainActions.UpdateNetworkEditor: {
       return {
         ...state,
@@ -42,7 +39,6 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
-    // transfer
     case MainActions.AddItemInTransfer: {
       return {
         ...state,
@@ -88,9 +84,7 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
           ...state.errorMsgs,
           transfer: '',
         },
-        transfer: {
-          items,
-        },
+        transfer: { items },
       }
     }
     case MainActions.UpdateTransfer: {

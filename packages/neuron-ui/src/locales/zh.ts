@@ -8,6 +8,19 @@ export default {
       addresses: '地址管理',
       settings: '设置',
     },
+    wizard: {
+      'create-or-import-your-first-wallet': '创建或导入您的第一个钱包',
+      'create-new-wallet': '创建新钱包',
+      'import-wallet': '导入钱包',
+      next: '下一步',
+      back: '上一步',
+      name: '钱包名称',
+      'your-wallet-seed-is': '用于生成钱包的 seed 为',
+      'input-your-seed': '请输入您的 seed',
+      password: '密码',
+      'confirm-password': '确认密码',
+      'set-a-strong-password-to-protect-your-wallet': '请设置一个强密码用于保护您的钱包',
+    },
     send: {
       address: '地址',
       capacity: '价值',
@@ -33,9 +46,7 @@ export default {
       detail: '详情',
       explorer: '浏览器',
     },
-    transaction: {
-      goBack: '返回',
-    },
+    transaction: { goBack: '返回' },
     addresses: {
       deletewallet: '删除钱包',
       exportwallet: '导出钱包',
@@ -47,14 +58,6 @@ export default {
         general: '通用',
         wallets: '钱包',
         network: '网络',
-      },
-      general: {
-        photosetting: '设置头像',
-        passwordsetting: '设置密码',
-        languagesetting: '设置语言',
-        aboutneuron: '关于 Neuron',
-        contactus: '联系我们',
-        addnetwork: '新增网络',
       },
       walletmanger: {
         createwallet: '创建钱包',
@@ -109,6 +112,10 @@ export default {
       'invalid-capacity': '无效的价值',
       'capacity-is-not-enough': '余额不足',
       'is-unremovable': '{{target}}不可删除',
+      'create-wallet-success': "您已成功创建钱包 '{{name}}' ",
+      'network-is-not-found': '未找到节点信息',
+      'name-has-been-used': '名称已被使用',
+      'failed-to-initiate,-please-reopen-Neuron': '初始化失败, 请新打开 Neuron',
     },
   },
 }

@@ -1,5 +1,5 @@
-import { setNetwork } from '../../services/UILayer'
-import { Network } from '../../contexts/Chain'
+import { networksCall } from '../../services/UILayer'
+import { Network } from '../../contexts/NeuronWallet'
 
 export enum HeaderActions {
   SetNetwork,
@@ -8,16 +8,15 @@ export enum HeaderActions {
 export interface InitState {
   networks: Network[]
 }
-export const initState: InitState = {
-  networks: [],
-}
+
+export const initState: InitState = { networks: [] }
 
 export const reducer = (state: any, action: { type: HeaderActions; payload?: any }) => {
   switch (action.type) {
     case HeaderActions.SetNetwork: {
       return {
         ...state,
-        netowrk: action.payload,
+        network: action.payload,
       }
     }
     default: {
@@ -27,11 +26,11 @@ export const reducer = (state: any, action: { type: HeaderActions; payload?: any
 }
 
 export const actionCreators = {
-  setNetwork: (network: Network) => {
-    setNetwork(network)
+  setNetwork: (id: string) => {
+    networksCall.activate(id)
     return {
       type: HeaderActions.SetNetwork,
-      payload: network,
+      payload: id,
     }
   },
 }

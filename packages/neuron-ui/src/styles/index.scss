@@ -2,8 +2,16 @@
 
 * {
   user-select: none;
-  outline: none;
-  cursor: initial !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: none !important;
+  cursor: default !important;
+}
+
+[type=button],
+[type=reset],
+[type=submit],
+button {
+  -webkit-appearance: none !important;
 }
 
 ul {
@@ -28,4 +36,12 @@ body {
 
 .sidebar {
   background-color: white;
+}
+
+.form-control,
+.btn {
+
+  &:focus {
+    box-shadow: none !important;
+  }
 }

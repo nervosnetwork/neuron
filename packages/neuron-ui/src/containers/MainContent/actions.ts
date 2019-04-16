@@ -1,4 +1,5 @@
 export enum MainActions {
+  UpdateMnemonic,
   UpdateTempWallet,
   CreateWallet,
   DeleteWallet,
@@ -7,7 +8,6 @@ export enum MainActions {
   GetTransaction,
   GetTransactions,
   SetPage,
-  SetNetwork,
   UpdateNetworkEditor,
   SaveNetworks,
   DeleteNetwork,
@@ -19,6 +19,8 @@ export enum MainActions {
   UpdateTransfer,
   UpdatePassword,
   UpdateLoading,
+  Networks,
+  Wallet,
 }
 
 export default MainActions

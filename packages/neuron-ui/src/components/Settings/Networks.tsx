@@ -1,124 +1,100 @@
-import React, { useContext } from 'react'
-import styled from 'styled-components'
+import React, { useMemo } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
-import { Configure } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
-import ChainContext, { Network } from '../../contexts/Chain'
-import SettingsContext, { defaultNetworks } from '../../contexts/Settings'
 import { ContentProps } from '../../containers/MainContent'
 import { Routes } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
 import Dialog from '../../widgets/Dialog'
+import ContextMenuZone from '../../widgets/ContextMenuZone'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
-import Dropdown, { DropDownItem } from '../../widgets/Dropdown'
+import { useNeuronWallet } from '../../utils/hooks'
 
-const Testnet = defaultNetworks[0].name
-
-const Popover = styled.div`
-  position: relative;
-  &:hover {
-    & > ul {
-      display: block !important;
-    }
-  }
-`
-
-const NetworkActions = ({ isDefault, actionItems }: { isDefault: boolean; actionItems: DropDownItem[] }) => {
-  if (isDefault) {
-    return null
-  }
-  return (
-    <Popover>
-      <Configure />
-      <Dropdown
-        items={actionItems}
-        style={{
-          position: 'absolute',
-          top: '100%',
-          right: '0',
-          zIndex: '999',
-          display: 'none',
-        }}
-        itemsStyle={{
-          textTransform: 'capitalize',
-          boxShadow: '0px 1px 3px rgb(120, 120, 120)',
-        }}
-      />
-    </Popover>
-  )
+interface MenuItemParams {
+  id: string
 }
 
 const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const chain = useContext(ChainContext)
-  const settings = useContext(SettingsContext)
+  const {
+    chain,
+    settings: { networks },
+  } = useNeuronWallet()
   const [t] = useTranslation()
-  const { dispatch, dialog } = props
+  const { dispatch, dialog, history } = props
 
-  const actionItems = (network: Network, isDefault: boolean, isChecked: boolean) => [
-    {
-      label: t('menuitem.select'),
-      onClick: () => {
-        props.dispatch(actionCreators.setNetwork(network))
+  const menuItems = useMemo(
+    () => [
+      {
+        label: t('menuitem.select'),
+        isDisabled: ({ id }: MenuItemParams) => {
+          return id === chain.network.id
+        },
+        click: ({ id }: MenuItemParams) => {
+          dispatch(actionCreators.setNetwork(id))
+        },
       },
-      disabled: isChecked || isDefault,
-    },
-    {
-      label: t('menuitem.edit'),
-      onClick: () => {
-        props.history.push(`${Routes.NetworkEditor}/${network.name}`)
+      {
+        label: t('menuitem.edit'),
+        isDisabled: ({ id }: MenuItemParams) => {
+          return networks[0] && networks[0].id === id
+        },
+        click: ({ id }: MenuItemParams) => {
+          history.push(`${Routes.NetworkEditor}/${id}`)
+        },
       },
-      disabled: isDefault,
-    },
-    {
-      label: t('menuitem.remove'),
-      onClick: () => {
-        props.dispatch({
-          type: MainActions.SetDialog,
-          payload: {
-            open: true,
-            isChecked,
-            network,
-          },
-        })
+      {
+        label: t('menuitem.delete'),
+        isDisabled: ({ id }: MenuItemParams) => {
+          return networks[0] && networks[0].id === id
+        },
+        click: ({ id }: MenuItemParams) => {
+          props.dispatch({
+            type: MainActions.SetDialog,
+            payload: {
+              open: true,
+              id,
+            },
+          })
+        },
       },
-      disabled: isDefault,
-    },
-  ]
+    ],
+    [],
+  )
 
   return (
     <>
-      <ListGroup>
-        {settings.networks.map(network => {
-          const isChecked =
-            // chain.network.remote === network.remote && // it will make things too complex
-            chain.network.name === network.name
-          const isDefault = network.name === Testnet
-          return (
-            <ListGroup.Item
-              key={network.name || network.remote}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Form.Check
-                inline
-                label={network.name || network.remote}
-                type="radio"
-                checked={isChecked}
-                disabled={isChecked}
-                onChange={() => {
-                  props.dispatch(actionCreators.setNetwork(network))
+      <ContextMenuZone menuItems={menuItems}>
+        <ListGroup>
+          {networks.map(network => {
+            const isChecked =
+              // chain.network.remote === network.remote && // it will make things too complex
+              chain.network.id === network.id
+            return (
+              <ListGroup.Item
+                key={network.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                 }}
-              />
-              <NetworkActions isDefault={isDefault} actionItems={actionItems(network, isDefault, isChecked)} />
-            </ListGroup.Item>
-          )
-        })}
-      </ListGroup>
+                data-menuitem={JSON.stringify({ id: network.id })}
+              >
+                <Form.Check
+                  inline
+                  label={network.name || network.remote}
+                  type="radio"
+                  checked={isChecked}
+                  disabled={isChecked}
+                  onChange={() => {
+                    props.dispatch(actionCreators.setNetwork(network.id!))
+                  }}
+                />
+              </ListGroup.Item>
+            )
+          })}
+        </ListGroup>
+      </ContextMenuZone>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
         {t('settings.network.addnetwork')}
       </Link>
@@ -133,7 +109,11 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           })
         }
       >
-        <RemoveNetworkDialog isChecked={dialog.isChecked as boolean} network={dialog.network} dispatch={dispatch} />
+        <RemoveNetworkDialog
+          isChecked={dialog.id === chain.network.id}
+          network={networks.find(n => n.id === dialog.id)}
+          dispatch={dispatch}
+        />
       </Dialog>
     </>
   )

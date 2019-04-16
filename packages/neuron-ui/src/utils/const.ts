@@ -1,5 +1,9 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
+export const ADDRESS_LENGTH = 40
+export const PAGE_SIZE = 15
 export const EXPLORER = 'http://localhost:3000'
+export const UnremovableNetwork = 'Testnet'
+export const UnremovableNetworkId = '0'
 
 export const DEFAULT_NETWORKS = [
   {
@@ -12,51 +16,35 @@ export const DEFAULT_NETWORKS = [
   },
 ]
 
-export enum NetworkStatus {
+export enum ConnectStatus {
   Online = 'online',
   Offline = 'offline',
 }
+export enum NetworkType {
+  Default,
+  Normal,
+}
 
 export enum Channel {
-  // App
+  Initiate = 'initiate',
   SetLanguage = 'setLanguage',
-  // Chain
-  GetBlock = 'getBlock',
-  GetTransaction = 'getTransaction',
-  GetLiveCell = 'getLiveCell',
-  GetTipHeader = 'getTipHeader',
-  GetTipBlockNumber = 'getTipBlockNumber',
-  GetLocalNodeId = 'getLocalNodeId',
-  GetNetwork = 'getNetwork',
-  SetNetwork = 'setNetwork',
-  SwitchNetwork = 'switchNetwork',
-
-  // Wallet
-  CreateWallet = 'createWallet',
-  DeleteWallet = 'deleteWallet',
-  EditWallet = 'editWallet',
-  ImportWallet = 'importWallet',
-  ExportWallet = 'exportWallet',
-  SwitchWallet = 'switchWallet',
   GetBalance = 'getBalance',
-  GetCellsByTypeHash = 'getCellsByTypeHash',
-  GetUnspentCells = 'getUnspentCells',
-  GetTransactions = 'getTransactions',
   GetWallet = 'getWallet',
   CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
-  SendTransaction = 'sendTransaction',
-  Sign = 'sign',
 
-  // Page
   NavTo = 'navTo',
-  // Terminal
   Terminal = 'terminal',
+  Networks = 'networks',
+  Transactions = 'transactions',
+  Wallets = 'wallets',
+  Helpers = 'helpers',
 }
 
 export enum Routes {
-  Home = '/',
+  Launch = '/',
+  Mnemonic = '/mnemonic',
   Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
@@ -70,9 +58,11 @@ export enum Routes {
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
   WalletWizard = '/wallets/wizard',
+  WalletSubmission = '/wallets/submission',
   Terminal = '/terminal',
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
+  Prompt = '/prompt',
 }
 
 export enum LocalStorage {
@@ -115,4 +105,10 @@ export enum TransactionType {
   Sent,
   Received,
   Other,
+}
+
+export enum MnemonicAction {
+  Create = 'create',
+  Verify = 'verify',
+  Import = 'import',
 }

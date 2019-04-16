@@ -1,94 +1,43 @@
-import React, { useEffect, useContext } from 'react'
-import { Button } from 'react-bootstrap'
-import styled from 'styled-components'
-import { Launch } from 'grommet-icons'
-import WalletContext from '../../contexts/Wallet'
-import { Routes } from '../../utils/const'
-import ImportWallet from './importWallet'
-import CreateWallet from './createWallet'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
-const Wizard = styled.div`
-  .full-screen & {
-    background-color: white;
-    width: 100%;
-    height: 100%;
-  }
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .buttonGroup {
-    button {
-      cursor: pointer;
-    }
-  }
-`
+import Screen from '../../widgets/Screen'
+import ScreenMessages from '../ScreenMessages'
+import ScreenButtonRow from '../../widgets/ScreenButtonRow'
 
-const NavButton = ({
-  label,
-  position,
-  onSubmit,
-}: {
-  label: string
-  position: 'left' | 'right'
-  onSubmit: (e: any) => void
-}) => (
-  <Button
-    key={label}
-    style={{
-      float: position,
-    }}
-    size="lg"
-    type="button"
-    onKeyPress={onSubmit}
-    onClick={onSubmit}
-  >
-    {label}
-  </Button>
-)
+import { Routes, MnemonicAction } from '../../utils/const'
 
-export default (props: any) => {
-  const wallet = useContext(WalletContext)
-  useEffect(() => {
-    const content = document.querySelector('.main-content')
-    if (content && !wallet.address) {
-      content.classList.add('full-screen')
-      return () => {
-        content.classList.remove('full-screen')
-      }
-    }
-    return () => {}
-  }, [wallet.address])
-  const buttons = [
-    {
-      label: 'Create New Wallet',
-      position: 'left' as 'left',
-      onSubmit: () => props.history.push(Routes.CreateWallet),
-    },
-    {
-      label: 'Import Wallet',
-      position: 'right' as 'right',
-      onSubmit: () => props.history.push(Routes.ImportWallet),
-    },
-  ]
+import { useNeuronWallet } from '../../utils/hooks'
+import { walletsCall } from '../../services/UILayer'
+
+const buttons = [
+  { label: 'wizard.create-new-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Create}` },
+  { label: 'wizard.import-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Import}` },
+]
+
+const Wizard = () => {
+  const { messages } = useNeuronWallet()
+  const [t] = useTranslation()
+  walletsCall.generateMnemonic()
+  const message = 'wizard.create-or-import-your-first-wallet'
   return (
-    <Wizard>
-      <div
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        <h1>
-          <Launch size="large" />
-        </h1>
-        <h1>Create or import your first wallet</h1>
-        <div className="buttonGroup">
-          {buttons.map(button => (
-            <NavButton {...button} key={button.label} />
+    <Screen>
+      <ScreenMessages messages={messages} />
+      <div>
+        <h1>{t(message)}</h1>
+        <ScreenButtonRow>
+          {buttons.map(({ label, href }) => (
+            <Link key={label} className="btn btn-primary" to={href}>
+              {t(label)}
+            </Link>
           ))}
-        </div>
+        </ScreenButtonRow>
       </div>
-    </Wizard>
+    </Screen>
   )
 }
 
-export { ImportWallet, CreateWallet }
+Wizard.displayName = 'Wizard'
+
+export default Wizard

@@ -2,45 +2,23 @@ import Key from '../src/keys/key'
 
 describe('Key tests', () => {
   const mnemonic = 'mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier'
+  const privateKey = '4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488'
   const keystoreJson =
-    '{"master":{"privateKey":"4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488","chainCode":"769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495"},"password":"1qaz.2wsx"}'
+    '{"version":0,"id":"e24843a9-ff71-4165-be2f-fc435f62635c","crypto":{"ciphertext":"c671676b15e35107091318582186762c8ce11e7fc03cdd13efe7099985d94355a60477ddf2ff39b0054233cbcbefc297f1521094db1b473c095c9c3b9c143a0ad80c6806e14596bd438994a025ed76187350ae216d1b411f54f31c5beec989efdcb42ad673cda64d753dc876ed47da8cf65f4b45eded003b5a3a9a8f62dd69890bec62aaae6eeded75f650109f2d700db74515eaed5f3d401b59b02cd0518899","cipherparams":{"iv":"c210625979883ad1b6f90e7fb3f5b70d"},"cipher":"aes-128-ctr","kdf":"scrypt","kdfparams":{"dklen":32,"salt":"54257d76bb23cbe83220f2bc267f98a69a3e1624d62e94f5bcbba9a8df34ec14","n":8192,"r":8,"p":1},"mac":"88b415ff1651bf94ce7fbc82a72a6fcd7e095cd763e8f726ef7bea4ccb028b00"}}'
 
-  it('import key from mnemonic without children', async () => {
-    const key = Key.fromMnemonic(mnemonic, false, '1qaz.2wsx')
-    expect(key.getMnemonic()).toBe('mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier')
-    expect(key.getKeystoreString()).toBe(keystoreJson)
-    expect(key.getKeystore().master.privateKey).toBe('4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488')
-    expect(key.getKeystore().master.chainCode).toBe('769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495')
+  it('import key from mnemonic', async () => {
+    const key = Key.fromMnemonic(mnemonic, '1qaz.2wsx', 17, 3)
+    expect(privateKey).toBe(key.keysData!.privateKey)
+    expect(key.addresses!.receiving.length).toEqual(17)
+    expect(key.addresses!.change.length).toEqual(3)
+    expect(key.addresses!.receiving[0]).not.toBe(undefined)
   })
 
-  it('import key from keystore json without children', async () => {
-    const key = Key.fromKeystoreString(keystoreJson, '1qaz.2wsx')
-    expect(key.getKeystore().master.privateKey).toBe('4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488')
-    expect(key.getKeystore().master.chainCode).toBe('769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495')
-  })
-
-  it('generate key', async () => {
-    const key = Key.generateKey('1qaz.2wsx')
-    expect(key.getMnemonic()).not.toEqual(null)
-    expect(key.getKeystore()).not.toEqual(null)
-    expect(key.getKeystore().master).not.toEqual(null)
-  })
-
-  it('import key from mnemonic with children', async () => {
-    const key = Key.fromMnemonic(mnemonic, true, '1qaz.2wsx')
-    expect(key.getMnemonic()).toBe('mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier')
-    expect(key.getKeystore().master.privateKey).toBe('4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488')
-    expect(key.getKeystore().master.chainCode).toBe('769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495')
-    expect(key.getKeystore().children!.length > 0).toEqual(true)
-    expect(key.getKeystore().children![0].privateKey).not.toBe(null)
-  })
-
-  it('import key from keystore json with children', async () => {
-    const keystore = Key.fromMnemonic(mnemonic, true, '1qaz.2wsx').getKeystoreString()
-    const key = Key.fromKeystoreString(keystore, '1qaz.2wsx')
-    expect(key.getKeystore().master.privateKey).toBe('4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488')
-    expect(key.getKeystore().master.chainCode).toBe('769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495')
-    expect(key.getKeystore().children!.length > 0).toEqual(true)
-    expect(key.getKeystore().children![0].privateKey).not.toBe(null)
+  it('import key from keystore', async () => {
+    const key = Key.fromKeystore(keystoreJson, '1qaz.2wsx', 17, 3)
+    expect(privateKey).toBe(key.keysData!.privateKey)
+    expect(key.addresses!.receiving.length).toEqual(17)
+    expect(key.addresses!.change.length).toEqual(3)
+    expect(key.addresses!.receiving[0]).not.toBe(undefined)
   })
 })

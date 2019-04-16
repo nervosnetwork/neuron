@@ -2,7 +2,7 @@ import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from '
 import env from './env'
 import dispatch, { Command } from './commands/dispatcher'
 import i18n from './i18n'
-import WalletChannel from './channel'
+import WalletChannel from './channel/wallet'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',

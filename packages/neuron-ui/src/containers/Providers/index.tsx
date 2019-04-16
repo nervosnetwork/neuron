@@ -1,13 +1,10 @@
 import React, { useReducer, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ChainContext, { initChain, Cell, Transaction } from '../../contexts/Chain'
-import WalletContext from '../../contexts/Wallet'
-import SettingsContext from '../../contexts/Settings'
+import NeuronWalletContext from '../../contexts/NeuronWallet'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
-import UILayer from '../../services/UILayer'
-import { Channel, NetworkStatus } from '../../utils/const'
-import { loadNetworks } from '../../utils/localStorage'
+import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
+import { Channel, Routes } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -15,150 +12,208 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   const [providers, dispatch] = useReducer(reducer, initProviders)
   const [, i18n] = useTranslation()
   useEffect(() => {
-    UILayer.on(Channel.SetLanguage, (_e: Event, args: Response<string>) => {
-      if (args.status) {
-        if (args.result !== i18n.language) {
-          i18n.changeLanguage(args.result)
-        }
-      }
-    })
-
-    UILayer.on(Channel.GetWallet, (_e: any, args: Response<any>) => {
-      dispatch({
-        type: ProviderActions.Wallet,
-        payload: {
-          ...args.result,
-        },
-      })
-    })
-
-    UILayer.on(Channel.GetWallets, (_e: any, args: Response<any>) => {
-      dispatch({
-        type: ProviderActions.Settings,
-        payload: {
-          wallets: args.result,
-        },
-      })
-    })
-
     UILayer.on(
-      Channel.CreateWallet,
-      (_e: Event, args: Response<{ name: string; address: string; publicKey: Uint8Array }>) => {
+      Channel.Initiate,
+      (
+        _e: Event,
+        args: ChannelResponse<{ networks: any; activeNetwork: any; wallets: any; activeWallet: any; locale: string }>,
+      ) => {
         if (args.status) {
-          // TODO: handle created wallet
+          const { locale, networks, activeNetwork: network, wallets, activeWallet: wallet } = args.result
+          if (locale !== i18n.language) {
+            i18n.changeLanguage(locale)
+          }
+          if (networks.length) {
+            dispatch({
+              type: ProviderActions.Initiate,
+              payload: { networks, network, wallet, wallets },
+            })
+          }
+        } else {
+          // TODO: better prompt
+          window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
+          window.close()
         }
       },
     )
 
-    UILayer.on(Channel.DeleteWallet, (_e: Event, args: Response<string>) => {
-      if (args.status) {
-        // TODO: handle wallet deleted
-      }
-    })
+    // TODO: this method is useless if manually switch is not supported
+    // UILayer.on(Channel.SetLanguage, (_e: Event, args: ChannelResponse<string>) => {
+    //   if (args.status) {
+    //     if (args.result !== i18n.language) {
+    //       i18n.changeLanguage(args.result)
+    //     }
+    //   }
+    // })
 
-    UILayer.on(
-      Channel.GetNetwork,
-      (_e: Event, args: Response<{ name: string; remote: string; connected: boolean }>) => {
-        if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              network: {
-                name: args.result.name,
-                remote: args.result.remote,
-                status: args.result.connected ? NetworkStatus.Online : NetworkStatus.Offline,
-              },
-            },
-          })
-        }
-      },
-    )
-
-    UILayer.on(Channel.GetBalance, (_e: Event, args: Response<number>) => {
+    UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
         dispatch({
           type: ProviderActions.Wallet,
-          payload: {
-            balance: args.result,
-          },
+          payload: { balance: args.result },
         })
       }
     })
 
-    UILayer.on(Channel.SendCapacity, () => {
-      // TODO
-    })
-
-    UILayer.on(Channel.GetCellsByTypeHash, (_e: Event, args: Response<Cell[]>) => {
-      // TODO:
+    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            cells: args.result,
-          },
-        })
-      }
-    })
-
-    UILayer.on(Channel.GetTransaction, (_e: Event, args: Response<Transaction>) => {
-      if (args.status) {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: args.result,
-          },
-        })
-      } else {
-        dispatch({
-          type: ProviderActions.Chain,
-          payload: {
-            transaction: initChain.transaction,
-          },
-        })
-      }
-    })
-
-    UILayer.on(
-      Channel.GetTransactions,
-      (_e: Event, args: Response<{ totalCount: number; items: Transaction[]; pageNo: number; pageSize: number }>) => {
-        // TODO:
-        if (args.status) {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: args.result,
-            },
-          })
-        } else {
-          dispatch({
-            type: ProviderActions.Chain,
-            payload: {
-              transactions: initChain.transactions,
-            },
-          })
+        switch (method) {
+          case TransactionsMethod.GetAll: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: { transactions: { ...providers.chain.transactions, ...args.result } },
+            })
+            break
+          }
+          case TransactionsMethod.Get: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: { transaction: { ...providers.chain.transaction, ...args.result } },
+            })
+            break
+          }
+          default: {
+            break
+          }
         }
-      },
-    )
-    UILayer.addEventListener('NetworksUpdate', () => {
-      const networks = loadNetworks()
-      dispatch({
-        type: ProviderActions.Settings,
-        payload: {
-          networks,
-        },
-      })
+      } else {
+        // TODO: handle error
+      }
+    })
+
+    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
+      if (args.status) {
+        switch (method) {
+          case WalletsMethod.ImportMnemonic: {
+            const time = new Date().getTime()
+            dispatch({
+              type: ProviderActions.AddMessage,
+              payload: {
+                category: 'success',
+                title: 'Wallet Created',
+                content: args.result.name,
+                time,
+                actions: [],
+                dismiss: () => {
+                  dispatch({
+                    type: ProviderActions.DismissMessage,
+                    payload: time,
+                  })
+                },
+              },
+            })
+            break
+          }
+          case WalletsMethod.GetAll: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: { wallets: args.result },
+            })
+            break
+          }
+          case WalletsMethod.GetActive: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: args.result,
+            })
+            break
+          }
+          case WalletsMethod.Activate: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: args.result,
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } else {
+        const time = new Date().getTime()
+        if (method === WalletsMethod.GetActive) {
+          // don't show this error in wizard view
+          return
+        }
+
+        dispatch({
+          type: ProviderActions.AddMessage,
+          payload: {
+            category: 'danger',
+            title: 'Wallet',
+            content: args.msg,
+            time,
+            actions: [],
+            dismiss: () => {
+              dispatch({
+                type: ProviderActions.DismissMessage,
+                payload: time,
+              })
+            },
+          },
+        })
+      }
+    })
+
+    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: ChannelResponse<any>) => {
+      if (args.status) {
+        switch (method) {
+          case NetworksMethod.GetAll: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: { networks: args.result },
+            })
+            break
+          }
+          case NetworksMethod.ActiveOne: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: { network: args.result },
+            })
+            break
+          }
+          case NetworksMethod.Activate: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: { network: args.result },
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } else {
+        const time = new Date().getTime()
+        dispatch({
+          type: ProviderActions.AddMessage,
+          payload: {
+            category: 'danger',
+            title: 'Networks',
+            content: args.msg,
+            time,
+            actions: [
+              {
+                label: 'view',
+                action: Routes.SettingsNetworks,
+              },
+            ],
+            dismiss: () => {
+              dispatch({
+                type: ProviderActions.DismissMessage,
+                payload: time,
+              })
+            },
+          },
+        })
+      }
     })
   }, [])
 
   return (
-    <SettingsContext.Provider value={providers.settings}>
-      <ChainContext.Provider value={providers.chain}>
-        <WalletContext.Provider value={providers.wallet}>
-          <Comp {...props} providerDispatch={dispatch} />
-        </WalletContext.Provider>
-      </ChainContext.Provider>
-    </SettingsContext.Provider>
+    <NeuronWalletContext.Provider value={providers}>
+      <Comp {...props} providerDispatch={dispatch} />
+    </NeuronWalletContext.Provider>
   )
 }
 

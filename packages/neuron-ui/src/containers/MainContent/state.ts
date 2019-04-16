@@ -1,14 +1,21 @@
 import { CapacityUnit } from '../../utils/const'
 
 export const initState = {
+  mnemonic: {
+    generated: '',
+    imported: '',
+    name: '',
+    password: '',
+    confirmPassword: '',
+  },
   tempWallet: {
-    walletName: '',
+    name: '',
     password: '',
     mnemonic: '',
     keystore: '',
   },
   createWallet: {
-    walletName: '',
+    name: '',
     password: '',
   },
   transfer: {
@@ -34,11 +41,10 @@ export const initState = {
     transfer: '',
     transaction: '',
     transactions: '',
+    wizard: '',
   },
   password: '',
-  dialog: {
-    open: false,
-  } as { open: boolean; [index: string]: any },
+  dialog: { open: false } as { open: boolean; [index: string]: any },
 }
 
 export default initState

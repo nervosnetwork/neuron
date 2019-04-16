@@ -1,13 +1,16 @@
-import React, { useReducer, useEffect, useContext } from 'react'
+import React, { useReducer, useEffect } from 'react'
 import styled from 'styled-components'
 
-import ChainContext from '../../contexts/Chain'
 import { initState, reducer, MainDispatch, InitState } from './reducer'
 import MainActions from './actions'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const Main = styled.main`
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
+  padding-top: 50px;
 `
 
 export interface ContentProps extends InitState {
@@ -20,25 +23,22 @@ const MainContent = ({
   children,
 }: React.PropsWithoutRef<{ providerDispatch: any; children?: any }>) => {
   const [state, dispatch] = useReducer(reducer, initState)
-  const chain = useContext(ChainContext)
-  const { transaction, transactions } = chain
+  const {
+    chain: { transaction, transactions },
+  } = useNeuronWallet()
   const { pageNo, pageSize, addresses, items } = transactions
 
   useEffect(() => {
     dispatch({
       type: MainActions.UpdateLoading,
-      payload: {
-        transaction: false,
-      },
+      payload: { transaction: false },
     })
   }, [transaction.hash])
 
   useEffect(() => {
     dispatch({
       type: MainActions.UpdateLoading,
-      payload: {
-        transactions: false,
-      },
+      payload: { transactions: false },
     })
   }, [pageNo, pageSize, addresses.join(','), items.map(item => item.hash).join(',')])
 

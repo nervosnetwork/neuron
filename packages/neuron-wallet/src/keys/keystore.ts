@@ -1,4 +1,4 @@
-export interface Master {
+export interface KeysData {
   privateKey: string
   chainCode: string
 }
@@ -9,8 +9,29 @@ export interface Child {
   chainCode: string
 }
 
+export interface CipherParams {
+  iv: string
+}
+
+export interface KdfParams {
+  dklen: number
+  n: number
+  r: number
+  p: number
+  salt: string
+}
+
+export interface Crypto {
+  cipher: string
+  cipherparams: CipherParams
+  ciphertext: string
+  kdf: string
+  kdfparams: KdfParams
+  mac: string
+}
+
 export interface Keystore {
-  master: Master
-  children?: Child[]
-  password: string
+  crypto: Crypto
+  id: string
+  version: number
 }

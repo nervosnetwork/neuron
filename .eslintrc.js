@@ -24,7 +24,6 @@ module.exports = {
       "args": "after-used",
       "ignoreRestSiblings": false
     }],
-    "operator-linebreak": [2, "after"],
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
       "code": 120,
@@ -36,9 +35,11 @@ module.exports = {
       "ignoreRegExpLiterals": true,
     }],
     "object-curly-newline": ["error", {
-      "ObjectExpression": "always",
+      "ObjectExpression": {
+        "consistent": true
+      },
       "ObjectPattern": {
-        "multiline": true
+        "consistent": true
       },
       "ImportDeclaration": {
         "consistent": true,
@@ -52,6 +53,9 @@ module.exports = {
     "no-console": [2, {
       "allow": ["warn", "error", "info"]
     }]
+  },
+  "globals": {
+    "BigInt": "readonly"
   },
   "env": {
     "jest": true,

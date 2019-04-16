@@ -1,20 +1,20 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
-import styled from 'styled-components'
-import WalletContext from '../../contexts/Wallet'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
-const Panel = styled.div`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  background: #ccc;
-`
+import { useNeuronWallet } from '../../utils/hooks'
+import BannerMessages from '../../widgets/BannerMessages'
 
-const Notice = () => {
-  const wallet = useContext(WalletContext)
-  return wallet.msg ? <Panel>{'New message coming: {wallet.msg}'}</Panel> : null
+dayjs.extend(relativeTime)
+
+const NoticeContent = () => {
+  const { messages } = useNeuronWallet()
+  return <BannerMessages messages={messages} style={{ paddingTop: '20px', paddingRight: '40px' }} />
 }
 
-const Notification = () => createPortal(<Notice />, document.querySelector('#notification') as HTMLElement)
+NoticeContent.displayName = 'NoticeContent'
+
+const Notification = () => createPortal(<NoticeContent />, document.querySelector('#notification') as HTMLElement)
 
 export default Notification

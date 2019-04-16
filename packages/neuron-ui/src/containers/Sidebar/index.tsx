@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import {
@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { mainContents } from '../../components/Router'
-import WalletContext from '../../contexts/Wallet'
+import { useNeuronWallet } from '../../utils/hooks'
 
 const SidebarAside = styled.div`
   ul {
@@ -77,7 +77,7 @@ const walletMenuItems = [
 ]
 
 const Sidebar = (props: any) => {
-  const wallet = useContext(WalletContext)
+  const { wallet } = useNeuronWallet()
   const [t] = useTranslation()
 
   const walletRoutes = walletMenuItems.map(item => {

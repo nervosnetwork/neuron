@@ -1,7 +1,14 @@
+$column-gap: 40px;
+
 body {
   display: grid;
-  grid-template: 'sidebar header' 60px 'sidebar content' 1fr 'sidebar content' 1fr / 240px 1fr;
-  column-gap: 40px;
+  grid-template:
+    'sidebar header header header' 60px
+    'sidebar notification notification notification' auto
+    'sidebar content content content' 1fr
+    'sidebar content content content' 1fr /
+    240px 1fr 1fr 340px;
+  column-gap: $column-gap;
 
   height: 100vh;
 }
@@ -17,12 +24,19 @@ body {
 .main-content {
   grid-area: content;
   overflow: auto;
-  &.full-screen {
-    grid-area: 1/1/4/4;
-  }
+  padding-right: $column-gap;
 }
 
-
 .notification {
-  grid-area: 4/3/5/4;
+  grid-area: notification;
+  z-index: 1;
+}
+
+.dialog{
+  grid-area: 1/1/5/5;
+  dialog {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
 }
