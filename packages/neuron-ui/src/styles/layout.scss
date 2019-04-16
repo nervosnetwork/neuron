@@ -38,5 +38,7 @@ body {
     margin: 0;
     padding: 0;
     border: none;
+    pointer-events: auto;
   }
+  pointer-events: none;
 }
