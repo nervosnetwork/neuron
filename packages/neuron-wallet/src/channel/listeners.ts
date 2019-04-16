@@ -37,7 +37,6 @@ export default class Listeners {
       'sendCapacity',
       'networks',
       'wallets',
-      'deleteWallet',
       'transactions',
       'helpers',
     ],

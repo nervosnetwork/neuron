@@ -3,7 +3,6 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-// import { Routes } from '../../utils/const'
 import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
@@ -92,7 +91,6 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           wallet={myWallet}
           dispatch={dispatch}
           checkType={CheckType.EditWallet}
-          // handle={() => props.history.push(`${Routes.SettingsWallets}`)}
           errorMessage=""
           newWalletName={walletName}
           newPassword={password}

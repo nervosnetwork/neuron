@@ -85,7 +85,7 @@ const InputWalletPasswordDialog = ({
     >
       {wallet ? (
         <>
-          <Card.Header>{`Please Enter ${wallet.name} Password`}</Card.Header>
+          <Card.Header>{t('settings.walletmanger.deletewallettitle', { name: wallet.name })}</Card.Header>
           <Card.Body>
             <Form.Group as={Row} controlId="formPlaintextPassword">
               <Col>
