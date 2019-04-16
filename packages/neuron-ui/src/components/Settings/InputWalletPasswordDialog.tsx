@@ -16,7 +16,6 @@ export enum CheckType {
 interface InputPasswordProps {
   wallet?: Wallet
   dispatch: any
-  handle?: any
   checkType: CheckType
   newWalletName?: string
   newPassword?: string
