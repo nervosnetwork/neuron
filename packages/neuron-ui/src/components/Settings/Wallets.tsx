@@ -34,6 +34,15 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     dispatch(actionCreators.getActiveWallet())
   }, [])
 
+  useEffect(() => {
+    dispatch({
+      type: MainActions.SetDialog,
+      payload: {
+        open: false,
+      },
+    })
+  }, [wallets.length])
+
   const menuItems = useMemo(
     () => [
       {
