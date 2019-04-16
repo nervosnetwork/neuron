@@ -15,10 +15,10 @@ import Receive from '../Receive'
 import History from '../History'
 import Transaction from '../Transaction'
 import Settings from '../Settings'
-import General from '../Settings/General'
+import GeneralSetting from '../GeneralSetting'
 import Addresses from '../Addresses'
 import Wallets from '../Settings/Wallets'
-import Network from '../Settings/Networks'
+import NetworkSetting from '../NetworkSetting'
 import NetworkEditor from '../NetworkEditor'
 import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
@@ -108,10 +108,10 @@ export const mainContents: CustomRoute[] = [
     component: Settings,
   },
   {
-    name: `SettingsGeneral`,
+    name: `GeneralSetting`,
     path: Routes.SettingsGeneral,
     exact: false,
-    component: General,
+    component: GeneralSetting,
   },
   {
     name: `SettingsWallets`,
@@ -120,10 +120,10 @@ export const mainContents: CustomRoute[] = [
     component: Wallets,
   },
   {
-    name: `SettingsNetwork`,
+    name: `NetworkSetting`,
     path: Routes.SettingsNetworks,
     exact: true,
-    component: Network,
+    component: NetworkSetting,
   },
   {
     name: `NetorkEditor`,
