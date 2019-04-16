@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn } from 'typeorm'
-import { Script, OutPoint } from '../cell'
+import { Script, OutPoint } from '../services/cells'
 
 @Entity()
 export default class Cell extends BaseEntity {
