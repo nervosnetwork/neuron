@@ -33,6 +33,7 @@ export enum NetworksMethod {
   Delete = 'delete',
   Activate = 'activate',
   ActiveOne = 'activeOne',
+  Status = 'status',
 }
 
 export enum TransactionsMethod {

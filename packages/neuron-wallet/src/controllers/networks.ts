@@ -11,6 +11,7 @@ export enum NetworksMethod {
   Activate = 'activate',
   ActiveOne = 'activeOne',
   Clear = 'clear',
+  Status = 'status',
 }
 
 class NetworksController {
