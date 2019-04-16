@@ -3,7 +3,6 @@ import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from '../env'
 import TerminalChannel from '../channel/terminal'
-import monitorChain from '../monitor'
 import initWindow from './initWindow'
 
 function createWindow() {
@@ -42,11 +41,6 @@ function createWindow() {
     initWindow(mainWindow!)
   })
 
-  /**
-   * @monitorChain
-   * @description monitor network
-   */
-  monitorChain(mainWindow.webContents)
   const terminalChannel = new TerminalChannel(mainWindow.webContents)
   terminalChannel.start()
 
