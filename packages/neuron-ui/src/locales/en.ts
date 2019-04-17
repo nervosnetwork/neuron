@@ -75,6 +75,7 @@ export default {
           confirmpassword: 'Confirm Password',
           editwallet: 'Edit Wallet',
         },
+        deletewallettitle: 'Please Enter {{name}} Password',
         walletdetail: {
           balance: 'balance',
           nowallet: 'No Wallet',

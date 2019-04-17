@@ -1,7 +1,6 @@
 import { interval, Subject } from 'rxjs'
-import { distinctUntilChanged, flatMap } from 'rxjs/operators'
+import { distinctUntilChanged, flatMap, retry, filter } from 'rxjs/operators'
 import ckbCore from '../core'
-import logger from '../utils/logger'
 
 class NodeService {
   tick = interval(1000)
@@ -15,20 +14,35 @@ class NodeService {
 
   tipNumber = () =>
     this.tick
-      .pipe(flatMap(() => ckbCore.rpc.getTipBlockNumber()))
-      .pipe(distinctUntilChanged())
+      .pipe(
+        flatMap(() => ckbCore.rpc.getTipBlockNumber()),
+        // TODO: to determine retry or not
+        retry(3),
+        distinctUntilChanged(),
+      )
       .subscribe(
-        tipNumber => this.tipNumberSubject.next(tipNumber),
-        error =>
-          logger.log({
-            level: 'error',
-            message: error.message,
-          }),
+        tipNumber => {
+          this.tipNumberSubject.next(tipNumber)
+        },
+        () => {
+          this.tipNumberSubject.next(undefined)
+          this.tipNumber()
+        },
       )
 
-  tipHeader = () => this.tipNumberSubject.pipe(flatMap(ckbCore.rpc.getTipHeader))
+  tipHeader = () =>
+    this.tipNumberSubject.pipe(
+      filter(tipNumber => typeof tipNumber !== 'undefined'),
+      flatMap(ckbCore.rpc.getTipHeader),
+    )
 
-  tipBlock = () => this.tipNumberSubject.pipe(flatMap(ckbCore.rpc.getBlockHash)).pipe(flatMap(ckbCore.rpc.getBlock))
+  tipBlock = () =>
+    this.tipNumberSubject
+      .pipe(
+        filter(tipNumber => typeof tipNumber !== 'undefined'),
+        flatMap(ckbCore.rpc.getBlockHash),
+      )
+      .pipe(flatMap(ckbCore.rpc.getBlock))
 }
 
 const nodeService = new NodeService()

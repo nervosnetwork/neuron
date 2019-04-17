@@ -21,6 +21,12 @@ export default {
       payload: id,
     }
   },
+  deleteWallet(params: { id: string; password: string }) {
+    walletsCall.delete(params)
+    return {
+      type: MainActions.Wallet,
+    }
+  },
   backupWallet: (id: string) => {
     walletsCall.backup(id)
     return {
@@ -60,16 +66,6 @@ export default {
     return {
       type: MainActions.Wallet,
       payload: params,
-    }
-  },
-  deleteWallet: (id: string, password: string) => {
-    walletsCall.delete({
-      id,
-      password,
-    })
-    return {
-      type: MainActions.Wallet,
-      payload: id,
     }
   },
   importWallet: (isKeystore: boolean, params: typeof initState.tempWallet) => {

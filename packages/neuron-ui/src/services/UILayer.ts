@@ -11,6 +11,7 @@ declare global {
     bridge: any
   }
 }
+
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -33,6 +34,7 @@ export enum NetworksMethod {
   Delete = 'delete',
   Activate = 'activate',
   ActiveOne = 'activeOne',
+  Status = 'status',
 }
 
 export enum TransactionsMethod {
@@ -49,6 +51,7 @@ export interface TransferItem {
   capacity: string
   unit: CapacityUnit
 }
+
 export interface GetTransactionsParams {
   pageNo: number
   pageSize: number

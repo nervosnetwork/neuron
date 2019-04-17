@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm'
-import { Cell } from '../cell'
+import { Cell } from '../services/cells'
 import { Witness } from '../services/transactions'
 
 interface OutPoint {

@@ -1,4 +1,4 @@
-import { Cell } from './cell'
+import { Cell } from './services/cells'
 
 // mock as cells in db
 export const storeCells: Cell[] = [
@@ -7,7 +7,7 @@ export const storeCells: Cell[] = [
       hash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
       index: 0,
     },
-    state: 'live',
+    status: 'live',
     // origin cell infos
     data: '0x',
     capacity: '10',
@@ -19,7 +19,7 @@ export const storeCells: Cell[] = [
       hash: '0xb22b53a7613f5754850f118eae16caf867107d72a9b125ca596855583e712c97',
       index: 0,
     },
-    state: 'dead',
+    status: 'dead',
     // origin cell infos
     data: '0x',
     capacity: '20',

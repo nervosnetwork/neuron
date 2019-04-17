@@ -38,5 +38,8 @@ docs
 # vscode config
 ./packages/neuron-wallet/.vscode
 
+# Webstorm config
+.idea
+
 # sqlite db
 *.db.*

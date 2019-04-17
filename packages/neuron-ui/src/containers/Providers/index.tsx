@@ -4,7 +4,7 @@ import NeuronWalletContext from '../../contexts/NeuronWallet'
 import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
 
 import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
-import { Channel, Routes } from '../../utils/const'
+import { Channel, Routes, ConnectStatus } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -176,6 +176,15 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             dispatch({
               type: ProviderActions.Chain,
               payload: { network: args.result },
+            })
+            break
+          }
+          case NetworksMethod.Status: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
+              },
             })
             break
           }

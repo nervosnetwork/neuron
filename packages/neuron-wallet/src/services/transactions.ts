@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import { Cell, OutPoint } from '../cell'
+import { Cell, OutPoint } from './cells'
 import TransactionEntity from '../entities/Transaction'
 import { getHistoryTransactions } from '../mock_rpc'
 
