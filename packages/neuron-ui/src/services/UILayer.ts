@@ -11,6 +11,7 @@ declare global {
     bridge: any
   }
 }
+
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -49,6 +50,7 @@ export interface TransferItem {
   capacity: string
   unit: CapacityUnit
 }
+
 export interface GetTransactionsParams {
   pageNo: number
   pageSize: number

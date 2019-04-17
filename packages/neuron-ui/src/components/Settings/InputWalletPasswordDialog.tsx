@@ -14,10 +14,10 @@ export enum CheckType {
 }
 
 interface InputPasswordProps {
-  wallet: Wallet
+  wallet?: Wallet
   dispatch: any
+  errorMessage: string
   checkType: CheckType
-  handle?: any
   newWalletName?: string
   newPassword?: string
 }
@@ -31,11 +31,10 @@ const InputWalletPasswordDialog = ({
   wallet,
   dispatch,
   checkType,
-  handle,
+  errorMessage,
   newWalletName,
   newPassword,
 }: InputPasswordProps) => {
-  const [errorMsg, setErrorMsg] = useState('')
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
 
@@ -47,27 +46,17 @@ const InputWalletPasswordDialog = ({
           open: false,
         },
       })
-      if (handle) {
-        handle(wallet.id, password)
-      }
-    } else if (args.msg) {
-      setErrorMsg(args.msg)
-    } else {
-      setErrorMsg('Wrong password')
     }
   }
 
-  const handleSubmit = () => {
-    if (!password) {
-      setErrorMsg('Please enter password')
-    }
+  const handleSubmit = (id: string) => {
     switch (checkType) {
       case CheckType.EditWallet:
         if (newWalletName && newPassword) {
           dispatch(
             actionCreators.createOrUpdateWallet(
               {
-                id: wallet.id,
+                id,
                 name: newWalletName,
               },
               password,
@@ -76,11 +65,11 @@ const InputWalletPasswordDialog = ({
         }
         break
       case CheckType.DeleteWallet:
-        dispatch(actionCreators.deleteWallet(wallet.id, password))
+        dispatch(actionCreators.deleteWallet({ id, password }))
         break
       case CheckType.CheckPassword:
       default:
-        checkPassword(wallet.id, password, handleResult)
+        checkPassword(id, password, handleResult)
     }
   }
 
@@ -94,40 +83,46 @@ const InputWalletPasswordDialog = ({
         width: '40%',
       }}
     >
-      <Card.Header>{`Please Enter ${wallet.name} Password`}</Card.Header>
-      <Card.Body>
-        <Form.Group as={Row} controlId="formPlaintextPassword">
-          <Col>
-            <Form.Control
-              type="password"
-              placeholder="password"
-              onChange={(e: any) => setPassword(e.currentTarget.value)}
-              isInvalid={errorMsg !== ''}
-            />
-            <Form.Control.Feedback type="invalid">{errorMsg}</Form.Control.Feedback>
-          </Col>
-        </Form.Group>
-      </Card.Body>
-      <Card.Footer className="text-muted">
-        <ButtonDiv>
-          <Button variant="danger" onClick={handleSubmit}>
-            {t('common.confirm')}
-          </Button>
-          <Button
-            variant="light"
-            onClick={() =>
-              dispatch({
-                type: MainActions.SetDialog,
-                payload: {
-                  open: false,
-                },
-              })
-            }
-          >
-            {t('common.cancel')}
-          </Button>
-        </ButtonDiv>
-      </Card.Footer>
+      {wallet ? (
+        <>
+          <Card.Header>{t('settings.walletmanger.deletewallettitle', { name: wallet.name })}</Card.Header>
+          <Card.Body>
+            <Form.Group as={Row} controlId="formPlaintextPassword">
+              <Col>
+                <Form.Control
+                  type="password"
+                  placeholder="password"
+                  onChange={(e: any) => setPassword(e.currentTarget.value)}
+                  isInvalid={errorMessage !== ''}
+                />
+                <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
+              </Col>
+            </Form.Group>
+          </Card.Body>
+          <Card.Footer className="text-muted">
+            <ButtonDiv>
+              <Button variant="danger" onClick={() => handleSubmit(wallet.id)} disabled={password === ''}>
+                {t('common.confirm')}
+              </Button>
+              <Button
+                variant="light"
+                onClick={() =>
+                  dispatch({
+                    type: MainActions.SetDialog,
+                    payload: {
+                      open: false,
+                    },
+                  })
+                }
+              >
+                {t('common.cancel')}
+              </Button>
+            </ButtonDiv>
+          </Card.Footer>
+        </>
+      ) : (
+        <div>Wallet not found</div>
+      )}
     </Card>
   )
 }

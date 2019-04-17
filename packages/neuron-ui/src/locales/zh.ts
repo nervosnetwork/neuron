@@ -68,6 +68,7 @@ export default {
           confirmpassword: '确认密码',
           editwallet: '编辑钱包',
         },
+        deletewallettitle: '请输入{{name}}的密码',
         walletdetail: {
           balance: '余额',
           nowallet: '没有钱包',
