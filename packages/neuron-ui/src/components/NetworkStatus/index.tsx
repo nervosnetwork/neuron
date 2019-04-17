@@ -6,7 +6,6 @@ import { FormSubtract as HyphenIcon } from 'grommet-icons'
 import Dropdown from '../../widgets/Dropdown'
 import { ConnectStatus, Routes } from '../../utils/const'
 import { Network } from '../../contexts/NeuronWallet'
-import { HeaderActions, actionCreators } from '../../containers/Header/reducer'
 import { useNeuronWallet } from '../../utils/hooks'
 
 const Container = styled.div`
@@ -43,10 +42,10 @@ const CurrentNetwork = styled.div<{ online: boolean }>`
 const ConnectStatusHeader = ({
   networks,
   navTo,
-  dispatch,
+  activate,
 }: {
   networks: Network[]
-  dispatch: React.Dispatch<{ type: HeaderActions; payload?: any }>
+  activate: (id: string) => void
   navTo: Function
 }) => {
   const { chain } = useNeuronWallet()
@@ -58,7 +57,7 @@ const ConnectStatusHeader = ({
       label: network.name || network.remote,
       key: network.id,
       onClick: () => {
-        dispatch(actionCreators.setNetwork(network.id!))
+        activate(network.id)
       },
     })),
     {
