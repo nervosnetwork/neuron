@@ -1,9 +1,12 @@
 import { dialog } from 'electron'
-import NetworksController from '../controllers/networks'
+import { distinctUntilChanged } from 'rxjs/operators'
+import NetworksController, { NetworksMethod } from '../controllers/networks'
+import windowManage from './windowManage'
 import WalletChannel from '../channel/wallet'
 import initConnection from '../typeorm'
 import nodeService from '../services/node'
 import env from '../env'
+import { Channel } from './const'
 
 const initiateNetworks = () => {
   NetworksController.clear()
@@ -15,8 +18,25 @@ const initiateNetworks = () => {
   })
 }
 
+const syncConnectStatus = () => {
+  nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
+    tipNumber => {
+      windowManage.broadcast(Channel.Networks, NetworksMethod.Status, {
+        status: 1,
+        result: typeof tipNumber !== 'undefined',
+      })
+    },
+    () => {},
+    () => {
+      // TODO: handle complete
+    },
+  )
+}
+
 const initApp = () => {
   nodeService.start()
+  // TODO: this function should be moved to somewhere syncing data
+  syncConnectStatus()
   initConnection().then()
   WalletChannel.start()
   const { status, result } = NetworksController.activeOne()
