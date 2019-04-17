@@ -18,7 +18,7 @@ const initiateNetworks = () => {
   })
 }
 
-const checkConnectStatus = () => {
+const syncConnectStatus = () => {
   nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
     tipNumber => {
       windowManage.broadcast(Channel.Networks, NetworksMethod.Status, {
@@ -36,7 +36,7 @@ const checkConnectStatus = () => {
 const initApp = () => {
   nodeService.start()
   // TODO: this function should be moved to somewhere syncing data
-  checkConnectStatus()
+  syncConnectStatus()
   initConnection().then()
   WalletChannel.start()
   const { status, result } = NetworksController.activeOne()
