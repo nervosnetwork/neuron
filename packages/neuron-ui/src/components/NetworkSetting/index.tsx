@@ -96,7 +96,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         </ListGroup>
       </ContextMenuZone>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
-        {t('settings.network.addnetwork')}
+        {t('settings.network.add-network')}
       </Link>
       <Dialog
         open={dialog.open}

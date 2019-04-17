@@ -25,9 +25,7 @@ export default {
       address: 'address',
       capacity: 'capacity',
       send: 'Send',
-      transactionfee: 'transaction fee',
-      sendcapacity: 'Send Capacity',
-      confirmpassword: 'Confirm Password',
+      'confirm-password': 'Confirm Password',
       to: 'to',
       'input-password-to-confirm': 'input password to confirm',
       'this-transfer-will-send': 'This transfer will send',
@@ -54,40 +52,37 @@ export default {
       balance: 'Balance',
       transactions: 'Transactions',
       actions: {
-        copyaddress: 'Copy address',
-        requestpayment: 'Request Payment',
-        spendfrom: 'Spend From',
-        viewonexplorer: 'View On Explorer',
+        'copy-address': 'Copy address',
+        'request-payment': 'Request Payment',
+        'spend-from': 'Spend From',
+        'view-on-explorer': 'View On Explorer',
       },
     },
     settings: {
-      settingtabs: {
+      'setting-tabs': {
         general: 'General',
         wallets: 'Wallets',
         network: 'Network',
       },
-      walletmanger: {
-        createwallet: 'Create Wallet',
-        importwallet: 'Import Wallet',
-        editwallet: {
-          walletname: 'Wallet Name',
+      'wallet-manager': {
+        'edit-wallet': {
+          'wallet-name': 'Wallet Name',
           password: 'Password',
-          confirmpassword: 'Confirm Password',
-          editwallet: 'Edit Wallet',
+          'confirm-password': 'Confirm Password',
+          'edit-wallet': 'Edit Wallet',
         },
-        deletewallettitle: 'Please Enter {{name}} Password',
-        walletdetail: {
+        'delete-wallet-title': 'Please Enter {{name}} Password',
+        'wallet-detail': {
           balance: 'balance',
-          nowallet: 'No Wallet',
         },
       },
       network: {
         online: 'online',
         offline: 'offline',
-        addnetwork: 'Add Network',
-        editnetwork: {
+        'add-network': 'Add Network',
+        'edit-network': {
           title: 'Add Network',
-          rpcurl: 'RPC URL',
+          'rpc-url': 'RPC URL',
           name: 'Name',
         },
       },
@@ -108,7 +103,6 @@ export default {
       confirm: 'Confirm',
       cancel: 'Cancel',
       save: 'Save',
-      clickcopy: 'Click to copy',
     },
     messages: {
       'at-least-one-address-needed': 'at least one address needed',
@@ -124,6 +118,7 @@ export default {
       'network-is-not-found': 'Network is not found',
       'name-has-been-used': 'Name has been used',
       'failed-to-initiate,-please-reopen-Neuron': 'Failed to initiate, please reopen Neuron',
+      'no-wallet': 'No Wallet',
     },
   },
 }

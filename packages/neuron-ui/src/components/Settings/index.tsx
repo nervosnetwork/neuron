@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { Routes } from '../../utils/const'
 
 const tabs = [
-  { label: 'settings.settingtabs.general', to: Routes.SettingsGeneral },
-  { label: 'settings.settingtabs.wallets', to: Routes.SettingsWallets },
-  { label: 'settings.settingtabs.network', to: Routes.SettingsNetworks },
+  { label: 'settings.setting-tabs.general', to: Routes.SettingsGeneral },
+  { label: 'settings.setting-tabs.wallets', to: Routes.SettingsWallets },
+  { label: 'settings.setting-tabs.network', to: Routes.SettingsNetworks },
 ]
 
 const Settings = () => {

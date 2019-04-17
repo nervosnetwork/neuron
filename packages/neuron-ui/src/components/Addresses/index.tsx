@@ -45,27 +45,27 @@ const AddressPanel = ({ address, history }: { address: string; history: any }) =
   const [t] = useTranslation()
   const actionItems = [
     {
-      label: t('addresses.actions.copyaddress'),
+      label: t('addresses.actions.copy-address'),
       click: () => {
         window.clipboard.writeText(address)
       },
     },
     {
-      label: t('addresses.actions.requestpayment'),
+      label: t('addresses.actions.request-payment'),
       click: () => {
         window.clipboard.writeText(address)
         history.push(`${Routes.Receive}/${address}`)
       },
     },
     {
-      label: t('addresses.actions.spendfrom'),
+      label: t('addresses.actions.spend-from'),
       click: () => {
         window.clipboard.writeText(address)
         // TODO: navigate to send page with address
       },
     },
     {
-      label: t('addresses.actions.viewonexplorer'),
+      label: t('addresses.actions.view-on-explorer'),
       click: () => {
         window.clipboard.writeText(address)
         window.open(EXPLORER)

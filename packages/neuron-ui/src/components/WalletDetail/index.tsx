@@ -9,7 +9,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
   const { wallet } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const items = [`${t('settings.walletmanger.walletdetail.balance')}: ${wallet.balance}`]
+  const items = [`${t('settings.wallet-manager.walletdetail.balance')}: ${wallet.balance}`]
 
   return wallet.name ? (
     <Card>
@@ -22,7 +22,7 @@ const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentPr
       </ListGroup>
     </Card>
   ) : (
-    <Alert variant="warning">{t('settings.walletmanger.walletdetail.nowallet')}</Alert>
+    <Alert variant="warning">{t('messages.no-wallet')}</Alert>
   )
 }
 
