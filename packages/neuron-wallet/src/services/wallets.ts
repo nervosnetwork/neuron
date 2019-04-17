@@ -34,33 +34,10 @@ export default class WalletService {
     return key.checkPassword(password)
   }
 
-  // TODO: update wallet
-  // public update = ({
-  //   id,
-  //   name,
-  //   address,
-  //   publicKey,
-  // }: {
-  //   id: string
-  //   name?: string
-  //   address?: string
-  //   publicKey?: Uint8Array
-  // }): boolean => {
-  //   const wallet = this.show(id)
-  //   if (wallet) {
-  //     if (name) {
-  //       wallet.name = name
-  //     }
-  //     if (address) {
-  //       wallet.address = address
-  //     }
-  //     if (publicKey) {
-  //       wallet.publicKey = publicKey
-  //     }
-  //     return true
-  //   }
-  //   return false
-  // }
+  public update = (walletId: string, newWallet: WalletData) => {
+    const currentWallet = walletStore.getWallet(walletId)
+    walletStore.update(walletId, { ...currentWallet, ...newWallet })
+  }
 
   public delete = (id: string): boolean => {
     const wallet = this.get(id)

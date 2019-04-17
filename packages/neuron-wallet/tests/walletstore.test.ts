@@ -116,7 +116,8 @@ describe.skip('wallet store', () => {
   it('rename wallet', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
-    walletStore.renameWallet(wallet1.id, wallet2.name)
+    wallet1.name = wallet2.name
+    walletStore.update(wallet1.id, wallet1)
     const wallet = walletStore.getWallet(wallet1.id)
     assert.deepEqual(wallet, {
       id: wallet1.id,
@@ -132,7 +133,8 @@ describe.skip('wallet store', () => {
       receiving: ['address1', 'address2', 'address3'],
       change: ['address1', 'address2', 'address3'],
     }
-    walletStore.updateAddresses(wallet1.id, addresses)
+    wallet1.addresses = addresses
+    walletStore.update(wallet1.id, wallet1)
     const wallet = walletStore.getWallet(wallet1.id)
     assert.deepEqual(wallet, {
       id: wallet1.id,

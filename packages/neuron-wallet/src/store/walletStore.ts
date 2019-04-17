@@ -102,16 +102,8 @@ export default class WalletStore {
     return walletList
   }
 
-  renameWallet = (walletId: string, name: string) => {
-    const wallet = this.getWallet(walletId)
-    wallet.name = name
-    this.getWalletStore(walletId).set(walletId, wallet)
-  }
-
-  updateAddresses = (walletId: string, addresses: Addresses) => {
-    const wallet = this.getWallet(walletId)
-    wallet.addresses = addresses
-    this.getWalletStore(walletId).set(walletId, wallet)
+  update = (walletId: string, newWallet: WalletData) => {
+    this.getWalletStore(walletId).set(walletId, newWallet)
   }
 
   deleteWallet = (walletId: string) => {
