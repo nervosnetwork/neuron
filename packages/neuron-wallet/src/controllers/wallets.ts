@@ -126,6 +126,27 @@ class WalletsController {
     }
   }
 
+  public static update = ({
+    walletId,
+    newWallet,
+  }: {
+    walletId: string
+    newWallet: WalletData
+  }): ChannelResponse<boolean> => {
+    try {
+      WalletsController.service.update(walletId, newWallet)
+      return {
+        status: ResponseCode.Success,
+        result: true,
+      }
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Failed to update wallet',
+      }
+    }
+  }
+
   public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
     if (WalletsController.service.validate({ id, password })) {
       const success = WalletsController.service.delete(id)
