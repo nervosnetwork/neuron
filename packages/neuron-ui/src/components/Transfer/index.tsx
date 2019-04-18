@@ -187,7 +187,7 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
       </Card>
       <Dialog open={dialog.open} onClick={onCancel}>
         <TransferConfirm
-          title={t('send.confirmpassword')}
+          title={t('send.confirm-password')}
           message={<TransferItemList items={transfer.items} />}
           password={password}
           onChange={onPswChange}

@@ -25,9 +25,7 @@ export default {
       address: '地址',
       capacity: '价值',
       send: '发送',
-      transactionfee: '交易费',
-      sendcapacity: '转账',
-      confirmpassword: '确认密码',
+      'confirm-password': '确认密码',
       to: '至',
       'input-password-to-confirm': '输入密码以确认本次交易',
       'this-transfer-will-send': '本次交易将发送',
@@ -48,39 +46,38 @@ export default {
     },
     transaction: { goBack: '返回' },
     addresses: {
-      deletewallet: '删除钱包',
-      exportwallet: '导出钱包',
-      createwallet: '创建钱包',
-      importwallet: '导入钱包',
+      actions: {
+        'copy-address': '复制地址',
+        'request-payment': '请求支付',
+        'spend-from': '支付来源',
+        'view-on-explorer': '在浏览器中查看',
+      },
     },
     settings: {
-      settingtabs: {
+      'setting-tabs': {
         general: '通用',
         wallets: '钱包',
         network: '网络',
       },
-      walletmanger: {
-        createwallet: '创建钱包',
-        importwallet: '导入钱包',
-        editwallet: {
-          walletname: '钱包名称',
+      'wallet-manager': {
+        'edit-wallet': {
+          'wallet-name': '钱包名称',
           password: '密码',
-          confirmpassword: '确认密码',
-          editwallet: '编辑钱包',
+          'confirm-password': '确认密码',
+          'edit-wallet': '编辑钱包',
         },
-        deletewallettitle: '请输入{{name}}的密码',
-        walletdetail: {
+        'delete-wallet-title': '请输入{{name}}的密码',
+        'wallet-detail': {
           balance: '余额',
-          nowallet: '没有钱包',
         },
       },
       network: {
         online: '在线',
         offline: '离线',
-        addnetwork: '新增网络',
-        editnetwork: {
+        'add-network': '新增网络',
+        'edit-network': {
           title: '新增网络',
-          rpcurl: 'RPC地址',
+          'rpc-url': 'RPC地址',
           name: '名字',
         },
       },
@@ -101,7 +98,6 @@ export default {
       confirm: '确认',
       cancel: '取消',
       save: '保存',
-      clickcopy: '点击复制',
     },
     messages: {
       'at-least-one-address-needed': '需要至少一个地址',
@@ -117,6 +113,7 @@ export default {
       'network-is-not-found': '未找到节点信息',
       'name-has-been-used': '名称已被使用',
       'failed-to-initiate,-please-reopen-Neuron': '初始化失败, 请新打开 Neuron',
+      'no-wallet': '没有钱包',
     },
   },
 }

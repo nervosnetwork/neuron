@@ -23,24 +23,24 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   const inputs: InputProps[] = [
     {
-      label: t('settings.walletmanger.editwallet.walletname'),
+      label: t('settings.wallet-manager.edit-wallet.wallet-name'),
       value: walletName,
       onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: t('settings.walletmanger.editwallet.walletname'),
+      placeholder: t('settings.wallet-manager.edit-wallet.wallet-name'),
       maxLength: 20,
     },
     {
-      label: t('settings.walletmanger.editwallet.password'),
+      label: t('settings.wallet-manager.edit-wallet.password'),
       value: password,
       onChange: e => setPassword(e.currentTarget.value),
-      placeholder: t('settings.walletmanger.editwallet.password'),
+      placeholder: t('settings.wallet-manager.edit-wallet.password'),
       inputType: 'password',
     },
     {
-      label: t('settings.walletmanger.editwallet.confirmpassword'),
+      label: t('settings.wallet-manager.edit-wallet.confirm-password'),
       value: confirmPassword,
       onChange: e => setConfirmPassword(e.currentTarget.value),
-      placeholder: t('settings.walletmanger.editwallet.confirmpassword'),
+      placeholder: t('settings.wallet-manager.edit-wallet.confirm-password'),
       inputType: 'password',
     },
   ]
@@ -64,7 +64,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
 
   return (
     <Card>
-      <Card.Header>{t('settings.walletmanger.editwallet.editwallet')}</Card.Header>
+      <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
       {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>

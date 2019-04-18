@@ -67,14 +67,14 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
 
   const inputs: InputProps[] = [
     {
-      label: t('settings.network.editnetwork.rpcurl'),
+      label: t('settings.network.edit-network.rpc-url'),
       value: networkEditor.remote,
       onChange: handleInput('remote'),
       tooltip: TooltipText.URL,
       placeholder: PlaceHolder.URL,
     },
     {
-      label: t('settings.network.editnetwork.name'),
+      label: t('settings.network.edit-network.name'),
       value: networkEditor.name,
       onChange: handleInput('name'),
       tooltip: TooltipText.Name,
@@ -126,7 +126,7 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
 
   return (
     <Card>
-      <Card.Header>{params.id === 'new' ? t('settings.network.editnetwork.title') : 'name'}</Card.Header>
+      <Card.Header>{params.id === 'new' ? t('settings.network.edit-network.title') : 'name'}</Card.Header>
       {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
       <Card.Body>
         <Form>
