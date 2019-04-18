@@ -60,7 +60,7 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       {
         label: t('menuitem.edit'),
         click: ({ id }: MenuItemParams) => {
-          history.push(`${Routes.WalletEditor}/${id}}`)
+          history.push(`${Routes.WalletEditor}/${id}`)
         },
       },
       {
