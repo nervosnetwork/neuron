@@ -1,34 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Card, Form, Button, Alert } from 'react-bootstrap'
+import { Card, Form, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
 import { useNeuronWallet } from '../../utils/hooks'
+import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
+import Dialog from '../../widgets/Dialog'
+import { Routes } from '../../utils/const'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
-  const { match, dispatch } = props
+  const { match, dialog, dispatch } = props
   const { params } = match
   const [t] = useTranslation()
   const {
     settings: { wallets },
+    messages: errorMessage,
   } = useNeuronWallet()
 
   const myWallet = wallets.find(wallet => wallet.id === params.id)
+  const [walletName, setWalletName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    if (password !== '') {
+      dispatch({
+        type: MainActions.SetDialog,
+        payload: {
+          open: false,
+        },
+      })
+      props.history.push(`${Routes.SettingsWallets}`)
+    }
+  }, [wallets])
 
   const inputs: InputProps[] = [
     {
       label: t('settings.wallet-manager.edit-wallet.wallet-name'),
-      value: myWallet!.name,
-      onChange: e => {
-        myWallet!.name = e.currentTarget.value
-      },
-      placeholder: t('settings.wallet-manager.edit-wallet.wallet-name'),
+      value: walletName,
+      onChange: e => setWalletName(e.currentTarget.value),
+      placeholder: myWallet!.name,
       maxLength: 20,
     },
     {
@@ -48,26 +62,17 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   ]
 
   const handleSubmit = () => {
-    if (!myWallet!.name) {
-      setErrorMsg('Please Enter Wallet name')
-    } else if (!password || !confirmPassword) {
-      setErrorMsg('Please Enter password')
-    } else if (confirmPassword !== password) {
-      setErrorMsg('Password inconsistent')
-    } else {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open: true,
-        },
-      })
-    }
+    dispatch({
+      type: MainActions.SetDialog,
+      payload: {
+        open: true,
+      },
+    })
   }
 
   return (
     <Card>
       <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
-      {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>
           {inputs.map(inputProps => (
@@ -80,11 +85,31 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           size="lg"
           block
           onClick={() => handleSubmit()}
-          disabled={password === '' || confirmPassword === '' || password !== confirmPassword}
+          disabled={password === '' || confirmPassword === '' || password !== confirmPassword || walletName === ''}
         >
           {t('common.save')}
         </Button>
       </Card.Body>
+      <Dialog
+        open={dialog.open}
+        onClick={() => {
+          dispatch({
+            type: MainActions.SetDialog,
+            payload: {
+              open: false,
+            },
+          })
+        }}
+      >
+        <InputWalletPasswordDialog
+          wallet={myWallet}
+          dispatch={dispatch}
+          checkType={CheckType.EditWallet}
+          errorMessage={errorMessage.length > 0 ? errorMessage[errorMessage.length - 1].content : ''}
+          newWalletName={walletName}
+          newPassword={password}
+        />
+      </Dialog>
     </Card>
   )
 }

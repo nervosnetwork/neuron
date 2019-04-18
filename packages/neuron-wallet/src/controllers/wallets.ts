@@ -127,17 +127,39 @@ class WalletsController {
   }
 
   public static update = ({
-    walletId,
-    newWallet,
+    id,
+    name,
+    password,
+    newPassword,
   }: {
-    walletId: string
-    newWallet: WalletData
+    id: string
+    password: string
+    name: string
+    newPassword?: string
   }): ChannelResponse<boolean> => {
     try {
-      WalletsController.service.update(walletId, newWallet)
+      const wallet = WalletsController.service.get(id)
+      if (wallet) {
+        if (WalletsController.service.validate({ id, password })) {
+          wallet.name = name
+          if (newPassword) {
+            wallet.keystore = Key.fromKeystore(JSON.stringify(wallet!.keystore), newPassword).keystore!
+          }
+          WalletsController.service.update(id, wallet)
+          windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+          return {
+            status: ResponseCode.Success,
+            result: true,
+          }
+        }
+        return {
+          status: ResponseCode.Fail,
+          msg: 'Wrong Password',
+        }
+      }
       return {
-        status: ResponseCode.Success,
-        result: true,
+        status: ResponseCode.Fail,
+        msg: 'Find no wallet',
       }
     } catch (e) {
       return {

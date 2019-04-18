@@ -7,7 +7,7 @@ export interface Wallet {
   message: string
 }
 
-interface Addresses {
+export interface Addresses {
   receiving: string[]
   change: string[]
 }
