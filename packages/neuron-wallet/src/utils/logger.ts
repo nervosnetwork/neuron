@@ -1,4 +1,9 @@
+import { app } from 'electron'
 import winston, { format } from 'winston'
+import env from '../env'
+
+const { isDevMode } = env
+const path = isDevMode ? '' : `${app.getPath('logs')}/`
 
 const { combine, timestamp, json } = format
 
@@ -10,13 +15,18 @@ const logger = winston.createLogger({
   format: combine(timestamp(), json()),
   transports: [
     new winston.transports.File({
-      filename: 'combined.log',
+      filename: `${path}combined.log`,
     }),
     new winston.transports.File({
-      filename: 'error.log',
+      filename: `${path}error.log`,
       level: 'error',
     }),
   ],
+})
+
+logger.log({
+  level: 'error',
+  message: 'Hello distributed log files!',
 })
 
 export default logger
