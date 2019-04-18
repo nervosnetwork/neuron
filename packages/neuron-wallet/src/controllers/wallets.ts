@@ -143,7 +143,8 @@ class WalletsController {
         if (WalletsController.service.validate({ id, password })) {
           wallet.name = name
           if (newPassword) {
-            wallet.keystore = Key.fromKeystore(JSON.stringify(wallet!.keystore), newPassword).keystore!
+            const key = Key.fromKeystore(JSON.stringify(wallet!.keystore), password)
+            wallet.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           }
           WalletsController.service.update(id, wallet)
           windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())

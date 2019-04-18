@@ -157,7 +157,7 @@ export default class Key {
     throw new Error('Wrong mnemonic')
   }
 
-  private toKeystore = (encryptedData: string, password: string) => {
+  public toKeystore = (encryptedData: string, password: string) => {
     const salt = crypto.randomBytes(32)
     const iv = crypto.randomBytes(16)
     const kdf = 'scrypt'
