@@ -68,6 +68,7 @@ export const mainContents: CustomRoute[] = [
     name: `Wallet`,
     path: Routes.Wallet,
     exact: false,
+    params: `/:id?`,
     component: WalletDetail,
   },
   {
@@ -78,7 +79,8 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `Receive`,
-    path: `${Routes.Receive}/:address`,
+    path: Routes.Receive,
+    params: `/:address?`,
     exact: false,
     component: Receive,
   },

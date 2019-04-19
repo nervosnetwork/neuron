@@ -30,11 +30,6 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   const [t] = useTranslation()
 
   useEffect(() => {
-    dispatch(actionCreators.getAll())
-    dispatch(actionCreators.getActiveWallet())
-  }, [])
-
-  useEffect(() => {
     dispatch({
       type: MainActions.SetDialog,
       payload: {
