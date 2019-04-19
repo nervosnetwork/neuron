@@ -17,7 +17,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   const [t] = useTranslation()
   const {
     settings: { wallets },
-    messages: errorMessage,
+    messages: errorMessages,
   } = useNeuronWallet()
 
   const myWallet = wallets.find(wallet => wallet.id === params.id)
@@ -105,7 +105,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           wallet={myWallet}
           dispatch={dispatch}
           checkType={CheckType.EditWallet}
-          errorMessage={errorMessage.length > 0 ? errorMessage[errorMessage.length - 1].content : ''}
+          errorMessage={errorMessages.length > 0 ? errorMessages[errorMessages.length - 1].content : ''}
           newWalletName={walletName}
           newPassword={password}
         />
