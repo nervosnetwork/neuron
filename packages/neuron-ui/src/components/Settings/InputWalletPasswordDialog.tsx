@@ -4,11 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Card, Button, Form, Row, Col } from 'react-bootstrap'
 
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import { checkPassword } from '../../services/UILayer'
 import { Wallet } from '../../contexts/NeuronWallet'
 
 export enum CheckType {
-  CheckPassword,
   EditWallet,
   DeleteWallet,
 }
@@ -16,6 +14,7 @@ export enum CheckType {
 interface InputPasswordProps {
   wallet?: Wallet
   dispatch: any
+  handle?: any
   errorMessage: string
   checkType: CheckType
   newWalletName?: string
@@ -38,38 +37,23 @@ const InputWalletPasswordDialog = ({
   const [password, setPassword] = useState('')
   const [t] = useTranslation()
 
-  const handleResult = (args: ChannelResponse<string>) => {
-    if (args.result) {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open: false,
-        },
-      })
-    }
-  }
-
   const handleSubmit = (id: string) => {
     switch (checkType) {
       case CheckType.EditWallet:
-        if (newWalletName && newPassword) {
-          dispatch(
-            actionCreators.createOrUpdateWallet(
-              {
-                id,
-                name: newWalletName,
-              },
-              password,
-            ),
-          )
-        }
+        dispatch(
+          actionCreators.updateWallet({
+            id,
+            password,
+            newPassword,
+            name: newWalletName,
+          }),
+        )
         break
       case CheckType.DeleteWallet:
         dispatch(actionCreators.deleteWallet({ id, password }))
         break
-      case CheckType.CheckPassword:
       default:
-        checkPassword(id, password, handleResult)
+        break
     }
   }
 

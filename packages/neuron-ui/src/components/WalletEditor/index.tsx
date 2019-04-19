@@ -1,32 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Card, Form, Button, Alert } from 'react-bootstrap'
+import { Card, Form, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
 import { MainActions } from '../../containers/MainContent/reducer'
-import { Wallet } from '../../contexts/NeuronWallet'
+import { useNeuronWallet } from '../../utils/hooks'
+import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
 import Dialog from '../../widgets/Dialog'
+import { Routes } from '../../utils/const'
 
-export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ wallet: string }>>) => {
+export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
   const { match, dialog, dispatch } = props
   const { params } = match
   const [t] = useTranslation()
+  const {
+    settings: { wallets },
+    messages: errorMessages,
+  } = useNeuronWallet()
 
-  const myWallet: Wallet = JSON.parse(params.wallet)
-  const [walletName, setWalletName] = useState(myWallet.name)
+  const myWallet = wallets.find(wallet => wallet.id === params.id)
+  const [walletName, setWalletName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    if (password !== '') {
+      dispatch({
+        type: MainActions.SetDialog,
+        payload: {
+          open: false,
+        },
+      })
+      props.history.push(`${Routes.SettingsWallets}`)
+    }
+  }, [wallets])
 
   const inputs: InputProps[] = [
     {
       label: t('settings.wallet-manager.edit-wallet.wallet-name'),
       value: walletName,
       onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: t('settings.wallet-manager.edit-wallet.wallet-name'),
+      placeholder: myWallet!.name,
       maxLength: 20,
     },
     {
@@ -46,33 +62,31 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   ]
 
   const handleSubmit = () => {
-    if (!walletName) {
-      setErrorMsg('Please Enter Wallet name')
-    } else if (!password || !confirmPassword) {
-      setErrorMsg('Please Enter password')
-    } else if (confirmPassword !== password) {
-      setErrorMsg('Password inconsistent')
-    } else {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open: true,
-        },
-      })
-    }
+    dispatch({
+      type: MainActions.SetDialog,
+      payload: {
+        open: true,
+      },
+    })
   }
 
   return (
     <Card>
       <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
-      {errorMsg ? <Alert variant="warning">{errorMsg}</Alert> : null}
       <Card.Body>
         <Form>
           {inputs.map(inputProps => (
             <InlineInput {...inputProps} key={inputProps.label} />
           ))}
         </Form>
-        <Button type="submit" variant="primary" size="lg" block onClick={() => handleSubmit()}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          block
+          onClick={() => handleSubmit()}
+          disabled={password === '' || confirmPassword === '' || password !== confirmPassword || walletName === ''}
+        >
           {t('common.save')}
         </Button>
       </Card.Body>
@@ -91,7 +105,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           wallet={myWallet}
           dispatch={dispatch}
           checkType={CheckType.EditWallet}
-          errorMessage=""
+          errorMessage={errorMessages.length > 0 ? errorMessages[errorMessages.length - 1].content : ''}
           newWalletName={walletName}
           newPassword={password}
         />
