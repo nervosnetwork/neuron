@@ -5,7 +5,6 @@ import { Channel } from './const'
 import { ResponseCode } from '../controllers'
 
 const initWindow = (win: BrowserWindow) => {
-  // TODO: get wallets on initiation
   const wallet = WalletsController.getActive() as any
   const wallets = WalletsController.getAll() as any
   const initState = {
