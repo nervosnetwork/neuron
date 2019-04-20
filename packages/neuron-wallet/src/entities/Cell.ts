@@ -39,6 +39,11 @@ export default class Cell extends BaseEntity {
   })
   status!: string
 
+  @Column({
+    type: 'varchar',
+  })
+  lockHash!: string
+
   public outPoint(): OutPoint {
     return {
       hash: this.outPointHash,

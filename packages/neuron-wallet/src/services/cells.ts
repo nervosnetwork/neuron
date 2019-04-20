@@ -1,5 +1,5 @@
+import { getConnection, In } from 'typeorm'
 import asw from '../wallets/asw'
-import ckbCore from '../core'
 import { getLiveCells } from '../mock_rpc'
 import CellEntity from '../entities/Cell'
 
@@ -21,11 +21,24 @@ export interface Cell {
   type?: Script | null
   outPoint?: OutPoint
   status?: string
+  lockHash?: string
 }
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "warn" */
+/* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
+  public static getLiveCellsByLockHashes = async (lockHashes: string[]): Promise<Cell[]> => {
+    const totalCells: Cell[] = []
+
+    for (const lockHash of lockHashes) {
+      const cells = await CellsService.getLiveCellsByLockHash(lockHash)
+      totalCells.concat(cells)
+    }
+
+    return totalCells
+  }
+
   public static getLiveCellsByLockHash = async (_lockHash: string): Promise<Cell[]> => {
     const to = 100
     let currentFrom = 0
@@ -44,6 +57,7 @@ export default class CellsService {
     cells.forEach(async cell => {
       const c = cell
       c.status = 'live'
+      c.lockHash = Math.round(Math.random() * 1000).toString()
       await CellsService.create(c)
     })
   }
@@ -57,18 +71,55 @@ export default class CellsService {
     cellEntity.lockScript = cell.lock
     cellEntity.typeScript = cell.type || null
     cellEntity.status = cell.status!
+    cellEntity.lockHash = cell.lockHash!
 
     await cellEntity.save()
     return cellEntity
   }
 
-  public static getBalance = async (_lockHashes: string[]): Promise<string> => {
-    return '1000'
+  public static getBalance = async (lockHashes: string[]): Promise<string> => {
+    const cells: CellEntity[] = await getConnection()
+      .getRepository(CellEntity)
+      .find({
+        where: { lockHash: In(lockHashes) },
+      })
+
+    const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
+
+    return capacity.toString()
   }
 
-  public static getLiveCell = async (outPoint: OutPoint) => {
-    const liveCell = await ckbCore.rpc.getLiveCell(outPoint)
-    return liveCell
+  public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
+    const cellEntity: CellEntity | undefined = await CellsService.getCellEntity(outPoint)
+
+    if (!cellEntity) {
+      return cellEntity
+    }
+
+    const cell: Cell = {
+      outPoint: {
+        hash: cellEntity.outPointHash,
+        index: cellEntity.outPointIndex,
+      },
+      capacity: cellEntity.capacity,
+      lockHash: cellEntity.lockHash,
+      lock: cellEntity.lockScript,
+    }
+
+    return cell
+  }
+
+  private static getCellEntity = async (outPoint: OutPoint): Promise<CellEntity | undefined> => {
+    const cellEntity: CellEntity | undefined = await getConnection()
+      .getRepository(CellEntity)
+      .createQueryBuilder('cell')
+      .where('cell.outPointHash = :outPointHash and cell.outPointIndex = :outPointIndex', {
+        outPointHash: outPoint.hash,
+        outPointIndex: outPoint.index,
+      })
+      .getOne()
+
+    return cellEntity
   }
 
   public static getUnspentCells = async () => {
