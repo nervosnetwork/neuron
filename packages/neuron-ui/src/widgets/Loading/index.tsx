@@ -1,5 +1,12 @@
 import styled, { keyframes } from 'styled-components'
 
+export interface SpinnerProps {
+  frontColor?: string
+  backgroundColor?: string
+  size?: string
+  bandSize?: string
+}
+
 const rotate = keyframes`
   from{
     transform: rotate(0);
@@ -8,12 +15,7 @@ const rotate = keyframes`
     transform: rotate(360deg);
   }
 `
-export const Spinner = styled.div<{
-  frontColor?: string
-  backgroundColor?: string
-  size?: string
-  bandSize?: string
-}>`
+export const Spinner = styled.div<SpinnerProps>`
   margin: 0 auto;
   width: ${props => props.size || '20px'};
   height: ${props => props.size || '20px'};
