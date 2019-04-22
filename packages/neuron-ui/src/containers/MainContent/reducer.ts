@@ -21,24 +21,6 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
-    case MainActions.UpdateNetworkEditor: {
-      return {
-        ...state,
-        networkEditor: {
-          ...state.networkEditor,
-          ...action.payload,
-        },
-      }
-    }
-    case MainActions.DeleteNetwork: {
-      return {
-        ...state,
-        networkEditor: {
-          ...state.networkEditor,
-          ...action.payload,
-        },
-      }
-    }
     case MainActions.AddItemInTransfer: {
       return {
         ...state,

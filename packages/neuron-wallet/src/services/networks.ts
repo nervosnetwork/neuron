@@ -23,6 +23,18 @@ export default class NetworksService {
         status: ResponseCode.Success,
         result: newValue,
       })
+      const network = this.activeOne()
+      if (network) {
+        windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveOne, {
+          status: ResponseCode.Success,
+          result: network,
+        })
+      } else {
+        const defaultNetowrk = this.defaultOne()
+        if (defaultNetowrk) {
+          this.activate(defaultNetowrk.id)
+        }
+      }
     })
 
     store.onDidChange(NetworksKey.Active, () => {
