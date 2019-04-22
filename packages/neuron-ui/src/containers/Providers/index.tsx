@@ -1,10 +1,10 @@
-import React, { useReducer, useEffect } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { useTranslation } from 'react-i18next'
 import NeuronWalletContext from '../../contexts/NeuronWallet'
-import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
+import { initProviders, ProviderActions, ProviderDispatch, reducer } from './reducer'
 
 import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
-import { Channel, Routes, ConnectStatus } from '../../utils/const'
+import { Channel, ConnectStatus, Routes } from '../../utils/const'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
@@ -118,10 +118,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case WalletsMethod.Activate: {
+          case WalletsMethod.Delete: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: { wallets: args.result.allWallets },
+            })
             dispatch({
               type: ProviderActions.Wallet,
-              payload: args.result,
+              payload: args.result.activeWallet,
             })
             break
           }

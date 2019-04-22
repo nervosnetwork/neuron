@@ -172,14 +172,15 @@ class WalletsController {
     }
   }
 
-  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
+  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<any> => {
     if (WalletsController.service.validate({ id, password })) {
-      const success = WalletsController.service.delete(id)
-      if (success) {
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+      if (WalletsController.service.delete(id)) {
         return {
           status: ResponseCode.Success,
-          result: true,
+          result: {
+            allWallets: WalletsController.service.getAll(),
+            activeWallet: WalletsController.service.getActive(),
+          },
         }
       }
       return {
@@ -223,6 +224,7 @@ class WalletsController {
   public static activate = (id: string) => {
     const success = WalletsController.service.setActive(id)
     if (success) {
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
       return {
         status: ResponseCode.Success,
         result: WalletsController.service.getActive(),
