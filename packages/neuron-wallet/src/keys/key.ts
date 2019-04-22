@@ -13,8 +13,8 @@ export interface Addresses {
 }
 
 enum DefaultAddressNumber {
-  Receiving = 17,
-  Change = 3,
+  Receiving = 20,
+  Change = 10,
 }
 
 export default class Key {

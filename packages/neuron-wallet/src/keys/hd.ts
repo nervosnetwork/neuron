@@ -14,7 +14,7 @@ enum AddressType {
   Change = 1,
 }
 
-const MaxAddressNumber = 20
+const MaxAddressNumber = 30
 
 const HD = {
   // Generate both receiving and change addresses
