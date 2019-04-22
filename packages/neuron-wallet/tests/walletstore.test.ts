@@ -14,7 +14,7 @@ describe.skip('wallet store', () => {
       id: '0',
       crypto: {
         cipher: 'wallet1',
-        cipherparams: { iv: 'walle1' },
+        cipherparams: { iv: 'wallet1' },
         ciphertext: 'wallet1',
         kdf: '1',
         kdfparams: {
@@ -41,7 +41,7 @@ describe.skip('wallet store', () => {
       id: '1',
       crypto: {
         cipher: 'wallet2',
-        cipherparams: { iv: 'walle2' },
+        cipherparams: { iv: 'wallet2' },
         ciphertext: 'wallet2',
         kdf: '2',
         kdfparams: {
@@ -67,7 +67,7 @@ describe.skip('wallet store', () => {
       id: '1',
       crypto: {
         cipher: 'wallet3',
-        cipherparams: { iv: 'walle1' },
+        cipherparams: { iv: 'wallet1' },
         ciphertext: 'wallet3',
         kdf: '3',
         kdfparams: {
