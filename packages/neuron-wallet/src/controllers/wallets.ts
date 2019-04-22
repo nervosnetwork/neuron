@@ -82,6 +82,7 @@ class WalletsController {
         keystore: key.keystore!,
         addresses: key.addresses!,
       })
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
       return {
         status: ResponseCode.Success,
         result: wallet,
@@ -114,6 +115,7 @@ class WalletsController {
         keystore: key.keystore!,
         addresses: key.addresses!,
       })
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
       return {
         status: ResponseCode.Success,
         result: wallet,

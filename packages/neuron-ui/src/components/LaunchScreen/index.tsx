@@ -10,6 +10,7 @@ const LaunchScreen = (props: React.PropsWithoutRef<RouteComponentProps>) => {
     wallet,
     settings: { networks },
   } = useNeuronWallet()
+
   useEffect(() => {
     if (!networks.length) return
     if (wallet.id) {
