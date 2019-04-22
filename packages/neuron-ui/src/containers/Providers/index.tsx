@@ -118,13 +118,6 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case WalletsMethod.Activate: {
-            dispatch({
-              type: ProviderActions.Wallet,
-              payload: args.result,
-            })
-            break
-          }
           default: {
             break
           }

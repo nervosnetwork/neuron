@@ -177,6 +177,7 @@ class WalletsController {
       const success = WalletsController.service.delete(id)
       if (success) {
         windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
         return {
           status: ResponseCode.Success,
           result: true,
@@ -223,6 +224,7 @@ class WalletsController {
   public static activate = (id: string) => {
     const success = WalletsController.service.setActive(id)
     if (success) {
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
       return {
         status: ResponseCode.Success,
         result: WalletsController.service.getActive(),
