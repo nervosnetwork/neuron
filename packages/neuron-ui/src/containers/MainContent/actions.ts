@@ -8,7 +8,6 @@ export enum MainActions {
   GetTransaction,
   GetTransactions,
   SetPage,
-  UpdateNetworkEditor,
   SaveNetworks,
   DeleteNetwork,
   ErrorMessage,

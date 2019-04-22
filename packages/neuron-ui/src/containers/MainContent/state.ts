@@ -28,10 +28,6 @@ export const initState = {
     ],
     submitting: false,
   },
-  networkEditor: {
-    name: '',
-    remote: '',
-  },
   loadings: {
     transaction: false,
     transactions: false,
