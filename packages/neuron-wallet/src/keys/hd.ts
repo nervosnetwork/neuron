@@ -1,6 +1,7 @@
 import * as bip32 from 'bip32'
+import TransactionsService from '../services/transactions'
 import { Child, KeysData } from './keystore'
-import Address from './address'
+import ckbCore from '../core'
 
 enum BIP44Params {
   Purpose = "44'",
@@ -16,9 +17,13 @@ enum AddressType {
 
 const MaxAddressNumber = 30
 
-const HD = {
+class HD {
   // Generate both receiving and change addresses
-  generateAddresses: (keysData: KeysData, receivingAddressNumber: number, changeAddressNumber: number) => {
+  public static generateAddresses = (
+    keysData: KeysData,
+    receivingAddressNumber: number,
+    changeAddressNumber: number,
+  ) => {
     if (receivingAddressNumber < 1 || changeAddressNumber < 1) {
       throw new Error('Address number error.')
     } else if (receivingAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
@@ -40,25 +45,34 @@ const HD = {
       receiving: receivingAddresses,
       change: changeAddresses,
     }
-  },
+  }
 
-  latestUnusedAddress: (keysData: KeysData) => {
+  public static latestUnusedAddress = (keysData: KeysData) => {
     const root: bip32.BIP32Interface = bip32.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
     const latestUnusedIndex = HD.searchAddress(root, 20)
     return HD.addressFromHDIndex(root, latestUnusedIndex)
-  },
+  }
 
-  searchUsedChildKeys: (root: bip32.BIP32Interface) => {
+  public static isUsedAddress = (address: string) => {
+    return TransactionsService.hasTransactions(address)
+  }
+
+  public static addressFromPrivateKey = (privateKey: string) => {
+    const account = ckbCore.wallet.accountFromPrivateKey(Buffer.from(ckbCore.utils.hexToBytes(privateKey)))
+    return ckbCore.utils.pubkeyToAddress(account.hexPubKey)
+  }
+
+  public static searchUsedChildKeys = (root: bip32.BIP32Interface) => {
     const children: Child[] = []
     const nextUnusedIndex = HD.searchAddress(root, 20)
     for (let index = 0; index < nextUnusedIndex; index++) {
       const path = HD.path(AddressType.Receiving, index)
       const { privateKey, chainCode } = root.derivePath(path)
       if (privateKey) {
-        if (Address.isUsedAddress(Address.addressFromPrivateKey(privateKey.toString('hex')))) {
+        if (HD.isUsedAddress(HD.addressFromPrivateKey(privateKey.toString('hex')))) {
           children.push({
             path,
             privateKey: privateKey.toString('hex'),
@@ -70,23 +84,23 @@ const HD = {
       }
     }
     return children
-  },
+  }
 
-  path: (type: AddressType, index: number) => {
+  public static path = (type: AddressType, index: number) => {
     return `m/${BIP44Params.Purpose}/${BIP44Params.CoinTypeTestnet}/${BIP44Params.Account}/${type}/${index}`
-  },
+  }
 
-  addressFromHDIndex: (root: bip32.BIP32Interface, index: number, type = AddressType.Receiving) => {
+  public static addressFromHDIndex = (root: bip32.BIP32Interface, index: number, type = AddressType.Receiving) => {
     const path = HD.path(type, index)
     const { privateKey } = root.derivePath(path)
     if (privateKey) {
-      return Address.addressFromPrivateKey(privateKey.toString('hex'))
+      return HD.addressFromPrivateKey(privateKey.toString('hex'))
     }
     throw new Error('Empty private key')
-  },
+  }
 
   // TODO: refactor me
-  searchAddress: (
+  public static searchAddress = (
     root: bip32.BIP32Interface,
     index: number,
     maxUsedIndex = 0,
@@ -94,7 +108,7 @@ const HD = {
     depth = 0,
   ): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receiving, index))) {
+    if (!HD.isUsedAddress(HD.addressFromHDIndex(root, AddressType.Receiving, index))) {
       if (index === 0) {
         return 0
       }
@@ -106,7 +120,7 @@ const HD = {
         depth + 1,
       )
     }
-    if (!Address.isUsedAddress(HD.addressFromHDIndex(root, index + 1))) {
+    if (!HD.isUsedAddress(HD.addressFromHDIndex(root, index + 1))) {
       return index + 1
     }
     return HD.searchAddress(
@@ -116,7 +130,7 @@ const HD = {
       minUnusedIndex,
       depth + 1,
     )
-  },
+  }
 }
 
 export default HD
