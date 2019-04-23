@@ -35,7 +35,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   }, [id])
 
   const inputs: InputProps[] = useInputs(editor)
-  const isParamsValid = useIsParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
+  const areParamsValid = useAreParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
   const toggleDialog = useToggleDialog(dispatch)
 
   const handleSubmit = () => {
