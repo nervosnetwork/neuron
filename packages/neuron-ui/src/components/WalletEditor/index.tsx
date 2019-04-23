@@ -1,65 +1,46 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Card, Form, Button } from 'react-bootstrap'
+import { Card, Form, Button, Col, Row } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { ContentProps } from '../../containers/MainContent'
 import InlineInput, { InputProps } from '../../widgets/InlineInput'
-import { MainActions } from '../../containers/MainContent/reducer'
+import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import { useNeuronWallet } from '../../utils/hooks'
-import InputWalletPasswordDialog, { CheckType } from '../Settings/InputWalletPasswordDialog'
 import Dialog from '../../widgets/Dialog'
-import { Routes } from '../../utils/const'
+
+import { useWalletEditor, useInputs, useIsParamsValid, useToggleDialog } from './hooks'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
   const { match, dialog, dispatch } = props
-  const { params } = match
+  const {
+    params: { id },
+  } = match
   const [t] = useTranslation()
   const {
     settings: { wallets },
-    messages: errorMessages,
+    // messages,
   } = useNeuronWallet()
 
-  const myWallet = wallets.find(wallet => wallet.id === params.id)
-  const [walletName, setWalletName] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const wallet = useMemo(() => wallets.find(w => w.id === id), [id])
+
+  if (!wallet) {
+    // TODO: Better error handling
+    throw new Error('Wallet not found')
+  }
+
+  const editor = useWalletEditor()
 
   useEffect(() => {
-    if (password !== '') {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open: false,
-        },
-      })
-      props.history.push(`${Routes.SettingsWallets}`)
+    if (wallet) {
+      editor.initiate(wallet.name)
+    } else {
+      // TODO: handle error of wallet not found
     }
-  }, [wallets])
+  }, [id])
+  const inputs: InputProps[] = useInputs(editor)
 
-  const inputs: InputProps[] = [
-    {
-      label: t('settings.wallet-manager.edit-wallet.wallet-name'),
-      value: walletName,
-      onChange: e => setWalletName(e.currentTarget.value),
-      placeholder: myWallet!.name,
-      maxLength: 20,
-    },
-    {
-      label: t('settings.wallet-manager.edit-wallet.password'),
-      value: password,
-      onChange: e => setPassword(e.currentTarget.value),
-      placeholder: t('settings.wallet-manager.edit-wallet.password'),
-      inputType: 'password',
-    },
-    {
-      label: t('settings.wallet-manager.edit-wallet.confirm-password'),
-      value: confirmPassword,
-      onChange: e => setConfirmPassword(e.currentTarget.value),
-      placeholder: t('settings.wallet-manager.edit-wallet.confirm-password'),
-      inputType: 'password',
-    },
-  ]
+  const isParamsValid = useIsParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
 
   const handleSubmit = () => {
     dispatch({
@@ -70,6 +51,19 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     })
   }
 
+  const handleConfirm = () => {
+    dispatch(
+      actionCreators.updateWallet({
+        id: wallet.id,
+        password: editor.password.value,
+        newPassword: editor.newPassword.value,
+        name: editor.name.value,
+      }),
+    )
+  }
+
+  const toggleDialog = useToggleDialog(dispatch)
+
   return (
     <Card>
       <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
@@ -79,36 +73,54 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
             <InlineInput {...inputProps} key={inputProps.label} />
           ))}
         </Form>
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          block
-          onClick={() => handleSubmit()}
-          disabled={password === '' || confirmPassword === '' || password !== confirmPassword || walletName === ''}
-        >
+        <Button type="submit" variant="primary" size="lg" block onClick={handleSubmit} disabled={!isParamsValid}>
           {t('common.save')}
         </Button>
       </Card.Body>
       <Dialog
         open={dialog.open}
         onClick={() => {
-          dispatch({
-            type: MainActions.SetDialog,
-            payload: {
-              open: false,
-            },
-          })
+          toggleDialog(false)
         }}
       >
-        <InputWalletPasswordDialog
-          wallet={myWallet}
-          dispatch={dispatch}
-          checkType={CheckType.EditWallet}
-          errorMessage={errorMessages.length > 0 ? errorMessages[errorMessages.length - 1].content : ''}
-          newWalletName={walletName}
-          newPassword={password}
-        />
+        <Card
+          onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          style={{
+            width: '40%',
+          }}
+        >
+          <>
+            <Card.Header>
+              {t('settings.wallet-manager.delete-wallet-title', { name: wallet ? wallet.name : '' })}
+            </Card.Header>
+            <Card.Body>
+              <Form.Group as={Row} controlId="formPlaintextPassword">
+                <Col>
+                  <Form.Control
+                    type="password"
+                    placeholder="password"
+                    onChange={editor.password.onChange}
+                    // isInvalid={messages.walletEditor !== ''}
+                  />
+                  {/*
+                    <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
+                     */}
+                </Col>
+              </Form.Group>
+            </Card.Body>
+            <Card.Footer className="text-muted">
+              <Button variant="danger" onClick={handleConfirm} disabled={editor.password.value === ''}>
+                {t('common.confirm')}
+              </Button>
+              <Button variant="light" onClick={() => toggleDialog(false)}>
+                {t('common.cancel')}
+              </Button>
+            </Card.Footer>
+          </>
+        </Card>
       </Dialog>
     </Card>
   )

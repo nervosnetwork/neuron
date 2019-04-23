@@ -63,6 +63,7 @@ export default {
         'edit-wallet': {
           'wallet-name': '钱包名称',
           password: '密码',
+          'new-password': '新密码',
           'confirm-password': '确认密码',
           'edit-wallet': '编辑钱包',
         },
