@@ -88,9 +88,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           }}
         >
           <>
-            <Card.Header>
-              {t('settings.wallet-manager.delete-wallet-title', { name: wallet ? wallet.name : '' })}
-            </Card.Header>
+            <Card.Header>{t('settings.wallet-manager.delete-wallet-title', { name: wallet.name })}</Card.Header>
             <Card.Body>
               <Form.Group as={Row} controlId="formPlaintextPassword">
                 <Col>
