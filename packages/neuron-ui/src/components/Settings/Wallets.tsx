@@ -1,6 +1,6 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import { Col, Row, ListGroup, Form, Container } from 'react-bootstrap'
+import { Col, Row, ListGroup, Form, Container, Pagination } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { Routes, MnemonicAction } from '../../utils/const'
@@ -28,6 +28,10 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   } = useNeuronWallet()
   const { dispatch, dialog, history } = props
   const [t] = useTranslation()
+  const pageSize = 5
+  const [totalPage, setTotalPage] = useState(0)
+  const [pageNo, setPageNo] = useState(1)
+  const showWallets = wallets.slice(pageSize * (pageNo - 1), pageSize * pageNo)
 
   useEffect(() => {
     dispatch({
@@ -36,7 +40,14 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
         open: false,
       },
     })
+    setTotalPage(Math.ceil(wallets.length / pageSize))
   }, [wallets.length])
+
+  useEffect(() => {
+    if (pageNo > totalPage) {
+      setPageNo(1)
+    }
+  }, [totalPage])
 
   const menuItems = useMemo(
     () => [
@@ -74,11 +85,29 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     [],
   )
 
+  const pageItems = useMemo(() => {
+    const items = []
+    for (let number = 1; number <= totalPage; number++) {
+      items.push(
+        <Pagination.Item
+          key={number}
+          active={number === pageNo}
+          onClick={() => {
+            setPageNo(number)
+          }}
+        >
+          {number}
+        </Pagination.Item>,
+      )
+    }
+    return items
+  }, [totalPage, pageNo])
+
   return (
     <>
       <ContextMenuZone menuItems={menuItems}>
         <ListGroup>
-          {wallets.map(wallet => {
+          {showWallets.map(wallet => {
             const isChecked = wallet.id === activeWallet.id
             return (
               <ListGroup.Item
@@ -104,6 +133,13 @@ const Wallets = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           })}
         </ListGroup>
       </ContextMenuZone>
+      <Container
+        style={{
+          marginTop: 30,
+        }}
+      >
+        <Pagination>{pageItems}</Pagination>
+      </Container>
       <Container
         style={{
           marginTop: 30,
