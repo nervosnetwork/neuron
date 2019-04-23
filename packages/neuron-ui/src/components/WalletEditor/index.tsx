@@ -9,7 +9,7 @@ import { MainActions, actionCreators } from '../../containers/MainContent/reduce
 import { useNeuronWallet } from '../../utils/hooks'
 import Dialog from '../../widgets/Dialog'
 
-import { useWalletEditor, useInputs, useIsParamsValid, useToggleDialog } from './hooks'
+import { useWalletEditor, useInputs, useAreParamsValid, useToggleDialog } from './hooks'
 
 export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
   const { match, dialog, dispatch } = props
@@ -35,7 +35,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   }, [id])
 
   const inputs: InputProps[] = useInputs(editor)
-  const isParamsValid = useIsParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
+  const areParamsValid = useAreParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
   const toggleDialog = useToggleDialog(dispatch)
 
   const handleSubmit = () => {
@@ -68,7 +68,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
             <InlineInput {...inputProps} key={inputProps.label} />
           ))}
         </Form>
-        <Button type="submit" variant="primary" size="lg" block onClick={handleSubmit} disabled={!isParamsValid}>
+        <Button type="submit" variant="primary" size="lg" block onClick={handleSubmit} disabled={!areParamsValid}>
           {t('common.save')}
         </Button>
       </Card.Body>

@@ -56,7 +56,7 @@ export const useInputs = ({ name, newPassword, confirmNewPassword }: ReturnType<
   )
 }
 
-export const useIsParamsValid = (name: string, password: string, confirmPassword: string) => {
+export const useAreParamsValid = (name: string, password: string, confirmPassword: string) => {
   return useMemo(() => {
     return !(password === '' || confirmPassword === '' || password !== confirmPassword || name === '')
   }, [name, password, confirmPassword])
@@ -78,5 +78,5 @@ export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
 export default {
   useWalletEditor,
   useInputs,
-  useIsParamsValid,
+  useAreParamsValid,
 }
