@@ -152,7 +152,7 @@ export default class TransactionsService {
     tx.inputs = []
     tx.outputs = []
     await getConnection().manager.save(tx)
-    transaction.inputs!.forEach(async i => {
+    await transaction.inputs!.forEach(async i => {
       const input = new InputEntity()
       input.outPointHash = i.previousOutput.hash
       input.outPointIndex = i.previousOutput.index
@@ -160,7 +160,7 @@ export default class TransactionsService {
       input.transaction = tx
       await getConnection().manager.save(input)
     })
-    transaction.outputs!.forEach(async (o, index) => {
+    await transaction.outputs!.forEach(async (o, index) => {
       const output = new OutputEntity()
       output.outPointHash = transaction.hash
       output.outPointIndex = index
