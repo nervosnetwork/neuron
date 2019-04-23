@@ -19,7 +19,6 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   const [t] = useTranslation()
   const {
     settings: { wallets },
-    // messages,
   } = useNeuronWallet()
 
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id])
@@ -32,15 +31,12 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   const editor = useWalletEditor()
 
   useEffect(() => {
-    if (wallet) {
-      editor.initiate(wallet.name)
-    } else {
-      // TODO: handle error of wallet not found
-    }
+    editor.initiate(wallet.name)
   }, [id])
-  const inputs: InputProps[] = useInputs(editor)
 
+  const inputs: InputProps[] = useInputs(editor)
   const isParamsValid = useIsParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
+  const toggleDialog = useToggleDialog(dispatch)
 
   const handleSubmit = () => {
     dispatch({
@@ -52,6 +48,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   }
 
   const handleConfirm = () => {
+    toggleDialog(false)
     dispatch(
       actionCreators.updateWallet({
         id: wallet.id,
@@ -61,8 +58,6 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
       }),
     )
   }
-
-  const toggleDialog = useToggleDialog(dispatch)
 
   return (
     <Card>
@@ -99,15 +94,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
             <Card.Body>
               <Form.Group as={Row} controlId="formPlaintextPassword">
                 <Col>
-                  <Form.Control
-                    type="password"
-                    placeholder="password"
-                    onChange={editor.password.onChange}
-                    // isInvalid={messages.walletEditor !== ''}
-                  />
-                  {/*
-                    <Form.Control.Feedback type="invalid">{errorMessage}</Form.Control.Feedback>
-                     */}
+                  <Form.Control type="password" placeholder="password" onChange={editor.password.onChange} />
                 </Col>
               </Form.Group>
             </Card.Body>

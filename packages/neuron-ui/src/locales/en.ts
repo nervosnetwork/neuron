@@ -120,6 +120,9 @@ export default {
       'name-has-been-used': 'Name has been used',
       'failed-to-initiate,-please-reopen-Neuron': 'Failed to initiate, please reopen Neuron',
       'no-wallet': 'No Wallet',
+      'wallet-imported-successfully': '{{name}} imported successfully',
+      'wallet-created-successfully': '{{name}} created successfully',
+      'wallet-updated-successfully': '{{name}} updated successfully',
     },
   },
 }

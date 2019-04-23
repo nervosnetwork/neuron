@@ -138,7 +138,7 @@ class WalletsController {
     password: string
     name: string
     newPassword?: string
-  }): ChannelResponse<boolean> => {
+  }): ChannelResponse<WalletData> => {
     try {
       const wallet = WalletsController.service.get(id)
       if (wallet) {
@@ -152,22 +152,22 @@ class WalletsController {
           windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
           return {
             status: ResponseCode.Success,
-            result: true,
+            result: WalletsController.service.get(id),
           }
         }
         return {
           status: ResponseCode.Fail,
-          msg: 'Wrong Password',
+          msg: 'Incorrect password',
         }
       }
       return {
         status: ResponseCode.Fail,
-        msg: 'Find no wallet',
+        msg: 'Wallet not found',
       }
     } catch (e) {
       return {
         status: ResponseCode.Fail,
-        msg: 'Failed to update wallet',
+        msg: e.message,
       }
     }
   }
