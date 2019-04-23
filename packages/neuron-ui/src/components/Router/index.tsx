@@ -1,5 +1,6 @@
 import React from 'react'
 import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { createHashHistory } from 'history'
 
 import RoutesWithProps from './RoutesWithProps'
 import Header from '../../containers/Header'
@@ -36,6 +37,7 @@ export interface CustomRoute {
   component: React.FunctionComponent<any>
 }
 
+export const history = createHashHistory()
 export const containers: CustomRoute[] = [
   {
     name: 'Header',

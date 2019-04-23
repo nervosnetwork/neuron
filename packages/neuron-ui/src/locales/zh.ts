@@ -63,6 +63,7 @@ export default {
         'edit-wallet': {
           'wallet-name': '钱包名称',
           password: '密码',
+          'new-password': '新密码',
           'confirm-password': '确认密码',
           'edit-wallet': '编辑钱包',
         },
@@ -114,6 +115,9 @@ export default {
       'name-has-been-used': '名称已被使用',
       'failed-to-initiate,-please-reopen-Neuron': '初始化失败, 请新打开 Neuron',
       'no-wallet': '没有钱包',
+      'wallet-imported-successfully': '{{name}} 导入成功',
+      'wallet-created-successfully': '{{name}} 创建成功',
+      'wallet-updated-successfully': '{{name}} 更新成功',
     },
   },
 }
