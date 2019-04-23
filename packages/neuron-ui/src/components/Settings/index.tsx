@@ -1,4 +1,5 @@
 import React from 'react'
+import { Location } from 'history'
 import { NavLink } from 'react-router-dom'
 import { Nav } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -19,8 +20,8 @@ const Settings = () => {
           <NavLink
             className="nav-link"
             to={tab.to}
-            isActive={(match, history) => {
-              if (history.pathname === Routes.Settings && idx === 0) {
+            isActive={(match: any, location: Location) => {
+              if (location.pathname === Routes.Settings && idx === 0) {
                 return true
               }
               return !!match

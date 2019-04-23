@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 import { Container } from 'react-bootstrap'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { History } from 'history'
 import Table from '../../widgets/Table'
 import { Routes, EXPLORER } from '../../utils/const'
 import { mockAddresses } from './mock'
@@ -41,7 +42,7 @@ const getTransactionsForAddress = (address: string) => {
   return address.length
 }
 
-const AddressPanel = ({ address, history }: { address: string; history: any }) => {
+const AddressPanel = ({ address, history }: { address: string; history: History }) => {
   const [t] = useTranslation()
   const actionItems = [
     {
@@ -79,7 +80,7 @@ const AddressPanel = ({ address, history }: { address: string; history: any }) =
   )
 }
 
-const fetchHDAddresses = (history: any) => {
+const fetchHDAddresses = (history: History) => {
   const addresses = generateHDAddresses().map(address => ({
     type: address.type,
     address: <AddressPanel address={address.address} history={history} />,
