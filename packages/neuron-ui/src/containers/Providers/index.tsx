@@ -129,6 +129,31 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
+          case WalletsMethod.Update: {
+            const time = new Date().getTime()
+            dispatch({
+              type: ProviderActions.AddMessage,
+              payload: {
+                category: 'success',
+                title: 'Wallet',
+                content: 'Wallet updated',
+                time,
+                actions: [
+                  {
+                    label: 'view',
+                    action: Routes.SettingsNetworks,
+                  },
+                ],
+                dismiss: () => {
+                  dispatch({
+                    type: ProviderActions.DismissMessage,
+                    payload: time,
+                  })
+                },
+              },
+            })
+            break
+          }
           default: {
             break
           }

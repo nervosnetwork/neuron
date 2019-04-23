@@ -68,6 +68,7 @@ export default {
         'edit-wallet': {
           'wallet-name': 'Wallet Name',
           password: 'Password',
+          'new-password': 'New Password',
           'confirm-password': 'Confirm Password',
           'edit-wallet': 'Edit Wallet',
         },
