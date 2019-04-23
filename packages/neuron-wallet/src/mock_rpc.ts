@@ -90,8 +90,22 @@ export const getHistoryTransactions = async (_lockHashes: string[], _from: strin
     version: 0,
     blockNumber: index.toString(),
     blockHash: `0x${randomHexString()}`,
-    inputs: [],
-    outputs: [],
+    inputs: [
+      {
+        args: [],
+        previousOutput: {
+          hash: `0x${randomHexString()}`,
+          index: 0,
+        },
+      },
+    ],
+    outputs: [
+      {
+        capacity: '100',
+        data: '0x',
+        lock: {},
+      },
+    ],
     deps: [],
     witnesses: [],
   }))
