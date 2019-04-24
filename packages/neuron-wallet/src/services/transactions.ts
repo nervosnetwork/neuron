@@ -3,7 +3,7 @@ import { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
-import { getHistoryTransactions, randomHexString } from '../mock_rpc'
+import { getHistoryTransactions } from '../mock_rpc'
 import ckbCore from '../core'
 
 export interface Input {
