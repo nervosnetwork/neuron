@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import i18n from '../../utils/i18n'
-import { Network } from '../../contexts/NeuronWallet'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import i18n from 'utils/i18n'
+import { Network } from 'contexts/NeuronWallet'
 
 enum PlaceHolder {
   Name = 'My Custom Node',

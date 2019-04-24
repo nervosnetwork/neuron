@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from 'react'
 import { History } from 'history'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import i18n from '../../utils/i18n'
-import { Routes } from '../../utils/const'
-import { Wallet } from '../../contexts/NeuronWallet/wallet'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import i18n from 'utils/i18n'
+import { Routes } from 'utils/const'
+import { Wallet } from 'contexts/NeuronWallet/wallet'
 
 interface MenuItemParams {
   id: string

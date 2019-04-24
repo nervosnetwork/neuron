@@ -20,7 +20,19 @@
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
+    "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "jest": {
     "displayName": "electron",
@@ -68,6 +80,8 @@
     "electron": "4.1.4",
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "^2.2.4",
+    "husky": "^1.3.1",
+    "lint-staged": "^8.1.5",
     "rimraf": "^2.6.3",
     "spectron": "^5.0.0"
   }

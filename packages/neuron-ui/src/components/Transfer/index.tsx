@@ -3,19 +3,18 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import TransferConfirm from '../TransferConfirm'
+import Dialog from 'widgets/Dialog'
+import QRScanner from 'widgets/QRScanner'
+import InlineInputWithDropdown from 'widgets/InlineInput/InlineInputWithDropdown'
+import { Spinner } from 'widgets/Loading'
+
+import { ContentProps } from 'containers/MainContent'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import initState from 'containers/MainContent/state'
+import UILayer, { TransferItem } from 'services/UILayer'
+import { CapacityUnit, PlaceHolders, Channel, Routes } from 'utils/const'
 import TransferItemList from '../TransferItemList'
-
-import Dialog from '../../widgets/Dialog'
-import QRScanner from '../../widgets/QRScanner'
-import InlineInputWithDropdown from '../../widgets/InlineInput/InlineInputWithDropdown'
-import { Spinner } from '../../widgets/Loading'
-
-import { ContentProps } from '../../containers/MainContent'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import initState from '../../containers/MainContent/state'
-import UILayer, { TransferItem } from '../../services/UILayer'
-import { CapacityUnit, PlaceHolders, Channel, Routes } from '../../utils/const'
+import TransferConfirm from '../TransferConfirm'
 
 const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const { t } = useTranslation()

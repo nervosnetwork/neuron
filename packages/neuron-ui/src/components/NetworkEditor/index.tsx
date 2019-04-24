@@ -3,10 +3,10 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
+import { ContentProps } from 'containers/MainContent'
 
-import InlineInput, { InputProps } from '../../widgets/InlineInput'
-import { useNeuronWallet } from '../../utils/hooks'
+import InlineInput, { InputProps } from 'widgets/InlineInput'
+import { useNeuronWallet } from 'utils/hooks'
 import { useInitiate, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
 export interface RawNetwork {

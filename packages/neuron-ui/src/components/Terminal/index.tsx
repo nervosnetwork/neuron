@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 
-import TerminalChannel from '../../services/Terminal'
-import { useNeuronWallet } from '../../utils/hooks'
+import TerminalChannel from 'services/Terminal'
+import { useNeuronWallet } from 'utils/hooks'
 
 const prompt = '=>'
 enum Hightlight {

@@ -3,14 +3,15 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import { Routes } from '../../utils/const'
-import { useNeuronWallet } from '../../utils/hooks'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import { ContentProps } from 'containers/MainContent'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 
-import Dialog from '../../widgets/Dialog'
-import ListGroupWithMaxHeight from '../../widgets/ListGroupWithMaxHeight'
-import ContextMenuZone from '../../widgets/ContextMenuZone'
+import { Routes } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+
+import Dialog from 'widgets/Dialog'
+import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
+import ContextMenuZone from 'widgets/ContextMenuZone'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
 
 interface MenuItemParams {

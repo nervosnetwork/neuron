@@ -12,8 +12,8 @@ import {
 } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
-import { useNeuronWallet } from '../../utils/hooks'
-import { Routes } from '../../utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+import { Routes } from 'utils/const'
 
 const SidebarAside = styled.nav`
   display: flex;

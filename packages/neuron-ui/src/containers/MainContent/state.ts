@@ -1,4 +1,4 @@
-import { CapacityUnit } from '../../utils/const'
+import { CapacityUnit } from 'utils/const'
 
 export const initState = {
   mnemonic: {

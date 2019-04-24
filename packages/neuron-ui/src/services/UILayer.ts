@@ -1,9 +1,9 @@
-import { Network } from '../contexts/NeuronWallet'
-import { RawNetwork } from '../components/NetworkEditor'
+import { Network } from 'contexts/NeuronWallet'
+import { RawNetwork } from 'components/NetworkEditor'
 
-import { CapacityUnit, Channel } from '../utils/const'
-import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
-import instantiateMethodCall from '../utils/instantiateMethodCall'
+import { CapacityUnit, Channel } from 'utils/const'
+import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
+import instantiateMethodCall from 'utils/instantiateMethodCall'
 
 declare global {
   interface Window {

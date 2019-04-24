@@ -3,9 +3,9 @@ import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 
-import NetworkStatus from '../../components/NetworkStatus'
-import { useNeuronWallet } from '../../utils/hooks'
-import { networksCall } from '../../services/UILayer'
+import NetworkStatus from 'components/NetworkStatus'
+import { useNeuronWallet } from 'utils/hooks'
+import { networksCall } from 'services/UILayer'
 
 const AppHeader = styled.div`
   height: 100%;

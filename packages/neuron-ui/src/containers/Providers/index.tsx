@@ -1,11 +1,11 @@
 import React, { useEffect, useReducer } from 'react'
 import { useTranslation } from 'react-i18next'
-import { history } from '../../components/Router'
-import NeuronWalletContext from '../../contexts/NeuronWallet'
-import { initProviders, ProviderActions, ProviderDispatch, reducer } from './reducer'
+import { history } from 'components/Router'
+import NeuronWalletContext from 'contexts/NeuronWallet'
 
-import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
-import { Channel, ConnectStatus, Routes } from '../../utils/const'
+import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import { Channel, ConnectStatus, Routes } from 'utils/const'
+import { initProviders, ProviderActions, ProviderDispatch, reducer } from './reducer'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,

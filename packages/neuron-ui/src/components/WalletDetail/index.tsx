@@ -2,8 +2,8 @@ import React from 'react'
 import { Card, ListGroup, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import { useNeuronWallet } from '../../utils/hooks'
+import { ContentProps } from 'containers/MainContent'
+import { useNeuronWallet } from 'utils/hooks'
 
 const WalletDetail: React.SFC<{ children?: React.ReactNode } & Partial<ContentProps>> = () => {
   const { wallet } = useNeuronWallet()

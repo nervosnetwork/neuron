@@ -3,16 +3,16 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import Screen from '../../widgets/Screen'
+import Screen from 'widgets/Screen'
+import ScreenButtonRow from 'widgets/ScreenButtonRow'
+
+import { ContentProps } from 'containers/MainContent'
+import { initState } from 'containers/MainContent/state'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+
+import { verifyWalletSubmission } from 'utils/validators'
+import { useNeuronWallet } from 'utils/hooks'
 import ScreenMessages from '../ScreenMessages'
-import ScreenButtonRow from '../../widgets/ScreenButtonRow'
-
-import { ContentProps } from '../../containers/MainContent'
-import { initState } from '../../containers/MainContent/state'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-
-import { verifyWalletSubmission } from '../../utils/validators'
-import { useNeuronWallet } from '../../utils/hooks'
 
 const inptus = [
   { label: 'password', key: 'password', type: 'password' },

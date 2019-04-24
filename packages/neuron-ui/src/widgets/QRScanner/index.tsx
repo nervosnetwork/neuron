@@ -4,8 +4,8 @@ import { Scan as ScanIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 import jsQR from 'jsqr'
 
+import { drawPolygon } from 'utils/canvasActions'
 import Dialog from '../Dialog'
-import { drawPolygon } from '../../utils/canvasActions'
 
 interface QRScannerProps {
   title: string

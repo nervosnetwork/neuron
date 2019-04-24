@@ -1,7 +1,7 @@
-import { sendCapacity, TransferItem } from '../../../services/UILayer'
+import { sendCapacity, TransferItem } from 'services/UILayer'
 
-import { Message } from '../../../utils/const'
-import { verifyAddress } from '../../../utils/validators'
+import { Message } from 'utils/const'
+import { verifyAddress } from 'utils/validators'
 
 import { MainActions } from '../reducer'
 

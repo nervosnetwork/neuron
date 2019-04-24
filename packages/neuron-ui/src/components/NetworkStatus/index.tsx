@@ -3,10 +3,10 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { FormSubtract as HyphenIcon } from 'grommet-icons'
 
-import Dropdown from '../../widgets/Dropdown'
-import { ConnectStatus, Routes } from '../../utils/const'
-import { Network } from '../../contexts/NeuronWallet'
-import { useNeuronWallet } from '../../utils/hooks'
+import Dropdown from 'widgets/Dropdown'
+import { ConnectStatus, Routes } from 'utils/const'
+import { Network } from 'contexts/NeuronWallet'
+import { useNeuronWallet } from 'utils/hooks'
 
 const Container = styled.div`
   position: relative;

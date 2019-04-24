@@ -1,9 +1,9 @@
 import React, { useReducer, useEffect } from 'react'
 import styled from 'styled-components'
 
+import { useNeuronWallet } from 'utils/hooks'
 import { initState, reducer, MainDispatch, InitState } from './reducer'
 import MainActions from './actions'
-import { useNeuronWallet } from '../../utils/hooks'
 
 const Main = styled.main`
   display: flex;

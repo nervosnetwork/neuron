@@ -2,9 +2,9 @@ import React from 'react'
 import { Card, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import { Network } from '../../contexts/NeuronWallet'
-import { UnremovableNetwork } from '../../utils/const'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import { Network } from 'contexts/NeuronWallet'
+import { UnremovableNetwork } from 'utils/const'
 
 const RemoveNetworkDialog = ({
   isChecked,
