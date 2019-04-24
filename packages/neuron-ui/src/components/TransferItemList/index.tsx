@@ -1,8 +1,8 @@
 import React from 'react'
 import { ListGroup } from 'react-bootstrap'
 
-import { TransferItem } from '../../services/UILayer'
-import i18n from '../../utils/i18n'
+import { TransferItem } from 'services/UILayer'
+import i18n from 'utils/i18n'
 
 const TransferItemList = ({ items }: { items: TransferItem[] }) => (
   <ListGroup variant="flush">

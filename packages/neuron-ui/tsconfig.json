@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
     "lib": [
       "dom",
       "dom.iterable",

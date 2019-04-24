@@ -3,7 +3,7 @@ import { Location } from 'history'
 import { NavLink } from 'react-router-dom'
 import { Nav } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
-import { Routes } from '../../utils/const'
+import { Routes } from 'utils/const'
 
 const tabs = [
   { label: 'settings.setting-tabs.general', to: Routes.SettingsGeneral },

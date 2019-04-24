@@ -1,5 +1,5 @@
+import { Channel } from 'utils/const'
 import UILayer from './UILayer'
-import { Channel } from '../utils/const'
 
 const TerminalChannel = {
   on: (cb: Function) => UILayer.on(Channel.Terminal, cb),

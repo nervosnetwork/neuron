@@ -2,11 +2,13 @@ import React from 'react'
 import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
 import { createHashHistory } from 'history'
 
+import Header from 'containers/Header'
+import Sidebar from 'containers/Sidebar'
+import MainContent from 'containers/MainContent'
+import Notification from 'containers/Notification'
+import UILayer from 'services/UILayer'
+import { Routes, Channel } from 'utils/const'
 import RoutesWithProps from './RoutesWithProps'
-import Header from '../../containers/Header'
-import Sidebar from '../../containers/Sidebar'
-import MainContent from '../../containers/MainContent'
-import Notification from '../../containers/Notification'
 import WalletWizard from '../WalletWizard'
 import Mnemonic from '../Mnemonic'
 import WalletSubmission from '../WalletSubmission'
@@ -25,9 +27,6 @@ import WalletEditor from '../WalletEditor'
 import Terminal from '../Terminal'
 import Prompt from '../Prompt'
 import LaunchScreen from '../LaunchScreen'
-
-import UILayer from '../../services/UILayer'
-import { Routes, Channel } from '../../utils/const'
 
 export interface CustomRoute {
   name: string

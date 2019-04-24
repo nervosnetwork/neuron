@@ -1,4 +1,4 @@
-import { initNeuronWallet } from '../../contexts/NeuronWallet'
+import { initNeuronWallet } from 'contexts/NeuronWallet'
 
 export enum ProviderActions {
   Initiate = 'initiate',

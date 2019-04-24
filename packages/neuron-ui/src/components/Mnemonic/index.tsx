@@ -4,15 +4,15 @@ import styled from 'styled-components'
 import { Alert, Button, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import Screen from '../../widgets/Screen'
-import ScreenMessages from '../ScreenMessages'
-import ScreenButtonRow from '../../widgets/ScreenButtonRow'
+import Screen from 'widgets/Screen'
+import ScreenButtonRow from 'widgets/ScreenButtonRow'
 
-import { ContentProps } from '../../containers/MainContent'
-import { MainActions } from '../../containers/MainContent/reducer'
-import { MnemonicAction, Routes } from '../../utils/const'
-import { useNeuronWallet } from '../../utils/hooks'
-import { helpersCall } from '../../services/UILayer'
+import { ContentProps } from 'containers/MainContent'
+import { MainActions } from 'containers/MainContent/reducer'
+import { MnemonicAction, Routes } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+import { helpersCall } from 'services/UILayer'
+import ScreenMessages from '../ScreenMessages'
 
 const Container = styled.div`
   text-align: center;

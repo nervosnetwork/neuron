@@ -3,14 +3,14 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { Col, Card, Button, Row, ListGroup, Form, Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { Routes, MnemonicAction } from '../../utils/const'
-import { useNeuronWallet } from '../../utils/hooks'
-import { ContentProps } from '../../containers/MainContent'
-import { actionCreators } from '../../containers/MainContent/reducer'
+import { Routes, MnemonicAction } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+import { ContentProps } from 'containers/MainContent'
+import { actionCreators } from 'containers/MainContent/reducer'
 
-import Dialog from '../../widgets/Dialog'
-import ListGroupWithMaxHeight from '../../widgets/ListGroupWithMaxHeight'
-import ContextMenuZone from '../../widgets/ContextMenuZone'
+import Dialog from 'widgets/Dialog'
+import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
+import ContextMenuZone from 'widgets/ContextMenuZone'
 
 import { useToggleDialog, useDeleteWallet, useMenuItems, useWalletToDelete, useHandleConfirm } from './hooks'
 

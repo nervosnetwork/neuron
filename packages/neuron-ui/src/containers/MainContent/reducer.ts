@@ -1,4 +1,4 @@
-import { CapacityUnit } from '../../utils/const'
+import { CapacityUnit } from 'utils/const'
 import actionCreators from './actionCreators'
 import MainActions from './actions'
 import initState from './state'

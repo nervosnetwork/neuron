@@ -1,4 +1,4 @@
-import { Message } from '../../widgets/BannerMessages'
+import { Message } from 'widgets/BannerMessages'
 
 const messagesState = [] as Message[]
 

@@ -1,5 +1,5 @@
-import { ConnectStatus, TransactionType } from '../../utils/const'
-import { RawNetwork } from '../../components/NetworkEditor'
+import { RawNetwork } from 'components/NetworkEditor'
+import { ConnectStatus, TransactionType } from 'utils/const'
 
 export interface Transaction {
   type: TransactionType

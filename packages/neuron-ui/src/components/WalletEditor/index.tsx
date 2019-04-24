@@ -3,11 +3,11 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Col, Row } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import InlineInput, { InputProps } from '../../widgets/InlineInput'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
-import { useNeuronWallet } from '../../utils/hooks'
-import Dialog from '../../widgets/Dialog'
+import { ContentProps } from 'containers/MainContent'
+import InlineInput, { InputProps } from 'widgets/InlineInput'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import { useNeuronWallet } from 'utils/hooks'
+import Dialog from 'widgets/Dialog'
 
 import { useWalletEditor, useInputs, useAreParamsValid, useToggleDialog } from './hooks'
 

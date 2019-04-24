@@ -3,10 +3,10 @@ import { Container } from 'react-bootstrap'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { History } from 'history'
-import Table from '../../widgets/Table'
-import { Routes, EXPLORER } from '../../utils/const'
+import { Routes, EXPLORER } from 'utils/const'
+import Table from 'widgets/Table'
+import ContextMenuZone from 'widgets/ContextMenuZone'
 import { mockAddresses } from './mock'
-import ContextMenuZone from '../../widgets/ContextMenuZone'
 
 const headers = [
   {

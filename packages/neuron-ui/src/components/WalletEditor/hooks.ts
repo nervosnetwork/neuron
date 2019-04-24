@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
-import { MainActions } from '../../containers/MainContent/reducer'
-import i18n from '../../utils/i18n'
+import { MainActions } from 'containers/MainContent/reducer'
+import i18n from 'utils/i18n'
 
 export const useWalletEditor = () => {
   const [name, setName] = useState('')
