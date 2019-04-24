@@ -1,7 +1,10 @@
 import { getConnection } from 'typeorm'
-import { Cell, OutPoint } from './cells'
+import { Cell, OutPoint, Script } from './cells'
+import InputEntity from '../entities/Input'
+import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
 import { getHistoryTransactions } from '../mock_rpc'
+import ckbCore from '../core'
 
 export interface Input {
   previousOutput: OutPoint
@@ -104,7 +107,30 @@ export default class TransactionsService {
   }
 
   public static get = async (hash: string): Promise<Transaction | undefined> => {
-    const transaction = await TransactionEntity.findOne(hash)
+    const tx = await getConnection()
+      .getRepository(TransactionEntity)
+      .findOne(hash, { relations: ['inputs', 'outputs'] })
+
+    if (!tx) {
+      return undefined
+    }
+
+    const transaction: Transaction = {
+      ...tx,
+      inputs: tx.inputs.map(i => {
+        return {
+          ...i,
+          previousOutput: i.previousOutput(),
+        }
+      }),
+      outputs: tx.outputs.map(o => {
+        return {
+          ...o,
+          outPoint: o.outPoint(),
+        }
+      }),
+    }
+
     return transaction
   }
 
@@ -118,16 +144,37 @@ export default class TransactionsService {
     tx.hash = transaction.hash
     tx.version = transaction.version
     tx.deps = transaction.deps!
-    tx.inputs = transaction.inputs!
-    tx.outputs = transaction.outputs!
     tx.timestamp = transaction.timestamp!
     tx.value = transaction.value!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnesses!
     tx.type = transaction.type!
-    const txEntity = await tx.save()
-    return txEntity
+    tx.inputs = []
+    tx.outputs = []
+    await getConnection().manager.save(tx)
+    await transaction.inputs!.forEach(async i => {
+      const input = new InputEntity()
+      input.outPointHash = i.previousOutput.hash
+      input.outPointIndex = i.previousOutput.index
+      input.args = i.args
+      input.transaction = tx
+      await getConnection().manager.save(input)
+    })
+    await transaction.outputs!.forEach(async (o, index) => {
+      const output = new OutputEntity()
+      output.outPointHash = transaction.hash
+      output.outPointIndex = index
+      output.capacity = o.capacity
+      output.data = o.data!
+      output.lock = o.lock
+      output.type = o.type!
+      output.lockHash = o.lockHash!
+      output.transaction = tx
+      await getConnection().manager.save(output)
+    })
+
+    return tx
   }
 
   /* eslint no-await-in-loop: "warn" */
@@ -161,6 +208,11 @@ export default class TransactionsService {
     // TODO: calculate value, sum of not return charge output
     tx.value = Math.round(Math.random() * 10000).toString()
     tx.type = ['send', 'receive', 'unknown'][Math.round(Math.random() * 2)]
+    tx.outputs = tx.outputs!.map(o => {
+      const output = o
+      output.lockHash = TransactionsService.lockScriptToHash(output.lock!)
+      return output
+    })
     const txEntity = await TransactionsService.create(transaction)
     return txEntity
   }
@@ -211,5 +263,17 @@ export default class TransactionsService {
       inputs,
       outputs,
     }
+  }
+
+  // use SDK lockScriptToHash
+  public static lockScriptToHash = (lock: Script) => {
+    const binaryHash: string = lock!.binaryHash!
+    const args: Uint8Array[] = lock.args!.map(n => {
+      return ckbCore.utils.hexToBytes(n)
+    })
+    return ckbCore.utils.lockScriptToHash({
+      binaryHash,
+      args,
+    })
   }
 }

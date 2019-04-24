@@ -1,17 +1,14 @@
-import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm'
-import { Cell } from '../services/cells'
+import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from 'typeorm'
 import { Witness } from '../services/transactions'
+import InputEntity from './Input'
+import OutputEntity from './Output'
 
 interface OutPoint {
   hash: string
   index: number
 }
 
-interface Input {
-  previousOutput: OutPoint
-  args: string[]
-}
-
+/* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()
 export default class Transaction extends BaseEntity {
   @PrimaryColumn({
@@ -33,16 +30,6 @@ export default class Transaction extends BaseEntity {
     type: 'simple-json',
   })
   witnesses!: Witness[]
-
-  @Column({
-    type: 'simple-json',
-  })
-  inputs!: Input[]
-
-  @Column({
-    type: 'simple-json',
-  })
-  outputs!: Cell[]
 
   @Column({
     type: 'varchar',
@@ -68,4 +55,10 @@ export default class Transaction extends BaseEntity {
     type: 'varchar',
   })
   type!: string
+
+  @OneToMany(_type => InputEntity, input => input.transaction)
+  inputs!: InputEntity[]
+
+  @OneToMany(_type => OutputEntity, output => output.transaction)
+  outputs!: OutputEntity[]
 }

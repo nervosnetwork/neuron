@@ -4,6 +4,8 @@ import app from './app'
 
 import Cell from './entities/Cell'
 import Transaction from './entities/Transaction'
+import Input from './entities/Input'
+import Output from './entities/Output'
 
 const dbPath = path.join(app.getPath('userData'), 'cell.sqlite')
 
@@ -11,7 +13,7 @@ const connectOptions = async () => {
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
     database: dbPath,
-    entities: [Cell, Transaction],
+    entities: [Cell, Transaction, Input, Output],
   })
 
   return connectionOptions
