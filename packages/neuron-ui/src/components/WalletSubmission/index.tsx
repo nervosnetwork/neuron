@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,6 @@ import { ContentProps } from '../../containers/MainContent'
 import { initState } from '../../containers/MainContent/state'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 
-import { Routes } from '../../utils/const'
 import { verifyWalletSubmission } from '../../utils/validators'
 import { useNeuronWallet } from '../../utils/hooks'
 
@@ -23,11 +22,7 @@ const inptus = [
 
 const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const {
-    messages,
-    settings: { wallets },
-  } = useNeuronWallet()
-  const cachedWallets = useRef(wallets)
+  const { messages } = useNeuronWallet()
 
   const { dispatch, mnemonic, history } = props
 
@@ -43,13 +38,6 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
       })
     }
   }, [])
-
-  useEffect(() => {
-    if (wallets.length > cachedWallets.current.length) {
-      const newWallet = wallets[wallets.length - 1]
-      history.push(`${Routes.Wallet}/${newWallet.id}`)
-    }
-  }, [wallets.length])
 
   const onChange = useCallback(
     (field: keyof typeof mnemonic) => (e: React.FormEvent<{ value: string }>) => {

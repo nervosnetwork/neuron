@@ -1,5 +1,6 @@
 import React from 'react'
 import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { createHashHistory } from 'history'
 
 import RoutesWithProps from './RoutesWithProps'
 import Header from '../../containers/Header'
@@ -17,7 +18,7 @@ import Transaction from '../Transaction'
 import Settings from '../Settings'
 import GeneralSetting from '../GeneralSetting'
 import Addresses from '../Addresses'
-import Wallets from '../Settings/Wallets'
+import Wallets from '../WalletSetting'
 import NetworkSetting from '../NetworkSetting'
 import NetworkEditor from '../NetworkEditor'
 import WalletEditor from '../WalletEditor'
@@ -36,6 +37,7 @@ export interface CustomRoute {
   component: React.FunctionComponent<any>
 }
 
+export const history = createHashHistory()
 export const containers: CustomRoute[] = [
   {
     name: 'Header',

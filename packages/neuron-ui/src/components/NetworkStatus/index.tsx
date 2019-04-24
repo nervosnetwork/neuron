@@ -83,16 +83,20 @@ const ConnectStatusHeader = ({
         selected={networkItems.findIndex(network => network.label === chain.network.name)}
         style={{
           position: 'absolute',
-          top: 'calc(100% + 1px)',
+          top: '100%',
           left: tipNumber === null ? 'auto' : '0',
           right: tipNumber === null ? '0' : 'auto',
           zIndex: '999',
           display: 'none',
+          maxHeight: '50vh',
+          overflowY: 'scroll',
+          border: '1px solid #ddd',
         }}
         itemsStyle={{
           textTransform: 'capitalize',
           boxShadow: '0px 0px 1px rgba(120, 120, 120, 0.5)',
           maxWidth: '200px',
+          minHeight: '48px',
         }}
       />
     </Container>

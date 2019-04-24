@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Routes } from '../../utils/const'
 import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
 import i18n from '../../utils/i18n'
 import { Network } from '../../contexts/NeuronWallet'
@@ -72,7 +71,7 @@ export const useInitiate = (id: string, networks: Network[], editor: EditorType,
         },
       })
     }
-  }, [id, networks, dispatch, editor])
+  }, [])
 }
 
 export const useInputs = (editor: EditorType) => {
@@ -119,40 +118,10 @@ export const useHandleSubmit = (
     dispatch(actionCreators.createOrUpdateNetwork({ id, name, remote }, networks))
   }, [id, name, remote, networks, dispatch])
 
-export const useIsUpdated = (
-  id: string,
-  cachedNetworks: Network[],
-  networks: Network[],
-  dispatch: DispatchType,
-  history: any,
-) => {
-  const currentNetwork = networks.find(network => network.id === id)
-  useEffect(() => {
-    if (cachedNetworks.length !== networks.length) {
-      history.push(Routes.SettingsNetworks)
-    } else if (id !== 'new') {
-      const cachedNetwork = cachedNetworks.find(network => network.id === id)
-      if (!cachedNetwork || !currentNetwork) {
-        dispatch({
-          type: MainActions.ErrorMessage,
-          payload: {
-            networks: i18n.t('messages.network-is-not-found'),
-          },
-        })
-        return
-      }
-      if (cachedNetwork.name !== currentNetwork.name || cachedNetwork.remote !== currentNetwork.remote) {
-        history.push(Routes.SettingsNetworks)
-      }
-    }
-  }, [id, networks.length, currentNetwork, cachedNetworks, dispatch, history])
-}
-
 export default {
   useInitiate,
   useInputs,
   useNetworkEditor,
   useIsInputsValid,
   useHandleSubmit,
-  useIsUpdated,
 }

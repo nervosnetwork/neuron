@@ -1942,16 +1942,6 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-core@0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.9.0.tgz#acf606cd253d98fd23248f797e369799977c32db"
-  integrity sha512-8afJFP/5jK9equSD36mROTr2AHGS+vd4i3JRuB9qW/oJOtp6YoShnH9dbBSXfLrcyx/j/QlfTcmIX5LSNaohww==
-  dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "^0.9.0"
-    "@nervosnetwork/ckb-sdk-utils" "^0.9.0"
-    "@nervosnetwork/ckb-sdk-wallet" "^0.9.0"
-    "@nervosnetwork/ckb-types" "^0.9.0"
-
 "@nervosnetwork/ckb-sdk-core@^0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.8.0.tgz#34d82c88f3193bf683497e25dd2bfc9292153edc"
@@ -1961,6 +1951,16 @@
     "@nervosnetwork/ckb-sdk-utils" "^0.8.0"
     "@nervosnetwork/ckb-sdk-wallet" "^0.8.0"
     "@nervosnetwork/ckb-types" "^0.8.0"
+
+"@nervosnetwork/ckb-sdk-core@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.9.0.tgz#acf606cd253d98fd23248f797e369799977c32db"
+  integrity sha512-8afJFP/5jK9equSD36mROTr2AHGS+vd4i3JRuB9qW/oJOtp6YoShnH9dbBSXfLrcyx/j/QlfTcmIX5LSNaohww==
+  dependencies:
+    "@nervosnetwork/ckb-sdk-rpc" "^0.9.0"
+    "@nervosnetwork/ckb-sdk-utils" "^0.9.0"
+    "@nervosnetwork/ckb-sdk-wallet" "^0.9.0"
+    "@nervosnetwork/ckb-types" "^0.9.0"
 
 "@nervosnetwork/ckb-sdk-rpc@^0.8.0":
   version "0.8.0"
