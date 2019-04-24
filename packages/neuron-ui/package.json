@@ -60,7 +60,6 @@
     "babel-jest": "^24.7.1",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.9.1",
-    "eslint-plugin-react-hooks": "^1.6.0",
     "jest-styled-components": "^6.3.1",
     "jsqr": "^1.2.0",
     "react-app-rewired": "^2.1.1",
