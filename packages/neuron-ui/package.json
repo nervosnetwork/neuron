@@ -31,12 +31,7 @@
       "git add"
     ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": ["last 2 chrome versions"],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.8.0",
     "@types/node": "11.13.5",
