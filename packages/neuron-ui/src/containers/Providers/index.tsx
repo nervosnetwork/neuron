@@ -226,7 +226,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         })
       }
     })
-  }, [])
+  }, [i18n])
 
   return (
     <NeuronWalletContext.Provider value={providers}>

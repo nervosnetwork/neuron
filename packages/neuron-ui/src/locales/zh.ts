@@ -68,6 +68,7 @@ export default {
           'edit-wallet': '编辑钱包',
         },
         'delete-wallet-title': '请输入{{name}}的密码',
+        password: '密码',
         'wallet-detail': {
           balance: '余额',
         },

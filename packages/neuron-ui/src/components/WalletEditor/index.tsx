@@ -83,9 +83,6 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
             e.preventDefault()
             e.stopPropagation()
           }}
-          style={{
-            width: '40%',
-          }}
         >
           <>
             <Card.Header>{t('settings.wallet-manager.delete-wallet-title', { name: wallet.name })}</Card.Header>
