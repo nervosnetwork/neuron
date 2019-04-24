@@ -3,6 +3,7 @@ import ckbCore from '../core'
 import AddressType from './type'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
+import { HDAddress } from '../keys/key'
 
 const MaxAddressNumber = 30
 
@@ -37,13 +38,19 @@ class Address {
     } else if (receivingAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
       throw new Error('Address number error.')
     }
-    const receivingAddresses = []
-    const changeAddresses = []
+    const receivingAddresses: HDAddress[] = []
+    const changeAddresses: HDAddress[] = []
     for (let index = 0; index < receivingAddressNumber; index++) {
-      receivingAddresses.push(Address.addressFromHDIndex(keysData, index, AddressType.Receiving))
+      receivingAddresses.push({
+        address: Address.addressFromHDIndex(keysData, index, AddressType.Receiving),
+        path: HD.path(AddressType.Receiving, index),
+      })
     }
     for (let index = 0; index < changeAddressNumber; index++) {
-      changeAddresses.push(Address.addressFromHDIndex(keysData, index, AddressType.Change))
+      changeAddresses.push({
+        address: Address.addressFromHDIndex(keysData, index, AddressType.Change),
+        path: HD.path(AddressType.Change, index),
+      })
     }
     return {
       receiving: receivingAddresses,

@@ -8,9 +8,14 @@ import Address from '../address/index'
 import HD from './hd'
 import { Keystore, KdfParams, KeysData, Child } from './keystore'
 
+export interface HDAddress {
+  address: string
+  path: string
+}
+
 export interface Addresses {
-  receiving: string[]
-  change: string[]
+  receiving: HDAddress[]
+  change: HDAddress[]
 }
 
 enum DefaultAddressNumber {
