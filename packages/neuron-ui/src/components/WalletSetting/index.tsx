@@ -82,7 +82,11 @@ const Wallets = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPro
             <Card.Body>
               <Form.Group as={Row} controlId="formPlaintextPassword">
                 <Col>
-                  <Form.Control type="password" placeholder="password" onChange={deleteWallet.password.onChange} />
+                  <Form.Control
+                    type="password"
+                    placeholder={`${t('settings.wallet-manager.password')}`}
+                    onChange={deleteWallet.password.onChange}
+                  />
                 </Col>
               </Form.Group>
             </Card.Body>

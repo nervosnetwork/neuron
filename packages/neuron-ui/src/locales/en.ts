@@ -73,8 +73,9 @@ export default {
           'edit-wallet': 'Edit Wallet',
         },
         'delete-wallet-title': 'Please Enter {{name}} Password',
+        password: 'Password',
         'wallet-detail': {
-          balance: 'balance',
+          balance: 'Balance',
         },
       },
       network: {
