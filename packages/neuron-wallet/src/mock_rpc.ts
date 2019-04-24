@@ -103,7 +103,10 @@ export const getHistoryTransactions = async (_lockHashes: string[], _from: strin
       {
         capacity: '100',
         data: '0x',
-        lock: {},
+        lock: {
+          binaryHash: `0x${randomHexString()}`,
+          args: [`0x${randomHexString()}`],
+        },
       },
     ],
     deps: [],

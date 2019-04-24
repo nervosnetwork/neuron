@@ -1,9 +1,10 @@
 import { getConnection } from 'typeorm'
-import { Cell, OutPoint } from './cells'
+import { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
 import { getHistoryTransactions, randomHexString } from '../mock_rpc'
+import ckbCore from '../core'
 
 export interface Input {
   previousOutput: OutPoint
@@ -209,8 +210,7 @@ export default class TransactionsService {
     tx.type = ['send', 'receive', 'unknown'][Math.round(Math.random() * 2)]
     tx.outputs = tx.outputs!.map(o => {
       const output = o
-      // TODO: calculate lockHash
-      output.lockHash = randomHexString()
+      output.lockHash = TransactionsService.lockScriptToHash(output.lock!)
       return output
     })
     const txEntity = await TransactionsService.create(transaction)
@@ -263,5 +263,17 @@ export default class TransactionsService {
       inputs,
       outputs,
     }
+  }
+
+  // use SDK lockScriptToHash
+  public static lockScriptToHash = (lock: Script) => {
+    const binaryHash: string = lock!.binaryHash!
+    const args: Uint8Array[] = lock.args!.map(n => {
+      return ckbCore.utils.hexToBytes(n)
+    })
+    return ckbCore.utils.lockScriptToHash({
+      binaryHash,
+      args,
+    })
   }
 }
