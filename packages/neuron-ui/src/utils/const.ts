@@ -2,19 +2,8 @@ export const MAX_NETWORK_NAME_LENGTH = 28
 export const ADDRESS_LENGTH = 40
 export const PAGE_SIZE = 15
 export const EXPLORER = 'http://localhost:3000'
-export const UnremovableNetwork = 'Testnet'
-export const UnremovableNetworkId = '0'
-
-export const DEFAULT_NETWORKS = [
-  {
-    name: 'Testnet',
-    remote: 'http://localhost:8114',
-  },
-  {
-    name: 'Localhost',
-    remote: 'http://localhost:8114',
-  },
-]
+export const UNREMOVABLE_NETWORK = 'Testnet'
+export const UNREMOVABLE_NETWORK_ID = '0'
 
 export enum ConnectStatus {
   Online = 'online',

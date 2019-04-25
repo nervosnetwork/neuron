@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 import { Network } from 'contexts/NeuronWallet'
-import { UnremovableNetwork } from 'utils/const'
+import { UNREMOVABLE_NETWORK } from 'utils/const'
 
 const RemoveNetworkDialog = ({
   isChecked,
@@ -29,7 +29,7 @@ const RemoveNetworkDialog = ({
           <Card.Body>
             {`Network of name: ${network.name}, address: ${network.remote} will be removed.`}
             {isChecked ? (
-              <p>{`It's the active network, removing it will make reconnect to ${UnremovableNetwork}`}</p>
+              <p>{`It's the active network, removing it will make reconnect to ${UNREMOVABLE_NETWORK}`}</p>
             ) : null}
           </Card.Body>
           <Card.Footer className="text-muted">
