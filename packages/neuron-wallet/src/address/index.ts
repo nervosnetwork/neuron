@@ -3,9 +3,13 @@ import ckbCore from '../core'
 import AddressType from './type'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
-import { HDAddress } from '../keys/key'
 
 const MaxAddressNumber = 30
+
+export interface HDAddress {
+  address: string
+  path: string
+}
 
 class Address {
   public static isUsedAddress = (address: string) => {

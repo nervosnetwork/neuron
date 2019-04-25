@@ -4,13 +4,8 @@ import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
 import { v4 } from 'uuid'
-import Address from '../address/index'
+import Address, { HDAddress } from '../address/index'
 import { Keystore, KdfParams, KeysData } from './keystore'
-
-export interface HDAddress {
-  address: string
-  path: string
-}
 
 export interface Addresses {
   receiving: HDAddress[]
