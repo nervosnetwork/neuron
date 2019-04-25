@@ -38,6 +38,10 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       },
     )
 
+    UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
+      history.push(args.result.router)
+    })
+
     UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
         dispatch({
