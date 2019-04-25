@@ -5,8 +5,7 @@ import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
 import { v4 } from 'uuid'
 import Address from '../address/index'
-import HD from './hd'
-import { Keystore, KdfParams, KeysData, Child } from './keystore'
+import { Keystore, KdfParams, KeysData } from './keystore'
 
 export interface HDAddress {
   address: string
@@ -150,12 +149,7 @@ export default class Key {
 
   public allUsedAddress = () => {
     if (this.keysData) {
-      const children: Child[] = HD.searchUsedChildKeys(this.keysData)
-      const addresses: string[] = []
-      children.forEach(child => {
-        addresses.push(Address.addressFromPrivateKey(child.privateKey))
-      })
-      return addresses
+      return Address.searchUsedChildAddresses(this.keysData)
     }
     return []
   }
