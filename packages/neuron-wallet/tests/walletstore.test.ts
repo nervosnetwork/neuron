@@ -28,8 +28,34 @@ describe.skip('wallet store', () => {
       },
     },
     addresses: {
-      receiving: ['address1', 'address2', 'address3'],
-      change: ['address1', 'address2', 'address3'],
+      receiving: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
+      change: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
     },
   }
 
@@ -55,8 +81,34 @@ describe.skip('wallet store', () => {
       },
     },
     addresses: {
-      receiving: ['address1', 'address2', 'address3'],
-      change: ['address1', 'address2', 'address3'],
+      receiving: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
+      change: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
     },
   }
   const wallet3: WalletData = {
@@ -81,8 +133,34 @@ describe.skip('wallet store', () => {
       },
     },
     addresses: {
-      receiving: ['address1', 'address2', 'address3'],
-      change: ['address1', 'address2', 'address3'],
+      receiving: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
+      change: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
     },
   }
 
@@ -130,8 +208,34 @@ describe.skip('wallet store', () => {
   it('update addresses', () => {
     walletStore.saveWallet(wallet1)
     const addresses = {
-      receiving: ['address1', 'address2', 'address3'],
-      change: ['address1', 'address2', 'address3'],
+      receiving: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
+      change: [
+        {
+          address: 'address1',
+          path: 'path1',
+        },
+        {
+          address: 'address2',
+          path: 'path2',
+        },
+        {
+          address: 'address3',
+          path: 'path3',
+        },
+      ],
     }
     wallet1.addresses = addresses
     walletStore.update(wallet1.id, wallet1)

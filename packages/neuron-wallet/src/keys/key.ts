@@ -4,12 +4,12 @@ import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
 import { v4 } from 'uuid'
-import HD from './hd'
+import Address, { HDAddress } from '../address/index'
 import { Keystore, KdfParams, KeysData } from './keystore'
 
 export interface Addresses {
-  receiving: string[]
-  change: string[]
+  receiving: HDAddress[]
+  change: HDAddress[]
 }
 
 enum DefaultAddressNumber {
@@ -88,7 +88,7 @@ export default class Key {
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
     key.keysData = JSON.parse(keysData)
-    key.addresses = HD.generateAddresses(JSON.parse(keysData), receivingAddressNumber, changeAddressNumber)
+    key.addresses = Address.generateAddresses(JSON.parse(keysData), receivingAddressNumber, changeAddressNumber)
     return key
   }
 
@@ -104,7 +104,7 @@ export default class Key {
     const key = new Key()
     const keysData = key.generatePrivateKeyFromMnemonic(mnemonic)
     key.keysData = keysData
-    key.addresses = HD.generateAddresses(keysData, receivingAddressNumber, changeAddressNumber)
+    key.addresses = Address.generateAddresses(keysData, receivingAddressNumber, changeAddressNumber)
     key.keystore = key.toKeystore(JSON.stringify(keysData), password)
     return key
   }
@@ -135,11 +135,18 @@ export default class Key {
     return mac === this.keystore.crypto.mac
   }
 
-  public latestUnusedAddress = () => {
+  public nextUnusedAddress = () => {
     if (this.keysData) {
-      return HD.latestUnusedAddress(this.keysData)
+      return Address.nextUnusedAddress(this.keysData)
     }
     return ''
+  }
+
+  public allUsedAddresses = () => {
+    if (this.keysData) {
+      return Address.searchUsedAddresses(this.keysData)
+    }
+    return []
   }
 
   private generatePrivateKeyFromMnemonic = (mnemonic: string) => {

@@ -6,7 +6,7 @@ export interface KeysData {
 export interface Child {
   path: string
   privateKey: string
-  chainCode: string
+  publicKey: string
 }
 
 export interface CipherParams {
