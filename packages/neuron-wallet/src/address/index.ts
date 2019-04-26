@@ -4,7 +4,7 @@ import AddressType from './type'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
 
-const MaxAddressNumber = 30
+const MAX_ADDRESS_COUNT = 30
 
 export interface HDAddress {
   address: string
@@ -12,7 +12,7 @@ export interface HDAddress {
 }
 
 class Address {
-  public static isUsedAddress = (address: string) => {
+  public static isAddressUsed = (address: string) => {
     return TransactionsService.hasTransactions(address)
   }
 
@@ -30,32 +30,28 @@ class Address {
     return Address.addressFromPrivateKey(privateKey)
   }
 
-  public static latestUnusedAddress = (keysData: KeysData) => {
-    const latestUnusedIndex = Address.searchAddress(keysData, 20)
-    const { privateKey } = HD.keyFromHDIndex(keysData, latestUnusedIndex, AddressType.Receiving)
+  public static nextUnusedAddress = (keysData: KeysData) => {
+    const nextUnusedIndex = Address.searchHDIndex(keysData, 20)
+    const { privateKey } = HD.keyFromHDIndex(keysData, nextUnusedIndex, AddressType.Receiving)
     return Address.addressFromPrivateKey(privateKey)
   }
 
   // Generate both receiving and change addresses
-  public static generateAddresses = (
-    keysData: KeysData,
-    receivingAddressNumber: number,
-    changeAddressNumber: number,
-  ) => {
-    if (receivingAddressNumber < 1 || changeAddressNumber < 1) {
+  public static generateAddresses = (keysData: KeysData, receivingAddressCount: number, changeAddressCount: number) => {
+    if (receivingAddressCount < 1 || changeAddressCount < 1) {
       throw new Error('Address number error.')
-    } else if (receivingAddressNumber > MaxAddressNumber || changeAddressNumber > MaxAddressNumber) {
+    } else if (receivingAddressCount > MAX_ADDRESS_COUNT || changeAddressCount > MAX_ADDRESS_COUNT) {
       throw new Error('Address number error.')
     }
     const receivingAddresses: HDAddress[] = []
     const changeAddresses: HDAddress[] = []
-    for (let index = 0; index < receivingAddressNumber; index++) {
+    for (let index = 0; index < receivingAddressCount; index++) {
       receivingAddresses.push({
         address: Address.addressFromHDIndex(keysData, index, AddressType.Receiving),
         path: HD.pathFromIndex(AddressType.Receiving, index),
       })
     }
-    for (let index = 0; index < changeAddressNumber; index++) {
+    for (let index = 0; index < changeAddressCount; index++) {
       changeAddresses.push({
         address: Address.addressFromHDIndex(keysData, index, AddressType.Change),
         path: HD.pathFromIndex(AddressType.Change, index),
@@ -67,15 +63,15 @@ class Address {
     }
   }
 
-  public static searchUsedChildAddresses = (keysData: KeysData) => {
-    const children: HDAddress[] = []
-    const nextUnusedIndex = Address.searchAddress(keysData)
+  public static searchUsedAddresses = (keysData: KeysData) => {
+    const addresses: HDAddress[] = []
+    const nextUnusedIndex = Address.searchHDIndex(keysData)
     for (let index = 0; index < nextUnusedIndex; index++) {
       const { publicKey, path } = HD.keyFromHDIndex(keysData, index)
       if (publicKey) {
         const address = Address.addressFromPrivateKey(publicKey)
-        if (Address.isUsedAddress(address)) {
-          children.push({
+        if (Address.isAddressUsed(address)) {
+          addresses.push({
             path,
             address,
           })
@@ -84,11 +80,11 @@ class Address {
         throw new Error('Empty private key')
       }
     }
-    return children
+    return addresses
   }
 
   // TODO: refactor me
-  public static searchAddress = (
+  public static searchHDIndex = (
     keysData: KeysData,
     startIndex = 0,
     maxUsedIndex = 0,
@@ -96,11 +92,11 @@ class Address {
     depth = 0,
   ): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isUsedAddress(Address.addressFromHDIndex(keysData, startIndex))) {
+    if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex))) {
       if (startIndex === 0) {
         return 0
       }
-      return Address.searchAddress(
+      return Address.searchHDIndex(
         keysData,
         Math.floor((startIndex - maxUsedIndex) / 2 + maxUsedIndex),
         maxUsedIndex,
@@ -108,10 +104,10 @@ class Address {
         depth + 1,
       )
     }
-    if (!Address.isUsedAddress(Address.addressFromHDIndex(keysData, startIndex + 1))) {
+    if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex + 1))) {
       return startIndex + 1
     }
-    return Address.searchAddress(
+    return Address.searchHDIndex(
       keysData,
       Math.round((minUnusedIndex - startIndex) / 2 + startIndex),
       Math.max(maxUsedIndex, startIndex),

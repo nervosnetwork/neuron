@@ -135,16 +135,16 @@ export default class Key {
     return mac === this.keystore.crypto.mac
   }
 
-  public latestUnusedAddress = () => {
+  public nextUnusedAddress = () => {
     if (this.keysData) {
-      return Address.latestUnusedAddress(this.keysData)
+      return Address.nextUnusedAddress(this.keysData)
     }
     return ''
   }
 
-  public allUsedAddress = () => {
+  public allUsedAddresses = () => {
     if (this.keysData) {
-      return Address.searchUsedChildAddresses(this.keysData)
+      return Address.searchUsedAddresses(this.keysData)
     }
     return []
   }
