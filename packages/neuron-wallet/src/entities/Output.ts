@@ -41,6 +41,11 @@ export default class Output extends BaseEntity {
   })
   lockHash!: string
 
+  @Column({
+    type: 'varchar',
+  })
+  status!: string
+
   public outPoint(): OutPoint {
     return {
       hash: this.outPointHash,

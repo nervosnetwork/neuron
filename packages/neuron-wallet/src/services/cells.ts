@@ -1,7 +1,7 @@
 import { getConnection, In } from 'typeorm'
 import asw from '../wallets/asw'
 import { getLiveCells } from '../mock_rpc'
-import CellEntity from '../entities/Cell'
+import OutputEntity from '../entities/Output'
 
 export interface OutPoint {
   hash: string
@@ -63,13 +63,13 @@ export default class CellsService {
   }
 
   public static create = async (cell: Cell) => {
-    const cellEntity = new CellEntity()
+    const cellEntity = new OutputEntity()
     cellEntity.outPointHash = cell.outPoint!.hash
     cellEntity.outPointIndex = cell.outPoint!.index
     cellEntity.capacity = cell.capacity
     cellEntity.data = cell.data || ''
-    cellEntity.lockScript = cell.lock
-    cellEntity.typeScript = cell.type || null
+    cellEntity.lock = cell.lock
+    cellEntity.type = cell.type || null
     cellEntity.status = cell.status!
     cellEntity.lockHash = cell.lockHash!
 
@@ -78,8 +78,8 @@ export default class CellsService {
   }
 
   public static getBalance = async (lockHashes: string[]): Promise<string> => {
-    const cells: CellEntity[] = await getConnection()
-      .getRepository(CellEntity)
+    const cells: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
       .find({
         where: { lockHash: In(lockHashes) },
       })
@@ -90,7 +90,7 @@ export default class CellsService {
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
-    const cellEntity: CellEntity | undefined = await CellsService.getCellEntity(outPoint)
+    const cellEntity: OutputEntity | undefined = await CellsService.getCellEntity(outPoint)
 
     if (!cellEntity) {
       return cellEntity
@@ -103,15 +103,15 @@ export default class CellsService {
       },
       capacity: cellEntity.capacity,
       lockHash: cellEntity.lockHash,
-      lock: cellEntity.lockScript,
+      lock: cellEntity.lock,
     }
 
     return cell
   }
 
-  private static getCellEntity = async (outPoint: OutPoint): Promise<CellEntity | undefined> => {
-    const cellEntity: CellEntity | undefined = await getConnection()
-      .getRepository(CellEntity)
+  private static getCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
+    const cellEntity: OutputEntity | undefined = await getConnection()
+      .getRepository(OutputEntity)
       .createQueryBuilder('cell')
       .where('cell.outPointHash = :outPointHash and cell.outPointIndex = :outPointIndex', {
         outPointHash: outPoint.hash,

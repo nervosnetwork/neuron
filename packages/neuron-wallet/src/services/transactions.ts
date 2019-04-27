@@ -171,6 +171,7 @@ export default class TransactionsService {
       output.type = o.type!
       output.lockHash = o.lockHash!
       output.transaction = tx
+      output.status = 'live'
       await getConnection().manager.save(output)
     })
 
