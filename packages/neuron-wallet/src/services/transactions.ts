@@ -162,13 +162,13 @@ export default class TransactionsService {
     }
     const lockHash: string = TransactionsService.lockScriptToHash(lock)
 
-    const transaction: TransactionEntity | undefined = await getConnection()
-      .getRepository(TransactionEntity)
+    const output: OutputEntity | undefined = await getConnection()
+      .getRepository(OutputEntity)
       .findOne({
         where: { lockHash },
       })
 
-    if (transaction) {
+    if (output) {
       return true
     }
     return false
