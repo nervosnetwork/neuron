@@ -114,11 +114,12 @@ export default class TransactionsService {
   public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = []
-    for (const addr of params.addresses) {
-      const lockHash: string = await TransactionsService.addressToLockHash(addr)
-      lockHashes.push(lockHash)
-    }
+    const lockHashes: string[] = await Promise.all(
+      params.addresses.map(async addr => {
+        const lockHash: string = await TransactionsService.addressToLockHash(addr)
+        return lockHash
+      }),
+    )
 
     return TransactionsService.getAll({
       pageNo: params.pageNo,
@@ -130,12 +131,13 @@ export default class TransactionsService {
   public static getAllByPubkeys = async (
     params: TransactionsByPubkeysParams,
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = []
-    for (const pubkey of params.pubkeys) {
-      const addr = ckbCore.utils.pubkeyToAddress(pubkey)
-      const lockHash = await TransactionsService.addressToLockHash(addr)
-      lockHashes.push(lockHash)
-    }
+    const lockHashes: string[] = await Promise.all(
+      params.pubkeys.map(async pubkey => {
+        const addr = ckbCore.utils.pubkeyToAddress(pubkey)
+        const lockHash = await TransactionsService.addressToLockHash(addr)
+        return lockHash
+      }),
+    )
 
     return TransactionsService.getAll({
       pageNo: params.pageNo,
