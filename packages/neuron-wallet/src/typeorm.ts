@@ -2,7 +2,6 @@ import { createConnection, getConnectionOptions } from 'typeorm'
 import * as path from 'path'
 import app from './app'
 
-import Cell from './entities/Cell'
 import Transaction from './entities/Transaction'
 import Input from './entities/Input'
 import Output from './entities/Output'
@@ -13,7 +12,7 @@ const connectOptions = async () => {
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
     database: dbPath,
-    entities: [Cell, Transaction, Input, Output],
+    entities: [Transaction, Input, Output],
   })
 
   return connectionOptions
