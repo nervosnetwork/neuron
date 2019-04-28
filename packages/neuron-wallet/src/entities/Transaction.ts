@@ -39,22 +39,12 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  value!: string
-
-  @Column({
-    type: 'varchar',
-  })
   blockNumber!: string
 
   @Column({
     type: 'varchar',
   })
   blockHash!: string
-
-  @Column({
-    type: 'varchar',
-  })
-  type!: string
 
   @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]

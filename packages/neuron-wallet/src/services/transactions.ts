@@ -10,6 +10,8 @@ export interface Input {
   previousOutput: OutPoint
   args: string[]
   validSince?: number
+  capacity?: string | null
+  lockHash?: string | null
 }
 
 export interface Witness {
@@ -61,24 +63,47 @@ export interface TargetOutput {
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
-    // TODO: calculate lockHashes when saving transactions
-    const totalCount = await TransactionEntity.count()
-    const connection = getConnection()
     const skip = (params.pageNo - 1) * params.pageSize
-    const transactions = await connection
+
+    const query = getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
+      .leftJoinAndSelect('tx.inputs', 'input')
+      .leftJoinAndSelect('tx.outputs', 'output')
+      .where('input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes)', {
+        lockHashes: params.lockHashes,
+      })
+
+    const totalCount: number = await query.getCount()
+
+    const transactions: TransactionEntity[] = await query
       .skip(skip)
       .take(params.pageSize)
       .getMany()
 
-    const txs: Transaction[] = transactions!.map(tx => ({
-      timestamp: tx.timestamp,
-      value: tx.value,
-      hash: tx.hash,
-      version: tx.version,
-      type: tx.type,
-    }))
+    const txs: Transaction[] = transactions!.map(tx => {
+      const outputCapacities: bigint = tx.outputs
+        .filter(o => params.lockHashes.includes(o.lockHash))
+        .map(o => BigInt(o.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const inputCapacities: bigint = tx.inputs
+        .filter(i => {
+          if (i.lockHash) {
+            return params.lockHashes.includes(i.lockHash)
+          }
+          return false
+        })
+        .map(i => BigInt(i.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const value: bigint = outputCapacities - inputCapacities
+      return {
+        timestamp: tx.timestamp,
+        value: value.toString(),
+        hash: tx.hash,
+        version: tx.version,
+        type: value > BigInt(0) ? 'receive' : 'send',
+      }
+    })
 
     return {
       totalCount: totalCount || 0,
@@ -89,20 +114,35 @@ export default class TransactionsService {
   public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
   ): Promise<PaginationResult<Transaction>> => {
+    const lockHashes: string[] = await Promise.all(
+      params.addresses.map(async addr => {
+        const lockHash: string = await TransactionsService.addressToLockHash(addr)
+        return lockHash
+      }),
+    )
+
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
-      lockHashes: [],
+      lockHashes,
     })
   }
 
   public static getAllByPubkeys = async (
     params: TransactionsByPubkeysParams,
   ): Promise<PaginationResult<Transaction>> => {
+    const lockHashes: string[] = await Promise.all(
+      params.pubkeys.map(async pubkey => {
+        const addr = ckbCore.utils.pubkeyToAddress(pubkey)
+        const lockHash = await TransactionsService.addressToLockHash(addr)
+        return lockHash
+      }),
+    )
+
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
-      lockHashes: [],
+      lockHashes,
     })
   }
 
@@ -163,11 +203,9 @@ export default class TransactionsService {
     tx.version = transaction.version
     tx.deps = transaction.deps!
     tx.timestamp = transaction.timestamp!
-    tx.value = transaction.value!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnesses!
-    tx.type = transaction.type!
     tx.inputs = []
     tx.outputs = []
     await getConnection().manager.save(tx)
@@ -177,6 +215,8 @@ export default class TransactionsService {
       input.outPointIndex = i.previousOutput.index
       input.args = i.args
       input.transaction = tx
+      input.capacity = i.capacity || null
+      input.lockHash = i.lockHash || null
       await getConnection().manager.save(input)
     })
     await transaction.outputs!.forEach(async (o, index) => {
@@ -224,14 +264,28 @@ export default class TransactionsService {
 
   public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    // TODO: calculate value, sum of not return charge output
-    tx.value = Math.round(Math.random() * 10000).toString()
-    tx.type = ['send', 'receive', 'unknown'][Math.round(Math.random() * 2)]
     tx.outputs = tx.outputs!.map(o => {
       const output = o
       output.lockHash = TransactionsService.lockScriptToHash(output.lock!)
       return output
     })
+
+    tx.inputs = await Promise.all(
+      tx.inputs!.map(async i => {
+        const input: Input = i
+        const outputEntity: OutputEntity | undefined = await getConnection()
+          .getRepository(OutputEntity)
+          .findOne({
+            outPointHash: i.previousOutput.hash,
+            outPointIndex: i.previousOutput.index,
+          })
+        if (outputEntity) {
+          input.capacity = outputEntity.capacity
+          input.lockHash = outputEntity.lockHash
+        }
+        return input
+      }),
+    )
     const txEntity = await TransactionsService.create(transaction)
     return txEntity
   }
@@ -428,5 +482,23 @@ export default class TransactionsService {
   // is this lockHash belongs to me
   public static checkLockHash = (lockHash: string): boolean => {
     return parseInt(lockHash[lockHash.length - 1], 16) % 2 === 0
+  }
+
+  public static addressToLockScript = async (address: string): Promise<Script> => {
+    const blake160: string = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+    const contractInfo = await TransactionsService.contractInfo()
+
+    const lock: Script = {
+      binaryHash: contractInfo.binaryHash,
+      args: [blake160],
+    }
+    return lock
+  }
+
+  public static addressToLockHash = async (address: string): Promise<string> => {
+    const lock: Script = await TransactionsService.addressToLockScript(address)
+    const lockHash: string = await TransactionsService.lockScriptToHash(lock)
+
+    return lockHash
   }
 }

@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint } from '../services/cells'
+import { Script, OutPoint, Cell } from '../services/cells'
 import TransactionEntity from './Transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -55,4 +55,14 @@ export default class Output extends BaseEntity {
 
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs)
   transaction!: TransactionEntity
+
+  public toInterface(): Cell {
+    return {
+      capacity: this.capacity,
+      lock: this.lock,
+      lockHash: this.lockHash,
+      outPoint: this.outPoint(),
+      status: this.status,
+    }
+  }
 }
