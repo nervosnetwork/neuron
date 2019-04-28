@@ -30,6 +30,12 @@ export default class Input extends BaseEntity {
   @ManyToOne(_type => Transaction, transaction => transaction.inputs)
   transaction!: Transaction
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  capacity: string | null = null
+
   public previousOutput(): OutPoint {
     return {
       hash: this.outPointHash,
