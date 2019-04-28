@@ -222,13 +222,14 @@ export default class TransactionsService {
   public static contractInfo = async () => {
     const genesisHash: string = await ckbCore.rpc.getBlockHash(0)
     const genesisBlock = await ckbCore.rpc.getBlock(genesisHash)
-    const secpTx = genesisBlock.commitTransactions[0]
+    const systemScriptTx = genesisBlock.commitTransactions[0]
     const blake2b = ckbCore.utils.blake2b(32)
     // TODO: update data type when update SDK
-    blake2b.update(secpTx.outputs[0].data)
+    const systemScriptCell = systemScriptTx.outputs[0]
+    blake2b.update(systemScriptCell.data)
     const binaryHash: string = blake2b.digest('hex')
     const outPoint: OutPoint = {
-      hash: secpTx.hash,
+      hash: systemScriptTx.hash,
       index: 0,
     }
     return {
