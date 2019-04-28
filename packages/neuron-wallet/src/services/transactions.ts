@@ -135,8 +135,26 @@ export default class TransactionsService {
   }
 
   // check whether the address has history transactions
-  public static hasTransactions = (_address: string): boolean => {
-    return Math.random() >= 0.5
+  public static hasTransactions = async (address: string): Promise<boolean> => {
+    const blake160 = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+    const contractInfo = await TransactionsService.contractInfo()
+
+    const lock: Script = {
+      binaryHash: contractInfo.binaryHash,
+      args: [blake160],
+    }
+    const lockHash: string = TransactionsService.lockScriptToHash(lock)
+
+    const transaction: TransactionEntity | undefined = await getConnection()
+      .getRepository(TransactionEntity)
+      .findOne({
+        where: { lockHash },
+      })
+
+    if (transaction) {
+      return true
+    }
+    return false
   }
 
   public static create = async (transaction: Transaction): Promise<TransactionEntity> => {
