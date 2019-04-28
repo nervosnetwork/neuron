@@ -3,6 +3,7 @@ import ckbCore from '../core'
 import AddressType from './type'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
+import AddressStore from './store'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -61,6 +62,11 @@ class Address {
       receiving: receivingAddresses,
       change: changeAddresses,
     }
+  }
+
+  public static allAddresses = () => {
+    const addressStore = new AddressStore()
+    return addressStore.allAddresses
   }
 
   public static searchUsedAddresses = (keysData: KeysData) => {
