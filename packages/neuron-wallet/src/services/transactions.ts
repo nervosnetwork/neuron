@@ -61,13 +61,17 @@ export interface TargetOutput {
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
-    // TODO: calculate lockHashes when saving transactions
     const totalCount = await TransactionEntity.count()
-    const connection = getConnection()
     const skip = (params.pageNo - 1) * params.pageSize
-    const transactions = await connection
+
+    const transactions: TransactionEntity[] = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
+      .leftJoinAndSelect('tx.inputs', 'input')
+      .leftJoinAndSelect('tx.outputs', 'output')
+      .where('input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes)', {
+        lockHashes: params.lockHashes,
+      })
       .skip(skip)
       .take(params.pageSize)
       .getMany()
@@ -89,20 +93,33 @@ export default class TransactionsService {
   public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
   ): Promise<PaginationResult<Transaction>> => {
+    const lockHashes: string[] = []
+    for (const addr of params.addresses) {
+      const lockHash: string = await TransactionsService.addressToLockHash(addr)
+      lockHashes.push(lockHash)
+    }
+
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
-      lockHashes: [],
+      lockHashes,
     })
   }
 
   public static getAllByPubkeys = async (
     params: TransactionsByPubkeysParams,
   ): Promise<PaginationResult<Transaction>> => {
+    const lockHashes: string[] = []
+    for (const pubkey of params.pubkeys) {
+      const addr = ckbCore.utils.pubkeyToAddress(pubkey)
+      const lockHash = await TransactionsService.addressToLockHash(addr)
+      lockHashes.push(lockHash)
+    }
+
     return TransactionsService.getAll({
       pageNo: params.pageNo,
       pageSize: params.pageSize,
-      lockHashes: [],
+      lockHashes,
     })
   }
 
@@ -428,5 +445,23 @@ export default class TransactionsService {
   // is this lockHash belongs to me
   public static checkLockHash = (lockHash: string): boolean => {
     return parseInt(lockHash[lockHash.length - 1], 16) % 2 === 0
+  }
+
+  public static addressToLockScript = async (address: string): Promise<Script> => {
+    const blake160: string = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+    const contractInfo = await TransactionsService.contractInfo()
+
+    const lock: Script = {
+      binaryHash: contractInfo.binaryHash,
+      args: [blake160],
+    }
+    return lock
+  }
+
+  public static addressToLockHash = async (address: string): Promise<string> => {
+    const lock: Script = await TransactionsService.addressToLockScript(address)
+    const lockHash: string = await TransactionsService.lockScriptToHash(lock)
+
+    return lockHash
   }
 }
