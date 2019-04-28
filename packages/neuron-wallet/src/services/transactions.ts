@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import { Cell, OutPoint, Script } from './cells'
+import CellsService, { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
@@ -218,49 +218,76 @@ export default class TransactionsService {
     return txEntity
   }
 
-  public static generateTx = async (_lockHashes: string[], _targetOutputs: TargetOutput[]) => {
-    const inputs: Input[] = [
-      {
-        previousOutput: {
-          hash: '0xb2becaa4e71e43abc75d1a87280b63df4dceaae1716540faf65e38925d2f641d',
-          index: 0,
-        },
-        args: [],
-        validSince: 0,
-      },
-    ]
+  // system contract info
+  public static contractInfo = async () => {
+    const genesisHash: string = await ckbCore.rpc.getBlockHash(0)
+    const genesisBlock = await ckbCore.rpc.getBlock(genesisHash)
+    const systemScriptTx = genesisBlock.commitTransactions[0]
+    const blake2b = ckbCore.utils.blake2b(32)
+    // TODO: update data type when update SDK
+    const systemScriptCell = systemScriptTx.outputs[0]
+    blake2b.update(systemScriptCell.data)
+    const binaryHash: string = blake2b.digest('hex')
+    const outPoint: OutPoint = {
+      hash: systemScriptTx.hash,
+      index: 0,
+    }
+    return {
+      binaryHash,
+      outPoint,
+    }
+  }
 
-    const outputs = [
-      {
-        capacity: '1000',
-        data: '',
+  // lockHashes for each inputs
+  public static generateTx = async (lockHashes: string[], targetOutputs: TargetOutput[], changeAddress: string) => {
+    const { binaryHash, outPoint } = await TransactionsService.contractInfo()
+
+    const needCapacities: bigint = targetOutputs
+      .map(o => BigInt(o.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const { inputs, capacities } = await CellsService.gatherInputs(needCapacities.toString(), lockHashes)
+
+    const outputs: Cell[] = targetOutputs.map(o => {
+      const { capacity, address } = o
+
+      const blake160: string = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+
+      const output: Cell = {
+        capacity,
+        data: '0x',
         lock: {
-          binary_hash: '0x8bddddc3ae2e09c13106634d012525aa32fc47736456dba11514d352845e561d',
-          args: [
-            '0x65323139336466353164373834313136303137393662333562313762346638663263643835626430616461383834326166323365303836633136396133316432',
-          ],
+          binaryHash,
+          args: [blake160],
         },
-      },
-      {
-        capacity: '49000',
-        data: '',
+      }
+
+      return output
+    })
+
+    // change
+    if (BigInt(capacities) > needCapacities) {
+      const changeBlake160: string = ckbCore.utils.parseAddress(
+        changeAddress,
+        ckbCore.utils.AddressPrefix.Testnet,
+        'hex',
+      ) as string
+
+      const output: Cell = {
+        capacity: `${BigInt(capacities) - needCapacities}`,
+        data: '0x',
         lock: {
-          binary_hash: '0x8bddddc3ae2e09c13106634d012525aa32fc47736456dba11514d352845e561d',
-          args: [
-            '0x33366333323965643633306436636537353037313261343737353433363732616461623537663463366664333661373134393633303534353662623239386462',
-          ],
+          binaryHash,
+          args: [changeBlake160],
         },
-      },
-    ]
+      }
+
+      outputs.push(output)
+    }
 
     return {
       version: 0,
-      deps: [
-        {
-          hash: '0x8d37f0856ebb70c12871830667d82224e6619896c7f12bb73a14dd9329af9c8d',
-          index: 0,
-        },
-      ],
+      deps: [outPoint],
       inputs,
       outputs,
     }

@@ -2,6 +2,9 @@ import { getConnection, In } from 'typeorm'
 import asw from '../wallets/asw'
 import { getLiveCells } from '../mock_rpc'
 import OutputEntity from '../entities/Output'
+import { Input } from './transactions'
+
+const MIN_CELL_CAPACITY = '40'
 
 export interface OutPoint {
   hash: string
@@ -120,6 +123,50 @@ export default class CellsService {
       .getOne()
 
     return cellEntity
+  }
+
+  // gather inputs for generateTx
+  public static gatherInputs = async (capacity: string, lockHashes: string[]) => {
+    const capacityInt = BigInt(capacity)
+
+    if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
+      throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
+    }
+
+    // only live cells
+    const cellEntities: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
+      .find({
+        where: {
+          lockHash: In(lockHashes),
+          status: 'live',
+        },
+      })
+    cellEntities.sort((a, b) => +a.capacity - +b.capacity)
+
+    const inputs: Input[] = []
+    let inputCapacities: bigint = BigInt(0)
+    cellEntities.every(cell => {
+      const input: Input = {
+        previousOutput: cell.outPoint(),
+        args: [],
+      }
+      inputs.push(input)
+      inputCapacities += BigInt(cell.capacity)
+      if (inputCapacities > capacityInt) {
+        return false
+      }
+      return true
+    })
+
+    if (inputCapacities < capacityInt) {
+      throw new Error('Capacity not enough')
+    }
+
+    return {
+      inputs,
+      capacities: inputCapacities.toString(),
+    }
   }
 
   public static getUnspentCells = async () => {
