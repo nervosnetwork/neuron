@@ -206,14 +206,37 @@ export default class TransactionsService {
 
   public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    // TODO: calculate value, sum of not return charge output
-    tx.value = Math.round(Math.random() * 10000).toString()
-    tx.type = ['send', 'receive', 'unknown'][Math.round(Math.random() * 2)]
+
+    let inputCapacities: bigint = BigInt(0)
+    for (const input of tx.inputs!) {
+      const outputEntity: OutputEntity | undefined = await getConnection()
+        .getRepository(OutputEntity)
+        .findOne({
+          outPointHash: input.previousOutput.hash,
+          outPointIndex: input.previousOutput.index,
+        })
+      if (outputEntity && TransactionsService.checkLockHash(outputEntity.lockHash)) {
+        inputCapacities += BigInt(outputEntity.capacity)
+      }
+    }
+
     tx.outputs = tx.outputs!.map(o => {
       const output = o
       output.lockHash = TransactionsService.lockScriptToHash(output.lock!)
       return output
     })
+
+    const outputCapacities: bigint = tx
+      .outputs!.filter(o => {
+        return TransactionsService.checkLockHash(o.lockHash!)
+      })
+      .map(o => BigInt(o.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const value: bigint = inputCapacities - outputCapacities
+    tx.value = value.toString()
+    tx.type = value > BigInt(0) ? 'send' : 'receive'
+
     const txEntity = await TransactionsService.create(transaction)
     return txEntity
   }
