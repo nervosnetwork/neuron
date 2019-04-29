@@ -7,18 +7,18 @@ import ckbCore from '../core'
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "warn" */
 export default class SyncBlocksService {
-  private lockHashesVar: string[]
+  private lockHashList: string[]
 
   constructor(lockHashes: string[]) {
-    this.lockHashesVar = lockHashes
+    this.lockHashList = lockHashes
   }
 
   get lockHashes(): string[] {
-    return this.lockHashesVar
+    return this.lockHashList
   }
 
   set lockHashes(lockHashes: string[]) {
-    this.lockHashesVar = lockHashes
+    this.lockHashList = lockHashes
   }
 
   // continue to loop blocks to latest block
@@ -122,6 +122,6 @@ export default class SyncBlocksService {
 
   // is this lockHash belongs to me
   checkLockHash(lockHash: string): boolean {
-    return this.lockHashesVar.includes(lockHash)
+    return this.lockHashList.includes(lockHash)
   }
 }
