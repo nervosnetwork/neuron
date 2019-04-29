@@ -1,8 +1,8 @@
 import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from 'electron'
-import env from './env'
-import dispatch, { Command } from './commands/dispatcher'
+import env from '../env'
+import dispatch, { Command } from '../commands/dispatcher'
 import i18n from './i18n'
-import WalletChannel from './channel/wallet'
+import WalletChannel from '../channel/wallet'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -56,6 +56,15 @@ const getMenuTemplate = () => {
         {
           label: i18n.t('mainmenu.edit.paste'),
           role: 'paste',
+        },
+      ],
+    },
+    {
+      label: i18n.t('mainmenu.view.label'),
+      submenu: [
+        {
+          label: i18n.t('mainmenu.view.fullscreen'),
+          role: 'togglefullscreen',
         },
       ],
     },
