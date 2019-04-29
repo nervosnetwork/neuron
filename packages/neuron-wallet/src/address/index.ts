@@ -12,29 +12,32 @@ export interface HDAddress {
   path: string
 }
 
+const { utils } = ckbCore
+const { AddressPrefix, AddressType: Type, AddressBinIdx } = utils
+
 class Address {
   public static isAddressUsed = (address: string) => {
     return TransactionsService.hasTransactions(address)
   }
 
-  public static addressFromPrivateKey = (privateKey: string) => {
-    const account = ckbCore.wallet.accountFromPrivateKey(Buffer.from(ckbCore.utils.hexToBytes(privateKey)))
-    return Address.addressFromPublicKey(account.hexPubKey)
-  }
-
-  public static addressFromPublicKey = (publicKey: string) => {
-    return ckbCore.utils.pubkeyToAddress(publicKey)
+  public static addressFromPublicKey = (publicKey: string, addressPrefix = AddressPrefix.Testnet) => {
+    const options = {
+      prefix: addressPrefix,
+      type: Type.BinIdx,
+      binIdx: AddressBinIdx.P2PH,
+    }
+    return ckbCore.utils.pubkeyToAddress(publicKey, options)
   }
 
   public static addressFromHDIndex = (keysData: KeysData, index: number, type = AddressType.Receiving) => {
-    const { privateKey } = HD.keyFromHDIndex(keysData, index, type)
-    return Address.addressFromPrivateKey(privateKey)
+    const { publicKey } = HD.keyFromHDIndex(keysData, index, type)
+    return Address.addressFromPublicKey(publicKey)
   }
 
   public static nextUnusedAddress = (keysData: KeysData) => {
     const nextUnusedIndex = Address.searchHDIndex(keysData, 20)
-    const { privateKey } = HD.keyFromHDIndex(keysData, nextUnusedIndex, AddressType.Receiving)
-    return Address.addressFromPrivateKey(privateKey)
+    const { publicKey } = HD.keyFromHDIndex(keysData, nextUnusedIndex, AddressType.Receiving)
+    return Address.addressFromPublicKey(publicKey)
   }
 
   // Generate both receiving and change addresses
@@ -66,7 +69,7 @@ class Address {
 
   public static allAddresses = () => {
     const addressStore = new AddressStore()
-    return addressStore.allAddresses
+    return addressStore.allAddresses()
   }
 
   public static searchUsedAddresses = (keysData: KeysData) => {
@@ -75,7 +78,7 @@ class Address {
     for (let index = 0; index < nextUnusedIndex; index++) {
       const { publicKey, path } = HD.keyFromHDIndex(keysData, index)
       if (publicKey) {
-        const address = Address.addressFromPrivateKey(publicKey)
+        const address = Address.addressFromPublicKey(publicKey)
         if (Address.isAddressUsed(address)) {
           addresses.push({
             path,
