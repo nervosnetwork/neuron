@@ -5,20 +5,20 @@ import { Spinner } from 'widgets/Loading'
 import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
 
-const LaunchScreen = (props: React.PropsWithoutRef<RouteComponentProps>) => {
+const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
-    wallet,
+    wallet: { id },
     settings: { networks },
   } = useNeuronWallet()
 
   useEffect(() => {
     if (!networks.length) return
-    if (wallet.id) {
-      props.history.push(Routes.Wallet)
+    if (id) {
+      history.push(Routes.Wallet)
     } else {
-      props.history.push(Routes.WalletWizard)
+      history.push(Routes.WalletWizard)
     }
-  }, [networks.length])
+  }, [networks.length, id, history])
 
   return (
     <Screen>

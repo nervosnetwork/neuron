@@ -60,7 +60,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         }
         requestAnimationFrame(tick)
       })
-  }, [])
+  }, [video])
 
   const stopScan = (v: any) => {
     if (v && v.srcObject) {
@@ -78,7 +78,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
       stopScan(video)
     }
     return () => stopScan(video)
-  }, [open])
+  }, [video, open, scan, stopScan])
 
   return (
     <>

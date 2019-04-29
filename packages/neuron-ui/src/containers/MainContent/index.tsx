@@ -41,7 +41,7 @@ const MainContent = ({
       type: MainActions.UpdateLoading,
       payload: { transactions: false },
     })
-  }, [pageNo, pageSize, addresses.join(','), items.map(item => item.hash).join(',')])
+  }, [pageNo, pageSize, addresses, items])
 
   return (
     <Main>

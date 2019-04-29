@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Card, Form, Button, Col, Row } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -21,7 +21,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
     settings: { wallets },
   } = useNeuronWallet()
 
-  const wallet = useMemo(() => wallets.find(w => w.id === id), [id])
+  const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets])
 
   if (!wallet) {
     // TODO: Better error handling
@@ -38,16 +38,16 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   const areParamsValid = useAreParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
   const toggleDialog = useToggleDialog(dispatch)
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     dispatch({
       type: MainActions.SetDialog,
       payload: {
         open: true,
       },
     })
-  }
+  }, [dispatch])
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     toggleDialog(false)
     dispatch(
       actionCreators.updateWallet({
@@ -57,7 +57,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
         name: editor.name.value,
       }),
     )
-  }
+  }, [dispatch, toggleDialog])
 
   return (
     <Card>
