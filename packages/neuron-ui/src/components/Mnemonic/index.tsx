@@ -67,7 +67,7 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           })
         })
     }
-  }, [type])
+  }, [type, dispatch, history, isCreate])
 
   const onChange = useCallback(
     (e: React.FormEvent<{ value: string }>) => {
@@ -78,12 +78,12 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         payload: { imported: value },
       })
     },
-    [type],
+    [isCreate, dispatch],
   )
 
   const onBack = useCallback(() => {
     history.goBack()
-  }, [])
+  }, [history])
 
   const onNext = useCallback(() => {
     switch (type) {
@@ -100,7 +100,7 @@ const Mnemonic = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         break
       }
     }
-  }, [type])
+  }, [type, history])
 
   const disableNext = type === MnemonicAction.Verify && !(generated === imported)
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'

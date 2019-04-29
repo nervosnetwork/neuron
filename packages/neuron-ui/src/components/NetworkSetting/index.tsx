@@ -18,13 +18,12 @@ interface MenuItemParams {
   id: string
 }
 
-const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     chain,
     settings: { networks },
   } = useNeuronWallet()
   const [t] = useTranslation()
-  const { dispatch, dialog, history } = props
 
   const menuItems = useMemo(
     () => [
@@ -52,7 +51,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           return networks[0] && networks[0].id === id
         },
         click: ({ id }: MenuItemParams) => {
-          props.dispatch({
+          dispatch({
             type: MainActions.SetDialog,
             payload: {
               open: true,
@@ -62,7 +61,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         },
       },
     ],
-    [],
+    [chain.network.id, dispatch, history, networks, t],
   )
 
   return (
@@ -80,7 +79,7 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
                   checked={isChecked}
                   disabled={isChecked}
                   onChange={() => {
-                    props.dispatch(actionCreators.setNetwork(network.id!))
+                    dispatch(actionCreators.setNetwork(network.id!))
                   }}
                 />
               </ListGroup.Item>

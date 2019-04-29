@@ -11,7 +11,8 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
   props: React.Props<any>,
 ) => {
   const [providers, dispatch] = useReducer(reducer, initProviders)
-  const [t, i18n] = useTranslation()
+  const { chain } = providers
+  const [, i18n] = useTranslation()
   useEffect(() => {
     UILayer.on(
       Channel.Initiate,
@@ -32,7 +33,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           }
         } else {
           // TODO: better prompt
-          window.alert(t('messages.failed-to-initiate,-please-reopen-Neuron'))
+          window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
           window.close()
         }
       },
@@ -57,14 +58,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           case TransactionsMethod.GetAll: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { transactions: { ...providers.chain.transactions, ...args.result } },
+              payload: { transactions: { ...chain.transactions, ...args.result } },
             })
             break
           }
           case TransactionsMethod.Get: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { transaction: { ...providers.chain.transaction, ...args.result } },
+              payload: { transaction: { ...chain.transaction, ...args.result } },
             })
             break
           }
@@ -84,8 +85,8 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           case WalletsMethod.Update: {
             const content =
               method === WalletsMethod.ImportMnemonic
-                ? t('messages.wallet-imported-successfully', { name: args.result.name })
-                : t('messages.wallet-updated-successfully', { name: args.result.name })
+                ? i18n.t('messages.wallet-imported-successfully', { name: args.result.name })
+                : i18n.t('messages.wallet-updated-successfully', { name: args.result.name })
             const time = new Date().getTime()
             dispatch({
               type: ProviderActions.AddMessage,
@@ -230,7 +231,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         })
       }
     })
-  }, [i18n])
+  }, [i18n, chain])
 
   return (
     <NeuronWalletContext.Provider value={providers}>

@@ -37,7 +37,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
         payload: initState.mnemonic,
       })
     }
-  }, [])
+  }, [dispatch])
 
   const onChange = useCallback(
     (field: keyof typeof mnemonic) => (e: React.FormEvent<{ value: string }>) => {
@@ -47,10 +47,8 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
         payload: { [field]: value },
       })
     },
-    [],
+    [dispatch, mnemonic],
   )
-
-  const onBack = useCallback(history.goBack, [])
 
   const onNext = useCallback(
     (params: { name: string; password: string; imported: string }) => () => {
@@ -58,7 +56,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
         actionCreators.importMnemonic({ name: params.name, password: params.password, mnemonic: params.imported }),
       )
     },
-    [],
+    [dispatch],
   )
 
   const message = 'wizard.set-a-strong-password-to-protect-your-wallet'
@@ -83,7 +81,7 @@ const WalletSubmission = (props: React.PropsWithoutRef<ContentProps & RouteCompo
           </InputGroup>
         ))}
         <ScreenButtonRow>
-          <Button role="button" onClick={onBack} onKeyPress={onBack}>
+          <Button role="button" onClick={history.goBack} onKeyPress={history.goBack}>
             {t('wizard.back')}
           </Button>
           <Button role="button" onClick={onNext(mnemonic)} onKeyPress={onNext(mnemonic)} disabled={disableNext}>

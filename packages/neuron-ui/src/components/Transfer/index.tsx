@@ -44,48 +44,54 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         payload: initState.transfer,
       })
     }
-  }, [])
+  }, [dispatch, history])
 
-  const updateTransferItem = (field: string) => (idx: number) => (value: string) => {
-    dispatch({
-      type: MainActions.UpdateItemInTransfer,
-      payload: {
-        idx,
-        item: {
-          [field]: value,
+  const updateTransferItem = useCallback(
+    (field: string) => (idx: number) => (value: string) => {
+      dispatch({
+        type: MainActions.UpdateItemInTransfer,
+        payload: {
+          idx,
+          item: {
+            [field]: value,
+          },
         },
-      },
-    })
-  }
+      })
+    },
+    [dispatch],
+  )
 
   const onSubmit = useCallback(
     (items: TransferItem[]) => () => {
       dispatch(actionCreators.submitTransfer(items))
     },
-    [],
+    [dispatch],
   )
 
-  const onPswChange = useCallback((e: React.SyntheticEvent<HTMLInputElement>) => {
-    dispatch({
-      type: MainActions.UpdatePassword,
-      payload: e.currentTarget.value,
-    })
-  }, [])
+  const onPswChange = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      dispatch({
+        type: MainActions.UpdatePassword,
+        payload: e.currentTarget.value,
+      })
+    },
+    [dispatch],
+  )
 
   const onConfirm = useCallback(
     (items: TransferItem[], pwd: string) => () => {
-      props.dispatch({
+      dispatch({
         type: MainActions.SetDialog,
         payload: {
           open: false,
         },
       })
-      props.dispatch({
+      dispatch({
         type: MainActions.UpdatePassword,
         payload: '',
       })
       setTimeout(() => {
-        props.dispatch(
+        dispatch(
           actionCreators.confirmTransfer({
             items,
             password: pwd,
@@ -93,17 +99,17 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
         )
       }, 10)
     },
-    [],
+    [dispatch],
   )
 
   const onCancel = useCallback(() => {
-    props.dispatch({
+    dispatch({
       type: MainActions.SetDialog,
       payload: {
         open: false,
       },
     })
-  }, [])
+  }, [dispatch])
 
   const onItemChange = (field: string, idx: number) => (e: React.FormEvent<{ value: string }>) => {
     updateTransferItem(field)(idx)(e.currentTarget.value)
@@ -118,7 +124,7 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           key: unit,
           onClick: () => updateTransferItem('unit')(idx)(unit),
         })),
-    [],
+    [updateTransferItem],
   )
 
   const disabled = transfer.submitting && !errorMsgs.transfer

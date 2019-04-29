@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { ContentProps } from 'containers/MainContent'
 import { actionCreators, MainActions } from 'containers/MainContent/reducer'
 import { ProviderActions } from 'containers/Providers/reducer'
+
 import { useNeuronWallet } from 'utils/hooks'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
@@ -29,11 +30,11 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
         },
       })
     }
-  }, [match.params.hash])
+  }, [match.params.hash, dispatch, providerDispatch])
 
   const goBack = useCallback(() => {
     history.goBack()
-  }, [])
+  }, [history])
 
   return (
     <Card>

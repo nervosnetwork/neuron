@@ -71,7 +71,7 @@ export const useInitiate = (id: string, networks: Network[], editor: EditorType,
         },
       })
     }
-  }, [])
+  }, [dispatch, id])
 }
 
 export const useInputs = (editor: EditorType) => {
