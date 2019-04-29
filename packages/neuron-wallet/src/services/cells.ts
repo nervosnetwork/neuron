@@ -34,7 +34,10 @@ export default class CellsService {
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
-        where: { lockHash: In(lockHashes) },
+        where: {
+          lockHash: In(lockHashes),
+          status: 'live',
+        },
       })
 
     const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
@@ -43,34 +46,23 @@ export default class CellsService {
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
-    const cellEntity: OutputEntity | undefined = await CellsService.getCellEntity(outPoint)
+    const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
 
     if (!cellEntity) {
-      return cellEntity
+      return undefined
     }
 
-    const cell: Cell = {
-      outPoint: {
-        hash: cellEntity.outPointHash,
-        index: cellEntity.outPointIndex,
-      },
-      capacity: cellEntity.capacity,
-      lockHash: cellEntity.lockHash,
-      lock: cellEntity.lock,
-    }
-
-    return cell
+    return cellEntity.toInterface()
   }
 
-  private static getCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
+  private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
     const cellEntity: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
-      .createQueryBuilder('cell')
-      .where('cell.outPointHash = :outPointHash and cell.outPointIndex = :outPointIndex', {
+      .findOne({
         outPointHash: outPoint.hash,
         outPointIndex: outPoint.index,
+        status: 'live',
       })
-      .getOne()
 
     return cellEntity
   }
