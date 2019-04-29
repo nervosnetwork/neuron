@@ -1,6 +1,5 @@
 import { getConnection, In } from 'typeorm'
 import asw from '../wallets/asw'
-import { getLiveCells } from '../mock_rpc'
 import OutputEntity from '../entities/Output'
 import { Input } from './transactions'
 
@@ -31,55 +30,6 @@ export interface Cell {
 /* eslint no-await-in-loop: "warn" */
 /* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
-  public static getLiveCellsByLockHashes = async (lockHashes: string[]): Promise<Cell[]> => {
-    const totalCells: Cell[] = []
-
-    for (const lockHash of lockHashes) {
-      const cells = await CellsService.getLiveCellsByLockHash(lockHash)
-      totalCells.concat(cells)
-    }
-
-    return totalCells
-  }
-
-  public static getLiveCellsByLockHash = async (_lockHash: string): Promise<Cell[]> => {
-    const to = 100
-    let currentFrom = 0
-    let cells: Cell[] = []
-    while (currentFrom <= to) {
-      const currentTo = Math.min(currentFrom + 100, to)
-      const cs = await getLiveCells()
-      cells = cells.concat(cs)
-      currentFrom = currentTo + 1
-    }
-    return cells
-  }
-
-  public static loadCellsFromChain = async (lockHash: string): Promise<void> => {
-    const cells = await CellsService.getLiveCellsByLockHash(lockHash)
-    cells.forEach(async cell => {
-      const c = cell
-      c.status = 'live'
-      c.lockHash = Math.round(Math.random() * 1000).toString()
-      await CellsService.create(c)
-    })
-  }
-
-  public static create = async (cell: Cell) => {
-    const cellEntity = new OutputEntity()
-    cellEntity.outPointHash = cell.outPoint!.hash
-    cellEntity.outPointIndex = cell.outPoint!.index
-    cellEntity.capacity = cell.capacity
-    cellEntity.data = cell.data || ''
-    cellEntity.lock = cell.lock
-    cellEntity.type = cell.type || null
-    cellEntity.status = cell.status!
-    cellEntity.lockHash = cell.lockHash!
-
-    await cellEntity.save()
-    return cellEntity
-  }
-
   public static getBalance = async (lockHashes: string[]): Promise<string> => {
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
