@@ -262,6 +262,7 @@ export default class TransactionsService {
     return txEntities
   }
 
+  // update previousOutput's status to 'dead' if found
   public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
@@ -282,6 +283,9 @@ export default class TransactionsService {
         if (outputEntity) {
           input.capacity = outputEntity.capacity
           input.lockHash = outputEntity.lockHash
+          // update status to 'dead' if found in input
+          outputEntity.status = 'dead'
+          await getConnection().manager.save(outputEntity)
         }
         return input
       }),
@@ -375,113 +379,6 @@ export default class TransactionsService {
       binaryHash,
       args,
     })
-  }
-
-  // continue to loop blocks to latest block
-  public static loopBlocks = async () => {
-    const tipBlockNumber: number = await ckbCore.rpc.getTipBlockNumber()
-    // TODO: should load currentBlockNumber from local
-    const currentBlockNumber = 0
-    for (let i = currentBlockNumber; i <= tipBlockNumber; ++i) {
-      // TODO: check fork
-      const blockHash: string = await ckbCore.rpc.getBlockHash(i)
-      const block = await ckbCore.rpc.getBlock(blockHash)
-      await TransactionsService.resolveBlock(block)
-    }
-  }
-
-  // resolve block
-  public static resolveBlock = async (block: CKBComponents.Block) => {
-    const transactions: Transaction[] = block.commitTransactions.map(t => {
-      const inputs: Input[] = t.inputs.map(i => {
-        const args = i.args.map(a => ckbCore.utils.bytesToHex(a))
-        const previousOutput = i.prevOutput
-        const ii: Input = {
-          previousOutput,
-          args,
-        }
-        return ii
-      })
-
-      const outputs: Cell[] = t.outputs.map(o => {
-        let type
-        if (o.type) {
-          type = {
-            binaryHash: o.type.binaryHash,
-            args: o.type.args.map(ckbCore.utils.bytesToHex),
-          }
-        }
-        return {
-          ...o,
-          data: ckbCore.utils.bytesToHex(o.data),
-          capacity: o.capacity.toString(),
-          lock: {
-            binaryHash: o.lock.binaryHash,
-            args: o.lock.args.map(ckbCore.utils.bytesToHex),
-          },
-          type,
-        }
-      })
-
-      const tx = {
-        ...t,
-        inputs,
-        outputs,
-      }
-
-      return tx
-    })
-    TransactionsService.resolveTxs(transactions)
-  }
-
-  // resolve transactions
-  public static resolveTxs = async (transactions: Transaction[]) => {
-    await transactions.forEach(async tx => {
-      await TransactionsService.resolveTx(tx)
-    })
-  }
-
-  // resolve single transaction
-  public static resolveTx = async (transaction: Transaction) => {
-    if (TransactionsService.anyOutput(transaction.outputs!) || TransactionsService.anyInput(transaction.inputs!)) {
-      TransactionsService.create(transaction)
-    }
-  }
-
-  public static anyOutput = (outputs: Cell[]): boolean => {
-    return !!outputs.find(output => {
-      return TransactionsService.checkLockScript(output.lock!)
-    })
-  }
-
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "warn" */
-  public static anyInput = async (inputs: Input[]): Promise<boolean> => {
-    for (const input of inputs) {
-      const outPoint: OutPoint = input.previousOutput
-      const output = await getConnection()
-        .getRepository(InputEntity)
-        .findOne({
-          outPointHash: outPoint.hash,
-          outPointIndex: outPoint.index,
-        })
-      if (output) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  // is this lockScript belongs to me
-  public static checkLockScript = (lock: Script): boolean => {
-    const lockHash = TransactionsService.lockScriptToHash(lock)
-    return TransactionsService.checkLockHash(lockHash)
-  }
-
-  // is this lockHash belongs to me
-  public static checkLockHash = (lockHash: string): boolean => {
-    return parseInt(lockHash[lockHash.length - 1], 16) % 2 === 0
   }
 
   public static addressToLockScript = async (address: string): Promise<Script> => {

@@ -6,8 +6,6 @@ import { NetworksMethod } from '../controllers/networks'
 import { NetworkWithID } from '../store/networksStore'
 import { WalletsMethod } from '../controllers/wallets'
 
-import asw from '../wallets/asw'
-
 import { Channel } from '../utils/const'
 import { transactions, transactionCount } from '../mock'
 
@@ -27,8 +25,8 @@ export default class WalletChannel extends Listeners {
   public sendWallet = (
     wallet: any = {
       name: 'asw',
-      address: asw.address,
-      publicKey: asw.publicKey,
+      address: '',
+      publicKey: '',
     },
   ) => {
     this.win.webContents.send(Channel.Wallets, 'activeWallet', {

@@ -23,7 +23,7 @@ function createWindow() {
     webPreferences: {
       devTools: env.isDevMode,
       nodeIntegration: false,
-      preload: path.join(__dirname, '../preload.js'),
+      preload: path.join(__dirname, './preload.js'),
     },
   })
 

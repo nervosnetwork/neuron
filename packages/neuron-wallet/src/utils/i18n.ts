@@ -1,6 +1,6 @@
 import i18n from 'i18next'
-import zh from './locales/zh'
-import en from './locales/en'
+import zh from '../locales/zh'
+import en from '../locales/en'
 
 if (!i18n.isInitialized) {
   i18n.init({

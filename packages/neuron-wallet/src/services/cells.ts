@@ -1,5 +1,4 @@
 import { getConnection, In } from 'typeorm'
-import asw from '../wallets/asw'
 import OutputEntity from '../entities/Output'
 import { Input } from './transactions'
 
@@ -109,10 +108,5 @@ export default class CellsService {
       inputs,
       capacities: inputCapacities.toString(),
     }
-  }
-
-  public static getUnspentCells = async () => {
-    const cells = await asw.getUnspentCells()
-    return cells
   }
 }
