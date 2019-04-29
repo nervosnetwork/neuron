@@ -1,8 +1,9 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Badge, Table, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
+
 import { Close as CloseIcon } from 'grommet-icons'
 import dayjs from 'dayjs'
 
@@ -10,18 +11,26 @@ import ContextMenuZone from 'widgets/ContextMenuZone'
 import Pagination from 'widgets/Table/Pagination'
 
 import { ContentProps } from 'containers/MainContent'
-import { actionCreators, MainActions } from 'containers/MainContent/reducer'
-import { ProviderActions } from 'containers/Providers/reducer'
 
-import { useNeuronWallet } from 'utils/hooks'
 import { Transaction } from 'contexts/NeuronWallet'
-import { queryParsers } from 'utils/parser'
-import { TransactionType, Routes, EXPLORER } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+import { TransactionType, EXPLORER } from 'utils/const'
 import { queryFormatter } from 'utils/formatters'
 
-const FormatOfDay = 'YYYY-MM-DD'
-const FormatOfTime = 'HH:mm'
-interface MenuItemParams {
+import { useSearch, useMenuItems, useOnChangePage, useOnAddressRemove } from './hooks'
+
+enum TimeFormat {
+  Day = 'YYYY-MM-DD',
+  Time = 'HH:mm',
+}
+
+const headers = [
+  { label: 'history.meta', key: 'meta' },
+  { label: 'history.transaction-hash', key: 'hash' },
+  { label: 'history.amount', key: 'value' },
+]
+
+export interface MenuItemParams {
   hash: string
 }
 
@@ -35,20 +44,14 @@ const AddressBadge = styled(Badge)`
   margin-bottom: 15px;
 `
 
-const headers = [
-  { label: 'history.meta', key: 'meta' },
-  { label: 'history.transaction-hash', key: 'hash' },
-  { label: 'history.amount', key: 'value' },
-]
-
-const groupHistory = (items: Transaction[]) => {
+const groupHistory = (items: Transaction[]): Transaction[][] => {
   return items.reduce((acc: Transaction[][], cur: Transaction) => {
     if (!acc.length) {
       acc.push([cur])
       return acc
     }
     const lastGroup = acc[acc.length - 1]
-    if (dayjs(cur.time).format(FormatOfDay) === dayjs(lastGroup[0].time).format(FormatOfDay)) {
+    if (dayjs(cur.time).format(TimeFormat.Day) === dayjs(lastGroup[0].time).format(TimeFormat.Day)) {
       lastGroup.push(cur)
       return acc
     }
@@ -66,62 +69,18 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     dispatch,
     providerDispatch,
   } = props
-  const { chain } = useNeuronWallet()
+  const {
+    chain: {
+      transactions: { pageNo, pageSize, totalCount, items, addresses },
+    },
+  } = useNeuronWallet()
   const [t] = useTranslation()
-  const { pageNo, pageSize, totalCount, items, addresses } = chain.transactions
 
-  useEffect(() => {
-    const params = queryParsers.history(search)
-    providerDispatch({
-      type: ProviderActions.CleanTransactions,
-    })
-    dispatch(actionCreators.getTransactions(params))
-    return () => {
-      dispatch({
-        type: MainActions.ErrorMessage,
-        payload: {
-          transactions: '',
-        },
-      })
-    }
-  }, [search])
+  useSearch(search, dispatch, providerDispatch)
 
-  const menuItems = useMemo(() => {
-    return [
-      {
-        label: t('history.detail'),
-        click: (params: MenuItemParams) => {
-          history.push(`${Routes.Transaction}/${params.hash}`)
-        },
-      },
-      {
-        label: t('history.explorer'),
-        click: () => {
-          window.open(EXPLORER)
-        },
-      },
-    ]
-  }, [])
-
-  const onPageChange = useCallback(
-    (page: number) => {
-      const params = queryParsers.history(search)
-      params.pageNo = page
-      const newQuery = queryFormatter(params)
-      history.push(`${pathname}?${newQuery.toString()}`)
-    },
-    [search],
-  )
-
-  const onAddressRemove = useCallback(
-    (address: string) => () => {
-      const params = queryParsers.history(search)
-      params.addresses = params.addresses.filter((addr: string) => addr !== address)
-      const newQuery = queryFormatter(params)
-      history.push(`${pathname}?${newQuery.toString()}`)
-    },
-    [search],
-  )
+  const menuItems = useMenuItems(t, history, EXPLORER)
+  const onPageChange = useOnChangePage(search, pathname, history, queryFormatter)
+  const onAddressRemove = useOnAddressRemove(search, pathname, history, queryFormatter)
 
   if (loadings.transactions) {
     return <div>Loading</div>
@@ -131,7 +90,7 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
     <Container>
       <h1>{t('siderbar.history')}</h1>
       {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transactions}`)}</Alert> : null}
-      {addresses.map((address: string) => (
+      {addresses.map(address => (
         <AddressBadge variant="primary" key={address}>
           {address}
           <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
@@ -139,33 +98,31 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       ))}
       <ContextMenuZone menuItems={menuItems}>
         {groupHistory(items).map(group => (
-          <Table key={dayjs(group[0].time).format(FormatOfDay)} striped>
+          <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
             <thead>
               <tr>
-                <th colSpan={headers.length}>{dayjs(group[0].time).format(FormatOfDay)}</th>
+                <th colSpan={headers.length}>{dayjs(group[0].time).format(TimeFormat.Day)}</th>
               </tr>
             </thead>
             <tbody>
-              {group.map((historyItem: Transaction) => (
+              {group.map(historyItem => (
                 <tr key={historyItem.hash}>
-                  {headers.map(header => {
-                    if (header.key === headers[0].key)
-                      return (
-                        <MetaData key={headers[0].key}>
-                          <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                            {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
-                          </span>
-                          <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                            {dayjs(historyItem.time).format(FormatOfTime)}
-                          </span>
-                        </MetaData>
-                      )
-                    return (
+                  {headers.map(header =>
+                    header.key === headers[0].key ? (
+                      <MetaData key={headers[0].key}>
+                        <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
+                          {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
+                        </span>
+                        <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
+                          {dayjs(historyItem.time).format(TimeFormat.Time)}
+                        </span>
+                      </MetaData>
+                    ) : (
                       <td key={header.key} data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
                         {historyItem[header.key as keyof Transaction]}
                       </td>
-                    )
-                  })}
+                    ),
+                  )}
                 </tr>
               ))}
             </tbody>
