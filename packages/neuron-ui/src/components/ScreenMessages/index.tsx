@@ -1,5 +1,5 @@
 import React from 'react'
-import BannerMessages, { Message } from '../../widgets/BannerMessages'
+import BannerMessages, { Message } from 'widgets/BannerMessages'
 
 const style = {
   position: 'absolute',

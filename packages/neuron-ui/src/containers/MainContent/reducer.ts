@@ -1,4 +1,4 @@
-import { CapacityUnit } from '../../utils/const'
+import { CapacityUnit } from 'utils/const'
 import actionCreators from './actionCreators'
 import MainActions from './actions'
 import initState from './state'
@@ -17,24 +17,6 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         ...state,
         mnemonic: {
           ...state.mnemonic,
-          ...action.payload,
-        },
-      }
-    }
-    case MainActions.UpdateNetworkEditor: {
-      return {
-        ...state,
-        networkEditor: {
-          ...state.networkEditor,
-          ...action.payload,
-        },
-      }
-    }
-    case MainActions.DeleteNetwork: {
-      return {
-        ...state,
-        networkEditor: {
-          ...state.networkEditor,
           ...action.payload,
         },
       }

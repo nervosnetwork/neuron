@@ -82,6 +82,7 @@ class WalletsController {
         keystore: key.keystore!,
         addresses: key.addresses!,
       })
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
       return {
         status: ResponseCode.Success,
         result: wallet,
@@ -114,6 +115,7 @@ class WalletsController {
         keystore: key.keystore!,
         addresses: key.addresses!,
       })
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
       return {
         status: ResponseCode.Success,
         result: wallet,
@@ -126,14 +128,59 @@ class WalletsController {
     }
   }
 
-  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<boolean> => {
+  public static update = ({
+    id,
+    name,
+    password,
+    newPassword,
+  }: {
+    id: string
+    password: string
+    name: string
+    newPassword?: string
+  }): ChannelResponse<WalletData> => {
+    try {
+      const wallet = WalletsController.service.get(id)
+      if (wallet) {
+        if (WalletsController.service.validate({ id, password })) {
+          wallet.name = name
+          if (newPassword) {
+            const key = Key.fromKeystore(JSON.stringify(wallet!.keystore), password)
+            wallet.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
+          }
+          WalletsController.service.update(id, wallet)
+          windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+          return {
+            status: ResponseCode.Success,
+            result: WalletsController.service.get(id),
+          }
+        }
+        return {
+          status: ResponseCode.Fail,
+          msg: 'Incorrect password',
+        }
+      }
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Wallet not found',
+      }
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.message,
+      }
+    }
+  }
+
+  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<any> => {
     if (WalletsController.service.validate({ id, password })) {
-      const success = WalletsController.service.delete(id)
-      if (success) {
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+      if (WalletsController.service.delete(id)) {
         return {
           status: ResponseCode.Success,
-          result: true,
+          result: {
+            allWallets: WalletsController.service.getAll(),
+            activeWallet: WalletsController.service.getActive(),
+          },
         }
       }
       return {
@@ -177,6 +224,7 @@ class WalletsController {
   public static activate = (id: string) => {
     const success = WalletsController.service.setActive(id)
     if (success) {
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
       return {
         status: ResponseCode.Success,
         result: WalletsController.service.getActive(),

@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import Screen from '../../widgets/Screen'
-import { Spinner } from '../../widgets/Loading'
-import { useNeuronWallet } from '../../utils/hooks'
-import { Routes } from '../../utils/const'
+import Screen from 'widgets/Screen'
+import { Spinner } from 'widgets/Loading'
+import { useNeuronWallet } from 'utils/hooks'
+import { Routes } from 'utils/const'
 
 const LaunchScreen = (props: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
     wallet,
     settings: { networks },
   } = useNeuronWallet()
+
   useEffect(() => {
     if (!networks.length) return
     if (wallet.id) {

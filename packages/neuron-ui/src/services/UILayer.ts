@@ -1,9 +1,9 @@
-import { Network } from '../contexts/NeuronWallet'
-import { RawNetwork } from '../components/NetworkEditor'
+import { Network } from 'contexts/NeuronWallet'
+import { RawNetwork } from 'components/NetworkEditor'
 
-import { Channel, CapacityUnit } from '../utils/const'
-import SyntheticEventEmitter from '../utils/SyntheticEventEmitter'
-import instantiateMethodCall from '../utils/instantiateMethodCall'
+import { CapacityUnit, Channel } from 'utils/const'
+import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
+import instantiateMethodCall from 'utils/instantiateMethodCall'
 
 declare global {
   interface Window {
@@ -142,7 +142,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   generateMnemonic: () => void
   importKeystore: (params: { name: string; keystore: string; password: string }) => void
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
-  update: (params: { id: string; name?: string; password: string; newPassword?: string }) => void
+  update: (params: { id: string; password: string; newPassword?: string; name?: string }) => void
   delete: (params: { id: string; password: string }) => void
   export: (id: string) => void
   getActive: () => void

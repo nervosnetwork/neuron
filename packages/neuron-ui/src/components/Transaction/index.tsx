@@ -3,10 +3,10 @@ import { RouteComponentProps } from 'react-router-dom'
 import { Card, Alert, Button } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import { actionCreators, MainActions } from '../../containers/MainContent/reducer'
-import { ProviderActions } from '../../containers/Providers/reducer'
-import { useNeuronWallet } from '../../utils/hooks'
+import { ContentProps } from 'containers/MainContent'
+import { actionCreators, MainActions } from 'containers/MainContent/reducer'
+import { ProviderActions } from 'containers/Providers/reducer'
+import { useNeuronWallet } from 'utils/hooks'
 
 const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
   const { match, errorMsgs, dispatch, providerDispatch, history } = props

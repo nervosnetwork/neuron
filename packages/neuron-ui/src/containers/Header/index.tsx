@@ -1,11 +1,11 @@
-import React, { useEffect, useCallback, useReducer } from 'react'
+import React, { useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 
-import NetworkStatusHeader from '../../components/NetworkStatus'
-import { initState, reducer, HeaderActions } from './reducer'
-import { useNeuronWallet } from '../../utils/hooks'
+import NetworkStatus from 'components/NetworkStatus'
+import { useNeuronWallet } from 'utils/hooks'
+import { networksCall } from 'services/UILayer'
 
 const AppHeader = styled.div`
   height: 100%;
@@ -14,38 +14,16 @@ const AppHeader = styled.div`
   justify-content: flex-end;
 `
 
-const Header = (props: React.PropsWithoutRef<RouteComponentProps>) => {
+const Header = ({ history: { push } }: React.PropsWithoutRef<RouteComponentProps>) => {
   const { settings } = useNeuronWallet()
 
-  const [header, dispatch] = useReducer(reducer, {
-    ...initState,
-    networks: settings.networks,
-  })
+  const activateNetwork = useCallback(networksCall.activate, [])
 
-  const navTo = useCallback((path: string) => {
-    props.history.push(path)
-  }, [])
-
-  useEffect(() => {
-    let cachedNetworks = window.localStorage.getItem('networks')
-    if (cachedNetworks) {
-      try {
-        cachedNetworks = JSON.parse(cachedNetworks)
-        if (cachedNetworks && cachedNetworks.length) {
-          dispatch({
-            type: HeaderActions.SetNetwork,
-            payload: [...new Set([...header.networks, ...cachedNetworks])],
-          })
-        }
-      } catch (err) {
-        console.error('Invalid Cached Networks')
-      }
-    }
-  }, [])
+  const navTo = useCallback(push, [])
 
   return (
     <AppHeader>
-      <NetworkStatusHeader networks={settings.networks} navTo={navTo} dispatch={dispatch} />
+      <NetworkStatus networks={settings.networks} navTo={navTo} activate={activateNetwork} />
     </AppHeader>
   )
 }

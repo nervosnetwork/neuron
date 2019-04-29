@@ -1,32 +1,32 @@
 import React from 'react'
-import { HashRouter as Router, Route, RouteComponentProps } from 'react-router-dom'
+import { HashRouter as Router } from 'react-router-dom'
+import { createHashHistory } from 'history'
 
+import Header from 'containers/Header'
+import Sidebar from 'containers/Sidebar'
+import MainContent from 'containers/MainContent'
+import Notification from 'containers/Notification'
+import WalletWizard from 'components/WalletWizard'
+import Mnemonic from 'components/Mnemonic'
+import WalletSubmission from 'components/WalletSubmission'
+import WalletDetail from 'components/WalletDetail'
+import Send from 'components/Transfer'
+import Receive from 'components/Receive'
+import History from 'components/History'
+import Transaction from 'components/Transaction'
+import Settings from 'components/Settings'
+import GeneralSetting from 'components/GeneralSetting'
+import Addresses from 'components/Addresses'
+import Wallets from 'components/WalletSetting'
+import NetworkSetting from 'components/NetworkSetting'
+import NetworkEditor from 'components/NetworkEditor'
+import WalletEditor from 'components/WalletEditor'
+import Terminal from 'components/Terminal'
+import Prompt from 'components/Prompt'
+import LaunchScreen from 'components/LaunchScreen'
+
+import { Routes } from 'utils/const'
 import RoutesWithProps from './RoutesWithProps'
-import Header from '../../containers/Header'
-import Sidebar from '../../containers/Sidebar'
-import MainContent from '../../containers/MainContent'
-import Notification from '../../containers/Notification'
-import WalletWizard from '../WalletWizard'
-import Mnemonic from '../Mnemonic'
-import WalletSubmission from '../WalletSubmission'
-import WalletDetail from '../WalletDetail'
-import Send from '../Transfer'
-import Receive from '../Receive'
-import History from '../History'
-import Transaction from '../Transaction'
-import Settings from '../Settings'
-import GeneralSetting from '../GeneralSetting'
-import Addresses from '../Addresses'
-import Wallets from '../Settings/Wallets'
-import NetworkSetting from '../NetworkSetting'
-import NetworkEditor from '../NetworkEditor'
-import WalletEditor from '../WalletEditor'
-import Terminal from '../Terminal'
-import Prompt from '../Prompt'
-import LaunchScreen from '../LaunchScreen'
-
-import UILayer from '../../services/UILayer'
-import { Routes, Channel } from '../../utils/const'
 
 export interface CustomRoute {
   name: string
@@ -36,6 +36,7 @@ export interface CustomRoute {
   component: React.FunctionComponent<any>
 }
 
+export const history = createHashHistory()
 export const containers: CustomRoute[] = [
   {
     name: 'Header',
@@ -68,6 +69,7 @@ export const mainContents: CustomRoute[] = [
     name: `Wallet`,
     path: Routes.Wallet,
     exact: false,
+    params: `/:id?`,
     component: WalletDetail,
   },
   {
@@ -78,7 +80,8 @@ export const mainContents: CustomRoute[] = [
   },
   {
     name: `Receive`,
-    path: `${Routes.Receive}/:address`,
+    path: Routes.Receive,
+    params: `/:address?`,
     exact: false,
     component: Receive,
   },
@@ -176,21 +179,10 @@ export const mainContents: CustomRoute[] = [
 const CustomRouter = (appProps: any) => {
   return (
     <Router>
-      <Route
-        render={(props: RouteComponentProps<{}>) => {
-          UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
-            props.history.push(args.result.router)
-          })
-          return (
-            <>
-              <RoutesWithProps contents={containers} />
-              <MainContent {...appProps}>
-                <RoutesWithProps contents={mainContents} />
-              </MainContent>
-            </>
-          )
-        }}
-      />
+      <RoutesWithProps contents={containers} />
+      <MainContent {...appProps}>
+        <RoutesWithProps contents={mainContents} />
+      </MainContent>
     </Router>
   )
 }

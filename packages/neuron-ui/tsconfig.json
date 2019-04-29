@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "./src",
     "lib": [
       "dom",
       "dom.iterable",
@@ -31,7 +32,7 @@
     "typeRoots": [
       "./types",
       "node_modules/@nervosnetwork/ckb-types",
-      "node_modules/@types",
+      "node_modules/@types"
     ]
   },
   "include": [

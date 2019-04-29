@@ -2,10 +2,11 @@ import React, { useCallback } from 'react'
 import { Container } from 'react-bootstrap'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import Table from '../../widgets/Table'
-import { Routes, EXPLORER } from '../../utils/const'
+import { History } from 'history'
+import { Routes, EXPLORER } from 'utils/const'
+import Table from 'widgets/Table'
+import ContextMenuZone from 'widgets/ContextMenuZone'
 import { mockAddresses } from './mock'
-import ContextMenuZone from '../../widgets/ContextMenuZone'
 
 const headers = [
   {
@@ -41,31 +42,31 @@ const getTransactionsForAddress = (address: string) => {
   return address.length
 }
 
-const AddressPanel = ({ address, history }: { address: string; history: any }) => {
+const AddressPanel = ({ address, history }: { address: string; history: History }) => {
   const [t] = useTranslation()
   const actionItems = [
     {
-      label: t('addresses.actions.copyaddress'),
+      label: t('addresses.actions.copy-address'),
       click: () => {
         window.clipboard.writeText(address)
       },
     },
     {
-      label: t('addresses.actions.requestpayment'),
+      label: t('addresses.actions.request-payment'),
       click: () => {
         window.clipboard.writeText(address)
         history.push(`${Routes.Receive}/${address}`)
       },
     },
     {
-      label: t('addresses.actions.spendfrom'),
+      label: t('addresses.actions.spend-from'),
       click: () => {
         window.clipboard.writeText(address)
         // TODO: navigate to send page with address
       },
     },
     {
-      label: t('addresses.actions.viewonexplorer'),
+      label: t('addresses.actions.view-on-explorer'),
       click: () => {
         window.clipboard.writeText(address)
         window.open(EXPLORER)
@@ -79,7 +80,7 @@ const AddressPanel = ({ address, history }: { address: string; history: any }) =
   )
 }
 
-const fetchHDAddresses = (history: any) => {
+const fetchHDAddresses = (history: History) => {
   const addresses = generateHDAddresses().map(address => ({
     type: address.type,
     address: <AddressPanel address={address.address} history={history} />,

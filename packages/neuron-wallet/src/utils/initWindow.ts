@@ -1,15 +1,15 @@
 import { app, BrowserWindow } from 'electron'
-// import WalletsController from '../controllers/wallets'
+import WalletsController from '../controllers/wallets'
 import NetworksController from '../controllers/networks'
 import { Channel } from './const'
 import { ResponseCode } from '../controllers'
 
 const initWindow = (win: BrowserWindow) => {
-  // TODO: get wallets on initiation
-  // const wallet = WalletsController.getActive() as any
+  const wallet = WalletsController.getActive() as any
+  const wallets = WalletsController.getAll() as any
   const initState = {
-    // activeWallet: wallet.status ? wallet.result : null,
-    wallets: [],
+    activeWallet: wallet.status ? wallet.result : null,
+    wallets: wallets.status ? wallets.result : [],
     activeNetwork: NetworksController.activeOne().result,
     networks: NetworksController.getAll().result,
     locale: app.getLocale(),

@@ -2,9 +2,9 @@ import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import Screen from '../../widgets/Screen'
+import Screen from 'widgets/Screen'
 
-import { queryParsers } from '../../utils/parser'
+import { queryParsers } from 'utils/parser'
 
 const Prompt = ({
   match: {

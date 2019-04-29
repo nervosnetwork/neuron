@@ -1,13 +1,14 @@
 import React from 'react'
+import { Location } from 'history'
 import { NavLink } from 'react-router-dom'
 import { Nav } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
-import { Routes } from '../../utils/const'
+import { Routes } from 'utils/const'
 
 const tabs = [
-  { label: 'settings.settingtabs.general', to: Routes.SettingsGeneral },
-  { label: 'settings.settingtabs.wallets', to: Routes.SettingsWallets },
-  { label: 'settings.settingtabs.network', to: Routes.SettingsNetworks },
+  { label: 'settings.setting-tabs.general', to: Routes.SettingsGeneral },
+  { label: 'settings.setting-tabs.wallets', to: Routes.SettingsWallets },
+  { label: 'settings.setting-tabs.network', to: Routes.SettingsNetworks },
 ]
 
 const Settings = () => {
@@ -19,8 +20,8 @@ const Settings = () => {
           <NavLink
             className="nav-link"
             to={tab.to}
-            isActive={(match, history) => {
-              if (history.pathname === Routes.Settings && idx === 0) {
+            isActive={(match: any, location: Location) => {
+              if (location.pathname === Routes.Settings && idx === 0) {
                 return true
               }
               return !!match

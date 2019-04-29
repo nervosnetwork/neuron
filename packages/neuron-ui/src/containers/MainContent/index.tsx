@@ -1,16 +1,17 @@
 import React, { useReducer, useEffect } from 'react'
 import styled from 'styled-components'
 
+import { useNeuronWallet } from 'utils/hooks'
 import { initState, reducer, MainDispatch, InitState } from './reducer'
 import MainActions from './actions'
-import { useNeuronWallet } from '../../utils/hooks'
 
 const Main = styled.main`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% -100px);
   width: 100%;
   padding-top: 50px;
+  box-sizing: border-box;
 `
 
 export interface ContentProps extends InitState {

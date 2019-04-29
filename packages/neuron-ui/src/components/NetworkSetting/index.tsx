@@ -3,14 +3,16 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from '../../containers/MainContent'
-import { Routes } from '../../utils/const'
-import { MainActions, actionCreators } from '../../containers/MainContent/reducer'
+import { ContentProps } from 'containers/MainContent'
+import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 
-import Dialog from '../../widgets/Dialog'
-import ContextMenuZone from '../../widgets/ContextMenuZone'
+import { Routes } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
+
+import Dialog from 'widgets/Dialog'
+import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
+import ContextMenuZone from 'widgets/ContextMenuZone'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
-import { useNeuronWallet } from '../../utils/hooks'
 
 interface MenuItemParams {
   id: string
@@ -66,20 +68,11 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
   return (
     <>
       <ContextMenuZone menuItems={menuItems}>
-        <ListGroup>
+        <ListGroupWithMaxHeight>
           {networks.map(network => {
-            const isChecked =
-              // chain.network.remote === network.remote && // it will make things too complex
-              chain.network.id === network.id
+            const isChecked = chain.network.id === network.id
             return (
-              <ListGroup.Item
-                key={network.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}
-                data-menuitem={JSON.stringify({ id: network.id })}
-              >
+              <ListGroup.Item key={network.id} data-menuitem={JSON.stringify({ id: network.id })}>
                 <Form.Check
                   inline
                   label={network.name || network.remote}
@@ -93,10 +86,10 @@ const Networks = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
               </ListGroup.Item>
             )
           })}
-        </ListGroup>
+        </ListGroupWithMaxHeight>
       </ContextMenuZone>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
-        {t('settings.network.addnetwork')}
+        {t('settings.network.add-network')}
       </Link>
       <Dialog
         open={dialog.open}

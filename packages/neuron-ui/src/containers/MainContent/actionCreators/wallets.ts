@@ -46,26 +46,10 @@ export default {
       type: MainActions.Wallet,
     }
   },
-  createOrUpdateWallet: (
-    params:
-      | { name: string; address: string; publicKey: Uint8Array }
-      | { id: string; name?: string; address?: string; publicKey?: Uint8Array },
-    password: string,
-  ) => {
-    // verification
-    if ('id' in params) {
-      // update
-      walletsCall.update({
-        ...params,
-        password,
-      })
-    } else {
-      // create
-      // walletsCall.create({ ...params, password })
-    }
+  updateWallet: (params: { id: string; password: string; newPassword?: string; name?: string }) => {
+    walletsCall.update(params)
     return {
       type: MainActions.Wallet,
-      payload: params,
     }
   },
   importWallet: (isKeystore: boolean, params: typeof initState.tempWallet) => {

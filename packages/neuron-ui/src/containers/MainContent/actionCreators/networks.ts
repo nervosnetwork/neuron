@@ -1,9 +1,9 @@
-import { Network } from '../../../contexts/NeuronWallet'
-import { networksCall } from '../../../services/UILayer'
-import { MainActions } from '../reducer'
+import { Network } from 'contexts/NeuronWallet'
+import { networksCall } from 'services/UILayer'
 
-import { Message, MAX_NETWORK_NAME_LENGTH, UnremovableNetworkId, UnremovableNetwork } from '../../../utils/const'
-import i18n from '../../../utils/i18n'
+import { Message, MAX_NETWORK_NAME_LENGTH, UNREMOVABLE_NETWORK_ID, UNREMOVABLE_NETWORK } from 'utils/const'
+import i18n from 'utils/i18n'
+import { MainActions } from '../reducer'
 
 export default {
   getNetwork: (id: string) => {
@@ -71,10 +71,10 @@ export default {
   },
   deleteNetwork: (id?: string) => {
     if (id === undefined) throw new Error('No network id found')
-    if (id === UnremovableNetworkId) {
+    if (id === UNREMOVABLE_NETWORK_ID) {
       return {
         type: MainActions.ErrorMessage,
-        payload: { networks: i18n.t(`messages.is-unremovable`, { target: UnremovableNetwork }) },
+        payload: { networks: i18n.t(`messages.is-unremovable`, { target: UNREMOVABLE_NETWORK }) },
       }
     }
     networksCall.delete(id)

@@ -1,16 +1,17 @@
-import React, { useReducer, useEffect } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { useTranslation } from 'react-i18next'
-import NeuronWalletContext from '../../contexts/NeuronWallet'
-import { reducer, initProviders, ProviderActions, ProviderDispatch } from './reducer'
+import { history } from 'components/Router'
+import NeuronWalletContext from 'contexts/NeuronWallet'
 
-import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from '../../services/UILayer'
-import { Channel, Routes, ConnectStatus } from '../../utils/const'
+import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import { Channel, ConnectStatus, Routes } from 'utils/const'
+import { initProviders, ProviderActions, ProviderDispatch, reducer } from './reducer'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
   props: React.Props<any>,
 ) => {
   const [providers, dispatch] = useReducer(reducer, initProviders)
-  const [, i18n] = useTranslation()
+  const [t, i18n] = useTranslation()
   useEffect(() => {
     UILayer.on(
       Channel.Initiate,
@@ -31,20 +32,15 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
           }
         } else {
           // TODO: better prompt
-          window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
+          window.alert(t('messages.failed-to-initiate,-please-reopen-Neuron'))
           window.close()
         }
       },
     )
 
-    // TODO: this method is useless if manually switch is not supported
-    // UILayer.on(Channel.SetLanguage, (_e: Event, args: ChannelResponse<string>) => {
-    //   if (args.status) {
-    //     if (args.result !== i18n.language) {
-    //       i18n.changeLanguage(args.result)
-    //     }
-    //   }
-    // })
+    UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
+      history.push(args.result.router)
+    })
 
     UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
       if (args.status) {
@@ -84,16 +80,21 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case WalletsMethod.ImportMnemonic: {
+          case WalletsMethod.ImportMnemonic:
+          case WalletsMethod.Update: {
+            const content =
+              method === WalletsMethod.ImportMnemonic
+                ? t('messages.wallet-imported-successfully', { name: args.result.name })
+                : t('messages.wallet-updated-successfully', { name: args.result.name })
             const time = new Date().getTime()
             dispatch({
               type: ProviderActions.AddMessage,
               payload: {
                 category: 'success',
-                title: 'Wallet Created',
-                content: args.result.name,
-                time,
+                title: 'Wallet',
+                content,
                 actions: [],
+                time,
                 dismiss: () => {
                   dispatch({
                     type: ProviderActions.DismissMessage,
@@ -102,6 +103,8 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
                 },
               },
             })
+            // TODO: so imperative, better refactor
+            history.push(Routes.SettingsWallets)
             break
           }
           case WalletsMethod.GetAll: {
@@ -118,10 +121,14 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case WalletsMethod.Activate: {
+          case WalletsMethod.Delete: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: { wallets: args.result.allWallets },
+            })
             dispatch({
               type: ProviderActions.Wallet,
-              payload: args.result,
+              payload: args.result.activeWallet,
             })
             break
           }
@@ -172,6 +179,12 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
+          case NetworksMethod.Create:
+          case NetworksMethod.Update: {
+            // TODO: so imperative, better refactor
+            history.push(Routes.SettingsNetworks)
+            break
+          }
           case NetworksMethod.Activate: {
             dispatch({
               type: ProviderActions.Chain,
@@ -217,7 +230,7 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
         })
       }
     })
-  }, [])
+  }, [i18n])
 
   return (
     <NeuronWalletContext.Provider value={providers}>
