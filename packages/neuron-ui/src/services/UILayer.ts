@@ -39,6 +39,7 @@ export enum NetworksMethod {
 
 export enum TransactionsMethod {
   GetAll = 'getAll',
+  GetAllByAddresses = 'getAllByAddresses',
   Get = 'get',
 }
 
@@ -118,7 +119,7 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 }
 
 export const transactionsCall = instantiateMethodCall(transactions) as {
-  getAll: (params: GetTransactionsParams) => void
+  getAllByAddresses: (params: GetTransactionsParams) => void
   get: (hash: string) => void
 }
 

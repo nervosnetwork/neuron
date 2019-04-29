@@ -13,7 +13,7 @@ export default {
   },
 
   getTransactions: (params: GetTransactionsParams) => {
-    transactionsCall.getAll(params)
+    transactionsCall.getAllByAddresses(params)
     return {
       type: MainActions.UpdateLoading,
       payload: {
