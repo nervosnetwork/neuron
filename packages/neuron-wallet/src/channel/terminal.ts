@@ -1,11 +1,8 @@
 import { ipcMain, WebContents, Notification } from 'electron'
 import { Channel } from '../utils/const'
-import asw from '../wallets/asw'
 
 const methods: { [index: string]: Function } = {
-  getASWBalance: () => {
-    return asw.getBalance()
-  },
+  getASWBalance: () => {},
   notification: (args: string[]) => {
     return new Promise(resolve => {
       const notification = new Notification({

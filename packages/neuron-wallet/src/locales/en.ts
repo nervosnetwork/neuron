@@ -12,6 +12,10 @@ export default {
         copy: 'Copy',
         paste: 'Paste',
       },
+      view: {
+        label: 'View',
+        fullscreen: 'Fullscreen',
+      },
       window: {
         label: 'Window',
         minimize: 'Minimize',
@@ -24,9 +28,9 @@ export default {
       develop: {
         terminal: 'Terminal',
         develop: 'Develop',
-        forceReload: 'forceReload',
-        reload: 'reload',
-        toggleDevTools: 'toggleDevTools',
+        forceReload: 'Force Reload',
+        reload: 'Reload',
+        toggleDevTools: 'Toggle DevTools',
       },
     },
     messages: {

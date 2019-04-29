@@ -12,6 +12,10 @@ export default {
         copy: '复制',
         paste: '粘贴',
       },
+      view: {
+        label: '视图',
+        fullscreen: ' 全屏',
+      },
       window: {
         label: '窗口',
         minimize: '最小化',

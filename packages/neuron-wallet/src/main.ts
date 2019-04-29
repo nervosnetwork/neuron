@@ -3,8 +3,8 @@ import 'reflect-metadata'
 
 import initApp from './utils/initApp'
 import createWindow from './utils/createWindow'
-import i18n from './i18n'
-import mainmenu from './menu'
+import i18n from './utils/i18n'
+import mainmenu from './utils/mainmenu'
 
 let mainWindow: Electron.BrowserWindow | null
 
