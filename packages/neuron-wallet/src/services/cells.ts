@@ -1,5 +1,4 @@
 import { getConnection, In } from 'typeorm'
-import { getLiveCells } from '../mock_rpc'
 import OutputEntity from '../entities/Output'
 import { Input } from './transactions'
 
@@ -30,60 +29,14 @@ export interface Cell {
 /* eslint no-await-in-loop: "warn" */
 /* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
-  public static getLiveCellsByLockHashes = async (lockHashes: string[]): Promise<Cell[]> => {
-    const totalCells: Cell[] = []
-
-    for (const lockHash of lockHashes) {
-      const cells = await CellsService.getLiveCellsByLockHash(lockHash)
-      totalCells.concat(cells)
-    }
-
-    return totalCells
-  }
-
-  public static getLiveCellsByLockHash = async (_lockHash: string): Promise<Cell[]> => {
-    const to = 100
-    let currentFrom = 0
-    let cells: Cell[] = []
-    while (currentFrom <= to) {
-      const currentTo = Math.min(currentFrom + 100, to)
-      const cs = await getLiveCells()
-      cells = cells.concat(cs)
-      currentFrom = currentTo + 1
-    }
-    return cells
-  }
-
-  public static loadCellsFromChain = async (lockHash: string): Promise<void> => {
-    const cells = await CellsService.getLiveCellsByLockHash(lockHash)
-    cells.forEach(async cell => {
-      const c = cell
-      c.status = 'live'
-      c.lockHash = Math.round(Math.random() * 1000).toString()
-      await CellsService.create(c)
-    })
-  }
-
-  public static create = async (cell: Cell) => {
-    const cellEntity = new OutputEntity()
-    cellEntity.outPointHash = cell.outPoint!.hash
-    cellEntity.outPointIndex = cell.outPoint!.index
-    cellEntity.capacity = cell.capacity
-    cellEntity.data = cell.data || ''
-    cellEntity.lock = cell.lock
-    cellEntity.type = cell.type || null
-    cellEntity.status = cell.status!
-    cellEntity.lockHash = cell.lockHash!
-
-    await cellEntity.save()
-    return cellEntity
-  }
-
   public static getBalance = async (lockHashes: string[]): Promise<string> => {
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
-        where: { lockHash: In(lockHashes) },
+        where: {
+          lockHash: In(lockHashes),
+          status: 'live',
+        },
       })
 
     const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
@@ -92,34 +45,23 @@ export default class CellsService {
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
-    const cellEntity: OutputEntity | undefined = await CellsService.getCellEntity(outPoint)
+    const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
 
     if (!cellEntity) {
-      return cellEntity
+      return undefined
     }
 
-    const cell: Cell = {
-      outPoint: {
-        hash: cellEntity.outPointHash,
-        index: cellEntity.outPointIndex,
-      },
-      capacity: cellEntity.capacity,
-      lockHash: cellEntity.lockHash,
-      lock: cellEntity.lock,
-    }
-
-    return cell
+    return cellEntity.toInterface()
   }
 
-  private static getCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
+  private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
     const cellEntity: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
-      .createQueryBuilder('cell')
-      .where('cell.outPointHash = :outPointHash and cell.outPointIndex = :outPointIndex', {
+      .findOne({
         outPointHash: outPoint.hash,
         outPointIndex: outPoint.index,
+        status: 'live',
       })
-      .getOne()
 
     return cellEntity
   }
