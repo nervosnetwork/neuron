@@ -262,6 +262,7 @@ export default class TransactionsService {
     return txEntities
   }
 
+  // update previousOutput's status to 'dead' if found
   public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
@@ -282,6 +283,9 @@ export default class TransactionsService {
         if (outputEntity) {
           input.capacity = outputEntity.capacity
           input.lockHash = outputEntity.lockHash
+          // update status to 'dead' if found in input
+          outputEntity.status = 'dead'
+          await getConnection().manager.save(outputEntity)
         }
         return input
       }),
