@@ -3,7 +3,7 @@ import ckbCore from '../core'
 import AddressType from './type'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
-import AddressStore from './store'
+import WalletStore, { WalletData } from '../store/walletStore'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -68,8 +68,18 @@ class Address {
   }
 
   public static allAddresses = () => {
-    const addressStore = new AddressStore()
-    return addressStore.allAddresses()
+    const walletStore = new WalletStore()
+    const walletDatas: WalletData[] = walletStore.getAllWallets()
+    const addresses: string[] = []
+    walletDatas.forEach(walletData => {
+      walletData.addresses.receiving.forEach(hdAddress => {
+        addresses.push(hdAddress.address)
+      })
+      walletData.addresses.change.forEach(hdAddress => {
+        addresses.push(hdAddress.address)
+      })
+    })
+    return addresses
   }
 
   public static searchUsedAddresses = (keysData: KeysData) => {
