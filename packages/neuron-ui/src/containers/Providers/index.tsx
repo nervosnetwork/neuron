@@ -18,17 +18,23 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
       Channel.Initiate,
       (
         _e: Event,
-        args: ChannelResponse<{ networks: any; activeNetwork: any; wallets: any; activeWallet: any; locale: string }>,
+        args: ChannelResponse<{
+          networks: any
+          activeNetworkId: string
+          wallets: any
+          activeWallet: any
+          locale: string
+        }>,
       ) => {
         if (args.status) {
-          const { locale, networks, activeNetwork: network, wallets, activeWallet: wallet } = args.result
+          const { locale, networks, activeNetworkId: networkId, wallets, activeWallet: wallet } = args.result
           if (locale !== i18n.language) {
             i18n.changeLanguage(locale)
           }
           if (networks.length) {
             dispatch({
               type: ProviderActions.Initiate,
-              payload: { networks, network, wallet, wallets },
+              payload: { networks, networkId, wallet, wallets },
             })
           }
         } else {
@@ -173,10 +179,10 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
             })
             break
           }
-          case NetworksMethod.ActiveOne: {
+          case NetworksMethod.ActiveId: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { network: args.result },
+              payload: { networkId: args.result },
             })
             break
           }
