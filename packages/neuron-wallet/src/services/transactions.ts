@@ -369,16 +369,23 @@ export default class TransactionsService {
     }
   }
 
+  // TODO: check this algorithm
   // use SDK lockScriptToHash
   public static lockScriptToHash = (lock: Script) => {
     const binaryHash: string = lock!.binaryHash!
     const args: Uint8Array[] = lock.args!.map(n => {
       return ckbCore.utils.hexToBytes(n)
     })
-    return ckbCore.utils.lockScriptToHash({
+    const lockHash: string = ckbCore.utils.lockScriptToHash({
       binaryHash,
       args,
     })
+
+    if (lockHash.startsWith('0x')) {
+      return lockHash
+    }
+
+    return `0x${lockHash}`
   }
 
   public static addressToLockScript = async (address: string): Promise<Script> => {
