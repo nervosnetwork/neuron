@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import { Script, OutPoint, Cell } from './cells'
 import TransactionsService, { Input, Transaction } from './transactions'
-import InputEntity from '../entities/Input'
+import OutputEntity from '../entities/Output'
 import ckbCore from '../core'
 import SyncInfoEntity from '../entities/SyncInfo'
 
@@ -202,15 +202,17 @@ export default class SyncBlocksService {
 
   // resolve transactions
   async resolveTxs(transactions: Transaction[]) {
-    await transactions.forEach(async tx => {
+    for (const tx of transactions) {
       await this.resolveTx(tx)
-    })
+    }
   }
 
   // resolve single transaction
   async resolveTx(transaction: Transaction) {
-    if (this.anyOutput(transaction.outputs!) || SyncBlocksService.anyInput(transaction.inputs!)) {
-      TransactionsService.create(transaction)
+    const anyOutput: boolean = this.anyOutput(transaction.outputs!)
+    const anyInput: boolean = await SyncBlocksService.anyInput(transaction.inputs!)
+    if (anyOutput || anyInput) {
+      TransactionsService.convertTransactionAndCreate(transaction)
     }
   }
 
@@ -224,7 +226,7 @@ export default class SyncBlocksService {
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
       const output = await getConnection()
-        .getRepository(InputEntity)
+        .getRepository(OutputEntity)
         .findOne({
           outPointHash: outPoint.hash,
           outPointIndex: outPoint.index,
@@ -275,9 +277,10 @@ export default class SyncBlocksService {
   }
 
   static convertBlock(block: CKBComponents.Block): Block {
+    const blockHeader = SyncBlocksService.convertBlockHeader(block.header)
     return {
-      header: SyncBlocksService.convertBlockHeader(block.header),
-      transactions: block.commitTransactions.map(SyncBlocksService.convertTransaction),
+      header: blockHeader,
+      transactions: block.commitTransactions.map(tx => SyncBlocksService.convertTransaction(tx, blockHeader)),
     }
   }
 
@@ -291,8 +294,8 @@ export default class SyncBlocksService {
     }
   }
 
-  static convertTransaction(transaction: CKBComponents.Transaction): Transaction {
-    return {
+  static convertTransaction(transaction: CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
+    const tx: Transaction = {
       hash: transaction.hash,
       version: transaction.version,
       deps: transaction.deps,
@@ -300,12 +303,26 @@ export default class SyncBlocksService {
       inputs: transaction.inputs.map(SyncBlocksService.convertInput),
       outputs: transaction.outputs.map(SyncBlocksService.convertOutput),
     }
+    if (blockHeader) {
+      tx.timestamp = blockHeader.timestamp
+      tx.blockNumber = blockHeader.number
+      tx.blockHash = blockHeader.hash
+    }
+    return tx
   }
 
-  static convertInput(input: CKBComponents.CellInput): Input {
+  // FIXME: input of SDK return not compatible with CKBComponents.CellInput
+  static convertInput(input: any): Input {
     return {
-      previousOutput: input.prevOutput,
-      args: input.args.map(arg => ckbCore.utils.bytesToHex(arg)),
+      previousOutput: input.previous_output,
+      args: input.args.map((arg: Uint8Array) => ckbCore.utils.bytesToHex(arg)),
+    }
+  }
+
+  static convertOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
+    return {
+      hash: outPoint.hash,
+      index: outPoint.index,
     }
   }
 
@@ -317,10 +334,11 @@ export default class SyncBlocksService {
     }
   }
 
-  static convertScript(script: CKBComponents.Script): Script {
+  // FIXME: lock script of SDK return not compatible with CKBComponents.Script
+  static convertScript(script: any): Script {
     return {
-      args: script.args.map(arg => ckbCore.utils.bytesToHex(arg)),
-      binaryHash: script.binaryHash,
+      args: script.args.map((arg: Uint8Array) => ckbCore.utils.bytesToHex(arg)),
+      binaryHash: script.binary_hash,
     }
   }
 }
