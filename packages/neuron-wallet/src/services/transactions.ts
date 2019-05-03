@@ -60,6 +60,18 @@ export interface TargetOutput {
   capacity: string
 }
 
+enum TxSaveType {
+  Sent = 'sent',
+  Fetch = 'fetch',
+}
+
+enum OutputStatus {
+  Sent = 'sent',
+  Live = 'live',
+  Pending = 'pending',
+  Dead = 'dead',
+}
+
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 export default class TransactionsService {
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
@@ -197,7 +209,73 @@ export default class TransactionsService {
     return false
   }
 
-  public static create = async (transaction: Transaction): Promise<TransactionEntity> => {
+  /* eslint no-await-in-loop: "off" */
+  /* eslint no-restricted-syntax: "off" */
+  // when after sent:
+  // 1. don't have before, output = sent, input = pending
+  // 2. have before, do nothing
+  public static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const txEntity: TransactionEntity | undefined = await getConnection()
+      .getRepository(TransactionEntity)
+      .findOne(transaction.hash)
+
+    if (txEntity) {
+      // nothing to do if exist before
+      return txEntity
+    }
+    return TransactionsService.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
+  }
+
+  // when after fetch:
+  // 1. don't have before, output = live, input = dead
+  // 2. have before, output = live, input = dead
+  public static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const connection = getConnection()
+    const txEntity: TransactionEntity | undefined = await connection
+      .getRepository(TransactionEntity)
+      .findOne(transaction.hash, { relations: ['inputs', 'outputs'] })
+
+    if (txEntity) {
+      // input -> previousOutput => dead
+      // output => live
+      const outputs: OutputEntity[] = await Promise.all(
+        txEntity.outputs.map(async o => {
+          const output = o
+          output.status = OutputStatus.Live
+          return output
+        }),
+      )
+
+      const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
+        txEntity.inputs.map(async input => {
+          const outPoint: OutPoint = input.previousOutput()
+          const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+            outPointHash: outPoint.hash,
+            outPointIndex: outPoint.index,
+          })
+          if (outputEntity) {
+            outputEntity.status = OutputStatus.Dead
+          }
+          return outputEntity
+        }),
+      )
+
+      const previousOutputs: OutputEntity[] = previousOutputsWithUndefined.filter(o => !!o) as OutputEntity[]
+      await connection.manager.save(outputs.concat(previousOutputs))
+
+      return txEntity
+    }
+
+    return TransactionsService.create(transaction, OutputStatus.Live, OutputStatus.Dead)
+  }
+
+  // only create, check exist before this
+  public static create = async (
+    transaction: Transaction,
+    outputStatus: OutputStatus,
+    inputStatus: OutputStatus,
+  ): Promise<TransactionEntity> => {
+    const connection = getConnection()
     const tx = new TransactionEntity()
     tx.hash = transaction.hash
     tx.version = transaction.version
@@ -208,7 +286,7 @@ export default class TransactionsService {
     tx.witnesses = transaction.witnesses!
     tx.inputs = []
     tx.outputs = []
-    await getConnection().manager.save(tx)
+    await connection.manager.save(tx)
     await transaction.inputs!.forEach(async i => {
       const input = new InputEntity()
       input.outPointHash = i.previousOutput.hash
@@ -217,7 +295,17 @@ export default class TransactionsService {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
-      await getConnection().manager.save(input)
+      await connection.manager.save(input)
+
+      const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+        outPointHash: input.previousOutput().hash,
+        outPointIndex: input.previousOutput().index,
+      })
+      if (previousOutput) {
+        // update previousOutput status here
+        previousOutput.status = inputStatus
+        await connection.manager.save(previousOutput)
+      }
     })
     await transaction.outputs!.forEach(async (o, index) => {
       const output = new OutputEntity()
@@ -229,8 +317,8 @@ export default class TransactionsService {
       output.type = o.type!
       output.lockHash = o.lockHash!
       output.transaction = tx
-      output.status = 'live'
-      await getConnection().manager.save(output)
+      output.status = outputStatus
+      await connection.manager.save(output)
     })
 
     return tx
@@ -251,11 +339,12 @@ export default class TransactionsService {
     }
   }
 
+  // convert fetch transactions
   public static convertTransactions = async (transactions: Transaction[]): Promise<TransactionEntity[]> => {
     const txEntities: TransactionEntity[] = []
 
     transactions.forEach(async tx => {
-      const txEntity = await TransactionsService.convertTransactionAndCreate(tx)
+      const txEntity = await TransactionsService.saveFetchTx(tx)
       txEntities.push(txEntity)
     })
 
@@ -263,7 +352,13 @@ export default class TransactionsService {
   }
 
   // update previousOutput's status to 'dead' if found
-  public static convertTransactionAndCreate = async (transaction: Transaction): Promise<TransactionEntity> => {
+  // calculate output lockHash, input lockHash and capacity
+  // when sent a transaction, use TxSaveType.Sent
+  // when fetch a transaction, use TxSaveType.Fetch
+  public static convertTransactionAndSave = async (
+    transaction: Transaction,
+    saveType: TxSaveType,
+  ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
       const output = o
@@ -283,14 +378,35 @@ export default class TransactionsService {
         if (outputEntity) {
           input.capacity = outputEntity.capacity
           input.lockHash = outputEntity.lockHash
-          // update status to 'dead' if found in input
-          outputEntity.status = 'dead'
-          await getConnection().manager.save(outputEntity)
         }
         return input
       }),
     )
-    const txEntity = await TransactionsService.create(transaction)
+    let txEntity: TransactionEntity
+    if (saveType === TxSaveType.Sent) {
+      txEntity = await TransactionsService.saveWithSent(transaction)
+    } else if (saveType === TxSaveType.Fetch) {
+      txEntity = await TransactionsService.saveWithFetch(transaction)
+    } else {
+      throw new Error('Error TxSaveType!')
+    }
+    return txEntity
+  }
+
+  public static saveFetchTx = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(
+      transaction,
+      TxSaveType.Fetch,
+    )
+    return txEntity
+  }
+
+  // TODO: should call this after sent tx, not after generate tx
+  public static saveSentTx = async (transaction: Transaction): Promise<TransactionEntity> => {
+    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(
+      transaction,
+      TxSaveType.Sent,
+    )
     return txEntity
   }
 
