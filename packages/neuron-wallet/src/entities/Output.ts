@@ -21,20 +21,9 @@ export default class Output extends BaseEntity {
   capacity!: string
 
   @Column({
-    type: 'text',
-  })
-  data!: string
-
-  @Column({
     type: 'simple-json',
   })
   lock!: Script
-
-  @Column({
-    type: 'simple-json',
-    nullable: true,
-  })
-  type: Script | null = null
 
   @Column({
     type: 'varchar',

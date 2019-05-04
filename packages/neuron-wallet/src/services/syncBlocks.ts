@@ -329,7 +329,6 @@ export default class SyncBlocksService {
   static convertOutput(output: CKBComponents.CellOutput): Cell {
     return {
       capacity: output.capacity.toString(),
-      data: ckbCore.utils.bytesToHex(output.data),
       lock: SyncBlocksService.convertScript(output.lock),
     }
   }
