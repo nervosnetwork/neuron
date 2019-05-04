@@ -1,6 +1,6 @@
 {
   "type": "sqlite",
-  "synchronize": true,
+  "synchronize": false,
   "logging": true,
   "database": "cell-dev.sqlite",
   "entities": [
