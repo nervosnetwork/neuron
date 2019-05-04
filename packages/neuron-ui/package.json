@@ -7,7 +7,7 @@
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
   },
-  "homepage": "./",
+  "homepage": "https://www.nervos.org",
   "main": "./build",
   "license": "MIT",
   "scripts": {
