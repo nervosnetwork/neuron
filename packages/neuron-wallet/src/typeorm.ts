@@ -7,6 +7,8 @@ import Input from './entities/Input'
 import Output from './entities/Output'
 import SyncInfo from './entities/SyncInfo'
 
+import { InitMigration1556945182896 } from './migration/1556945182896-InitMigration'
+
 const dbPath = path.join(app.getPath('userData'), 'cell.sqlite')
 
 const connectOptions = async () => {
@@ -14,6 +16,7 @@ const connectOptions = async () => {
   Object.assign(connectionOptions, {
     database: dbPath,
     entities: [Transaction, Input, Output, SyncInfo],
+    migrations: [InitMigration1556945182896],
   })
 
   return connectionOptions
