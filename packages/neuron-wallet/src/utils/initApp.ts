@@ -37,7 +37,8 @@ const initApp = () => {
   nodeService.start()
   // TODO: this function should be moved to somewhere syncing data
   syncConnectStatus()
-  initConnection().then()
+  // TODO: call this function after get network name
+  initConnection('testnet').then()
   WalletChannel.start()
   const { status, result } = NetworksController.activeOne()
   if (!status) {
