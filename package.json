@@ -27,7 +27,8 @@
     "lint": "lerna run lint",
     "test": "lerna run --parallel test",
     "precommit": "lerna run precommit",
-    "postinstall": "npm rebuild tiny-secp256k1 && lerna run rebuild:nativemodules"
+    "postinstall": "npm rebuild tiny-secp256k1 && lerna run rebuild:nativemodules",
+    "migrate": "ts-node ./node_modules/.bin/typeorm migration:generate"
   },
   "devDependencies": {
     "@cryptape/sdk-ts-config": "0.0.1",

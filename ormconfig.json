@@ -2,6 +2,7 @@
   "type": "sqlite",
   "synchronize": true,
   "logging": true,
+  "database": "cell-dev.sqlite",
   "entities": [
      "packages/neuron-wallet/src/entities/**/*.ts"
   ],
