@@ -64,7 +64,7 @@ export default class SyncBlocksService {
     if (checkResult.success !== true) {
       if (checkResult.index! < checkSize) {
         // result blocks range to save, and delete all transactions where blockNumber >= checkResult.blockHeader!.number
-        // TODO: delete all transactions where blockNumber >= checkResult.blockHeader!.number
+        await this.deleteTxs(checkResult.blockHeader!.number)
         blocksToSave = blocks.slice(checkResult.index!, blocks.length)
       } else {
         // reset blocks range to save, and reset currentBlockNumber
@@ -75,6 +75,14 @@ export default class SyncBlocksService {
       blocksToSave = blocks.slice(checkSize, blocks.length)
     }
     await this.resolveBlocks(blocksToSave)
+  }
+
+  // delete all transactions where blockNumber >= checkResult.blockHeader!.number
+  async deleteTxs(sinceBlockNumber: string) {
+    const blockNumbers: number[] = Array.from({ length: this.sizeForCheck + 2 }).map(
+      (_a, i) => i + parseInt(sinceBlockNumber, 10),
+    )
+    await TransactionsService.deleteByBlockNumbers(blockNumbers.map(n => n.toString()))
   }
 
   async tryGetTipBlockNumber(): Promise<number> {

@@ -31,7 +31,7 @@ export default class Input extends BaseEntity {
   })
   lockHash: string | null = null
 
-  @ManyToOne(_type => Transaction, transaction => transaction.inputs)
+  @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
   transaction!: Transaction
 
   @Column({
