@@ -23,20 +23,6 @@ const connectOptions = async (networkName: string) => {
   return connectionOptions
 }
 
-export const generateConnection = async (
-  networkName: string,
-  func: Function,
-  errorFunc: Function = (error: any) => console.error(error),
-) => {
-  const connectionOptions = await connectOptions(networkName)
-
-  createConnection(connectionOptions)
-    .then(async (connection: any) => {
-      await func(connection)
-    })
-    .catch(errorFunc())
-}
-
 export const initConnection = async (networkName: string) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
