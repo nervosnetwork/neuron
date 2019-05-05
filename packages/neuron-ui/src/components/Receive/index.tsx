@@ -46,7 +46,7 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
   const { match } = props
   const { params } = match
 
-  const accountAddress = !params.address || !params.address.startsWith('0x') ? receiving[0] : params.address
+  const accountAddress = params.address || receiving[0]
 
   if (!accountAddress) {
     // TODO: better error handling

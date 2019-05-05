@@ -217,8 +217,8 @@ class WalletsController {
         result: {
           ...activeWallet,
           addresses: {
-            receiving: activeWallet.addresses.receiving.map(addr => `0x${addr.address}`),
-            change: activeWallet.addresses.change.map(addr => `0x${addr.address}`),
+            receiving: activeWallet.addresses.receiving.map(addr => addr.address),
+            change: activeWallet.addresses.change.map(addr => addr.address),
           },
         },
       }
