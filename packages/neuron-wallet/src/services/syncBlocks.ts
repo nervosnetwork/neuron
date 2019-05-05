@@ -212,7 +212,7 @@ export default class SyncBlocksService {
     const anyOutput: boolean = this.anyOutput(transaction.outputs!)
     const anyInput: boolean = await SyncBlocksService.anyInput(transaction.inputs!)
     if (anyOutput || anyInput) {
-      TransactionsService.convertTransactionAndCreate(transaction)
+      TransactionsService.saveFetchTx(transaction)
     }
   }
 
