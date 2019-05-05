@@ -1,6 +1,6 @@
-import { ResponseCode, ChannelResponse } from '.'
-import NetworksService from '../services/networks'
-import { NetworkType, NetworkID, NetworkWithID, Network } from '../store/networksStore'
+import { app } from 'electron'
+import { ResponseCode } from '.'
+import NetworksService, { NetworkType, NetworkID, Network } from '../services/networks'
 
 export enum NetworksMethod {
   GetAll = 'getAll',
@@ -9,23 +9,23 @@ export enum NetworksMethod {
   Update = 'update',
   Delete = 'delete',
   Activate = 'activate',
-  ActiveOne = 'activeOne',
+  ActiveId = 'activeId',
   Clear = 'clear',
   Status = 'status',
 }
 
 class NetworksController {
-  static service = new NetworksService()
+  static service = new NetworksService(app.getPath('userData'), 'networks.json')
 
-  public static getAll = (): ChannelResponse<NetworkWithID[]> => {
+  public static getAll = async () => {
     return {
       status: ResponseCode.Success,
-      result: NetworksController.service.getAll(),
+      result: await NetworksController.service.getAll(),
     }
   }
 
-  public static get = (id: NetworkID): ChannelResponse<NetworkWithID> => {
-    const network = NetworksController.service.get(id)
+  public static get = async (id: NetworkID) => {
+    const network = await NetworksController.service.get(id)
     if (network) {
       return {
         status: ResponseCode.Success,
@@ -38,7 +38,7 @@ class NetworksController {
     }
   }
 
-  public static create = ({ name, remote, type = NetworkType.Normal }: Network): ChannelResponse<NetworkWithID> => {
+  public static create = async ({ name, remote, type = NetworkType.Normal }: Network) => {
     if (!name || !remote) {
       return {
         status: ResponseCode.Fail,
@@ -53,7 +53,7 @@ class NetworksController {
       }
     }
     try {
-      const created = NetworksController.service.create(name, remote, type)
+      const created = await NetworksController.service.create(name, remote, type)
       return {
         status: ResponseCode.Success,
         result: created,
@@ -66,9 +66,9 @@ class NetworksController {
     }
   }
 
-  public static update = (id: NetworkID, options: Partial<Network>): ChannelResponse<boolean> => {
+  public static update = async (id: NetworkID, options: Partial<Network>) => {
     try {
-      NetworksController.service.update(id, options)
+      await NetworksController.service.update(id, options)
       return {
         status: ResponseCode.Success,
         result: true,
@@ -81,9 +81,8 @@ class NetworksController {
     }
   }
 
-  public static delete = (id: NetworkID): ChannelResponse<boolean> => {
-    // regard the network of id 1 as the default one, which is not allowed to be deleted
-    const defaultNetwork = NetworksController.service.defaultOne()
+  public static delete = async (id: NetworkID) => {
+    const defaultNetwork = await NetworksController.service.defaultOne()
     if (defaultNetwork && defaultNetwork.id === id) {
       return {
         status: ResponseCode.Fail,
@@ -91,18 +90,18 @@ class NetworksController {
       }
     }
     try {
-      const activeNetwork = NetworksController.service.activeOne()
-      if (activeNetwork && activeNetwork.id === id) {
+      const activeId = await NetworksController.service.activeId()
+      if (activeId === id) {
         if (!defaultNetwork) {
           return {
             status: ResponseCode.Fail,
             msg: 'Default network is not set, cannot delete active network',
           }
         }
-        NetworksController.service.delete(id)
-        NetworksController.activate(defaultNetwork.id)
+        await NetworksController.service.delete(id)
+        await NetworksController.activate(defaultNetwork.id)
       }
-      NetworksController.service.delete(id)
+      await NetworksController.service.delete(id)
       return {
         status: ResponseCode.Success,
         result: true,
@@ -115,12 +114,12 @@ class NetworksController {
     }
   }
 
-  public static activeOne = () => {
-    const activeOne = NetworksController.service.activeOne()
-    if (activeOne) {
+  public static activeOne = async () => {
+    const activeId = await NetworksController.service.activeId()
+    if (activeId) {
       return {
         status: ResponseCode.Success,
-        result: activeOne,
+        result: activeId,
       }
     }
     return {
@@ -129,24 +128,27 @@ class NetworksController {
     }
   }
 
-  public static activate = (id: NetworkID) => {
+  public static activate = async (id: NetworkID) => {
     try {
-      NetworksController.service.activate(id)
+      await NetworksController.service.activate(id)
     } catch (err) {
       return {
         status: ResponseCode.Fail,
         msg: err.message,
       }
     }
-    return NetworksController.activeOne()
+    return {
+      status: ResponseCode.Success,
+      result: true,
+    }
   }
 
-  public static status = () => {
-    return false
-  }
-
-  public static clear = () => {
-    return NetworksController.service.clear()
+  public static clear = async () => {
+    await NetworksController.service.clear()
+    return {
+      status: ResponseCode.Success,
+      result: true,
+    }
   }
 }
 
