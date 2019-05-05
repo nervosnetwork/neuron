@@ -220,7 +220,7 @@ export default class TransactionsService {
       .findOne(transaction.hash)
 
     if (txEntity) {
-      // nothing to do if exist before
+      // nothing to do if exists already
       return txEntity
     }
     return TransactionsService.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
@@ -353,7 +353,7 @@ export default class TransactionsService {
 
   // update previousOutput's status to 'dead' if found
   // calculate output lockHash, input lockHash and capacity
-  // when sent a transaction, use TxSaveType.Sent
+  // when send a transaction, use TxSaveType.Sent
   // when fetch a transaction, use TxSaveType.Fetch
   public static convertTransactionAndSave = async (
     transaction: Transaction,
