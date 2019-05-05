@@ -42,4 +42,4 @@ docs
 .idea
 
 # sqlite db
-*.db.*
+cell-dev.sqlite
