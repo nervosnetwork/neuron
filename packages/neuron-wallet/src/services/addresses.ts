@@ -1,9 +1,9 @@
-import TransactionsService from '../transactions'
-import ckbCore from '../../core'
-import HD from '../../keys/hd'
-import { KeysData } from '../../keys/keystore'
+import TransactionsService from './transactions'
+import ckbCore from '../core'
+import HD from '../keys/hd'
+import { KeysData } from '../keys/keystore'
 // TODO: Should use service
-import WalletStore from '../../store/walletStore'
+import WalletStore from '../store/walletStore'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
