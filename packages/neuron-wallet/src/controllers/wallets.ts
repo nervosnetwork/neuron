@@ -183,11 +183,13 @@ class WalletsController {
           },
         }
       }
+
       return {
         status: ResponseCode.Fail,
         msg: 'Failed to delete wallet',
       }
     }
+
     return {
       status: ResponseCode.Fail,
       msg: 'Incorrect password',
@@ -209,9 +211,16 @@ class WalletsController {
 
   public static getActive = () => {
     try {
+      const activeWallet = WalletsController.service.getActive()
       return {
         status: ResponseCode.Success,
-        result: WalletsController.service.getActive(),
+        result: {
+          ...activeWallet,
+          addresses: {
+            receiving: activeWallet.addresses.receiving.map(addr => addr.address),
+            change: activeWallet.addresses.change.map(addr => addr.address),
+          },
+        },
       }
     } catch (e) {
       return {

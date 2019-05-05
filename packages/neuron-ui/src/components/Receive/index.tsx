@@ -5,6 +5,7 @@ import QRCode from 'qrcode.react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Copy } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+import { useNeuronWallet } from 'utils/hooks'
 
 declare global {
   interface Window {
@@ -14,7 +15,6 @@ declare global {
 
 const AddressPanel = styled.div`
   dispaly: flex;
-  display: -webkit-flex; /* Safari */
   flex-direction: row;
   margin: 10px 0 0 0;
 `
@@ -36,16 +36,23 @@ const QRCodeModal = styled.div`
 `
 
 const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: string }>>) => {
+  const {
+    wallet: {
+      addresses: { receiving },
+    },
+  } = useNeuronWallet()
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
   const { match } = props
   const { params } = match
-  const generateNewAddress = () => {
-    // TODO: generate new address
-    return '0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674'
+
+  const accountAddress = params.address || receiving[0]
+
+  if (!accountAddress) {
+    // TODO: better error handling
+    throw new Error('Found no addresses')
   }
 
-  const accountAddress = !params.address || !params.address.startsWith('0x') ? generateNewAddress() : params.address
   const copyAddress = () => {
     window.clipboard.writeText(accountAddress)
   }
