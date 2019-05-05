@@ -30,7 +30,7 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
       {
         label: t('menuitem.select'),
         isDisabled: ({ id }: MenuItemParams) => {
-          return id === chain.network.id
+          return id === chain.networkId
         },
         click: ({ id }: MenuItemParams) => {
           dispatch(actionCreators.setNetwork(id))
@@ -61,7 +61,7 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
         },
       },
     ],
-    [chain.network.id, dispatch, history, networks, t],
+    [chain.networkId, dispatch, history, networks, t],
   )
 
   return (
@@ -69,7 +69,7 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
       <ContextMenuZone menuItems={menuItems}>
         <ListGroupWithMaxHeight>
           {networks.map(network => {
-            const isChecked = chain.network.id === network.id
+            const isChecked = chain.networkId === network.id
             return (
               <ListGroup.Item key={network.id} data-menuitem={JSON.stringify({ id: network.id })}>
                 <Form.Check
@@ -102,7 +102,7 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
         }
       >
         <RemoveNetworkDialog
-          isChecked={dialog.id === chain.network.id}
+          isChecked={dialog.id === chain.networkId}
           network={networks.find(n => n.id === dialog.id)}
           dispatch={dispatch}
         />

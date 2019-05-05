@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron'
 import Listeners from './listeners'
 import { ChannelResponse } from '../controllers'
 import { NetworksMethod } from '../controllers/networks'
-import { NetworkWithID } from '../store/networksStore'
+import { NetworkWithID } from '../services/networks'
 import { WalletsMethod } from '../controllers/wallets'
 
 import { Channel } from '../utils/const'
@@ -95,7 +95,7 @@ export default class WalletChannel extends Listeners {
       this.win.webContents.send(Channel.Networks, NetworksMethod.GetAll, params.networks)
     }
     if (params.active) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveOne, params.active)
+      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveId, params.active)
     }
     // TODO: status handler
     // if (params.status) {
