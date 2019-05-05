@@ -5,6 +5,7 @@ import initApp from './utils/initApp'
 import createWindow from './utils/createWindow'
 import i18n from './utils/i18n'
 import mainmenu from './utils/mainmenu'
+import createLoopTask from './utils/createLoopTask'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -23,7 +24,10 @@ const openWindow = () => {
   }
 }
 
-app.on('ready', openWindow)
+app.on('ready', () => {
+  openWindow()
+  createLoopTask()
+})
 
 app.on('activate', openWindow)
 
