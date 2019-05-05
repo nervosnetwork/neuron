@@ -1,43 +1,198 @@
-import React from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Container, Button, FormControl, InputGroup } from 'react-bootstrap'
 
-import Screen from 'widgets/Screen'
+import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import ScreenButtonRow from 'widgets/ScreenButtonRow'
+import { MnemonicAction } from 'utils/const'
+import { verifyWalletSubmission } from 'utils/validators'
+import { helpersCall, walletsCall } from 'services/UILayer'
 
-import { Routes, MnemonicAction } from 'utils/const'
+export enum WalletWizardPath {
+  Welcome = '/welcome',
+  Mnemonic = '/mnemonic',
+  Submission = '/submission',
+}
 
-import { useNeuronWallet } from 'utils/hooks'
-import { walletsCall } from 'services/UILayer'
-import ScreenMessages from '../ScreenMessages'
+const initState: WithWizardState = {
+  generated: '',
+  imported: '',
+  password: '',
+  confirmPassword: '',
+  name: '',
+}
 
-const buttons = [
-  { label: 'wizard.create-new-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Create}` },
-  { label: 'wizard.import-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Import}` },
+const submissionInputs = [
+  { label: 'password', key: 'password', type: 'password' },
+  { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
+  { label: 'name', key: 'name', type: 'text' },
 ]
 
-const Wizard = () => {
-  const { messages } = useNeuronWallet()
+const Welcome = ({ rootPath }: { rootPath: string }) => {
   const [t] = useTranslation()
-  walletsCall.generateMnemonic()
   const message = 'wizard.create-or-import-your-first-wallet'
+
+  const buttons = useMemo(
+    () => [
+      { label: 'wizard.create-new-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}` },
+      { label: 'wizard.import-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}` },
+    ],
+    [rootPath],
+  )
+
   return (
-    <Screen>
-      <ScreenMessages messages={messages} />
-      <div>
-        <h1>{t(message)}</h1>
-        <ScreenButtonRow>
-          {buttons.map(({ label, href }) => (
-            <Link key={label} className="btn btn-primary" to={href}>
-              {t(label)}
-            </Link>
-          ))}
-        </ScreenButtonRow>
-      </div>
-    </Screen>
+    <div>
+      <h1>{t(message)}</h1>
+      <ScreenButtonRow>
+        {buttons.map(({ label, href }) => (
+          <Link key={label} className="btn btn-primary" to={href}>
+            {t(label)}
+          </Link>
+        ))}
+      </ScreenButtonRow>
+    </div>
   )
 }
 
-Wizard.displayName = 'Wizard'
+Welcome.displayName = 'Welcome'
 
-export default Wizard
+const Mnemonic = ({
+  rootPath,
+  match: {
+    params: { type },
+  },
+  history,
+  state,
+  dispatch,
+}: WizardElementProps<{ type: string }>) => {
+  const { generated, imported } = state
+  const [t] = useTranslation()
+  const isCreate = type === MnemonicAction.Create
+  const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
+  const disableNext = type === MnemonicAction.Verify && !(generated === imported)
+
+  useEffect(() => {
+    if (type === MnemonicAction.Create) {
+      helpersCall
+        .generateMnemonic()
+        .then((res: string) => {
+          dispatch({
+            type: 'generated',
+            payload: res,
+          })
+        })
+        // TODO: Better Error Handle
+        .catch(err => console.error(err))
+    }
+  }, [dispatch, helpersCall])
+
+  const onChange = useCallback(
+    e => {
+      dispatch({
+        type: 'imported',
+        payload: e.target.value,
+      })
+    },
+    [dispatch],
+  )
+  const onNext = useCallback(() => {
+    if (isCreate) {
+      history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
+    } else {
+      history.push(`${rootPath}${WalletWizardPath.Submission}`)
+    }
+  }, [isCreate])
+
+  return (
+    <Container>
+      <h1>{t(message)}</h1>
+      <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
+      <ScreenButtonRow>
+        <Button role="button" onClick={history.goBack}>
+          {t('wizard.back')}
+        </Button>
+        <Button role="button" onClick={onNext} disabled={disableNext}>
+          {t('wizard.next')}
+        </Button>
+      </ScreenButtonRow>
+    </Container>
+  )
+}
+
+Mnemonic.displayName = 'Mnemonic'
+
+const Submission = ({ history, state, dispatch }: WizardElementProps) => {
+  const { name, password, confirmPassword, imported } = state
+  const [t] = useTranslation()
+  const message = 'wizard.set-a-strong-password-to-protect-your-wallet'
+
+  useEffect(() => {
+    dispatch({
+      type: 'name',
+      payload: `wallet @${Math.round(Math.random() * 100)}`,
+    })
+  }, [dispatch])
+
+  const onChange = useCallback(
+    (field: keyof WithWizardState) => {
+      return ({ currentTarget: { value } }: React.FormEvent<{ value: string }>) => {
+        dispatch({
+          type: field,
+          payload: value,
+        })
+      }
+    },
+    [dispatch],
+  )
+
+  const onNext = useCallback(() => walletsCall.importMnemonic({ name, password, mnemonic: imported }), [
+    name,
+    password,
+    imported,
+  ])
+
+  const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
+
+  return (
+    <div>
+      <h1>{t(message)}</h1>
+      {submissionInputs.map(input => (
+        <InputGroup key={input.key}>
+          <InputGroup.Prepend>
+            <InputGroup.Text>{t(`wizard.${input.label}`)}</InputGroup.Text>
+          </InputGroup.Prepend>
+          <FormControl type={input.type} value={state[input.key]} onChange={onChange(input.key)} />
+        </InputGroup>
+      ))}
+      <ScreenButtonRow>
+        <Button role="button" onClick={history.goBack} onKeyPress={history.goBack}>
+          {t('wizard.back')}
+        </Button>
+        <Button role="button" onClick={onNext} disabled={disableNext}>
+          {t('wizard.next')}
+        </Button>
+      </ScreenButtonRow>
+    </div>
+  )
+}
+
+Submission.displayName = 'Submission'
+
+const elements = [
+  {
+    path: WalletWizardPath.Welcome,
+    Component: Welcome,
+  },
+  {
+    path: WalletWizardPath.Mnemonic,
+    params: '/:type',
+    Component: Mnemonic,
+  },
+  {
+    path: WalletWizardPath.Submission,
+    Component: Submission,
+  },
+]
+
+export default withWizard(elements, initState)
