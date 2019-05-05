@@ -7,8 +7,6 @@ import Sidebar from 'containers/Sidebar'
 import MainContent from 'containers/MainContent'
 import Notification from 'containers/Notification'
 import WalletWizard from 'components/WalletWizard'
-import Mnemonic from 'components/Mnemonic'
-import WalletSubmission from 'components/WalletSubmission'
 import WalletDetail from 'components/WalletDetail'
 import Send from 'components/Transfer'
 import Receive from 'components/Receive'
@@ -147,19 +145,6 @@ export const mainContents: CustomRoute[] = [
     path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
-  },
-  {
-    name: `Mnemonic`,
-    path: Routes.Mnemonic,
-    params: `/:type`,
-    exact: false,
-    component: Mnemonic,
-  },
-  {
-    name: `WalletSubmission`,
-    path: Routes.WalletSubmission,
-    exact: true,
-    component: WalletSubmission,
   },
   {
     name: `Terminal`,

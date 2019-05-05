@@ -4,6 +4,7 @@ import { Col, Card, Button, Row, ListGroup, Form, Container } from 'react-bootst
 import { useTranslation } from 'react-i18next'
 
 import { Routes, MnemonicAction } from 'utils/const'
+import { WalletWizardPath } from 'components/WalletWizard'
 import { useNeuronWallet } from 'utils/hooks'
 import { ContentProps } from 'containers/MainContent'
 import { actionCreators } from 'containers/MainContent/reducer'
@@ -15,8 +16,14 @@ import ContextMenuZone from 'widgets/ContextMenuZone'
 import { useToggleDialog, useDeleteWallet, useMenuItems, useWalletToDelete, useHandleConfirm } from './hooks'
 
 const buttons = [
-  { label: 'wizard.create-new-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Create}` },
-  { label: 'wizard.import-wallet', href: `${Routes.Mnemonic}/${MnemonicAction.Import}` },
+  {
+    label: 'wizard.create-new-wallet',
+    href: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+  },
+  {
+    label: 'wizard.import-wallet',
+    href: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+  },
 ]
 
 const Wallets = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {

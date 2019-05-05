@@ -33,7 +33,7 @@ export enum Channel {
 
 export enum Routes {
   Launch = '/',
-  Mnemonic = '/mnemonic',
+  WalletWizard = '/wizard',
   Wallet = '/wallet',
   Send = '/send',
   Receive = '/receive',
@@ -46,8 +46,6 @@ export enum Routes {
   SettingsNetworks = '/settings/networks',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
-  WalletWizard = '/wallets/wizard',
-  WalletSubmission = '/wallets/submission',
   Terminal = '/terminal',
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
