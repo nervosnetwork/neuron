@@ -315,9 +315,7 @@ export default class TransactionsService {
         output.outPointHash = transaction.hash
         output.outPointIndex = index
         output.capacity = o.capacity
-        output.data = o.data!
         output.lock = o.lock
-        output.type = o.type!
         output.lockHash = o.lockHash!
         output.transaction = tx
         output.status = outputStatus
