@@ -1,5 +1,5 @@
 import * as bip32 from 'bip32'
-import AddressType from '../address/type'
+import { AddressType } from '../services/address'
 import { KeysData } from './keystore'
 
 // 360 is just a tentative value, and we also need a coin type of mainnet.

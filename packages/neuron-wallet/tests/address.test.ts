@@ -1,4 +1,4 @@
-import Address from '../src/address/index'
+import Address from '../src/services/address'
 import ckbCore from '../src/core'
 
 describe('Key tests', () => {

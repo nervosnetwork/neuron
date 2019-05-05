@@ -23,7 +23,7 @@ interface Options {
 }
 
 const userDataPath = app.getPath('userData')
-const storePath = env.isDevMode ? `${userDataPath}/dev` : userDataPath
+const storePath = env.isDevMode ? `${userDataPath}/dev/wallets` : `${userDataPath}/wallets`
 const WalletIDKey = 'WalletID'
 const ActiveWalletID = 'ActiveID'
 
