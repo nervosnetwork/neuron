@@ -33,7 +33,7 @@ export enum NetworksMethod {
   Update = 'update',
   Delete = 'delete',
   Activate = 'activate',
-  ActiveOne = 'activeOne',
+  ActiveId = 'activeId',
   Status = 'status',
 }
 

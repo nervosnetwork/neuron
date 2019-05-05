@@ -1,23 +1,38 @@
 import * as path from 'path'
 import app from './app'
+import { NetworkWithID } from './services/networks'
 
 const isDevMode = !app.isPackaged
-const env = {
+interface ENV {
+  isDevMode: boolean
+  mainURL: string
+  remote: string
+  presetNetwors: {
+    active: 'testnet'
+    list: NetworkWithID[]
+  }
+}
+const env: ENV = {
   isDevMode,
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
-  defaultNetworks: [
-    {
-      name: 'Testnet',
-      remote: 'http://localhost:8114',
-      type: 0,
-    },
-    {
-      name: 'Local',
-      remote: 'http://localhost:8114',
-      type: 1,
-    },
-  ],
+  presetNetwors: {
+    active: 'testnet',
+    list: [
+      {
+        id: 'testnet',
+        name: 'Testnet',
+        remote: 'http://localhost:8114',
+        type: 0,
+      },
+      {
+        id: 'local',
+        name: 'Local',
+        remote: 'http://localhost:8114',
+        type: 1,
+      },
+    ],
+  },
 }
 
 export default env

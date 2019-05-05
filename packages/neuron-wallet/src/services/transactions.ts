@@ -211,24 +211,24 @@ export default class TransactionsService {
     return false
   }
 
-  // when after sent:
-  // 1. don't have before, output = sent, input = pending
-  // 2. have before, do nothing
+  // After the tx is sent:
+  // 1. If the tx is not persisted before sending, output = sent, input = pending
+  // 2. If the tx is already persisted before sending, do nothing
   public static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
     const txEntity: TransactionEntity | undefined = await getConnection()
       .getRepository(TransactionEntity)
       .findOne(transaction.hash)
 
     if (txEntity) {
-      // nothing to do if exist before
+      // nothing to do if exists already
       return txEntity
     }
     return TransactionsService.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
   }
 
-  // when after fetch:
-  // 1. don't have before, output = live, input = dead
-  // 2. have before, output = live, input = dead
+  // After the tx is fetched:
+  // 1. If the tx is not persisted before fetching, output = live, input = dead
+  // 2. If the tx is already persisted before fetching, output = live, input = dead
   public static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
     const connection = getConnection()
     const txEntity: TransactionEntity | undefined = await connection
@@ -355,7 +355,7 @@ export default class TransactionsService {
 
   // update previousOutput's status to 'dead' if found
   // calculate output lockHash, input lockHash and capacity
-  // when sent a transaction, use TxSaveType.Sent
+  // when send a transaction, use TxSaveType.Sent
   // when fetch a transaction, use TxSaveType.Fetch
   public static convertTransactionAndSave = async (
     transaction: Transaction,
