@@ -73,6 +73,8 @@ enum OutputStatus {
 }
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
+/* eslint no-await-in-loop: "off" */
+/* eslint no-restricted-syntax: "off" */
 export default class TransactionsService {
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
     const skip = (params.pageNo - 1) * params.pageSize
@@ -209,8 +211,6 @@ export default class TransactionsService {
     return false
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "off" */
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
@@ -286,8 +286,9 @@ export default class TransactionsService {
     tx.witnesses = transaction.witnesses!
     tx.inputs = []
     tx.outputs = []
-    await connection.manager.save(tx)
-    await transaction.inputs!.forEach(async i => {
+    const inputs: InputEntity[] = []
+    const previousOutputs: OutputEntity[] = []
+    for (const i of transaction.inputs!) {
       const input = new InputEntity()
       input.outPointHash = i.previousOutput.hash
       input.outPointIndex = i.previousOutput.index
@@ -295,7 +296,7 @@ export default class TransactionsService {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
-      await connection.manager.save(input)
+      inputs.push(input)
 
       const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
         outPointHash: input.previousOutput().hash,
@@ -304,27 +305,30 @@ export default class TransactionsService {
       if (previousOutput) {
         // update previousOutput status here
         previousOutput.status = inputStatus
-        await connection.manager.save(previousOutput)
+        previousOutputs.push(previousOutput)
       }
-    })
-    await transaction.outputs!.forEach(async (o, index) => {
-      const output = new OutputEntity()
-      output.outPointHash = transaction.hash
-      output.outPointIndex = index
-      output.capacity = o.capacity
-      output.data = o.data!
-      output.lock = o.lock
-      output.type = o.type!
-      output.lockHash = o.lockHash!
-      output.transaction = tx
-      output.status = outputStatus
-      await connection.manager.save(output)
-    })
+    }
 
+    const outputs: OutputEntity[] = await Promise.all(
+      transaction.outputs!.map(async (o, index) => {
+        const output = new OutputEntity()
+        output.outPointHash = transaction.hash
+        output.outPointIndex = index
+        output.capacity = o.capacity
+        output.data = o.data!
+        output.lock = o.lock
+        output.type = o.type!
+        output.lockHash = o.lockHash!
+        output.transaction = tx
+        output.status = outputStatus
+        return output
+      }),
+    )
+
+    await connection.manager.save([tx, ...inputs, ...previousOutputs, ...outputs])
     return tx
   }
 
-  /* eslint no-await-in-loop: "warn" */
   // NO parallel
   public static loadTransactionsHistoryFromChain = async (lockHashes: string[]) => {
     // TODO: to => get_tip_block_number
