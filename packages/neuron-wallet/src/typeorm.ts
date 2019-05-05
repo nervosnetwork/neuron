@@ -1,4 +1,4 @@
-import { createConnection, getConnectionOptions } from 'typeorm'
+import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import * as path from 'path'
 import app from './app'
 
@@ -9,9 +9,10 @@ import SyncInfo from './entities/SyncInfo'
 
 import { InitMigration1556975381415 } from './migration/1556975381415-InitMigration'
 
-const dbPath = path.join(app.getPath('userData'), 'cell.sqlite')
+const userDataPath = app.getPath('userData')
 
-const connectOptions = async () => {
+const connectOptions = async (networkName: string) => {
+  const dbPath = path.join(userDataPath, `cell-${networkName}.sqlite`)
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
     database: dbPath,
@@ -22,25 +23,20 @@ const connectOptions = async () => {
   return connectionOptions
 }
 
-export const generateConnection = async (
-  func: Function,
-  errorFunc: Function = (error: any) => console.error(error),
-) => {
-  const connectionOptions = await connectOptions()
+export const initConnection = async (networkName: string) => {
+  // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
+  try {
+    await getConnection().close()
+  } catch (e) {
+    // console.error(e)
+  }
+  const connectionOptions = await connectOptions(networkName)
 
-  createConnection(connectionOptions)
-    .then(async (connection: any) => {
-      await func(connection)
-    })
-    .catch(errorFunc())
-}
-
-export const initConnection = async () => {
-  const connectionOptions = await connectOptions()
-
-  createConnection(connectionOptions)
-    .then()
-    .catch((error: any) => console.error(error))
+  try {
+    await createConnection(connectionOptions)
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 export default initConnection
