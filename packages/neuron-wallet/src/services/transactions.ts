@@ -211,9 +211,9 @@ export default class TransactionsService {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "off" */
-  // when after sent:
-  // 1. don't have before, output = sent, input = pending
-  // 2. have before, do nothing
+  // After the tx is sent:
+  // 1. If the tx is not persisted before sending, output = sent, input = pending
+  // 2. If the tx is already persisted before sending, do nothing
   public static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
     const txEntity: TransactionEntity | undefined = await getConnection()
       .getRepository(TransactionEntity)
@@ -226,9 +226,9 @@ export default class TransactionsService {
     return TransactionsService.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
   }
 
-  // when after fetch:
-  // 1. don't have before, output = live, input = dead
-  // 2. have before, output = live, input = dead
+  // After the tx is fetched:
+  // 1. If the tx is not persisted before fetching, output = live, input = dead
+  // 2. If the tx is already persisted before fetching, output = live, input = dead
   public static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
     const connection = getConnection()
     const txEntity: TransactionEntity | undefined = await connection
