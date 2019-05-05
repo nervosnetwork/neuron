@@ -13,7 +13,7 @@ export interface Network extends RawNetwork {
 }
 
 export interface Chain {
-  network: Network
+  networkId: string
   connectStatus: ConnectStatus
   tipBlockNumber?: number
   transaction: Transaction
@@ -27,11 +27,7 @@ export interface Chain {
 }
 
 const chainState: Chain = {
-  network: {
-    id: '',
-    name: '',
-    remote: '',
-  },
+  networkId: '',
   connectStatus: ConnectStatus.Offline,
   tipBlockNumber: undefined,
   transaction: {

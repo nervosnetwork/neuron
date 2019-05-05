@@ -25,12 +25,12 @@ describe(`Store`, () => {
   })
 
   it('save a: 1', async () => {
-    const success = await store.save('a', 1)
+    const success = await store.write('a', 1)
     expect(success).toBe(true)
   })
 
   it('save the same value', async () => {
-    const success = await store.save('a', 1)
+    const success = await store.write('a', 1)
     expect(success).toBe('Same value')
   })
 
@@ -41,10 +41,21 @@ describe(`Store`, () => {
 
   it('update to a: 2', async () => {
     const newValue = 2
-    const success = await store.save('a', newValue)
+    const success = await store.write('a', newValue)
     if (!success) throw new Error('Failed save')
     const value = await store.read('a')
     expect(value).toBe(newValue)
+  })
+
+  it('save b: 1 synchronously', async () => {
+    store.writeSync('b', 1)
+    const value = await store.read('b')
+    expect(value).toBe(1)
+  })
+
+  it('read b: 1 synchronously', () => {
+    const value = store.readSync('b')
+    expect(value).toBe(1)
   })
 
   it('delete file', async () => {
