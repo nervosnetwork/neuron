@@ -42,7 +42,7 @@ export default class Output extends BaseEntity {
     }
   }
 
-  @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs)
+  @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
   public toInterface(): Cell {

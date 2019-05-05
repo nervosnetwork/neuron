@@ -327,6 +327,18 @@ export default class TransactionsService {
     return tx
   }
 
+  // delete transaction and it's inputs and outputs
+  public static deleteByBlockNumbers = async (blockNumbers: string[]) => {
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(TransactionEntity)
+      .where('blockNumber in (:...blockNumbers)', {
+        blockNumbers,
+      })
+      .execute()
+  }
+
   // NO parallel
   public static loadTransactionsHistoryFromChain = async (lockHashes: string[]) => {
     // TODO: to => get_tip_block_number
