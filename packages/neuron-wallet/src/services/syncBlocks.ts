@@ -223,13 +223,16 @@ export default class SyncBlocksService {
   async resolveTx(transaction: Transaction) {
     const outputs: Cell[] = this.filterOutputs(transaction.outputs!)
     const anyInput: boolean = await SyncBlocksService.anyInput(transaction.inputs!)
-    if (outputs.length > 0 || anyInput) {
+
+    if (outputs.length > 0) {
       // found addresses used
       const addresses: string[] = outputs.map(output => {
         return TransactionsService.lockScriptToAddress(output.lock)
       })
       addressesUsedSubject.next(addresses)
+    }
 
+    if (outputs.length > 0 || anyInput) {
       // save fetched transactions
       await TransactionsService.saveFetchTx(transaction)
     }
