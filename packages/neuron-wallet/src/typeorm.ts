@@ -1,6 +1,7 @@
 import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import * as path from 'path'
 import app from './app'
+import env from './env'
 
 import Transaction from './entities/Transaction'
 import Input from './entities/Input'
@@ -11,11 +12,18 @@ import { InitMigration1556975381415 } from './migration/1556975381415-InitMigrat
 
 const userDataPath = app.getPath('userData')
 
+const dbPath = (networkName: string): string => {
+  const name = `cell-${networkName}.sqlite`
+  if (env.isDevMode) {
+    return path.join(userDataPath, 'dev', name)
+  }
+  return path.join(userDataPath, name)
+}
+
 const connectOptions = async (networkName: string) => {
-  const dbPath = path.join(userDataPath, `cell-${networkName}.sqlite`)
   const connectionOptions = await getConnectionOptions()
   Object.assign(connectionOptions, {
-    database: dbPath,
+    database: dbPath(networkName),
     entities: [Transaction, Input, Output, SyncInfo],
     migrations: [InitMigration1556975381415],
   })
