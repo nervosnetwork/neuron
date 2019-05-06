@@ -2,7 +2,6 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import NetworksController, { NetworksMethod } from '../controllers/networks'
 import windowManage from './windowManage'
 import WalletChannel from '../channel/wallet'
-import initConnection from '../typeorm'
 import nodeService from '../services/node'
 import { Channel } from './const'
 
@@ -25,8 +24,6 @@ const initApp = async () => {
   nodeService.start()
   // TODO: this function should be moved to somewhere syncing data
   syncConnectStatus()
-  // TODO: call this function after get network name
-  initConnection('testnet').then()
   WalletChannel.start()
   const activeId = await NetworksController.service.activeId()
   if (!activeId) {
