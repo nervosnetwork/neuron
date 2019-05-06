@@ -4,6 +4,7 @@ import Screen from 'widgets/Screen'
 import { Spinner } from 'widgets/Loading'
 import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
+import { WalletWizardPath } from 'components/WalletWizard'
 
 const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
@@ -16,7 +17,7 @@ const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) =
     if (id) {
       history.push(Routes.Wallet)
     } else {
-      history.push(Routes.WalletWizard)
+      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     }
   }, [networks.length, id, history])
 
