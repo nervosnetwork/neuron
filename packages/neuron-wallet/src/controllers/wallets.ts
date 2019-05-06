@@ -11,6 +11,7 @@ export enum WalletsMethod {
   GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
+  Create = 'create',
   Update = 'update',
   Delete = 'delete',
   GetActive = 'getActive',
@@ -93,6 +94,29 @@ class WalletsController {
         msg: e.message,
       }
     }
+  }
+
+  public static create({
+    name,
+    password,
+    mnemonic,
+    receivingAddressNumber = 17,
+    changeAddressNumber = 3,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+    receivingAddressNumber: number
+    changeAddressNumber: number
+  }): ChannelResponse<WalletData> {
+    const res = WalletsController.importMnemonic({
+      name,
+      password,
+      mnemonic,
+      receivingAddressNumber,
+      changeAddressNumber,
+    })
+    return res
   }
 
   public static importKeystore = ({

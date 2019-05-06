@@ -18,6 +18,7 @@ export enum WalletsMethod {
   GenerateMnemonic = 'generateMnemonic',
   ImportMnemonic = 'importMnemonic',
   ImportKeystore = 'importKeystore',
+  Create = 'create',
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
@@ -143,6 +144,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   generateMnemonic: () => void
   importKeystore: (params: { name: string; keystore: string; password: string }) => void
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
+  create: (params: { name: string; mnemonic: string; password: string }) => void
   update: (params: { id: string; password: string; newPassword?: string; name?: string }) => void
   delete: (params: { id: string; password: string }) => void
   export: (id: string) => void
