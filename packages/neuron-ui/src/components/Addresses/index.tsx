@@ -98,7 +98,7 @@ const Addresses = (props: React.PropsWithoutRef<RouteComponentProps>) => {
           ...header,
           label: t(header.label),
         }))}
-        items={[...changeAddresses, ...receivingAddresses]}
+        items={[...receivingAddresses, ...changeAddresses]}
         pageNo={pageNo}
         pageSize={pageSize}
         totalCount={totalCount}
