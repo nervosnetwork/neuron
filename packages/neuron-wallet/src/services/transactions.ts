@@ -535,4 +535,17 @@ export default class TransactionsService {
 
     return lockHash
   }
+
+  public static lockScriptToAddress = (lock: Script): string => {
+    const blake160: string = lock.args![0]
+    return TransactionsService.blake160ToAddress(blake160)
+  }
+
+  public static blake160ToAddress = (blake160: string): string => {
+    return ckbCore.utils.bech32Address(blake160, {
+      prefix: ckbCore.utils.AddressPrefix.Testnet,
+      type: ckbCore.utils.AddressType.BinIdx,
+      binIdx: ckbCore.utils.AddressBinIdx.P2PH,
+    })
+  }
 }
