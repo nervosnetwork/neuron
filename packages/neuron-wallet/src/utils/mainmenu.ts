@@ -43,7 +43,6 @@ const getMenuTemplate = () => {
     },
     {
       label: i18n.t('mainmenu.edit.label'),
-      role: 'editMenu',
       submenu: [
         {
           label: i18n.t('mainmenu.edit.cut'),
@@ -70,7 +69,6 @@ const getMenuTemplate = () => {
     },
     {
       label: i18n.t('mainmenu.window.label'),
-      role: 'windowMenu',
       submenu: [
         {
           label: i18n.t('mainmenu.window.minimize'),
@@ -128,7 +126,7 @@ const getMenuTemplate = () => {
           },
         },
       ],
-    })
+    } as MenuItemConstructorOptions)
   }
 
   return menuTemplate
