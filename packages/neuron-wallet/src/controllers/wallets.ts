@@ -67,8 +67,8 @@ class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 17,
-    changeAddressNumber = 3,
+    receivingAddressNumber = 20,
+    changeAddressNumber = 10,
   }: {
     name: string
     password: string
@@ -100,8 +100,8 @@ class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 17,
-    changeAddressNumber = 3,
+    receivingAddressNumber = 20,
+    changeAddressNumber = 10,
   }: {
     name: string
     password: string
@@ -123,8 +123,8 @@ class WalletsController {
     name,
     password,
     keystore,
-    receivingAddressNumber = 17,
-    changeAddressNumber = 3,
+    receivingAddressNumber = 20,
+    changeAddressNumber = 10,
   }: {
     name: string
     password: string
