@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron'
 import WalletsController from '../controllers/wallets'
 import NetworksController from '../controllers/networks'
-import { Channel } from './const'
+import { Channel } from '../utils/const'
 import { ResponseCode } from '../controllers'
 
 const initWindow = async (win: BrowserWindow) => {
