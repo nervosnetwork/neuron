@@ -5,7 +5,7 @@ import initApp from './utils/initApp'
 import createWindow from './utils/createWindow'
 import i18n from './utils/i18n'
 import mainmenu from './utils/mainmenu'
-import createLoopTask from './utils/createLoopTask'
+import createLoopTask from './startup/loopTask/create'
 
 let mainWindow: Electron.BrowserWindow | null
 

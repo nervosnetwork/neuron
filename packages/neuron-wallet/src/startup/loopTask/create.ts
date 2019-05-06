@@ -1,7 +1,9 @@
 import { BrowserWindow } from 'electron'
-import env from '../env'
-import SyncBlocksService from '../services/syncBlocks'
-import initConnection from '../typeorm'
+import path from 'path'
+import SyncBlocksService from '../../services/syncBlocks'
+import initConnection from '../../typeorm'
+
+const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
 // create a background task to sync transactions
 // this task is a renderer process
@@ -15,7 +17,7 @@ const createLoopTask = () => {
     },
   })
 
-  loopWindow.loadURL(env.mainURL)
+  loopWindow.loadURL(loadURL)
 
   loopWindow.on('ready-to-show', async () => {
     loopWindow!.hide()
