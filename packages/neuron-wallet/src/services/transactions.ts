@@ -160,6 +160,15 @@ export default class TransactionsService {
     })
   }
 
+  public static getBalanceByAddresses = async (addresses: string[]): Promise<string> => {
+    const lockHashes: string[] = await Promise.all(
+      addresses.map(async addr => {
+        return TransactionsService.addressToLockHash(addr)
+      }),
+    )
+    return CellsService.getBalance(lockHashes)
+  }
+
   public static get = async (hash: string): Promise<Transaction | undefined> => {
     const tx = await getConnection()
       .getRepository(TransactionEntity)

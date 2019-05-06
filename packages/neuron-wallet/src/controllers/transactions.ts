@@ -44,6 +44,24 @@ export default class TransactionsController {
     }
   }
 
+  public static getBalanceByAddresses = async (addresses: string[]): Promise<ChannelResponse<string>> => {
+    let balance: string
+
+    try {
+      balance = await TransactionsService.getBalanceByAddresses(addresses)
+    } catch (e) {
+      return {
+        status: ResponseCode.Fail,
+        msg: e.toString(),
+      }
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: balance,
+    }
+  }
+
   public static get = async (hash: string): Promise<ChannelResponse<Transaction>> => {
     const transaction = await TransactionsService.get(hash)
     if (!transaction) {
