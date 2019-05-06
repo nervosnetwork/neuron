@@ -87,12 +87,18 @@ const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDis
     UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
+          case WalletsMethod.Create:
           case WalletsMethod.ImportMnemonic:
           case WalletsMethod.Update: {
-            const content =
-              method === WalletsMethod.ImportMnemonic
-                ? i18n.t('messages.wallet-imported-successfully', { name: args.result.name })
-                : i18n.t('messages.wallet-updated-successfully', { name: args.result.name })
+            let template = ''
+            if (method === WalletsMethod.Create) {
+              template = 'messages.wallet-created-successfully'
+            } else if (method === WalletsMethod.Update) {
+              template = 'messages.wallet-updated-successfully'
+            } else {
+              template = 'messages.wallet-imported-successfully'
+            }
+            const content = i18n.t(template, { name: args.result.name })
             const time = new Date().getTime()
             dispatch({
               type: ProviderActions.AddMessage,

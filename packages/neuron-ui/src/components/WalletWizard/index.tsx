@@ -100,7 +100,7 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
-      history.push(`${rootPath}${WalletWizardPath.Submission}`)
+      history.push(`${rootPath}${WalletWizardPath.Submission}/${type === MnemonicAction.Verify ? 'create' : 'import'}`)
     }
   }, [isCreate])
 
@@ -122,7 +122,14 @@ const Mnemonic = ({
 
 Mnemonic.displayName = 'Mnemonic'
 
-const Submission = ({ history, state, dispatch }: WizardElementProps) => {
+const Submission = ({
+  match: {
+    params: { type },
+  },
+  history,
+  state,
+  dispatch,
+}: WizardElementProps<{ type: string }>) => {
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
   const message = 'wizard.set-a-strong-password-to-protect-your-wallet'
@@ -146,11 +153,18 @@ const Submission = ({ history, state, dispatch }: WizardElementProps) => {
     [dispatch],
   )
 
-  const onNext = useCallback(() => walletsCall.importMnemonic({ name, password, mnemonic: imported }), [
-    name,
-    password,
-    imported,
-  ])
+  const onNext = useCallback(() => {
+    const p = {
+      name,
+      password,
+      mnemonic: imported,
+    }
+    if (type === 'create') {
+      walletsCall.create(p)
+    } else {
+      walletsCall.importMnemonic(p)
+    }
+  }, [type, name, password, imported])
 
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 
@@ -191,6 +205,7 @@ const elements = [
   },
   {
     path: WalletWizardPath.Submission,
+    params: '/:type',
     Component: Submission,
   },
 ]
