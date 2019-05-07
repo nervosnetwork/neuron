@@ -1,9 +1,9 @@
 import { distinctUntilChanged } from 'rxjs/operators'
 import NetworksController, { NetworksMethod } from '../controllers/networks'
-import windowManage from './windowManage'
+import windowManage from '../utils/windowManage'
 import WalletChannel from '../channel/wallet'
 import nodeService from '../services/node'
-import { Channel } from './const'
+import { Channel } from '../utils/const'
 
 const syncConnectStatus = () => {
   nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
