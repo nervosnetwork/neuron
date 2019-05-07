@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import { Subject } from 'rxjs'
 import { Script, OutPoint, Cell } from './cells'
 import TransactionsService, { Input, Transaction } from './transactions'
 import OutputEntity from '../entities/Output'
@@ -17,6 +18,9 @@ export interface Block {
   header: BlockHeader
   transactions: Transaction[]
 }
+
+// subscribe this Subject to monitor which addresses are used
+export const addressesUsedSubject = new Subject()
 
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "warn" */
@@ -217,15 +221,25 @@ export default class SyncBlocksService {
 
   // resolve single transaction
   async resolveTx(transaction: Transaction) {
-    const anyOutput: boolean = this.anyOutput(transaction.outputs!)
+    const outputs: Cell[] = this.filterOutputs(transaction.outputs!)
     const anyInput: boolean = await SyncBlocksService.anyInput(transaction.inputs!)
-    if (anyOutput || anyInput) {
-      TransactionsService.saveFetchTx(transaction)
+
+    if (outputs.length > 0) {
+      // found addresses used
+      const addresses: string[] = outputs.map(output => {
+        return TransactionsService.lockScriptToAddress(output.lock)
+      })
+      addressesUsedSubject.next(addresses)
+    }
+
+    if (outputs.length > 0 || anyInput) {
+      // save fetched transactions
+      await TransactionsService.saveFetchTx(transaction)
     }
   }
 
-  anyOutput(outputs: Cell[]): boolean {
-    return !!outputs.find(output => {
+  filterOutputs(outputs: Cell[]): Cell[] {
+    return outputs.filter(output => {
       return this.checkLockScript(output.lock!)
     })
   }
