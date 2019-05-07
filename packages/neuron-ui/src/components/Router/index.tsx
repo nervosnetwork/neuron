@@ -73,6 +73,7 @@ export const mainContents: CustomRoute[] = [
   {
     name: `Send`,
     path: Routes.Send,
+    params: `/:address?`,
     exact: false,
     component: Send,
   },

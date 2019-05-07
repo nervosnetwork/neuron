@@ -21,12 +21,16 @@ export const useNetworkEditor = (
 ) => {
   const [name, setName] = useState(currentName)
   const [remote, setRemote] = useState(currentRemote)
-
-  return {
-    initiate: ({ name: initName, remote: initRemote }: { name: string; remote: string }) => {
+  const initialize = useCallback(
+    ({ name: initName, remote: initRemote }: { name: string; remote: string }) => {
       setName(initName)
       setRemote(initRemote)
     },
+    [setName, setRemote],
+  )
+
+  return {
+    initialize,
     name: {
       value: name,
       onChange: (e: React.FormEvent<Pick<any, string>>) => {
@@ -48,12 +52,12 @@ type DispatchType = React.Dispatch<{
   payload?: any
 }>
 
-export const useInitiate = (id: string, networks: Network[], editor: EditorType, dispatch: DispatchType) => {
+export const useInitialize = (id: string, networks: Network[], initialize: Function, dispatch: DispatchType) => {
   useEffect(() => {
     if (id !== 'new') {
       const network = networks.find(n => n.id === id)
       if (network) {
-        editor.initiate(network)
+        initialize(network)
       } else {
         dispatch({
           type: MainActions.ErrorMessage,
@@ -71,7 +75,7 @@ export const useInitiate = (id: string, networks: Network[], editor: EditorType,
         },
       })
     }
-  }, [dispatch, id])
+  }, [dispatch, id, initialize, networks])
 }
 
 export const useInputs = (editor: EditorType) => {
@@ -119,7 +123,7 @@ export const useHandleSubmit = (
   }, [id, name, remote, networks, dispatch])
 
 export default {
-  useInitiate,
+  useInitialize,
   useInputs,
   useNetworkEditor,
   useIsInputsValid,

@@ -85,7 +85,7 @@ const Mnemonic = ({
         // TODO: Better Error Handle
         .catch(err => console.error(err))
     }
-  }, [dispatch, helpersCall])
+  }, [dispatch, type])
 
   const onChange = useCallback(
     e => {
@@ -102,7 +102,7 @@ const Mnemonic = ({
     } else {
       history.push(`${rootPath}${WalletWizardPath.Submission}/${type === MnemonicAction.Verify ? 'create' : 'import'}`)
     }
-  }, [isCreate])
+  }, [isCreate, history, rootPath, type])
 
   return (
     <Container>

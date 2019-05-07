@@ -1,7 +1,10 @@
-import React, { useCallback, useEffect } from 'react'
+import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
+
+import TransferItemList from 'components/TransferItemList'
+import TransferConfirm from 'components/TransferConfirm'
 
 import Dialog from 'widgets/Dialog'
 import QRScanner from 'widgets/QRScanner'
@@ -9,123 +12,47 @@ import InlineInputWithDropdown from 'widgets/InlineInput/InlineInputWithDropdown
 import { Spinner } from 'widgets/Loading'
 
 import { ContentProps } from 'containers/MainContent'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import initState from 'containers/MainContent/state'
-import UILayer, { TransferItem } from 'services/UILayer'
-import { CapacityUnit, PlaceHolders, Channel, Routes } from 'utils/const'
-import TransferItemList from '../TransferItemList'
-import TransferConfirm from '../TransferConfirm'
+import { useOnDialogCancel } from 'containers/MainContent/hooks'
+import { PlaceHolders } from 'utils/const'
 
-const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+import {
+  useUpdateTransferItem,
+  useOnSubmit,
+  useOnPasswordChange,
+  useOnConfirm,
+  useOnItemChange,
+  useDropdownItems,
+  useInitialize,
+} from './hooks'
+
+const Transfer = ({
+  transfer,
+  dispatch,
+  password,
+  dialog,
+  errorMsgs,
+  history,
+  match: {
+    params: { address },
+  },
+}: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
-  const { transfer, dispatch, password, dialog, errorMsgs, history } = props
 
-  useEffect(() => {
-    UILayer.on(Channel.SendCapacity, (_e: Event, args: ChannelResponse<string>) => {
-      if (args.status) {
-        history.push(`${Routes.Transaction}/${args.result}`)
-      } else {
-        dispatch({
-          type: MainActions.UpdateTransfer,
-          payload: {
-            submitting: false,
-          },
-        })
-        dispatch({
-          type: MainActions.ErrorMessage,
-          payload: { transfer: args.msg },
-        })
-      }
-    })
-    return () => {
-      UILayer.removeAllListeners(Channel.SendCapacity)
-      dispatch({
-        type: MainActions.UpdateTransfer,
-        payload: initState.transfer,
-      })
-    }
-  }, [dispatch, history])
+  const updateTransferItem = useUpdateTransferItem(dispatch)
 
-  const updateTransferItem = useCallback(
-    (field: string) => (idx: number) => (value: string) => {
-      dispatch({
-        type: MainActions.UpdateItemInTransfer,
-        payload: {
-          idx,
-          item: {
-            [field]: value,
-          },
-        },
-      })
-    },
-    [dispatch],
-  )
+  const onSubmit = useOnSubmit(dispatch)
 
-  const onSubmit = useCallback(
-    (items: TransferItem[]) => () => {
-      dispatch(actionCreators.submitTransfer(items))
-    },
-    [dispatch],
-  )
+  const onPasswordChange = useOnPasswordChange(dispatch)
 
-  const onPswChange = useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      dispatch({
-        type: MainActions.UpdatePassword,
-        payload: e.currentTarget.value,
-      })
-    },
-    [dispatch],
-  )
+  const onConfirm = useOnConfirm(dispatch)
 
-  const onConfirm = useCallback(
-    (items: TransferItem[], pwd: string) => () => {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open: false,
-        },
-      })
-      dispatch({
-        type: MainActions.UpdatePassword,
-        payload: '',
-      })
-      setTimeout(() => {
-        dispatch(
-          actionCreators.confirmTransfer({
-            items,
-            password: pwd,
-          }),
-        )
-      }, 10)
-    },
-    [dispatch],
-  )
+  const onCancel = useOnDialogCancel(dispatch)
 
-  const onCancel = useCallback(() => {
-    dispatch({
-      type: MainActions.SetDialog,
-      payload: {
-        open: false,
-      },
-    })
-  }, [dispatch])
+  const onItemChange = useOnItemChange(updateTransferItem)
 
-  const onItemChange = (field: string, idx: number) => (e: React.FormEvent<{ value: string }>) => {
-    updateTransferItem(field)(idx)(e.currentTarget.value)
-  }
+  const dropdownItems = useDropdownItems(updateTransferItem)
 
-  const dropdownItems = useCallback(
-    (idx: number) =>
-      Object.values(CapacityUnit)
-        .filter(unit => typeof unit === 'string')
-        .map((unit: string) => ({
-          label: unit.toUpperCase(),
-          key: unit,
-          onClick: () => updateTransferItem('unit')(idx)(unit),
-        })),
-    [updateTransferItem],
-  )
+  useInitialize(address, dispatch, history, updateTransferItem)
 
   const disabled = transfer.submitting && !errorMsgs.transfer
 
@@ -195,7 +122,7 @@ const Transfer = (props: React.PropsWithoutRef<ContentProps & RouteComponentProp
           title={t('send.confirm-password')}
           message={<TransferItemList items={transfer.items} />}
           password={password}
-          onChange={onPswChange}
+          onChange={onPasswordChange}
           onSubmit={onConfirm(transfer.items, password)}
           onCancel={onCancel}
         />
