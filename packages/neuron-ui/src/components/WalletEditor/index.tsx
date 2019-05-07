@@ -4,6 +4,7 @@ import { Card, Form, Button, Col, Row } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { ContentProps } from 'containers/MainContent'
+import { useOnDialogCancel } from 'containers/MainContent/hooks'
 import InlineInput, { InputProps } from 'widgets/InlineInput'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 import { useNeuronWallet } from 'utils/hooks'
@@ -11,11 +12,13 @@ import Dialog from 'widgets/Dialog'
 
 import { useWalletEditor, useInputs, useAreParamsValid, useToggleDialog } from './hooks'
 
-export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
-  const { match, dialog, dispatch } = props
-  const {
+export default ({
+  dialog,
+  dispatch,
+  match: {
     params: { id },
-  } = match
+  },
+}: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
   const [t] = useTranslation()
   const {
     settings: { wallets },
@@ -29,10 +32,11 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
   }
 
   const editor = useWalletEditor()
+  const { initialize } = editor
 
   useEffect(() => {
-    editor.initiate(wallet.name)
-  }, [id])
+    initialize(wallet.name)
+  }, [id, initialize, wallet.name])
 
   const inputs: InputProps[] = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
@@ -57,7 +61,9 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
         name: editor.name.value,
       }),
     )
-  }, [dispatch, toggleDialog])
+  }, [editor.name.value, editor.newPassword.value, editor.password.value, wallet.id, dispatch, toggleDialog])
+
+  const onCancel = useOnDialogCancel(dispatch)
 
   return (
     <Card>
@@ -72,12 +78,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
           {t('common.save')}
         </Button>
       </Card.Body>
-      <Dialog
-        open={dialog.open}
-        onClick={() => {
-          toggleDialog(false)
-        }}
-      >
+      <Dialog open={dialog.open} onClick={onCancel}>
         <Card
           onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
             e.preventDefault()
@@ -97,7 +98,7 @@ export default (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<
               <Button variant="danger" onClick={handleConfirm} disabled={editor.password.value === ''}>
                 {t('common.confirm')}
               </Button>
-              <Button variant="light" onClick={() => toggleDialog(false)}>
+              <Button variant="light" onClick={onCancel}>
                 {t('common.cancel')}
               </Button>
             </Card.Footer>

@@ -43,7 +43,7 @@ class Store extends EventEmitter {
           }
           resolve(content)
         } catch (parseErr) {
-          console.error('\x1b[33m%s\x1b[0m', `Failed to parse data, backup to ${this.location}.brk and initiate data`)
+          console.error('\x1b[33m%s\x1b[0m', `Failed to parse data, backup to ${this.location}.brk and initialize data`)
           this.backup(data)
           this.init()
           reject(parseErr)

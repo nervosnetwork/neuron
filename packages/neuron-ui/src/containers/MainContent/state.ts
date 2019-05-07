@@ -1,23 +1,6 @@
 import { CapacityUnit } from 'utils/const'
 
 export const initState = {
-  mnemonic: {
-    generated: '',
-    imported: '',
-    name: '',
-    password: '',
-    confirmPassword: '',
-  },
-  tempWallet: {
-    name: '',
-    password: '',
-    mnemonic: '',
-    keystore: '',
-  },
-  createWallet: {
-    name: '',
-    password: '',
-  },
   transfer: {
     items: [
       {

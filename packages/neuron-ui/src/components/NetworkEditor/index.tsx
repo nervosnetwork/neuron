@@ -7,7 +7,7 @@ import { ContentProps } from 'containers/MainContent'
 
 import InlineInput, { InputProps } from 'widgets/InlineInput'
 import { useNeuronWallet } from 'utils/hooks'
-import { useInitiate, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
+import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
 export interface RawNetwork {
   name: string
@@ -29,7 +29,7 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
   } = useNeuronWallet()
   const [t] = useTranslation()
   const inputs: InputProps[] = useInputs(editor)
-  useInitiate(id, networks, editor, dispatch)
+  useInitialize(id, networks, editor.initialize, dispatch)
 
   const cachedNetworks = useRef(networks)
   const cachedNetwork = cachedNetworks.current.find(network => network.id === id)

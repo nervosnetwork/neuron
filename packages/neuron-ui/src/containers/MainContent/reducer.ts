@@ -12,15 +12,6 @@ export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>
 export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
-    case MainActions.UpdateMnemonic: {
-      return {
-        ...state,
-        mnemonic: {
-          ...state.mnemonic,
-          ...action.payload,
-        },
-      }
-    }
     case MainActions.AddItemInTransfer: {
       return {
         ...state,

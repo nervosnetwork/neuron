@@ -7,10 +7,14 @@ export const useWalletEditor = () => {
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
-  return {
-    initiate: (initName: string = '') => {
+  const initialize = useCallback(
+    (initName: string = '') => {
       setName(initName)
     },
+    [setName],
+  )
+  return {
+    initialize,
     name: {
       value: name,
       onChange: (e: React.FormEvent<Pick<any, string>>) => setName(e.currentTarget.value),
@@ -52,7 +56,7 @@ export const useInputs = ({ name, newPassword, confirmNewPassword }: ReturnType<
         inputType: 'password',
       },
     ],
-    [name.value, newPassword.value, confirmNewPassword.value],
+    [name, newPassword, confirmNewPassword],
   )
 }
 

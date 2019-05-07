@@ -1,11 +1,12 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Container } from 'react-bootstrap'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { History } from 'history'
-import { Routes, EXPLORER } from 'utils/const'
+
 import Table from 'widgets/Table'
 import ContextMenuZone from 'widgets/ContextMenuZone'
+import { Routes, EXPLORER } from 'utils/const'
 import { useNeuronWallet } from 'utils/hooks'
 
 const headers = [
@@ -29,35 +30,39 @@ const headers = [
 
 const AddressPanel = ({ address, history }: { address: string; history: History }) => {
   const [t] = useTranslation()
-  const actionItems = [
-    {
-      label: t('addresses.actions.copy-address'),
-      click: () => {
-        window.clipboard.writeText(address)
+  const actionItems = useMemo(
+    () => [
+      {
+        label: t('addresses.actions.copy-address'),
+        click: () => {
+          window.clipboard.writeText(address)
+        },
       },
-    },
-    {
-      label: t('addresses.actions.request-payment'),
-      click: () => {
-        window.clipboard.writeText(address)
-        history.push(`${Routes.Receive}/${address}`)
+      {
+        label: t('addresses.actions.request-payment'),
+        click: () => {
+          window.clipboard.writeText(address)
+          history.push(`${Routes.Receive}/${address}`)
+        },
       },
-    },
-    {
-      label: t('addresses.actions.spend-from'),
-      click: () => {
-        window.clipboard.writeText(address)
-        // TODO: navigate to send page with address
+      {
+        label: t('addresses.actions.spend-from'),
+        click: () => {
+          window.clipboard.writeText(address)
+          history.push(`${Routes.Send}/${address}`)
+        },
       },
-    },
-    {
-      label: t('addresses.actions.view-on-explorer'),
-      click: () => {
-        window.clipboard.writeText(address)
-        window.open(EXPLORER)
+      {
+        label: t('addresses.actions.view-on-explorer'),
+        click: () => {
+          window.clipboard.writeText(address)
+          window.open(EXPLORER)
+        },
       },
-    },
-  ]
+    ],
+    [history, address, t],
+  )
+
   return (
     <ContextMenuZone menuItems={actionItems}>
       <span data-menuitem={JSON.stringify({ hash: address })}>{address}</span>
@@ -65,30 +70,40 @@ const AddressPanel = ({ address, history }: { address: string; history: History 
   )
 }
 
-const Addresses = (props: React.PropsWithoutRef<RouteComponentProps>) => {
+const Addresses = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
-    wallet: { addresses },
+    wallet: {
+      addresses: { receiving, change },
+    },
   } = useNeuronWallet()
   const [t] = useTranslation()
-  const [pageNo, pageSize, totalCount] = [0, 20, 20]
   const onPageChange = useCallback(() => {}, [])
-  const { history } = props
 
-  const receivingAddresses = addresses.receiving.map(address => ({
-    type: 'Receiving',
-    address: <AddressPanel address={address} history={history} />,
-    balance: '0',
-    transactions: '0',
-    key: address,
-  }))
+  const receivingAddresses = useMemo(
+    () =>
+      receiving.map(address => ({
+        type: 'Receiving',
+        address: <AddressPanel address={address} history={history} />,
+        balance: '0',
+        transactions: '0',
+        key: address,
+      })),
+    [receiving, history],
+  )
 
-  const changeAddresses = addresses.change.map(address => ({
-    type: 'Change',
-    address: <AddressPanel address={address} history={history} />,
-    balance: '0',
-    transactions: '0',
-    key: address,
-  }))
+  const changeAddresses = useMemo(
+    () =>
+      change.map(address => ({
+        type: 'Change',
+        address: <AddressPanel address={address} history={history} />,
+        balance: '0',
+        transactions: '0',
+        key: address,
+      })),
+    [change, history],
+  )
+
+  const count = useMemo(() => receiving.length + change.length, [receiving, change])
 
   return (
     <Container>
@@ -99,9 +114,9 @@ const Addresses = (props: React.PropsWithoutRef<RouteComponentProps>) => {
           label: t(header.label),
         }))}
         items={[...receivingAddresses, ...changeAddresses]}
-        pageNo={pageNo}
-        pageSize={pageSize}
-        totalCount={totalCount}
+        pageNo={0}
+        pageSize={count}
+        totalCount={count}
         onPageChange={onPageChange}
         tableAttrs={{
           bordered: false,

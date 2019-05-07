@@ -15,6 +15,15 @@ interface QRScannerProps {
   styles?: { [index: string]: any }
 }
 
+const stopScan = (v: any) => {
+  if (v && v.srcObject) {
+    const track = v.srcObject.getTracks()[0]
+    if (track) {
+      track.stop()
+    }
+  }
+}
+
 const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
   const [open, setOpen] = useState(false)
   const [data, setData] = useState('')
@@ -62,15 +71,6 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
       })
   }, [video])
 
-  const stopScan = (v: any) => {
-    if (v && v.srcObject) {
-      const track = v.srcObject.getTracks()[0]
-      if (track) {
-        track.stop()
-      }
-    }
-  }
-
   useEffect(() => {
     if (open) {
       scan()
@@ -78,7 +78,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
       stopScan(video)
     }
     return () => stopScan(video)
-  }, [video, open, scan, stopScan])
+  }, [video, open, scan])
 
   return (
     <>
