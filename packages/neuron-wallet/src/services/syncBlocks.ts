@@ -92,7 +92,7 @@ export default class SyncBlocksService {
   async tryGetTipBlockNumber(): Promise<number> {
     try {
       const tipBlockNumber = await ckbCore.rpc.getTipBlockNumber()
-      return tipBlockNumber
+      return parseInt(tipBlockNumber, 10)
     } catch {
       return this.tryGetTipBlockNumber()
     }
@@ -150,7 +150,7 @@ export default class SyncBlocksService {
     const blockNumbers = Array.from({ length: size }).map((_a, i) => i + startBlockNumber)
     const blockHashes: string[] = await Promise.all(
       blockNumbers.map(async num => {
-        const hash: string = await ckbCore.rpc.getBlockHash(num)
+        const hash: string = await ckbCore.rpc.getBlockHash(num.toString())
         return hash
       }),
     )
@@ -358,7 +358,7 @@ export default class SyncBlocksService {
   // FIXME: lock script of SDK return not compatible with CKBComponents.Script
   static convertScript(script: any): Script {
     return {
-      args: script.args.map((arg: Uint8Array) => ckbCore.utils.bytesToHex(arg)),
+      args: script.args,
       binaryHash: script.binary_hash,
     }
   }

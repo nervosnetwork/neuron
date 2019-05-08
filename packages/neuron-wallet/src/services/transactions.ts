@@ -9,7 +9,7 @@ import ckbCore from '../core'
 export interface Input {
   previousOutput: OutPoint
   args: string[]
-  validSince?: number
+  validSince?: string
   capacity?: string | null
   lockHash?: string | null
 }
@@ -426,13 +426,18 @@ export default class TransactionsService {
 
   // system contract info
   public static contractInfo = async () => {
-    const genesisHash: string = await ckbCore.rpc.getBlockHash(0)
+    const genesisHash: string = await ckbCore.rpc.getBlockHash('0')
     const genesisBlock = await ckbCore.rpc.getBlock(genesisHash)
     const systemScriptTx = genesisBlock.commitTransactions[0]
     const blake2b = ckbCore.utils.blake2b(32)
-    // TODO: update data type when update SDK
     const systemScriptCell = systemScriptTx.outputs[0]
-    blake2b.update(systemScriptCell.data)
+    const { data } = systemScriptCell
+    if (typeof data === 'string') {
+      blake2b.update(ckbCore.utils.hexToBytes(data))
+    } else {
+      // if Uint8Array
+      blake2b.update(data)
+    }
     const binaryHash: string = blake2b.digest('hex')
     const outPoint: OutPoint = {
       hash: systemScriptTx.hash,
@@ -503,9 +508,7 @@ export default class TransactionsService {
   // use SDK lockScriptToHash
   public static lockScriptToHash = (lock: Script) => {
     const binaryHash: string = lock!.binaryHash!
-    const args: Uint8Array[] = lock.args!.map(n => {
-      return ckbCore.utils.hexToBytes(n)
-    })
+    const args: string[] = lock.args!
     const lockHash: string = ckbCore.utils.lockScriptToHash({
       binaryHash,
       args,
