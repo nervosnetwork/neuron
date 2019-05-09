@@ -107,7 +107,16 @@ const Mnemonic = ({
   return (
     <Container>
       <h1>{t(message)}</h1>
-      <FormControl as="textarea" disabled={isCreate} value={isCreate ? generated : imported} onChange={onChange} />
+      <FormControl
+        style={{
+          resize: 'none',
+        }}
+        as="textarea"
+        rows="3"
+        disabled={isCreate}
+        value={isCreate ? generated : imported}
+        onChange={onChange}
+      />
       <ScreenButtonRow>
         <Button role="button" onClick={history.goBack}>
           {t('wizard.back')}
