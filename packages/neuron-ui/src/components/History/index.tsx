@@ -60,15 +60,14 @@ const groupHistory = (items: Transaction[]): Transaction[][] => {
   }, [])
 }
 
-const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    location: { search, pathname },
-    history,
-    loadings,
-    errorMsgs,
-    dispatch,
-    providerDispatch,
-  } = props
+const History = ({
+  location: { search, pathname },
+  history,
+  loadings,
+  errorMsgs,
+  dispatch,
+  providerDispatch,
+}: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     chain: {
       transactions: { pageNo, pageSize, totalCount, items, addresses },
@@ -131,7 +130,7 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
       </ContextMenuZone>
       <Row>
         <Col>
-          <Pagination currentPage={pageNo} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
+          <Pagination currentPage={pageNo - 1} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
         </Col>
       </Row>
     </Container>

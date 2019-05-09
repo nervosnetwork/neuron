@@ -5,7 +5,7 @@ export const history = (search: string) => {
   const addresses = query.get('addresses')
   // use Object.fromEntries in ES10
   const params = {
-    pageNo: +(query.get('pageNo') || 0),
+    pageNo: +(query.get('pageNo') || 1),
     pageSize: +(query.get('pageSize') || PAGE_SIZE),
     addresses: addresses ? addresses.split(',') : [],
   }

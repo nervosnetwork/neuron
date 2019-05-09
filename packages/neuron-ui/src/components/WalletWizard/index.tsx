@@ -84,6 +84,11 @@ const Mnemonic = ({
         })
         // TODO: Better Error Handle
         .catch(err => console.error(err))
+    } else {
+      dispatch({
+        type: 'imported',
+        payload: '',
+      })
     }
   }, [dispatch, type])
 
@@ -138,6 +143,14 @@ const Submission = ({
     dispatch({
       type: 'name',
       payload: `wallet @${Math.round(Math.random() * 100)}`,
+    })
+    dispatch({
+      type: 'password',
+      payload: '',
+    })
+    dispatch({
+      type: 'confirmPassword',
+      payload: '',
     })
   }, [dispatch])
 
