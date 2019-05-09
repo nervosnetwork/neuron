@@ -5,7 +5,7 @@ import { Input } from './transactions'
 const MIN_CELL_CAPACITY = '40'
 
 export interface OutPoint {
-  hash: string
+  txHash: string
   index: number
 }
 
@@ -58,7 +58,7 @@ export default class CellsService {
     const cellEntity: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
       .findOne({
-        outPointHash: outPoint.hash,
+        outPointHash: outPoint.txHash,
         outPointIndex: outPoint.index,
         status: 'live',
       })

@@ -37,7 +37,7 @@ export default class Output extends BaseEntity {
 
   public outPoint(): OutPoint {
     return {
-      hash: this.outPointHash,
+      txHash: this.outPointHash,
       index: this.outPointIndex,
     }
   }

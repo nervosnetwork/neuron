@@ -159,8 +159,8 @@ export default class Listeners {
   public static wallets = () => {
     return ipcMain.on(
       Channel.Wallets,
-      (e: Electron.Event, method: keyof typeof WalletsController, ...params: any[]) => {
-        e.sender.send(Channel.Wallets, method, (WalletsController[method] as Function)(...params))
+      async (e: Electron.Event, method: keyof typeof WalletsController, ...params: any[]) => {
+        e.sender.send(Channel.Wallets, method, await (WalletsController[method] as Function)(...params))
       },
     )
   }

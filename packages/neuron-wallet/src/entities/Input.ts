@@ -13,7 +13,7 @@ export default class Input extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  outPointHash!: string
+  outPointTxHash!: string
 
   @Column({
     type: 'varchar',
@@ -42,7 +42,7 @@ export default class Input extends BaseEntity {
 
   public previousOutput(): OutPoint {
     return {
-      hash: this.outPointHash,
+      txHash: this.outPointTxHash,
       index: this.outPointIndex,
     }
   }

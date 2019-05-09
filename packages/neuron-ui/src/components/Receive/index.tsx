@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Container, Card, OverlayTrigger, Tooltip, Modal, Form } from 'react-bootstrap'
+import { Container, Card, OverlayTrigger, Tooltip, Modal, Form, InputGroup } from 'react-bootstrap'
 import QRCode from 'qrcode.react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Copy } from 'grommet-icons'
+import { Copy as CopyIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 import { useNeuronWallet } from 'utils/hooks'
 
@@ -17,13 +17,6 @@ const AddressPanel = styled.div`
   dispaly: flex;
   flex-direction: row;
   margin: 10px 0 0 0;
-`
-
-const CopyImage = styled(Copy)`
-  width: 15px;
-  height: 25px;
-  padding-top: 10px;
-  margin-left: 10px;
 `
 
 const QRCodePanel = styled.div`
@@ -68,10 +61,19 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
             <Form.Label>{t('Address')}</Form.Label>
             <AddressPanel>
               <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Copy address')}</Tooltip>}>
-                <Form.Control readOnly type="text" placeholder={accountAddress} onClick={() => copyAddress()} />
-              </OverlayTrigger>
-              <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Copy address')}</Tooltip>}>
-                <CopyImage onClick={() => copyAddress()} />
+                <InputGroup>
+                  <Form.Control readOnly type="text" placeholder={accountAddress} onClick={() => copyAddress()} />
+                  <InputGroup.Append>
+                    <CopyIcon
+                      style={{
+                        width: '15px',
+                        height: '25px',
+                        paddingTop: '10px',
+                        marginLeft: '10px',
+                      }}
+                    />
+                  </InputGroup.Append>
+                </InputGroup>
               </OverlayTrigger>
             </AddressPanel>
           </Form.Group>

@@ -4,7 +4,7 @@ import InputEntity from './Input'
 import OutputEntity from './Output'
 
 interface OutPoint {
-  hash: string
+  txHash: string
   index: number
 }
 

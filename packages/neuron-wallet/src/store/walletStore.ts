@@ -39,7 +39,7 @@ export default class WalletStore {
   }
 
   private getIDList = (): string[] => {
-    return this.walletIDStore.get(WalletIDKey, [])
+    return this.walletIDStore.get(WalletIDKey, []) as any
   }
 
   private addWalletID = (id: string) => {
@@ -73,7 +73,7 @@ export default class WalletStore {
     if (!wallet) {
       throw WalletStoreError.NoWallet
     }
-    return wallet
+    return wallet as any
   }
 
   setActiveWallet = (walletId: string): boolean => {
@@ -86,7 +86,7 @@ export default class WalletStore {
   }
 
   getActiveWallet = (): WalletData => {
-    const walletId = this.walletIDStore.get(ActiveWalletID, null)
+    const walletId = this.walletIDStore.get(ActiveWalletID, null) as string
     if (walletId) {
       return this.getWallet(walletId)
     }

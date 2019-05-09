@@ -1,5 +1,5 @@
 import * as bip32 from 'bip32'
-import bip39 from 'bip39'
+import * as bip39 from 'bip39'
 import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
@@ -92,7 +92,7 @@ export default class Key {
     return key
   }
 
-  public static fromMnemonic(
+  public static async fromMnemonic(
     mnemonic: string,
     password: string,
     receivingAddressNumber = DefaultAddressNumber.Receiving,
@@ -102,7 +102,7 @@ export default class Key {
       throw new Error('Wrong Mnemonic')
     }
     const key = new Key()
-    const keysData = key.generatePrivateKeyFromMnemonic(mnemonic)
+    const keysData = await key.generatePrivateKeyFromMnemonic(mnemonic)
     key.keysData = keysData
     key.addresses = Address.generateAddresses(keysData, receivingAddressNumber, changeAddressNumber)
     key.keystore = key.toKeystore(JSON.stringify(keysData), password)
@@ -149,8 +149,8 @@ export default class Key {
     return []
   }
 
-  private generatePrivateKeyFromMnemonic = (mnemonic: string) => {
-    const seed = bip39.mnemonicToSeed(mnemonic)
+  private generatePrivateKeyFromMnemonic = async (mnemonic: string) => {
+    const seed = await bip39.mnemonicToSeed(mnemonic)
     const root = bip32.fromSeed(seed)
     if (root.privateKey) {
       const privateKey = root.privateKey.toString('hex')

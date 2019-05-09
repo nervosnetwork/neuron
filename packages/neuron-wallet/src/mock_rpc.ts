@@ -4,7 +4,7 @@ import { Cell } from './services/cells'
 export const storeCells: Cell[] = [
   {
     outPoint: {
-      hash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
+      txHash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
       index: 0,
     },
     status: 'live',
@@ -16,7 +16,7 @@ export const storeCells: Cell[] = [
   },
   {
     outPoint: {
-      hash: '0xb22b53a7613f5754850f118eae16caf867107d72a9b125ca596855583e712c97',
+      txHash: '0xb22b53a7613f5754850f118eae16caf867107d72a9b125ca596855583e712c97',
       index: 0,
     },
     status: 'dead',
@@ -35,7 +35,7 @@ export const getLiveCells = async () => {
   const cells: Cell[] = [
     {
       outPoint: {
-        hash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
+        txHash: '0x3abd21e6e51674bb961bb4c5f3cee9faa5da30e64be10628dc1cef292cbae324',
         index: 0,
       },
       // origin cell infos
@@ -46,7 +46,7 @@ export const getLiveCells = async () => {
     },
     {
       outPoint: {
-        hash: '0xb22b53a7613f5754850f118eae16caf867107d72a9b125ca596855583e712c97',
+        txHash: '0xb22b53a7613f5754850f118eae16caf867107d72a9b125ca596855583e712c97',
         index: 0,
       },
       // origin cell infos
@@ -94,7 +94,7 @@ export const getHistoryTransactions = async (_lockHashes: string[], _from: strin
       {
         args: [],
         previousOutput: {
-          hash: `0x${randomHexString()}`,
+          txHash: `0x${randomHexString()}`,
           index: 0,
         },
       },
