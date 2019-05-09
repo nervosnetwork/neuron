@@ -63,7 +63,7 @@ const groupHistory = (items: Transaction[]): Transaction[][] => {
 const History = ({
   location: { search, pathname },
   history,
-  loadings,
+  // loadings,
   errorMsgs,
   dispatch,
   providerDispatch,
@@ -81,20 +81,24 @@ const History = ({
   const onPageChange = useOnChangePage(search, pathname, history, queryFormatter)
   const onAddressRemove = useOnAddressRemove(search, pathname, history, queryFormatter)
 
-  if (loadings.transactions) {
-    return <div>Loading</div>
-  }
+  // if (loadings.transactions) {
+  //   return <div>Loading</div>
+  // }
 
   return (
     <Container>
       <h1>{t('siderbar.history')}</h1>
       {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transactions}`)}</Alert> : null}
-      {addresses.map(address => (
-        <AddressBadge variant="primary" key={address}>
-          {address}
-          <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
-        </AddressBadge>
-      ))}
+      {addresses.length > 0 ? (
+        addresses.map(address => (
+          <AddressBadge variant="primary" key={address}>
+            {address}
+            <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
+          </AddressBadge>
+        ))
+      ) : (
+        <div>No Transactions Found</div>
+      )}
       <ContextMenuZone menuItems={menuItems}>
         {groupHistory(items).map(group => (
           <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
@@ -128,11 +132,13 @@ const History = ({
           </Table>
         ))}
       </ContextMenuZone>
-      <Row>
-        <Col>
-          <Pagination currentPage={pageNo - 1} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
-        </Col>
-      </Row>
+      {addresses.length > 0 ? (
+        <Row>
+          <Col>
+            <Pagination currentPage={pageNo - 1} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
+          </Col>
+        </Row>
+      ) : null}
     </Container>
   )
 }

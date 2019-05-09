@@ -35,7 +35,7 @@ export default class TransactionsController {
     if (transactions) {
       return {
         status: ResponseCode.Success,
-        result: transactions,
+        result: { ...params, ...transactions },
       }
     }
     return {

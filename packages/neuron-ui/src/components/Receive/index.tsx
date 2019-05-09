@@ -50,7 +50,7 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
 
   if (!accountAddress) {
     // TODO: better error handling
-    throw new Error('Found no addresses')
+    return <div>{t('receive.address-not-found')}</div>
   }
 
   const copyAddress = () => {

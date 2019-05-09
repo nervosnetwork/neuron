@@ -31,6 +31,9 @@
       "this-transfer-will-send": "This transfer will send",
       "scan-to-get-address": "scan the qrcode to get address"
     },
+    "receive": {
+      "address-not-found": "Address not found"
+    },
     "history": {
       "meta": "meta",
       "type": "type",
