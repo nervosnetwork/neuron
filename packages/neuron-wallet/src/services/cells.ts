@@ -58,7 +58,7 @@ export default class CellsService {
     const cellEntity: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
       .findOne({
-        outPointHash: outPoint.txHash,
+        outPointTxHash: outPoint.txHash,
         outPointIndex: outPoint.index,
         status: 'live',
       })
