@@ -81,10 +81,6 @@ const History = ({
   const onPageChange = useOnChangePage(search, pathname, history, queryFormatter)
   const onAddressRemove = useOnAddressRemove(search, pathname, history, queryFormatter)
 
-  // if (loadings.transactions) {
-  //   return <div>Loading</div>
-  // }
-
   return (
     <Container>
       <h1>{t('siderbar.history')}</h1>
