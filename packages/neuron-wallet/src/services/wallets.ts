@@ -23,6 +23,10 @@ export default class WalletService {
     keystore: Keystore
     addresses: Addresses
   }): WalletData => {
+    const index = walletStore.getAllWallets().findIndex(wallet => wallet.name === name)
+    if (index !== -1) {
+      throw Error('Wallet name existed')
+    }
     const id = v4()
     walletStore.saveWallet({ id, name, keystore, addresses })
     return { id, name, keystore, addresses }
