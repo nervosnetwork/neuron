@@ -1,4 +1,7 @@
 import { v4 } from 'uuid'
+
+import ckbCore from '../core'
+import TransactionsService from './transactions'
 import WalletStore, { WalletData } from '../store/walletStore'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
@@ -54,5 +57,40 @@ export default class WalletService {
 
   public getActive = (): WalletData => {
     return walletStore.getActiveWallet()
+  }
+
+  /**
+   * transactions related
+   */
+  public sendCapacity = (
+    items: {
+      address: CKBComponents.Hash256
+      capacity: CKBComponents.Capacity
+      unit: 'byte' | 'shannon'
+    }[],
+    password: string,
+  ) => {
+    // TODO: verify password
+    if (!password) {
+      throw new Error('Incorrect password')
+    }
+
+    const changeAddress = walletStore.getActiveWallet().addresses.change[0].address
+
+    // TODO: this is always success code hash, should be replaced in the future
+    const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    const lockhashes = items.map(({ address }) =>
+      ckbCore.utils.lockScriptToHash({
+        // TODO: has be updated with sdk@0.11.0
+        binaryHash: codeHash,
+        args: [ckbCore.utils.blake160(address)],
+      }),
+    )
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(10 ** 8))).toString(),
+    }))
+
+    return TransactionsService.generateTx(lockhashes, targetOutputs, changeAddress)
   }
 }

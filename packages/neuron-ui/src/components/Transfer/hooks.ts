@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
 import { History } from 'history'
-import UILayer, { TransferItem } from 'services/UILayer'
+import { TransferItem } from 'services/UILayer'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import { Channel, Routes, CapacityUnit } from 'utils/const'
+import { CapacityUnit } from 'utils/const'
 import initState from 'containers/MainContent/state'
 
 export const useUpdateTransferItem = (dispatch: React.Dispatch<any>) =>
@@ -94,24 +94,7 @@ export const useInitialize = (
     if (address) {
       updateTransferItem('address')(0)(address)
     }
-    UILayer.on(Channel.SendCapacity, (_e: Event, args: ChannelResponse<string>) => {
-      if (args.status) {
-        history.push(`${Routes.Transaction}/${args.result}`)
-      } else {
-        dispatch({
-          type: MainActions.UpdateTransfer,
-          payload: {
-            submitting: false,
-          },
-        })
-        dispatch({
-          type: MainActions.ErrorMessage,
-          payload: { transfer: args.msg },
-        })
-      }
-    })
     return () => {
-      UILayer.removeAllListeners(Channel.SendCapacity)
       dispatch({
         type: MainActions.UpdateTransfer,
         payload: initState.transfer,

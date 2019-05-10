@@ -1,4 +1,4 @@
-import { sendCapacity, TransferItem } from 'services/UILayer'
+import { walletsCall, TransferItem } from 'services/UILayer'
 
 import { Message } from 'utils/const'
 import { verifyAddress } from 'utils/validators'
@@ -7,7 +7,6 @@ import { MainActions } from '../reducer'
 
 export default {
   submitTransfer: (items: TransferItem[]) => {
-    // TODO: verification
     const errorAction = {
       type: MainActions.ErrorMessage,
       payload: {
@@ -23,7 +22,7 @@ export default {
           errorAction.payload.transfer = Message.InvalidAddress
           return true
         }
-        if (+item.capacity < 0) {
+        if (Number.isNaN(+item.capacity) || +item.capacity < 0) {
           errorAction.payload.transfer = Message.InvalidCapacity
           return true
         }
@@ -43,7 +42,7 @@ export default {
   },
 
   confirmTransfer: ({ items, password }: { items: TransferItem[]; password: string }) => {
-    sendCapacity(items, password)
+    walletsCall.sendCapacity({ items, password })
     return {
       type: MainActions.UpdateTransfer,
       payload: {

@@ -25,6 +25,7 @@ export enum WalletsMethod {
   GetActive = 'getActive',
   Activate = 'activate',
   Backup = 'backup',
+  SendCapacity = 'sendCapacity',
 }
 
 export enum NetworksMethod {
@@ -151,6 +152,13 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   getActive: () => void
   activate: (id: string) => void
   backup: (id: string) => void
+  sendCapacity: (params: {
+    items: {
+      address: string
+      capacity: string
+    }[]
+    password: string
+  }) => void
 }
 
 export const helpers = (method: HelpersMethod, ...params: any) => {
