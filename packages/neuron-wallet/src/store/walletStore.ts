@@ -1,8 +1,9 @@
-import Store from 'electron-store'
+import fs from 'fs'
 import { Keystore } from '../keys/keystore'
 import env from '../env'
 import { Addresses } from '../keys/key'
 import app from '../app'
+import Store from '../utils/store'
 
 export enum WalletStoreError {
   NoWallet,
@@ -16,111 +17,98 @@ export interface WalletData {
   addresses: Addresses
 }
 
-interface Options {
-  name?: string
-  cwd?: string
-  encryptionKey?: string | Buffer
-}
-
-const userDataPath = app.getPath('userData')
-const storePath = env.isDevMode ? `${userDataPath}/dev/wallets` : `${userDataPath}/wallets`
-const WalletIDKey = 'WalletID'
-const ActiveWalletID = 'ActiveID'
+// TODO: Check if '/dev/wallets' path works on Windows
+const defaultStorePath = env.isDevMode ? '/dev/wallets' : '/wallets'
 
 export default class WalletStore {
-  walletIDStore: Store
+  private storePath: string
+  private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
+  private walletsKey = 'wallets'
+  private currentWalletKey = 'current'
 
-  constructor() {
-    const idOptions: Options = {
-      name: WalletIDKey,
-      cwd: storePath,
-    }
-    this.walletIDStore = new Store(idOptions)
-  }
-
-  private getIDList = (): string[] => {
-    return this.walletIDStore.get(WalletIDKey, []) as any
-  }
-
-  private addWalletID = (id: string) => {
-    this.walletIDStore.set(WalletIDKey, this.getIDList().concat(id))
-  }
-
-  private removeWalletID = (id: string) => {
-    const idList = this.getIDList()
-    idList.splice(idList.indexOf(id), 1)
-    this.walletIDStore.set(WalletIDKey, idList)
+  constructor(storePath: string = defaultStorePath) {
+    this.storePath = `${app.getPath('userData')}/${storePath}`
+    fs.mkdirSync(this.storePath, { recursive: true })
+    this.listStore = new Store(this.storePath, 'wallets.json')
   }
 
   private getWalletStore = (id: string): Store => {
-    const options: Options = {
-      name: id,
-      cwd: storePath,
-    }
-    return new Store(options)
+    return new Store(this.storePath, `${id}.json`)
   }
 
-  saveWallet = (walletData: WalletData) => {
-    this.addWalletID(walletData.id)
-    this.getWalletStore(walletData.id).set(walletData.id, walletData)
-    if (this.getIDList().length === 1) {
-      this.setActiveWallet(walletData.id)
-    }
+  getAllWallets = (): WalletData[] => {
+    return this.listStore.readSync(this.walletsKey) || []
   }
 
-  getWallet = (walletId: string): WalletData => {
-    const wallet = this.getWalletStore(walletId).get(walletId, null)
+  getWallet = (id: string): WalletData => {
+    const wallets = this.getAllWallets()
+    const wallet = wallets.find((w: WalletData) => w.id === id)
     if (!wallet) {
       throw WalletStoreError.NoWallet
     }
     return wallet as any
   }
 
-  setActiveWallet = (walletId: string): boolean => {
-    const index = this.getIDList().findIndex(id => id === walletId)
+  saveWallet = (walletData: WalletData) => {
+    this.listStore.writeSync(this.walletsKey, this.getAllWallets().concat(walletData))
+    // TODO: Save keystore to that store instead.
+    this.getWalletStore(walletData.id).writeSync(walletData.id, walletData)
+    if (this.getAllWallets().length === 1) {
+      this.setCurrentWallet(walletData.id)
+    }
+  }
+
+  updateWallet = (id: string, newWallet: WalletData) => {
+    const wallets = this.getAllWallets()
+    const index = wallets.findIndex((w: WalletData) => w.id === id)
+    if (index !== -1) {
+      wallets[index] = newWallet
+      this.listStore.writeSync(this.walletsKey, wallets)
+    } else {
+      throw WalletStoreError.NoWallet
+    }
+    // TODO: Save keystore to that store instead.
+    this.getWalletStore(id).writeSync(id, newWallet)
+  }
+
+  deleteWallet = (id: string) => {
+    const currentId = this.getCurrentWallet().id
+    const wallets = this.getAllWallets()
+    const index = wallets.findIndex((w: WalletData) => w.id === id)
+    if (index !== -1) {
+      wallets.splice(index, 1)
+      this.listStore.writeSync(this.walletsKey, wallets)
+    } else {
+      throw WalletStoreError.NoWallet
+    }
+    this.getWalletStore(id).clear()
+
+    if (currentId === id) {
+      this.setCurrentWallet(this.getAllWallets()[0].id)
+    }
+  }
+
+  setCurrentWallet = (walletId: string): boolean => {
+    const index = this.getAllWallets().findIndex((w: WalletData) => w.id === walletId)
     if (index === -1) {
       return false
     }
-    this.walletIDStore.set(ActiveWalletID, walletId)
+    this.listStore.writeSync(this.currentWalletKey, walletId)
     return true
   }
 
-  getActiveWallet = (): WalletData => {
-    const walletId = this.walletIDStore.get(ActiveWalletID, null) as string
+  getCurrentWallet = (): WalletData => {
+    const walletId = this.listStore.readSync(this.currentWalletKey) as string
     if (walletId) {
       return this.getWallet(walletId)
     }
     throw WalletStoreError.NoActiveWallet
   }
 
-  getAllWallets = (): WalletData[] => {
-    const walletList: WalletData[] = []
-    const idList = this.getIDList()
-    idList.forEach(id => {
-      walletList.push(this.getWallet(id))
-    })
-    return walletList
-  }
-
-  update = (walletId: string, newWallet: WalletData) => {
-    this.getWalletStore(walletId).set(walletId, newWallet)
-  }
-
-  deleteWallet = (walletId: string) => {
-    const activeId = this.getActiveWallet().id
-    this.removeWalletID(walletId)
-    this.getWalletStore(walletId).clear()
-    const idList = this.getIDList()
-    if (idList.length > 0 && activeId === walletId) {
-      this.setActiveWallet(idList[0])
-    }
-  }
-
   clearAll = () => {
-    const idList = this.getIDList()
-    idList.forEach(id => {
-      this.getWalletStore(id).clear()
+    this.getAllWallets().forEach(w => {
+      this.getWalletStore(w.id).clear()
     })
-    this.walletIDStore.clear()
+    this.listStore.clear()
   }
 }

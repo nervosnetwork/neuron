@@ -1,13 +1,11 @@
-import { v4 } from 'uuid'
 import assert from 'assert'
 import WalletStore, { WalletData } from '../src/store/walletStore'
 
-// TODO: re-enable tests after removing electron dependency
-describe.skip('wallet store', () => {
-  const walletStore = new WalletStore()
+describe('wallet store', () => {
+  let walletStore: WalletStore
 
   const wallet1: WalletData = {
-    id: v4(),
+    id: '1',
     name: 'wallet1',
     keystore: {
       version: 0,
@@ -60,7 +58,7 @@ describe.skip('wallet store', () => {
   }
 
   const wallet2: WalletData = {
-    id: v4(),
+    id: '2',
     name: 'wallet2',
     keystore: {
       version: 0,
@@ -112,7 +110,7 @@ describe.skip('wallet store', () => {
     },
   }
   const wallet3: WalletData = {
-    id: v4(),
+    id: '3',
     name: 'wallet3',
     keystore: {
       version: 0,
@@ -165,6 +163,10 @@ describe.skip('wallet store', () => {
   }
 
   beforeEach(() => {
+    walletStore = new WalletStore('test/wallets')
+  })
+
+  afterEach(() => {
     walletStore.clearAll()
   })
 
@@ -195,7 +197,7 @@ describe.skip('wallet store', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
     wallet1.name = wallet2.name
-    walletStore.update(wallet1.id, wallet1)
+    walletStore.updateWallet(wallet1.id, wallet1)
     const wallet = walletStore.getWallet(wallet1.id)
     assert.deepStrictEqual(wallet, {
       id: wallet1.id,
@@ -238,7 +240,7 @@ describe.skip('wallet store', () => {
       ],
     }
     wallet1.addresses = addresses
-    walletStore.update(wallet1.id, wallet1)
+    walletStore.updateWallet(wallet1.id, wallet1)
     const wallet = walletStore.getWallet(wallet1.id)
     assert.deepStrictEqual(wallet, {
       id: wallet1.id,
@@ -262,24 +264,24 @@ describe.skip('wallet store', () => {
   it('get and set active wallet', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
-    assert.strictEqual(walletStore.setActiveWallet(wallet1.id), true)
-    assert.deepStrictEqual(walletStore.getActiveWallet(), wallet1)
-    assert.strictEqual(walletStore.setActiveWallet(wallet2.id), true)
-    assert.deepStrictEqual(walletStore.getActiveWallet(), wallet2)
-    assert.strictEqual(walletStore.setActiveWallet(wallet1.id), true)
+    assert.strictEqual(walletStore.setCurrentWallet(wallet1.id), true)
+    assert.deepStrictEqual(walletStore.getCurrentWallet(), wallet1)
+    assert.strictEqual(walletStore.setCurrentWallet(wallet2.id), true)
+    assert.deepStrictEqual(walletStore.getCurrentWallet(), wallet2)
+    assert.strictEqual(walletStore.setCurrentWallet(wallet1.id), true)
   })
 
   it('first wallet is active wallet', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
-    assert.deepStrictEqual(walletStore.getActiveWallet(), wallet1)
+    assert.deepStrictEqual(walletStore.getCurrentWallet(), wallet1)
   })
 
   it('delete active wallet', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
     walletStore.deleteWallet(wallet1.id)
-    const activeWallet = walletStore.getActiveWallet()
+    const activeWallet = walletStore.getCurrentWallet()
     assert.deepStrictEqual(activeWallet, wallet2)
     assert.strictEqual(walletStore.getAllWallets().length, 1)
   })
@@ -288,7 +290,7 @@ describe.skip('wallet store', () => {
     walletStore.saveWallet(wallet1)
     walletStore.saveWallet(wallet2)
     walletStore.deleteWallet(wallet2.id)
-    const activeWallet = walletStore.getActiveWallet()
+    const activeWallet = walletStore.getCurrentWallet()
     assert.deepStrictEqual(activeWallet, wallet1)
   })
 })

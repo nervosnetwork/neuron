@@ -36,7 +36,7 @@ export default class WalletService {
 
   public update = (walletId: string, newWallet: WalletData) => {
     const currentWallet = walletStore.getWallet(walletId)
-    walletStore.update(walletId, { ...currentWallet, ...newWallet })
+    walletStore.updateWallet(walletId, { ...currentWallet, ...newWallet })
   }
 
   public delete = (id: string): boolean => {
@@ -49,10 +49,10 @@ export default class WalletService {
   }
 
   public setActive = (id: string): boolean => {
-    return walletStore.setActiveWallet(id)
+    return walletStore.setCurrentWallet(id)
   }
 
   public getActive = (): WalletData => {
-    return walletStore.getActiveWallet()
+    return walletStore.getCurrentWallet()
   }
 }
