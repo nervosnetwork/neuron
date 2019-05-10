@@ -63,7 +63,7 @@ class WalletsController {
     }
   }
 
-  public static importMnemonic = ({
+  public static importMnemonic = async ({
     name,
     password,
     mnemonic,
@@ -75,9 +75,9 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<WalletData> => {
+  }): Promise<ChannelResponse<WalletData>> => {
     try {
-      const key = Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+      const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
         keystore: key.keystore!,
@@ -96,7 +96,7 @@ class WalletsController {
     }
   }
 
-  public static create({
+  public static create = async ({
     name,
     password,
     mnemonic,
@@ -108,8 +108,8 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<WalletData> {
-    const res = WalletsController.importMnemonic({
+  }): Promise<ChannelResponse<WalletData>> => {
+    const res = await WalletsController.importMnemonic({
       name,
       password,
       mnemonic,

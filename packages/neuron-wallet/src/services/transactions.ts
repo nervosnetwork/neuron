@@ -250,7 +250,7 @@ export default class TransactionsService {
         txEntity.inputs.map(async input => {
           const outPoint: OutPoint = input.previousOutput()
           const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-            outPointHash: outPoint.hash,
+            outPointHash: outPoint.txHash,
             outPointIndex: outPoint.index,
           })
           if (outputEntity) {
@@ -290,7 +290,7 @@ export default class TransactionsService {
     const previousOutputs: OutputEntity[] = []
     for (const i of transaction.inputs!) {
       const input = new InputEntity()
-      input.outPointHash = i.previousOutput.hash
+      input.outPointTxHash = i.previousOutput.txHash
       input.outPointIndex = i.previousOutput.index
       input.args = i.args
       input.transaction = tx
@@ -299,7 +299,7 @@ export default class TransactionsService {
       inputs.push(input)
 
       const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-        outPointHash: input.previousOutput().hash,
+        outPointHash: input.previousOutput().txHash,
         outPointIndex: input.previousOutput().index,
       })
       if (previousOutput) {
@@ -386,7 +386,7 @@ export default class TransactionsService {
         const outputEntity: OutputEntity | undefined = await getConnection()
           .getRepository(OutputEntity)
           .findOne({
-            outPointHash: i.previousOutput.hash,
+            outPointHash: i.previousOutput.txHash,
             outPointIndex: i.previousOutput.index,
           })
         if (outputEntity) {
@@ -428,7 +428,7 @@ export default class TransactionsService {
   public static contractInfo = async () => {
     const genesisHash: string = await ckbCore.rpc.getBlockHash('0')
     const genesisBlock = await ckbCore.rpc.getBlock(genesisHash)
-    const systemScriptTx = genesisBlock.commitTransactions[0]
+    const systemScriptTx = genesisBlock.transactions[0]
     const blake2b = ckbCore.utils.blake2b(32)
     const systemScriptCell = systemScriptTx.outputs[0]
     const { data } = systemScriptCell
@@ -440,7 +440,7 @@ export default class TransactionsService {
     }
     const binaryHash: string = blake2b.digest('hex')
     const outPoint: OutPoint = {
-      hash: systemScriptTx.hash,
+      txHash: systemScriptTx.hash,
       index: 0,
     }
     return {

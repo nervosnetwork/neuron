@@ -250,7 +250,7 @@ export default class SyncBlocksService {
       const output = await getConnection()
         .getRepository(OutputEntity)
         .findOne({
-          outPointHash: outPoint.hash,
+          outPointHash: outPoint.txHash,
           outPointIndex: outPoint.index,
         })
       if (output) {
@@ -302,7 +302,7 @@ export default class SyncBlocksService {
     const blockHeader = SyncBlocksService.convertBlockHeader(block.header)
     return {
       header: blockHeader,
-      transactions: block.commitTransactions.map(tx => SyncBlocksService.convertTransaction(tx, blockHeader)),
+      transactions: block.transactions.map(tx => SyncBlocksService.convertTransaction(tx, blockHeader)),
     }
   }
 
@@ -343,7 +343,7 @@ export default class SyncBlocksService {
 
   static convertOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
     return {
-      hash: outPoint.hash,
+      txHash: outPoint.txHash,
       index: outPoint.index,
     }
   }
