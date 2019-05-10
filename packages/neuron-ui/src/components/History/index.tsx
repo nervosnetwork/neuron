@@ -60,15 +60,14 @@ const groupHistory = (items: Transaction[]): Transaction[][] => {
   }, [])
 }
 
-const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    location: { search, pathname },
-    history,
-    loadings,
-    errorMsgs,
-    dispatch,
-    providerDispatch,
-  } = props
+const History = ({
+  location: { search, pathname },
+  history,
+  // loadings,
+  errorMsgs,
+  dispatch,
+  providerDispatch,
+}: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     chain: {
       transactions: { pageNo, pageSize, totalCount, items, addresses },
@@ -82,20 +81,20 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
   const onPageChange = useOnChangePage(search, pathname, history, queryFormatter)
   const onAddressRemove = useOnAddressRemove(search, pathname, history, queryFormatter)
 
-  if (loadings.transactions) {
-    return <div>Loading</div>
-  }
-
   return (
     <Container>
       <h1>{t('siderbar.history')}</h1>
       {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transactions}`)}</Alert> : null}
-      {addresses.map(address => (
-        <AddressBadge variant="primary" key={address}>
-          {address}
-          <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
-        </AddressBadge>
-      ))}
+      {addresses.length > 0 ? (
+        addresses.map(address => (
+          <AddressBadge variant="primary" key={address}>
+            {address}
+            <CloseIcon size="small" color="#fff" onClick={onAddressRemove(address)} />
+          </AddressBadge>
+        ))
+      ) : (
+        <div>No Transactions Found</div>
+      )}
       <ContextMenuZone menuItems={menuItems}>
         {groupHistory(items).map(group => (
           <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
@@ -129,11 +128,13 @@ const History = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps
           </Table>
         ))}
       </ContextMenuZone>
-      <Row>
-        <Col>
-          <Pagination currentPage={pageNo} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
-        </Col>
-      </Row>
+      {addresses.length > 0 ? (
+        <Row>
+          <Col>
+            <Pagination currentPage={pageNo - 1} pageSize={pageSize} total={totalCount} onChange={onPageChange} />
+          </Col>
+        </Row>
+      ) : null}
     </Container>
   )
 }

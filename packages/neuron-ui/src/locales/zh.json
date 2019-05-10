@@ -31,6 +31,9 @@
       "this-transfer-will-send": "本次交易将发送",
       "scan-to-get-address": "扫码二维码以获取地址"
     },
+    "receive": {
+      "address-not-found": "未找到地址"
+    },
     "history": {
       "meta": "元信息",
       "type": "类型",

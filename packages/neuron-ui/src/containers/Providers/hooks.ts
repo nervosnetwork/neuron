@@ -54,7 +54,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case TransactionsMethod.GetAll: {
+          case TransactionsMethod.GetAllByAddresses: {
             dispatch({
               type: ProviderActions.Chain,
               payload: { transactions: { ...chain.transactions, ...args.result } },
