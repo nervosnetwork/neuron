@@ -11,6 +11,15 @@ export interface Wallet {
   name: string
   keystore: Keystore
   addresses: Addresses
+
+  // TODO: add explictly keystore loading func
+  // loadKeystore: () => Keystore
+}
+
+export interface WalletProperties {
+  name: string
+  keystore: Keystore
+  addresses: Addresses
 }
 
 // TODO: Check if '/dev/wallets' path works on Windows
@@ -40,16 +49,8 @@ export default class WalletService {
     return this.getAll().find(wallet => wallet.id === id)
   }
 
-  public create = ({
-    name,
-    keystore,
-    addresses,
-  }: {
-    name: string
-    keystore: Keystore
-    addresses: Addresses
-  }): Wallet => {
-    const wallet = { id: uuid(), name, keystore, addresses }
+  public create = (prop: WalletProperties): Wallet => {
+    const wallet = { ...prop, id: uuid() }
     this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet))
     // TODO: Save keystore to that store instead.
     this.getWalletStore(wallet.id).writeSync(wallet.id, wallet)
@@ -59,11 +60,11 @@ export default class WalletService {
     return wallet
   }
 
-  public update = (id: string, newWallet: Wallet) => {
+  public update = (id: string, prop: WalletProperties) => {
     const wallets = this.getAll()
     const index = wallets.findIndex((w: Wallet) => w.id === id)
     if (index !== -1) {
-      wallets[index] = { ...newWallet, id }
+      wallets[index] = { ...prop, id }
       this.listStore.writeSync(this.walletsKey, wallets)
     }
   }

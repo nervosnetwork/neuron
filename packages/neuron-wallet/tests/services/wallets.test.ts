@@ -1,11 +1,10 @@
 import assert from 'assert'
-import WalletService, { Wallet } from '../../src/services/wallets'
+import WalletService from '../../src/services/wallets'
 
 describe('wallet service', () => {
   let walletService: WalletService
 
-  const wallet1: Wallet = {
-    id: 'na',
+  const wallet1 = {
     name: 'wallet1',
     keystore: {
       version: 0,
@@ -57,8 +56,7 @@ describe('wallet service', () => {
     },
   }
 
-  const wallet2: Wallet = {
-    id: 'na',
+  const wallet2 = {
     name: 'wallet2',
     keystore: {
       version: 0,
@@ -109,8 +107,7 @@ describe('wallet service', () => {
       ],
     },
   }
-  const wallet3: Wallet = {
-    id: 'na',
+  const wallet3 = {
     name: 'wallet3',
     keystore: {
       version: 0,
