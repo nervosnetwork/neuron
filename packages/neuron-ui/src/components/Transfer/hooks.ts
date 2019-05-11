@@ -40,9 +40,9 @@ export const useOnPasswordChange = (dispatch: React.Dispatch<any>) =>
     [dispatch],
   )
 
-export const useOnConfirm = (dispatch: React.Dispatch<any>) =>
+export const useOnConfirm = (dispatch: React.Dispatch<any>, setLoading: Function) =>
   useCallback(
-    (items: TransferItem[], pwd: string) => () => {
+    (id: string, items: TransferItem[], pwd: string) => () => {
       dispatch({
         type: MainActions.SetDialog,
         payload: {
@@ -53,16 +53,18 @@ export const useOnConfirm = (dispatch: React.Dispatch<any>) =>
         type: MainActions.UpdatePassword,
         payload: '',
       })
+      setLoading(true)
       setTimeout(() => {
         dispatch(
           actionCreators.confirmTransfer({
+            id,
             items,
             password: pwd,
           }),
         )
       }, 10)
     },
-    [dispatch],
+    [dispatch, setLoading],
   )
 
 export const useOnItemChange = (updateTransferItem: Function) => (field: string, idx: number) => (
@@ -102,6 +104,14 @@ export const useInitialize = (
     }
   }, [address, dispatch, history, updateTransferItem])
 
+export const useMessageListener = (id: string, messageId: string | null, title: string, setLoading: Function) => {
+  useEffect(() => {
+    if (title === 'Transaction' && messageId === id) {
+      setLoading(false)
+    }
+  }, [title, messageId, id, setLoading])
+}
+
 export default {
   useUpdateTransferItem,
   useOnSubmit,
@@ -109,5 +119,6 @@ export default {
   useOnConfirm,
   useOnItemChange,
   useDropdownItems,
+  useMessageListener,
   useInitialize,
 }

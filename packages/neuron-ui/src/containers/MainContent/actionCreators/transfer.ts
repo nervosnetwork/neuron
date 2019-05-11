@@ -41,8 +41,8 @@ export default {
     }
   },
 
-  confirmTransfer: ({ items, password }: { items: TransferItem[]; password: string }) => {
-    walletsCall.sendCapacity({ items, password })
+  confirmTransfer: ({ id, items, password }: { id: string; items: TransferItem[]; password: string }) => {
+    walletsCall.sendCapacity({ id, items, password })
     return {
       type: MainActions.UpdateTransfer,
       payload: {

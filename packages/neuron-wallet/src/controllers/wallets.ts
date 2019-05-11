@@ -272,6 +272,7 @@ class WalletsController {
   }
 
   public static sendCapacity = async (params: {
+    id: string
     items: {
       address: CKBComponents.Hash256
       capacity: CKBComponents.Capacity
@@ -286,15 +287,18 @@ class WalletsController {
       }
     }
     try {
-      const result = await WalletsController.service.sendCapacity(params.items, params.password)
+      const hash = await WalletsController.service.sendCapacity(params.items, params.password)
       return {
         status: ResponseCode.Success,
-        result,
+        result: hash,
       }
     } catch (err) {
       return {
         status: ResponseCode.Fail,
-        msg: err.message,
+        msg: {
+          content: `Error: "${err.message}"`,
+          id: params.id,
+        },
       }
     }
   }

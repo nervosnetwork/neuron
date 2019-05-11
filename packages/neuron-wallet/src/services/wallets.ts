@@ -62,7 +62,7 @@ export default class WalletService {
   /**
    * transactions related
    */
-  public sendCapacity = (
+  public sendCapacity = async (
     items: {
       address: CKBComponents.Hash256
       capacity: CKBComponents.Capacity
@@ -79,9 +79,10 @@ export default class WalletService {
 
     // TODO: this is always success code hash, should be replaced in the future
     const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
+
     const lockhashes = items.map(({ address }) =>
       ckbCore.utils.lockScriptToHash({
-        // TODO: has be updated with sdk@0.11.0
+        // TODO: binaryHash has be updated to codeHash with sdk@0.11.0
         binaryHash: codeHash,
         args: [ckbCore.utils.blake160(address)],
       }),
@@ -91,6 +92,11 @@ export default class WalletService {
       capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(10 ** 8))).toString(),
     }))
 
-    return TransactionsService.generateTx(lockhashes, targetOutputs, changeAddress)
+    const transaction = (await TransactionsService.generateTx(
+      lockhashes,
+      targetOutputs,
+      changeAddress,
+    )) as CKBComponents.RawTransaction
+    return ckbCore.rpc.sendTransaction(transaction)
   }
 }

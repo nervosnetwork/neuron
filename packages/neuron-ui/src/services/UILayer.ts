@@ -153,6 +153,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   activate: (id: string) => void
   backup: (id: string) => void
   sendCapacity: (params: {
+    id: string
     items: {
       address: string
       capacity: string

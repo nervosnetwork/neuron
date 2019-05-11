@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +15,8 @@ import { ContentProps } from 'containers/MainContent'
 import { useOnDialogCancel } from 'containers/MainContent/hooks'
 import { PlaceHolders } from 'utils/const'
 
+import { useNeuronWallet } from 'utils/hooks'
+
 import {
   useUpdateTransferItem,
   useOnSubmit,
@@ -23,6 +25,7 @@ import {
   useOnItemChange,
   useDropdownItems,
   useInitialize,
+  useMessageListener,
 } from './hooks'
 
 const Transfer = ({
@@ -38,13 +41,23 @@ const Transfer = ({
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
 
+  const id = useMemo(() => Math.round(Math.random() * 1000).toString(), [])
+
+  const { messages } = useNeuronWallet()
+
+  const [loading, setLoading] = useState(false)
+
+  const lastMessage = messages[messages.length - 1] || { title: '', id: null }
+
+  useMessageListener(id, lastMessage.id, lastMessage.title, setLoading)
+
   const updateTransferItem = useUpdateTransferItem(dispatch)
 
   const onSubmit = useOnSubmit(dispatch)
 
   const onPasswordChange = useOnPasswordChange(dispatch)
 
-  const onConfirm = useOnConfirm(dispatch)
+  const onConfirm = useOnConfirm(dispatch, setLoading)
 
   const onCancel = useOnDialogCancel(dispatch)
 
@@ -53,8 +66,6 @@ const Transfer = ({
   const dropdownItems = useDropdownItems(updateTransferItem)
 
   useInitialize(address, dispatch, history, updateTransferItem)
-
-  const disabled = transfer.submitting && !errorMsgs.transfer
 
   return (
     <Container>
@@ -70,7 +81,7 @@ const Transfer = ({
                   <Col sm={10}>
                     <InputGroup>
                       <Form.Control
-                        disabled={disabled}
+                        disabled={loading}
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
                         placeholder={PlaceHolders.transfer.Address}
@@ -93,7 +104,7 @@ const Transfer = ({
                 </Form.Group>
                 <InlineInputWithDropdown
                   label={t('send.capacity')}
-                  disabled={disabled}
+                  disabled={loading}
                   value={item.capacity}
                   placeholder={PlaceHolders.transfer.Capacity}
                   onChange={onItemChange('capacity', idx)}
@@ -105,15 +116,8 @@ const Transfer = ({
               </div>
             ))}
           </Form>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            block
-            disabled={disabled}
-            onClick={onSubmit(transfer.items)}
-          >
-            {disabled ? <Spinner /> : t('send.send')}
+          <Button type="submit" variant="primary" size="lg" block disabled={loading} onClick={onSubmit(transfer.items)}>
+            {loading ? <Spinner /> : t('send.send')}
           </Button>
         </Card.Body>
       </Card>
@@ -123,7 +127,7 @@ const Transfer = ({
           message={<TransferItemList items={transfer.items} />}
           password={password}
           onChange={onPasswordChange}
-          onSubmit={onConfirm(transfer.items, password)}
+          onSubmit={onConfirm(id, transfer.items, password)}
           onCancel={onCancel}
         />
       </Dialog>
