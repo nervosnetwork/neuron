@@ -1,5 +1,5 @@
 import WalletsService from '../services/wallets'
-import { WalletData } from '../store/walletStore'
+import { Wallet } from '../store/walletStore'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
@@ -21,7 +21,7 @@ export enum WalletsMethod {
 class WalletsController {
   static service = new WalletsService()
 
-  public static getAll = (): ChannelResponse<WalletData[]> => {
+  public static getAll = (): ChannelResponse<Wallet[]> => {
     const wallets = WalletsController.service.getAll()
     if (wallets) {
       return {
@@ -35,7 +35,7 @@ class WalletsController {
     }
   }
 
-  public static get = (id: string): ChannelResponse<WalletData> => {
+  public static get = (id: string): ChannelResponse<Wallet> => {
     const wallet = WalletsController.service.get(id)
     if (wallet) {
       return {
@@ -75,7 +75,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<WalletData>> => {
+  }): Promise<ChannelResponse<Wallet>> => {
     try {
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
@@ -108,7 +108,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<WalletData>> => {
+  }): Promise<ChannelResponse<Wallet>> => {
     const res = await WalletsController.importMnemonic({
       name,
       password,
@@ -131,7 +131,7 @@ class WalletsController {
     keystore: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<WalletData> => {
+  }): ChannelResponse<Wallet> => {
     try {
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
@@ -162,7 +162,7 @@ class WalletsController {
     password: string
     name: string
     newPassword?: string
-  }): ChannelResponse<WalletData> => {
+  }): ChannelResponse<Wallet> => {
     try {
       const wallet = WalletsController.service.get(id)
       if (wallet) {

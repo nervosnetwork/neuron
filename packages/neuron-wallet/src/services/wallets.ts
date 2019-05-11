@@ -1,16 +1,16 @@
 import { v4 } from 'uuid'
-import WalletStore, { WalletData } from '../store/walletStore'
+import WalletStore, { Wallet } from '../store/walletStore'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 
 const walletStore = new WalletStore()
 
 export default class WalletService {
-  public getAll = (): WalletData[] => {
+  public getAll = (): Wallet[] => {
     return walletStore.getAllWallets()
   }
 
-  public get = (id: string): WalletData | undefined => {
+  public get = (id: string): Wallet | undefined => {
     return this.getAll().find(wallet => wallet.id === id)
   }
 
@@ -22,7 +22,7 @@ export default class WalletService {
     name: string
     keystore: Keystore
     addresses: Addresses
-  }): WalletData => {
+  }): Wallet => {
     const id = v4()
     walletStore.saveWallet({ id, name, keystore, addresses })
     return { id, name, keystore, addresses }
@@ -34,7 +34,7 @@ export default class WalletService {
     return key.checkPassword(password)
   }
 
-  public update = (walletId: string, newWallet: WalletData) => {
+  public update = (walletId: string, newWallet: Wallet) => {
     const currentWallet = walletStore.getWallet(walletId)
     walletStore.updateWallet(walletId, { ...currentWallet, ...newWallet })
   }
@@ -52,7 +52,7 @@ export default class WalletService {
     return walletStore.setCurrentWallet(id)
   }
 
-  public getActive = (): WalletData => {
+  public getActive = (): Wallet => {
     return walletStore.getCurrentWallet()
   }
 }

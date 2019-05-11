@@ -10,7 +10,7 @@ export enum WalletStoreError {
   NoActiveWallet,
 }
 
-export interface WalletData {
+export interface Wallet {
   id: string
   name: string
   keystore: Keystore
@@ -36,31 +36,31 @@ export default class WalletStore {
     return new Store(this.storePath, `${id}.json`)
   }
 
-  getAllWallets = (): WalletData[] => {
+  getAllWallets = (): Wallet[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
 
-  getWallet = (id: string): WalletData => {
+  getWallet = (id: string): Wallet => {
     const wallets = this.getAllWallets()
-    const wallet = wallets.find((w: WalletData) => w.id === id)
+    const wallet = wallets.find((w: Wallet) => w.id === id)
     if (!wallet) {
       throw WalletStoreError.NoWallet
     }
     return wallet as any
   }
 
-  saveWallet = (walletData: WalletData) => {
-    this.listStore.writeSync(this.walletsKey, this.getAllWallets().concat(walletData))
+  saveWallet = (wallet: Wallet) => {
+    this.listStore.writeSync(this.walletsKey, this.getAllWallets().concat(wallet))
     // TODO: Save keystore to that store instead.
-    this.getWalletStore(walletData.id).writeSync(walletData.id, walletData)
+    this.getWalletStore(wallet.id).writeSync(wallet.id, wallet)
     if (this.getAllWallets().length === 1) {
-      this.setCurrentWallet(walletData.id)
+      this.setCurrentWallet(wallet.id)
     }
   }
 
-  updateWallet = (id: string, newWallet: WalletData) => {
+  updateWallet = (id: string, newWallet: Wallet) => {
     const wallets = this.getAllWallets()
-    const index = wallets.findIndex((w: WalletData) => w.id === id)
+    const index = wallets.findIndex((w: Wallet) => w.id === id)
     if (index !== -1) {
       wallets[index] = newWallet
       this.listStore.writeSync(this.walletsKey, wallets)
@@ -74,7 +74,7 @@ export default class WalletStore {
   deleteWallet = (id: string) => {
     const currentId = this.getCurrentWallet().id
     const wallets = this.getAllWallets()
-    const index = wallets.findIndex((w: WalletData) => w.id === id)
+    const index = wallets.findIndex((w: Wallet) => w.id === id)
     if (index !== -1) {
       wallets.splice(index, 1)
       this.listStore.writeSync(this.walletsKey, wallets)
@@ -89,7 +89,7 @@ export default class WalletStore {
   }
 
   setCurrentWallet = (walletId: string): boolean => {
-    const index = this.getAllWallets().findIndex((w: WalletData) => w.id === walletId)
+    const index = this.getAllWallets().findIndex((w: Wallet) => w.id === walletId)
     if (index === -1) {
       return false
     }
@@ -97,7 +97,7 @@ export default class WalletStore {
     return true
   }
 
-  getCurrentWallet = (): WalletData => {
+  getCurrentWallet = (): Wallet => {
     const walletId = this.listStore.readSync(this.currentWalletKey) as string
     if (walletId) {
       return this.getWallet(walletId)

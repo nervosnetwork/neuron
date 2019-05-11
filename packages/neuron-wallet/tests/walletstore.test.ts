@@ -1,10 +1,10 @@
 import assert from 'assert'
-import WalletStore, { WalletData } from '../src/store/walletStore'
+import WalletStore, { Wallet } from '../src/store/walletStore'
 
 describe('wallet store', () => {
   let walletStore: WalletStore
 
-  const wallet1: WalletData = {
+  const wallet1: Wallet = {
     id: '1',
     name: 'wallet1',
     keystore: {
@@ -57,7 +57,7 @@ describe('wallet store', () => {
     },
   }
 
-  const wallet2: WalletData = {
+  const wallet2: Wallet = {
     id: '2',
     name: 'wallet2',
     keystore: {
@@ -109,7 +109,7 @@ describe('wallet store', () => {
       ],
     },
   }
-  const wallet3: WalletData = {
+  const wallet3: Wallet = {
     id: '3',
     name: 'wallet3',
     keystore: {
