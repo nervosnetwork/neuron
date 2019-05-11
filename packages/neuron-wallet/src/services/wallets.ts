@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import { v4 as uuid } from 'uuid'
+import ckbCore from '../core'
+import TransactionsService from './transactions'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import app from '../app'
@@ -184,5 +186,47 @@ export default class WalletService {
       wallet.deleteKeystore()
     })
     this.listStore.clear()
+  }
+
+  /**
+   * transactions related
+   */
+  public sendCapacity = async (
+    items: {
+      address: CKBComponents.Hash256
+      capacity: CKBComponents.Capacity
+      unit: 'byte' | 'shannon'
+    }[],
+    password: string,
+  ) => {
+    // TODO: verify password
+    if (!password) {
+      throw new Error('Incorrect password')
+    }
+
+    // TODO: should pass in wallet id instead of accessing current wallet directly
+    const changeAddress = this.getCurrent()!.addresses.change[0].address
+
+    // TODO: this is always success code hash, should be replaced in the future
+    const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
+
+    const lockhashes = items.map(({ address }) =>
+      ckbCore.utils.lockScriptToHash({
+        // TODO: binaryHash has be updated to codeHash with sdk@0.11.0
+        binaryHash: codeHash,
+        args: [ckbCore.utils.blake160(address)],
+      }),
+    )
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(10 ** 8))).toString(),
+    }))
+
+    const transaction = (await TransactionsService.generateTx(
+      lockhashes,
+      targetOutputs,
+      changeAddress,
+    )) as CKBComponents.RawTransaction
+    return ckbCore.rpc.sendTransaction(transaction)
   }
 }

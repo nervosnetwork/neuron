@@ -94,7 +94,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         onClick={() => {
           setOpen(true)
         }}
-        onKeyPress={() => setOpen(true)}
+        onKeyPress={() => {}}
         type="button"
       >
         <ScanIcon />

@@ -8,7 +8,7 @@ import Input from './entities/Input'
 import Output from './entities/Output'
 import SyncInfo from './entities/SyncInfo'
 
-import { InitMigration1556975381415 } from './migration/1556975381415-InitMigration'
+import { InitMigration1557483560422 } from './migration/1557483560422-InitMigration'
 
 const userDataPath = app.getPath('userData')
 
@@ -25,7 +25,7 @@ const connectOptions = async (networkName: string) => {
   Object.assign(connectionOptions, {
     database: dbPath(networkName),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1556975381415],
+    migrations: [InitMigration1557483560422],
   })
 
   return connectionOptions

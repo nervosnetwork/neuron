@@ -8,7 +8,7 @@ export default class Output extends BaseEntity {
   @PrimaryColumn({
     type: 'varchar',
   })
-  outPointHash!: string
+  outPointTxHash!: string
 
   @PrimaryColumn({
     type: 'int',
@@ -37,7 +37,7 @@ export default class Output extends BaseEntity {
 
   public outPoint(): OutPoint {
     return {
-      txHash: this.outPointHash,
+      txHash: this.outPointTxHash,
       index: this.outPointIndex,
     }
   }

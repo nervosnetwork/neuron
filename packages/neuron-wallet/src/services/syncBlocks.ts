@@ -250,7 +250,7 @@ export default class SyncBlocksService {
       const output = await getConnection()
         .getRepository(OutputEntity)
         .findOne({
-          outPointHash: outPoint.txHash,
+          outPointTxHash: outPoint.txHash,
           outPointIndex: outPoint.index,
         })
       if (output) {

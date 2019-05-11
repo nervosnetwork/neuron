@@ -1,6 +1,6 @@
-import { ipcMain, Notification } from 'electron'
+import { ipcMain } from 'electron'
 import { Channel } from '../utils/const'
-import { wallets, verifyPassword, transactionHashGen } from '../mock'
+import { wallets, verifyPassword } from '../mock'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/networks'
 import TransactionsController from '../controllers/transactions'
@@ -31,15 +31,7 @@ const checkPassword = (walletID: string, password: string) => {
 
 export default class Listeners {
   static start = (
-    methods: string[] = [
-      'getBalance',
-      'checkWalletPassword',
-      'sendCapacity',
-      'networks',
-      'wallets',
-      'transactions',
-      'helpers',
-    ],
+    methods: string[] = ['getBalance', 'checkWalletPassword', 'networks', 'wallets', 'transactions', 'helpers'],
   ) => {
     methods.forEach(method => {
       const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
@@ -77,50 +69,6 @@ export default class Listeners {
         result: `balance`,
       })
     })
-  }
-
-  /**
-   * @static sendCapacity
-   * @memberof ChannelListeners
-   * @description channel to send capacity
-   */
-  static sendCapacity = () => {
-    return ipcMain.on(
-      Channel.SendCapacity,
-      (
-        e: Electron.Event,
-        { items, password }: { items: { address: string; capacity: string; unit: string }[]; password: string },
-      ) => {
-        setTimeout(() => {
-          const hash = transactionHashGen()
-          if (!items.length || !items[0].address) {
-            e.sender.send(Channel.SendCapacity, {
-              status: ResponseCode.Fail,
-              msg: 'Address not specified',
-            })
-            return
-          }
-          // TODO: verify password
-          // TODO: verify capacity
-          const notification = new Notification({
-            title: `Send Capacity`,
-            body: `Send Capacity to CKB with ${JSON.stringify(
-              {
-                items,
-                password,
-              },
-              null,
-              2,
-            )}`,
-          })
-          notification.show()
-          e.sender.send(Channel.SendCapacity, {
-            status: ResponseCode.Success,
-            result: hash,
-          })
-        }, 3000)
-      },
-    )
   }
 
   /**

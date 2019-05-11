@@ -250,7 +250,7 @@ export default class TransactionsService {
         txEntity.inputs.map(async input => {
           const outPoint: OutPoint = input.previousOutput()
           const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-            outPointHash: outPoint.txHash,
+            outPointTxHash: outPoint.txHash,
             outPointIndex: outPoint.index,
           })
           if (outputEntity) {
@@ -299,7 +299,7 @@ export default class TransactionsService {
       inputs.push(input)
 
       const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-        outPointHash: input.previousOutput().txHash,
+        outPointTxHash: input.previousOutput().txHash,
         outPointIndex: input.previousOutput().index,
       })
       if (previousOutput) {
@@ -312,7 +312,7 @@ export default class TransactionsService {
     const outputs: OutputEntity[] = await Promise.all(
       transaction.outputs!.map(async (o, index) => {
         const output = new OutputEntity()
-        output.outPointHash = transaction.hash
+        output.outPointTxHash = transaction.hash
         output.outPointIndex = index
         output.capacity = o.capacity
         output.lock = o.lock
@@ -386,7 +386,7 @@ export default class TransactionsService {
         const outputEntity: OutputEntity | undefined = await getConnection()
           .getRepository(OutputEntity)
           .findOne({
-            outPointHash: i.previousOutput.txHash,
+            outPointTxHash: i.previousOutput.txHash,
             outPointIndex: i.previousOutput.index,
           })
         if (outputEntity) {
