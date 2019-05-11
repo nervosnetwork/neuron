@@ -2,7 +2,7 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import NetworksController, { NetworksMethod } from '../controllers/networks'
 import windowManage from '../utils/windowManage'
 import WalletChannel from '../channel/wallet'
-import nodeService from '../services/node'
+import nodeService from './nodeService'
 import { Channel } from '../utils/const'
 
 const syncConnectStatus = () => {
@@ -21,7 +21,6 @@ const syncConnectStatus = () => {
 }
 
 const initApp = async () => {
-  nodeService.start()
   // TODO: this function should be moved to somewhere syncing data
   syncConnectStatus()
   WalletChannel.start()
@@ -29,6 +28,17 @@ const initApp = async () => {
   if (!activeId) {
     await NetworksController.service.init()
   }
+  if (!nodeService.core.node.url) {
+    const id = await NetworksController.service.activeId()
+    const network = await NetworksController.service.get(id || '')
+    if (network) {
+      nodeService.setNetwork(network.remote)
+    } else {
+      throw new Error('Network not set')
+    }
+  }
+
+  nodeService.start()
 }
 
 export default initApp

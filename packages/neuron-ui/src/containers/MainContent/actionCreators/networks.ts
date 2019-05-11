@@ -36,6 +36,12 @@ export default {
         payload: { networks: i18n.t(`messages.${Message.URLIsRequired}`) },
       }
     }
+    if (!remote.startsWith('http')) {
+      return {
+        type: MainActions.ErrorMessage,
+        payload: { networks: i18n.t(`messages.${Message.ProtocolIsRequired}`) },
+      }
+    }
     // verification, for now, only name is unique
     if (id === 'new') {
       if (networks.some(network => network.name === name)) {
