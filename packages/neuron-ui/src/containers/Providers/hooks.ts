@@ -138,6 +138,10 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
             break
           }
+          case WalletsMethod.SendCapacity: {
+            history.push(`${Routes.Transaction}/${args.result}`)
+            break
+          }
           default: {
             break
           }
@@ -145,16 +149,19 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       } else {
         const time = new Date().getTime()
         if (method === WalletsMethod.GetActive) {
-          // don't show this error in wizard view
           return
         }
+        const title = method === WalletsMethod.SendCapacity ? 'Transaction' : 'Wallet'
+        const { content, id } =
+          typeof args.msg === 'string' ? { content: args.msg, id: null } : args.msg || { content: '', id: null }
 
         dispatch({
           type: ProviderActions.AddMessage,
           payload: {
             category: 'danger',
-            title: 'Wallet',
-            content: args.msg,
+            title,
+            id,
+            content,
             time,
             actions: [],
             dismiss: () => {

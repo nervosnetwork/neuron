@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react'
 import { History } from 'history'
-import UILayer, { TransferItem } from 'services/UILayer'
+import { TransferItem } from 'services/UILayer'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import { Channel, Routes, CapacityUnit } from 'utils/const'
+import { CapacityUnit } from 'utils/const'
 import initState from 'containers/MainContent/state'
 
 export const useUpdateTransferItem = (dispatch: React.Dispatch<any>) =>
@@ -40,9 +40,9 @@ export const useOnPasswordChange = (dispatch: React.Dispatch<any>) =>
     [dispatch],
   )
 
-export const useOnConfirm = (dispatch: React.Dispatch<any>) =>
+export const useOnConfirm = (dispatch: React.Dispatch<any>, setLoading: Function) =>
   useCallback(
-    (items: TransferItem[], pwd: string) => () => {
+    (id: string, items: TransferItem[], pwd: string) => () => {
       dispatch({
         type: MainActions.SetDialog,
         payload: {
@@ -53,16 +53,18 @@ export const useOnConfirm = (dispatch: React.Dispatch<any>) =>
         type: MainActions.UpdatePassword,
         payload: '',
       })
+      setLoading(true)
       setTimeout(() => {
         dispatch(
           actionCreators.confirmTransfer({
+            id,
             items,
             password: pwd,
           }),
         )
       }, 10)
     },
-    [dispatch],
+    [dispatch, setLoading],
   )
 
 export const useOnItemChange = (updateTransferItem: Function) => (field: string, idx: number) => (
@@ -94,30 +96,21 @@ export const useInitialize = (
     if (address) {
       updateTransferItem('address')(0)(address)
     }
-    UILayer.on(Channel.SendCapacity, (_e: Event, args: ChannelResponse<string>) => {
-      if (args.status) {
-        history.push(`${Routes.Transaction}/${args.result}`)
-      } else {
-        dispatch({
-          type: MainActions.UpdateTransfer,
-          payload: {
-            submitting: false,
-          },
-        })
-        dispatch({
-          type: MainActions.ErrorMessage,
-          payload: { transfer: args.msg },
-        })
-      }
-    })
     return () => {
-      UILayer.removeAllListeners(Channel.SendCapacity)
       dispatch({
         type: MainActions.UpdateTransfer,
         payload: initState.transfer,
       })
     }
   }, [address, dispatch, history, updateTransferItem])
+
+export const useMessageListener = (id: string, messageId: string | null, title: string, setLoading: Function) => {
+  useEffect(() => {
+    if (title === 'Transaction' && messageId === id) {
+      setLoading(false)
+    }
+  }, [title, messageId, id, setLoading])
+}
 
 export default {
   useUpdateTransferItem,
@@ -126,5 +119,6 @@ export default {
   useOnConfirm,
   useOnItemChange,
   useDropdownItems,
+  useMessageListener,
   useInitialize,
 }

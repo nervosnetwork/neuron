@@ -16,6 +16,7 @@ export enum WalletsMethod {
   Delete = 'delete',
   GetActive = 'getActive',
   Activate = 'activate',
+  SendCapacity = 'sendCapacity',
 }
 
 class WalletsController {
@@ -268,6 +269,38 @@ class WalletsController {
       msg: 'Failed to activate wallet',
     }
     // TODO: verification
+  }
+
+  public static sendCapacity = async (params: {
+    id: string
+    items: {
+      address: CKBComponents.Hash256
+      capacity: CKBComponents.Capacity
+      unit: 'byte' | 'shannon'
+    }[]
+    password: string
+  }) => {
+    if (!params) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Parameters not received',
+      }
+    }
+    try {
+      const hash = await WalletsController.service.sendCapacity(params.items, params.password)
+      return {
+        status: ResponseCode.Success,
+        result: hash,
+      }
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: {
+          content: `Error: "${err.message}"`,
+          id: params.id,
+        },
+      }
+    }
   }
 }
 

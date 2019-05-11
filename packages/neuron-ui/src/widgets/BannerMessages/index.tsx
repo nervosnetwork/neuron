@@ -32,6 +32,7 @@ const ActionZone = styled.div`
 export interface Message {
   title: string
   content: string
+  id: string | null
   time: number
   category: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light'
   actions: { label: string; action: React.MouseEventHandler | string }[]
