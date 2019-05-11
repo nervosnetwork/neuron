@@ -1,4 +1,4 @@
-import WalletsService, { Wallet } from '../services/wallets'
+import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
@@ -151,6 +151,7 @@ class WalletsController {
     }
   }
 
+  // TODO: update addresses?
   public static update = ({
     id,
     name,
@@ -166,12 +167,12 @@ class WalletsController {
       const wallet = WalletsController.service.get(id)
       if (wallet) {
         if (WalletsController.service.validate({ id, password })) {
-          wallet.name = name
+          const props: WalletProperties = { name, addresses: wallet.addresses, keystore: null }
           if (newPassword) {
-            const key = Key.fromKeystore(JSON.stringify(wallet!.keystore), password)
-            wallet.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
+            const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
+            props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           }
-          WalletsController.service.update(id, wallet)
+          WalletsController.service.update(id, props)
           windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
           return {
             status: ResponseCode.Success,

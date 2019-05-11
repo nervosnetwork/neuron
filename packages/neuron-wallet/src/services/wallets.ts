@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import { v4 as uuid } from 'uuid'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
@@ -9,17 +10,71 @@ import Store from '../utils/store'
 export interface Wallet {
   id: string
   name: string
-  keystore: Keystore
   addresses: Addresses
 
-  // TODO: add explictly keystore loading func
-  // loadKeystore: () => Keystore
+  loadKeystore: () => Keystore
 }
 
 export interface WalletProperties {
   name: string
-  keystore: Keystore
   addresses: Addresses
+  keystore: Keystore | null
+}
+
+class FileKeystoreWallet implements Wallet {
+  id: string
+  name: string
+  addresses: Addresses
+
+  private storePath: string
+
+  constructor(id: string, props: WalletProperties, storePath: string) {
+    this.id = id
+
+    this.name = props.name
+    this.addresses = props.addresses
+
+    this.storePath = storePath
+  }
+
+  static fromJSON = (
+    json: { id: string; name: string; addresses: Addresses },
+    storePath: string,
+  ): FileKeystoreWallet => {
+    const props = { name: json.name, addresses: json.addresses, keystore: null }
+    return new FileKeystoreWallet(json.id, props, storePath)
+  }
+
+  update = (props: WalletProperties) => {
+    this.name = props.name
+    this.addresses = props.addresses
+  }
+
+  toJSON = (): any => {
+    return {
+      id: this.id,
+      name: this.name,
+      addresses: this.addresses,
+    }
+  }
+
+  loadKeystore = (): Keystore => {
+    // TODO: handle fs error
+    const data = fs.readFileSync(this.storeLocation(), { encoding: 'utf8' })
+    return JSON.parse(data) as Keystore
+  }
+
+  private storeLocation = (): string => {
+    return path.resolve(this.storePath, `${this.id}.json`)
+  }
+
+  saveKeystore = (keystore: Keystore) => {
+    fs.writeFileSync(this.storeLocation(), JSON.stringify(keystore), { encoding: 'utf8' })
+  }
+
+  deleteKeystore = () => {
+    fs.unlinkSync(this.storeLocation())
+  }
 }
 
 // TODO: Check if '/dev/wallets' path works on Windows
@@ -37,34 +92,38 @@ export default class WalletService {
     this.listStore = new Store(this.storePath, 'wallets.json')
   }
 
-  private getWalletStore = (id: string): Store => {
-    return new Store(this.storePath, `${id}.json`)
-  }
-
   public getAll = (): Wallet[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
 
   public get = (id: string): Wallet | undefined => {
-    return this.getAll().find(wallet => wallet.id === id)
+    const wallet = this.getAll().find(w => w.id === id)
+    if (wallet) {
+      return FileKeystoreWallet.fromJSON(wallet, this.storePath)
+    }
+    return undefined
   }
 
-  public create = (prop: WalletProperties): Wallet => {
-    const wallet = { ...prop, id: uuid() }
-    this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet))
-    // TODO: Save keystore to that store instead.
-    this.getWalletStore(wallet.id).writeSync(wallet.id, wallet)
+  public create = (props: WalletProperties): Wallet => {
+    const wallet = new FileKeystoreWallet(uuid(), props, this.storePath)
+    wallet.saveKeystore(props.keystore!)
+    this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet.toJSON()))
     if (this.getAll().length === 1) {
       this.setCurrent(wallet.id)
     }
     return wallet
   }
 
-  public update = (id: string, prop: WalletProperties) => {
+  public update = (id: string, props: WalletProperties) => {
     const wallets = this.getAll()
     const index = wallets.findIndex((w: Wallet) => w.id === id)
     if (index !== -1) {
-      wallets[index] = { ...prop, id }
+      const wallet = FileKeystoreWallet.fromJSON(wallets[index], this.storePath)
+      wallet.update(props)
+      if (props.keystore) {
+        wallet.saveKeystore(props.keystore)
+      }
+      wallets[index] = wallet.toJSON()
       this.listStore.writeSync(this.walletsKey, wallets)
     }
   }
@@ -78,9 +137,10 @@ export default class WalletService {
       return false
     }
 
+    const wallet = FileKeystoreWallet.fromJSON(wallets[index], this.storePath)
     wallets.splice(index, 1)
     this.listStore.writeSync(this.walletsKey, wallets)
-    this.getWalletStore(id).clear()
+    wallet.deleteKeystore()
 
     const newWallets = this.getAll()
     if (currentId === id && newWallets.length > 0) {
@@ -110,7 +170,7 @@ export default class WalletService {
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
     if (wallet) {
-      const key = new Key({ keystore: wallet.keystore })
+      const key = new Key({ keystore: wallet.loadKeystore() })
       return key.checkPassword(password)
     }
 
@@ -120,7 +180,8 @@ export default class WalletService {
 
   public clearAll = () => {
     this.getAll().forEach(w => {
-      this.getWalletStore(w.id).clear()
+      const wallet = FileKeystoreWallet.fromJSON(w, this.storePath)
+      wallet.deleteKeystore()
     })
     this.listStore.clear()
   }
