@@ -1,9 +1,8 @@
 import TransactionsService from './transactions'
+import WalletService from './wallets'
 import ckbCore from '../core'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
-// TODO: Should use service
-import WalletStore from '../store/walletStore'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
@@ -67,7 +66,7 @@ class Address {
   }
 
   public static allAddresses = () =>
-    new WalletStore().getAllWallets().reduce((total: HDAddress[], cur) => {
+    new WalletService().getAll().reduce((total: HDAddress[], cur) => {
       return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
     }, [])
 

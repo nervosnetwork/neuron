@@ -1,5 +1,5 @@
-import Addresses from '../src/services/addresses'
-import ckbCore from '../src/core'
+import Addresses from '../../src/services/addresses'
+import ckbCore from '../../src/core'
 
 describe('Key tests', () => {
   const { utils } = ckbCore

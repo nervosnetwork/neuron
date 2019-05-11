@@ -1,13 +1,39 @@
+import fs from 'fs'
 import { v4 as uuid } from 'uuid'
-import WalletStore, { Wallet } from '../store/walletStore'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
+import app from '../app'
+import env from '../env'
+import Store from '../utils/store'
 
-const walletStore = new WalletStore()
+export interface Wallet {
+  id: string
+  name: string
+  keystore: Keystore
+  addresses: Addresses
+}
+
+// TODO: Check if '/dev/wallets' path works on Windows
+const defaultStorePath = env.isDevMode ? '/dev/wallets' : '/wallets'
 
 export default class WalletService {
+  private storePath: string
+  private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
+  private walletsKey = 'wallets'
+  private currentWalletKey = 'current'
+
+  constructor(storePath: string = defaultStorePath) {
+    this.storePath = `${app.getPath('userData')}/${storePath}`
+    fs.mkdirSync(this.storePath, { recursive: true })
+    this.listStore = new Store(this.storePath, 'wallets.json')
+  }
+
+  private getWalletStore = (id: string): Store => {
+    return new Store(this.storePath, `${id}.json`)
+  }
+
   public getAll = (): Wallet[] => {
-    return walletStore.getAllWallets()
+    return this.listStore.readSync(this.walletsKey) || []
   }
 
   public get = (id: string): Wallet | undefined => {
@@ -23,36 +49,78 @@ export default class WalletService {
     keystore: Keystore
     addresses: Addresses
   }): Wallet => {
-    const id = uuid()
-    walletStore.saveWallet({ id, name, keystore, addresses })
-    return { id, name, keystore, addresses }
+    const wallet = { id: uuid(), name, keystore, addresses }
+    this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet))
+    // TODO: Save keystore to that store instead.
+    this.getWalletStore(wallet.id).writeSync(wallet.id, wallet)
+    if (this.getAll().length === 1) {
+      this.setCurrent(wallet.id)
+    }
+    return wallet
   }
 
-  public validate = ({ id, password }: { id: string; password: string }) => {
-    const wallet = walletStore.getWallet(id)
-    const key = new Key({ keystore: wallet.keystore })
-    return key.checkPassword(password)
-  }
-
-  public update = (walletId: string, newWallet: Wallet) => {
-    const currentWallet = walletStore.getWallet(walletId)
-    walletStore.updateWallet(walletId, { ...currentWallet, ...newWallet })
+  public update = (id: string, newWallet: Wallet) => {
+    const wallets = this.getAll()
+    const index = wallets.findIndex((w: Wallet) => w.id === id)
+    if (index !== -1) {
+      wallets[index] = { ...newWallet, id }
+      this.listStore.writeSync(this.walletsKey, wallets)
+    }
   }
 
   public delete = (id: string): boolean => {
+    const current = this.getCurrent()
+    const currentId = current ? current.id : ''
+    const wallets = this.getAll()
+    const index = wallets.findIndex((w: Wallet) => w.id === id)
+    if (index === -1) {
+      return false
+    }
+
+    wallets.splice(index, 1)
+    this.listStore.writeSync(this.walletsKey, wallets)
+    this.getWalletStore(id).clear()
+
+    const newWallets = this.getAll()
+    if (currentId === id && newWallets.length > 0) {
+      this.setCurrent(newWallets[0].id)
+    }
+
+    return true
+  }
+
+  public setCurrent = (id: string): boolean => {
     const wallet = this.get(id)
     if (wallet) {
-      walletStore.deleteWallet(id)
+      this.listStore.writeSync(this.currentWalletKey, id)
       return true
     }
     return false
   }
 
-  public setActive = (id: string): boolean => {
-    return walletStore.setCurrentWallet(id)
+  public getCurrent = (): Wallet | undefined => {
+    const walletId = this.listStore.readSync(this.currentWalletKey) as string
+    if (walletId) {
+      return this.get(walletId)
+    }
+    return undefined
   }
 
-  public getActive = (): Wallet => {
-    return walletStore.getCurrentWallet()
+  public validate = ({ id, password }: { id: string; password: string }) => {
+    const wallet = this.get(id)
+    if (wallet) {
+      const key = new Key({ keystore: wallet.keystore })
+      return key.checkPassword(password)
+    }
+
+    // TODO: Throw wallet not found instead.
+    return false
+  }
+
+  public clearAll = () => {
+    this.getAll().forEach(w => {
+      this.getWalletStore(w.id).clear()
+    })
+    this.listStore.clear()
   }
 }

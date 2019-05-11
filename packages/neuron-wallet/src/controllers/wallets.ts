@@ -1,5 +1,4 @@
-import WalletsService from '../services/wallets'
-import { Wallet } from '../store/walletStore'
+import WalletsService, { Wallet } from '../services/wallets'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
@@ -203,7 +202,7 @@ class WalletsController {
           status: ResponseCode.Success,
           result: {
             allWallets: WalletsController.service.getAll(),
-            activeWallet: WalletsController.service.getActive(),
+            activeWallet: WalletsController.service.getCurrent(),
           },
         }
       }
@@ -234,8 +233,8 @@ class WalletsController {
   }
 
   public static getActive = () => {
-    try {
-      const activeWallet = WalletsController.service.getActive()
+    const activeWallet = WalletsController.service.getCurrent()
+    if (activeWallet) {
       return {
         status: ResponseCode.Success,
         result: {
@@ -246,21 +245,21 @@ class WalletsController {
           },
         },
       }
-    } catch (e) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'No active wallet',
-      }
+    }
+
+    return {
+      status: ResponseCode.Fail,
+      msg: 'No active wallet',
     }
   }
 
   public static activate = (id: string) => {
-    const success = WalletsController.service.setActive(id)
+    const success = WalletsController.service.setCurrent(id)
     if (success) {
       windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
       return {
         status: ResponseCode.Success,
-        result: WalletsController.service.getActive(),
+        result: WalletsController.service.getCurrent(),
       }
     }
     return {
