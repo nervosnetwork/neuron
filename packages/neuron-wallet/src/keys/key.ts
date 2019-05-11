@@ -3,7 +3,7 @@ import * as bip39 from 'bip39'
 import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
 import SHA3 from 'sha3'
-import { v4 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
 
@@ -193,7 +193,7 @@ export default class Key {
       .replace('0x', '')
     return {
       version: 0,
-      id: v4(),
+      id: uuid(),
       crypto: {
         ciphertext: ciphertext.toString('hex'),
         cipherparams: {

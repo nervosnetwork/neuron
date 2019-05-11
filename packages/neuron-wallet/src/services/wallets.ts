@@ -1,4 +1,4 @@
-import { v4 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import WalletStore, { Wallet } from '../store/walletStore'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
@@ -23,7 +23,7 @@ export default class WalletService {
     keystore: Keystore
     addresses: Addresses
   }): Wallet => {
-    const id = v4()
+    const id = uuid()
     walletStore.saveWallet({ id, name, keystore, addresses })
     return { id, name, keystore, addresses }
   }
