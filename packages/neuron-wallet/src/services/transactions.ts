@@ -4,7 +4,9 @@ import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
 import { getHistoryTransactions } from '../mock_rpc'
-import ckbCore from '../core'
+import nodeService from '../startup/nodeService'
+
+const { core } = nodeService
 
 export interface Input {
   previousOutput: OutPoint
@@ -147,7 +149,7 @@ export default class TransactionsService {
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.pubkeys.map(async pubkey => {
-        const addr = ckbCore.utils.pubkeyToAddress(pubkey)
+        const addr = core.utils.pubkeyToAddress(pubkey)
         const lockHash = await TransactionsService.addressToLockHash(addr)
         return lockHash
       }),
@@ -190,7 +192,7 @@ export default class TransactionsService {
 
   // check whether the address has history transactions
   public static hasTransactions = async (address: string): Promise<boolean> => {
-    const blake160 = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+    const blake160 = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
@@ -426,14 +428,14 @@ export default class TransactionsService {
 
   // system contract info
   public static contractInfo = async () => {
-    const genesisHash: string = await ckbCore.rpc.getBlockHash('0')
-    const genesisBlock = await ckbCore.rpc.getBlock(genesisHash)
+    const genesisHash: string = await core.rpc.getBlockHash('0')
+    const genesisBlock = await core.rpc.getBlock(genesisHash)
     const systemScriptTx = genesisBlock.transactions[0]
-    const blake2b = ckbCore.utils.blake2b(32)
+    const blake2b = core.utils.blake2b(32)
     const systemScriptCell = systemScriptTx.outputs[0]
     const { data } = systemScriptCell
     if (typeof data === 'string') {
-      blake2b.update(ckbCore.utils.hexToBytes(data))
+      blake2b.update(core.utils.hexToBytes(data))
     } else {
       // if Uint8Array
       blake2b.update(data)
@@ -462,7 +464,7 @@ export default class TransactionsService {
     const outputs: Cell[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
-      const blake160: string = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+      const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
 
       const output: Cell = {
         capacity,
@@ -478,9 +480,9 @@ export default class TransactionsService {
 
     // change
     if (BigInt(capacities) > needCapacities) {
-      const changeBlake160: string = ckbCore.utils.parseAddress(
+      const changeBlake160: string = core.utils.parseAddress(
         changeAddress,
-        ckbCore.utils.AddressPrefix.Testnet,
+        core.utils.AddressPrefix.Testnet,
         'hex',
       ) as string
 
@@ -509,7 +511,7 @@ export default class TransactionsService {
   public static lockScriptToHash = (lock: Script) => {
     const binaryHash: string = lock!.binaryHash!
     const args: string[] = lock.args!
-    const lockHash: string = ckbCore.utils.lockScriptToHash({
+    const lockHash: string = core.utils.lockScriptToHash({
       binaryHash,
       args,
     })
@@ -522,7 +524,7 @@ export default class TransactionsService {
   }
 
   public static addressToLockScript = async (address: string): Promise<Script> => {
-    const blake160: string = ckbCore.utils.parseAddress(address, ckbCore.utils.AddressPrefix.Testnet, 'hex') as string
+    const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
@@ -545,10 +547,10 @@ export default class TransactionsService {
   }
 
   public static blake160ToAddress = (blake160: string): string => {
-    return ckbCore.utils.bech32Address(blake160, {
-      prefix: ckbCore.utils.AddressPrefix.Testnet,
-      type: ckbCore.utils.AddressType.BinIdx,
-      binIdx: ckbCore.utils.AddressBinIdx.P2PH,
+    return core.utils.bech32Address(blake160, {
+      prefix: core.utils.AddressPrefix.Testnet,
+      type: core.utils.AddressType.BinIdx,
+      binIdx: core.utils.AddressBinIdx.P2PH,
     })
   }
 }

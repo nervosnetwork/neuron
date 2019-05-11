@@ -1,11 +1,24 @@
+import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, Subject } from 'rxjs'
 import { distinctUntilChanged, flatMap, retry, filter } from 'rxjs/operators'
-import ckbCore from '../core'
 
 class NodeService {
   tick = interval(1000)
 
   tipNumberSubject = new Subject()
+
+  core: Core = new Core('')
+
+  setNetwork = (url: string) => {
+    if (typeof url !== 'string') {
+      throw new Error('url should be type of string')
+    }
+    if (!url.startsWith('http')) {
+      throw new Error('Protocol of url should be specified')
+    }
+    this.core = new Core(url)
+    return this.core
+  }
 
   start = () => {
     const { unsubscribe } = this.tipNumber()
@@ -15,7 +28,9 @@ class NodeService {
   tipNumber = () =>
     this.tick
       .pipe(
-        flatMap(() => ckbCore.rpc.getTipBlockNumber()),
+        flatMap(() => {
+          return this.core.rpc.getTipBlockNumber()
+        }),
         // TODO: to determine retry or not
         retry(3),
         distinctUntilChanged(),
@@ -33,18 +48,16 @@ class NodeService {
   tipHeader = () =>
     this.tipNumberSubject.pipe(
       filter(tipNumber => typeof tipNumber !== 'undefined'),
-      flatMap(ckbCore.rpc.getTipHeader),
+      flatMap(this.core.rpc.getTipHeader),
     )
 
   tipBlock = () =>
     this.tipNumberSubject
       .pipe(
         filter(tipNumber => typeof tipNumber !== 'undefined'),
-        flatMap(ckbCore.rpc.getBlockHash),
+        flatMap(this.core.rpc.getBlockHash),
       )
-      .pipe(flatMap(ckbCore.rpc.getBlock))
+      .pipe(flatMap(this.core.rpc.getBlock))
 }
 
-const nodeService = new NodeService()
-
-export default nodeService
+export default NodeService
