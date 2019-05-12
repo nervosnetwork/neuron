@@ -39,6 +39,8 @@ export default class SyncBlocksService {
 
   private tryBlocksTime = 0
 
+  private stopFlag = false
+
   constructor(lockHashes: string[]) {
     this.lockHashList = lockHashes
   }
@@ -53,10 +55,14 @@ export default class SyncBlocksService {
 
   // continue to loop blocks, follow chain height
   async loopBlocks() {
-    const flag = true
-    while (flag) {
+    while (!this.stopFlag) {
       await this.resolveBatchBlocks()
     }
+  }
+
+  // stop loop
+  stop() {
+    this.stopFlag = true
   }
 
   // resolve block to
