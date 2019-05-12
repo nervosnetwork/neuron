@@ -86,6 +86,7 @@ export enum Message {
   InvalidCapacity = 'invalid-capacity',
   CapacityNotEnough = 'capacity-is-not-enough',
   IsUnremovable = 'is-unremovable',
+  ProtocolIsRequired = 'protocol-is-required',
 }
 
 export enum TransactionType {
