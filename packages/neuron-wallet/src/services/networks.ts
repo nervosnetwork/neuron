@@ -1,4 +1,4 @@
-import { v4 } from 'uuid'
+import { v4 as uuid } from 'uuid'
 import Store from '../utils/store'
 import env from '../env'
 
@@ -83,7 +83,7 @@ export default class NetworksService extends Store {
       throw new Error('Network name exists')
     }
     const newOne = {
-      id: v4(),
+      id: uuid(),
       name,
       remote,
       type,

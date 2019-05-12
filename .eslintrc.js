@@ -52,7 +52,8 @@ module.exports = {
     "no-plusplus": [0],
     "no-console": [2, {
       "allow": ["warn", "error", "info"]
-    }]
+    }],
+    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }]
   },
   "globals": {
     "BigInt": "readonly"

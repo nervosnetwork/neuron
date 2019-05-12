@@ -1,5 +1,4 @@
-import WalletsService from '../services/wallets'
-import { WalletData } from '../store/walletStore'
+import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
@@ -22,7 +21,7 @@ export enum WalletsMethod {
 class WalletsController {
   static service = new WalletsService()
 
-  public static getAll = (): ChannelResponse<WalletData[]> => {
+  public static getAll = (): ChannelResponse<Wallet[]> => {
     const wallets = WalletsController.service.getAll()
     if (wallets) {
       return {
@@ -36,7 +35,7 @@ class WalletsController {
     }
   }
 
-  public static get = (id: string): ChannelResponse<WalletData> => {
+  public static get = (id: string): ChannelResponse<Wallet> => {
     const wallet = WalletsController.service.get(id)
     if (wallet) {
       return {
@@ -76,7 +75,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<WalletData>> => {
+  }): Promise<ChannelResponse<Wallet>> => {
     try {
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
@@ -109,7 +108,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<WalletData>> => {
+  }): Promise<ChannelResponse<Wallet>> => {
     const res = await WalletsController.importMnemonic({
       name,
       password,
@@ -132,7 +131,7 @@ class WalletsController {
     keystore: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<WalletData> => {
+  }): ChannelResponse<Wallet> => {
     try {
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
@@ -153,6 +152,7 @@ class WalletsController {
     }
   }
 
+  // TODO: update addresses?
   public static update = ({
     id,
     name,
@@ -163,17 +163,17 @@ class WalletsController {
     password: string
     name: string
     newPassword?: string
-  }): ChannelResponse<WalletData> => {
+  }): ChannelResponse<Wallet> => {
     try {
       const wallet = WalletsController.service.get(id)
       if (wallet) {
         if (WalletsController.service.validate({ id, password })) {
-          wallet.name = name
+          const props: WalletProperties = { name, addresses: wallet.addresses, keystore: null }
           if (newPassword) {
-            const key = Key.fromKeystore(JSON.stringify(wallet!.keystore), password)
-            wallet.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
+            const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
+            props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           }
-          WalletsController.service.update(id, wallet)
+          WalletsController.service.update(id, props)
           windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
           return {
             status: ResponseCode.Success,
@@ -204,7 +204,7 @@ class WalletsController {
           status: ResponseCode.Success,
           result: {
             allWallets: WalletsController.service.getAll(),
-            activeWallet: WalletsController.service.getActive(),
+            activeWallet: WalletsController.service.getCurrent(),
           },
         }
       }
@@ -235,8 +235,8 @@ class WalletsController {
   }
 
   public static getActive = () => {
-    try {
-      const activeWallet = WalletsController.service.getActive()
+    const activeWallet = WalletsController.service.getCurrent()
+    if (activeWallet) {
       return {
         status: ResponseCode.Success,
         result: {
@@ -247,21 +247,21 @@ class WalletsController {
           },
         },
       }
-    } catch (e) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'No active wallet',
-      }
+    }
+
+    return {
+      status: ResponseCode.Fail,
+      msg: 'No active wallet',
     }
   }
 
   public static activate = (id: string) => {
-    const success = WalletsController.service.setActive(id)
+    const success = WalletsController.service.setCurrent(id)
     if (success) {
       windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
       return {
         status: ResponseCode.Success,
-        result: WalletsController.service.getActive(),
+        result: WalletsController.service.getCurrent(),
       }
     }
     return {
