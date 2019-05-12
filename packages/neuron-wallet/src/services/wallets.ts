@@ -1,13 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import { v4 as uuid } from 'uuid'
-import ckbCore from '../core'
 import TransactionsService from './transactions'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import app from '../app'
 import env from '../env'
 import Store from '../utils/store'
+import nodeService from '../startup/nodeService'
+
+const { core } = nodeService
 
 export interface Wallet {
   id: string
@@ -211,10 +213,10 @@ export default class WalletService {
     const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
 
     const lockhashes = items.map(({ address }) =>
-      ckbCore.utils.lockScriptToHash({
+      core.utils.lockScriptToHash({
         // TODO: binaryHash has be updated to codeHash with sdk@0.11.0
         binaryHash: codeHash,
-        args: [ckbCore.utils.blake160(address)],
+        args: [core.utils.blake160(address)],
       }),
     )
     const targetOutputs = items.map(item => ({
@@ -227,6 +229,6 @@ export default class WalletService {
       targetOutputs,
       changeAddress,
     )) as CKBComponents.RawTransaction
-    return ckbCore.rpc.sendTransaction(transaction)
+    return core.rpc.sendTransaction(transaction)
   }
 }

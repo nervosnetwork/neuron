@@ -1,8 +1,9 @@
 import Addresses from '../../src/services/addresses'
-import ckbCore from '../../src/core'
+import nodeService from '../../src/startup/nodeService'
+
+const { utils } = nodeService.core
 
 describe('Key tests', () => {
-  const { utils } = ckbCore
   const { AddressPrefix } = utils
 
   it('Generate testnet address from public key', async () => {

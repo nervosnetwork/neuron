@@ -3,8 +3,10 @@ import { Subject } from 'rxjs'
 import { Script, OutPoint, Cell } from './cells'
 import TransactionsService, { Input, Transaction } from './transactions'
 import OutputEntity from '../entities/Output'
-import ckbCore from '../core'
 import SyncInfoEntity from '../entities/SyncInfo'
+import nodeService from '../startup/nodeService'
+
+const { core } = nodeService
 
 export interface BlockHeader {
   version: number
@@ -91,7 +93,7 @@ export default class SyncBlocksService {
 
   async tryGetTipBlockNumber(): Promise<number> {
     try {
-      const tipBlockNumber = await ckbCore.rpc.getTipBlockNumber()
+      const tipBlockNumber = await core.rpc.getTipBlockNumber()
       return parseInt(tipBlockNumber, 10)
     } catch {
       return this.tryGetTipBlockNumber()
@@ -150,7 +152,7 @@ export default class SyncBlocksService {
     const blockNumbers = Array.from({ length: size }).map((_a, i) => i + startBlockNumber)
     const blockHashes: string[] = await Promise.all(
       blockNumbers.map(async num => {
-        const hash: string = await ckbCore.rpc.getBlockHash(num.toString())
+        const hash: string = await core.rpc.getBlockHash(num.toString())
         return hash
       }),
     )
@@ -160,7 +162,7 @@ export default class SyncBlocksService {
   static async getBlocks(blockHashes: string[]): Promise<Block[]> {
     const blocks = await Promise.all(
       blockHashes.map(async hash => {
-        const block = await ckbCore.rpc.getBlock(hash)
+        const block = await core.rpc.getBlock(hash)
         return SyncBlocksService.convertBlock(block)
       }),
     )
@@ -337,7 +339,7 @@ export default class SyncBlocksService {
   static convertInput(input: any): Input {
     return {
       previousOutput: input.previous_output,
-      args: input.args.map((arg: Uint8Array) => ckbCore.utils.bytesToHex(arg)),
+      args: input.args.map((arg: Uint8Array) => core.utils.bytesToHex(arg)),
     }
   }
 

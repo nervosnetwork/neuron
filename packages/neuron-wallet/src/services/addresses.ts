@@ -1,12 +1,12 @@
 import TransactionsService from './transactions'
 import WalletService from './wallets'
-import ckbCore from '../core'
+import nodeService from '../startup/nodeService'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
-} = ckbCore
+} = nodeService.core
 
 export const MAX_ADDRESS_COUNT = 30
 export const SEARCH_RANGE = 20

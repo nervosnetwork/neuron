@@ -6,6 +6,7 @@ import windowManage from '../utils/windowManage'
 import { ResponseCode } from '../controllers'
 import { NetworksMethod } from '../controllers/networks'
 import { Channel } from '../utils/const'
+import nodeService from '../startup/nodeService'
 
 export type NetworkID = string
 export type NetworkName = string
@@ -50,6 +51,10 @@ export default class NetworksService extends Store {
     })
 
     this.on(NetworksKey.Active, async (_, newActiveId) => {
+      const network = await this.get(newActiveId)
+      if (network) {
+        nodeService.setNetwork(network.remote)
+      }
       windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
         status: ResponseCode.Success,
         result: newActiveId,
