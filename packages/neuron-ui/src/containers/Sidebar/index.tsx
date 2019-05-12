@@ -17,6 +17,8 @@ import { Routes } from 'utils/const'
 
 const SidebarAside = styled.nav`
   display: flex;
+  width: 240px;
+  box-sizing: border-box;
   flex-direction: column;
   margin: 40px 0 0 0;
   padding: 0 32px;
@@ -44,10 +46,11 @@ const menuItems = [
 const Sidebar = () => {
   const {
     wallet: { name },
+    settings: { wallets },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  return (
+  return wallets.length ? (
     <SidebarAside>
       {menuItems.map(menuItem => (
         <NavLink
@@ -65,7 +68,7 @@ const Sidebar = () => {
         </NavLink>
       ))}
     </SidebarAside>
-  )
+  ) : null
 }
 
 const Container = (props: any) => createPortal(<Sidebar {...props} />, document.querySelector('aside') as HTMLElement)
