@@ -5,6 +5,7 @@ import { NetworkWithID } from './services/networks'
 const isDevMode = !app.isPackaged
 interface ENV {
   isDevMode: boolean
+  fileBasePath: string
   mainURL: string
   remote: string
   presetNetwors: {
@@ -14,6 +15,7 @@ interface ENV {
 }
 const env: ENV = {
   isDevMode,
+  fileBasePath: path.resolve(app.getPath('userData'), isDevMode ? 'dev/' : ''),
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
   presetNetwors: {
