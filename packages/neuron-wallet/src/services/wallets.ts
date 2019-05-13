@@ -109,6 +109,10 @@ export default class WalletService {
   }
 
   public create = (props: WalletProperties): Wallet => {
+    const index = this.getAll().findIndex(wallet => wallet.name === props.name)
+    if (index !== -1) {
+      throw Error('Wallet name existed')
+    }
     const wallet = new FileKeystoreWallet(uuid(), props, this.storePath)
     wallet.saveKeystore(props.keystore!)
     this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet.toJSON()))
@@ -123,6 +127,9 @@ export default class WalletService {
     const index = wallets.findIndex((w: Wallet) => w.id === id)
     if (index !== -1) {
       const wallet = FileKeystoreWallet.fromJSON(wallets[index], this.storePath)
+      if (wallet.name !== props.name && wallets.findIndex(storeWallet => storeWallet.name === props.name) !== -1) {
+        throw Error('Wallet name existed')
+      }
       wallet.update(props)
       if (props.keystore) {
         wallet.saveKeystore(props.keystore)
@@ -184,8 +191,7 @@ export default class WalletService {
 
   public clearAll = () => {
     this.getAll().forEach(w => {
-      const wallet = FileKeystoreWallet.fromJSON(w, this.storePath)
-      wallet.deleteKeystore()
+      this.delete(w.id)
     })
     this.listStore.clear()
   }

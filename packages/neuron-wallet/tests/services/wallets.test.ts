@@ -1,165 +1,169 @@
-import WalletService from '../../src/services/wallets'
+import WalletService, { WalletProperties } from '../../src/services/wallets'
 
 describe('wallet service', () => {
   let walletService: WalletService
 
-  const wallet1 = {
-    name: 'wallet1',
-    keystore: {
-      version: 0,
-      id: '0',
-      crypto: {
-        cipher: 'wallet1',
-        cipherparams: { iv: 'wallet1' },
-        ciphertext: 'wallet1',
-        kdf: '1',
-        kdfparams: {
-          dklen: 1,
-          n: 1,
-          r: 1,
-          p: 1,
-          salt: '1',
-        },
-        mac: '1',
-      },
-    },
-    addresses: {
-      receiving: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-      change: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-    },
-  }
-
-  const wallet2 = {
-    name: 'wallet2',
-    keystore: {
-      version: 0,
-      id: '1',
-      crypto: {
-        cipher: 'wallet2',
-        cipherparams: { iv: 'wallet2' },
-        ciphertext: 'wallet2',
-        kdf: '2',
-        kdfparams: {
-          dklen: 1,
-          n: 1,
-          r: 1,
-          p: 1,
-          salt: '1',
-        },
-        mac: '2',
-      },
-    },
-    addresses: {
-      receiving: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-      change: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-    },
-  }
-  const wallet3 = {
-    name: 'wallet3',
-    keystore: {
-      version: 0,
-      id: '1',
-      crypto: {
-        cipher: 'wallet3',
-        cipherparams: { iv: 'wallet1' },
-        ciphertext: 'wallet3',
-        kdf: '3',
-        kdfparams: {
-          dklen: 1,
-          n: 1,
-          r: 1,
-          p: 1,
-          salt: '1',
-        },
-        mac: '3',
-      },
-    },
-    addresses: {
-      receiving: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-      change: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-    },
-  }
+  let wallet1: WalletProperties
+  let wallet2: WalletProperties
+  let wallet3: WalletProperties
 
   beforeEach(() => {
     walletService = new WalletService('test/wallets')
+    wallet1 = {
+      name: 'wallet-test1',
+      keystore: {
+        version: 0,
+        id: '0',
+        crypto: {
+          cipher: 'wallet1',
+          cipherparams: { iv: 'wallet1' },
+          ciphertext: 'wallet1',
+          kdf: '1',
+          kdfparams: {
+            dklen: 1,
+            n: 1,
+            r: 1,
+            p: 1,
+            salt: '1',
+          },
+          mac: '1',
+        },
+      },
+      addresses: {
+        receiving: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+        change: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+      },
+    }
+
+    wallet2 = {
+      name: 'wallet-test2',
+      keystore: {
+        version: 0,
+        id: '1',
+        crypto: {
+          cipher: 'wallet2',
+          cipherparams: { iv: 'wallet2' },
+          ciphertext: 'wallet2',
+          kdf: '2',
+          kdfparams: {
+            dklen: 1,
+            n: 1,
+            r: 1,
+            p: 1,
+            salt: '1',
+          },
+          mac: '2',
+        },
+      },
+      addresses: {
+        receiving: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+        change: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+      },
+    }
+
+    wallet3 = {
+      name: 'wallet-test3',
+      keystore: {
+        version: 0,
+        id: '1',
+        crypto: {
+          cipher: 'wallet3',
+          cipherparams: { iv: 'wallet1' },
+          ciphertext: 'wallet3',
+          kdf: '3',
+          kdfparams: {
+            dklen: 1,
+            n: 1,
+            r: 1,
+            p: 1,
+            salt: '1',
+          },
+          mac: '3',
+        },
+      },
+      addresses: {
+        receiving: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+        change: [
+          {
+            address: 'address1',
+            path: 'path1',
+          },
+          {
+            address: 'address2',
+            path: 'path2',
+          },
+          {
+            address: 'address3',
+            path: 'path3',
+          },
+        ],
+      },
+    }
   })
 
   afterEach(() => {
@@ -227,7 +231,7 @@ describe('wallet service', () => {
       ],
     }
     wallet1.addresses = addresses
-    walletService.update(w1.id, wallet1)
+    walletService.update(w1.id, wallet2)
     const wallet = walletService.get(w1.id)
     expect(wallet).toBeDefined()
     expect(wallet!.addresses).toEqual(addresses)
@@ -236,6 +240,7 @@ describe('wallet service', () => {
   it('delete wallet', () => {
     const w1 = walletService.create(wallet1)
     walletService.create(wallet2)
+    expect(walletService.getAll().length).toBe(2)
     walletService.delete(w1.id)
     const wallet = walletService.get(w1.id)
     expect(wallet).toBeUndefined()
