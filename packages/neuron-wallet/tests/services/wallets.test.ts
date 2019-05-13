@@ -6,7 +6,7 @@ describe('wallet service', () => {
   const wallet1 = {
     name: 'wallet1',
     keystore: {
-      version: 0,
+      version: 3,
       id: '0',
       crypto: {
         cipher: 'wallet1',
@@ -58,7 +58,7 @@ describe('wallet service', () => {
   const wallet2 = {
     name: 'wallet2',
     keystore: {
-      version: 0,
+      version: 3,
       id: '1',
       crypto: {
         cipher: 'wallet2',
@@ -109,7 +109,7 @@ describe('wallet service', () => {
   const wallet3 = {
     name: 'wallet3',
     keystore: {
-      version: 0,
+      version: 3,
       id: '1',
       crypto: {
         cipher: 'wallet3',
