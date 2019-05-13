@@ -78,12 +78,16 @@ class WalletsController {
   }): Promise<ChannelResponse<Wallet>> => {
     try {
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+      const currentWallet = WalletsController.service.getCurrent()
       const wallet = WalletsController.service.create({
         name,
         keystore: key.keystore!,
         addresses: key.addresses!,
       })
       windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+      if (!currentWallet && WalletsController.service.getAll().length === 1) {
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
+      }
       return {
         status: ResponseCode.Success,
         result: wallet,
