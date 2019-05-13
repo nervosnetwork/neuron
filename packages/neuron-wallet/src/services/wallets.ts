@@ -191,7 +191,8 @@ export default class WalletService {
 
   public clearAll = () => {
     this.getAll().forEach(w => {
-      this.delete(w.id)
+      const wallet = FileKeystoreWallet.fromJSON(w, this.storePath)
+      wallet.deleteKeystore()
     })
     this.listStore.clear()
   }

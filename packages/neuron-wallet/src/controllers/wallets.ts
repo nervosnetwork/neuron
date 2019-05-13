@@ -84,6 +84,9 @@ class WalletsController {
         addresses: key.addresses!,
       })
       windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
+      if (WalletsController.service.getAll().length === 1) {
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
+      }
       return {
         status: ResponseCode.Success,
         result: wallet,
