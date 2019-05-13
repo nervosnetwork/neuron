@@ -5,7 +5,7 @@ import { distinctUntilChanged, flatMap, retry, filter } from 'rxjs/operators'
 class NodeService {
   tick = interval(1000)
 
-  tipNumberSubject = new Subject()
+  tipNumberSubject = new Subject<string | undefined>()
 
   core: Core = new Core('')
 

@@ -1,12 +1,21 @@
 import { getConnection } from 'typeorm'
 import { Subject } from 'rxjs'
+import Core from '@nervosnetwork/ckb-sdk-core'
 import { Script, OutPoint, Cell } from './cells'
 import TransactionsService, { Input, Transaction } from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
-import nodeService from '../startup/nodeService'
+// import nodeService from '../startup/nodeService'
+import { networkSwitchSubject } from './networks'
 
-const { core } = nodeService
+// FIXME: now have some problem with core, should should update every time network switched
+// const { core } = nodeService
+let core: Core
+networkSwitchSubject.subscribe(network => {
+  if (network) {
+    core = new Core(network.remote)
+  }
+})
 
 export interface BlockHeader {
   version: number
@@ -31,15 +40,17 @@ export default class SyncBlocksService {
 
   private fetchSize = 128
 
-  private minFetchSize = 2
+  private minFetchSize = 16
 
-  private sizeForCheck = 5
+  // TODO: it should depends on CKB
+  private sizeForCheck = 12
 
-  private tryHashesTime = 0
-
-  private tryBlocksTime = 0
+  private tryTime = 0
 
   private stopFlag = false
+
+  // cache the blocks for check fork
+  private blockHeadersForCheck: BlockHeader[] = []
 
   constructor(lockHashes: string[]) {
     this.lockHashList = lockHashes
@@ -55,6 +66,7 @@ export default class SyncBlocksService {
 
   // continue to loop blocks, follow chain height
   async loopBlocks() {
+    await this.initBlockHeadersForCheck()
     while (!this.stopFlag) {
       await this.resolveBatchBlocks()
     }
@@ -65,27 +77,59 @@ export default class SyncBlocksService {
     this.stopFlag = true
   }
 
+  stopped() {
+    return this.stopFlag
+  }
+
+  async initBlockHeadersForCheck(): Promise<void> {
+    const currentBlockNumber: number = await SyncBlocksService.currentBlockNumber()
+    if (currentBlockNumber <= 0) {
+      return
+    }
+    const startBlockNumber: number = currentBlockNumber - this.sizeForCheck
+    const realStartBlockNumber: number = startBlockNumber > 0 ? startBlockNumber : 0
+    const blockHashes: string[] = await SyncBlocksService.getBlockHashes(realStartBlockNumber, this.sizeForCheck)
+    const blocks: Block[] = await SyncBlocksService.getBlocks(blockHashes)
+    this.blockHeadersForCheck = blocks.map(block => block.header)
+  }
+
+  updateBlockHeadersForCheck(blocks: Block[]) {
+    const start: number = blocks.length - this.sizeForCheck
+    const realStart: number = start > 0 ? start : 0
+    this.blockHeadersForCheck = blocks.slice(realStart, blocks.length).map(block => block.header)
+  }
+
   // resolve block to
   async resolveBatchBlocks() {
     // using database to sync currentBlockNumber value
-    const currentBlockNumber = await SyncBlocksService.currentBlockNumber()
-    const [blockHashes, checkSize] = await this.tryGetBlockHashes(currentBlockNumber)
+    // currentBlockNumber means last checked blockNumber
+    // so should start with currentBlockNumber + 1
+    const currentBlockNumber: number = await SyncBlocksService.currentBlockNumber()
+    const blockHashes: string[] = await this.tryGetBlockHashes(currentBlockNumber + 1)
     const blocks: Block[] = await this.tryGetBlocks(blockHashes)
-    const checkResult = SyncBlocksService.checkBlockRange(blocks.map(block => block.header))
+    const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
+    const checkResult = this.checkBlockRange(blockHeaders)
     let blocksToSave: Block[] = []
     if (checkResult.success !== true) {
-      if (checkResult.index! < checkSize) {
-        // result blocks range to save, and delete all transactions where blockNumber >= checkResult.blockHeader!.number
-        await this.deleteTxs(checkResult.blockHeader!.number)
-        blocksToSave = blocks.slice(checkResult.index!, blocks.length)
+      // this type means blockHeadersForCheck has an error
+      if (checkResult.type! === 'blockHeadersForCheckError') {
+        const firstCheckNumber = this.blockHeadersForCheck[0].number
+        await this.deleteTxs(firstCheckNumber)
+        // reset currentBlockNumber
+        SyncBlocksService.updateCurrentBlockNumber(parseInt(firstCheckNumber, 10) - 1)
+        // re init blockHeadersForCheck, should reset currentBlockNumber before
+        await this.initBlockHeadersForCheck()
+        blocksToSave = []
       } else {
         // reset blocks range to save, and reset currentBlockNumber
-        blocksToSave = blocks.slice(checkSize, checkResult.index!)
+        blocksToSave = blocks.slice(0, checkResult.index!)
         await SyncBlocksService.updateCurrentBlockNumber(parseInt(checkResult.blockHeader!.number, 10))
       }
     } else {
-      blocksToSave = blocks.slice(checkSize, blocks.length)
+      blocksToSave = blocks
     }
+
+    this.updateBlockHeadersForCheck(blocksToSave)
     await this.resolveBlocks(blocksToSave)
   }
 
@@ -98,60 +142,84 @@ export default class SyncBlocksService {
   }
 
   async tryGetTipBlockNumber(): Promise<number> {
+    if (this.stopped()) {
+      return -1
+    }
+
+    let tipBlockNumber
     try {
-      const tipBlockNumber = await core.rpc.getTipBlockNumber()
-      return parseInt(tipBlockNumber, 10)
-    } catch {
+      tipBlockNumber = await core.rpc.getTipBlockNumber()
+    } catch (err) {
+      console.error(err)
       return this.tryGetTipBlockNumber()
     }
+    return parseInt(tipBlockNumber, 10)
   }
 
-  async tryGetBlockHashes(startBlockNumber: number): Promise<[string[], number]> {
-    const tipBlockNumber = await this.tryGetTipBlockNumber()
-    // startBlockNumber should >= tipBlockNumber
-    if (tipBlockNumber < startBlockNumber) {
-      return [[], 0]
+  async tryGetBlockHashes(startBlockNumber: number): Promise<string[]> {
+    // return if stopped
+    if (this.stopped()) {
+      return []
     }
-    const size: number = tipBlockNumber - startBlockNumber
-    const realSize: number = Math.min(size, this.fetchSize)
-    const realStartBlockNumber = Math.max(startBlockNumber - this.sizeForCheck, 0)
+    const tipBlockNumber = await this.tryGetTipBlockNumber()
+    // startBlockNumber should >= 0 && startBlockNumber should >= tipBlockNumber
+    if (startBlockNumber < 0 || tipBlockNumber < startBlockNumber) {
+      return []
+    }
+
+    // size for fetch
+    const size: number = Math.min(tipBlockNumber - startBlockNumber, this.fetchSize)
 
     let blockHashes: string[] = []
     try {
       // TODO: check RPC error info
-      blockHashes = await SyncBlocksService.getBlockHashes(realStartBlockNumber, realSize)
-    } catch {
-      // TODO: should only catch RPC error
-      this.tryHashesTime += 1
-      if (this.tryHashesTime >= 3) {
-        this.tryHashesTime = 0
-        const halfFetchSize = parseInt((this.fetchSize / 2).toString(), 10)
-        this.fetchSize = Math.max(halfFetchSize, this.minFetchSize)
-      }
+      blockHashes = await SyncBlocksService.getBlockHashes(startBlockNumber, size)
+    } catch (err) {
+      console.error(err)
+      this.checkTryTime()
       return this.tryGetBlockHashes(startBlockNumber)
     }
 
-    const realCheckSize = startBlockNumber - realStartBlockNumber
-    const endBlockNumber = realStartBlockNumber + realSize - 1
+    // clearTryTime if success
+    this.clearTryTime()
+
+    const endBlockNumber: number = startBlockNumber + size - 1
     // update current block number here
     await SyncBlocksService.updateCurrentBlockNumber(endBlockNumber)
-    return [blockHashes, realCheckSize]
+    return blockHashes
+  }
+
+  clearTryTime() {
+    this.tryTime = 0
+  }
+
+  // reduce fetchSize to half if try three times in a row
+  checkTryTime() {
+    this.tryTime += 1
+    if (this.tryTime >= 3) {
+      this.clearTryTime()
+      const halfFetchSize = parseInt((this.fetchSize / 2).toString(), 10)
+      this.fetchSize = Math.max(halfFetchSize, this.minFetchSize)
+    }
   }
 
   // return blocks should exclude check blocks
   async tryGetBlocks(blockHashes: string[]): Promise<Block[]> {
+    if (this.stopped()) {
+      return []
+    }
+
+    let blocks: Block[]
     try {
-      const blocks: Block[] = await SyncBlocksService.getBlocks(blockHashes)
-      return blocks
-    } catch {
-      this.tryBlocksTime += 1
-      if (this.tryBlocksTime >= 3) {
-        this.tryBlocksTime = 0
-        const halfFetchSize = parseInt((this.fetchSize / 2).toString(), 10)
-        this.fetchSize = Math.max(halfFetchSize, this.minFetchSize)
-      }
+      blocks = await SyncBlocksService.getBlocks(blockHashes)
+    } catch (err) {
+      console.error(err)
+      this.checkTryTime()
       return this.tryGetBlocks(blockHashes)
     }
+    // clear if success
+    this.clearTryTime()
+    return blocks
   }
 
   static async getBlockHashes(startBlockNumber: number, size: number): Promise<string[]> {
@@ -175,13 +243,25 @@ export default class SyncBlocksService {
     return blocks
   }
 
-  static checkBlockRange(
+  checkBlockRange(
     blockHeaders: BlockHeader[],
   ): {
     success: boolean
     index?: number
     blockHeader?: BlockHeader
+    type?: string
   } {
+    if (this.blockHeadersForCheck.length > 0) {
+      const lastBlockHeaderForCheck: BlockHeader = this.blockHeadersForCheck[this.blockHeadersForCheck.length - 1]
+      const firstBlockHeader = blockHeaders[0]
+      if (firstBlockHeader.parentHash !== lastBlockHeaderForCheck.hash) {
+        return {
+          success: false,
+          type: 'blockHeadersForCheckError',
+        }
+      }
+    }
+
     // we can use such as 5 blocks to check parent hash
     // the first time we get blocks whose block number in 0-100
     // next time we get blocks whose block number in 96 - 200
@@ -195,6 +275,7 @@ export default class SyncBlocksService {
       if (currentBlockHeader.parentHash !== previousBlockHeader.hash) {
         return {
           success: false,
+          type: 'blockHeadersError',
           index: i,
           blockHeader: currentBlockHeader,
         }
@@ -341,11 +422,11 @@ export default class SyncBlocksService {
     return tx
   }
 
-  // FIXME: input of SDK return not compatible with CKBComponents.CellInput
-  static convertInput(input: any): Input {
+  static convertInput(input: CKBComponents.CellInput): Input {
     return {
-      previousOutput: input.previous_output,
-      args: input.args.map((arg: Uint8Array) => core.utils.bytesToHex(arg)),
+      previousOutput: input.previousOutput,
+      args: input.args,
+      since: input.since,
     }
   }
 
@@ -363,11 +444,10 @@ export default class SyncBlocksService {
     }
   }
 
-  // FIXME: lock script of SDK return not compatible with CKBComponents.Script
-  static convertScript(script: any): Script {
+  static convertScript(script: CKBComponents.Script): Script {
     return {
       args: script.args,
-      binaryHash: script.binary_hash,
+      codeHash: script.codeHash,
     }
   }
 }
