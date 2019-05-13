@@ -1,6 +1,8 @@
 import { app } from 'electron'
+import path from 'path'
 import { ResponseCode } from '.'
 import NetworksService, { NetworkType, NetworkID, Network } from '../services/networks'
+import env from '../env'
 
 export enum NetworksMethod {
   GetAll = 'getAll',
@@ -14,8 +16,10 @@ export enum NetworksMethod {
   Status = 'status',
 }
 
+const storePath = path.join(app.getPath('userData'), env.isDevMode ? 'dev' : '')
+
 class NetworksController {
-  static service = new NetworksService(app.getPath('userData'), 'networks.json')
+  static service = new NetworksService(storePath, 'networks.json')
 
   public static getAll = async () => {
     return {
