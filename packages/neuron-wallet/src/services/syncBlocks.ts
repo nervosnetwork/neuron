@@ -52,6 +52,8 @@ export default class SyncBlocksService {
   // cache the blocks for check fork
   private blockHeadersForCheck: BlockHeader[] = []
 
+  private currentBlockNumberValue: number | undefined = undefined
+
   constructor(lockHashes: string[]) {
     this.lockHashList = lockHashes
   }
@@ -82,7 +84,7 @@ export default class SyncBlocksService {
   }
 
   async initBlockHeadersForCheck(): Promise<void> {
-    const currentBlockNumber: number = await SyncBlocksService.currentBlockNumber()
+    const currentBlockNumber: number = await this.currentBlockNumber()
     if (currentBlockNumber <= 0) {
       return
     }
@@ -104,7 +106,7 @@ export default class SyncBlocksService {
     // using database to sync currentBlockNumber value
     // currentBlockNumber means last checked blockNumber
     // so should start with currentBlockNumber + 1
-    const currentBlockNumber: number = await SyncBlocksService.currentBlockNumber()
+    const currentBlockNumber: number = await this.currentBlockNumber()
     const blockHashes: string[] = await this.tryGetBlockHashes(currentBlockNumber + 1)
     const blocks: Block[] = await this.tryGetBlocks(blockHashes)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
@@ -116,14 +118,14 @@ export default class SyncBlocksService {
         const firstCheckNumber = this.blockHeadersForCheck[0].number
         await this.deleteTxs(firstCheckNumber)
         // reset currentBlockNumber
-        SyncBlocksService.updateCurrentBlockNumber(parseInt(firstCheckNumber, 10) - 1)
+        this.updateCurrentBlockNumber(parseInt(firstCheckNumber, 10) - 1)
         // re init blockHeadersForCheck, should reset currentBlockNumber before
         await this.initBlockHeadersForCheck()
         blocksToSave = []
       } else {
         // reset blocks range to save, and reset currentBlockNumber
         blocksToSave = blocks.slice(0, checkResult.index!)
-        await SyncBlocksService.updateCurrentBlockNumber(parseInt(checkResult.blockHeader!.number, 10))
+        await this.updateCurrentBlockNumber(parseInt(checkResult.blockHeader!.number, 10))
       }
     } else {
       blocksToSave = blocks
@@ -185,7 +187,7 @@ export default class SyncBlocksService {
 
     const endBlockNumber: number = startBlockNumber + size - 1
     // update current block number here
-    await SyncBlocksService.updateCurrentBlockNumber(endBlockNumber)
+    await this.updateCurrentBlockNumber(endBlockNumber)
     return blockHashes
   }
 
@@ -361,7 +363,10 @@ export default class SyncBlocksService {
   }
 
   // get SyncInfo name = 'currentBlockNumber'
-  static async currentBlockNumber(): Promise<number> {
+  async currentBlockNumber(): Promise<number> {
+    if (this.currentBlockNumberValue) {
+      return this.currentBlockNumberValue
+    }
     const blockNumber: SyncInfoEntity | undefined = await getConnection()
       .getRepository(SyncInfoEntity)
       .findOne({
@@ -373,7 +378,7 @@ export default class SyncBlocksService {
     return parseInt(blockNumber.value, 10)
   }
 
-  static async updateCurrentBlockNumber(currentBlockNumber: number): Promise<void> {
+  async updateCurrentBlockNumber(currentBlockNumber: number): Promise<void> {
     let current: SyncInfoEntity | undefined = await getConnection()
       .getRepository(SyncInfoEntity)
       .findOne({
@@ -385,6 +390,7 @@ export default class SyncBlocksService {
     }
     current.value = currentBlockNumber.toString()
     await getConnection().manager.save(current)
+    this.currentBlockNumberValue = currentBlockNumber
   }
 
   static convertBlock(block: CKBComponents.Block): Block {
