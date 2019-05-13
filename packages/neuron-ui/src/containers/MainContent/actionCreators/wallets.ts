@@ -37,7 +37,7 @@ export default {
       payload: id,
     }
   },
-  updateWallet: (params: { id: string; password: string; newPassword?: string; name?: string }) => {
+  updateWallet: (params: { id: string; password?: string; newPassword?: string; name?: string }) => {
     walletsCall.update(params)
     return {
       type: MainActions.Wallet,

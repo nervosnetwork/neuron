@@ -4,9 +4,6 @@ import i18n from 'utils/i18n'
 
 export const useWalletEditor = () => {
   const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const initialize = useCallback(
     (initName: string = '') => {
       setName(initName)
@@ -19,22 +16,10 @@ export const useWalletEditor = () => {
       value: name,
       onChange: (e: React.FormEvent<Pick<any, string>>) => setName(e.currentTarget.value),
     },
-    password: {
-      value: password,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => setPassword(e.currentTarget.value),
-    },
-    newPassword: {
-      value: newPassword,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => setNewPassword(e.currentTarget.value),
-    },
-    confirmNewPassword: {
-      value: confirmNewPassword,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => setConfirmNewPassword(e.currentTarget.value),
-    },
   }
 }
 
-export const useInputs = ({ name, newPassword, confirmNewPassword }: ReturnType<typeof useWalletEditor>) => {
+export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
   return useMemo(
     () => [
       {
@@ -43,27 +28,15 @@ export const useInputs = ({ name, newPassword, confirmNewPassword }: ReturnType<
         placeholder: i18n.t('settings.wallet-manager.edit-wallet.wallet-name'),
         maxLength: 20,
       },
-      {
-        ...newPassword,
-        label: i18n.t('settings.wallet-manager.edit-wallet.new-password'),
-        placeholder: i18n.t('settings.wallet-manager.edit-wallet.password'),
-        inputType: 'password',
-      },
-      {
-        ...confirmNewPassword,
-        label: i18n.t('settings.wallet-manager.edit-wallet.confirm-password'),
-        placeholder: i18n.t('settings.wallet-manager.edit-wallet.confirm-password'),
-        inputType: 'password',
-      },
     ],
-    [name, newPassword, confirmNewPassword],
+    [name],
   )
 }
 
-export const useAreParamsValid = (name: string, password: string, confirmPassword: string) => {
+export const useAreParamsValid = (name: string) => {
   return useMemo(() => {
-    return !(password === '' || confirmPassword === '' || password !== confirmPassword || name === '')
-  }, [name, password, confirmPassword])
+    return !(name === '')
+  }, [name])
 }
 
 export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
