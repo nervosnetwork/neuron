@@ -1,8 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import EventEmitter from 'events'
-
-import console = require('console')
+import Logger from './logger'
 
 class Store extends EventEmitter {
   public readonly location: string
@@ -15,10 +14,17 @@ class Store extends EventEmitter {
 
   constructor(pathname: string, filename: string) {
     super()
+    if (!fs.existsSync(pathname)) {
+      fs.mkdirSync(pathname, { recursive: true })
+    }
     this.location = path.resolve(pathname, filename)
     const exist = fs.existsSync(this.location)
     if (!exist) {
-      fs.writeFileSync(this.location, '{}', this.config)
+      try {
+        fs.writeFileSync(this.location, this.defaultValue, this.config)
+      } catch (err) {
+        Logger.log({ level: 'error', message: err.message })
+      }
     }
   }
 
