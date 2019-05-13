@@ -231,7 +231,7 @@ describe('wallet service', () => {
       ],
     }
     wallet1.addresses = addresses
-    walletService.update(w1.id, wallet2)
+    walletService.update(w1.id, wallet1)
     const wallet = walletService.get(w1.id)
     expect(wallet).toBeDefined()
     expect(wallet!.addresses).toEqual(addresses)
