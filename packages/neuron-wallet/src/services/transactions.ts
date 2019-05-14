@@ -3,7 +3,6 @@ import CellsService, { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
-import { getHistoryTransactions } from '../mock_rpc'
 import nodeService from '../startup/nodeService'
 
 const { core } = nodeService
@@ -341,32 +340,6 @@ export default class TransactionsService {
       .execute()
   }
 
-  // NO parallel
-  public static loadTransactionsHistoryFromChain = async (lockHashes: string[]) => {
-    // TODO: to => get_tip_block_number
-    const to = 1000
-    let currentFrom = 0
-    let currentTo = to
-    while (currentFrom <= to) {
-      currentTo = Math.min(currentFrom + 100, to)
-      const txs = await getHistoryTransactions(lockHashes, currentFrom.toString(), currentTo.toString())
-      await TransactionsService.convertTransactions(txs)
-      currentFrom = currentTo + 1
-    }
-  }
-
-  // convert fetch transactions
-  public static convertTransactions = async (transactions: Transaction[]): Promise<TransactionEntity[]> => {
-    const txEntities: TransactionEntity[] = []
-
-    transactions.forEach(async tx => {
-      const txEntity = await TransactionsService.saveFetchTx(tx)
-      txEntities.push(txEntity)
-    })
-
-    return txEntities
-  }
-
   // update previousOutput's status to 'dead' if found
   // calculate output lockHash, input lockHash and capacity
   // when send a transaction, use TxSaveType.Sent
@@ -506,7 +479,6 @@ export default class TransactionsService {
     }
   }
 
-  // TODO: check this algorithm
   // use SDK lockScriptToHash
   public static lockScriptToHash = (lock: Script) => {
     const binaryHash: string = lock!.binaryHash!
