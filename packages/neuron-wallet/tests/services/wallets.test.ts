@@ -8,7 +8,7 @@ describe('wallet service', () => {
   let wallet3: WalletProperties
 
   beforeEach(() => {
-    walletService = new WalletService('test/wallets')
+    walletService = new WalletService()
     wallet1 = {
       name: 'wallet-test1',
       keystore: {
