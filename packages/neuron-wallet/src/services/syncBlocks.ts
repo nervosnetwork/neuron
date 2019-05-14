@@ -8,7 +8,7 @@ import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
 import { networkSwitchSubject } from './networks'
 
-// FIXME: now have some problem with core, should should update every time network switched
+// FIXME: now have some problem with core, should update every time network switched
 // const { core } = nodeService
 let core: Core
 networkSwitchSubject.subscribe(network => {
