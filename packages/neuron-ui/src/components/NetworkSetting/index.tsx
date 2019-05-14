@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 
 import { ContentProps } from 'containers/MainContent'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
@@ -13,6 +14,13 @@ import Dialog from 'widgets/Dialog'
 import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
 import ContextMenuZone from 'widgets/ContextMenuZone'
 import RemoveNetworkDialog from './RemoveNetworkDialog'
+
+const CheckBox = styled(Form.Check)`
+  pointer-events: none;
+  input {
+    pointer-events: auto;
+  }
+`
 
 interface MenuItemParams {
   id: string
@@ -32,8 +40,10 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
         isDisabled: ({ id }: MenuItemParams) => {
           return id === chain.networkId
         },
-        click: ({ id }: MenuItemParams) => {
-          dispatch(actionCreators.setNetwork(id))
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            dispatch(actionCreators.setNetwork(params.id))
+          }
         },
       },
       {
@@ -41,8 +51,10 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
         isDisabled: ({ id }: MenuItemParams) => {
           return networks[0] && networks[0].id === id
         },
-        click: ({ id }: MenuItemParams) => {
-          history.push(`${Routes.NetworkEditor}/${id}`)
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            history.push(`${Routes.NetworkEditor}/${params.id}`)
+          }
         },
       },
       {
@@ -50,14 +62,16 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
         isDisabled: ({ id }: MenuItemParams) => {
           return networks[0] && networks[0].id === id
         },
-        click: ({ id }: MenuItemParams) => {
-          dispatch({
-            type: MainActions.SetDialog,
-            payload: {
-              open: true,
-              id,
-            },
-          })
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            dispatch({
+              type: MainActions.SetDialog,
+              payload: {
+                open: true,
+                id: params.id,
+              },
+            })
+          }
         },
       },
     ],
@@ -72,7 +86,7 @@ const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPr
             const isChecked = chain.networkId === network.id
             return (
               <ListGroup.Item key={network.id} data-menuitem={JSON.stringify({ id: network.id })}>
-                <Form.Check
+                <CheckBox
                   inline
                   label={network.name || network.remote}
                   type="radio"
