@@ -1,4 +1,5 @@
-import { getConnection } from 'typeorm'
+import { getConnection, Transaction } from 'typeorm'
+import { ReplaySubject } from 'rxjs'
 import CellsService, { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
@@ -19,8 +20,7 @@ export interface Witness {
   data: string[]
 }
 
-export interface Transaction {
-  hash: string
+export interface TransactionWithoutHash {
   version: number
   deps?: OutPoint[]
   inputs?: Input[]
@@ -31,6 +31,10 @@ export interface Transaction {
   blockHash?: string
   witnesses?: Witness[]
   type?: string
+}
+
+export interface Transaction extends TransactionWithoutHash {
+  hash: string
 }
 
 export interface TransactionsByAddressesParam {
@@ -77,6 +81,8 @@ enum OutputStatus {
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
 export default class TransactionsService {
+  public static txSentSubject = new ReplaySubject<{ transaction: TransactionWithoutHash; txHash: string }>(100)
+
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
     const skip = (params.pageNo - 1) * params.pageSize
 
@@ -390,12 +396,15 @@ export default class TransactionsService {
     return txEntity
   }
 
-  // TODO: should call this after sent tx, not after generate tx
-  public static saveSentTx = async (transaction: Transaction): Promise<TransactionEntity> => {
-    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(
-      transaction,
-      TxSaveType.Sent,
-    )
+  public static saveSentTx = async (
+    transaction: TransactionWithoutHash,
+    txHash: string,
+  ): Promise<TransactionEntity> => {
+    const tx: Transaction = {
+      hash: txHash,
+      ...transaction,
+    }
+    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
   }
 
@@ -526,3 +535,8 @@ export default class TransactionsService {
     })
   }
 }
+
+// listen to send tx event
+TransactionsService.txSentSubject.subscribe(msg => {
+  TransactionsService.saveSentTx(msg.transaction, msg.txHash)
+})
