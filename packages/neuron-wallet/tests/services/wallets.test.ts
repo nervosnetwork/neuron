@@ -12,7 +12,7 @@ describe('wallet service', () => {
     wallet1 = {
       name: 'wallet-test1',
       keystore: {
-        version: 0,
+        version: 3,
         id: '0',
         crypto: {
           cipher: 'wallet1',
@@ -64,7 +64,7 @@ describe('wallet service', () => {
     wallet2 = {
       name: 'wallet-test2',
       keystore: {
-        version: 0,
+        version: 3,
         id: '1',
         crypto: {
           cipher: 'wallet2',
@@ -116,7 +116,7 @@ describe('wallet service', () => {
     wallet3 = {
       name: 'wallet-test3',
       keystore: {
-        version: 0,
+        version: 3,
         id: '1',
         crypto: {
           cipher: 'wallet3',
