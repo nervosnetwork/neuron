@@ -171,22 +171,30 @@ class WalletsController {
     try {
       const wallet = WalletsController.service.get(id)
       if (wallet) {
-        if (WalletsController.service.validate({ id, password })) {
-          const props: WalletProperties = { name, addresses: wallet.addresses, keystore: null }
-          if (newPassword) {
+        const props: WalletProperties = {
+          name: wallet.name,
+          addresses: wallet.addresses,
+          keystore: wallet.loadKeystore(),
+        }
+        if (newPassword) {
+          if (WalletsController.service.validate({ id, password })) {
             const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
             props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
-          }
-          WalletsController.service.update(id, props)
-          windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
-          return {
-            status: ResponseCode.Success,
-            result: WalletsController.service.get(id),
+          } else {
+            return {
+              status: ResponseCode.Fail,
+              msg: 'Incorrect password',
+            }
           }
         }
+        if (name) {
+          props.name = name
+        }
+        WalletsController.service.update(id, props)
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
         return {
-          status: ResponseCode.Fail,
-          msg: 'Incorrect password',
+          status: ResponseCode.Success,
+          result: WalletsController.service.get(id),
         }
       }
       return {

@@ -1,19 +1,14 @@
-import React, { useEffect, useMemo, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
-import { Card, Form, Button, Col, Row } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
-
 import { ContentProps } from 'containers/MainContent'
-import { useOnDialogCancel } from 'containers/MainContent/hooks'
-import InlineInput, { InputProps } from 'widgets/InlineInput'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import { actionCreators } from 'containers/MainContent/reducer'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { Button, Card, Form } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
+import { RouteComponentProps } from 'react-router-dom'
 import { useNeuronWallet } from 'utils/hooks'
-import Dialog from 'widgets/Dialog'
-
-import { useWalletEditor, useInputs, useAreParamsValid, useToggleDialog } from './hooks'
+import InlineInput, { InputProps } from 'widgets/InlineInput'
+import { useAreParamsValid, useInputs, useToggleDialog, useWalletEditor } from './hooks'
 
 export default ({
-  dialog,
   dispatch,
   match: {
     params: { id },
@@ -39,31 +34,18 @@ export default ({
   }, [id, initialize, wallet.name])
 
   const inputs: InputProps[] = useInputs(editor)
-  const areParamsValid = useAreParamsValid(editor.name.value, editor.newPassword.value, editor.confirmNewPassword.value)
+  const areParamsValid = useAreParamsValid(editor.name.value)
   const toggleDialog = useToggleDialog(dispatch)
-
-  const handleSubmit = useCallback(() => {
-    dispatch({
-      type: MainActions.SetDialog,
-      payload: {
-        open: true,
-      },
-    })
-  }, [dispatch])
 
   const handleConfirm = useCallback(() => {
     toggleDialog(false)
     dispatch(
       actionCreators.updateWallet({
         id: wallet.id,
-        password: editor.password.value,
-        newPassword: editor.newPassword.value,
         name: editor.name.value,
       }),
     )
-  }, [editor.name.value, editor.newPassword.value, editor.password.value, wallet.id, dispatch, toggleDialog])
-
-  const onCancel = useOnDialogCancel(dispatch)
+  }, [editor.name.value, wallet.id, dispatch, toggleDialog])
 
   return (
     <Card>
@@ -74,37 +56,10 @@ export default ({
             <InlineInput {...inputProps} key={inputProps.label} />
           ))}
         </Form>
-        <Button type="submit" variant="primary" size="lg" block onClick={handleSubmit} disabled={!areParamsValid}>
+        <Button type="submit" variant="primary" size="lg" block onClick={handleConfirm} disabled={!areParamsValid}>
           {t('common.save')}
         </Button>
       </Card.Body>
-      <Dialog open={dialog.open} onClick={onCancel}>
-        <Card
-          onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-        >
-          <>
-            <Card.Header>{t('settings.wallet-manager.delete-wallet-title', { name: wallet.name })}</Card.Header>
-            <Card.Body>
-              <Form.Group as={Row} controlId="formPlaintextPassword">
-                <Col>
-                  <Form.Control type="password" placeholder="password" onChange={editor.password.onChange} />
-                </Col>
-              </Form.Group>
-            </Card.Body>
-            <Card.Footer className="text-muted">
-              <Button variant="danger" onClick={handleConfirm} disabled={editor.password.value === ''}>
-                {t('common.confirm')}
-              </Button>
-              <Button variant="light" onClick={onCancel}>
-                {t('common.cancel')}
-              </Button>
-            </Card.Footer>
-          </>
-        </Card>
-      </Dialog>
     </Card>
   )
 }
