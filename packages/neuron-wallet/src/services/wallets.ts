@@ -219,7 +219,7 @@ export default class WalletService {
     // TODO: this is always success code hash, should be replaced in the future
     const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
 
-    const lockhashes = items.map(({ address }) =>
+    const lockHashes = items.map(({ address }) =>
       core.utils.lockScriptToHash({
         // TODO: binaryHash has be updated to codeHash with sdk@0.11.0
         binaryHash: codeHash,
@@ -231,11 +231,17 @@ export default class WalletService {
       capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(10 ** 8))).toString(),
     }))
 
-    const transaction = (await TransactionsService.generateTx(
-      lockhashes,
-      targetOutputs,
-      changeAddress,
-    )) as CKBComponents.RawTransaction
-    return core.rpc.sendTransaction(transaction)
+    const transaction = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
+
+    const rawTransaction = transaction as CKBComponents.RawTransaction
+    const txHash = await core.rpc.sendTransaction(rawTransaction)
+
+    // save signed transaction with txHash
+    TransactionsService.txSentSubject.next({
+      transaction,
+      txHash,
+    })
+
+    return txHash
   }
 }
