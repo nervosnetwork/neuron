@@ -10,7 +10,7 @@ const { core } = nodeService
 export interface Input {
   previousOutput: OutPoint
   args: string[]
-  validSince?: string
+  since?: string
   capacity?: string | null
   lockHash?: string | null
 }
@@ -195,7 +195,7 @@ export default class TransactionsService {
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
-      binaryHash: contractInfo.binaryHash,
+      codeHash: contractInfo.codeHash,
       args: [blake160],
     }
     const lockHash: string = TransactionsService.lockScriptToHash(lock)
@@ -413,20 +413,20 @@ export default class TransactionsService {
       // if Uint8Array
       blake2b.update(data)
     }
-    const binaryHash: string = blake2b.digest('hex')
+    const codeHash: string = blake2b.digest('hex')
     const outPoint: OutPoint = {
       txHash: systemScriptTx.hash,
       index: 0,
     }
     return {
-      binaryHash,
+      codeHash,
       outPoint,
     }
   }
 
   // lockHashes for each inputs
   public static generateTx = async (lockHashes: string[], targetOutputs: TargetOutput[], changeAddress: string) => {
-    const { binaryHash, outPoint } = await TransactionsService.contractInfo()
+    const { codeHash, outPoint } = await TransactionsService.contractInfo()
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
@@ -443,7 +443,7 @@ export default class TransactionsService {
         capacity,
         data: '0x',
         lock: {
-          binaryHash,
+          codeHash,
           args: [blake160],
         },
       }
@@ -463,7 +463,7 @@ export default class TransactionsService {
         capacity: `${BigInt(capacities) - needCapacities}`,
         data: '0x',
         lock: {
-          binaryHash,
+          codeHash,
           args: [changeBlake160],
         },
       }
@@ -481,10 +481,10 @@ export default class TransactionsService {
 
   // use SDK lockScriptToHash
   public static lockScriptToHash = (lock: Script) => {
-    const binaryHash: string = lock!.binaryHash!
+    const codeHash: string = lock!.codeHash!
     const args: string[] = lock.args!
     const lockHash: string = core.utils.lockScriptToHash({
-      binaryHash,
+      binaryHash: codeHash,
       args,
     })
 
@@ -500,7 +500,7 @@ export default class TransactionsService {
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
-      binaryHash: contractInfo.binaryHash,
+      codeHash: contractInfo.codeHash,
       args: [blake160],
     }
     return lock
