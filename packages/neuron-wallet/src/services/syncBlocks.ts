@@ -37,16 +37,11 @@ export const addressesUsedSubject = new Subject()
 /* eslint no-restricted-syntax: "warn" */
 export default class SyncBlocksService {
   private lockHashList: string[]
-
   private fetchSize = 128
-
   private minFetchSize = 16
-
   // TODO: it should depends on CKB
   private sizeForCheck = 12
-
   private tryTime = 0
-
   private stopFlag = false
 
   // cache the blocks for check fork
