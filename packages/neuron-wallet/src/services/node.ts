@@ -1,11 +1,11 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { interval, Subject } from 'rxjs'
+import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, retry, filter } from 'rxjs/operators'
 
 class NodeService {
   tick = interval(1000)
 
-  tipNumberSubject = new Subject<string | undefined>()
+  tipNumberSubject = new BehaviorSubject<string | undefined>(undefined)
 
   core: Core = new Core('')
 

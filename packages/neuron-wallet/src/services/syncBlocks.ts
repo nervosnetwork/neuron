@@ -1,11 +1,11 @@
 import { getConnection } from 'typeorm'
-import { Subject } from 'rxjs'
+import { Subject, BehaviorSubject } from 'rxjs'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { Script, OutPoint, Cell } from './cells'
 import TransactionsService, { Input, Transaction } from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
-// import nodeService from '../startup/nodeService'
+import nodeService from '../startup/nodeService'
 import { networkSwitchSubject } from './networks'
 
 // FIXME: now have some problem with core, should should update every time network switched
@@ -54,8 +54,19 @@ export default class SyncBlocksService {
 
   private currentBlockNumberValue: number | undefined = undefined
 
-  constructor(lockHashes: string[]) {
+  private tipBlockNumber: number = -1
+
+  constructor(
+    lockHashes: string[],
+    tipNumberSubject: BehaviorSubject<string | undefined> = nodeService.tipNumberSubject,
+  ) {
     this.lockHashList = lockHashes
+    // listen for tipNumber changes
+    tipNumberSubject.subscribe(num => {
+      if (num) {
+        this.tipBlockNumber = parseInt(num, 10)
+      }
+    })
   }
 
   get lockHashes(): string[] {
@@ -143,34 +154,18 @@ export default class SyncBlocksService {
     await TransactionsService.deleteByBlockNumbers(blockNumbers.map(n => n.toString()))
   }
 
-  async tryGetTipBlockNumber(): Promise<number> {
-    if (this.stopped()) {
-      return -1
-    }
-
-    let tipBlockNumber
-    try {
-      tipBlockNumber = await core.rpc.getTipBlockNumber()
-    } catch (err) {
-      console.error(err)
-      return this.tryGetTipBlockNumber()
-    }
-    return parseInt(tipBlockNumber, 10)
-  }
-
   async tryGetBlockHashes(startBlockNumber: number): Promise<string[]> {
     // return if stopped
     if (this.stopped()) {
       return []
     }
-    const tipBlockNumber = await this.tryGetTipBlockNumber()
     // startBlockNumber should >= 0 && startBlockNumber should >= tipBlockNumber
-    if (startBlockNumber < 0 || tipBlockNumber < startBlockNumber) {
+    if (startBlockNumber < 0 || this.tipBlockNumber < startBlockNumber) {
       return []
     }
 
     // size for fetch
-    const size: number = Math.min(tipBlockNumber - startBlockNumber, this.fetchSize)
+    const size: number = Math.min(this.tipBlockNumber - startBlockNumber, this.fetchSize)
 
     let blockHashes: string[] = []
     try {
