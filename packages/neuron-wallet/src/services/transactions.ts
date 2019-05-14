@@ -1,9 +1,9 @@
-import { getConnection } from 'typeorm'
+import { getConnection, Transaction } from 'typeorm'
+import { ReplaySubject } from 'rxjs'
 import CellsService, { Cell, OutPoint, Script } from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
-import { getHistoryTransactions } from '../mock_rpc'
 import nodeService from '../startup/nodeService'
 
 const { core } = nodeService
@@ -11,7 +11,7 @@ const { core } = nodeService
 export interface Input {
   previousOutput: OutPoint
   args: string[]
-  validSince?: string
+  since?: string
   capacity?: string | null
   lockHash?: string | null
 }
@@ -20,8 +20,7 @@ export interface Witness {
   data: string[]
 }
 
-export interface Transaction {
-  hash: string
+export interface TransactionWithoutHash {
   version: number
   deps?: OutPoint[]
   inputs?: Input[]
@@ -32,6 +31,10 @@ export interface Transaction {
   blockHash?: string
   witnesses?: Witness[]
   type?: string
+}
+
+export interface Transaction extends TransactionWithoutHash {
+  hash: string
 }
 
 export interface TransactionsByAddressesParam {
@@ -78,6 +81,8 @@ enum OutputStatus {
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
 export default class TransactionsService {
+  public static txSentSubject = new ReplaySubject<{ transaction: TransactionWithoutHash; txHash: string }>(100)
+
   public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
     const skip = (params.pageNo - 1) * params.pageSize
 
@@ -196,7 +201,7 @@ export default class TransactionsService {
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
-      binaryHash: contractInfo.binaryHash,
+      codeHash: contractInfo.codeHash,
       args: [blake160],
     }
     const lockHash: string = TransactionsService.lockScriptToHash(lock)
@@ -341,32 +346,6 @@ export default class TransactionsService {
       .execute()
   }
 
-  // NO parallel
-  public static loadTransactionsHistoryFromChain = async (lockHashes: string[]) => {
-    // TODO: to => get_tip_block_number
-    const to = 1000
-    let currentFrom = 0
-    let currentTo = to
-    while (currentFrom <= to) {
-      currentTo = Math.min(currentFrom + 100, to)
-      const txs = await getHistoryTransactions(lockHashes, currentFrom.toString(), currentTo.toString())
-      await TransactionsService.convertTransactions(txs)
-      currentFrom = currentTo + 1
-    }
-  }
-
-  // convert fetch transactions
-  public static convertTransactions = async (transactions: Transaction[]): Promise<TransactionEntity[]> => {
-    const txEntities: TransactionEntity[] = []
-
-    transactions.forEach(async tx => {
-      const txEntity = await TransactionsService.saveFetchTx(tx)
-      txEntities.push(txEntity)
-    })
-
-    return txEntities
-  }
-
   // update previousOutput's status to 'dead' if found
   // calculate output lockHash, input lockHash and capacity
   // when send a transaction, use TxSaveType.Sent
@@ -417,12 +396,15 @@ export default class TransactionsService {
     return txEntity
   }
 
-  // TODO: should call this after sent tx, not after generate tx
-  public static saveSentTx = async (transaction: Transaction): Promise<TransactionEntity> => {
-    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(
-      transaction,
-      TxSaveType.Sent,
-    )
+  public static saveSentTx = async (
+    transaction: TransactionWithoutHash,
+    txHash: string,
+  ): Promise<TransactionEntity> => {
+    const tx: Transaction = {
+      hash: txHash,
+      ...transaction,
+    }
+    const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
   }
 
@@ -440,20 +422,20 @@ export default class TransactionsService {
       // if Uint8Array
       blake2b.update(data)
     }
-    const binaryHash: string = blake2b.digest('hex')
+    const codeHash: string = blake2b.digest('hex')
     const outPoint: OutPoint = {
       txHash: systemScriptTx.hash,
       index: 0,
     }
     return {
-      binaryHash,
+      codeHash,
       outPoint,
     }
   }
 
   // lockHashes for each inputs
   public static generateTx = async (lockHashes: string[], targetOutputs: TargetOutput[], changeAddress: string) => {
-    const { binaryHash, outPoint } = await TransactionsService.contractInfo()
+    const { codeHash, outPoint } = await TransactionsService.contractInfo()
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
@@ -470,7 +452,7 @@ export default class TransactionsService {
         capacity,
         data: '0x',
         lock: {
-          binaryHash,
+          codeHash,
           args: [blake160],
         },
       }
@@ -490,7 +472,7 @@ export default class TransactionsService {
         capacity: `${BigInt(capacities) - needCapacities}`,
         data: '0x',
         lock: {
-          binaryHash,
+          codeHash,
           args: [changeBlake160],
         },
       }
@@ -506,13 +488,12 @@ export default class TransactionsService {
     }
   }
 
-  // TODO: check this algorithm
   // use SDK lockScriptToHash
   public static lockScriptToHash = (lock: Script) => {
-    const binaryHash: string = lock!.binaryHash!
+    const codeHash: string = lock!.codeHash!
     const args: string[] = lock.args!
     const lockHash: string = core.utils.lockScriptToHash({
-      binaryHash,
+      binaryHash: codeHash,
       args,
     })
 
@@ -528,7 +509,7 @@ export default class TransactionsService {
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
-      binaryHash: contractInfo.binaryHash,
+      codeHash: contractInfo.codeHash,
       args: [blake160],
     }
     return lock
@@ -554,3 +535,8 @@ export default class TransactionsService {
     })
   }
 }
+
+// listen to send tx event
+TransactionsService.txSentSubject.subscribe(msg => {
+  TransactionsService.saveSentTx(msg.transaction, msg.txHash)
+})

@@ -2,12 +2,9 @@ import * as bip32 from 'bip32'
 import { AddressType } from '../services/addresses'
 import { KeysData } from './keystore'
 
-// 360 is just a tentative value, and we also need a coin type of mainnet.
-const COIN_TYPE_TESTNET = "360'"
-
 class HD {
   public static pathFromIndex = (type: AddressType, index: number) => {
-    return `m/44'/${COIN_TYPE_TESTNET}/0'/${type}/${index}`
+    return `m/44'/309'/0'/${type}/${index}`
   }
 
   public static indexFromPath = (path: string) => {

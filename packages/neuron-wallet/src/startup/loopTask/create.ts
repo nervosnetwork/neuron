@@ -1,10 +1,11 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import { Subject, BehaviorSubject } from 'rxjs'
+import { Subject } from 'rxjs'
 import SyncBlocksService from '../../services/syncBlocks'
 import initConnection from '../../typeorm'
 import Address from '../../services/addresses'
 import TransactionsService from '../../services/transactions'
+import { networkSwitchSubject } from '../../services/networks'
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
@@ -12,11 +13,6 @@ const stopLoopSubject = new Subject()
 
 // TODO: mock as an address subject
 const addressChangeSubject = new Subject()
-
-// TODO: mock as an network init or change subject
-// init-message means network not initialized
-const networkChangeSubject = new BehaviorSubject('init-message')
-networkChangeSubject.next('testnet')
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -72,9 +68,9 @@ const createLoopTask = () => {
     loopWindow!.hide()
 
     // TODO: add an event on networkId for when it init and changed, it should broadcast a message with networkId
-    networkChangeSubject.subscribe(async (networkId: string) => {
-      if (networkId !== 'init-message') {
-        await switchNetwork(networkId)
+    networkSwitchSubject.subscribe(async network => {
+      if (network) {
+        await switchNetwork(network.name)
       }
     })
   })

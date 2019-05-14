@@ -12,8 +12,8 @@ export const MAX_ADDRESS_COUNT = 30
 export const SEARCH_RANGE = 20
 
 export enum AddressType {
-  Receiving = 0,
-  Change = 1,
+  Receiving = 0, // External chain
+  Change = 1, // Internal chain
 }
 
 export interface HDAddress {

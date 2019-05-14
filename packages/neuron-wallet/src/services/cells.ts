@@ -11,7 +11,7 @@ export interface OutPoint {
 
 export interface Script {
   args?: string[]
-  binaryHash?: string | null
+  codeHash?: string | null
 }
 
 // FIXME: should update capacity to string

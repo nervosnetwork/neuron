@@ -1,4 +1,6 @@
 import { v4 as uuid } from 'uuid'
+import { BehaviorSubject } from 'rxjs'
+
 import Store from '../utils/store'
 import env from '../env'
 
@@ -28,6 +30,8 @@ export interface NetworkWithID extends Network {
   id: NetworkID
 }
 
+export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
+
 export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(env.presetNetwors))
@@ -54,6 +58,7 @@ export default class NetworksService extends Store {
       const network = await this.get(newActiveId)
       if (network) {
         nodeService.setNetwork(network.remote)
+        networkSwitchSubject.next(network)
       }
       windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
         status: ResponseCode.Success,
