@@ -1,6 +1,6 @@
 import { ResponseCode, ChannelResponse } from '.'
+import { Transaction } from '../appTypes/types'
 import TransactionsService, {
-  Transaction,
   TransactionsByAddressesParam,
   PaginationResult,
   TransactionsByLockHashesParam,
