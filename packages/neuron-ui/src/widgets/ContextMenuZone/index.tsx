@@ -47,7 +47,7 @@ const ContextMenuZone = ({
 
   const onContextMenu = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     const { target } = e.nativeEvent
-    let params = (target as any).getAttribute('data-menuitem')
+    let params = (target as any).getAttribute('data-menuitem') || {}
     if (params) {
       try {
         params = JSON.parse(params)

@@ -49,27 +49,35 @@ export const useMenuItems = (
     () => [
       {
         label: i18n.t('menuitem.select'),
-        click: ({ id }: MenuItemParams) => {
-          dispatch(actionCreators.activateWallet(id))
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            dispatch(actionCreators.activateWallet(params.id))
+          }
         },
       },
       {
         label: i18n.t('menuitem.backup'),
-        click: ({ id }: MenuItemParams) => {
-          dispatch(actionCreators.backupWallet(id))
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            dispatch(actionCreators.backupWallet(params.id))
+          }
         },
       },
       {
         label: i18n.t('menuitem.edit'),
-        click: ({ id }: MenuItemParams) => {
-          history.push(`${Routes.WalletEditor}/${id}`)
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            history.push(`${Routes.WalletEditor}/${params.id}`)
+          }
         },
       },
       {
         label: i18n.t('menuitem.remove'),
-        click: ({ id }: MenuItemParams) => {
-          deleteWallet.id.set(id)
-          toggleDialog(true)
+        click: (params: MenuItemParams) => {
+          if (params && params.id) {
+            deleteWallet.id.set(params.id)
+            toggleDialog(true)
+          }
         },
       },
     ],
