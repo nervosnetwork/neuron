@@ -2,7 +2,20 @@ import * as path from 'path'
 import app from './app'
 import { NetworkWithID } from './services/networks'
 
+const { NODE_ENV } = process.env
+
 const isDevMode = !app.isPackaged
+
+const fileBase = (() => {
+  if (NODE_ENV === 'prod') {
+    return ''
+  }
+  if (NODE_ENV === 'test') {
+    return 'test/'
+  }
+  return 'dev/'
+})()
+
 interface ENV {
   isDevMode: boolean
   fileBasePath: string
@@ -15,7 +28,7 @@ interface ENV {
 }
 const env: ENV = {
   isDevMode,
-  fileBasePath: path.resolve(app.getPath('userData'), isDevMode ? 'dev/' : ''),
+  fileBasePath: path.resolve(app.getPath('userData'), fileBase),
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
   presetNetwors: {
