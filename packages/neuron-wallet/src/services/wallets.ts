@@ -93,7 +93,7 @@ export default class WalletService {
   constructor(storePath: string = defaultStorePath) {
     this.storePath = `${app.getPath('userData')}/${storePath}`
     fs.mkdirSync(this.storePath, { recursive: true })
-    this.listStore = new Store('wallet', 'wallets.json')
+    this.listStore = new Store('wallets', 'wallets.json')
   }
 
   public getAll = (): Wallet[] => {
