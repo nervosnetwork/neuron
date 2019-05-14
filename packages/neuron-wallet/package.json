@@ -51,7 +51,7 @@
     ]
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-core": "0.11.0-alpha.0",
+    "@nervosnetwork/ckb-sdk-core": "0.11.0",
     "bip32": "2.0.2",
     "bip39": "3.0.2",
     "chalk": "2.4.2",
@@ -68,7 +68,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@nervosnetwork/ckb-types": "0.11.0-alpha.0",
+    "@nervosnetwork/ckb-types": "0.11.0",
     "@nervosnetwork/neuron-ui": "0.1.0",
     "@types/bip39": "2.4.2",
     "@types/electron-devtools-installer": "2.2.0",
