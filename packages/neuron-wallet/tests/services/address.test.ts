@@ -25,11 +25,11 @@ describe('Key tests', () => {
     }
     const addresses = Addresses.generateAddresses(keysData, 2, 2)
     expect(2).toBe(addresses.receiving.length)
-    expect('ckt1q9gry5zgy4tp7rnhacvl49rqgcufpn6hsacc2edvdzg26n').toBe(addresses.receiving[0].address)
-    expect("m/44'/360'/0'/0/0").toBe(addresses.receiving[0].path)
+    expect('ckt1q9gry5zgmgxa776jt6k40ysfkhwv8egepeqwzuv6jqjt02').toBe(addresses.receiving[0].address)
+    expect("m/44'/309'/0'/0/0").toBe(addresses.receiving[0].path)
 
     expect(2).toBe(addresses.change.length)
-    expect('ckt1q9gry5zgl0arwx02534dv6k6mfarffgulzqmxwvgpfvk23').toBe(addresses.change[0].address)
-    expect("m/44'/360'/0'/1/0").toBe(addresses.change[0].path)
+    expect('ckt1q9gry5zgclst8my3sdp75u0htlh56u8md3c4fttkum6mt3').toBe(addresses.change[0].address)
+    expect("m/44'/309'/0'/1/0").toBe(addresses.change[0].path)
   })
 })
