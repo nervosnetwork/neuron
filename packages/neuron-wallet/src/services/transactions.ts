@@ -493,7 +493,7 @@ export default class TransactionsService {
     const codeHash: string = lock!.codeHash!
     const args: string[] = lock.args!
     const lockHash: string = core.utils.lockScriptToHash({
-      binaryHash: codeHash,
+      codeHash,
       args,
     })
 

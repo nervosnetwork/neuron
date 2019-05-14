@@ -1990,48 +1990,48 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-core@0.11.0-alpha.0":
-  version "0.11.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.11.0-alpha.0.tgz#2b5aae7aa41feb8aae7f73ce388af98cd357d768"
-  integrity sha512-8jFkts9ZuOckUd3AX1aESssvV32dGAIvF7tZd1MfN8HZvxIgfjmhUmac9FIpnhnWCl2865NUMvO9y2KZwNcSQA==
+"@nervosnetwork/ckb-sdk-core@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.11.0.tgz#820ad01fcd93e9dd87d7111e36117d5eb9a0c60a"
+  integrity sha512-SgW3HmoU4YYYeTVpM/3dnrjm7K6PO7UmfCUISzcX/ZDKBsSHo8NmjXe3BRfyv33ZIRvckE8Yop244ucXXxP8Ew==
   dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "^0.11.0-alpha.0"
-    "@nervosnetwork/ckb-sdk-utils" "^0.11.0-alpha.0"
-    "@nervosnetwork/ckb-sdk-wallet" "^0.11.0-alpha.0"
-    "@nervosnetwork/ckb-types" "^0.11.0-alpha.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.11.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.11.0"
+    "@nervosnetwork/ckb-sdk-wallet" "0.11.0"
+    "@nervosnetwork/ckb-types" "0.11.0"
 
-"@nervosnetwork/ckb-sdk-rpc@^0.11.0-alpha.0":
-  version "0.11.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.11.0-alpha.0.tgz#f33558c36b8299f08f46e59a17ff7044b2aa8955"
-  integrity sha512-ZcgRzAwfyDQyQ1GVKpwg2xcYM2GmJbhv/IYDQvA2UgPFUki0/AbRippGDMSEwTlnZZbCDscKMMnR8hv4XlYcHA==
+"@nervosnetwork/ckb-sdk-rpc@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.11.0.tgz#93a1d94a00e3442e5be72e9c5055f42cc24466b1"
+  integrity sha512-6VIkT31Z0IN3b0vD4XQx+hRMMNb8e+XCyLA8z+nYhEhwYTLLEJMAzgk1c6E5N+kJ5QGLjzSAm4F4cpwEx0HDGg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "^0.11.0-alpha.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.11.0"
     axios "^0.18.0"
 
-"@nervosnetwork/ckb-sdk-utils@^0.11.0-alpha.0":
-  version "0.11.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.11.0-alpha.0.tgz#f1136f12cedda2e9cdcb0d2165941afaf2e92adb"
-  integrity sha512-9//7WQUFjw0tzsNbDKzjqSwFyM5fsHU0vdKc8IdIeZFnGdwj1iRZuFJOZkqJfFcBmy7M0fvobMV71ZKNx5Huiw==
+"@nervosnetwork/ckb-sdk-utils@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.11.0.tgz#934df7e4c802a40bc36f42e0075fa4882cfc25dc"
+  integrity sha512-a/A7FVgwLChbakvGql4kfyCYRxj1C93GpBNQZalgjNPCokrK0g3HkCwrX+7Ey/cqrcC6Ot3xvBkPbY7TXh3o6w==
   dependencies:
-    "@nervosnetwork/ckb-types" "^0.11.0-alpha.0"
+    "@nervosnetwork/ckb-types" "0.11.0"
     blake2b-wasm "1.1.7"
     bs58check "2.1.2"
     eth-lib "0.2.8"
     safe-buffer "5.1.2"
     tiny-secp256k1 "1.0.1"
 
-"@nervosnetwork/ckb-sdk-wallet@^0.11.0-alpha.0":
-  version "0.11.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-wallet/-/ckb-sdk-wallet-0.11.0-alpha.0.tgz#7f371846a58086b1d3a09c7b8fd7082d8718a381"
-  integrity sha512-eVsOoxO366gl77Bd+H2K01SclgF5nZ5wg/BRRCvHBWKYA4CE3MS5/oRReK45hCNLmJk6x+XLVhBmjkwCcxtXmw==
+"@nervosnetwork/ckb-sdk-wallet@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-wallet/-/ckb-sdk-wallet-0.11.0.tgz#9aea5ccc3405795df48c0f53060ea2cb04a676a0"
+  integrity sha512-enuegh04sfJfZcnpGYnWu9Bid6PA6UZhaZrbGnKMjmdFy6hkssDoPj5SiAj0V9HOfrGSs/SqRhelIU76Bi9uXA==
   dependencies:
-    "@nervosnetwork/ckb-sdk-rpc" "^0.11.0-alpha.0"
-    "@nervosnetwork/ckb-sdk-utils" "^0.11.0-alpha.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.11.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.11.0"
 
-"@nervosnetwork/ckb-types@0.11.0-alpha.0", "@nervosnetwork/ckb-types@^0.11.0-alpha.0":
-  version "0.11.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.11.0-alpha.0.tgz#6a456cc500eafbb7028947bef6a17241164c14ac"
-  integrity sha512-1Ebp2qEBt4eAvycCxGW7nFwBE/zBVb+MeceoqAUJm8w/vfM8bcPiezacDCs1QZx5CqQF2Jd59mJ0MbxyQBR/ag==
+"@nervosnetwork/ckb-types@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.11.0.tgz#571a6c33def973fd8b10b35c3cf8166770942fb8"
+  integrity sha512-mM99hw3xt1Ct1Jbmtn9l5kg3hbcxkKNFjjieXlSJOBeW4FpDUotvtQEQaPtlPeN0+uRC32XGzcqcFe4bMDQlOw==
 
 "@nodelib/fs.stat@^1.1.2":
   version "1.1.3"

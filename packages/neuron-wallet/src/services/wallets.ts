@@ -206,8 +206,7 @@ export default class WalletService {
 
     const lockHashes = items.map(({ address }) =>
       core.utils.lockScriptToHash({
-        // TODO: binaryHash has be updated to codeHash with sdk@0.11.0
-        binaryHash: codeHash,
+        codeHash,
         args: [core.utils.blake160(address)],
       }),
     )
