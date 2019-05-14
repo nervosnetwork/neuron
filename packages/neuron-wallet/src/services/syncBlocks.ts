@@ -1,8 +1,8 @@
 import { getConnection } from 'typeorm'
 import { Subject, BehaviorSubject } from 'rxjs'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { Script, OutPoint, Cell } from './cells'
-import TransactionsService, { Input, Transaction } from './transactions'
+import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader } from '../appTypes/types'
+import TransactionsService from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
@@ -16,19 +16,6 @@ networkSwitchSubject.subscribe(network => {
     core = new Core(network.remote)
   }
 })
-
-export interface BlockHeader {
-  version: number
-  timestamp: string
-  hash: string
-  parentHash: string
-  number: string
-}
-
-export interface Block {
-  header: BlockHeader
-  transactions: Transaction[]
-}
 
 // subscribe this Subject to monitor which addresses are used
 export const addressesUsedSubject = new Subject()

@@ -1,41 +1,13 @@
-import { getConnection, Transaction } from 'typeorm'
+import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import CellsService, { Cell, OutPoint, Script } from './cells'
+import { Cell, OutPoint, Script, Transaction, TransactionWithoutHash, Input } from '../appTypes/types'
+import CellsService from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
 import nodeService from '../startup/nodeService'
 
 const { core } = nodeService
-
-export interface Input {
-  previousOutput: OutPoint
-  args: string[]
-  since?: string
-  capacity?: string | null
-  lockHash?: string | null
-}
-
-export interface Witness {
-  data: string[]
-}
-
-export interface TransactionWithoutHash {
-  version: number
-  deps?: OutPoint[]
-  inputs?: Input[]
-  outputs?: Cell[]
-  timestamp?: string
-  value?: string
-  blockNumber?: string
-  blockHash?: string
-  witnesses?: Witness[]
-  type?: string
-}
-
-export interface Transaction extends TransactionWithoutHash {
-  hash: string
-}
 
 export interface TransactionsByAddressesParam {
   pageNo: number

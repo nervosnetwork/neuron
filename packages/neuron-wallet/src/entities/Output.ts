@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint, Cell } from '../services/cells'
+import { Script, OutPoint, Cell } from '../appTypes/types'
 import TransactionEntity from './Transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
