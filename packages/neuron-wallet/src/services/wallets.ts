@@ -63,7 +63,9 @@ class FileKeystoreWallet implements Wallet {
   }
 
   saveKeystore = (keystore: Keystore) => {
-    new FileService().writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify(keystore))
+    const keystoreToSave = keystore
+    keystoreToSave.id = this.id
+    new FileService().writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify(keystoreToSave))
   }
 
   deleteKeystore = () => {
