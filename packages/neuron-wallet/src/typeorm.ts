@@ -1,6 +1,5 @@
 import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import * as path from 'path'
-import app from './app'
 import env from './env'
 
 import Transaction from './entities/Transaction'
@@ -10,14 +9,9 @@ import SyncInfo from './entities/SyncInfo'
 
 import { InitMigration1557483560422 } from './migration/1557483560422-InitMigration'
 
-const userDataPath = app.getPath('userData')
-
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
-  if (env.isDevMode) {
-    return path.join(userDataPath, 'dev', name)
-  }
-  return path.join(userDataPath, name)
+  return path.join(env.fileBasePath, name)
 }
 
 const connectOptions = async (networkName: string) => {
