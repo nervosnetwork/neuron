@@ -21,7 +21,7 @@ interface ENV {
   fileBasePath: string
   mainURL: string
   remote: string
-  presetNetwors: {
+  presetNetworks: {
     active: 'testnet'
     list: NetworkWithID[]
   }
@@ -31,7 +31,7 @@ const env: ENV = {
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
   remote: 'http://localhost:8114',
-  presetNetwors: {
+  presetNetworks: {
     active: 'testnet',
     list: [
       {
