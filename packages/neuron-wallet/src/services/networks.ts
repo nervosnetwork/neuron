@@ -34,7 +34,7 @@ export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithI
 
 export default class NetworksService extends Store {
   constructor() {
-    super('networks', 'index.json', JSON.stringify(env.presetNetwors))
+    super('networks', 'index.json', JSON.stringify(env.presetNetworks))
     this.on(NetworksKey.List, async (_, newValue: NetworkWithID[]) => {
       windowManage.broadcast(Channel.Networks, NetworksMethod.GetAll, {
         status: ResponseCode.Success,
@@ -47,9 +47,9 @@ export default class NetworksService extends Store {
           result: network,
         })
       } else {
-        const defaultNetowrk = await this.defaultOne()
-        if (defaultNetowrk) {
-          this.activate(defaultNetowrk.id)
+        const defaultNetwork = await this.defaultOne()
+        if (defaultNetwork) {
+          this.activate(defaultNetwork.id)
         }
       }
     })
