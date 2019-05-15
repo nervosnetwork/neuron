@@ -4,6 +4,7 @@ import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import Store from '../utils/store'
 import nodeService from '../startup/nodeService'
+import fileService from '../startup/fileService'
 
 const { core } = nodeService
 
@@ -28,13 +29,10 @@ class FileKeystoreWallet implements Wallet {
   public name: string
   public addresses: Addresses
 
-  private keyStore: Store
-
-  constructor(id: string, { name, addresses, keystore }: WalletProperties) {
+  constructor(id: string, { name, addresses }: WalletProperties) {
     this.id = id
     this.name = name
     this.addresses = addresses
-    this.keyStore = new Store(MODULE_NAME, `${id}.json`, JSON.stringify(keystore || {}))
   }
 
   static fromJSON = (json: { id: string; name: string; addresses: Addresses }): FileKeystoreWallet => {
@@ -44,11 +42,9 @@ class FileKeystoreWallet implements Wallet {
 
   public update = ({ name, addresses }: WalletProperties) => {
     if (name) {
-      this.keyStore.writeSync('name', name)
       this.name = name
     }
     if (addresses) {
-      this.keyStore.writeSync('addresses', JSON.stringify(addresses))
       this.addresses = addresses
     }
   }
@@ -62,13 +58,22 @@ class FileKeystoreWallet implements Wallet {
   }
 
   public loadKeystore = (): Keystore => {
-    // TODO: handle fs error
-    const data = this.keyStore.service.readFileSync(MODULE_NAME, `${this.id}.json`)
+    const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
     return JSON.parse(data) as Keystore
   }
 
-  clear = () => {
-    this.keyStore.clear()
+  saveKeystore = (keystore: Keystore) => {
+    const keystoreToSave = keystore
+    keystoreToSave.id = this.id
+    fileService.writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify(keystoreToSave))
+  }
+
+  deleteKeystore = () => {
+    fileService.deleteFileSync(MODULE_NAME, this.keystoreFileName())
+  }
+
+  keystoreFileName = () => {
+    return `${this.id}.json`
   }
 }
 
@@ -99,6 +104,7 @@ export default class WalletService {
       throw Error('Wallet name existed')
     }
     const wallet = new FileKeystoreWallet(uuid(), props)
+    wallet.saveKeystore(props.keystore!)
     this.listStore.writeSync(this.walletsKey, this.getAll().concat(wallet.toJSON()))
     if (this.getAll().length === 1) {
       this.setCurrent(wallet.id)
@@ -115,6 +121,9 @@ export default class WalletService {
         throw Error('Wallet name existed')
       }
       wallet.update(props)
+      if (props.keystore) {
+        wallet.saveKeystore(props.keystore)
+      }
       wallets[index] = wallet.toJSON()
       this.listStore.writeSync(this.walletsKey, wallets)
     }
@@ -132,7 +141,7 @@ export default class WalletService {
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
     wallets.splice(index, 1)
     this.listStore.writeSync(this.walletsKey, wallets)
-    wallet.clear()
+    wallet.deleteKeystore()
 
     const newWallets = this.getAll()
     if (currentId === id) {
@@ -177,7 +186,7 @@ export default class WalletService {
   public clearAll = () => {
     this.getAll().forEach(w => {
       const wallet = FileKeystoreWallet.fromJSON(w)
-      wallet.clear()
+      wallet.deleteKeystore()
     })
     this.listStore.clear()
   }

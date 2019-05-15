@@ -192,7 +192,7 @@ export default class Key {
       .toString('hex')
       .replace('0x', '')
     return {
-      version: 0,
+      version: 3,
       id: uuid(),
       crypto: {
         ciphertext: ciphertext.toString('hex'),
