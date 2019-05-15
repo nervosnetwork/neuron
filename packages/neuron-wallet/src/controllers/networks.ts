@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import { ResponseCode } from '.'
 import NetworksService, { NetworkType, NetworkID, Network } from '../services/networks'
 
@@ -15,7 +14,7 @@ export enum NetworksMethod {
 }
 
 class NetworksController {
-  static service = new NetworksService(app.getPath('userData'), 'networks.json')
+  static service = new NetworksService()
 
   public static getAll = async () => {
     return {

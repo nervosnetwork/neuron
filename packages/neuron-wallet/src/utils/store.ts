@@ -1,109 +1,117 @@
-import fs from 'fs'
-import path from 'path'
 import EventEmitter from 'events'
-import Logger from './logger'
+import fileService from '../startup/fileService'
+import logger from './logger'
 
 class Store extends EventEmitter {
-  public readonly location: string
+  public moduleName: string
+  public filename: string
+  public defaultValue: string
+  public service = fileService
 
-  public defaultValue = '{}'
-
-  public config = {
-    encoding: 'utf8',
-  }
-
-  constructor(pathname: string, filename: string) {
+  constructor(moduleName: string, filename: string, defaultValue: string = '{}') {
     super()
-    if (!fs.existsSync(pathname)) {
-      fs.mkdirSync(pathname, { recursive: true })
+    this.moduleName = moduleName
+    this.filename = filename
+    this.defaultValue = defaultValue
+    this.init()
+  }
+
+  public hasModule = () => {
+    return this.service.hasModule(this.moduleName)
+  }
+
+  public hasFile = () => {
+    return this.service.hasFile(this.moduleName, this.filename)
+  }
+
+  public init = () => {
+    if (!this.hasModule()) {
+      this.service.addModule(this.moduleName)
     }
-    this.location = path.resolve(pathname, filename)
-    const exist = fs.existsSync(this.location)
-    if (!exist) {
-      try {
-        fs.writeFileSync(this.location, this.defaultValue, this.config)
-      } catch (err) {
-        Logger.log({ level: 'error', message: err.message })
-      }
+    if (!this.hasFile()) {
+      this.service.writeFileSync(this.moduleName, this.filename, this.defaultValue)
     }
   }
 
-  public init = () =>
-    new Promise((resolve, reject) => {
-      fs.writeFile(this.location, this.defaultValue, this.config, err => {
-        if (err) reject(err)
-        resolve(true)
-      })
-    })
+  public backup = () => {
+    if (this.hasModule() && this.hasFile()) {
+      const data = this.service.readFileSync(this.moduleName, this.filename)
+      this.service.writeFileSync(this.moduleName, `${this.filename}.brk`, data)
+      this.service.deleteFileSync(this.moduleName, this.filename)
+    }
+    this.init()
+  }
 
   public read = <T>(key?: string): Promise<T | undefined> =>
-    new Promise((resolve, reject) => {
-      fs.readFile(this.location, this.config, (loadErr, data) => {
-        if (loadErr) {
-          reject(loadErr)
-        }
-        try {
-          const content = JSON.parse(data)
-          if (key) {
-            resolve(content[key])
-          }
-          resolve(content)
-        } catch (parseErr) {
-          console.error('\x1b[33m%s\x1b[0m', `Failed to parse data, backup to ${this.location}.brk and initialize data`)
-          this.backup(data)
-          this.init()
-          reject(parseErr)
-        }
+    this.service
+      .readFile(this.moduleName, this.filename)
+      .then(data => {
+        const content = JSON.parse(data)
+        return content[key as string]
       })
-    })
+      .catch(err => {
+        this.backup()
+        logger.log({
+          level: 'error',
+          message: err.message,
+        })
+        return this.read(key)
+      })
 
   public write = (key: string, data: any) =>
-    this.read().then((content: any = {}) => {
-      const oldValue = content[key]
-      if (oldValue !== data) {
-        const newContent = { ...content, ...{ [key]: data } }
-        return new Promise((resolve, reject) => {
-          fs.writeFile(this.location, JSON.stringify(newContent), this.config, err => {
-            if (err) reject(err)
-            this.emit(key, oldValue, data)
-            return resolve(true)
-          })
+    this.read()
+      .then((content: any = {}) => {
+        const oldValue = content[key]
+        if (oldValue !== data) {
+          const newContent = { ...content, ...{ [key]: data } }
+          this.service.writeFileSync(this.moduleName, this.filename, JSON.stringify(newContent))
+        }
+      })
+      .catch(err => {
+        this.backup()
+        logger.log({
+          level: 'error',
+          message: err.message,
         })
-      }
-      return 'Same value'
-    })
+        this.write(key, data)
+      })
 
   public readSync = <T>(key?: string): T => {
-    const data = fs.readFileSync(this.location, this.config)
-    const content = JSON.parse(data)
-    return key ? content[key] : content
+    try {
+      const data = this.service.readFileSync(this.moduleName, this.filename)
+      const content = JSON.parse(data)
+      return key ? content[key] : content
+    } catch (err) {
+      this.backup()
+      logger.log({
+        level: 'error',
+        message: err.message,
+      })
+      return this.readSync(key)
+    }
   }
 
   public writeSync = (key: string, data: any) => {
-    const content: { [key: string]: any } = this.readSync()
-    const oldValue = content[key]
-    fs.writeFileSync(this.location, JSON.stringify({ ...content, ...{ [key]: data } }), this.config)
-    this.emit(key, oldValue, data)
-    return true
+    try {
+      const content: { [key: string]: any } = this.readSync()
+      const oldValue = content[key]
+      this.service.writeFileSync(this.moduleName, this.filename, JSON.stringify({ ...content, ...{ [key]: data } }))
+      this.emit(key, oldValue, data)
+    } catch (err) {
+      this.backup()
+      logger.log({
+        level: 'error',
+        message: err.message,
+      })
+      this.writeSync(key, data)
+    }
   }
 
-  public clear = () =>
-    new Promise((resolve, reject) => {
-      fs.unlink(this.location, err => {
-        if (err) {
-          reject(err)
-        }
-        resolve(true)
-      })
-    })
-
-  public backup = (data: string) =>
-    new Promise((resolve, reject) => {
-      fs.writeFile(`${this.location}.brk`, data, this.config, err => {
-        if (err) reject(err)
-        resolve(true)
-      })
-    })
+  public clear = () => {
+    if (this.hasModule() && this.hasFile()) {
+      this.service.deleteFileSync(this.moduleName, this.filename)
+    }
+  }
 }
 
 export default Store

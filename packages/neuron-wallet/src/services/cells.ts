@@ -1,29 +1,8 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from '../entities/Output'
-import { Input } from './transactions'
+import { Input, Cell, OutPoint } from '../appTypes/types'
 
 const MIN_CELL_CAPACITY = '40'
-
-export interface OutPoint {
-  txHash: string
-  index: number
-}
-
-export interface Script {
-  args?: string[]
-  binaryHash?: string | null
-}
-
-// FIXME: should update capacity to string
-export interface Cell {
-  capacity: string
-  data?: string
-  lock: Script
-  type?: Script | null
-  outPoint?: OutPoint
-  status?: string
-  lockHash?: string
-}
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "warn" */

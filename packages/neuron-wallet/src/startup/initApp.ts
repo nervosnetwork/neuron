@@ -24,10 +24,6 @@ const initApp = async () => {
   // TODO: this function should be moved to somewhere syncing data
   syncConnectStatus()
   WalletChannel.start()
-  const activeId = await NetworksController.service.activeId()
-  if (!activeId) {
-    await NetworksController.service.init()
-  }
   if (!nodeService.core.node.url) {
     const id = await NetworksController.service.activeId()
     const network = await NetworksController.service.get(id || '')

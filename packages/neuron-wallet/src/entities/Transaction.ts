@@ -1,12 +1,7 @@
 import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from 'typeorm'
-import { Witness } from '../services/transactions'
+import { Witness, OutPoint } from '../appTypes/types'
 import InputEntity from './Input'
 import OutputEntity from './Output'
-
-interface OutPoint {
-  txHash: string
-  index: number
-}
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()

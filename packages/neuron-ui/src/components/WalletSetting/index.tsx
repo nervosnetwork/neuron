@@ -3,6 +3,8 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { Col, Card, Button, Row, ListGroup, Form, Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
+import styled from 'styled-components'
+
 import { Routes, MnemonicAction } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { useNeuronWallet } from 'utils/hooks'
@@ -14,6 +16,13 @@ import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
 import ContextMenuZone from 'widgets/ContextMenuZone'
 
 import { useToggleDialog, useDeleteWallet, useMenuItems, useWalletToDelete, useHandleConfirm } from './hooks'
+
+const CheckBox = styled(Form.Check)`
+  pointer-events: none;
+  input {
+    pointer-events: auto;
+  }
+`
 
 const buttons = [
   {
@@ -47,7 +56,7 @@ const Wallets = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPro
             const isChecked = wallet.id === activeId
             return (
               <ListGroup.Item key={wallet.id} data-menuitem={JSON.stringify({ id: wallet.id })}>
-                <Form.Check
+                <CheckBox
                   inline
                   label={wallet.name}
                   type="radio"

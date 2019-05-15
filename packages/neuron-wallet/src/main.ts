@@ -9,8 +9,6 @@ import createLoopTask from './startup/loopTask/create'
 
 let mainWindow: Electron.BrowserWindow | null
 
-initApp()
-
 const openWindow = () => {
   i18n.changeLanguage(app.getLocale())
   Menu.setApplicationMenu(mainmenu())
@@ -25,6 +23,7 @@ const openWindow = () => {
 }
 
 app.on('ready', () => {
+  initApp()
   openWindow()
   createLoopTask()
 })
