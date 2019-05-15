@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid'
 import TransactionsService from './transactions'
-import FileService from './file'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import Store from '../utils/store'
 import nodeService from '../startup/nodeService'
+import fileService from '../startup/fileService'
 
 const { core } = nodeService
 
@@ -58,18 +58,18 @@ class FileKeystoreWallet implements Wallet {
   }
 
   public loadKeystore = (): Keystore => {
-    const data = new FileService().readFileSync(MODULE_NAME, this.keystoreFileName())
+    const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
     return JSON.parse(data) as Keystore
   }
 
   saveKeystore = (keystore: Keystore) => {
     const keystoreToSave = keystore
     keystoreToSave.id = this.id
-    new FileService().writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify(keystoreToSave))
+    fileService.writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify(keystoreToSave))
   }
 
   deleteKeystore = () => {
-    new FileService().deleteFileSync(MODULE_NAME, this.keystoreFileName())
+    fileService.deleteFileSync(MODULE_NAME, this.keystoreFileName())
   }
 
   keystoreFileName = () => {
