@@ -453,10 +453,11 @@ export default class TransactionsService {
     }
 
     return {
-      version: 0,
+      version: '0',
       deps: [outPoint],
       inputs,
       outputs,
+      witnesses: [],
     }
   }
 

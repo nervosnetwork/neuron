@@ -33,7 +33,7 @@
   },
   "browserslist": ["last 2 chrome versions"],
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-core": "0.11.0",
+    "@nervosnetwork/ckb-sdk-core": "0.12.0",
     "@types/node": "11.13.5",
     "@types/react": "16.8.13",
     "@types/react-dom": "16.8.4",
