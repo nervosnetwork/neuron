@@ -85,8 +85,7 @@ export default class SyncBlocksService {
     }
     const startBlockNumber: number = currentBlockNumber - this.sizeForCheck
     const realStartBlockNumber: number = startBlockNumber > 0 ? startBlockNumber : 0
-    const blockHashes: string[] = await SyncBlocksService.getBlockHashes(realStartBlockNumber, this.sizeForCheck)
-    const blocks: Block[] = await SyncBlocksService.getBlocks(blockHashes)
+    const blocks: Block[] = await SyncBlocksService.getBlockByNumber(realStartBlockNumber, this.sizeForCheck)
     this.blockHeadersForCheck = blocks.map(block => block.header)
   }
 
@@ -102,8 +101,7 @@ export default class SyncBlocksService {
     // currentBlockNumber means last checked blockNumber
     // so should start with currentBlockNumber + 1
     const currentBlockNumber: number = await this.currentBlockNumber()
-    const blockHashes: string[] = await this.tryGetBlockHashes(currentBlockNumber + 1)
-    const blocks: Block[] = await this.tryGetBlocks(blockHashes)
+    const blocks: Block[] = await this.tryGetBlocksByNumber(currentBlockNumber + 1)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
     const checkResult = this.checkBlockRange(blockHeaders)
     let blocksToSave: Block[] = []
@@ -138,38 +136,6 @@ export default class SyncBlocksService {
     await TransactionsService.deleteByBlockNumbers(blockNumbers.map(n => n.toString()))
   }
 
-  async tryGetBlockHashes(startBlockNumber: number): Promise<string[]> {
-    // return if stopped
-    if (this.stopped()) {
-      return []
-    }
-    // startBlockNumber should >= 0 && startBlockNumber should >= tipBlockNumber
-    if (startBlockNumber < 0 || this.tipBlockNumber < startBlockNumber) {
-      return []
-    }
-
-    // size for fetch
-    const size: number = Math.min(this.tipBlockNumber - startBlockNumber, this.fetchSize)
-
-    let blockHashes: string[] = []
-    try {
-      // TODO: check RPC error info
-      blockHashes = await SyncBlocksService.getBlockHashes(startBlockNumber, size)
-    } catch (err) {
-      console.error(err)
-      this.checkTryTime()
-      return this.tryGetBlockHashes(startBlockNumber)
-    }
-
-    // clearTryTime if success
-    this.clearTryTime()
-
-    const endBlockNumber: number = startBlockNumber + size - 1
-    // update current block number here
-    await this.updateCurrentBlockNumber(endBlockNumber)
-    return blockHashes
-  }
-
   clearTryTime() {
     this.tryTime = 0
   }
@@ -184,40 +150,44 @@ export default class SyncBlocksService {
     }
   }
 
-  // return blocks should exclude check blocks
-  async tryGetBlocks(blockHashes: string[]): Promise<Block[]> {
+  async tryGetBlocksByNumber(startBlockNumber: number): Promise<Block[]> {
+    // return if stopped
     if (this.stopped()) {
       return []
     }
 
-    let blocks: Block[]
+    // startBlockNumber should >= 0 && startBlockNumber should >= tipBlockNumber
+    if (startBlockNumber < 0 || this.tipBlockNumber < startBlockNumber) {
+      return []
+    }
+
+    // size for fetch
+    const size: number = Math.min(this.tipBlockNumber - startBlockNumber, this.fetchSize)
+
+    let blocks: Block[] = []
     try {
-      blocks = await SyncBlocksService.getBlocks(blockHashes)
+      // TODO: check RPC error info
+      blocks = await SyncBlocksService.getBlockByNumber(startBlockNumber, size)
     } catch (err) {
       console.error(err)
       this.checkTryTime()
-      return this.tryGetBlocks(blockHashes)
+      return this.tryGetBlocksByNumber(startBlockNumber)
     }
-    // clear if success
+
+    // clearTryTime if success
     this.clearTryTime()
+
+    const endBlockNumber: number = startBlockNumber + size - 1
+    // update current block number here
+    await this.updateCurrentBlockNumber(endBlockNumber)
     return blocks
   }
 
-  static async getBlockHashes(startBlockNumber: number, size: number): Promise<string[]> {
+  static async getBlockByNumber(startBlockNumber: number, size: number): Promise<Block[]> {
     const blockNumbers = Array.from({ length: size }).map((_a, i) => i + startBlockNumber)
-    const blockHashes: string[] = await Promise.all(
+    const blocks: Block[] = await Promise.all(
       blockNumbers.map(async num => {
-        const hash: string = await core.rpc.getBlockHash(num.toString())
-        return hash
-      }),
-    )
-    return blockHashes
-  }
-
-  static async getBlocks(blockHashes: string[]): Promise<Block[]> {
-    const blocks = await Promise.all(
-      blockHashes.map(async hash => {
-        const block = await core.rpc.getBlock(hash)
+        const block = await core.rpc.getBlockByNumber(num.toString())
         return TypeConvert.toBlock(block)
       }),
     )
