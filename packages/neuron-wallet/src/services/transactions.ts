@@ -484,9 +484,13 @@ export default class TransactionsService {
     return `0x${lockHash}`
   }
 
-  // FIXME: core.utils.parseAddress to return expected values, should fix it
   public static addressToLockScript = async (address: string): Promise<Script> => {
-    const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
+    let blake160: string = result.slice(hrp.length, result.length)
+    if (!blake160.startsWith('0x')) {
+      blake160 = `0x${blake160}`
+    }
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
@@ -496,7 +500,6 @@ export default class TransactionsService {
     return lock
   }
 
-  // FIXME: also fix this when fix addressToLockScript
   public static addressToLockHash = async (address: string): Promise<string> => {
     const lock: Script = await TransactionsService.addressToLockScript(address)
     const lockHash: string = await TransactionsService.lockScriptToHash(lock)
@@ -504,7 +507,6 @@ export default class TransactionsService {
     return lockHash
   }
 
-  // TODO: update this
   public static lockScriptToAddress = (lock: Script): string => {
     const blake160: string = lock.args![0]
     return TransactionsService.blake160ToAddress(blake160)

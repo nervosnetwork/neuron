@@ -1,21 +1,24 @@
-// import { Script } from '../../src/appTypes/types'
+import { Script } from '../../src/appTypes/types'
 import TransactionsService from '../../src/services/transactions'
 
-// const contractInfo = {
-//   outPoint: {
-//     txHash: '0xb027f6103472559d62ce829b72d158e15072ed3ba4b3f89d9fd67c8e2c87197',
-//     index: 0,
-//   },
-//   codeHash: '0x55a809b92c5c404989bfe523639a741f4368ecaa3d4c42d1eb8854445b1b798b',
-// }
+const contractInfo = {
+  outPoint: {
+    blockHash: null,
+    cell: {
+      txHash: '0xbffab7ee0a050e2cb882de066d3dbf3afdd8932d6a26eda44f06e4b23f0f4b5a',
+      index: '1',
+    },
+  },
+  codeHash: '0x9e3b3557f11b2b3532ce352bfe8017e9fd11d154c4c7f9b7aaaa1e621b539a08',
+}
 
 describe('TransactionsService Test', () => {
   const bob = {
     lockScript: {
-      codeHash: '0x55a809b92c5c404989bfe523639a741f4368ecaa3d4c42d1eb8854445b1b798b',
-      args: ['0x33366333323965643633306436636537353037313261343737353433363732616461623537663463'],
+      codeHash: '0x9e3b3557f11b2b3532ce352bfe8017e9fd11d154c4c7f9b7aaaa1e621b539a08',
+      args: ['0x36c329ed630d6ce750712a477543672adab57f4c'],
     },
-    lockHash: '0x848ffe4178a3057077cb46ffd711dff753923d134c0235032fec0389bbb1eab9',
+    lockHash: '0x3dbdeb3538b7abe1b1f85a86b150805728c29b26faceb5051fb6c7f92c346ed8',
     address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
   }
@@ -27,32 +30,31 @@ describe('TransactionsService Test', () => {
   })
 
   // FIXME: test failed, should fix addressToLockScript
-  // it('addressToLockScript', async () => {
-  //   const mockContractInfo = jest.fn()
-  //   mockContractInfo.mockReturnValue(contractInfo)
-  //   TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
+  it('addressToLockScript', async () => {
+    const mockContractInfo = jest.fn()
+    mockContractInfo.mockReturnValue(contractInfo)
+    TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
 
-  //   const lockScript: Script = await TransactionsService.addressToLockScript(bob.address)
+    const lockScript: Script = await TransactionsService.addressToLockScript(bob.address)
 
-  //   expect(lockScript).toEqual(bob.lockScript)
-  // })
+    expect(lockScript).toEqual(bob.lockScript)
+  })
 
-  // it('addressToLockHash', async () => {
-  //   const mockContractInfo = jest.fn()
-  //   mockContractInfo.mockReturnValue(contractInfo)
-  //   TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
+  it('addressToLockHash', async () => {
+    const mockContractInfo = jest.fn()
+    mockContractInfo.mockReturnValue(contractInfo)
+    TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
 
-  //   const lockHash: string = await TransactionsService.addressToLockHash(bob.address)
+    const lockHash: string = await TransactionsService.addressToLockHash(bob.address)
 
-  //   expect(lockHash).toEqual(bob.lockHash)
-  // })
+    expect(lockHash).toEqual(bob.lockHash)
+  })
 
-  // TODO: now have some problem, wait
-  // it('lockScriptToAddress', async () => {
-  //   const address: string = TransactionsService.lockScriptToAddress(bob.lockScript)
+  it('lockScriptToAddress', async () => {
+    const address: string = TransactionsService.lockScriptToAddress(bob.lockScript)
 
-  //   expect(address).toEqual(bob.address)
-  // })
+    expect(address).toEqual(bob.address)
+  })
 
   it('blake160ToAddress', async () => {
     const address: string = TransactionsService.blake160ToAddress(bob.blake160)
