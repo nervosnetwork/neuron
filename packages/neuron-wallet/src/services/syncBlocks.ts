@@ -315,7 +315,10 @@ export default class SyncBlocksService {
   public static async anyInput(inputs: Input[]): Promise<boolean> {
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
-      const cell: CellOutPoint = outPoint.cell!
+      const { cell } = outPoint
+      if (!cell) {
+        break
+      }
       const output = await getConnection()
         .getRepository(OutputEntity)
         .findOne({
