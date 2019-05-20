@@ -270,8 +270,11 @@ export default class TransactionsService {
     const previousOutputs: OutputEntity[] = []
     for (const i of transaction.inputs!) {
       const input = new InputEntity()
-      input.outPointTxHash = i.previousOutput.cell!.txHash
-      input.outPointIndex = i.previousOutput.cell!.index
+      const { cell } = i.previousOutput
+      if (cell) {
+        input.outPointTxHash = cell.txHash
+        input.outPointIndex = cell.index
+      }
       input.args = i.args
       input.transaction = tx
       input.capacity = i.capacity || null

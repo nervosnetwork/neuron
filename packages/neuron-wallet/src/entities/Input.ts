@@ -9,15 +9,18 @@ export default class Input extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
+  // cellbase input has empty cell { txHash, index }
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  outPointTxHash!: string
+  outPointTxHash: string | null = null
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  outPointIndex!: string
+  outPointIndex: string | null = null
 
   @Column({
     type: 'simple-json',
@@ -39,7 +42,10 @@ export default class Input extends BaseEntity {
   })
   capacity: string | null = null
 
-  public cellOutPoint(): CellOutPoint {
+  public cellOutPoint(): CellOutPoint | null {
+    if (!this.outPointTxHash || !this.outPointIndex) {
+      return null
+    }
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
