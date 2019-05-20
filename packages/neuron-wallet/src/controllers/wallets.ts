@@ -76,6 +76,12 @@ class WalletsController {
     receivingAddressNumber: number
     changeAddressNumber: number
   }): Promise<ChannelResponse<Wallet>> => {
+    if (!WalletsController.verifyPasswordComplexity(password)) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Password is too simple',
+      }
+    }
     try {
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const currentWallet = WalletsController.service.getCurrent()
@@ -136,6 +142,12 @@ class WalletsController {
     receivingAddressNumber: number
     changeAddressNumber: number
   }): ChannelResponse<Wallet> => {
+    if (!WalletsController.verifyPasswordComplexity(password)) {
+      return {
+        status: ResponseCode.Fail,
+        msg: 'Password is too simple',
+      }
+    }
     try {
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
@@ -154,6 +166,33 @@ class WalletsController {
         msg: e.message,
       }
     }
+  }
+
+  public static verifyPasswordComplexity = (password: string) => {
+    if (password.length < 8) {
+      return false
+    }
+    let complex = 0
+    let reg = /\d/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[a-z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[A-Z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[^0-9a-zA-Z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    if (complex >= 3) {
+      return true
+    }
+    return false
   }
 
   // TODO: update addresses?
@@ -178,6 +217,12 @@ class WalletsController {
         }
         if (newPassword) {
           if (WalletsController.service.validate({ id, password })) {
+            if (!WalletsController.verifyPasswordComplexity(newPassword)) {
+              return {
+                status: ResponseCode.Fail,
+                msg: 'Password is too simple',
+              }
+            }
             const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
             props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           } else {
