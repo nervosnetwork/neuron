@@ -53,6 +53,11 @@ export interface Cell {
 }
 
 export interface OutPoint {
+  blockHash?: string | null
+  cell?: CellOutPoint | null
+}
+
+export interface CellOutPoint {
   txHash: string
   index: string
 }

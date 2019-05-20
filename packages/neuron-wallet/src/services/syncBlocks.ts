@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import { Subject, BehaviorSubject } from 'rxjs'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader } from '../appTypes/types'
+import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader, CellOutPoint } from '../appTypes/types'
 import TransactionsService from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
@@ -315,11 +315,12 @@ export default class SyncBlocksService {
   public static async anyInput(inputs: Input[]): Promise<boolean> {
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
+      const cell: CellOutPoint = outPoint.cell!
       const output = await getConnection()
         .getRepository(OutputEntity)
         .findOne({
-          outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index,
+          outPointTxHash: cell.txHash,
+          outPointIndex: cell.index,
         })
       if (output) {
         return true
@@ -414,9 +415,13 @@ export default class SyncBlocksService {
   }
 
   static convertOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
+    const cell: CellOutPoint = {
+      txHash: outPoint.cell!.txHash,
+      index: outPoint.cell!.index,
+    }
     return {
-      txHash: outPoint.txHash,
-      index: outPoint.index,
+      blockHash: null,
+      cell,
     }
   }
 

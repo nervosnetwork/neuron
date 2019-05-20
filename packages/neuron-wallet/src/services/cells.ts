@@ -34,11 +34,12 @@ export default class CellsService {
   }
 
   private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
+    const cell = outPoint.cell!
     const cellEntity: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
       .findOne({
-        outPointTxHash: outPoint.txHash,
-        outPointIndex: outPoint.index,
+        outPointTxHash: cell.txHash,
+        outPointIndex: cell.index,
         status: 'live',
       })
 
