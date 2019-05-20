@@ -1,13 +1,14 @@
 import { getConnection } from 'typeorm'
 import { Subject, BehaviorSubject } from 'rxjs'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader, CellOutPoint } from '../appTypes/types'
+import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader } from '../appTypes/types'
 import TransactionsService from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
 import { networkSwitchSubject } from './networks'
 import LockUtils from '../utils/lockUtils'
+import TypeConvert from '../appTypes/typeConvert'
 
 // FIXME: now have some problem with core, should update every time network switched
 // const { core } = nodeService
@@ -217,7 +218,7 @@ export default class SyncBlocksService {
     const blocks = await Promise.all(
       blockHashes.map(async hash => {
         const block = await core.rpc.getBlock(hash)
-        return SyncBlocksService.convertBlock(block)
+        return TypeConvert.toBlock(block)
       }),
     )
     return blocks
@@ -373,73 +374,5 @@ export default class SyncBlocksService {
     current.value = currentBlockNumber.toString()
     await getConnection().manager.save(current)
     this.currentBlockNumberValue = currentBlockNumber
-  }
-
-  static convertBlock(block: CKBComponents.Block): Block {
-    const blockHeader = SyncBlocksService.convertBlockHeader(block.header)
-    return {
-      header: blockHeader,
-      transactions: block.transactions.map(tx => SyncBlocksService.convertTransaction(tx, blockHeader)),
-    }
-  }
-
-  static convertBlockHeader(blockHeader: CKBComponents.BlockHeader): BlockHeader {
-    return {
-      version: blockHeader.version,
-      timestamp: blockHeader.timestamp.toString(),
-      hash: blockHeader.hash,
-      parentHash: blockHeader.parentHash,
-      number: blockHeader.number.toString(),
-    }
-  }
-
-  static convertTransaction(transaction: CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
-    const tx: Transaction = {
-      hash: transaction.hash,
-      version: transaction.version,
-      deps: transaction.deps,
-      witnesses: transaction.witnesses,
-      inputs: transaction.inputs.map(SyncBlocksService.convertInput),
-      outputs: transaction.outputs.map(SyncBlocksService.convertOutput),
-    }
-    if (blockHeader) {
-      tx.timestamp = blockHeader.timestamp
-      tx.blockNumber = blockHeader.number
-      tx.blockHash = blockHeader.hash
-    }
-    return tx
-  }
-
-  static convertInput(input: CKBComponents.CellInput): Input {
-    return {
-      previousOutput: input.previousOutput,
-      args: input.args,
-      since: input.since,
-    }
-  }
-
-  static convertOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
-    const cell: CellOutPoint = {
-      txHash: outPoint.cell!.txHash,
-      index: outPoint.cell!.index,
-    }
-    return {
-      blockHash: null,
-      cell,
-    }
-  }
-
-  static convertOutput(output: CKBComponents.CellOutput): Cell {
-    return {
-      capacity: output.capacity.toString(),
-      lock: SyncBlocksService.convertScript(output.lock),
-    }
-  }
-
-  static convertScript(script: CKBComponents.Script): Script {
-    return {
-      args: script.args,
-      codeHash: script.codeHash,
-    }
   }
 }
