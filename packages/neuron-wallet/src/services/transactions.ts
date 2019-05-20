@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { Cell, OutPoint, Script, Transaction, TransactionWithoutHash, Input } from '../appTypes/types'
+import { Cell, OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../appTypes/types'
 import CellsService from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
@@ -228,9 +228,10 @@ export default class TransactionsService {
       const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
         txEntity.inputs.map(async input => {
           const outPoint: OutPoint = input.previousOutput()
+          const cell: CellOutPoint = outPoint.cell!
           const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-            outPointTxHash: outPoint.txHash,
-            outPointIndex: outPoint.index,
+            outPointTxHash: cell.txHash,
+            outPointIndex: cell.index,
           })
           if (outputEntity) {
             outputEntity.status = OutputStatus.Dead
@@ -269,8 +270,11 @@ export default class TransactionsService {
     const previousOutputs: OutputEntity[] = []
     for (const i of transaction.inputs!) {
       const input = new InputEntity()
-      input.outPointTxHash = i.previousOutput.txHash
-      input.outPointIndex = i.previousOutput.index
+      const { cell } = i.previousOutput
+      if (cell) {
+        input.outPointTxHash = cell.txHash
+        input.outPointIndex = cell.index
+      }
       input.args = i.args
       input.transaction = tx
       input.capacity = i.capacity || null
@@ -278,8 +282,8 @@ export default class TransactionsService {
       inputs.push(input)
 
       const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-        outPointTxHash: input.previousOutput().txHash,
-        outPointIndex: input.previousOutput().index,
+        outPointTxHash: input.previousOutput().cell!.txHash,
+        outPointIndex: input.previousOutput().cell!.index,
       })
       if (previousOutput) {
         // update previousOutput status here
@@ -292,7 +296,7 @@ export default class TransactionsService {
       transaction.outputs!.map(async (o, index) => {
         const output = new OutputEntity()
         output.outPointTxHash = transaction.hash
-        output.outPointIndex = index
+        output.outPointIndex = index.toString()
         output.capacity = o.capacity
         output.lock = o.lock
         output.lockHash = o.lockHash!
@@ -339,8 +343,8 @@ export default class TransactionsService {
         const outputEntity: OutputEntity | undefined = await getConnection()
           .getRepository(OutputEntity)
           .findOne({
-            outPointTxHash: i.previousOutput.txHash,
-            outPointIndex: i.previousOutput.index,
+            outPointTxHash: i.previousOutput.cell!.txHash,
+            outPointIndex: i.previousOutput.cell!.index,
           })
         if (outputEntity) {
           input.capacity = outputEntity.capacity
@@ -395,9 +399,12 @@ export default class TransactionsService {
       blake2b.update(data)
     }
     const codeHash: string = blake2b.digest('hex')
-    const outPoint: OutPoint = {
+    const cellOutPoint: CellOutPoint = {
       txHash: systemScriptTx.hash,
-      index: 0,
+      index: '0',
+    }
+    const outPoint: OutPoint = {
+      cell: cellOutPoint,
     }
     return {
       codeHash,
@@ -453,10 +460,11 @@ export default class TransactionsService {
     }
 
     return {
-      version: 0,
+      version: '0',
       deps: [outPoint],
       inputs,
       outputs,
+      witnesses: [],
     }
   }
 
@@ -476,9 +484,13 @@ export default class TransactionsService {
     return `0x${lockHash}`
   }
 
-  // FIXME: core.utils.parseAddress to return expected values, should fix it
   public static addressToLockScript = async (address: string): Promise<Script> => {
-    const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
+    let blake160: string = result.slice(hrp.length, result.length)
+    if (!blake160.startsWith('0x')) {
+      blake160 = `0x${blake160}`
+    }
     const contractInfo = await TransactionsService.contractInfo()
 
     const lock: Script = {
@@ -488,7 +500,6 @@ export default class TransactionsService {
     return lock
   }
 
-  // FIXME: also fix this when fix addressToLockScript
   public static addressToLockHash = async (address: string): Promise<string> => {
     const lock: Script = await TransactionsService.addressToLockScript(address)
     const lockHash: string = await TransactionsService.lockScriptToHash(lock)
@@ -496,7 +507,6 @@ export default class TransactionsService {
     return lockHash
   }
 
-  // TODO: update this
   public static lockScriptToAddress = (lock: Script): string => {
     const blake160: string = lock.args![0]
     return TransactionsService.blake160ToAddress(blake160)

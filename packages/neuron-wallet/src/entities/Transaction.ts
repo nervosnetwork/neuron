@@ -12,9 +12,9 @@ export default class Transaction extends BaseEntity {
   hash!: string
 
   @Column({
-    type: 'int',
+    type: 'varchar',
   })
-  version!: number
+  version!: string
 
   @Column({
     type: 'simple-json',

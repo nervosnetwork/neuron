@@ -6,7 +6,7 @@ export interface Block {
 }
 
 export interface BlockHeader {
-  version: number
+  version: string
   timestamp: string
   hash: string
   parentHash: string
@@ -14,7 +14,7 @@ export interface BlockHeader {
 }
 
 export interface TransactionWithoutHash {
-  version: number
+  version: string
   deps?: OutPoint[]
   inputs?: Input[]
   outputs?: Cell[]
@@ -53,8 +53,13 @@ export interface Cell {
 }
 
 export interface OutPoint {
+  blockHash?: string | null
+  cell?: CellOutPoint | null
+}
+
+export interface CellOutPoint {
   txHash: string
-  index: number
+  index: string
 }
 
 export interface Script {

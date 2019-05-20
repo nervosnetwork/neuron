@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface } from '../appTypes/types'
+import { OutPoint, Input as InputInterface, CellOutPoint } from '../appTypes/types'
 import Transaction from './Transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -9,15 +9,18 @@ export default class Input extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
+  // cellbase input has empty cell { txHash, index }
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  outPointTxHash!: string
+  outPointTxHash: string | null = null
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  outPointIndex!: number
+  outPointIndex: string | null = null
 
   @Column({
     type: 'simple-json',
@@ -39,10 +42,20 @@ export default class Input extends BaseEntity {
   })
   capacity: string | null = null
 
-  public previousOutput(): OutPoint {
+  public cellOutPoint(): CellOutPoint | null {
+    if (!this.outPointTxHash || !this.outPointIndex) {
+      return null
+    }
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
+    }
+  }
+
+  public previousOutput(): OutPoint {
+    return {
+      blockHash: null,
+      cell: this.cellOutPoint(),
     }
   }
 
