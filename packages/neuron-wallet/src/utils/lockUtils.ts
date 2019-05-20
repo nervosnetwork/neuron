@@ -26,7 +26,7 @@ export default class LockUtils {
     const codeHash: string = blake2b.digest('hex')
     const cellOutPoint: CellOutPoint = {
       txHash: systemScriptTx.hash,
-      index: '0',
+      index: '1',
     }
     const outPoint: OutPoint = {
       cell: cellOutPoint,
