@@ -6,6 +6,7 @@ import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
 import TransactionEntity from '../entities/Transaction'
 import nodeService from '../startup/nodeService'
+import LockUtils from '../utils/lockUtils'
 
 const { core } = nodeService
 
@@ -109,7 +110,7 @@ export default class TransactionsService {
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.addresses.map(async addr => {
-        const lockHash: string = await TransactionsService.addressToLockHash(addr)
+        const lockHash: string = await LockUtils.addressToLockHash(addr)
         return lockHash
       }),
     )
@@ -127,7 +128,7 @@ export default class TransactionsService {
     const lockHashes: string[] = await Promise.all(
       params.pubkeys.map(async pubkey => {
         const addr = core.utils.pubkeyToAddress(pubkey)
-        const lockHash = await TransactionsService.addressToLockHash(addr)
+        const lockHash = await LockUtils.addressToLockHash(addr)
         return lockHash
       }),
     )
@@ -170,13 +171,13 @@ export default class TransactionsService {
   // check whether the address has history transactions
   public static hasTransactions = async (address: string): Promise<boolean> => {
     const blake160 = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
-    const contractInfo = await TransactionsService.contractInfo()
+    const contractInfo = await LockUtils.systemScript()
 
     const lock: Script = {
       codeHash: contractInfo.codeHash,
       args: [blake160],
     }
-    const lockHash: string = TransactionsService.lockScriptToHash(lock)
+    const lockHash: string = LockUtils.lockScriptToHash(lock)
 
     const output: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
@@ -333,7 +334,7 @@ export default class TransactionsService {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
       const output = o
-      output.lockHash = TransactionsService.lockScriptToHash(output.lock!)
+      output.lockHash = LockUtils.lockScriptToHash(output.lock!)
       return output
     })
 
@@ -384,37 +385,9 @@ export default class TransactionsService {
     return txEntity
   }
 
-  // system contract info
-  public static contractInfo = async () => {
-    const genesisHash: string = await core.rpc.getBlockHash('0')
-    const genesisBlock = await core.rpc.getBlock(genesisHash)
-    const systemScriptTx = genesisBlock.transactions[0]
-    const blake2b = core.utils.blake2b(32)
-    const systemScriptCell = systemScriptTx.outputs[0]
-    const { data } = systemScriptCell
-    if (typeof data === 'string') {
-      blake2b.update(core.utils.hexToBytes(data))
-    } else {
-      // if Uint8Array
-      blake2b.update(data)
-    }
-    const codeHash: string = blake2b.digest('hex')
-    const cellOutPoint: CellOutPoint = {
-      txHash: systemScriptTx.hash,
-      index: '0',
-    }
-    const outPoint: OutPoint = {
-      cell: cellOutPoint,
-    }
-    return {
-      codeHash,
-      outPoint,
-    }
-  }
-
   // lockHashes for each inputs
   public static generateTx = async (lockHashes: string[], targetOutputs: TargetOutput[], changeAddress: string) => {
-    const { codeHash, outPoint } = await TransactionsService.contractInfo()
+    const { codeHash, outPoint } = await LockUtils.systemScript()
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
@@ -466,58 +439,6 @@ export default class TransactionsService {
       outputs,
       witnesses: [],
     }
-  }
-
-  // use SDK lockScriptToHash
-  public static lockScriptToHash = (lock: Script) => {
-    const codeHash: string = lock!.codeHash!
-    const args: string[] = lock.args!
-    const lockHash: string = core.utils.lockScriptToHash({
-      codeHash,
-      args,
-    })
-
-    if (lockHash.startsWith('0x')) {
-      return lockHash
-    }
-
-    return `0x${lockHash}`
-  }
-
-  public static addressToLockScript = async (address: string): Promise<Script> => {
-    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
-    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
-    let blake160: string = result.slice(hrp.length, result.length)
-    if (!blake160.startsWith('0x')) {
-      blake160 = `0x${blake160}`
-    }
-    const contractInfo = await TransactionsService.contractInfo()
-
-    const lock: Script = {
-      codeHash: contractInfo.codeHash,
-      args: [blake160],
-    }
-    return lock
-  }
-
-  public static addressToLockHash = async (address: string): Promise<string> => {
-    const lock: Script = await TransactionsService.addressToLockScript(address)
-    const lockHash: string = await TransactionsService.lockScriptToHash(lock)
-
-    return lockHash
-  }
-
-  public static lockScriptToAddress = (lock: Script): string => {
-    const blake160: string = lock.args![0]
-    return TransactionsService.blake160ToAddress(blake160)
-  }
-
-  public static blake160ToAddress = (blake160: string): string => {
-    return core.utils.bech32Address(blake160, {
-      prefix: core.utils.AddressPrefix.Testnet,
-      type: core.utils.AddressType.BinIdx,
-      binIdx: core.utils.AddressBinIdx.P2PH,
-    })
   }
 }
 

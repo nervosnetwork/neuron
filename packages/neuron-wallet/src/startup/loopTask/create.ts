@@ -4,8 +4,8 @@ import { Subject } from 'rxjs'
 import SyncBlocksService from '../../services/syncBlocks'
 import initConnection from '../../typeorm'
 import Address from '../../services/addresses'
-import TransactionsService from '../../services/transactions'
 import { networkSwitchSubject } from '../../services/networks'
+import LockUtils from '../../utils/lockUtils'
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
@@ -20,7 +20,7 @@ const loadAddressesAndConvert = async (): Promise<string[]> => {
   const addresses: string[] = Address.allAddresses().map(addr => addr.address)
   const lockHashes: string[] = await Promise.all(
     addresses.map(async addr => {
-      return TransactionsService.addressToLockHash(addr)
+      return LockUtils.addressToLockHash(addr)
     }),
   )
   return lockHashes

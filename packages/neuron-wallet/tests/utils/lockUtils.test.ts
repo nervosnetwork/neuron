@@ -1,7 +1,7 @@
 import { Script } from '../../src/appTypes/types'
-import TransactionsService from '../../src/services/transactions'
+import LockUtils from '../../src/utils/lockUtils'
 
-const contractInfo = {
+const systemScript = {
   outPoint: {
     blockHash: null,
     cell: {
@@ -12,7 +12,7 @@ const contractInfo = {
   codeHash: '0x9e3b3557f11b2b3532ce352bfe8017e9fd11d154c4c7f9b7aaaa1e621b539a08',
 }
 
-describe('TransactionsService Test', () => {
+describe('LockUtils Test', () => {
   const bob = {
     lockScript: {
       codeHash: '0x9e3b3557f11b2b3532ce352bfe8017e9fd11d154c4c7f9b7aaaa1e621b539a08',
@@ -24,7 +24,7 @@ describe('TransactionsService Test', () => {
   }
 
   it('lockScriptToHash', async () => {
-    const lockHash: string = TransactionsService.lockScriptToHash(bob.lockScript)
+    const lockHash: string = LockUtils.lockScriptToHash(bob.lockScript)
 
     expect(lockHash).toEqual(bob.lockHash)
   })
@@ -32,32 +32,32 @@ describe('TransactionsService Test', () => {
   // FIXME: test failed, should fix addressToLockScript
   it('addressToLockScript', async () => {
     const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(contractInfo)
-    TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
+    mockContractInfo.mockReturnValue(systemScript)
+    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockScript: Script = await TransactionsService.addressToLockScript(bob.address)
+    const lockScript: Script = await LockUtils.addressToLockScript(bob.address)
 
     expect(lockScript).toEqual(bob.lockScript)
   })
 
   it('addressToLockHash', async () => {
     const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(contractInfo)
-    TransactionsService.contractInfo = mockContractInfo.bind(TransactionsService)
+    mockContractInfo.mockReturnValue(systemScript)
+    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockHash: string = await TransactionsService.addressToLockHash(bob.address)
+    const lockHash: string = await LockUtils.addressToLockHash(bob.address)
 
     expect(lockHash).toEqual(bob.lockHash)
   })
 
   it('lockScriptToAddress', async () => {
-    const address: string = TransactionsService.lockScriptToAddress(bob.lockScript)
+    const address: string = LockUtils.lockScriptToAddress(bob.lockScript)
 
     expect(address).toEqual(bob.address)
   })
 
   it('blake160ToAddress', async () => {
-    const address: string = TransactionsService.blake160ToAddress(bob.blake160)
+    const address: string = LockUtils.blake160ToAddress(bob.blake160)
 
     expect(address).toEqual(bob.address)
   })
