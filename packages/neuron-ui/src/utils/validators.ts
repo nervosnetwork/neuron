@@ -13,7 +13,7 @@ export const verifyWalletSubmission = ({
   confirmPassword: string
   name: string
 }) => {
-  return password && name && password === confirmPassword
+  return password && name && password === confirmPassword && password.length >= 8
 }
 
 export default {
