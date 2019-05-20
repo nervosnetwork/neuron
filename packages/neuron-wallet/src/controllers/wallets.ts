@@ -79,7 +79,7 @@ class WalletsController {
     if (!WalletsController.verifyPasswordComplexity(password)) {
       return {
         status: ResponseCode.Fail,
-        msg: 'Password is too simple',
+        msg: 'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
       }
     }
     try {
@@ -145,7 +145,7 @@ class WalletsController {
     if (!WalletsController.verifyPasswordComplexity(password)) {
       return {
         status: ResponseCode.Fail,
-        msg: 'Password is too simple',
+        msg: 'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
       }
     }
     try {
@@ -220,7 +220,8 @@ class WalletsController {
             if (!WalletsController.verifyPasswordComplexity(newPassword)) {
               return {
                 status: ResponseCode.Fail,
-                msg: 'Password is too simple',
+                msg:
+                  'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
               }
             }
             const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
