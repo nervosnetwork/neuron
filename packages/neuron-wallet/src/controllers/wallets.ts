@@ -3,6 +3,7 @@ import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
 import Key from '../keys/key'
+import i18n from '../utils/i18n'
 
 export enum WalletsMethod {
   GetAll = 'getAll',
@@ -76,13 +77,8 @@ class WalletsController {
     receivingAddressNumber: number
     changeAddressNumber: number
   }): Promise<ChannelResponse<Wallet>> => {
-    if (!WalletsController.verifyPasswordComplexity(password)) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
-      }
-    }
     try {
+      WalletsController.verifyPasswordComplexity(password)
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const currentWallet = WalletsController.service.getCurrent()
       const wallet = WalletsController.service.create({
@@ -142,13 +138,8 @@ class WalletsController {
     receivingAddressNumber: number
     changeAddressNumber: number
   }): ChannelResponse<Wallet> => {
-    if (!WalletsController.verifyPasswordComplexity(password)) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
-      }
-    }
     try {
+      WalletsController.verifyPasswordComplexity(password)
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
@@ -170,7 +161,7 @@ class WalletsController {
 
   public static verifyPasswordComplexity = (password: string) => {
     if (password.length < 8) {
-      return false
+      throw Error(i18n.t('messages.wallet-password-at-least-8-characters'))
     }
     let complex = 0
     let reg = /\d/
@@ -189,10 +180,9 @@ class WalletsController {
     if (reg.test(password)) {
       complex++
     }
-    if (complex >= 3) {
-      return true
+    if (complex < 3) {
+      throw Error(i18n.t('messages.wallet-password-at-least-3-types'))
     }
-    return false
   }
 
   // TODO: update addresses?
@@ -217,13 +207,7 @@ class WalletsController {
         }
         if (newPassword) {
           if (WalletsController.service.validate({ id, password })) {
-            if (!WalletsController.verifyPasswordComplexity(newPassword)) {
-              return {
-                status: ResponseCode.Fail,
-                msg:
-                  'At least 8 characters, three types of uppercase and lowercase alphabets, numbers, and special symbols!',
-              }
-            }
+            WalletsController.verifyPasswordComplexity(password)
             const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
             props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           } else {
