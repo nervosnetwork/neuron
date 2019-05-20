@@ -7,6 +7,7 @@ import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
 import { networkSwitchSubject } from './networks'
+import LockUtils from '../utils/lockUtils'
 import TypeConvert from '../appTypes/typeConvert'
 
 // FIXME: now have some problem with core, should update every time network switched
@@ -296,7 +297,7 @@ export default class SyncBlocksService {
     if (outputs.length > 0) {
       // found addresses used
       const addresses: string[] = outputs.map(output => {
-        return TransactionsService.lockScriptToAddress(output.lock)
+        return LockUtils.lockScriptToAddress(output.lock)
       })
       addressesUsedSubject.next(addresses)
     }
@@ -335,7 +336,7 @@ export default class SyncBlocksService {
   }
 
   checkLockScript(lock: Script): boolean {
-    const lockHash = TransactionsService.lockScriptToHash(lock)
+    const lockHash = LockUtils.lockScriptToHash(lock)
     return this.checkLockHash(lockHash)
   }
 
