@@ -65,6 +65,12 @@ export default class NetworksService extends Store {
         result: newActiveId,
       })
     })
+
+    this.activeId().then(activeId => {
+      if (activeId) {
+        this.emit(NetworksKey.Active, null, activeId)
+      }
+    })
   }
 
   public getAll = async () => {
