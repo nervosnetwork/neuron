@@ -11,8 +11,7 @@ export default class LockUtils {
       return this.systemScriptInfo
     }
 
-    const genesisHash: string = await core.rpc.getBlockHash('0')
-    const genesisBlock = await core.rpc.getBlock(genesisHash)
+    const genesisBlock = await core.rpc.getBlockByNumber('0')
     const systemScriptTx = genesisBlock.transactions[0]
     const blake2b = core.utils.blake2b(32)
     const systemScriptCell = systemScriptTx.outputs[0]
