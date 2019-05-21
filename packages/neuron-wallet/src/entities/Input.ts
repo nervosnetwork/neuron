@@ -63,6 +63,8 @@ export default class Input extends BaseEntity {
     return {
       previousOutput: this.previousOutput(),
       args: this.args,
+      capacity: this.capacity,
+      lockHash: this.lockHash,
     }
   }
 }

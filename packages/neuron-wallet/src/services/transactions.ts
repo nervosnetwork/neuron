@@ -149,21 +149,7 @@ export default class TransactionsService {
       return undefined
     }
 
-    const transaction: Transaction = {
-      ...tx,
-      inputs: tx.inputs.map(i => {
-        return {
-          ...i,
-          previousOutput: i.previousOutput(),
-        }
-      }),
-      outputs: tx.outputs.map(o => {
-        return {
-          ...o,
-          outPoint: o.outPoint(),
-        }
-      }),
-    }
+    const transaction: Transaction = tx.toInterface()
 
     return transaction
   }

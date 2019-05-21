@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from 'typeorm'
-import { Witness, OutPoint } from '../appTypes/types'
+import { Witness, OutPoint, Transaction as TransactionInterface } from '../appTypes/types'
 import InputEntity from './Input'
 import OutputEntity from './Output'
 
@@ -46,4 +46,18 @@ export default class Transaction extends BaseEntity {
 
   @OneToMany(_type => OutputEntity, output => output.transaction)
   outputs!: OutputEntity[]
+
+  public toInterface(): TransactionInterface {
+    return {
+      hash: this.hash,
+      version: this.version,
+      deps: this.deps,
+      inputs: this.inputs.map(input => input.toInterface()),
+      outputs: this.outputs.map(output => output.toInterface()),
+      timestamp: this.timestamp,
+      blockNumber: this.blockNumber,
+      blockHash: this.blockHash,
+      witnesses: this.witnesses,
+    }
+  }
 }
