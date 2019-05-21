@@ -2025,11 +2025,6 @@
     blake2b-wasm "1.1.7"
     elliptic "^6.4.1"
 
-"@nervosnetwork/ckb-types@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.11.0.tgz#571a6c33def973fd8b10b35c3cf8166770942fb8"
-  integrity sha512-mM99hw3xt1Ct1Jbmtn9l5kg3hbcxkKNFjjieXlSJOBeW4FpDUotvtQEQaPtlPeN0+uRC32XGzcqcFe4bMDQlOw==
-
 "@nervosnetwork/ckb-types@0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.12.0.tgz#f9c5ac446b3667cdf9dbea7b86434e73114d506e"
