@@ -1,5 +1,6 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
 export const ADDRESS_LENGTH = 50
+export const MIN_PASSWORD_LENGTH = 8
 export const PAGE_SIZE = 15
 export const EXPLORER = 'http://localhost:3000'
 export const UNREMOVABLE_NETWORK = 'Testnet'

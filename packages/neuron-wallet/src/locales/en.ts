@@ -36,9 +36,9 @@ export default {
     messages: {
       'failed-to-load-networks': 'Failed to load networks',
       'Networks-will-be-reset': 'Networks will be reset',
-      'wallet-password-at-least-8-characters': 'Password must be at least 8 characters',
-      'wallet-password-at-least-3-types':
-        'Password must be three types of uppercase and lowercase alphabets, numbers, and special symbols',
+      'wallet-password-less-than-min-length': 'Password must be at least {{minPasswordLength}} characters',
+      'wallet-password-letter-complexity':
+        'Password must contain a combination of uppercase and lowercase letters, numbers and special symbols.',
     },
   },
 }

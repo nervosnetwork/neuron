@@ -19,6 +19,8 @@ export enum WalletsMethod {
   SendCapacity = 'sendCapacity',
 }
 
+export const MIN_PASSWORD_LENGTH = 8
+
 class WalletsController {
   static service = new WalletsService()
 
@@ -160,8 +162,8 @@ class WalletsController {
   }
 
   public static verifyPasswordComplexity = (password: string) => {
-    if (password.length < 8) {
-      throw Error(i18n.t('messages.wallet-password-at-least-8-characters'))
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      throw Error(i18n.t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
     }
     let complex = 0
     let reg = /\d/
@@ -181,7 +183,7 @@ class WalletsController {
       complex++
     }
     if (complex < 3) {
-      throw Error(i18n.t('messages.wallet-password-at-least-3-types'))
+      throw Error(i18n.t('messages.wallet-password-letter-complexity'))
     }
   }
 
