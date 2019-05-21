@@ -97,6 +97,9 @@ export default class SyncBlocksService {
 
   // resolve block to
   async resolveBatchBlocks() {
+    if (this.tipBlockNumber < 0) {
+      return
+    }
     // using database to sync currentBlockNumber value
     // currentBlockNumber means last checked blockNumber
     // so should start with currentBlockNumber + 1
