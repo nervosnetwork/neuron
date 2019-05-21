@@ -25,6 +25,7 @@ interface ENV {
     active: 'testnet'
     list: NetworkWithID[]
   }
+  testnet: boolean
 }
 const env: ENV = {
   isDevMode,
@@ -48,6 +49,7 @@ const env: ENV = {
       },
     ],
   },
+  testnet: true,
 }
 
 export default env

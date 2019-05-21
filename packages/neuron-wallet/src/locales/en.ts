@@ -40,6 +40,12 @@ export default {
       'wallet-password-more-than-max-length': 'Password up to {{maxPasswordLength}} characters',
       'wallet-password-letter-complexity':
         'Password must contain a combination of uppercase and lowercase letters, numbers and special symbols.',
+      'current-wallet-is-not-found': 'Current wallet is not found',
+      'password-is-required': 'Password is required',
+      'password-is-incorrect': 'Password is incorrect',
+      'current-key-has-no-data': 'Current Key has no data',
+      'address-is-invalid': 'Address {{address}} is invalid',
+      'codehash-is-not-loaded': 'codehash is not loaded',
     },
   },
 }

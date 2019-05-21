@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { Cell, OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../appTypes/types'
+import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../appTypes/types'
 import CellsService from './cells'
 import InputEntity from '../entities/Input'
 import OutputEntity from '../entities/Output'
@@ -372,7 +372,11 @@ export default class TransactionsService {
   }
 
   // lockHashes for each inputs
-  public static generateTx = async (lockHashes: string[], targetOutputs: TargetOutput[], changeAddress: string) => {
+  public static generateTx = async (
+    lockHashes: string[],
+    targetOutputs: TargetOutput[],
+    changeAddress: string,
+  ): Promise<CKBComponents.RawTransaction> => {
     const { codeHash, outPoint } = await LockUtils.systemScript()
 
     const needCapacities: bigint = targetOutputs
@@ -381,12 +385,12 @@ export default class TransactionsService {
 
     const { inputs, capacities } = await CellsService.gatherInputs(needCapacities.toString(), lockHashes)
 
-    const outputs: Cell[] = targetOutputs.map(o => {
+    const outputs: CKBComponents.CellOutput[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
       const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
 
-      const output: Cell = {
+      const output: CKBComponents.Cell = {
         capacity,
         data: '0x',
         lock: {
@@ -406,7 +410,7 @@ export default class TransactionsService {
         'hex',
       ) as string
 
-      const output: Cell = {
+      const output: CKBComponents.CellOutput = {
         capacity: `${BigInt(capacities) - needCapacities}`,
         data: '0x',
         lock: {
