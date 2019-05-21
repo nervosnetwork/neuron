@@ -1,7 +1,7 @@
 import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
-import { Channel } from '../utils/const'
+import { Channel, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
 import Key from '../keys/key'
 import i18n from '../utils/i18n'
 
@@ -18,9 +18,6 @@ export enum WalletsMethod {
   Activate = 'activate',
   SendCapacity = 'sendCapacity',
 }
-
-export const MIN_PASSWORD_LENGTH = 8
-export const MAX_PASSWORD_LENGTH = 50
 
 class WalletsController {
   static service = new WalletsService()
