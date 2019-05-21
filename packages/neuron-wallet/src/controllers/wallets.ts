@@ -20,6 +20,7 @@ export enum WalletsMethod {
 }
 
 export const MIN_PASSWORD_LENGTH = 8
+export const MAX_PASSWORD_LENGTH = 50
 
 class WalletsController {
   static service = new WalletsService()
@@ -164,6 +165,9 @@ class WalletsController {
   public static verifyPasswordComplexity = (password: string) => {
     if (password.length < MIN_PASSWORD_LENGTH) {
       throw Error(i18n.t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
+    }
+    if (password.length > MAX_PASSWORD_LENGTH) {
+      throw Error(i18n.t('messages.wallet-password-more-than-max-length', { maxPasswordLength: MAX_PASSWORD_LENGTH }))
     }
     let complex = 0
     let reg = /\d/

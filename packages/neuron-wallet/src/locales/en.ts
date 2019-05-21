@@ -37,6 +37,7 @@ export default {
       'failed-to-load-networks': 'Failed to load networks',
       'Networks-will-be-reset': 'Networks will be reset',
       'wallet-password-less-than-min-length': 'Password must be at least {{minPasswordLength}} characters',
+      'wallet-password-more-than-max-length': 'Password up to {{maxPasswordLength}} characters',
       'wallet-password-letter-complexity':
         'Password must contain a combination of uppercase and lowercase letters, numbers and special symbols.',
     },
