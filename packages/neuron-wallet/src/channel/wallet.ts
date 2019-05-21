@@ -24,7 +24,7 @@ export default class WalletChannel extends Listeners {
 
   public sendWallet = (
     wallet: any = {
-      name: 'asw',
+      name: '',
       address: '',
       publicKey: '',
     },
