@@ -1,6 +1,6 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from '../entities/Output'
-import { Input, Cell, OutPoint } from '../appTypes/types'
+import { Cell, OutPoint } from '../appTypes/types'
 
 const MIN_CELL_CAPACITY = '40'
 
@@ -47,7 +47,13 @@ export default class CellsService {
   }
 
   // gather inputs for generateTx
-  public static gatherInputs = async (capacity: string, lockHashes: string[]) => {
+  public static gatherInputs = async (
+    capacity: string,
+    lockHashes: string[],
+  ): Promise<{
+    inputs: CKBComponents.CellInput[]
+    capacities: string
+  }> => {
     const capacityInt = BigInt(capacity)
 
     if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
@@ -65,12 +71,13 @@ export default class CellsService {
       })
     cellEntities.sort((a, b) => +a.capacity - +b.capacity)
 
-    const inputs: Input[] = []
+    const inputs: CKBComponents.CellInput[] = []
     let inputCapacities: bigint = BigInt(0)
     cellEntities.every(cell => {
-      const input: Input = {
+      const input: CKBComponents.CellInput = {
         previousOutput: cell.outPoint(),
         args: [],
+        since: '0',
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)

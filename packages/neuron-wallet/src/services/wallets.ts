@@ -5,8 +5,13 @@ import { Keystore } from '../keys/keystore'
 import Store from '../utils/store'
 import nodeService from '../startup/nodeService'
 import fileService from '../startup/fileService'
+import LockUtils from '../utils/lockUtils'
+import env from '../env'
+import i18n from '../utils/i18n'
 
 const { core } = nodeService
+
+const hrp = `01${Buffer.from('P2PH').toString('hex')}`
 
 const MODULE_NAME = 'wallets'
 
@@ -202,37 +207,64 @@ export default class WalletService {
     }[],
     password: string,
   ) => {
-    // TODO: verify password
-    if (!password) {
-      throw new Error('Incorrect password')
-    }
+    const wallet = await this.getCurrent()
+    if (!wallet) throw new Error(i18n.t('messages.current-wallet-is-not-found'))
 
-    // TODO: should pass in wallet id instead of accessing current wallet directly
-    const changeAddress = this.getCurrent()!.addresses.change[0].address
+    if (password === undefined || password === '') throw new Error(i18n.t('messages.password-is-required'))
 
-    // TODO: this is always success code hash, should be replaced in the future
-    const codeHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    const key = new Key({ keystore: wallet.loadKeystore() })
 
-    const lockHashes = items.map(({ address }) =>
-      core.utils.lockScriptToHash({
+    if (!key.checkPassword(password)) throw new Error(i18n.t('messages.password-is-incorrect'))
+    if (!key.keysData) throw new Error(i18n.t('messages.current-key-has-no-data'))
+    const { privateKey } = key.keysData
+    const addrObj = core.generateAddress(privateKey)
+
+    const changeAddress = wallet.addresses.change[0].address
+
+    const { codeHash } = await LockUtils.systemScript()
+    if (!codeHash) throw new Error(i18n.t('messages.codehash-is-not-loaded'))
+
+    const lockHashes = items.map(({ address }) => {
+      const identifier = core.utils.parseAddress(
+        address,
+        env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet,
+        'hex',
+      ) as string
+      if (!identifier.startsWith(hrp)) throw new Error(i18n.t('messages.address-is-invalid', { address }))
+      return core.utils.lockScriptToHash({
         codeHash,
-        args: [core.utils.blake160(address)],
-      }),
-    )
+        args: [identifier.slice(10)],
+      })
+    })
+
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(10 ** 8))).toString(),
+      capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(100_000_000))).toString(),
     }))
 
-    const transaction = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
+    const rawTransaction = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
 
-    const rawTransaction = transaction as CKBComponents.RawTransaction
-    const txHash = await core.rpc.sendTransaction(rawTransaction)
+    const txHash = await (core.rpc as any).computeTransactionHash(rawTransaction)
+    const signature = addrObj.sign(txHash)
+    const signatureSize = core.utils.hexToBytes(signature).length
+    const sequence = new DataView(new ArrayBuffer(8))
+    sequence.setUint8(0, signatureSize)
+    const sequencedSignatureSize = Buffer.from(sequence.buffer).toString('hex')
+    const witness = {
+      data: [`0x${addrObj.publicKey}`, `0x${signature}`, `0x${sequencedSignatureSize}`],
+    }
+    const witnesses = Array.from(
+      {
+        length: rawTransaction.inputs.length,
+      },
+      () => witness,
+    )
+    rawTransaction.witnesses = witnesses
+    const realTxHash = await core.rpc.sendTransaction(rawTransaction)
 
-    // save signed transaction with txHash
     TransactionsService.txSentSubject.next({
-      transaction,
-      txHash,
+      transaction: rawTransaction,
+      txHash: realTxHash,
     })
 
     return txHash

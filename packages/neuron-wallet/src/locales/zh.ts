@@ -39,6 +39,12 @@ export default {
       'wallet-password-less-than-min-length': '密码至少{{minPasswordLength}}位字符',
       'wallet-password-more-than-max-length': '密码不能超过{{maxPasswordLength}}位字符',
       'wallet-password-letter-complexity': '密码包含大写字母、小写字母、数字、特殊符号的至少三类',
+      'current-wallet-is-not-found': '未找到当前钱包',
+      'password-is-required': '缺少密码',
+      'password-is-incorrect': '密码不正确',
+      'current-key-has-no-data': '当前 Key 文件缺少数据',
+      'address-is-invalid': '地址 {{address}} 不合法',
+      'codehash-is-not-loaded': 'codehash 还未加载完成',
     },
   },
 }
