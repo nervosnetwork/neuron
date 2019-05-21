@@ -36,6 +36,9 @@ export default {
     messages: {
       'failed-to-load-networks': '加载节点失败',
       'Networks-will-be-reset': '节点列表将被重置',
+      'wallet-password-less-than-min-length': '密码至少{{minPasswordLength}}位字符',
+      'wallet-password-more-than-max-length': '密码不能超过{{maxPasswordLength}}位字符',
+      'wallet-password-letter-complexity': '密码包含大写字母、小写字母、数字、特殊符号的至少三类',
     },
   },
 }

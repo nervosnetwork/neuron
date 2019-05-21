@@ -1,8 +1,9 @@
 import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
 import { ChannelResponse, ResponseCode } from '.'
 import windowManage from '../utils/windowManage'
-import { Channel } from '../utils/const'
+import { Channel, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
 import Key from '../keys/key'
+import i18n from '../utils/i18n'
 
 export enum WalletsMethod {
   GetAll = 'getAll',
@@ -77,6 +78,7 @@ class WalletsController {
     changeAddressNumber: number
   }): Promise<ChannelResponse<Wallet>> => {
     try {
+      WalletsController.verifyPasswordComplexity(password)
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
       const currentWallet = WalletsController.service.getCurrent()
       const wallet = WalletsController.service.create({
@@ -137,6 +139,7 @@ class WalletsController {
     changeAddressNumber: number
   }): ChannelResponse<Wallet> => {
     try {
+      WalletsController.verifyPasswordComplexity(password)
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
       const wallet = WalletsController.service.create({
         name,
@@ -153,6 +156,35 @@ class WalletsController {
         status: ResponseCode.Fail,
         msg: e.message,
       }
+    }
+  }
+
+  public static verifyPasswordComplexity = (password: string) => {
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      throw Error(i18n.t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
+    }
+    if (password.length > MAX_PASSWORD_LENGTH) {
+      throw Error(i18n.t('messages.wallet-password-more-than-max-length', { maxPasswordLength: MAX_PASSWORD_LENGTH }))
+    }
+    let complex = 0
+    let reg = /\d/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[a-z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[A-Z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    reg = /[^0-9a-zA-Z]/
+    if (reg.test(password)) {
+      complex++
+    }
+    if (complex < 3) {
+      throw Error(i18n.t('messages.wallet-password-letter-complexity'))
     }
   }
 
@@ -178,6 +210,7 @@ class WalletsController {
         }
         if (newPassword) {
           if (WalletsController.service.validate({ id, password })) {
+            WalletsController.verifyPasswordComplexity(password)
             const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
             props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
           } else {
