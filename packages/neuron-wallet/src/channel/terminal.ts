@@ -2,7 +2,6 @@ import { ipcMain, WebContents, Notification } from 'electron'
 import { Channel } from '../utils/const'
 
 const methods: { [index: string]: Function } = {
-  getASWBalance: () => {},
   notification: (args: string[]) => {
     return new Promise(resolve => {
       const notification = new Notification({
