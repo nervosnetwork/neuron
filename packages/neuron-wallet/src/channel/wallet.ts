@@ -1,11 +1,6 @@
 import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
-import { ChannelResponse } from '../controllers'
-import { NetworksMethod } from '../controllers/networks'
-import { NetworkWithID } from '../services/networks'
-import { WalletsMethod } from '../controllers/wallets'
-
 import { Channel } from '../utils/const'
 
 export enum ResponseCode {
@@ -19,19 +14,6 @@ export default class WalletChannel extends Listeners {
   constructor(window: BrowserWindow) {
     super()
     this.win = window
-  }
-
-  public sendWallet = (
-    wallet: any = {
-      name: '',
-      address: '',
-      publicKey: '',
-    },
-  ) => {
-    this.win.webContents.send(Channel.Wallets, 'activeWallet', {
-      status: ResponseCode.Success,
-      result: wallet,
-    })
   }
 
   public setUILocale = (locale: string) => {
@@ -48,33 +30,5 @@ export default class WalletChannel extends Listeners {
         router: route,
       },
     })
-  }
-
-  public syncWallets = (params: { activeOne?: ChannelResponse<any>; wallets?: ChannelResponse<any> }) => {
-    if (!this.win) return
-    if (params.activeOne) {
-      this.win.webContents.send(Channel.Wallets, WalletsMethod.GetActive, params.activeOne)
-    }
-    if (params.wallets) {
-      this.win.webContents.send(Channel.Wallets, WalletsMethod.GetAll, params.wallets)
-    }
-  }
-
-  public syncNetworks = (params: {
-    active?: ChannelResponse<NetworkWithID>
-    networks?: ChannelResponse<NetworkWithID[]>
-    status?: ChannelResponse<number>
-  }) => {
-    if (!this.win) return
-    if (params.networks) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.GetAll, params.networks)
-    }
-    if (params.active) {
-      this.win.webContents.send(Channel.Networks, NetworksMethod.ActiveId, params.active)
-    }
-    // TODO: status handler
-    // if (params.status) {
-    //   this.win.webContents.send(Channel.Networks, 'status', params.status)
-    // }
   }
 }
