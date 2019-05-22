@@ -1,6 +1,8 @@
-import WalletsController from '../../src/controllers/wallets'
+import controllers from '../../src/controllers'
 import i18n from '../../src/utils/i18n'
 import { MIN_PASSWORD_LENGTH } from '../../src/utils/const'
+
+const { WalletsController } = controllers
 
 describe('wallet controllers tests', () => {
   it('verify password complexity', () => {

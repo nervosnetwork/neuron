@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron'
 import { Channel } from '../utils/const'
-import NetworksController from '../controllers/networks'
-import TransactionsController from '../controllers/transactions'
-import WalletsController from '../controllers/wallets'
-import HelpersController from '../controllers/helpers'
+import controllers from '../controllers'
+
+const { NetworksController, TransactionsController, WalletsController, HelpersController } = controllers
 
 export default class Listeners {
   static start = (methods: string[] = ['networks', 'wallets', 'transactions', 'helpers']) => {
