@@ -4,6 +4,7 @@ import windowManage from '../utils/windowManage'
 import WalletChannel from '../channel/wallet'
 import nodeService from './nodeService'
 import { Channel } from '../utils/const'
+import logger from '../utils/logger'
 
 const syncConnectStatus = () => {
   nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
@@ -13,9 +14,9 @@ const syncConnectStatus = () => {
         result: typeof tipNumber !== 'undefined',
       })
     },
-    () => {},
-    () => {
-      // TODO: handle complete
+    err => {
+      logger.log({ level: 'error', message: err.message })
+      syncConnectStatus()
     },
   )
 }
