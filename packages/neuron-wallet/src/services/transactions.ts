@@ -266,6 +266,7 @@ export default class TransactionsService {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
+      input.since = i.since!
       inputs.push(input)
 
       const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
