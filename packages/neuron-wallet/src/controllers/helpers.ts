@@ -1,11 +1,11 @@
 import Key from '../keys/key'
-import { ChannelResponse, ResponseCode } from '.'
+import { ResponseCode } from '.'
 
 export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
 }
 class HelpersController {
-  public static generateMnemonic = (): ChannelResponse<string> => {
+  public static generateMnemonic = (): Controller.Response<string> => {
     const mnemonic = Key.generateMnemonic()
     if (mnemonic) {
       return {

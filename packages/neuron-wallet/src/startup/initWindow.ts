@@ -1,8 +1,8 @@
 import { app, BrowserWindow } from 'electron'
-import WalletsController from '../controllers/wallets'
-import NetworksController from '../controllers/networks'
+import controllers, { ResponseCode } from '../controllers'
 import { Channel } from '../utils/const'
-import { ResponseCode } from '../controllers'
+
+const { WalletsController, NetworksController } = controllers
 
 const initWindow = async (win: BrowserWindow) => {
   const wallet = WalletsController.getActive() as any

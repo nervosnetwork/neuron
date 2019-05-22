@@ -1,4 +1,4 @@
-import { ResponseCode, ChannelResponse } from '.'
+import { ResponseCode } from '.'
 import { Transaction } from '../appTypes/types'
 import TransactionsService, {
   TransactionsByAddressesParam,
@@ -11,7 +11,7 @@ export default class TransactionsController {
 
   public static getAll = async (
     params: TransactionsByLockHashesParam,
-  ): Promise<ChannelResponse<PaginationResult<Transaction>>> => {
+  ): Promise<Controller.Response<PaginationResult<Transaction>>> => {
     const transactions = await TransactionsService.getAll(params)
 
     if (!transactions) {
@@ -29,7 +29,7 @@ export default class TransactionsController {
 
   public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
-  ): Promise<ChannelResponse<PaginationResult<Transaction>>> => {
+  ): Promise<Controller.Response<PaginationResult<Transaction>>> => {
     const transactions = await TransactionsService.getAllByAddresses(params)
 
     if (transactions) {
@@ -44,7 +44,7 @@ export default class TransactionsController {
     }
   }
 
-  public static get = async (hash: string): Promise<ChannelResponse<Transaction>> => {
+  public static get = async (hash: string): Promise<Controller.Response<Transaction>> => {
     const transaction = await TransactionsService.get(hash)
     if (!transaction) {
       return {

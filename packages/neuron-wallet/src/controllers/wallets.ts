@@ -1,5 +1,5 @@
 import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
-import { ChannelResponse, ResponseCode } from '.'
+import { ResponseCode } from './index'
 import windowManage from '../utils/windowManage'
 import { Channel, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
 import Key from '../keys/key'
@@ -22,7 +22,7 @@ export enum WalletsMethod {
 class WalletsController {
   static service = new WalletsService()
 
-  public static getAll = (): ChannelResponse<Wallet[]> => {
+  public static getAll = (): Controller.Response<Wallet[]> => {
     const wallets = WalletsController.service.getAll()
     if (wallets) {
       return {
@@ -36,7 +36,7 @@ class WalletsController {
     }
   }
 
-  public static get = (id: string): ChannelResponse<Wallet> => {
+  public static get = (id: string): Controller.Response<Wallet> => {
     const wallet = WalletsController.service.get(id)
     if (wallet) {
       return {
@@ -50,7 +50,7 @@ class WalletsController {
     }
   }
 
-  public static generateMnemonic = (): ChannelResponse<string> => {
+  public static generateMnemonic = (): Controller.Response<string> => {
     const mnemonic = Key.generateMnemonic()
     if (mnemonic) {
       return {
@@ -76,7 +76,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<Wallet>> => {
+  }): Promise<Controller.Response<Wallet>> => {
     try {
       WalletsController.verifyPasswordComplexity(password)
       const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
@@ -114,7 +114,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<ChannelResponse<Wallet>> => {
+  }): Promise<Controller.Response<Wallet>> => {
     const res = await WalletsController.importMnemonic({
       name,
       password,
@@ -137,7 +137,7 @@ class WalletsController {
     keystore: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): ChannelResponse<Wallet> => {
+  }): Controller.Response<Wallet> => {
     try {
       WalletsController.verifyPasswordComplexity(password)
       const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
@@ -199,7 +199,7 @@ class WalletsController {
     password: string
     name: string
     newPassword?: string
-  }): ChannelResponse<Wallet> => {
+  }): Controller.Response<Wallet> => {
     try {
       const wallet = WalletsController.service.get(id)
       if (wallet) {
@@ -242,7 +242,7 @@ class WalletsController {
     }
   }
 
-  public static delete = ({ id, password }: { id: string; password: string }): ChannelResponse<any> => {
+  public static delete = ({ id, password }: { id: string; password: string }): Controller.Response<any> => {
     if (WalletsController.service.validate({ id, password })) {
       if (WalletsController.service.delete(id)) {
         return {
@@ -266,7 +266,7 @@ class WalletsController {
     }
   }
 
-  public static export = ({ id, password }: { id: string; password: string }): ChannelResponse<string> => {
+  public static export = ({ id, password }: { id: string; password: string }): Controller.Response<string> => {
     if (WalletsController.service.validate({ id, password })) {
       return {
         status: ResponseCode.Success,

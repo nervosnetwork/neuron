@@ -1,12 +1,8 @@
 import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
+import { ResponseCode } from '../controllers'
 import { Channel } from '../utils/const'
-
-export enum ResponseCode {
-  Fail,
-  Success,
-}
 
 export default class WalletChannel extends Listeners {
   public win: BrowserWindow
