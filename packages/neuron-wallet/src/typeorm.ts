@@ -11,7 +11,7 @@ import { InitMigration1558328532490 } from './migration/1558328532490-InitMigrat
 
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
-  return path.join(env.fileBasePath, name)
+  return path.join(env.fileBasePath, 'cells', name)
 }
 
 const connectOptions = async (networkName: string) => {
