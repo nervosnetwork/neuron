@@ -32,7 +32,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Wallets not found',
+      msg: i18n.t('messages.wallet-not-found'),
     }
   }
 
@@ -46,7 +46,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Wallet not found',
+      msg: i18n.t('messages.wallet-not-found'),
     }
   }
 
@@ -60,7 +60,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Failed to create mnemonic',
+      msg: i18n.t('messages.failed-to-create-mnemonic'),
     }
   }
 
@@ -216,7 +216,7 @@ class WalletsController {
           } else {
             return {
               status: ResponseCode.Fail,
-              msg: 'Incorrect password',
+              msg: i18n.t('messages.wallet-incorrect-password'),
             }
           }
         }
@@ -232,7 +232,7 @@ class WalletsController {
       }
       return {
         status: ResponseCode.Fail,
-        msg: 'Wallet not found',
+        msg: i18n.t('messages.wallet-not-found'),
       }
     } catch (e) {
       return {
@@ -256,13 +256,13 @@ class WalletsController {
 
       return {
         status: ResponseCode.Fail,
-        msg: 'Failed to delete wallet',
+        msg: i18n.t('messages.failed-to-delete-wallet'),
       }
     }
 
     return {
       status: ResponseCode.Fail,
-      msg: 'Incorrect password',
+      msg: i18n.t('messages.wallet-incorrect-password'),
     }
   }
 
@@ -275,7 +275,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Incorrect password',
+      msg: i18n.t('messages.wallet-incorrect-password'),
     }
   }
 
@@ -296,7 +296,7 @@ class WalletsController {
 
     return {
       status: ResponseCode.Fail,
-      msg: 'No active wallet',
+      msg: i18n.t('messages.no-active-wallet'),
     }
   }
 
@@ -311,7 +311,7 @@ class WalletsController {
     }
     return {
       status: ResponseCode.Fail,
-      msg: 'Failed to activate wallet',
+      msg: i18n.t('messages.failed-to-activate-wallet'),
     }
     // TODO: verification
   }
