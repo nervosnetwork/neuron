@@ -106,7 +106,7 @@ export default class WalletService {
   public create = (props: WalletProperties): Wallet => {
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
     if (index !== -1) {
-      throw Error('Wallet name existed')
+      throw Error(i18n.t('messages.wallet-name-existed'))
     }
     const wallet = new FileKeystoreWallet(uuid(), props)
     wallet.saveKeystore(props.keystore!)
@@ -123,7 +123,7 @@ export default class WalletService {
     if (index !== -1) {
       const wallet = FileKeystoreWallet.fromJSON(wallets[index])
       if (wallet.name !== props.name && wallets.findIndex(storeWallet => storeWallet.name === props.name) !== -1) {
-        throw Error('Wallet name existed')
+        throw Error(i18n.t('messages.wallet-name-existed'))
       }
       wallet.update(props)
       if (props.keystore) {

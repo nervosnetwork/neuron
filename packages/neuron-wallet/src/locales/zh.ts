@@ -45,6 +45,13 @@ export default {
       'current-key-has-no-data': '当前 Key 文件缺少数据',
       'address-is-invalid': '地址 {{address}} 不合法',
       'codehash-is-not-loaded': 'codehash 还未加载完成',
+      'wallet-not-found': '未找到钱包',
+      'no-active-wallet': '没有默认钱包',
+      'wallet-incorrect-password': '密码错误',
+      'failed-to-create-mnemonic': '创建助记词失败',
+      'failed-to-activate-wallet': '设置默认钱包失败',
+      'failed-to-delete-wallet': '删除钱包失败',
+      'wallet-name-existed': '钱包名称重复',
     },
   },
 }

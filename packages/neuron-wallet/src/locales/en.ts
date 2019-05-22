@@ -46,6 +46,13 @@ export default {
       'current-key-has-no-data': 'Current Key has no data',
       'address-is-invalid': 'Address {{address}} is invalid',
       'codehash-is-not-loaded': 'codehash is not loaded',
+      'wallet-not-found': 'Wallet not found',
+      'no-active-wallet': 'No active wallet',
+      'wallet-incorrect-password': 'Incorrect password',
+      'failed-to-create-mnemonic': 'Failed to create mnemonic',
+      'failed-to-activate-wallet': 'Failed to activate wallet',
+      'failed-to-delete-wallet': 'Failed to delete wallet',
+      'wallet-name-existed': 'Wallet name existed',
     },
   },
 }
