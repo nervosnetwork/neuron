@@ -1,38 +1,13 @@
 import { ipcMain } from 'electron'
 import { Channel } from '../utils/const'
-import { wallets, verifyPassword } from '../mock'
 import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/networks'
 import TransactionsController from '../controllers/transactions'
 import WalletsController from '../controllers/wallets'
 import HelpersController from '../controllers/helpers'
 
-const checkPassword = (walletID: string, password: string) => {
-  const myWallet = wallets().find(wallet => wallet.id === walletID)
-  if (!myWallet) {
-    return {
-      status: ResponseCode.Success,
-      result: false,
-      msg: 'Wallet not found',
-    }
-  }
-  if (verifyPassword(myWallet, password)) {
-    return {
-      status: ResponseCode.Success,
-      result: true,
-    }
-  }
-  return {
-    status: ResponseCode.Success,
-    result: false,
-    msg: 'Wrong password',
-  }
-}
-
 export default class Listeners {
-  static start = (
-    methods: string[] = ['getBalance', 'checkWalletPassword', 'networks', 'wallets', 'transactions', 'helpers'],
-  ) => {
+  static start = (methods: string[] = ['getBalance', 'networks', 'wallets', 'transactions', 'helpers']) => {
     methods.forEach(method => {
       const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
       if (descriptor) {
@@ -42,20 +17,6 @@ export default class Listeners {
   }
 
   // wallet
-
-  /**
-   * @static checkWalletPassword
-   * @memberof ChannelListeners
-   * @description channel to check wallets password
-   */
-  static checkWalletPassword = () => {
-    return ipcMain.on(
-      Channel.CheckWalletPassword,
-      (e: Electron.Event, { walletID, password }: { walletID: string; password: string }) => {
-        e.sender.send(Channel.CheckWalletPassword, checkPassword(walletID, password))
-      },
-    )
-  }
 
   /**
    * @static getBalance

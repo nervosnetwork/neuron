@@ -93,16 +93,6 @@ export const sendCapacity = (items: TransferItem[], password: string) => {
   })
 }
 
-export const checkPassword = (walletID: string, password: string, handleResult: any) => {
-  UILayer.on(Channel.CheckWalletPassword, (_e: any, args: ChannelResponse<string>) => {
-    handleResult(args)
-  })
-  UILayer.send(Channel.CheckWalletPassword, {
-    walletID,
-    password,
-  })
-}
-
 export const networks = (method: NetworksMethod, ...params: any[]) => {
   UILayer.send(Channel.Networks, method, ...params)
 }
