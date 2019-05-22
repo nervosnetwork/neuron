@@ -42,15 +42,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       history.push(args.result.router)
     })
 
-    UILayer.on(Channel.GetBalance, (_e: Event, args: ChannelResponse<number>) => {
-      if (args.status) {
-        dispatch({
-          type: ProviderActions.Wallet,
-          payload: { balance: args.result },
-        })
-      }
-    })
-
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {

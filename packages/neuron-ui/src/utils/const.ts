@@ -18,12 +18,6 @@ export enum NetworkType {
 
 export enum Channel {
   Initiate = 'initiate',
-  SetLanguage = 'setLanguage',
-  GetBalance = 'getBalance',
-  GetWallet = 'getWallet',
-  GetWallets = 'getWallets',
-  SendCapacity = 'sendCapacity',
-
   NavTo = 'navTo',
   Terminal = 'terminal',
   Networks = 'networks',

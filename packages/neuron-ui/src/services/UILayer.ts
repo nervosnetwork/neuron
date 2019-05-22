@@ -85,14 +85,6 @@ const UILayer = (() => {
   }
 })()
 
-// TODO: to be included in one of basic channels
-export const sendCapacity = (items: TransferItem[], password: string) => {
-  return UILayer.send(Channel.SendCapacity, {
-    items,
-    password,
-  })
-}
-
 export const networks = (method: NetworksMethod, ...params: any[]) => {
   UILayer.send(Channel.Networks, method, ...params)
 }
