@@ -29,6 +29,11 @@ export default class Input extends BaseEntity {
 
   @Column({
     type: 'varchar',
+  })
+  since!: string
+
+  @Column({
+    type: 'varchar',
     nullable: true,
   })
   lockHash: string | null = null

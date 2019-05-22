@@ -8,6 +8,7 @@ import Output from './entities/Output'
 import SyncInfo from './entities/SyncInfo'
 
 import { InitMigration1558328532490 } from './migration/1558328532490-InitMigration'
+import { AddSince1558491231870 } from './migration/1558491231870-AddSince'
 
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
@@ -19,7 +20,7 @@ const connectOptions = async (networkName: string) => {
   Object.assign(connectionOptions, {
     database: dbPath(networkName),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1558328532490],
+    migrations: [InitMigration1558328532490, AddSince1558491231870],
   })
 
   return connectionOptions
