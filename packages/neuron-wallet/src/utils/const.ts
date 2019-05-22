@@ -11,7 +11,6 @@ export enum Channel {
   SwitchWallet = 'switchWallet',
   GetBalance = 'getBalance',
   GetTransactions = 'getTransactions',
-  CheckWalletPassword = 'checkWalletPassword',
   GetWallets = 'getWallets',
   SendCapacity = 'sendCapacity',
   NavTo = 'navTo',

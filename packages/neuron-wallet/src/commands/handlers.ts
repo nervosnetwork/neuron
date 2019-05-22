@@ -69,16 +69,6 @@ const rendererMessageHandler: Handler = (command, info) => {
       }
       break
     }
-    case Command.SendTransactionHistory: {
-      if (info && info.extra && info.extra.pageNo && info.extra.pageSize && info.extra.addresses) {
-        info.channel.sendTransactionHistory({
-          pageNo: +info.extra.pageNo,
-          pageSize: +info.extra.pageSize,
-          addresses: info.extra.addresses,
-        })
-      }
-      break
-    }
     default:
       break
   }

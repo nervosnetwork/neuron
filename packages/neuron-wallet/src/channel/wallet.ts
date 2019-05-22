@@ -7,7 +7,6 @@ import { NetworkWithID } from '../services/networks'
 import { WalletsMethod } from '../controllers/wallets'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount } from '../mock'
 
 export enum ResponseCode {
   Fail,
@@ -47,30 +46,6 @@ export default class WalletChannel extends Listeners {
       status: ResponseCode.Success,
       result: {
         router: route,
-      },
-    })
-  }
-
-  public sendTransactionHistory = ({
-    pageNo,
-    pageSize,
-    addresses,
-  }: {
-    pageNo: number
-    pageSize: number
-    addresses: string[]
-  }) => {
-    this.win.webContents.send(Channel.GetTransactions, {
-      status: ResponseCode.Success,
-      result: {
-        addresses,
-        pageNo,
-        pageSize,
-        totalCount: transactionCount,
-        items: transactions.map(tx => ({
-          ...tx,
-          value: +tx.value * pageNo * pageSize,
-        })),
       },
     })
   }
