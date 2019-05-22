@@ -1,34 +1,17 @@
 import { ipcMain } from 'electron'
 import { Channel } from '../utils/const'
-import { ResponseCode } from './wallet'
 import NetworksController from '../controllers/networks'
 import TransactionsController from '../controllers/transactions'
 import WalletsController from '../controllers/wallets'
 import HelpersController from '../controllers/helpers'
 
 export default class Listeners {
-  static start = (methods: string[] = ['getBalance', 'networks', 'wallets', 'transactions', 'helpers']) => {
+  static start = (methods: string[] = ['networks', 'wallets', 'transactions', 'helpers']) => {
     methods.forEach(method => {
       const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
       if (descriptor) {
         descriptor.value()
       }
-    })
-  }
-
-  // wallet
-
-  /**
-   * @static getBalance
-   * @memberof ChannelListeners
-   * @description channel to get balance
-   */
-  static getBalance = () => {
-    return ipcMain.on(Channel.GetBalance, (e: Electron.Event) => {
-      e.sender.send(Channel.GetBalance, {
-        status: ResponseCode.Success,
-        result: `balance`,
-      })
     })
   }
 
