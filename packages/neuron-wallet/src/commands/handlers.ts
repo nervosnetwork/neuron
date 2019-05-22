@@ -57,18 +57,6 @@ const rendererMessageHandler: Handler = (command, info) => {
       }
       break
     }
-    case Command.SyncWallets: {
-      if (info) {
-        info.channel.syncWallets(info.extra! as any)
-      }
-      break
-    }
-    case Command.SyncNetworks: {
-      if (info) {
-        info.channel.syncNetworks(info.extra! as any)
-      }
-      break
-    }
     default:
       break
   }
