@@ -7,7 +7,22 @@ import { NetworkWithID } from '../services/networks'
 import { WalletsMethod } from '../controllers/wallets'
 
 import { Channel } from '../utils/const'
-import { transactions, transactionCount } from '../mock'
+
+// TODO: remove this, originally taken from 'mock'
+const transactions = Array.from({
+  length: 200,
+})
+  .map(() => ({
+    time: `${new Date().getTime() - Math.round(Math.random() * 100000000)}`,
+    value: `${Math.random()}`,
+    hash: `${Math.round(Math.random() * 10000000000000000)}`,
+    version: 0,
+    type: Math.round(Math.random()),
+  }))
+  .sort((p, n) => +n.time - +p.time)
+
+const transactionCount = 500
+// TODO: remove above, originally taken from 'mock'
 
 export enum ResponseCode {
   Fail,
