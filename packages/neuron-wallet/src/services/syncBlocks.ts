@@ -32,6 +32,7 @@ export default class SyncBlocksService {
   private sizeForCheck = 12
   private tryTime = 0
   private stopFlag = false
+  private loopFlag = false
 
   // cache the blocks for check fork
   private blockHeadersForCheck: BlockHeader[] = []
@@ -46,9 +47,12 @@ export default class SyncBlocksService {
   ) {
     this.lockHashList = lockHashes
     // listen for tipNumber changes
-    tipNumberSubject.subscribe(num => {
+    tipNumberSubject.subscribe(async num => {
       if (num) {
         this.tipBlockNumber = parseInt(num, 10)
+        if (this.loopFlag === true && this.stopped()) {
+          await this.loopBlocks()
+        }
       }
     })
   }
@@ -63,6 +67,12 @@ export default class SyncBlocksService {
 
   // continue to loop blocks, follow chain height
   async loopBlocks() {
+    this.loopFlag = true
+    this.stopFlag = false
+    if (this.tipBlockNumber < 0) {
+      this.stopFlag = true
+      return
+    }
     await this.initBlockHeadersForCheck()
     while (!this.stopFlag) {
       await this.resolveBatchBlocks()
@@ -71,6 +81,7 @@ export default class SyncBlocksService {
 
   // stop loop
   stop() {
+    this.loopFlag = false
     this.stopFlag = true
   }
 
