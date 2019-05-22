@@ -4,7 +4,6 @@ enum Command {
   SendWallet = 'send-wallet',
   SyncWallets = 'sync-wallets',
   SyncNetworks = 'sync-network',
-  SendTransactionHistory = 'send-transaction-history',
   ShowAbout = 'show-about',
   ShowPreferences = 'show-preferences',
   ShowTerminal = 'show-terminal',

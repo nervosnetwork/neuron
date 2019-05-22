@@ -8,22 +8,6 @@ import { WalletsMethod } from '../controllers/wallets'
 
 import { Channel } from '../utils/const'
 
-// TODO: remove this, originally taken from 'mock'
-const transactions = Array.from({
-  length: 200,
-})
-  .map(() => ({
-    time: `${new Date().getTime() - Math.round(Math.random() * 100000000)}`,
-    value: `${Math.random()}`,
-    hash: `${Math.round(Math.random() * 10000000000000000)}`,
-    version: 0,
-    type: Math.round(Math.random()),
-  }))
-  .sort((p, n) => +n.time - +p.time)
-
-const transactionCount = 500
-// TODO: remove above, originally taken from 'mock'
-
 export enum ResponseCode {
   Fail,
   Success,
@@ -62,30 +46,6 @@ export default class WalletChannel extends Listeners {
       status: ResponseCode.Success,
       result: {
         router: route,
-      },
-    })
-  }
-
-  public sendTransactionHistory = ({
-    pageNo,
-    pageSize,
-    addresses,
-  }: {
-    pageNo: number
-    pageSize: number
-    addresses: string[]
-  }) => {
-    this.win.webContents.send(Channel.GetTransactions, {
-      status: ResponseCode.Success,
-      result: {
-        addresses,
-        pageNo,
-        pageSize,
-        totalCount: transactionCount,
-        items: transactions.map(tx => ({
-          ...tx,
-          value: +tx.value * pageNo * pageSize,
-        })),
       },
     })
   }
