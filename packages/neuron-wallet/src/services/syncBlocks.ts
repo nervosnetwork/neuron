@@ -116,6 +116,9 @@ export default class SyncBlocksService {
     // so should start with currentBlockNumber + 1
     const currentBlockNumber: number = await this.currentBlockNumber()
     const blocks: Block[] = await this.tryGetBlocksByNumber(currentBlockNumber + 1)
+    if (blocks.length <= 0) {
+      return
+    }
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
     const checkResult = this.checkBlockRange(blockHeaders)
     let blocksToSave: Block[] = []
@@ -176,7 +179,7 @@ export default class SyncBlocksService {
     }
 
     // size for fetch
-    const size: number = Math.min(this.tipBlockNumber - startBlockNumber, this.fetchSize)
+    const size: number = Math.min(this.tipBlockNumber - startBlockNumber + 1, this.fetchSize)
 
     let blocks: Block[] = []
     try {
