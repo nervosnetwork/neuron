@@ -1,11 +1,26 @@
 import Key from '../keys/key'
 import { ResponseCode } from '.'
+import { CatchControllerError } from '../utils/decorators'
+import i18n from '../utils/i18n'
 
 export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
 }
+
+/**
+ * @class HelpersController
+ * @description handle messages from helpers channel
+ */
 class HelpersController {
-  public static generateMnemonic = (): Controller.Response<string> => {
+  /**
+   * @method generateMnemonic
+   * @static
+   * @memberof HelpersController
+   * @description generate mnemonic
+   */
+
+  @CatchControllerError
+  public static async generateMnemonic() {
     const mnemonic = Key.generateMnemonic()
     if (mnemonic) {
       return {
@@ -13,10 +28,7 @@ class HelpersController {
         result: mnemonic,
       }
     }
-    return {
-      status: ResponseCode.Fail,
-      result: 'Failed to generate mnemonic',
-    }
+    throw new Error(i18n.t('messages.failed-to-create-mnemonic'))
   }
 }
 

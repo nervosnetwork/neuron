@@ -53,6 +53,14 @@ export default {
       'failed-to-activate-wallet': 'Failed to activate wallet',
       'failed-to-delete-wallet': 'Failed to delete wallet',
       'wallet-name-existed': 'Wallet name existed',
+      'network-of-id-is-not-found': 'Network of id {{id}} is not found',
+      'id-is-required': 'ID is required',
+      'name-and-remote-address-are-required': 'Name and remote address are required',
+      'invalid-name': 'Name is invalid',
+      'default-network-is-unremovable': 'Default network is unremovable',
+      'cannot-delete-active-network-due-to-lack-of-default-one':
+        'Cannot delete active network due to lack of default one',
+      'active-network-is-not-set': 'Active network is not set',
     },
   },
 }

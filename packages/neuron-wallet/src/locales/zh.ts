@@ -52,6 +52,13 @@ export default {
       'failed-to-activate-wallet': '设置默认钱包失败',
       'failed-to-delete-wallet': '删除钱包失败',
       'wallet-name-existed': '钱包名称重复',
+      'network-of-id-is-not-found': '未找到 Id 为 {{id}} 的网络设置',
+      'id-is-required': '缺少参数 ID',
+      'name-and-remote-address-are-required': '缺少名称或地址',
+      'invalid-name': '非法名称',
+      'default-network-is-unremovable': '默认网络不可删除',
+      'cannot-delete-active-network-due-to-lack-of-default-one': '未设置默认网络, 因此无法删除当前网络',
+      'active-network-is-not-set': '未设置当前网络',
     },
   },
 }
