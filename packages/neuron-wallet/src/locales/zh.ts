@@ -59,6 +59,8 @@ export default {
       'default-network-is-unremovable': '默认网络不可删除',
       'cannot-delete-active-network-due-to-lack-of-default-one': '未设置默认网络, 因此无法删除当前网络',
       'active-network-is-not-set': '未设置当前网络',
+      'no-response-from-transaction-service': '交易服务未响应',
+      'transaction-is-not-found': '未找到交易 {{hash}}',
     },
   },
 }

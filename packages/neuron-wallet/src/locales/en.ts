@@ -61,6 +61,8 @@ export default {
       'cannot-delete-active-network-due-to-lack-of-default-one':
         'Cannot delete active network due to lack of default one',
       'active-network-is-not-set': 'Active network is not set',
+      'no-response-from-transaction-service': 'No response from transaction service',
+      'transaction-is-not-found': 'Transaction {{hash}} is not found',
     },
   },
 }

@@ -5,21 +5,25 @@ import TransactionsService, {
   PaginationResult,
   TransactionsByLockHashesParam,
 } from '../services/transactions'
+import { CatchControllerError } from '../utils/decorators'
+import i18n from '../utils/i18n'
 
 export default class TransactionsController {
   static service = new TransactionsService()
 
-  public static getAll = async (
+  /**
+   * @method getAll
+   * @static
+   * @memberof TransactionsController
+   * @description get all transactions
+   */
+  @CatchControllerError
+  public static async getAll(
     params: TransactionsByLockHashesParam,
-  ): Promise<Controller.Response<PaginationResult<Transaction>>> => {
+  ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
-    if (!transactions) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'Transactions not found',
-      }
-    }
+    if (!transactions) throw new Error(i18n.t('messages.no-response-from-transaction-service'))
 
     return {
       status: ResponseCode.Success,
@@ -27,31 +31,38 @@ export default class TransactionsController {
     }
   }
 
-  public static getAllByAddresses = async (
+  /**
+   * @method getAllByAddresses
+   * @static
+   * @memberof TransactionsController
+   * @description get all transactions by page number, page size, address list
+   */
+  @CatchControllerError
+  public static async getAllByAddresses(
     params: TransactionsByAddressesParam,
-  ): Promise<Controller.Response<PaginationResult<Transaction>>> => {
+  ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAllByAddresses(params)
 
-    if (transactions) {
-      return {
-        status: ResponseCode.Success,
-        result: { ...params, ...transactions },
-      }
-    }
+    if (!transactions) throw new Error(i18n.t('messages.no-response-from-transaction-service'))
+
     return {
-      status: ResponseCode.Fail,
-      msg: 'Transactions not found',
+      status: ResponseCode.Success,
+      result: { ...params, ...transactions },
     }
   }
 
-  public static get = async (hash: string): Promise<Controller.Response<Transaction>> => {
+  /**
+   * @method get
+   * @static
+   * @memberof TransactionsController
+   * @description get transaction by hash
+   */
+  @CatchControllerError
+  public static async get(hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
-    if (!transaction) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'Transaction not found',
-      }
-    }
+
+    if (!transaction) throw new Error(i18n.t('messages.transaction-is-not-found', { hash }))
+
     return {
       status: ResponseCode.Success,
       result: transaction,
