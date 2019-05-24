@@ -62,21 +62,20 @@ class Keychain {
   }
 
   public derivePath = (path: string): Keychain => {
-    const master = ['m', `m'`, 'M', `M'`]
+    const master = ['m', `/`, '']
     if (master.includes(path)) {
       return this
     }
 
-    const entries = path.split('/')
     let bip32: Keychain = this
-    entries.forEach((c, i) => {
-      if (i === 0 && !master.includes(c)) {
-        return
-      }
 
+    let entries = path.split('/')
+    if (entries[0] === 'm') {
+      entries = entries.slice(1)
+    }
+    entries.forEach(c => {
       const childIndex = parseInt(c, 10)
       const hardened = c.length > 1 && c[c.length - 1] === "'"
-
       bip32 = bip32.deriveChild(childIndex, hardened)
     })
 

@@ -32,6 +32,21 @@ describe('BIP32 Keychain tests', () => {
     expect(child.depth).toEqual(1)
   })
 
+  it('derive path', () => {
+    const master = Keychain.fromSeed(shortSeed)
+    expect(master.derivePath(`m/0'`).privateKey.toString('hex')).toEqual(
+      'edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea',
+    )
+
+    const child = master.derivePath(`m/0'/1/2'`)
+    expect(child.privateKey.toString('hex')).toEqual('cbce0d719ecf7431d88e6a89fa1483e02e35092af60c042b1df2ff59fa424dca')
+    expect(child.identifier.toString('hex')).toEqual('ee7ab90cde56a8c0e2bb086ac49748b8db9dce72')
+    expect(child.fingerprint).toEqual(4001020172)
+    expect(child.chainCode.toString('hex')).toEqual('04466b9cc8e161e966409ca52986c584f07e9dc81f735db683c3ff6ec7b1503f')
+    expect(child.index).toEqual(2)
+    expect(child.depth).toEqual(3)
+  })
+
   it('create master keychain from long seed', () => {
     const master = Keychain.fromSeed(longSeed)
     expect(master.privateKey.toString('hex')).toEqual(
