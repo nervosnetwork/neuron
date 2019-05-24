@@ -41,11 +41,11 @@ class Keychain {
 
     if (hardened) {
       const pk = Buffer.concat([Buffer.alloc(1, 0), this.privateKey])
-      data = Buffer.concat([pk, indexBuffer])
       indexBuffer.writeUInt32BE(index + 0x80000000, 0)
+      data = Buffer.concat([pk, indexBuffer])
     } else {
-      data = Buffer.concat([this.publicKey, indexBuffer])
       indexBuffer.writeUInt32BE(index, 0)
+      data = Buffer.concat([this.publicKey, indexBuffer])
     }
 
     const i = crypto
