@@ -8,15 +8,13 @@ import TransactionsService, {
 import { CatchControllerError } from '../utils/decorators'
 import i18n from '../utils/i18n'
 
+/**
+ * @class TransactionsController
+ * @description handle messages from transactions channel
+ */
 export default class TransactionsController {
   static service = new TransactionsService()
 
-  /**
-   * @method getAll
-   * @static
-   * @memberof TransactionsController
-   * @description get all transactions
-   */
   @CatchControllerError
   public static async getAll(
     params: TransactionsByLockHashesParam,
@@ -31,12 +29,6 @@ export default class TransactionsController {
     }
   }
 
-  /**
-   * @method getAllByAddresses
-   * @static
-   * @memberof TransactionsController
-   * @description get all transactions by page number, page size, address list
-   */
   @CatchControllerError
   public static async getAllByAddresses(
     params: TransactionsByAddressesParam,
@@ -51,12 +43,6 @@ export default class TransactionsController {
     }
   }
 
-  /**
-   * @method get
-   * @static
-   * @memberof TransactionsController
-   * @description get transaction by hash
-   */
   @CatchControllerError
   public static async get(hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
