@@ -1,4 +1,4 @@
-import Key from '../src/keys/key'
+import Key from '../../src/keys/key'
 
 describe('Key tests', () => {
   const mnemonic = 'mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier'
