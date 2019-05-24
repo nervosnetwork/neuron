@@ -12,13 +12,6 @@ export enum HelpersMethod {
  * @description handle messages from helpers channel
  */
 class HelpersController {
-  /**
-   * @method generateMnemonic
-   * @static
-   * @memberof HelpersController
-   * @description generate mnemonic
-   */
-
   @CatchControllerError
   public static async generateMnemonic() {
     const mnemonic = Key.generateMnemonic()

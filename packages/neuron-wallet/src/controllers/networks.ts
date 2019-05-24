@@ -22,13 +22,6 @@ export enum NetworksMethod {
 class NetworksController {
   static service = new NetworksService()
 
-  /**
-   * @method getAll
-   * @static
-   * @memberof NetworksController
-   * @description return all networks if possible
-   */
-
   @CatchControllerError
   public static async getAll() {
     const networks = await NetworksController.service.getAll()
@@ -38,12 +31,6 @@ class NetworksController {
     }
   }
 
-  /**
-   * @method get
-   * @static
-   * @memberof NetworksController
-   * @description get netowrk by id
-   */
   @CatchControllerError
   public static async get(id: NetworkID) {
     if (typeof id === 'undefined') throw new Error(i18n.t('messages.id-is-required'))
@@ -57,13 +44,6 @@ class NetworksController {
     }
   }
 
-  /**
-   *
-   * @method create
-   * @static
-   * @memberof NetworksController
-   * @description create network with name, remote address, netowrk type
-   */
   @CatchControllerError
   public static async create({ name, remote, type = NetworkType.Normal }: Network) {
     if (!name || !remote) throw new Error(i18n.t('messages.name-and-remote-address-are-required'))
@@ -76,12 +56,6 @@ class NetworksController {
     }
   }
 
-  /**
-   * @method update
-   * @static
-   * @memberof NetworksController
-   * @description update network by id
-   */
   @CatchControllerError
   public static async update(id: NetworkID, options: Partial<Network>) {
     if (options.name && options.name === 'error') throw new Error(i18n.t('messages.invalid-name'))
@@ -93,12 +67,6 @@ class NetworksController {
     }
   }
 
-  /**
-   * @method delete
-   * @static
-   * @memberof NetworksController
-   * @description delete network by id
-   */
   @CatchControllerError
   public static async delete(id: NetworkID) {
     const defaultNetwork = await NetworksController.service.defaultOne()
@@ -119,12 +87,6 @@ class NetworksController {
     }
   }
 
-  /**
-   * @method activeOne
-   * @static
-   * @memberof NetworksController
-   * @description get the currecnt/active network id
-   */
   @CatchControllerError
   public static async activeOne() {
     const activeId = await NetworksController.service.activeId()
@@ -137,12 +99,6 @@ class NetworksController {
     throw new Error(i18n.t('messages.active-network-is-not-set'))
   }
 
-  /**
-   * @method activate
-   * @static
-   * @memberof NetworksController
-   * @description set the current/active network by id
-   */
   @CatchControllerError
   public static async activate(id: NetworkID) {
     await NetworksController.service.activate(id)
@@ -152,12 +108,6 @@ class NetworksController {
     }
   }
 
-  /**
-   * @mehtod clear
-   * @static
-   * @memberof NetworksController
-   * @description clear the networks
-   */
   @CatchControllerError
   public static async clear() {
     await NetworksController.service.clear()
