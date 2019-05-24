@@ -64,8 +64,8 @@ export default class Listeners {
   public static helpers = () => {
     return ipcMain.on(
       Channel.Helpers,
-      (e: Electron.Event, method: keyof typeof HelpersController, ...params: any[]) => {
-        e.sender.send(Channel.Helpers, method, (HelpersController[method] as Function)(...params))
+      async (e: Electron.Event, method: keyof typeof HelpersController, ...params: any[]) => {
+        e.sender.send(Channel.Helpers, method, await (HelpersController[method] as Function)(...params))
       },
     )
   }
