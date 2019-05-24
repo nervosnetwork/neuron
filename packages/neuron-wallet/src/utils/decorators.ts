@@ -6,7 +6,7 @@ export const CatchControllerError = (_target: any, _name: string, descripor: Pro
     ...descripor,
     async value(...args: any[]) {
       try {
-        return await originalMethod.apply(this, args)
+        return originalMethod(...args)
       } catch (err) {
         return {
           status: ResponseCode.Fail,
