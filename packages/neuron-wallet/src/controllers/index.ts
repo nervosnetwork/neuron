@@ -7,6 +7,7 @@ export enum ResponseCode {
   Fail,
   Success,
 }
+
 export const methods = {
   NetworksMethod,
   WalletsMethod,
