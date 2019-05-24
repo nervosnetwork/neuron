@@ -173,8 +173,7 @@ describe('wallet service', () => {
   it('save wallet', () => {
     const { id } = walletService.create(wallet1)
     const wallet = walletService.get(id)
-    expect(wallet).toBeDefined()
-    expect(wallet!.name).toEqual(wallet1.name)
+    expect(wallet && wallet.name).toEqual(wallet1.name)
   })
 
   it('wallet not exist', () => {
@@ -194,8 +193,7 @@ describe('wallet service', () => {
     wallet1.name = wallet2.name
     walletService.update(w1.id, wallet1)
     const wallet = walletService.get(w1.id)
-    expect(wallet).toBeDefined()
-    expect(wallet!.name).toEqual(wallet2.name)
+    expect(wallet && wallet.name).toEqual(wallet2.name)
   })
 
   it('update addresses', () => {
@@ -233,8 +231,7 @@ describe('wallet service', () => {
     wallet1.addresses = addresses
     walletService.update(w1.id, wallet1)
     const wallet = walletService.get(w1.id)
-    expect(wallet).toBeDefined()
-    expect(wallet!.addresses).toEqual(addresses)
+    expect(wallet && wallet.addresses).toEqual(addresses)
   })
 
   it('delete wallet', () => {
@@ -249,19 +246,25 @@ describe('wallet service', () => {
   it('get and set active wallet', () => {
     const w1 = walletService.create(wallet1)
     const w2 = walletService.create(wallet2)
-    expect(walletService.setCurrent(w1.id)).toBeTruthy()
-    expect(walletService.getCurrent()!.id).toEqual(w1.id)
-    expect(walletService.setCurrent(w2.id)).toBeTruthy()
-    expect(walletService.getCurrent()!.id).toEqual(w2.id)
-    expect(walletService.setCurrent(w1.id)).toBeTruthy()
+
+    expect(() => walletService.setCurrent(w1.id)).not.toThrowError()
+
+    let currentWallet = walletService.getCurrent()
+    expect(currentWallet && currentWallet.id).toEqual(w1.id)
+
+    expect(() => walletService.setCurrent(w2.id)).not.toThrowError()
+
+    currentWallet = walletService.getCurrent()
+    expect(currentWallet && currentWallet.id).toEqual(w2.id)
+
+    expect(() => walletService.setCurrent(w1.id)).not.toThrowError()
   })
 
   it('first wallet is active wallet', () => {
     const w1 = walletService.create(wallet1)
     walletService.create(wallet2)
     const activeWallet = walletService.getCurrent()
-    expect(activeWallet).toBeDefined()
-    expect(activeWallet!.id).toEqual(w1.id)
+    expect(activeWallet && activeWallet.id).toEqual(w1.id)
   })
 
   it('delete current wallet', () => {
@@ -269,8 +272,7 @@ describe('wallet service', () => {
     const w2 = walletService.create(wallet2)
     walletService.delete(w1.id)
     const activeWallet = walletService.getCurrent()
-    expect(activeWallet).toBeDefined()
-    expect(activeWallet!.id).toEqual(w2.id)
+    expect(activeWallet && activeWallet.id).toEqual(w2.id)
     expect(walletService.getAll().length).toEqual(1)
   })
 
@@ -279,7 +281,6 @@ describe('wallet service', () => {
     const w2 = walletService.create(wallet2)
     walletService.delete(w2.id)
     const activeWallet = walletService.getCurrent()
-    expect(activeWallet).toBeDefined()
-    expect(activeWallet!.id).toEqual(w1.id)
+    expect(activeWallet && activeWallet.id).toEqual(w1.id)
   })
 })

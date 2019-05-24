@@ -33,6 +33,10 @@ export default {
         toggleDevTools: '开发者工具',
       },
     },
+    services: {
+      transactions: '交易',
+      wallets: '钱包',
+    },
     messages: {
       'failed-to-load-networks': '加载节点失败',
       'Networks-will-be-reset': '节点列表将被重置',
@@ -45,7 +49,7 @@ export default {
       'current-key-has-no-data': '当前 Key 文件缺少数据',
       'address-is-invalid': '地址 {{address}} 不合法',
       'codehash-is-not-loaded': 'codehash 还未加载完成',
-      'wallet-not-found': '未找到钱包',
+      'wallet-is-not-found': '未找到钱包 {{id}}',
       'no-active-wallet': '没有默认钱包',
       'wallet-incorrect-password': '密码错误',
       'failed-to-create-mnemonic': '创建助记词失败',
@@ -59,8 +63,12 @@ export default {
       'default-network-is-unremovable': '默认网络不可删除',
       'cannot-delete-active-network-due-to-lack-of-default-one': '未设置默认网络, 因此无法删除当前网络',
       'active-network-is-not-set': '未设置当前网络',
-      'no-response-from-transaction-service': '交易服务未响应',
       'transaction-is-not-found': '未找到交易 {{hash}}',
+      'service-not-responds': '{{service}} 服务未响应',
+      'name-is-required': '缺少名称',
+      'mnemonic-is-required': '缺少助记词',
+      'keystore-is-required': '缺少 Keystore',
+      'parameters-of-sending-transactions-are-required': '缺少交易参数',
     },
   },
 }

@@ -6,6 +6,8 @@ import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
 import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
+import i18n from '../utils/i18n'
+import { verifyPasswordComplexity } from '../utils/validators'
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -53,6 +55,10 @@ export default class Key {
     receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
+    if (!password) throw new Error(i18n.t('messages.password-is-required'))
+    verifyPasswordComplexity(password)
+
+    if (!keystore) throw new Error(i18n.t('messages.keystore-is-required'))
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
     key.keystore = keystoreObject
@@ -98,6 +104,10 @@ export default class Key {
     receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
+    if (!password) throw new Error(i18n.t('messages.password-is-required'))
+    verifyPasswordComplexity(password)
+
+    if (!mnemonic) throw new Error(i18n.t('messages.mnemonic-is-required'))
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }

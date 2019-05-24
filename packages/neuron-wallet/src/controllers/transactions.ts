@@ -21,7 +21,10 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
-    if (!transactions) throw new Error(i18n.t('messages.no-response-from-transaction-service'))
+    if (!transactions)
+      throw new Error(
+        i18n.t('messages.transactions-service-not-responds', { service: i18n.t('services.transactions') }),
+      )
 
     return {
       status: ResponseCode.Success,
@@ -35,7 +38,8 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAllByAddresses(params)
 
-    if (!transactions) throw new Error(i18n.t('messages.no-response-from-transaction-service'))
+    if (!transactions)
+      throw new Error(i18n.t('messages.service-not-responds', { service: i18n.t('services.transactions') }))
 
     return {
       status: ResponseCode.Success,

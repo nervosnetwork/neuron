@@ -104,6 +104,8 @@ export default class WalletService {
   }
 
   public create = (props: WalletProperties): Wallet => {
+    if (!props.name) throw new Error(i18n.t('messages.name-is-required'))
+
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
     if (index !== -1) {
       throw Error(i18n.t('messages.wallet-name-existed'))
@@ -134,13 +136,14 @@ export default class WalletService {
     }
   }
 
-  public delete = (id: string): boolean => {
+  public delete = (id: string) => {
     const current = this.getCurrent()
     const currentId = current ? current.id : ''
     const wallets = this.getAll()
     const index = wallets.findIndex((w: Wallet) => w.id === id)
+
     if (index === -1) {
-      return false
+      throw new Error(i18n.t('wallet-is-not-found', { id }))
     }
 
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
@@ -156,17 +159,12 @@ export default class WalletService {
         this.listStore.clear()
       }
     }
-
-    return true
   }
 
-  public setCurrent = (id: string): boolean => {
+  public setCurrent = (id: string) => {
     const wallet = this.get(id)
-    if (wallet) {
-      this.listStore.writeSync(this.currentWalletKey, id)
-      return true
-    }
-    return false
+    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    this.listStore.writeSync(this.currentWalletKey, id)
   }
 
   public getCurrent = (): Wallet | undefined => {
@@ -179,13 +177,9 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
-    if (wallet) {
-      const key = new Key({ keystore: wallet.loadKeystore() })
-      return key.checkPassword(password)
-    }
-
-    // TODO: Throw wallet not found instead.
-    return false
+    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    const key = new Key({ keystore: wallet.loadKeystore() })
+    return key.checkPassword(password)
   }
 
   public clearAll = () => {
