@@ -1,6 +1,38 @@
-import * as bip32 from 'bip32'
 import { AddressType } from '../services/addresses'
 import { KeysData } from './keystore'
+
+// BIP32 Keychain
+class Keychain {
+  chainCode: Buffer
+  index: number
+  depth: number
+  parentFingerprint: number
+
+  privateKey: Buffer = Buffer.from('')
+  publicKey: Buffer = Buffer.from('')
+
+  constructor() {
+    this.chainCode = Buffer.from('')
+    this.index = 0
+    this.depth = 0
+    this.parentFingerprint = 0
+  }
+
+  public static fromPrivateKey = (_privateKey: Buffer, _chainCode: Buffer): Keychain => {
+    // TODO
+    return new Keychain()
+  }
+
+  public static fromSeed = (_seed: Buffer): Keychain => {
+    // TODO
+    return new Keychain()
+  }
+
+  derivePath = (_path: String): Keychain => {
+    // TODO
+    return new Keychain()
+  }
+}
 
 class HD {
   public static pathFromIndex = (type: AddressType, index: number) => {
@@ -13,7 +45,7 @@ class HD {
   }
 
   public static keyFromHDIndex = (keysData: KeysData, index: number, type = AddressType.Receiving) => {
-    const root: bip32.BIP32Interface = bip32.fromPrivateKey(
+    const root: Keychain = Keychain.fromPrivateKey(
       Buffer.from(keysData.privateKey, 'hex'),
       Buffer.from(keysData.chainCode, 'hex'),
     )
@@ -30,4 +62,5 @@ class HD {
   }
 }
 
+export { Keychain }
 export default HD
