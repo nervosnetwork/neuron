@@ -5,7 +5,7 @@ import TransactionsService, {
   PaginationResult,
   TransactionsByLockHashesParam,
 } from '../services/transactions'
-import { CatchControllerError } from '../utils/decorators'
+import { CatchControllerError } from '../decorators'
 import i18n from '../utils/i18n'
 
 /**

@@ -1,6 +1,6 @@
 import Key from '../keys/key'
 import { ResponseCode } from '.'
-import { CatchControllerError } from '../utils/decorators'
+import { CatchControllerError } from '../decorators'
 import i18n from '../utils/i18n'
 
 export enum HelpersMethod {

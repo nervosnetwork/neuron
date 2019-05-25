@@ -3,7 +3,7 @@ import { ResponseCode } from './index'
 import windowManage from '../utils/windowManage'
 import { Channel } from '../utils/const'
 import Key from '../keys/key'
-import { CatchControllerError } from '../utils/decorators'
+import { CatchControllerError } from '../decorators'
 import i18n from '../utils/i18n'
 import { verifyPasswordComplexity } from '../utils/validators'
 
