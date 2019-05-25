@@ -1,8 +1,9 @@
-os:
-  - linux
-  - osx
-
-osx_image: xcode10.2
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+    - os: osx
+      osx_image: xcode10.2
 
 language: node_js
 
