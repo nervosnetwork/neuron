@@ -1,4 +1,3 @@
-import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import crypto from 'crypto-browserify'
 import scryptsy from 'scrypt.js'
@@ -8,6 +7,7 @@ import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
 import i18n from '../utils/i18n'
 import { verifyPasswordComplexity } from '../utils/validators'
+import { Keychain } from './hd'
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -161,7 +161,7 @@ export default class Key {
 
   private generatePrivateKeyFromMnemonic = async (mnemonic: string) => {
     const seed = await bip39.mnemonicToSeed(mnemonic)
-    const root = bip32.fromSeed(seed)
+    const root = Keychain.fromSeed(seed)
     if (root.privateKey) {
       const privateKey = root.privateKey.toString('hex')
       const chainCode = root.chainCode.toString('hex')

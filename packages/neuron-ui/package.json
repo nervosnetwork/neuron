@@ -16,8 +16,7 @@
     "test": "react-app-rewired test --env=jsdom --color",
     "build": "react-app-rewired build",
     "clean": "rimraf build/*",
-    "precommit": "lint-staged",
-    "postinstall": "npm rebuild tiny-secp256k1"
+    "precommit": "lint-staged"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -42,7 +41,7 @@
     "grommet-icons": "4.2.0",
     "history": "4.9.0",
     "i18next": "15.0.5",
-    "node-sass": "4.11.0",
+    "node-sass": "4.12.0",
     "qrcode.react": "0.9.3",
     "react": "16.8.6",
     "react-bootstrap": "1.0.0-beta.8",
