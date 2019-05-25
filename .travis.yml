@@ -1,22 +1,18 @@
 language: node_js
 
-matrix:
-  include:
-    - name: Test on Linux
-      os: linux
-      dist: xenial
-      node_js:
-        - '11'
-        - '12'
-    - name: Test on macOS
-      os: osx
-      osx_image: xcode10.2
-      node_js:
-        - '11'
-        - '12'
+os:
+  - linux
+  - osx
+
+dist: xenial
+osx_image: xcode10.2
 
 services:
   - xvfb
+
+node_js:
+  - '11'
+  - '12'
 
 cache:
   - npm
