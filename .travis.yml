@@ -2,12 +2,13 @@ os:
   - linux
   - osx
 
-osx_image: xcode10.1
+osx_image: xcode10.2
 
 language: node_js
 
 node_js:
-  - '11.10'
+  - '11'
+  - '12'
 
 cache:
   - npm
