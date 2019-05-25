@@ -5,6 +5,11 @@ matrix:
     - os: osx
       osx_image: xcode10.2
 
+addons:
+   apt:
+     packages:
+       - xvfb
+
 language: node_js
 
 node_js:
