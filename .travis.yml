@@ -1,14 +1,14 @@
 matrix:
   include:
-    - os: linux
+    - name: Test on Linux
+      os: linux
       dist: xenial
-    - os: osx
+    - name: Test on macOS
+      os: osx
       osx_image: xcode10.2
 
-addons:
-   apt:
-     packages:
-       - xvfb
+services:
+  - xvfb
 
 language: node_js
 
@@ -27,11 +27,6 @@ before_install:
 install:
   - travis_retry yarn install
   - travis_retry yarn lerna bootstrap
-
-before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export DISPLAY=:99.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh -e /etc/init.d/xvfb start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sleep 3; fi
 
 script:
   - git diff --exit-code yarn.lock
