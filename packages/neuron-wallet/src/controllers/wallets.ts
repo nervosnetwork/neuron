@@ -1,9 +1,11 @@
 import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
 import { ResponseCode } from './index'
 import windowManage from '../utils/windowManage'
-import { Channel, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
+import { Channel } from '../utils/const'
 import Key from '../keys/key'
+import { CatchControllerError } from '../decorators'
 import i18n from '../utils/i18n'
+import { verifyPasswordComplexity } from '../utils/validators'
 
 export enum WalletsMethod {
   GetAll = 'getAll',
@@ -19,52 +21,82 @@ export enum WalletsMethod {
   SendCapacity = 'sendCapacity',
 }
 
+/**
+ * @class WalletsController
+ * @description handle messages from wallets channel
+ */
 class WalletsController {
   static service = new WalletsService()
 
-  public static getAll = (): Controller.Response<Wallet[]> => {
+  @CatchControllerError
+  public static async getAll(): Promise<Controller.Response<Wallet[]>> {
     const wallets = WalletsController.service.getAll()
-    if (wallets) {
-      return {
-        status: ResponseCode.Success,
-        result: wallets,
-      }
-    }
+    if (!wallets) throw new Error(i18n.t('wallets-service-not-responds', { services: i18n.t('services.wallets') }))
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.wallet-not-found'),
+      status: ResponseCode.Success,
+      result: wallets,
     }
   }
 
-  public static get = (id: string): Controller.Response<Wallet> => {
+  @CatchControllerError
+  public static async get(id: string): Promise<Controller.Response<Wallet>> {
+    if (typeof id === 'undefined') throw new Error(i18n.t('messages.id-is-required'))
+
     const wallet = WalletsController.service.get(id)
-    if (wallet) {
-      return {
-        status: ResponseCode.Success,
-        result: wallet,
-      }
-    }
+    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.wallet-not-found'),
+      status: ResponseCode.Success,
+      result: wallet,
     }
   }
 
-  public static generateMnemonic = (): Controller.Response<string> => {
+  @CatchControllerError
+  public static async generateMnemonic(): Promise<Controller.Response<string>> {
     const mnemonic = Key.generateMnemonic()
-    if (mnemonic) {
-      return {
-        status: ResponseCode.Success,
-        result: mnemonic,
-      }
+    if (!mnemonic) throw new Error(i18n.t('messages.failed-to-create-mnemonic'))
+    return {
+      status: ResponseCode.Success,
+      result: mnemonic,
+    }
+  }
+
+  @CatchControllerError
+  public static async importMnemonic({
+    name,
+    password,
+    mnemonic,
+    receivingAddressNumber = 20,
+    changeAddressNumber = 10,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+    receivingAddressNumber: number
+    changeAddressNumber: number
+  }): Promise<Controller.Response<Wallet>> {
+    const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+    const currentWallet = WalletsController.service.getCurrent()
+    const wallet = WalletsController.service.create({
+      name,
+      keystore: key.keystore || null,
+      addresses: key.addresses || {
+        receiving: [],
+        change: [],
+      },
+    })
+    // TODO: use event listener on wallets service
+    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
+    if (!currentWallet && WalletsController.service.getAll().length === 1) {
+      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, await WalletsController.getActive())
     }
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.failed-to-create-mnemonic'),
+      status: ResponseCode.Success,
+      result: wallet,
     }
   }
 
-  public static importMnemonic = async ({
+  @CatchControllerError
+  public static async create({
     name,
     password,
     mnemonic,
@@ -76,56 +108,18 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<Controller.Response<Wallet>> => {
-    try {
-      WalletsController.verifyPasswordComplexity(password)
-      const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
-      const currentWallet = WalletsController.service.getCurrent()
-      const wallet = WalletsController.service.create({
-        name,
-        keystore: key.keystore!,
-        addresses: key.addresses!,
-      })
-      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
-      if (!currentWallet && WalletsController.service.getAll().length === 1) {
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
-      }
-      return {
-        status: ResponseCode.Success,
-        result: wallet,
-      }
-    } catch (e) {
-      return {
-        status: ResponseCode.Fail,
-        msg: e.message,
-      }
-    }
-  }
-
-  public static create = async ({
-    name,
-    password,
-    mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
-  }: {
-    name: string
-    password: string
-    mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
-  }): Promise<Controller.Response<Wallet>> => {
-    const res = await WalletsController.importMnemonic({
+  }): Promise<Controller.Response<Wallet>> {
+    return WalletsController.importMnemonic({
       name,
       password,
       mnemonic,
       receivingAddressNumber,
       changeAddressNumber,
     })
-    return res
   }
 
-  public static importKeystore = ({
+  @CatchControllerError
+  public static async importKeystore({
     name,
     password,
     keystore,
@@ -137,59 +131,24 @@ class WalletsController {
     keystore: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Controller.Response<Wallet> => {
-    try {
-      WalletsController.verifyPasswordComplexity(password)
-      const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
-      const wallet = WalletsController.service.create({
-        name,
-        keystore: key.keystore!,
-        addresses: key.addresses!,
-      })
-      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
-      return {
-        status: ResponseCode.Success,
-        result: wallet,
-      }
-    } catch (e) {
-      return {
-        status: ResponseCode.Fail,
-        msg: e.message,
-      }
-    }
-  }
-
-  public static verifyPasswordComplexity = (password: string) => {
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      throw Error(i18n.t('messages.wallet-password-less-than-min-length', { minPasswordLength: MIN_PASSWORD_LENGTH }))
-    }
-    if (password.length > MAX_PASSWORD_LENGTH) {
-      throw Error(i18n.t('messages.wallet-password-more-than-max-length', { maxPasswordLength: MAX_PASSWORD_LENGTH }))
-    }
-    let complex = 0
-    let reg = /\d/
-    if (reg.test(password)) {
-      complex++
-    }
-    reg = /[a-z]/
-    if (reg.test(password)) {
-      complex++
-    }
-    reg = /[A-Z]/
-    if (reg.test(password)) {
-      complex++
-    }
-    reg = /[^0-9a-zA-Z]/
-    if (reg.test(password)) {
-      complex++
-    }
-    if (complex < 3) {
-      throw Error(i18n.t('messages.wallet-password-letter-complexity'))
+  }): Promise<Controller.Response<Wallet>> {
+    const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
+    const wallet = WalletsController.service.create({
+      name,
+      keystore: key.keystore || null,
+      addresses: key.addresses || { receiving: [], change: [] },
+    })
+    // TODO: use event listener on wallets service
+    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
+    return {
+      status: ResponseCode.Success,
+      result: wallet,
     }
   }
 
   // TODO: update addresses?
-  public static update = ({
+  @CatchControllerError
+  public static async update({
     id,
     name,
     password,
@@ -199,124 +158,94 @@ class WalletsController {
     password: string
     name: string
     newPassword?: string
-  }): Controller.Response<Wallet> => {
-    try {
-      const wallet = WalletsController.service.get(id)
-      if (wallet) {
-        const props: WalletProperties = {
-          name: wallet.name,
-          addresses: wallet.addresses,
-          keystore: wallet.loadKeystore(),
-        }
-        if (newPassword) {
-          if (WalletsController.service.validate({ id, password })) {
-            WalletsController.verifyPasswordComplexity(password)
-            const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
-            props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
-          } else {
-            return {
-              status: ResponseCode.Fail,
-              msg: i18n.t('messages.wallet-incorrect-password'),
-            }
-          }
-        }
-        if (name) {
-          props.name = name
-        }
-        WalletsController.service.update(id, props)
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, WalletsController.getAll())
-        return {
-          status: ResponseCode.Success,
-          result: WalletsController.service.get(id),
-        }
+  }): Promise<Controller.Response<Wallet>> {
+    const wallet = WalletsController.service.get(id)
+    if (!wallet) throw new Error(i18n.t('wallet-is-not-found', { id }))
+
+    const props: WalletProperties = {
+      name: name || wallet.name,
+      addresses: wallet.addresses,
+      keystore: wallet.loadKeystore(),
+    }
+
+    if (newPassword) {
+      if (WalletsController.service.validate({ id, password })) {
+        verifyPasswordComplexity(password)
+        const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
+        props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
+      } else {
+        throw new Error(i18n.t('messages.wallet-incorrect-password'))
       }
-      return {
-        status: ResponseCode.Fail,
-        msg: i18n.t('messages.wallet-not-found'),
-      }
-    } catch (e) {
-      return {
-        status: ResponseCode.Fail,
-        msg: e.message,
-      }
+    }
+
+    WalletsController.service.update(id, props)
+    // TODO: use event listener on wallets service
+    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
+    return {
+      status: ResponseCode.Success,
+      result: WalletsController.service.get(id),
     }
   }
 
-  public static delete = ({ id, password }: { id: string; password: string }): Controller.Response<any> => {
-    if (WalletsController.service.validate({ id, password })) {
-      if (WalletsController.service.delete(id)) {
-        return {
-          status: ResponseCode.Success,
-          result: {
-            allWallets: WalletsController.service.getAll(),
-            activeWallet: WalletsController.service.getCurrent(),
-          },
-        }
-      }
+  @CatchControllerError
+  public static async delete({ id, password }: { id: string; password: string }): Promise<Controller.Response<any>> {
+    if (!WalletsController.service.validate({ id, password }))
+      throw new Error(i18n.t('messages.wallet-incorrect-password'))
 
-      return {
-        status: ResponseCode.Fail,
-        msg: i18n.t('messages.failed-to-delete-wallet'),
-      }
-    }
+    WalletsController.service.delete(id)
 
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.wallet-incorrect-password'),
+      status: ResponseCode.Success,
+      result: {
+        allWallets: WalletsController.service.getAll(),
+        activeWallet: WalletsController.service.getCurrent(),
+      },
     }
   }
 
-  public static export = ({ id, password }: { id: string; password: string }): Controller.Response<string> => {
-    if (WalletsController.service.validate({ id, password })) {
-      return {
-        status: ResponseCode.Success,
-        result: JSON.stringify(WalletsController.service.get(id)),
-      }
+  @CatchControllerError
+  public static async export({ id, password }: { id: string; password: string }): Promise<Controller.Response<string>> {
+    if (!WalletsController.service.validate({ id, password })) {
+      throw new Error(i18n.t('messages.wallet-incorrect-password'))
     }
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.wallet-incorrect-password'),
+      status: ResponseCode.Success,
+      result: JSON.stringify(WalletsController.service.get(id)),
     }
   }
 
-  public static getActive = () => {
+  @CatchControllerError
+  public static async getActive() {
     const activeWallet = WalletsController.service.getCurrent()
-    if (activeWallet) {
-      return {
-        status: ResponseCode.Success,
-        result: {
-          ...activeWallet,
-          addresses: {
-            receiving: activeWallet.addresses.receiving.map(addr => addr.address),
-            change: activeWallet.addresses.change.map(addr => addr.address),
-          },
-        },
-      }
+    if (!activeWallet) {
+      throw new Error(i18n.t('messages.no-active-wallet'))
     }
-
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.no-active-wallet'),
+      status: ResponseCode.Success,
+      result: {
+        ...activeWallet,
+        addresses: {
+          receiving: activeWallet.addresses.receiving.map(addr => addr.address),
+          change: activeWallet.addresses.change.map(addr => addr.address),
+        },
+      },
     }
   }
 
-  public static activate = (id: string) => {
-    const success = WalletsController.service.setCurrent(id)
-    if (success) {
-      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, WalletsController.getActive())
-      return {
-        status: ResponseCode.Success,
-        result: WalletsController.service.getCurrent(),
-      }
-    }
+  @CatchControllerError
+  public static async activate(id: string) {
+    WalletsController.service.setCurrent(id)
+    // TODO: use event listener on wallets service
+    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, await WalletsController.getActive())
     return {
-      status: ResponseCode.Fail,
-      msg: i18n.t('messages.failed-to-activate-wallet'),
+      status: ResponseCode.Success,
+      result: WalletsController.service.getCurrent(),
     }
     // TODO: verification
   }
 
-  public static sendCapacity = async (params: {
+  @CatchControllerError
+  public static async sendCapacity(params: {
     id: string
     items: {
       address: CKBComponents.Hash256
@@ -324,13 +253,8 @@ class WalletsController {
       unit: 'byte' | 'shannon'
     }[]
     password: string
-  }) => {
-    if (!params) {
-      return {
-        status: ResponseCode.Fail,
-        msg: 'Parameters not received',
-      }
-    }
+  }) {
+    if (!params) throw new Error(i18n.t('messages.parameters-of-sending-transactions-are-required'))
     try {
       const hash = await WalletsController.service.sendCapacity(params.items, params.password)
       return {

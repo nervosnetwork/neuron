@@ -33,6 +33,10 @@ export default {
         toggleDevTools: 'Toggle DevTools',
       },
     },
+    services: {
+      transactions: 'Transactions',
+      wallets: 'Wallets',
+    },
     messages: {
       'failed-to-load-networks': 'Failed to load networks',
       'Networks-will-be-reset': 'Networks will be reset',
@@ -46,7 +50,7 @@ export default {
       'current-key-has-no-data': 'Current Key has no data',
       'address-is-invalid': 'Address {{address}} is invalid',
       'codehash-is-not-loaded': 'codehash is not loaded',
-      'wallet-not-found': 'Wallet not found',
+      'wallet-is-not-found': 'Wallet {{id}} not found',
       'no-active-wallet': 'No active wallet',
       'wallet-incorrect-password': 'Incorrect password',
       'failed-to-create-mnemonic': 'Failed to create mnemonic',
@@ -61,8 +65,12 @@ export default {
       'cannot-delete-active-network-due-to-lack-of-default-one':
         'Cannot delete active network due to lack of default one',
       'active-network-is-not-set': 'Active network is not set',
-      'no-response-from-transaction-service': 'No response from transaction service',
       'transaction-is-not-found': 'Transaction {{hash}} is not found',
+      'service-not-responds': '{{service}} service not respond',
+      'name-is-required': 'Name is required',
+      'mnemonic-is-required': 'Mnemonic is required',
+      'keystore-is-required': '-eystore is required',
+      'parameters-of-sending-transactions-are-required': 'Parameters of sending transactions are required',
     },
   },
 }

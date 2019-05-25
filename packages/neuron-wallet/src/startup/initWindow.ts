@@ -5,11 +5,9 @@ import { Channel } from '../utils/const'
 const { WalletsController, NetworksController } = controllers
 
 const initWindow = async (win: BrowserWindow) => {
-  const wallet = WalletsController.getActive() as any
-  const wallets = WalletsController.getAll() as any
   const initState = {
-    activeWallet: wallet.status ? wallet.result : null,
-    wallets: wallets.status ? wallets.result : [],
+    activeWallet: await WalletsController.service.getCurrent(),
+    wallets: await WalletsController.service.getAll(),
     activeNetworkId: await NetworksController.service.activeId(),
     networks: await NetworksController.service.getAll(),
     locale: app.getLocale(),
