@@ -1,8 +1,7 @@
 import { BrowserWindow } from 'electron'
 
 import Listeners from './listeners'
-import { ResponseCode } from '../controllers'
-import { Channel } from '../utils/const'
+import { Channel, ResponseCode } from '../utils/const'
 
 export default class WalletChannel extends Listeners {
   public win: BrowserWindow

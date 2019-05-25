@@ -1,4 +1,3 @@
-import { ResponseCode } from '.'
 import { Transaction } from '../appTypes/types'
 import TransactionsService, {
   TransactionsByAddressesParam,
@@ -6,6 +5,7 @@ import TransactionsService, {
   TransactionsByLockHashesParam,
 } from '../services/transactions'
 import { CatchControllerError } from '../decorators'
+import { ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 /**

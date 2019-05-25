@@ -12,6 +12,12 @@ export enum Channel {
   Helpers = 'helpers',
 }
 
+export enum ResponseCode {
+  Fail,
+  Success,
+}
+
 export default {
   Channel,
+  ResponseCode,
 }

@@ -5,9 +5,8 @@ import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
 import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
-import i18n from '../utils/i18n'
-import { verifyPasswordComplexity } from '../utils/validators'
 import { Keychain } from './hd'
+import { Validate, Required, Password } from '../decorators'
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -49,22 +48,17 @@ export default class Key {
     return bip39.generateMnemonic()
   }
 
-  static fromKeystore(
-    keystore: string,
-    password: string,
+  @Validate
+  static async fromKeystore(
+    @Required keystore: string,
+    @Password password: string,
     receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
-    if (!password) throw new Error(i18n.t('messages.password-is-required'))
-    verifyPasswordComplexity(password)
-
-    if (!keystore) throw new Error(i18n.t('messages.keystore-is-required'))
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
     key.keystore = keystoreObject
-    if (password === undefined) {
-      throw new Error('No password given.')
-    } else if (!key.checkPassword(password)) {
+    if (!key.checkPassword(password)) {
       throw new Error('Password error.')
     }
     const { kdfparams } = keystoreObject.crypto
@@ -98,16 +92,13 @@ export default class Key {
     return key
   }
 
+  @Validate
   public static async fromMnemonic(
-    mnemonic: string,
-    password: string,
+    @Required mnemonic: string,
+    @Password password: string,
     receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
-    if (!password) throw new Error(i18n.t('messages.password-is-required'))
-    verifyPasswordComplexity(password)
-
-    if (!mnemonic) throw new Error(i18n.t('messages.mnemonic-is-required'))
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new Error('Wrong Mnemonic')
     }

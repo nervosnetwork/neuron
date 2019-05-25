@@ -1,12 +1,12 @@
-import { ResponseCode } from '../controllers'
+import { ResponseCode } from '../utils/const'
 
-export const CatchControllerError = (_target: any, _name: string, descripor: PropertyDescriptor) => {
-  const originalMethod = descripor.value
+export const CatchControllerError = (_target: any, _name: string, descriptor: PropertyDescriptor) => {
+  const originalMethod = descriptor.value
   return {
-    ...descripor,
+    ...descriptor,
     async value(...args: any[]) {
       try {
-        return originalMethod(...args)
+        return await originalMethod(...args)
       } catch (err) {
         return {
           status: ResponseCode.Fail,

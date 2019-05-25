@@ -1,6 +1,6 @@
-import { ResponseCode } from '.'
 import NetworksService, { NetworkType, NetworkID, Network } from '../services/networks'
 import { CatchControllerError } from '../decorators'
+import { ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 export enum NetworksMethod {
