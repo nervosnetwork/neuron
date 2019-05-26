@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron'
-import controllers, { ResponseCode } from '../controllers'
-import { Channel } from '../utils/const'
+import controllers from '../controllers'
+import { Channel, ResponseCode } from '../utils/const'
 
 const { WalletsController, NetworksController } = controllers
 

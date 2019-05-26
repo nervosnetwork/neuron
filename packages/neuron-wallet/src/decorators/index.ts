@@ -1,7 +1,10 @@
-import errorsDecorators from './errors'
+import errorDecorators from './errors'
+import validatorDecorators from './validators'
 
-export const { CatchControllerError } = errorsDecorators
+export const { CatchControllerError } = errorDecorators
+export const { Validate, Password, Required } = validatorDecorators
 
 export default {
-  ...errorsDecorators,
+  ...errorDecorators,
+  ...validatorDecorators,
 }

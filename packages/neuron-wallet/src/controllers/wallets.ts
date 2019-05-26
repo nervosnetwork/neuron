@@ -1,11 +1,9 @@
 import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
-import { ResponseCode } from './index'
-import windowManage from '../utils/windowManage'
-import { Channel } from '../utils/const'
 import Key from '../keys/key'
 import { CatchControllerError } from '../decorators'
+import windowManage from '../utils/windowManage'
+import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
-import { verifyPasswordComplexity } from '../utils/validators'
 
 export enum WalletsMethod {
   GetAll = 'getAll',
@@ -132,7 +130,7 @@ class WalletsController {
     receivingAddressNumber: number
     changeAddressNumber: number
   }): Promise<Controller.Response<Wallet>> {
-    const key = Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
+    const key = await Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
     const wallet = WalletsController.service.create({
       name,
       keystore: key.keystore || null,
@@ -170,8 +168,7 @@ class WalletsController {
 
     if (newPassword) {
       if (WalletsController.service.validate({ id, password })) {
-        verifyPasswordComplexity(password)
-        const key = Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
+        const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
         props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
       } else {
         throw new Error(i18n.t('messages.wallet-incorrect-password'))

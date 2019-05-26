@@ -15,7 +15,7 @@ describe('Key tests', () => {
   })
 
   it('import key from keystore', async () => {
-    const key = Key.fromKeystore(keystoreJson, '1qaz.2wsx', 20, 10)
+    const key = await Key.fromKeystore(keystoreJson, '1qaz.2wsx', 20, 10)
     expect(privateKey).toBe(key.keysData!.privateKey)
     expect(key.addresses!.receiving.length).toEqual(20)
     expect(key.addresses!.change.length).toEqual(10)

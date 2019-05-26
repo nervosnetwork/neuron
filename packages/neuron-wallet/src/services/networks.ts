@@ -5,9 +5,8 @@ import Store from '../utils/store'
 import env from '../env'
 
 import windowManage from '../utils/windowManage'
-import { ResponseCode } from '../controllers'
 import { NetworksMethod } from '../controllers/networks'
-import { Channel } from '../utils/const'
+import { Channel, ResponseCode } from '../utils/const'
 import nodeService from '../startup/nodeService'
 
 export type NetworkID = string

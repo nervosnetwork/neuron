@@ -3,11 +3,6 @@ import WalletsController, { WalletsMethod } from './wallets'
 import TransactionsController from './transactions'
 import HelpersController, { HelpersMethod } from './helpers'
 
-export enum ResponseCode {
-  Fail,
-  Success,
-}
-
 export const methods = {
   NetworksMethod,
   WalletsMethod,
@@ -19,5 +14,4 @@ export default {
   WalletsController,
   TransactionsController,
   HelpersController,
-  ResponseCode,
 }
