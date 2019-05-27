@@ -3,7 +3,7 @@ import { History } from 'history'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 import i18n from 'utils/i18n'
 import { Routes } from 'utils/const'
-import { Wallet } from 'contexts/NeuronWallet/wallet'
+import { PlainWallet } from 'contexts/NeuronWallet/wallet'
 
 interface MenuItemParams {
   id: string
@@ -84,7 +84,7 @@ export const useMenuItems = (
     [deleteWallet.id, dispatch, history, toggleDialog],
   )
 }
-export const useWalletToDelete = (deleteId: string, wallets: Wallet[]) =>
+export const useWalletToDelete = (deleteId: string, wallets: PlainWallet[]) =>
   useMemo(() => wallets.find(w => w.id === deleteId), [deleteId, wallets])
 
 export const useHandleConfirm = (

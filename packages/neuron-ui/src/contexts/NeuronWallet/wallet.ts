@@ -1,6 +1,8 @@
-export interface Wallet {
+export interface PlainWallet {
   name: string
   id: string
+}
+export interface Wallet extends PlainWallet {
   balance: number
   addresses: Addresses
   publicKey: Uint8Array
