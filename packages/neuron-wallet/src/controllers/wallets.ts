@@ -27,7 +27,7 @@ class WalletsController {
   static service = new WalletsService()
 
   @CatchControllerError
-  public static async getAll(): Promise<Controller.Response<Wallet[]>> {
+  public static async getAll() {
     const wallets = WalletsController.service.getAll()
     if (!wallets) throw new Error(i18n.t('wallets-service-not-responds', { services: i18n.t('services.wallets') }))
     return {

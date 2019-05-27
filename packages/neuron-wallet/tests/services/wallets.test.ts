@@ -177,8 +177,8 @@ describe('wallet service', () => {
   })
 
   it('wallet not exist', () => {
-    const wallet = walletService.get('1111111111')
-    expect(wallet).toBeUndefined()
+    const id = '1111111111'
+    expect(() => walletService.get(id)).toThrowError()
   })
 
   it('get all wallets', () => {
@@ -239,8 +239,7 @@ describe('wallet service', () => {
     walletService.create(wallet2)
     expect(walletService.getAll().length).toBe(2)
     walletService.delete(w1.id)
-    const wallet = walletService.get(w1.id)
-    expect(wallet).toBeUndefined()
+    expect(() => walletService.get(w1.id)).toThrowError()
   })
 
   it('get and set active wallet', () => {
