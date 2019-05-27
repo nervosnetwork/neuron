@@ -1,23 +1,8 @@
-import WalletsService, { Wallet, WalletProperties } from '../services/wallets'
-import Key from '../keys/key'
-import { CatchControllerError } from '../decorators'
-import windowManage from '../utils/windowManage'
-import { Channel, ResponseCode } from '../utils/const'
-import i18n from '../utils/i18n'
-
-export enum WalletsMethod {
-  GetAll = 'getAll',
-  Get = 'get',
-  GenerateMnemonic = 'generateMnemonic',
-  ImportMnemonic = 'importMnemonic',
-  ImportKeystore = 'importKeystore',
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
-  GetActive = 'getActive',
-  Activate = 'activate',
-  SendCapacity = 'sendCapacity',
-}
+import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
+import Key from '../../keys/key'
+import { CatchControllerError } from '../../decorators'
+import { ResponseCode } from '../../utils/const'
+import i18n from '../../utils/i18n'
 
 /**
  * @class WalletsController
@@ -71,9 +56,8 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<Controller.Response<Wallet>> {
+  }): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'addresses'>>> {
     const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
-    const currentWallet = WalletsController.service.getCurrent()
     const wallet = WalletsController.service.create({
       name,
       keystore: key.keystore || null,
@@ -82,14 +66,13 @@ class WalletsController {
         change: [],
       },
     })
-    // TODO: use event listener on wallets service
-    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
-    if (!currentWallet && WalletsController.service.getAll().length === 1) {
-      windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, await WalletsController.getActive())
-    }
     return {
       status: ResponseCode.Success,
-      result: wallet,
+      result: {
+        id: wallet.id,
+        name: wallet.name,
+        addresses: wallet.addresses,
+      },
     }
   }
 
@@ -106,7 +89,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<Controller.Response<Wallet>> {
+  }): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'addresses'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
@@ -136,8 +119,6 @@ class WalletsController {
       keystore: key.keystore || null,
       addresses: key.addresses || { receiving: [], change: [] },
     })
-    // TODO: use event listener on wallets service
-    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
     return {
       status: ResponseCode.Success,
       result: wallet,
@@ -176,8 +157,6 @@ class WalletsController {
     }
 
     WalletsController.service.update(id, props)
-    // TODO: use event listener on wallets service
-    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, await WalletsController.getAll())
     return {
       status: ResponseCode.Success,
       result: WalletsController.service.get(id),
@@ -232,11 +211,11 @@ class WalletsController {
   @CatchControllerError
   public static async activate(id: string) {
     WalletsController.service.setCurrent(id)
-    // TODO: use event listener on wallets service
-    windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, await WalletsController.getActive())
+    const currentWallet = WalletsController.service.getCurrent()
+    if (!currentWallet) throw new Error('messages.current-wallet-is-not-found')
     return {
       status: ResponseCode.Success,
-      result: WalletsController.service.getCurrent(),
+      result: currentWallet.toJSON(),
     }
     // TODO: verification
   }

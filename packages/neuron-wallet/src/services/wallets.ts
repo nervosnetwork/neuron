@@ -1,4 +1,6 @@
 import { v4 as uuid } from 'uuid'
+import { fromEvent } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
@@ -8,12 +10,16 @@ import fileService from '../startup/fileService'
 import LockUtils from '../utils/lockUtils'
 import env from '../env'
 import i18n from '../utils/i18n'
+import windowManage from '../utils/windowManage'
+import WalletsMethod from '../controllers/wallets/methods'
+import { Channel, ResponseCode } from '../utils/const'
 
 const { core } = nodeService
 
 const hrp = `01${Buffer.from('P2PH').toString('hex')}`
 
 const MODULE_NAME = 'wallets'
+const DEBOUNCE_TIME = 50
 
 export interface Wallet {
   id: string
@@ -94,13 +100,56 @@ export default class WalletService {
 
   constructor() {
     this.listStore = new Store(MODULE_NAME, 'wallets.json')
+
+    fromEvent<[any, Pick<Wallet, 'id' | 'name' | 'addresses'>[]]>(this.listStore, this.walletsKey)
+      .pipe(debounceTime(DEBOUNCE_TIME))
+      .subscribe(([, wallets]) => {
+        const result = wallets.map(({ id, name }) => ({ id, name }))
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, {
+          status: ResponseCode.Success,
+          result,
+        })
+        const wallet = this.getCurrent()
+        if (wallet) {
+          const currentWallet = wallet.toJSON()
+          windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, {
+            status: ResponseCode.Success,
+            result: {
+              id: currentWallet.id,
+              name: currentWallet.name,
+              addresses: {
+                receiving: currentWallet.addresses.receiving.map(addr => addr.address),
+                change: currentWallet.addresses.change.map(addr => addr.address),
+              },
+            },
+          })
+        }
+      })
+
+    fromEvent(this.listStore, this.currentWalletKey)
+      .pipe(debounceTime(DEBOUNCE_TIME))
+      .subscribe(([, newId]) => {
+        if (newId === undefined) return
+        const currentWallet = this.get(newId).toJSON()
+        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, {
+          status: ResponseCode.Success,
+          result: {
+            id: currentWallet.id,
+            name: currentWallet.name,
+            addresses: {
+              receiving: currentWallet.addresses.receiving.map(addr => addr.address),
+              change: currentWallet.addresses.change.map(addr => addr.address),
+            },
+          },
+        })
+      })
   }
 
   public getAll = (): Pick<Wallet, Exclude<keyof Wallet, 'loadKeystore'>>[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
 
-  public get = (id: string): Wallet => {
+  public get = (id: string) => {
     if (id === undefined) throw new Error(i18n.t('is-required', { field: 'id' }))
 
     const wallet = this.getAll().find(w => w.id === id)
@@ -109,7 +158,7 @@ export default class WalletService {
     return FileKeystoreWallet.fromJSON(wallet)
   }
 
-  public create = (props: WalletProperties): Wallet => {
+  public create = (props: WalletProperties) => {
     if (!props) throw new Error(i18n.t('is-required', { field: 'wallet property' }))
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
@@ -181,7 +230,7 @@ export default class WalletService {
     this.listStore.writeSync(this.currentWalletKey, id)
   }
 
-  public getCurrent = (): Wallet | undefined => {
+  public getCurrent = () => {
     const walletId = this.listStore.readSync(this.currentWalletKey) as string
     if (walletId) {
       return this.get(walletId)
