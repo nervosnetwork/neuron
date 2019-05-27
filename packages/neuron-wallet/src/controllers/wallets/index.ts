@@ -12,12 +12,12 @@ class WalletsController {
   static service = new WalletsService()
 
   @CatchControllerError
-  public static async getAll() {
+  public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
     const wallets = WalletsController.service.getAll()
     if (!wallets) throw new Error(i18n.t('wallets-service-not-responds', { services: i18n.t('services.wallets') }))
     return {
       status: ResponseCode.Success,
-      result: wallets,
+      result: wallets.map(({ name, id }) => ({ name, id })),
     }
   }
 
