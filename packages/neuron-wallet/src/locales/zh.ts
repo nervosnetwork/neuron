@@ -69,6 +69,7 @@ export default {
       'mnemonic-is-required': '缺少助记词',
       'keystore-is-required': '缺少 Keystore',
       'parameters-of-sending-transactions-are-required': '缺少交易参数',
+      'is-required': '缺少 {{field}}',
     },
   },
 }
