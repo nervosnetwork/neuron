@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import { remote } from 'electron'
 import { Subject, BehaviorSubject } from 'rxjs'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader } from '../appTypes/types'
@@ -6,14 +7,17 @@ import TransactionsService from './transactions'
 import OutputEntity from '../entities/Output'
 import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
-import { networkSwitchSubject } from './networks'
 import LockUtils from '../utils/lockUtils'
 import TypeConvert from '../appTypes/typeConvert'
+
+const { app }: { app: any } = remote
+const { syncTask } = app
+const { networkSwitchSubject } = syncTask
 
 // FIXME: now have some problem with core, should update every time network switched
 // const { core } = nodeService
 let core: Core
-networkSwitchSubject.subscribe(network => {
+networkSwitchSubject.subscribe((network: any) => {
   if (network) {
     core = new Core(network.remote)
   }

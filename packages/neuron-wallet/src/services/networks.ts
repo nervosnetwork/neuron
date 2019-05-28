@@ -5,9 +5,20 @@ import Store from '../utils/store'
 import env from '../env'
 
 import windowManage from '../utils/windowManage'
-import { NetworksMethod } from '../controllers/networks'
 import { Channel, ResponseCode } from '../utils/const'
 import nodeService from '../startup/nodeService'
+
+export enum NetworksMethod {
+  GetAll = 'getAll',
+  Get = 'get',
+  Create = 'create',
+  Update = 'update',
+  Delete = 'delete',
+  Activate = 'activate',
+  ActiveId = 'activeId',
+  Clear = 'clear',
+  Status = 'status',
+}
 
 export type NetworkID = string
 export type NetworkName = string

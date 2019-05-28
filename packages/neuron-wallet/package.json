@@ -14,8 +14,9 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "start:dev": "tsc && electron .",
-    "build": "tsc",
+    "start:dev": "tsc && yarn run html:copy && electron .",
+    "build": "tsc && yarn run html:copy",
+    "html:copy": "cp ./src/startup/loopTask/index.html ./dist/startup/loopTask/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",

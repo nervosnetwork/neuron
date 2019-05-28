@@ -3,17 +3,7 @@ import { CatchControllerError } from '../decorators'
 import { ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
-export enum NetworksMethod {
-  GetAll = 'getAll',
-  Get = 'get',
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
-  Activate = 'activate',
-  ActiveId = 'activeId',
-  Clear = 'clear',
-  Status = 'status',
-}
+export { NetworksMethod } from '../services/networks'
 
 /**
  * @class NetworksController
