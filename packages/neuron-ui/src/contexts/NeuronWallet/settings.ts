@@ -1,9 +1,9 @@
 import { Network } from './chain'
-import { Wallet } from './wallet'
+import { WalletIdentity } from './wallet'
 
 export interface Settings {
   networks: Network[]
-  wallets: Wallet[]
+  wallets: WalletIdentity[]
 }
 
 export const settingsState: Settings = {
