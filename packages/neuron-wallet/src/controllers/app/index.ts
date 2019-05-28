@@ -1,11 +1,14 @@
-import { app, dialog, shell } from 'electron'
+import { app, dialog, shell, Menu, MessageBoxOptions } from 'electron'
 import { Channel, ResponseCode } from '../../utils/const'
 import windowManage from '../../utils/windowManage'
-import { URL } from './options'
+import { URL, contextMenuTemplate } from './options'
 
 class AppController {
-  public static showMessageBox(options: any) {
-    dialog.showMessageBox(options)
+  public static showMessageBox(
+    options: MessageBoxOptions,
+    callback: (response: number, checkboxChecked: boolean) => void = () => {},
+  ) {
+    dialog.showMessageBox(options, callback)
   }
 
   public static navTo(path: string) {
@@ -24,6 +27,24 @@ class AppController {
 
   public static openExternal(url: string) {
     shell.openExternal(url)
+  }
+
+  public static async contextMenu(params: { type: string; id: string }) {
+    if (!params || params.id === undefined) return
+    const { id, type } = params
+    switch (type) {
+      case 'networkList':
+      case 'walletList':
+      case 'addressList':
+      case 'transactionList': {
+        const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
+        menu.popup()
+        break
+      }
+      default: {
+        break
+      }
+    }
   }
 
   public static showAbout() {

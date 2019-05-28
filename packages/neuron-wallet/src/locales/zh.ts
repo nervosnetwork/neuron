@@ -71,5 +71,30 @@ export default {
       'parameters-of-sending-transactions-are-required': '缺少交易参数',
       'is-required': '缺少 {{field}}',
     },
+    contextMenu: {
+      select: '选择',
+      backup: ' 备份',
+      edit: '编辑',
+      delete: '删除',
+      'copy-address': '复制地址',
+      'request-payment': '请求支付',
+      'spend-from': '支付来源',
+      'view-on-explorer': '在浏览器中查看',
+    },
+    messageBox: {
+      button: {
+        confirm: '确定',
+        discard: '放弃',
+      },
+      'remove-network': {
+        title: '删除网络',
+        message: '网络名称: {{name}}, 地址: {{address}} 的网络设置将被删除.',
+        alert: '这是当前连接网络, 删除后会连接到默认网络',
+      },
+      'remove-wallet': {
+        title: '删除钱包',
+        password: '密码',
+      },
+    },
   },
 }

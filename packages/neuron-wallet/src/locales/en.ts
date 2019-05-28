@@ -73,5 +73,30 @@ export default {
       'parameters-of-sending-transactions-are-required': 'Parameters of sending transactions are required',
       'is-required': '{{field}} is required',
     },
+    contextMenu: {
+      select: 'Select',
+      backup: 'Backup',
+      edit: 'Edit',
+      delete: 'Delete',
+      'copy-address': 'Copy address',
+      'request-payment': 'Request Payment',
+      'spend-from': 'Spend From',
+      'view-on-explorer': 'View On Explorer',
+    },
+    messageBox: {
+      button: {
+        confirm: 'OK',
+        discard: 'Cancel',
+      },
+      'remove-network': {
+        title: 'Remove Network',
+        message: 'Network of name: {{name}}, address: {{address}} will be removed.',
+        alert: 'This is the current network, by removing it, the connection will be switched to the default network',
+      },
+      'remove-wallet': {
+        title: 'Delete the wallet',
+        password: 'Password',
+      },
+    },
   },
 }

@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { History } from 'history'
 import { actionCreators, MainActions } from 'containers/MainContent/reducer'
 import { ProviderActions } from 'containers/Providers/reducer'
 import { queryParsers } from 'utils/parser'
-import { Routes } from 'utils/const'
-import { MenuItemParams } from '.'
 
 export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
   useEffect(() => {
@@ -22,25 +20,6 @@ export const useSearch = (search: string, dispatch: React.Dispatch<any>, provide
       })
     }
   }, [search, dispatch, providerDispatch])
-}
-
-export const useMenuItems = (t: Function, history: History, EXPLORER: string) => {
-  return useMemo(() => {
-    return [
-      {
-        label: t('history.detail'),
-        click: (params: MenuItemParams) => {
-          history.push(`${Routes.Transaction}/${params.hash}`)
-        },
-      },
-      {
-        label: t('history.explorer'),
-        click: () => {
-          window.open(EXPLORER)
-        },
-      },
-    ]
-  }, [t, history, EXPLORER])
 }
 
 export const useOnChangePage = (search: string, pathname: string, history: History, queryFormatter: Function) => {
@@ -69,7 +48,6 @@ export const useOnAddressRemove = (search: string, pathname: string, history: Hi
 
 export default {
   useSearch,
-  useMenuItems,
   useOnChangePage,
   useOnAddressRemove,
 }

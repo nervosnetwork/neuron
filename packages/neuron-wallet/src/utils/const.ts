@@ -5,6 +5,7 @@ export enum Channel {
   Initiate = 'initiate',
   SetLanguage = 'setLanguage',
   NavTo = 'navTo',
+  App = 'app',
   Terminal = 'terminal',
   Networks = 'networks',
   Wallets = 'wallets',

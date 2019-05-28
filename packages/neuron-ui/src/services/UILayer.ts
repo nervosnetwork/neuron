@@ -12,6 +12,10 @@ declare global {
   }
 }
 
+export enum AppMethod {
+  ContextMenu = 'contextMenu',
+}
+
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -84,6 +88,14 @@ const UILayer = (() => {
     addEventListener: (event: string, cb: EventListenerOrEventListenerObject) => window.addEventListener(event, cb),
   }
 })()
+
+export const app = (method: AppMethod, ...params: any) => {
+  UILayer.send(Channel.App, method, ...params)
+}
+
+export const appCalls = instantiateMethodCall(app) as {
+  contextMenu: ({ type, id }: { type: string; id: string }) => Promise<void>
+}
 
 export const networks = (method: NetworksMethod, ...params: any[]) => {
   UILayer.send(Channel.Networks, method, ...params)

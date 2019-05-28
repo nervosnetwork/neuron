@@ -50,14 +50,6 @@
     "transaction": {
       "goBack": "返回"
     },
-    "addresses": {
-      "actions": {
-        "copy-address": "复制地址",
-        "request-payment": "请求支付",
-        "spend-from": "支付来源",
-        "view-on-explorer": "在浏览器中查看"
-      }
-    },
     "settings": {
       "setting-tabs": {
         "general": "通用",
