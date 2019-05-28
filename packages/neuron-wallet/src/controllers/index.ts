@@ -1,3 +1,4 @@
+import AppController from './app'
 import NetworksController, { NetworksMethod } from './networks'
 import WalletsController from './wallets'
 import TransactionsController from './transactions'
@@ -12,6 +13,7 @@ export const methods = {
 }
 
 export default {
+  AppController,
   NetworksController,
   WalletsController,
   TransactionsController,

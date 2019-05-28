@@ -1,8 +1,7 @@
-import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from 'electron'
+import { app, Menu, MenuItemConstructorOptions } from 'electron'
 import env from '../env'
 import dispatch, { Command } from '../commands/dispatcher'
 import i18n from './i18n'
-import WalletChannel from '../channel/wallet'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -26,10 +25,8 @@ const getMenuTemplate = () => {
         {
           label: i18n.t('mainmenu.neuron.preferences'),
           accelerator: 'CmdOrCtrl+,',
-          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-            dispatch(Command.ShowPreferences, {
-              channel: new WalletChannel(browserWindow),
-            })
+          click: () => {
+            dispatch(Command.ShowPreferences)
           },
         },
         separator,
@@ -119,10 +116,8 @@ const getMenuTemplate = () => {
         {
           label: i18n.t('mainmenu.develop.terminal'),
           accelerator: 'Cmd+Shift+t',
-          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-            dispatch(Command.ShowTerminal, {
-              channel: new WalletChannel(browserWindow),
-            })
+          click: () => {
+            dispatch(Command.ShowTerminal)
           },
         },
       ],
