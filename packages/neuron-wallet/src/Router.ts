@@ -1,13 +1,13 @@
 import { ipcMain } from 'electron'
-import { Channel } from '../utils/const'
-import controllers from '../controllers'
+import { Channel } from './utils/const'
+import controllers from './controllers'
 
 const { NetworksController, TransactionsController, WalletsController, HelpersController } = controllers
 
-export default class Listeners {
+export default class Router {
   static start = (methods: string[] = ['networks', 'wallets', 'transactions', 'helpers']) => {
     methods.forEach(method => {
-      const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
+      const descriptor = Object.getOwnPropertyDescriptor(Router, method)
       if (descriptor) {
         descriptor.value()
       }
@@ -68,5 +68,9 @@ export default class Listeners {
         e.sender.send(Channel.Helpers, method, await (HelpersController[method] as Function)(...params))
       },
     )
+  }
+
+  constructor() {
+    Router.start()
   }
 }

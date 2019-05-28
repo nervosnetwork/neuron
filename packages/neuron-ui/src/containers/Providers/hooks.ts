@@ -38,8 +38,8 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       },
     )
 
-    UILayer.on(Channel.NavTo, (_e: Event, args: ChannelResponse<{ router: string }>) => {
-      history.push(args.result.router)
+    UILayer.on(Channel.NavTo, (_e: Event, _method: '', args: ChannelResponse<string>) => {
+      history.push(args.result)
     })
 
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {

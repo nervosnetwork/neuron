@@ -1,9 +1,8 @@
 import { app, dialog, shell, BrowserWindow } from 'electron'
 import Command from './commands'
-import WalletChannel from '../channel/wallet'
+import AppController from '../controllers/app'
 
 export interface CommandInfo {
-  channel: WalletChannel
   window?: BrowserWindow
   extra?: { [index: string]: any }
 }
@@ -39,22 +38,16 @@ const externalUrlHandler: Handler = command => {
 const rendererMessageHandler: Handler = (command, info) => {
   switch (command) {
     case Command.ShowPreferences: {
-      if (info) {
-        info.channel.navTo('/settings/general')
-      }
+      AppController.navTo('/settings/general')
       break
     }
     case Command.ShowTerminal: {
-      if (info) {
-        info.channel.navTo('/terminal')
-      }
+      AppController.navTo('/terminal')
 
       break
     }
     case Command.SetUILocale: {
-      if (info) {
-        info.channel.setUILocale(info!.extra!.locale)
-      }
+      AppController.setUILocale(info!.extra!.locale)
       break
     }
     default:

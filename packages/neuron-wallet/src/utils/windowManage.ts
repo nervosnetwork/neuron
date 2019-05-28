@@ -9,6 +9,13 @@ class WindowManage {
       }
     })
   }
+
+  public static sendToFocusedWindow = (channel: Channel, method: string, params: any) => {
+    const window = BrowserWindow.getFocusedWindow()
+    if (window) {
+      window.webContents.send(channel, method, params)
+    }
+  }
 }
 
 export default WindowManage
