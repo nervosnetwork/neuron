@@ -56,7 +56,7 @@ export default {
       'failed-to-create-mnemonic': 'Failed to create mnemonic',
       'failed-to-activate-wallet': 'Failed to activate wallet',
       'failed-to-delete-wallet': 'Failed to delete wallet',
-      'wallet-name-existed': 'Wallet name {{name}} existed',
+      'wallet-name-existed': 'A wallet with name {{name}} already exists',
       'network-of-id-is-not-found': 'Network of id {{id}} is not found',
       'id-is-required': 'ID is required',
       'name-and-remote-address-are-required': 'Name and remote address are required',
