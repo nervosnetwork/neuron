@@ -9,6 +9,7 @@ import SyncInfoEntity from '../entities/SyncInfo'
 import nodeService from '../startup/nodeService'
 import LockUtils from '../utils/lockUtils'
 import TypeConvert from '../appTypes/typeConvert'
+import { NetworkWithID } from './networks'
 
 const { app }: { app: any } = remote
 const { syncTask } = app
@@ -17,7 +18,7 @@ const { networkSwitchSubject } = syncTask
 // FIXME: now have some problem with core, should update every time network switched
 // const { core } = nodeService
 let core: Core
-networkSwitchSubject.subscribe((network: any) => {
+networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
   if (network) {
     core = new Core(network.remote)
   }

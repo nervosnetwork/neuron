@@ -2,14 +2,13 @@ import { BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import { Subject } from 'rxjs'
 import path from 'path'
-// import run from './syncTask'
-import { networkSwitchSubject } from '../../services/networks'
+import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import app from '../../app'
 import nodeService from '../nodeService'
 import env from '../../env'
 import initConnection from '../../typeorm'
 
-networkSwitchSubject.subscribe(async (network: any) => {
+networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
     await initConnection(network.name)
   }
