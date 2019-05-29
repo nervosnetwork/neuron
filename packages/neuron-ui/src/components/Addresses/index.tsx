@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 import { Container } from 'react-bootstrap'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import Table from 'widgets/Table'
@@ -30,7 +29,7 @@ const AddressPanel = ({ address }: { address: string }) => {
   return <div onContextMenu={() => appCalls.contextMenu({ type: 'addressList', id: address })}>{address}</div>
 }
 
-const Addresses = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
+const Addresses = () => {
   const {
     wallet: {
       addresses: { receiving, change },
@@ -48,7 +47,7 @@ const Addresses = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
         transactions: '0',
         key: address,
       })),
-    [receiving, history],
+    [receiving],
   )
 
   const changeAddresses = useMemo(
@@ -60,7 +59,7 @@ const Addresses = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
         transactions: '0',
         key: address,
       })),
-    [change, history],
+    [change],
   )
 
   const count = useMemo(() => receiving.length + change.length, [receiving, change])
