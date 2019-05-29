@@ -7,6 +7,13 @@ import { networkSwitchSubject } from '../../services/networks'
 import app from '../../app'
 import nodeService from '../nodeService'
 import env from '../../env'
+import initConnection from '../../typeorm'
+
+networkSwitchSubject.subscribe(async (network: any) => {
+  if (network) {
+    await initConnection(network.name)
+  }
+})
 
 // TODO: mock as an address subject
 export const addressChangeSubject = new Subject()
