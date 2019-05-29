@@ -7,17 +7,17 @@ import { useTranslation } from 'react-i18next'
 import { Close as CloseIcon } from 'grommet-icons'
 import dayjs from 'dayjs'
 
-import ContextMenuZone from 'widgets/ContextMenuZone'
 import Pagination from 'widgets/Table/Pagination'
 
 import { ContentProps } from 'containers/MainContent'
 
+import { appCalls } from 'services/UILayer'
 import { Transaction } from 'contexts/NeuronWallet'
 import { useNeuronWallet } from 'utils/hooks'
-import { TransactionType, EXPLORER } from 'utils/const'
+import { TransactionType } from 'utils/const'
 import { queryFormatter } from 'utils/formatters'
 
-import { useSearch, useMenuItems, useOnChangePage, useOnAddressRemove } from './hooks'
+import { useSearch, useOnChangePage, useOnAddressRemove } from './hooks'
 
 enum TimeFormat {
   Day = 'YYYY-MM-DD',
@@ -77,7 +77,6 @@ const History = ({
 
   useSearch(search, dispatch, providerDispatch)
 
-  const menuItems = useMenuItems(t, history, EXPLORER)
   const onPageChange = useOnChangePage(search, pathname, history, queryFormatter)
   const onAddressRemove = useOnAddressRemove(search, pathname, history, queryFormatter)
 
@@ -95,39 +94,34 @@ const History = ({
       ) : (
         <div>No Transactions Found</div>
       )}
-      <ContextMenuZone menuItems={menuItems}>
-        {groupHistory(items).map(group => (
-          <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
-            <thead>
-              <tr>
-                <th colSpan={headers.length}>{dayjs(group[0].time).format(TimeFormat.Day)}</th>
+      {groupHistory(items).map(group => (
+        <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
+          <thead>
+            <tr>
+              <th colSpan={headers.length}>{dayjs(group[0].time).format(TimeFormat.Day)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {group.map(historyItem => (
+              <tr
+                key={historyItem.hash}
+                onContextMenu={() => appCalls.contextMenu({ type: 'transactionList', id: historyItem.hash })}
+              >
+                {headers.map(header =>
+                  header.key === headers[0].key ? (
+                    <MetaData key={headers[0].key}>
+                      {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
+                      {dayjs(historyItem.time).format(TimeFormat.Time)}
+                    </MetaData>
+                  ) : (
+                    <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
+                  ),
+                )}
               </tr>
-            </thead>
-            <tbody>
-              {group.map(historyItem => (
-                <tr key={historyItem.hash}>
-                  {headers.map(header =>
-                    header.key === headers[0].key ? (
-                      <MetaData key={headers[0].key}>
-                        <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                          {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
-                        </span>
-                        <span data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                          {dayjs(historyItem.time).format(TimeFormat.Time)}
-                        </span>
-                      </MetaData>
-                    ) : (
-                      <td key={header.key} data-menuitem={JSON.stringify({ hash: historyItem.hash })}>
-                        {historyItem[header.key as keyof Transaction]}
-                      </td>
-                    ),
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ))}
-      </ContextMenuZone>
+            ))}
+          </tbody>
+        </Table>
+      ))}
       {addresses.length > 0 ? (
         <Row>
           <Col>

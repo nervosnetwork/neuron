@@ -3,7 +3,6 @@ export const ADDRESS_LENGTH = 50
 export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 50
 export const PAGE_SIZE = 15
-export const EXPLORER = 'http://localhost:3000'
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
 
@@ -20,6 +19,7 @@ export enum Channel {
   Initiate = 'initiate',
   NavTo = 'navTo',
   Terminal = 'terminal',
+  App = 'app',
   Networks = 'networks',
   Transactions = 'transactions',
   Wallets = 'wallets',

@@ -1,8 +1,7 @@
-import { app, Menu, MenuItem, MenuItemConstructorOptions, BrowserWindow } from 'electron'
+import { app, Menu, MenuItemConstructorOptions } from 'electron'
 import env from '../env'
-import dispatch, { Command } from '../commands/dispatcher'
 import i18n from './i18n'
-import WalletChannel from '../channel/wallet'
+import AppController from '../controllers/app'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -18,19 +17,13 @@ const getMenuTemplate = () => {
             app: app.getName(),
           }),
           role: 'about',
-          click: () => {
-            dispatch(Command.ShowAbout)
-          },
+          click: AppController.showAbout,
         },
         separator,
         {
           label: i18n.t('mainmenu.neuron.preferences'),
           accelerator: 'CmdOrCtrl+,',
-          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-            dispatch(Command.ShowPreferences, {
-              channel: new WalletChannel(browserWindow),
-            })
-          },
+          click: AppController.showPreference,
         },
         separator,
         {
@@ -86,15 +79,11 @@ const getMenuTemplate = () => {
       submenu: [
         {
           label: 'Nervos',
-          click: () => {
-            dispatch(Command.OpenNervosWebsite)
-          },
+          click: AppController.openWebsite,
         },
         {
           label: i18n.t('mainmenu.help.sourceCode'),
-          click: () => {
-            dispatch(Command.OpenSourceCodeReposity)
-          },
+          click: AppController.openRepository,
         },
       ],
     },
@@ -119,11 +108,7 @@ const getMenuTemplate = () => {
         {
           label: i18n.t('mainmenu.develop.terminal'),
           accelerator: 'Cmd+Shift+t',
-          click: (_menuItem: MenuItem, browserWindow: BrowserWindow) => {
-            dispatch(Command.ShowTerminal, {
-              channel: new WalletChannel(browserWindow),
-            })
-          },
+          click: AppController.showTerminal,
         },
       ],
     } as MenuItemConstructorOptions)

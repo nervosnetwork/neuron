@@ -1,16 +1,27 @@
 import { ipcMain } from 'electron'
-import { Channel } from '../utils/const'
-import controllers from '../controllers'
+import { Channel } from './utils/const'
+import controllers from './controllers'
 
-const { NetworksController, TransactionsController, WalletsController, HelpersController } = controllers
+const { AppController, NetworksController, TransactionsController, WalletsController, HelpersController } = controllers
 
-export default class Listeners {
-  static start = (methods: string[] = ['networks', 'wallets', 'transactions', 'helpers']) => {
+export default class Router {
+  static start = (methods: string[] = ['app', 'networks', 'wallets', 'transactions', 'helpers']) => {
     methods.forEach(method => {
-      const descriptor = Object.getOwnPropertyDescriptor(Listeners, method)
+      const descriptor = Object.getOwnPropertyDescriptor(Router, method)
       if (descriptor) {
         descriptor.value()
       }
+    })
+  }
+
+  /**
+   * @method app
+   * @memberof ChannelListeners
+   * @description listen to Channel.App and invoke corresponding method of appController
+   */
+  public static app = () => {
+    return ipcMain.on(Channel.App, async (e: Electron.Event, method: keyof typeof AppController, ...params: any[]) => {
+      e.sender.send(Channel.App, method, await (AppController[method] as Function)(...params))
     })
   }
 
@@ -68,5 +79,9 @@ export default class Listeners {
         e.sender.send(Channel.Helpers, method, await (HelpersController[method] as Function)(...params))
       },
     )
+  }
+
+  constructor() {
+    Router.start()
   }
 }

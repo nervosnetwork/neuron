@@ -1,7 +1,10 @@
+import AppController from './app'
 import NetworksController, { NetworksMethod } from './networks'
-import WalletsController, { WalletsMethod } from './wallets'
+import WalletsController from './wallets'
 import TransactionsController from './transactions'
 import HelpersController, { HelpersMethod } from './helpers'
+
+import WalletsMethod from './wallets/methods'
 
 export const methods = {
   NetworksMethod,
@@ -10,6 +13,7 @@ export const methods = {
 }
 
 export default {
+  AppController,
   NetworksController,
   WalletsController,
   TransactionsController,
