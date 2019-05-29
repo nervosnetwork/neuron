@@ -25,6 +25,7 @@ interface ENV {
     active: 'testnet'
     list: NetworkWithID[]
   }
+  explorer: string
   testnet: boolean
 }
 const env: ENV = {
@@ -49,6 +50,7 @@ const env: ENV = {
       },
     ],
   },
+  explorer: 'https://explorer.nervos.org',
   testnet: true,
 }
 

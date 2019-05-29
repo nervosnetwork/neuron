@@ -55,13 +55,7 @@
       "type": "Type",
       "address": "Address",
       "balance": "Balance",
-      "transactions": "Transactions",
-      "actions": {
-        "copy-address": "Copy address",
-        "request-payment": "Request Payment",
-        "spend-from": "Spend From",
-        "view-on-explorer": "View On Explorer"
-      }
+      "transactions": "Transactions"
     },
     "settings": {
       "setting-tabs": {

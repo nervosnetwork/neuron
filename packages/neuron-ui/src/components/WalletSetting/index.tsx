@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import styled from 'styled-components'
 
+import { appCalls } from 'services/UILayer'
 import { Routes, MnemonicAction } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { useNeuronWallet } from 'utils/hooks'
@@ -13,9 +14,8 @@ import { actionCreators } from 'containers/MainContent/reducer'
 
 import Dialog from 'widgets/Dialog'
 import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
-import ContextMenuZone from 'widgets/ContextMenuZone'
 
-import { useToggleDialog, useDeleteWallet, useMenuItems, useWalletToDelete, useHandleConfirm } from './hooks'
+import { useToggleDialog, useDeleteWallet, useWalletToDelete, useHandleConfirm } from './hooks'
 
 const CheckBox = styled(Form.Check)`
   pointer-events: none;
@@ -35,7 +35,7 @@ const buttons = [
   },
 ]
 
-const Wallets = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+const Wallets = ({ dispatch, dialog }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     wallet: { id: activeId },
     settings: { wallets },
@@ -44,33 +44,33 @@ const Wallets = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentPro
   const deleteWallet = useDeleteWallet()
   const [t] = useTranslation()
   const toggleDialog = useToggleDialog(dispatch)
-  const menuItems = useMenuItems(deleteWallet, history, toggleDialog, dispatch)
   const handleConfirm = useHandleConfirm(deleteWallet, toggleDialog, dispatch)
   const walletToDelete = useWalletToDelete(deleteWallet.id.value, wallets)
 
   return (
     <>
-      <ContextMenuZone menuItems={menuItems}>
-        <ListGroupWithMaxHeight>
-          {wallets.map(wallet => {
-            const isChecked = wallet.id === activeId
-            return (
-              <ListGroup.Item key={wallet.id} data-menuitem={JSON.stringify({ id: wallet.id })}>
-                <CheckBox
-                  inline
-                  label={wallet.name}
-                  type="radio"
-                  checked={isChecked}
-                  disabled={isChecked}
-                  onChange={() => {
-                    dispatch(actionCreators.activateWallet(wallet.id))
-                  }}
-                />
-              </ListGroup.Item>
-            )
-          })}
-        </ListGroupWithMaxHeight>
-      </ContextMenuZone>
+      <ListGroupWithMaxHeight>
+        {wallets.map(wallet => {
+          const isChecked = wallet.id === activeId
+          return (
+            <ListGroup.Item
+              key={wallet.id}
+              onContextMenu={() => appCalls.contextMenu({ type: 'walletList', id: wallet.id })}
+            >
+              <CheckBox
+                inline
+                label={wallet.name}
+                type="radio"
+                checked={isChecked}
+                disabled={isChecked}
+                onChange={() => {
+                  dispatch(actionCreators.activateWallet(wallet.id))
+                }}
+              />
+            </ListGroup.Item>
+          )
+        })}
+      </ListGroupWithMaxHeight>
       <Container>
         <Row>
           {buttons.map(({ label, href }) => (

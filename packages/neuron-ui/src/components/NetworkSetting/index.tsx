@@ -1,19 +1,17 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { Form, ListGroup } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import { ContentProps } from 'containers/MainContent'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import { actionCreators } from 'containers/MainContent/reducer'
 
+import { appCalls } from 'services/UILayer'
 import { Routes } from 'utils/const'
 import { useNeuronWallet } from 'utils/hooks'
 
-import Dialog from 'widgets/Dialog'
 import ListGroupWithMaxHeight from 'widgets/ListGroupWithMaxHeight'
-import ContextMenuZone from 'widgets/ContextMenuZone'
-import RemoveNetworkDialog from './RemoveNetworkDialog'
 
 const CheckBox = styled(Form.Check)`
   pointer-events: none;
@@ -22,105 +20,40 @@ const CheckBox = styled(Form.Check)`
   }
 `
 
-interface MenuItemParams {
-  id: string
-}
-
-const Networks = ({ dispatch, dialog, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
+const Networks = ({ dispatch }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     chain,
     settings: { networks },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const menuItems = useMemo(
-    () => [
-      {
-        label: t('menuitem.select'),
-        isDisabled: ({ id }: MenuItemParams) => {
-          return id === chain.networkId
-        },
-        click: (params: MenuItemParams) => {
-          if (params && params.id) {
-            dispatch(actionCreators.setNetwork(params.id))
-          }
-        },
-      },
-      {
-        label: t('menuitem.edit'),
-        isDisabled: ({ id }: MenuItemParams) => {
-          return networks[0] && networks[0].id === id
-        },
-        click: (params: MenuItemParams) => {
-          if (params && params.id) {
-            history.push(`${Routes.NetworkEditor}/${params.id}`)
-          }
-        },
-      },
-      {
-        label: t('menuitem.delete'),
-        isDisabled: ({ id }: MenuItemParams) => {
-          return networks[0] && networks[0].id === id
-        },
-        click: (params: MenuItemParams) => {
-          if (params && params.id) {
-            dispatch({
-              type: MainActions.SetDialog,
-              payload: {
-                open: true,
-                id: params.id,
-              },
-            })
-          }
-        },
-      },
-    ],
-    [chain.networkId, dispatch, history, networks, t],
-  )
-
   return (
     <>
-      <ContextMenuZone menuItems={menuItems}>
-        <ListGroupWithMaxHeight>
-          {networks.map(network => {
-            const isChecked = chain.networkId === network.id
-            return (
-              <ListGroup.Item key={network.id} data-menuitem={JSON.stringify({ id: network.id })}>
-                <CheckBox
-                  inline
-                  label={network.name || network.remote}
-                  type="radio"
-                  checked={isChecked}
-                  disabled={isChecked}
-                  onChange={() => {
-                    dispatch(actionCreators.setNetwork(network.id!))
-                  }}
-                />
-              </ListGroup.Item>
-            )
-          })}
-        </ListGroupWithMaxHeight>
-      </ContextMenuZone>
+      <ListGroupWithMaxHeight>
+        {networks.map(network => {
+          const isChecked = chain.networkId === network.id
+          return (
+            <ListGroup.Item
+              key={network.id}
+              onContextMenu={() => appCalls.contextMenu({ type: 'networkList', id: network.id })}
+            >
+              <CheckBox
+                inline
+                label={network.name || network.remote}
+                type="radio"
+                checked={isChecked}
+                disabled={isChecked}
+                onChange={() => {
+                  dispatch(actionCreators.setNetwork(network.id!))
+                }}
+              />
+            </ListGroup.Item>
+          )
+        })}
+      </ListGroupWithMaxHeight>
       <Link to={`${Routes.NetworkEditor}/new`} className="btn btn-primary">
         {t('settings.network.add-network')}
       </Link>
-      <Dialog
-        open={dialog.open}
-        onClick={() =>
-          dispatch({
-            type: MainActions.SetDialog,
-            payload: {
-              open: false,
-            },
-          })
-        }
-      >
-        <RemoveNetworkDialog
-          isChecked={dialog.id === chain.networkId}
-          network={networks.find(n => n.id === dialog.id)}
-          dispatch={dispatch}
-        />
-      </Dialog>
     </>
   )
 }
