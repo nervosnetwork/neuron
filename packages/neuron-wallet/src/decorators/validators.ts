@@ -54,7 +54,7 @@ const Validate = (target: any, propertyKey: string, descriptor: PropertyDescript
       if (requiredIndices) {
         requiredIndices.forEach(idx => {
           if (idx >= args.length || args[idx] === undefined) {
-            throw new Error('Missing required argument')
+            throw new Error(i18n.t('messages.missing-required-argument'))
           }
         })
       }
@@ -63,7 +63,7 @@ const Validate = (target: any, propertyKey: string, descriptor: PropertyDescript
       if (passwordIndex !== undefined) {
         verifyPasswordComplexity(args[passwordIndex])
       }
-      return originalMethod(...args)
+      return originalMethod.apply(this, args)
     },
   }
 }
