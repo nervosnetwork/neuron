@@ -7,11 +7,11 @@ const { NODE_ENV } = process.env
 const isDevMode = !app.isPackaged
 
 const fileBase = (() => {
-  if (NODE_ENV === 'prod') {
-    return ''
-  }
   if (NODE_ENV === 'test') {
     return 'test/'
+  }
+  if (!isDevMode) {
+    return ''
   }
   return 'dev/'
 })()
