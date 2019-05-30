@@ -18,7 +18,6 @@ export enum NetworkType {
 export enum Channel {
   Initiate = 'initiate',
   NavTo = 'navTo',
-  Terminal = 'terminal',
   App = 'app',
   Networks = 'networks',
   Transactions = 'transactions',
@@ -41,7 +40,6 @@ export enum Routes {
   SettingsNetworks = '/settings/networks',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
-  Terminal = '/terminal',
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
   Prompt = '/prompt',

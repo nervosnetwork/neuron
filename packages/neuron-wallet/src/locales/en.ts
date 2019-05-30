@@ -26,7 +26,6 @@ export default {
         sourceCode: 'Source Code',
       },
       develop: {
-        terminal: 'Terminal',
         develop: 'Develop',
         forceReload: 'Force Reload',
         reload: 'Reload',

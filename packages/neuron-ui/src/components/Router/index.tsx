@@ -19,7 +19,6 @@ import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
 import NetworkEditor from 'components/NetworkEditor'
 import WalletEditor from 'components/WalletEditor'
-import Terminal from 'components/Terminal'
 import Prompt from 'components/Prompt'
 import LaunchScreen from 'components/LaunchScreen'
 
@@ -146,12 +145,6 @@ export const mainContents: CustomRoute[] = [
     path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
-  },
-  {
-    name: `Terminal`,
-    path: Routes.Terminal,
-    exact: true,
-    component: Terminal,
   },
   {
     name: `Prompt`,
