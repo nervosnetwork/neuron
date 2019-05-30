@@ -10,6 +10,7 @@ import nodeService from '../startup/nodeService'
 import LockUtils from '../utils/lockUtils'
 import TypeConvert from '../appTypes/typeConvert'
 import { NetworkWithID } from './networks'
+import AddressesUsedSubject from '../subjects/addressesUsedSubject'
 
 const { app }: { app: any } = remote
 const { syncBlockTask } = app
@@ -23,9 +24,6 @@ networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
     core = new Core(network.remote)
   }
 })
-
-// subscribe this Subject to monitor which addresses are used
-export const addressesUsedSubject = new Subject()
 
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "warn" */
@@ -46,11 +44,15 @@ export default class SyncBlocksService {
 
   private tipBlockNumber: number = -1
 
+  private addressesUsedSubject: Subject<string[]>
+
   constructor(
     lockHashes: string[],
     tipNumberSubject: BehaviorSubject<string | undefined> = nodeService.tipNumberSubject,
+    addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.subject,
   ) {
     this.lockHashList = lockHashes
+    this.addressesUsedSubject = addressesUsedSubject
     // listen for tipNumber changes
     tipNumberSubject.subscribe(async num => {
       if (num) {
@@ -291,7 +293,7 @@ export default class SyncBlocksService {
       const addresses: string[] = outputs.map(output => {
         return LockUtils.lockScriptToAddress(output.lock)
       })
-      addressesUsedSubject.next(addresses)
+      this.addressesUsedSubject.next(addresses)
     }
 
     if (outputs.length > 0 || anyInput) {
