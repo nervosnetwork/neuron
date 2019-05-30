@@ -12,8 +12,8 @@ import TypeConvert from '../appTypes/typeConvert'
 import { NetworkWithID } from './networks'
 
 const { app }: { app: any } = remote
-const { syncTask } = app
-const { networkSwitchSubject } = syncTask
+const { syncBlockTask } = app
+const { networkSwitchSubject } = syncBlockTask
 
 // FIXME: now have some problem with core, should update every time network switched
 // const { core } = nodeService

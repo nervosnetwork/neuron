@@ -16,7 +16,7 @@
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
     "build": "tsc && yarn run html:copy",
-    "html:copy": "ncp ./src/startup/loopTask/index.html ./dist/startup/loopTask/index.html",
+    "html:copy": "ncp ./src/startup/syncBlockTask/index.html ./dist/startup/syncBlockTask/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",

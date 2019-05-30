@@ -25,7 +25,7 @@ const syncTaskAttrs = {
   addressChangeSubject,
 }
 
-Object.defineProperty(app, 'syncTask', {
+Object.defineProperty(app, 'syncBlockTask', {
   get: () => {
     return syncTaskAttrs
   },
@@ -34,8 +34,8 @@ Object.defineProperty(app, 'syncTask', {
 /* eslint global-require: "off" */
 // create a background task to sync transactions
 // this task is a renderer process
-const createLoopTask = () => {
-  let loopWindow: BrowserWindow | null = new BrowserWindow({
+const createSyncBlockTask = () => {
+  let syncBlockBackgroundWindow: BrowserWindow | null = new BrowserWindow({
     width: 1366,
     height: 768,
     show: false,
@@ -44,21 +44,21 @@ const createLoopTask = () => {
     },
   })
 
-  loopWindow.loadURL(loadURL)
+  syncBlockBackgroundWindow.loadURL(loadURL)
 
-  loopWindow.on('ready-to-show', async () => {
+  syncBlockBackgroundWindow.on('ready-to-show', async () => {
     if (env.isDevMode && process.env.DEV_SYNC_TASK) {
-      loopWindow!.show()
+      syncBlockBackgroundWindow!.show()
     } else {
-      loopWindow!.hide()
+      syncBlockBackgroundWindow!.hide()
     }
   })
 
-  loopWindow.on('closed', () => {
-    loopWindow = null
+  syncBlockBackgroundWindow.on('closed', () => {
+    syncBlockBackgroundWindow = null
   })
 
-  return loopWindow
+  return syncBlockBackgroundWindow
 }
 
-export default createLoopTask
+export default createSyncBlockTask

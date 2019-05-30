@@ -7,8 +7,8 @@ import LockUtils from '../../utils/lockUtils'
 
 // read main process properties from `remote.app`
 const { app }: { app: any } = remote
-const { syncTask } = app
-const { networkSwitchSubject, nodeService, addressChangeSubject } = syncTask
+const { syncBlockTask } = app
+const { networkSwitchSubject, nodeService, addressChangeSubject } = syncBlockTask
 
 export const stopLoopSubject = new Subject()
 

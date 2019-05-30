@@ -3,7 +3,7 @@ import 'reflect-metadata'
 
 import initApp from './startup/initApp'
 import createWindow from './startup/createWindow'
-import createLoopTask from './startup/loopTask/create'
+import createSyncBlockTask from './startup/syncBlockTask/create'
 
 import i18n from './utils/i18n'
 import mainmenu from './utils/mainmenu'
@@ -26,7 +26,7 @@ const openWindow = () => {
 app.on('ready', () => {
   initApp()
   openWindow()
-  createLoopTask()
+  createSyncBlockTask()
 })
 
 app.on('activate', openWindow)
