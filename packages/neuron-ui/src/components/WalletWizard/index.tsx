@@ -7,6 +7,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import ScreenButtonRow from 'widgets/ScreenButtonRow'
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
+import { useNeuronWallet } from 'utils/hooks'
 import { helpersCall, walletsCall } from 'services/UILayer'
 
 export enum WalletWizardPath {
@@ -144,14 +145,24 @@ const Submission = ({
   state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
+  const {
+    settings: { wallets },
+  } = useNeuronWallet()
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
   const message = 'wizard.set-a-strong-password-to-protect-your-wallet'
 
   useEffect(() => {
+    const genName = (baseNum: number = 0): string => {
+      const walletName = `wallet ${baseNum}`
+      if (wallets.some(wallet => wallet.name === walletName)) {
+        return genName(baseNum + 1)
+      }
+      return walletName
+    }
     dispatch({
       type: 'name',
-      payload: `wallet @${Math.round(Math.random() * 100)}`,
+      payload: genName(wallets.length + 1),
     })
     dispatch({
       type: 'password',
@@ -161,7 +172,7 @@ const Submission = ({
       type: 'confirmPassword',
       payload: '',
     })
-  }, [dispatch])
+  }, [dispatch, wallets])
 
   const onChange = useCallback(
     (field: keyof WithWizardState) => {
