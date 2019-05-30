@@ -55,7 +55,7 @@ export default {
       'failed-to-create-mnemonic': '创建助记词失败',
       'failed-to-activate-wallet': '设置默认钱包失败',
       'failed-to-delete-wallet': '删除钱包失败',
-      'wallet-name-existed': '钱包名称重复',
+      'wallet-name-is-used': '钱包名称重复',
       'network-of-id-is-not-found': '未找到 Id 为 {{id}} 的网络设置',
       'id-is-required': '缺少参数 ID',
       'name-and-remote-address-are-required': '缺少名称或地址',
@@ -70,6 +70,9 @@ export default {
       'keystore-is-required': '缺少 Keystore',
       'parameters-of-sending-transactions-are-required': '缺少交易参数',
       'is-required': '缺少 {{field}}',
+      'invalid-format': '{{field}} 格式不正确',
+      'network-name-is-used': '网络名称已存在',
+      'missing-required-argument': '缺少必要参数',
     },
     contextMenu: {
       select: '选择',
