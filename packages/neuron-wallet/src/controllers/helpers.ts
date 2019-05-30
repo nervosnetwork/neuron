@@ -3,15 +3,11 @@ import { CatchControllerError } from '../decorators'
 import { ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
-export enum HelpersMethod {
-  GenerateMnemonic = 'generateMnemonic',
-}
-
 /**
  * @class HelpersController
  * @description handle messages from helpers channel
  */
-class HelpersController {
+export default class HelpersController {
   @CatchControllerError
   public static async generateMnemonic() {
     const mnemonic = Key.generateMnemonic()
@@ -25,4 +21,10 @@ class HelpersController {
   }
 }
 
-export default HelpersController
+/* eslint-disable */
+declare global {
+  module Controller {
+    type HelpersMehtod = Exclude<keyof typeof HelpersController, keyof typeof Object>
+  }
+}
+/* eslint-enable */

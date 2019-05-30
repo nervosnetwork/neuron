@@ -7,7 +7,7 @@ import i18n from '../../utils/i18n'
  * @class NetworksController
  * @description handle messages from networks channel
  */
-class NetworksController {
+export default class NetworksController {
   static service = new NetworksService()
 
   @CatchControllerError
@@ -106,4 +106,10 @@ class NetworksController {
   }
 }
 
-export default NetworksController
+/* eslint-disable */
+declare global {
+  module Controller {
+    type NetworksMethod = Exclude<keyof typeof NetworksController, keyof typeof Object>
+  }
+}
+/* eslint-enable */

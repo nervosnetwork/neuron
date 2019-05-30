@@ -1,5 +1,5 @@
 import { distinctUntilChanged } from 'rxjs/operators'
-import controllers, { methods } from '../controllers'
+import controllers from '../controllers'
 import windowManage from '../utils/windowManage'
 import Router from '../Router'
 import nodeService from './nodeService'
@@ -8,12 +8,11 @@ import logger from '../utils/logger'
 import app from '../app'
 
 const { NetworksController } = controllers
-const { NetworksMethod } = methods
 
 const syncConnectStatus = () => {
   nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
     tipNumber => {
-      windowManage.broadcast(Channel.Networks, NetworksMethod.Status, {
+      windowManage.broadcast(Channel.Networks, 'status', {
         status: 1,
         result: typeof tipNumber !== 'undefined',
       })
