@@ -1,5 +1,4 @@
 import { BrowserWindow } from 'electron'
-import windowStateKeeper from 'electron-window-state'
 import { Subject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
@@ -36,19 +35,10 @@ Object.defineProperty(app, 'syncTask', {
 // create a background task to sync transactions
 // this task is a renderer process
 const createLoopTask = () => {
-  const windowState = windowStateKeeper({
-    defaultWidth: 1366,
-    defaultHeight: 768,
-  })
   let loopWindow: BrowserWindow | null = new BrowserWindow({
-    x: windowState.x,
-    y: windowState.y,
-    width: windowState.width,
-    height: windowState.height,
-    minWidth: 800,
-    minHeight: 600,
+    width: 1366,
+    height: 768,
     show: false,
-    backgroundColor: '#e9ecef',
     webPreferences: {
       nodeIntegration: true,
     },
