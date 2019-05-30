@@ -26,7 +26,6 @@ export default {
         sourceCode: '源代码',
       },
       develop: {
-        terminal: '终端',
         develop: '开发',
         forceReload: '强制刷新',
         reload: '刷新',

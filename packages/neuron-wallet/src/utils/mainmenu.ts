@@ -105,11 +105,6 @@ const getMenuTemplate = () => {
           label: i18n.t('mainmenu.develop.toggleDevTools'),
           role: 'toggleDevTools',
         },
-        {
-          label: i18n.t('mainmenu.develop.terminal'),
-          accelerator: 'Cmd+Shift+t',
-          click: AppController.showTerminal,
-        },
       ],
     } as MenuItemConstructorOptions)
   }

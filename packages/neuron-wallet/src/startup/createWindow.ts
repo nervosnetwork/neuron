@@ -2,7 +2,6 @@ import { BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from '../env'
-import TerminalChannel from '../channel/terminal'
 import initWindow from './initWindow'
 
 function createWindow() {
@@ -40,9 +39,6 @@ function createWindow() {
      */
     initWindow(mainWindow!)
   })
-
-  const terminalChannel = new TerminalChannel(mainWindow.webContents)
-  terminalChannel.start()
 
   return mainWindow
 }

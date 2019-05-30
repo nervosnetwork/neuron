@@ -70,10 +70,6 @@ export default class AppController {
   public static showPreference() {
     AppController.navTo(URL.Preference)
   }
-
-  public static showTerminal() {
-    AppController.navTo(URL.Terminal)
-  }
 }
 
 /* eslint-disable */
