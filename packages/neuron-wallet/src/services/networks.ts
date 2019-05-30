@@ -1,24 +1,17 @@
 import { v4 as uuid } from 'uuid'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, fromEvent } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
 
 import Store from '../utils/store'
 import env from '../env'
 
 import windowManage from '../utils/windowManage'
+import NetworksMethod from '../controllers/networks/methods'
 import { Channel, ResponseCode } from '../utils/const'
-import nodeService from '../startup/nodeService'
+import i18n from '../utils/i18n'
 
-export enum NetworksMethod {
-  GetAll = 'getAll',
-  Get = 'get',
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
-  Activate = 'activate',
-  ActiveId = 'activeId',
-  Clear = 'clear',
-  Status = 'status',
-}
+import { Validate, Required } from '../decorators'
+import nodeService from '../startup/nodeService'
 
 export type NetworkID = string
 export type NetworkName = string
@@ -40,41 +33,47 @@ export interface NetworkWithID extends Network {
   id: NetworkID
 }
 
+const DEBOUNCE_TIME = 50
+
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
 
 export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(env.presetNetworks))
-    this.on(NetworksKey.List, async (_, newValue: NetworkWithID[]) => {
-      windowManage.broadcast(Channel.Networks, NetworksMethod.GetAll, {
-        status: ResponseCode.Success,
-        result: newValue,
+    fromEvent<[NetworkWithID[], NetworkWithID[]]>(this, NetworksKey.List)
+      .pipe(debounceTime(DEBOUNCE_TIME))
+      .subscribe(async ([, newValue]) => {
+        windowManage.broadcast(Channel.Networks, NetworksMethod.GetAll, {
+          status: ResponseCode.Success,
+          result: newValue,
+        })
+        const network = await this.activeId()
+        if (network) {
+          windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
+            status: ResponseCode.Success,
+            result: network,
+          })
+        } else {
+          const defaultNetwork = await this.defaultOne()
+          if (defaultNetwork) {
+            this.activate(defaultNetwork.id)
+          }
+        }
       })
-      const network = await this.activeId()
-      if (network) {
+
+    fromEvent<[string, string]>(this, NetworksKey.Active)
+      .pipe(debounceTime(DEBOUNCE_TIME))
+      .subscribe(async ([, newActiveId]) => {
+        const network = await this.get(newActiveId)
+        if (network) {
+          nodeService.setNetwork(network.remote)
+          networkSwitchSubject.next(network)
+        }
         windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
           status: ResponseCode.Success,
-          result: network,
+          result: newActiveId,
         })
-      } else {
-        const defaultNetwork = await this.defaultOne()
-        if (defaultNetwork) {
-          this.activate(defaultNetwork.id)
-        }
-      }
-    })
-
-    this.on(NetworksKey.Active, async (_, newActiveId) => {
-      const network = await this.get(newActiveId)
-      if (network) {
-        nodeService.setNetwork(network.remote)
-        networkSwitchSubject.next(network)
-      }
-      windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
-        status: ResponseCode.Success,
-        result: newActiveId,
       })
-    })
 
     this.activeId().then(activeId => {
       if (activeId) {
@@ -88,20 +87,27 @@ export default class NetworksService extends Store {
     return list || []
   }
 
-  public get = async (id: NetworkID) => {
+  @Validate
+  public async get(@Required id: NetworkID) {
     const list = await this.getAll()
-    return list.find(item => item.id === id)
+    return list.find(item => item.id === id) || null
   }
 
-  public updateAll = async (networks: NetworkWithID[]) => {
+  @Validate
+  public async updateAll(@Required networks: NetworkWithID[]) {
+    if (!Array.isArray(networks)) throw new Error(i18n.t('messages.invalid-format', { field: 'networks' }))
     await this.writeSync(NetworksKey.List, networks)
-    return true
   }
 
-  public create = async (name: NetworkName, remote: NetworkRemote, type: NetworkType = NetworkType.Normal) => {
+  @Validate
+  public async create(
+    @Required name: NetworkName,
+    @Required remote: NetworkRemote,
+    type: NetworkType = NetworkType.Normal,
+  ) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {
-      throw new Error('Network name exists')
+      throw new Error(i18n.t('messages.network-name-is-used'))
     }
     const newOne = {
       id: uuid(),
@@ -113,11 +119,12 @@ export default class NetworksService extends Store {
     return newOne
   }
 
-  public update = async (id: NetworkID, options: Partial<Network>) => {
+  @Validate
+  public async update(@Required id: NetworkID, @Required options: Partial<Network>) {
     const list = await this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
-      throw new Error(`Network with id ${id} is not found`)
+      throw new Error(i18n.t('messages.network-of-id-is-not-found', { id }))
     }
     Object.assign(network, options)
     this.updateAll(list)
@@ -125,34 +132,29 @@ export default class NetworksService extends Store {
     if (activeId === id) {
       await this.activate(id)
     }
-    return true
   }
 
-  public delete = async (id: NetworkID) => {
+  @Validate
+  public async delete(@Required id: NetworkID) {
     const list = await this.getAll()
     this.updateAll(list.filter(item => item.id !== id))
-    return true
   }
 
-  public activate = async (id: NetworkID) => {
+  @Validate
+  public async activate(@Required id: NetworkID) {
     const network = await this.get(id)
     if (!network) {
-      throw new Error(`Network of ${id} is not found`)
+      throw new Error(i18n.t('messages.network-of-id-is-not-found', { id }))
     }
     this.writeSync(NetworksKey.Active, id)
   }
 
   public activeId = async () => {
-    return this.read<string>(NetworksKey.Active)
+    return (await this.read<string>(NetworksKey.Active)) || null
   }
 
   public defaultOne = async () => {
     const list = await this.getAll()
-    return list.find(item => item.type === NetworkType.Default)
-  }
-
-  public clear = async () => {
-    await this.clear()
-    return true
+    return list.find(item => item.type === NetworkType.Default) || null
   }
 }

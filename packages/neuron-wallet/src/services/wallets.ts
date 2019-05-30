@@ -41,9 +41,9 @@ class FileKeystoreWallet implements Wallet {
   public addresses: Addresses
 
   constructor(id: string, { name, addresses }: WalletProperties) {
-    if (id === undefined) throw new Error(i18n.t('is-required', { field: 'id' }))
-    if (name === undefined) throw new Error(i18n.t('is-required', { field: 'name' }))
-    if (addresses === undefined) throw new Error(i18n.t('is-required', { field: 'addresses' }))
+    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
+    if (name === undefined) throw new Error(i18n.t('messages.is-required', { field: 'name' }))
+    if (addresses === undefined) throw new Error(i18n.t('messages.is-required', { field: 'addresses' }))
 
     this.id = id
     this.name = name
@@ -150,7 +150,7 @@ export default class WalletService {
   }
 
   public get = (id: string) => {
-    if (id === undefined) throw new Error(i18n.t('is-required', { field: 'id' }))
+    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
 
     const wallet = this.getAll().find(w => w.id === id)
     if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
@@ -159,11 +159,11 @@ export default class WalletService {
   }
 
   public create = (props: WalletProperties) => {
-    if (!props) throw new Error(i18n.t('is-required', { field: 'wallet property' }))
+    if (!props) throw new Error(i18n.t('messages.is-required', { field: 'wallet property' }))
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
-    if (index !== -1) throw Error(i18n.t('messages.wallet-name-existed', { name: props.name }))
+    if (index !== -1) throw Error(i18n.t('messages.wallet-name-is-used', { name: props.name }))
 
     const wallet = new FileKeystoreWallet(uuid(), props)
 
@@ -185,7 +185,7 @@ export default class WalletService {
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
 
     if (wallet.name !== props.name && wallets.findIndex(storeWallet => storeWallet.name === props.name) !== -1) {
-      throw Error(i18n.t('messages.wallet-name-existed', { name: props.name }))
+      throw Error(i18n.t('messages.wallet-name-is-used', { name: props.name }))
     }
 
     wallet.update(props)
@@ -222,7 +222,7 @@ export default class WalletService {
   }
 
   public setCurrent = (id: string) => {
-    if (id === undefined) throw new Error(i18n.t('is-required', { field: 'id' }))
+    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
 
     const wallet = this.get(id)
     if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
