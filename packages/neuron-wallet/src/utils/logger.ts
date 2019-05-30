@@ -1,7 +1,7 @@
-import { app } from 'electron'
 import winston, { format } from 'winston'
 import path from 'path'
 import env from '../env'
+import app from '../app'
 
 const { isDevMode } = env
 const basePath = isDevMode ? './' : `${app.getPath('logs')}`
