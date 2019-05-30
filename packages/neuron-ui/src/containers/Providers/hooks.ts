@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { history } from 'components/Router'
 
-import UILayer, { NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import UILayer, { AppMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
 import { Channel, ConnectStatus, Routes } from 'utils/const'
 import { ProviderActions } from './reducer'
 
@@ -38,8 +38,20 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       },
     )
 
-    UILayer.on(Channel.NavTo, (_e: Event, _method: '', args: ChannelResponse<string>) => {
-      history.push(args.result)
+    UILayer.on(Channel.App, (_e: Event, method: AppMethod, args: ChannelResponse<any>) => {
+      if (args && args.status) {
+        switch (method) {
+          case 'navTo': {
+            history.push(args.result)
+            break
+          }
+          default: {
+            break
+          }
+        }
+      } else {
+        // TODO: handle error
+      }
     })
 
     UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {

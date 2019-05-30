@@ -4,8 +4,15 @@ import logger from './logger'
 
 const error = { level: 'error', message: 'Electron is not loaded' }
 
+interface SendMessage {
+  (channel: Channel.App, method: Controller.AppMethod, params: any): void
+  (channel: Channel.Wallets, method: Controller.WalletsMethod, params: any): void
+  (channel: Channel.Networks, method: Controller.NetworksMethod | 'status', params: any): void
+  (channel: Channel.Helpers, method: Controller.HelpersMethod, params: any): void
+}
+
 class WindowManage {
-  public static broadcast = (channel: Channel, method: string, params: any): void => {
+  public static broadcast: SendMessage = (channel: Channel, method: string, params: any): void => {
     if (!BrowserWindow) {
       logger.log(error)
       return
@@ -17,7 +24,7 @@ class WindowManage {
     })
   }
 
-  public static sendToFocusedWindow = (channel: Channel, method: string, params: any): void => {
+  public static sendToFocusedWindow: SendMessage = (channel: Channel, method: string, params: any): void => {
     if (!BrowserWindow) {
       logger.log(error)
       return

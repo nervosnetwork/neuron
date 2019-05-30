@@ -76,7 +76,7 @@ export default class NetworksController {
   }
 
   @CatchControllerError
-  public static async activeOne() {
+  public static async activeId() {
     const activeId = await NetworksController.service.activeId()
     if (activeId) {
       return {
@@ -109,7 +109,7 @@ export default class NetworksController {
 /* eslint-disable */
 declare global {
   module Controller {
-    type NetworksMethod = Exclude<keyof typeof NetworksController, keyof typeof Object>
+    type NetworksMethod = Exclude<keyof typeof NetworksController, keyof typeof Object | 'service'>
   }
 }
 /* eslint-enable */

@@ -31,7 +31,7 @@ export const contextMenuTemplate: {
 } = {
   networkList: async (id: string) => {
     const { result: network } = await NetworksController.get(id)
-    const { result: activeNetworkId } = await NetworksController.activeOne()
+    const { result: activeNetworkId } = await NetworksController.activeId()
     const isActive = activeNetworkId === id
     const isDefault = network.type === 0
 
