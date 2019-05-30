@@ -252,7 +252,7 @@ export default class WalletsController {
 /* eslint-disable */
 declare global {
   module Controller {
-    type WalletsMethod = Exclude<keyof typeof WalletsController, keyof typeof Object>
+    type WalletsMethod = Exclude<keyof typeof WalletsController, keyof typeof Object | 'service'>
   }
 }
 /* eslint-enable */

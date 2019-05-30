@@ -3,7 +3,7 @@ import { Channel, ResponseCode } from '../../utils/const'
 import windowManage from '../../utils/windowManage'
 import { URL, contextMenuTemplate } from './options'
 
-class AppController {
+export default class AppController {
   public static showMessageBox(
     options: MessageBoxOptions,
     callback: (response: number, checkboxChecked: boolean) => void = () => {},
@@ -12,14 +12,14 @@ class AppController {
   }
 
   public static navTo(path: string) {
-    windowManage.sendToFocusedWindow(Channel.NavTo, '', {
+    windowManage.sendToFocusedWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
       result: path,
     })
   }
 
   public static setUILocale(locale: string) {
-    windowManage.broadcast(Channel.SetLanguage, '', {
+    windowManage.broadcast(Channel.App, 'setUILocale', {
       status: ResponseCode.Success,
       result: locale,
     })
@@ -76,4 +76,10 @@ class AppController {
   }
 }
 
-export default AppController
+/* eslint-disable */
+declare global {
+  module Controller {
+    type AppMethod = Exclude<keyof typeof AppController, keyof typeof Object>
+  }
+}
+/* eslint-enable */

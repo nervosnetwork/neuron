@@ -24,7 +24,7 @@ export default class HelpersController {
 /* eslint-disable */
 declare global {
   module Controller {
-    type HelpersMehtod = Exclude<keyof typeof HelpersController, keyof typeof Object>
+    type HelpersMethod = Exclude<keyof typeof HelpersController, keyof typeof Object>
   }
 }
 /* eslint-enable */

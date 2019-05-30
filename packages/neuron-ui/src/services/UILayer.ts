@@ -14,6 +14,8 @@ declare global {
 
 export enum AppMethod {
   ContextMenu = 'contextMenu',
+  NavTo = 'navTo',
+  SetUILocale = 'setUILocale',
 }
 
 export enum WalletsMethod {
