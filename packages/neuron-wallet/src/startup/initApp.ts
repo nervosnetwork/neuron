@@ -1,7 +1,7 @@
 import { distinctUntilChanged } from 'rxjs/operators'
 import controllers from '../controllers'
 import windowManage from '../utils/windowManage'
-import Router from '../Router'
+import Router from '../router'
 import nodeService from './nodeService'
 import { Channel } from '../utils/const'
 import logger from '../utils/logger'
