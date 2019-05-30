@@ -8,7 +8,6 @@ import i18n from '../../utils/i18n'
 import WalletsController from '../wallets'
 import windowManage from '../../utils/windowManage'
 import { Channel } from '../../utils/const'
-import WalletsMethod from '../wallets/methods'
 import env from '../../env'
 
 export enum MenuCommand {
@@ -111,7 +110,7 @@ export const contextMenuTemplate: {
             .then(async (password: string | null = '') => {
               if (password === null) return
               const res = await WalletsController.delete({ id, password })
-              windowManage.sendToFocusedWindow(Channel.Wallets, WalletsMethod.Delete, res)
+              windowManage.sendToFocusedWindow(Channel.Wallets, 'delete', res)
             })
             .catch((err: Error) => {
               logger.log({ level: 'error', message: err.message })

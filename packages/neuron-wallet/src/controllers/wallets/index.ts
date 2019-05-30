@@ -8,7 +8,7 @@ import i18n from '../../utils/i18n'
  * @class WalletsController
  * @description handle messages from wallets channel
  */
-class WalletsController {
+export default class WalletsController {
   static service = new WalletsService()
 
   @CatchControllerError
@@ -56,7 +56,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'addresses'>>> {
+  }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
     const wallet = WalletsController.service.create({
       name,
@@ -89,7 +89,7 @@ class WalletsController {
     mnemonic: string
     receivingAddressNumber: number
     changeAddressNumber: number
-  }): Promise<Controller.Response<Pick<Wallet, 'id' | 'name' | 'addresses'>>> {
+  }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
@@ -249,4 +249,10 @@ class WalletsController {
   }
 }
 
-export default WalletsController
+/* eslint-disable */
+declare global {
+  module Controller {
+    type WalletsMethod = Exclude<keyof typeof WalletsController, keyof typeof Object>
+  }
+}
+/* eslint-enable */

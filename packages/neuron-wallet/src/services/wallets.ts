@@ -11,7 +11,6 @@ import LockUtils from '../utils/lockUtils'
 import env from '../env'
 import i18n from '../utils/i18n'
 import windowManage from '../utils/windowManage'
-import WalletsMethod from '../controllers/wallets/methods'
 import { Channel, ResponseCode } from '../utils/const'
 
 const { core } = nodeService
@@ -50,7 +49,7 @@ class FileKeystoreWallet implements Wallet {
     this.addresses = addresses
   }
 
-  static fromJSON = (json: Pick<Wallet, Exclude<keyof Wallet, 'loadKeystore'>>) => {
+  static fromJSON = (json: Omit<Wallet, 'loadKeystore'>) => {
     return new FileKeystoreWallet(json.id, {
       name: json.name,
       addresses: json.addresses,
@@ -67,7 +66,7 @@ class FileKeystoreWallet implements Wallet {
     }
   }
 
-  public toJSON = (): Pick<Wallet, 'id' | 'name' | 'addresses'> => {
+  public toJSON = (): Omit<Wallet, 'loadKeystore'> => {
     return {
       id: this.id,
       name: this.name,
@@ -101,18 +100,18 @@ export default class WalletService {
   constructor() {
     this.listStore = new Store(MODULE_NAME, 'wallets.json')
 
-    fromEvent<[any, Pick<Wallet, 'id' | 'name' | 'addresses'>[]]>(this.listStore, this.walletsKey)
+    fromEvent<[any, Omit<Wallet, 'loadKeystore'>[]]>(this.listStore, this.walletsKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, wallets]) => {
         const result = wallets.map(({ id, name }) => ({ id, name }))
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetAll, {
+        windowManage.broadcast(Channel.Wallets, 'getAll', {
           status: ResponseCode.Success,
           result,
         })
         const wallet = this.getCurrent()
         if (wallet) {
           const currentWallet = wallet.toJSON()
-          windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, {
+          windowManage.broadcast(Channel.Wallets, 'getActive', {
             status: ResponseCode.Success,
             result: {
               id: currentWallet.id,
@@ -131,7 +130,7 @@ export default class WalletService {
       .subscribe(([, newId]) => {
         if (newId === undefined) return
         const currentWallet = this.get(newId).toJSON()
-        windowManage.broadcast(Channel.Wallets, WalletsMethod.GetActive, {
+        windowManage.broadcast(Channel.Wallets, 'getActive', {
           status: ResponseCode.Success,
           result: {
             id: currentWallet.id,
@@ -145,7 +144,7 @@ export default class WalletService {
       })
   }
 
-  public getAll = (): Pick<Wallet, Exclude<keyof Wallet, 'loadKeystore'>>[] => {
+  public getAll = (): Omit<Wallet, 'loadKeystore'>[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
 

@@ -6,7 +6,6 @@ import Store from '../utils/store'
 import env from '../env'
 
 import windowManage from '../utils/windowManage'
-import NetworksMethod from '../controllers/networks/methods'
 import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
@@ -43,13 +42,13 @@ export default class NetworksService extends Store {
     fromEvent<[NetworkWithID[], NetworkWithID[]]>(this, NetworksKey.List)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(async ([, newValue]) => {
-        windowManage.broadcast(Channel.Networks, NetworksMethod.GetAll, {
+        windowManage.broadcast(Channel.Networks, 'getAll', {
           status: ResponseCode.Success,
           result: newValue,
         })
         const network = await this.activeId()
         if (network) {
-          windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
+          windowManage.broadcast(Channel.Networks, 'activeId', {
             status: ResponseCode.Success,
             result: network,
           })
@@ -69,7 +68,7 @@ export default class NetworksService extends Store {
           nodeService.setNetwork(network.remote)
           networkSwitchSubject.next(network)
         }
-        windowManage.broadcast(Channel.Networks, NetworksMethod.ActiveId, {
+        windowManage.broadcast(Channel.Networks, 'activeId', {
           status: ResponseCode.Success,
           result: newActiveId,
         })
