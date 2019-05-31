@@ -4,11 +4,15 @@ import SyncBlocksService from '../../services/syncBlocks'
 import initConnection from '../../typeorm'
 import Address from '../../services/addresses'
 import LockUtils from '../../utils/lockUtils'
+import AddressesUsedSubject from '../../subjects/addressesUsedSubject'
 
 // read main process properties from `remote.app`
 const { app }: { app: any } = remote
 const { syncBlockTask } = app
-const { networkSwitchSubject, nodeService, addressChangeSubject } = syncBlockTask
+const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = syncBlockTask
+
+// pass to task a main process subject
+AddressesUsedSubject.setSubject(addressesUsedSubject)
 
 export const stopLoopSubject = new Subject()
 
