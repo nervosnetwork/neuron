@@ -1,6 +1,5 @@
 import * as bip39 from 'bip39'
-import crypto from 'crypto-browserify'
-import scryptsy from 'scrypt.js'
+import crypto from 'crypto'
 import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
 import Address, { HDAddress } from '../services/addresses'
@@ -62,13 +61,15 @@ export default class Key {
       throw new Error('Password error.')
     }
     const { kdfparams } = keystoreObject.crypto
-    const derivedKey = scryptsy(
+    const derivedKey: Buffer = crypto.scryptSync(
       Buffer.from(password),
       Buffer.from(kdfparams.salt, 'hex'),
-      kdfparams.n,
-      kdfparams.r,
-      kdfparams.p,
       kdfparams.dklen,
+      {
+        N: kdfparams.n,
+        r: kdfparams.r,
+        p: kdfparams.p,
+      },
     )
     const ciphertext = Buffer.from(keystoreObject.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)
@@ -118,13 +119,15 @@ export default class Key {
       throw new Error('Keystore is undefined.')
     }
     const { kdfparams } = this.keystore.crypto
-    const derivedKey = scryptsy(
+    const derivedKey: Buffer = crypto.scryptSync(
       Buffer.from(password),
       Buffer.from(kdfparams.salt, 'hex'),
-      kdfparams.n,
-      kdfparams.r,
-      kdfparams.p,
       kdfparams.dklen,
+      {
+        N: kdfparams.n,
+        r: kdfparams.r,
+        p: kdfparams.p,
+      },
     )
     const ciphertext = Buffer.from(this.keystore.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)
@@ -179,7 +182,11 @@ export default class Key {
       salt: salt.toString('hex'),
       ...params,
     }
-    const derivedKey = scryptsy(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
+    const derivedKey: Buffer = crypto.scryptSync(Buffer.from(password), salt, kdfparams.dklen, {
+      N: kdfparams.n,
+      r: kdfparams.r,
+      p: kdfparams.p,
+    })
 
     const cipher = crypto.createCipheriv('aes-128-ctr', derivedKey.slice(0, 16), iv)
     if (!cipher) {
