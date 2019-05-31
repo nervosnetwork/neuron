@@ -154,7 +154,7 @@ const Submission = ({
 
   useEffect(() => {
     const genName = (baseNum: number = 0): string => {
-      const walletName = `wallet ${baseNum}`
+      const walletName = t('wizard.wallet-suffix', { suffix: baseNum })
       if (wallets.some(wallet => wallet.name === walletName)) {
         return genName(baseNum + 1)
       }
@@ -172,7 +172,7 @@ const Submission = ({
       type: 'confirmPassword',
       payload: '',
     })
-  }, [dispatch, wallets])
+  }, [dispatch, wallets, t])
 
   const onChange = useCallback(
     (field: keyof WithWizardState) => {

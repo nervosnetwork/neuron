@@ -19,7 +19,8 @@
       "input-your-seed": "请输入您的 seed",
       "password": "密码",
       "confirm-password": "确认密码",
-      "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包"
+      "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
+      "wallet-suffix": "钱包 {{suffix}}"
     },
     "send": {
       "address": "地址",
