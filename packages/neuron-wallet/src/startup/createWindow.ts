@@ -2,7 +2,7 @@ import { BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from '../env'
-import initWindow from './initWindow'
+import AppController from '../controllers/app'
 
 function createWindow() {
   const windowState = windowStateKeeper({
@@ -33,11 +33,7 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     mainWindow.focus()
-    /**
-     * @initWindow
-     * @desc send current wallet to window
-     */
-    initWindow(mainWindow!)
+    AppController.initWindow(mainWindow!)
   })
 
   return mainWindow
