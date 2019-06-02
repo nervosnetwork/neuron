@@ -5,12 +5,12 @@ import { debounceTime } from 'rxjs/operators'
 import Store from '../utils/store'
 import env from '../env'
 
-import windowManage from '../utils/windowManage'
+import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 import { Validate, Required } from '../decorators'
-import nodeService from '../startup/nodeService'
+import nodeService from '../startup/node-service'
 
 export type NetworkID = string
 export type NetworkName = string

@@ -1,7 +1,7 @@
 import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from 'typeorm'
-import { Witness, OutPoint, Transaction as TransactionInterface } from '../appTypes/types'
-import InputEntity from './Input'
-import OutputEntity from './Output'
+import { Witness, OutPoint, Transaction as TransactionInterface } from '../app-types/types'
+import InputEntity from './input'
+import OutputEntity from './output'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()

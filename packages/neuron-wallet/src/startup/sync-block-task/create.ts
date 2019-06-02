@@ -3,10 +3,10 @@ import { Subject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import app from '../../app'
-import nodeService from '../nodeService'
+import nodeService from '../node-service'
 import env from '../../env'
 import initConnection from '../../typeorm'
-import { AddressesUsedSubject } from '../../subjects/addressesUsedSubject'
+import { AddressesUsedSubject } from '../../subjects/addresses-used-subject'
 
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {

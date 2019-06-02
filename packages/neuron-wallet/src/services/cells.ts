@@ -1,6 +1,6 @@
 import { getConnection, In } from 'typeorm'
-import OutputEntity from '../entities/Output'
-import { Cell, OutPoint } from '../appTypes/types'
+import OutputEntity from '../entities/output'
+import { Cell, OutPoint } from '../app-types/types'
 
 const MIN_CELL_CAPACITY = '40'
 

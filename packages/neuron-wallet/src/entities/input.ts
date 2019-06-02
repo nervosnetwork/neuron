@@ -1,6 +1,6 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface, CellOutPoint } from '../appTypes/types'
-import Transaction from './Transaction'
+import { OutPoint, Input as InputInterface, CellOutPoint } from '../app-types/types'
+import Transaction from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 // cellbase input may have same OutPoint
