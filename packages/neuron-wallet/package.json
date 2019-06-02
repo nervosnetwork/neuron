@@ -21,7 +21,7 @@
     "test": "jest --color",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "package": "./script/package.sh",
-    "precommit": "lint-staged && yarn test",
+    "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "husky": {
