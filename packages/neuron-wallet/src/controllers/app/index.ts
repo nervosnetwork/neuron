@@ -1,6 +1,6 @@
 import { app, dialog, shell, Menu, MessageBoxOptions, BrowserWindow } from 'electron'
 import { Channel, ResponseCode } from '../../utils/const'
-import windowManage from '../../utils/windowManage'
+import windowManage from '../../utils/window-manage'
 import { URL, contextMenuTemplate } from './options'
 import WalletsController from '../wallets'
 import NetworksController from '../networks'

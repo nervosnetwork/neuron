@@ -1,9 +1,9 @@
 import { app, Menu } from 'electron'
 import 'reflect-metadata'
 
-import initApp from './startup/initApp'
-import createWindow from './startup/createWindow'
-import createSyncBlockTask from './startup/syncBlockTask/create'
+import initApp from './startup/init-app'
+import createWindow from './startup/create-window'
+import createSyncBlockTask from './startup/sync-block-task/create'
 
 import i18n from './utils/i18n'
 import mainmenu from './utils/mainmenu'

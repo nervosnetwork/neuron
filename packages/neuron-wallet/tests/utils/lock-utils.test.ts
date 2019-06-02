@@ -1,5 +1,5 @@
-import { Script } from '../../src/appTypes/types'
-import LockUtils from '../../src/utils/lockUtils'
+import { Script } from '../../src/app-types/types'
+import LockUtils from '../../src/utils/lock-utils'
 
 const systemScript = {
   outPoint: {

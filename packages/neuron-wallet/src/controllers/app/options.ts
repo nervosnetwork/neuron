@@ -6,7 +6,7 @@ import NetworksController from '../networks'
 import AppController from '.'
 import i18n from '../../utils/i18n'
 import WalletsController from '../wallets'
-import windowManage from '../../utils/windowManage'
+import windowManage from '../../utils/window-manage'
 import { Channel } from '../../utils/const'
 import env from '../../env'
 

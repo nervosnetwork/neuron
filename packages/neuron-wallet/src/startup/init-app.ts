@@ -1,6 +1,6 @@
 import { distinctUntilChanged } from 'rxjs/operators'
 import controllers from '../controllers'
-import windowManage from '../utils/windowManage'
+import windowManage from '../utils/window-manage'
 import Router from '../router'
 import nodeService from './nodeService'
 import { Channel } from '../utils/const'

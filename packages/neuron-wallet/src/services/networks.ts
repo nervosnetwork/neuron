@@ -5,7 +5,7 @@ import { debounceTime } from 'rxjs/operators'
 import Store from '../utils/store'
 import env from '../env'
 
-import windowManage from '../utils/windowManage'
+import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 

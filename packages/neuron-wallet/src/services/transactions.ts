@@ -1,12 +1,12 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../appTypes/types'
+import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../app-types/types'
 import CellsService from './cells'
-import InputEntity from '../entities/Input'
-import OutputEntity from '../entities/Output'
-import TransactionEntity from '../entities/Transaction'
+import InputEntity from '../entities/input'
+import OutputEntity from '../entities/output'
+import TransactionEntity from '../entities/transaction'
 import nodeService from '../startup/nodeService'
-import LockUtils from '../utils/lockUtils'
+import LockUtils from '../utils/lock-utils'
 
 const { core } = nodeService
 

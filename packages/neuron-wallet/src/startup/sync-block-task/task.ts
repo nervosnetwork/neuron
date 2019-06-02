@@ -1,10 +1,10 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
-import SyncBlocksService from '../../services/syncBlocks'
+import SyncBlocksService from '../../services/sync-blocks'
 import initConnection from '../../typeorm'
 import Address from '../../services/addresses'
-import LockUtils from '../../utils/lockUtils'
-import AddressesUsedSubject from '../../subjects/addressesUsedSubject'
+import LockUtils from '../../utils/lock-utils'
+import AddressesUsedSubject from '../../subjects/addresses-used-subject'
 
 // read main process properties from `remote.app`
 const { app }: { app: any } = remote

@@ -1,4 +1,4 @@
-import { Transaction } from '../appTypes/types'
+import { Transaction } from '../app-types/types'
 import TransactionsService, {
   TransactionsByAddressesParam,
   PaginationResult,
