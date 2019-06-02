@@ -5,7 +5,7 @@ import CellsService from './cells'
 import InputEntity from '../entities/input'
 import OutputEntity from '../entities/output'
 import TransactionEntity from '../entities/transaction'
-import nodeService from '../startup/nodeService'
+import nodeService from '../startup/node-service'
 import LockUtils from '../utils/lock-utils'
 
 const { core } = nodeService
