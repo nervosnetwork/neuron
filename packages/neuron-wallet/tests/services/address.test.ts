@@ -1,5 +1,5 @@
 import Addresses from '../../src/services/addresses'
-import nodeService from '../../src/startup/nodeService'
+import nodeService from '../../src/startup/node-service'
 
 const { utils } = nodeService.core
 
