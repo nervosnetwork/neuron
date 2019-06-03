@@ -6,11 +6,11 @@ export default class FileService {
   private static instance: FileService
 
   static getInstance(): FileService {
-    if (!this.instance) {
-      this.instance = new FileService()
+    if (!FileService.instance) {
+      FileService.instance = new FileService()
     }
 
-    return this.instance
+    return FileService.instance
   }
 
   public basePath = env.fileBasePath

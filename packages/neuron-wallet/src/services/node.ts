@@ -6,11 +6,11 @@ class NodeService {
   private static instance: NodeService
 
   static getInstance(): NodeService {
-    if (!this.instance) {
-      this.instance = new NodeService()
+    if (!NodeService.instance) {
+      NodeService.instance = new NodeService()
     }
 
-    return this.instance
+    return NodeService.instance
   }
 
   public delayTime = 0
