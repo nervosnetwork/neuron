@@ -3,6 +3,16 @@ import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
 
 class NodeService {
+  private static instance: NodeService
+
+  static getInstance(): NodeService {
+    if (!NodeService.instance) {
+      NodeService.instance = new NodeService()
+    }
+
+    return NodeService.instance
+  }
+
   public delayTime = 0
   public intervalTime = 1000
   public tipNumberSubject = new BehaviorSubject<string | undefined>(undefined)
@@ -54,5 +64,7 @@ class NodeService {
       )
   }
 }
+
+export const nodeService = NodeService.getInstance()
 
 export default NodeService

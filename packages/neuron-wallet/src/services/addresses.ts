@@ -1,6 +1,6 @@
 import TransactionsService from './transactions'
 import WalletService from './wallets'
-import nodeService from '../startup/node-service'
+import { nodeService } from './node'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
 
