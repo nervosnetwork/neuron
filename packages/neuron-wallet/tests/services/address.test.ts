@@ -1,7 +1,7 @@
 import Addresses from '../../src/services/addresses'
-import { nodeService } from '../../src/services/node'
+import NodeService from '../../src/services/node'
 
-const { utils } = nodeService.core
+const { utils } = NodeService.getInstance().core
 
 describe('Key tests', () => {
   const { AddressPrefix } = utils

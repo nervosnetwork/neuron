@@ -65,6 +65,4 @@ class NodeService {
   }
 }
 
-export const nodeService = NodeService.getInstance()
-
 export default NodeService

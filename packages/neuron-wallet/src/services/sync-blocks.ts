@@ -6,7 +6,7 @@ import { Script, OutPoint, Cell, Input, Transaction, Block, BlockHeader } from '
 import TransactionsService from './transactions'
 import OutputEntity from '../entities/output'
 import SyncInfoEntity from '../entities/sync-info'
-import { nodeService } from './node'
+import NodeService from './node'
 import LockUtils from '../utils/lock-utils'
 import TypeConvert from '../app-types/type-convert'
 import { NetworkWithID } from './networks'
@@ -17,7 +17,7 @@ const { syncBlockTask } = app
 const { networkSwitchSubject } = syncBlockTask
 
 // FIXME: now have some problem with core, should update every time network switched
-// const { core } = nodeService
+// const { core } = NodeService.getInstance()
 let core: Core
 networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
   if (network) {
@@ -48,7 +48,7 @@ export default class SyncBlocksService {
 
   constructor(
     lockHashes: string[],
-    tipNumberSubject: BehaviorSubject<string | undefined> = nodeService.tipNumberSubject,
+    tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject,
     addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.subject,
   ) {
     this.lockHashList = lockHashes

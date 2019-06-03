@@ -1,7 +1,7 @@
-import { nodeService } from '../services/node'
+import NodeService from '../services/node'
 import { CellOutPoint, OutPoint, Script } from '../app-types/types'
 
-const { core } = nodeService
+const { core } = NodeService.getInstance()
 
 export default class LockUtils {
   static systemScriptInfo: { codeHash: string; outPoint: OutPoint } | undefined

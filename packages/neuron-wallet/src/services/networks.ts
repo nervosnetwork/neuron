@@ -10,7 +10,7 @@ import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 import { Validate, Required } from '../decorators'
-import { nodeService } from './node'
+import NodeService from './node'
 
 export type NetworkID = string
 export type NetworkName = string
@@ -65,7 +65,7 @@ export default class NetworksService extends Store {
       .subscribe(async ([, newActiveId]) => {
         const network = await this.get(newActiveId)
         if (network) {
-          nodeService.setNetwork(network.remote)
+          NodeService.getInstance().setNetwork(network.remote)
           networkSwitchSubject.next(network)
         }
         windowManage.broadcast(Channel.Networks, 'activeId', {
