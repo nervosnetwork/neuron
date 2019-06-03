@@ -2,11 +2,12 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import controllers from '../controllers'
 import windowManage from '../utils/window-manage'
 import Router from '../router'
-import { nodeService } from '../services/node'
+import NodeService from '../services/node'
 import { Channel } from '../utils/const'
 import logger from '../utils/logger'
 import app from '../app'
 
+const nodeService = NodeService.getInstance()
 const { NetworksController } = controllers
 
 const syncConnectStatus = () => {

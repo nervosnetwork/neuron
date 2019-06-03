@@ -5,10 +5,10 @@ import CellsService from './cells'
 import InputEntity from '../entities/input'
 import OutputEntity from '../entities/output'
 import TransactionEntity from '../entities/transaction'
-import { nodeService } from './node'
+import NodeService from './node'
 import LockUtils from '../utils/lock-utils'
 
-const { core } = nodeService
+const { core } = NodeService.getInstance()
 
 export interface TransactionsByAddressesParam {
   pageNo: number

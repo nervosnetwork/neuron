@@ -5,15 +5,16 @@ import TransactionsService from './transactions'
 import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import Store from '../utils/store'
-import { nodeService } from './node'
-import { fileService } from './file'
+import NodeService from './node'
+import FileService from './file'
 import LockUtils from '../utils/lock-utils'
 import env from '../env'
 import i18n from '../utils/i18n'
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
 
-const { core } = nodeService
+const { core } = NodeService.getInstance()
+const fileService = FileService.getInstance()
 
 const hrp = `01${Buffer.from('P2PH').toString('hex')}`
 
