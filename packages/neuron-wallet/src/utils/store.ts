@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import fileService from '../startup/file-service'
+import { fileService } from '../services/file'
 import logger from './logger'
 
 class Store extends EventEmitter {

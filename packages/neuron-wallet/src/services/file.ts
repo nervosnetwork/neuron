@@ -3,6 +3,16 @@ import path from 'path'
 import env from '../env'
 
 export default class FileService {
+  static instance: FileService
+
+  static getInstance(): FileService {
+    if (!this.instance) {
+      this.instance = new FileService()
+    }
+
+    return this.instance
+  }
+
   public basePath = env.fileBasePath
   public config = {
     encoding: 'utf8',
@@ -58,3 +68,5 @@ export default class FileService {
     return fs.unlinkSync(path.join(this.basePath, moduleName, filename))
   }
 }
+
+export const fileService = new FileService()
