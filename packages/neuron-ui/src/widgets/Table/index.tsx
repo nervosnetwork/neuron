@@ -54,15 +54,17 @@ export default ({
         ))}
       </tbody>
     </BsTable>
-    <Row>
-      <Col>
-        <Pagination
-          currentPage={pageNo}
-          pageSize={pageSize}
-          total={totalCount}
-          onChange={page => onPageChange(page, pageSize)}
-        />
-      </Col>
-    </Row>
+    {totalCount <= pageSize ? null : (
+      <Row>
+        <Col>
+          <Pagination
+            currentPage={pageNo}
+            pageSize={pageSize}
+            total={totalCount}
+            onChange={page => onPageChange(page, pageSize)}
+          />
+        </Col>
+      </Row>
+    )}
   </>
 )
