@@ -3,7 +3,7 @@ import { Subject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import app from '../../app'
-import { nodeService } from '../../services/node'
+import NodeService from '../../services/node'
 import env from '../../env'
 import initConnection from '../../typeorm'
 import { AddressesUsedSubject } from '../../subjects/addresses-used-subject'
@@ -22,7 +22,7 @@ const loadURL = `file://${path.join(__dirname, 'index.html')}`
 // pass data in main process to renderer process
 const syncTaskAttrs = {
   networkSwitchSubject,
-  nodeService,
+  nodeService: NodeService.getInstance(),
   addressChangeSubject,
   addressesUsedSubject: AddressesUsedSubject.getSubject(),
 }

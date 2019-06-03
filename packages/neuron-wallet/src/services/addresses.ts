@@ -1,12 +1,12 @@
 import TransactionsService from './transactions'
 import WalletService from './wallets'
-import { nodeService } from './node'
+import NodeService from './node'
 import HD from '../keys/hd'
 import { KeysData } from '../keys/keystore'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
-} = nodeService.core
+} = NodeService.getInstance().core
 
 export const MAX_ADDRESS_COUNT = 30
 export const SEARCH_RANGE = 20
