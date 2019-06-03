@@ -64,6 +64,7 @@ const Sidebar = () => {
             fontWeight: 'bolder',
           }}
         >
+          {<menuItem.icon size="20px" style={{ paddingRight: '5px' }} />}
           {menuItem.name === menuItems[0].name ? name : t(menuItem.name)}
         </NavLink>
       ))}
