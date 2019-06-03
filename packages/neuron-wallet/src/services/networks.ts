@@ -10,7 +10,7 @@ import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 import { Validate, Required } from '../decorators'
-import nodeService from '../startup/node-service'
+import { nodeService } from './node'
 
 export type NetworkID = string
 export type NetworkName = string

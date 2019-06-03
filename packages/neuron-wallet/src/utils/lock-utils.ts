@@ -1,4 +1,4 @@
-import nodeService from '../startup/node-service'
+import { nodeService } from '../services/node'
 import { CellOutPoint, OutPoint, Script } from '../app-types/types'
 
 const { core } = nodeService
