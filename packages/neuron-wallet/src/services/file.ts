@@ -3,7 +3,7 @@ import path from 'path'
 import env from '../env'
 
 export default class FileService {
-  static instance: FileService
+  private static instance: FileService
 
   static getInstance(): FileService {
     if (!this.instance) {

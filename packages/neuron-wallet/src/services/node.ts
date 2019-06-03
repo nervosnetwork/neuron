@@ -3,7 +3,7 @@ import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
 
 class NodeService {
-  static instance: NodeService
+  private static instance: NodeService
 
   static getInstance(): NodeService {
     if (!this.instance) {
