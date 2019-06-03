@@ -6,7 +6,7 @@ import Key, { Addresses } from '../keys/key'
 import { Keystore } from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
-import { fileService } from './file'
+import FileService from './file'
 import LockUtils from '../utils/lock-utils'
 import env from '../env'
 import i18n from '../utils/i18n'
@@ -75,16 +75,20 @@ class FileKeystoreWallet implements Wallet {
   }
 
   public loadKeystore = () => {
-    const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
+    const data = FileService.getInstance().readFileSync(MODULE_NAME, this.keystoreFileName())
     return JSON.parse(data) as Keystore
   }
 
   saveKeystore = (keystore: Keystore) => {
-    fileService.writeFileSync(MODULE_NAME, this.keystoreFileName(), JSON.stringify({ ...keystore, id: this.id }))
+    FileService.getInstance().writeFileSync(
+      MODULE_NAME,
+      this.keystoreFileName(),
+      JSON.stringify({ ...keystore, id: this.id }),
+    )
   }
 
   deleteKeystore = () => {
-    fileService.deleteFileSync(MODULE_NAME, this.keystoreFileName())
+    FileService.getInstance().deleteFileSync(MODULE_NAME, this.keystoreFileName())
   }
 
   keystoreFileName = () => {

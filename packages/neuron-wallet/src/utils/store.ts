@@ -1,12 +1,12 @@
 import EventEmitter from 'events'
-import { fileService } from '../services/file'
+import FileService from '../services/file'
 import logger from './logger'
 
 class Store extends EventEmitter {
   public moduleName: string
   public filename: string
   public defaultValue: string
-  public service = fileService
+  public service = FileService.getInstance()
 
   constructor(moduleName: string, filename: string, defaultValue: string = '{}') {
     super()

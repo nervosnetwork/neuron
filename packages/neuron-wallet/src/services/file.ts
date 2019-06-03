@@ -68,5 +68,3 @@ export default class FileService {
     return fs.unlinkSync(path.join(this.basePath, moduleName, filename))
   }
 }
-
-export const fileService = new FileService()
