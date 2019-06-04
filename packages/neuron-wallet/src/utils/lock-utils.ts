@@ -1,5 +1,5 @@
 import NodeService from '../services/node'
-import { CellOutPoint, OutPoint, Script } from '../app-types/types'
+import { OutPoint, Script } from '../app-types/types'
 
 const { core } = NodeService.getInstance()
 
@@ -11,29 +11,34 @@ export default class LockUtils {
       return this.systemScriptInfo
     }
 
-    const genesisBlock = await core.rpc.getBlockByNumber('0')
-    const systemScriptTx = genesisBlock.transactions[0]
-    const blake2b = core.utils.blake2b(32)
-    const systemScriptCell = systemScriptTx.outputs[0]
-    const { data } = systemScriptCell
-    if (typeof data === 'string') {
-      blake2b.update(core.utils.hexToBytes(data))
-    } else {
-      // if Uint8Array
-      blake2b.update(data)
+    const systemCell = await core.loadSystemCell()
+    let { codeHash } = systemCell
+    const { outPoint } = systemCell
+    let { blockHash } = outPoint
+    let { txHash } = outPoint.cell
+    const { index } = outPoint.cell
+
+    if (!codeHash.startsWith('0x')) {
+      codeHash = `0x${codeHash}`
     }
-    const codeHash: string = blake2b.digest('hex')
-    const cellOutPoint: CellOutPoint = {
-      txHash: systemScriptTx.hash,
-      index: '1',
+
+    if (!blockHash.startsWith('0x')) {
+      blockHash = `0x${blockHash}`
     }
-    const outPoint: OutPoint = {
-      cell: cellOutPoint,
+
+    if (!txHash.startsWith('0x')) {
+      txHash = `0x${txHash}`
     }
 
     const systemScriptInfo = {
       codeHash,
-      outPoint,
+      outPoint: {
+        blockHash,
+        cell: {
+          txHash,
+          index,
+        },
+      },
     }
 
     this.systemScriptInfo = systemScriptInfo
