@@ -269,14 +269,17 @@ export default class TransactionsService {
       input.since = i.since!
       inputs.push(input)
 
-      const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-        outPointTxHash: input.previousOutput().cell!.txHash,
-        outPointIndex: input.previousOutput().cell!.index,
-      })
-      if (previousOutput) {
-        // update previousOutput status here
-        previousOutput.status = inputStatus
-        previousOutputs.push(previousOutput)
+      if (cell) {
+        const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+          outPointTxHash: input.previousOutput().cell!.txHash,
+          outPointIndex: input.previousOutput().cell!.index,
+        })
+
+        if (previousOutput) {
+          // update previousOutput status here
+          previousOutput.status = inputStatus
+          previousOutputs.push(previousOutput)
+        }
       }
     }
 
@@ -328,15 +331,19 @@ export default class TransactionsService {
     tx.inputs = await Promise.all(
       tx.inputs!.map(async i => {
         const input: Input = i
-        const outputEntity: OutputEntity | undefined = await getConnection()
-          .getRepository(OutputEntity)
-          .findOne({
-            outPointTxHash: i.previousOutput.cell!.txHash,
-            outPointIndex: i.previousOutput.cell!.index,
-          })
-        if (outputEntity) {
-          input.capacity = outputEntity.capacity
-          input.lockHash = outputEntity.lockHash
+        const { cell } = i.previousOutput
+
+        if (cell) {
+          const outputEntity: OutputEntity | undefined = await getConnection()
+            .getRepository(OutputEntity)
+            .findOne({
+              outPointTxHash: cell.txHash,
+              outPointIndex: cell.index,
+            })
+          if (outputEntity) {
+            input.capacity = outputEntity.capacity
+            input.lockHash = outputEntity.lockHash
+          }
         }
         return input
       }),
