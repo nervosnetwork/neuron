@@ -1,8 +1,8 @@
 import { ADDRESS_LENGTH, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from './const'
 
 export const verifyAddress = (address: string): boolean => {
-  // TODO: verify address
-  return address.replace(/^0x/, '').length === ADDRESS_LENGTH
+  // TODO: verify address, prd required
+  return address.length === ADDRESS_LENGTH
 }
 export const verifyWalletSubmission = ({
   password,

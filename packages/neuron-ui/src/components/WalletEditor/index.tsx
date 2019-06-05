@@ -3,9 +3,10 @@ import { actionCreators } from 'containers/MainContent/reducer'
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Button, Card, Form } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
+import { RouteComponentProps, Link } from 'react-router-dom'
 import { useNeuronWallet } from 'utils/hooks'
 import InlineInput, { InputProps } from 'widgets/InlineInput'
+import { Routes } from 'utils/const'
 import { useAreParamsValid, useInputs, useToggleDialog, useWalletEditor } from './hooks'
 
 export default ({
@@ -22,8 +23,15 @@ export default ({
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets])
 
   if (!wallet) {
-    // TODO: Better error handling
-    throw new Error('Wallet not found')
+    const label = `${t('siderbar.settings')}-${t('settings.setting-tabs.wallets')}`
+    return (
+      <div>
+        <p>{t('messages.wallet-is-not-found')}</p>
+        <Link to={Routes.SettingsWallets} className="btn btn-primary">
+          {label}
+        </Link>
+      </div>
+    )
   }
 
   const editor = useWalletEditor()

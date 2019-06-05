@@ -124,7 +124,8 @@
       "wallet-imported-successfully": "{{name}} imported successfully",
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
-      "protocol-is-required": "Protocol is required"
+      "protocol-is-required": "Protocol is required",
+      "wallet-is-not-found": "Wallet is not found"
     }
   }
 }
