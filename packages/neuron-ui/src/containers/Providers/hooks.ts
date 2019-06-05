@@ -31,8 +31,10 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
           }
         } else {
-          // TODO: better prompt
+          /* eslint-disable no-alert */
+          // TODO: better prompt, prd required
           window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
+          /* eslint-enable no-alert */
           window.close()
         }
       },
@@ -49,8 +51,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             break
           }
         }
-      } else {
-        // TODO: handle error
       }
     })
 
@@ -75,8 +75,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             break
           }
         }
-      } else {
-        // TODO: handle error
       }
     })
 

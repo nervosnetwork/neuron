@@ -17,7 +17,6 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
   } = useNeuronWallet()
 
   useEffect(() => {
-    // TODO: verify hash
     dispatch(actionCreators.getTransaction(match.params.hash))
     return () => {
       providerDispatch({

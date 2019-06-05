@@ -117,7 +117,8 @@
       "wallet-imported-successfully": "{{name}} 导入成功",
       "wallet-created-successfully": "{{name}} 创建成功",
       "wallet-updated-successfully": "{{name}} 更新成功",
-      "protocol-is-required": "请指定 URL 协议"
+      "protocol-is-required": "请指定 URL 协议",
+      "wallet-is-not-found": "未找到钱包"
     }
   }
 }

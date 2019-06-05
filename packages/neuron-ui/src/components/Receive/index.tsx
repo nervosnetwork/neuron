@@ -42,7 +42,6 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
   const accountAddress = params.address || receiving[0]
 
   if (!accountAddress) {
-    // TODO: better error handling
     return <div>{t('receive.address-not-found')}</div>
   }
 

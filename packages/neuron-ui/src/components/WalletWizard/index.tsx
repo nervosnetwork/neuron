@@ -83,8 +83,10 @@ const Mnemonic = ({
             payload: res,
           })
         })
-        // TODO: Better Error Handle
-        .catch(err => console.error(err))
+        .catch(err => {
+          console.error(err)
+          history.goBack()
+        })
     } else {
       dispatch({
         type: 'imported',

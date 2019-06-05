@@ -90,7 +90,6 @@ export default {
     }
   },
   setNetwork: (id: string) => {
-    // TODO: verification
     networksCall.activate(id)
     return {
       type: MainActions.Networks,
