@@ -1,13 +1,11 @@
-import { MenuItemConstructorOptions, clipboard } from 'electron'
+import fs from 'fs'
+import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
 import prompt from 'electron-prompt'
 
-import logger from '../../utils/logger'
 import NetworksController from '../networks'
 import AppController from '.'
 import i18n from '../../utils/i18n'
 import WalletsController from '../wallets'
-import windowManage from '../../utils/window-manage'
-import { Channel } from '../../utils/const'
 import env from '../../env'
 
 export enum MenuCommand {
@@ -66,7 +64,14 @@ export const contextMenuTemplate: {
             },
             (btnIdx: number) => {
               if (btnIdx === 0) {
-                NetworksController.delete(id)
+                try {
+                  NetworksController.service.delete(id)
+                } catch (err) {
+                  dialog.showMessageBox({
+                    type: 'error',
+                    message: err.message,
+                  })
+                }
               }
             },
           )
@@ -84,8 +89,42 @@ export const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.backup'),
-        click: () => {
-          // TODO: backup
+        click: async () => {
+          prompt({
+            title: i18n.t('messageBox.backup-keystore.title'),
+            label: i18n.t('messageBox.backup-keystore.password'),
+            value: '',
+            inputAttrs: {
+              type: 'password',
+            },
+          })
+            .then(async (password: string | null = '') => {
+              if (password === null) return
+
+              const wallet = await WalletsController.service.get(id)
+
+              if (!WalletsController.service.validate({ id, password }))
+                throw new Error(i18n.t('messages.password-is-incorrect'))
+
+              const keystore = wallet.loadKeystore()
+              dialog.showSaveDialog(
+                {
+                  title: i18n.t('messages.save-keystore'),
+                  defaultPath: wallet.name,
+                },
+                (filename?: string) => {
+                  if (filename) {
+                    fs.writeFileSync(filename, JSON.stringify(keystore))
+                  }
+                },
+              )
+            })
+            .catch((err: Error) => {
+              dialog.showMessageBox({
+                type: 'error',
+                message: err.message,
+              })
+            })
         },
       },
       {
@@ -107,11 +146,13 @@ export const contextMenuTemplate: {
           })
             .then(async (password: string | null = '') => {
               if (password === null) return
-              const res = await WalletsController.delete({ id, password })
-              windowManage.sendToFocusedWindow(Channel.Wallets, 'delete', res)
+              await WalletsController.delete({ id, password })
             })
             .catch((err: Error) => {
-              logger.log({ level: 'error', message: err.message })
+              dialog.showMessageBox({
+                type: 'error',
+                message: err.message,
+              })
             })
         },
       },

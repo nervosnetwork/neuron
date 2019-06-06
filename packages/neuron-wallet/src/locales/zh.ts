@@ -72,6 +72,7 @@ export default {
       'invalid-format': '{{field}} 格式不正确',
       'network-name-is-used': '网络名称已存在',
       'missing-required-argument': '缺少必要参数',
+      'save-keystore': '保存 Keystore 文件',
     },
     contextMenu: {
       select: '选择',
@@ -95,6 +96,10 @@ export default {
       },
       'remove-wallet': {
         title: '删除钱包',
+        password: '密码',
+      },
+      'backup-keystore': {
+        title: '备份 Keystore 文件',
         password: '密码',
       },
     },
