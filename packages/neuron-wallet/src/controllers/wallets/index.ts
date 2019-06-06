@@ -1,6 +1,6 @@
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
 import Key from '../../keys/key'
-import { Controller, CatchControllerError } from '../../decorators'
+import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import i18n from '../../utils/i18n'
 
@@ -8,7 +8,7 @@ import i18n from '../../utils/i18n'
  * @class WalletsController
  * @description handle messages from wallets channel
  */
-@Controller(Channel.Wallets)
+@ControllerDecorator(Channel.Wallets)
 export default class WalletsController {
   static service = new WalletsService()
 
