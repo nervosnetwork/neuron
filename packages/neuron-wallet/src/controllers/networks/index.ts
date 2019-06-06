@@ -1,12 +1,13 @@
 import NetworksService, { NetworkType, NetworkID, Network } from '../../services/networks'
-import { CatchControllerError } from '../../decorators'
-import { ResponseCode } from '../../utils/const'
+import { CatchControllerError, Controller } from '../../decorators'
+import { Channel, ResponseCode } from '../../utils/const'
 import i18n from '../../utils/i18n'
 
 /**
  * @class NetworksController
  * @description handle messages from networks channel
  */
+@Controller(Channel.Networks)
 export default class NetworksController {
   static service = new NetworksService()
 
