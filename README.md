@@ -1,4 +1,5 @@
 # Neuron
+
 Nervos CKB Wallet
 
 [![TravisCI](https://travis-ci.com/nervosnetwork/neuron.svg?branch=develop)](https://travis-ci.com/nervosnetwork/neuron)
@@ -14,25 +15,55 @@ You will need `node >= 11` and `yarn >= 1.12` to build and run this Neuron.
 
 Please be noted that Neuron depends on [node-gyp](https://github.com/nodejs/node-gyp) to build native NPM modules. Follow [this](https://github.com/nodejs/node-gyp#installation) to install node-gyp dependencies.
 
-In the project directory, you can run:
+#### Lerna
 
-### `yarn install && yarn bootstrap`
+Neuron project uses [lerna](https://github.com/lerna/lerna/) for packages management. It can be installed globally, or locally in the project.
 
-Installs all dependencies.
+```sh
+$ yarn global add lerna # install lerna globally
+# or
+$ yarn add lerna --exact --ignore-workspace-root-check # install lerna locally in the project
+```
 
-### `yarn start:ui`
+#### Install Dependencies
 
-Runs the UI app in the development and watch mode.<br>
-Neuron UI will start and open in browser (`http://localhost:3000`).
+After lerna installed, the dependencies can be installed by
 
-### `yarn start`
+```sh
+$ yarn bootstrap
+```
 
-Runs the app in the development mode.<br>
-Neuron will start as a desktop app.
+### Start Neuron
 
-### `yarn test`
+### Start Neuron in development mode
 
-Launches the test runner in the watch mode.
+```sh
+$ yarn start
+```
+
+This command will start two tasks
+
+1. start `neuron-ui`, which works for the user interface.
+2. start `neuron-wallet`, works for the wallet functionality.
+
+They are also able to start independently:
+
+```sh
+# start neuron-ui at `http://localhost:3000`
+$ cd packages/neuron-ui && yarn start
+```
+
+```sh
+# start neuron-wallet
+$ cd packages/neuron-wallet && yarn start:dev
+```
+
+### Test
+
+```sh
+# launch the test runner in the watch mode.
+$ yarn test
+```
 
 ## License
 
