@@ -66,23 +66,23 @@ class Address {
   }
 
   public static allAddresses = () =>
-    new WalletService().getAll().reduce((total: HDAddress[], cur) => {
-      return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
-    }, [])
+    WalletService.getInstance()
+      .getAll()
+      .reduce((total: HDAddress[], cur) => {
+        return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
+      }, [])
 
   public static searchUsedAddresses = (keysData: KeysData) =>
-    Array.from({ length: Address.searchHDIndex(keysData) })
-      .map((_, idx) => {
-        const { publicKey, path } = HD.keyFromHDIndex(keysData, idx)
-        if (!publicKey) return null
-        const address = Address.addressFromPublicKey(publicKey)
-        if (Address.isAddressUsed(address)) return null
-        return {
-          path,
-          address,
-        }
-      })
-      .filter(addr => addr)
+    Array.from({ length: Address.searchHDIndex(keysData) }, (_, idx) => {
+      const { publicKey, path } = HD.keyFromHDIndex(keysData, idx)
+      if (!publicKey) return null
+      const address = Address.addressFromPublicKey(publicKey)
+      if (Address.isAddressUsed(address)) return null
+      return {
+        path,
+        address,
+      }
+    }).filter(addr => addr) as HDAddress[]
 
   // TODO: refactor me
   public static searchHDIndex = (
