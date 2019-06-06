@@ -100,6 +100,10 @@ export default {
         title: 'Delete the wallet',
         password: 'Password',
       },
+      'backup-keystore': {
+        title: 'Backup the Keystore',
+        password: 'Password',
+      },
     },
   },
 }

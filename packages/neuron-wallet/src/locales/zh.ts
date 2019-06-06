@@ -98,6 +98,10 @@ export default {
         title: '删除钱包',
         password: '密码',
       },
+      'backup-keystore': {
+        title: '备份 Keystore 文件',
+        password: '密码',
+      },
     },
   },
 }
