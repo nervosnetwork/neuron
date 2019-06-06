@@ -4,9 +4,9 @@ import windowManage from '../../utils/window-manage'
 import { URL, contextMenuTemplate } from './options'
 import WalletsController from '../wallets'
 import NetworksController from '../networks'
-import { Controller } from '../../decorators'
+import { Controller as ControllerDecorator } from '../../decorators'
 
-@Controller(Channel.App)
+@ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
     const [activeWallet, wallets, activeNetworkId, networks] = await Promise.all([

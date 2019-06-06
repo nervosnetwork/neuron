@@ -4,7 +4,7 @@ import TransactionsService, {
   PaginationResult,
   TransactionsByLockHashesParam,
 } from '../services/transactions'
-import { Controller, CatchControllerError } from '../decorators'
+import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
@@ -12,7 +12,7 @@ import i18n from '../utils/i18n'
  * @class TransactionsController
  * @description handle messages from transactions channel
  */
-@Controller(Channel.Transactions)
+@ControllerDecorator(Channel.Transactions)
 export default class TransactionsController {
   static service = new TransactionsService()
 
