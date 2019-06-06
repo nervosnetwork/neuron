@@ -1,4 +1,5 @@
-import { MenuItemConstructorOptions, clipboard } from 'electron'
+import fs from 'fs'
+import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
 import prompt from 'electron-prompt'
 
 import logger from '../../utils/logger'
@@ -7,7 +8,7 @@ import AppController from '.'
 import i18n from '../../utils/i18n'
 import WalletsController from '../wallets'
 import windowManage from '../../utils/window-manage'
-import { Channel } from '../../utils/const'
+import { Channel, ResponseCode } from '../../utils/const'
 import env from '../../env'
 
 export enum MenuCommand {
@@ -84,8 +85,24 @@ export const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.backup'),
-        click: () => {
-          // TODO: backup
+        click: async () => {
+          const { status, result, msg: message = '' } = await WalletsController.get(id)
+          if (status === ResponseCode.Success && result) {
+            const keystore = result.loadKeystore()
+            dialog.showSaveDialog(
+              {
+                title: i18n.t('messages.save-keystore'),
+                defaultPath: result.name,
+              },
+              (filename?: string) => {
+                if (filename) {
+                  fs.writeFileSync(filename, JSON.stringify(keystore))
+                }
+              },
+            )
+          } else {
+            logger.log({ level: 'error', message })
+          }
         },
       },
       {

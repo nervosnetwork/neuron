@@ -1,6 +1,6 @@
 declare module Controller {
   interface Response<T = any> {
-    status: ResponseCode
+    status: number
     msg?: string
     result?: T
   }

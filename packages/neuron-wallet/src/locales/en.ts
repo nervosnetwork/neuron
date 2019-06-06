@@ -74,6 +74,7 @@ export default {
       'invalid-format': '{{field}} is in invalid format',
       'network-name-is-used': 'Network name is used',
       'missing-required-argument': 'Missing required argument',
+      'save-keystore': 'Save Keystore',
     },
     contextMenu: {
       select: 'Select',
