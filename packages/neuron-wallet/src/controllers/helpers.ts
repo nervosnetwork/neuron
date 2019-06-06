@@ -1,12 +1,13 @@
 import Key from '../keys/key'
-import { CatchControllerError } from '../decorators'
-import { ResponseCode } from '../utils/const'
+import { Controller, CatchControllerError } from '../decorators'
+import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 /**
  * @class HelpersController
  * @description handle messages from helpers channel
  */
+@Controller(Channel.Helpers)
 export default class HelpersController {
   @CatchControllerError
   public static async generateMnemonic() {

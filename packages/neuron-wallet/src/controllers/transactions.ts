@@ -4,14 +4,15 @@ import TransactionsService, {
   PaginationResult,
   TransactionsByLockHashesParam,
 } from '../services/transactions'
-import { CatchControllerError } from '../decorators'
-import { ResponseCode } from '../utils/const'
+import { Controller, CatchControllerError } from '../decorators'
+import { Channel, ResponseCode } from '../utils/const'
 import i18n from '../utils/i18n'
 
 /**
  * @class TransactionsController
  * @description handle messages from transactions channel
  */
+@Controller(Channel.Transactions)
 export default class TransactionsController {
   static service = new TransactionsService()
 
