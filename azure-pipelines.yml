@@ -27,10 +27,7 @@ jobs:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: |
-        curl -o- -L https://yarnpkg.com/install.sh | bash -s
-        export PATH=$HOME/.yarn/bin:$PATH
-        yarn global add lerna
+    - script: yarn global add lerna
       name: Install
     - script: |
         yarn bootstrap
@@ -53,10 +50,7 @@ jobs:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: |
-        # curl -o- -L https://yarnpkg.com/install.sh | bash -s
-        # export PATH=$HOME/.yarn/bin:$PATH
-        yarn global add lerna
+    - script: yarn global add lerna
       name: Install
     - script: |
         yarn bootstrap
