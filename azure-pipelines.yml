@@ -78,11 +78,12 @@ jobs:
       displayName: 'Install Node.js'
     - script: yarn global add lerna
       name: Install
-    - powershell: (yarn bootstrap) -and (yarn build)
-      env:
-        CI: false
-      displayName: Build
-    - powershell: yarn test
-      env:
-        CI: true
-      displayName: Test
+    - script: |
+        yarn bootstrap
+        set CI=false
+        yarn build
+      name: Build
+    - script: |
+        set CI=true
+        yarn test
+      name: Test
