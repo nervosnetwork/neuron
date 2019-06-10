@@ -94,9 +94,17 @@ class FileKeystoreWallet implements Wallet {
 }
 
 export default class WalletService {
+  private static instance: WalletService
   private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
   private walletsKey = 'wallets'
   private currentWalletKey = 'current'
+
+  public static getInstance = () => {
+    if (!WalletService.instance) {
+      WalletService.instance = new WalletService()
+    }
+    return WalletService.instance
+  }
 
   constructor() {
     this.listStore = new Store(MODULE_NAME, 'wallets.json')
