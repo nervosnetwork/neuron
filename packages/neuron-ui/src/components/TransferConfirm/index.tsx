@@ -32,6 +32,7 @@ const TransferConfirm = ({
         <InputGroup>
           <FormControl
             placeholder={t('send.input-password-to-confirm') as string}
+            type="password"
             value={password}
             onChange={onChange}
           />

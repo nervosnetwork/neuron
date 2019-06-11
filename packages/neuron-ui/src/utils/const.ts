@@ -57,7 +57,7 @@ export enum CapacityUnit {
 
 export const PlaceHolders = {
   transfer: {
-    Address: 'eg: 0x0da2fe99fe549e082d4ed483c2e968a89ea8d11aabf5d79e5cbf06522de6e674',
+    Address: 'eg: ckt1q9gry5zgzrccrjnvnhktjx6remmktn9h6s2fupurhzmgm9',
     Capacity: 'eg: 100',
   },
 }
