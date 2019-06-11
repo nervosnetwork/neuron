@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Container, Button, FormControl, InputGroup } from 'react-bootstrap'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
-import ScreenButtonRow from 'widgets/ScreenButtonRow'
+import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
 import { useNeuronWallet } from 'utils/hooks'
@@ -125,14 +125,14 @@ const Mnemonic = ({
         value={isCreate ? generated : imported}
         onChange={onChange}
       />
-      <ScreenButtonRow>
+      <RightScreenButtonRow>
         <Button role="button" onClick={history.goBack}>
           {t('wizard.back')}
         </Button>
         <Button role="button" onClick={onNext} disabled={disableNext}>
           {t('wizard.next')}
         </Button>
-      </ScreenButtonRow>
+      </RightScreenButtonRow>
     </Container>
   )
 }
@@ -214,14 +214,14 @@ const Submission = ({
           <FormControl type={input.type} value={state[input.key]} onChange={onChange(input.key)} />
         </InputGroup>
       ))}
-      <ScreenButtonRow>
+      <RightScreenButtonRow>
         <Button role="button" onClick={history.goBack} onKeyPress={history.goBack}>
           {t('wizard.back')}
         </Button>
         <Button role="button" onClick={onNext} disabled={disableNext}>
           {t('wizard.next')}
         </Button>
-      </ScreenButtonRow>
+      </RightScreenButtonRow>
     </div>
   )
 }
