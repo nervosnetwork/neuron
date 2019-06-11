@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Container, Button, FormControl, InputGroup } from 'react-bootstrap'
+import { Container, Button, FormControl, Form } from 'react-bootstrap'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
@@ -25,9 +25,9 @@ const initState: WithWizardState = {
 }
 
 const submissionInputs = [
+  { label: 'name', key: 'name', type: 'text', hint: 'wizard.set-a-strong-password-to-protect-your-wallet' },
   { label: 'password', key: 'password', type: 'password' },
   { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
-  { label: 'name', key: 'name', type: 'text' },
 ]
 
 const Welcome = ({ rootPath }: { rootPath: string }) => {
@@ -152,7 +152,7 @@ const Submission = ({
   } = useNeuronWallet()
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
-  const message = 'wizard.set-a-strong-password-to-protect-your-wallet'
+  const message = 'wizard.set-wallet-name-and-password'
 
   useEffect(() => {
     const genName = (baseNum: number = 0): string => {
@@ -204,15 +204,14 @@ const Submission = ({
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 
   return (
-    <div>
+    <Form>
       <h1>{t(message)}</h1>
       {submissionInputs.map(input => (
-        <InputGroup key={input.key}>
-          <InputGroup.Prepend>
-            <InputGroup.Text>{t(`wizard.${input.label}`)}</InputGroup.Text>
-          </InputGroup.Prepend>
+        <Form.Group key={input.key}>
+          <Form.Label>{t(`wizard.${input.label}`)}</Form.Label>
           <FormControl type={input.type} value={state[input.key]} onChange={onChange(input.key)} />
-        </InputGroup>
+          {input.hint ? <Form.Text className="text-muted">{t(input.hint)}</Form.Text> : null}
+        </Form.Group>
       ))}
       <RightScreenButtonRow>
         <Button role="button" onClick={history.goBack} onKeyPress={history.goBack}>
@@ -222,7 +221,7 @@ const Submission = ({
           {t('wizard.next')}
         </Button>
       </RightScreenButtonRow>
-    </div>
+    </Form>
   )
 }
 

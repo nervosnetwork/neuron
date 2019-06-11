@@ -1,18 +1,12 @@
 import styled from 'styled-components'
 
-const RightScreenButtonRow = styled.div`
+const ScreenButtonRow = styled.div`
   display: flex;
   padding-top: 30px;
-  justify-content: flex-end;
-
-  button {
-    margin-left: 20px;
-  }
+  justify-content: space-between;
 `
 
-const LeftScreenButtonRow = styled.div`
-  display: flex;
-  padding-top: 30px;
+const LeftScreenButtonRow = styled(ScreenButtonRow)`
   justify-content: flex-start;
 
   button {
@@ -20,10 +14,13 @@ const LeftScreenButtonRow = styled.div`
   }
 `
 
-export { RightScreenButtonRow, LeftScreenButtonRow }
+const RightScreenButtonRow = styled(ScreenButtonRow)`
+  justify-content: flex-end;
 
-export default styled.div`
-  display: flex;
-  padding-top: 30px;
-  justify-content: space-between;
+  button {
+    margin-left: 20px;
+  }
 `
+
+export { LeftScreenButtonRow, RightScreenButtonRow }
+export default ScreenButtonRow
