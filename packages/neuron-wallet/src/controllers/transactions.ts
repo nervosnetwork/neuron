@@ -11,7 +11,7 @@ import Key from '../keys/key'
 
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
-import i18n from '../utils/i18n'
+import { KeyHasNotData, TransactionIsNotFound, CurrentWalletIsNotSet, ServiceHasNotResponse } from '../exceptions'
 
 /**
  * @class TransactionsController
@@ -25,10 +25,7 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
-    if (!transactions)
-      throw new Error(
-        i18n.t('messages.transactions-service-not-responds', { service: i18n.t('services.transactions') }),
-      )
+    if (!transactions) throw new ServiceHasNotResponse('Transactions')
 
     return {
       status: ResponseCode.Success,
@@ -46,16 +43,15 @@ export default class TransactionsController {
 
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
-      if (!wallet) throw new Error(i18n.t('messages.current-wallet-is-not-found'))
+      if (!wallet) throw new CurrentWalletIsNotSet()
       const key = new Key({ keystore: wallet.loadKeystore() })
-      if (!key.keysData) throw new Error(i18n.t('messages.current-key-has-no-data'))
+      if (!key.keysData) throw new KeyHasNotData()
       searchAddresses = AddressService.searchUsedAddresses(key.keysData).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
 
-    if (!transactions)
-      throw new Error(i18n.t('messages.service-not-responds', { service: i18n.t('services.transactions') }))
+    if (!transactions) throw new ServiceHasNotResponse('Transactions')
 
     return {
       status: ResponseCode.Success,
@@ -67,7 +63,7 @@ export default class TransactionsController {
   public static async get(hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
 
-    if (!transaction) throw new Error(i18n.t('messages.transaction-is-not-found', { hash }))
+    if (!transaction) throw new TransactionIsNotFound(hash)
 
     return {
       status: ResponseCode.Success,

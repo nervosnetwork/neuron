@@ -1,6 +1,7 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from '../entities/output'
 import { Cell, OutPoint } from '../app-types/types'
+import { CapacityIsNotEnough } from '../exceptions'
 
 const MIN_CELL_CAPACITY = '40'
 
@@ -88,7 +89,7 @@ export default class CellsService {
     })
 
     if (inputCapacities < capacityInt) {
-      throw new Error('Capacity not enough')
+      throw new CapacityIsNotEnough()
     }
 
     return {

@@ -6,6 +6,7 @@ import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
 import { Keychain } from './hd'
 import { Validate, Required, Password } from '../decorators'
+import { PasswordIsIncorrect, IsRequired, MnemonicIsInvalid, UnsupportedCipher } from '../exceptions'
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -58,7 +59,7 @@ export default class Key {
     const key = new Key()
     key.keystore = keystoreObject
     if (!key.checkPassword(password)) {
-      throw new Error('Password error.')
+      throw new PasswordIsIncorrect()
     }
     const { kdfparams } = keystoreObject.crypto
     const derivedKey: Buffer = crypto.scryptSync(
@@ -101,7 +102,7 @@ export default class Key {
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
     if (!bip39.validateMnemonic(mnemonic)) {
-      throw new Error('Wrong Mnemonic')
+      throw new MnemonicIsInvalid()
     }
     const key = new Key()
     const keysData = await key.generatePrivateKeyFromMnemonic(mnemonic)
@@ -113,10 +114,10 @@ export default class Key {
 
   public checkPassword = (password: string) => {
     if (password === undefined) {
-      throw new Error('No password given.')
+      throw new IsRequired('Password')
     }
     if (this.keystore === undefined) {
-      throw new Error('Keystore is undefined.')
+      throw new IsRequired('Keystore')
     }
     const { kdfparams } = this.keystore.crypto
     const derivedKey: Buffer = crypto.scryptSync(
@@ -165,7 +166,7 @@ export default class Key {
       }
       return keysData
     }
-    throw new Error('Wrong mnemonic')
+    throw new MnemonicIsInvalid()
   }
 
   public toKeystore = (encryptedData: string, password: string) => {
@@ -190,7 +191,7 @@ export default class Key {
 
     const cipher = crypto.createCipheriv('aes-128-ctr', derivedKey.slice(0, 16), iv)
     if (!cipher) {
-      throw new Error('Unsupported cipher')
+      throw new UnsupportedCipher()
     }
     const ciphertext = Buffer.concat([cipher.update(Buffer.from(encryptedData, 'utf8')), cipher.final()])
     const hash = new SHA3(256)

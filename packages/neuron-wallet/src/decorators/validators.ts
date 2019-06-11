@@ -2,6 +2,7 @@ import 'reflect-metadata'
 
 import i18n from '../utils/i18n'
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
+import { MissingRequiredArgument } from '../exceptions'
 
 const requiredMetadataKey = Symbol('required')
 const passwordMetadataKey = Symbol('password')
@@ -54,7 +55,7 @@ const Validate = (target: any, propertyKey: string, descriptor: PropertyDescript
       if (requiredIndices) {
         requiredIndices.forEach(idx => {
           if (idx >= args.length || args[idx] === undefined) {
-            throw new Error(i18n.t('messages.missing-required-argument'))
+            throw new MissingRequiredArgument()
           }
         })
       }

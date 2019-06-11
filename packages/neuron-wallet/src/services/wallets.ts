@@ -12,6 +12,14 @@ import env from '../env'
 import i18n from '../utils/i18n'
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
+import {
+  CurrentWalletIsNotSet,
+  WalletIsNotFound,
+  IsRequired,
+  KeyHasNotData,
+  CodeHashIsNotLoaded,
+  AddressIsInvalid,
+} from '../exceptions'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -41,9 +49,9 @@ class FileKeystoreWallet implements Wallet {
   public addresses: Addresses
 
   constructor(id: string, { name, addresses }: WalletProperties) {
-    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
-    if (name === undefined) throw new Error(i18n.t('messages.is-required', { field: 'name' }))
-    if (addresses === undefined) throw new Error(i18n.t('messages.is-required', { field: 'addresses' }))
+    if (id === undefined) throw new IsRequired('ID')
+    if (name === undefined) throw new IsRequired('Name')
+    if (addresses === undefined) throw new IsRequired('Addresses')
 
     this.id = id
     this.name = name
@@ -158,16 +166,16 @@ export default class WalletService {
   }
 
   public get = (id: string) => {
-    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
+    if (id === undefined) throw new IsRequired('ID')
 
     const wallet = this.getAll().find(w => w.id === id)
-    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (!wallet) throw new WalletIsNotFound(id)
 
     return FileKeystoreWallet.fromJSON(wallet)
   }
 
   public create = (props: WalletProperties) => {
-    if (!props) throw new Error(i18n.t('messages.is-required', { field: 'wallet property' }))
+    if (!props) throw new IsRequired('wallet property')
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
@@ -188,7 +196,7 @@ export default class WalletService {
   public update = (id: string, props: WalletProperties) => {
     const wallets = this.getAll()
     const index = wallets.findIndex((w: Wallet) => w.id === id)
-    if (index === -1) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (index === -1) throw new WalletIsNotFound(id)
 
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
 
@@ -211,7 +219,7 @@ export default class WalletService {
     const current = this.getCurrent()
     const currentId = current ? current.id : ''
 
-    if (!walletJSON) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (!walletJSON) throw new WalletIsNotFound(id)
 
     const wallet = FileKeystoreWallet.fromJSON(walletJSON)
 
@@ -230,10 +238,10 @@ export default class WalletService {
   }
 
   public setCurrent = (id: string) => {
-    if (id === undefined) throw new Error(i18n.t('messages.is-required', { field: 'id' }))
+    if (id === undefined) throw new IsRequired('ID')
 
     const wallet = this.get(id)
-    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (!wallet) throw new WalletIsNotFound(id)
 
     this.listStore.writeSync(this.currentWalletKey, id)
   }
@@ -248,7 +256,7 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
-    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (!wallet) throw new WalletIsNotFound(id)
 
     const key = new Key({ keystore: wallet.loadKeystore() })
     return key.checkPassword(password)
@@ -274,14 +282,13 @@ export default class WalletService {
     password: string,
   ) => {
     const wallet = await this.getCurrent()
-    if (!wallet) throw new Error(i18n.t('messages.current-wallet-is-not-found'))
+    if (!wallet) throw new CurrentWalletIsNotSet()
 
-    if (password === undefined || password === '')
-      throw new Error(i18n.t('messages.is-required', { field: 'password' }))
+    if (password === undefined || password === '') throw new IsRequired('Password')
 
     const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
 
-    if (!key.keysData) throw new Error(i18n.t('messages.current-key-has-no-data'))
+    if (!key.keysData) throw new KeyHasNotData()
 
     const { privateKey } = key.keysData
 
@@ -290,7 +297,7 @@ export default class WalletService {
     const changeAddress = wallet.addresses.change[0].address
 
     const { codeHash } = await LockUtils.systemScript()
-    if (!codeHash) throw new Error(i18n.t('messages.codehash-is-not-loaded'))
+    if (!codeHash) throw new CodeHashIsNotLoaded()
 
     const lockHashes = items.map(({ address }) => {
       // TODO: identifier will be a property of addressObj in SDK@0.13.0
@@ -299,7 +306,7 @@ export default class WalletService {
         env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet,
         'hex',
       ) as string
-      if (!identifier.startsWith(hrp)) throw new Error(i18n.t('messages.address-is-invalid', { address }))
+      if (!identifier.startsWith(hrp)) throw new AddressIsInvalid(address)
       return core.utils.lockScriptToHash({
         codeHash,
         args: [identifier.slice(10)],

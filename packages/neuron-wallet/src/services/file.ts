@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import env from '../env'
+import { FileIsNotFound, ModuleIsNotFound } from '../exceptions'
 
 export default class FileService {
   private static instance: FileService
@@ -39,18 +40,18 @@ export default class FileService {
   }
 
   public hasFile(moduleName: string, filename: string) {
-    if (!this.hasModule(moduleName)) throw new Error(`Module ${moduleName} not found`)
+    if (!this.hasModule(moduleName)) throw new ModuleIsNotFound(moduleName)
     return fs.existsSync(path.join(this.basePath, moduleName, filename))
   }
 
   public readFileSync = (moduleName: string, filename: string) => {
-    if (!this.hasFile(moduleName, filename)) throw new Error(`File ${filename} not found`)
+    if (!this.hasFile(moduleName, filename)) throw new FileIsNotFound(filename)
     return fs.readFileSync(path.join(this.basePath, moduleName, filename), this.config)
   }
 
   public readFile = (moduleName: string, filename: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-      if (!this.hasFile(moduleName, filename)) reject(new Error(`File ${filename} not found`))
+      if (!this.hasFile(moduleName, filename)) reject(new FileIsNotFound(filename))
       fs.readFile(path.join(this.basePath, moduleName, filename), this.config, (err, file) => {
         if (err) reject(err)
         resolve(file)
@@ -59,12 +60,12 @@ export default class FileService {
   }
 
   public writeFileSync = (moduleName: string, filename: string, data: string) => {
-    if (!this.hasModule(moduleName)) throw new Error(`Module ${moduleName} not found`)
+    if (!this.hasModule(moduleName)) throw new ModuleIsNotFound(moduleName)
     return fs.writeFileSync(path.join(this.basePath, moduleName, filename), data, this.config)
   }
 
   public deleteFileSync = (moduleName: string, filename: string) => {
-    if (!this.hasFile(moduleName, filename)) throw new Error(`File ${filename} not found`)
+    if (!this.hasFile(moduleName, filename)) throw new FileIsNotFound(filename)
     return fs.unlinkSync(path.join(this.basePath, moduleName, filename))
   }
 }
