@@ -3,7 +3,7 @@ export interface WalletIdentity {
   id: string
 }
 export interface Wallet extends WalletIdentity {
-  balance: number
+  balance: string
   addresses: Addresses
   publicKey: Uint8Array
   message: string
@@ -17,7 +17,7 @@ export interface Addresses {
 export const walletState: Wallet = {
   name: '',
   id: '',
-  balance: 0,
+  balance: '0',
   addresses: { receiving: [], change: [] },
   publicKey: new Uint8Array(0),
   message: '',
