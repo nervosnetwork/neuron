@@ -2,19 +2,22 @@ import { app, dialog, shell, Menu, MessageBoxOptions, BrowserWindow } from 'elec
 import { Channel, ResponseCode } from '../../utils/const'
 import windowManage from '../../utils/window-manage'
 import { URL, contextMenuTemplate } from './options'
-import WalletsController from '../wallets'
-import NetworksController from '../networks'
+import NetworksService from '../../services/networks'
+import WalletsService from '../../services/wallets'
 import { Controller as ControllerDecorator } from '../../decorators'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
+    const walletsService = WalletsService.getInstance()
+    const networksService = NetworksService.getInstance()
     const [activeWallet, wallets, activeNetworkId, networks] = await Promise.all([
-      WalletsController.service.getCurrent(),
-      WalletsController.service.getAll(),
-      NetworksController.service.activeId(),
-      NetworksController.service.getAll(),
+      walletsService.getCurrent(),
+      walletsService.getAll(),
+      networksService.activeId(),
+      networksService.getAll(),
     ])
+
     const locale = app.getLocale()
     const initState = {
       activeWallet: activeWallet && {

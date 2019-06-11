@@ -4,17 +4,17 @@ import { Controller as ControllerDecorator, CatchControllerError } from '../../d
 import { ResponseCode, Channel } from '../../utils/const'
 import i18n from '../../utils/i18n'
 
+const walletsService = WalletsService.getInstance()
+
 /**
  * @class WalletsController
  * @description handle messages from wallets channel
  */
 @ControllerDecorator(Channel.Wallets)
 export default class WalletsController {
-  static service = new WalletsService()
-
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
-    const wallets = WalletsController.service.getAll()
+    const wallets = walletsService.getAll()
     if (!wallets) throw new Error(i18n.t('wallets-service-not-responds', { services: i18n.t('services.wallets') }))
     return {
       status: ResponseCode.Success,
@@ -26,7 +26,7 @@ export default class WalletsController {
   public static async get(id: string): Promise<Controller.Response<Wallet>> {
     if (typeof id === 'undefined') throw new Error(i18n.t('messages.id-is-required'))
 
-    const wallet = WalletsController.service.get(id)
+    const wallet = walletsService.get(id)
     if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
     return {
       status: ResponseCode.Success,
@@ -59,7 +59,7 @@ export default class WalletsController {
     changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
-    const wallet = WalletsController.service.create({
+    const wallet = walletsService.create({
       name,
       keystore: key.keystore || null,
       addresses: key.addresses || {
@@ -115,7 +115,7 @@ export default class WalletsController {
     changeAddressNumber: number
   }): Promise<Controller.Response<Wallet>> {
     const key = await Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
-    const wallet = WalletsController.service.create({
+    const wallet = walletsService.create({
       name,
       keystore: key.keystore || null,
       addresses: key.addresses || { receiving: [], change: [] },
@@ -139,7 +139,7 @@ export default class WalletsController {
     name: string
     newPassword?: string
   }): Promise<Controller.Response<Wallet>> {
-    const wallet = WalletsController.service.get(id)
+    const wallet = walletsService.get(id)
     if (!wallet) throw new Error(i18n.t('wallet-is-not-found', { id }))
 
     const props: WalletProperties = {
@@ -149,7 +149,7 @@ export default class WalletsController {
     }
 
     if (newPassword) {
-      if (WalletsController.service.validate({ id, password })) {
+      if (walletsService.validate({ id, password })) {
         const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
         props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
       } else {
@@ -157,43 +157,42 @@ export default class WalletsController {
       }
     }
 
-    WalletsController.service.update(id, props)
+    walletsService.update(id, props)
     return {
       status: ResponseCode.Success,
-      result: WalletsController.service.get(id),
+      result: walletsService.get(id),
     }
   }
 
   @CatchControllerError
   public static async delete({ id, password }: { id: string; password: string }): Promise<Controller.Response<any>> {
-    if (!WalletsController.service.validate({ id, password }))
-      throw new Error(i18n.t('messages.wallet-incorrect-password'))
+    if (!walletsService.validate({ id, password })) throw new Error(i18n.t('messages.wallet-incorrect-password'))
 
-    WalletsController.service.delete(id)
+    walletsService.delete(id)
 
     return {
       status: ResponseCode.Success,
       result: {
-        allWallets: WalletsController.service.getAll(),
-        activeWallet: WalletsController.service.getCurrent(),
+        allWallets: walletsService.getAll(),
+        activeWallet: walletsService.getCurrent(),
       },
     }
   }
 
   @CatchControllerError
   public static async export({ id, password }: { id: string; password: string }): Promise<Controller.Response<string>> {
-    if (!WalletsController.service.validate({ id, password })) {
+    if (!walletsService.validate({ id, password })) {
       throw new Error(i18n.t('messages.wallet-incorrect-password'))
     }
     return {
       status: ResponseCode.Success,
-      result: JSON.stringify(WalletsController.service.get(id)),
+      result: JSON.stringify(walletsService.get(id)),
     }
   }
 
   @CatchControllerError
   public static async getActive() {
-    const activeWallet = WalletsController.service.getCurrent()
+    const activeWallet = walletsService.getCurrent()
     if (!activeWallet) {
       throw new Error(i18n.t('messages.no-active-wallet'))
     }
@@ -211,8 +210,8 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async activate(id: string) {
-    WalletsController.service.setCurrent(id)
-    const currentWallet = WalletsController.service.getCurrent()
+    walletsService.setCurrent(id)
+    const currentWallet = walletsService.getCurrent()
     if (!currentWallet) throw new Error('messages.current-wallet-is-not-found')
     return {
       status: ResponseCode.Success,
@@ -233,7 +232,7 @@ export default class WalletsController {
   }) {
     if (!params) throw new Error(i18n.t('messages.parameters-of-sending-transactions-are-required'))
     try {
-      const hash = await WalletsController.service.sendCapacity(params.items, params.password)
+      const hash = await walletsService.sendCapacity(params.items, params.password)
       return {
         status: ResponseCode.Success,
         result: hash,

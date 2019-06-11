@@ -37,6 +37,15 @@ const DEBOUNCE_TIME = 50
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
 
 export default class NetworksService extends Store {
+  private static instance: NetworksService
+
+  public static getInstance = () => {
+    if (!NetworksService.instance) {
+      NetworksService.instance = new NetworksService()
+    }
+    return NetworksService.instance
+  }
+
   constructor() {
     super('networks', 'index.json', JSON.stringify(env.presetNetworks))
     fromEvent<[NetworkWithID[], NetworkWithID[]]>(this, NetworksKey.List)
