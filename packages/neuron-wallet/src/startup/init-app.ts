@@ -1,14 +1,14 @@
 import { distinctUntilChanged } from 'rxjs/operators'
-import controllers from '../controllers'
 import windowManage from '../utils/window-manage'
 import Router from '../router'
 import NodeService from '../services/node'
+import NetworksService from '../services/networks'
 import { Channel } from '../utils/const'
 import logger from '../utils/logger'
 import app from '../app'
 
 const nodeService = NodeService.getInstance()
-const { NetworksController } = controllers
+const networksService = NetworksService.getInstance()
 
 const syncConnectStatus = () => {
   nodeService.tipNumberSubject.pipe(distinctUntilChanged()).subscribe(
@@ -29,8 +29,8 @@ const initApp = async () => {
   // TODO: this function should be moved to somewhere syncing data
   syncConnectStatus()
   if (!nodeService.core.node.url) {
-    const id = await NetworksController.service.activeId()
-    const network = await NetworksController.service.get(id || '')
+    const id = await networksService.activeId()
+    const network = await networksService.get(id || '')
     if (network) {
       nodeService.setNetwork(network.remote)
     } else {

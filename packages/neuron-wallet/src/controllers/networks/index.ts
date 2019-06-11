@@ -3,17 +3,17 @@ import { CatchControllerError, Controller as ControllerDecorator } from '../../d
 import { Channel, ResponseCode } from '../../utils/const'
 import i18n from '../../utils/i18n'
 
+const networksService = NetworksService.getInstance()
+
 /**
  * @class NetworksController
  * @description handle messages from networks channel
  */
 @ControllerDecorator(Channel.Networks)
 export default class NetworksController {
-  static service = new NetworksService()
-
   @CatchControllerError
   public static async getAll() {
-    const networks = await NetworksController.service.getAll()
+    const networks = await networksService.getAll()
     return {
       status: ResponseCode.Success,
       result: networks,
@@ -24,7 +24,7 @@ export default class NetworksController {
   public static async get(id: NetworkID) {
     if (typeof id === 'undefined') throw new Error(i18n.t('messages.id-is-required'))
 
-    const network = await NetworksController.service.get(id)
+    const network = await networksService.get(id)
     if (!network) throw new Error(i18n.t('messages.network-of-id-is-not-found', { id }))
 
     return {
@@ -38,7 +38,7 @@ export default class NetworksController {
     if (!name || !remote) throw new Error(i18n.t('messages.name-and-remote-address-are-required'))
     if (name === 'error') throw new Error(i18n.t('messages.invalid-name'))
 
-    const created = await NetworksController.service.create(name, remote, type)
+    const created = await networksService.create(name, remote, type)
     return {
       status: ResponseCode.Success,
       result: created,
@@ -49,7 +49,7 @@ export default class NetworksController {
   public static async update(id: NetworkID, options: Partial<Network>) {
     if (options.name && options.name === 'error') throw new Error(i18n.t('messages.invalid-name'))
 
-    await NetworksController.service.update(id, options)
+    await networksService.update(id, options)
     return {
       status: ResponseCode.Success,
       result: true,
@@ -58,17 +58,17 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async delete(id: NetworkID) {
-    const defaultNetwork = await NetworksController.service.defaultOne()
+    const defaultNetwork = await networksService.defaultOne()
 
     if (defaultNetwork && defaultNetwork.id === id) throw new Error(i18n.t('messages.default-network-is-unremovable'))
 
-    const activeId = await NetworksController.service.activeId()
+    const activeId = await networksService.activeId()
     if (activeId === id) {
       if (!defaultNetwork) throw new Error('messages.cannot-delete-active-network-due-to-lack-of-default-one')
-      await NetworksController.service.delete(id)
+      await networksService.delete(id)
       await NetworksController.activate(defaultNetwork.id)
     }
-    await NetworksController.service.delete(id)
+    await networksService.delete(id)
 
     return {
       status: ResponseCode.Success,
@@ -78,7 +78,7 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async activeId() {
-    const activeId = await NetworksController.service.activeId()
+    const activeId = await networksService.activeId()
     if (activeId) {
       return {
         status: ResponseCode.Success,
@@ -90,7 +90,7 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async activate(id: NetworkID) {
-    await NetworksController.service.activate(id)
+    await networksService.activate(id)
     return {
       status: ResponseCode.Success,
       result: true,
@@ -99,7 +99,7 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async clear() {
-    await NetworksController.service.clear()
+    await networksService.clear()
     return {
       status: ResponseCode.Success,
       result: true,
