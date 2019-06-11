@@ -279,9 +279,8 @@ export default class WalletService {
     if (password === undefined || password === '')
       throw new Error(i18n.t('messages.is-required', { field: 'password' }))
 
-    const key = new Key({ keystore: wallet.loadKeystore() })
+    const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
 
-    if (!key.checkPassword(password)) throw new Error(i18n.t('messages.password-is-incorrect'))
     if (!key.keysData) throw new Error(i18n.t('messages.current-key-has-no-data'))
 
     const { privateKey } = key.keysData
