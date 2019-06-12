@@ -25,8 +25,8 @@ const initState: WithWizardState = {
 }
 
 const submissionInputs = [
-  { label: 'name', key: 'name', type: 'text', hint: 'wizard.set-a-strong-password-to-protect-your-wallet' },
-  { label: 'password', key: 'password', type: 'password' },
+  { label: 'name', key: 'name', type: 'text' },
+  { label: 'password', key: 'password', type: 'password', hint: 'wizard.set-a-strong-password-to-protect-your-wallet' },
   { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
 ]
 
