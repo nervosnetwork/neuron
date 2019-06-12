@@ -36,7 +36,7 @@ export default class TransactionsController {
   @CatchControllerError
   public static async getAllByAddresses(
     params: TransactionsByAddressesParam,
-  ): Promise<Controller.Response<PaginationResult<Transaction>>> {
+  ): Promise<Controller.Response<PaginationResult<Transaction> & TransactionsByAddressesParam>> {
     const { pageNo, pageSize, addresses } = params
 
     let searchAddresses = [...addresses]
