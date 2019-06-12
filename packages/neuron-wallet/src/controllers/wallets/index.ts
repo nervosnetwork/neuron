@@ -2,7 +2,13 @@ import WalletsService, { Wallet, WalletProperties } from '../../services/wallets
 import Key from '../../keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
-import i18n from '../../utils/i18n'
+import {
+  CurrentWalletNotSet,
+  IsRequired,
+  WalletNotFound,
+  IncorrectPassword,
+  ServiceHasNoResponse,
+} from '../../exceptions'
 
 const walletsService = WalletsService.getInstance()
 
@@ -15,7 +21,7 @@ export default class WalletsController {
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
     const wallets = walletsService.getAll()
-    if (!wallets) throw new Error(i18n.t('wallets-service-not-responds', { services: i18n.t('services.wallets') }))
+    if (!wallets) throw new ServiceHasNoResponse('Wallet')
     return {
       status: ResponseCode.Success,
       result: wallets.map(({ name, id }) => ({ name, id })),
@@ -24,23 +30,13 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async get(id: string): Promise<Controller.Response<Wallet>> {
-    if (typeof id === 'undefined') throw new Error(i18n.t('messages.id-is-required'))
+    if (typeof id === 'undefined') throw new IsRequired('ID')
 
     const wallet = walletsService.get(id)
-    if (!wallet) throw new Error(i18n.t('messages.wallet-is-not-found', { id }))
+    if (!wallet) throw new WalletNotFound(id)
     return {
       status: ResponseCode.Success,
       result: wallet,
-    }
-  }
-
-  @CatchControllerError
-  public static async generateMnemonic(): Promise<Controller.Response<string>> {
-    const mnemonic = Key.generateMnemonic()
-    if (!mnemonic) throw new Error(i18n.t('messages.failed-to-create-mnemonic'))
-    return {
-      status: ResponseCode.Success,
-      result: mnemonic,
     }
   }
 
@@ -140,7 +136,7 @@ export default class WalletsController {
     newPassword?: string
   }): Promise<Controller.Response<Wallet>> {
     const wallet = walletsService.get(id)
-    if (!wallet) throw new Error(i18n.t('wallet-is-not-found', { id }))
+    if (!wallet) throw new WalletNotFound(id)
 
     const props: WalletProperties = {
       name: name || wallet.name,
@@ -153,7 +149,7 @@ export default class WalletsController {
         const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
         props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
       } else {
-        throw new Error(i18n.t('messages.wallet-incorrect-password'))
+        throw new IncorrectPassword()
       }
     }
 
@@ -166,7 +162,7 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async delete({ id, password }: { id: string; password: string }): Promise<Controller.Response<any>> {
-    if (!walletsService.validate({ id, password })) throw new Error(i18n.t('messages.wallet-incorrect-password'))
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
 
     walletsService.delete(id)
 
@@ -181,9 +177,7 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async export({ id, password }: { id: string; password: string }): Promise<Controller.Response<string>> {
-    if (!walletsService.validate({ id, password })) {
-      throw new Error(i18n.t('messages.wallet-incorrect-password'))
-    }
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
     return {
       status: ResponseCode.Success,
       result: JSON.stringify(walletsService.get(id)),
@@ -194,7 +188,7 @@ export default class WalletsController {
   public static async getActive() {
     const activeWallet = walletsService.getCurrent()
     if (!activeWallet) {
-      throw new Error(i18n.t('messages.no-active-wallet'))
+      throw new CurrentWalletNotSet()
     }
     return {
       status: ResponseCode.Success,
@@ -212,7 +206,7 @@ export default class WalletsController {
   public static async activate(id: string) {
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent()
-    if (!currentWallet) throw new Error('messages.current-wallet-is-not-found')
+    if (!currentWallet) throw new CurrentWalletNotSet()
     return {
       status: ResponseCode.Success,
       result: currentWallet.toJSON(),
@@ -230,7 +224,7 @@ export default class WalletsController {
     }[]
     password: string
   }) {
-    if (!params) throw new Error(i18n.t('messages.parameters-of-sending-transactions-are-required'))
+    if (!params) throw new IsRequired('Parameters')
     try {
       const hash = await walletsService.sendCapacity(params.items, params.password)
       return {

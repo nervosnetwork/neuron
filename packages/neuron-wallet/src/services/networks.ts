@@ -7,10 +7,10 @@ import env from '../env'
 
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
-import i18n from '../utils/i18n'
 
 import { Validate, Required } from '../decorators'
 import NodeService from './node'
+import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
 
 export type NetworkID = string
 export type NetworkName = string
@@ -103,7 +103,7 @@ export default class NetworksService extends Store {
 
   @Validate
   public async updateAll(@Required networks: NetworkWithID[]) {
-    if (!Array.isArray(networks)) throw new Error(i18n.t('messages.invalid-format', { field: 'networks' }))
+    if (!Array.isArray(networks)) throw new InvalidFormat('Networks')
     await this.writeSync(NetworksKey.List, networks)
   }
 
@@ -115,7 +115,7 @@ export default class NetworksService extends Store {
   ) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {
-      throw new Error(i18n.t('messages.network-name-is-used'))
+      throw new UsedName('Network')
     }
     const newOne = {
       id: uuid(),
@@ -132,7 +132,7 @@ export default class NetworksService extends Store {
     const list = await this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
-      throw new Error(i18n.t('messages.network-of-id-is-not-found', { id }))
+      throw new NetworkNotFound(id)
     }
     Object.assign(network, options)
     this.updateAll(list)
@@ -152,7 +152,7 @@ export default class NetworksService extends Store {
   public async activate(@Required id: NetworkID) {
     const network = await this.get(id)
     if (!network) {
-      throw new Error(i18n.t('messages.network-of-id-is-not-found', { id }))
+      throw new NetworkNotFound(id)
     }
     this.writeSync(NetworksKey.Active, id)
   }

@@ -6,6 +6,7 @@ import NetworksService from '../services/networks'
 import { Channel } from '../utils/const'
 import logger from '../utils/logger'
 import app from '../app'
+import { ActiveNetowrkNotSet } from '../exceptions'
 
 const nodeService = NodeService.getInstance()
 const networksService = NetworksService.getInstance()
@@ -34,7 +35,7 @@ const initApp = async () => {
     if (network) {
       nodeService.setNetwork(network.remote)
     } else {
-      throw new Error('Network not set')
+      throw new ActiveNetowrkNotSet()
     }
   }
   const router = new Router()

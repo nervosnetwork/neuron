@@ -1,6 +1,7 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
+import { ShouldBeTypeOf } from '../exceptions'
 
 class NodeService {
   private static instance: NodeService
@@ -21,7 +22,7 @@ class NodeService {
 
   setNetwork = (url: string) => {
     if (typeof url !== 'string') {
-      throw new Error('url should be type of string')
+      throw new ShouldBeTypeOf('URL', 'string')
     }
     if (!url.startsWith('http')) {
       throw new Error('Protocol of url should be specified')
