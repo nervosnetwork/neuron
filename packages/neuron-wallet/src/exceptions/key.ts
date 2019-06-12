@@ -14,7 +14,7 @@ export class UnsupportedCipher extends Error {
 
 export class InvalidMnemonic extends Error {
   constructor() {
-    super(i18n.t('messages.mnemonic-is-invalid'))
+    super(i18n.t('messages.invalid-mnemonic'))
   }
 }
 

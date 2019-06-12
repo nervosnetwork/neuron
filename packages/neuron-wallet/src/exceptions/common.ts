@@ -2,13 +2,13 @@ import i18n from '../utils/i18n'
 
 export class InvalidName extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.name-is-invalid', { field }))
+    super(i18n.t('messages.invalid-name', { field }))
   }
 }
 
 export class UsedName extends Error {
   constructor(field: string) {
-    super(i18n.t('messages.name-is-used', { field }))
+    super(i18n.t('messages.used-name', { field }))
   }
 }
 export class IsRequired extends Error {

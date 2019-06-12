@@ -9,7 +9,6 @@ import NodeService from './node'
 import FileService from './file'
 import LockUtils from '../utils/lock-utils'
 import env from '../env'
-import i18n from '../utils/i18n'
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
 import {
@@ -19,6 +18,7 @@ import {
   KeyHasNoData,
   CodeHashNotLoaded,
   InvalidAddress,
+  UsedName,
 } from '../exceptions'
 
 const { core } = NodeService.getInstance()
@@ -179,7 +179,7 @@ export default class WalletService {
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
-    if (index !== -1) throw Error(i18n.t('messages.wallet-name-is-used', { name: props.name }))
+    if (index !== -1) throw new UsedName('Wallet')
 
     const wallet = new FileKeystoreWallet(uuid(), props)
 
@@ -201,7 +201,7 @@ export default class WalletService {
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
 
     if (wallet.name !== props.name && wallets.findIndex(storeWallet => storeWallet.name === props.name) !== -1) {
-      throw Error(i18n.t('messages.wallet-name-is-used', { name: props.name }))
+      throw new UsedName('Wallet')
     }
 
     wallet.update(props)

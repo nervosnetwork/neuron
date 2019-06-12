@@ -5,7 +5,7 @@ import i18n from '../../src/utils/i18n'
 const ERROR_MESSAGE = {
   MISSING_ARG: 'Missing required argument',
   NAME_USED: 'Network name is used',
-  NETWORK_ID_NOT_FOUND: 'messages.network-is-not-found',
+  NETWORK_ID_NOT_FOUND: 'messages.network-not-found',
 }
 
 const {

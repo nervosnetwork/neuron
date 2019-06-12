@@ -2,13 +2,13 @@ import i18n from '../utils/i18n'
 
 export class NetworkNotFound extends Error {
   constructor(id: string) {
-    super(i18n.t('messages.network-is-not-found', { id }))
+    super(i18n.t('messages.network-not-found', { id }))
   }
 }
 
 export class DefaultNetworkUnremovable extends Error {
   constructor() {
-    super(i18n.t('messages.default-network-is-unremovable'))
+    super(i18n.t('messages.default-network-unremovable'))
   }
 }
 
@@ -20,7 +20,7 @@ export class LackOfDefaultNetwork extends Error {
 
 export class ActiveNetowrkNotSet extends Error {
   constructor() {
-    super(i18n.t('messages.active-network-is-not-set'))
+    super(i18n.t('messages.active-network-not-set'))
   }
 }
 
