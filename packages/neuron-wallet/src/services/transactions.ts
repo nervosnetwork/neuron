@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, CellOutPoint } from '../app-types/types'
+import { OutPoint, Script, Transaction, TransactionWithoutHash, Input } from '../app-types/types'
 import CellsService from './cells'
 import InputEntity from '../entities/input'
 import OutputEntity from '../entities/output'
@@ -215,15 +215,19 @@ export default class TransactionsService {
       const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
         txEntity.inputs.map(async input => {
           const outPoint: OutPoint = input.previousOutput()
-          const cell: CellOutPoint = outPoint.cell!
-          const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-            outPointTxHash: cell.txHash,
-            outPointIndex: cell.index,
-          })
-          if (outputEntity) {
-            outputEntity.status = OutputStatus.Dead
+          const { cell } = outPoint
+
+          if (cell) {
+            const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
+              outPointTxHash: cell.txHash,
+              outPointIndex: cell.index,
+            })
+            if (outputEntity) {
+              outputEntity.status = OutputStatus.Dead
+            }
+            return outputEntity
           }
-          return outputEntity
+          return undefined
         }),
       )
 
