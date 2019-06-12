@@ -3,11 +3,11 @@ import Key from '../../keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
-  CurrentWalletIsNotSet,
+  CurrentWalletNotSet,
   IsRequired,
-  WalletIsNotFound,
-  PasswordIsIncorrect,
-  ServiceHasNotResponse,
+  WalletNotFound,
+  IncorrectPassword,
+  ServiceHasNoResponse,
 } from '../../exceptions'
 
 const walletsService = WalletsService.getInstance()
@@ -21,7 +21,7 @@ export default class WalletsController {
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
     const wallets = walletsService.getAll()
-    if (!wallets) throw new ServiceHasNotResponse('Wallet')
+    if (!wallets) throw new ServiceHasNoResponse('Wallet')
     return {
       status: ResponseCode.Success,
       result: wallets.map(({ name, id }) => ({ name, id })),
@@ -33,7 +33,7 @@ export default class WalletsController {
     if (typeof id === 'undefined') throw new IsRequired('ID')
 
     const wallet = walletsService.get(id)
-    if (!wallet) throw new WalletIsNotFound(id)
+    if (!wallet) throw new WalletNotFound(id)
     return {
       status: ResponseCode.Success,
       result: wallet,
@@ -136,7 +136,7 @@ export default class WalletsController {
     newPassword?: string
   }): Promise<Controller.Response<Wallet>> {
     const wallet = walletsService.get(id)
-    if (!wallet) throw new WalletIsNotFound(id)
+    if (!wallet) throw new WalletNotFound(id)
 
     const props: WalletProperties = {
       name: name || wallet.name,
@@ -149,7 +149,7 @@ export default class WalletsController {
         const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
         props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
       } else {
-        throw new PasswordIsIncorrect()
+        throw new IncorrectPassword()
       }
     }
 
@@ -162,7 +162,7 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async delete({ id, password }: { id: string; password: string }): Promise<Controller.Response<any>> {
-    if (!walletsService.validate({ id, password })) throw new PasswordIsIncorrect()
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
 
     walletsService.delete(id)
 
@@ -177,7 +177,7 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async export({ id, password }: { id: string; password: string }): Promise<Controller.Response<string>> {
-    if (!walletsService.validate({ id, password })) throw new PasswordIsIncorrect()
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
     return {
       status: ResponseCode.Success,
       result: JSON.stringify(walletsService.get(id)),
@@ -188,7 +188,7 @@ export default class WalletsController {
   public static async getActive() {
     const activeWallet = walletsService.getCurrent()
     if (!activeWallet) {
-      throw new CurrentWalletIsNotSet()
+      throw new CurrentWalletNotSet()
     }
     return {
       status: ResponseCode.Success,
@@ -206,7 +206,7 @@ export default class WalletsController {
   public static async activate(id: string) {
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent()
-    if (!currentWallet) throw new CurrentWalletIsNotSet()
+    if (!currentWallet) throw new CurrentWalletNotSet()
     return {
       status: ResponseCode.Success,
       result: currentWallet.toJSON(),

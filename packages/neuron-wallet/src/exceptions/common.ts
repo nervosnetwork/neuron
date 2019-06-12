@@ -1,12 +1,12 @@
 import i18n from '../utils/i18n'
 
-export class NameIsInvalid extends Error {
+export class InvalidName extends Error {
   constructor(field: string) {
     super(i18n.t('messages.name-is-invalid', { field }))
   }
 }
 
-export class NameIsUsed extends Error {
+export class UsedName extends Error {
   constructor(field: string) {
     super(i18n.t('messages.name-is-used', { field }))
   }
@@ -23,7 +23,7 @@ export class MissingRequiredArgument extends Error {
   }
 }
 
-export class ServiceHasNotResponse extends Error {
+export class ServiceHasNoResponse extends Error {
   constructor(serviceName: string) {
     super(`${serviceName} service has no response`)
   }
@@ -41,10 +41,10 @@ export class ShouldBeTypeOf extends Error {
 }
 
 export default {
-  NameIsInvalid,
-  NameIsUsed,
+  InvalidName,
+  UsedName,
   IsRequired,
   MissingRequiredArgument,
-  ServiceHasNotResponse,
+  ServiceHasNoResponse,
   ShouldBeTypeOf,
 }

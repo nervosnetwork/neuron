@@ -3,11 +3,11 @@ import { CatchControllerError, Controller as ControllerDecorator } from '../../d
 import { Channel, ResponseCode } from '../../utils/const'
 import {
   IsRequired,
-  NameIsInvalid,
-  NetworkIsNotFound,
-  DefaultNetworkIsUnremovable,
-  LackOfDefaultNetork,
-  ActiveNetowrkIsNotSet,
+  InvalidName,
+  NetworkNotFound,
+  DefaultNetworkUnremovable,
+  LackOfDefaultNetwork,
+  ActiveNetowrkNotSet,
 } from '../../exceptions'
 
 const networksService = NetworksService.getInstance()
@@ -32,7 +32,7 @@ export default class NetworksController {
     if (typeof id === 'undefined') throw new IsRequired('ID')
 
     const network = await networksService.get(id)
-    if (!network) throw new NetworkIsNotFound(id)
+    if (!network) throw new NetworkNotFound(id)
 
     return {
       status: ResponseCode.Success,
@@ -43,7 +43,7 @@ export default class NetworksController {
   @CatchControllerError
   public static async create({ name, remote, type = NetworkType.Normal }: Network) {
     if (!name || !remote) throw new IsRequired('Name and address')
-    if (name === 'error') throw new NameIsInvalid('Network')
+    if (name === 'error') throw new InvalidName('Network')
 
     const created = await networksService.create(name, remote, type)
     return {
@@ -54,7 +54,7 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async update(id: NetworkID, options: Partial<Network>) {
-    if (options.name && options.name === 'error') throw new NameIsInvalid('Network')
+    if (options.name && options.name === 'error') throw new InvalidName('Network')
 
     await networksService.update(id, options)
     return {
@@ -67,11 +67,11 @@ export default class NetworksController {
   public static async delete(id: NetworkID) {
     const defaultNetwork = await networksService.defaultOne()
 
-    if (defaultNetwork && defaultNetwork.id === id) throw new DefaultNetworkIsUnremovable()
+    if (defaultNetwork && defaultNetwork.id === id) throw new DefaultNetworkUnremovable()
 
     const activeId = await networksService.activeId()
     if (activeId === id) {
-      if (!defaultNetwork) throw new LackOfDefaultNetork()
+      if (!defaultNetwork) throw new LackOfDefaultNetwork()
       await networksService.delete(id)
       await NetworksController.activate(defaultNetwork.id)
     }
@@ -92,7 +92,7 @@ export default class NetworksController {
         result: activeId,
       }
     }
-    throw new ActiveNetowrkIsNotSet()
+    throw new ActiveNetowrkNotSet()
   }
 
   @CatchControllerError

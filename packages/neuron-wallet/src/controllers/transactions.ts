@@ -11,7 +11,7 @@ import Key from '../keys/key'
 
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
-import { KeyHasNotData, TransactionIsNotFound, CurrentWalletIsNotSet, ServiceHasNotResponse } from '../exceptions'
+import { KeyHasNoData, TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
 
 /**
  * @class TransactionsController
@@ -25,7 +25,7 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
-    if (!transactions) throw new ServiceHasNotResponse('Transactions')
+    if (!transactions) throw new ServiceHasNoResponse('Transactions')
 
     return {
       status: ResponseCode.Success,
@@ -43,15 +43,15 @@ export default class TransactionsController {
 
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
-      if (!wallet) throw new CurrentWalletIsNotSet()
+      if (!wallet) throw new CurrentWalletNotSet()
       const key = new Key({ keystore: wallet.loadKeystore() })
-      if (!key.keysData) throw new KeyHasNotData()
+      if (!key.keysData) throw new KeyHasNoData()
       searchAddresses = AddressService.searchUsedAddresses(key.keysData).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
 
-    if (!transactions) throw new ServiceHasNotResponse('Transactions')
+    if (!transactions) throw new ServiceHasNoResponse('Transactions')
 
     return {
       status: ResponseCode.Success,
@@ -63,7 +63,7 @@ export default class TransactionsController {
   public static async get(hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
 
-    if (!transaction) throw new TransactionIsNotFound(hash)
+    if (!transaction) throw new TransactionNotFound(hash)
 
     return {
       status: ResponseCode.Success,

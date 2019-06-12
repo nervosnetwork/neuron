@@ -1,6 +1,6 @@
 import i18n from '../utils/i18n'
 
-export class KeyHasNotData extends Error {
+export class KeyHasNoData extends Error {
   constructor() {
     super(i18n.t('messages.current-key-has-no-data'))
   }
@@ -12,14 +12,14 @@ export class UnsupportedCipher extends Error {
   }
 }
 
-export class MnemonicIsInvalid extends Error {
+export class InvalidMnemonic extends Error {
   constructor() {
     super(i18n.t('messages.mnemonic-is-invalid'))
   }
 }
 
 export default {
-  KeyHasNotData,
+  KeyHasNoData,
   UnsupportedCipher,
-  MnemonicIsInvalid,
+  InvalidMnemonic,
 }

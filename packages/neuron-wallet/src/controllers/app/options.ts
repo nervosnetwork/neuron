@@ -9,7 +9,7 @@ import WalletsService from '../../services/wallets'
 import AppController from '.'
 import i18n from '../../utils/i18n'
 import env from '../../env'
-import { PasswordIsIncorrect } from '../../exceptions/wallet'
+import { IncorrectPassword } from '../../exceptions/wallet'
 
 export enum MenuCommand {
   ShowAbout = 'show-about',
@@ -109,7 +109,7 @@ export const contextMenuTemplate: {
 
               const wallet = await walletsService.get(id)
 
-              if (!walletsService.validate({ id, password })) throw new PasswordIsIncorrect()
+              if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
 
               const keystore = wallet.loadKeystore()
               dialog.showSaveDialog(

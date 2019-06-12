@@ -13,12 +13,12 @@ import i18n from '../utils/i18n'
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
 import {
-  CurrentWalletIsNotSet,
-  WalletIsNotFound,
+  CurrentWalletNotSet,
+  WalletNotFound,
   IsRequired,
-  KeyHasNotData,
-  CodeHashIsNotLoaded,
-  AddressIsInvalid,
+  KeyHasNoData,
+  CodeHashNotLoaded,
+  InvalidAddress,
 } from '../exceptions'
 
 const { core } = NodeService.getInstance()
@@ -169,7 +169,7 @@ export default class WalletService {
     if (id === undefined) throw new IsRequired('ID')
 
     const wallet = this.getAll().find(w => w.id === id)
-    if (!wallet) throw new WalletIsNotFound(id)
+    if (!wallet) throw new WalletNotFound(id)
 
     return FileKeystoreWallet.fromJSON(wallet)
   }
@@ -196,7 +196,7 @@ export default class WalletService {
   public update = (id: string, props: WalletProperties) => {
     const wallets = this.getAll()
     const index = wallets.findIndex((w: Wallet) => w.id === id)
-    if (index === -1) throw new WalletIsNotFound(id)
+    if (index === -1) throw new WalletNotFound(id)
 
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
 
@@ -219,7 +219,7 @@ export default class WalletService {
     const current = this.getCurrent()
     const currentId = current ? current.id : ''
 
-    if (!walletJSON) throw new WalletIsNotFound(id)
+    if (!walletJSON) throw new WalletNotFound(id)
 
     const wallet = FileKeystoreWallet.fromJSON(walletJSON)
 
@@ -241,7 +241,7 @@ export default class WalletService {
     if (id === undefined) throw new IsRequired('ID')
 
     const wallet = this.get(id)
-    if (!wallet) throw new WalletIsNotFound(id)
+    if (!wallet) throw new WalletNotFound(id)
 
     this.listStore.writeSync(this.currentWalletKey, id)
   }
@@ -256,7 +256,7 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
-    if (!wallet) throw new WalletIsNotFound(id)
+    if (!wallet) throw new WalletNotFound(id)
 
     const key = new Key({ keystore: wallet.loadKeystore() })
     return key.checkPassword(password)
@@ -282,13 +282,13 @@ export default class WalletService {
     password: string,
   ) => {
     const wallet = await this.getCurrent()
-    if (!wallet) throw new CurrentWalletIsNotSet()
+    if (!wallet) throw new CurrentWalletNotSet()
 
     if (password === undefined || password === '') throw new IsRequired('Password')
 
     const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
 
-    if (!key.keysData) throw new KeyHasNotData()
+    if (!key.keysData) throw new KeyHasNoData()
 
     const { privateKey } = key.keysData
 
@@ -297,7 +297,7 @@ export default class WalletService {
     const changeAddress = wallet.addresses.change[0].address
 
     const { codeHash } = await LockUtils.systemScript()
-    if (!codeHash) throw new CodeHashIsNotLoaded()
+    if (!codeHash) throw new CodeHashNotLoaded()
 
     const lockHashes = items.map(({ address }) => {
       // TODO: identifier will be a property of addressObj in SDK@0.13.0
@@ -306,7 +306,7 @@ export default class WalletService {
         env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet,
         'hex',
       ) as string
-      if (!identifier.startsWith(hrp)) throw new AddressIsInvalid(address)
+      if (!identifier.startsWith(hrp)) throw new InvalidAddress(address)
       return core.utils.lockScriptToHash({
         codeHash,
         args: [identifier.slice(10)],

@@ -1,15 +1,15 @@
-export class ModuleIsNotFound extends Error {
+export class ModuleNotFound extends Error {
   constructor(moduleName: string) {
     super(`Module ${moduleName} not found`)
   }
 }
-export class FileIsNotFound extends Error {
+export class FileNotFound extends Error {
   constructor(filename: string) {
     super(`File ${filename} not found`)
   }
 }
 
 export default {
-  ModuleIsNotFound,
-  FileIsNotFound,
+  ModuleNotFound,
+  FileNotFound,
 }

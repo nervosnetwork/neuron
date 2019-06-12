@@ -10,7 +10,7 @@ import { Channel, ResponseCode } from '../utils/const'
 
 import { Validate, Required } from '../decorators'
 import NodeService from './node'
-import { NameIsUsed, NetworkIsNotFound, InvalidFormat } from '../exceptions'
+import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
 
 export type NetworkID = string
 export type NetworkName = string
@@ -115,7 +115,7 @@ export default class NetworksService extends Store {
   ) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {
-      throw new NameIsUsed('Network')
+      throw new UsedName('Network')
     }
     const newOne = {
       id: uuid(),
@@ -132,7 +132,7 @@ export default class NetworksService extends Store {
     const list = await this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
-      throw new NetworkIsNotFound(id)
+      throw new NetworkNotFound(id)
     }
     Object.assign(network, options)
     this.updateAll(list)
@@ -152,7 +152,7 @@ export default class NetworksService extends Store {
   public async activate(@Required id: NetworkID) {
     const network = await this.get(id)
     if (!network) {
-      throw new NetworkIsNotFound(id)
+      throw new NetworkNotFound(id)
     }
     this.writeSync(NetworksKey.Active, id)
   }

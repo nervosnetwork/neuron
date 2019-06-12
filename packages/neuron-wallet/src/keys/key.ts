@@ -6,7 +6,7 @@ import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
 import { Keychain } from './hd'
 import { Validate, Required, Password } from '../decorators'
-import { PasswordIsIncorrect, IsRequired, MnemonicIsInvalid, UnsupportedCipher } from '../exceptions'
+import { IncorrectPassword, IsRequired, InvalidMnemonic, UnsupportedCipher } from '../exceptions'
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -59,7 +59,7 @@ export default class Key {
     const key = new Key()
     key.keystore = keystoreObject
     if (!key.checkPassword(password)) {
-      throw new PasswordIsIncorrect()
+      throw new IncorrectPassword()
     }
     const { kdfparams } = keystoreObject.crypto
     const derivedKey: Buffer = crypto.scryptSync(
@@ -102,7 +102,7 @@ export default class Key {
     changeAddressNumber = DefaultAddressNumber.Change,
   ) {
     if (!bip39.validateMnemonic(mnemonic)) {
-      throw new MnemonicIsInvalid()
+      throw new InvalidMnemonic()
     }
     const key = new Key()
     const keysData = await key.generatePrivateKeyFromMnemonic(mnemonic)
@@ -166,7 +166,7 @@ export default class Key {
       }
       return keysData
     }
-    throw new MnemonicIsInvalid()
+    throw new InvalidMnemonic()
   }
 
   public toKeystore = (encryptedData: string, password: string) => {

@@ -1,32 +1,32 @@
 import i18n from '../utils/i18n'
 
-export class NetworkIsNotFound extends Error {
+export class NetworkNotFound extends Error {
   constructor(id: string) {
     super(i18n.t('messages.network-is-not-found', { id }))
   }
 }
 
-export class DefaultNetworkIsUnremovable extends Error {
+export class DefaultNetworkUnremovable extends Error {
   constructor() {
     super(i18n.t('messages.default-network-is-unremovable'))
   }
 }
 
-export class LackOfDefaultNetork extends Error {
+export class LackOfDefaultNetwork extends Error {
   constructor() {
     super(i18n.t('messages.lack-of-default-network'))
   }
 }
 
-export class ActiveNetowrkIsNotSet extends Error {
+export class ActiveNetowrkNotSet extends Error {
   constructor() {
     super(i18n.t('messages.active-network-is-not-set'))
   }
 }
 
 export default {
-  NetworkIsNotFound,
-  DefaultNetworkIsUnremovable,
-  LackOfDefaultNetork,
-  ActiveNetowrkIsNotSet,
+  NetworkNotFound,
+  DefaultNetworkUnremovable,
+  LackOfDefaultNetwork,
+  ActiveNetowrkNotSet,
 }
