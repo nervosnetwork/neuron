@@ -23,6 +23,9 @@
       "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}"
     },
+    "detail": {
+      "more-transactions": "More"
+    },
     "send": {
       "address": "address",
       "capacity": "capacity",
@@ -126,7 +129,8 @@
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
       "protocol-is-required": "Protocol is required",
-      "wallet-is-not-found": "Wallet is not found"
+      "wallet-not-found": "Wallet not found",
+      "no-transactions": "No transactions"
     }
   }
 }

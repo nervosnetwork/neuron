@@ -4,6 +4,7 @@ import windowManage from '../../utils/window-manage'
 import { URL, contextMenuTemplate } from './options'
 import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
+import TransactionsController from '../transactions'
 import { Controller as ControllerDecorator } from '../../decorators'
 
 @ControllerDecorator(Channel.App)
@@ -11,11 +12,16 @@ export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
     const walletsService = WalletsService.getInstance()
     const networksService = NetworksService.getInstance()
-    const [activeWallet, wallets, activeNetworkId, networks] = await Promise.all([
+    const [activeWallet, wallets, activeNetworkId, networks, transactions] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
       networksService.activeId(),
       networksService.getAll(),
+      TransactionsController.getAllByAddresses({
+        pageNo: 1,
+        pageSize: 15,
+        addresses: [],
+      }).then(res => res.result),
     ])
 
     const locale = app.getLocale()
@@ -31,6 +37,7 @@ export default class AppController {
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       activeNetworkId,
       networks,
+      transactions,
       locale,
     }
     win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })

@@ -1,69 +1,29 @@
 import React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
-import { Container, Row, Col, Badge, Table, Alert } from 'react-bootstrap'
+import { Container, Row, Col, Badge, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import { Close as CloseIcon } from 'grommet-icons'
-import dayjs from 'dayjs'
 
+import TransactionList from 'components/TransactionList'
 import Pagination from 'widgets/Table/Pagination'
 
 import { ContentProps } from 'containers/MainContent'
 
-import { appCalls } from 'services/UILayer'
-import { Transaction } from 'contexts/NeuronWallet'
 import { useNeuronWallet } from 'utils/hooks'
-import { TransactionType } from 'utils/const'
 import { queryFormatter } from 'utils/formatters'
 
 import { useSearch, useOnChangePage, useOnAddressRemove } from './hooks'
-
-enum TimeFormat {
-  Day = 'YYYY-MM-DD',
-  Time = 'HH:mm',
-}
-
-const headers = [
-  { label: 'history.meta', key: 'meta' },
-  { label: 'history.transaction-hash', key: 'hash' },
-  { label: 'history.amount', key: 'value' },
-]
-
-export interface MenuItemParams {
-  hash: string
-}
-
-const MetaData = styled.td`
-  display: flex;
-  flex-direction: column;
-`
 
 const AddressBadge = styled(Badge)`
   margin-right: 15px;
   margin-bottom: 15px;
 `
 
-const groupHistory = (items: Transaction[]): Transaction[][] => {
-  return items.reduce((acc: Transaction[][], cur: Transaction) => {
-    if (!acc.length) {
-      acc.push([cur])
-      return acc
-    }
-    const lastGroup = acc[acc.length - 1]
-    if (dayjs(cur.time).format(TimeFormat.Day) === dayjs(lastGroup[0].time).format(TimeFormat.Day)) {
-      lastGroup.push(cur)
-      return acc
-    }
-    acc.push([cur])
-    return acc
-  }, [])
-}
-
 const History = ({
   location: { search, pathname },
   history,
-  // loadings,
   errorMsgs,
   dispatch,
   providerDispatch,
@@ -92,37 +52,10 @@ const History = ({
           </AddressBadge>
         ))
       ) : (
-        <div>No Transactions Found</div>
+        <div>{t('messages.no-transactions')}</div>
       )}
-      {groupHistory(items).map(group => (
-        <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
-          <thead>
-            <tr>
-              <th colSpan={headers.length}>{dayjs(group[0].time).format(TimeFormat.Day)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.map(historyItem => (
-              <tr
-                key={historyItem.hash}
-                onContextMenu={() => appCalls.contextMenu({ type: 'transactionList', id: historyItem.hash })}
-              >
-                {headers.map(header =>
-                  header.key === headers[0].key ? (
-                    <MetaData key={headers[0].key}>
-                      {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
-                      {dayjs(historyItem.time).format(TimeFormat.Time)}
-                    </MetaData>
-                  ) : (
-                    <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
-                  ),
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      ))}
-      {addresses.length > 0 ? (
+      <TransactionList items={items} />
+      {totalCount > pageSize ? (
         <Row>
           <Col>
             <Pagination currentPage={pageNo - 1} pageSize={pageSize} total={totalCount} onChange={onPageChange} />

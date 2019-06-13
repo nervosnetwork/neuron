@@ -17,11 +17,20 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           activeNetworkId: string
           wallets: any
           activeWallet: any
+          transactions: any
           locale: string
         }>,
       ) => {
         if (args.status) {
-          const { locale, networks, activeNetworkId: networkId, wallets, activeWallet: wallet, balance } = args.result
+          const {
+            locale,
+            networks,
+            activeNetworkId: networkId,
+            wallets,
+            activeWallet: wallet,
+            balance,
+            transactions,
+          } = args.result
           if (locale !== i18n.language) {
             i18n.changeLanguage(locale)
           }
@@ -29,6 +38,12 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             dispatch({
               type: ProviderActions.Initiate,
               payload: { networks, networkId, wallet: { ...wallet, balance }, wallets },
+            })
+          }
+          if (transactions && transactions.totalCount) {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: { transactions: { ...chain.transactions, ...transactions } },
             })
           }
         } else {

@@ -3,6 +3,7 @@ import { History } from 'history'
 import { actionCreators, MainActions } from 'containers/MainContent/reducer'
 import { ProviderActions } from 'containers/Providers/reducer'
 import { queryParsers } from 'utils/parser'
+import { PAGE_SIZE } from '../../utils/const'
 
 export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
   useEffect(() => {
@@ -12,6 +13,7 @@ export const useSearch = (search: string, dispatch: React.Dispatch<any>, provide
     })
     dispatch(actionCreators.getTransactions(params))
     return () => {
+      dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, addresses: [] }))
       dispatch({
         type: MainActions.ErrorMessage,
         payload: {
