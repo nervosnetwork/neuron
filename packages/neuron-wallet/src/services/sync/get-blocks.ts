@@ -2,9 +2,11 @@ import Core from '@nervosnetwork/ckb-sdk-core'
 
 import { Block } from '../../app-types/types'
 import TypeConvert from '../../app-types/type-convert'
-import { networkSwitchSubject, NetworkWithID } from '../networks'
+import { NetworkWithID } from '../networks'
 import CheckAndSave from './check-and-save'
 import Utils from './utils'
+
+import { networkSwitchSubject } from './renderer-params'
 
 let core: Core
 networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
