@@ -71,6 +71,7 @@ const Mnemonic = ({
   const [t] = useTranslation()
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
+  const hint = isCreate ? 'wizard.write-down-seed' : ''
   const disableNext = type === MnemonicAction.Verify && !(generated === imported)
 
   useEffect(() => {
@@ -93,7 +94,7 @@ const Mnemonic = ({
         payload: '',
       })
     }
-  }, [dispatch, type])
+  }, [dispatch, type, history])
 
   const onChange = useCallback(
     e => {
@@ -125,6 +126,7 @@ const Mnemonic = ({
         value={isCreate ? generated : imported}
         onChange={onChange}
       />
+      <Form.Text className="text-muted">{t(hint)}</Form.Text>
       <RightScreenButtonRow>
         <Button role="button" onClick={history.goBack}>
           {t('wizard.back')}
