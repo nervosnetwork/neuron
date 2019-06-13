@@ -21,7 +21,8 @@
       "confirm-password": "确认密码",
       "set-wallet-name-and-password": "命名并设置密码用于保护钱包",
       "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
-      "wallet-suffix": "钱包 {{suffix}}"
+      "wallet-suffix": "钱包 {{suffix}}",
+      "write-down-seed": "请记下您的助记词并保存到安全的地方"
     },
     "detail": {
       "more-transactions": "更多交易记录"
