@@ -1,3 +1,2 @@
 src/migration
 dist
-src/types/async/*.ts
