@@ -18,14 +18,20 @@ export default class Queue {
   private fetchSize: number = 4
   private retryTime: number = 5
 
-  constructor(lockHashes: string[], startBlockNumber: string, endBlockNumber: string) {
+  constructor(
+    lockHashes: string[],
+    startBlockNumber: string,
+    endBlockNumber: string,
+    currentBlockNumber: BlockNumber = new BlockNumber(),
+    rangeForCheck: RangeForCheck = new RangeForCheck(),
+  ) {
     this.generateQueue()
     this.lockHashes = lockHashes
     this.getBlocksService = new GetBlocks()
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
-    this.rangeForCheck = new RangeForCheck()
-    this.currentBlockNumber = new BlockNumber()
+    this.rangeForCheck = rangeForCheck
+    this.currentBlockNumber = currentBlockNumber
   }
 
   private generateQueue = () => {
@@ -53,6 +59,18 @@ export default class Queue {
 
   public get = () => {
     return this.q
+  }
+
+  public pause = () => {
+    this.q.pause()
+  }
+
+  public resume = () => {
+    this.q.resume()
+  }
+
+  public kill = () => {
+    this.q.kill()
   }
 
   public pipeline = async (blockNumbers: string[]) => {
@@ -107,6 +125,9 @@ export default class Queue {
   }
 
   public process = () => {
+    if (this.startBlockNumber > this.endBlockNumber) {
+      return undefined
+    }
     return this.batchPush()
   }
 

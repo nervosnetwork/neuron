@@ -1,21 +1,33 @@
 import { getConnection } from 'typeorm'
+import { Subject } from 'rxjs'
 import { Transaction, Cell, OutPoint } from '../../../app-types/types'
 import OutputEntity from '../../../entities/output'
 import TransactionsService from '../../transactions'
 import CheckOutput from './output'
+import LockUtils from '../../../utils/lock-utils'
+import AddressesUsedSubject from '../../../subjects/addresses-used-subject'
 
 export default class CheckTx {
   private tx: Transaction
+  private addressesUsedSubject: Subject<string[]>
 
-  constructor(tx: Transaction) {
+  constructor(tx: Transaction, addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.getSubject()) {
     this.tx = tx
+    this.addressesUsedSubject = addressesUsedSubject
   }
 
   public check = async (lockHashes: string[]): Promise<boolean> => {
     const outputs: Cell[] = this.filterOutputs(lockHashes)
     const anyInput: boolean = await this.anyInputs()
 
-    // TODO: tell address used
+    if (outputs.length > 0) {
+      // found addresses used
+      const addresses: string[] = outputs.map(output => {
+        return LockUtils.lockScriptToAddress(output.lock)
+      })
+      this.addressesUsedSubject.next(addresses)
+    }
+
     if (outputs.length > 0 || anyInput) {
       return true
     }
