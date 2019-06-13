@@ -2,6 +2,8 @@ import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
+import windowManage from '../utils/window-manage'
+import { Channel } from '../utils/const'
 
 class NodeService {
   private static instance: NodeService
@@ -17,10 +19,24 @@ class NodeService {
   public delayTime = 0
   public intervalTime = 1000
   public tipNumberSubject = new BehaviorSubject<string | undefined>(undefined)
+  public connectStatusSubject = new BehaviorSubject<boolean>(false)
 
   public core: Core = new Core('')
 
-  setNetwork = (url: string) => {
+  constructor() {
+    this.syncConnectStatus()
+  }
+
+  public syncConnectStatus = () => {
+    this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
+      windowManage.broadcast(Channel.Networks, 'status', {
+        status: 1,
+        result: connectStatus,
+      })
+    })
+  }
+
+  public setNetwork = (url: string) => {
     if (typeof url !== 'string') {
       throw new ShouldBeTypeOf('URL', 'string')
     }
@@ -28,23 +44,32 @@ class NodeService {
       throw new Error('Protocol of url should be specified')
     }
     this.core.setNode({ url })
-    this.tipNumberSubject.next(undefined)
+    this.connectStatusSubject.next(false)
     return this.core
   }
 
-  start = () => {
+  public start = () => {
     const { unsubscribe } = this.tipNumber()
     this.stop = unsubscribe
   }
 
   public stop: Function | null = null
 
-  tipNumber = () => {
+  public tipNumber = () => {
     return interval(this.intervalTime)
       .pipe(
         delay(this.delayTime),
         flatMap(() => {
-          return this.core.rpc.getTipBlockNumber()
+          return this.core.rpc
+            .getTipBlockNumber()
+            .then(tipNumber => {
+              this.connectStatusSubject.next(true)
+              return tipNumber
+            })
+            .catch(err => {
+              this.connectStatusSubject.next(false)
+              throw err
+            })
         }),
         retry(3),
         distinctUntilChanged(),
