@@ -1,7 +1,7 @@
 import Key from '../keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
-import i18n from '../utils/i18n'
+import { FailToCreateMnemonic } from '../exceptions'
 
 /**
  * @class HelpersController
@@ -18,7 +18,7 @@ export default class HelpersController {
         result: mnemonic,
       }
     }
-    throw new Error(i18n.t('messages.failed-to-create-mnemonic'))
+    throw new FailToCreateMnemonic()
   }
 }
 

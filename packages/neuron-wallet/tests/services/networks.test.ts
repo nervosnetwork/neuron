@@ -3,9 +3,9 @@ import env from '../../src/env'
 import i18n from '../../src/utils/i18n'
 
 const ERROR_MESSAGE = {
-  MISSING_ARG: 'messages.missing-required-argument',
-  NAME_USED: 'messages.network-name-is-used',
-  NETWORK_ID_NOT_FOUND: 'messages.network-of-id-is-not-found',
+  MISSING_ARG: 'Missing required argument',
+  NAME_USED: 'Network name is used',
+  NETWORK_ID_NOT_FOUND: 'messages.network-not-found',
 }
 
 const {

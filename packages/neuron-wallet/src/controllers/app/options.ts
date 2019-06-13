@@ -3,10 +3,13 @@ import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
 import prompt from 'electron-prompt'
 
 import NetworksController from '../networks'
+import WalletsController from '../wallets'
+import NetworksService from '../../services/networks'
+import WalletsService from '../../services/wallets'
 import AppController from '.'
 import i18n from '../../utils/i18n'
-import WalletsController from '../wallets'
 import env from '../../env'
+import { IncorrectPassword } from '../../exceptions/wallet'
 
 export enum MenuCommand {
   ShowAbout = 'show-about',
@@ -21,6 +24,9 @@ export enum URL {
   Repository = 'https://github.com/nervosnetwork/neuron',
   Preference = '/settings/general',
 }
+
+const networksService = NetworksService.getInstance()
+const walletsService = WalletsService.getInstance()
 
 export const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
@@ -65,7 +71,7 @@ export const contextMenuTemplate: {
             (btnIdx: number) => {
               if (btnIdx === 0) {
                 try {
-                  NetworksController.service.delete(id)
+                  networksService.delete(id)
                 } catch (err) {
                   dialog.showMessageBox({
                     type: 'error',
@@ -101,10 +107,9 @@ export const contextMenuTemplate: {
             .then(async (password: string | null = '') => {
               if (password === null) return
 
-              const wallet = await WalletsController.service.get(id)
+              const wallet = await walletsService.get(id)
 
-              if (!WalletsController.service.validate({ id, password }))
-                throw new Error(i18n.t('messages.password-is-incorrect'))
+              if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
 
               const keystore = wallet.loadKeystore()
               dialog.showSaveDialog(

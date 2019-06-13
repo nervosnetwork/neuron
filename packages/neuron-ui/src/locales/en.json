@@ -19,8 +19,12 @@
       "input-your-seed": "Input your seed",
       "password": "Password",
       "confirm-password": "Confirm Password",
-      "set-a-strong-password-to-protect-your-wallet": "Set a strong password to protect your wallet",
+      "set-wallet-name-and-password": "Set name and password to protect your wallet",
+      "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}"
+    },
+    "detail": {
+      "more-transactions": "More"
     },
     "send": {
       "address": "address",
@@ -125,7 +129,8 @@
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
       "protocol-is-required": "Protocol is required",
-      "wallet-is-not-found": "Wallet is not found"
+      "wallet-not-found": "Wallet not found",
+      "no-transactions": "No transactions"
     }
   }
 }
