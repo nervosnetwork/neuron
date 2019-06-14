@@ -12,7 +12,6 @@ class NodeService {
     if (!NodeService.instance) {
       NodeService.instance = new NodeService()
     }
-
     return NodeService.instance
   }
 
@@ -24,6 +23,7 @@ class NodeService {
   public core: Core = new Core('')
 
   constructor() {
+    this.start()
     this.syncConnectStatus()
   }
 
