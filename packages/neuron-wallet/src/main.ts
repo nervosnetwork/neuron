@@ -1,18 +1,20 @@
 import { app, Menu } from 'electron'
 import 'reflect-metadata'
-
-import initApp from './startup/init-app'
-import createWindow from './startup/create-window'
-import createSyncBlockTask from './startup/sync-block-task/create'
-
 import i18n from './utils/i18n'
 import mainmenu from './utils/mainmenu'
 
+import Router from './router'
+import createWindow from './startup/create-window'
+import createSyncBlockTask from './startup/sync-block-task/create'
+
 let mainWindow: Electron.BrowserWindow | null
 
+const router = new Router()
+
+Object.defineProperty(app, 'router', {
+  value: router,
+})
 const openWindow = () => {
-  i18n.changeLanguage(app.getLocale())
-  Menu.setApplicationMenu(mainmenu())
   if (!mainWindow) {
     mainWindow = createWindow()
     mainWindow.on('closed', () => {
@@ -24,9 +26,10 @@ const openWindow = () => {
 }
 
 app.on('ready', () => {
-  initApp()
-  openWindow()
+  i18n.changeLanguage(app.getLocale())
+  Menu.setApplicationMenu(mainmenu())
   createSyncBlockTask()
+  openWindow()
 })
 
 app.on('activate', openWindow)

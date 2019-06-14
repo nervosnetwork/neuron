@@ -1,11 +1,14 @@
-import { app, dialog, shell, Menu, MessageBoxOptions, BrowserWindow } from 'electron'
-import { Channel, ResponseCode } from '../../utils/const'
-import windowManage from '../../utils/window-manage'
+import { dialog, shell, Menu, MessageBoxOptions, BrowserWindow } from 'electron'
+import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
-import NetworksService from '../../services/networks'
-import WalletsService from '../../services/wallets'
+
 import TransactionsController from '../transactions'
 import { Controller as ControllerDecorator } from '../../decorators'
+import NetworksService from '../../services/networks'
+import WalletsService from '../../services/wallets'
+
+import { Channel, ResponseCode } from '../../utils/const'
+import windowManage from '../../utils/window-manage'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
