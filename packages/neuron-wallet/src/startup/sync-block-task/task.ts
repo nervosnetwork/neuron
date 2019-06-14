@@ -7,10 +7,9 @@ import AddressesUsedSubject from '../../subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 
-// read main process properties from `remote.app`
-const { app }: { app: any } = remote
-const { syncBlockTask } = app
-const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = syncBlockTask
+const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = remote.require(
+  './startup/sync-block-task/params',
+)
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)

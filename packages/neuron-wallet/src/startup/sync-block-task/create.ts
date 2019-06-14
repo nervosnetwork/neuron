@@ -2,11 +2,8 @@ import { BrowserWindow } from 'electron'
 import { Subject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
-import app from '../../app'
-import NodeService from '../../services/node'
 import env from '../../env'
 import initConnection from '../../typeorm'
-import { AddressesUsedSubject } from '../../subjects/addresses-used-subject'
 
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
@@ -16,23 +13,10 @@ networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
 
 // TODO: mock as an address subject
 export const addressChangeSubject = new Subject()
-const nodeService = NodeService.getInstance()
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
-// pass data in main process to renderer process
-const syncTaskAttrs = {
-  networkSwitchSubject,
-  nodeService,
-  addressChangeSubject,
-  addressesUsedSubject: AddressesUsedSubject.getSubject(),
-}
-
-Object.defineProperty(app, 'syncBlockTask', {
-  get: () => {
-    return syncTaskAttrs
-  },
-})
+export { networkSwitchSubject }
 
 /* eslint global-require: "off" */
 // create a background task to sync transactions
