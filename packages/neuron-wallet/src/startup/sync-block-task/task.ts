@@ -1,15 +1,15 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
-import SyncBlocksService from '../../services/sync-blocks'
 import initConnection from '../../typeorm'
 import Address from '../../services/addresses'
 import LockUtils from '../../utils/lock-utils'
 import AddressesUsedSubject from '../../subjects/addresses-used-subject'
+import BlockListener from '../../services/sync/block-listener'
+import { NetworkWithID } from '../../services/networks'
 
-// read main process properties from `remote.app`
-const { app }: { app: any } = remote
-const { syncBlockTask } = app
-const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = syncBlockTask
+const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = remote.require(
+  './startup/sync-block-task/params',
+)
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -38,23 +38,22 @@ export const switchNetwork = async (networkId: string) => {
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  const syncBlocksService = new SyncBlocksService(lockHashes, nodeService.tipNumberSubject)
+  const blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  // TODO: should change to listen real address module event
   addressChangeSubject.subscribe(async () => {
-    syncBlocksService.lockHashes = await loadAddressesAndConvert()
+    const hashes: string[] = await loadAddressesAndConvert()
+    blockListener.setLockHashes(hashes)
   })
 
   stopLoopSubject.subscribe(() => {
-    syncBlocksService.stop()
+    blockListener.stop()
   })
 
-  await syncBlocksService.loopBlocks()
+  blockListener.start()
 }
 
 export const run = () => {
-  // TODO: add an event on networkId for when it init and changed, it should broadcast a message with networkId
-  networkSwitchSubject.subscribe(async (network: any) => {
+  networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
       await switchNetwork(network.name)
     }
