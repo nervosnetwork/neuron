@@ -19,7 +19,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           activeWallet: any
           transactions: any
           locale: string
-        }>,
+        }>
       ) => {
         if (args.status) {
           const {
@@ -53,7 +53,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           /* eslint-enable no-alert */
           window.close()
         }
-      },
+      }
     )
 
     UILayer.on(Channel.App, (_e: Event, method: AppMethod, args: ChannelResponse<any>) => {

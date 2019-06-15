@@ -55,7 +55,7 @@ const BannerMessages = ({ messages, style = {} }: { messages: Message[]; style?:
                 <button key={label} type="button" className={`btn btn-outline-${category}`} onClick={action}>
                   {label}
                 </button>
-              ),
+              )
             )}
           </ActionZone>
         </AlertItem>

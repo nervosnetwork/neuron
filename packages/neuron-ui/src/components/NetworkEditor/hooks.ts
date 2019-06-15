@@ -17,7 +17,7 @@ export const useNetworkEditor = (
   { currentName, currentRemote }: { currentName: string; currentRemote: string } = {
     currentName: '',
     currentRemote: '',
-  },
+  }
 ) => {
   const [name, setName] = useState(currentName)
   const [remote, setRemote] = useState(currentRemote)
@@ -26,7 +26,7 @@ export const useNetworkEditor = (
       setName(initName)
       setRemote(initRemote)
     },
-    [setName, setRemote],
+    [setName, setRemote]
   )
 
   return {
@@ -94,7 +94,7 @@ export const useInputs = (editor: EditorType) => {
         placeholder: PlaceHolder.Name,
       },
     ],
-    [editor.remote, editor.name],
+    [editor.remote, editor.name]
   )
 }
 
@@ -106,7 +106,7 @@ export const useIsInputsValid = (editor: EditorType, cachedNetwork: Network | un
 
   const notModified = useMemo(
     () => cachedNetwork && (cachedNetwork.name === editor.name.value && cachedNetwork.remote === editor.remote.value),
-    [cachedNetwork, editor.name.value, editor.remote.value],
+    [cachedNetwork, editor.name.value, editor.remote.value]
   )
   return { invalidParams, notModified }
 }
@@ -116,7 +116,7 @@ export const useHandleSubmit = (
   name: string,
   remote: string,
   networks: Network[],
-  dispatch: DispatchType,
+  dispatch: DispatchType
 ) =>
   useCallback(() => {
     dispatch(actionCreators.createOrUpdateNetwork({ id, name, remote }, networks))

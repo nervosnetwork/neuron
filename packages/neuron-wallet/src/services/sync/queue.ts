@@ -23,7 +23,7 @@ export default class Queue {
     startBlockNumber: string,
     endBlockNumber: string,
     currentBlockNumber: BlockNumber = new BlockNumber(),
-    rangeForCheck: RangeForCheck = new RangeForCheck(),
+    rangeForCheck: RangeForCheck = new RangeForCheck()
   ) {
     this.generateQueue()
     this.lockHashes = lockHashes

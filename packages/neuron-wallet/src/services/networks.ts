@@ -111,7 +111,7 @@ export default class NetworksService extends Store {
   public async create(
     @Required name: NetworkName,
     @Required remote: NetworkRemote,
-    type: NetworkType = NetworkType.Normal,
+    type: NetworkType = NetworkType.Normal
   ) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {

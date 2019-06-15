@@ -50,7 +50,7 @@ export default class CellsService {
   // gather inputs for generateTx
   public static gatherInputs = async (
     capacity: string,
-    lockHashes: string[],
+    lockHashes: string[]
   ): Promise<{
     inputs: CKBComponents.CellInput[]
     capacities: string

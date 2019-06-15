@@ -8,7 +8,7 @@ import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 
 const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = remote.require(
-  './startup/sync-block-task/params',
+  './startup/sync-block-task/params'
 )
 
 // pass to task a main process subject
@@ -23,7 +23,7 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
   const lockHashes: string[] = await Promise.all(
     addresses.map(async addr => {
       return LockUtils.addressToLockHash(addr)
-    }),
+    })
   )
   return lockHashes
 }

@@ -8,7 +8,7 @@ export const useWalletEditor = () => {
     (initName: string = '') => {
       setName(initName)
     },
-    [setName],
+    [setName]
   )
   return {
     initialize,
@@ -29,7 +29,7 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
         maxLength: 20,
       },
     ],
-    [name],
+    [name]
   )
 }
 
@@ -49,7 +49,7 @@ export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
         },
       })
     },
-    [dispatch],
+    [dispatch]
   )
 
 export default {

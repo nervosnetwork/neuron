@@ -21,7 +21,7 @@ import { KeyHasNoData, TransactionNotFound, CurrentWalletNotSet, ServiceHasNoRes
 export default class TransactionsController {
   @CatchControllerError
   public static async getAll(
-    params: TransactionsByLockHashesParam,
+    params: TransactionsByLockHashesParam
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
@@ -35,7 +35,7 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async getAllByAddresses(
-    params: TransactionsByAddressesParam,
+    params: TransactionsByAddressesParam
   ): Promise<Controller.Response<PaginationResult<Transaction> & TransactionsByAddressesParam>> {
     const { pageNo, pageSize, addresses } = params
 

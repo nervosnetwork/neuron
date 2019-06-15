@@ -27,7 +27,7 @@ export default {
           return true
         }
         return false
-      },
+      }
     )
     if (invalid) {
       return errorAction

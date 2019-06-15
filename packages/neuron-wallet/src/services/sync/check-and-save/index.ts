@@ -16,7 +16,7 @@ export default class CheckAndSave {
       txs.map(async tx => {
         const checkTx = new CheckTx(tx)
         return checkTx.checkAndSave(this.lockHashes)
-      }),
+      })
     )
   }
 }

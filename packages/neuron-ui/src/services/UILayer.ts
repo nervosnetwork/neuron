@@ -130,7 +130,7 @@ export const wallets = (
     | { keystore: string; password: string }
     | { mnemonic: string; password: string }
     | { id: string; password: string }
-    | { id: string; name?: string; password: string; newPassword?: string },
+    | { id: string; name?: string; password: string; newPassword?: string }
 ) => {
   UILayer.send(Channel.Wallets, method, params)
 }

@@ -48,7 +48,7 @@ export default class AppController {
 
   public static showMessageBox(
     options: MessageBoxOptions,
-    callback: (response: number, checkboxChecked: boolean) => void = () => {},
+    callback: (response: number, checkboxChecked: boolean) => void = () => {}
   ) {
     dialog.showMessageBox(options, callback)
   }

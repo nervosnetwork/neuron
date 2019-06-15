@@ -35,7 +35,7 @@ const reducer = (
   }: {
     type: string
     payload: string
-  },
+  }
 ) => {
   switch (type) {
     default: {

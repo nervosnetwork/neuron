@@ -79,7 +79,7 @@ export const contextMenuTemplate: {
                   })
                 }
               }
-            },
+            }
           )
         },
       },
@@ -121,7 +121,7 @@ export const contextMenuTemplate: {
                   if (filename) {
                     fs.writeFileSync(filename, JSON.stringify(keystore))
                   }
-                },
+                }
               )
             })
             .catch((err: Error) => {

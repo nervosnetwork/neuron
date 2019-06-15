@@ -15,7 +15,7 @@ export default class BlockListener {
 
   constructor(
     lockHashes: string[],
-    tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject,
+    tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject
   ) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = new BlockNumber()
@@ -96,7 +96,7 @@ export default class BlockListener {
       startBlockNumber,
       endBlockNumber,
       this.currentBlockNumber,
-      this.rangeForCheck,
+      this.rangeForCheck
     )
 
     this.queue.get().drain(() => {

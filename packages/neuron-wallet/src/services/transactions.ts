@@ -106,13 +106,13 @@ export default class TransactionsService {
   }
 
   public static getAllByAddresses = async (
-    params: TransactionsByAddressesParam,
+    params: TransactionsByAddressesParam
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.addresses.map(async addr => {
         const lockHash: string = await LockUtils.addressToLockHash(addr)
         return lockHash
-      }),
+      })
     )
 
     return TransactionsService.getAll({
@@ -123,14 +123,14 @@ export default class TransactionsService {
   }
 
   public static getAllByPubkeys = async (
-    params: TransactionsByPubkeysParams,
+    params: TransactionsByPubkeysParams
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.pubkeys.map(async pubkey => {
         const addr = core.utils.pubkeyToAddress(pubkey)
         const lockHash = await LockUtils.addressToLockHash(addr)
         return lockHash
-      }),
+      })
     )
 
     return TransactionsService.getAll({
@@ -209,7 +209,7 @@ export default class TransactionsService {
           const output = o
           output.status = OutputStatus.Live
           return output
-        }),
+        })
       )
 
       const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
@@ -228,7 +228,7 @@ export default class TransactionsService {
             return outputEntity
           }
           return undefined
-        }),
+        })
       )
 
       const previousOutputs: OutputEntity[] = previousOutputsWithUndefined.filter(o => !!o) as OutputEntity[]
@@ -244,7 +244,7 @@ export default class TransactionsService {
   public static create = async (
     transaction: Transaction,
     outputStatus: OutputStatus,
-    inputStatus: OutputStatus,
+    inputStatus: OutputStatus
   ): Promise<TransactionEntity> => {
     const connection = getConnection()
     const tx = new TransactionEntity()
@@ -298,7 +298,7 @@ export default class TransactionsService {
         output.transaction = tx
         output.status = outputStatus
         return output
-      }),
+      })
     )
 
     await connection.manager.save([tx, ...inputs, ...previousOutputs, ...outputs])
@@ -323,7 +323,7 @@ export default class TransactionsService {
   // when fetch a transaction, use TxSaveType.Fetch
   public static convertTransactionAndSave = async (
     transaction: Transaction,
-    saveType: TxSaveType,
+    saveType: TxSaveType
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
@@ -350,7 +350,7 @@ export default class TransactionsService {
           }
         }
         return input
-      }),
+      })
     )
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
@@ -366,14 +366,14 @@ export default class TransactionsService {
   public static saveFetchTx = async (transaction: Transaction): Promise<TransactionEntity> => {
     const txEntity: TransactionEntity = await TransactionsService.convertTransactionAndSave(
       transaction,
-      TxSaveType.Fetch,
+      TxSaveType.Fetch
     )
     return txEntity
   }
 
   public static saveSentTx = async (
     transaction: TransactionWithoutHash,
-    txHash: string,
+    txHash: string
   ): Promise<TransactionEntity> => {
     const tx: Transaction = {
       hash: txHash,
@@ -387,7 +387,7 @@ export default class TransactionsService {
   public static generateTx = async (
     lockHashes: string[],
     targetOutputs: TargetOutput[],
-    changeAddress: string,
+    changeAddress: string
   ): Promise<CKBComponents.RawTransaction> => {
     const { codeHash, outPoint } = await LockUtils.systemScript()
 
@@ -419,7 +419,7 @@ export default class TransactionsService {
       const changeBlake160: string = core.utils.parseAddress(
         changeAddress,
         core.utils.AddressPrefix.Testnet,
-        'hex',
+        'hex'
       ) as string
 
       const output: CKBComponents.CellOutput = {

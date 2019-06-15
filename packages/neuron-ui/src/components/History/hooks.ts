@@ -32,7 +32,7 @@ export const useOnChangePage = (search: string, pathname: string, history: Histo
       const newQuery = queryFormatter(params)
       history.push(`${pathname}?${newQuery.toString()}`)
     },
-    [search, pathname, history, queryFormatter],
+    [search, pathname, history, queryFormatter]
   )
 }
 
@@ -44,7 +44,7 @@ export const useOnAddressRemove = (search: string, pathname: string, history: Hi
       const newQuery = queryFormatter(params)
       history.push(`${pathname}?${newQuery.toString()}`)
     },
-    [search, pathname, history, queryFormatter],
+    [search, pathname, history, queryFormatter]
   )
 }
 
