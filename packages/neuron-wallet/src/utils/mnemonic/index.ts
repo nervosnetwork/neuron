@@ -6,12 +6,16 @@ const PBKDF2_ROUNDS = 2048
 const KEY_LEN = 64
 const MIN_ENTROPY_SIZE = 16
 const MAX_ENTROPY_SIZE = 32
+const MIN_WORDS_SIZE = 12
+const MAX_WORDS_SIZE = 24
 
 const INVALID_MNEMONIC = `Invalid mnemonic`
 const INVALID_CHECKSUM = `Invalid checksum`
 const ENTROPY_NOT_DIVISIBLE = `Entropy should be divisable by 4`
 const ENTROPY_TOO_LONG = `Entropy should be shorter than ${MAX_ENTROPY_SIZE + 1}`
 const ENTROPY_TOO_SHORT = `Entropy should be longer than ${MIN_ENTROPY_SIZE - 1}`
+const WORDS_TOO_LONG = `Words should be shorter than ${MAX_WORDS_SIZE + 1}`
+const WORDS_TOO_SHORT = `Words should be longer than ${MIN_WORDS_SIZE - 1}`
 
 if (wordList.length !== RADIX)
   throw new Error(`Word list should have ${RADIX} words, but ${wordList.length} received in fact`)
@@ -59,6 +63,8 @@ export function mnemonicToSeed(mnemonic: string = '', password: string = ''): Pr
 
 export function mnemonicToEntropy(mnemonic: string = '') {
   const words = mnemonic.normalize('NFKD').split(' ')
+  if (words.length < MIN_WORDS_SIZE) throw new Error(WORDS_TOO_SHORT)
+  if (words.length > MAX_WORDS_SIZE) throw new Error(WORDS_TOO_LONG)
   if (words.length % 3 !== 0) throw new Error(INVALID_MNEMONIC)
   const bits = words
     .map(word => {
