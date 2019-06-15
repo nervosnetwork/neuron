@@ -1,0 +1,147 @@
+{
+  "vectors": [
+    {
+      "entropy": "00000000000000000000000000000000",
+      "mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+      "seed": "5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4"
+    },
+
+    {
+      "entropy": "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
+      "mnemonic": "legal winner thank year wave sausage worth useful legal winner thank yellow",
+      "seed": "878386efb78845b3355bd15ea4d39ef97d179cb712b77d5c12b6be415fffeffe5f377ba02bf3f8544ab800b955e51fbff09828f682052a20faa6addbbddfb096"
+    },
+
+    {
+      "entropy": "80808080808080808080808080808080",
+      "mnemonic": "letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+      "seed": "77d6be9708c8218738934f84bbbb78a2e048ca007746cb764f0673e4b1812d176bbb173e1a291f31cf633f1d0bad7d3cf071c30e98cd0688b5bcce65ecaceb36"
+    },
+
+    {
+      "entropy": "ffffffffffffffffffffffffffffffff",
+      "mnemonic": "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong",
+      "seed": "b6a6d8921942dd9806607ebc2750416b289adea669198769f2e15ed926c3aa92bf88ece232317b4ea463e84b0fcd3b53577812ee449ccc448eb45e6f544e25b6"
+    },
+
+    {
+      "entropy": "000000000000000000000000000000000000000000000000",
+      "mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon agent",
+      "seed": "4975bb3d1faf5308c86a30893ee903a976296609db223fd717e227da5a813a34dc1428b71c84a787fc51f3b9f9dc28e9459f48c08bd9578e9d1b170f2d7ea506"
+    },
+
+    {
+      "entropy": "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
+      "mnemonic": "legal winner thank year wave sausage worth useful legal winner thank year wave sausage worth useful legal will",
+      "seed": "b059400ce0f55498a5527667e77048bb482ff6daa16c37b4b9e8af70c85b3f4df588004f19812a1a027c9a51e5e94259a560268e91cd10e206451a129826e740"
+    },
+
+    {
+      "entropy": "808080808080808080808080808080808080808080808080",
+      "mnemonic": "letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter always",
+      "seed": "04d5f77103510c41d610f7f5fb3f0badc77c377090815cee808ea5d2f264fdfabf7c7ded4be6d4c6d7cdb021ba4c777b0b7e57ca8aa6de15aeb9905dba674d66"
+    },
+
+    {
+      "entropy": "ffffffffffffffffffffffffffffffffffffffffffffffff",
+      "mnemonic": "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo when",
+      "seed": "d2911131a6dda23ac4441d1b66e2113ec6324354523acfa20899a2dcb3087849264e91f8ec5d75355f0f617be15369ffa13c3d18c8156b97cd2618ac693f759f"
+    },
+
+    {
+      "entropy": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art",
+      "seed": "408b285c123836004f4b8842c89324c1f01382450c0d439af345ba7fc49acf705489c6fc77dbd4e3dc1dd8cc6bc9f043db8ada1e243c4a0eafb290d399480840"
+    },
+
+    {
+      "entropy": "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
+      "mnemonic": "legal winner thank year wave sausage worth useful legal winner thank year wave sausage worth useful legal winner thank year wave sausage worth title",
+      "seed": "761914478ebf6fe16185749372e91549361af22b386de46322cf8b1ba7e92e80c4af05196f742be1e63aab603899842ddadf4e7248d8e43870a4b6ff9bf16324"
+    },
+
+    {
+      "entropy": "8080808080808080808080808080808080808080808080808080808080808080",
+      "mnemonic": "letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic bless",
+      "seed": "848bbe19cad445e46f35fd3d1a89463583ac2b60b5eb4cfcf955731775a5d9e17a81a71613fed83f1ae27b408478fdec2bbc75b5161d1937aa7cdf4ad686ef5f"
+    },
+
+    {
+      "entropy": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "mnemonic": "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
+      "seed": "e28a37058c7f5112ec9e16a3437cf363a2572d70b6ceb3b6965447623d620f14d06bb321a26b33ec15fcd84a3b5ddfd5520e230c924c87aaa0d559749e044fef"
+    },
+
+    {
+      "entropy": "77c2b00716cec7213839159e404db50d",
+      "mnemonic": "jelly better achieve collect unaware mountain thought cargo oxygen act hood bridge",
+      "seed": "c7b8fbb38c1abe38dfc0fea9797804558dfac244cd7737ae3a1b619991e0ad520155d982f906629639dc39e440520f98f820bea4f886a63a45923a63441f25ef"
+    },
+
+    {
+      "entropy": "b63a9c59a6e641f288ebc103017f1da9f8290b3da6bdef7b",
+      "mnemonic": "renew stay biology evidence goat welcome casual join adapt armor shuffle fault little machine walk stumble urge swap",
+      "seed": "b1a1f06f175feccc998684667474b3d83efa57a0f39bb3a6cf3a3350ee7a6638ae6d15c4622c8252efe5aa319b026db1d4c91a80661ed34da1f2fb7d381224c8"
+    },
+
+    {
+      "entropy": "3e141609b97933b66a060dcddc71fad1d91677db872031e85f4c015c5e7e8982",
+      "mnemonic": "dignity pass list indicate nasty swamp pool script soccer toe leaf photo multiply desk host tomato cradle drill spread actor shine dismiss champion exotic",
+      "seed": "ecf9632e864630c00be4ca3d752d4f19a852cd628d9bbc3309a4c1a2f39801461a6816ca52793ddd3dacb242e207ad48e8bfde3afd0e8f978ad0e8cc4dd276c1"
+    },
+
+    {
+      "entropy": "0460ef47585604c5660618db2e6a7e7f",
+      "mnemonic": "afford alter spike radar gate glance object seek swamp infant panel yellow",
+      "seed": "3ddfd060236156416f8915ed6ced01c3316292aec7250434f7e32cda2338e76399874787257acad15618c81bcddd88714f8c0d316140dad809f0ca8b1a971679"
+    },
+
+    {
+      "entropy": "72f60ebac5dd8add8d2a25a797102c3ce21bc029c200076f",
+      "mnemonic": "indicate race push merry suffer human cruise dwarf pole review arch keep canvas theme poem divorce alter left",
+      "seed": "fe34200c8c3781f81f48d19f628a7370eb25c94c75077c9a6d4a1ef30fd9cc2f29f8ea7ef52bb765c5278413c19b7b2854b62cb3591ce4d749cd7f497da436a6"
+    },
+
+    {
+      "entropy": "2c85efc7f24ee4573d2b81a6ec66cee209b2dcbd09d8eddc51e0215b0b68e416",
+      "mnemonic": "clutch control vehicle tonight unusual clog visa ice plunge glimpse recipe series open hour vintage deposit universe tip job dress radar refuse motion taste",
+      "seed": "fa9ca5ef1ebfcb5e945091d413843bf7ce748d27b8b99bb5373d34b9a6b1450d2a2d7f04480904b29c78a41a6ea949288f687f72b5b8e322193a7eae8151f109"
+    },
+
+    {
+      "entropy": "eaebabb2383351fd31d703840b32e9e2",
+      "mnemonic": "turtle front uncle idea crush write shrug there lottery flower risk shell",
+      "seed": "4ef6e8484a846392f996b15283906b73be4ec100859ce68689d5a0fad7f761745b86d70ea5f5c43e4cc93ce4b82b3d9aeed7f85d503fac00b10ebbc150399100"
+    },
+
+    {
+      "entropy": "7ac45cfe7722ee6c7ba84fbc2d5bd61b45cb2fe5eb65aa78",
+      "mnemonic": "kiss carry display unusual confirm curtain upgrade antique rotate hello void custom frequent obey nut hole price segment",
+      "seed": "f0b24a453174e3c4f27634f3e2be07c069328f7cbaa24f695cbeb79a39e79f05154bddbabec57b832a46813d2e49e7b33f438e79cc566f78a3179dbce86cdd84"
+    },
+
+    {
+      "entropy": "4fa1a8bc3e6d80ee1316050e862c1812031493212b7ec3f3bb1b08f168cabeef",
+      "mnemonic": "exile ask congress lamp submit jacket era scheme attend cousin alcohol catch course end lucky hurt sentence oven short ball bird grab wing top",
+      "seed": "8a91a843ad4fede95f23937099a94f117115a369903603761ecabae734b5d501ddba04b1a3c9f2256437ef2d230f295d8f08676e5de93ad5190da6645ded8160"
+    },
+
+    {
+      "entropy": "18ab19a9f54a9274f03e5209a2ac8a91",
+      "mnemonic": "board flee heavy tunnel powder denial science ski answer betray cargo cat",
+      "seed": "22087755f76d6fb93ddd19e71106d4d4146f48424a241c0eda88787227827166223f61860d53652b635f360b5a37dd26c8aed3fa10b6f8e95be18f1913f4ca88"
+    },
+
+    {
+      "entropy": "18a2e1d81b8ecfb2a333adcb0c17a5b9eb76cc5d05db91a4",
+      "mnemonic": "board blade invite damage undo sun mimic interest slam gaze truly inherit resist great inject rocket museum chief",
+      "seed": "99539dbb0a15a76cdadd9cc066bae337a006823fa3439b42656fd0fca3d48afe6a0ca6f7a1d10412df611c32e18669a29bc0494de61b4c36730a5c31045464e2"
+    },
+
+    {
+      "entropy": "15da872c95a13dd738fbf50e427583ad61f18fd99f628c417a61cf8343c90419",
+      "mnemonic": "beyond stage sleep clip because twist token leaf atom beauty genius food business side grid unable middle armed observe pair crouch tonight away coconut",
+      "seed": "898c7388d88e3a5b3b2922a0f03f95c8e61aeadba9fa8a7b0b5629d7c98e1e0aec53f0b10fcbd4a913b4b8c985028b0026ec6fdb0a4442ee18344ca3fac4d692"
+    }
+  ]
+}

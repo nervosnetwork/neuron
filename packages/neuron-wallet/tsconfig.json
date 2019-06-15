@@ -5,6 +5,7 @@
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
