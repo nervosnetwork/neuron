@@ -1,12 +1,15 @@
-import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
+
 import Address, { HDAddress } from '../services/addresses'
 import { Keystore, KdfParams, KeysData } from './keystore'
 import { Keychain } from './hd'
 import { Validate, Required, Password } from '../decorators'
 import { IncorrectPassword, IsRequired, InvalidMnemonic, UnsupportedCipher } from '../exceptions'
+import { entropyToMnemonic, validateMnemonic, mnemonicToSeed } from '../utils/mnemonic'
+
+const ENTROPY_SIZE = 16
 
 export interface Addresses {
   receiving: HDAddress[]
@@ -45,7 +48,8 @@ export default class Key {
   }
 
   static generateMnemonic = () => {
-    return bip39.generateMnemonic()
+    const entropy = crypto.randomBytes(ENTROPY_SIZE).toString('hex')
+    return entropyToMnemonic(entropy)
   }
 
   @Validate
@@ -101,7 +105,7 @@ export default class Key {
     receivingAddressNumber = DefaultAddressNumber.Receiving,
     changeAddressNumber = DefaultAddressNumber.Change
   ) {
-    if (!bip39.validateMnemonic(mnemonic)) {
+    if (!validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
     }
     const key = new Key()
@@ -155,7 +159,7 @@ export default class Key {
   }
 
   private generatePrivateKeyFromMnemonic = async (mnemonic: string) => {
-    const seed = await bip39.mnemonicToSeed(mnemonic)
+    const seed = await mnemonicToSeed(mnemonic)
     const root = Keychain.fromSeed(seed)
     if (root.privateKey) {
       const privateKey = root.privateKey.toString('hex')
