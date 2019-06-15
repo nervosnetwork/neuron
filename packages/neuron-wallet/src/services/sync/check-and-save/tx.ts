@@ -5,13 +5,13 @@ import OutputEntity from '../../../entities/output'
 import TransactionsService from '../../transactions'
 import CheckOutput from './output'
 import LockUtils from '../../../utils/lock-utils'
-import AddressesUsedSubject from '../../../subjects/addresses-used-subject'
+import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
 
 export default class CheckTx {
   private tx: Transaction
   private addressesUsedSubject: Subject<string[]>
 
-  constructor(tx: Transaction, addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.getSubject()) {
+  constructor(tx: Transaction, addressesUsedSubject: Subject<string[]> = addressesUsedSubjectParam) {
     this.tx = tx
     this.addressesUsedSubject = addressesUsedSubject
   }
