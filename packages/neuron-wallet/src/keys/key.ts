@@ -23,11 +23,8 @@ enum DefaultAddressNumber {
 
 export default class Key {
   public mnemonic?: string
-
   public keystore?: Keystore
-
   public keysData?: KeysData
-
   public addresses?: Addresses
 
   constructor({
@@ -53,12 +50,7 @@ export default class Key {
   }
 
   @Validate
-  static async fromKeystore(
-    @Required keystore: string,
-    @Password password: string,
-    receivingAddressNumber = DefaultAddressNumber.Receiving,
-    changeAddressNumber = DefaultAddressNumber.Change
-  ) {
+  static async fromKeystore(@Required keystore: string, @Password password: string) {
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
     key.keystore = keystoreObject
@@ -94,24 +86,23 @@ export default class Key {
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
     key.keysData = JSON.parse(keysData)
-    key.addresses = Address.generateAddresses(JSON.parse(keysData), receivingAddressNumber, changeAddressNumber)
+    key.addresses = Address.generateAddresses(
+      JSON.parse(keysData),
+      DefaultAddressNumber.Receiving,
+      DefaultAddressNumber.Change
+    )
     return key
   }
 
   @Validate
-  public static async fromMnemonic(
-    @Required mnemonic: string,
-    @Password password: string,
-    receivingAddressNumber = DefaultAddressNumber.Receiving,
-    changeAddressNumber = DefaultAddressNumber.Change
-  ) {
+  public static async fromMnemonic(@Required mnemonic: string, @Password password: string) {
     if (!validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
     }
     const key = new Key()
     const keysData = await key.generatePrivateKeyFromMnemonic(mnemonic)
     key.keysData = keysData
-    key.addresses = Address.generateAddresses(keysData, receivingAddressNumber, changeAddressNumber)
+    key.addresses = Address.generateAddresses(keysData, DefaultAddressNumber.Receiving, DefaultAddressNumber.Change)
     key.keystore = key.toKeystore(JSON.stringify(keysData), password)
     return key
   }

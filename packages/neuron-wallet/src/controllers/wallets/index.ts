@@ -45,16 +45,12 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
-    const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+    const key = await Key.fromMnemonic(mnemonic, password)
     const wallet = walletsService.create({
       name,
       keystore: key.keystore || null,
@@ -78,21 +74,15 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
       mnemonic,
-      receivingAddressNumber,
-      changeAddressNumber,
     })
   }
 
@@ -101,16 +91,12 @@ export default class WalletsController {
     name,
     password,
     keystore,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     keystore: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Wallet>> {
-    const key = await Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
+    const key = await Key.fromKeystore(keystore, password)
     const wallet = walletsService.create({
       name,
       keystore: key.keystore || null,
