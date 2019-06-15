@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Container, Card, OverlayTrigger, Tooltip, Modal, Form, InputGroup } from 'react-bootstrap'
-import QRCode from 'qrcode.react'
+import QRCode from 'widgets/QRCode'
 import { RouteComponentProps } from 'react-router-dom'
 import { Copy as CopyIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +14,7 @@ declare global {
 }
 
 const AddressPanel = styled.div`
-  dispaly: flex;
+  display: flex;
   flex-direction: row;
   margin: 10px 0 0 0;
 `
@@ -79,7 +79,6 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
           <QRCodePanel onClick={() => setShowLargeQRCode(true)}>
             <QRCode value={accountAddress} size={256} />
           </QRCodePanel>
-
           <Modal centered show={showLargeQRCode} onHide={() => setShowLargeQRCode(false)}>
             <Modal.Header closeButton>
               <Modal.Title id="contained-modal-title-vcenter">{t('Address QRCode')}</Modal.Title>
