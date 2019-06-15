@@ -12,7 +12,7 @@ export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
         },
       })
     },
-    [dispatch],
+    [dispatch]
   )
 
 export const useDeleteWallet = () => {
@@ -38,7 +38,7 @@ export const useWalletToDelete = (deleteId: string, wallets: WalletIdentity[]) =
 export const useHandleConfirm = (
   deleteWallet: ReturnType<typeof useDeleteWallet>,
   toggleDialog: ReturnType<typeof useToggleDialog>,
-  dispatch: React.Dispatch<any>,
+  dispatch: React.Dispatch<any>
 ) =>
   useCallback(() => {
     toggleDialog(false)
@@ -46,7 +46,7 @@ export const useHandleConfirm = (
       actionCreators.deleteWallet({
         id: deleteWallet.id.value,
         password: deleteWallet.password.value,
-      }),
+      })
     )
   }, [deleteWallet, toggleDialog, dispatch])
 

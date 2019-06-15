@@ -18,7 +18,7 @@ export const useUpdateTransferItem = (dispatch: React.Dispatch<any>) =>
         },
       })
     },
-    [dispatch],
+    [dispatch]
   )
 
 export const useOnSubmit = (dispatch: React.Dispatch<any>) =>
@@ -26,7 +26,7 @@ export const useOnSubmit = (dispatch: React.Dispatch<any>) =>
     (items: TransferItem[]) => () => {
       dispatch(actionCreators.submitTransfer(items))
     },
-    [dispatch],
+    [dispatch]
   )
 
 export const useOnPasswordChange = (dispatch: React.Dispatch<any>) =>
@@ -37,7 +37,7 @@ export const useOnPasswordChange = (dispatch: React.Dispatch<any>) =>
         payload: e.currentTarget.value,
       })
     },
-    [dispatch],
+    [dispatch]
   )
 
 export const useOnConfirm = (dispatch: React.Dispatch<any>, setLoading: Function) =>
@@ -60,15 +60,15 @@ export const useOnConfirm = (dispatch: React.Dispatch<any>, setLoading: Function
             id,
             items,
             password: pwd,
-          }),
+          })
         )
       }, 10)
     },
-    [dispatch, setLoading],
+    [dispatch, setLoading]
   )
 
 export const useOnItemChange = (updateTransferItem: Function) => (field: string, idx: number) => (
-  e: React.FormEvent<{ value: string }>,
+  e: React.FormEvent<{ value: string }>
 ) => {
   updateTransferItem(field)(idx)(e.currentTarget.value)
 }
@@ -83,14 +83,14 @@ export const useDropdownItems = (updateTransferItem: Function) =>
           key: unit,
           onClick: () => updateTransferItem('unit')(idx)(unit),
         })),
-    [updateTransferItem],
+    [updateTransferItem]
   )
 
 export const useInitialize = (
   address: string,
   dispatch: React.Dispatch<any>,
   history: History,
-  updateTransferItem: Function,
+  updateTransferItem: Function
 ) =>
   useEffect(() => {
     if (address) {

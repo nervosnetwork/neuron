@@ -51,7 +51,7 @@ export default ({
       actionCreators.updateWallet({
         id: wallet.id,
         name: editor.name.value,
-      }),
+      })
     )
   }, [editor.name.value, wallet.id, dispatch, toggleDialog])
 

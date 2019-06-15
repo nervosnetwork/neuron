@@ -279,7 +279,7 @@ export default class WalletService {
       capacity: CKBComponents.Capacity
       unit: 'byte' | 'shannon'
     }[],
-    password: string,
+    password: string
   ) => {
     const wallet = await this.getCurrent()
     if (!wallet) throw new CurrentWalletNotSet()
@@ -304,7 +304,7 @@ export default class WalletService {
       const identifier = core.utils.parseAddress(
         address,
         env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet,
-        'hex',
+        'hex'
       ) as string
       if (!identifier.startsWith(hrp)) throw new InvalidAddress(address)
       return core.utils.lockScriptToHash({
@@ -333,7 +333,7 @@ export default class WalletService {
       {
         length: rawTransaction.inputs.length,
       },
-      () => witness,
+      () => witness
     )
     rawTransaction.witnesses = witnesses
     const realTxHash = await core.rpc.sendTransaction(rawTransaction)

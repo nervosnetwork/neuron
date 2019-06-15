@@ -47,7 +47,7 @@ const Addresses = () => {
         transactions: '0',
         key: address,
       })),
-    [receiving],
+    [receiving]
   )
 
   const changeAddresses = useMemo(
@@ -59,7 +59,7 @@ const Addresses = () => {
         transactions: '0',
         key: address,
       })),
-    [change],
+    [change]
   )
 
   const count = useMemo(() => receiving.length + change.length, [receiving, change])

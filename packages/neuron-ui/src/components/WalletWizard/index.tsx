@@ -39,7 +39,7 @@ const Welcome = ({ rootPath }: { rootPath: string }) => {
       { label: 'wizard.create-new-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}` },
       { label: 'wizard.import-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}` },
     ],
-    [rootPath],
+    [rootPath]
   )
 
   return (
@@ -103,7 +103,7 @@ const Mnemonic = ({
         payload: e.target.value,
       })
     },
-    [dispatch],
+    [dispatch]
   )
   const onNext = useCallback(() => {
     if (isCreate) {
@@ -187,7 +187,7 @@ const Submission = ({
         })
       }
     },
-    [dispatch],
+    [dispatch]
   )
 
   const onNext = useCallback(() => {

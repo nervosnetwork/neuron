@@ -72,7 +72,7 @@ class NodeService {
             })
         }),
         retry(3),
-        distinctUntilChanged(),
+        distinctUntilChanged()
       )
       .subscribe(
         tipNumber => {
@@ -86,7 +86,7 @@ class NodeService {
           this.tipNumberSubject.next(undefined)
           const { unsubscribe } = this.tipNumber()
           this.stop = unsubscribe
-        },
+        }
       )
   }
 }

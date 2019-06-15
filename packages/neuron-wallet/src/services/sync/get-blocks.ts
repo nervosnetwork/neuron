@@ -29,7 +29,7 @@ export default class GetBlocks {
     const blocks: Block[] = await Promise.all(
       blockNumbers.map(async num => {
         return this.retryGetBlock(num)
-      }),
+      })
     )
 
     return blocks

@@ -65,7 +65,7 @@ const TransactionList = ({ items }: { items: Transaction[] }) => {
                     </MetaData>
                   ) : (
                     <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
-                  ),
+                  )
                 )}
               </tr>
             ))}

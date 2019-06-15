@@ -5,13 +5,13 @@ describe('BIP32 Keychain tests', () => {
   const shortSeed = Buffer.from('000102030405060708090a0b0c0d0e0f', 'hex')
   const longSeed = Buffer.from(
     'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542',
-    'hex',
+    'hex'
   )
 
   it('create master keychain from seed', () => {
     const master = Keychain.fromSeed(shortSeed)
     expect(master.privateKey.toString('hex')).toEqual(
-      'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
+      'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35'
     )
     expect(master.identifier.toString('hex')).toEqual('3442193e1bb70916e914552172cd4e2dbc9df811')
     expect(master.fingerprint).toEqual(876747070)
@@ -35,7 +35,7 @@ describe('BIP32 Keychain tests', () => {
   it('derive path', () => {
     const master = Keychain.fromSeed(shortSeed)
     expect(master.derivePath(`m/0'`).privateKey.toString('hex')).toEqual(
-      'edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea',
+      'edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea'
     )
 
     const child = master.derivePath(`m/0'/1/2'`)
@@ -50,7 +50,7 @@ describe('BIP32 Keychain tests', () => {
   it('create master keychain from long seed', () => {
     const master = Keychain.fromSeed(longSeed)
     expect(master.privateKey.toString('hex')).toEqual(
-      '4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e',
+      '4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e'
     )
     expect(master.identifier.toString('hex')).toEqual('bd16bee53961a47d6ad888e29545434a89bdfe95')
     expect(master.fingerprint).toEqual(3172384485)
@@ -63,7 +63,7 @@ describe('BIP32 Keychain tests', () => {
   it('derive path large index', () => {
     const master = Keychain.fromSeed(longSeed)
     expect(master.derivePath(`m`).privateKey.toString('hex')).toEqual(
-      '4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e',
+      '4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e'
     )
 
     let child = master.derivePath(`0/2147483647'`)
@@ -106,7 +106,7 @@ describe('BIP32 Keychain tests', () => {
     const child = Keychain.fromPublicKey(
       Buffer.from('0357bfe1e341d01c69fe5654309956cbea516822fba8a601743a012a7896ee8dc2', 'hex'),
       Buffer.from('04466b9cc8e161e966409ca52986c584f07e9dc81f735db683c3ff6ec7b1503f', 'hex'),
-      `m/0'/1/2'`,
+      `m/0'/1/2'`
     )
     expect(child.identifier.toString('hex')).toEqual('ee7ab90cde56a8c0e2bb086ac49748b8db9dce72')
     expect(child.fingerprint).toEqual(4001020172)
@@ -115,10 +115,10 @@ describe('BIP32 Keychain tests', () => {
 
     const grandchild = child.deriveChild(2, false)
     expect(grandchild.publicKey.toString('hex')).toEqual(
-      '02e8445082a72f29b75ca48748a914df60622a609cacfce8ed0e35804560741d29',
+      '02e8445082a72f29b75ca48748a914df60622a609cacfce8ed0e35804560741d29'
     )
     expect(grandchild.chainCode.toString('hex')).toEqual(
-      'cfb71883f01676f587d023cc53a35bc7f88f724b1f8c2892ac1275ac822a3edd',
+      'cfb71883f01676f587d023cc53a35bc7f88f724b1f8c2892ac1275ac822a3edd'
     )
     expect(grandchild.identifier.toString('hex')).toEqual('d880d7d893848509a62d8fb74e32148dac68412f')
     expect(grandchild.fingerprint).toEqual(3632322520)
@@ -129,7 +129,7 @@ describe('BIP32 Keychain tests', () => {
   it('private key add', () => {
     const k = new Keychain(
       Buffer.from('9e919c96ac5a4caea7ba0ea1f7dd7bca5dca8a11e66ed633690c71e483a6e3c9', 'hex'),
-      Buffer.from('36e92e33659808bf06c3e4302b657f39ca285f6bb5393019bb4e2f7b96e3f914', 'hex'),
+      Buffer.from('36e92e33659808bf06c3e4302b657f39ca285f6bb5393019bb4e2f7b96e3f914', 'hex')
     )
     const t = k.privateKeyAdd(k.privateKey, k.chainCode)
     expect(t.toString('hex')).toEqual('d57acaca11f2556dae7df2d22342fb0427f2e97d9ba8064d245aa1601a8adcdd')
@@ -138,10 +138,10 @@ describe('BIP32 Keychain tests', () => {
   it('public key add', () => {
     const k = new Keychain(
       Buffer.from('56788dc69315bf1b10c1ae232176de9dd57e83bf07f9bc33f64f9da9eb31f13b', 'hex'),
-      Buffer.from('953fd6b91b51605d32a28ab478f39ab53c90103b93bd688330b118c460e9c667', 'hex'),
+      Buffer.from('953fd6b91b51605d32a28ab478f39ab53c90103b93bd688330b118c460e9c667', 'hex')
     )
     expect(k.publicKey).toEqual(
-      Buffer.from('03556b2c7e03b12845a973a6555b49fe44b0836fbf3587709fa73bb040ba181b21', 'hex'),
+      Buffer.from('03556b2c7e03b12845a973a6555b49fe44b0836fbf3587709fa73bb040ba181b21', 'hex')
     )
     const t = k.publicKeyAdd(k.publicKey, k.chainCode)
     expect(t.toString('hex')).toEqual('03db6eab66f918e434bae0e24fd73de1a2b293a2af9bd3ad53123996fa94494f37')

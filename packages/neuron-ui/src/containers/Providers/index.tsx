@@ -5,7 +5,7 @@ import { initProviders, ProviderDispatch, reducer } from './reducer'
 import { useChannelListeners } from './hooks'
 
 const withProviders = (Comp: React.ComponentType<{ providerDispatch: ProviderDispatch }>) => (
-  props: React.Props<any>,
+  props: React.Props<any>
 ) => {
   const [providers, dispatch] = useReducer(reducer, initProviders)
   const { chain } = providers

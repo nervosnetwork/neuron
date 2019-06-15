@@ -30,7 +30,7 @@ export type currencyCode = 'CKB' | 'CNY' | 'USD'
 export const currencyFormatter = (
   shannons: string,
   unit: currencyCode = 'CKB',
-  exchange: string = '0.000000001',
+  exchange: string = '0.000000001'
 ): string => {
   const [integer, decimal] = numberParser(shannons, exchange)
   const dot = '.'

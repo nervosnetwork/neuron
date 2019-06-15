@@ -53,7 +53,7 @@ export default class Key {
     @Required keystore: string,
     @Password password: string,
     receivingAddressNumber = DefaultAddressNumber.Receiving,
-    changeAddressNumber = DefaultAddressNumber.Change,
+    changeAddressNumber = DefaultAddressNumber.Change
   ) {
     const keystoreObject: Keystore = JSON.parse(keystore)
     const key = new Key()
@@ -70,7 +70,7 @@ export default class Key {
         N: kdfparams.n,
         r: kdfparams.r,
         p: kdfparams.p,
-      },
+      }
     )
     const ciphertext = Buffer.from(keystoreObject.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)
@@ -85,7 +85,7 @@ export default class Key {
     const decipher = crypto.createDecipheriv(
       keystoreObject.crypto.cipher,
       derivedKey.slice(0, 16),
-      Buffer.from(keystoreObject.crypto.cipherparams.iv, 'hex'),
+      Buffer.from(keystoreObject.crypto.cipherparams.iv, 'hex')
     )
     const seed = `0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`
     const keysData = Buffer.from(seed.replace('0x', ''), 'hex').toString()
@@ -99,7 +99,7 @@ export default class Key {
     @Required mnemonic: string,
     @Password password: string,
     receivingAddressNumber = DefaultAddressNumber.Receiving,
-    changeAddressNumber = DefaultAddressNumber.Change,
+    changeAddressNumber = DefaultAddressNumber.Change
   ) {
     if (!bip39.validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
@@ -128,7 +128,7 @@ export default class Key {
         N: kdfparams.n,
         r: kdfparams.r,
         p: kdfparams.p,
-      },
+      }
     )
     const ciphertext = Buffer.from(this.keystore.crypto.ciphertext, 'hex')
     const hash = new SHA3(256)

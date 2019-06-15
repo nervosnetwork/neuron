@@ -44,7 +44,7 @@ class Address {
   public static generateAddresses = (
     keysData: KeysData,
     receivingAddressCount: number = 20,
-    changeAddressCount: number = 10,
+    changeAddressCount: number = 10
   ) => {
     if (receivingAddressCount < 1 || changeAddressCount < 1) {
       throw new Error('Address number error.')
@@ -90,7 +90,7 @@ class Address {
     startIndex = 0,
     maxUsedIndex = 0,
     minUnusedIndex = 100,
-    depth = 0,
+    depth = 0
   ): any => {
     if (depth >= 10) return maxUsedIndex + 1
     if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex))) {
@@ -102,7 +102,7 @@ class Address {
         Math.floor((startIndex - maxUsedIndex) / 2 + maxUsedIndex),
         maxUsedIndex,
         Math.min(minUnusedIndex, startIndex),
-        depth + 1,
+        depth + 1
       )
     }
     if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex + 1))) {
@@ -113,7 +113,7 @@ class Address {
       Math.round((minUnusedIndex - startIndex) / 2 + startIndex),
       Math.max(maxUsedIndex, startIndex),
       minUnusedIndex,
-      depth + 1,
+      depth + 1
     )
   }
 }

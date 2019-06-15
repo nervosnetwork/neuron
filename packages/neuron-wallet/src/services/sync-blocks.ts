@@ -49,7 +49,7 @@ export default class SyncBlocksService {
   constructor(
     lockHashes: string[],
     tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject,
-    addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.subject,
+    addressesUsedSubject: Subject<string[]> = AddressesUsedSubject.subject
   ) {
     this.lockHashList = lockHashes
     this.addressesUsedSubject = addressesUsedSubject
@@ -155,7 +155,7 @@ export default class SyncBlocksService {
   // delete all transactions where blockNumber >= checkResult.blockHeader!.number
   async deleteTxs(sinceBlockNumber: string) {
     const blockNumbers: number[] = Array.from({ length: this.sizeForCheck + 2 }).map(
-      (_a, i) => i + parseInt(sinceBlockNumber, 10),
+      (_a, i) => i + parseInt(sinceBlockNumber, 10)
     )
     await TransactionsService.deleteByBlockNumbers(blockNumbers.map(n => n.toString()))
   }
@@ -213,13 +213,13 @@ export default class SyncBlocksService {
       blockNumbers.map(async num => {
         const block = await core.rpc.getBlockByNumber(num.toString())
         return TypeConvert.toBlock(block)
-      }),
+      })
     )
     return blocks
   }
 
   checkBlockRange(
-    blockHeaders: BlockHeader[],
+    blockHeaders: BlockHeader[]
   ): {
     success: boolean
     index?: number
@@ -266,7 +266,7 @@ export default class SyncBlocksService {
     await Promise.all(
       blocks.map(async block => {
         await this.resolveBlock(block)
-      }),
+      })
     )
   }
 

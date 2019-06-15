@@ -53,7 +53,7 @@ const MainContent = ({
             ...state,
             providerDispatch,
             dispatch,
-          }),
+          })
       )}
     </Main>
   )
