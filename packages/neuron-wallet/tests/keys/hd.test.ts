@@ -66,13 +66,29 @@ describe('BIP32 Keychain tests', () => {
       '4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e',
     )
 
-    const child = master.derivePath(`0/2147483647'`)
+    let child = master.derivePath(`0/2147483647'`)
     expect(child.privateKey.toString('hex')).toEqual('877c779ad9687164e9c2f4f0f4ff0340814392330693ce95a58fe18fd52e6e93')
     expect(child.identifier.toString('hex')).toEqual('d8ab493736da02f11ed682f88339e720fb0379d1')
     expect(child.fingerprint).toEqual(3635104055)
     expect(child.chainCode.toString('hex')).toEqual('be17a268474a6bb9c61e1d720cf6215e2a88c5406c4aee7b38547f585c9a37d9')
     expect(child.index).toEqual(2147483647)
     expect(child.depth).toEqual(2)
+
+    child = child.deriveChild(1, false)
+    expect(child.privateKey.toString('hex')).toEqual('704addf544a06e5ee4bea37098463c23613da32020d604506da8c0518e1da4b7')
+    expect(child.identifier.toString('hex')).toEqual('78412e3a2296a40de124307b6485bd19833e2e34')
+    expect(child.fingerprint).toEqual(2017537594)
+    expect(child.chainCode.toString('hex')).toEqual('f366f48f1ea9f2d1d3fe958c95ca84ea18e4c4ddb9366c336c927eb246fb38cb')
+    expect(child.index).toEqual(1)
+    expect(child.depth).toEqual(3)
+
+    child = child.deriveChild(2147483646, true)
+    expect(child.privateKey.toString('hex')).toEqual('f1c7c871a54a804afe328b4c83a1c33b8e5ff48f5087273f04efa83b247d6a2d')
+    expect(child.identifier.toString('hex')).toEqual('31a507b815593dfc51ffc7245ae7e5aee304246e')
+    expect(child.fingerprint).toEqual(832899000)
+    expect(child.chainCode.toString('hex')).toEqual('637807030d55d01f9a0cb3a7839515d796bd07706386a6eddf06cc29a65a0e29')
+    expect(child.index).toEqual(2147483646)
+    expect(child.depth).toEqual(4)
   })
 
   it('derive children no hardened', () => {
