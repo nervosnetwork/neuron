@@ -15,6 +15,7 @@ export default {
       view: {
         label: '视图',
         fullscreen: ' 全屏',
+        'address-book': '地址簿',
       },
       window: {
         label: '窗口',

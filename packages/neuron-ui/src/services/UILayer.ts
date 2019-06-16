@@ -13,6 +13,7 @@ declare global {
 }
 
 export enum AppMethod {
+  ToggleAddressBook = 'toggleAddressBook',
   ContextMenu = 'contextMenu',
   NavTo = 'navTo',
   SetUILocale = 'setUILocale',

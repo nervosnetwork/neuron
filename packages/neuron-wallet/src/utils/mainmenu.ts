@@ -58,6 +58,10 @@ const getMenuTemplate = () => {
           label: i18n.t('mainmenu.view.fullscreen'),
           role: 'togglefullscreen',
         },
+        {
+          label: i18n.t('mainmenu.view.address-book'),
+          click: AppController.toggleAddressBook,
+        },
       ],
     },
     {

@@ -15,6 +15,7 @@ export default {
       view: {
         label: 'View',
         fullscreen: 'Fullscreen',
+        'address-book': 'Address Book',
       },
       window: {
         label: 'Window',
