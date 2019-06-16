@@ -42,7 +42,7 @@ const History = ({
 
   return (
     <Container>
-      <h1>{t('siderbar.history')}</h1>
+      <h1>{t('navbar.history')}</h1>
       {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transactions}`)}</Alert> : null}
       {addresses.length > 0 ? (
         addresses.map(address => (

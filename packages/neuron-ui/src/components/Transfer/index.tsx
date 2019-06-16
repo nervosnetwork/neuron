@@ -70,7 +70,7 @@ const Transfer = ({
   return (
     <Container>
       <Card>
-        <Card.Header>{t('siderbar.send')}</Card.Header>
+        <Card.Header>{t('navbar.send')}</Card.Header>
         <Card.Body>
           {errorMsgs.transfer ? <Alert variant="warning">{t(`messages.${errorMsgs.transfer}`)}</Alert> : null}
           <Form>

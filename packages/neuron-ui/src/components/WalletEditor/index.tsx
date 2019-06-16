@@ -23,7 +23,7 @@ export default ({
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets])
 
   if (!wallet) {
-    const label = `${t('siderbar.settings')}-${t('settings.setting-tabs.wallets')}`
+    const label = `${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`
     return (
       <div>
         <p>{t('messages.wallet-is-not-found')}</p>
