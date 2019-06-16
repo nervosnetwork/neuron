@@ -23,11 +23,6 @@ export default class Input extends BaseEntity {
   outPointIndex: string | null = null
 
   @Column({
-    type: 'simple-json',
-  })
-  args!: string[]
-
-  @Column({
     type: 'varchar',
   })
   since!: string
@@ -67,7 +62,6 @@ export default class Input extends BaseEntity {
   public toInterface(): InputInterface {
     return {
       previousOutput: this.previousOutput(),
-      args: this.args,
       capacity: this.capacity,
       lockHash: this.lockHash,
     }

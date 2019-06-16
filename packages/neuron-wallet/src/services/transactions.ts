@@ -266,7 +266,6 @@ export default class TransactionsService {
         input.outPointTxHash = cell.txHash
         input.outPointIndex = cell.index
       }
-      input.args = i.args
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
