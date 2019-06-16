@@ -1,44 +1,25 @@
 const { ipcRenderer } = require('electron')
 
 const form = document.querySelector('form') as any
-
-const { language } = window.navigator
-
-const locale = (() => {
-  if (language === 'en-US' || language === 'en') {
-    return 'en-US'
-  }
-  return 'zh-CN'
-})()
-
-const labels: any = {
-  'zh-CN': {
-    label: '请输入密码',
-    submit: '提交',
-    cancel: '取消',
-  },
-  'en-US': {
-    label: 'Input your password',
-    submit: 'Submit',
-    cancel: 'Cancel',
-  },
-}
-
-form.password.labels[0].innerText = labels[locale].label
-form.submit.value = labels[locale].submit
-form.cancel.value = labels[locale].cancel
+const id = window.location.hash.slice(1)
 
 form.addEventListener('submit', (event: any) => {
   event.preventDefault()
   if (event && event.target) {
     const password = event.target.password.value
-    ipcRenderer.send('prompt-data', password)
+    ipcRenderer.send(`prompt-data-${id}`, password)
   }
   return false
 })
 
 form.cancel.addEventListener('click', (event: Event) => {
   event.preventDefault()
-  ipcRenderer.send('prompt-cancel')
+  ipcRenderer.send(`prompt-cancel-${id}`)
   return false
+})
+
+ipcRenderer.on(`prompt-init`, (_e: Event, labels: any) => {
+  form.password.labels[0].innerText = labels.label
+  form.submit.value = labels.submit
+  form.cancel.value = labels.cancel
 })

@@ -1,17 +1,25 @@
 import { BrowserWindow, ipcMain, BrowserWindowConstructorOptions } from 'electron'
 import url from 'url'
 import path from 'path'
+import i18n from '../i18n'
 
-let promptWindow: BrowserWindow | null = null
-
-const cleanup = () => {
-  if (promptWindow) {
-    promptWindow.close()
-    promptWindow = null
+const cleanup = (win: BrowserWindow | null) => {
+  if (win) {
+    win.close()
   }
 }
 
+const passwordLabels = {
+  label: i18n.t('prompt.password.label'),
+  submit: i18n.t('prompt.password.submit'),
+  cancel: i18n.t('prompt.password.cancel'),
+}
+
 const prompt = (type = 'password', browserOptions: BrowserWindowConstructorOptions = {}) => {
+  let win: BrowserWindow | null = null
+
+  const id = `${Date.now()}${Math.round(Math.random() * 100)}`
+  const labels = passwordLabels
   return new Promise(resolve => {
     const options = {
       width: 500,
@@ -25,43 +33,53 @@ const prompt = (type = 'password', browserOptions: BrowserWindowConstructorOptio
       selectOptions: null,
       useHtmlLabel: false,
       customStylesheet: null,
+      show: false,
       ...browserOptions,
     }
 
-    promptWindow = new BrowserWindow({
+    win = new BrowserWindow({
       ...options,
       webPreferences: {
         nodeIntegration: true,
       },
     })
 
-    promptWindow.setMenu(null)
+    win.on(`ready-to-show`, () => {
+      if (win) {
+        win.show()
+        win.focus()
+        win.webContents.send(`prompt-init`, labels)
+      }
+    })
+
+    win.setMenu(null)
 
     const dataHandler = (_e: Event, data: string) => {
-      cleanup()
+      cleanup(win)
       resolve(data)
     }
 
     const cancelHandler = () => {
-      cleanup()
+      cleanup(win)
       resolve(null)
     }
 
-    ipcMain.on(`prompt-data`, dataHandler)
-    ipcMain.on(`prompt-cancel`, cancelHandler)
+    ipcMain.on(`prompt-data-${id}`, dataHandler)
+    ipcMain.on(`prompt-cancel-${id}`, cancelHandler)
 
-    promptWindow.on('closed', () => {
-      ipcMain.removeListener(`prompt-data`, dataHandler)
-      ipcMain.removeListener(`prompt-cancel`, cancelHandler)
+    win.on('closed', () => {
+      ipcMain.removeListener(`prompt-data-${id}`, dataHandler)
+      ipcMain.removeListener(`prompt-cancel-${id}`, cancelHandler)
     })
 
     const promptUrl = url.format({
       protocol: 'file',
       slashes: true,
       pathname: path.join(__dirname, type, 'index.html'),
+      hash: id,
     })
 
-    promptWindow.loadURL(promptUrl)
+    win.loadURL(promptUrl)
   })
 }
 

@@ -100,5 +100,12 @@ export default {
         password: '密码',
       },
     },
+    prompt: {
+      password: {
+        label: '请输入密码',
+        submit: '提交',
+        cancel: '取消',
+      },
+    },
   },
 }
