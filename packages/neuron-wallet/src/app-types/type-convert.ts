@@ -40,7 +40,6 @@ export default class TypeConvert {
   static toInput(input: CKBComponents.CellInput): Input {
     return {
       previousOutput: input.previousOutput,
-      args: input.args,
       since: input.since,
     }
   }

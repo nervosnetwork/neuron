@@ -32,7 +32,6 @@ export interface Transaction extends TransactionWithoutHash {
 
 export interface Input {
   previousOutput: OutPoint
-  args: string[]
   since?: string
   capacity?: string | null
   lockHash?: string | null
