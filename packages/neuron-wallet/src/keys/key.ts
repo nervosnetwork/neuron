@@ -41,7 +41,7 @@ export class ExtendedKey {
   }
 
   static parsePublic = (serialized: string) => {
-    return new ExtendedKey(undefined, serialized.slice(0, 64), serialized.slice(64))
+    return new ExtendedKey(undefined, serialized.slice(0, 66), serialized.slice(66))
   }
 }
 
