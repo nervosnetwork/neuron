@@ -101,5 +101,12 @@ export default {
         password: 'Password',
       },
     },
+    prompt: {
+      password: {
+        label: 'Input your password',
+        submit: 'Submit',
+        cancel: 'Cancel',
+      },
+    },
   },
 }
