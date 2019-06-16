@@ -2,6 +2,7 @@ import React from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router-dom'
 import {
+  Local as IconGeneral,
   Upload as IconSend,
   Download as IconReceive,
   History as IconHistory,
@@ -13,13 +14,14 @@ import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
 
 const menuItems = [
+  { name: 'navbar.general', route: Routes.General, icon: IconGeneral },
   { name: 'navbar.send', route: Routes.Send, icon: IconSend },
   { name: 'navbar.receive', route: Routes.Receive, icon: IconReceive },
   { name: 'navbar.history', route: Routes.History, icon: IconHistory },
   { name: 'navbar.addresses', route: Routes.Addresses, icon: IconAddresses },
 ]
 
-const Sidebar = () => {
+const Navbar = () => {
   const {
     settings: { wallets, showAddressBook },
   } = useNeuronWallet()
@@ -27,7 +29,7 @@ const Sidebar = () => {
 
   return wallets.length ? (
     <>
-      {(showAddressBook ? menuItems : menuItems.slice(0, 3)).map(menuItem => (
+      {(showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)).map(menuItem => (
         <NavLink
           key={menuItem.name}
           to={menuItem.route}
@@ -47,6 +49,8 @@ const Sidebar = () => {
   ) : null
 }
 
-const Container = (props: any) => createPortal(<Sidebar {...props} />, document.querySelector('navbar') as HTMLElement)
+Navbar.displayName = 'Navbar'
+
+const Container = (props: any) => createPortal(<Navbar {...props} />, document.querySelector('navbar') as HTMLElement)
 
 export default Container

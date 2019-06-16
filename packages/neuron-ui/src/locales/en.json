@@ -1,6 +1,7 @@
 {
   "translation": {
     "navbar": {
+      "general": "General",
       "wallet": "Wallet",
       "send": "Send",
       "receive": "Receive",
