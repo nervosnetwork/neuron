@@ -1,14 +1,3 @@
-export interface KeysData {
-  privateKey: string
-  chainCode: string
-}
-
-export interface Child {
-  path: string
-  privateKey: string
-  publicKey: string
-}
-
 export interface CipherParams {
   iv: string
 }

@@ -281,6 +281,10 @@ export default class WalletService {
     }[],
     password: string
   ) => {
+    // TODO:
+    //  Collect inputs from multiple addresses.
+    //  Use account type and index for specifying each address.
+    //  Derivate private key for each address to sign.
     const wallet = await this.getCurrent()
     if (!wallet) throw new CurrentWalletNotSet()
 
@@ -288,11 +292,11 @@ export default class WalletService {
 
     const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
 
-    if (!key.keysData) throw new KeyHasNoData()
+    if (!key.extendedKey) throw new KeyHasNoData()
 
-    const { privateKey } = key.keysData
+    const { publicKey: privateKey } = key.extendedKey
 
-    const addrObj = core.generateAddress(privateKey)
+    const addrObj = core.generateAddress(privateKey!)
 
     const changeAddress = wallet.addresses.change[0].address
 

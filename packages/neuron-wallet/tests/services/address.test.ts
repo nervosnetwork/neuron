@@ -1,5 +1,6 @@
 import Addresses from '../../src/services/addresses'
 import NodeService from '../../src/services/node'
+import { ExtendedKey } from '../../src/keys/key';
 
 const { utils } = NodeService.getInstance().core
 
@@ -18,12 +19,13 @@ describe('Key tests', () => {
     expect('ckb1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6vqdd7em').toBe(address)
   })
 
-  it('Generate addresses from key data', async () => {
-    const keysData = {
-      privateKey: '4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488',
-      chainCode: '769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495',
-    }
-    const addresses = Addresses.generateAddresses(keysData, 2, 2)
+  it('Generate addresses from extended key', async () => {
+    const extendedKey = new ExtendedKey(
+      undefined, // '4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488'
+      '024579b5711c35b33d6234b508822e1c6b67799a7bc4dc39ee3a0bde4e4aae407e',
+      '769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495'
+    )
+    const addresses = Addresses.generateAddresses(extendedKey, 2, 2)
     expect(2).toBe(addresses.receiving.length)
     expect('ckt1q9gry5zgmgxa776jt6k40ysfkhwv8egepeqwzuv6jqjt02').toBe(addresses.receiving[0].address)
     expect("m/44'/309'/0'/0/0").toBe(addresses.receiving[0].path)

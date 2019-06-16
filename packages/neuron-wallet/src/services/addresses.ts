@@ -2,7 +2,7 @@ import TransactionsService from './transactions'
 import WalletService from './wallets'
 import NodeService from './node'
 import HD from '../keys/hd'
-import { KeysData } from '../keys/keystore'
+import { ExtendedKey } from '../keys/key'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
@@ -31,18 +31,18 @@ class Address {
       binIdx: AddressBinIdx.P2PH,
     })
 
-  public static addressFromHDIndex = (keysData: KeysData, index: number, type = AddressType.Receiving) =>
-    Address.addressFromPublicKey(HD.keyFromHDIndex(keysData, index, type).publicKey)
+  public static addressFromHDIndex = (extendedKey: ExtendedKey, index: number, type = AddressType.Receiving) =>
+    Address.addressFromPublicKey(HD.keyFromHDIndex(extendedKey, index, type).publicKey)
 
-  public static nextUnusedAddress = (keysData: KeysData) => {
-    const nextUnusedIndex = Address.searchHDIndex(keysData, SEARCH_RANGE)
-    const { publicKey } = HD.keyFromHDIndex(keysData, nextUnusedIndex, AddressType.Receiving)
+  public static nextUnusedAddress = (extendedKey: ExtendedKey) => {
+    const nextUnusedIndex = Address.searchHDIndex(extendedKey, SEARCH_RANGE)
+    const { publicKey } = HD.keyFromHDIndex(extendedKey, nextUnusedIndex, AddressType.Receiving)
     return Address.addressFromPublicKey(publicKey)
   }
 
   // Generate both receiving and change addresses
   public static generateAddresses = (
-    keysData: KeysData,
+    extendedKey: ExtendedKey,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -52,11 +52,11 @@ class Address {
       throw new Error('Address number error.')
     }
     const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => ({
-      address: Address.addressFromHDIndex(keysData, idx, AddressType.Receiving),
+      address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Receiving),
       path: HD.pathFromIndex(AddressType.Receiving, idx),
     }))
     const change = Array.from({ length: changeAddressCount }).map((_, idx) => ({
-      address: Address.addressFromHDIndex(keysData, idx, AddressType.Change),
+      address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Change),
       path: HD.pathFromIndex(AddressType.Change, idx),
     }))
     return {
@@ -72,9 +72,9 @@ class Address {
         return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
       }, [])
 
-  public static searchUsedAddresses = (keysData: KeysData) =>
-    Array.from({ length: Address.searchHDIndex(keysData) }, (_, idx) => {
-      const { publicKey, path } = HD.keyFromHDIndex(keysData, idx)
+  public static searchUsedAddresses = (extendedKey: ExtendedKey) =>
+    Array.from({ length: Address.searchHDIndex(extendedKey) }, (_, idx) => {
+      const { publicKey, path } = HD.keyFromHDIndex(extendedKey, idx)
       if (!publicKey) return null
       const address = Address.addressFromPublicKey(publicKey)
       if (Address.isAddressUsed(address)) return null
@@ -86,30 +86,30 @@ class Address {
 
   // TODO: refactor me
   public static searchHDIndex = (
-    keysData: KeysData,
+    extendedKey: ExtendedKey,
     startIndex = 0,
     maxUsedIndex = 0,
     minUnusedIndex = 100,
     depth = 0
   ): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex))) {
+    if (!Address.isAddressUsed(Address.addressFromHDIndex(extendedKey, startIndex))) {
       if (startIndex === 0) {
         return 0
       }
       return Address.searchHDIndex(
-        keysData,
+        extendedKey,
         Math.floor((startIndex - maxUsedIndex) / 2 + maxUsedIndex),
         maxUsedIndex,
         Math.min(minUnusedIndex, startIndex),
         depth + 1
       )
     }
-    if (!Address.isAddressUsed(Address.addressFromHDIndex(keysData, startIndex + 1))) {
+    if (!Address.isAddressUsed(Address.addressFromHDIndex(extendedKey, startIndex + 1))) {
       return startIndex + 1
     }
     return Address.searchHDIndex(
-      keysData,
+      extendedKey,
       Math.round((minUnusedIndex - startIndex) / 2 + startIndex),
       Math.max(maxUsedIndex, startIndex),
       minUnusedIndex,

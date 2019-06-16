@@ -133,7 +133,7 @@ export default class WalletsController {
     if (newPassword) {
       if (walletsService.validate({ id, password })) {
         const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
-        props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
+        props.keystore = key.toKeystore(key.extendedKey!.serializePrivate(), newPassword)
       } else {
         throw new IncorrectPassword()
       }

@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import { ec as EC } from 'elliptic'
 import BN from 'bn.js'
 import { AddressType } from '../services/addresses'
-import { KeysData } from './keystore'
+import { ExtendedKey } from './key'
 
 const ec = new EC('secp256k1')
 
@@ -163,19 +163,18 @@ class HD {
     return array[array.length - 1]
   }
 
-  public static keyFromHDIndex = (keysData: KeysData, index: number, type = AddressType.Receiving) => {
-    const root = new Keychain(Buffer.from(keysData.privateKey, 'hex'), Buffer.from(keysData.chainCode, 'hex'))
-    root.calculateFingerprint()
+  public static keyFromHDIndex = (extendedKey: ExtendedKey, index: number, type = AddressType.Receiving) => {
     const path = HD.pathFromIndex(type, index)
-    const { privateKey, publicKey } = root.derivePath(path)
-    if (privateKey && publicKey && path) {
-      return {
-        privateKey: privateKey.toString('hex'),
-        publicKey: publicKey.toString('hex'),
-        path,
-      }
+    const keychain = Keychain.fromPublicKey(
+      Buffer.from(extendedKey.publicKey!, 'hex'),
+      Buffer.from(extendedKey.chainCode, 'hex'),
+      path
+    )
+    return {
+      privateKey: keychain.privateKey.toString('hex'),
+      publicKey: keychain.publicKey.toString('hex'),
+      path,
     }
-    throw new Error('Empty private key')
   }
 }
 
