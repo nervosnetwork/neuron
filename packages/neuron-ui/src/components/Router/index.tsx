@@ -6,6 +6,7 @@ import Header from 'containers/Header'
 import Sidebar from 'containers/Sidebar'
 import MainContent from 'containers/MainContent'
 import Notification from 'containers/Notification'
+import Footer from 'containers/Footer'
 import WalletWizard from 'components/WalletWizard'
 import WalletDetail from 'components/WalletDetail'
 import Send from 'components/Transfer'
@@ -46,6 +47,12 @@ export const containers: CustomRoute[] = [
     path: '/',
     exact: false,
     component: Sidebar,
+  },
+  {
+    name: 'Footer',
+    path: '/',
+    exact: false,
+    component: Footer,
   },
   {
     name: 'Notification',
