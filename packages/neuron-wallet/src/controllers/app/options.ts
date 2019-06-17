@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
-import prompt from 'electron-prompt'
+import prompt from '../../utils/prompt'
 
 import NetworksController from '../networks'
 import WalletsController from '../wallets'
@@ -96,13 +96,8 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.backup'),
         click: async () => {
-          prompt({
+          prompt('password', {
             title: i18n.t('messageBox.backup-keystore.title'),
-            label: i18n.t('messageBox.backup-keystore.password'),
-            value: '',
-            inputAttrs: {
-              type: 'password',
-            },
           })
             .then(async (password: string | null = '') => {
               if (password === null) return
@@ -141,13 +136,8 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.delete'),
         click: () => {
-          prompt({
+          prompt('password', {
             title: i18n.t('messageBox.remove-wallet.title'),
-            label: i18n.t('messageBox.remove-wallet.password'),
-            value: '',
-            inputAttrs: {
-              type: 'password',
-            },
           })
             .then(async (password: string | null = '') => {
               if (password === null) return

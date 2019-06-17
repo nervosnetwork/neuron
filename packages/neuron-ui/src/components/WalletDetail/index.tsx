@@ -25,7 +25,7 @@ const WalletDetail: React.SFC<React.PropsWithoutRef<ContentProps>> = () => {
       <Card.Header>{wallet.name}</Card.Header>
       <Card.Body>
         {`Balance: ${currencyFormatter(wallet.balance)}(${currencyFormatter(wallet.balance, 'CNY')})`}
-        <h5>{t('siderbar.history')}</h5>
+        <h5>{t('navbar.history')}</h5>
         {totalCount ? (
           <TransactionList items={items.slice(0, LIST_COUNT)} />
         ) : (

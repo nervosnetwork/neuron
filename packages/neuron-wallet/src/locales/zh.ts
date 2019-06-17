@@ -15,6 +15,7 @@ export default {
       view: {
         label: '视图',
         fullscreen: ' 全屏',
+        'address-book': '地址簿',
       },
       window: {
         label: '窗口',
@@ -98,6 +99,13 @@ export default {
       'backup-keystore': {
         title: '备份 Keystore 文件',
         password: '密码',
+      },
+    },
+    prompt: {
+      password: {
+        label: '请输入密码',
+        submit: '提交',
+        cancel: '取消',
       },
     },
   },

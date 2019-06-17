@@ -1,6 +1,7 @@
 {
   "translation": {
-    "siderbar": {
+    "navbar": {
+      "general": "通用",
       "wallet": "钱包",
       "send": "转账",
       "receive": "收款",

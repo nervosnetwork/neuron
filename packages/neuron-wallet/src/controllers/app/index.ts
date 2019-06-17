@@ -53,6 +53,12 @@ export default class AppController {
     dialog.showMessageBox(options, callback)
   }
 
+  public static toggleAddressBook() {
+    windowManage.broadcast(Channel.App, 'toggleAddressBook', {
+      status: ResponseCode.Success,
+    })
+  }
+
   public static navTo(path: string) {
     windowManage.sendToFocusedWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,

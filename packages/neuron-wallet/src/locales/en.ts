@@ -15,6 +15,7 @@ export default {
       view: {
         label: 'View',
         fullscreen: 'Fullscreen',
+        'address-book': 'Address Book',
       },
       window: {
         label: 'Window',
@@ -99,6 +100,13 @@ export default {
       'backup-keystore': {
         title: 'Backup the Keystore',
         password: 'Password',
+      },
+    },
+    prompt: {
+      password: {
+        label: 'Input your password',
+        submit: 'Submit',
+        cancel: 'Cancel',
       },
     },
   },

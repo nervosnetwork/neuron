@@ -77,7 +77,6 @@ export default class CellsService {
     cellEntities.every(cell => {
       const input: CKBComponents.CellInput = {
         previousOutput: cell.outPoint(),
-        args: [],
         since: '0',
       }
       inputs.push(input)

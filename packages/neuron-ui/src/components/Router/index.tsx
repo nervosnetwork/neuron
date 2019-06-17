@@ -3,9 +3,12 @@ import { HashRouter as Router } from 'react-router-dom'
 import { createHashHistory } from 'history'
 
 import Header from 'containers/Header'
-import Sidebar from 'containers/Sidebar'
+import Navbar from 'containers/Navbar'
 import MainContent from 'containers/MainContent'
 import Notification from 'containers/Notification'
+import Footer from 'containers/Footer'
+
+import General from 'components/General'
 import WalletWizard from 'components/WalletWizard'
 import WalletDetail from 'components/WalletDetail'
 import Send from 'components/Transfer'
@@ -42,10 +45,16 @@ export const containers: CustomRoute[] = [
     component: Header,
   },
   {
-    name: 'Sidebar',
+    name: 'Navbar',
     path: '/',
     exact: false,
-    component: Sidebar,
+    component: Navbar,
+  },
+  {
+    name: 'Footer',
+    path: '/',
+    exact: false,
+    component: Footer,
   },
   {
     name: 'Notification',
@@ -61,6 +70,12 @@ export const mainContents: CustomRoute[] = [
     path: Routes.Launch,
     exact: true,
     component: LaunchScreen,
+  },
+  {
+    name: `General`,
+    path: Routes.General,
+    exact: true,
+    component: General,
   },
   {
     name: `Wallet`,

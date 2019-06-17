@@ -53,7 +53,7 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
     <Container>
       <Card>
         <Card.Header>
-          <h2>{t('siderbar.receive')}</h2>
+          <h2>{t('navbar.receive')}</h2>
         </Card.Header>
         <Card.Body>
           <Form.Group>
