@@ -21,13 +21,13 @@ const menuItems = [
 
 const Sidebar = () => {
   const {
-    settings: { wallets },
+    settings: { wallets, showAddressBook },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
   return wallets.length ? (
     <>
-      {menuItems.map(menuItem => (
+      {(showAddressBook ? menuItems : menuItems.slice(0, 3)).map(menuItem => (
         <NavLink
           key={menuItem.name}
           to={menuItem.route}

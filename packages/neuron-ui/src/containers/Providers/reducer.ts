@@ -36,6 +36,15 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
     case ProviderActions.Settings:
     case ProviderActions.Wallet:
     case ProviderActions.Chain: {
+      if (action.payload.toggleAddressBook) {
+        return {
+          ...state,
+          settings: {
+            ...state.settings,
+            showAddressBook: !state.settings.showAddressBook,
+          },
+        }
+      }
       return {
         ...state,
         [action.type]: {
