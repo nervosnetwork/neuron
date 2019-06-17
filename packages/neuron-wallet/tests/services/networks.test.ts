@@ -119,10 +119,10 @@ describe(`networks service`, () => {
 })
 
 describe(`networks service errors`, () => {
-  const service = new NetworksService()
-  afterEach(() => service.clear())
-
   describe('validation on parameters', () => {
+    const service = new NetworksService()
+    afterEach(() => service.clear())
+
     it(`service.get requires id`, () => {
       expect(service.get(undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
     })
@@ -147,6 +147,9 @@ describe(`networks service errors`, () => {
   })
 
   describe('validation on network existence', () => {
+    const service = new NetworksService()
+    afterEach(() => service.clear())
+
     it(`create network with existing name`, () => {
       expect(service.create('Testnet', 'http://localhost')).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NAME_USED))
     })
