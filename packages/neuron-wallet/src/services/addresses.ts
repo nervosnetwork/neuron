@@ -32,15 +32,16 @@ class Address {
     })
 
   public static addressFromHDIndex = (extendedKey: ExtendedPublicKey, index: number, type = AddressType.Receiving) =>
-    Address.addressFromPublicKey(HD.keyFromHDIndex(extendedKey, index, type).publicKey)
+    Address.addressFromPublicKey(HD.keyFromExtendedPublicKey(extendedKey, type, index).publicKey)
 
   public static nextUnusedAddress = (extendedKey: ExtendedPublicKey) => {
     const nextUnusedIndex = Address.searchHDIndex(extendedKey, SEARCH_RANGE)
-    const { publicKey } = HD.keyFromHDIndex(extendedKey, nextUnusedIndex, AddressType.Receiving)
+    const { publicKey } = HD.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, nextUnusedIndex)
     return Address.addressFromPublicKey(publicKey)
   }
 
-  // Generate both receiving and change addresses
+  // Generate both receiving and change addresses.
+  // m/44'/309'/0' is the fixed path for the extended public key.
   public static generateAddresses = (
     extendedKey: ExtendedPublicKey,
     receivingAddressCount: number = 20,
@@ -53,11 +54,11 @@ class Address {
     }
     const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => ({
       address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Receiving),
-      path: HD.pathFromIndex(AddressType.Receiving, idx),
+      path: HD.pathForReceiving(idx),
     }))
     const change = Array.from({ length: changeAddressCount }).map((_, idx) => ({
       address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Change),
-      path: HD.pathFromIndex(AddressType.Change, idx),
+      path: HD.pathForChange(idx),
     }))
     return {
       receiving,
@@ -74,7 +75,7 @@ class Address {
 
   public static searchUsedAddresses = (extendedKey: ExtendedPublicKey) =>
     Array.from({ length: Address.searchHDIndex(extendedKey) }, (_, idx) => {
-      const { publicKey, path } = HD.keyFromHDIndex(extendedKey, idx)
+      const { publicKey, path } = HD.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, idx)
       if (!publicKey) return null
       const address = Address.addressFromPublicKey(publicKey)
       if (Address.isAddressUsed(address)) return null

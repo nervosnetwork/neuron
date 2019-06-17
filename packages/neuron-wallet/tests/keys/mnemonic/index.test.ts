@@ -5,7 +5,8 @@ import {
   mnemonicToSeedSync,
   validateMnemonic,
 } from '../../../src/keys/mnemonic'
-import fixtures from './fixtures.json.js'
+
+const fixtures = require('./fixtures.json')
 
 describe('mnemonic', () => {
   it('generate, validate mnemonic', () => {

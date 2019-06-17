@@ -1,13 +1,8 @@
 import crypto from 'crypto'
 
-import Address, { HDAddress } from '../services/addresses'
-import Keystore from './keystore'
-import Keychain, { privateToPublic } from './keychain'
-import { Validate, Required, Password } from '../decorators'
-import { IsRequired, InvalidMnemonic } from '../exceptions'
-import { entropyToMnemonic, validateMnemonic, mnemonicToSeed } from './mnemonic'
-
-const ENTROPY_SIZE = 16
+import { HDAddress } from '../services/addresses'
+import { privateToPublic } from './keychain'
+import { entropyToMnemonic } from './mnemonic'
 
 export class ExtendedPublicKey {
   publicKey: string
@@ -60,53 +55,9 @@ export interface Addresses {
   change: HDAddress[]
 }
 
-export default class Key {
-  public keystore?: Keystore
-  public addresses?: Addresses
-
-  constructor(keystore: Keystore | undefined) {
-    this.keystore = keystore
-  }
-
-  static generateMnemonic = () => {
-    const entropy = crypto.randomBytes(ENTROPY_SIZE).toString('hex')
-    return entropyToMnemonic(entropy)
-  }
-
-  @Validate
-  static async fromKeystore(@Required keystore: Keystore, @Password password: string) {
-    const extendedPrivateKey = keystore.extendedPrivatKey(password)
-    const key = new Key(keystore)
-    key.addresses = Address.generateAddresses(extendedPrivateKey.toExtendedPublicKey())
-    return key
-  }
-
-  @Validate
-  public static async fromMnemonic(@Required mnemonic: string, @Password password: string) {
-    if (!validateMnemonic(mnemonic)) {
-      throw new InvalidMnemonic()
-    }
-
-    const seed = await mnemonicToSeed(mnemonic)
-    const root = Keychain.fromSeed(seed)
-    if (!root.privateKey) {
-      throw new InvalidMnemonic()
-    }
-    const extendedKey = new ExtendedPrivateKey(root.privateKey.toString('hex'), root.chainCode.toString('hex'))
-    const keystore = Keystore.create(extendedKey, password)
-    const key = new Key(keystore)
-    key.addresses = Address.generateAddresses(extendedKey.toExtendedPublicKey())
-    return key
-  }
-
-  public checkPassword = (password: string) => {
-    if (password === undefined) {
-      throw new IsRequired('Password')
-    }
-    if (this.keystore === undefined) {
-      throw new IsRequired('Keystore')
-    }
-
-    return this.keystore.checkPassword(password)
-  }
+// Generate 12 words mnemonic code
+export const generateMnemonic = () => {
+  const entropySize = 16
+  const entropy = crypto.randomBytes(entropySize).toString('hex')
+  return entropyToMnemonic(entropy)
 }

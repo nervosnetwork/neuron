@@ -126,6 +126,31 @@ describe('BIP32 Keychain tests', () => {
     expect(grandchild.depth).toEqual(4)
   })
 
+  it('derive ckb keys', () => {
+    const master = Keychain.fromSeed(shortSeed)
+    const extendedKey = master.derivePath(`m/44'/309'/0'`)
+    expect(extendedKey.privateKey.toString('hex')).toEqual(
+      'bb39d218506b30ca69b0f3112427877d983dd3cd2cabc742ab723e2964d98016'
+    )
+    expect(extendedKey.publicKey.toString('hex')).toEqual(
+      '03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3'
+    )
+    expect(extendedKey.chainCode.toString('hex')).toEqual(
+      '37e85a19f54f0a242a35599abac64a71aacc21e3a5860dd024377ffc7e6827d8'
+    )
+
+    const addressKey = extendedKey.deriveChild(0, false).deriveChild(0, false)
+    expect(addressKey.privateKey.toString('hex')).toEqual(
+      'fcba4708f1f07ddc00fc77422d7a70c72b3456f5fef3b2f68368cdee4e6fb498'
+    )
+    expect(addressKey.publicKey.toString('hex')).toEqual(
+      '0331b3c0225388c5010e3507beb28ecf409c022ef6f358f02b139cbae082f5a2a3'
+    )
+    expect(addressKey.chainCode.toString('hex')).toEqual(
+      'c4b7aef857b625bbb0497267ed51151d090f81737f4f22a0ac3673483b927090'
+    )
+  })
+
   it('private key add', () => {
     const k = new Keychain(
       Buffer.from('9e919c96ac5a4caea7ba0ea1f7dd7bca5dca8a11e66ed633690c71e483a6e3c9', 'hex'),

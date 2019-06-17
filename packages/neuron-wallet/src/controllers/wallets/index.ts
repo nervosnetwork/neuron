@@ -1,5 +1,4 @@
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
-import Key from '../../keys/key'
 import Keystore from '../../keys/keystore'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
@@ -51,14 +50,11 @@ export default class WalletsController {
     password: string
     mnemonic: string
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
-    const key = await Key.fromMnemonic(mnemonic, password)
+    const keystore = await Keystore.fromMnemonic(mnemonic, password)
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || {
-        receiving: [],
-        change: [],
-      },
+      keystore,
+      addresses: { receiving: [], change: [] }, // Fetch addresses
     })
     return {
       status: ResponseCode.Success,
@@ -97,11 +93,19 @@ export default class WalletsController {
     password: string
     keystore: string
   }): Promise<Controller.Response<Wallet>> {
-    const key = await Key.fromKeystore(JSON.parse(keystore), password)
+    if (password === undefined) {
+      throw new IsRequired('Password')
+    }
+
+    const keystoreObject = Keystore.fromJson(keystore)
+    if (!keystoreObject.checkPassword(password)) {
+      throw new IncorrectPassword()
+    }
+
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || { receiving: [], change: [] },
+      keystore: keystoreObject,
+      addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
     return {
       status: ResponseCode.Success,
@@ -132,7 +136,7 @@ export default class WalletsController {
     }
 
     if (newPassword) {
-      const extendedPrivateKey = wallet!.loadKeystore().extendedPrivatKey(password)
+      const extendedPrivateKey = wallet!.loadKeystore().extendedPrivateKey(password)
       props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }
 
