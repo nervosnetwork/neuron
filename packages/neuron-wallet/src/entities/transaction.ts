@@ -28,18 +28,21 @@ export default class Transaction extends BaseEntity {
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  timestamp!: string
+  timestamp: string | undefined = undefined
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  blockNumber!: string
+  blockNumber: string | undefined = undefined
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
-  blockHash!: string
+  blockHash: string | undefined = undefined
 
   @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]

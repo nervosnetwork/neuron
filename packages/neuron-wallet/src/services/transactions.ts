@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Script, Transaction, TransactionWithoutHash, Input } from '../app-types/types'
+import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, Cell } from '../app-types/types'
 import CellsService from './cells'
 import InputEntity from '../entities/input'
 import OutputEntity from '../entities/output'
@@ -387,7 +387,7 @@ export default class TransactionsService {
     lockHashes: string[],
     targetOutputs: TargetOutput[],
     changeAddress: string
-  ): Promise<CKBComponents.RawTransaction> => {
+  ): Promise<TransactionWithoutHash> => {
     const { codeHash, outPoint } = await LockUtils.systemScript()
 
     const needCapacities: bigint = targetOutputs
@@ -396,12 +396,12 @@ export default class TransactionsService {
 
     const { inputs, capacities } = await CellsService.gatherInputs(needCapacities.toString(), lockHashes)
 
-    const outputs: CKBComponents.CellOutput[] = targetOutputs.map(o => {
+    const outputs: Cell[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
-      const blake160: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+      const blake160: string = LockUtils.addressToBlake160(address)
 
-      const output: CKBComponents.Cell = {
+      const output: Cell = {
         capacity,
         data: '0x',
         lock: {
@@ -415,13 +415,9 @@ export default class TransactionsService {
 
     // change
     if (BigInt(capacities) > needCapacities) {
-      const changeBlake160: string = core.utils.parseAddress(
-        changeAddress,
-        core.utils.AddressPrefix.Testnet,
-        'hex'
-      ) as string
+      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
 
-      const output: CKBComponents.CellOutput = {
+      const output: Cell = {
         capacity: `${BigInt(capacities) - needCapacities}`,
         data: '0x',
         lock: {

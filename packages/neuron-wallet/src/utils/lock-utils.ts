@@ -63,17 +63,11 @@ export default class LockUtils {
   }
 
   static async addressToLockScript(address: string): Promise<Script> {
-    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
-    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
-    let blake160: string = result.slice(hrp.length, result.length)
-    if (!blake160.startsWith('0x')) {
-      blake160 = `0x${blake160}`
-    }
     const systemScript = await this.systemScript()
 
     const lock: Script = {
       codeHash: systemScript.codeHash,
-      args: [blake160],
+      args: [LockUtils.addressToBlake160(address)],
     }
     return lock
   }
@@ -96,5 +90,15 @@ export default class LockUtils {
       type: core.utils.AddressType.BinIdx,
       binIdx: core.utils.AddressBinIdx.P2PH,
     })
+  }
+
+  static addressToBlake160(address: string): string {
+    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
+    let blake160: string = result.slice(hrp.length, result.length)
+    if (!blake160.startsWith('0x')) {
+      blake160 = `0x${blake160}`
+    }
+    return blake160
   }
 }

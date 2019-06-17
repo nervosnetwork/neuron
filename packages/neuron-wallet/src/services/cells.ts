@@ -1,6 +1,6 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from '../entities/output'
-import { Cell, OutPoint } from '../app-types/types'
+import { Cell, OutPoint, Input } from '../app-types/types'
 import { CapacityNotEnough } from '../exceptions'
 
 const MIN_CELL_CAPACITY = '40'
@@ -52,7 +52,7 @@ export default class CellsService {
     capacity: string,
     lockHashes: string[]
   ): Promise<{
-    inputs: CKBComponents.CellInput[]
+    inputs: Input[]
     capacities: string
   }> => {
     const capacityInt = BigInt(capacity)
@@ -72,12 +72,13 @@ export default class CellsService {
       })
     cellEntities.sort((a, b) => +a.capacity - +b.capacity)
 
-    const inputs: CKBComponents.CellInput[] = []
+    const inputs: Input[] = []
     let inputCapacities: bigint = BigInt(0)
     cellEntities.every(cell => {
-      const input: CKBComponents.CellInput = {
+      const input: Input = {
         previousOutput: cell.outPoint(),
         since: '0',
+        lock: cell.lock,
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
