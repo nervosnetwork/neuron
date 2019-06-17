@@ -1,10 +1,24 @@
 export default {
   translation: {
-    mainmenu: {
+    keywords: {
+      wallet: '钱包',
+      password: '密码',
+      'wallet-name': '钱包名称',
+    },
+    'application-menu': {
       neuron: {
         about: '关于{{app}}',
         preferences: '设置...',
         quit: '退出{{app}}',
+      },
+      wallet: {
+        label: '钱包',
+        select: '选择钱包',
+        'create-new': '创建新钱包',
+        import: '导入钱包',
+        backup: '备份当前钱包',
+        delete: '删除当前钱包',
+        'change-password': '修改密码',
       },
       edit: {
         label: '编辑',
