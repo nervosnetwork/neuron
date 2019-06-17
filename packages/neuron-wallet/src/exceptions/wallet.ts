@@ -17,6 +17,12 @@ export class IncorrectPassword extends Error {
   }
 }
 
+export class EmptyPassword extends Error {
+  constructor() {
+    super(i18n.t('messages.is-required', { field: i18n.t('keywords.password') }))
+  }
+}
+
 export class CodeHashNotLoaded extends Error {
   constructor() {
     super(i18n.t('messages.codehash-not-loaded'))
@@ -33,6 +39,7 @@ export default {
   WalletNotFound,
   CurrentWalletNotSet,
   IncorrectPassword,
+  EmptyPassword,
   CodeHashNotLoaded,
   CapacityNotEnough,
 }

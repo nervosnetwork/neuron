@@ -1,15 +1,11 @@
-import fs from 'fs'
 import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
-import prompt from '../../utils/prompt'
 
 import NetworksController from '../networks'
 import WalletsController from '../wallets'
 import NetworksService from '../../services/networks'
-import WalletsService from '../../services/wallets'
 import AppController from '.'
 import i18n from '../../utils/i18n'
 import env from '../../env'
-import { IncorrectPassword } from '../../exceptions/wallet'
 
 export enum MenuCommand {
   ShowAbout = 'show-about',
@@ -23,10 +19,11 @@ export enum URL {
   Website = 'https://www.nervos.org/',
   Repository = 'https://github.com/nervosnetwork/neuron',
   Preference = '/settings/general',
+  CreateWallet = '/wizard/mnemonic/create',
+  ImportWallet = '/wizard/mnemonic/import',
 }
 
 const networksService = NetworksService.getInstance()
-const walletsService = WalletsService.getInstance()
 
 export const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
@@ -96,35 +93,13 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.backup'),
         click: async () => {
-          prompt('password', {
-            title: i18n.t('messageBox.backup-keystore.title'),
-          })
-            .then(async (password: string | null = '') => {
-              if (password === null) return
-
-              const wallet = await walletsService.get(id)
-
-              if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
-
-              const keystore = wallet.loadKeystore()
-              dialog.showSaveDialog(
-                {
-                  title: i18n.t('messages.save-keystore'),
-                  defaultPath: wallet.name,
-                },
-                (filename?: string) => {
-                  if (filename) {
-                    fs.writeFileSync(filename, JSON.stringify(keystore))
-                  }
-                }
-              )
+          const res = await WalletsController.backup(id)
+          if (!res.status) {
+            AppController.showMessageBox({
+              type: 'error',
+              message: res.msg!,
             })
-            .catch((err: Error) => {
-              dialog.showMessageBox({
-                type: 'error',
-                message: err.message,
-              })
-            })
+          }
         },
       },
       {
@@ -135,20 +110,14 @@ export const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.delete'),
-        click: () => {
-          prompt('password', {
-            title: i18n.t('messageBox.remove-wallet.title'),
-          })
-            .then(async (password: string | null = '') => {
-              if (password === null) return
-              await WalletsController.delete({ id, password })
+        click: async () => {
+          const res = await WalletsController.delete(id)
+          if (!res.status) {
+            AppController.showMessageBox({
+              type: 'error',
+              message: res.msg!,
             })
-            .catch((err: Error) => {
-              dialog.showMessageBox({
-                type: 'error',
-                message: err.message,
-              })
-            })
+          }
         },
       },
     ]
