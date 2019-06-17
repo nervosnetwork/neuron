@@ -7,14 +7,13 @@ import TransactionsService, {
 
 import AddressService from '../services/addresses'
 import WalletsService from '../services/wallets'
-import Key from '../keys/key'
 
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
-import { KeyHasNoData, TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
+import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
 
 /**
- * @class TransactionsController
+ * @class TransactionsControlle r
  * @description handle messages from transactions channel
  */
 @ControllerDecorator(Channel.Transactions)
@@ -44,9 +43,7 @@ export default class TransactionsController {
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
       if (!wallet) throw new CurrentWalletNotSet()
-      const key = new Key({ keystore: wallet.loadKeystore() })
-      if (!key.extendedKey) throw new KeyHasNoData()
-      searchAddresses = AddressService.searchUsedAddresses(key.extendedKey).map(addr => addr.address)
+      searchAddresses = AddressService.searchUsedAddresses(wallet.extendedPublicKey()).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })

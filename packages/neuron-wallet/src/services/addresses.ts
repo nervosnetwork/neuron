@@ -2,7 +2,7 @@ import TransactionsService from './transactions'
 import WalletService from './wallets'
 import NodeService from './node'
 import HD from '../keys/hd'
-import { ExtendedKey } from '../keys/key'
+import { ExtendedPublicKey } from '../keys/key'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
@@ -31,10 +31,10 @@ class Address {
       binIdx: AddressBinIdx.P2PH,
     })
 
-  public static addressFromHDIndex = (extendedKey: ExtendedKey, index: number, type = AddressType.Receiving) =>
+  public static addressFromHDIndex = (extendedKey: ExtendedPublicKey, index: number, type = AddressType.Receiving) =>
     Address.addressFromPublicKey(HD.keyFromHDIndex(extendedKey, index, type).publicKey)
 
-  public static nextUnusedAddress = (extendedKey: ExtendedKey) => {
+  public static nextUnusedAddress = (extendedKey: ExtendedPublicKey) => {
     const nextUnusedIndex = Address.searchHDIndex(extendedKey, SEARCH_RANGE)
     const { publicKey } = HD.keyFromHDIndex(extendedKey, nextUnusedIndex, AddressType.Receiving)
     return Address.addressFromPublicKey(publicKey)
@@ -42,7 +42,7 @@ class Address {
 
   // Generate both receiving and change addresses
   public static generateAddresses = (
-    extendedKey: ExtendedKey,
+    extendedKey: ExtendedPublicKey,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -72,7 +72,7 @@ class Address {
         return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
       }, [])
 
-  public static searchUsedAddresses = (extendedKey: ExtendedKey) =>
+  public static searchUsedAddresses = (extendedKey: ExtendedPublicKey) =>
     Array.from({ length: Address.searchHDIndex(extendedKey) }, (_, idx) => {
       const { publicKey, path } = HD.keyFromHDIndex(extendedKey, idx)
       if (!publicKey) return null
@@ -86,7 +86,7 @@ class Address {
 
   // TODO: refactor me
   public static searchHDIndex = (
-    extendedKey: ExtendedKey,
+    extendedKey: ExtendedPublicKey,
     startIndex = 0,
     maxUsedIndex = 0,
     minUnusedIndex = 100,

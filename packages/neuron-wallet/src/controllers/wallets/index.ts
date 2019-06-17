@@ -1,5 +1,6 @@
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
 import Key from '../../keys/key'
+import Keystore from '../../keys/keystore'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
@@ -96,7 +97,7 @@ export default class WalletsController {
     password: string
     keystore: string
   }): Promise<Controller.Response<Wallet>> {
-    const key = await Key.fromKeystore(keystore, password)
+    const key = await Key.fromKeystore(JSON.parse(keystore), password)
     const wallet = walletsService.create({
       name,
       keystore: key.keystore || null,
@@ -131,12 +132,8 @@ export default class WalletsController {
     }
 
     if (newPassword) {
-      if (walletsService.validate({ id, password })) {
-        const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
-        props.keystore = key.toKeystore(key.extendedKey!.serializePrivate(), newPassword)
-      } else {
-        throw new IncorrectPassword()
-      }
+      const extendedPrivateKey = wallet!.loadKeystore().extendedPrivatKey(password)
+      props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }
 
     walletsService.update(id, props)

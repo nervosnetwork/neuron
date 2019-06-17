@@ -1,6 +1,6 @@
 import Addresses from '../../src/services/addresses'
 import NodeService from '../../src/services/node'
-import { ExtendedKey } from '../../src/keys/key';
+import { ExtendedPublicKey } from '../../src/keys/key';
 
 const { utils } = NodeService.getInstance().core
 
@@ -20,7 +20,7 @@ describe('Key tests', () => {
   })
 
   it('Generate addresses from extended key', async () => {
-    const extendedKey = new ExtendedKey(
+    const extendedKey = new ExtendedPublicKey(
       undefined, // '4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488'
       '024579b5711c35b33d6234b508822e1c6b67799a7bc4dc39ee3a0bde4e4aae407e',
       '769382d9761bef8ed409ce4f9d5aeae5b5260f6f60e50f791826c27ae7afc495'
