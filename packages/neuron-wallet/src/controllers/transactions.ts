@@ -13,7 +13,7 @@ import { Channel, ResponseCode } from '../utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
 
 /**
- * @class TransactionsControlle r
+ * @class TransactionsController
  * @description handle messages from transactions channel
  */
 @ControllerDecorator(Channel.Transactions)
