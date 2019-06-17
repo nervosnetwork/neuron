@@ -4,7 +4,7 @@ import {
   mnemonicToSeed,
   mnemonicToSeedSync,
   validateMnemonic,
-} from '../../../src/utils/mnemonic'
+} from '../../../src/keys/mnemonic'
 
 const fixtures = require('./fixtures.json')
 

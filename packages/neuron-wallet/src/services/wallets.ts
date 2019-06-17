@@ -2,8 +2,8 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import Key, { Addresses } from '../keys/key'
-import { Keystore } from '../keys/keystore'
+import { Addresses, ExtendedPublicKey } from '../keys/key'
+import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
 import FileService from './file'
@@ -15,7 +15,6 @@ import {
   CurrentWalletNotSet,
   WalletNotFound,
   IsRequired,
-  KeyHasNoData,
   CodeHashNotLoaded,
   InvalidAddress,
   UsedName,
@@ -56,6 +55,11 @@ class FileKeystoreWallet implements Wallet {
     this.id = id
     this.name = name
     this.addresses = addresses
+  }
+
+  extendedPublicKey = (): ExtendedPublicKey => {
+    // FIXME: save and get extended public key
+    return new ExtendedPublicKey('todo', 'todo')
   }
 
   static fromJSON = (json: Omit<Wallet, 'loadKeystore'>) => {
@@ -258,8 +262,7 @@ export default class WalletService {
     const wallet = this.get(id)
     if (!wallet) throw new WalletNotFound(id)
 
-    const key = new Key({ keystore: wallet.loadKeystore() })
-    return key.checkPassword(password)
+    return wallet.loadKeystore().checkPassword(password)
   }
 
   public clearAll = () => {
@@ -281,16 +284,21 @@ export default class WalletService {
     }[],
     password: string
   ) => {
+    // TODO:
+    //  Collect inputs from multiple addresses.
+    //  Use account type and index for specifying each address.
+    //  Derivate private key for each address to sign.
     const wallet = await this.getCurrent()
     if (!wallet) throw new CurrentWalletNotSet()
 
     if (password === undefined || password === '') throw new IsRequired('Password')
 
-    const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
+    // const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
+    // TODO:
+    //  1. get extended public key from wallet (to be implement) to fetch addresses
+    //  2. get private key from key(keystore)
 
-    if (!key.keysData) throw new KeyHasNoData()
-
-    const { privateKey } = key.keysData
+    const privateKey = ''
 
     const addrObj = core.generateAddress(privateKey)
 

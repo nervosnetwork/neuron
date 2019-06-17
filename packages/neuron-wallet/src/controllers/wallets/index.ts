@@ -1,7 +1,7 @@
 import fs from 'fs'
 import AppController from '../app'
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
-import Key from '../../keys/key'
+import Keystore from '../../keys/keystore'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
@@ -50,23 +50,16 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
-    const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+    const keystore = await Keystore.fromMnemonic(mnemonic, password)
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || {
-        receiving: [],
-        change: [],
-      },
+      keystore,
+      addresses: { receiving: [], change: [] }, // Fetch addresses
     })
     return {
       status: ResponseCode.Success,
@@ -83,21 +76,15 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
       mnemonic,
-      receivingAddressNumber,
-      changeAddressNumber,
     })
   }
 
@@ -106,20 +93,24 @@ export default class WalletsController {
     name,
     password,
     keystore,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     keystore: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Wallet>> {
-    const key = await Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
+    if (password === undefined) {
+      throw new IsRequired('Password')
+    }
+
+    const keystoreObject = Keystore.fromJson(keystore)
+    if (!keystoreObject.checkPassword(password)) {
+      throw new IncorrectPassword()
+    }
+
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || { receiving: [], change: [] },
+      keystore: keystoreObject,
+      addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
     return {
       status: ResponseCode.Success,
@@ -150,12 +141,8 @@ export default class WalletsController {
     }
 
     if (newPassword) {
-      if (walletsService.validate({ id, password })) {
-        const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
-        props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
-      } else {
-        throw new IncorrectPassword()
-      }
+      const extendedPrivateKey = wallet!.loadKeystore().extendedPrivateKey(password)
+      props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }
 
     walletsService.update(id, props)

@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import wordList from './wordList'
+import wordList from './word-list'
 
 const RADIX = 2048
 const PBKDF2_ROUNDS = 2048

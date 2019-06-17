@@ -1,4 +1,4 @@
-import Key from '../keys/key'
+import { generateMnemonic } from '../keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
 import { FailToCreateMnemonic } from '../exceptions'
@@ -11,7 +11,7 @@ import { FailToCreateMnemonic } from '../exceptions'
 export default class HelpersController {
   @CatchControllerError
   public static async generateMnemonic() {
-    const mnemonic = Key.generateMnemonic()
+    const mnemonic = generateMnemonic()
     if (mnemonic) {
       return {
         status: ResponseCode.Success,
