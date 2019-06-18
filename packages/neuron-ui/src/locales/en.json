@@ -52,7 +52,11 @@
       "other": "other",
       "more-actions": "more actions",
       "detail": "detail",
-      "explorer": "explorer"
+      "explorer": "explorer",
+      "first": "First",
+      "previous": "Previous",
+      "next": "Next",
+      "last": "Last"
     },
     "transaction": {
       "goBack": "go back"
