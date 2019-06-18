@@ -65,7 +65,7 @@ export interface TransactionOutput {
 export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
-  addresses: string[]
+  keywords?: string
 }
 
 const UILayer = (() => {

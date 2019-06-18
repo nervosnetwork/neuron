@@ -27,7 +27,7 @@ const MainContent = ({
   const {
     chain: { transaction, transactions },
   } = useNeuronWallet()
-  const { pageNo, pageSize, addresses, items } = transactions
+  const { pageNo, pageSize, items } = transactions
 
   useEffect(() => {
     dispatch({
@@ -41,7 +41,7 @@ const MainContent = ({
       type: MainActions.UpdateLoading,
       payload: { transactions: false },
     })
-  }, [pageNo, pageSize, addresses, items])
+  }, [pageNo, pageSize, items])
 
   return (
     <Main>

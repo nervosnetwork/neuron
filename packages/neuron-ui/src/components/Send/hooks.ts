@@ -55,8 +55,6 @@ const useOnItemChange = (updateTransactionOutput: Function) => (field: string, i
   updateTransactionOutput(field)(idx)(e.currentTarget.value)
 }
 
-// const useAddItem = () => {}
-
 const useDropdownItems = (updateTransactionOutput: Function) =>
   useCallback(
     (idx: number) =>

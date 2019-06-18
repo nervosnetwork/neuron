@@ -22,7 +22,6 @@ export interface Chain {
     pageSize: number
     totalCount: number
     items: Transaction[]
-    addresses: string[]
   }
 }
 
@@ -41,7 +40,6 @@ const chainState: Chain = {
     pageSize: 15,
     totalCount: 0,
     items: [],
-    addresses: [],
   },
 }
 
