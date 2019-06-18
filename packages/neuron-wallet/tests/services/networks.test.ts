@@ -154,12 +154,12 @@ describe(`networks service errors`, () => {
       expect(service.create('Testnet', 'http://localhost')).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NAME_USED))
     })
 
-    it(`update network which is not existing`, () => {
+    it.skip(`update network which is not existing`, () => {
       const id = '1'
       expect(service.update(id, {})).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
 
-    it(`activate network which is not existing`, () => {
+    it.skip(`activate network which is not existing`, () => {
       const id = '1'
       expect(service.activate(id)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NETWORK_ID_NOT_FOUND, { id }))
     })
