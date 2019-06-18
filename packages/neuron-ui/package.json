@@ -30,6 +30,9 @@
       "git add"
     ]
   },
+  "jest": {
+    "displayName": "Neuron UI"
+  },
   "browserslist": ["last 2 chrome versions"],
   "dependencies": {
     "bootstrap": "4.3.1",

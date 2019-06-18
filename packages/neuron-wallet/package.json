@@ -31,7 +31,7 @@
     ]
   },
   "jest": {
-    "displayName": "electron",
+    "displayName": "Neuron Wallet",
     "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
     "transform": {
       "^.+\\.ts?$": "ts-jest"
