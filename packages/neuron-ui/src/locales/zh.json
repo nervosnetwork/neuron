@@ -57,6 +57,14 @@
     "transaction": {
       "goBack": "返回"
     },
+    "addresses": {
+      "addresses": "地址",
+      "type": "交易类型",
+      "address": "地址",
+      "description": "标签",
+      "balance": "余额",
+      "transactions": "交易总数"
+    },
     "settings": {
       "setting-tabs": {
         "general": "通用",

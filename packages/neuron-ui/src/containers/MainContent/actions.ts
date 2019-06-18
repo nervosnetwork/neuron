@@ -7,6 +7,7 @@ export enum MainActions {
   ExportWallet,
   GetTransaction,
   GetTransactions,
+  UpdateTransactionDescription,
   SetPage,
   SaveNetworks,
   DeleteNetwork,

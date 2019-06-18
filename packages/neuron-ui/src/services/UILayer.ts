@@ -50,6 +50,7 @@ export enum TransactionsMethod {
   GetAll = 'getAll',
   GetAllByAddresses = 'getAllByAddresses',
   Get = 'get',
+  UpdateDescription = 'updateDescription',
 }
 
 export enum HelpersMethod {
@@ -66,6 +67,11 @@ export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
   keywords?: string
+}
+
+export interface UpdateDescriptionParams {
+  key: string
+  description: string
 }
 
 const UILayer = (() => {
@@ -120,6 +126,7 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 export const transactionsCall = instantiateMethodCall(transactions) as {
   getAllByAddresses: (params: GetTransactionsParams) => void
   get: (hash: string) => void
+  updateDescription: (params: UpdateDescriptionParams) => void
 }
 
 export const wallets = (

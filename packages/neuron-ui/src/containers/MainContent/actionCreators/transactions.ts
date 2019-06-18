@@ -1,5 +1,5 @@
 import { MainActions } from '../reducer'
-import { transactionsCall, GetTransactionsParams } from '../../../services/UILayer'
+import { transactionsCall, GetTransactionsParams, UpdateDescriptionParams } from '../../../services/UILayer'
 
 export default {
   getTransaction: (hash: string) => {
@@ -19,6 +19,13 @@ export default {
       payload: {
         transactions: true,
       },
+    }
+  },
+  updateDescription: (params: UpdateDescriptionParams) => {
+    transactionsCall.updateDescription(params)
+    return {
+      type: MainActions.UpdateTransactionDescription,
+      payload: params.key,
     }
   },
 }
