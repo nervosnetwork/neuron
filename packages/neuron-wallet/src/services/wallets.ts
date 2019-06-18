@@ -8,22 +8,15 @@ import Store from '../utils/store'
 import NodeService from './node'
 import FileService from './file'
 import LockUtils from '../utils/lock-utils'
-import env from '../env'
 import windowManage from '../utils/window-manage'
 import { Channel, ResponseCode } from '../utils/const'
-import {
-  CurrentWalletNotSet,
-  WalletNotFound,
-  IsRequired,
-  CodeHashNotLoaded,
-  InvalidAddress,
-  UsedName,
-} from '../exceptions'
+import { Witness, TransactionWithoutHash, Input } from '../app-types/types'
+import ConvertTo from '../app-types/convert-to'
+import Blake2b from '../utils/blake2b'
+import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
-
-const hrp = `01${Buffer.from('P2PH').toString('hex')}`
 
 const MODULE_NAME = 'wallets'
 const DEBOUNCE_TIME = 50
@@ -278,9 +271,8 @@ export default class WalletService {
    */
   public sendCapacity = async (
     items: {
-      address: CKBComponents.Hash256
-      capacity: CKBComponents.Capacity
-      unit: 'byte' | 'shannon'
+      address: string
+      capacity: string
     }[],
     password: string
   ) => {
@@ -293,64 +285,86 @@ export default class WalletService {
 
     if (password === undefined || password === '') throw new IsRequired('Password')
 
+    const addressInfos = this.getAddressInfo()
+
+    const addresses: string[] = addressInfos.map(info => info.address)
     // const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
     // TODO:
     //  1. get extended public key from wallet (to be implement) to fetch addresses
     //  2. get private key from key(keystore)
 
-    const privateKey = ''
-
-    const addrObj = core.generateAddress(privateKey)
-
-    const changeAddress = wallet.addresses.change[0].address
-
-    const { codeHash } = await LockUtils.systemScript()
-    if (!codeHash) throw new CodeHashNotLoaded()
-
-    const lockHashes = items.map(({ address }) => {
-      // TODO: identifier will be a property of addressObj in SDK@0.13.0
-      const identifier = core.utils.parseAddress(
-        address,
-        env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet,
-        'hex'
-      ) as string
-      if (!identifier.startsWith(hrp)) throw new InvalidAddress(address)
-      return core.utils.lockScriptToHash({
-        codeHash,
-        args: [identifier.slice(10)],
-      })
-    })
+    const lockHashes: string[] = await Promise.all(addresses.map(async addr => LockUtils.addressToLockHash(addr)))
 
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: (BigInt(item.capacity) * (item.unit === 'byte' ? BigInt(1) : BigInt(100_000_000))).toString(),
+      capacity: (BigInt(item.capacity) * BigInt(1)).toString(),
     }))
 
-    const rawTransaction = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
+    const changeAddress: string = this.getChangeAddress()
 
-    const txHash = await (core.rpc as any).computeTransactionHash(rawTransaction)
-    const signature = addrObj.sign(txHash)
-    const signatureSize = core.utils.hexToBytes(signature).length
-    const sequence = new DataView(new ArrayBuffer(8))
-    sequence.setUint8(0, signatureSize)
-    const sequencedSignatureSize = Buffer.from(sequence.buffer).toString('hex')
-    const witness = {
-      data: [`0x${addrObj.publicKey}`, `0x${signature}`, `0x${sequencedSignatureSize}`],
-    }
-    const witnesses = Array.from(
-      {
-        length: rawTransaction.inputs.length,
-      },
-      () => witness
-    )
-    rawTransaction.witnesses = witnesses
-    const realTxHash = await core.rpc.sendTransaction(rawTransaction)
+    const tx: TransactionWithoutHash = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
+
+    const txHash: string = await (core.rpc as any).computeTransactionHash(ConvertTo.toSdkTxWithoutHash(tx))
+
+    const { inputs } = tx
+
+    const witnesses: Witness[] = inputs!.map((input: Input) => {
+      const blake160: string = input.lock!.args![0]
+      const info = addressInfos.find(i => i.blake160 === blake160)
+      const { path } = info!
+      const privateKey = this.getPrivateKey(path)
+      const witness = this.signWitness({ data: [] }, privateKey, txHash)
+      return witness
+    })
+
+    tx.witnesses = witnesses
+
+    const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
+    await core.rpc.sendTransaction(txToSend)
 
     TransactionsService.txSentSubject.next({
-      transaction: rawTransaction,
-      txHash: realTxHash,
+      transaction: tx,
+      txHash,
     })
 
     return txHash
+  }
+
+  // path should be '0/*' or '1/*'
+  public getAddressInfo = () => {
+    const item = {
+      pubkey: '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01',
+      address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+      blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+      path: '0/0',
+    }
+    return [item]
+  }
+
+  public getChangeAddress = (): string => {
+    return 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf'
+  }
+
+  public signWitness = (witness: Witness, privateKey: string, txHash: string): Witness => {
+    const addrObj = core.generateAddress(privateKey)
+    const oldData = witness.data
+    const blake2b = new Blake2b()
+    blake2b.update(txHash)
+    oldData.forEach(data => {
+      blake2b.update(data)
+    })
+    const message = blake2b.digest()
+    const signature = `0x${addrObj.sign(message)}`
+    const newWitness: Witness = {
+      data: [`0x${addrObj.publicKey}`, signature],
+    }
+    return newWitness
+  }
+
+  public getPrivateKey = (path: string): string => {
+    if (path !== '0/0') {
+      throw new Error('')
+    }
+    return '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
   }
 }

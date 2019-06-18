@@ -61,4 +61,10 @@ describe('LockUtils Test', () => {
 
     expect(address).toEqual(bob.address)
   })
+
+  it('addressToBlake160', () => {
+    const blake160 = LockUtils.addressToBlake160(bob.address)
+
+    expect(blake160).toEqual(bob.blake160)
+  })
 })
