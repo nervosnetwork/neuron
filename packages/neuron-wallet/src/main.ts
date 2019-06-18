@@ -1,7 +1,7 @@
 import { app, Menu } from 'electron'
 import 'reflect-metadata'
 import i18n from './utils/i18n'
-import mainmenu from './utils/mainmenu'
+import applicationMenu from './utils/application-menu'
 
 import Router from './router'
 import createWindow from './startup/create-window'
@@ -27,7 +27,7 @@ const openWindow = () => {
 
 app.on('ready', () => {
   i18n.changeLanguage(app.getLocale())
-  Menu.setApplicationMenu(mainmenu())
+  Menu.setApplicationMenu(applicationMenu)
   createSyncBlockTask()
   openWindow()
 })

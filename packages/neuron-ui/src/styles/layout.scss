@@ -1,15 +1,13 @@
-$column-gap: 40px;
-
 body {
   display: grid;
   grid-template:
-    'sidebar header header header' 60px
-    'sidebar notification notification notification' auto
-    'sidebar content content content' 1fr
-    'sidebar content content content' 1fr
-    'footer  footer  footer  footer'  50px /
-    auto 1fr 1fr 340px;
-  column-gap: $column-gap;
+    'header header header' 60px
+    'navbar navbar navbar' 60px
+    'notification notification notification' auto
+    'content content content' 1fr
+    'content content content' 1fr 
+    'footer  footer  footer' 50px /
+    1fr 1fr 1fr;
 
   height: 100vh;
 }
@@ -20,18 +18,19 @@ footer {
   justify-content: space-between
 }
 
-.sidebar {
-  grid-area: sidebar;
-}
-
 .header {
   grid-area: header;
+}
+
+.navbar {
+  grid-area: navbar;
+  display:flex;
+  justify-content: flex-start;
 }
 
 .main-content {
   grid-area: content;
   overflow: auto;
-  padding-right: $column-gap;
 }
 
 .notification {

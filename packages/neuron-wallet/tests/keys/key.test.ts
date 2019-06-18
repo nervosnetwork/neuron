@@ -1,24 +1,40 @@
-import Key from '../../src/keys/key'
+import { ExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from '../../src/keys/key'
 
-describe('Key tests', () => {
-  const mnemonic = 'mechanic oppose oyster normal bunker trim step nasty birth naive panel soldier'
-  const privateKey = '4e91f531d3351fd561506538ec0a68ba05d3d3444197e81d615ab76bbd200488'
-  const keystoreJson =
-    '{"version":0,"id":"e24843a9-ff71-4165-be2f-fc435f62635c","crypto":{"ciphertext":"c671676b15e35107091318582186762c8ce11e7fc03cdd13efe7099985d94355a60477ddf2ff39b0054233cbcbefc297f1521094db1b473c095c9c3b9c143a0ad80c6806e14596bd438994a025ed76187350ae216d1b411f54f31c5beec989efdcb42ad673cda64d753dc876ed47da8cf65f4b45eded003b5a3a9a8f62dd69890bec62aaae6eeded75f650109f2d700db74515eaed5f3d401b59b02cd0518899","cipherparams":{"iv":"c210625979883ad1b6f90e7fb3f5b70d"},"cipher":"aes-128-ctr","kdf":"scrypt","kdfparams":{"dklen":32,"salt":"54257d76bb23cbe83220f2bc267f98a69a3e1624d62e94f5bcbba9a8df34ec14","n":8192,"r":8,"p":1},"mac":"88b415ff1651bf94ce7fbc82a72a6fcd7e095cd763e8f726ef7bea4ccb028b00"}}'
+const fixture = {
+  privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
+  publicKey: '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2',
+  chainCode: '873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508',
+}
 
-  it('import key from mnemonic', async () => {
-    const key = await Key.fromMnemonic(mnemonic, '1qaz.2wsx', 20, 10)
-    expect(privateKey).toBe(key.keysData!.privateKey)
-    expect(key.addresses!.receiving.length).toEqual(20)
-    expect(key.addresses!.change.length).toEqual(10)
-    expect(key.addresses!.receiving[0]).not.toBe(undefined)
+describe('extended public key', () => {
+  it('serialize and parse', () => {
+    const extendedKey = new ExtendedPublicKey(fixture.publicKey, fixture.chainCode)
+    const serialized = extendedKey.serialize()
+    const parsed = ExtendedPublicKey.parse(serialized)
+    expect(parsed.publicKey).toEqual(fixture.publicKey)
+    expect(parsed.chainCode).toEqual(fixture.chainCode)
+  })
+})
+
+describe('extended private key', () => {
+  it('serialize and parse', () => {
+    const extendedKey = new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode)
+    const serialized = extendedKey.serialize()
+    const parsed = ExtendedPrivateKey.parse(serialized)
+    expect(parsed.privateKey).toEqual(fixture.privateKey)
+    expect(parsed.chainCode).toEqual(fixture.chainCode)
   })
 
-  it('import key from keystore', async () => {
-    const key = await Key.fromKeystore(keystoreJson, '1qaz.2wsx', 20, 10)
-    expect(privateKey).toBe(key.keysData!.privateKey)
-    expect(key.addresses!.receiving.length).toEqual(20)
-    expect(key.addresses!.change.length).toEqual(10)
-    expect(key.addresses!.receiving[0]).not.toBe(undefined)
+  it('derivate extended public key', () => {
+    const extendedKey = new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode).toExtendedPublicKey()
+    expect(extendedKey.publicKey).toEqual(fixture.publicKey)
+    expect(extendedKey.chainCode).toEqual(fixture.chainCode)
+  })
+})
+
+describe('generate mnemonic', () => {
+  it('generate 12 words code', () => {
+    const mnemonic = generateMnemonic()
+    expect(mnemonic.split(' ').length).toBe(12)
   })
 })

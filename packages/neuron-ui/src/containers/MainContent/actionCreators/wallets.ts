@@ -24,8 +24,8 @@ export default {
       payload: id,
     }
   },
-  deleteWallet(params: { id: string; password: string }) {
-    walletsCall.delete(params)
+  deleteWallet(id: string) {
+    walletsCall.delete(id)
     return {
       type: MainActions.Wallet,
     }

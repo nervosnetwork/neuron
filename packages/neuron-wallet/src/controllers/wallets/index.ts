@@ -1,5 +1,7 @@
+import fs from 'fs'
+import AppController from '../app'
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
-import Key from '../../keys/key'
+import Keystore from '../../keys/keystore'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
@@ -7,8 +9,11 @@ import {
   IsRequired,
   WalletNotFound,
   IncorrectPassword,
+  EmptyPassword,
   ServiceHasNoResponse,
 } from '../../exceptions'
+import prompt from '../../utils/prompt'
+import i18n from '../../utils/i18n'
 
 const walletsService = WalletsService.getInstance()
 
@@ -45,23 +50,16 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
-    const key = await Key.fromMnemonic(mnemonic, password, receivingAddressNumber, changeAddressNumber)
+    const keystore = await Keystore.fromMnemonic(mnemonic, password)
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || {
-        receiving: [],
-        change: [],
-      },
+      keystore,
+      addresses: { receiving: [], change: [] }, // Fetch addresses
     })
     return {
       status: ResponseCode.Success,
@@ -78,21 +76,15 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     mnemonic: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
       mnemonic,
-      receivingAddressNumber,
-      changeAddressNumber,
     })
   }
 
@@ -101,20 +93,24 @@ export default class WalletsController {
     name,
     password,
     keystore,
-    receivingAddressNumber = 20,
-    changeAddressNumber = 10,
   }: {
     name: string
     password: string
     keystore: string
-    receivingAddressNumber: number
-    changeAddressNumber: number
   }): Promise<Controller.Response<Wallet>> {
-    const key = await Key.fromKeystore(keystore, password, receivingAddressNumber, changeAddressNumber)
+    if (password === undefined) {
+      throw new IsRequired('Password')
+    }
+
+    const keystoreObject = Keystore.fromJson(keystore)
+    if (!keystoreObject.checkPassword(password)) {
+      throw new IncorrectPassword()
+    }
+
     const wallet = walletsService.create({
       name,
-      keystore: key.keystore || null,
-      addresses: key.addresses || { receiving: [], change: [] },
+      keystore: keystoreObject,
+      addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
     return {
       status: ResponseCode.Success,
@@ -145,12 +141,8 @@ export default class WalletsController {
     }
 
     if (newPassword) {
-      if (walletsService.validate({ id, password })) {
-        const key = await Key.fromKeystore(JSON.stringify(wallet!.loadKeystore()), password)
-        props.keystore = key.toKeystore(JSON.stringify(key.keysData!), newPassword)
-      } else {
-        throw new IncorrectPassword()
-      }
+      const extendedPrivateKey = wallet!.loadKeystore().extendedPrivateKey(password)
+      props.keystore = Keystore.create(extendedPrivateKey, newPassword)
     }
 
     walletsService.update(id, props)
@@ -161,9 +153,16 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async delete({ id, password }: { id: string; password: string }): Promise<Controller.Response<any>> {
-    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
+  public static async delete(id: string): Promise<Controller.Response<any>> {
+    const password = await WalletsController.requestPassword(i18n.t('messageBox.remove-wallet.title'))
+    if (password === null)
+      return {
+        status: ResponseCode.Success,
+        result: null,
+      }
 
+    if (password === '') throw new EmptyPassword()
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
     walletsService.delete(id)
 
     return {
@@ -182,6 +181,17 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: JSON.stringify(walletsService.get(id)),
     }
+  }
+
+  @CatchControllerError
+  public static async backup(id: string): Promise<Controller.Response<boolean>> {
+    const password = await WalletsController.requestPassword(i18n.t('messageBox.backup-keystore.title'))
+    if (password === null)
+      return {
+        status: ResponseCode.Success,
+        result: false,
+      }
+    return WalletsController.downloadKeystore(id, password)
   }
 
   @CatchControllerError
@@ -240,6 +250,39 @@ export default class WalletsController {
         },
       }
     }
+  }
+
+  private static async requestPassword(title: string): Promise<string | null> {
+    const password = (await prompt('password', {
+      title,
+    })) as string | null
+    return password
+  }
+
+  private static async downloadKeystore(id: string, password: string): Promise<Controller.Response<boolean>> {
+    if (password === '') throw new EmptyPassword()
+    const wallet = await walletsService.get(id)
+
+    if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
+
+    const keystore = wallet.loadKeystore()
+    return new Promise(resolve => {
+      AppController.showSaveDialog(
+        {
+          title: i18n.t('messages.save-keystore'),
+          defaultPath: wallet.name,
+        },
+        (filename?: string) => {
+          if (filename) {
+            fs.writeFileSync(filename, JSON.stringify(keystore))
+            resolve({
+              status: ResponseCode.Success,
+              result: true,
+            })
+          }
+        }
+      )
+    })
   }
 }
 

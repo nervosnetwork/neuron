@@ -1,10 +1,24 @@
 export default {
   translation: {
-    mainmenu: {
+    keywords: {
+      wallet: 'Wallet',
+      password: 'Password',
+      'wallet-name': 'Wallet Name',
+    },
+    'application-menu': {
       neuron: {
         about: 'About {{app}}',
         preferences: 'Preferences...',
         quit: 'Quit {{app}}',
+      },
+      wallet: {
+        label: 'Wallet',
+        select: 'Select Wallet',
+        'create-new': 'Create New Wallet',
+        import: 'Import Wallet',
+        backup: 'Backup Current Wallet',
+        delete: 'Delete Current Wallet',
+        'change-password': 'Change Password',
       },
       edit: {
         label: 'Edit',
@@ -15,6 +29,7 @@ export default {
       view: {
         label: 'View',
         fullscreen: 'Fullscreen',
+        'address-book': 'Address Book',
       },
       window: {
         label: 'Window',

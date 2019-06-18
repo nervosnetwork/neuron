@@ -1,5 +1,6 @@
 import WalletService, { WalletProperties } from '../../src/services/wallets'
 import { Witness } from '../../src/app-types/types'
+import Keystore from '../../src/keys/keystore'
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -12,10 +13,8 @@ describe('wallet service', () => {
     walletService = new WalletService()
     wallet1 = {
       name: 'wallet-test1',
-      keystore: {
-        version: 3,
-        id: '0',
-        crypto: {
+      keystore: new Keystore(
+        {
           cipher: 'wallet1',
           cipherparams: { iv: 'wallet1' },
           ciphertext: 'wallet1',
@@ -29,7 +28,8 @@ describe('wallet service', () => {
           },
           mac: '1',
         },
-      },
+        '0'
+      ),
       addresses: {
         receiving: [
           {
@@ -64,10 +64,8 @@ describe('wallet service', () => {
 
     wallet2 = {
       name: 'wallet-test2',
-      keystore: {
-        version: 3,
-        id: '1',
-        crypto: {
+      keystore: new Keystore(
+        {
           cipher: 'wallet2',
           cipherparams: { iv: 'wallet2' },
           ciphertext: 'wallet2',
@@ -81,7 +79,8 @@ describe('wallet service', () => {
           },
           mac: '2',
         },
-      },
+        '2'
+      ),
       addresses: {
         receiving: [
           {
@@ -116,10 +115,8 @@ describe('wallet service', () => {
 
     wallet3 = {
       name: 'wallet-test3',
-      keystore: {
-        version: 3,
-        id: '1',
-        crypto: {
+      keystore: new Keystore(
+        {
           cipher: 'wallet3',
           cipherparams: { iv: 'wallet1' },
           ciphertext: 'wallet3',
@@ -133,7 +130,8 @@ describe('wallet service', () => {
           },
           mac: '3',
         },
-      },
+        '3'
+      ),
       addresses: {
         receiving: [
           {

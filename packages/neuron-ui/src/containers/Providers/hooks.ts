@@ -59,8 +59,17 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
     UILayer.on(Channel.App, (_e: Event, method: AppMethod, args: ChannelResponse<any>) => {
       if (args && args.status) {
         switch (method) {
-          case 'navTo': {
+          case AppMethod.NavTo: {
             history.push(args.result)
+            break
+          }
+          case AppMethod.ToggleAddressBook: {
+            dispatch({
+              type: ProviderActions.Settings,
+              payload: {
+                toggleAddressBook: true,
+              },
+            })
             break
           }
           default: {

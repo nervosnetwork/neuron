@@ -1,20 +1,23 @@
-import { dialog, shell, Menu, MessageBoxOptions, BrowserWindow } from 'electron'
+import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
 import TransactionsController from '../transactions'
-import { Controller as ControllerDecorator } from '../../decorators'
 import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
+import WalletsController from '../wallets'
 
+import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
 import windowManage from '../../utils/window-manage'
+import i18n from '../../utils/i18n'
+
+const walletsService = WalletsService.getInstance()
+const networksService = NetworksService.getInstance()
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
-    const walletsService = WalletsService.getInstance()
-    const networksService = NetworksService.getInstance()
     const [activeWallet, wallets, activeNetworkId, networks, transactions] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
@@ -48,9 +51,19 @@ export default class AppController {
 
   public static showMessageBox(
     options: MessageBoxOptions,
-    callback: (response: number, checkboxChecked: boolean) => void = () => {}
+    callback?: (response: number, checkboxChecked: boolean) => void
   ) {
     dialog.showMessageBox(options, callback)
+  }
+
+  public static showSaveDialog(options: SaveDialogOptions, callback?: (filename?: string, bookmark?: string) => void) {
+    dialog.showSaveDialog(options, callback)
+  }
+
+  public static toggleAddressBook() {
+    windowManage.broadcast(Channel.App, 'toggleAddressBook', {
+      status: ResponseCode.Success,
+    })
   }
 
   public static navTo(path: string) {
@@ -111,6 +124,52 @@ export default class AppController {
 
   public static showPreference() {
     AppController.navTo(URL.Preference)
+  }
+
+  public static createWallet() {
+    AppController.navTo(URL.CreateWallet)
+  }
+
+  public static importWallet() {
+    AppController.navTo(URL.ImportWallet)
+  }
+
+  public static async backupCurrentWallet() {
+    const currentWallet = AppController.getCurrentWallet()
+    if (currentWallet) {
+      const res = await WalletsController.backup(currentWallet.id)
+      if (!res.status) {
+        AppController.showMessageBox({
+          type: 'error',
+          message: res.msg!,
+        })
+      }
+    }
+  }
+
+  public static async deleteCurrentWallet() {
+    const currentWallet = AppController.getCurrentWallet()
+    if (currentWallet) {
+      const res = await WalletsController.delete(currentWallet.id)
+      if (!res.status) {
+        AppController.showMessageBox({
+          type: 'error',
+          message: res.msg!,
+        })
+      }
+    }
+  }
+
+  private static getCurrentWallet() {
+    const currentWallet = walletsService.getCurrent()
+    if (!currentWallet) {
+      AppController.showMessageBox({
+        type: 'error',
+        message: i18n.t('messages.not-found', { field: i18n.t('keywords.wallet') }),
+      })
+      return null
+    }
+    return currentWallet
   }
 }
 
