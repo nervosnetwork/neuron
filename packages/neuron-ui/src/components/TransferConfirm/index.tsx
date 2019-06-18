@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, Button, InputGroup, FormControl } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-const TransferConfirm = ({
+const TransactionConfirm = ({
   title,
   message,
   password,
@@ -27,7 +27,7 @@ const TransferConfirm = ({
     >
       <Card.Header>{title}</Card.Header>
       <Card.Body>
-        <Card.Text>{`${t('send.this-transfer-will-send')}: `}</Card.Text>
+        <Card.Text>{`${t('send.this-transaction-will-send')}: `}</Card.Text>
         {typeof message === 'string' ? <Card.Text>{message}</Card.Text> : message}
         <InputGroup>
           <FormControl
@@ -55,4 +55,4 @@ const TransferConfirm = ({
   )
 }
 
-export default TransferConfirm
+export default TransactionConfirm

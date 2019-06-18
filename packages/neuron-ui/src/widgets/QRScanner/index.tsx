@@ -40,9 +40,11 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
       })
       .then((stream: MediaStream) => {
         video.srcObject = stream
-        Object.defineProperty(window, 'video', {
-          value: video,
-        })
+        if (!('video' in window)) {
+          Object.defineProperty(window, 'video', {
+            value: video,
+          })
+        }
         video.play()
         function tick() {
           if (video.readyState === video.HAVE_ENOUGH_DATA && canvasRef.current) {

@@ -24,7 +24,7 @@ const General = () => {
     <GeneralPanel>
       <Balance>
         <h1>Balance</h1>
-        <div>Capacity</div>
+        <div>Amount</div>
         <div>Living Cells</div>
         <div>Cell Types</div>
       </Balance>

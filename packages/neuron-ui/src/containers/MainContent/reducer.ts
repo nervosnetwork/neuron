@@ -12,19 +12,19 @@ export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>
 export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
-    case MainActions.AddItemInTransfer: {
+    case MainActions.AddTransactionOutput: {
       return {
         ...state,
         errorMsgs: {
           ...state.errorMsgs,
-          transfer: '',
+          send: '',
         },
-        transfer: {
-          items: [
-            ...state.transfer.items,
+        send: {
+          outputs: [
+            ...state.send.outputs,
             {
               address: '',
-              capacity: '',
+              amount: '',
               unit: CapacityUnit.CKB,
             },
           ],
@@ -32,43 +32,53 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
-    case MainActions.RemoveItemInTransfer: {
+    case MainActions.RemoveTransactionOutput: {
       return {
         ...state,
         errorMsgs: {
           ...state.errorMsgs,
-          transfer: '',
+          send: '',
         },
-        transfer: {
-          items: [...state.transfer.items].splice(action.payload),
+        send: {
+          // outputs: [...state.send.outputs].splice(action.payload),
+          outputs: state.send.outputs.filter((_, idx) => idx !== action.payload),
           submitting: false,
         },
       }
     }
-    case MainActions.UpdateItemInTransfer: {
-      const items = [...state.transfer.items]
-      items[action.payload.idx] = {
-        ...items[action.payload.idx],
+    case MainActions.UpdateTransactionOutput: {
+      const outputs = [...state.send.outputs]
+      outputs[action.payload.idx] = {
+        ...outputs[action.payload.idx],
         ...action.payload.item,
       }
       return {
         ...state,
         errorMsgs: {
           ...state.errorMsgs,
-          transfer: '',
+          send: '',
         },
-        transfer: { items },
+        send: { outputs },
       }
     }
-    case MainActions.UpdateTransfer: {
+    case MainActions.UpdateTransactionPrice: {
+      return {
+        ...state,
+        send: {
+          ...state.send,
+          price: action.payload,
+        },
+      }
+    }
+    case MainActions.UpdateSendState: {
       return {
         ...state,
         errorMsgs: {
           ...state.errorMsgs,
-          transfer: '',
+          send: '',
         },
-        transfer: {
-          ...state.transfer,
+        send: {
+          ...state.send,
           submitting: false,
           ...action.payload,
         },
@@ -96,9 +106,9 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
           ...state.errorMsgs,
           ...action.payload,
         },
-        transfer: {
-          ...state.transfer,
-          submitting: action.payload.transfer ? false : state.transfer.submitting,
+        send: {
+          ...state.send,
+          submitting: action.payload.send ? false : state.send.submitting,
         },
       }
     }

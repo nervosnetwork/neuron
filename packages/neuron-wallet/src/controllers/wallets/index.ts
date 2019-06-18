@@ -232,11 +232,16 @@ export default class WalletsController {
       capacity: CKBComponents.Capacity
       unit: 'byte' | 'shannon'
     }[]
-    password: string
   }) {
+    const password = await WalletsController.requestPassword(i18n.t('messageBox.send-capacity.title'))
+    if (password === null)
+      return {
+        status: ResponseCode.Success,
+        result: false,
+      }
     if (!params) throw new IsRequired('Parameters')
     try {
-      const hash = await walletsService.sendCapacity(params.items, params.password)
+      const hash = await walletsService.sendCapacity(params.items, password)
       return {
         status: ResponseCode.Success,
         result: hash,

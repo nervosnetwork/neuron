@@ -1,12 +1,12 @@
 import wallets from './wallets'
 import networks from './networks'
-import transfer from './transfer'
+import send from './send'
 import transactions from './transactions'
 
 export const actionCreators = {
   ...wallets,
   ...networks,
-  ...transfer,
+  ...send,
   ...transactions,
 }
 

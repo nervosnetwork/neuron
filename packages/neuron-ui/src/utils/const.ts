@@ -57,16 +57,16 @@ export enum CapacityUnit {
 }
 
 export const PlaceHolders = {
-  transfer: {
+  send: {
     Address: 'eg: ckt1q9gry5zgzrccrjnvnhktjx6remmktn9h6s2fupurhzmgm9',
-    Capacity: 'eg: 100',
+    Amount: 'eg: 100',
   },
 }
 
 export const Tooltips = {
-  transfer: {
-    Address: 'Address to send capacity',
-    Capacity: 'Capacity to send',
+  send: {
+    Address: 'Address to send amount',
+    Amount: 'Amount to send',
   },
 }
 
@@ -77,8 +77,8 @@ export enum Message {
   NetworkNameExist = 'network-name-exists',
   AtLeastOneAddressNeeded = 'at-least-one-address-needed',
   InvalidAddress = 'invalid-address',
-  InvalidCapacity = 'invalid-capacity',
-  CapacityNotEnough = 'capacity-is-not-enough',
+  InvalidAmount = 'invalid-amount',
+  AmountNotEnough = 'amount-is-not-enough',
   IsUnremovable = 'is-unremovable',
   ProtocolIsRequired = 'protocol-is-required',
 }
