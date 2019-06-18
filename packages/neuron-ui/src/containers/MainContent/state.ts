@@ -1,14 +1,15 @@
 import { CapacityUnit } from 'utils/const'
 
 export const initState = {
-  transfer: {
-    items: [
+  send: {
+    outputs: [
       {
         address: '',
-        capacity: '',
+        amount: '',
         unit: CapacityUnit.CKB,
       },
     ],
+    price: '0',
     submitting: false,
   },
   loadings: {
@@ -17,7 +18,7 @@ export const initState = {
   },
   errorMsgs: {
     networks: '',
-    transfer: '',
+    send: '',
     transaction: '',
     transactions: '',
     wizard: '',

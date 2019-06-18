@@ -101,6 +101,9 @@ export default {
         confirm: '确定',
         discard: '放弃',
       },
+      'send-capacity': {
+        title: '发送交易',
+      },
       'remove-network': {
         title: '删除网络',
         message: '网络名称: {{name}}, 地址: {{address}} 的网络设置将被删除.',

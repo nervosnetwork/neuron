@@ -56,9 +56,9 @@ export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
 }
 
-export interface TransferItem {
+export interface TransactionOutput {
   address: string
-  capacity: string
+  amount: string
   unit: CapacityUnit
 }
 
@@ -153,9 +153,8 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     id: string
     items: {
       address: string
-      capacity: string
+      amount: string
     }[]
-    password: string
   }) => void
 }
 

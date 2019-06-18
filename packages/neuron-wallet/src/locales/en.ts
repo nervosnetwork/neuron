@@ -102,6 +102,9 @@ export default {
         confirm: 'OK',
         discard: 'Cancel',
       },
+      'send-capacity': {
+        title: 'Send Transaction',
+      },
       'remove-network': {
         title: 'Remove Network',
         message: 'Network of name: {{name}}, address: {{address}} will be removed.',

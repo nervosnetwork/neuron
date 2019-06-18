@@ -30,12 +30,12 @@
     },
     "send": {
       "address": "地址",
-      "capacity": "价值",
+      "amount": "价值",
       "send": "发送",
       "confirm-password": "确认密码",
       "to": "至",
       "input-password-to-confirm": "输入密码以确认本次交易",
-      "this-transfer-will-send": "本次交易将发送",
+      "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫码二维码以获取地址"
     },
     "receive": {
@@ -112,8 +112,8 @@
       "length-of-name-should-be-less-than-or-equal-to": "名称长度应不大于 {{length}}",
       "network-name-exists": "节点名称已存在",
       "invalid-address": "无效的地址",
-      "invalid-capacity": "无效的价值",
-      "capacity-is-not-enough": "余额不足",
+      "invalid-amount": "无效的价值",
+      "amount-is-not-enough": "余额不足",
       "is-unremovable": "{{target}}不可删除",
       "create-wallet-success": "您已成功创建钱包 '{{name}}'",
       "network-is-not-found": "未找到节点信息",

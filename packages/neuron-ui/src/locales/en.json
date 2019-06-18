@@ -30,12 +30,12 @@
     },
     "send": {
       "address": "address",
-      "capacity": "capacity",
+      "amount": "amount",
       "send": "Send",
       "confirm-password": "Confirm Password",
       "to": "to",
       "input-password-to-confirm": "input password to confirm",
-      "this-transfer-will-send": "This transfer will send",
+      "this-transaction-will-send": "This transaction will send",
       "scan-to-get-address": "scan the qrcode to get address"
     },
     "receive": {
@@ -119,8 +119,8 @@
       "length-of-name-should-be-less-than-or-equal-to": "length-of-name-should-be-less-than-or-equal-to {{length}}",
       "network-name-exists": "network name exists",
       "invalid-address": "invalid address",
-      "invalid-capacity": "invalid capacity",
-      "capacity-is-not-enough": "capacity is not enough",
+      "invalid-amount": "invalid amount",
+      "amount-is-not-enough": "amount is not enough",
       "is-unremovable": "{{target}} is unremovable",
       "create-wallet-success": "You have created wallet '{{name}}' successfully",
       "network-is-not-found": "Network is not found",
