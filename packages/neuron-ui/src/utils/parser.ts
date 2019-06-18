@@ -2,12 +2,12 @@ import { PAGE_SIZE } from './const'
 
 export const history = (search: string) => {
   const query = new URLSearchParams(search)
-  const addresses = query.get('addresses')
+  const keywords = query.get('keywords') || ''
   // use Object.fromEntries in ES10
   const params = {
     pageNo: +(query.get('pageNo') || 1),
     pageSize: +(query.get('pageSize') || PAGE_SIZE),
-    addresses: addresses ? addresses.split(',') : [],
+    keywords,
   }
   return params
 }

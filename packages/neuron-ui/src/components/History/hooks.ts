@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { History } from 'history'
 import { actionCreators, MainActions } from 'containers/MainContent/reducer'
 import { ProviderActions } from 'containers/Providers/reducer'
@@ -6,14 +6,16 @@ import { queryParsers } from 'utils/parser'
 import { PAGE_SIZE } from '../../utils/const'
 
 export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
+  const [keywords, setKeywords] = useState('')
   useEffect(() => {
     const params = queryParsers.history(search)
+    setKeywords(params.keywords)
     providerDispatch({
       type: ProviderActions.CleanTransactions,
     })
     dispatch(actionCreators.getTransactions(params))
     return () => {
-      dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, addresses: [] }))
+      dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '' }))
       dispatch({
         type: MainActions.ErrorMessage,
         payload: {
@@ -22,6 +24,8 @@ export const useSearch = (search: string, dispatch: React.Dispatch<any>, provide
       })
     }
   }, [search, dispatch, providerDispatch])
+  const onKeywordsChange = (e: any) => setKeywords(e.currentTarget.value)
+  return { keywords, onKeywordsChange }
 }
 
 export const useOnChangePage = (search: string, pathname: string, history: History, queryFormatter: Function) => {
@@ -36,20 +40,7 @@ export const useOnChangePage = (search: string, pathname: string, history: Histo
   )
 }
 
-export const useOnAddressRemove = (search: string, pathname: string, history: History, queryFormatter: Function) => {
-  return useCallback(
-    (address: string) => () => {
-      const params = queryParsers.history(search)
-      params.addresses = params.addresses.filter((addr: string) => addr !== address)
-      const newQuery = queryFormatter(params)
-      history.push(`${pathname}?${newQuery.toString()}`)
-    },
-    [search, pathname, history, queryFormatter]
-  )
-}
-
 export default {
   useSearch,
   useOnChangePage,
-  useOnAddressRemove,
 }

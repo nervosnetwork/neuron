@@ -23,7 +23,6 @@ export const initState = {
     transactions: '',
     wizard: '',
   },
-  password: '',
   dialog: { open: false } as { open: boolean; [index: string]: any },
 }
 
