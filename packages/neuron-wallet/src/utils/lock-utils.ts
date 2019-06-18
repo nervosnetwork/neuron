@@ -1,5 +1,6 @@
 import NodeService from '../services/node'
 import { OutPoint, Script } from '../app-types/types'
+import env from '../env'
 
 const { core } = NodeService.getInstance()
 
@@ -85,15 +86,17 @@ export default class LockUtils {
   }
 
   static blake160ToAddress(blake160: string): string {
+    const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
     return core.utils.bech32Address(blake160, {
-      prefix: core.utils.AddressPrefix.Testnet,
+      prefix,
       type: core.utils.AddressType.BinIdx,
       binIdx: core.utils.AddressBinIdx.P2PH,
     })
   }
 
   static addressToBlake160(address: string): string {
-    const result: string = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
+    const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
+    const result: string = core.utils.parseAddress(address, prefix, 'hex') as string
     const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
     let blake160: string = result.slice(hrp.length, result.length)
     if (!blake160.startsWith('0x')) {
