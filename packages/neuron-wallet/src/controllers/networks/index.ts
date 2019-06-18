@@ -7,7 +7,7 @@ import {
   NetworkNotFound,
   DefaultNetworkUnremovable,
   LackOfDefaultNetwork,
-  ActiveNetowrkNotSet,
+  ActiveNetworkNotSet,
 } from '../../exceptions'
 
 const networksService = NetworksService.getInstance()
@@ -92,7 +92,7 @@ export default class NetworksController {
         result: activeId,
       }
     }
-    throw new ActiveNetowrkNotSet()
+    throw new ActiveNetworkNotSet()
   }
 
   @CatchControllerError
