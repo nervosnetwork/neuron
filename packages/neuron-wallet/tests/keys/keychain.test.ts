@@ -1,4 +1,4 @@
-import Keychain from '../../src/keys/keychain'
+import Keychain, { privateToPublic } from '../../src/keys/keychain'
 
 // https://en.bitcoin.it/wiki/BIP_0032_TestVectors
 describe('BIP32 Keychain tests', () => {
@@ -165,5 +165,13 @@ describe('BIP32 Keychain tests', () => {
     // @ts-ignore: Private method
     const sum = Keychain.publicKeyAdd(publicKey, toAdd)
     expect(sum.toString('hex')).toEqual('03db6eab66f918e434bae0e24fd73de1a2b293a2af9bd3ad53123996fa94494f37')
+  })
+})
+
+describe('private to public', () => {
+  it('derive public key from private key', () => {
+    const privateKey = Buffer.from('bb39d218506b30ca69b0f3112427877d983dd3cd2cabc742ab723e2964d98016', 'hex')
+    const publicKey = Buffer.from('03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3', 'hex')
+    expect(privateToPublic(privateKey)).toEqual(publicKey)
   })
 })

@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
 import initConnection from '../../typeorm'
-import Address from '../../services/addresses'
+import AddressService from '../../services/addresses'
 import LockUtils from '../../utils/lock-utils'
 import AddressesUsedSubject from '../../subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
@@ -19,7 +19,7 @@ export const stopLoopSubject = new Subject()
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (): Promise<string[]> => {
-  const addresses: string[] = Address.allAddresses().map(addr => addr.address)
+  const addresses: string[] = AddressService.allAddresses().map(addr => addr.address)
   const lockHashes: string[] = await Promise.all(
     addresses.map(async addr => {
       return LockUtils.addressToLockHash(addr)

@@ -1,8 +1,8 @@
 import TransactionsService from './transactions'
 import WalletService from './wallets'
 import NodeService from './node'
-import HD from '../keys/hd'
 import { ExtendedPublicKey } from '../keys/key'
+import Address, { AddressType } from '../keys/address'
 
 const {
   utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
@@ -11,17 +11,7 @@ const {
 export const MAX_ADDRESS_COUNT = 30
 export const SEARCH_RANGE = 20
 
-export enum AddressType {
-  Receiving = 0, // External chain
-  Change = 1, // Internal chain
-}
-
-export interface HDAddress {
-  address: string
-  path: string
-}
-
-class Address {
+class AddressService {
   public static isAddressUsed = (address: string) => TransactionsService.hasTransactions(address)
 
   public static addressFromPublicKey = (publicKey: string, prefix = AddressPrefix.Testnet) =>
@@ -32,12 +22,12 @@ class Address {
     })
 
   public static addressFromHDIndex = (extendedKey: ExtendedPublicKey, index: number, type = AddressType.Receiving) =>
-    Address.addressFromPublicKey(HD.keyFromExtendedPublicKey(extendedKey, type, index).publicKey)
+    AddressService.addressFromPublicKey(Address.keyFromExtendedPublicKey(extendedKey, type, index).publicKey)
 
   public static nextUnusedAddress = (extendedKey: ExtendedPublicKey) => {
-    const nextUnusedIndex = Address.searchHDIndex(extendedKey, SEARCH_RANGE)
-    const { publicKey } = HD.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, nextUnusedIndex)
-    return Address.addressFromPublicKey(publicKey)
+    const nextUnusedIndex = AddressService.searchHDIndex(extendedKey, SEARCH_RANGE)
+    const { publicKey } = Address.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, nextUnusedIndex)
+    return AddressService.addressFromPublicKey(publicKey)
   }
 
   // Generate both receiving and change addresses.
@@ -53,12 +43,12 @@ class Address {
       throw new Error('Address number error.')
     }
     const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => ({
-      address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Receiving),
-      path: HD.pathForReceiving(idx),
+      address: AddressService.addressFromHDIndex(extendedKey, idx, AddressType.Receiving),
+      path: Address.pathForReceiving(idx),
     }))
     const change = Array.from({ length: changeAddressCount }).map((_, idx) => ({
-      address: Address.addressFromHDIndex(extendedKey, idx, AddressType.Change),
-      path: HD.pathForChange(idx),
+      address: AddressService.addressFromHDIndex(extendedKey, idx, AddressType.Change),
+      path: Address.pathForChange(idx),
     }))
     return {
       receiving,
@@ -69,21 +59,21 @@ class Address {
   public static allAddresses = () =>
     WalletService.getInstance()
       .getAll()
-      .reduce((total: HDAddress[], cur) => {
+      .reduce((total: Address[], cur) => {
         return [...total, ...cur.addresses.change, ...cur.addresses.receiving]
       }, [])
 
   public static searchUsedAddresses = (extendedKey: ExtendedPublicKey) =>
-    Array.from({ length: Address.searchHDIndex(extendedKey) }, (_, idx) => {
-      const { publicKey, path } = HD.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, idx)
+    Array.from({ length: AddressService.searchHDIndex(extendedKey) }, (_, idx) => {
+      const { publicKey, path } = Address.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, idx)
       if (!publicKey) return null
-      const address = Address.addressFromPublicKey(publicKey)
-      if (Address.isAddressUsed(address)) return null
+      const address = AddressService.addressFromPublicKey(publicKey)
+      if (AddressService.isAddressUsed(address)) return null
       return {
         path,
         address,
       }
-    }).filter(addr => addr) as HDAddress[]
+    }).filter(addr => addr) as Address[]
 
   // TODO: refactor me
   public static searchHDIndex = (
@@ -94,11 +84,11 @@ class Address {
     depth = 0
   ): any => {
     if (depth >= 10) return maxUsedIndex + 1
-    if (!Address.isAddressUsed(Address.addressFromHDIndex(extendedKey, startIndex))) {
+    if (!AddressService.isAddressUsed(AddressService.addressFromHDIndex(extendedKey, startIndex))) {
       if (startIndex === 0) {
         return 0
       }
-      return Address.searchHDIndex(
+      return AddressService.searchHDIndex(
         extendedKey,
         Math.floor((startIndex - maxUsedIndex) / 2 + maxUsedIndex),
         maxUsedIndex,
@@ -106,10 +96,10 @@ class Address {
         depth + 1
       )
     }
-    if (!Address.isAddressUsed(Address.addressFromHDIndex(extendedKey, startIndex + 1))) {
+    if (!AddressService.isAddressUsed(AddressService.addressFromHDIndex(extendedKey, startIndex + 1))) {
       return startIndex + 1
     }
-    return Address.searchHDIndex(
+    return AddressService.searchHDIndex(
       extendedKey,
       Math.round((minUnusedIndex - startIndex) / 2 + startIndex),
       Math.max(maxUsedIndex, startIndex),
@@ -119,4 +109,4 @@ class Address {
   }
 }
 
-export default Address
+export default AddressService

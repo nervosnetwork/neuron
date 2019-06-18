@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-import { HDAddress } from '../services/addresses'
+import Address from './address'
 import { privateToPublic } from './keychain'
 import { entropyToMnemonic } from './mnemonic'
 
@@ -51,8 +51,8 @@ export enum DefaultAddressNumber {
 }
 
 export interface Addresses {
-  receiving: HDAddress[]
-  change: HDAddress[]
+  receiving: Address[]
+  change: Address[]
 }
 
 // Generate 12 words mnemonic code

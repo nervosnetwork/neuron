@@ -1,19 +1,31 @@
-import { AddressType } from '../services/addresses'
 import { ExtendedPublicKey } from './key'
 import Keychain from './keychain'
 
-class HD {
+export enum AddressType {
+  Receiving = 0, // External chain
+  Change = 1, // Internal chain
+}
+
+export default class Address {
+  address: string
+  path: string // BIP44 change/address_index (address_type/index)
+
+  constructor(address: string, path: string) {
+    this.address = address
+    this.path = path
+  }
+
   public static extendedKeyPath = `m/44'/309'/0'`
   public static pathFor = (type: AddressType, index: number) => {
-    return `${HD.extendedKeyPath}/${type}/${index}`
+    return `${Address.extendedKeyPath}/${type}/${index}`
   }
 
   public static pathForReceiving = (index: number) => {
-    return HD.pathFor(AddressType.Receiving, index)
+    return Address.pathFor(AddressType.Receiving, index)
   }
 
   public static pathForChange = (index: number) => {
-    return HD.pathFor(AddressType.Change, index)
+    return Address.pathFor(AddressType.Change, index)
   }
 
   // extendedKey: always be the extended public key for path `m/44'/309'/0'`.
@@ -25,15 +37,13 @@ class HD {
     const keychain = Keychain.fromPublicKey(
       Buffer.from(extendedKey.publicKey, 'hex'),
       Buffer.from(extendedKey.chainCode, 'hex'),
-      HD.extendedKeyPath
+      Address.extendedKeyPath
     )
       .deriveChild(type, false)
       .deriveChild(index, false)
     return {
       publicKey: keychain.publicKey.toString('hex'),
-      path: HD.pathFor(type, index),
+      path: Address.pathFor(type, index),
     }
   }
 }
-
-export default HD
