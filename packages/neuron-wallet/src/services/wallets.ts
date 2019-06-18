@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { Addresses, ExtendedPublicKey } from '../keys/key'
+import { Addresses, AccountExtendedPublicKey } from '../keys/key'
 import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
@@ -27,43 +27,45 @@ export interface Wallet {
   addresses: Addresses
 
   loadKeystore: () => Keystore
+  accountExtendedPublicKey: () => AccountExtendedPublicKey
 }
 
 export interface WalletProperties {
+  id: string
   name: string
   addresses: Addresses
-  keystore: Keystore | null
+  extendedKey: string // Serialized account extended public key
+  keystore?: Keystore
 }
 
 class FileKeystoreWallet implements Wallet {
   public id: string
   public name: string
   public addresses: Addresses
+  private extendedKey: string = ''
 
-  constructor(id: string, { name, addresses }: WalletProperties) {
+  constructor(props: WalletProperties) {
+    const { id, name, addresses, extendedKey } = props
+
     if (id === undefined) throw new IsRequired('ID')
     if (name === undefined) throw new IsRequired('Name')
     if (addresses === undefined) throw new IsRequired('Addresses')
 
     this.id = id
     this.name = name
+    this.extendedKey = extendedKey
     this.addresses = addresses
   }
 
-  extendedPublicKey = (): ExtendedPublicKey => {
-    // FIXME: save and get extended public key
-    return new ExtendedPublicKey('todo', 'todo')
+  accountExtendedPublicKey = (): AccountExtendedPublicKey => {
+    return AccountExtendedPublicKey.parse(this.extendedKey) as AccountExtendedPublicKey
   }
 
-  static fromJSON = (json: Omit<Wallet, 'loadKeystore'>) => {
-    return new FileKeystoreWallet(json.id, {
-      name: json.name,
-      addresses: json.addresses,
-      keystore: null,
-    })
+  static fromJSON = (json: WalletProperties) => {
+    return new FileKeystoreWallet(json)
   }
 
-  public update = ({ name, addresses }: WalletProperties) => {
+  public update = ({ name, addresses }: { name: string; addresses: Addresses }) => {
     if (name) {
       this.name = name
     }
@@ -72,10 +74,11 @@ class FileKeystoreWallet implements Wallet {
     }
   }
 
-  public toJSON = (): Omit<Wallet, 'loadKeystore'> => {
+  public toJSON = () => {
     return {
       id: this.id,
       name: this.name,
+      extendedKey: this.extendedKey,
       addresses: this.addresses,
     }
   }
@@ -114,7 +117,7 @@ export default class WalletService {
   constructor() {
     this.listStore = new Store(MODULE_NAME, 'wallets.json')
 
-    fromEvent<[any, Omit<Wallet, 'loadKeystore'>[]]>(this.listStore, this.walletsKey)
+    fromEvent<[any, WalletProperties[]]>(this.listStore, this.walletsKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, wallets]) => {
         const result = wallets.map(({ id, name }) => ({ id, name }))
@@ -124,15 +127,14 @@ export default class WalletService {
         })
         const wallet = this.getCurrent()
         if (wallet) {
-          const currentWallet = wallet.toJSON()
           windowManage.broadcast(Channel.Wallets, 'getActive', {
             status: ResponseCode.Success,
             result: {
-              id: currentWallet.id,
-              name: currentWallet.name,
+              id: wallet.id,
+              name: wallet.name,
               addresses: {
-                receiving: currentWallet.addresses.receiving.map(addr => addr.address),
-                change: currentWallet.addresses.change.map(addr => addr.address),
+                receiving: wallet.addresses.receiving.map(addr => addr.address),
+                change: wallet.addresses.change.map(addr => addr.address),
               },
             },
           })
@@ -142,8 +144,11 @@ export default class WalletService {
     fromEvent(this.listStore, this.currentWalletKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, newId]) => {
-        if (newId === undefined) return
-        const currentWallet = this.get(newId).toJSON()
+        if (newId === undefined) {
+          return
+        }
+
+        const currentWallet = this.get(newId)
         windowManage.broadcast(Channel.Wallets, 'getActive', {
           status: ResponseCode.Success,
           result: {
@@ -158,15 +163,19 @@ export default class WalletService {
       })
   }
 
-  public getAll = (): Omit<Wallet, 'loadKeystore'>[] => {
+  public getAll = (): WalletProperties[] => {
     return this.listStore.readSync(this.walletsKey) || []
   }
 
   public get = (id: string) => {
-    if (id === undefined) throw new IsRequired('ID')
+    if (id === undefined) {
+      throw new IsRequired('ID')
+    }
 
     const wallet = this.getAll().find(w => w.id === id)
-    if (!wallet) throw new WalletNotFound(id)
+    if (!wallet) {
+      throw new WalletNotFound(id)
+    }
 
     return FileKeystoreWallet.fromJSON(wallet)
   }
@@ -176,9 +185,11 @@ export default class WalletService {
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
-    if (index !== -1) throw new UsedName('Wallet')
+    if (index !== -1) {
+      throw new UsedName('Wallet')
+    }
 
-    const wallet = new FileKeystoreWallet(uuid(), props)
+    const wallet = new FileKeystoreWallet({ ...props, id: uuid() })
 
     wallet.saveKeystore(props.keystore!)
 
@@ -190,10 +201,12 @@ export default class WalletService {
     return wallet
   }
 
-  public update = (id: string, props: WalletProperties) => {
+  public update = (id: string, props: Omit<WalletProperties, 'id' | 'extendedKey'>) => {
     const wallets = this.getAll()
-    const index = wallets.findIndex((w: Wallet) => w.id === id)
-    if (index === -1) throw new WalletNotFound(id)
+    const index = wallets.findIndex((w: WalletProperties) => w.id === id)
+    if (index === -1) {
+      throw new WalletNotFound(id)
+    }
 
     const wallet = FileKeystoreWallet.fromJSON(wallets[index])
 

@@ -2,10 +2,8 @@ import crypto from 'crypto'
 import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
 
-import { UnsupportedCipher, IncorrectPassword, InvalidMnemonic } from '../exceptions'
-import Keychain from './keychain'
+import { UnsupportedCipher, IncorrectPassword } from '../exceptions'
 import { ExtendedPrivateKey } from './key'
-import { validateMnemonic, mnemonicToSeedSync } from './mnemonic'
 
 const CIPHER = 'aes-128-ctr'
 
@@ -44,20 +42,6 @@ export default class Keystore {
   static fromJson = (json: string) => {
     const object = JSON.parse(json)
     return new Keystore(object.crypto, object.id)
-  }
-
-  static fromMnemonic = (mnemonic: string, password: string) => {
-    if (!validateMnemonic(mnemonic)) {
-      throw new InvalidMnemonic()
-    }
-
-    const seed = mnemonicToSeedSync(mnemonic)
-    const root = Keychain.fromSeed(seed)
-    if (!root.privateKey) {
-      throw new InvalidMnemonic()
-    }
-    const extendedKey = new ExtendedPrivateKey(root.privateKey.toString('hex'), root.chainCode.toString('hex'))
-    return Keystore.create(extendedKey, password)
   }
 
   static create = (extendedPrivateKey: ExtendedPrivateKey, password: string) => {
