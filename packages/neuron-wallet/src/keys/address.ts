@@ -1,10 +1,21 @@
+import { AddressPrefix, AddressType as Type, AddressBinIdx, pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
+
 import { ExtendedPublicKey } from './key'
 import Keychain from './keychain'
+
+export { AddressPrefix }
 
 export enum AddressType {
   Receiving = 0, // External chain
   Change = 1, // Internal chain
 }
+
+export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Testnet) =>
+  pubkeyToAddress(publicKey, {
+    prefix,
+    type: Type.BinIdx,
+    binIdx: AddressBinIdx.P2PH,
+  })
 
 export default class Address {
   address: string

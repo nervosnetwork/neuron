@@ -1,4 +1,4 @@
-import Address, { AddressType } from '../../src/keys/address'
+import Address, { AddressType, publicKeyToAddress, AddressPrefix } from '../../src/keys/address'
 import { ExtendedPublicKey } from '../../src/keys/key'
 
 describe('address', () => {
@@ -26,5 +26,17 @@ describe('address', () => {
     const changeKeyAndPath = Address.keyFromExtendedPublicKey(extendedKey, AddressType.Change, 1)
     expect(changeKeyAndPath.publicKey).toEqual('0360bf05c11e7b4ac8de58077554e3d777acd64bf4abb9cd947002eb98a4827bba')
     expect(changeKeyAndPath.path).toEqual(`m/44'/309'/0'/1/1`)
+  })
+
+  it('Generate testnet address from public key', () => {
+    const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
+    const address = publicKeyToAddress(publicKey)
+    expect('ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf').toBe(address)
+  })
+
+  it('Generate mainnet address from public key', () => {
+    const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
+    const address = publicKeyToAddress(publicKey, AddressPrefix.Mainnet)
+    expect('ckb1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6vqdd7em').toBe(address)
   })
 })

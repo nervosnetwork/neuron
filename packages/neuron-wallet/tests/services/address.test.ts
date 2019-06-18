@@ -1,24 +1,7 @@
 import AddressService from '../../src/services/addresses'
-import NodeService from '../../src/services/node'
 import { ExtendedPublicKey } from '../../src/keys/key'
 
-const { utils } = NodeService.getInstance().core
-
 describe('Key tests', () => {
-  const { AddressPrefix } = utils
-
-  it('Generate testnet address from public key', () => {
-    const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
-    const address = AddressService.addressFromPublicKey(publicKey)
-    expect('ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf').toBe(address)
-  })
-
-  it('Generate mainnet address from public key', () => {
-    const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
-    const address = AddressService.addressFromPublicKey(publicKey, AddressPrefix.Mainnet)
-    expect('ckb1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6vqdd7em').toBe(address)
-  })
-
   it('Generate addresses from extended public key', () => {
     const extendedKey = new ExtendedPublicKey(
       '03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3',

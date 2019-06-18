@@ -1,33 +1,21 @@
 import TransactionsService from './transactions'
 import WalletService from './wallets'
-import NodeService from './node'
 import { ExtendedPublicKey } from '../keys/key'
-import Address, { AddressType } from '../keys/address'
+import Address, { AddressType, publicKeyToAddress } from '../keys/address'
 
-const {
-  utils: { AddressPrefix, AddressType: Type, AddressBinIdx, pubkeyToAddress },
-} = NodeService.getInstance().core
-
-export const MAX_ADDRESS_COUNT = 30
-export const SEARCH_RANGE = 20
+const MAX_ADDRESS_COUNT = 30
+const SEARCH_RANGE = 20
 
 class AddressService {
   public static isAddressUsed = (address: string) => TransactionsService.hasTransactions(address)
 
-  public static addressFromPublicKey = (publicKey: string, prefix = AddressPrefix.Testnet) =>
-    pubkeyToAddress(publicKey, {
-      prefix,
-      type: Type.BinIdx,
-      binIdx: AddressBinIdx.P2PH,
-    })
-
   public static addressFromHDIndex = (extendedKey: ExtendedPublicKey, index: number, type = AddressType.Receiving) =>
-    AddressService.addressFromPublicKey(Address.keyFromExtendedPublicKey(extendedKey, type, index).publicKey)
+    publicKeyToAddress(Address.keyFromExtendedPublicKey(extendedKey, type, index).publicKey)
 
   public static nextUnusedAddress = (extendedKey: ExtendedPublicKey) => {
     const nextUnusedIndex = AddressService.searchHDIndex(extendedKey, SEARCH_RANGE)
     const { publicKey } = Address.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, nextUnusedIndex)
-    return AddressService.addressFromPublicKey(publicKey)
+    return publicKeyToAddress(publicKey)
   }
 
   // Generate both receiving and change addresses.
@@ -67,7 +55,7 @@ class AddressService {
     Array.from({ length: AddressService.searchHDIndex(extendedKey) }, (_, idx) => {
       const { publicKey, path } = Address.keyFromExtendedPublicKey(extendedKey, AddressType.Receiving, idx)
       if (!publicKey) return null
-      const address = AddressService.addressFromPublicKey(publicKey)
+      const address = publicKeyToAddress(publicKey)
       if (AddressService.isAddressUsed(address)) return null
       return {
         path,
