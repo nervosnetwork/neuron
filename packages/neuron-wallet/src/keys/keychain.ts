@@ -83,10 +83,10 @@ export default class Keychain {
     let child: Keychain
     if (this.isNeutered()) {
       child = new Keychain(EMPTY_BUFFER, ir)
-      child.publicKey = this.publicKeyAdd(this.publicKey, il)
+      child.publicKey = Keychain.publicKeyAdd(this.publicKey, il)
       child.calculateFingerprint()
     } else {
-      const privateKey = this.privateKeyAdd(this.privateKey, il)
+      const privateKey = Keychain.privateKeyAdd(this.privateKey, il)
       child = new Keychain(privateKey, ir)
       child.calculateFingerprint()
     }
@@ -134,13 +134,13 @@ export default class Keychain {
       .digest()
   }
 
-  privateKeyAdd = (privateKey: Buffer, factor: Buffer): Buffer => {
+  private static privateKeyAdd = (privateKey: Buffer, factor: Buffer): Buffer => {
     const curveOrder = new BN('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 16)
     const result = new BN(privateKey).add(new BN(factor)).mod(curveOrder)
     return Buffer.from(result.toString(16), 'hex')
   }
 
-  publicKeyAdd = (publicKey: Buffer, factor: Buffer): Buffer => {
+  private static publicKeyAdd = (publicKey: Buffer, factor: Buffer): Buffer => {
     const x = new BN(publicKey.slice(1)).toRed(ec.curve.red)
     let y = x
       .redSqr()
