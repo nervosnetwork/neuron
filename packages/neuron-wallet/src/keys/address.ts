@@ -1,7 +1,6 @@
 import { AddressPrefix, AddressType as Type, AddressBinIdx, pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 
-import { ExtendedPublicKey } from './key'
-import Keychain from './keychain'
+import { AccountExtendedPublicKey } from './key'
 
 export { AddressPrefix }
 
@@ -18,17 +17,24 @@ export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Tes
   })
 
 export default class Address {
+  publicKey?: string
   address: string
-  path: string // BIP44 change/address_index (address_type/index)
+  path: string // BIP44 path
 
-  constructor(address: string, path: string) {
+  constructor(address: string, path: string = Address.pathForReceiving(0)) {
     this.address = address
     this.path = path
   }
 
-  public static extendedKeyPath = `m/44'/309'/0'`
+  public static fromPublicKey = (publicKey: string, path: string, prefix: AddressPrefix = AddressPrefix.Testnet) => {
+    const address = publicKeyToAddress(publicKey, prefix)
+    const instance = new Address(address, path)
+    instance.publicKey = publicKey
+    return instance
+  }
+
   public static pathFor = (type: AddressType, index: number) => {
-    return `${Address.extendedKeyPath}/${type}/${index}`
+    return `${AccountExtendedPublicKey.ckbAccountPath}/${type}/${index}`
   }
 
   public static pathForReceiving = (index: number) => {
@@ -37,24 +43,5 @@ export default class Address {
 
   public static pathForChange = (index: number) => {
     return Address.pathFor(AddressType.Change, index)
-  }
-
-  // extendedKey: always be the extended public key for path `m/44'/309'/0'`.
-  public static keyFromExtendedPublicKey = (
-    extendedKey: ExtendedPublicKey,
-    type = AddressType.Receiving,
-    index: number
-  ) => {
-    const keychain = Keychain.fromPublicKey(
-      Buffer.from(extendedKey.publicKey, 'hex'),
-      Buffer.from(extendedKey.chainCode, 'hex'),
-      Address.extendedKeyPath
-    )
-      .deriveChild(type, false)
-      .deriveChild(index, false)
-    return {
-      publicKey: keychain.publicKey.toString('hex'),
-      path: Address.pathFor(type, index),
-    }
   }
 }

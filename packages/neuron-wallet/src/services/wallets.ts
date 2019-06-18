@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { Addresses, ExtendedPublicKey } from '../keys/key'
+import { Addresses, AccountExtendedPublicKey } from '../keys/key'
 import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
@@ -57,9 +57,9 @@ class FileKeystoreWallet implements Wallet {
     this.addresses = addresses
   }
 
-  extendedPublicKey = (): ExtendedPublicKey => {
+  extendedPublicKey = (): AccountExtendedPublicKey => {
     // FIXME: save and get extended public key
-    return new ExtendedPublicKey('todo', 'todo')
+    return new AccountExtendedPublicKey('todo', 'todo')
   }
 
   static fromJSON = (json: Omit<Wallet, 'loadKeystore'>) => {

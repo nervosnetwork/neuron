@@ -1,9 +1,9 @@
 import AddressService from '../../src/services/addresses'
-import { ExtendedPublicKey } from '../../src/keys/key'
+import { AccountExtendedPublicKey } from '../../src/keys/key'
 
 describe('Key tests', () => {
   it('Generate addresses from extended public key', () => {
-    const extendedKey = new ExtendedPublicKey(
+    const extendedKey = new AccountExtendedPublicKey(
       '03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3',
       '37e85a19f54f0a242a35599abac64a71aacc21e3a5860dd024377ffc7e6827d8'
     )
