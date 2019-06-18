@@ -330,12 +330,13 @@ export default class WalletService {
     return txHash
   }
 
+  // path should be '0/*' or '1/*'
   public getAddressInfo = () => {
     const item = {
       pubkey: '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01',
       address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
       blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      path: '',
+      path: '0/0',
     }
     return [item]
   }
@@ -361,7 +362,7 @@ export default class WalletService {
   }
 
   public getPrivateKey = (path: string): string => {
-    if (path !== '') {
+    if (path !== '0/0') {
       throw new Error('')
     }
     return '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
