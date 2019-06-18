@@ -32,7 +32,13 @@ describe('account extended public key', () => {
     expect(extendedKey.addressPublicKey(AddressType.Change, 1)).toEqual(
       '0360bf05c11e7b4ac8de58077554e3d777acd64bf4abb9cd947002eb98a4827bba'
     )
-    // expect(changeKeyAndPath.path).toEqual(`m/44'/309'/0'/1/1`)
+  })
+
+  it('serialize and parse', () => {
+    const serialized = extendedKey.serialize()
+    const parsed = AccountExtendedPublicKey.parse(serialized)
+    expect(parsed.publicKey).toEqual(extendedKey.publicKey)
+    expect(parsed.chainCode).toEqual(extendedKey.chainCode)
   })
 
   it('derive address', () => {

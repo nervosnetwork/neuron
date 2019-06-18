@@ -2,6 +2,9 @@ import fs from 'fs'
 import AppController from '../app'
 import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
 import Keystore from '../../keys/keystore'
+import Keychain from '../../keys/keychain'
+import { validateMnemonic, mnemonicToSeedSync } from '../../keys/mnemonic'
+import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../../keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
@@ -9,6 +12,7 @@ import {
   IsRequired,
   WalletNotFound,
   IncorrectPassword,
+  InvalidMnemonic,
   EmptyPassword,
   ServiceHasNoResponse,
 } from '../../exceptions'
@@ -54,10 +58,32 @@ export default class WalletsController {
     name: string
     password: string
     mnemonic: string
-  }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
-    const keystore = await Keystore.fromMnemonic(mnemonic, password)
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    if (!validateMnemonic(mnemonic)) {
+      throw new InvalidMnemonic()
+    }
+
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterKeychain = Keychain.fromSeed(seed)
+    if (!masterKeychain.privateKey) {
+      throw new InvalidMnemonic()
+    }
+    const extendedKey = new ExtendedPrivateKey(
+      masterKeychain.privateKey.toString('hex'),
+      masterKeychain.chainCode.toString('hex')
+    )
+    const keystore = Keystore.create(extendedKey, password)
+
+    const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(
+      accountKeychain.publicKey.toString('hex'),
+      accountKeychain.chainCode.toString('hex')
+    )
+
     const wallet = walletsService.create({
+      id: '',
       name,
+      extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
       addresses: { receiving: [], change: [] }, // Fetch addresses
     })
@@ -80,7 +106,7 @@ export default class WalletsController {
     name: string
     password: string
     mnemonic: string
-  }): Promise<Controller.Response<Omit<Wallet, 'loadKeystore'>>> {
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
     return WalletsController.importMnemonic({
       name,
       password,
@@ -103,12 +129,21 @@ export default class WalletsController {
     }
 
     const keystoreObject = Keystore.fromJson(keystore)
-    if (!keystoreObject.checkPassword(password)) {
-      throw new IncorrectPassword()
-    }
+    const masterPrivateKey = keystoreObject.extendedPrivateKey(password)
+    const masterKeychain = new Keychain(
+      Buffer.from(masterPrivateKey.privateKey, 'hex'),
+      Buffer.from(masterPrivateKey.chainCode, 'hex')
+    )
+    const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(
+      accountKeychain.publicKey.toString('hex'),
+      accountKeychain.chainCode.toString('hex')
+    )
 
     const wallet = walletsService.create({
+      id: '',
       name,
+      extendedKey: accountExtendedPublicKey.serialize(),
       keystore: keystoreObject,
       addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
@@ -134,7 +169,7 @@ export default class WalletsController {
     const wallet = walletsService.get(id)
     if (!wallet) throw new WalletNotFound(id)
 
-    const props: WalletProperties = {
+    const props = {
       name: name || wallet.name,
       addresses: wallet.addresses,
       keystore: wallet.loadKeystore(),
