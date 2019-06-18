@@ -290,17 +290,11 @@ export default class WalletService {
 
     const changeAddress: string = this.getChangeAddress()
 
-    const unsignedTransaction: TransactionWithoutHash = await TransactionsService.generateTx(
-      lockHashes,
-      targetOutputs,
-      changeAddress
-    )
+    const tx: TransactionWithoutHash = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
 
-    const txHash: string = await (core.rpc as any).computeTransactionHash(
-      ConvertTo.toSdkTxWithoutHash(unsignedTransaction)
-    )
+    const txHash: string = await (core.rpc as any).computeTransactionHash(ConvertTo.toSdkTxWithoutHash(tx))
 
-    const { inputs } = unsignedTransaction
+    const { inputs } = tx
 
     const witnesses: Witness[] = inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args![0]
@@ -311,14 +305,14 @@ export default class WalletService {
       return witness
     })
 
-    unsignedTransaction.witnesses = witnesses
+    tx.witnesses = witnesses
 
-    const txToSend = ConvertTo.toSdkTxWithoutHash(unsignedTransaction)
-    const realTxHash = await core.rpc.sendTransaction(txToSend)
+    const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
+    await core.rpc.sendTransaction(txToSend)
 
     TransactionsService.txSentSubject.next({
-      transaction: unsignedTransaction,
-      txHash: realTxHash,
+      transaction: tx,
+      txHash,
     })
 
     return txHash
