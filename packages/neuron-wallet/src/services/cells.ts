@@ -70,7 +70,16 @@ export default class CellsService {
           status: 'live',
         },
       })
-    cellEntities.sort((a, b) => +a.capacity - +b.capacity)
+    cellEntities.sort((a, b) => {
+      const result = BigInt(a.capacity) - BigInt(b.capacity)
+      if (result > BigInt(0)) {
+        return 1
+      }
+      if (result === BigInt(0)) {
+        return 0
+      }
+      return -1
+    })
 
     const inputs: CKBComponents.CellInput[] = []
     let inputCapacities: bigint = BigInt(0)
