@@ -19,10 +19,7 @@ export interface AddressMetaInfo {
 export default class AddressService {
   public static isAddressUsed = async (address: string): Promise<boolean> => {
     const addressEntity = await AddressDao.findByAddress(address)
-    if (!addressEntity) {
-      return false
-    }
-    return true
+    return !!addressEntity
   }
 
   public static generateAndSave = async (
