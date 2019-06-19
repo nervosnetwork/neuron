@@ -35,8 +35,14 @@ export default class AppController {
       activeWallet: activeWallet && {
         ...activeWallet,
         addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => addr.address),
-          change: activeWallet.addresses.change.map(addr => addr.address),
+          receiving: activeWallet.addresses.receiving.map(addr => ({
+            address: addr.address,
+            description: Math.random().toString(),
+          })),
+          change: activeWallet.addresses.change.map(addr => ({
+            address: addr.address,
+            description: Math.random().toString(),
+          })),
         },
       },
       balance: '1000000000000001212121212', // TODO: provide the balance of current wallet

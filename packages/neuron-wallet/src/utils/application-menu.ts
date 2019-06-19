@@ -72,6 +72,7 @@ const applicationMenuTemplate: MenuItemConstructorOptions[] = [
       {
         label: i18n.t('application-menu.view.address-book'),
         click: AppController.toggleAddressBook,
+        accelerator: 'CmdOrCtrl+B',
       },
     ],
   },

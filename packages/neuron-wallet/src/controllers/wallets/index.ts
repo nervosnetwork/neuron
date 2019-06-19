@@ -240,8 +240,14 @@ export default class WalletsController {
       result: {
         ...activeWallet,
         addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => addr.address),
-          change: activeWallet.addresses.change.map(addr => addr.address),
+          receiving: activeWallet.addresses.receiving.map(addr => ({
+            address: addr.address,
+            description: Math.random().toString(),
+          })),
+          change: activeWallet.addresses.change.map(addr => ({
+            address: addr.address,
+            description: Math.random().toString(),
+          })),
         },
       },
     }

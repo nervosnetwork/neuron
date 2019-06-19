@@ -39,7 +39,7 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
   const { match } = props
   const { params } = match
 
-  const accountAddress = params.address || receiving[0]
+  const accountAddress = params.address || (receiving[0] && receiving[0].address)
 
   if (!accountAddress) {
     return <div>{t('receive.address-not-found')}</div>
