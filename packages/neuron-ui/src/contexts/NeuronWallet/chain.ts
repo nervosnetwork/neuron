@@ -36,7 +36,7 @@ const chainState: Chain = {
     time: +new Date(0),
   },
   transactions: {
-    pageNo: -1,
+    pageNo: 1,
     pageSize: 15,
     totalCount: 0,
     items: [],
