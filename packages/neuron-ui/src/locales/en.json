@@ -65,6 +65,7 @@
       "addresses": "Addresses",
       "type": "Type",
       "address": "Address",
+      "description": "Description",
       "balance": "Balance",
       "transactions": "Transactions"
     },
