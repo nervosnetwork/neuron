@@ -110,7 +110,6 @@ export default class AddressService {
     return [testnetAddressInfo, mainnetAddressInfo]
   }
 
-  // TODO: next unused address
   public static nextUnusedAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
     const version = AddressService.getAddressVersion()
 
@@ -121,7 +120,6 @@ export default class AddressService {
     return addressEntity.toInterface()
   }
 
-  // TODO: all addresses of all wallets
   public static allAddresses = async (): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
 
@@ -130,7 +128,6 @@ export default class AddressService {
     return addressEntities.map(addr => addr.toInterface())
   }
 
-  // TODO: all addresses of one wallet
   public static usedAddresses = async (walletId: string): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
     const addressEntities = await AddressDao.usedAddressesByWalletId(walletId, version)
