@@ -1,6 +1,4 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import TransactionsService from './transactions'
-// import WalletService from './wallets'
 import { AccountExtendedPublicKey } from '../keys/key'
 import Address, { AddressType } from '../keys/address'
 import LockUtils from '../utils/lock-utils'
@@ -19,7 +17,13 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
-  public static isAddressUsed = (address: string) => TransactionsService.hasTransactions(address)
+  public static isAddressUsed = async (address: string): Promise<boolean> => {
+    const addressEntity = await AddressDao.findByAddress(address)
+    if (!addressEntity) {
+      return false
+    }
+    return true
+  }
 
   public static generateAndSave = async (
     walletId: string,

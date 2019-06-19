@@ -94,4 +94,16 @@ export default class AddressDao {
 
     return addressEntities
   }
+
+  public static findByAddress = async (address: string): Promise<AddressEntity | undefined> => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        address,
+      })
+      .getOne()
+
+    return addressEntity
+  }
 }
