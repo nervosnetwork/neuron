@@ -29,7 +29,6 @@
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules",
     "db:migrate": "ts-node ./node_modules/.bin/typeorm migration:generate",
-    "db:migrate-address": "ts-node ./node_modules/.bin/typeorm --config address-ormconfig.json migration:generate",
     "address-db": "ts-node ./node_modules/.bin/typeorm --config address-ormconfig.json"
   },
   "husky": {
