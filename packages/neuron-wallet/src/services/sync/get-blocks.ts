@@ -56,4 +56,13 @@ export default class GetBlocks {
     const block = await core.rpc.getBlockByNumber(num)
     return TypeConvert.toBlock(block)
   }
+
+  public static genesisBlockHash = async (): Promise<string> => {
+    const hash: string = await Utils.retry(3, 100, async () => {
+      const h: string = await core.rpc.getBlockHash('0')
+      return h
+    })
+
+    return hash
+  }
 }

@@ -4,10 +4,14 @@ import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
 import initConnection from '../../typeorm'
+import genesisBlockHash from './genesis'
+
+export { genesisBlockHash }
 
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
-    await initConnection(network.name)
+    const hash = await genesisBlockHash()
+    await initConnection(hash)
   }
 })
 
