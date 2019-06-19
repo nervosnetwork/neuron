@@ -44,3 +44,4 @@ docs
 
 # sqlite db
 cell-dev.sqlite
+address-dev.sqlite

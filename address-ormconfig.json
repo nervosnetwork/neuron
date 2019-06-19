@@ -1,0 +1,21 @@
+{
+  "type": "sqlite",
+  "synchronize": false,
+  "migrationsRun": true,
+  "logging": true,
+  "database": "address-dev.sqlite",
+  "entities": [
+     "packages/neuron-wallet/src/addresses/entities/**/*.ts"
+  ],
+  "migrations": [
+     "packages/neuron-wallet/src/addresses/migrations/**/*.ts"
+  ],
+  "subscribers": [
+     "packages/neuron-wallet/src/addresses/subscriber/**/*.ts"
+  ],
+  "cli": {
+     "entitiesDir": "packages/neuron-wallet/src/addresses/entities",
+     "migrationsDir": "packages/neuron-wallet/src/addresses/migrations",
+     "subscribersDir": "packages/neuron-wallet/src/addresses/subscriber"
+  }
+}

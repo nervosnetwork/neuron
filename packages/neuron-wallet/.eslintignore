@@ -1,2 +1,3 @@
 src/migration
 dist
+src/addresses/migrations
