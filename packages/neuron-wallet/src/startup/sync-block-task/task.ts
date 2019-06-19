@@ -7,9 +7,13 @@ import AddressesUsedSubject from '../../subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 
-const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = remote.require(
-  './startup/sync-block-task/params'
-)
+const {
+  networkSwitchSubject,
+  nodeService,
+  addressChangeSubject,
+  addressesUsedSubject,
+  genesisBlockHash,
+} = remote.require('./startup/sync-block-task/params')
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -30,11 +34,11 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
 
 // call this after network switched
 // TODO: listen to network switch
-export const switchNetwork = async (networkId: string) => {
+export const switchNetwork = async (blockHash: string) => {
   // stop all blocks service
   stopLoopSubject.next('stop')
   // disconnect old connection and connect to new database
-  await initConnection(networkId)
+  await initConnection(blockHash)
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
@@ -55,7 +59,7 @@ export const switchNetwork = async (networkId: string) => {
 export const run = () => {
   networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
-      await switchNetwork(network.name)
+      await switchNetwork(genesisBlockHash)
     }
   })
 }

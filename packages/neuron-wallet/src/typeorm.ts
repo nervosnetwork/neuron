@@ -17,26 +17,26 @@ const dbPath = (networkName: string): string => {
   return path.join(env.fileBasePath, 'cells', name)
 }
 
-const connectOptions = async (networkName: string): Promise<SqliteConnectionOptions> => {
+const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
   const connectionOptions = await getConnectionOptions()
 
   return {
     ...connectionOptions,
     type: 'sqlite',
-    database: dbPath(networkName),
+    database: dbPath(genesisBlockHash),
     entities: [Transaction, Input, Output, SyncInfo],
     migrations: [InitMigration1560769176614],
   }
 }
 
-export const initConnection = async (networkName: string) => {
+export const initConnection = async (genesisBlockHash: string) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
     await getConnection().close()
   } catch (err) {
     logger.log({ level: 'error', message: err.message })
   }
-  const connectionOptions = await connectOptions(networkName)
+  const connectionOptions = await connectOptions(genesisBlockHash)
 
   try {
     await createConnection(connectionOptions)
