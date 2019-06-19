@@ -1,5 +1,5 @@
 import { getConnection as getTxConnection } from 'typeorm'
-import AddressEntity from './entities/address'
+import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../keys/address'
 import { getConnection } from './ormconfig'
 import TransactionsService from '../services/transactions'
@@ -12,6 +12,7 @@ export interface Address {
   addressIndex: number
   txCount: number
   blake160: string
+  version: string
 }
 
 export default class AddressDao {
@@ -46,5 +47,51 @@ export default class AddressDao {
     addressEntity.txCount = txCount
     await getTxConnection().manager.save(addressEntity)
     return true
+  }
+
+  public static nextUnusedAddress = async (
+    walletId: string,
+    version: AddressVersion
+  ): Promise<AddressEntity | undefined> => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        version,
+        addressType: AddressType.Receiving,
+      })
+      .orderBy('address.addressIndex', 'ASC')
+      .getOne()
+
+    return addressEntity
+  }
+
+  public static allAddresses = async (version: AddressVersion): Promise<AddressEntity[]> => {
+    const addressEntities = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        version,
+      })
+      .getMany()
+
+    return addressEntities
+  }
+
+  public static usedAddressesByWalletId = async (
+    walletId: string,
+    version: AddressVersion
+  ): Promise<AddressEntity[]> => {
+    const addressEntities = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        version,
+      })
+      .getMany()
+
+    return addressEntities
   }
 }

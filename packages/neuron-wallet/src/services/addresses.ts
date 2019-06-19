@@ -4,7 +4,9 @@ import TransactionsService from './transactions'
 import { AccountExtendedPublicKey } from '../keys/key'
 import Address, { AddressType } from '../keys/address'
 import LockUtils from '../utils/lock-utils'
-import AddressDao from '../addresses/dao'
+import AddressDao, { Address as AddressInterface } from '../addresses/dao'
+import env from '../env'
+import { AddressVersion } from '../addresses/entities/address'
 
 const MAX_ADDRESS_COUNT = 30
 // const SEARCH_RANGE = 20
@@ -96,22 +98,47 @@ export default class AddressService {
       addressIndex: addressMetaInfo.addressIndex,
       txCount: 0,
       blake160,
+      version: AddressVersion.Testnet,
     }
 
     const mainnetAddressInfo = {
       ...testnetAddressInfo,
       address: mainnetAddress,
+      version: AddressVersion.Mainnet,
     }
 
     return [testnetAddressInfo, mainnetAddressInfo]
   }
 
   // TODO: next unused address
-  // public static nextUnusedAddress = (walletId: string) => {}
+  public static nextUnusedAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
+    const version = AddressService.getAddressVersion()
+
+    const addressEntity = await AddressDao.nextUnusedAddress(walletId, version)
+    if (!addressEntity) {
+      return undefined
+    }
+    return addressEntity.toInterface()
+  }
 
   // TODO: all addresses of all wallets
-  // public static allAddresses = () => {}
+  public static allAddresses = async (): Promise<AddressInterface[]> => {
+    const version = AddressService.getAddressVersion()
+
+    const addressEntities = await AddressDao.allAddresses(version)
+
+    return addressEntities.map(addr => addr.toInterface())
+  }
 
   // TODO: all addresses of one wallet
-  // public static usedAddresses = (walletId: string) => {}
+  public static usedAddresses = async (walletId: string): Promise<AddressInterface[]> => {
+    const version = AddressService.getAddressVersion()
+    const addressEntities = await AddressDao.usedAddressesByWalletId(walletId, version)
+
+    return addressEntities.map(addr => addr.toInterface())
+  }
+
+  private static getAddressVersion = (): AddressVersion => {
+    return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
+  }
 }

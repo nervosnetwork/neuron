@@ -1,20 +1,23 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm'
 import { AddressType } from '../../keys/address'
+import { Address as AddressInterface } from '../dao'
+
+export enum AddressVersion {
+  Testnet = 'testnet',
+  Mainnet = 'mainnet',
+}
 
 @Entity()
 export default class Address extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number
+  @PrimaryColumn({
+    type: 'varchar',
+  })
+  address!: string
 
   @Column({
     type: 'varchar',
   })
   walletId!: string
-
-  @Column({
-    type: 'varchar',
-  })
-  address!: string
 
   @Column({
     type: 'varchar',
@@ -40,4 +43,22 @@ export default class Address extends BaseEntity {
     type: 'varchar',
   })
   blake160!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  version!: AddressVersion
+
+  public toInterface = (): AddressInterface => {
+    return {
+      address: this.address,
+      walletId: this.walletId,
+      path: this.path,
+      addressType: this.addressType,
+      addressIndex: this.addressIndex,
+      txCount: this.txCount,
+      blake160: this.blake160,
+      version: this.version,
+    }
+  }
 }
