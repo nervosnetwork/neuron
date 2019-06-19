@@ -7,6 +7,7 @@ export interface Wallet extends WalletIdentity {
   addresses: Addresses
   publicKey: Uint8Array
   message: string
+  sending: boolean
 }
 
 export interface Addresses {
@@ -21,6 +22,7 @@ export const walletState: Wallet = {
   addresses: { receiving: [], change: [] },
   publicKey: new Uint8Array(0),
   message: '',
+  sending: false,
 }
 
 export default walletState

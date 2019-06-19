@@ -18,6 +18,7 @@ import {
 } from '../../exceptions'
 import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
+import windowManage from '../../utils/window-manage'
 
 const walletsService = WalletsService.getInstance()
 
@@ -277,11 +278,21 @@ export default class WalletsController {
     if (!params) throw new IsRequired('Parameters')
     try {
       const hash = await walletsService.sendCapacity(params.items, password)
+
+      // TODO: tell neuron-ui when to set sending to false, usually at the time the tx hash returns
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+        status: ResponseCode.Success,
+        result: true,
+      })
       return {
         status: ResponseCode.Success,
         result: hash,
       }
     } catch (err) {
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+        status: ResponseCode.Success,
+        result: false,
+      })
       return {
         status: ResponseCode.Fail,
         msg: {
