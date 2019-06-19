@@ -8,6 +8,11 @@ import { PAGE_SIZE } from '../../utils/const'
 export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
   const [keywords, setKeywords] = useState('')
   useEffect(() => {
+    ;(document.querySelector('main') as HTMLElement).scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest',
+    })
     const params = queryParsers.history(search)
     setKeywords(params.keywords)
     providerDispatch({
