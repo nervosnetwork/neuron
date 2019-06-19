@@ -1,12 +1,8 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { useNeuronWallet } from 'utils/hooks'
 import BannerMessages from 'widgets/BannerMessages'
-
-dayjs.extend(relativeTime)
 
 const NoticeContent = () => {
   const { messages } = useNeuronWallet()
