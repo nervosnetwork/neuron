@@ -3,15 +3,11 @@ import styled from 'styled-components'
 import { Table } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
-import dayjs from 'dayjs'
 import { appCalls } from 'services/UILayer'
 import { Transaction } from 'contexts/NeuronWallet'
 import { TransactionType } from 'utils/const'
 
-enum TimeFormat {
-  Day = 'YYYY-MM-DD',
-  Time = 'HH:mm',
-}
+const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
 const headers = [
   { label: 'history.meta', key: 'meta' },
@@ -31,7 +27,7 @@ const groupHistory = (items: Transaction[]): Transaction[][] => {
       return acc
     }
     const lastGroup = acc[acc.length - 1]
-    if (dayjs(cur.time).format(TimeFormat.Day) === dayjs(lastGroup[0].time).format(TimeFormat.Day)) {
+    if (timeFormatter.format(cur.time) === timeFormatter.format(lastGroup[0].time)) {
       lastGroup.push(cur)
       return acc
     }
@@ -45,10 +41,10 @@ const TransactionList = ({ items }: { items: Transaction[] }) => {
   return (
     <>
       {groupHistory(items).map(group => (
-        <Table key={dayjs(group[0].time).format(TimeFormat.Day)} striped>
+        <Table key={timeFormatter.format(group[0].time)} striped>
           <thead>
             <tr>
-              <th colSpan={headers.length}>{dayjs(group[0].time).format(TimeFormat.Day)}</th>
+              <th colSpan={headers.length}>{timeFormatter.format(group[0].time)}</th>
             </tr>
           </thead>
           <tbody>
@@ -61,7 +57,7 @@ const TransactionList = ({ items }: { items: Transaction[] }) => {
                   header.key === headers[0].key ? (
                     <MetaData key={headers[0].key}>
                       {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
-                      {dayjs(historyItem.time).format(TimeFormat.Time)}
+                      {timeFormatter.format(historyItem.time)}
                     </MetaData>
                   ) : (
                     <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
