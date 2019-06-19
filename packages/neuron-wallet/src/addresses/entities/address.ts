@@ -35,4 +35,9 @@ export default class Address extends BaseEntity {
     type: 'int',
   })
   txCount!: number
+
+  @Column({
+    type: 'varchar',
+  })
+  blake160!: string
 }

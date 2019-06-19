@@ -1,0 +1,50 @@
+import { getConnection as getTxConnection } from 'typeorm'
+import AddressEntity from './entities/address'
+import { AddressType } from '../keys/address'
+import { getConnection } from './ormconfig'
+import TransactionsService from '../services/transactions'
+
+export interface Address {
+  walletId: string
+  address: string
+  path: string
+  addressType: AddressType
+  addressIndex: number
+  txCount: number
+  blake160: string
+}
+
+export default class AddressDao {
+  public static create = async (addresses: Address[]): Promise<AddressEntity[]> => {
+    const addressEntities: AddressEntity[] = addresses.map(address => {
+      const addressEntity = new AddressEntity()
+      addressEntity.walletId = address.walletId
+      addressEntity.address = address.address
+      addressEntity.path = address.path
+      addressEntity.addressType = address.addressType
+      addressEntity.addressIndex = address.addressIndex
+      addressEntity.txCount = address.txCount || 0
+      addressEntity.blake160 = address.blake160
+      return addressEntity
+    })
+
+    return getConnection().manager.save(addressEntities)
+  }
+
+  public static updateTxCount = async (address: string): Promise<boolean> => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .findOne({
+        address,
+      })
+
+    if (!addressEntity) {
+      return false
+    }
+
+    const txCount: number = await TransactionsService.getCountByAddress(address)
+    addressEntity.txCount = txCount
+    await getTxConnection().manager.save(addressEntity)
+    return true
+  }
+}

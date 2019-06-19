@@ -437,6 +437,23 @@ export default class TransactionsService {
       witnesses: [],
     }
   }
+
+  // tx count with one lockHash
+  public static getCountByLockHash = async (lockHash: string): Promise<number> => {
+    const count: number = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`output.lockHash = :lockHash`, { lockHash })
+      .select('DISTINCT output.outPointTxHash', 'outPointTxHash')
+      .getCount()
+
+    return count
+  }
+
+  public static getCountByAddress = async (address: string): Promise<number> => {
+    const lockHash: string = await LockUtils.addressToLockHash(address)
+    return TransactionsService.getCountByLockHash(lockHash)
+  }
 }
 
 // listen to send tx event
