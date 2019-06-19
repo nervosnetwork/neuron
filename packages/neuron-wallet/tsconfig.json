@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "lib": [
+      "esnext"
+    ],
     "module": "commonjs",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
