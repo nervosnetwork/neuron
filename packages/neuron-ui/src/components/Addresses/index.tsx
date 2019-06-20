@@ -72,6 +72,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
 
   const submitDescription = useCallback(
     (idx: number) => {
+      if (addresses[idx].description === localDescriptions[idx]) return
       dispatch(
         actionCreators.updateDescription({
           key: addresses[idx].address,
