@@ -16,6 +16,7 @@ import Blake2b from '../utils/blake2b'
 import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../addresses/dao'
+import Keychain from '../keys/keychain'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -289,7 +290,9 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
-    if (!wallet) throw new WalletNotFound(id)
+    if (!wallet) {
+      throw new WalletNotFound(id)
+    }
 
     return wallet.loadKeystore().checkPassword(password)
   }
@@ -302,9 +305,6 @@ export default class WalletService {
     this.listStore.clear()
   }
 
-  /**
-   * transactions related
-   */
   public sendCapacity = async (
     items: {
       address: string
@@ -313,22 +313,18 @@ export default class WalletService {
     password: string,
     fee: string = '0'
   ) => {
-    // TODO:
-    //  Collect inputs from multiple addresses.
-    //  Use account type and index for specifying each address.
-    //  Derivate private key for each address to sign.
     const wallet = await this.getCurrent()
-    if (!wallet) throw new CurrentWalletNotSet()
+    if (!wallet) {
+      throw new CurrentWalletNotSet()
+    }
 
-    if (password === undefined || password === '') throw new IsRequired('Password')
+    if (password === undefined || password === '') {
+      throw new IsRequired('Password')
+    }
 
     const addressInfos = await this.getAddressInfos()
 
     const addresses: string[] = addressInfos.map(info => info.address)
-    // const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
-    // TODO:
-    //  1. get extended public key from wallet (to be implement) to fetch addresses
-    //  2. get private key from key(keystore)
 
     const lockHashes: string[] = await Promise.all(addresses.map(async addr => LockUtils.addressToLockHash(addr)))
 
@@ -351,7 +347,7 @@ export default class WalletService {
     const { inputs } = tx
 
     const paths = addressInfos.map(info => info.path)
-    const pathAndPrivateKeys = this.getPrivateKey(paths, password)
+    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
     const witnesses: Witness[] = inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args![0]
@@ -408,18 +404,18 @@ export default class WalletService {
     return newWitness
   }
 
-  /* eslint @typescript-eslint/no-unused-vars: "off" */
-  public getPrivateKey = (paths: string[], _password: string): PathAndPrivateKey[] => {
+  // Derivate all child private keys for specified BIP44 paths.
+  public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
+    const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
+    const masterKeychain = new Keychain(
+      Buffer.from(masterPrivateKey.privateKey, 'hex'),
+      Buffer.from(masterPrivateKey.chainCode, 'hex')
+    )
+
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
-    const path = uniquePaths[0]
-    if (path !== "m/44'/309'/0'/0/0") {
-      throw new Error('')
-    }
-    return [
-      {
-        path: "m/44'/309'/0'/0/0",
-        privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
-      },
-    ]
+    return uniquePaths.map(path => ({
+      path,
+      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+    }))
   }
 }
