@@ -6,8 +6,10 @@ const { NODE_ENV } = process.env
 
 const isDevMode = !app.isPackaged
 
+const isTestMode = NODE_ENV === 'test'
+
 const fileBase = (() => {
-  if (NODE_ENV === 'test') {
+  if (isTestMode) {
     return 'test/'
   }
   if (!isDevMode) {
@@ -27,6 +29,7 @@ interface ENV {
   }
   explorer: string
   testnet: boolean
+  isTestMode: boolean
 }
 const env: ENV = {
   isDevMode,
@@ -52,6 +55,7 @@ const env: ENV = {
   },
   explorer: 'https://explorer.nervos.org',
   testnet: true,
+  isTestMode,
 }
 
 export default env
