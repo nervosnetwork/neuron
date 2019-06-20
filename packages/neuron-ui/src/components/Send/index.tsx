@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next'
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
 import InlineInputWithDropdown from 'widgets/InlineInput/InlineInputWithDropdown'
+import { Spinner } from 'widgets/Loading'
 
 import { ContentProps } from 'containers/MainContent'
 import { PlaceHolders } from 'utils/const'
+import { useNeuronWallet } from 'utils/hooks'
 
 import { useInitialize } from './hooks'
 
@@ -22,6 +24,9 @@ const Send = ({
   },
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
+  const {
+    wallet: { sending },
+  } = useNeuronWallet()
   const {
     id,
     updateTransactionOutput,
@@ -47,6 +52,7 @@ const Send = ({
                   <Col sm={10}>
                     <InputGroup>
                       <Form.Control
+                        disabled={sending}
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
                         placeholder={PlaceHolders.send.Address}
@@ -72,6 +78,7 @@ const Send = ({
                   value={item.amount}
                   placeholder={PlaceHolders.send.Amount}
                   onChange={onItemChange('amount', idx)}
+                  disabled={sending}
                   dropDown={{
                     title: item.unit,
                     items: dropdownItems(idx),
@@ -91,8 +98,15 @@ const Send = ({
             ))}
           </Form>
           <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
-          <Button type="submit" variant="primary" size="lg" block onClick={onSubmit(id, send.outputs)}>
-            {t('send.send')}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            block
+            onClick={onSubmit(id, send.outputs)}
+            disabled={sending}
+          >
+            {sending ? <Spinner /> : t('send.send')}
           </Button>
         </Card.Body>
       </Card>

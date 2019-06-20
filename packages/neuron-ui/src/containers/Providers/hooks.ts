@@ -168,6 +168,15 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             history.push(`${Routes.Transaction}/${args.result}`)
             break
           }
+          case WalletsMethod.SendingStatus: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: {
+                sending: args.result,
+              },
+            })
+            break
+          }
           default: {
             break
           }
