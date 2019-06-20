@@ -28,6 +28,10 @@ export class ExtendedPublicKey {
 export class AccountExtendedPublicKey extends ExtendedPublicKey {
   public static ckbAccountPath = `m/44'/309'/0'`
 
+  static parse = (serialized: string) => {
+    return new AccountExtendedPublicKey(serialized.slice(0, 66), serialized.slice(66))
+  }
+
   address = (
     type: AddressType = AddressType.Receiving,
     index: number,

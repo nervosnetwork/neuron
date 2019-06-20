@@ -114,7 +114,7 @@ export default class WalletsController {
     })
     if (response && response.result) {
       const walletId = response.result.id
-      walletsService.generateAddressesById(walletId)
+      await walletsService.generateAddressesById(walletId)
     }
     return response
   }
