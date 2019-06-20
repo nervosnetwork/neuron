@@ -88,7 +88,7 @@ export class FileKeystoreWallet implements Wallet {
 
   public loadKeystore = () => {
     const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
-    return JSON.parse(data) as Keystore
+    return Keystore.fromJson(data)
   }
 
   saveKeystore = (keystore: Keystore) => {
