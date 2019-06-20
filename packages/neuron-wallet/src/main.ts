@@ -1,12 +1,15 @@
-import { app, Menu } from 'electron'
+import { app } from 'electron'
 import 'reflect-metadata'
 import i18n from './utils/i18n'
-import applicationMenu from './utils/application-menu'
+import { updateApplicationMenu } from './utils/application-menu'
 
 import Router from './router'
 import createWindow from './startup/create-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
 import initConnection from './addresses/ormconfig'
+import WalletsService from './services/wallets'
+
+const walletsService = WalletsService.getInstance()
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -28,7 +31,10 @@ const openWindow = () => {
 
 app.on('ready', () => {
   i18n.changeLanguage(app.getLocale())
-  Menu.setApplicationMenu(applicationMenu)
+  const wallets = walletsService.getAll()
+  const currentWallet = walletsService.getCurrent()
+
+  updateApplicationMenu(wallets, currentWallet && currentWallet.id)
   initConnection()
   createSyncBlockTask()
   openWindow()
