@@ -15,7 +15,7 @@ const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) =
   useEffect(() => {
     if (!networks.length) return
     if (id) {
-      history.push(Routes.Wallet)
+      history.push(Routes.General)
     } else {
       history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     }
