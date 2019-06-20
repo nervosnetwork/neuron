@@ -103,9 +103,11 @@ const applicationMenuTemplate: MenuItemConstructorOptions[] = [
       },
     ],
   },
-  {
+]
+
+if (env.isDevMode) {
+  applicationMenuTemplate.push({
     label: i18n.t('application-menu.develop.develop'),
-    visible: env.isDevMode,
     submenu: [
       {
         label: i18n.t('application-menu.develop.reload'),
@@ -124,7 +126,7 @@ const applicationMenuTemplate: MenuItemConstructorOptions[] = [
         click: (_, win) => AppController.initWindow(win),
       },
     ],
-  },
-]
+  })
+}
 
 export default Menu.buildFromTemplate(applicationMenuTemplate)
