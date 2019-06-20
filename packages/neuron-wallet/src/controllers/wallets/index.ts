@@ -107,11 +107,16 @@ export default class WalletsController {
     password: string
     mnemonic: string
   }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    return WalletsController.importMnemonic({
+    const response = await WalletsController.importMnemonic({
       name,
       password,
       mnemonic,
     })
+    if (response && response.result) {
+      const walletId = response.result.id
+      walletsService.generateAddressesById(walletId)
+    }
+    return response
   }
 
   @CatchControllerError
