@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
+import { useNeuronWallet } from 'utils/hooks'
+import { useTranslation } from 'react-i18next'
 
 const GeneralPanel = styled.div`
   display: grid;
+  grid-gap: 50px;
   grid-template:
     'balance activity' 1fr
     'blockchain activity' 1fr /
@@ -19,26 +22,77 @@ const Blockchain = styled.div`
   grid-area: blockchain;
 `
 
+const Field = styled.div`
+  display: flex;
+  justify-content: space-between;
+  & span:first-child::after {
+    content: ':';
+  }
+`
+
 const General = () => {
+  const {
+    chain: {
+      networkId,
+      transactions: { items },
+    },
+    settings: { networks },
+  } = useNeuronWallet()
+  const [t] = useTranslation()
+  const activeNetwork = useMemo(() => networks.find(n => n.id === networkId), [networkId, networks])
   return (
     <GeneralPanel>
       <Balance>
-        <h1>Balance</h1>
-        <div>Amount</div>
-        <div>Living Cells</div>
-        <div>Cell Types</div>
+        <h1>{t('general.balance')}</h1>
+        <Field>
+          <span>{t('general.amount')}</span>
+          <span>Mock Amount</span>
+        </Field>
+        <Field>
+          <span>{t('general.live-cells')}</span>
+          <span>Mock Living Cells</span>
+        </Field>
+        <Field>
+          <span>{t('general.cell-types')}</span>
+          <span>Mock Cell Types</span>
+        </Field>
       </Balance>
       <Activity>
-        <h1>Activity</h1>
-        {Array.from({ length: 5 }, () => (
-          <div>Activity Item</div>
-        ))}
+        <h1>{t('general.recent-activities')}</h1>
+        {items.length ? (
+          <table>
+            <tbody>
+              {items.map(tx => (
+                <tr key={tx.hash}>
+                  <td>{tx.time}</td>
+                  <td>{tx.type}</td>
+                  <td>{tx.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div>{t('general.no-recent-activities')}</div>
+        )}
       </Activity>
       <Blockchain>
-        <h1>Blockchain</h1>
-        <div>Chain Identity</div>
-        <div>Blockchain height</div>
-        <div>RPC Service</div>
+        <h1>{t('general.blockchain-status')}</h1>
+        {activeNetwork ? (
+          <>
+            <Field>
+              <span>{t('general.blockchain-identity')}</span>
+              <span>Mock Chain ID</span>
+            </Field>
+            <Field>
+              <span>{t('general.block-height')}</span>
+              <span>{`${(100000).toLocaleString()} / ${(200000).toLocaleString()}`}</span>
+            </Field>
+            <Field>
+              <span>{t('general.rpc-service')}</span>
+              <span>{activeNetwork.name}</span>
+            </Field>
+          </>
+        ) : null}
       </Blockchain>
     </GeneralPanel>
   )

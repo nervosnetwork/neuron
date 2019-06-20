@@ -9,6 +9,18 @@
       "addresses": "地址管理",
       "settings": "设置"
     },
+    "general": {
+      "balance": "余额",
+      "amount": "价值",
+      "live-cells": "可用 Cells",
+      "cell-types": "Cell 类型",
+      "recent-activities": "近期活动",
+      "no-recent-activities": "近期没有活动",
+      "blockchain-status": "同步节点状态",
+      "blockchain-identity": "链的 ID",
+      "block-height": "区块高度",
+      "rpc-service": "RPC 服务"
+    },
     "wizard": {
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",

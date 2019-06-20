@@ -9,6 +9,18 @@
       "addresses": "Addresses",
       "settings": "Settings"
     },
+    "general": {
+      "balance": "Balance",
+      "amount": "Amount",
+      "live-cells": "Live Cells",
+      "cell-types": "Cell Types",
+      "recent-activities": "Recent Activites",
+      "no-recent-activities": "No Recent Activities",
+      "blockchain-status": "Blockchain Status",
+      "blockchain-identity": "Chain Identity",
+      "block-height": "Block Height",
+      "rpc-service": "RPC Service"
+    },
     "wizard": {
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create New Wallet",
