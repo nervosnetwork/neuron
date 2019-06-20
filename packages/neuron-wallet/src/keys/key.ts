@@ -4,6 +4,11 @@ import Address, { AddressType, AddressPrefix } from './address'
 import Keychain, { privateToPublic } from './keychain'
 import { entropyToMnemonic } from './mnemonic'
 
+export interface PathAndPrivateKey {
+  path: string
+  privateKey: string
+}
+
 export class ExtendedPublicKey {
   publicKey: string
   chainCode: string
