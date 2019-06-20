@@ -136,6 +136,13 @@ export default class AddressService {
     return addressEntities.map(addr => addr.toInterface())
   }
 
+  public static allAddressesByWalletId = async (walletId: string): Promise<AddressInterface[]> => {
+    const version = AddressService.getAddressVersion()
+    const addressEntities = await AddressDao.allAddressesByWalletId(walletId, version)
+
+    return addressEntities.map(addr => addr.toInterface())
+  }
+
   public static usedAddresses = async (walletId: string): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
     const addressEntities = await AddressDao.usedAddressesByWalletId(walletId, version)

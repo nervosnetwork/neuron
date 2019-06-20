@@ -79,6 +79,22 @@ export default class AddressDao {
     return addressEntities
   }
 
+  public static allAddressesByWalletId = async (
+    walletId: string,
+    version: AddressVersion
+  ): Promise<AddressEntity[]> => {
+    const addressEntities = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        version,
+      })
+      .getMany()
+
+    return addressEntities
+  }
+
   public static usedAddressesByWalletId = async (
     walletId: string,
     version: AddressVersion
