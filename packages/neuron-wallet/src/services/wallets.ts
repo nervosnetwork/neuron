@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { Addresses, AccountExtendedPublicKey } from '../keys/key'
+import { Addresses, AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
 import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
@@ -343,11 +343,18 @@ export default class WalletService {
 
     const { inputs } = tx
 
+    const paths = addressInfos.map(info => info.path)
+    const pathAndPrivateKeys = this.getPrivateKey(paths, password)
+
     const witnesses: Witness[] = inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args![0]
       const info = addressInfos.find(i => i.blake160 === blake160)
       const { path } = info!
-      const privateKey = this.getPrivateKey(path)
+      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
+      if (!pathAndPrivateKey) {
+        throw new Error('no private key found')
+      }
+      const { privateKey } = pathAndPrivateKey
       const witness = this.signWitness({ data: [] }, privateKey, txHash)
       return witness
     })
@@ -371,7 +378,7 @@ export default class WalletService {
       pubkey: '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01',
       address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
       blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      path: '0/0',
+      path: "m/44'/309'/0'/0/0",
     }
     return [item]
   }
@@ -396,10 +403,18 @@ export default class WalletService {
     return newWitness
   }
 
-  public getPrivateKey = (path: string): string => {
-    if (path !== '0/0') {
+  /* eslint @typescript-eslint/no-unused-vars: "off" */
+  public getPrivateKey = (paths: string[], _password: string): PathAndPrivateKey[] => {
+    const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
+    const path = uniquePaths[0]
+    if (path !== "m/44'/309'/0'/0/0") {
       throw new Error('')
     }
-    return '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
+    return [
+      {
+        path: "m/44'/309'/0'/0/0",
+        privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
+      },
+    ]
   }
 }
