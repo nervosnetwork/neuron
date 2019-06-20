@@ -2,7 +2,6 @@ import React from 'react'
 import { HashRouter as Router } from 'react-router-dom'
 import { createHashHistory } from 'history'
 
-import Header from 'containers/Header'
 import Navbar from 'containers/Navbar'
 import MainContent from 'containers/MainContent'
 import Notification from 'containers/Notification'
@@ -38,12 +37,6 @@ export interface CustomRoute {
 
 export const history = createHashHistory()
 export const containers: CustomRoute[] = [
-  {
-    name: 'Header',
-    path: '/',
-    exact: false,
-    component: Header,
-  },
   {
     name: 'Navbar',
     path: '/',
