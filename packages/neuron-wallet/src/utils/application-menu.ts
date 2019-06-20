@@ -112,12 +112,16 @@ const applicationMenuTemplate: MenuItemConstructorOptions[] = [
         role: 'reload',
       },
       {
-        label: i18n.t('application-menu.develop.forceReload'),
+        label: i18n.t('application-menu.develop.force-reload'),
         role: 'forceReload' as 'forcereload',
       },
       {
-        label: i18n.t('application-menu.develop.toggleDevTools'),
+        label: i18n.t('application-menu.develop.toggle-dev-tools'),
         role: 'toggleDevTools' as 'toggledevtools',
+      },
+      {
+        label: i18n.t('application-menu.develop.initialize-window'),
+        click: (_, win) => AppController.initWindow(win),
       },
     ],
   },

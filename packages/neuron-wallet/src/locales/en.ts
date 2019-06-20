@@ -42,9 +42,10 @@ export default {
       },
       develop: {
         develop: 'Develop',
-        forceReload: 'Force Reload',
+        'force-reload': 'Force Reload',
         reload: 'Reload',
-        toggleDevTools: 'Toggle DevTools',
+        'toggle-dev-tools': 'Toggle DevTools',
+        'initialize-window': 'Initialize Window',
       },
     },
     services: {

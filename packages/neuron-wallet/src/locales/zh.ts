@@ -42,9 +42,10 @@ export default {
       },
       develop: {
         develop: '开发',
-        forceReload: '强制刷新',
+        'force-reload': '强制刷新',
         reload: '刷新',
-        toggleDevTools: '开发者工具',
+        'toggle-dev-tools': '开发者工具',
+        'initialize-window': ' 初始化窗口',
       },
     },
     services: {
