@@ -29,12 +29,17 @@ export default class AddressService {
     changeAddressCount: number = 10
   ) => {
     const addresses = AddressService.generateAddresses(walletId, extendedKey, receivingAddressCount, changeAddressCount)
-    const allAddresses = [...addresses.receiving, ...addresses.change]
+    const allAddresses = [
+      ...addresses.testnetReceiving,
+      ...addresses.mainnetReceiving,
+      ...addresses.testnetChange,
+      ...addresses.mainnetChange,
+    ]
     await AddressDao.create(allAddresses)
   }
 
   // Generate both receiving and change addresses.
-  private static generateAddresses = (
+  public static generateAddresses = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     receivingAddressCount: number = 20,
@@ -45,33 +50,35 @@ export default class AddressService {
     } else if (receivingAddressCount > MAX_ADDRESS_COUNT || changeAddressCount > MAX_ADDRESS_COUNT) {
       throw new Error('Address number error.')
     }
-    const receiving = Array.from({ length: receivingAddressCount })
-      .map((_, idx) => {
-        // extendedKey.address(AddressType.Receiving, idx)
-        const addressMetaInfo: AddressMetaInfo = {
-          walletId,
-          addressType: AddressType.Receiving,
-          addressIndex: idx,
-          accountExtendedPublicKey: extendedKey,
-        }
-        return AddressService.toAddress(addressMetaInfo)
-      })
-      .flat()
-    const change = Array.from({ length: changeAddressCount })
-      .map((_, idx) => {
-        // extendedKey.address(AddressType.Change, idx)
-        const addressMetaInfo: AddressMetaInfo = {
-          walletId,
-          addressType: AddressType.Change,
-          addressIndex: idx,
-          accountExtendedPublicKey: extendedKey,
-        }
-        return AddressService.toAddress(addressMetaInfo)
-      })
-      .flat()
+    const receiving = Array.from({ length: receivingAddressCount }).map((_, idx) => {
+      // extendedKey.address(AddressType.Receiving, idx)
+      const addressMetaInfo: AddressMetaInfo = {
+        walletId,
+        addressType: AddressType.Receiving,
+        addressIndex: idx,
+        accountExtendedPublicKey: extendedKey,
+      }
+      return AddressService.toAddress(addressMetaInfo)
+    })
+    const testnetReceiving = receiving.map(arr => arr[0])
+    const mainnetReceiving = receiving.map(arr => arr[1])
+    const change = Array.from({ length: changeAddressCount }).map((_, idx) => {
+      // extendedKey.address(AddressType.Change, idx)
+      const addressMetaInfo: AddressMetaInfo = {
+        walletId,
+        addressType: AddressType.Change,
+        addressIndex: idx,
+        accountExtendedPublicKey: extendedKey,
+      }
+      return AddressService.toAddress(addressMetaInfo)
+    })
+    const testnetChange = change.map(arr => arr[0])
+    const mainnetChange = change.map(arr => arr[1])
     return {
-      receiving,
-      change,
+      testnetReceiving,
+      mainnetReceiving,
+      testnetChange,
+      mainnetChange,
     }
   }
 
