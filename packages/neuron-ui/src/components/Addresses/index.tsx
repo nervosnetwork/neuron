@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
+import styled from 'styled-components'
 import { Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
@@ -7,6 +8,15 @@ import { appCalls } from 'services/UILayer'
 import { useNeuronWallet } from 'utils/hooks'
 import { ContentProps } from 'containers/MainContent'
 import { actionCreators } from 'containers/MainContent/reducer'
+
+const DescriptionField = styled.input`
+  padding: 0 5px;
+  background: transparent;
+  border: none;
+  &:focus {
+    box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.3);
+  }
+`
 
 const headers = [
   {
@@ -31,6 +41,7 @@ const headers = [
   },
 ]
 
+const onPageChange = () => {}
 const AddressPanel = ({ address }: { address: string }) => {
   return <div onContextMenu={() => appCalls.contextMenu({ type: 'addressList', id: address })}>{address}</div>
 }
@@ -42,49 +53,83 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
     },
   } = useNeuronWallet()
   const [t] = useTranslation()
-  const onPageChange = useCallback(() => {}, [])
-  const onDescriptionUpdate = useCallback(
-    (address: string) => (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        dispatch(
-          actionCreators.updateDescription({
-            key: address,
-            description: 'Discriptiont to update',
-          })
-        )
-      } else {
-        // TODO: update the description
+
+  const addresses = useMemo(
+    () => [
+      ...receiving.map(addr => ({
+        type: 'receive',
+        ...addr,
+      })),
+      ...change.map(addr => ({
+        type: 'change',
+        ...addr,
+      })),
+    ],
+    [receiving, change]
+  )
+
+  const [localDescriptions, setLocalDescriptions] = useState(addresses.map(addr => addr.description))
+
+  const submitDescription = useCallback(
+    (idx: number) => {
+      dispatch(
+        actionCreators.updateDescription({
+          key: addresses[idx].address,
+          description: localDescriptions[idx],
+        })
+      )
+    },
+    [dispatch, localDescriptions, addresses]
+  )
+
+  const onDescriptionFieldBlur = useCallback(
+    (idx: number): React.FocusEventHandler => () => {
+      submitDescription(idx)
+    },
+    [submitDescription]
+  )
+
+  const onDescriptionPress = useCallback(
+    (idx: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key && e.key === 'Enter') {
+        submitDescription(idx)
       }
     },
-    []
+    [submitDescription]
   )
 
-  const receivingAddresses = useMemo(
+  const onDescriptionChange = useCallback(
+    (idx: number) => (e: any) => {
+      const newDesc = localDescriptions.map((desc, index) => {
+        if (index !== idx) return desc
+        return e.currentTarget.value
+      })
+      setLocalDescriptions(newDesc)
+    },
+    [localDescriptions, setLocalDescriptions]
+  )
+
+  const addressesItems = useMemo(
     () =>
-      receiving.map(address => ({
-        type: 'Receiving',
+      addresses.map(({ type, address, description }, idx) => ({
+        type,
         address: <AddressPanel address={address} />,
-        description: <input type="text" value="" onKeyPress={onDescriptionUpdate(address)} />,
+        description: (
+          <DescriptionField
+            type="text"
+            title={description}
+            value={localDescriptions[idx]}
+            onKeyPress={onDescriptionPress(idx)}
+            onBlur={onDescriptionFieldBlur(idx)}
+            onChange={onDescriptionChange(idx)}
+          />
+        ),
         balance: '0',
         transactions: '0',
         key: address,
       })),
-    [receiving]
+    [addresses, onDescriptionChange, localDescriptions, onDescriptionFieldBlur, onDescriptionPress]
   )
-
-  const changeAddresses = useMemo(
-    () =>
-      change.map(address => ({
-        type: 'Change',
-        address: <AddressPanel address={address} />,
-        balance: '0',
-        transactions: '0',
-        key: address,
-      })),
-    [change]
-  )
-
-  const count = useMemo(() => receiving.length + change.length, [receiving, change])
 
   return (
     <Container>
@@ -94,10 +139,10 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
           ...header,
           label: t(header.label),
         }))}
-        items={[...receivingAddresses, ...changeAddresses]}
+        items={addressesItems}
         pageNo={0}
-        pageSize={count}
-        totalCount={count}
+        pageSize={addressesItems.length}
+        totalCount={addressesItems.length}
         onPageChange={onPageChange}
         tableAttrs={{
           bordered: false,

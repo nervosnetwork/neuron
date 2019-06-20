@@ -8,10 +8,14 @@ export interface Wallet extends WalletIdentity {
   publicKey: Uint8Array
   message: string
 }
+export interface Address {
+  address: string
+  description: string
+}
 
 export interface Addresses {
-  receiving: string[]
-  change: string[]
+  receiving: Address[]
+  change: Address[]
 }
 
 export const walletState: Wallet = {

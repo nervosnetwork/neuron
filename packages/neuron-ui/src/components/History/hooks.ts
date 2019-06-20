@@ -5,13 +5,15 @@ import { ProviderActions } from 'containers/Providers/reducer'
 import { queryParsers } from 'utils/parser'
 import { PAGE_SIZE } from '../../utils/const'
 
-const container = document.querySelector('main') as HTMLElement
 const backToTop = () => {
-  container.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-    inline: 'nearest',
-  })
+  const container = document.querySelector('main') as HTMLElement
+  if (container) {
+    container.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest',
+    })
+  }
 }
 
 export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
