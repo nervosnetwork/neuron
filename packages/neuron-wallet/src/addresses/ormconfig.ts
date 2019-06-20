@@ -6,7 +6,7 @@ import env from '../env'
 
 import Address from './entities/address'
 
-import { AddAddress1560955591638 } from './migrations/1560955591638-AddAddress'
+import { AddAddress1560998222848 } from './migrations/1560998222848-AddAddress'
 
 const dbPath = path.join(env.fileBasePath, 'address.sqlite')
 
@@ -18,7 +18,7 @@ const connectOptions = (): SqliteConnectionOptions => {
     type: 'sqlite',
     database: dbPath,
     entities: [Address],
-    migrations: [AddAddress1560955591638],
+    migrations: [AddAddress1560998222848],
     synchronize: false,
     migrationsRun: true,
     logging: true,

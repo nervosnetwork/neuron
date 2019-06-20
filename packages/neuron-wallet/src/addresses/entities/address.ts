@@ -14,7 +14,7 @@ export default class Address extends BaseEntity {
   })
   address!: string
 
-  @Column({
+  @PrimaryColumn({
     type: 'varchar',
   })
   walletId!: string
