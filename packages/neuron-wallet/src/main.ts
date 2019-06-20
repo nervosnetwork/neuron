@@ -6,6 +6,7 @@ import applicationMenu from './utils/application-menu'
 import Router from './router'
 import createWindow from './startup/create-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
+import initConnection from './addresses/ormconfig'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -28,6 +29,7 @@ const openWindow = () => {
 app.on('ready', () => {
   i18n.changeLanguage(app.getLocale())
   Menu.setApplicationMenu(applicationMenu)
+  initConnection()
   createSyncBlockTask()
   openWindow()
 })
