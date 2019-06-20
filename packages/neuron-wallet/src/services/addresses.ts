@@ -128,6 +128,16 @@ export default class AddressService {
     return addressEntity.toInterface()
   }
 
+  public static nextUnusedChangeAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
+    const version = AddressService.getAddressVersion()
+
+    const addressEntity = await AddressDao.nextUnusedChangeAddress(walletId, version)
+    if (!addressEntity) {
+      return undefined
+    }
+    return addressEntity.toInterface()
+  }
+
   public static allAddresses = async (): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
 

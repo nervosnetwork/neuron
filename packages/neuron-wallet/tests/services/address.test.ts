@@ -65,6 +65,17 @@ describe('Key tests with db', () => {
     version: AddressVersion.Testnet,
   }
 
+  const changeAddress: Address = {
+    walletId: '1',
+    address: 'ckt1q9gry5zgugvnmaga0pq3vqtedv6mz7603ukdsk7sk7v7d3',
+    path: "m/44'/309'/0'/0/0",
+    addressType: AddressType.Change,
+    addressIndex: 0,
+    txCount: 0,
+    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    version: AddressVersion.Testnet,
+  }
+
   beforeAll(async () => {
     await initConnection()
   })
@@ -112,8 +123,16 @@ describe('Key tests with db', () => {
   })
 
   it('nextUnusedAddress', async () => {
+    await AddressDao.create([address, usedAddress, changeAddress])
     const addr = await AddressService.nextUnusedAddress(walletId)
     const addrDao = await AddressDao.nextUnusedAddress(walletId, AddressVersion.Testnet)
+    expect(addr).toEqual(addrDao && addrDao.toInterface())
+  })
+
+  it('nextUnusedChangeAddress', async () => {
+    await AddressDao.create([address, usedAddress, changeAddress])
+    const addr = await AddressService.nextUnusedChangeAddress(walletId)
+    const addrDao = await AddressDao.nextUnusedChangeAddress(walletId, AddressVersion.Testnet)
     expect(addr).toEqual(addrDao && addrDao.toInterface())
   })
 

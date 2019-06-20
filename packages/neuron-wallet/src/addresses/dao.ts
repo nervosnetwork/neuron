@@ -69,6 +69,25 @@ export default class AddressDao {
     return addressEntity
   }
 
+  public static nextUnusedChangeAddress = async (
+    walletId: string,
+    version: AddressVersion
+  ): Promise<AddressEntity | undefined> => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        version,
+        addressType: AddressType.Change,
+        txCount: 0,
+      })
+      .orderBy('address.addressIndex', 'ASC')
+      .getOne()
+
+    return addressEntity
+  }
+
   public static allAddresses = async (version: AddressVersion): Promise<AddressEntity[]> => {
     const addressEntities = await getConnection()
       .getRepository(AddressEntity)
