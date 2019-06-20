@@ -309,7 +309,8 @@ export default class WalletService {
       address: string
       capacity: string
     }[],
-    password: string
+    password: string,
+    fee: string = '0'
   ) => {
     // TODO:
     //  Collect inputs from multiple addresses.
@@ -337,7 +338,12 @@ export default class WalletService {
 
     const changeAddress: string = this.getChangeAddress()
 
-    const tx: TransactionWithoutHash = await TransactionsService.generateTx(lockHashes, targetOutputs, changeAddress)
+    const tx: TransactionWithoutHash = await TransactionsService.generateTx(
+      lockHashes,
+      targetOutputs,
+      changeAddress,
+      fee
+    )
 
     const txHash: string = await (core.rpc as any).computeTransactionHash(ConvertTo.toSdkTxWithoutHash(tx))
 

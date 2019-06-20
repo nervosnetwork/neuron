@@ -275,10 +275,10 @@ export default class WalletsController {
   public static async sendCapacity(params: {
     id: string
     items: {
-      address: CKBComponents.Hash256
-      capacity: CKBComponents.Capacity
-      unit: 'byte' | 'shannon'
+      address: string
+      capacity: string
     }[]
+    fee: string
   }) {
     const password = await WalletsController.requestPassword(i18n.t('messageBox.send-capacity.title'))
     if (password === null)
@@ -288,7 +288,7 @@ export default class WalletsController {
       }
     if (!params) throw new IsRequired('Parameters')
     try {
-      const hash = await walletsService.sendCapacity(params.items, password)
+      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
 
       // TODO: tell neuron-ui when to set sending to false, usually at the time the tx hash returns
       windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {

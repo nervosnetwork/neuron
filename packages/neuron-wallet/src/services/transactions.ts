@@ -386,7 +386,8 @@ export default class TransactionsService {
   public static generateTx = async (
     lockHashes: string[],
     targetOutputs: TargetOutput[],
-    changeAddress: string
+    changeAddress: string,
+    fee: string = '0'
   ): Promise<TransactionWithoutHash> => {
     const { codeHash, outPoint } = await LockUtils.systemScript()
 
@@ -414,11 +415,11 @@ export default class TransactionsService {
     })
 
     // change
-    if (BigInt(capacities) > needCapacities) {
+    if (BigInt(capacities) > needCapacities + BigInt(fee)) {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
 
       const output: Cell = {
-        capacity: `${BigInt(capacities) - needCapacities}`,
+        capacity: `${BigInt(capacities) - needCapacities - BigInt(fee)}`,
         data: '0x',
         lock: {
           codeHash,
