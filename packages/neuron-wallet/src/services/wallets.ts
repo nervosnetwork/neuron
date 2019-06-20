@@ -15,6 +15,7 @@ import ConvertTo from '../app-types/convert-to'
 import Blake2b from '../utils/blake2b'
 import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
+import { Address as AddressInterface } from '../addresses/dao'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -321,7 +322,7 @@ export default class WalletService {
 
     if (password === undefined || password === '') throw new IsRequired('Password')
 
-    const addressInfos = this.getAddressInfo()
+    const addressInfos = await this.getAddressInfos()
 
     const addresses: string[] = addressInfos.map(info => info.address)
     // const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
@@ -336,7 +337,7 @@ export default class WalletService {
       capacity: (BigInt(item.capacity) * BigInt(1)).toString(),
     }))
 
-    const changeAddress: string = this.getChangeAddress()
+    const changeAddress: string = await this.getChangeAddress()
 
     const tx: TransactionWithoutHash = await TransactionsService.generateTx(
       lockHashes,
@@ -378,19 +379,17 @@ export default class WalletService {
     return txHash
   }
 
-  // path should be '0/*' or '1/*'
-  public getAddressInfo = () => {
-    const item = {
-      pubkey: '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01',
-      address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
-      blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      path: "m/44'/309'/0'/0/0",
-    }
-    return [item]
+  // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
+  public getAddressInfos = async (): Promise<AddressInterface[]> => {
+    const walletId = this.getCurrent()!.id
+    const addrs = await AddressService.allAddressesByWalletId(walletId)
+    return addrs
   }
 
-  public getChangeAddress = (): string => {
-    return 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf'
+  public getChangeAddress = async (): Promise<string> => {
+    const walletId = this.getCurrent()!.id
+    const addr = await AddressService.nextUnusedChangeAddress(walletId)
+    return addr!.address
   }
 
   public signWitness = (witness: Witness, privateKey: string, txHash: string): Witness => {
