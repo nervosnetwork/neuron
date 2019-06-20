@@ -405,8 +405,7 @@ export default class WalletService {
 
   /* eslint @typescript-eslint/no-unused-vars: "off" */
   public getPrivateKey = (paths: string[], _password: string): PathAndPrivateKey[] => {
-    const unique = (value: string, index: number, self: any) => self.indexOf(value) === index
-    const uniquePaths = paths.filter(unique)
+    const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
     const path = uniquePaths[0]
     if (path !== "m/44'/309'/0'/0/0") {
       throw new Error('')
