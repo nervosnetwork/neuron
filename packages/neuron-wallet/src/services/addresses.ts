@@ -17,8 +17,8 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
-  public static isAddressUsed = async (address: string): Promise<boolean> => {
-    const addressEntity = await AddressDao.findByAddress(address)
+  public static isAddressUsed = async (address: string, walletId: string): Promise<boolean> => {
+    const addressEntity = await AddressDao.findByAddress(address, walletId)
     return !!addressEntity
   }
 

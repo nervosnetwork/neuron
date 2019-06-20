@@ -13,10 +13,11 @@ const dbPath = path.join(env.fileBasePath, 'address.sqlite')
 const connectionName = 'address'
 
 const connectOptions = (): SqliteConnectionOptions => {
+  const database = env.isTestMode ? ':memory:' : dbPath
   return {
     name: connectionName,
     type: 'sqlite',
-    database: dbPath,
+    database,
     entities: [Address],
     migrations: [AddAddress1560998222848],
     synchronize: false,

@@ -1,4 +1,4 @@
-import { getConnection as getTxConnection } from 'typeorm'
+import { getConnection as getTxConnection, Not } from 'typeorm'
 import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../keys/address'
 import { getConnection } from './ormconfig'
@@ -12,7 +12,7 @@ export interface Address {
   addressIndex: number
   txCount: number
   blake160: string
-  version: string
+  version: AddressVersion
 }
 
 export default class AddressDao {
@@ -26,6 +26,7 @@ export default class AddressDao {
       addressEntity.addressIndex = address.addressIndex
       addressEntity.txCount = address.txCount || 0
       addressEntity.blake160 = address.blake160
+      addressEntity.version = address.version
       return addressEntity
     })
 
@@ -60,6 +61,7 @@ export default class AddressDao {
         walletId,
         version,
         addressType: AddressType.Receiving,
+        txCount: 0,
       })
       .orderBy('address.addressIndex', 'ASC')
       .getOne()
@@ -105,18 +107,20 @@ export default class AddressDao {
       .where({
         walletId,
         version,
+        txCount: Not(0),
       })
       .getMany()
 
     return addressEntities
   }
 
-  public static findByAddress = async (address: string): Promise<AddressEntity | undefined> => {
+  public static findByAddress = async (address: string, walletId: string): Promise<AddressEntity | undefined> => {
     const addressEntity = await getConnection()
       .getRepository(AddressEntity)
       .createQueryBuilder('address')
       .where({
         address,
+        walletId,
       })
       .getOne()
 
