@@ -19,7 +19,7 @@ export const stopLoopSubject = new Subject()
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (): Promise<string[]> => {
-  const addresses: string[] = AddressService.allAddresses().map(addr => addr.address)
+  const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
   const lockHashes: string[] = await Promise.all(
     addresses.map(async addr => {
       return LockUtils.addressToLockHash(addr)

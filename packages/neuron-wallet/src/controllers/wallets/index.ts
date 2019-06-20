@@ -1,6 +1,6 @@
 import fs from 'fs'
 import AppController from '../app'
-import WalletsService, { Wallet, WalletProperties } from '../../services/wallets'
+import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../../services/wallets'
 import Keystore from '../../keys/keystore'
 import Keychain from '../../keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from '../../keys/mnemonic'
@@ -250,7 +250,7 @@ export default class WalletsController {
   @CatchControllerError
   public static async activate(id: string) {
     walletsService.setCurrent(id)
-    const currentWallet = walletsService.getCurrent()
+    const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
     if (!currentWallet) throw new CurrentWalletNotSet()
     return {
       status: ResponseCode.Success,

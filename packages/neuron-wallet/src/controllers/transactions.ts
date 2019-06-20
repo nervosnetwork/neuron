@@ -43,7 +43,7 @@ export default class TransactionsController {
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
       if (!wallet) throw new CurrentWalletNotSet()
-      searchAddresses = AddressService.searchUsedAddresses(wallet.accountExtendedPublicKey()).map(addr => addr.address)
+      searchAddresses = (await AddressService.usedAddresses(wallet.id)).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })

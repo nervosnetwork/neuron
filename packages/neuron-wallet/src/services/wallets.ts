@@ -39,7 +39,7 @@ export interface WalletProperties {
   keystore?: Keystore
 }
 
-class FileKeystoreWallet implements Wallet {
+export class FileKeystoreWallet implements Wallet {
   public id: string
   public name: string
   public addresses: Addresses
