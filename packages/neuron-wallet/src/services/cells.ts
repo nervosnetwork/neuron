@@ -106,4 +106,27 @@ export default class CellsService {
       capacities: inputCapacities.toString(),
     }
   }
+
+  public static allBlake160s = async (): Promise<string[]> => {
+    const outputEntities = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select(`DISTINCT args`, 'args')
+      .getMany()
+    const blake160s: string[] = outputEntities
+      .map(output => {
+        const { lock } = output
+        if (!lock) {
+          return undefined
+        }
+        const { args } = lock
+        if (!args) {
+          return undefined
+        }
+        return args[0]
+      })
+      .filter(blake160 => !!blake160) as string[]
+
+    return blake160s
+  }
 }

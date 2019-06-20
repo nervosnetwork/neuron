@@ -38,6 +38,14 @@ export default class AddressService {
     await AddressDao.create(allAddresses)
   }
 
+  /* eslint no-await-in-loop: "off" */
+  /* eslint no-restricted-syntax: "off" */
+  public static updateTxCounts = async (addresses: string[]) => {
+    for (const address of addresses) {
+      await AddressDao.updateTxCount(address)
+    }
+  }
+
   // Generate both receiving and change addresses.
   public static generateAddresses = (
     walletId: string,

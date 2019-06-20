@@ -33,21 +33,21 @@ export default class AddressDao {
     return getConnection().manager.save(addressEntities)
   }
 
-  public static updateTxCount = async (address: string): Promise<boolean> => {
-    const addressEntity = await getConnection()
+  public static updateTxCount = async (address: string): Promise<AddressEntity[]> => {
+    const addressEntities = await getConnection()
       .getRepository(AddressEntity)
-      .findOne({
+      .find({
         address,
       })
 
-    if (!addressEntity) {
-      return false
-    }
-
     const txCount: number = await TransactionsService.getCountByAddress(address)
-    addressEntity.txCount = txCount
-    await getTxConnection().manager.save(addressEntity)
-    return true
+    const entities = addressEntities.map(entity => {
+      const addressEntity = entity
+      addressEntity.txCount = txCount
+      return addressEntity
+    })
+
+    return getTxConnection().manager.save(entities)
   }
 
   public static nextUnusedAddress = async (

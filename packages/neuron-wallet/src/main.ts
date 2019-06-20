@@ -26,10 +26,10 @@ const openWindow = () => {
   }
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   i18n.changeLanguage(app.getLocale())
   Menu.setApplicationMenu(applicationMenu)
-  initConnection()
+  await initConnection()
   createSyncBlockTask()
   openWindow()
 })
