@@ -14,6 +14,7 @@ import { Witness, TransactionWithoutHash, Input } from '../app-types/types'
 import ConvertTo from '../app-types/convert-to'
 import Blake2b from '../utils/blake2b'
 import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
+import AddressService from './addresses'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -167,7 +168,7 @@ export default class WalletService {
     return this.listStore.readSync(this.walletsKey) || []
   }
 
-  public get = (id: string) => {
+  public get = (id: string): Wallet => {
     if (id === undefined) {
       throw new IsRequired('ID')
     }
@@ -178,6 +179,27 @@ export default class WalletService {
     }
 
     return FileKeystoreWallet.fromJSON(wallet)
+  }
+
+  public generateAddressesById = async (
+    id: string,
+    receivingAddressCount: number = 20,
+    changeAddressCount: number = 10
+  ) => {
+    const wallet: Wallet = this.get(id)
+    const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+    await AddressService.generateAndSave(id, accountExtendedPublicKey, receivingAddressCount, changeAddressCount)
+  }
+
+  public generateCurrentWalletAddresses = async (
+    receivingAddressCount: number = 20,
+    changeAddressCount: number = 10
+  ) => {
+    const wallet: Wallet | undefined = this.getCurrent()
+    if (!wallet) {
+      return undefined
+    }
+    return this.generateAddressesById(wallet.id, receivingAddressCount, changeAddressCount)
   }
 
   public create = (props: WalletProperties) => {
