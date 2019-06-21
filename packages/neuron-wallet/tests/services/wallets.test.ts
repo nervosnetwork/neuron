@@ -190,8 +190,8 @@ describe('get keys with paths', () => {
   const changePath = `m/44'/309'/0'/1/0`
   const receivingPrivateKey = '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
   // const receivingPublicKey = '0x034dc074f2663d73aedd36f5fc2d1a1e4ec846a4dffa62d8d8bae8a4d6fffdf2b0'
-  const changePriateKey = '0x2305f8479f3935f7d7c5b048634bfbb13b3c9d96e3b9f6e911cad87b29af7421'
-  // const changePublicKey = '0x022d0e3c4a618a617186841b46fca865c0a5298c26cd0935f6df8ff38b9e81e2f3'
+  const changePriateKey = '0x15ec3e9ba7024557a116f37f08a99ee7769882c2cb4cfabeced1662394279747'
+  // const changePublicKey = '03f3600eb8f2bd7675fd7763dbe3fc36a1103e45b46629860a88a374bcf015df03'
 
   it('get keys', () => {
     const seed = mnemonicToSeedSync(mnemonic)
