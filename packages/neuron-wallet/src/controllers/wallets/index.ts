@@ -204,6 +204,7 @@ export default class WalletsController {
 
     if (password === '') throw new EmptyPassword()
     if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
+
     walletsService.delete(id)
 
     return {

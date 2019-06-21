@@ -17,6 +17,7 @@ import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../ex
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../addresses/dao'
 import Keychain from '../keys/keychain'
+import { updateApplicationMenu } from '../utils/application-menu'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -104,6 +105,32 @@ export class FileKeystoreWallet implements Wallet {
   }
 }
 
+const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) => {
+  const wallet = wallets.find(w => w.id === currentId)
+  if (!wallet) return
+  windowManage.broadcast(Channel.Wallets, 'getActive', {
+    status: ResponseCode.Success,
+    result: {
+      id: wallet.id,
+      name: wallet.name,
+      addresses: {
+        receiving: wallet.addresses.receiving.map(addr => addr.address),
+        change: wallet.addresses.change.map(addr => addr.address),
+      },
+    },
+  })
+  updateApplicationMenu(wallets, currentId)
+}
+
+const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
+  const result = wallets.map(({ id, name }) => ({ id, name }))
+  windowManage.broadcast(Channel.Wallets, 'getAll', {
+    status: ResponseCode.Success,
+    result,
+  })
+  updateApplicationMenu(wallets, currentId)
+}
+
 export default class WalletService {
   private static instance: WalletService
   private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
@@ -123,46 +150,19 @@ export default class WalletService {
     fromEvent<[any, WalletProperties[]]>(this.listStore, this.walletsKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, wallets]) => {
-        const result = wallets.map(({ id, name }) => ({ id, name }))
-        windowManage.broadcast(Channel.Wallets, 'getAll', {
-          status: ResponseCode.Success,
-          result,
-        })
         const wallet = this.getCurrent()
         if (wallet) {
-          windowManage.broadcast(Channel.Wallets, 'getActive', {
-            status: ResponseCode.Success,
-            result: {
-              id: wallet.id,
-              name: wallet.name,
-              addresses: {
-                receiving: wallet.addresses.receiving.map(addr => addr.address),
-                change: wallet.addresses.change.map(addr => addr.address),
-              },
-            },
-          })
+          onCurrentWalletUpdated(wallets, wallet.id)
         }
+        onWalletsUpdated(wallets, wallet && wallet.id)
       })
 
     fromEvent(this.listStore, this.currentWalletKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, newId]) => {
-        if (newId === undefined) {
-          return
-        }
-
-        const currentWallet = this.get(newId)
-        windowManage.broadcast(Channel.Wallets, 'getActive', {
-          status: ResponseCode.Success,
-          result: {
-            id: currentWallet.id,
-            name: currentWallet.name,
-            addresses: {
-              receiving: currentWallet.addresses.receiving.map(addr => addr.address),
-              change: currentWallet.addresses.change.map(addr => addr.address),
-            },
-          },
-        })
+        if (newId === undefined) return
+        const wallets = this.getAll()
+        onCurrentWalletUpdated(wallets, newId)
       })
   }
 
