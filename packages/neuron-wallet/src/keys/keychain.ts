@@ -5,6 +5,10 @@ import BN from 'bn.js'
 const ec = new EC('secp256k1')
 
 export const privateToPublic = (privateKey: Buffer) => {
+  if (privateKey.length !== 32) {
+    throw new Error('Private key must be 32 bytes')
+  }
+
   return Buffer.from(ec.keyFromPrivate(privateKey).getPublic(true, 'hex') as string, 'hex')
 }
 
