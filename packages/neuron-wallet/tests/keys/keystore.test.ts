@@ -14,15 +14,27 @@ const fixture = {
     '{"version":3,"id":"e24843a9-ff71-4165-be2f-fc435f62635c","crypto":{"ciphertext":"c0f0e6c9a6f46e85a889bb26402d854b48ea81f3a9cbc5de2f9619523cd0bd1d486373cddd41b4d6f8e1f28bbfbefdb6e3db309c0d438e517bce19933181e6b9213a0315dfe336b9ae36b04dce611828ed5a9b65c084253974b834d99824722a910f324b35f899df013e429d11db65148bc0b5137f34c32b2c54e17e3df8023a","cipherparams":{"iv":"5ddddd8ab419b494da98de6b909abec2"},"cipher":"aes-128-ctr","kdf":"scrypt","kdfparams":{"dklen":32,"salt":"78ee5048a3370ff776f03ebbcf7322ce6f6be6be8466206c045ea6146282cded","n":8192,"r":8,"p":1},"mac":"4f36d572648115b26cf0e9d1c219192d0411bea66092ca48bbf148f26057e649"}}'
     */
 
-describe('check password', () => {
+describe('load and check password', () => {
   const password = 'hello~!23'
   const keystore = Keystore.create(new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode), password)
 
   it('checks wrong password', () => {
-    expect(keystore.checkPassword(`oops${password}`)).toBeFalsy()
+    expect(keystore.checkPassword(`oops${password}`)).toBe(false)
   })
 
   it('checks correct password', () => {
-    expect(keystore.checkPassword(password)).toBeTruthy()
+    expect(keystore.checkPassword(password)).toBe(true)
+  })
+
+  it('descrypt', () => {
+    expect(keystore.decrypt(password)).toEqual(
+      new ExtendedPrivateKey(fixture.privateKey, fixture.chainCode).serialize()
+    )
+  })
+
+  it('loads private key', () => {
+    const extendedPrivateKey = keystore.extendedPrivateKey(password)
+    expect(extendedPrivateKey.privateKey).toEqual(fixture.privateKey)
+    expect(extendedPrivateKey.chainCode).toEqual(fixture.chainCode)
   })
 })

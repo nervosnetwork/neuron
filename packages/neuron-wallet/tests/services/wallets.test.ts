@@ -217,6 +217,9 @@ describe('get keys with paths', () => {
       keystore,
     })
 
+    const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
+    expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
+
     const pathsAndKeys = walletService.getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({
       path: receivingPath,
