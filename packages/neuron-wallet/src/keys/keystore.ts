@@ -68,7 +68,7 @@ export default class Keystore {
       throw new UnsupportedCipher()
     }
     const ciphertext = Buffer.concat([
-      cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'utf8')),
+      cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'hex')),
       cipher.final(),
     ])
     const hash = new SHA3(256)

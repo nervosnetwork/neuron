@@ -3,6 +3,9 @@ import '../../src/controllers/app'
 import WalletService, { WalletProperties } from '../../src/services/wallets'
 import { Witness } from '../../src/app-types/types'
 import Keystore from '../../src/keys/keystore'
+import Keychain from '../../src/keys/keychain'
+import { mnemonicToSeedSync } from '../../src/keys/mnemonic'
+import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/keys/key'
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -34,36 +37,6 @@ describe('wallet service', () => {
         },
         '0'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
 
     wallet2 = {
@@ -87,36 +60,6 @@ describe('wallet service', () => {
         },
         '2'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
 
     wallet3 = {
@@ -140,36 +83,6 @@ describe('wallet service', () => {
         },
         '3'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
   })
 
@@ -201,44 +114,6 @@ describe('wallet service', () => {
     walletService.update(w1.id, wallet1)
     const wallet = walletService.get(w1.id)
     expect(wallet && wallet.name).toEqual(wallet2.name)
-  })
-
-  it('update addresses', () => {
-    const w1 = walletService.create(wallet1)
-    const addresses = {
-      receiving: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-      change: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-    }
-    wallet1.addresses = addresses
-    walletService.update(w1.id, wallet1)
-    const wallet = walletService.get(w1.id)
-    expect(wallet && wallet.addresses).toEqual(addresses)
   })
 
   it('delete wallet', () => {
@@ -304,5 +179,55 @@ describe('sign witness', () => {
     const wallet = new WalletService()
     const newWitness = wallet.signWitness(witness, privateKey, txHash)
     expect(newWitness.data).toEqual(expectedData)
+  })
+})
+
+describe('get keys with paths', () => {
+  const walletService = WalletService.getInstance()
+  const mnemonic = 'tank planet champion pottery together intact quick police asset flower sudden question'
+  const password = '1234abc~'
+  const receivingPath = `m/44'/309'/0'/0/0`
+  const changePath = `m/44'/309'/0'/1/0`
+  const receivingPrivateKey = '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
+  // const receivingPublicKey = '0x034dc074f2663d73aedd36f5fc2d1a1e4ec846a4dffa62d8d8bae8a4d6fffdf2b0'
+  const changePriateKey = '0x15ec3e9ba7024557a116f37f08a99ee7769882c2cb4cfabeced1662394279747'
+  // const changePublicKey = '03f3600eb8f2bd7675fd7763dbe3fc36a1103e45b46629860a88a374bcf015df03'
+
+  it('get keys', () => {
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterKeychain = Keychain.fromSeed(seed)
+    const extendedKey = new ExtendedPrivateKey(
+      masterKeychain.privateKey.toString('hex'),
+      masterKeychain.chainCode.toString('hex')
+    )
+    const p = masterKeychain.derivePath(receivingPath).privateKey.toString('hex')
+    expect(`0x${p}`).toEqual(receivingPrivateKey)
+    const keystore = Keystore.create(extendedKey, password)
+
+    const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(
+      accountKeychain.publicKey.toString('hex'),
+      accountKeychain.chainCode.toString('hex')
+    )
+
+    const wallet = walletService.create({
+      id: '',
+      name: 'Test Wallet',
+      extendedKey: accountExtendedPublicKey.serialize(),
+      keystore,
+    })
+
+    const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
+    expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
+
+    const pathsAndKeys = walletService.getPrivateKeys(wallet, [receivingPath, changePath], password)
+    expect(pathsAndKeys[0]).toEqual({
+      path: receivingPath,
+      privateKey: receivingPrivateKey,
+    })
+    expect(pathsAndKeys[1]).toEqual({
+      path: changePath,
+      privateKey: changePriateKey,
+    })
   })
 })
