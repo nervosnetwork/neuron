@@ -3,6 +3,9 @@ import '../../src/controllers/app'
 import WalletService, { WalletProperties } from '../../src/services/wallets'
 import { Witness } from '../../src/app-types/types'
 import Keystore from '../../src/keys/keystore'
+import Keychain from '../../src/keys/keychain'
+import { mnemonicToSeedSync } from '../../src/keys/mnemonic'
+import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/keys/key'
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -176,5 +179,52 @@ describe('sign witness', () => {
     const wallet = new WalletService()
     const newWitness = wallet.signWitness(witness, privateKey, txHash)
     expect(newWitness.data).toEqual(expectedData)
+  })
+})
+
+describe('get keys with paths', () => {
+  const walletService = WalletService.getInstance()
+  const mnemonic = 'tank planet champion pottery together intact quick police asset flower sudden question'
+  const password = '1234abc~'
+  const receivingPath = `m/44'/309'/0'/0/0`
+  const changePath = `m/44'/309'/0'/1/0`
+  const receivingPrivateKey = '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
+  // const receivingPublicKey = '0x034dc074f2663d73aedd36f5fc2d1a1e4ec846a4dffa62d8d8bae8a4d6fffdf2b0'
+  const changePriateKey = '0x2305f8479f3935f7d7c5b048634bfbb13b3c9d96e3b9f6e911cad87b29af7421'
+  // const changePublicKey = '0x022d0e3c4a618a617186841b46fca865c0a5298c26cd0935f6df8ff38b9e81e2f3'
+
+  it('get keys', () => {
+    const seed = mnemonicToSeedSync(mnemonic)
+    const masterKeychain = Keychain.fromSeed(seed)
+    const extendedKey = new ExtendedPrivateKey(
+      masterKeychain.privateKey.toString('hex'),
+      masterKeychain.chainCode.toString('hex')
+    )
+    const p = masterKeychain.derivePath(receivingPath).privateKey.toString('hex')
+    expect(`0x${p}`).toEqual(receivingPrivateKey)
+    const keystore = Keystore.create(extendedKey, password)
+
+    const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
+    const accountExtendedPublicKey = new AccountExtendedPublicKey(
+      accountKeychain.publicKey.toString('hex'),
+      accountKeychain.chainCode.toString('hex')
+    )
+
+    const wallet = walletService.create({
+      id: '',
+      name: 'Test Wallet',
+      extendedKey: accountExtendedPublicKey.serialize(),
+      keystore,
+    })
+
+    const pathsAndKeys = walletService.getPrivateKeys(wallet, [receivingPath, changePath], password)
+    expect(pathsAndKeys[0]).toEqual({
+      path: receivingPath,
+      privateKey: receivingPrivateKey,
+    })
+    expect(pathsAndKeys[1]).toEqual({
+      path: changePath,
+      privateKey: changePriateKey,
+    })
   })
 })
