@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { history } from 'components/Router'
 
-import UILayer, { AppMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
 import { Channel, ConnectStatus, Routes } from 'utils/const'
 import { ProviderActions } from './reducer'
 
@@ -68,6 +68,34 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               type: ProviderActions.Settings,
               payload: {
                 toggleAddressBook: true,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      }
+    })
+
+    UILayer.on(Channel.Chain, (_e: Event, method: ChainMethod, args: ChannelResponse<any>) => {
+      if (args && args.status) {
+        switch (method) {
+          case ChainMethod.Status: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
+              },
+            })
+            break
+          }
+          case ChainMethod.TipBlockNumber: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                tipBlockNumber: args.result,
               },
             })
             break
@@ -237,15 +265,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             dispatch({
               type: ProviderActions.Chain,
               payload: { network: args.result },
-            })
-            break
-          }
-          case NetworksMethod.Status: {
-            dispatch({
-              type: ProviderActions.Chain,
-              payload: {
-                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
-              },
             })
             break
           }

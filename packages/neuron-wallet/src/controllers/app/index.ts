@@ -34,16 +34,6 @@ export default class AppController {
     const initState = {
       activeWallet: activeWallet && {
         ...activeWallet,
-        addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-          change: activeWallet.addresses.change.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-        },
       },
       balance: '1000000000000001212121212', // TODO: provide the balance of current wallet
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],

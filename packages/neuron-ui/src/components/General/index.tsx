@@ -35,6 +35,7 @@ const General = () => {
     chain: {
       networkId,
       transactions: { items },
+      tipBlockNumber,
     },
     settings: { networks },
   } = useNeuronWallet()
@@ -85,7 +86,7 @@ const General = () => {
             </Field>
             <Field>
               <span>{t('general.block-height')}</span>
-              <span>{`${(100000).toLocaleString()} / ${(200000).toLocaleString()}`}</span>
+              <span>{`${(100000).toLocaleString()} / ${+(tipBlockNumber || 0).toLocaleString()}`}</span>
             </Field>
             <Field>
               <span>{t('general.rpc-service')}</span>
