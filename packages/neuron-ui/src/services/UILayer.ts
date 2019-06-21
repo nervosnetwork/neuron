@@ -19,6 +19,11 @@ export enum AppMethod {
   SetUILocale = 'setUILocale',
 }
 
+export enum ChainMethod {
+  Status = 'status',
+  TipBlockNumber = 'tipBlockNumber',
+}
+
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -44,7 +49,6 @@ export enum NetworksMethod {
   Delete = 'delete',
   Activate = 'activate',
   ActiveId = 'activeId',
-  Status = 'status',
 }
 
 export enum TransactionsMethod {
