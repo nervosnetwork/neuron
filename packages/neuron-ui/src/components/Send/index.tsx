@@ -84,16 +84,18 @@ const Send = ({
                     items: dropdownItems(idx),
                   }}
                 />
-                {send.outputs.length > 1 ? (
-                  <button type="button" onClick={() => removeTransactionOutput(idx)}>
-                    Remove this
-                  </button>
-                ) : null}
-                {idx === send.outputs.length - 1 ? (
-                  <button type="button" onClick={() => addTransactionOutput()}>
-                    Add one
-                  </button>
-                ) : null}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  {send.outputs.length > 1 ? (
+                    <button type="button" onClick={() => removeTransactionOutput(idx)}>
+                      Remove this
+                    </button>
+                  ) : null}
+                  {idx === send.outputs.length - 1 ? (
+                    <button type="button" onClick={() => addTransactionOutput()}>
+                      Add one
+                    </button>
+                  ) : null}
+                </div>
               </div>
             ))}
           </Form>
