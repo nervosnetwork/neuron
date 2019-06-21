@@ -22,7 +22,7 @@ const connectOptions = (): SqliteConnectionOptions => {
     migrations: [AddAddress1560998222848],
     synchronize: false,
     migrationsRun: true,
-    logging: true,
+    logging: ['error'],
   }
 }
 
