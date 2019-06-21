@@ -174,4 +174,14 @@ describe('private to public', () => {
     const publicKey = Buffer.from('03e5b310636a0f6e7dcdfffa98f28d7ed70df858bb47acf13db830bfde3510b3f3', 'hex')
     expect(privateToPublic(privateKey)).toEqual(publicKey)
   })
+
+  it('derive public key from private key wrong length', () => {
+    expect(() => privateToPublic(Buffer.from(''))).toThrowError()
+    expect(() =>
+      privateToPublic(Buffer.from('39d218506b30ca69b0f3112427877d983dd3cd2cabc742ab723e2964d98016', 'hex'))
+    ).toThrowError()
+    expect(() =>
+      privateToPublic(Buffer.from('0xbb39d218506b30ca69b0f3112427877d983dd3cd2cabc742ab723e2964d98016', 'hex'))
+    ).toThrowError()
+  })
 })
