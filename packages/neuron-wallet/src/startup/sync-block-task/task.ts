@@ -1,6 +1,7 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
 import initConnection from '../../typeorm'
+import { initConnection as initAddressConnection } from '../../addresses/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../utils/lock-utils'
 import AddressesUsedSubject from '../../subjects/addresses-used-subject'
@@ -56,10 +57,12 @@ export const switchNetwork = async (blockHash: string) => {
   blockListener.start()
 }
 
-export const run = () => {
+export const run = async () => {
+  await initAddressConnection()
   networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
-      await switchNetwork(genesisBlockHash)
+      const hash = await genesisBlockHash()
+      await switchNetwork(hash)
     }
   })
 }
