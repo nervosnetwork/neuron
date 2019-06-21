@@ -5,7 +5,10 @@ import BN from 'bn.js'
 const ec = new EC('secp256k1')
 
 export const privateToPublic = (privateKey: Buffer) => {
-  return Buffer.from(ec.keyFromPrivate(privateKey).getPublic(true, 'hex') as string, 'hex')
+  return Buffer.from(
+    ec.keyFromPrivate(privateKey.length === 66 ? privateKey.slice(2) : privateKey).getPublic(true, 'hex') as string,
+    'hex'
+  )
 }
 
 const EMPTY_BUFFER = Buffer.from('')
