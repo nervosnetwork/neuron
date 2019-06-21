@@ -135,9 +135,13 @@ export default class Keychain {
   }
 
   private static privateKeyAdd = (privateKey: Buffer, factor: Buffer): Buffer => {
-    const curveOrder = new BN('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 16)
-    const result = new BN(privateKey).add(new BN(factor)).mod(curveOrder)
-    return Buffer.from(result.toString(16), 'hex')
+    const result = new BN(factor)
+    result.iadd(new BN(privateKey))
+    if (result.cmp(ec.curve.n) >= 0) {
+      result.isub(ec.curve.n)
+    }
+
+    return result.toArrayLike(Buffer, 'be', 32)
   }
 
   private static publicKeyAdd = (publicKey: Buffer, factor: Buffer): Buffer => {
