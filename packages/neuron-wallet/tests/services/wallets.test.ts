@@ -34,36 +34,6 @@ describe('wallet service', () => {
         },
         '0'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
 
     wallet2 = {
@@ -87,36 +57,6 @@ describe('wallet service', () => {
         },
         '2'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
 
     wallet3 = {
@@ -140,36 +80,6 @@ describe('wallet service', () => {
         },
         '3'
       ),
-      addresses: {
-        receiving: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-        change: [
-          {
-            address: 'address1',
-            path: 'path1',
-          },
-          {
-            address: 'address2',
-            path: 'path2',
-          },
-          {
-            address: 'address3',
-            path: 'path3',
-          },
-        ],
-      },
     }
   })
 
@@ -201,44 +111,6 @@ describe('wallet service', () => {
     walletService.update(w1.id, wallet1)
     const wallet = walletService.get(w1.id)
     expect(wallet && wallet.name).toEqual(wallet2.name)
-  })
-
-  it('update addresses', () => {
-    const w1 = walletService.create(wallet1)
-    const addresses = {
-      receiving: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-      change: [
-        {
-          address: 'address1',
-          path: 'path1',
-        },
-        {
-          address: 'address2',
-          path: 'path2',
-        },
-        {
-          address: 'address3',
-          path: 'path3',
-        },
-      ],
-    }
-    wallet1.addresses = addresses
-    walletService.update(w1.id, wallet1)
-    const wallet = walletService.get(w1.id)
-    expect(wallet && wallet.addresses).toEqual(addresses)
   })
 
   it('delete wallet', () => {

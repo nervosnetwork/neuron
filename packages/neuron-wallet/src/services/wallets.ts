@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { Addresses, AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
+import { AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
 import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
@@ -28,7 +28,6 @@ const DEBOUNCE_TIME = 50
 export interface Wallet {
   id: string
   name: string
-  addresses: Addresses
 
   loadKeystore: () => Keystore
   accountExtendedPublicKey: () => AccountExtendedPublicKey
@@ -37,7 +36,6 @@ export interface Wallet {
 export interface WalletProperties {
   id: string
   name: string
-  addresses: Addresses
   extendedKey: string // Serialized account extended public key
   keystore?: Keystore
 }
@@ -45,20 +43,17 @@ export interface WalletProperties {
 export class FileKeystoreWallet implements Wallet {
   public id: string
   public name: string
-  public addresses: Addresses
   private extendedKey: string = ''
 
   constructor(props: WalletProperties) {
-    const { id, name, addresses, extendedKey } = props
+    const { id, name, extendedKey } = props
 
     if (id === undefined) throw new IsRequired('ID')
     if (name === undefined) throw new IsRequired('Name')
-    if (addresses === undefined) throw new IsRequired('Addresses')
 
     this.id = id
     this.name = name
     this.extendedKey = extendedKey
-    this.addresses = addresses
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
@@ -69,12 +64,9 @@ export class FileKeystoreWallet implements Wallet {
     return new FileKeystoreWallet(json)
   }
 
-  public update = ({ name, addresses }: { name: string; addresses: Addresses }) => {
+  public update = ({ name }: { name: string }) => {
     if (name) {
       this.name = name
-    }
-    if (addresses) {
-      this.addresses = addresses
     }
   }
 
@@ -83,7 +75,6 @@ export class FileKeystoreWallet implements Wallet {
       id: this.id,
       name: this.name,
       extendedKey: this.extendedKey,
-      addresses: this.addresses,
     }
   }
 
@@ -113,10 +104,6 @@ const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) 
     result: {
       id: wallet.id,
       name: wallet.name,
-      addresses: {
-        receiving: wallet.addresses.receiving.map(addr => addr.address),
-        change: wallet.addresses.change.map(addr => addr.address),
-      },
     },
   })
   updateApplicationMenu(wallets, currentId)

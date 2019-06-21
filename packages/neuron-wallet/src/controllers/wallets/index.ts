@@ -86,14 +86,12 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
-      addresses: { receiving: [], change: [] }, // Fetch addresses
     })
     return {
       status: ResponseCode.Success,
       result: {
         id: wallet.id,
         name: wallet.name,
-        addresses: wallet.addresses,
       },
     }
   }
@@ -151,7 +149,6 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore: keystoreObject,
-      addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
     return {
       status: ResponseCode.Success,
@@ -177,7 +174,6 @@ export default class WalletsController {
 
     const props = {
       name: name || wallet.name,
-      addresses: wallet.addresses,
       keystore: wallet.loadKeystore(),
     }
 
@@ -246,16 +242,6 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: {
         ...activeWallet,
-        addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-          change: activeWallet.addresses.change.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-        },
       },
     }
   }
