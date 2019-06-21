@@ -19,6 +19,7 @@ export enum Channel {
   Initiate = 'initiate',
   NavTo = 'navTo',
   App = 'app',
+  Chain = 'chain',
   Networks = 'networks',
   Transactions = 'transactions',
   Wallets = 'wallets',
