@@ -165,7 +165,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     id: string
     items: {
       address: string
-      amount: string
+      capacity: string
     }[]
     fee: string
   }) => void

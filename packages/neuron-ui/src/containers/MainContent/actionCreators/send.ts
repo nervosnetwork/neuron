@@ -37,7 +37,7 @@ export default {
       id,
       items: items.map(item => ({
         address: item.address,
-        amount: CKBToShannonFormatter(item.amount, item.unit),
+        capacity: CKBToShannonFormatter(item.amount, item.unit),
       })),
       fee: '0',
     })
