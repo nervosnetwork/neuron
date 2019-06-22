@@ -4,26 +4,24 @@ export interface WalletIdentity {
 }
 export interface Wallet extends WalletIdentity {
   balance: string
-  addresses: Addresses
+  addresses: Address[]
   publicKey: Uint8Array
   message: string
   sending: boolean
 }
 export interface Address {
   address: string
+  identifier: string
   description: string
-}
-
-export interface Addresses {
-  receiving: Address[]
-  change: Address[]
+  type: 0 | 1 // 0 for receiving, 1 for change
+  txCount: number
 }
 
 export const walletState: Wallet = {
   name: '',
   id: '',
   balance: '0',
-  addresses: { receiving: [], change: [] },
+  addresses: [],
   publicKey: new Uint8Array(0),
   message: '',
   sending: false,

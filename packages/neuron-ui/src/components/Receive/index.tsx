@@ -30,16 +30,14 @@ const QRCodeModal = styled.div`
 
 const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: string }>>) => {
   const {
-    wallet: {
-      addresses: { receiving },
-    },
+    wallet: { addresses },
   } = useNeuronWallet()
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
   const { match } = props
   const { params } = match
 
-  const accountAddress = params.address || (receiving[0] && receiving[0].address)
+  const accountAddress = params.address || (addresses.find(addr => addr.type === 0) || { address: '' }).address
 
   if (!accountAddress) {
     return <div>{t('receive.address-not-found')}</div>

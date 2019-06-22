@@ -5,13 +5,6 @@ import { CapacityUnit, Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
-declare global {
-  interface Window {
-    require: any
-    bridge: any
-  }
-}
-
 export enum AppMethod {
   ToggleAddressBook = 'toggleAddressBook',
   ContextMenu = 'contextMenu',
@@ -39,6 +32,7 @@ export enum WalletsMethod {
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
+  AvailableAddresses = 'availableAddresses',
 }
 
 export enum NetworksMethod {

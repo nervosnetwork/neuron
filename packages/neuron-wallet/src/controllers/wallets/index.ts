@@ -1,4 +1,6 @@
 import fs from 'fs'
+import { AddressType } from '../../keys/address'
+import { Address } from '../../addresses/dao'
 import AppController from '../app'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../../services/wallets'
 import Keystore from '../../keys/keystore'
@@ -19,6 +21,7 @@ import {
 import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManage from '../../utils/window-manage'
+import AddressService from '../../services/addresses'
 
 const walletsService = WalletsService.getInstance()
 
@@ -256,6 +259,78 @@ export default class WalletsController {
       result: currentWallet.toJSON(),
     }
     // TODO: verification
+  }
+
+  @CatchControllerError
+  public static async getAvailableAddresses(
+    id?: string,
+    {
+      countOfReceiving = 20,
+      countOfChange = 10,
+    }: {
+      countOfReceiving: number
+      countOfChange: number
+    } = {
+      countOfReceiving: 20,
+      countOfChange: 10,
+    }
+  ) {
+    let walletId = id
+    if (walletId === undefined) {
+      const currentWallet = walletsService.getCurrent()
+      if (currentWallet) {
+        walletId = currentWallet.id
+      }
+    }
+
+    if (walletId === undefined) {
+      throw new CurrentWalletNotSet()
+    }
+    const addresses: {
+      address: string
+      identifier: string
+      description: string
+      type: AddressType
+      txCount: number
+    }[] = []
+    /* eslint-disable no-await-in-loop */
+    // TODO: do not use async loop
+    // TODO: need a method to get next x unused receiving addresses
+    // NOTICE: i < 1 here to avoid repeated key in address view
+    for (let i = 0; i < (1 || countOfReceiving); i++) {
+      const { address, blake160: identifier, addressType: type, txCount } = (await AddressService.nextUnusedAddress(
+        walletId
+      )) as Address
+      addresses.push({
+        address,
+        identifier,
+        type,
+        txCount,
+        description: 'mock description',
+      })
+    }
+    // TODO: need a method to get next x unused change addresses
+    // NOTICE: i < 1 here to avoid repeated key in address view
+    for (let i = 0; i < (1 || countOfChange); i++) {
+      const {
+        address,
+        blake160: identifier,
+        addressType: type,
+        txCount,
+      } = (await AddressService.nextUnusedChangeAddress(walletId)) as Address
+      addresses.push({
+        address,
+        identifier,
+        type,
+        txCount,
+        description: 'mock description',
+      })
+    }
+    /* eslint-enable no-await-in-loop */
+    return {
+      status: ResponseCode.Success,
+      result: addresses,
+    }
   }
 
   @CatchControllerError
