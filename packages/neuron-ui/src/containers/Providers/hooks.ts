@@ -193,7 +193,9 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             break
           }
           case WalletsMethod.SendCapacity: {
-            history.push(`${Routes.Transaction}/${args.result}`)
+            if (args.result) {
+              history.push(`${Routes.Transaction}/${args.result}`)
+            }
             break
           }
           case WalletsMethod.SendingStatus: {
@@ -210,6 +212,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
         }
       } else {
+        if (!args.msg) return
         const time = new Date().getTime()
         if (method === WalletsMethod.GetActive) {
           return

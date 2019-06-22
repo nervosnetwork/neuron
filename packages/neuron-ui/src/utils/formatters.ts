@@ -1,5 +1,7 @@
 /* global BigInt */
 
+import { CapacityUnit } from './const'
+
 const base = 10e9
 const numberParser = (value: string, exchange: string) => {
   const res = (BigInt(value) * BigInt(+exchange * base)).toString()
@@ -47,7 +49,25 @@ export const currencyFormatter = (
   return `${integer.replace(/\B(?=(\d{3})+(?!\d))/g, delimiter)}${dot}${decimal} ${unit}`
 }
 
+export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
+  switch (uint) {
+    case CapacityUnit.CKB: {
+      return (BigInt(amount) * BigInt(1e8)).toString()
+    }
+    case CapacityUnit.CKKB: {
+      return (BigInt(amount) * BigInt(1e11)).toString()
+    }
+    case CapacityUnit.CKGB: {
+      return (BigInt(amount) * BigInt(1e17)).toString()
+    }
+    default: {
+      return amount
+    }
+  }
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
+  CKBToShannonFormatter,
 }
