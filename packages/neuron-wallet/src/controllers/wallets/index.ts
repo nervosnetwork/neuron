@@ -271,7 +271,7 @@ export default class WalletsController {
     if (password === null)
       return {
         status: ResponseCode.Success,
-        result: false,
+        result: '',
       }
     if (!params) throw new IsRequired('Parameters')
     try {

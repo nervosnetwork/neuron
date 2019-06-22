@@ -2,6 +2,7 @@ import { walletsCall, TransactionOutput } from 'services/UILayer'
 
 import { Message } from 'utils/const'
 import { verifyAddress } from 'utils/validators'
+import { CKBToShannonFormatter } from 'utils/formatters'
 
 import { MainActions } from '../reducer'
 
@@ -32,7 +33,14 @@ export default {
     if (invalid) {
       return errorAction
     }
-    walletsCall.sendCapacity({ id, items })
+    walletsCall.sendCapacity({
+      id,
+      items: items.map(item => ({
+        address: item.address,
+        capacity: CKBToShannonFormatter(item.amount, item.unit),
+      })),
+      fee: '0',
+    })
     return {
       type: MainActions.UpdateSendState,
       payload: {
