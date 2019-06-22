@@ -7,11 +7,11 @@ import { ExtendedPrivateKey } from './key'
 
 const CIPHER = 'aes-128-ctr'
 
-export interface CipherParams {
+interface CipherParams {
   iv: string
 }
 
-export interface KdfParams {
+interface KdfParams {
   dklen: number
   n: number
   r: number
@@ -19,7 +19,7 @@ export interface KdfParams {
   salt: string
 }
 
-export interface Crypto {
+interface Crypto {
   cipher: string
   cipherparams: CipherParams
   ciphertext: string
