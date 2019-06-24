@@ -77,9 +77,12 @@
       "addresses": "地址",
       "type": "交易类型",
       "address": "地址",
+      "identifier": "标志",
       "description": "标签",
       "balance": "余额",
-      "transactions": "交易总数"
+      "transactions": "交易总数",
+      "receiving-address": "收款地址",
+      "change-address": "找零地址"
     },
     "settings": {
       "setting-tabs": {

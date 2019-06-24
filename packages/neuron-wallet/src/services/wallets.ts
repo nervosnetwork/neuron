@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { Addresses, AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
+import { AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
 import Keystore from '../keys/keystore'
 import Store from '../utils/store'
 import NodeService from './node'
@@ -16,6 +16,8 @@ import Blake2b from '../utils/blake2b'
 import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../addresses/dao'
+import Keychain from '../keys/keychain'
+import { updateApplicationMenu } from '../utils/application-menu'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -26,7 +28,6 @@ const DEBOUNCE_TIME = 50
 export interface Wallet {
   id: string
   name: string
-  addresses: Addresses
 
   loadKeystore: () => Keystore
   accountExtendedPublicKey: () => AccountExtendedPublicKey
@@ -35,7 +36,6 @@ export interface Wallet {
 export interface WalletProperties {
   id: string
   name: string
-  addresses: Addresses
   extendedKey: string // Serialized account extended public key
   keystore?: Keystore
 }
@@ -43,20 +43,17 @@ export interface WalletProperties {
 export class FileKeystoreWallet implements Wallet {
   public id: string
   public name: string
-  public addresses: Addresses
   private extendedKey: string = ''
 
   constructor(props: WalletProperties) {
-    const { id, name, addresses, extendedKey } = props
+    const { id, name, extendedKey } = props
 
     if (id === undefined) throw new IsRequired('ID')
     if (name === undefined) throw new IsRequired('Name')
-    if (addresses === undefined) throw new IsRequired('Addresses')
 
     this.id = id
     this.name = name
     this.extendedKey = extendedKey
-    this.addresses = addresses
   }
 
   accountExtendedPublicKey = (): AccountExtendedPublicKey => {
@@ -67,12 +64,9 @@ export class FileKeystoreWallet implements Wallet {
     return new FileKeystoreWallet(json)
   }
 
-  public update = ({ name, addresses }: { name: string; addresses: Addresses }) => {
+  public update = ({ name }: { name: string }) => {
     if (name) {
       this.name = name
-    }
-    if (addresses) {
-      this.addresses = addresses
     }
   }
 
@@ -81,13 +75,12 @@ export class FileKeystoreWallet implements Wallet {
       id: this.id,
       name: this.name,
       extendedKey: this.extendedKey,
-      addresses: this.addresses,
     }
   }
 
   public loadKeystore = () => {
     const data = fileService.readFileSync(MODULE_NAME, this.keystoreFileName())
-    return JSON.parse(data) as Keystore
+    return Keystore.fromJson(data)
   }
 
   saveKeystore = (keystore: Keystore) => {
@@ -101,6 +94,28 @@ export class FileKeystoreWallet implements Wallet {
   keystoreFileName = () => {
     return `${this.id}.json`
   }
+}
+
+const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) => {
+  const wallet = wallets.find(w => w.id === currentId)
+  if (!wallet) return
+  windowManage.broadcast(Channel.Wallets, 'getActive', {
+    status: ResponseCode.Success,
+    result: {
+      id: wallet.id,
+      name: wallet.name,
+    },
+  })
+  updateApplicationMenu(wallets, currentId)
+}
+
+const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
+  const result = wallets.map(({ id, name }) => ({ id, name }))
+  windowManage.broadcast(Channel.Wallets, 'getAll', {
+    status: ResponseCode.Success,
+    result,
+  })
+  updateApplicationMenu(wallets, currentId)
 }
 
 export default class WalletService {
@@ -122,46 +137,19 @@ export default class WalletService {
     fromEvent<[any, WalletProperties[]]>(this.listStore, this.walletsKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, wallets]) => {
-        const result = wallets.map(({ id, name }) => ({ id, name }))
-        windowManage.broadcast(Channel.Wallets, 'getAll', {
-          status: ResponseCode.Success,
-          result,
-        })
         const wallet = this.getCurrent()
         if (wallet) {
-          windowManage.broadcast(Channel.Wallets, 'getActive', {
-            status: ResponseCode.Success,
-            result: {
-              id: wallet.id,
-              name: wallet.name,
-              addresses: {
-                receiving: wallet.addresses.receiving.map(addr => addr.address),
-                change: wallet.addresses.change.map(addr => addr.address),
-              },
-            },
-          })
+          onCurrentWalletUpdated(wallets, wallet.id)
         }
+        onWalletsUpdated(wallets, wallet && wallet.id)
       })
 
     fromEvent(this.listStore, this.currentWalletKey)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, newId]) => {
-        if (newId === undefined) {
-          return
-        }
-
-        const currentWallet = this.get(newId)
-        windowManage.broadcast(Channel.Wallets, 'getActive', {
-          status: ResponseCode.Success,
-          result: {
-            id: currentWallet.id,
-            name: currentWallet.name,
-            addresses: {
-              receiving: currentWallet.addresses.receiving.map(addr => addr.address),
-              change: currentWallet.addresses.change.map(addr => addr.address),
-            },
-          },
-        })
+        if (newId === undefined) return
+        const wallets = this.getAll()
+        onCurrentWalletUpdated(wallets, newId)
       })
   }
 
@@ -289,7 +277,9 @@ export default class WalletService {
 
   public validate = ({ id, password }: { id: string; password: string }) => {
     const wallet = this.get(id)
-    if (!wallet) throw new WalletNotFound(id)
+    if (!wallet) {
+      throw new WalletNotFound(id)
+    }
 
     return wallet.loadKeystore().checkPassword(password)
   }
@@ -302,9 +292,6 @@ export default class WalletService {
     this.listStore.clear()
   }
 
-  /**
-   * transactions related
-   */
   public sendCapacity = async (
     items: {
       address: string
@@ -313,22 +300,18 @@ export default class WalletService {
     password: string,
     fee: string = '0'
   ) => {
-    // TODO:
-    //  Collect inputs from multiple addresses.
-    //  Use account type and index for specifying each address.
-    //  Derivate private key for each address to sign.
     const wallet = await this.getCurrent()
-    if (!wallet) throw new CurrentWalletNotSet()
+    if (!wallet) {
+      throw new CurrentWalletNotSet()
+    }
 
-    if (password === undefined || password === '') throw new IsRequired('Password')
+    if (password === undefined || password === '') {
+      throw new IsRequired('Password')
+    }
 
     const addressInfos = await this.getAddressInfos()
 
     const addresses: string[] = addressInfos.map(info => info.address)
-    // const key = await Key.fromKeystore(JSON.stringify(wallet.loadKeystore()), password)
-    // TODO:
-    //  1. get extended public key from wallet (to be implement) to fetch addresses
-    //  2. get private key from key(keystore)
 
     const lockHashes: string[] = await Promise.all(addresses.map(async addr => LockUtils.addressToLockHash(addr)))
 
@@ -351,7 +334,7 @@ export default class WalletService {
     const { inputs } = tx
 
     const paths = addressInfos.map(info => info.path)
-    const pathAndPrivateKeys = this.getPrivateKey(paths, password)
+    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
     const witnesses: Witness[] = inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args![0]
@@ -408,18 +391,18 @@ export default class WalletService {
     return newWitness
   }
 
-  /* eslint @typescript-eslint/no-unused-vars: "off" */
-  public getPrivateKey = (paths: string[], _password: string): PathAndPrivateKey[] => {
+  // Derivate all child private keys for specified BIP44 paths.
+  public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
+    const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
+    const masterKeychain = new Keychain(
+      Buffer.from(masterPrivateKey.privateKey, 'hex'),
+      Buffer.from(masterPrivateKey.chainCode, 'hex')
+    )
+
     const uniquePaths = paths.filter((value, idx, a) => a.indexOf(value) === idx)
-    const path = uniquePaths[0]
-    if (path !== "m/44'/309'/0'/0/0") {
-      throw new Error('')
-    }
-    return [
-      {
-        path: "m/44'/309'/0'/0/0",
-        privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
-      },
-    ]
+    return uniquePaths.map(path => ({
+      path,
+      privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
+    }))
   }
 }

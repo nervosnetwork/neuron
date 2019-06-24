@@ -19,6 +19,7 @@ import {
 import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManage from '../../utils/window-manage'
+import AddressService from '../../services/addresses'
 
 const walletsService = WalletsService.getInstance()
 
@@ -86,14 +87,12 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore,
-      addresses: { receiving: [], change: [] }, // Fetch addresses
     })
     return {
       status: ResponseCode.Success,
       result: {
         id: wallet.id,
         name: wallet.name,
-        addresses: wallet.addresses,
       },
     }
   }
@@ -151,7 +150,6 @@ export default class WalletsController {
       name,
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore: keystoreObject,
-      addresses: { receiving: [], change: [] }, // TODO: fetch and return addresses
     })
     return {
       status: ResponseCode.Success,
@@ -177,7 +175,6 @@ export default class WalletsController {
 
     const props = {
       name: name || wallet.name,
-      addresses: wallet.addresses,
       keystore: wallet.loadKeystore(),
     }
 
@@ -204,6 +201,7 @@ export default class WalletsController {
 
     if (password === '') throw new EmptyPassword()
     if (!walletsService.validate({ id, password })) throw new IncorrectPassword()
+
     walletsService.delete(id)
 
     return {
@@ -245,16 +243,6 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: {
         ...activeWallet,
-        addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-          change: activeWallet.addresses.change.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-        },
       },
     }
   }
@@ -272,6 +260,34 @@ export default class WalletsController {
   }
 
   @CatchControllerError
+  public static async getAllAddresses(id?: string) {
+    let walletId = id
+    if (walletId === undefined) {
+      const currentWallet = walletsService.getCurrent()
+      if (currentWallet) {
+        walletId = currentWallet.id
+      }
+    }
+
+    if (walletId === undefined) {
+      throw new CurrentWalletNotSet()
+    }
+    const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
+      addrs.map(({ address, blake160: identifier, addressType: type, txCount }) => ({
+        address,
+        identifier,
+        type,
+        txCount,
+        description: 'mock description',
+      }))
+    )
+    return {
+      status: ResponseCode.Success,
+      result: addresses,
+    }
+  }
+
+  @CatchControllerError
   public static async sendCapacity(params: {
     id: string
     items: {
@@ -284,26 +300,20 @@ export default class WalletsController {
     if (password === null)
       return {
         status: ResponseCode.Success,
-        result: false,
+        result: '',
       }
     if (!params) throw new IsRequired('Parameters')
     try {
-      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
-
-      // TODO: tell neuron-ui when to set sending to false, usually at the time the tx hash returns
       windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
         status: ResponseCode.Success,
         result: true,
       })
+      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
       return {
         status: ResponseCode.Success,
         result: hash,
       }
     } catch (err) {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
-        status: ResponseCode.Success,
-        result: false,
-      })
       return {
         status: ResponseCode.Fail,
         msg: {
@@ -311,6 +321,11 @@ export default class WalletsController {
           id: params.id,
         },
       }
+    } finally {
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+        status: ResponseCode.Success,
+        result: false,
+      })
     }
   }
 

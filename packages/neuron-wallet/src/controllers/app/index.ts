@@ -18,7 +18,7 @@ const networksService = NetworksService.getInstance()
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
-    const [activeWallet, wallets, activeNetworkId, networks, transactions] = await Promise.all([
+    const [activeWallet, wallets, activeNetworkId, networks, transactions, addresses] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
       networksService.activeId(),
@@ -28,25 +28,17 @@ export default class AppController {
         pageSize: 15,
         addresses: [],
       }).then(res => res.result),
+      WalletsController.getAllAddresses().then(res => res.result),
     ])
 
     const locale = app.getLocale()
     const initState = {
       activeWallet: activeWallet && {
         ...activeWallet,
-        addresses: {
-          receiving: activeWallet.addresses.receiving.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-          change: activeWallet.addresses.change.map(addr => ({
-            address: addr.address,
-            description: Math.random().toString(),
-          })),
-        },
       },
       balance: '1000000000000001212121212', // TODO: provide the balance of current wallet
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
+      addresses,
       activeNetworkId,
       networks,
       transactions,

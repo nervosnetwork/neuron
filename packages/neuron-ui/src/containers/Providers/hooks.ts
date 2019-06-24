@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import { history } from 'components/Router'
 
-import UILayer, { AppMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
 import { Channel, ConnectStatus, Routes } from 'utils/const'
+import { Address } from 'contexts/NeuronWallet/wallet'
 import { ProviderActions } from './reducer'
 
 export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispatch<any>) =>
@@ -17,6 +18,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           activeNetworkId: string
           wallets: any
           activeWallet: any
+          addresses: Address[]
           transactions: any
           locale: string
         }>
@@ -28,6 +30,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             activeNetworkId: networkId,
             wallets,
             activeWallet: wallet,
+            addresses,
             balance,
             transactions,
           } = args.result
@@ -37,7 +40,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           if (networks.length) {
             dispatch({
               type: ProviderActions.Initiate,
-              payload: { networks, networkId, wallet: { ...wallet, balance }, wallets },
+              payload: { networks, networkId, wallet: { ...wallet, balance, addresses }, wallets },
             })
           }
           if (transactions && transactions.totalCount) {
@@ -68,6 +71,34 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               type: ProviderActions.Settings,
               payload: {
                 toggleAddressBook: true,
+              },
+            })
+            break
+          }
+          default: {
+            break
+          }
+        }
+      }
+    })
+
+    UILayer.on(Channel.Chain, (_e: Event, method: ChainMethod, args: ChannelResponse<any>) => {
+      if (args && args.status) {
+        switch (method) {
+          case ChainMethod.Status: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
+              },
+            })
+            break
+          }
+          case ChainMethod.TipBlockNumber: {
+            dispatch({
+              type: ProviderActions.Chain,
+              payload: {
+                tipBlockNumber: args.result,
               },
             })
             break
@@ -165,7 +196,9 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             break
           }
           case WalletsMethod.SendCapacity: {
-            history.push(`${Routes.Transaction}/${args.result}`)
+            if (args.result) {
+              history.push(`${Routes.Transaction}/${args.result}`)
+            }
             break
           }
           case WalletsMethod.SendingStatus: {
@@ -177,11 +210,21 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
             break
           }
+          case WalletsMethod.AllAddresses: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: {
+                address: args.result,
+              },
+            })
+            break
+          }
           default: {
             break
           }
         }
       } else {
+        if (!args.msg) return
         const time = new Date().getTime()
         if (method === WalletsMethod.GetActive) {
           return
@@ -237,15 +280,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             dispatch({
               type: ProviderActions.Chain,
               payload: { network: args.result },
-            })
-            break
-          }
-          case NetworksMethod.Status: {
-            dispatch({
-              type: ProviderActions.Chain,
-              payload: {
-                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
-              },
             })
             break
           }

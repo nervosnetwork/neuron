@@ -77,9 +77,12 @@
       "addresses": "Addresses",
       "type": "Type",
       "address": "Address",
+      "identifier": "Identifier",
       "description": "Description",
       "balance": "Balance",
-      "transactions": "Transactions"
+      "transactions": "Transactions",
+      "receiving-address": "Receiving Address",
+      "change-address": "Change Address"
     },
     "settings": {
       "setting-tabs": {

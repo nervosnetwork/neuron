@@ -3,7 +3,7 @@ import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
 import windowManage from '../utils/window-manage'
-import { Channel } from '../utils/const'
+import { Channel, ResponseCode } from '../utils/const'
 
 class NodeService {
   private static instance: NodeService
@@ -28,9 +28,17 @@ class NodeService {
   }
 
   public syncConnectStatus = () => {
+    this.tipNumberSubject.subscribe(tipNumber => {
+      if (typeof tipNumber === 'string') {
+        windowManage.broadcast(Channel.Chain, 'tipBlockNumber', {
+          status: ResponseCode.Success,
+          result: tipNumber,
+        })
+      }
+    })
     this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
-      windowManage.broadcast(Channel.Networks, 'status', {
-        status: 1,
+      windowManage.broadcast(Channel.Chain, 'status', {
+        status: ResponseCode.Success,
         result: connectStatus,
       })
     })
@@ -44,6 +52,7 @@ class NodeService {
       throw new Error('Protocol of url should be specified')
     }
     this.core.setNode({ url })
+    this.tipNumberSubject.next('0')
     this.connectStatusSubject.next(false)
     return this.core
   }

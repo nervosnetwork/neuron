@@ -5,18 +5,16 @@ import { CapacityUnit, Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
-declare global {
-  interface Window {
-    require: any
-    bridge: any
-  }
-}
-
 export enum AppMethod {
   ToggleAddressBook = 'toggleAddressBook',
   ContextMenu = 'contextMenu',
   NavTo = 'navTo',
   SetUILocale = 'setUILocale',
+}
+
+export enum ChainMethod {
+  Status = 'status',
+  TipBlockNumber = 'tipBlockNumber',
 }
 
 export enum WalletsMethod {
@@ -34,6 +32,7 @@ export enum WalletsMethod {
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
+  AllAddresses = 'allAddresses',
 }
 
 export enum NetworksMethod {
@@ -44,7 +43,6 @@ export enum NetworksMethod {
   Delete = 'delete',
   Activate = 'activate',
   ActiveId = 'activeId',
-  Status = 'status',
 }
 
 export enum TransactionsMethod {
@@ -161,8 +159,9 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     id: string
     items: {
       address: string
-      amount: string
+      capacity: string
     }[]
+    fee: string
   }) => void
 }
 
