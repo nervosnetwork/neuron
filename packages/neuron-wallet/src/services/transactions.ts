@@ -441,12 +441,27 @@ export default class TransactionsService {
 
   // tx count with one lockHash
   public static getCountByLockHash = async (lockHash: string): Promise<number> => {
-    const count: number = await getConnection()
+    const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where(`output.lockHash = :lockHash`, { lockHash })
       .select('DISTINCT output.outPointTxHash', 'outPointTxHash')
-      .getCount()
+      .getRawMany()
+
+    const outputTxHashes: string[] = outputs.map(output => output.outPointTxHash)
+
+    const inputs: InputEntity[] = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where(`input.lockHash = :lockHash`, { lockHash })
+      .select(`DISTINCT input.transactionHash`, 'transactionHash')
+      .getRawMany()
+
+    const inputTxHashes: string[] = inputs.map((input: any) => input.transactionHash)
+
+    const hashes: string[] = [...new Set(outputTxHashes.concat(inputTxHashes))]
+
+    const count: number = hashes.length
 
     return count
   }
