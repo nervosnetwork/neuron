@@ -1,22 +1,13 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import styled from 'styled-components'
+import React, { useMemo } from 'react'
 import { Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import Table from 'widgets/Table'
 import { appCalls } from 'services/UILayer'
-import { useNeuronWallet } from 'utils/hooks'
+import { useNeuronWallet, useLocalDescription } from 'utils/hooks'
 import { ContentProps } from 'containers/MainContent'
-import { actionCreators } from 'containers/MainContent/reducer'
 
-const DescriptionField = styled.input`
-  padding: 0 5px;
-  background: transparent;
-  border: none;
-  &:focus {
-    box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.3);
-  }
-`
+import DescriptionField from 'widgets/InlineInput/DescriptionField'
 
 const headers = [
   {
@@ -56,46 +47,13 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const [localDescriptions, setLocalDescriptions] = useState(addresses.map(addr => addr.description))
-
-  const submitDescription = useCallback(
-    (idx: number) => {
-      if (addresses[idx].description === localDescriptions[idx]) return
-      dispatch(
-        actionCreators.updateDescription({
-          key: addresses[idx].address,
-          description: localDescriptions[idx],
-        })
-      )
-    },
-    [dispatch, localDescriptions, addresses]
-  )
-
-  const onDescriptionFieldBlur = useCallback(
-    (idx: number): React.FocusEventHandler => () => {
-      submitDescription(idx)
-    },
-    [submitDescription]
-  )
-
-  const onDescriptionPress = useCallback(
-    (idx: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key && e.key === 'Enter') {
-        submitDescription(idx)
-      }
-    },
-    [submitDescription]
-  )
-
-  const onDescriptionChange = useCallback(
-    (idx: number) => (e: any) => {
-      const newDesc = localDescriptions.map((desc, index) => {
-        if (index !== idx) return desc
-        return e.currentTarget.value
-      })
-      setLocalDescriptions(newDesc)
-    },
-    [localDescriptions, setLocalDescriptions]
+  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
+    'address',
+    addresses.map(({ address: key, description }) => ({
+      key,
+      description,
+    })),
+    dispatch
   )
 
   const addressesItems = useMemo(
@@ -108,7 +66,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
           <DescriptionField
             type="text"
             title={description}
-            value={localDescriptions[idx]}
+            value={localDescription[idx]}
             onKeyPress={onDescriptionPress(idx)}
             onBlur={onDescriptionFieldBlur(idx)}
             onChange={onDescriptionChange(idx)}
@@ -119,7 +77,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
         transactions: txCount,
         key: identifier,
       })),
-    [addresses, onDescriptionChange, localDescriptions, onDescriptionFieldBlur, onDescriptionPress, t]
+    [addresses, onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t]
   )
 
   return (

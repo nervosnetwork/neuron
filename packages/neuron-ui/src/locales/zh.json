@@ -71,7 +71,8 @@
       "first": "第一页",
       "previous": "前一页",
       "next": "后一页",
-      "last": "最后一页"
+      "last": "最后一页",
+      "description": "标签"
     },
     "transaction": {
       "goBack": "返回"

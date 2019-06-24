@@ -1,9 +1,5 @@
 import { Transaction } from '../app-types/types'
-import TransactionsService, {
-  TransactionsByAddressesParam,
-  PaginationResult,
-  TransactionsByLockHashesParam,
-} from '../services/transactions'
+import TransactionsService, { PaginationResult, TransactionsByLockHashesParam } from '../services/transactions'
 
 import AddressService from '../services/addresses'
 import WalletsService from '../services/wallets'
@@ -34,11 +30,11 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async getAllByAddresses(
-    params: TransactionsByAddressesParam
-  ): Promise<Controller.Response<PaginationResult<Transaction> & TransactionsByAddressesParam>> {
-    const { pageNo, pageSize, addresses } = params
+    params: Controller.Params.TransactionsByAddresses
+  ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
+    const { pageNo, pageSize, addresses = '' } = params
 
-    let searchAddresses = [...addresses]
+    let searchAddresses = addresses.split(',')
 
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
@@ -49,7 +45,6 @@ export default class TransactionsController {
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
 
     if (!transactions) throw new ServiceHasNoResponse('Transactions')
-
     return {
       status: ResponseCode.Success,
       result: { ...params, ...transactions },
@@ -65,6 +60,18 @@ export default class TransactionsController {
     return {
       status: ResponseCode.Success,
       result: transaction,
+    }
+  }
+
+  @CatchControllerError
+  public static async updateDescription({ hash, description }: { hash: string; description: string }) {
+    // TODO: update description of specified transaction
+    return {
+      status: ResponseCode.Success,
+      result: {
+        hash,
+        description,
+      },
     }
   }
 }

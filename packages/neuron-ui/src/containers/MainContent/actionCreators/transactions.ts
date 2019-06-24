@@ -1,5 +1,5 @@
+import { transactionsCall, GetTransactionsParams, walletsCall } from 'services/UILayer'
 import { MainActions } from '../reducer'
-import { transactionsCall, GetTransactionsParams, UpdateDescriptionParams } from '../../../services/UILayer'
 
 export default {
   getTransaction: (hash: string) => {
@@ -21,11 +21,38 @@ export default {
       },
     }
   },
-  updateDescription: (params: UpdateDescriptionParams) => {
-    transactionsCall.updateDescription(params)
+  updateDescription: ({
+    type,
+    key,
+    description,
+  }: {
+    type: 'address' | 'transaction'
+    key: string
+    description: string
+  }) => {
+    if (type === 'address') {
+      walletsCall.updateAddressDescription({
+        address: key,
+        description,
+      })
+      return {
+        type: MainActions.UpdateTransactionDescription,
+        payload: key,
+      }
+    }
+    if (type === 'transaction') {
+      transactionsCall.updateDescription({
+        hash: key,
+        description,
+      })
+      return {
+        type: MainActions.UpdateTransactionDescription,
+        payload: key,
+      }
+    }
     return {
-      type: MainActions.UpdateTransactionDescription,
-      payload: params.key,
+      type: null,
+      payload: null,
     }
   },
 }

@@ -329,6 +329,19 @@ export default class WalletsController {
     }
   }
 
+  @CatchControllerError
+  public static async updateAddressDescription({ address, description }: { address: string; description: string }) {
+    // TODO: update description of specified address
+
+    return {
+      status: ResponseCode.Success,
+      result: {
+        address,
+        description,
+      },
+    }
+  }
+
   private static async requestPassword(title: string): Promise<string | null> {
     const password = (await prompt('password', {
       title,
