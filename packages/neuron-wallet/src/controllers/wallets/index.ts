@@ -304,22 +304,16 @@ export default class WalletsController {
       }
     if (!params) throw new IsRequired('Parameters')
     try {
-      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
-
-      // TODO: tell neuron-ui when to set sending to false, usually at the time the tx hash returns
       windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
         status: ResponseCode.Success,
         result: true,
       })
+      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
       return {
         status: ResponseCode.Success,
         result: hash,
       }
     } catch (err) {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
-        status: ResponseCode.Success,
-        result: false,
-      })
       return {
         status: ResponseCode.Fail,
         msg: {
@@ -327,6 +321,11 @@ export default class WalletsController {
           id: params.id,
         },
       }
+    } finally {
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+        status: ResponseCode.Success,
+        result: false,
+      })
     }
   }
 
