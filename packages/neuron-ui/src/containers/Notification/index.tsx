@@ -6,7 +6,7 @@ import BannerMessages from 'widgets/BannerMessages'
 
 const NoticeContent = () => {
   const { messages } = useNeuronWallet()
-  return <BannerMessages messages={messages} style={{ paddingTop: '20px', paddingRight: '40px' }} />
+  return <BannerMessages messages={messages} />
 }
 
 NoticeContent.displayName = 'NoticeContent'

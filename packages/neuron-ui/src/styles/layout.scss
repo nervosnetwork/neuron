@@ -5,7 +5,7 @@ body {
     'navbar navbar navbar' 60px
     'notification notification notification' auto
     'content content content' 1fr
-    'content content content' 1fr 
+    'content content content' 1fr
     'footer  footer  footer' 50px /
     1fr 1fr 1fr;
 
@@ -15,7 +15,8 @@ body {
 footer {
   grid-area: footer;
   display:flex;
-  justify-content: space-between
+  justify-content: space-between;
+  padding: 0 15px;
 }
 
 .header {

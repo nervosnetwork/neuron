@@ -22,7 +22,7 @@ const CurrentNetwork = styled.div<{ online: boolean }>`
 `
 
 const Sync = () => (
-  <div>
+  <div style={{ display: 'flex', alignItems: 'center' }}>
     Synchronizing
     <progress value="80" max="100" />
   </div>
