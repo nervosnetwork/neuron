@@ -19,6 +19,7 @@ import {
 import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManage from '../../utils/window-manage'
+import AddressService from '../../services/addresses'
 
 const walletsService = WalletsService.getInstance()
 
@@ -256,6 +257,34 @@ export default class WalletsController {
       result: currentWallet.toJSON(),
     }
     // TODO: verification
+  }
+
+  @CatchControllerError
+  public static async getAllAddresses(id?: string) {
+    let walletId = id
+    if (walletId === undefined) {
+      const currentWallet = walletsService.getCurrent()
+      if (currentWallet) {
+        walletId = currentWallet.id
+      }
+    }
+
+    if (walletId === undefined) {
+      throw new CurrentWalletNotSet()
+    }
+    const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
+      addrs.map(({ address, blake160: identifier, addressType: type, txCount }) => ({
+        address,
+        identifier,
+        type,
+        txCount,
+        description: 'mock description',
+      }))
+    )
+    return {
+      status: ResponseCode.Success,
+      result: addresses,
+    }
   }
 
   @CatchControllerError

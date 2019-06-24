@@ -1,8 +1,8 @@
-declare module global {
-  interface Window {
-    clipboard: any
-    remote: any
-  }
+declare interface Window {
+  clipboard: any
+  remote: any
+  require: any
+  bridge: any
 }
 
 declare module '*.json' {

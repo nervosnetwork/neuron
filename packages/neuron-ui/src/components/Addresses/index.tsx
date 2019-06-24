@@ -28,6 +28,10 @@ const headers = [
     key: 'address',
   },
   {
+    label: 'addresses.identifier',
+    key: 'identifier',
+  },
+  {
     label: 'addresses.description',
     key: 'description',
   },
@@ -48,25 +52,9 @@ const AddressPanel = ({ address }: { address: string }) => {
 
 const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   const {
-    wallet: {
-      addresses: { receiving, change },
-    },
+    wallet: { addresses },
   } = useNeuronWallet()
   const [t] = useTranslation()
-
-  const addresses = useMemo(
-    () => [
-      ...receiving.map(addr => ({
-        type: 'receive',
-        ...addr,
-      })),
-      ...change.map(addr => ({
-        type: 'change',
-        ...addr,
-      })),
-    ],
-    [receiving, change]
-  )
 
   const [localDescriptions, setLocalDescriptions] = useState(addresses.map(addr => addr.description))
 
@@ -112,9 +100,10 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
 
   const addressesItems = useMemo(
     () =>
-      addresses.map(({ type, address, description }, idx) => ({
-        type,
+      addresses.map(({ type, identifier, address, txCount, description }, idx) => ({
+        type: type === 0 ? t('addresses.receiving-address') : t('addresses.change-address'),
         address: <AddressPanel address={address} />,
+        identifier,
         description: (
           <DescriptionField
             type="text"
@@ -126,10 +115,10 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
           />
         ),
         balance: '0',
-        transactions: '0',
-        key: address,
+        transactions: txCount,
+        key: identifier,
       })),
-    [addresses, onDescriptionChange, localDescriptions, onDescriptionFieldBlur, onDescriptionPress]
+    [addresses, onDescriptionChange, localDescriptions, onDescriptionFieldBlur, onDescriptionPress, t]
   )
 
   return (

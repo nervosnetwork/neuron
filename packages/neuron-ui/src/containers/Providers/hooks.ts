@@ -3,6 +3,7 @@ import { history } from 'components/Router'
 
 import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
 import { Channel, ConnectStatus, Routes } from 'utils/const'
+import { Address } from 'contexts/NeuronWallet/wallet'
 import { ProviderActions } from './reducer'
 
 export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispatch<any>) =>
@@ -17,6 +18,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           activeNetworkId: string
           wallets: any
           activeWallet: any
+          addresses: Address[]
           transactions: any
           locale: string
         }>
@@ -28,6 +30,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             activeNetworkId: networkId,
             wallets,
             activeWallet: wallet,
+            addresses,
             balance,
             transactions,
           } = args.result
@@ -37,7 +40,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           if (networks.length) {
             dispatch({
               type: ProviderActions.Initiate,
-              payload: { networks, networkId, wallet: { ...wallet, balance }, wallets },
+              payload: { networks, networkId, wallet: { ...wallet, balance, addresses }, wallets },
             })
           }
           if (transactions && transactions.totalCount) {
@@ -203,6 +206,15 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               type: ProviderActions.Wallet,
               payload: {
                 sending: args.result,
+              },
+            })
+            break
+          }
+          case WalletsMethod.AllAddresses: {
+            dispatch({
+              type: ProviderActions.Wallet,
+              payload: {
+                address: args.result,
               },
             })
             break
