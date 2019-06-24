@@ -10,7 +10,7 @@ import SyncInfo from './entities/sync-info'
 import logger from './utils/logger'
 import env from './env'
 
-import { InitMigration1560769176614 } from './migration/1560769176614-InitMigration'
+import { InitMigration1561352954925 } from './migration/1561352954925-InitMigration'
 
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
@@ -25,7 +25,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     type: 'sqlite',
     database: dbPath(genesisBlockHash),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1560769176614],
+    migrations: [InitMigration1561352954925],
   }
 }
 

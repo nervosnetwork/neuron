@@ -44,6 +44,12 @@ export default class Transaction extends BaseEntity {
   })
   blockHash: string | undefined = undefined
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  description?: string
+
   @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]
 
@@ -61,6 +67,7 @@ export default class Transaction extends BaseEntity {
       blockNumber: this.blockNumber,
       blockHash: this.blockHash,
       witnesses: this.witnesses,
+      description: this.description,
     }
   }
 }
