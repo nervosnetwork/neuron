@@ -27,6 +27,11 @@ export default {
           errorAction.payload.send = Message.InvalidAmount
           return true
         }
+        const [, decimal = ''] = item.amount.split('.')
+        if (decimal.length > 8) {
+          errorAction.payload.send = Message.InvalidAmount
+          return true
+        }
         return false
       }
     )
