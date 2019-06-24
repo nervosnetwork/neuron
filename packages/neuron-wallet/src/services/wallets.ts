@@ -18,6 +18,7 @@ import AddressService from './addresses'
 import { Address as AddressInterface } from '../addresses/dao'
 import Keychain from '../keys/keychain'
 import { updateApplicationMenu } from '../utils/application-menu'
+import AddressesUsedSubject from '../subjects/addresses-used-subject'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -151,6 +152,25 @@ export default class WalletService {
         const wallets = this.getAll()
         onCurrentWalletUpdated(wallets, newId)
       })
+
+    AddressesUsedSubject.getSubject().subscribe(async () => {
+      const currentWallet = this.getCurrent()
+      if (currentWallet) {
+        const addresses = await AddressService.allAddressesByWalletId(currentWallet.id).then(addrs =>
+          addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
+            address,
+            identifier,
+            type,
+            txCount,
+            description,
+          }))
+        )
+        windowManage.broadcast(Channel.Wallets, 'allAddresses', {
+          status: ResponseCode.Success,
+          result: addresses,
+        })
+      }
+    })
   }
 
   public getAll = (): WalletProperties[] => {
