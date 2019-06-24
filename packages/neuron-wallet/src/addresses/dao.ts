@@ -13,6 +13,7 @@ export interface Address {
   txCount: number
   blake160: string
   version: AddressVersion
+  description?: string
 }
 
 export default class AddressDao {
