@@ -51,7 +51,10 @@
       "scan-to-get-address": "scan the qrcode to get address"
     },
     "receive": {
-      "address-not-found": "Address not found"
+      "click-to-copy": "Click to copy the address",
+      "address-not-found": "Address not found",
+      "prompt": "Neuron will update the receiving address after transaction for the security sake. Please go to the advance view if used receiving addresses are needed",
+      "address-qrcode": "Address QRCode"
     },
     "history": {
       "meta": "meta",

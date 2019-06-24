@@ -36,8 +36,10 @@ const Navbar = () => {
           isActive={match => {
             return !!match
           }}
+          style={{
+            paddingRight: '15px',
+          }}
           activeStyle={{
-            backgroundColor: '#eee',
             fontWeight: 'bolder',
           }}
         >

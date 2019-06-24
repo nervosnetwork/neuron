@@ -53,11 +53,16 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
         <Card.Header>
           <h2>{t('navbar.receive')}</h2>
         </Card.Header>
-        <Card.Body>
+        <Card.Body style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+          <QRCodePanel onClick={() => setShowLargeQRCode(true)} style={{ alignSelf: 'center' }}>
+            <QRCode value={accountAddress} size={256} />
+          </QRCodePanel>
           <Form.Group>
-            <Form.Label>{t('Address')}</Form.Label>
             <AddressPanel>
-              <OverlayTrigger placement="bottom" overlay={<Tooltip id="address-tooltip">{t('Copy address')}</Tooltip>}>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={<Tooltip id="address-tooltip">{t('receive.click-to-copy')}</Tooltip>}
+              >
                 <InputGroup>
                   <Form.Control readOnly type="text" placeholder={accountAddress} onClick={() => copyAddress()} />
                   <InputGroup.Append>
@@ -74,12 +79,10 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
               </OverlayTrigger>
             </AddressPanel>
           </Form.Group>
-          <QRCodePanel onClick={() => setShowLargeQRCode(true)}>
-            <QRCode value={accountAddress} size={256} />
-          </QRCodePanel>
+          <Form.Text className="text-muted">{t('receive.prompt')}</Form.Text>
           <Modal centered show={showLargeQRCode} onHide={() => setShowLargeQRCode(false)}>
             <Modal.Header closeButton>
-              <Modal.Title id="contained-modal-title-vcenter">{t('Address QRCode')}</Modal.Title>
+              <Modal.Title id="contained-modal-title-vcenter">{t('receive.address-qrcode')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <QRCodeModal>

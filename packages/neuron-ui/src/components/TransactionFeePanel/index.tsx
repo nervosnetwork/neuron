@@ -9,10 +9,12 @@ const PanelHeader = styled.div`
 `
 const PanelBody = styled.div`
   display: grid;
+  grid-gap: 15px;
   grid-template:
     'price cycles' 1fr
     'speed cycles' 1fr /
     250px auto;
+  padding: 15px 0;
 `
 
 const Price = styled.div`
