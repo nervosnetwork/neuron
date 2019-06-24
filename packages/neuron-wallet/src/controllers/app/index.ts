@@ -28,7 +28,7 @@ export default class AppController {
         pageSize: 15,
         addresses: [],
       }).then(res => res.result),
-      WalletsController.getAvailableAddresses().then(res => res.result),
+      WalletsController.getAllAddresses().then(res => res.result),
     ])
 
     const locale = app.getLocale()

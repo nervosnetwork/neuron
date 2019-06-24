@@ -32,7 +32,7 @@ export enum WalletsMethod {
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
-  AvailableAddresses = 'availableAddresses',
+  AllAddresses = 'allAddresses',
 }
 
 export enum NetworksMethod {

@@ -208,7 +208,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
             break
           }
-          case WalletsMethod.AvailableAddresses: {
+          case WalletsMethod.AllAddresses: {
             dispatch({
               type: ProviderActions.Wallet,
               payload: {
