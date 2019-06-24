@@ -24,6 +24,7 @@ export interface TransactionWithoutHash {
   blockHash?: string
   witnesses?: Witness[]
   type?: string
+  description?: string
 }
 
 export interface Transaction extends TransactionWithoutHash {
