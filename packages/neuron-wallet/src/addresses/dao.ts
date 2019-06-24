@@ -1,4 +1,4 @@
-import { getConnection as getTxConnection, Not } from 'typeorm'
+import { Not } from 'typeorm'
 import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../keys/address'
 import { getConnection } from './ormconfig'
@@ -34,21 +34,21 @@ export default class AddressDao {
     return getConnection().manager.save(addressEntities)
   }
 
-  public static updateTxCount = async (address: string): Promise<boolean> => {
-    const addressEntity = await getConnection()
+  public static updateTxCount = async (address: string): Promise<AddressEntity[]> => {
+    const addressEntities = await getConnection()
       .getRepository(AddressEntity)
-      .findOne({
+      .find({
         address,
       })
 
-    if (!addressEntity) {
-      return false
-    }
-
     const txCount: number = await TransactionsService.getCountByAddress(address)
-    addressEntity.txCount = txCount
-    await getTxConnection().manager.save(addressEntity)
-    return true
+    const entities = addressEntities.map(entity => {
+      const addressEntity = entity
+      addressEntity.txCount = txCount
+      return addressEntity
+    })
+
+    return getConnection().manager.save(entities)
   }
 
   public static nextUnusedAddress = async (

@@ -29,13 +29,13 @@ const openWindow = () => {
   }
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
   i18n.changeLanguage(app.getLocale())
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
   updateApplicationMenu(wallets, currentWallet && currentWallet.id)
-  initConnection()
+  await initConnection()
   createSyncBlockTask()
   openWindow()
 })
