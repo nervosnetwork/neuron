@@ -445,7 +445,7 @@ export default class TransactionsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where(`output.lockHash = :lockHash`, { lockHash })
-      .select('output.outPointTxHash', 'outPointTxHash')
+      .select('DISTINCT output.outPointTxHash', 'outPointTxHash')
       .getRawMany()
 
     const outputTxHashes: string[] = outputs.map(output => output.outPointTxHash)
