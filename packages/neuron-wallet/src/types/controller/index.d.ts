@@ -4,4 +4,12 @@ declare module Controller {
     msg?: string
     result?: T
   }
+
+  namespace Params {
+    interface TransactionsByAddresses {
+      pageNo: number
+      pageSize: number
+      addresses: string
+    }
+  }
 }

@@ -39,7 +39,7 @@ const History = ({
           <SearchIcon />
         </NavLink>
       </div>
-      <TransactionList items={items} />
+      <TransactionList items={items} dispatch={dispatch} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <NavLink to={`${Routes.History}?pageNo=1`}>{t('history.first')}</NavLink>
         <NavLink

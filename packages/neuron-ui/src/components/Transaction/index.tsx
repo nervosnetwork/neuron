@@ -51,7 +51,7 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
         </Card.Text>
         <Card.Text>
           <b>{`${t('history.date')}: `}</b>
-          {new Date(transaction.time).toLocaleString()}
+          {new Date(transaction.timestamp).toLocaleString()}
         </Card.Text>
       </Card.Body>
       <Card.Footer>

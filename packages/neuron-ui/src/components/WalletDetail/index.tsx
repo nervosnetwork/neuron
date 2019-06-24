@@ -11,7 +11,7 @@ import { Routes } from 'utils/const'
 
 const LIST_COUNT = 5
 
-const WalletDetail: React.SFC<React.PropsWithoutRef<ContentProps>> = () => {
+const WalletDetail = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   const {
     wallet,
     chain: {
@@ -27,7 +27,7 @@ const WalletDetail: React.SFC<React.PropsWithoutRef<ContentProps>> = () => {
         {`Balance: ${currencyFormatter(wallet.balance)}(${currencyFormatter(wallet.balance, 'CNY')})`}
         <h5>{t('navbar.history')}</h5>
         {totalCount ? (
-          <TransactionList items={items.slice(0, LIST_COUNT)} />
+          <TransactionList items={items.slice(0, LIST_COUNT)} dispatch={dispatch} />
         ) : (
           <div>{t('messages.no-transactions')}</div>
         )}

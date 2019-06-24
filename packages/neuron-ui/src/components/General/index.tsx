@@ -65,7 +65,7 @@ const General = () => {
             <tbody>
               {items.map(tx => (
                 <tr key={tx.hash}>
-                  <td>{tx.time}</td>
+                  <td>{tx.timestamp}</td>
                   <td>{tx.type}</td>
                   <td>{tx.value}</td>
                 </tr>

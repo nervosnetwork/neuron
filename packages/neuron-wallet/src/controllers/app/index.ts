@@ -26,7 +26,7 @@ export default class AppController {
       TransactionsController.getAllByAddresses({
         pageNo: 1,
         pageSize: 15,
-        addresses: [],
+        addresses: '',
       }).then(res => res.result),
       WalletsController.getAllAddresses().then(res => res.result),
     ])

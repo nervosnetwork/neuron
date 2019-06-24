@@ -33,6 +33,7 @@ export enum WalletsMethod {
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
   AllAddresses = 'allAddresses',
+  UpdateAddressDescription = 'updateAddressDescription',
 }
 
 export enum NetworksMethod {
@@ -66,11 +67,6 @@ export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
   keywords?: string
-}
-
-export interface UpdateDescriptionParams {
-  key: string
-  description: string
 }
 
 const UILayer = (() => {
@@ -125,7 +121,7 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 export const transactionsCall = instantiateMethodCall(transactions) as {
   getAllByAddresses: (params: GetTransactionsParams) => void
   get: (hash: string) => void
-  updateDescription: (params: UpdateDescriptionParams) => void
+  updateDescription: (params: { hash: string; description: string }) => void
 }
 
 export const wallets = (
@@ -163,6 +159,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     }[]
     fee: string
   }) => void
+  updateAddressDescription: (params: { address: string; description: string }) => void
 }
 
 export const helpers = (method: HelpersMethod, ...params: any) => {

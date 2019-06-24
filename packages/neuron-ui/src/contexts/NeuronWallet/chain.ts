@@ -3,9 +3,10 @@ import { ConnectStatus, TransactionType } from 'utils/const'
 
 export interface Transaction {
   type: TransactionType
-  time: number
+  timestamp: number
   value: string
   hash: string
+  description: string
 }
 
 export interface Network extends RawNetwork {
@@ -33,7 +34,8 @@ const chainState: Chain = {
     value: '',
     hash: '',
     type: TransactionType.Other,
-    time: +new Date(0),
+    timestamp: +new Date(0),
+    description: '',
   },
   transactions: {
     pageNo: 1,
