@@ -7,7 +7,6 @@ import env from '../env'
 import { AddressVersion } from '../addresses/entities/address'
 
 const MAX_ADDRESS_COUNT = 30
-// const SEARCH_RANGE = 20
 
 export interface AddressMetaInfo {
   walletId: string

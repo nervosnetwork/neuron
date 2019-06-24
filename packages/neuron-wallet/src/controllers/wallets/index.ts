@@ -273,12 +273,12 @@ export default class WalletsController {
       throw new CurrentWalletNotSet()
     }
     const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
-      addrs.map(({ address, blake160: identifier, addressType: type, txCount }) => ({
+      addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
         address,
         identifier,
         type,
         txCount,
-        description: 'mock description',
+        description,
       }))
     )
     return {
@@ -304,7 +304,7 @@ export default class WalletsController {
       }
     if (!params) throw new IsRequired('Parameters')
     try {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus', {
         status: ResponseCode.Success,
         result: true,
       })
@@ -322,7 +322,7 @@ export default class WalletsController {
         },
       }
     } finally {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus' as any, {
+      windowManage.broadcast(Channel.Wallets, 'sendingStatus', {
         status: ResponseCode.Success,
         result: false,
       })

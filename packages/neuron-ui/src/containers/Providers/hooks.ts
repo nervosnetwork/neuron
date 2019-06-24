@@ -214,7 +214,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             dispatch({
               type: ProviderActions.Wallet,
               payload: {
-                address: args.result,
+                addresses: args.result,
               },
             })
             break
