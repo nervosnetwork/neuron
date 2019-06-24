@@ -50,7 +50,7 @@ export default class Address extends BaseEntity {
   version!: AddressVersion
 
   @Column({
-    type: 'text',
+    type: 'varchar',
     nullable: true,
   })
   description?: string
