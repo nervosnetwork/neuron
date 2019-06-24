@@ -1,4 +1,4 @@
-import { getConnection as getTxConnection, Not } from 'typeorm'
+import { Not } from 'typeorm'
 import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../keys/address'
 import { getConnection } from './ormconfig'
@@ -48,7 +48,7 @@ export default class AddressDao {
       return addressEntity
     })
 
-    return getTxConnection().manager.save(entities)
+    return getConnection().manager.save(entities)
   }
 
   public static nextUnusedAddress = async (

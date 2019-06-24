@@ -111,7 +111,6 @@ export default class CellsService {
     const outputEntities = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
-      .select(`DISTINCT args`, 'args')
       .getMany()
     const blake160s: string[] = outputEntities
       .map(output => {
@@ -127,6 +126,8 @@ export default class CellsService {
       })
       .filter(blake160 => !!blake160) as string[]
 
-    return blake160s
+    const uniqueBlake160s = [...new Set(blake160s)]
+
+    return uniqueBlake160s
   }
 }
