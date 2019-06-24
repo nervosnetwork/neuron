@@ -5,6 +5,7 @@ import LockUtils from '../utils/lock-utils'
 import AddressDao, { Address as AddressInterface } from '../addresses/dao'
 import env from '../env'
 import { AddressVersion } from '../addresses/entities/address'
+import AddressesUsedSubject from '../subjects/addresses-used-subject'
 
 const MAX_ADDRESS_COUNT = 30
 // const SEARCH_RANGE = 20
@@ -172,3 +173,9 @@ export default class AddressService {
     return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
   }
 }
+
+// update txCount when addresses used
+const addressUsedSubject = AddressesUsedSubject.getSubject()
+addressUsedSubject.subscribe(async (addresses: string[]) => {
+  await AddressService.updateTxCounts(addresses)
+})
