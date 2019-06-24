@@ -23,7 +23,7 @@ const prompt = (type = 'password', browserOptions: BrowserWindowConstructorOptio
   return new Promise(resolve => {
     const options = {
       width: 500,
-      height: 400,
+      height: 200,
       resizable: false,
       title: type,
       label: 'Please input a value',
