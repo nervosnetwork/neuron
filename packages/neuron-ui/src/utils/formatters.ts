@@ -50,15 +50,19 @@ export const currencyFormatter = (
 }
 
 export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
+  const [integer = '0', decimal = ''] = amount.split('.')
+  const decimalLength = 10 ** decimal.length
+  const num = integer + decimal
+
   switch (uint) {
     case CapacityUnit.CKB: {
-      return (BigInt(amount) * BigInt(1e8)).toString()
+      return (BigInt(num) * BigInt(1e8 / decimalLength)).toString()
     }
     case CapacityUnit.CKKB: {
-      return (BigInt(amount) * BigInt(1e11)).toString()
+      return (BigInt(num) * BigInt(1e11 / decimalLength)).toString()
     }
     case CapacityUnit.CKGB: {
-      return (BigInt(amount) * BigInt(1e17)).toString()
+      return (BigInt(num) * BigInt(1e17 / decimalLength)).toString()
     }
     default: {
       return amount

@@ -56,6 +56,48 @@ describe('formatters', () => {
     const fixtures = [
       {
         source: {
+          amount: '1.234',
+          uint: CapacityUnit.CKB,
+        },
+        target: '123400000',
+      },
+      {
+        source: {
+          amount: '1.23456789',
+          uint: CapacityUnit.CKB,
+        },
+        target: '123456789',
+      },
+      {
+        source: {
+          amount: '1.0',
+          uint: CapacityUnit.CKB,
+        },
+        target: '100000000',
+      },
+      {
+        source: {
+          amount: '1.',
+          uint: CapacityUnit.CKB,
+        },
+        target: '100000000',
+      },
+      {
+        source: {
+          amount: '0.123',
+          uint: CapacityUnit.CKB,
+        },
+        target: '12300000',
+      },
+      {
+        source: {
+          amount: '.123',
+          uint: CapacityUnit.CKB,
+        },
+        target: '12300000',
+      },
+      {
+        source: {
           amount: '12345678901234567890123456789012345678901234567890123456789012345678901234',
           uint: CapacityUnit.CKB,
         },
