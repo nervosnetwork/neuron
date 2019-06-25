@@ -58,7 +58,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
 
   const addressesItems = useMemo(
     () =>
-      addresses.map(({ type, identifier, address, txCount, description }, idx) => ({
+      addresses.map(({ type, identifier, address, txCount, balance, description }, idx) => ({
         type: type === 0 ? t('addresses.receiving-address') : t('addresses.change-address'),
         address: <AddressPanel address={address} />,
         identifier,
@@ -73,7 +73,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
             maxLength={100}
           />
         ),
-        balance: '0',
+        balance,
         transactions: txCount,
         key: identifier,
       })),

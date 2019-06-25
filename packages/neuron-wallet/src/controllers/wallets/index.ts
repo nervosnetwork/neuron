@@ -279,6 +279,7 @@ export default class WalletsController {
         type,
         txCount,
         description,
+        balance: '0',
       }))
     )
     return {

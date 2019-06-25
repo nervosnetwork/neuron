@@ -163,6 +163,7 @@ export default class WalletService {
             type,
             txCount,
             description,
+            balance: '0',
           }))
         )
         windowManage.broadcast(Channel.Wallets, 'allAddresses', {
