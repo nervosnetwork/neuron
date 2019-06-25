@@ -318,7 +318,8 @@ export default class WalletService {
       capacity: string
     }[],
     password: string,
-    fee: string = '0'
+    fee: string = '0',
+    description?: string
   ) => {
     const wallet = await this.getCurrent()
     if (!wallet) {
@@ -374,6 +375,7 @@ export default class WalletService {
     const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
     await core.rpc.sendTransaction(txToSend)
 
+    tx.description = description
     TransactionsService.txSentSubject.next({
       transaction: tx,
       txHash,

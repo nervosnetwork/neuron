@@ -295,6 +295,7 @@ export default class WalletsController {
       capacity: string
     }[]
     fee: string
+    description?: string
   }) {
     const password = await WalletsController.requestPassword(i18n.t('messageBox.send-capacity.title'))
     if (password === null)
@@ -308,7 +309,7 @@ export default class WalletsController {
         status: ResponseCode.Success,
         result: true,
       })
-      const hash = await walletsService.sendCapacity(params.items, password, params.fee)
+      const hash = await walletsService.sendCapacity(params.items, password, params.fee, params.description)
       return {
         status: ResponseCode.Success,
         result: hash,
