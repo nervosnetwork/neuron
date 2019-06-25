@@ -50,6 +50,7 @@ describe('Key tests with db', () => {
     addressType: AddressType.Receiving,
     addressIndex: 0,
     txCount: 0,
+    balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }
@@ -61,6 +62,7 @@ describe('Key tests with db', () => {
     addressType: AddressType.Receiving,
     addressIndex: 0,
     txCount: 1,
+    balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }
@@ -72,6 +74,7 @@ describe('Key tests with db', () => {
     addressType: AddressType.Change,
     addressIndex: 0,
     txCount: 0,
+    balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }
