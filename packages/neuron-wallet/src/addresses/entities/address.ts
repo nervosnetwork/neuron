@@ -1,6 +1,7 @@
-import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm'
+import { Entity, BaseEntity, PrimaryColumn, Column, AfterInsert, AfterUpdate, AfterRemove } from 'typeorm'
 import { AddressType } from '../../keys/address'
 import { Address as AddressInterface } from '../dao'
+import AddressDbChangedSubject from '../../subjects/address-db-changed-subject'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -67,5 +68,24 @@ export default class Address extends BaseEntity {
       version: this.version,
       description: this.description,
     }
+  }
+
+  @AfterInsert()
+  emitInsert() {
+    this.changed('AfterInsert')
+  }
+
+  @AfterUpdate()
+  emitUpdate() {
+    this.changed('AfterUpdate')
+  }
+
+  @AfterRemove()
+  emitRemove() {
+    this.changed('AfterRemove')
+  }
+
+  private changed = (event: string) => {
+    AddressDbChangedSubject.getSubject().next(event)
   }
 }
