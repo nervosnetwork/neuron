@@ -46,7 +46,7 @@ const History = ({
           to={`${Routes.History}?pageNo=${pageNo - 1}`}
           style={{
             pointerEvents: pageNo - 1 < 1 ? 'none' : 'auto',
-            color: pageNo - 1 < 1 ? 'grey' : 'current',
+            color: pageNo - 1 < 1 ? 'grey' : '#007bff',
           }}
         >
           {t('history.previous')}
@@ -55,7 +55,7 @@ const History = ({
           to={`${Routes.History}?pageNo=${pageNo + 1}`}
           style={{
             pointerEvents: pageNo + 1 > totalPages ? 'none' : 'auto',
-            color: pageNo + 1 > totalPages ? 'grey' : 'current',
+            color: pageNo + 1 > totalPages ? 'grey' : '#007bff',
           }}
         >
           {t('history.next')}

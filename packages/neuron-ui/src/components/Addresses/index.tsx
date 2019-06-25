@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import { Container } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
 
 import Table from 'widgets/Table'
@@ -81,7 +80,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   )
 
   return (
-    <Container>
+    <>
       <h2>{t('addresses.addresses')}</h2>
       <Table
         headers={headers.map(header => ({
@@ -98,7 +97,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
           striped: true,
         }}
       />
-    </Container>
+    </>
   )
 }
 
