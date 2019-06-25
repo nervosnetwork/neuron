@@ -14,7 +14,7 @@ export { genesisBlockHash }
 const updateAllAddressesTxCount = async () => {
   const blake160s: string[] = await CellsService.allBlake160s()
   const addresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
-  await AddressService.updateTxCounts(addresses)
+  await AddressService.updateTxCountAndBalances(addresses)
 }
 
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
