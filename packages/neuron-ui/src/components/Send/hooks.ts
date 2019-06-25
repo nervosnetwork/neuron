@@ -10,7 +10,7 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(
     (field: string) => (idx: number) => (value: string) => {
       dispatch({
-        type: MainActions.UpdateTransactionOutput,
+        type: MainActions.UpdateSendOutput,
         payload: {
           idx,
           item: {
@@ -25,7 +25,7 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
 const useAddTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(() => {
     dispatch({
-      type: MainActions.AddTransactionOutput,
+      type: MainActions.AddSendOutput,
     })
   }, [dispatch])
 
@@ -33,7 +33,7 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(
     (idx: number) => {
       dispatch({
-        type: MainActions.RemoveTransactionOutput,
+        type: MainActions.RemoveSendOutput,
         payload: idx,
       })
     },
@@ -73,7 +73,7 @@ const useUpdateTransactionPrice = (dispatch: any) =>
   useCallback(
     (e: any) => {
       dispatch({
-        type: MainActions.UpdateTransactionPrice,
+        type: MainActions.UpdateSendPrice,
         paylaod: e.currentTarget.value,
       })
     },
