@@ -1,3 +1,4 @@
+/* globals BigInt */
 import React, { useEffect } from 'react'
 import { history } from 'components/Router'
 
@@ -5,6 +6,10 @@ import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, Wa
 import { Channel, ConnectStatus, Routes } from 'utils/const'
 import { Address } from 'contexts/NeuronWallet/wallet'
 import { ProviderActions } from './reducer'
+
+const addressesToBalance = (addresses: Address[] = []) => {
+  return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
+}
 
 export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispatch<any>) =>
   useEffect(() => {
@@ -31,7 +36,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             wallets,
             activeWallet: wallet,
             addresses,
-            balance,
             transactions,
           } = args.result
           if (locale !== i18n.language) {
@@ -40,7 +44,12 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           if (networks.length) {
             dispatch({
               type: ProviderActions.Initiate,
-              payload: { networks, networkId, wallet: { ...wallet, balance, addresses }, wallets },
+              payload: {
+                networks,
+                networkId,
+                wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
+                wallets,
+              },
             })
           }
           if (transactions && transactions.totalCount) {
@@ -211,10 +220,12 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             break
           }
           case WalletsMethod.AllAddresses: {
+            const addresses = args.result || []
             dispatch({
               type: ProviderActions.Wallet,
               payload: {
-                addresses: args.result,
+                addresses,
+                balance: addressesToBalance(addresses),
               },
             })
             break

@@ -1,4 +1,3 @@
-/* globals BigInt */
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useNeuronWallet } from 'utils/hooks'
@@ -33,7 +32,7 @@ const Field = styled.div`
 
 const General = () => {
   const {
-    wallet: { addresses },
+    wallet: { balance },
     chain: {
       networkId,
       transactions: { items },
@@ -43,9 +42,6 @@ const General = () => {
   } = useNeuronWallet()
   const [t] = useTranslation()
   const activeNetwork = useMemo(() => networks.find(n => n.id === networkId), [networkId, networks])
-  const balance = useMemo(() => {
-    return addresses.reduce((total, addr) => total + BigInt(addr.balance), BigInt(0)).toString()
-  }, [addresses])
   return (
     <GeneralPanel>
       <Balance>
