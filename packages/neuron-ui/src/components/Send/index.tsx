@@ -37,6 +37,7 @@ const Send = ({
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onClear,
   } = useInitialize(address, dispatch, history)
 
   return (
@@ -119,6 +120,9 @@ const Send = ({
             disabled={sending}
           >
             {sending ? <Spinner /> : t('send.send')}
+          </Button>
+          <Button type="reset" variant="outline-primary" size="lg" block onClick={onClear}>
+            Clear
           </Button>
         </Card.Body>
       </Card>

@@ -91,6 +91,15 @@ const useSendDescriptionChange = (dispatch: MainDispatch) =>
     [dispatch]
   )
 
+const clear = (dispatch: MainDispatch) => {
+  dispatch({
+    type: MainActions.UpdateSendState,
+    payload: initState.send,
+  })
+}
+
+const useClear = (dispatch: MainDispatch) => useCallback(() => clear(dispatch), [dispatch])
+
 export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -100,16 +109,14 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
+  const onClear = useClear(dispatch)
 
   useEffect(() => {
     if (address) {
       updateTransactionOutput('address')(0)(address)
     }
     return () => {
-      dispatch({
-        type: MainActions.UpdateSendState,
-        payload: initState.send,
-      })
+      clear(dispatch)
     }
   }, [address, dispatch, history, updateTransactionOutput])
 
@@ -125,6 +132,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onClear,
   }
 }
 
