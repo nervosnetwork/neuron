@@ -232,7 +232,12 @@ export default class TransactionsService {
       )
 
       const previousOutputs: OutputEntity[] = previousOutputsWithUndefined.filter(o => !!o) as OutputEntity[]
-      await connection.manager.save(outputs.concat(previousOutputs))
+
+      // should update timestamp / blockNumber / blockHash
+      txEntity.timestamp = transaction.timestamp
+      txEntity.blockHash = transaction.blockHash
+      txEntity.blockNumber = transaction.blockNumber
+      await connection.manager.save([txEntity, ...outputs.concat(previousOutputs)])
 
       return txEntity
     }
