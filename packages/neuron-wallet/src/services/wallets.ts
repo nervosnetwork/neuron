@@ -41,6 +41,22 @@ export interface WalletProperties {
   keystore?: Keystore
 }
 
+const broadcastCurrentAddresses = async (currentId: string) => {
+  const addresses = await AddressService.allAddressesByWalletId(currentId).then(addrs =>
+    addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
+      address,
+      identifier,
+      type,
+      txCount,
+      description,
+    }))
+  )
+  windowManage.broadcast(Channel.Wallets, 'allAddresses', {
+    status: ResponseCode.Success,
+    result: addresses,
+  })
+}
+
 export class FileKeystoreWallet implements Wallet {
   public id: string
   public name: string
@@ -149,6 +165,7 @@ export default class WalletService {
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(([, newId]) => {
         if (newId === undefined) return
+        broadcastCurrentAddresses(newId)
         const wallets = this.getAll()
         onCurrentWalletUpdated(wallets, newId)
       })
@@ -156,20 +173,7 @@ export default class WalletService {
     AddressesUsedSubject.getSubject().subscribe(async () => {
       const currentWallet = this.getCurrent()
       if (currentWallet) {
-        const addresses = await AddressService.allAddressesByWalletId(currentWallet.id).then(addrs =>
-          addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
-            address,
-            identifier,
-            type,
-            txCount,
-            description,
-            balance: '0',
-          }))
-        )
-        windowManage.broadcast(Channel.Wallets, 'allAddresses', {
-          status: ResponseCode.Success,
-          result: addresses,
-        })
+        broadcastCurrentAddresses(currentWallet.id)
       }
     })
   }
