@@ -25,7 +25,7 @@ const Send = ({
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
-    wallet: { sending },
+    wallet: { sending, balance },
   } = useNeuronWallet()
   const {
     id,
@@ -111,6 +111,7 @@ const Send = ({
             />
           </Form>
           <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
+          <div>{`${t('send.balance')}: ${balance}`}</div>
           <Button
             type="submit"
             variant="primary"

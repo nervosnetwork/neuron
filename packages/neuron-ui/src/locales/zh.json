@@ -49,7 +49,8 @@
       "input-password-to-confirm": "输入密码以确认本次交易",
       "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫码二维码以获取地址",
-      "description": "备注"
+      "description": "备注",
+      "balance": "余额"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
