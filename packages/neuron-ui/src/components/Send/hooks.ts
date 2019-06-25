@@ -4,6 +4,7 @@ import { TransactionOutput } from 'services/UILayer'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 import { CapacityUnit } from 'utils/const'
 import initState from 'containers/MainContent/state'
+import { MainDispatch } from '../../containers/MainContent/reducer'
 
 const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(
@@ -41,9 +42,9 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
 
 const useOnSubmit = (dispatch: React.Dispatch<any>) =>
   useCallback(
-    (id: string, items: TransactionOutput[]) => () => {
+    (id: string, items: TransactionOutput[], description: string) => () => {
       setTimeout(() => {
-        dispatch(actionCreators.submitTransaction(id, items))
+        dispatch(actionCreators.submitTransaction(id, items, description))
       }, 10)
     },
     [dispatch]
@@ -78,6 +79,18 @@ const useUpdateTransactionPrice = (dispatch: any) =>
     },
     [dispatch]
   )
+
+const useSendDescriptionChange = (dispatch: MainDispatch) =>
+  useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      dispatch({
+        type: MainActions.UpdateSendDescription,
+        payload: e.currentTarget.value,
+      })
+    },
+    [dispatch]
+  )
+
 export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -86,6 +99,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
+  const onDescriptionChange = useSendDescriptionChange(dispatch)
 
   useEffect(() => {
     if (address) {
@@ -110,6 +124,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
+    onDescriptionChange,
   }
 }
 

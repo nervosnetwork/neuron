@@ -48,7 +48,8 @@
       "to": "to",
       "input-password-to-confirm": "input password to confirm",
       "this-transaction-will-send": "This transaction will send",
-      "scan-to-get-address": "scan the qrcode to get address"
+      "scan-to-get-address": "scan the qrcode to get address",
+      "description": "Description"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",

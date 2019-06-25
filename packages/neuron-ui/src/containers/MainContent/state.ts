@@ -10,6 +10,7 @@ export const initState = {
       },
     ],
     price: '0',
+    description: '',
     submitting: false,
   },
   loadings: {

@@ -7,7 +7,7 @@ import { CKBToShannonFormatter } from 'utils/formatters'
 import { MainActions } from '../reducer'
 
 export default {
-  submitTransaction: (id: string, items: TransactionOutput[]) => {
+  submitTransaction: (id: string, items: TransactionOutput[], description: string) => {
     const errorAction = {
       type: MainActions.ErrorMessage,
       payload: {
@@ -45,6 +45,7 @@ export default {
         capacity: CKBToShannonFormatter(item.amount, item.unit),
       })),
       fee: '0',
+      description,
     })
     return {
       type: MainActions.UpdateSendState,

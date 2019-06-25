@@ -17,6 +17,7 @@ export enum MainActions {
   RemoveTransactionOutput,
   UpdateTransactionOutput,
   UpdateTransactionPrice,
+  UpdateSendDescription,
   UpdateSendState,
   UpdatePassword,
   UpdateLoading,

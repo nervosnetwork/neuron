@@ -158,6 +158,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
       capacity: string
     }[]
     fee: string
+    description: string
   }) => void
   updateAddressDescription: (params: { address: string; description: string }) => void
 }

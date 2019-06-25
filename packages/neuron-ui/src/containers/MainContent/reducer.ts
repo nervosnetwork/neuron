@@ -70,6 +70,15 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
+    case MainActions.UpdateSendDescription: {
+      return {
+        ...state,
+        send: {
+          ...state.send,
+          description: action.payload || '',
+        },
+      }
+    }
     case MainActions.UpdateSendState: {
       return {
         ...state,
