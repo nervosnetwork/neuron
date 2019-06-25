@@ -15,6 +15,7 @@ export interface Address {
   description: string
   type: 0 | 1 // 0 for receiving, 1 for change
   txCount: number
+  balance: string
 }
 
 export const walletState: Wallet = {
