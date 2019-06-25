@@ -3,6 +3,8 @@ import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../keys/address'
 import { getConnection } from './ormconfig'
 import TransactionsService from '../services/transactions'
+import CellsService from '../services/cells'
+import LockUtils from '../utils/lock-utils'
 
 export interface Address {
   walletId: string
@@ -11,6 +13,7 @@ export interface Address {
   addressType: AddressType
   addressIndex: number
   txCount: number
+  balance: string
   blake160: string
   version: AddressVersion
   description?: string
@@ -28,13 +31,14 @@ export default class AddressDao {
       addressEntity.txCount = address.txCount || 0
       addressEntity.blake160 = address.blake160
       addressEntity.version = address.version
+      addressEntity.balance = address.balance || '0'
       return addressEntity
     })
 
     return getConnection().manager.save(addressEntities)
   }
 
-  public static updateTxCount = async (address: string): Promise<AddressEntity[]> => {
+  public static updateTxCountAndBalance = async (address: string): Promise<AddressEntity[]> => {
     const addressEntities = await getConnection()
       .getRepository(AddressEntity)
       .find({
@@ -42,11 +46,15 @@ export default class AddressDao {
       })
 
     const txCount: number = await TransactionsService.getCountByAddress(address)
-    const entities = addressEntities.map(entity => {
-      const addressEntity = entity
-      addressEntity.txCount = txCount
-      return addressEntity
-    })
+    const entities = await Promise.all(
+      addressEntities.map(async entity => {
+        const addressEntity = entity
+        addressEntity.txCount = txCount
+        const lockHash: string = await LockUtils.addressToLockHash(addressEntity.address)
+        addressEntity.balance = await CellsService.getBalance([lockHash])
+        return addressEntity
+      })
+    )
 
     return getConnection().manager.save(entities)
   }

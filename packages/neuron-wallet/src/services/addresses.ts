@@ -40,9 +40,9 @@ export default class AddressService {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "off" */
-  public static updateTxCounts = async (addresses: string[]) => {
+  public static updateTxCountAndBalances = async (addresses: string[]) => {
     for (const address of addresses) {
-      await AddressDao.updateTxCount(address)
+      await AddressDao.updateTxCountAndBalance(address)
     }
   }
 
@@ -113,6 +113,7 @@ export default class AddressService {
       addressType: addressMetaInfo.addressType,
       addressIndex: addressMetaInfo.addressIndex,
       txCount: 0,
+      balance: '0',
       blake160,
       version: AddressVersion.Testnet,
     }
@@ -176,5 +177,5 @@ export default class AddressService {
 // update txCount when addresses used
 const addressUsedSubject = AddressesUsedSubject.getSubject()
 addressUsedSubject.subscribe(async (addresses: string[]) => {
-  await AddressService.updateTxCounts(addresses)
+  await AddressService.updateTxCountAndBalances(addresses)
 })

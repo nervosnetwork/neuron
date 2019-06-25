@@ -56,6 +56,11 @@ export default class Address extends BaseEntity {
   })
   description?: string
 
+  @Column({
+    type: 'varchar',
+  })
+  balance: string = '0'
+
   public toInterface = (): AddressInterface => {
     return {
       address: this.address,
@@ -66,6 +71,7 @@ export default class Address extends BaseEntity {
       txCount: this.txCount,
       blake160: this.blake160,
       version: this.version,
+      balance: this.balance,
       description: this.description,
     }
   }
