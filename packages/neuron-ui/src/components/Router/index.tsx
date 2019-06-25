@@ -9,7 +9,6 @@ import Footer from 'containers/Footer'
 
 import General from 'components/General'
 import WalletWizard from 'components/WalletWizard'
-import WalletDetail from 'components/WalletDetail'
 import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
@@ -69,13 +68,6 @@ export const mainContents: CustomRoute[] = [
     path: Routes.General,
     exact: true,
     component: General,
-  },
-  {
-    name: `Wallet`,
-    path: Routes.Wallet,
-    exact: false,
-    params: `/:id?`,
-    component: WalletDetail,
   },
   {
     name: `Send`,
