@@ -36,7 +36,6 @@ export default class AppController {
       activeWallet: activeWallet && {
         ...activeWallet,
       },
-      balance: '1000000000000001212121212', // TODO: provide the balance of current wallet
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
       activeNetworkId,
