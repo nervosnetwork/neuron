@@ -255,6 +255,7 @@ export default class TransactionsService {
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnesses!
+    tx.description = transaction.description
     tx.inputs = []
     tx.outputs = []
     const inputs: InputEntity[] = []
