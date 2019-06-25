@@ -12,7 +12,7 @@ export type MainDispatch = React.Dispatch<{ type: MainActions; payload?: any }>
 export type InitState = typeof initState
 export const reducer = (state: typeof initState, action: { type: MainActions; payload: any }) => {
   switch (action.type) {
-    case MainActions.AddTransactionOutput: {
+    case MainActions.AddSendOutput: {
       return {
         ...state,
         errorMsgs: {
@@ -32,7 +32,7 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
-    case MainActions.RemoveTransactionOutput: {
+    case MainActions.RemoveSendOutput: {
       return {
         ...state,
         errorMsgs: {
@@ -46,7 +46,7 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         },
       }
     }
-    case MainActions.UpdateTransactionOutput: {
+    case MainActions.UpdateSendOutput: {
       const outputs = [...state.send.outputs]
       outputs[action.payload.idx] = {
         ...outputs[action.payload.idx],
@@ -61,12 +61,21 @@ export const reducer = (state: typeof initState, action: { type: MainActions; pa
         send: { outputs },
       }
     }
-    case MainActions.UpdateTransactionPrice: {
+    case MainActions.UpdateSendPrice: {
       return {
         ...state,
         send: {
           ...state.send,
           price: action.payload,
+        },
+      }
+    }
+    case MainActions.UpdateSendDescription: {
+      return {
+        ...state,
+        send: {
+          ...state.send,
+          description: action.payload || '',
         },
       }
     }

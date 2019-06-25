@@ -36,6 +36,8 @@ const Send = ({
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
+    onDescriptionChange,
+    onClear,
   } = useInitialize(address, dispatch, history)
 
   return (
@@ -98,6 +100,15 @@ const Send = ({
                 </div>
               </div>
             ))}
+            <input
+              placeholder={t('send.description')}
+              type="text"
+              id="description"
+              alt="description"
+              value={send.description}
+              onChange={onDescriptionChange}
+              style={{ width: '100%' }}
+            />
           </Form>
           <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
           <Button
@@ -105,10 +116,13 @@ const Send = ({
             variant="primary"
             size="lg"
             block
-            onClick={onSubmit(id, send.outputs)}
+            onClick={onSubmit(id, send.outputs, send.description)}
             disabled={sending}
           >
             {sending ? <Spinner /> : t('send.send')}
+          </Button>
+          <Button type="reset" variant="outline-primary" size="lg" block onClick={onClear}>
+            Clear
           </Button>
         </Card.Body>
       </Card>

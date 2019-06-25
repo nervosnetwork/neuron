@@ -4,12 +4,13 @@ import { TransactionOutput } from 'services/UILayer'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
 import { CapacityUnit } from 'utils/const'
 import initState from 'containers/MainContent/state'
+import { MainDispatch } from '../../containers/MainContent/reducer'
 
 const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(
     (field: string) => (idx: number) => (value: string) => {
       dispatch({
-        type: MainActions.UpdateTransactionOutput,
+        type: MainActions.UpdateSendOutput,
         payload: {
           idx,
           item: {
@@ -24,7 +25,7 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
 const useAddTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(() => {
     dispatch({
-      type: MainActions.AddTransactionOutput,
+      type: MainActions.AddSendOutput,
     })
   }, [dispatch])
 
@@ -32,7 +33,7 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
   useCallback(
     (idx: number) => {
       dispatch({
-        type: MainActions.RemoveTransactionOutput,
+        type: MainActions.RemoveSendOutput,
         payload: idx,
       })
     },
@@ -41,9 +42,9 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
 
 const useOnSubmit = (dispatch: React.Dispatch<any>) =>
   useCallback(
-    (id: string, items: TransactionOutput[]) => () => {
+    (id: string, items: TransactionOutput[], description: string) => () => {
       setTimeout(() => {
-        dispatch(actionCreators.submitTransaction(id, items))
+        dispatch(actionCreators.submitTransaction(id, items, description))
       }, 10)
     },
     [dispatch]
@@ -72,12 +73,33 @@ const useUpdateTransactionPrice = (dispatch: any) =>
   useCallback(
     (e: any) => {
       dispatch({
-        type: MainActions.UpdateTransactionPrice,
+        type: MainActions.UpdateSendPrice,
         paylaod: e.currentTarget.value,
       })
     },
     [dispatch]
   )
+
+const useSendDescriptionChange = (dispatch: MainDispatch) =>
+  useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      dispatch({
+        type: MainActions.UpdateSendDescription,
+        payload: e.currentTarget.value,
+      })
+    },
+    [dispatch]
+  )
+
+const clear = (dispatch: MainDispatch) => {
+  dispatch({
+    type: MainActions.UpdateSendState,
+    payload: initState.send,
+  })
+}
+
+const useClear = (dispatch: MainDispatch) => useCallback(() => clear(dispatch), [dispatch])
+
 export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -86,16 +108,15 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
+  const onDescriptionChange = useSendDescriptionChange(dispatch)
+  const onClear = useClear(dispatch)
 
   useEffect(() => {
     if (address) {
       updateTransactionOutput('address')(0)(address)
     }
     return () => {
-      dispatch({
-        type: MainActions.UpdateSendState,
-        payload: initState.send,
-      })
+      clear(dispatch)
     }
   }, [address, dispatch, history, updateTransactionOutput])
 
@@ -110,6 +131,8 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
+    onDescriptionChange,
+    onClear,
   }
 }
 
