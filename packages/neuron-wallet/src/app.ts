@@ -1,9 +1,10 @@
 import path from 'path'
+import os from 'os'
 import { app as electronApp, remote } from 'electron'
 
 const fakeApp = {
   getPath(aPath: string): string {
-    return path.join(__dirname, '../tests', aPath)
+    return path.join(os.tmpdir(), aPath)
   },
   getName(): string {
     return 'Fake App'
