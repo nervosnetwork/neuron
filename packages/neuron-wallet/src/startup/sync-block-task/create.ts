@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import { Subject } from 'rxjs'
+import { Subject, ReplaySubject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
@@ -17,10 +17,12 @@ const updateAllAddressesTxCount = async () => {
   await AddressService.updateTxCountAndBalances(addresses)
 }
 
+export const databaseInitSubject = new ReplaySubject(1)
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
     // TODO: only switch if genesisHash is different
     await initDatabase()
+    databaseInitSubject.next(network)
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount()
   }

@@ -8,7 +8,7 @@ import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 
-const { networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject } = remote.require(
+const { nodeService, addressChangeSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
   './startup/sync-block-task/params'
 )
 
@@ -55,7 +55,7 @@ export const switchNetwork = async () => {
 
 export const run = async () => {
   await initAddressConnection()
-  networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
+  databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
       await switchNetwork()
     }
