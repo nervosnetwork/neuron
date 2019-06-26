@@ -11,11 +11,11 @@
      "packages/neuron-wallet/src/database/chain/migrations/**/*.ts"
   ],
   "subscribers": [
-     "packages/neuron-wallet/src/subscriber/**/*.ts"
+     "packages/neuron-wallet/src/database/chain/subscriber/**/*.ts"
   ],
   "cli": {
      "entitiesDir": "packages/neuron-wallet/src/database/chain/entities",
      "migrationsDir": "packages/neuron-wallet/src/database/chain/migrations",
-     "subscribersDir": "packages/neuron-wallet/src/subscriber"
+     "subscribersDir": "packages/neuron-wallet/src/database/chain/subscriber"
   }
 }
