@@ -10,7 +10,7 @@ import NodeService from './node'
 import LockUtils from '../utils/lock-utils'
 import TypeConvert from '../app-types/type-convert'
 import { NetworkWithID } from './networks'
-import AddressesUsedSubject from '../subjects/addresses-used-subject'
+import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
 const { app }: { app: any } = remote
 const { syncBlockTask } = app

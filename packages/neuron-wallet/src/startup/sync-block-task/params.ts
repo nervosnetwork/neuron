@@ -1,5 +1,5 @@
 import NodeService from '../../services/node'
-import { AddressesUsedSubject } from '../../subjects/addresses-used-subject'
+import { AddressesUsedSubject } from '../../models/subjects/addresses-used-subject'
 
 export { networkSwitchSubject } from '../../services/networks'
 export { addressChangeSubject, genesisBlockHash } from './create'

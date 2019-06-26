@@ -5,7 +5,7 @@ import LockUtils from '../utils/lock-utils'
 import AddressDao, { Address as AddressInterface } from '../database/address/dao'
 import env from '../env'
 import { AddressVersion } from '../database/address/entities/address'
-import AddressesUsedSubject from '../subjects/addresses-used-subject'
+import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
 const MAX_ADDRESS_COUNT = 30
 

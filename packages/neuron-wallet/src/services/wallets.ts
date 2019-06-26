@@ -18,7 +18,7 @@ import AddressService from './addresses'
 import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
 import { updateApplicationMenu } from '../utils/application-menu'
-import AddressesUsedSubject from '../subjects/addresses-used-subject'
+import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
