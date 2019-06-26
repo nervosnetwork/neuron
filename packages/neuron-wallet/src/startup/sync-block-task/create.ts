@@ -3,11 +3,11 @@ import { Subject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
-import initConnection from '../../database/chain/ormconfig'
 import genesisBlockHash from './genesis'
 import CellsService from '../../services/cells'
 import LockUtils from '../../utils/lock-utils'
 import AddressService from '../../services/addresses'
+import initDatabase from './init-database'
 
 export { genesisBlockHash }
 
@@ -20,8 +20,7 @@ const updateAllAddressesTxCount = async () => {
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
     // TODO: only switch if genesisHash is different
-    const hash = await genesisBlockHash()
-    await initConnection(hash)
+    await initDatabase()
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount()
   }
