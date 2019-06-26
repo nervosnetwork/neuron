@@ -1,4 +1,5 @@
-import NetworksService from '../../src/services/networks'
+import NetworksService, { NetworkWithID } from '../../src/services/networks'
+
 import env from '../../src/env'
 import i18n from '../../src/utils/i18n'
 
@@ -64,28 +65,59 @@ describe(`networks service`, () => {
   it(`update network name`, async () => {
     const name = 'updated name'
     await service.update(active, { name })
-    const network = await service.get(active)
+    const network = await new Promise<NetworkWithID>(resolve => {
+      setTimeout(async () => {
+        const activeNetwork = await service.get(active)
+        if (activeNetwork) {
+          resolve(activeNetwork)
+        }
+      }, 50)
+    })
     expect(network && network.name).toBe(name)
   })
 
   it(`update network remote address`, async () => {
     const addr = 'http://updated-address.com'
     await service.update(active, { remote: addr })
-    const network = await service.get(active)
+    const network = await new Promise<NetworkWithID>(resolve => {
+      setTimeout(async () => {
+        service.get(active).then(activeNetwork => {
+          if (activeNetwork) {
+            resolve(activeNetwork)
+          }
+        })
+      }, 50)
+    })
     expect(network && network.remote).toBe(addr)
   })
 
   it(`update network type`, async () => {
     const type = 1
     await service.update(active, { type })
-    const network = await service.get(active)
+    const network = await new Promise<NetworkWithID>(resolve => {
+      setTimeout(async () => {
+        service.get(active).then(activeNetwork => {
+          if (activeNetwork) {
+            resolve(activeNetwork)
+          }
+        })
+      }, 50)
+    })
     expect(network && network.type).toBe(type)
   })
 
   it(`activate the second network`, async () => {
     const { id } = list[1]
     await service.activate(id)
-    const activeNetworkId = await service.activeId()
+    const activeNetworkId = await new Promise<string>(resolve => {
+      setTimeout(async () => {
+        service.activeId().then(activeId => {
+          if (activeId) {
+            resolve(activeId)
+          }
+        })
+      }, 50)
+    })
     expect(activeNetworkId).toBe(id)
   })
 
