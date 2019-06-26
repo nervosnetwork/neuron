@@ -1,4 +1,4 @@
-import Keychain, { privateToPublic } from '../../src/keys/keychain'
+import Keychain, { privateToPublic } from '../../../src/models/keys/keychain'
 
 // https://en.bitcoin.it/wiki/BIP_0032_TestVectors
 describe('BIP32 Keychain tests', () => {

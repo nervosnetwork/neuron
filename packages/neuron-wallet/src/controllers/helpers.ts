@@ -1,4 +1,4 @@
-import { generateMnemonic } from '../keys/key'
+import { generateMnemonic } from '../models/keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
 import { FailToCreateMnemonic } from '../exceptions'

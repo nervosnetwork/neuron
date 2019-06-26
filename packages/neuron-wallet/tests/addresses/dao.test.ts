@@ -1,5 +1,5 @@
 import AddressEntity, { AddressVersion } from '../../src/addresses/entities/address'
-import { AddressType } from '../../src/keys/address'
+import { AddressType } from '../../src/models/keys/address'
 import initConnection, { getConnection } from '../../src/addresses/ormconfig'
 import AddressDao, { Address } from '../../src/addresses/dao'
 // import TransactionsService from '../../src/services/transactions'

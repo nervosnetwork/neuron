@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, PrimaryColumn, Column, AfterInsert, AfterUpdate, AfterRemove } from 'typeorm'
-import { AddressType } from '../../keys/address'
+import { AddressType } from '../../models/keys/address'
 import { Address as AddressInterface } from '../dao'
 import AddressDbChangedSubject from '../../subjects/address-db-changed-subject'
 

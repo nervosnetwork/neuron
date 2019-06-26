@@ -1,4 +1,4 @@
-import Address, { AddressType, publicKeyToAddress, AddressPrefix } from '../../src/keys/address'
+import Address, { AddressType, publicKeyToAddress, AddressPrefix } from '../../../src/models/keys/address'
 
 describe('address', () => {
   it('path from index', () => {
