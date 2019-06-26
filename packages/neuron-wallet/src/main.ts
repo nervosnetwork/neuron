@@ -6,7 +6,7 @@ import { updateApplicationMenu } from './utils/application-menu'
 import Router from './router'
 import createWindow from './startup/create-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
-import initConnection from './addresses/ormconfig'
+import initConnection from './database/address/ormconfig'
 import WalletsService from './services/wallets'
 
 const walletsService = WalletsService.getInstance()

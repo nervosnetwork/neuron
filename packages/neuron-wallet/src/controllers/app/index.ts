@@ -9,7 +9,7 @@ import WalletsController from '../wallets'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
-import windowManage from '../../utils/window-manage'
+import windowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 
 const walletsService = WalletsService.getInstance()
@@ -58,20 +58,20 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    windowManage.broadcast(Channel.App, 'toggleAddressBook', {
+    windowManager.broadcast(Channel.App, 'toggleAddressBook', {
       status: ResponseCode.Success,
     })
   }
 
   public static navTo(path: string) {
-    windowManage.sendToFocusedWindow(Channel.App, 'navTo', {
+    windowManager.sendToFocusedWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
       result: path,
     })
   }
 
   public static setUILocale(locale: string) {
-    windowManage.broadcast(Channel.App, 'setUILocale', {
+    windowManager.broadcast(Channel.App, 'setUILocale', {
       status: ResponseCode.Success,
       result: locale,
     })

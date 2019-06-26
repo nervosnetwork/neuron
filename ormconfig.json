@@ -5,17 +5,17 @@
   "logging": true,
   "database": "cell-dev.sqlite",
   "entities": [
-     "packages/neuron-wallet/src/entities/**/*.ts"
+     "packages/neuron-wallet/src/database/chain/entities/**/*.ts"
   ],
   "migrations": [
-     "packages/neuron-wallet/src/migration/**/*.ts"
+     "packages/neuron-wallet/src/database/chain/migrations/**/*.ts"
   ],
   "subscribers": [
-     "packages/neuron-wallet/src/subscriber/**/*.ts"
+     "packages/neuron-wallet/src/database/chain/subscriber/**/*.ts"
   ],
   "cli": {
-     "entitiesDir": "packages/neuron-wallet/src/entities",
-     "migrationsDir": "packages/neuron-wallet/src/migration",
-     "subscribersDir": "packages/neuron-wallet/src/subscriber"
+     "entitiesDir": "packages/neuron-wallet/src/database/chain/entities",
+     "migrationsDir": "packages/neuron-wallet/src/database/chain/migrations",
+     "subscribersDir": "packages/neuron-wallet/src/database/chain/subscriber"
   }
 }

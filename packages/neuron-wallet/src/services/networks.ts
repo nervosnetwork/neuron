@@ -2,10 +2,10 @@ import { v4 as uuid } from 'uuid'
 import { BehaviorSubject, fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 
-import Store from '../utils/store'
+import Store from '../models/store'
 import env from '../env'
 
-import windowManage from '../utils/window-manage'
+import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
 
 import { Validate, Required } from '../decorators'
@@ -51,13 +51,13 @@ export default class NetworksService extends Store {
     fromEvent<[NetworkWithID[], NetworkWithID[]]>(this, NetworksKey.List)
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(async ([, newValue]) => {
-        windowManage.broadcast(Channel.Networks, 'getAll', {
+        windowManager.broadcast(Channel.Networks, 'getAll', {
           status: ResponseCode.Success,
           result: newValue,
         })
         const network = await this.activeId()
         if (network) {
-          windowManage.broadcast(Channel.Networks, 'activeId', {
+          windowManager.broadcast(Channel.Networks, 'activeId', {
             status: ResponseCode.Success,
             result: network,
           })
@@ -77,7 +77,7 @@ export default class NetworksService extends Store {
           NodeService.getInstance().setNetwork(network.remote)
           networkSwitchSubject.next(network)
         }
-        windowManage.broadcast(Channel.Networks, 'activeId', {
+        windowManager.broadcast(Channel.Networks, 'activeId', {
           status: ResponseCode.Success,
           result: newActiveId,
         })

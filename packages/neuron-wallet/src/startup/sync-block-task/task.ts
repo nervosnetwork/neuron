@@ -1,10 +1,10 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
-import initConnection from '../../typeorm'
-import { initConnection as initAddressConnection } from '../../addresses/ormconfig'
+import initConnection from '../../database/chain/ormconfig'
+import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../utils/lock-utils'
-import AddressesUsedSubject from '../../subjects/addresses-used-subject'
+import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 

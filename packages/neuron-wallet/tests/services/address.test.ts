@@ -1,9 +1,9 @@
 import AddressService from '../../src/services/addresses'
-import { AccountExtendedPublicKey } from '../../src/keys/key'
-import initConnection, { getConnection } from '../../src/addresses/ormconfig'
-import AddressEntity, { AddressVersion } from '../../src/addresses/entities/address'
-import { AddressType } from '../../src/keys/address'
-import AddressDao, { Address } from '../../src/addresses/dao'
+import initConnection, { getConnection } from '../../src/database/address/ormconfig'
+import AddressEntity, { AddressVersion } from '../../src/database/address/entities/address'
+import AddressDao, { Address } from '../../src/database/address/dao'
+import { AddressType } from '../../src/models/keys/address'
+import { AccountExtendedPublicKey } from '../../src/models/keys/key'
 
 const walletId = '1'
 const extendedKey = new AccountExtendedPublicKey(

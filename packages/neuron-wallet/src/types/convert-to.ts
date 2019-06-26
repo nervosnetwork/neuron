@@ -1,4 +1,4 @@
-import { Transaction, Input, Cell, Script, TransactionWithoutHash } from './types'
+import { Transaction, Input, Cell, Script, TransactionWithoutHash } from './cell-types'
 
 export default class ConvertTo {
   public static toSdkTransaction = (tx: Transaction): CKBComponents.Transaction => {

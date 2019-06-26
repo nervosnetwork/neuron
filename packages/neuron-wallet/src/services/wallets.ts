@@ -2,23 +2,23 @@ import { v4 as uuid } from 'uuid'
 import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
-import { AccountExtendedPublicKey, PathAndPrivateKey } from '../keys/key'
-import Keystore from '../keys/keystore'
-import Store from '../utils/store'
+import { AccountExtendedPublicKey, PathAndPrivateKey } from '../models/keys/key'
+import Keystore from '../models/keys/keystore'
+import Store from '../models/store'
 import NodeService from './node'
 import FileService from './file'
 import LockUtils from '../utils/lock-utils'
-import windowManage from '../utils/window-manage'
+import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
-import { Witness, TransactionWithoutHash, Input } from '../app-types/types'
-import ConvertTo from '../app-types/convert-to'
+import { Witness, TransactionWithoutHash, Input } from '../types/cell-types'
+import ConvertTo from '../types/convert-to'
 import Blake2b from '../utils/blake2b'
 import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
-import { Address as AddressInterface } from '../addresses/dao'
-import Keychain from '../keys/keychain'
+import { Address as AddressInterface } from '../database/address/dao'
+import Keychain from '../models/keys/keychain'
 import { updateApplicationMenu } from '../utils/application-menu'
-import AddressesUsedSubject from '../subjects/addresses-used-subject'
+import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -51,7 +51,7 @@ const broadcastCurrentAddresses = async (currentId: string) => {
       description,
     }))
   )
-  windowManage.broadcast(Channel.Wallets, 'allAddresses', {
+  windowManager.broadcast(Channel.Wallets, 'allAddresses', {
     status: ResponseCode.Success,
     result: addresses,
   })
@@ -116,7 +116,7 @@ export class FileKeystoreWallet implements Wallet {
 const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) => {
   const wallet = wallets.find(w => w.id === currentId)
   if (!wallet) return
-  windowManage.broadcast(Channel.Wallets, 'getActive', {
+  windowManager.broadcast(Channel.Wallets, 'getActive', {
     status: ResponseCode.Success,
     result: {
       id: wallet.id,
@@ -128,7 +128,7 @@ const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) 
 
 const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
   const result = wallets.map(({ id, name }) => ({ id, name }))
-  windowManage.broadcast(Channel.Wallets, 'getAll', {
+  windowManager.broadcast(Channel.Wallets, 'getAll', {
     status: ResponseCode.Success,
     result,
   })

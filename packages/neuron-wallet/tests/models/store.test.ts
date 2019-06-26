@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import Store from '../src/utils/store'
-import env from '../src/env'
+import env from '../../src/env'
+import Store from '../../src/models/store'
 
 describe(`Store`, () => {
   const moduleName = 'test'

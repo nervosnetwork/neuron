@@ -1,10 +1,10 @@
 import fs from 'fs'
 import AppController from '../app'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../../services/wallets'
-import Keystore from '../../keys/keystore'
-import Keychain from '../../keys/keychain'
-import { validateMnemonic, mnemonicToSeedSync } from '../../keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../../keys/key'
+import Keystore from '../../models/keys/keystore'
+import Keychain from '../../models/keys/keychain'
+import { validateMnemonic, mnemonicToSeedSync } from '../../models/keys/mnemonic'
+import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../../models/keys/key'
 import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
 import { ResponseCode, Channel } from '../../utils/const'
 import {
@@ -18,7 +18,7 @@ import {
 } from '../../exceptions'
 import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
-import windowManage from '../../utils/window-manage'
+import windowManager from '../../models/window-manager'
 import AddressService from '../../services/addresses'
 
 const walletsService = WalletsService.getInstance()
@@ -306,7 +306,7 @@ export default class WalletsController {
       }
     if (!params) throw new IsRequired('Parameters')
     try {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus', {
+      windowManager.broadcast(Channel.Wallets, 'sendingStatus', {
         status: ResponseCode.Success,
         result: true,
       })
@@ -324,7 +324,7 @@ export default class WalletsController {
         },
       }
     } finally {
-      windowManage.broadcast(Channel.Wallets, 'sendingStatus', {
+      windowManager.broadcast(Channel.Wallets, 'sendingStatus', {
         status: ResponseCode.Success,
         result: false,
       })

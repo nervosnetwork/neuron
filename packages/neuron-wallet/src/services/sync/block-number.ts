@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import SyncInfoEntity from '../../entities/sync-info'
+import SyncInfoEntity from '../../database/chain/entities/sync-info'
 
 export default class BlockNumber {
   private current: bigint = BigInt(0)

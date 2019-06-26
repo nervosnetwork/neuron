@@ -1,7 +1,7 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 
-import { Block } from '../../app-types/types'
-import TypeConvert from '../../app-types/type-convert'
+import { Block } from '../../types/cell-types'
+import TypeConvert from '../../types/type-convert'
 import { NetworkWithID } from '../networks'
 import CheckAndSave from './check-and-save'
 import Utils from './utils'

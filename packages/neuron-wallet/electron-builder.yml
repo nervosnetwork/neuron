@@ -13,7 +13,7 @@ files:
     to: ui
   - from: "../.."
     to: "."
-    filter: ["!**/*", "ormconfig.json"]
+    filter: ["!**/*", "ormconfig.json", "ormconfig-address.json"]
   - package.json
   - dist
   - "!**/*.map"

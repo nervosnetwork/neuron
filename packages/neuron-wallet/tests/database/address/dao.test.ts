@@ -1,8 +1,7 @@
-import AddressEntity, { AddressVersion } from '../../src/addresses/entities/address'
-import { AddressType } from '../../src/keys/address'
-import initConnection, { getConnection } from '../../src/addresses/ormconfig'
-import AddressDao, { Address } from '../../src/addresses/dao'
-// import TransactionsService from '../../src/services/transactions'
+import AddressEntity, { AddressVersion } from '../../../src/database/address/entities/address'
+import { AddressType } from '../../../src/models/keys/address'
+import initConnection, { getConnection } from '../../../src/database/address/ormconfig'
+import AddressDao, { Address } from '../../../src/database/address/dao'
 
 describe('Address Dao tests', () => {
   const address: Address = {

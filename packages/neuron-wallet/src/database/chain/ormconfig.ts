@@ -7,10 +7,10 @@ import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
 
-import logger from './utils/logger'
-import env from './env'
+import logger from '../../utils/logger'
+import env from '../../env'
 
-import { InitMigration1561352954925 } from './migration/1561352954925-InitMigration'
+import { InitMigration1561352954925 } from './migrations/1561352954925-InitMigration'
 
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`

@@ -1,5 +1,5 @@
-import { ExtendedPrivateKey } from '../../src/keys/key'
-import Keystore from '../../src/keys/keystore'
+import { ExtendedPrivateKey } from '../../../src/models/keys/key'
+import Keystore from '../../../src/models/keys/keystore'
 
 const fixture = {
   privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
