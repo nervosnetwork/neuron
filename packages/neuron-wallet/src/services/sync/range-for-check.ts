@@ -1,4 +1,4 @@
-import { BlockHeader, Block } from '../../types/types'
+import { BlockHeader, Block } from '../../types/cell-types'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
 import Utils from './utils'

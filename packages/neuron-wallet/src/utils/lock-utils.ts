@@ -1,5 +1,5 @@
 import NodeService from '../services/node'
-import { OutPoint, Script } from '../types/types'
+import { OutPoint, Script } from '../types/cell-types'
 import env from '../env'
 
 const { core } = NodeService.getInstance()

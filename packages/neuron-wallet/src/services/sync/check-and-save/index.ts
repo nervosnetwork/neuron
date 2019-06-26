@@ -1,4 +1,4 @@
-import { Block } from '../../../types/types'
+import { Block } from '../../../types/cell-types'
 import CheckTx from './tx'
 
 export default class CheckAndSave {

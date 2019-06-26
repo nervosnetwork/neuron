@@ -1,6 +1,6 @@
 import async from 'async'
 import GetBlocks from './get-blocks'
-import { Block, BlockHeader } from '../../types/types'
+import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'

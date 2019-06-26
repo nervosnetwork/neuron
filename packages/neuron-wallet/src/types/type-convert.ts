@@ -1,4 +1,4 @@
-import { Block, BlockHeader, Transaction, Input, OutPoint, Cell, Script, CellOutPoint } from './types'
+import { Block, BlockHeader, Transaction, Input, OutPoint, Cell, Script, CellOutPoint } from './cell-types'
 
 // convert CKBComponents to types
 export default class TypeConvert {

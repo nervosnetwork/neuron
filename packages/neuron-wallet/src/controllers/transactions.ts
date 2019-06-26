@@ -1,4 +1,4 @@
-import { Transaction } from '../types/types'
+import { Transaction } from '../types/cell-types'
 import TransactionsService, { PaginationResult, TransactionsByLockHashesParam } from '../services/transactions'
 
 import AddressService from '../services/addresses'
