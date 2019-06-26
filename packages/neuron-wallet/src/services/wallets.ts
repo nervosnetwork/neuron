@@ -18,7 +18,7 @@ import AddressService from './addresses'
 import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
 import { updateApplicationMenu } from '../utils/application-menu'
-import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
+import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -170,12 +170,14 @@ export default class WalletService {
         onCurrentWalletUpdated(wallets, newId)
       })
 
-    AddressesUsedSubject.getSubject().subscribe(async () => {
-      const currentWallet = this.getCurrent()
-      if (currentWallet) {
-        broadcastCurrentAddresses(currentWallet.id)
-      }
-    })
+    AddressDbChangedSubject.getSubject()
+      .pipe(debounceTime(DEBOUNCE_TIME))
+      .subscribe(async () => {
+        const currentWallet = this.getCurrent()
+        if (currentWallet) {
+          broadcastCurrentAddresses(currentWallet.id)
+        }
+      })
   }
 
   public getAll = (): WalletProperties[] => {
