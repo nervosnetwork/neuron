@@ -1,4 +1,4 @@
-import { Script } from '../../src/types/types'
+import { Script } from '../../src/types/cell-types'
 import LockUtils from '../../src/utils/lock-utils'
 
 const systemScript = {
