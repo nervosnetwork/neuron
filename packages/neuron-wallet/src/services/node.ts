@@ -2,7 +2,7 @@ import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
-import windowManage from '../utils/window-manage'
+import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
 
 class NodeService {
@@ -30,14 +30,14 @@ class NodeService {
   public syncConnectStatus = () => {
     this.tipNumberSubject.subscribe(tipNumber => {
       if (typeof tipNumber === 'string') {
-        windowManage.broadcast(Channel.Chain, 'tipBlockNumber', {
+        windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
           status: ResponseCode.Success,
           result: tipNumber,
         })
       }
     })
     this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
-      windowManage.broadcast(Channel.Chain, 'status', {
+      windowManager.broadcast(Channel.Chain, 'status', {
         status: ResponseCode.Success,
         result: connectStatus,
       })

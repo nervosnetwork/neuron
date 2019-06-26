@@ -4,11 +4,11 @@ import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
 import { AccountExtendedPublicKey, PathAndPrivateKey } from '../models/keys/key'
 import Keystore from '../models/keys/keystore'
-import Store from '../utils/store'
+import Store from '../models/store'
 import NodeService from './node'
 import FileService from './file'
 import LockUtils from '../utils/lock-utils'
-import windowManage from '../utils/window-manage'
+import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
 import { Witness, TransactionWithoutHash, Input } from '../app-types/types'
 import ConvertTo from '../app-types/convert-to'
@@ -51,7 +51,7 @@ const broadcastCurrentAddresses = async (currentId: string) => {
       description,
     }))
   )
-  windowManage.broadcast(Channel.Wallets, 'allAddresses', {
+  windowManager.broadcast(Channel.Wallets, 'allAddresses', {
     status: ResponseCode.Success,
     result: addresses,
   })
@@ -116,7 +116,7 @@ export class FileKeystoreWallet implements Wallet {
 const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) => {
   const wallet = wallets.find(w => w.id === currentId)
   if (!wallet) return
-  windowManage.broadcast(Channel.Wallets, 'getActive', {
+  windowManager.broadcast(Channel.Wallets, 'getActive', {
     status: ResponseCode.Success,
     result: {
       id: wallet.id,
@@ -128,7 +128,7 @@ const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) 
 
 const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
   const result = wallets.map(({ id, name }) => ({ id, name }))
-  windowManage.broadcast(Channel.Wallets, 'getAll', {
+  windowManager.broadcast(Channel.Wallets, 'getAll', {
     status: ResponseCode.Success,
     result,
   })
