@@ -88,7 +88,10 @@ export const walletMenuItem: MenuItemConstructorOptions = {
         }
       },
     },
-    { id: 'change-password', label: i18n.t('application-menu.wallet.change-password') },
+    /**
+     * TODO: implement this menu item after alpha release
+     * { id: 'change-password', label: i18n.t('application-menu.wallet.change-password') },
+     */
   ],
 }
 
