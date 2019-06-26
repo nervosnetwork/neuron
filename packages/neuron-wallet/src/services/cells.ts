@@ -1,5 +1,5 @@
 import { getConnection, In } from 'typeorm'
-import OutputEntity from '../entities/output'
+import OutputEntity from '../database/chain/entities/output'
 import { Cell, OutPoint, Input } from '../app-types/types'
 import { CapacityNotEnough } from '../exceptions'
 

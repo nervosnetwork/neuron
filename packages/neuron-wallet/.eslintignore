@@ -1,3 +1,3 @@
 src/migration
 dist
-src/addresses/migrations
+src/database/**/migrations

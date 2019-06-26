@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import { Subject } from 'rxjs'
 import { Transaction, Cell, OutPoint } from '../../../app-types/types'
-import OutputEntity from '../../../entities/output'
+import OutputEntity from '../../../database/chain/entities/output'
 import TransactionsService from '../../transactions'
 import CheckOutput from './output'
 import LockUtils from '../../../utils/lock-utils'
