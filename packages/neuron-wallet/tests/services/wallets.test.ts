@@ -1,7 +1,7 @@
 import '../../src/controllers/wallets'
 import '../../src/controllers/app'
 import WalletService, { WalletProperties } from '../../src/services/wallets'
-import { Witness } from '../../src/app-types/types'
+import { Witness } from '../../src/types/types'
 import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
