@@ -24,7 +24,7 @@ const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
-const DEBOUNCE_TIME = 500
+const DEBOUNCE_TIME = 200
 
 export interface Wallet {
   id: string
