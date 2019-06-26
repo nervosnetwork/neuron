@@ -49,9 +49,13 @@ export default class Queue {
 
   private getWorker = () => {
     const worker = async (task: any, callback: any) => {
-      await Utils.retry(this.retryTime, 0, async () => {
-        await this.pipeline(task.blockNumbers)
-      })
+      try {
+        await Utils.retry(this.retryTime, 0, async () => {
+          await this.pipeline(task.blockNumbers)
+        })
+      } catch {
+        this.q.remove(() => true)
+      }
       await callback()
     }
     return worker

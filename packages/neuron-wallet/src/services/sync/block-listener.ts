@@ -71,6 +71,9 @@ export default class BlockListener {
 
   public regenerate = async (): Promise<void> => {
     if (this.queue) {
+      if (this.queue.get().length() <= 0) {
+        this.queue = undefined
+      }
       return
     }
 
@@ -87,7 +90,7 @@ export default class BlockListener {
   }
 
   public generateQueue = (startBlockNumber: string, endBlockNumber: string): Queue | undefined => {
-    if (startBlockNumber > endBlockNumber) {
+    if (BigInt(startBlockNumber) > BigInt(endBlockNumber)) {
       return undefined
     }
 
