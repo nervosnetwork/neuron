@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, Cell } from '../app-types/types'
+import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, Cell } from '../types/types'
 import CellsService from './cells'
 import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'

@@ -1,4 +1,4 @@
-import { Cell } from '../../../app-types/types'
+import { Cell } from '../../../types/types'
 import LockUtils from '../../../utils/lock-utils'
 
 export default class CheckOutput {
