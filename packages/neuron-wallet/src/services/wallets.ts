@@ -43,12 +43,13 @@ export interface WalletProperties {
 
 const broadcastCurrentAddresses = async (currentId: string) => {
   const addresses = await AddressService.allAddressesByWalletId(currentId).then(addrs =>
-    addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
+    addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
       address,
       identifier,
       type,
       txCount,
       description,
+      balance,
     }))
   )
   windowManager.broadcast(Channel.Wallets, 'allAddresses', {
