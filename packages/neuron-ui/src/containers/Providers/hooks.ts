@@ -206,7 +206,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case WalletsMethod.SendCapacity: {
             if (args.result) {
-              history.push(`${Routes.Transaction}/${args.result}`)
+              history.push(Routes.History)
             }
             break
           }
