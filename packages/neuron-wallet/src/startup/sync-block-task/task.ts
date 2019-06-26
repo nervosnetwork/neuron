@@ -1,20 +1,16 @@
 import { remote } from 'electron'
 import { Subject } from 'rxjs'
-import initConnection from '../../database/chain/ormconfig'
 import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../utils/lock-utils'
 import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
+import { initDatabase } from './init-database'
 
-const {
-  networkSwitchSubject,
-  nodeService,
-  addressChangeSubject,
-  addressesUsedSubject,
-  genesisBlockHash,
-} = remote.require('./startup/sync-block-task/params')
+const { nodeService, addressChangeSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
+  './startup/sync-block-task/params'
+)
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -35,11 +31,11 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
 
 // call this after network switched
 // TODO: listen to network switch
-export const switchNetwork = async (blockHash: string) => {
+export const switchNetwork = async () => {
   // stop all blocks service
   stopLoopSubject.next('stop')
   // disconnect old connection and connect to new database
-  await initConnection(blockHash)
+  await initDatabase()
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
@@ -59,10 +55,9 @@ export const switchNetwork = async (blockHash: string) => {
 
 export const run = async () => {
   await initAddressConnection()
-  networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
+  databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
-      const hash = await genesisBlockHash()
-      await switchNetwork(hash)
+      await switchNetwork()
     }
   })
 }
