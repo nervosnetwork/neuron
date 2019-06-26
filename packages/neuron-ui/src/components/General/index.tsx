@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useNeuronWallet } from 'utils/hooks'
 import { useTranslation } from 'react-i18next'
+import { localNumberFormatter } from 'utils/formatters'
 
 const GeneralPanel = styled.div`
   display: grid;
@@ -87,7 +88,7 @@ const General = () => {
             </Field>
             <Field>
               <span>{t('general.block-height')}</span>
-              <span>{`${(100000).toLocaleString()} / ${+(tipBlockNumber || 0).toLocaleString()}`}</span>
+              <span>{`${localNumberFormatter(tipBlockNumber)}`}</span>
             </Field>
             <Field>
               <span>{t('general.rpc-service')}</span>

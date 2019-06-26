@@ -10,6 +10,8 @@ const numberParser = (value: string, exchange: string) => {
   return [integer, decimal]
 }
 
+const numberFormatter = new Intl.NumberFormat('en-US')
+
 export const queryFormatter = (params: { [index: string]: any }) => {
   const newQuery = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
@@ -70,8 +72,13 @@ export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
   }
 }
 
+export const localNumberFormatter = (num: string | number = 0) => {
+  return numberFormatter.format(+num)
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
   CKBToShannonFormatter,
+  localNumberFormatter,
 }
