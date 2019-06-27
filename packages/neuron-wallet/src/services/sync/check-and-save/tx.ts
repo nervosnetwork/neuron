@@ -18,19 +18,20 @@ export default class CheckTx {
 
   public check = async (lockHashes: string[]): Promise<boolean> => {
     const outputs: Cell[] = this.filterOutputs(lockHashes)
-    const anyInput: boolean = await this.anyInputs()
+    const inputAddresses = await this.filterInputs()
 
-    if (outputs.length > 0) {
+    const outputAddresses: string[] = outputs.map(output => {
+      return LockUtils.lockScriptToAddress(output.lock)
+    })
+
+    const addresses: string[] = inputAddresses.concat(outputAddresses)
+
+    if (addresses.length > 0) {
       // found addresses used
-      const addresses: string[] = outputs.map(output => {
-        return LockUtils.lockScriptToAddress(output.lock)
-      })
       this.addressesUsedSubject.next(addresses)
-    }
-
-    if (outputs.length > 0 || anyInput) {
       return true
     }
+
     return false
   }
 
@@ -52,9 +53,10 @@ export default class CheckTx {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "warn" */
-  public anyInputs = async (): Promise<boolean> => {
+  public filterInputs = async (): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
+    const addresses: string[] = []
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
       const { cell } = outPoint
@@ -68,10 +70,10 @@ export default class CheckTx {
           outPointIndex: cell.index,
         })
       if (output) {
-        return true
+        addresses.push(LockUtils.lockScriptToAddress(output.lock))
       }
     }
 
-    return false
+    return addresses
   }
 }
