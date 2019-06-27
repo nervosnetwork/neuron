@@ -34,9 +34,12 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
     const { pageNo, pageSize, addresses = '' } = params
 
-    let searchAddresses = addresses.split(',')
+    let searchAddresses = addresses
+      .split(',')
+      .map(addr => addr.trim())
+      .filter(addr => addr !== '')
 
-    if (!searchAddresses.length) {
+    if (searchAddresses.length <= 0) {
       const wallet = WalletsService.getInstance().getCurrent()
       if (!wallet) throw new CurrentWalletNotSet()
       searchAddresses = (await AddressService.usedAddresses(wallet.id)).map(addr => addr.address)
