@@ -384,10 +384,7 @@ export default class WalletService {
     await core.rpc.sendTransaction(txToSend)
 
     tx.description = description
-    TransactionsService.txSentSubject.next({
-      transaction: tx,
-      txHash,
-    })
+    await TransactionsService.saveSentTx(tx, txHash)
 
     return txHash
   }

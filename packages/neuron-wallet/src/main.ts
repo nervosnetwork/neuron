@@ -18,11 +18,16 @@ const router = new Router()
 Object.defineProperty(app, 'router', {
   value: router,
 })
+
 const openWindow = () => {
   if (!mainWindow) {
     mainWindow = createWindow()
     mainWindow.on('closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
       if (mainWindow) {
+        mainWindow.removeAllListeners()
         mainWindow = null
       }
     })
@@ -41,9 +46,3 @@ app.on('ready', async () => {
 })
 
 app.on('activate', openWindow)
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
