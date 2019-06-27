@@ -16,8 +16,17 @@ const backToTop = () => {
   }
 }
 
-export const useSearch = (search: string, dispatch: React.Dispatch<any>, providerDispatch: React.Dispatch<any>) => {
+export const useSearch = (
+  search: string,
+  incomeKeywords: string,
+  dispatch: React.Dispatch<any>,
+  providerDispatch: React.Dispatch<any>
+) => {
   const [keywords, setKeywords] = useState('')
+  const onKeywordsChange = (e: any) => setKeywords(e.currentTarget.value)
+  useEffect(() => {
+    setKeywords(incomeKeywords)
+  }, [incomeKeywords, setKeywords])
   useEffect(() => {
     backToTop()
     const params = queryParsers.history(search)
@@ -36,7 +45,6 @@ export const useSearch = (search: string, dispatch: React.Dispatch<any>, provide
       })
     }
   }, [search, dispatch, providerDispatch])
-  const onKeywordsChange = (e: any) => setKeywords(e.currentTarget.value)
   return { keywords, onKeywordsChange }
 }
 

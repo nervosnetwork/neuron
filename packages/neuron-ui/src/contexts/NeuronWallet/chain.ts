@@ -23,6 +23,7 @@ export interface Chain {
     pageSize: number
     totalCount: number
     items: Transaction[]
+    keywords: string
   }
 }
 
@@ -42,6 +43,7 @@ const chainState: Chain = {
     pageSize: 15,
     totalCount: 0,
     items: [],
+    keywords: '',
   },
 }
 
