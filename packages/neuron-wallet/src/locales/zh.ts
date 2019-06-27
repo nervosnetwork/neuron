@@ -93,6 +93,7 @@ export default {
       edit: '编辑',
       delete: '删除',
       'copy-address': '复制地址',
+      'copy-identifier': '复制 ID',
       'request-payment': '请求支付',
       'spend-from': '支付来源',
       'view-on-explorer': '在浏览器中查看',

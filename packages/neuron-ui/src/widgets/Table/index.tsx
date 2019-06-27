@@ -21,6 +21,7 @@ interface Table {
   totalCount: number
   onPageChange: Function
   tableAttrs?: { [index: string]: boolean }
+  onContextMenu?: Function
 }
 
 export default ({
@@ -34,6 +35,7 @@ export default ({
     striped: true,
     bordered: true,
   },
+  onContextMenu,
 }: Table) => (
   <>
     <BsTable {...tableAttrs}>
@@ -46,7 +48,7 @@ export default ({
       </thead>
       <tbody>
         {items.map(item => (
-          <tr key={item.key}>
+          <tr key={item.key} onContextMenu={onContextMenu && onContextMenu(item.key)}>
             {headers.map(header => (
               <td key={header.key}>{item[header.key]}</td>
             ))}
