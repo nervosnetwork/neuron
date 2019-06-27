@@ -16,7 +16,7 @@ export default class CheckTx {
     this.addressesUsedSubject = addressesUsedSubject
   }
 
-  public check = async (lockHashes: string[]): Promise<boolean> => {
+  public check = async (lockHashes: string[]): Promise<string[]> => {
     const outputs: Cell[] = this.filterOutputs(lockHashes)
     const inputAddresses = await this.filterInputs()
 
@@ -26,19 +26,14 @@ export default class CheckTx {
 
     const addresses: string[] = inputAddresses.concat(outputAddresses)
 
-    if (addresses.length > 0) {
-      // found addresses used
-      this.addressesUsedSubject.next(addresses)
-      return true
-    }
-
-    return false
+    return addresses
   }
 
   public checkAndSave = async (lockHashes: string[]): Promise<boolean> => {
-    const checkResult = await this.check(lockHashes)
-    if (checkResult) {
+    const addresses = await this.check(lockHashes)
+    if (addresses.length > 0) {
       await TransactionsService.saveFetchTx(this.tx)
+      this.addressesUsedSubject.next(addresses)
       return true
     }
     return false
