@@ -26,17 +26,21 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           addresses: Address[]
           transactions: any
           locale: string
+          tipNumber: string
+          connectStatus: boolean
         }>
       ) => {
         if (args.status) {
           const {
             locale,
-            networks,
+            networks = [],
             activeNetworkId: networkId,
-            wallets,
+            wallets = [],
             activeWallet: wallet,
-            addresses,
-            transactions,
+            addresses = [],
+            transactions = [],
+            tipNumber = '0',
+            connectStatus = false,
           } = args.result
           if (locale !== i18n.language) {
             i18n.changeLanguage(locale)
@@ -52,12 +56,14 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               },
             })
           }
-          if (transactions && transactions.totalCount) {
-            dispatch({
-              type: ProviderActions.Chain,
-              payload: { transactions: { ...chain.transactions, ...transactions } },
-            })
-          }
+          dispatch({
+            type: ProviderActions.Chain,
+            payload: {
+              tipNumber,
+              connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
+              transactions: { ...chain.transactions, ...transactions },
+            },
+          })
         } else {
           /* eslint-disable no-alert */
           // TODO: better prompt, prd required

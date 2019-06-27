@@ -5,6 +5,7 @@ import { URL, contextMenuTemplate } from './options'
 import TransactionsController from '../transactions'
 import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
+import NodeService from '../../services/node'
 import WalletsController from '../wallets'
 
 import { Controller as ControllerDecorator } from '../../decorators'
@@ -14,11 +15,21 @@ import i18n from '../../utils/i18n'
 
 const walletsService = WalletsService.getInstance()
 const networksService = NetworksService.getInstance()
+const nodeService = NodeService.getInstance()
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
-    const [activeWallet, wallets, activeNetworkId, networks, transactions, addresses] = await Promise.all([
+    const [
+      activeWallet,
+      wallets,
+      activeNetworkId,
+      networks,
+      transactions,
+      addresses,
+      tipNumber,
+      connectStatus,
+    ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
       networksService.activeId(),
@@ -29,6 +40,26 @@ export default class AppController {
         addresses: '',
       }).then(res => res.result),
       WalletsController.getAllAddresses().then(res => res.result),
+      new Promise(resolve => {
+        nodeService.tipNumberSubject.subscribe(
+          tipNum => {
+            resolve(tipNum || '0')
+          },
+          () => {
+            resolve('0')
+          }
+        )
+      }),
+      new Promise(resolve => {
+        nodeService.connectStatusSubject.subscribe(
+          status => {
+            resolve(status)
+          },
+          () => {
+            resolve(false)
+          }
+        )
+      }),
     ])
 
     const locale = app.getLocale()
@@ -42,6 +73,8 @@ export default class AppController {
       networks,
       transactions,
       locale,
+      tipNumber,
+      connectStatus,
     }
     win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })
   }
