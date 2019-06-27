@@ -64,7 +64,7 @@
       "date": "时间",
       "amount": "价值(ckb)",
       "transaction-hash": "交易哈希",
-      "send": "发出",
+      "send": "转账",
       "receive": "收入",
       "other": "其他",
       "more-actions": "更多操作",
