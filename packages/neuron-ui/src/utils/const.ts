@@ -84,12 +84,6 @@ export enum Message {
   ProtocolIsRequired = 'protocol-is-required',
 }
 
-export enum TransactionType {
-  Sent,
-  Received,
-  Other,
-}
-
 export enum MnemonicAction {
   Create = 'create',
   Verify = 'verify',
