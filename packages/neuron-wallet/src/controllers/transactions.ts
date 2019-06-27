@@ -39,7 +39,7 @@ export default class TransactionsController {
       .map(addr => addr.trim())
       .filter(addr => addr !== '')
 
-    if (searchAddresses.length <= 0) {
+    if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
       if (!wallet) throw new CurrentWalletNotSet()
       searchAddresses = (await AddressService.usedAddresses(wallet.id)).map(addr => addr.address)
