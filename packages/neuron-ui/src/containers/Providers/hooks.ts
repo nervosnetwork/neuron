@@ -59,7 +59,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           dispatch({
             type: ProviderActions.Chain,
             payload: {
-              tipNumber,
+              tipBlockNumber: tipNumber,
               connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
               transactions: { ...chain.transactions, ...transactions },
             },

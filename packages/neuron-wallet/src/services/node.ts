@@ -17,7 +17,7 @@ class NodeService {
 
   public delayTime = 0
   public intervalTime = 1000
-  public tipNumberSubject = new BehaviorSubject<string | undefined>(undefined)
+  public tipNumberSubject = new BehaviorSubject<string>('0')
   public connectStatusSubject = new BehaviorSubject<boolean>(false)
 
   public core: Core = new Core('')
@@ -29,12 +29,10 @@ class NodeService {
 
   public syncConnectStatus = () => {
     this.tipNumberSubject.subscribe(tipNumber => {
-      if (typeof tipNumber === 'string') {
-        windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
-          status: ResponseCode.Success,
-          result: tipNumber,
-        })
-      }
+      windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
+        status: ResponseCode.Success,
+        result: tipNumber,
+      })
     })
     this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
       windowManager.broadcast(Channel.Chain, 'status', {
@@ -92,7 +90,6 @@ class NodeService {
           if (this.delayTime < 10 * this.intervalTime) {
             this.delayTime = 2 * this.intervalTime
           }
-          this.tipNumberSubject.next(undefined)
           const { unsubscribe } = this.tipNumber()
           this.stop = unsubscribe
         }
