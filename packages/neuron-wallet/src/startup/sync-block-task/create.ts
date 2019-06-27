@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import { Subject, ReplaySubject } from 'rxjs'
+import { ReplaySubject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
@@ -27,9 +27,6 @@ networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     await updateAllAddressesTxCount()
   }
 })
-
-// TODO: mock as an address subject
-export const addressChangeSubject = new Subject()
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
 

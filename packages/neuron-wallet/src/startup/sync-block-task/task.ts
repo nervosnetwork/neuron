@@ -8,7 +8,7 @@ import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 
-const { nodeService, addressChangeSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
+const { nodeService, addressDbChangedSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
   './startup/sync-block-task/params'
 )
 
@@ -41,9 +41,12 @@ export const switchNetwork = async () => {
   // start sync blocks service
   const blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  addressChangeSubject.subscribe(async () => {
-    const hashes: string[] = await loadAddressesAndConvert()
-    blockListener.setLockHashes(hashes)
+  addressDbChangedSubject.subscribe(async (event: string) => {
+    // ignore update and remove
+    if (event === 'AfterInsert') {
+      const hashes: string[] = await loadAddressesAndConvert()
+      blockListener.setLockHashes(hashes)
+    }
   })
 
   stopLoopSubject.subscribe(() => {
