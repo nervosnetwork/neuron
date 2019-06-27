@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { appCalls } from 'services/UILayer'
 import { Transaction } from 'contexts/NeuronWallet'
-import { TransactionType } from 'utils/const'
 import { useLocalDescription } from 'utils/hooks'
 import { MainDispatch } from 'containers/MainContent/reducer'
 
@@ -71,7 +70,7 @@ const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: 
                   if (header.key === 'meta') {
                     return (
                       <MetaData key={headers[0].key}>
-                        {t(`history.${TransactionType[historyItem.type]}`.toLowerCase())}
+                        {t(`history.${historyItem.type}`.toLowerCase())}
                         {timeFormatter.format(historyItem.timestamp)}
                       </MetaData>
                     )

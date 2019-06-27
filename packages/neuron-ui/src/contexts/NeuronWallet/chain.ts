@@ -1,8 +1,8 @@
 import { RawNetwork } from 'components/NetworkEditor'
-import { ConnectStatus, TransactionType } from 'utils/const'
+import { ConnectStatus } from 'utils/const'
 
 export interface Transaction {
-  type: TransactionType
+  type: 'send' | 'receive' | 'other'
   timestamp: number
   value: string
   hash: string
@@ -33,7 +33,7 @@ const chainState: Chain = {
   transaction: {
     value: '',
     hash: '',
-    type: TransactionType.Other,
+    type: 'other',
     timestamp: +new Date(0),
     description: '',
   },
