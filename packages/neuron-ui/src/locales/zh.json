@@ -65,7 +65,7 @@
       "amount": "价值(ckb)",
       "transaction-hash": "交易哈希",
       "send": "转账",
-      "receive": "收入",
+      "receive": "收款",
       "other": "其他",
       "more-actions": "更多操作",
       "detail": "详情",
