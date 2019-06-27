@@ -37,6 +37,10 @@ win:
       arch:
         - x64
 
+nsis:
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+
 mac:
   artifactName: "${productName}-${version}-${os}.${ext}"
   category: public.app-category.finance
