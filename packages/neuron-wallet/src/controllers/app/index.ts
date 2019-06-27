@@ -1,4 +1,5 @@
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
+import { take } from 'rxjs/operators'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
@@ -41,7 +42,7 @@ export default class AppController {
       }).then(res => res.result),
       WalletsController.getAllAddresses().then(res => res.result),
       new Promise(resolve => {
-        nodeService.tipNumberSubject.subscribe(
+        nodeService.tipNumberSubject.pipe(take(1)).subscribe(
           tipNum => {
             resolve(tipNum || '0')
           },
@@ -51,7 +52,7 @@ export default class AppController {
         )
       }),
       new Promise(resolve => {
-        nodeService.connectStatusSubject.subscribe(
+        nodeService.connectStatusSubject.pipe(take(1)).subscribe(
           status => {
             resolve(status)
           },
