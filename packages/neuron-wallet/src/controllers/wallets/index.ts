@@ -273,13 +273,13 @@ export default class WalletsController {
       throw new CurrentWalletNotSet()
     }
     const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
-      addrs.map(({ address, blake160: identifier, addressType: type, txCount, description = '' }) => ({
+      addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
         address,
         identifier,
         type,
         txCount,
         description,
-        balance: '0',
+        balance,
       }))
     )
     return {
