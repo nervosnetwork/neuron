@@ -14,6 +14,7 @@ const timeFormatter = new Intl.DateTimeFormat('en-GB')
 const headers = [
   { label: 'history.meta', key: 'meta' },
   { label: 'history.transaction-hash', key: 'hash' },
+  { label: 'history.status', key: 'status' },
   { label: 'history.description', key: 'description' },
   { label: 'history.amount', key: 'value' },
 ]

@@ -7,6 +7,7 @@ export interface Transaction {
   value: string
   hash: string
   description: string
+  status: 'pending' | 'committed'
 }
 
 export interface Network extends RawNetwork {
@@ -37,6 +38,7 @@ const chainState: Chain = {
     type: 'other',
     timestamp: +new Date(0),
     description: '',
+    status: 'pending',
   },
   transactions: {
     pageNo: 1,
