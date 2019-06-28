@@ -7,7 +7,7 @@ export interface Transaction {
   value: string
   hash: string
   description: string
-  status: 'pending' | 'committed'
+  status: 'pending' | 'success' | 'failed'
 }
 
 export interface Network extends RawNetwork {
