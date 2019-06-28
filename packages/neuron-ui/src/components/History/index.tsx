@@ -21,12 +21,12 @@ const History = ({
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
     chain: {
-      transactions: { pageNo, pageSize, totalCount, items },
+      transactions: { pageNo, pageSize, totalCount, items, keywords: incomeKeywords },
     },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, dispatch, providerDispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, incomeKeywords, dispatch, providerDispatch)
   const totalPages = Math.ceil(totalCount / pageSize) || 1
 
   return (

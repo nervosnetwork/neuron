@@ -114,7 +114,7 @@ export class FileKeystoreWallet implements Wallet {
   }
 }
 
-const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) => {
+const onCurrentWalletUpdated = async (wallets: WalletProperties[], currentId: string) => {
   const wallet = wallets.find(w => w.id === currentId)
   if (!wallet) return
   windowManager.broadcast(Channel.Wallets, 'getActive', {
@@ -125,6 +125,17 @@ const onCurrentWalletUpdated = (wallets: WalletProperties[], currentId: string) 
     },
   })
   updateApplicationMenu(wallets, currentId)
+  const addresses = await AddressService.usedAddresses(wallet.id)
+  const params = {
+    pageNo: 1,
+    pageSize: 15,
+    addresses: addresses.map(addr => addr.address),
+  }
+  const transactions = await TransactionsService.getAllByAddresses(params)
+  windowManager.broadcast(Channel.Transactions, 'getAllByAddresses', {
+    status: ResponseCode.Success,
+    result: { ...params, keywords: '', ...transactions },
+  })
 }
 
 const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
