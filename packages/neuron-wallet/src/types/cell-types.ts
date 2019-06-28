@@ -13,6 +13,11 @@ export interface BlockHeader {
   number: string
 }
 
+export enum TransactionStatus {
+  Pending = 'pending',
+  Committed = 'committed',
+}
+
 export interface TransactionWithoutHash {
   version: string
   deps?: OutPoint[]
@@ -25,6 +30,7 @@ export interface TransactionWithoutHash {
   witnesses?: Witness[]
   type?: string
   description?: string
+  status?: string
 }
 
 export interface Transaction extends TransactionWithoutHash {
