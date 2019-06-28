@@ -97,6 +97,7 @@ export default {
       'request-payment': '请求支付',
       'spend-from': '支付来源',
       'view-on-explorer': '在浏览器中查看',
+      detail: '详情',
     },
     messageBox: {
       button: {

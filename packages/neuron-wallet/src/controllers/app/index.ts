@@ -1,3 +1,4 @@
+import path from 'path'
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
 import { take } from 'rxjs/operators'
 import app from '../../app'
@@ -13,6 +14,7 @@ import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
 import windowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
+import env from '../../env'
 
 const walletsService = WalletsService.getInstance()
 const networksService = NetworksService.getInstance()
@@ -97,10 +99,10 @@ export default class AppController {
     })
   }
 
-  public static navTo(path: string) {
+  public static navTo(url: string) {
     windowManager.sendToFocusedWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
-      result: path,
+      result: url,
     })
   }
 
@@ -189,6 +191,23 @@ export default class AppController {
         })
       }
     }
+  }
+
+  public static async showTransactionDetails(hash: string) {
+    const win = new BrowserWindow({
+      titleBarStyle: 'hiddenInset',
+      width: 1200,
+      show: false,
+      webPreferences: {
+        preload: path.join(__dirname, '../../startup/preload.js'),
+      },
+    })
+    win.loadURL(`${env.mainURL}/#/transaction/${hash}`)
+    win.on('ready-to-show', () => {
+      win.show()
+      win.focus()
+      AppController.initWindow(win)
+    })
   }
 
   private static getCurrentWallet() {

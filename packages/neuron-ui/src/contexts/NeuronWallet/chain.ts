@@ -10,6 +10,36 @@ export interface Transaction {
   status: 'pending' | 'success' | 'failed'
 }
 
+interface DetailedTransaction extends Transaction {
+  blockHash: string
+  blockNumber: string
+  deps: any[]
+  inputs: {
+    capacity: string | null
+    lockHash: string | null
+    previousOutput: {
+      blockHash: string | null
+      cell: { txHash: string; index: string } | null
+    }
+  }[]
+  outputs: {
+    capacity: string
+    lock: {
+      args: string[]
+      codeHash: string
+    }
+    lockHash: string
+    outPoint: {
+      blockHash: string | null
+      cell: {
+        index: string
+        txHash: string
+      }
+    }
+  }[]
+  witnesses: string[]
+}
+
 export interface Network extends RawNetwork {
   id: string
 }
@@ -18,7 +48,7 @@ export interface Chain {
   networkId: string
   connectStatus: ConnectStatus
   tipBlockNumber?: number
-  transaction: Transaction
+  transaction: DetailedTransaction
   transactions: {
     pageNo: number
     pageSize: number
@@ -39,6 +69,12 @@ const chainState: Chain = {
     timestamp: +new Date(0),
     description: '',
     status: 'pending',
+    inputs: [],
+    outputs: [],
+    deps: [],
+    blockNumber: '',
+    blockHash: '',
+    witnesses: [],
   },
   transactions: {
     pageNo: 1,

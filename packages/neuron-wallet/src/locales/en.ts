@@ -98,6 +98,7 @@ export default {
       'request-payment': 'Request Payment',
       'spend-from': 'Spend From',
       'view-on-explorer': 'View On Explorer',
+      detail: 'Detail',
     },
     messageBox: {
       button: {

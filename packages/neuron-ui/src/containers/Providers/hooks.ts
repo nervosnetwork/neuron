@@ -138,7 +138,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           case TransactionsMethod.Get: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { transaction: { ...chain.transaction, ...args.result } },
+              payload: { transaction: args.result },
             })
             break
           }
