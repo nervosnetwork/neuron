@@ -98,8 +98,9 @@ export default class TransactionsService {
         .map(i => BigInt(i.capacity))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
+      // TODO: add failed status
       const status =
-        tx.outputs[0].status === OutputStatus.Pending ? TransactionStatus.Pending : TransactionStatus.Committed
+        tx.outputs[0].status === OutputStatus.Pending ? TransactionStatus.Pending : TransactionStatus.Success
       return {
         timestamp: tx.timestamp,
         value: value.toString(),

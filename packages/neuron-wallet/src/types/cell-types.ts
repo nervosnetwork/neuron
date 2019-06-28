@@ -15,7 +15,8 @@ export interface BlockHeader {
 
 export enum TransactionStatus {
   Pending = 'pending',
-  Committed = 'committed',
+  Success = 'success',
+  Failed = 'failed',
 }
 
 export interface TransactionWithoutHash {
