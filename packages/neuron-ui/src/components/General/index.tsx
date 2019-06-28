@@ -69,6 +69,7 @@ const General = () => {
                 <tr key={tx.hash}>
                   <td>{tx.timestamp}</td>
                   <td>{tx.type}</td>
+                  <td>{tx.status}</td>
                   <td>{tx.value}</td>
                 </tr>
               ))}

@@ -74,7 +74,8 @@
       "previous": "前一页",
       "next": "后一页",
       "last": "最后一页",
-      "description": "标签"
+      "description": "标签",
+      "status": "状态"
     },
     "transaction": {
       "goBack": "返回"

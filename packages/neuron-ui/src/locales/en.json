@@ -74,7 +74,8 @@
       "previous": "Previous",
       "next": "Next",
       "last": "Last",
-      "description": "Description"
+      "description": "Description",
+      "status": "Status"
     },
     "transaction": {
       "goBack": "go back"
