@@ -108,6 +108,8 @@ export default class TransactionsService {
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
         status,
+        createdAt: tx.createdAt,
+        updatedAt: tx.updatedAt,
       }
     })
 

@@ -32,6 +32,8 @@ export interface TransactionWithoutHash {
   type?: string
   description?: string
   status?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Transaction extends TransactionWithoutHash {

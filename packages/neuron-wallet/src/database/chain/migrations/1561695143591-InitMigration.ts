@@ -1,10 +1,10 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class InitMigration1561352954925 implements MigrationInterface {
+export class InitMigration1561695143591 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.query(`CREATE TABLE "output" ("outPointTxHash" varchar NOT NULL, "outPointIndex" varchar NOT NULL, "capacity" varchar NOT NULL, "lock" text NOT NULL, "lockHash" varchar NOT NULL, "status" varchar NOT NULL, "transactionHash" varchar, PRIMARY KEY ("outPointTxHash", "outPointIndex"))`);
-        await queryRunner.query(`CREATE TABLE "transaction" ("hash" varchar PRIMARY KEY NOT NULL, "version" varchar NOT NULL, "deps" text NOT NULL, "witnesses" text NOT NULL, "timestamp" varchar, "blockNumber" varchar, "blockHash" varchar, "description" varchar)`);
+        await queryRunner.query(`CREATE TABLE "transaction" ("hash" varchar PRIMARY KEY NOT NULL, "version" varchar NOT NULL, "deps" text NOT NULL, "witnesses" text NOT NULL, "timestamp" varchar, "blockNumber" varchar, "blockHash" varchar, "description" varchar, "createdAt" varchar NOT NULL, "updatedAt" varchar NOT NULL)`);
         await queryRunner.query(`CREATE TABLE "input" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "outPointTxHash" varchar, "outPointIndex" varchar, "since" varchar NOT NULL, "lockHash" varchar, "capacity" varchar, "transactionHash" varchar)`);
         await queryRunner.query(`CREATE TABLE "sync_info" ("name" varchar PRIMARY KEY NOT NULL, "value" varchar NOT NULL)`);
         await queryRunner.query(`CREATE TABLE "temporary_output" ("outPointTxHash" varchar NOT NULL, "outPointIndex" varchar NOT NULL, "capacity" varchar NOT NULL, "lock" text NOT NULL, "lockHash" varchar NOT NULL, "status" varchar NOT NULL, "transactionHash" varchar, CONSTRAINT "FK_29236a0eb11fac458990882f985" FOREIGN KEY ("transactionHash") REFERENCES "transaction" ("hash") ON DELETE CASCADE ON UPDATE NO ACTION, PRIMARY KEY ("outPointTxHash", "outPointIndex"))`);
