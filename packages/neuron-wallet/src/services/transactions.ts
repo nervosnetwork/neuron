@@ -1,6 +1,14 @@
 import { getConnection } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Script, Transaction, TransactionWithoutHash, Input, Cell } from '../types/cell-types'
+import {
+  OutPoint,
+  Script,
+  Transaction,
+  TransactionWithoutHash,
+  Input,
+  Cell,
+  TransactionStatus,
+} from '../types/cell-types'
 import CellsService from './cells'
 import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
@@ -90,12 +98,16 @@ export default class TransactionsService {
         .map(i => BigInt(i.capacity))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
+      // TODO: add failed status
+      const status =
+        tx.outputs[0].status === OutputStatus.Pending ? TransactionStatus.Pending : TransactionStatus.Success
       return {
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
+        status,
       }
     })
 
