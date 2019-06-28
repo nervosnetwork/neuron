@@ -164,7 +164,7 @@ export const contextMenuTemplate: {
     return [
       {
         label: i18n.t('contextMenu.detail'),
-        click: () => AppController.navTo(`/transaction/${hash}`),
+        click: () => AppController.showTransactionDetails(hash),
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),

@@ -62,7 +62,7 @@
       "meta": "元信息",
       "type": "类型",
       "date": "时间",
-      "amount": "价值(ckb)",
+      "amount": "金额",
       "transaction-hash": "交易哈希",
       "send": "转账",
       "receive": "收款",
@@ -75,7 +75,8 @@
       "next": "后一页",
       "last": "最后一页",
       "description": "标签",
-      "status": "状态"
+      "status": "状态",
+      "blockNumber": "区块高度"
     },
     "transaction": {
       "goBack": "返回"

@@ -59,23 +59,24 @@
       "address-qrcode": "Address QRCode"
     },
     "history": {
-      "meta": "meta",
-      "type": "type",
-      "date": "date",
-      "amount": "amount(ckb)",
-      "transaction-hash": "transaction hash",
-      "send": "send",
-      "receive": "receive",
-      "other": "other",
-      "more-actions": "more actions",
-      "detail": "detail",
-      "explorer": "explorer",
+      "meta": "Meta",
+      "type": "Type",
+      "date": "Date",
+      "amount": "Amount",
+      "transaction-hash": "Transaction Hash",
+      "send": "Send",
+      "receive": "Receive",
+      "other": "Other",
+      "more-actions": "More Actions",
+      "detail": "Detail",
+      "explorer": "Explorer",
       "first": "First",
       "previous": "Previous",
       "next": "Next",
       "last": "Last",
       "description": "Description",
-      "status": "Status"
+      "status": "Status",
+      "blockNumber": "Block Number"
     },
     "transaction": {
       "goBack": "go back"
