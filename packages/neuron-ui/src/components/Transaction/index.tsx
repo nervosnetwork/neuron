@@ -45,10 +45,6 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
         <Card.Body>
           {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transaction}`)}</Alert> : null}
           <Card.Text>
-            <b>{`${t('history.amount')}: `}</b>
-            {transaction.value}
-          </Card.Text>
-          <Card.Text>
             <div>
               <b>{`${t('history.date')}: `}</b>
               {transaction.timestamp ? new Date(+transaction.timestamp).toLocaleString() : null}
