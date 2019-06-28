@@ -10401,7 +10401,7 @@ octokit-pagination-methods@^1.1.0:
   resolved "https://registry.yarnpkg.com/octokit-pagination-methods/-/octokit-pagination-methods-1.1.0.tgz#cf472edc9d551055f9ef73f6e42b4dbb4c80bea4"
   integrity sha512-fZ4qZdQ2nxJvtcasX7Ghl+WlWS/d9IgnBIwFZXVNNZUmzpno91SX5bc5vuxiuKoCtK78XxGGNuSCrDC7xYB3OQ==
 
-office-ui-fabric-react@^7.6.1:
+office-ui-fabric-react@7.6.1:
   version "7.6.1"
   resolved "https://registry.yarnpkg.com/office-ui-fabric-react/-/office-ui-fabric-react-7.6.1.tgz#811dc1b84a2e83254acc30d32a7c586810719641"
   integrity sha512-GNFoUS8nkv5n8Mx3kCsjodJw2k+ByGB/WsM5oRxDi8J5uugfxzhXaxTo9PQsFoFXKojCAK1LJUutOheYMCeg8w==
