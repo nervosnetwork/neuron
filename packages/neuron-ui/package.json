@@ -33,12 +33,15 @@
   "jest": {
     "displayName": "Neuron UI"
   },
-  "browserslist": ["last 2 chrome versions"],
+  "browserslist": [
+    "last 2 chrome versions"
+  ],
   "dependencies": {
     "bootstrap": "4.3.1",
     "grommet-icons": "4.2.0",
     "history": "4.9.0",
     "i18next": "15.1.3",
+    "office-ui-fabric-react": "7.6.1",
     "qr.js": "0.0.0",
     "react": "16.8.6",
     "react-bootstrap": "1.0.0-beta.9",
