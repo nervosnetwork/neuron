@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany } from 'typeorm'
+import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
 import { Witness, OutPoint, Transaction as TransactionInterface } from '../../../types/cell-types'
 import InputEntity from './input'
 import OutputEntity from './output'
@@ -50,6 +50,16 @@ export default class Transaction extends BaseEntity {
   })
   description?: string
 
+  @Column({
+    type: 'varchar',
+  })
+  createdAt!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  updatedAt!: string
+
   @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]
 
@@ -68,6 +78,19 @@ export default class Transaction extends BaseEntity {
       blockHash: this.blockHash,
       witnesses: this.witnesses,
       description: this.description,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     }
+  }
+
+  @BeforeInsert()
+  updateCreatedAt() {
+    this.createdAt = Date.now().toString()
+    this.updatedAt = this.createdAt
+  }
+
+  @BeforeUpdate()
+  updateUpdatedAt() {
+    this.updatedAt = Date.now().toString()
   }
 }
