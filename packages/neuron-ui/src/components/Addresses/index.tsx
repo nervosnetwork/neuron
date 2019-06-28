@@ -36,9 +36,6 @@ const headers = [
 ]
 
 const onPageChange = () => {}
-const AddressPanel = ({ address }: { address: string }) => {
-  return <div onContextMenu={() => appCalls.contextMenu({ type: 'addressList', id: address })}>{address}</div>
-}
 
 const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   const {
@@ -59,7 +56,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
     () =>
       addresses.map(({ type, identifier, address, txCount, balance, description }, idx) => ({
         type: type === 0 ? t('addresses.receiving-address') : t('addresses.change-address'),
-        address: <AddressPanel address={address} />,
+        address,
         identifier,
         description: (
           <DescriptionField
@@ -96,6 +93,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
           bordered: false,
           striped: true,
         }}
+        onContextMenu={(key: string) => () => appCalls.contextMenu({ type: 'addressList', id: key })}
       />
     </>
   )

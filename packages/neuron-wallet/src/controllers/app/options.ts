@@ -1,4 +1,5 @@
 import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
+import { bech32Address } from '@nervosnetwork/ckb-sdk-utils'
 
 import NetworksController from '../networks'
 import WalletsController from '../wallets'
@@ -122,12 +123,21 @@ export const contextMenuTemplate: {
       },
     ]
   },
-  addressList: async (address: string) => {
+  addressList: async (identifier: string) => {
+    if (identifier === undefined) return []
+
+    const address = bech32Address(identifier)
     return [
       {
         label: i18n.t('contextMenu.copy-address'),
         click: () => {
           clipboard.writeText(address)
+        },
+      },
+      {
+        label: i18n.t('contextMenu.copy-identifier'),
+        click: () => {
+          clipboard.writeText(identifier)
         },
       },
       {
