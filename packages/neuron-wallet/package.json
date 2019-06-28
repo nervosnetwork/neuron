@@ -43,7 +43,7 @@
       "node"
     ],
     "setupFilesAfterEnv": [
-      "<rootDir>/setupTests.ts"
+      "<rootDir>/setup-tests.ts"
     ]
   },
   "dependencies": {
