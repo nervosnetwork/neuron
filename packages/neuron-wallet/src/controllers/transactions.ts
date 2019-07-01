@@ -7,6 +7,7 @@ import WalletsService from '../services/wallets'
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
+import LockUtils from '../utils/lock-utils'
 
 /**
  * @class TransactionsController
@@ -59,6 +60,31 @@ export default class TransactionsController {
     const transaction = await TransactionsService.get(hash)
 
     if (!transaction) throw new TransactionNotFound(hash)
+
+    const wallet = WalletsService.getInstance().getCurrent()
+    if (!wallet) throw new CurrentWalletNotSet()
+    const addresses: string[] = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
+    const lockHashes: string[] = await Promise.all(
+      addresses.map(async addr => {
+        return LockUtils.addressToLockHash(addr)
+      })
+    )
+
+    const outputCapacities: bigint = transaction
+      .outputs!.filter(o => lockHashes.includes(o.lockHash!))
+      .map(o => BigInt(o.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+    const inputCapacities: bigint = transaction
+      .inputs!.filter(i => {
+        if (i.lockHash) {
+          return lockHashes.includes(i.lockHash)
+        }
+        return false
+      })
+      .map(i => BigInt(i.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+    const value: bigint = outputCapacities - inputCapacities
+    transaction.value = value.toString()
 
     return {
       status: ResponseCode.Success,
