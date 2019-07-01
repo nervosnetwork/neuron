@@ -1,41 +1,63 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import Table from 'widgets/Table'
 import { appCalls } from 'services/UILayer'
 import { useNeuronWallet, useLocalDescription } from 'utils/hooks'
 import { ContentProps } from 'containers/MainContent'
 
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
+import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
 
-const headers = [
+const MIN_CELL_WIDTH = 70
+
+const addressColumns: IColumn[] = [
   {
-    label: 'addresses.type',
+    name: 'addresses.type',
     key: 'type',
+    fieldName: 'type',
+    isResizable: true,
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 120,
   },
   {
-    label: 'addresses.address',
+    name: 'addresses.address',
     key: 'address',
+    fieldName: 'address',
+    isResizable: true,
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 350,
   },
   {
-    label: 'addresses.identifier',
+    name: 'addresses.identifier',
     key: 'identifier',
+    fieldName: 'identifier',
+    isResizable: true,
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 300,
   },
   {
-    label: 'addresses.description',
+    name: 'addresses.description',
     key: 'description',
+    fieldName: 'description',
+    isResizable: true,
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 250,
   },
   {
-    label: 'addresses.balance',
+    name: 'addresses.balance',
     key: 'balance',
+    fieldName: 'balance',
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 200,
   },
   {
-    label: 'addresses.transactions',
+    name: 'addresses.transactions',
     key: 'transactions',
+    fieldName: 'transactions',
+    minWidth: MIN_CELL_WIDTH,
+    maxWidth: 200,
   },
 ]
-
-const onPageChange = () => {}
 
 const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   const {
@@ -77,25 +99,15 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
   )
 
   return (
-    <>
-      <h2>{t('addresses.addresses')}</h2>
-      <Table
-        headers={headers.map(header => ({
-          ...header,
-          label: t(header.label),
-        }))}
-        items={addressesItems}
-        pageNo={0}
-        pageSize={addressesItems.length}
-        totalCount={addressesItems.length}
-        onPageChange={onPageChange}
-        tableAttrs={{
-          bordered: false,
-          striped: true,
-        }}
-        onContextMenu={(key: string) => () => appCalls.contextMenu({ type: 'addressList', id: key })}
-      />
-    </>
+    <DetailsList
+      checkboxVisibility={CheckboxVisibility.hidden}
+      layoutMode={DetailsListLayoutMode.justified}
+      columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
+      items={addressesItems}
+      onItemContextMenu={item => {
+        appCalls.contextMenu({ type: 'addressList', id: item.key })
+      }}
+    />
   )
 }
 

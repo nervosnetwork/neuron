@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Container, Button, FormControl, Form } from 'react-bootstrap'
+import { Label, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
@@ -114,28 +114,26 @@ const Mnemonic = ({
   }, [isCreate, history, rootPath, type])
 
   return (
-    <Container>
+    <>
       <h1>{t(message)}</h1>
-      <FormControl
-        style={{
-          resize: 'none',
-        }}
-        as="textarea"
-        rows="3"
+      <TextField
+        multiline
+        resizable={false}
+        rows={3}
         disabled={isCreate}
         value={isCreate ? generated : imported}
         onChange={onChange}
+        description={t(hint)}
       />
-      <Form.Text className="text-muted">{t(hint)}</Form.Text>
       <RightScreenButtonRow>
-        <Button role="button" onClick={history.goBack}>
+        <DefaultButton role="button" onClick={history.goBack}>
           {t('wizard.back')}
-        </Button>
-        <Button role="button" onClick={onNext} disabled={disableNext}>
+        </DefaultButton>
+        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
           {t('wizard.next')}
-        </Button>
+        </PrimaryButton>
       </RightScreenButtonRow>
-    </Container>
+    </>
   )
 }
 
@@ -206,24 +204,28 @@ const Submission = ({
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 
   return (
-    <Form>
+    <div>
       <h1>{t(message)}</h1>
       {submissionInputs.map(input => (
-        <Form.Group key={input.key}>
-          <Form.Label>{t(`wizard.${input.label}`)}</Form.Label>
-          <FormControl type={input.type} value={state[input.key]} onChange={onChange(input.key)} />
-          {input.hint ? <Form.Text className="text-muted">{t(input.hint)}</Form.Text> : null}
-        </Form.Group>
+        <div key={input.key}>
+          <Label>{t(`wizard.${input.label}`)}</Label>
+          <TextField
+            type={input.type}
+            value={state[input.key]}
+            onChange={onChange(input.key)}
+            description={t(input.hint || '')}
+          />
+        </div>
       ))}
       <RightScreenButtonRow>
-        <Button role="button" onClick={history.goBack} onKeyPress={history.goBack}>
+        <DefaultButton role="button" onClick={history.goBack} onKeyPress={history.goBack}>
           {t('wizard.back')}
-        </Button>
-        <Button role="button" onClick={onNext} disabled={disableNext}>
+        </DefaultButton>
+        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
           {t('wizard.next')}
-        </Button>
+        </PrimaryButton>
       </RightScreenButtonRow>
-    </Form>
+    </div>
   )
 }
 

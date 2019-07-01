@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { NavLink } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router-dom'
+import { Pivot, PivotItem } from 'office-ui-fabric-react'
 import {
   Local as IconGeneral,
   Upload as IconSend,
@@ -14,41 +15,42 @@ import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
 
 const menuItems = [
-  { name: 'navbar.general', route: Routes.General, icon: IconGeneral },
-  { name: 'navbar.send', route: Routes.Send, icon: IconSend },
-  { name: 'navbar.receive', route: Routes.Receive, icon: IconReceive },
-  { name: 'navbar.history', route: Routes.History, icon: IconHistory },
-  { name: 'navbar.addresses', route: Routes.Addresses, icon: IconAddresses },
+  { name: 'navbar.general', url: Routes.General, icon: IconGeneral },
+  { name: 'navbar.send', url: Routes.Send, icon: IconSend },
+  { name: 'navbar.receive', url: Routes.Receive, icon: IconReceive },
+  { name: 'navbar.history', url: Routes.History, icon: IconHistory },
+  { name: 'navbar.addresses', url: Routes.Addresses, icon: IconAddresses },
 ]
 
-const Navbar = () => {
+const Navbar = ({ location, history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
     settings: { wallets, showAddressBook },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  return wallets.length ? (
-    <>
-      {(showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)).map(menuItem => (
-        <NavLink
-          key={menuItem.name}
-          to={menuItem.route}
-          isActive={match => {
-            return !!match
-          }}
-          style={{
-            paddingRight: '15px',
-          }}
-          activeStyle={{
-            fontWeight: 'bolder',
-          }}
-        >
-          {<menuItem.icon size="20px" style={{ paddingRight: '5px' }} />}
-          {t(menuItem.name)}
-        </NavLink>
+  const pivotItems = useMemo(
+    () =>
+      showAddressBook || location.pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1),
+    [showAddressBook]
+  )
+
+  if (!wallets.length) return null
+
+  return (
+    <Pivot
+      selectedKey={location.pathname}
+      onLinkClick={(pivotItem?: PivotItem) => {
+        if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
+          history.push(pivotItem.props.itemKey)
+        }
+      }}
+      headersOnly
+    >
+      {pivotItems.map(pivotItem => (
+        <PivotItem key={pivotItem.name} headerText={t(pivotItem.name)} itemKey={pivotItem.url} />
       ))}
-    </>
-  ) : null
+    </Pivot>
+  )
 }
 
 Navbar.displayName = 'Navbar'

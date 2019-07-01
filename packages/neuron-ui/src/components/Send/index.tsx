@@ -1,15 +1,23 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap'
+import {
+  Stack,
+  List,
+  MessageBar,
+  TextField,
+  Dropdown,
+  PrimaryButton,
+  DefaultButton,
+  Spinner,
+  MessageBarType,
+} from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
-import InlineInputWithDropdown from 'widgets/InlineInput/InlineInputWithDropdown'
-import { Spinner } from 'widgets/Loading'
 
 import { ContentProps } from 'containers/MainContent'
-import { PlaceHolders } from 'utils/const'
+import { PlaceHolders, CapacityUnit } from 'utils/const'
 import { useNeuronWallet } from 'utils/hooks'
 
 import { useInitialize } from './hooks'
@@ -32,7 +40,7 @@ const Send = ({
     updateTransactionOutput,
     onItemChange,
     onSubmit,
-    dropdownItems,
+    onCapacityUnitChange,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
@@ -41,93 +49,106 @@ const Send = ({
   } = useInitialize(address, dispatch, history)
 
   return (
-    <Container>
-      <Card>
-        <Card.Header>{t('navbar.send')}</Card.Header>
-        <Card.Body>
-          {errorMsgs.send ? <Alert variant="warning">{t(`messages.${errorMsgs.send}`)}</Alert> : null}
-          <Form>
-            {send.outputs.map((item, idx) => (
-              <div key={`amount-${idx * 1}`}>
-                <Form.Group as={Row}>
-                  <Form.Label column>{t('send.address')}</Form.Label>
-                  <Col sm={10}>
-                    <InputGroup>
-                      <Form.Control
-                        disabled={sending}
-                        value={item.address || ''}
-                        onChange={onItemChange('address', idx)}
-                        placeholder={PlaceHolders.send.Address}
-                      />
-                      <InputGroup.Append>
-                        <InputGroup.Text
-                          style={{
-                            padding: 0,
-                          }}
-                        >
-                          <QRScanner
-                            title={t('send.scan-to-get-address')}
-                            label={t('send.address')}
-                            onConfirm={(data: string) => updateTransactionOutput('address')(idx)(data)}
-                          />
-                        </InputGroup.Text>
-                      </InputGroup.Append>
-                    </InputGroup>
-                  </Col>
-                </Form.Group>
-                <InlineInputWithDropdown
-                  label={t('send.amount')}
-                  value={item.amount}
-                  placeholder={PlaceHolders.send.Amount}
-                  onChange={onItemChange('amount', idx)}
-                  disabled={sending}
-                  dropDown={{
-                    title: item.unit,
-                    items: dropdownItems(idx),
-                  }}
-                />
+    <Stack>
+      <Stack.Item>
+        {errorMsgs.send ? (
+          <MessageBar messageBarType={MessageBarType.warning}>{t(`messages.${errorMsgs.send}`)}</MessageBar>
+        ) : null}
+        <List
+          items={send.outputs}
+          onRenderCell={(item, idx) => {
+            if (undefined === item || undefined === idx) return null
+            return (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Stack horizontal>
+                  <TextField
+                    styles={{
+                      root: {
+                        flex: 1,
+                      },
+                    }}
+                    disabled={sending}
+                    value={item.address || ''}
+                    onChange={onItemChange('address', idx)}
+                    placeholder={PlaceHolders.send.Address}
+                    label={t('send.address')}
+                    underlined
+                    required
+                  />
+                  <div
+                    style={{
+                      padding: 0,
+                    }}
+                  >
+                    <QRScanner
+                      title={t('send.scan-to-get-address')}
+                      label={t('send.address')}
+                      onConfirm={(data: string) => updateTransactionOutput('address')(idx)(data)}
+                    />
+                  </div>
+                </Stack>
+                <Stack horizontal>
+                  <TextField
+                    styles={{
+                      root: { flex: 1 },
+                    }}
+                    label={t('send.amount')}
+                    value={item.amount}
+                    placeholder={PlaceHolders.send.Amount}
+                    onChange={onItemChange('amount', idx)}
+                    disabled={sending}
+                    underlined
+                    required
+                  />
+                  <Dropdown
+                    selectedKey={item.unit}
+                    options={[
+                      { key: CapacityUnit.CKB, text: 'CKB' },
+                      { key: CapacityUnit.CKKB, text: 'CKKB' },
+                      { key: CapacityUnit.CKGB, text: 'CKGB' },
+                    ]}
+                    onChange={onCapacityUnitChange(idx)}
+                  />
+                </Stack>
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   {send.outputs.length > 1 ? (
-                    <button type="button" onClick={() => removeTransactionOutput(idx)}>
-                      Remove this
-                    </button>
+                    <PrimaryButton text={t('send.remove-this')} onClick={() => removeTransactionOutput(idx)} />
                   ) : null}
                   {idx === send.outputs.length - 1 ? (
-                    <button type="button" onClick={() => addTransactionOutput()}>
-                      Add one
-                    </button>
+                    <PrimaryButton onClick={() => addTransactionOutput()} text={t('send.add-one')} />
                   ) : null}
                 </div>
-              </div>
-            ))}
-            <input
-              placeholder={t('send.description')}
-              type="text"
-              id="description"
-              alt="description"
-              value={send.description}
-              onChange={onDescriptionChange}
-              style={{ width: '100%' }}
+              </Stack>
+            )
+          }}
+        />
+
+        <TextField
+          placeholder={t('send.description')}
+          id="description"
+          alt="description"
+          value={send.description}
+          onChange={onDescriptionChange}
+        />
+        <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
+        <div>{`${t('send.balance')}: ${balance}`}</div>
+        <Stack horizontal horizontalAlign="space-around">
+          {sending ? (
+            <Spinner />
+          ) : (
+            <PrimaryButton
+              type="submit"
+              onClick={onSubmit(id, send.outputs, send.description)}
+              disabled={sending}
+              text={t('send.send')}
             />
-          </Form>
-          <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
-          <div>{`${t('send.balance')}: ${balance}`}</div>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            block
-            onClick={onSubmit(id, send.outputs, send.description)}
-            disabled={sending}
-          >
-            {sending ? <Spinner /> : t('send.send')}
-          </Button>
-          <Button type="reset" variant="outline-primary" size="lg" block onClick={onClear}>
+          )}
+          <DefaultButton type="reset" onClick={onClear}>
             Clear
-          </Button>
-        </Card.Body>
-      </Card>
-    </Container>
+          </DefaultButton>
+        </Stack>
+      </Stack.Item>
+    </Stack>
   )
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Container, Card, OverlayTrigger, Tooltip, Modal, Form, InputGroup } from 'react-bootstrap'
+import { Stack, TextField, TooltipHost, Modal } from 'office-ui-fabric-react'
 import QRCode from 'widgets/QRCode'
 import { RouteComponentProps } from 'react-router-dom'
 import { Copy as CopyIcon } from 'grommet-icons'
@@ -12,12 +12,6 @@ declare global {
     clipboard: any
   }
 }
-
-const AddressPanel = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin: 10px 0 0 0;
-`
 
 const QRCodePanel = styled.div`
   width: 300px;
@@ -48,51 +42,32 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
   }
 
   return (
-    <Container>
-      <Card>
-        <Card.Header>
-          <h2>{t('navbar.receive')}</h2>
-        </Card.Header>
-        <Card.Body style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-          <QRCodePanel onClick={() => setShowLargeQRCode(true)} style={{ alignSelf: 'center' }}>
-            <QRCode value={accountAddress} size={256} />
-          </QRCodePanel>
-          <Form.Group>
-            <AddressPanel>
-              <OverlayTrigger
-                placement="bottom"
-                overlay={<Tooltip id="address-tooltip">{t('receive.click-to-copy')}</Tooltip>}
-              >
-                <InputGroup>
-                  <Form.Control readOnly type="text" placeholder={accountAddress} onClick={() => copyAddress()} />
-                  <InputGroup.Append>
-                    <CopyIcon
-                      style={{
-                        width: '15px',
-                        height: '25px',
-                        paddingTop: '10px',
-                        marginLeft: '10px',
-                      }}
-                    />
-                  </InputGroup.Append>
-                </InputGroup>
-              </OverlayTrigger>
-            </AddressPanel>
-          </Form.Group>
-          <Form.Text className="text-muted">{t('receive.prompt')}</Form.Text>
-          <Modal centered show={showLargeQRCode} onHide={() => setShowLargeQRCode(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title id="contained-modal-title-vcenter">{t('receive.address-qrcode')}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <QRCodeModal>
-                <QRCode value={accountAddress} size={400} />
-              </QRCodeModal>
-            </Modal.Body>
-          </Modal>
-        </Card.Body>
-      </Card>
-    </Container>
+    <Stack>
+      <QRCodePanel onClick={() => setShowLargeQRCode(true)} style={{ alignSelf: 'center' }}>
+        <QRCode value={accountAddress} size={256} />
+      </QRCodePanel>
+      <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
+        <Stack horizontal horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
+          <TextField
+            styles={{ root: { flex: 1 } }}
+            readOnly
+            type="text"
+            placeholder={accountAddress}
+            onClick={() => copyAddress()}
+            description={t('receive.prompt')}
+          />
+          <CopyIcon onClick={() => copyAddress()} />
+        </Stack>
+      </TooltipHost>
+      <Modal isOpen={showLargeQRCode} onDismiss={() => setShowLargeQRCode(false)}>
+        <div>{t('receive.address-qrcode')}</div>
+        <div>
+          <QRCodeModal>
+            <QRCode value={accountAddress} size={400} />
+          </QRCodeModal>
+        </div>
+      </Modal>
+    </Stack>
   )
 }
 

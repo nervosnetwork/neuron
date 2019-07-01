@@ -1,11 +1,10 @@
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { ContentProps } from 'containers/MainContent'
 import { actionCreators } from 'containers/MainContent/reducer'
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { Button, Card, Form } from 'react-bootstrap'
+import { Stack, TextField, PrimaryButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps, Link } from 'react-router-dom'
 import { useNeuronWallet } from 'utils/hooks'
-import InlineInput, { InputProps } from 'widgets/InlineInput'
 import { Routes } from 'utils/const'
 import { useAreParamsValid, useInputs, useToggleDialog, useWalletEditor } from './hooks'
 
@@ -41,7 +40,7 @@ export default ({
     initialize(wallet.name)
   }, [id, initialize, wallet.name])
 
-  const inputs: InputProps[] = useInputs(editor)
+  const inputs = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value)
   const toggleDialog = useToggleDialog(dispatch)
 
@@ -56,18 +55,14 @@ export default ({
   }, [editor.name.value, wallet.id, dispatch, toggleDialog])
 
   return (
-    <Card>
-      <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
-      <Card.Body>
-        <Form>
-          {inputs.map(inputProps => (
-            <InlineInput {...inputProps} key={inputProps.label} />
-          ))}
-        </Form>
-        <Button type="submit" variant="primary" size="lg" block onClick={handleConfirm} disabled={!areParamsValid}>
-          {t('common.save')}
-        </Button>
-      </Card.Body>
-    </Card>
+    <Stack>
+      <Stack.Item>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Stack.Item>
+      <Stack.Item>
+        {inputs.map(inputProps => (
+          <TextField {...inputProps} key={inputProps.label} required />
+        ))}
+        <PrimaryButton onClick={handleConfirm} disabled={!areParamsValid} text={t('common.save')} />
+      </Stack.Item>
+    </Stack>
   )
 }

@@ -20,7 +20,6 @@ import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
 import NetworkEditor from 'components/NetworkEditor'
 import WalletEditor from 'components/WalletEditor'
-import Prompt from 'components/Prompt'
 import LaunchScreen from 'components/LaunchScreen'
 
 import { Routes } from 'utils/const'
@@ -145,13 +144,6 @@ export const mainContents: CustomRoute[] = [
     path: Routes.WalletWizard,
     exact: false,
     component: WalletWizard,
-  },
-  {
-    name: `Prompt`,
-    path: Routes.Prompt,
-    params: '/:event',
-    exact: false,
-    component: Prompt,
   },
 ]
 

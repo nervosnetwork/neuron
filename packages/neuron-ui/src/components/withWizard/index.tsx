@@ -1,8 +1,9 @@
 import React, { useReducer } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
+import { Panel, PanelType } from 'office-ui-fabric-react'
 import { useNeuronWallet } from 'utils/hooks'
 import ScreenMessages from 'components/ScreenMessages'
-import Screen from 'widgets/Screen'
+// import Screen from 'widgets/Screen'
 
 export interface Element {
   path: string
@@ -45,7 +46,7 @@ const reducer = (
 }
 
 const Wizard = ({ state, messages, elements, rootPath, dispatch }: WizardProps) => (
-  <Screen>
+  <Panel isOpen type={PanelType.custom} customWidth="100%">
     <ScreenMessages messages={messages} />
     {elements.map((element: any) => (
       <Route
@@ -56,7 +57,7 @@ const Wizard = ({ state, messages, elements, rootPath, dispatch }: WizardProps) 
         )}
       />
     ))}
-  </Screen>
+  </Panel>
 )
 
 Wizard.displayName = 'Wizard'

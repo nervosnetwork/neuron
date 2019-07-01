@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { History } from 'history'
+import { IDropdownOption } from 'office-ui-fabric-react'
 import { TransactionOutput } from 'services/UILayer'
 import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import { CapacityUnit } from 'utils/const'
 import initState from 'containers/MainContent/state'
 import { MainDispatch } from '../../containers/MainContent/reducer'
 
@@ -51,21 +51,21 @@ const useOnSubmit = (dispatch: React.Dispatch<any>) =>
   )
 
 const useOnItemChange = (updateTransactionOutput: Function) => (field: string, idx: number) => (
-  e: React.FormEvent<{ value: string }>
+  _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+  newValue?: string
 ) => {
-  updateTransactionOutput(field)(idx)(e.currentTarget.value)
+  if (undefined !== newValue) {
+    updateTransactionOutput(field)(idx)(newValue)
+  }
 }
 
-const useDropdownItems = (updateTransactionOutput: Function) =>
+const useCapacityUnitChange = (updateTransactionOutput: Function) =>
   useCallback(
-    (idx: number) =>
-      Object.values(CapacityUnit)
-        .filter(unit => typeof unit === 'string')
-        .map((unit: string) => ({
-          label: unit.toUpperCase(),
-          key: unit,
-          onClick: () => updateTransactionOutput('unit')(idx)(unit),
-        })),
+    (idx: number) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+      if (option) {
+        updateTransactionOutput('unit')(idx)(option.key)
+      }
+    },
     [updateTransactionOutput]
   )
 
@@ -82,11 +82,13 @@ const useUpdateTransactionPrice = (dispatch: any) =>
 
 const useSendDescriptionChange = (dispatch: MainDispatch) =>
   useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      dispatch({
-        type: MainActions.UpdateSendDescription,
-        payload: e.currentTarget.value,
-      })
+    (_e, newValue?: string) => {
+      if (undefined !== newValue) {
+        dispatch({
+          type: MainActions.UpdateSendDescription,
+          payload: newValue,
+        })
+      }
     },
     [dispatch]
   )
@@ -103,7 +105,7 @@ const useClear = (dispatch: MainDispatch) => useCallback(() => clear(dispatch), 
 export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
-  const dropdownItems = useDropdownItems(updateTransactionOutput)
+  const onCapacityUnitChange = useCapacityUnitChange(updateTransactionOutput)
   const onSubmit = useOnSubmit(dispatch)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
@@ -126,7 +128,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     id,
     updateTransactionOutput,
     onItemChange,
-    dropdownItems,
+    onCapacityUnitChange,
     onSubmit,
     addTransactionOutput,
     removeTransactionOutput,

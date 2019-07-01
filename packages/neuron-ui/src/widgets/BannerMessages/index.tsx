@@ -1,12 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { Alert } from 'react-bootstrap'
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react'
 
 const Container = styled.div`
   width: 100%;
 `
-const AlertItem = styled(Alert)`
+const AlertItem = styled(MessageBar)`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,7 +30,7 @@ export interface Message {
   content: string
   id: string | null
   time: number
-  category: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light'
+  category: MessageBarType
   actions: { label: string; action: React.MouseEventHandler | string }[]
   dismiss: () => void
 }
@@ -39,7 +39,7 @@ const BannerMessages = ({ messages, style = {} }: { messages: Message[]; style?:
   return (
     <Container style={style}>
       {messages.map(({ content, time, category, actions, dismiss }) => (
-        <AlertItem variant={category} key={time} dismissible onClose={dismiss}>
+        <AlertItem messageBarType={category} key={time} onDismiss={dismiss}>
           <Content>{content}</Content>
           <ActionZone>
             {actions.map(({ label, action }) =>
