@@ -1,5 +1,5 @@
 import { Cell } from '../../../types/cell-types'
-import LockUtils from '../../../utils/lock-utils'
+import LockUtils from '../../../models/lock-utils'
 
 export default class CheckOutput {
   private output: Cell

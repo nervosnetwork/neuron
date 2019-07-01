@@ -1,7 +1,7 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey } from '../models/keys/key'
 import Address, { AddressType } from '../models/keys/address'
-import LockUtils from '../utils/lock-utils'
+import LockUtils from '../models/lock-utils'
 import AddressDao, { Address as AddressInterface } from '../database/address/dao'
 import env from '../env'
 import { AddressVersion } from '../database/address/entities/address'

@@ -100,7 +100,7 @@ export default class AppController {
   }
 
   public static navTo(url: string) {
-    windowManager.sendToFocusedWindow(Channel.App, 'navTo', {
+    windowManager.sendToMainWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
       result: url,
     })
@@ -202,7 +202,7 @@ export default class AppController {
         preload: path.join(__dirname, '../../startup/preload.js'),
       },
     })
-    win.loadURL(`${env.mainURL}/#/transaction/${hash}`)
+    win.loadURL(`${env.mainURL}#/transaction/${hash}`)
     win.on('ready-to-show', () => {
       win.show()
       win.focus()

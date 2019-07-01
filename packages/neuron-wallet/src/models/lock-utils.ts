@@ -4,10 +4,15 @@ import env from '../env'
 
 const { core } = NodeService.getInstance()
 
-export default class LockUtils {
-  static systemScriptInfo: { codeHash: string; outPoint: OutPoint } | undefined
+export interface SystemScript {
+  codeHash: string
+  outPoint: OutPoint
+}
 
-  static async systemScript() {
+export default class LockUtils {
+  static systemScriptInfo: SystemScript | undefined
+
+  static async systemScript(): Promise<SystemScript> {
     if (this.systemScriptInfo) {
       return this.systemScriptInfo
     }
@@ -45,6 +50,10 @@ export default class LockUtils {
     this.systemScriptInfo = systemScriptInfo
 
     return systemScriptInfo
+  }
+
+  static setSystemScript(info: SystemScript) {
+    LockUtils.systemScriptInfo = info
   }
 
   // use SDK lockScriptToHash

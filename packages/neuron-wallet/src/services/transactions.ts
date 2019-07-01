@@ -14,7 +14,7 @@ import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
 import TransactionEntity from '../database/chain/entities/transaction'
 import NodeService from './node'
-import LockUtils from '../utils/lock-utils'
+import LockUtils from '../models/lock-utils'
 
 const { core } = NodeService.getInstance()
 
@@ -99,8 +99,7 @@ export default class TransactionsService {
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
       // TODO: add failed status
-      const status =
-        tx.outputs[0].status === OutputStatus.Pending ? TransactionStatus.Pending : TransactionStatus.Success
+      const status = tx.outputs[0].status === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
       return {
         timestamp: tx.timestamp,
         value: value.toString(),
