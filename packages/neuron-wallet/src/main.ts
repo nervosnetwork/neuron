@@ -5,7 +5,7 @@ import { updateApplicationMenu } from './utils/application-menu'
 
 import Router from './router'
 import WindowManager from './models/window-manager'
-import createWindow from './startup/create-window'
+import createMainWindow from './startup/create-main-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
 import initConnection from './database/address/ormconfig'
 import WalletsService from './services/wallets'
@@ -20,7 +20,7 @@ Object.defineProperty(app, 'router', {
 
 const openWindow = () => {
   if (!WindowManager.mainWindow) {
-    WindowManager.mainWindow = createWindow()
+    WindowManager.mainWindow = createMainWindow()
     WindowManager.mainWindow.on('closed', () => {
       if (process.platform !== 'darwin') {
         app.quit()
