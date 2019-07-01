@@ -5,7 +5,7 @@ import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
 import genesisBlockHash from './genesis'
 import CellsService from '../../services/cells'
-import LockUtils from '../../utils/lock-utils'
+import LockUtils from '../../models/lock-utils'
 import AddressService from '../../services/addresses'
 import initDatabase from './init-database'
 

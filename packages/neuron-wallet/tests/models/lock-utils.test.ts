@@ -1,5 +1,5 @@
 import { Script } from '../../src/types/cell-types'
-import LockUtils from '../../src/utils/lock-utils'
+import LockUtils from '../../src/models/lock-utils'
 
 const systemScript = {
   outPoint: {

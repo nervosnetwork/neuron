@@ -2,7 +2,7 @@ import initConnection from '../../database/chain/ormconfig'
 import Utils from '../../services/sync/utils'
 import genesisBlockHash from './genesis'
 import { updateMetaInfo, getMetaInfo } from '../../database/chain/meta-info'
-import LockUtils from '../../utils/lock-utils'
+import LockUtils from '../../models/lock-utils'
 
 export const initDatabase = async () => {
   try {
