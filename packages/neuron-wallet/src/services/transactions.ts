@@ -14,7 +14,7 @@ import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
 import TransactionEntity from '../database/chain/entities/transaction'
 import NodeService from './node'
-import LockUtils from '../utils/lock-utils'
+import LockUtils from '../models/lock-utils'
 
 const { core } = NodeService.getInstance()
 

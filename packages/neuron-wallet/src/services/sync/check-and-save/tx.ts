@@ -4,7 +4,7 @@ import { Transaction, Cell, OutPoint } from '../../../types/cell-types'
 import OutputEntity from '../../../database/chain/entities/output'
 import TransactionsService from '../../transactions'
 import CheckOutput from './output'
-import LockUtils from '../../../utils/lock-utils'
+import LockUtils from '../../../models/lock-utils'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
 
 export default class CheckTx {
