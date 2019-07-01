@@ -13,7 +13,7 @@ const extendedKey = new AccountExtendedPublicKey(
 
 describe('Key tests', () => {
   it('Generate addresses from extended public key', () => {
-    const addresses = AddressService.generateAddresses('1', extendedKey, 2, 2)
+    const addresses = AddressService.generateAddresses('1', extendedKey, 0, 0, 2, 2)
 
     expect(2).toBe(addresses.testnetReceiving.length)
     expect("m/44'/309'/0'/0/0").toBe(addresses.testnetReceiving[0].path)
@@ -94,7 +94,11 @@ describe('Key tests with db', () => {
   })
 
   const generate = async (id: string = walletId) => {
-    await AddressService.generateAndSave(id, extendedKey, 2, 1)
+    await AddressService.generateAndSave(id, extendedKey, 0, 0, 2, 1)
+  }
+
+  const checkAndGenerate = async (id: string = walletId) => {
+    await AddressService.checkAndGenerateSave(id, extendedKey, 2, 1)
   }
 
   it('generateAndSave', async () => {
@@ -106,6 +110,33 @@ describe('Key tests with db', () => {
       .getMany()
 
     expect(all.length).toEqual((2 + 1) * 2)
+  })
+
+  it('checkAndGenerateSave', async () => {
+    await generate()
+
+    const all = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .getMany()
+
+    const usedAll = all
+      .filter(one => one.addressType === AddressType.Receiving)
+      .map(one => {
+        const entity = one
+        entity.txCount = 1
+        return entity
+      })
+    await getConnection().manager.save(usedAll)
+
+    await checkAndGenerate()
+
+    const final = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .getMany()
+
+    expect(final.length).toEqual((2 + 1) * 2 * 2)
   })
 
   it('generateAndSave with two wallet', async () => {

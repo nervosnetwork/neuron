@@ -154,4 +154,27 @@ export default class AddressDao {
 
     return addressEntity
   }
+
+  public static maxAddressIndex = async (
+    walletId: string,
+    addressType: AddressType,
+    version: AddressVersion
+  ): Promise<AddressEntity | undefined> => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        addressType,
+        version,
+      })
+      .orderBy('address.addressIndex', 'DESC')
+      .getOne()
+
+    if (!addressEntity) {
+      return undefined
+    }
+
+    return addressEntity
+  }
 }

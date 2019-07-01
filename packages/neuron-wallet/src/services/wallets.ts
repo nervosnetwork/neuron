@@ -216,7 +216,7 @@ export default class WalletService {
   ) => {
     const wallet: Wallet = this.get(id)
     const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-    await AddressService.generateAndSave(id, accountExtendedPublicKey, receivingAddressCount, changeAddressCount)
+    await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, receivingAddressCount, changeAddressCount)
   }
 
   public generateCurrentWalletAddresses = async (
