@@ -1,0 +1,43 @@
+@import './layout.scss';
+
+* {
+  user-select: none;
+  outline: none !important;
+  -webkit-tap-highlight-color: none !important;
+  cursor: default !important;
+}
+
+[type=button],
+[type=reset],
+[type=submit],
+button {
+  -webkit-appearance: none !important;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.form-control,
+.btn {
+
+  &:focus {
+    box-shadow: none !important;
+  }
+}

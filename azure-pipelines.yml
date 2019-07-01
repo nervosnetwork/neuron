@@ -1,0 +1,89 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - develop
+      - rc/*
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - '*'
+
+jobs:
+  - job: macOS
+    pool:
+      vmImage: 'macos-10.14'
+    strategy:
+      matrix:
+        node_11_x:
+          node_version: 11.x
+        node_12_x:
+          node_version: 12.x
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(node_version)
+      displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      name: Install
+    - script: |
+        yarn bootstrap
+        CI=false yarn build
+      name: Build
+    - script: CI=true yarn test
+      name: Test
+
+  - job: Linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    strategy:
+      matrix:
+        node_11_x:
+          node_version: 11.x
+        node_12_x:
+          node_version: 12.x
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(node_version)
+      displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      name: Install
+    - script: |
+        yarn bootstrap
+        CI=false yarn build
+      name: Build
+    - script: |
+        export DISPLAY=':99.0'
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        CI=true yarn test
+      name: Test
+
+  - job: Windows
+    pool:
+      vmImage: 'windows-2019'
+    strategy:
+      matrix:
+        node_11_x:
+          node_version: 11.x
+        node_12_x:
+          node_version: 12.x
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(node_version)
+      displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      name: Install
+    - script: |
+        yarn bootstrap
+        set CI=false
+        yarn build
+      name: Build
+    - script: |
+        set CI=true
+        yarn test
+      name: Test

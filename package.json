@@ -1,0 +1,68 @@
+{
+  "name": "@nervosnetwork/neuron",
+  "productName": "Neuron",
+  "description": "CKB Neuron Wallet",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "author": {
+    "name": "Nervos Core Dev",
+    "email": "dev@nervos.org",
+    "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 11.10",
+    "yarn": ">= 1.12"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap && lerna link",
+    "start:ui": "lerna run --scope=@nervosnetwork/neuron-ui start",
+    "start": "concurrently \"cross-env BROWSER=none yarn run start:ui\" \"wait-on http://localhost:3000 && cd packages/neuron-wallet && yarn run start:dev\"",
+    "clean": "lerna run --stream clean",
+    "prebuild": "yarn clean",
+    "build": "lerna run --stream build",
+    "package": "yarn build && ./packages/neuron-wallet/script/package.sh",
+    "test": "lerna run --parallel test",
+    "lint": "lerna run --stream lint",
+    "postinstall": "lerna run rebuild:nativemodules",
+    "db:migrate": "ts-node ./node_modules/.bin/typeorm migration:generate",
+    "address-db": "ts-node ./node_modules/.bin/typeorm --config ormconfig-address.json"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lerna run --no-bail --stream precommit"
+    }
+  },
+  "devDependencies": {
+    "@cryptape/sdk-ts-config": "0.0.1",
+    "@types/jest": "24.0.13",
+    "@typescript-eslint/eslint-plugin": "1.10.2",
+    "@typescript-eslint/parser": "1.10.2",
+    "concurrently": "4.1.0",
+    "cross-env": "5.2.0",
+    "cz-conventional-changelog": "2.1.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb": "17.1.0",
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-import": "2.17.3",
+    "eslint-plugin-jsx-a11y": "6.2.1",
+    "eslint-plugin-prettier": "3.1.0",
+    "eslint-plugin-react": "7.13.0",
+    "husky": "2.3.0",
+    "lerna": "3.15.0",
+    "nodemon": "1.19.1",
+    "prettier": "1.17.1",
+    "ts-jest": "24.0.2",
+    "typescript": "3.5.1",
+    "wait-on": "3.2.0"
+  },
+  "dependencies": {},
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

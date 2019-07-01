@@ -1,0 +1,166 @@
+{
+  "translation": {
+    "navbar": {
+      "general": "通用",
+      "wallet": "钱包",
+      "send": "转账",
+      "receive": "收款",
+      "history": "交易历史",
+      "addresses": "地址管理",
+      "settings": "设置"
+    },
+    "general": {
+      "balance": "余额",
+      "amount": "价值",
+      "live-cells": "可用 Cells",
+      "cell-types": "Cell 类型",
+      "recent-activities": "近期活动",
+      "no-recent-activities": "近期没有活动",
+      "blockchain-status": "同步节点状态",
+      "blockchain-identity": "链的 ID",
+      "block-height": "区块高度",
+      "rpc-service": "RPC 服务"
+    },
+    "wizard": {
+      "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
+      "create-new-wallet": "创建新钱包",
+      "import-wallet": "导入钱包",
+      "next": "下一步",
+      "back": "上一步",
+      "name": "钱包名称",
+      "your-wallet-seed-is": "用于生成钱包的 seed 为",
+      "input-your-seed": "请输入您的 seed",
+      "password": "密码",
+      "confirm-password": "确认密码",
+      "set-wallet-name-and-password": "命名并设置密码用于保护钱包",
+      "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
+      "wallet-suffix": "钱包 {{suffix}}",
+      "write-down-seed": "请记下您的助记词并保存到安全的地方"
+    },
+    "detail": {
+      "more-transactions": "更多交易记录"
+    },
+    "send": {
+      "address": "地址",
+      "amount": "价值",
+      "send": "发送",
+      "confirm-password": "确认密码",
+      "to": "至",
+      "input-password-to-confirm": "输入密码以确认本次交易",
+      "this-transaction-will-send": "本次交易将发送",
+      "scan-to-get-address": "扫描二维码以获取地址",
+      "description": "备注",
+      "balance": "余额"
+    },
+    "receive": {
+      "click-to-copy": "点击复制地址",
+      "address-not-found": "未找到地址",
+      "prompt": "为了保护隐私，Neuron 会在每次收到转账后更新收款地址。如果您想引用用旧的收款地址，请访问高级页面。",
+      "address-qrcode": "地址二维码"
+    },
+    "history": {
+      "meta": "元信息",
+      "type": "类型",
+      "date": "时间",
+      "amount": "金额",
+      "transaction-hash": "交易哈希",
+      "send": "转账",
+      "receive": "收款",
+      "other": "其他",
+      "more-actions": "更多操作",
+      "detail": "详情",
+      "explorer": "浏览器",
+      "first": "第一页",
+      "previous": "前一页",
+      "next": "后一页",
+      "last": "最后一页",
+      "description": "标签",
+      "status": "状态",
+      "blockNumber": "区块高度"
+    },
+    "transaction": {
+      "goBack": "返回"
+    },
+    "addresses": {
+      "addresses": "地址",
+      "type": "交易类型",
+      "address": "地址",
+      "identifier": "标志",
+      "description": "标签",
+      "balance": "余额",
+      "transactions": "交易总数",
+      "receiving-address": "收款地址",
+      "change-address": "找零地址"
+    },
+    "settings": {
+      "setting-tabs": {
+        "general": "通用",
+        "wallets": "钱包",
+        "network": "网络"
+      },
+      "wallet-manager": {
+        "edit-wallet": {
+          "wallet-name": "钱包名称",
+          "password": "密码",
+          "new-password": "新密码",
+          "confirm-password": "确认密码",
+          "edit-wallet": "编辑钱包"
+        },
+        "delete-wallet-title": "请输入{{name}}的密码",
+        "password": "密码",
+        "wallet-detail": {
+          "balance": "余额"
+        }
+      },
+      "network": {
+        "online": "在线",
+        "offline": "离线",
+        "add-network": "新增网络",
+        "edit-network": {
+          "title": "新增网络",
+          "rpc-url": "RPC地址",
+          "name": "名字"
+        }
+      }
+    },
+    "menuitem": {
+      "add": "新增",
+      "update": "更新",
+      "delete": "删除",
+      "network": "网络",
+      "select": "选择",
+      "edit": "编辑",
+      "backup": "备份",
+      "remove": "移除",
+      "Save": "保存",
+      "management": "管理"
+    },
+    "common": {
+      "confirm": "确认",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "messages": {
+      "at-least-one-address-needed": "需要至少一个地址",
+      "name-is-required": "缺少名称",
+      "url-is-required": "缺少 URL",
+      "length-of-name-should-be-less-than-or-equal-to": "名称长度应不大于 {{length}}",
+      "network-name-exists": "节点名称已存在",
+      "invalid-address": "无效的地址",
+      "invalid-amount": "无效的价值",
+      "amount-is-not-enough": "余额不足",
+      "is-unremovable": "{{target}}不可删除",
+      "create-wallet-success": "您已成功创建钱包 '{{name}}'",
+      "network-is-not-found": "未找到节点信息",
+      "name-has-been-used": "名称已被使用",
+      "failed-to-initiate,-please-reopen-Neuron": "初始化失败, 请新打开 Neuron",
+      "no-wallet": "没有钱包",
+      "wallet-imported-successfully": "{{name}} 导入成功",
+      "wallet-created-successfully": "{{name}} 创建成功",
+      "wallet-updated-successfully": "{{name}} 更新成功",
+      "protocol-is-required": "请指定 URL 协议",
+      "wallet-not-found": "未找到钱包",
+      "no-transactions": "没有交易"
+    }
+  }
+}

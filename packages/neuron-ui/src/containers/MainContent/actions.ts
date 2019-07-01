@@ -1,0 +1,28 @@
+export enum MainActions {
+  UpdateMnemonic,
+  UpdateTempWallet,
+  CreateWallet,
+  DeleteWallet,
+  ImportWallet,
+  ExportWallet,
+  GetTransaction,
+  GetTransactions,
+  UpdateTransactionDescription,
+  SetPage,
+  SaveNetworks,
+  DeleteNetwork,
+  ErrorMessage,
+  SetDialog,
+  AddSendOutput,
+  RemoveSendOutput,
+  UpdateSendOutput,
+  UpdateSendPrice,
+  UpdateSendDescription,
+  UpdateSendState,
+  UpdatePassword,
+  UpdateLoading,
+  Networks,
+  Wallet,
+}
+
+export default MainActions

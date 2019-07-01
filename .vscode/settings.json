@@ -1,0 +1,19 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "directory": "packages/neuron-wallet",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "packages/neuron-ui",
+      "changeProcessCWD": true
+    }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

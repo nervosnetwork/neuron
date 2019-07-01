@@ -1,0 +1,55 @@
+appId: com.nervos.neuron
+copyright: Copyright (C) 2019 Nervos Foundation. All rights reserved
+productName: Neuron
+
+asar: true
+
+directories:
+  buildResources: .
+  output: release
+
+files:
+  - from: "../../node_modules/@nervosnetwork/neuron-ui/build"
+    to: ui
+  - from: "../.."
+    to: "."
+    filter: ["!**/*", "ormconfig.json", "ormconfig-address.json"]
+  - package.json
+  - dist
+  - "!**/*.map"
+  - "!**/src/"
+
+  - "!node_modules/chalk"
+  - "!node_modules/ansi-styles"
+  - "!node_modules/escape-string-regexp"
+  - from: "../../node_modules/chalk"
+    to: "node_modules/chalk"
+  - from: "../../node_modules/ansi-styles"
+    to: "node_modules/ansi-styles"
+  - from: "../../node_modules/escape-string-regexp"
+    to: "node_modules/escape-string-regexp"
+
+win:
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  icon: assets/images/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+
+mac:
+  artifactName: "${productName}-${version}-${os}.${ext}"
+  category: public.app-category.finance
+  icon: assets/images/icon.icns
+
+linux:
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  category: Finance
+  icon: assets/images/
+  target:
+    - "AppImage"
+    - "deb"

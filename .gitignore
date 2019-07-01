@@ -1,0 +1,46 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+build
+dist
+pages
+release
+
+# misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# deps lock
+# yarn-lock.json
+package-lock.json
+lerna-debug.log
+
+#docs
+docs
+
+# vscode config
+./packages/neuron-wallet/.vscode
+
+# Webstorm config
+.idea
+
+# sqlite db
+cell-dev.sqlite
+address-dev.sqlite
