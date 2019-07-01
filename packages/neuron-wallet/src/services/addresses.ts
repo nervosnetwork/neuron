@@ -4,8 +4,7 @@ import Address, { AddressType } from '../models/keys/address'
 import LockUtils from '../models/lock-utils'
 import AddressDao, { Address as AddressInterface } from '../database/address/dao'
 import env from '../env'
-import { AddressVersion } from '../database/address/entities/address'
-import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
+import AddressEntity, { AddressVersion } from '../database/address/entities/address'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -25,10 +24,19 @@ export default class AddressService {
   public static generateAndSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    receivingStartIndex: number,
+    changeStartIndex: number,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
-    const addresses = AddressService.generateAddresses(walletId, extendedKey, receivingAddressCount, changeAddressCount)
+    const addresses = AddressService.generateAddresses(
+      walletId,
+      extendedKey,
+      receivingStartIndex,
+      changeStartIndex,
+      receivingAddressCount,
+      changeAddressCount
+    )
     const allAddresses = [
       ...addresses.testnetReceiving,
       ...addresses.mainnetReceiving,
@@ -38,18 +46,52 @@ export default class AddressService {
     await AddressDao.create(allAddresses)
   }
 
+  public static checkAndGenerateSave = async (
+    walletId: string,
+    extendedKey: AccountExtendedPublicKey,
+    receivingAddressCount: number = 20,
+    changeAddressCount: number = 10
+  ) => {
+    const addressVersion = AddressService.getAddressVersion()
+    const maxIndexReceivingAddress = await AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
+    const maxIndexChangeAddress = await AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
+    if (
+      maxIndexReceivingAddress !== undefined &&
+      maxIndexReceivingAddress.txCount === 0 &&
+      maxIndexChangeAddress !== undefined &&
+      maxIndexChangeAddress.txCount === 0
+    ) {
+      return undefined
+    }
+    const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
+    const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
+    return AddressService.generateAndSave(
+      walletId,
+      extendedKey,
+      nextReceivingIndex,
+      nextChangeIndex,
+      receivingAddressCount,
+      changeAddressCount
+    )
+  }
+
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "off" */
   public static updateTxCountAndBalances = async (addresses: string[]) => {
+    let addrs: AddressEntity[] = []
     for (const address of addresses) {
-      await AddressDao.updateTxCountAndBalance(address)
+      const ads = await AddressDao.updateTxCountAndBalance(address)
+      addrs = addrs.concat(ads)
     }
+    return addrs
   }
 
   // Generate both receiving and change addresses.
   public static generateAddresses = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    receivingStartIndex: number,
+    changeStartIndex: number,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -63,7 +105,7 @@ export default class AddressService {
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
         addressType: AddressType.Receiving,
-        addressIndex: idx,
+        addressIndex: idx + receivingStartIndex,
         accountExtendedPublicKey: extendedKey,
       }
       return AddressService.toAddress(addressMetaInfo)
@@ -75,7 +117,7 @@ export default class AddressService {
       const addressMetaInfo: AddressMetaInfo = {
         walletId,
         addressType: AddressType.Change,
-        addressIndex: idx,
+        addressIndex: idx + changeStartIndex,
         accountExtendedPublicKey: extendedKey,
       }
       return AddressService.toAddress(addressMetaInfo)
@@ -173,9 +215,3 @@ export default class AddressService {
     return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
   }
 }
-
-// update txCount when addresses used
-const addressUsedSubject = AddressesUsedSubject.getSubject()
-addressUsedSubject.subscribe(async (addresses: string[]) => {
-  await AddressService.updateTxCountAndBalances(addresses)
-})
