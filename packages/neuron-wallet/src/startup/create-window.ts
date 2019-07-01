@@ -1,6 +1,7 @@
 import { BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
+import WindowManager from '../models/window-manager'
 import env from '../env'
 import AppController from '../controllers/app'
 import logger from '../utils/logger'
@@ -11,7 +12,7 @@ function createWindow() {
     defaultHeight: 768,
   })
 
-  global.mainWindow = new BrowserWindow({
+  WindowManager.mainWindow = new BrowserWindow({
     x: windowState.x,
     y: windowState.y,
     width: windowState.width,
@@ -27,15 +28,15 @@ function createWindow() {
     },
   })
 
-  windowState.manage(global.mainWindow)
+  windowState.manage(WindowManager.mainWindow)
 
-  global.mainWindow.loadURL(env.mainURL)
+  WindowManager.mainWindow.loadURL(env.mainURL)
 
-  global.mainWindow.on('ready-to-show', () => {
-    if (global.mainWindow) {
-      global.mainWindow.show()
-      global.mainWindow.focus()
-      AppController.initWindow(global.mainWindow!)
+  WindowManager.mainWindow.on('ready-to-show', () => {
+    if (WindowManager.mainWindow) {
+      WindowManager.mainWindow.show()
+      WindowManager.mainWindow.focus()
+      AppController.initWindow(WindowManager.mainWindow!)
     } else {
       logger.log({
         level: 'error',
@@ -44,7 +45,7 @@ function createWindow() {
     }
   })
 
-  return global.mainWindow
+  return WindowManager.mainWindow
 }
 
 export default createWindow

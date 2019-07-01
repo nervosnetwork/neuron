@@ -4,6 +4,7 @@ import i18n from './utils/i18n'
 import { updateApplicationMenu } from './utils/application-menu'
 
 import Router from './router'
+import WindowManager from './models/window-manager'
 import createWindow from './startup/create-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
 import initConnection from './database/address/ormconfig'
@@ -18,15 +19,15 @@ Object.defineProperty(app, 'router', {
 })
 
 const openWindow = () => {
-  if (!global.mainWindow) {
-    global.mainWindow = createWindow()
-    global.mainWindow.on('closed', () => {
+  if (!WindowManager.mainWindow) {
+    WindowManager.mainWindow = createWindow()
+    WindowManager.mainWindow.on('closed', () => {
       if (process.platform !== 'darwin') {
         app.quit()
       }
-      if (global.mainWindow) {
-        global.mainWindow.removeAllListeners()
-        global.mainWindow = null
+      if (WindowManager.mainWindow) {
+        WindowManager.mainWindow.removeAllListeners()
+        WindowManager.mainWindow = null
       }
     })
   }

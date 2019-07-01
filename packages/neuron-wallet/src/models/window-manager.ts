@@ -14,6 +14,7 @@ interface SendMessage {
 }
 
 export default class WindowManager {
+  public static mainWindow: BrowserWindow | null
   public static broadcast: SendMessage = (channel: Channel, method: string, params: any): void => {
     if (!BrowserWindow) {
       logger.log(error)
@@ -38,8 +39,8 @@ export default class WindowManager {
   }
 
   public static sendToMainWindow: SendMessage = (channel: Channel, method: string, params: any): void => {
-    if (global.mainWindow) {
-      global.mainWindow.webContents.send(channel, method, params)
+    if (WindowManager.mainWindow) {
+      WindowManager.mainWindow.webContents.send(channel, method, params)
     }
   }
 }
