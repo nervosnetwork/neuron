@@ -100,7 +100,7 @@ export default class AppController {
   }
 
   public static navTo(url: string) {
-    windowManager.sendToFocusedWindow(Channel.App, 'navTo', {
+    windowManager.sendToMainWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
       result: url,
     })

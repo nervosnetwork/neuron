@@ -36,4 +36,10 @@ export default class WindowManager {
       window.webContents.send(channel, method, params)
     }
   }
+
+  public static sendToMainWindow: SendMessage = (channel: Channel, method: string, params: any): void => {
+    if (global.mainWindow) {
+      global.mainWindow.webContents.send(channel, method, params)
+    }
+  }
 }

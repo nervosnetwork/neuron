@@ -11,8 +11,6 @@ import WalletsService from './services/wallets'
 
 const walletsService = WalletsService.getInstance()
 
-let mainWindow: Electron.BrowserWindow | null
-
 const router = new Router()
 
 Object.defineProperty(app, 'router', {
@@ -20,15 +18,15 @@ Object.defineProperty(app, 'router', {
 })
 
 const openWindow = () => {
-  if (!mainWindow) {
-    mainWindow = createWindow()
-    mainWindow.on('closed', () => {
+  if (!global.mainWindow) {
+    global.mainWindow = createWindow()
+    global.mainWindow.on('closed', () => {
       if (process.platform !== 'darwin') {
         app.quit()
       }
-      if (mainWindow) {
-        mainWindow.removeAllListeners()
-        mainWindow = null
+      if (global.mainWindow) {
+        global.mainWindow.removeAllListeners()
+        global.mainWindow = null
       }
     })
   }

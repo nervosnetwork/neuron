@@ -3,6 +3,7 @@ import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import env from '../env'
 import AppController from '../controllers/app'
+import logger from '../utils/logger'
 
 function createWindow() {
   const windowState = windowStateKeeper({
@@ -10,7 +11,7 @@ function createWindow() {
     defaultHeight: 768,
   })
 
-  const mainWindow = new BrowserWindow({
+  global.mainWindow = new BrowserWindow({
     x: windowState.x,
     y: windowState.y,
     width: windowState.width,
@@ -26,17 +27,24 @@ function createWindow() {
     },
   })
 
-  windowState.manage(mainWindow)
+  windowState.manage(global.mainWindow)
 
-  mainWindow.loadURL(env.mainURL)
+  global.mainWindow.loadURL(env.mainURL)
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-    mainWindow.focus()
-    AppController.initWindow(mainWindow!)
+  global.mainWindow.on('ready-to-show', () => {
+    if (global.mainWindow) {
+      global.mainWindow.show()
+      global.mainWindow.focus()
+      AppController.initWindow(global.mainWindow!)
+    } else {
+      logger.log({
+        level: 'error',
+        message: 'The main window is not initialized on ready to show',
+      })
+    }
   })
 
-  return mainWindow
+  return global.mainWindow
 }
 
 export default createWindow
