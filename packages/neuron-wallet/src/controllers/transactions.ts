@@ -7,7 +7,7 @@ import WalletsService from '../services/wallets'
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
 import { Channel, ResponseCode } from '../utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from '../exceptions'
-import LockUtils from '../utils/lock-utils'
+import LockUtils from '../models/lock-utils'
 
 /**
  * @class TransactionsController
