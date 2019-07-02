@@ -51,7 +51,7 @@ enum TxSaveType {
   Fetch = 'fetch',
 }
 
-enum OutputStatus {
+export enum OutputStatus {
   Sent = 'sent',
   Live = 'live',
   Pending = 'pending',
