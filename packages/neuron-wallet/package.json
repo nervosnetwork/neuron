@@ -15,6 +15,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
+    "prebuild": "ncp ../neuron-ui/build ./dist/neuron-ui",
     "build": "tsc && yarn run html:copy",
     "html:copy": "ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html && ncp ./src/utils/prompt/password/index.html ./dist/utils/prompt/password/index.html",
     "clean": "rimraf dist/*",
