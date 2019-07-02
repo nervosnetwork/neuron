@@ -7,6 +7,7 @@ import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
+import { register as registerTxStatusListener } from '../../listener/tx-status'
 
 const { nodeService, addressDbChangedSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
   './startup/sync-block-task/params'
@@ -63,6 +64,7 @@ export const run = async () => {
       await switchNetwork()
     }
   })
+  registerTxStatusListener()
 }
 
 run()

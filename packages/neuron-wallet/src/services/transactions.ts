@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection, In } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
 import {
   OutPoint,
@@ -56,6 +56,7 @@ export enum OutputStatus {
   Live = 'live',
   Pending = 'pending',
   Dead = 'dead',
+  Failed = 'failed',
 }
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -489,6 +490,67 @@ export default class TransactionsService {
   public static getCountByAddress = async (address: string): Promise<number> => {
     const lockHash: string = await LockUtils.addressToLockHash(address)
     return TransactionsService.getCountByLockHash(lockHash)
+  }
+
+  public static pendings = async (): Promise<TransactionEntity[]> => {
+    const pendingTransactions = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        status: TransactionStatus.Pending,
+      })
+      .getMany()
+
+    return pendingTransactions
+  }
+
+  // update tx status to TransactionStatus.Failed
+  // update outputs status to OutputStatus.Failed
+  // update previous outputs (inputs) to OutputStatus.Live
+  public static updateFailedTxs = async (hashes: string[]) => {
+    const txs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .leftJoinAndSelect('tx.inputs', 'input')
+      .leftJoinAndSelect('tx.outputs', 'output')
+      .where({
+        hash: In(hashes),
+        status: TransactionStatus.Pending,
+      })
+      .getMany()
+
+    const txToUpdate = txs.map(tx => {
+      const transaction = tx
+      transaction.status = TransactionStatus.Failed
+      return transaction
+    })
+    const allOutputs = txs
+      .map(tx => tx.outputs)
+      .reduce((acc, val) => acc.concat(val), [])
+      .map(o => {
+        const output = o
+        output.status = OutputStatus.Failed
+        return output
+      })
+    const allInputs = txs.map(tx => tx.inputs).reduce((acc, val) => acc.concat(val), [])
+    const previousOutputs = await Promise.all(
+      allInputs.map(async input => {
+        const output = await getConnection()
+          .getRepository(OutputEntity)
+          .createQueryBuilder('output')
+          .where({
+            outPointTxHash: input.outPointTxHash,
+            outPointIndex: input.outPointIndex,
+          })
+          .getOne()
+        if (output) {
+          output.status = OutputStatus.Live
+        }
+        return output
+      })
+    )
+    const previous = previousOutputs.filter(output => output) as OutputEntity[]
+    await getConnection().manager.save([...txToUpdate, ...allOutputs, ...previous])
   }
 }
 
