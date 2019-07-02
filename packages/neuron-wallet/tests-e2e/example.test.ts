@@ -3,7 +3,6 @@ import { Application } from 'spectron'
 describe('Setup tests', () => {
   let app: Application
 
-  /* Disable for now: it doesn't run well on Travis.
   beforeAll(async () => {
     app = new Application({
       path: 'node_modules/.bin/electron',
@@ -18,7 +17,7 @@ describe('Setup tests', () => {
       return app.stop()
     }
     return null
-  }) */
+  })
 
   it('opens app window', async () => {
     if (app) {
