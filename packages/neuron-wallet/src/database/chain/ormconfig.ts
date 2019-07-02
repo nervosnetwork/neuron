@@ -11,6 +11,7 @@ import logger from '../../utils/logger'
 import env from '../../env'
 
 import { InitMigration1561695143591 } from './migrations/1561695143591-InitMigration'
+import { AddStatusToTx1562038960990 } from './migrations/1562038960990-AddStatusToTx'
 
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
@@ -25,7 +26,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     type: 'sqlite',
     database: dbPath(genesisBlockHash),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1561695143591],
+    migrations: [InitMigration1561695143591, AddStatusToTx1562038960990],
   }
 }
 
