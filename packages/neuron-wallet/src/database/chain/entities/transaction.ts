@@ -1,7 +1,19 @@
-import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
+import {
+  Entity,
+  BaseEntity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+  AfterInsert,
+  AfterUpdate,
+  AfterRemove,
+} from 'typeorm'
 import { Witness, OutPoint, Transaction as TransactionInterface, TransactionStatus } from '../../../types/cell-types'
 import InputEntity from './input'
 import OutputEntity from './output'
+import TxDbChangedSubject from '../../../models/subjects/tx-db-changed-subject'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()
@@ -98,5 +110,24 @@ export default class Transaction extends BaseEntity {
   @BeforeUpdate()
   updateUpdatedAt() {
     this.updatedAt = Date.now().toString()
+  }
+
+  @AfterInsert()
+  emitInsert() {
+    this.changed('AfterInsert')
+  }
+
+  @AfterUpdate()
+  emitUpdate() {
+    this.changed('AfterUpdate')
+  }
+
+  @AfterRemove()
+  emitRemove() {
+    this.changed('AfterRemove')
+  }
+
+  private changed = (event: string) => {
+    TxDbChangedSubject.getSubject().next(event)
   }
 }
