@@ -5,7 +5,6 @@ const style = {
   position: 'absolute',
   top: '0',
   left: '0',
-  padding: '15px',
   zIndex: 999,
 }
 

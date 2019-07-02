@@ -1,8 +1,7 @@
 import styled from 'styled-components'
-import { Jumbotron } from 'react-bootstrap'
 
 type Mode = 'fullscreen' | 'responsive'
-const Screen = styled(Jumbotron)<{ mode: Mode }>`
+const Screen = styled('div')<{ mode: Mode }>`
   position: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 'absolute' : 'relative')};
   right: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 0 : 'auto')};
   bottom: ${({ mode = 'fullscreen' }) => (mode === 'fullscreen' ? 0 : 'auto')};

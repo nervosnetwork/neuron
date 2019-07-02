@@ -1,7 +1,6 @@
 body {
   display: grid;
   grid-template:
-    'header header header' 60px
     'navbar navbar navbar' 60px
     'notification notification notification' auto
     'content content content' 1fr
@@ -17,10 +16,6 @@ footer {
   display:flex;
   justify-content: space-between;
   padding: 0 15px;
-}
-
-.header {
-  grid-area: header;
 }
 
 .navbar {

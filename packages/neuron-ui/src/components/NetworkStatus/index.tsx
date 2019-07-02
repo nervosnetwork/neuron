@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { FormSubtract as HyphenIcon } from 'grommet-icons'
 
 import Dropdown from 'widgets/Dropdown'
 import { ConnectStatus, Routes } from 'utils/const'
@@ -101,12 +100,6 @@ const ConnectStatusHeader = ({
           />
         </>
       ) : null}
-      {tipNumber === null ? null : (
-        <>
-          <HyphenIcon />
-          {tipNumber}
-        </>
-      )}
     </Container>
   )
 }

@@ -23,7 +23,11 @@ export const useSearch = (
   providerDispatch: React.Dispatch<any>
 ) => {
   const [keywords, setKeywords] = useState('')
-  const onKeywordsChange = (e: any) => setKeywords(e.currentTarget.value)
+  const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    if (undefined !== newValue) {
+      setKeywords(newValue)
+    }
+  }
   useEffect(() => {
     setKeywords(incomingKeywords)
   }, [incomingKeywords, setKeywords])

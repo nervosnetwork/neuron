@@ -3,7 +3,9 @@ import { ConnectStatus } from 'utils/const'
 
 export interface Transaction {
   type: 'send' | 'receive' | 'other'
-  timestamp: number
+  createdAt: string
+  updatedAt: string
+  timestamp: string
   value: string
   hash: string
   description: string
@@ -66,7 +68,9 @@ const chainState: Chain = {
     value: '',
     hash: '',
     type: 'other',
-    timestamp: +new Date(0),
+    createdAt: '0',
+    updatedAt: '0',
+    timestamp: '0',
     description: '',
     status: 'pending',
     inputs: [],

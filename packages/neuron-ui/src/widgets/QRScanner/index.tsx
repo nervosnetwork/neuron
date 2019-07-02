@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Card, Button, InputGroup, FormControl } from 'react-bootstrap'
+import { Label, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
 import { Scan as ScanIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 import jsQR from 'jsqr'
@@ -107,45 +107,38 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
           setOpen(false)
         }}
       >
-        <Card
+        <div
+          role="presentation"
           onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
             e.preventDefault()
             e.stopPropagation()
           }}
         >
-          <Card.Header>
-            <Card.Text>{title}</Card.Text>
-          </Card.Header>
-          <Card.Body>
+          <h1>{title}</h1>
+          <div>
             <canvas ref={canvasRef} />
-          </Card.Body>
-          <Card.Footer>
-            <InputGroup>
-              <InputGroup.Prepend>
-                <InputGroup.Text>{label}</InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl readOnly value={data} />
-            </InputGroup>
+          </div>
+          <div>
+            <Label>{label}</Label>
+            <TextField readOnly value={data} />
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
               }}
             >
-              <Button
+              <PrimaryButton
                 onClick={() => {
                   onConfirm(data)
                   setOpen(false)
                 }}
               >
                 {t('common.confirm')}
-              </Button>
-              <Button variant="light" onClick={() => setOpen(false)}>
-                {t('common.cancel')}
-              </Button>
+              </PrimaryButton>
+              <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
             </div>
-          </Card.Footer>
-        </Card>
+          </div>
+        </div>
       </Dialog>
     </>
   )

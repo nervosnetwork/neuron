@@ -1,5 +1,8 @@
 {
   "translation": {
+    "launch-screen": {
+      "loading-wallets": "Loading wallets"
+    },
     "navbar": {
       "general": "General",
       "wallet": "Wallet",
@@ -50,7 +53,9 @@
       "this-transaction-will-send": "This transaction will send",
       "scan-to-get-address": "scan the qrcode to get address",
       "description": "Description",
-      "balance": "Balance"
+      "balance": "Balance",
+      "add-one": "Add One More",
+      "remove-this": "Remove This"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
@@ -62,6 +67,7 @@
       "meta": "Meta",
       "type": "Type",
       "date": "Date",
+      "timestamp": "Time",
       "amount": "Amount",
       "transaction-hash": "Transaction Hash",
       "send": "Send",

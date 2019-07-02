@@ -1,43 +1,18 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Table } from 'react-bootstrap'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { appCalls } from 'services/UILayer'
 import { Transaction } from 'contexts/NeuronWallet'
 import { useLocalDescription } from 'utils/hooks'
 import { MainDispatch } from 'containers/MainContent/reducer'
+import { DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
-const headers = [
-  { label: 'history.meta', key: 'meta' },
-  { label: 'history.transaction-hash', key: 'hash' },
-  { label: 'history.status', key: 'status' },
-  { label: 'history.description', key: 'description' },
-  { label: 'history.amount', key: 'value' },
-]
+const MIN_CELL_WIDTH = 70
 
-const MetaData = styled.td`
-  display: flex;
-  flex-direction: column;
-`
-
-const groupHistory = (items: Transaction[]): Transaction[][] => {
-  return items.reduce((acc: Transaction[][], cur: Transaction) => {
-    if (!acc.length) {
-      acc.push([cur])
-      return acc
-    }
-    const lastGroup = acc[acc.length - 1]
-    if (timeFormatter.format(cur.timestamp) === timeFormatter.format(lastGroup[0].timestamp)) {
-      lastGroup.push(cur)
-      return acc
-    }
-    acc.push([cur])
-    return acc
-  }, [])
+interface FormatTransaction extends Transaction {
+  date: string
 }
 
 const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: MainDispatch }) => {
@@ -45,58 +20,90 @@ const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: 
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'transaction',
-    items.map(({ hash: key, description }) => ({
+    items.map(({ hash: key, description = '' }) => ({
       key,
       description,
     })),
     dispatch
   )
+  const transactionColumns: IColumn[] = useMemo(
+    (): IColumn[] => [
+      { name: t('history.type'), key: 'type', fieldName: 'type', minWidth: MIN_CELL_WIDTH, maxWidth: 150 },
+      {
+        name: t('history.timestamp'),
+        key: 'timestamp',
+        fieldName: 'timestamp',
+        minWidth: MIN_CELL_WIDTH,
+        maxWidth: 150,
+        onRender: (item?: FormatTransaction) => {
+          return item ? <span>{new Date(+item.timestamp).toLocaleTimeString()}</span> : null
+        },
+      },
+      { name: t('history.transaction-hash'), key: 'hash', fieldName: 'hash', minWidth: MIN_CELL_WIDTH, maxWidth: 200 },
+      { name: t('history.status'), key: 'status', fieldName: 'status', minWidth: MIN_CELL_WIDTH, maxWidth: 50 },
+      {
+        name: t('history.description'),
+        key: 'description',
+        fieldName: 'description',
+        minWidth: MIN_CELL_WIDTH,
+        maxWidth: 200,
+        onRender: (item?: FormatTransaction, idx?: number) => {
+          return item && undefined !== idx ? (
+            <TextField
+              title={item.description}
+              value={localDescription[idx]}
+              onKeyPress={onDescriptionPress(idx)}
+              onBlur={onDescriptionFieldBlur(idx)}
+              onChange={onDescriptionChange(idx)}
+            />
+          ) : null
+        },
+      },
+      { name: t('history.amount'), key: 'value', fieldName: 'value', minWidth: MIN_CELL_WIDTH, maxWidth: 300 },
+    ],
+    [localDescription, onDescriptionChange, onDescriptionFieldBlur, onDescriptionPress, t]
+  )
+  const { groups, txs } = useMemo(() => {
+    const gs: IGroup[] = [
+      {
+        key: 'pending',
+        name: 'pending',
+        startIndex: 0,
+        count: 0,
+      },
+    ]
+    const ts = items.map(item => {
+      if (item.status === 'pending') {
+        gs[0].count++
+      }
+      const date = timeFormatter.format(+item.timestamp)
+      if (date !== gs[gs.length - 1].key) {
+        gs.push({
+          key: date,
+          name: date,
+          startIndex: gs[gs.length - 1].count + gs[gs.length - 1].startIndex,
+          count: 1,
+        })
+      } else {
+        gs[gs.length - 1].count++
+      }
+      return { ...item, date }
+    })
+    return { groups: gs, txs: ts }
+  }, [])
 
   return (
-    <>
-      {groupHistory(items).map(group => (
-        <Table key={timeFormatter.format(group[0].timestamp)} striped>
-          <thead>
-            <tr>
-              <th colSpan={headers.length}>{timeFormatter.format(group[0].timestamp)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.map(historyItem => (
-              <tr
-                key={historyItem.hash}
-                onContextMenu={() => appCalls.contextMenu({ type: 'transactionList', id: historyItem.hash })}
-              >
-                {headers.map(header => {
-                  if (header.key === 'meta') {
-                    return (
-                      <MetaData key={headers[0].key}>
-                        {t(`history.${historyItem.type}`.toLowerCase())}
-                        {timeFormatter.format(historyItem.timestamp)}
-                      </MetaData>
-                    )
-                  }
-                  if (header.key === 'description') {
-                    const idx = items.findIndex(item => item.hash === historyItem.hash)
-                    return (
-                      <DescriptionField
-                        type="text"
-                        title={historyItem.description}
-                        value={localDescription[idx]}
-                        onKeyPress={onDescriptionPress(idx)}
-                        onBlur={onDescriptionFieldBlur(idx)}
-                        onChange={onDescriptionChange(idx)}
-                      />
-                    )
-                  }
-                  return <td key={header.key}>{historyItem[header.key as keyof Transaction]}</td>
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      ))}
-    </>
+    <DetailsList
+      columns={transactionColumns}
+      items={txs}
+      groups={groups}
+      checkboxVisibility={CheckboxVisibility.hidden}
+      onItemContextMenu={item => {
+        if (item) {
+          appCalls.contextMenu({ type: 'transactionList', id: item.hash })
+        }
+      }}
+    />
   )
 }
 

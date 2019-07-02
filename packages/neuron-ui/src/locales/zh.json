@@ -1,5 +1,8 @@
 {
   "translation": {
+    "launch-screen": {
+      "loading-wallets": "加载钱包"
+    },
     "navbar": {
       "general": "通用",
       "wallet": "钱包",
@@ -50,7 +53,9 @@
       "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫描二维码以获取地址",
       "description": "备注",
-      "balance": "余额"
+      "balance": "余额",
+      "add-one": "添加",
+      "remove-this": "删除"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
@@ -62,6 +67,7 @@
       "meta": "元信息",
       "type": "类型",
       "date": "时间",
+      "timestamp": "时间",
       "amount": "金额",
       "transaction-hash": "交易哈希",
       "send": "转账",

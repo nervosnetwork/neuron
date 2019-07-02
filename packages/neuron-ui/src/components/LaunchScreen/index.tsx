@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import Screen from 'widgets/Screen'
-import { Spinner } from 'widgets/Loading'
+import { Panel, PanelType, Spinner, SpinnerSize } from 'office-ui-fabric-react'
 import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
+import { useTranslation } from 'react-i18next'
 
 const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
     wallet: { id },
     settings: { networks },
   } = useNeuronWallet()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!networks.length) return
@@ -22,9 +23,9 @@ const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) =
   }, [networks.length, id, history])
 
   return (
-    <Screen>
-      <Spinner frontColor="rgba(0, 0, 255, 0.5)" backgroundColor="transparent" size="30px" bandSize="5px" />
-    </Screen>
+    <Panel isOpen type={PanelType.custom} customWidth="100vw">
+      <Spinner label={t('launch-screen.loading-wallets')} size={SpinnerSize.large} />
+    </Panel>
   )
 }
 
