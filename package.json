@@ -26,7 +26,7 @@
     "build": "lerna run --stream build",
     "package": "yarn build && ./packages/neuron-wallet/script/package.sh",
     "test": "lerna run --parallel test",
-    "test:e2e": "lerna run --parallel test:e2e",
+    "test:e2e": "lerna run test:e2e --scope=@nervosnetwork/neuron-wallet",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules",
     "db:migrate": "ts-node ./node_modules/.bin/typeorm migration:generate",
