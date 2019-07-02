@@ -63,6 +63,6 @@
     "lint-staged": "8.1.7",
     "ncp": "2.0.0",
     "rimraf": "2.6.3",
-    "spectron": "5.0.0"
+    "spectron": "7.0.0"
   }
 }
