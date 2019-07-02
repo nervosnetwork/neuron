@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
-import { Witness, OutPoint, Transaction as TransactionInterface } from '../../../types/cell-types'
+import { Witness, OutPoint, Transaction as TransactionInterface, TransactionStatus } from '../../../types/cell-types'
 import InputEntity from './input'
 import OutputEntity from './output'
 
@@ -53,6 +53,11 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'varchar',
   })
+  status!: TransactionStatus
+
+  @Column({
+    type: 'varchar',
+  })
   createdAt!: string
 
   @Column({
@@ -78,6 +83,7 @@ export default class Transaction extends BaseEntity {
       blockHash: this.blockHash,
       witnesses: this.witnesses,
       description: this.description,
+      status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }

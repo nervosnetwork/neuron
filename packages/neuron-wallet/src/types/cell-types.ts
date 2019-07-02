@@ -31,7 +31,7 @@ export interface TransactionWithoutHash {
   witnesses?: Witness[]
   type?: string
   description?: string
-  status?: string
+  status?: TransactionStatus
   createdAt?: string
   updatedAt?: string
 }

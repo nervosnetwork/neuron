@@ -51,7 +51,7 @@ enum TxSaveType {
   Fetch = 'fetch',
 }
 
-enum OutputStatus {
+export enum OutputStatus {
   Sent = 'sent',
   Live = 'live',
   Pending = 'pending',
@@ -98,15 +98,13 @@ export default class TransactionsService {
         .map(i => BigInt(i.capacity))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
-      // TODO: add failed status
-      const status = tx.outputs[0].status === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
       return {
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
-        status,
+        status: tx.status,
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
       }
@@ -246,10 +244,11 @@ export default class TransactionsService {
 
       const previousOutputs: OutputEntity[] = previousOutputsWithUndefined.filter(o => !!o) as OutputEntity[]
 
-      // should update timestamp / blockNumber / blockHash
+      // should update timestamp / blockNumber / blockHash / status
       txEntity.timestamp = transaction.timestamp
       txEntity.blockHash = transaction.blockHash
       txEntity.blockNumber = transaction.blockNumber
+      txEntity.status = TransactionStatus.Success
       await connection.manager.save([txEntity, ...outputs.concat(previousOutputs)])
 
       return txEntity
@@ -274,6 +273,8 @@ export default class TransactionsService {
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnesses!
     tx.description = transaction.description
+    // update tx status here
+    tx.status = outputStatus === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
     tx.inputs = []
     tx.outputs = []
     const inputs: InputEntity[] = []
