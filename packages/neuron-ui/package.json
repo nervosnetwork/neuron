@@ -1,6 +1,6 @@
 {
   "name": "@nervosnetwork/neuron-ui",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
