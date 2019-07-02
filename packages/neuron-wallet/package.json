@@ -19,6 +19,7 @@
     "html:copy": "ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html && ncp ./src/utils/prompt/password/index.html ./dist/utils/prompt/password/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
+    "test:e2e": "jest --config jest.e2e.config.js --color",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
     "package": "./script/package.sh",
@@ -28,22 +29,6 @@
     "src/**/*.ts": [
       "eslint --fix",
       "git add"
-    ]
-  },
-  "jest": {
-    "displayName": "Neuron Wallet",
-    "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/setup-tests.ts"
     ]
   },
   "dependencies": {
@@ -78,6 +63,6 @@
     "lint-staged": "8.1.7",
     "ncp": "2.0.0",
     "rimraf": "2.6.3",
-    "spectron": "5.0.0"
+    "spectron": "7.0.0"
   }
 }

@@ -1,13 +1,18 @@
 import { Application } from 'spectron'
+import path from 'path'
 
-describe('Setup tests', () => {
+describe('setup tests', () => {
   let app: Application
 
-  /* Disable for now: it doesn't run well on Travis.
   beforeAll(async () => {
+    let electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
+    if (process.platform === 'win32') {
+      electronPath += '.cmd'
+    }
+
     app = new Application({
-      path: 'node_modules/.bin/electron',
-      args: ['dist/main.js'],
+      path: electronPath,
+      args: [path.join(__dirname, '..', 'dist', 'main.js')],
     })
 
     return app.start()
@@ -18,7 +23,7 @@ describe('Setup tests', () => {
       return app.stop()
     }
     return null
-  }) */
+  })
 
   it('opens app window', async () => {
     if (app) {
@@ -27,8 +32,6 @@ describe('Setup tests', () => {
       const title = await browserWindow.getTitle()
 
       expect(title).toBe('Electron')
-    } else {
-      expect(true).toBe(true) // Should go here as app is not assigned at all.
     }
   })
 })

@@ -23,7 +23,7 @@ function createWindow() {
     backgroundColor: '#e9ecef',
     webPreferences: {
       devTools: env.isDevMode,
-      nodeIntegration: false,
+      nodeIntegration: env.isDevMode,
       preload: path.join(__dirname, './preload.js'),
     },
   })
