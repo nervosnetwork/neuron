@@ -1,6 +1,6 @@
 module.exports = {
-  "displayName": "Unit Tests",
-  testRegex: "(/tests/.*.(test|spec))\\.(ts?|js?)$",
+  "displayName": "E2E Tests",
+  testRegex: "(/tests-e2e/.*.(test|spec))\\.(ts?|js?)$",
   transform: {
     "^.+\\.ts?$": "ts-jest"
   },
@@ -9,6 +9,9 @@ module.exports = {
     "js",
     "json",
     "node"
+  ],
+  "setupFilesAfterEnv": [
+    "<rootDir>/setup-e2e-tests.ts"
   ],
   "moduleFileExtensions": [
     "ts",

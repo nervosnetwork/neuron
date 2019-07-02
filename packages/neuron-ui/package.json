@@ -31,7 +31,7 @@
     ]
   },
   "jest": {
-    "displayName": "Neuron UI"
+    "displayName": "UI Tests"
   },
   "browserslist": [
     "last 2 chrome versions"
