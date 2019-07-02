@@ -87,3 +87,27 @@ jobs:
         set CI=true
         yarn test
       name: Test
+
+  - job: Integration
+    condition: |
+      or(
+        eq(variables['build.sourceBranch'], 'refs/heads/e2e-tests'),
+        startsWith(variables['Build.SourceBranch'], 'refs/heads/rc/')
+      )
+    pool:
+      vmImage: 'macos-10.14'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 12.x
+      displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      name: Install
+    - script: |
+        yarn bootstrap
+        CI=false yarn build
+      name: Build
+    - script: |
+        yarn build
+        yarn test:e2e
+      name: Test
