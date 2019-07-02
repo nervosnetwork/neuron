@@ -30,22 +30,6 @@
       "git add"
     ]
   },
-  "jest": {
-    "displayName": "Neuron Wallet",
-    "testRegex": "(/tests/.*.(test|spec))\\.(ts?|js?)$",
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/setup-tests.ts"
-    ]
-  },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.14.0",
     "@nervosnetwork/ckb-sdk-utils": "0.14.0",
