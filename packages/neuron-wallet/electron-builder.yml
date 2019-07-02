@@ -6,7 +6,7 @@ asar: true
 
 directories:
   buildResources: .
-  output: release
+  output: ../../release
 
 files:
   - from: "../../node_modules/@nervosnetwork/neuron-ui/build"
