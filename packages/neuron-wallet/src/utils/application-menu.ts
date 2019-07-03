@@ -4,7 +4,6 @@ import env from '../env'
 import i18n from './i18n'
 import AppController from '../controllers/app'
 import WalletsController from '../controllers/wallets'
-import { WalletProperties } from '../services/wallets'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -211,7 +210,7 @@ if (env.isDevMode) {
   applicationMenuTemplate.push(developMenuItem)
 }
 
-export const updateApplicationMenu = (wallets: WalletProperties[], id: string | undefined) => {
+export const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
   const applicationMenu = Menu.buildFromTemplate(applicationMenuTemplate)
   const selectMenu = applicationMenu.getMenuItemById('select')
 

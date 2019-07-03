@@ -1,3 +1,4 @@
+import emptyWalletState from 'contexts/NeuronWallet/wallet'
 import { initNeuronWallet } from 'contexts/NeuronWallet'
 
 export enum ProviderActions {
@@ -33,8 +34,22 @@ export const reducer = (state: typeof initProviders, action: { type: ProviderAct
         },
       }
     }
+    case ProviderActions.Wallet: {
+      if (!action.payload) {
+        return {
+          ...state,
+          wallet: emptyWalletState,
+        }
+      }
+      return {
+        ...state,
+        wallet: {
+          ...state.wallet,
+          ...action.payload,
+        },
+      }
+    }
     case ProviderActions.Settings:
-    case ProviderActions.Wallet:
     case ProviderActions.Chain: {
       if (action.payload.toggleAddressBook) {
         return {

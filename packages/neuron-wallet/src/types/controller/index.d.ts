@@ -12,4 +12,9 @@ declare module Controller {
       addresses: string
     }
   }
+
+  interface Wallet {
+    id: string
+    name: string
+  }
 }
