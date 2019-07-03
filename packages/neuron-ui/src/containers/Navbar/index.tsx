@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
-import { Pivot, PivotItem } from 'office-ui-fabric-react'
+import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize, getTheme } from 'office-ui-fabric-react'
 import {
   Local as IconGeneral,
   Upload as IconSend,
@@ -36,6 +36,25 @@ const Navbar = ({ location, history }: React.PropsWithoutRef<RouteComponentProps
 
   if (!wallets.length) return null
 
+  const theme = getTheme()
+  const styles = {
+    root: [
+      {
+        background: theme.palette.neutralLighter,
+      },
+    ],
+    link: [
+      {
+        padding: '0 30px',
+      },
+    ],
+    linkIsSelected: [
+      {
+        padding: '0 30px',
+      },
+    ],
+  }
+
   return (
     <Pivot
       selectedKey={location.pathname}
@@ -45,6 +64,9 @@ const Navbar = ({ location, history }: React.PropsWithoutRef<RouteComponentProps
         }
       }}
       headersOnly
+      linkFormat={PivotLinkFormat.tabs}
+      linkSize={PivotLinkSize.large}
+      styles={styles}
     >
       {pivotItems.map(pivotItem => (
         <PivotItem key={pivotItem.name} headerText={t(pivotItem.name)} itemKey={pivotItem.url} />
