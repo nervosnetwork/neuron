@@ -29,15 +29,6 @@ const addressColumns: IColumn[] = [
     maxWidth: 350,
   },
   {
-    name: 'addresses.identifier',
-    key: 'identifier',
-    fieldName: 'identifier',
-    className: 'fixedWidth',
-    isResizable: true,
-    minWidth: MIN_CELL_WIDTH,
-    maxWidth: 300,
-  },
-  {
     name: 'addresses.description',
     key: 'description',
     fieldName: 'description',
