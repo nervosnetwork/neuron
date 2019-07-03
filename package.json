@@ -24,7 +24,7 @@
     "clean": "lerna run --stream clean",
     "prebuild": "yarn clean",
     "build": "lerna run --stream build",
-    "package": "yarn build && ./packages/neuron-wallet/script/package.sh",
+    "package": "yarn build && ./packages/neuron-wallet/scripts/package.sh",
     "test": "lerna run --parallel test",
     "test:e2e": "lerna run test:e2e --scope=@nervosnetwork/neuron-wallet",
     "lint": "lerna run --stream lint",

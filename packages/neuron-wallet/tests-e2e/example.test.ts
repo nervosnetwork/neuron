@@ -31,7 +31,7 @@ describe('setup tests', () => {
       await client.waitUntilWindowLoaded()
       const title = await browserWindow.getTitle()
 
-      expect(title).toBe('Electron')
+      expect(title).toBe('Neuron')
     }
   })
 })

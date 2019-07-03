@@ -15,14 +15,13 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "tsc && yarn run html:copy",
-    "html:copy": "ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html && ncp ./src/utils/prompt/password/index.html ./dist/utils/prompt/password/index.html",
+    "build": "tsc && ./scripts/copy-renderer-html.sh",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "test:e2e": "jest --config jest.e2e.config.js --color",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "package": "./script/package.sh",
+    "package": "./scripts/package.sh",
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
