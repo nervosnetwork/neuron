@@ -8,7 +8,7 @@ import { ContentProps } from 'containers/MainContent'
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
 
-const MIN_CELL_WIDTH = 70
+const MIN_CELL_WIDTH = 100
 
 const addressColumns: IColumn[] = [
   {
@@ -23,6 +23,7 @@ const addressColumns: IColumn[] = [
     name: 'addresses.address',
     key: 'address',
     fieldName: 'address',
+    className: 'fixedWidth',
     isResizable: true,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 350,
@@ -31,6 +32,7 @@ const addressColumns: IColumn[] = [
     name: 'addresses.identifier',
     key: 'identifier',
     fieldName: 'identifier',
+    className: 'fixedWidth',
     isResizable: true,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 300,
