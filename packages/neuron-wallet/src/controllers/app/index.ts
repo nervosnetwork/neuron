@@ -24,14 +24,14 @@ const nodeService = NodeService.getInstance()
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
     const [
-      activeWallet,
-      wallets,
-      activeNetworkId,
-      networks,
-      transactions,
-      addresses,
-      tipNumber,
-      connectStatus,
+      activeWallet = null,
+      wallets = [],
+      activeNetworkId = '',
+      networks = [],
+      transactions = [],
+      addresses = [],
+      tipNumber = '0',
+      connectStatus = false,
     ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),

@@ -5,6 +5,7 @@ import { history } from 'components/Router'
 import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
 import { Channel, ConnectStatus, Routes } from 'utils/const'
 import { Address } from 'contexts/NeuronWallet/wallet'
+import { WalletWizardPath } from 'components/WalletWizard'
 import { ProviderActions } from './reducer'
 
 const addressesToBalance = (addresses: Address[] = []) => {
@@ -21,8 +22,8 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           networks: any
           balance: string
           activeNetworkId: string
-          wallets: any
-          activeWallet: any
+          wallets: [{ id: string; name: string }]
+          activeWallet: { id: string; name: string } | null
           addresses: Address[]
           transactions: any
           locale: string
@@ -32,11 +33,11 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       ) => {
         if (args.status) {
           const {
-            locale,
+            locale = 'zh-CN',
             networks = [],
-            activeNetworkId: networkId,
+            activeNetworkId: networkId = '',
             wallets = [],
-            activeWallet: wallet,
+            activeWallet: wallet = { id: '', name: '' },
             addresses = [],
             transactions = [],
             tipNumber = '0',
@@ -181,7 +182,6 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
                 },
               },
             })
-            // TODO: so imperative, better refactor
             history.push(Routes.SettingsWallets)
             break
           }
@@ -190,6 +190,9 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               type: ProviderActions.Settings,
               payload: { wallets: args.result },
             })
+            if (!args.result.length) {
+              history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+            }
             break
           }
           case WalletsMethod.GetActive: {
