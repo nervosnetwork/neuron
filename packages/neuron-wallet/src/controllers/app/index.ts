@@ -24,9 +24,9 @@ const nodeService = NodeService.getInstance()
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
     const [
-      activeWallet = null,
+      currentWallet = null,
       wallets = [],
-      activeNetworkId = '',
+      currentNetworkID = '',
       networks = [],
       transactions = [],
       addresses = [],
@@ -35,7 +35,7 @@ export default class AppController {
     ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
-      networksService.activeId(),
+      networksService.getCurrentID(),
       networksService.getAll(),
       TransactionsController.getAllByAddresses({
         pageNo: 1,
@@ -67,12 +67,12 @@ export default class AppController {
 
     const locale = app.getLocale()
     const initState = {
-      activeWallet: activeWallet && {
-        ...activeWallet,
+      currentWallet: currentWallet && {
+        ...currentWallet,
       },
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
-      activeNetworkId,
+      currentNetworkID,
       networks,
       transactions,
       locale,

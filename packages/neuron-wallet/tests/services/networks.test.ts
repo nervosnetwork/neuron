@@ -10,11 +10,10 @@ const ERROR_MESSAGE = {
 }
 
 const {
-  presetNetworks: { active, list },
+  presetNetworks: { current, list },
 } = env
 
 describe(`networks service`, () => {
-  // TODO:
   const service = new NetworksService()
   afterEach(() => service.clear())
 
@@ -28,19 +27,19 @@ describe(`networks service`, () => {
     expect(networks).toEqual(list)
   })
 
-  it(`has a default active network`, async () => {
-    const activeNetwork = await service.activeId()
-    expect(activeNetwork).toBe(active)
+  it(`has a default current network`, async () => {
+    const currentNetworkID = await service.getCurrentID()
+    expect(currentNetworkID).toBe(current)
   })
 
-  it(`has testnet as the default active network`, async () => {
+  it(`has testnet as the default current network`, async () => {
     const defaultNetwork = await service.defaultOne()
     expect(defaultNetwork).toEqual(list[0])
   })
 
-  it(`get network by id ${active}`, async () => {
-    const activeNetwork = await service.get(active)
-    expect(activeNetwork).toEqual(list.find(network => network.id === active))
+  it(`get network by id ${current}`, async () => {
+    const currentNetwork = await service.get(current)
+    expect(currentNetwork).toEqual(list.find(network => network.id === current))
   })
 
   it(`get network by id which not exists`, async () => {
@@ -64,12 +63,12 @@ describe(`networks service`, () => {
 
   it(`update network name`, async () => {
     const name = 'updated name'
-    await service.update(active, { name })
+    await service.update(current, { name })
     const network = await new Promise<NetworkWithID>(resolve => {
       setTimeout(async () => {
-        const activeNetwork = await service.get(active)
-        if (activeNetwork) {
-          resolve(activeNetwork)
+        const currentNetwork = await service.get(current)
+        if (currentNetwork) {
+          resolve(currentNetwork)
         }
       }, 50)
     })
@@ -78,12 +77,12 @@ describe(`networks service`, () => {
 
   it(`update network remote address`, async () => {
     const addr = 'http://updated-address.com'
-    await service.update(active, { remote: addr })
+    await service.update(current, { remote: addr })
     const network = await new Promise<NetworkWithID>(resolve => {
       setTimeout(async () => {
-        service.get(active).then(activeNetwork => {
-          if (activeNetwork) {
-            resolve(activeNetwork)
+        service.get(current).then(currentNetwork => {
+          if (currentNetwork) {
+            resolve(currentNetwork)
           }
         })
       }, 50)
@@ -93,12 +92,12 @@ describe(`networks service`, () => {
 
   it(`update network type`, async () => {
     const type = 1
-    await service.update(active, { type })
+    await service.update(current, { type })
     const network = await new Promise<NetworkWithID>(resolve => {
       setTimeout(async () => {
-        service.get(active).then(activeNetwork => {
-          if (activeNetwork) {
-            resolve(activeNetwork)
+        service.get(current).then(currentNetwork => {
+          if (currentNetwork) {
+            resolve(currentNetwork)
           }
         })
       }, 50)
@@ -109,27 +108,27 @@ describe(`networks service`, () => {
   it(`activate the second network`, async () => {
     const { id } = list[1]
     await service.activate(id)
-    const activeNetworkId = await new Promise<string>(resolve => {
+    const currentNetworkId = await new Promise<string>(resolve => {
       setTimeout(async () => {
-        service.activeId().then(activeId => {
-          if (activeId) {
-            resolve(activeId)
+        service.getCurrentID().then(currentId => {
+          if (currentId) {
+            resolve(currentId)
           }
         })
       }, 50)
     })
-    expect(activeNetworkId).toBe(id)
+    expect(currentNetworkId).toBe(id)
   })
 
-  it(`delete inactive network`, async () => {
+  it(`delete incurrent network`, async () => {
     await service.delete(list[1].id)
     const networks = await service.getAll()
-    const activeId = await service.activeId()
+    const currentId = await service.getCurrentID()
     expect(networks).toEqual(list.filter(n => n.id !== list[1].id))
-    expect(activeId).toBe(active)
+    expect(currentId).toBe(current)
   })
 
-  it(`delete active network and switch to the default one`, async () => {
+  it(`delete current network and switch to the default one`, async () => {
     const { id } = list[1]
     await service.activate(id)
     await service.delete(id)

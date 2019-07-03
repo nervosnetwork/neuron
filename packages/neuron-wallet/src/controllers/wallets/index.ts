@@ -206,7 +206,7 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: {
         allWallets: walletsService.getAll(),
-        activeWallet: walletsService.getCurrent(),
+        currentWallet: walletsService.getCurrent(),
       },
     }
   }
@@ -232,15 +232,15 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async getActive() {
-    const activeWallet = walletsService.getCurrent()
-    if (!activeWallet) {
+  public static async getCurrent() {
+    const currentWallet = walletsService.getCurrent()
+    if (!currentWallet) {
       throw new CurrentWalletNotSet()
     }
     return {
       status: ResponseCode.Success,
       result: {
-        ...activeWallet,
+        ...currentWallet,
       },
     }
   }

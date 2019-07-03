@@ -27,7 +27,7 @@ export enum WalletsMethod {
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
-  GetActive = 'getActive',
+  GetCurrent = 'getCurrent',
   Activate = 'activate',
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
@@ -43,7 +43,7 @@ export enum NetworksMethod {
   Update = 'update',
   Delete = 'delete',
   Activate = 'activate',
-  ActiveId = 'activeId',
+  CurrentID = 'currentID',
 }
 
 export enum TransactionsMethod {
@@ -110,7 +110,7 @@ export const networksCall = instantiateMethodCall(networks) as {
   create: (network: RawNetwork) => void
   update: (id: string, options: Partial<Network>) => void
   delete: (id: string) => void
-  activeOne: () => void
+  currentOne: () => void
   activate: (id: string) => void
 }
 
@@ -148,7 +148,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   update: (params: { id: string; password?: string; newPassword?: string; name?: string }) => void
   delete: (id: string) => void
   export: (id: string) => void
-  getActive: () => void
+  getCurrent: () => void
   activate: (id: string) => void
   backup: (id: string) => void
   sendCapacity: (params: {

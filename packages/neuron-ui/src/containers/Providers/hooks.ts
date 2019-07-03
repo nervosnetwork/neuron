@@ -21,9 +21,9 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
         args: ChannelResponse<{
           networks: any
           balance: string
-          activeNetworkId: string
+          currentNetworkID: string
           wallets: [{ id: string; name: string }]
-          activeWallet: { id: string; name: string } | null
+          currentWallet: { id: string; name: string } | null
           addresses: Address[]
           transactions: any
           locale: string
@@ -35,9 +35,9 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           const {
             locale = 'zh-CN',
             networks = [],
-            activeNetworkId: networkId = '',
+            currentNetworkID: networkID = '',
             wallets = [],
-            activeWallet: wallet = { id: '', name: '' },
+            currentWallet: wallet = { id: '', name: '' },
             addresses = [],
             transactions = [],
             tipNumber = '0',
@@ -51,7 +51,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               type: ProviderActions.Initiate,
               payload: {
                 networks,
-                networkId,
+                networkID,
                 wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
                 wallets,
               },
@@ -195,7 +195,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             }
             break
           }
-          case WalletsMethod.GetActive: {
+          case WalletsMethod.GetCurrent: {
             dispatch({
               type: ProviderActions.Wallet,
               payload: args.result,
@@ -209,7 +209,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
             dispatch({
               type: ProviderActions.Wallet,
-              payload: args.result.activeWallet,
+              payload: args.result.currentWallet,
             })
             break
           }
@@ -246,7 +246,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
       } else {
         if (!args.msg) return
         const time = new Date().getTime()
-        if (method === WalletsMethod.GetActive) {
+        if (method === WalletsMethod.GetCurrent) {
           return
         }
         const title = method === WalletsMethod.SendCapacity ? 'Transaction' : 'Wallet'
@@ -283,10 +283,10 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
             break
           }
-          case NetworksMethod.ActiveId: {
+          case NetworksMethod.CurrentID: {
             dispatch({
               type: ProviderActions.Chain,
-              payload: { networkId: args.result },
+              payload: { networkID: args.result },
             })
             break
           }

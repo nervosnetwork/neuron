@@ -23,7 +23,7 @@ const buttons = [
 
 const Wallets = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
-    wallet: { id: activeId },
+    wallet: { id: currentID },
     settings: { wallets },
   } = useNeuronWallet()
 
@@ -57,8 +57,8 @@ const Wallets = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Rou
           options={wallets.map(wallet => ({
             key: wallet.id,
             text: wallet.name,
-            checked: wallet.id === activeId,
-            disabled: wallet.id === activeId,
+            checked: wallet.id === currentID,
+            disabled: wallet.id === currentID,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
                 <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>

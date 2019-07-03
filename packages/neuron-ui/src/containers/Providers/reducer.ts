@@ -19,13 +19,13 @@ export type ProviderDispatch = React.Dispatch<{ type: ProviderActions; payload: 
 export const reducer = (state: typeof initProviders, action: { type: ProviderActions; payload: any }) => {
   switch (action.type) {
     case ProviderActions.Initiate: {
-      const { networks, networkId, wallets, wallet } = action.payload
+      const { networks, networkID, wallets, wallet } = action.payload
       return {
         ...state,
         wallet: wallet || state.wallet,
         chain: {
           ...state.chain,
-          networkId,
+          networkID,
         },
         settings: {
           ...state.settings,

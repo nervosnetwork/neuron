@@ -4,7 +4,7 @@ import { updateApplicationMenu } from '../../utils/application-menu'
 import {
   broadcastCurrentWallet,
   broadcastWalletList,
-  broadcastAddresses,
+  broadcastAddressList,
   broadcastTransactions,
 } from '../../utils/broadcast'
 
@@ -32,7 +32,7 @@ CurrentWalletSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(async ({ curren
   broadcastCurrentWallet(currentWallet)
   updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
   if (!currentWallet) return
-  broadcastAddresses(currentWallet.id)
+  broadcastAddressList(currentWallet.id)
   broadcastTransactions(currentWallet.id)
 })
 

@@ -30,16 +30,16 @@ const Sync = () => (
 
 const Footer = () => {
   const {
-    chain: { networkId, connectStatus },
+    chain: { networkID, connectStatus },
     settings: { networks },
   } = useNeuronWallet()
-  const activeNetwork = networks.find(network => network.id === networkId)
+  const currentNetwork = networks.find(network => network.id === networkID)
 
   return (
     <>
       <Sync />
-      {activeNetwork ? (
-        <CurrentNetwork online={connectStatus === ConnectStatus.Online}>{activeNetwork.name}</CurrentNetwork>
+      {currentNetwork ? (
+        <CurrentNetwork online={connectStatus === ConnectStatus.Online}>{currentNetwork.name}</CurrentNetwork>
       ) : null}
     </>
   )

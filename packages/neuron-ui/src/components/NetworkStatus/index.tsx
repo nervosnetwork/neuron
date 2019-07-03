@@ -65,21 +65,21 @@ const ConnectStatusHeader = ({
       onClick: () => navTo(Routes.SettingsNetworks),
     },
   ]
-  const activeNetwork = useMemo(() => networks.find(network => network.id === chain.networkId), [
+  const currentNetwork = useMemo(() => networks.find(network => network.id === chain.networkID), [
     networks,
-    chain.networkId,
+    chain.networkID,
   ])
 
   return (
     <Container>
-      {activeNetwork ? (
+      {currentNetwork ? (
         <>
           <CurrentNetwork online={chain.connectStatus === ConnectStatus.Online}>
-            {`${(activeNetwork.name && activeNetwork.name.slice(0, 30)) || activeNetwork.remote}`}
+            {`${(currentNetwork.name && currentNetwork.name.slice(0, 30)) || currentNetwork.remote}`}
           </CurrentNetwork>
           <Dropdown
             items={networkItems}
-            selected={networkItems.findIndex(network => network.label === activeNetwork.name)}
+            selected={networkItems.findIndex(network => network.label === currentNetwork.name)}
             style={{
               position: 'absolute',
               top: '100%',

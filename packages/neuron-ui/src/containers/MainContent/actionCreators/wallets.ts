@@ -11,8 +11,8 @@ export default {
       type: MainActions.Wallet,
     }
   },
-  getActiveWallet: () => {
-    walletsCall.getActive()
+  getCurrentWallet: () => {
+    walletsCall.getCurrent()
     return {
       type: MainActions.Wallet,
     }
