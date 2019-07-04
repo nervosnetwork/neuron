@@ -90,7 +90,7 @@ const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: 
       return { ...item, date }
     })
     return { groups: gs, txs: ts }
-  }, [])
+  }, [items])
 
   return (
     <DetailsList

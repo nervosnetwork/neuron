@@ -21,13 +21,14 @@ const History = ({
   providerDispatch,
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
   const {
+    wallet: { addresses },
     chain: {
       transactions: { pageNo, pageSize, totalCount, items, keywords: incomingKeywords },
     },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, dispatch, providerDispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch, providerDispatch)
   const onSearch = () => history.push(`${Routes.History}?keywords=${keywords}`)
   const totalPages = Math.ceil(totalCount / pageSize) || 1
 

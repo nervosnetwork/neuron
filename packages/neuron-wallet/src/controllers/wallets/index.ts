@@ -229,10 +229,6 @@ export default class WalletsController {
 
     return {
       status: ResponseCode.Success,
-      result: {
-        allWallets: walletsService.getAll(),
-        currentWallet: walletsService.getCurrent(),
-      },
     }
   }
 
@@ -257,45 +253,19 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async getCurrent() {
-    const currentWallet = walletsService.getCurrent()
-    if (!currentWallet) {
-      throw new CurrentWalletNotSet()
-    }
-    return {
-      status: ResponseCode.Success,
-      result: {
-        ...currentWallet,
-      },
-    }
-  }
-
-  @CatchControllerError
   public static async activate(id: string) {
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
-    if (!currentWallet) throw new CurrentWalletNotSet()
+    if (!currentWallet || id !== currentWallet.id) throw new CurrentWalletNotSet()
     return {
       status: ResponseCode.Success,
       result: currentWallet.toJSON(),
     }
-    // TODO: verification
   }
 
   @CatchControllerError
-  public static async getAllAddresses(id?: string) {
-    let walletId = id
-    if (walletId === undefined) {
-      const currentWallet = walletsService.getCurrent()
-      if (currentWallet) {
-        walletId = currentWallet.id
-      }
-    }
-
-    if (walletId === undefined) {
-      throw new CurrentWalletNotSet()
-    }
-    const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
+  public static async getAllAddresses(id: string) {
+    const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
       addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
         address,
         identifier,
@@ -314,6 +284,7 @@ export default class WalletsController {
   @CatchControllerError
   public static async sendCapacity(params: {
     id: string
+    walletID: string
     items: {
       address: string
       capacity: string
@@ -333,7 +304,13 @@ export default class WalletsController {
         status: ResponseCode.Success,
         result: true,
       })
-      const hash = await walletsService.sendCapacity(params.items, password, params.fee, params.description)
+      const hash = await walletsService.sendCapacity(
+        params.walletID,
+        params.items,
+        password,
+        params.fee,
+        params.description
+      )
       return {
         status: ResponseCode.Success,
         result: hash,

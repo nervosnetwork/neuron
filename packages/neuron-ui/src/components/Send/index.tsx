@@ -33,7 +33,7 @@ const Send = ({
 }: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
-    wallet: { sending, balance },
+    wallet: { id: walletID, sending, balance },
   } = useNeuronWallet()
   const {
     id,
@@ -138,7 +138,7 @@ const Send = ({
           ) : (
             <PrimaryButton
               type="submit"
-              onClick={onSubmit(id, send.outputs, send.description)}
+              onClick={onSubmit(id, walletID, send.outputs, send.description)}
               disabled={sending}
               text={t('send.send')}
             />
