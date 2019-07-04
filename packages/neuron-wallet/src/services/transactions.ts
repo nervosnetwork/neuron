@@ -460,6 +460,18 @@ export default class TransactionsService {
     }
   }
 
+  public static blake160sOfTx = (tx: TransactionWithoutHash | Transaction) => {
+    let inputBlake160s: string[] = []
+    let outputBlake160s: string[] = []
+    if (tx.inputs) {
+      inputBlake160s = tx.inputs.map(input => input.lock!.args![0])
+    }
+    if (tx.outputs) {
+      outputBlake160s = tx.outputs.map(output => output.lock.args![0])
+    }
+    return [...new Set(inputBlake160s.concat(outputBlake160s))]
+  }
+
   // tx count with one lockHash
   public static getCountByLockHash = async (lockHash: string): Promise<number> => {
     const outputs: OutputEntity[] = await getConnection()
@@ -551,6 +563,9 @@ export default class TransactionsService {
     )
     const previous = previousOutputs.filter(output => output) as OutputEntity[]
     await getConnection().manager.save([...txToUpdate, ...allOutputs, ...previous])
+    const blake160s = txs.map(tx => TransactionsService.blake160sOfTx(tx.toInterface()))
+    const uniqueBlake160s = [...new Set(blake160s.reduce((acc, val) => acc.concat(val), []))]
+    return uniqueBlake160s
   }
 }
 

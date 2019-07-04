@@ -19,6 +19,7 @@ import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
 import { updateApplicationMenu } from '../utils/application-menu'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
+import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -396,6 +397,11 @@ export default class WalletService {
 
     tx.description = description
     await TransactionsService.saveSentTx(tx, txHash)
+
+    // update addresses txCount and balance
+    const blake160s = TransactionsService.blake160sOfTx(tx)
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
+    AddressesUsedSubject.getSubject().next(usedAddresses)
 
     return txHash
   }

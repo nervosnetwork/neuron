@@ -59,7 +59,17 @@ export default class Address extends BaseEntity {
   @Column({
     type: 'varchar',
   })
-  balance: string = '0'
+  liveBalance: string = '0'
+
+  @Column()
+  sentBalance: string = '0'
+
+  @Column()
+  pendingBalance: string = '0'
+
+  public balance = (): string => {
+    return (BigInt(this.liveBalance) + BigInt(this.sentBalance) - BigInt(this.pendingBalance)).toString()
+  }
 
   public toInterface = (): AddressInterface => {
     return {
@@ -71,7 +81,10 @@ export default class Address extends BaseEntity {
       txCount: this.txCount,
       blake160: this.blake160,
       version: this.version,
-      balance: this.balance,
+      liveBalance: this.liveBalance,
+      sentBalance: this.sentBalance,
+      pendingBalance: this.pendingBalance,
+      balance: this.balance(),
       description: this.description,
     }
   }
