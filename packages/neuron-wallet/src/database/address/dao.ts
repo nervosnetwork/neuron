@@ -206,4 +206,15 @@ export default class AddressDao {
     addressEntity.description = description
     return getConnection().manager.save(addressEntity)
   }
+
+  public static deleteByWalletId = async (walletId: string) => {
+    const addresses = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+      })
+      .getMany()
+    return getConnection().manager.remove(addresses)
+  }
 }
