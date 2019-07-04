@@ -84,7 +84,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
             onKeyPress={onDescriptionPress(idx)}
             onBlur={onDescriptionFieldBlur(idx)}
             onChange={onDescriptionChange(idx)}
-            maxLength={100}
+            maxLength={300}
           />
         ),
         balance,
