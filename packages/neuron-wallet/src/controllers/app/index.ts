@@ -28,8 +28,6 @@ export default class AppController {
       wallets = [],
       currentNetworkID = '',
       networks = [],
-      transactions = [],
-      addresses = [],
       tipNumber = '0',
       connectStatus = false,
     ] = await Promise.all([
@@ -37,12 +35,6 @@ export default class AppController {
       walletsService.getAll(),
       networksService.getCurrentID(),
       networksService.getAll(),
-      TransactionsController.getAllByAddresses({
-        pageNo: 1,
-        pageSize: 15,
-        addresses: '',
-      }).then(res => res.result),
-      WalletsController.getAllAddresses().then(res => res.result),
       new Promise(resolve => {
         nodeService.tipNumberSubject.pipe(take(1)).subscribe(
           tipNum => {
@@ -64,7 +56,15 @@ export default class AppController {
         )
       }),
     ])
+    const addresses: Controller.Address[] = await (currentWallet
+      ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+      : [])
 
+    const transactions = await TransactionsController.getAllByKeywords({
+      pageNo: 1,
+      pageSize: 15,
+      keywords: addresses.map(addr => addr.address).join(','),
+    }).then(res => res.result)
     const locale = app.getLocale()
     const initState = {
       currentWallet: currentWallet && {

@@ -7,7 +7,7 @@ import { CKBToShannonFormatter } from 'utils/formatters'
 import { MainActions } from '../reducer'
 
 export default {
-  submitTransaction: (id: string, items: TransactionOutput[], description: string) => {
+  submitTransaction: (id: string, walletID: string, items: TransactionOutput[], description: string) => {
     const errorAction = {
       type: MainActions.ErrorMessage,
       payload: {
@@ -40,6 +40,7 @@ export default {
     }
     walletsCall.sendCapacity({
       id,
+      walletID,
       items: items.map(item => ({
         address: item.address,
         capacity: CKBToShannonFormatter(item.amount, item.unit),

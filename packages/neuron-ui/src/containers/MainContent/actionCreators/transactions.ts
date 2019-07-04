@@ -2,8 +2,8 @@ import { transactionsCall, GetTransactionsParams, walletsCall } from 'services/U
 import { MainActions } from '../reducer'
 
 export default {
-  getTransaction: (hash: string) => {
-    transactionsCall.get(hash)
+  getTransaction: (walletID: string, hash: string) => {
+    transactionsCall.get(walletID, hash)
     return {
       type: MainActions.UpdateLoading,
       payload: {
@@ -13,7 +13,7 @@ export default {
   },
 
   getTransactions: (params: GetTransactionsParams) => {
-    transactionsCall.getAllByAddresses(params)
+    transactionsCall.getAllByKeywords(params)
     return {
       type: MainActions.UpdateLoading,
       payload: {

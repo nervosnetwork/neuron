@@ -6,6 +6,11 @@ declare module Controller {
   }
 
   namespace Params {
+    interface TransactionsByKeywords {
+      pageNo: number
+      pageSize: number
+      keywords: string
+    }
     interface TransactionsByAddresses {
       pageNo: number
       pageSize: number
@@ -26,5 +31,14 @@ declare module Controller {
     name: string
     remote: string
     type: 0 | 1 // 0 for the default type, 1 for the normal type
+  }
+
+  interface Address {
+    address: string
+    identifier: string
+    type: number
+    txCount: number
+    description: string
+    balance: string
   }
 }

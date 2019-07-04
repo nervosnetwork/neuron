@@ -80,11 +80,12 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
   const { match, errorMsgs, dispatch, providerDispatch } = props
   const [t] = useTranslation()
   const {
+    wallet: { id: walletID },
     chain: { transaction },
   } = useNeuronWallet()
 
   useEffect(() => {
-    dispatch(actionCreators.getTransaction(match.params.hash))
+    dispatch(actionCreators.getTransaction(walletID, match.params.hash))
     return () => {
       providerDispatch({
         type: ProviderActions.CleanTransaction,
@@ -96,7 +97,7 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
         },
       })
     }
-  }, [match.params.hash, dispatch, providerDispatch])
+  }, [match.params.hash, dispatch, providerDispatch, walletID])
 
   return (
     <Screen mode="fullscreen">

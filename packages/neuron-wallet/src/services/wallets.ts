@@ -279,6 +279,7 @@ export default class WalletService {
   }
 
   public sendCapacity = async (
+    walletID: string,
     items: {
       address: string
       capacity: string
@@ -287,7 +288,7 @@ export default class WalletService {
     fee: string = '0',
     description?: string
   ) => {
-    const wallet = await this.getCurrent()
+    const wallet = await this.get(walletID)
     if (!wallet) {
       throw new CurrentWalletNotSet()
     }

@@ -48,7 +48,7 @@ export enum NetworksMethod {
 
 export enum TransactionsMethod {
   GetAll = 'getAll',
-  GetAllByAddresses = 'getAllByAddresses',
+  GetAllByKeywords = 'getAllByKeywords',
   Get = 'get',
   UpdateDescription = 'updateDescription',
 }
@@ -119,8 +119,8 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 }
 
 export const transactionsCall = instantiateMethodCall(transactions) as {
-  getAllByAddresses: (params: GetTransactionsParams) => void
-  get: (hash: string) => void
+  getAllByKeywords: (params: GetTransactionsParams) => void
+  get: (walletID: string, hash: string) => void
   updateDescription: (params: { hash: string; description: string }) => void
 }
 
@@ -134,6 +134,7 @@ export const wallets = (
     | { mnemonic: string; password: string }
     | { id: string; password: string }
     | { id: string; name?: string; password: string; newPassword?: string }
+    | { id: string; walletID: string; items: { address: string; capacity: string }[]; fee: string; description: string }
 ) => {
   UILayer.send(Channel.Wallets, method, params)
 }
@@ -153,6 +154,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   backup: (id: string) => void
   sendCapacity: (params: {
     id: string
+    walletID: string
     items: {
       address: string
       capacity: string

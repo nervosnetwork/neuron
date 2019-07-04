@@ -42,9 +42,9 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
 
 const useOnSubmit = (dispatch: React.Dispatch<any>) =>
   useCallback(
-    (id: string, items: TransactionOutput[], description: string) => () => {
+    (id: string, walletID: string, items: TransactionOutput[], description: string) => () => {
       setTimeout(() => {
-        dispatch(actionCreators.submitTransaction(id, items, description))
+        dispatch(actionCreators.submitTransaction(id, walletID, items, description))
       }, 10)
     },
     [dispatch]

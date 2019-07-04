@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { History } from 'history'
 import { actionCreators, MainActions } from 'containers/MainContent/reducer'
 import { ProviderActions } from 'containers/Providers/reducer'
@@ -19,18 +19,23 @@ const backToTop = () => {
 export const useSearch = (
   search: string,
   incomingKeywords: string,
+  addresses: { address: string }[],
   dispatch: React.Dispatch<any>,
   providerDispatch: React.Dispatch<any>
 ) => {
   const [keywords, setKeywords] = useState('')
+  const defaultKeywords = useMemo(() => addresses.map(addr => addr.address).join(','), [addresses])
+
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     if (undefined !== newValue) {
       setKeywords(newValue)
     }
   }
+
   useEffect(() => {
     setKeywords(incomingKeywords)
   }, [incomingKeywords, setKeywords])
+
   useEffect(() => {
     backToTop()
     const params = queryParsers.history(search)
@@ -38,7 +43,8 @@ export const useSearch = (
     providerDispatch({
       type: ProviderActions.CleanTransactions,
     })
-    dispatch(actionCreators.getTransactions(params))
+
+    dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords || defaultKeywords }))
     return () => {
       dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '' }))
       dispatch({
@@ -48,8 +54,8 @@ export const useSearch = (
         },
       })
     }
-  }, [search, dispatch, providerDispatch])
-  return { keywords, onKeywordsChange }
+  }, [search, dispatch, providerDispatch, defaultKeywords])
+  return { keywords, addresses, onKeywordsChange }
 }
 
 export const useOnChangePage = (search: string, pathname: string, history: History, queryFormatter: Function) => {

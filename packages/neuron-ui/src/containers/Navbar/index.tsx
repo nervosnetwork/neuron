@@ -22,16 +22,15 @@ const menuItems = [
   { name: 'navbar.addresses', url: Routes.Addresses, icon: IconAddresses },
 ]
 
-const Navbar = ({ location, history }: React.PropsWithoutRef<RouteComponentProps>) => {
+const Navbar = ({ location: { pathname }, history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const {
     settings: { wallets, showAddressBook },
   } = useNeuronWallet()
   const [t] = useTranslation()
 
   const pivotItems = useMemo(
-    () =>
-      showAddressBook || location.pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1),
-    [showAddressBook]
+    () => (showAddressBook || pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1)),
+    [showAddressBook, pathname]
   )
 
   if (!wallets.length) return null
@@ -57,7 +56,7 @@ const Navbar = ({ location, history }: React.PropsWithoutRef<RouteComponentProps
 
   return (
     <Pivot
-      selectedKey={location.pathname}
+      selectedKey={pathname}
       onLinkClick={(pivotItem?: PivotItem) => {
         if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
           history.push(pivotItem.props.itemKey)
