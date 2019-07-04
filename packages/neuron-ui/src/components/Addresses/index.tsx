@@ -25,8 +25,9 @@ const addressColumns: IColumn[] = [
     fieldName: 'address',
     className: 'fixedWidth',
     isResizable: true,
+    isCollapsible: false,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 350,
+    maxWidth: 450,
   },
   {
     name: 'addresses.description',
@@ -34,21 +35,23 @@ const addressColumns: IColumn[] = [
     fieldName: 'description',
     isResizable: true,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 250,
+    maxWidth: 350,
   },
   {
     name: 'addresses.balance',
     key: 'balance',
     fieldName: 'balance',
+    isResizable: true,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 200,
+    maxWidth: 250,
   },
   {
     name: 'addresses.transactions',
     key: 'transactions',
     fieldName: 'transactions',
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 200,
+    maxWidth: 150,
+    isResizable: true,
   },
 ]
 
