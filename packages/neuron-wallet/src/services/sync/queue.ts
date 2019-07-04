@@ -75,6 +75,7 @@ export default class Queue {
 
   public kill = () => {
     this.q.kill()
+    this.q.remove(() => true)
   }
 
   public pipeline = async (blockNumbers: string[]) => {

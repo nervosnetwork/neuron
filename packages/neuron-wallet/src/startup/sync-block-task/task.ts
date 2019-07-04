@@ -8,10 +8,15 @@ import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listener/tx-status'
+import BlockNumber from '../../services/sync/block-number'
 
-const { nodeService, addressDbChangedSubject, addressesUsedSubject, databaseInitSubject } = remote.require(
-  './startup/sync-block-task/params'
-)
+const {
+  nodeService,
+  addressDbChangedSubject,
+  addressesUsedSubject,
+  databaseInitSubject,
+  walletCreatedSubject,
+} = remote.require('./startup/sync-block-task/params')
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -40,13 +45,29 @@ export const switchNetwork = async () => {
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  const blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
+  let blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
   addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove
     if (event === 'AfterInsert') {
       const hashes: string[] = await loadAddressesAndConvert()
       blockListener.setLockHashes(hashes)
+    }
+  })
+
+  const regenerateListener = async () => {
+    const blockNumber = new BlockNumber()
+    await blockNumber.updateCurrent(BigInt(0))
+    const hashes: string[] = await loadAddressesAndConvert()
+    blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
+    await blockListener.start()
+  }
+
+  walletCreatedSubject.subscribe(async (type: string) => {
+    if (type === 'import') {
+      await blockListener.stop(regenerateListener)
+      // may not call drain
+      await regenerateListener()
     }
   })
 
