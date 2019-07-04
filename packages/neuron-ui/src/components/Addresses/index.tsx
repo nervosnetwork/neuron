@@ -8,7 +8,7 @@ import { ContentProps } from 'containers/MainContent'
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
 
-const MIN_CELL_WIDTH = 70
+const MIN_CELL_WIDTH = 100
 
 const addressColumns: IColumn[] = [
   {
@@ -23,17 +23,11 @@ const addressColumns: IColumn[] = [
     name: 'addresses.address',
     key: 'address',
     fieldName: 'address',
+    className: 'fixedWidth',
     isResizable: true,
+    isCollapsible: false,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 350,
-  },
-  {
-    name: 'addresses.identifier',
-    key: 'identifier',
-    fieldName: 'identifier',
-    isResizable: true,
-    minWidth: MIN_CELL_WIDTH,
-    maxWidth: 300,
+    maxWidth: 450,
   },
   {
     name: 'addresses.description',
@@ -41,21 +35,23 @@ const addressColumns: IColumn[] = [
     fieldName: 'description',
     isResizable: true,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 250,
+    maxWidth: 350,
   },
   {
     name: 'addresses.balance',
     key: 'balance',
     fieldName: 'balance',
+    isResizable: true,
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 200,
+    maxWidth: 250,
   },
   {
     name: 'addresses.transactions',
     key: 'transactions',
     fieldName: 'transactions',
     minWidth: MIN_CELL_WIDTH,
-    maxWidth: 200,
+    maxWidth: 150,
+    isResizable: true,
   },
 ]
 
@@ -88,7 +84,7 @@ const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
             onKeyPress={onDescriptionPress(idx)}
             onBlur={onDescriptionFieldBlur(idx)}
             onChange={onDescriptionChange(idx)}
-            maxLength={100}
+            maxLength={300}
           />
         ),
         balance,

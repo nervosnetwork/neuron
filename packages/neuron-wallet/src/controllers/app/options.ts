@@ -135,12 +135,6 @@ export const contextMenuTemplate: {
         },
       },
       {
-        label: i18n.t('contextMenu.copy-identifier'),
-        click: () => {
-          clipboard.writeText(identifier)
-        },
-      },
-      {
         label: i18n.t('contextMenu.request-payment'),
         click: () => {
           AppController.navTo(`/receive/${address}`)
