@@ -17,7 +17,7 @@ import Keychain from '../models/keys/keychain'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { broadcastAddresses } from '../utils/broadcast'
+import { broadcastAddressList } from '../utils/broadcast'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -119,8 +119,8 @@ export default class WalletService {
         WalletListSubject.next({ currentWallet, prevWalletList, currentWalletList })
       }
     )
-    this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentId: string | undefined) => {
-      if (undefined === currentId) return
+    this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentID: string | undefined) => {
+      if (undefined === currentID) return
       const currentWallet = this.getCurrent() || null
       const walletList = this.getAll()
       CurrentWalletSubject.next({
@@ -134,7 +134,7 @@ export default class WalletService {
       .subscribe(async () => {
         const currentWallet = this.getCurrent()
         if (currentWallet) {
-          broadcastAddresses(currentWallet.id)
+          broadcastAddressList(currentWallet.id)
         }
       })
   }
@@ -224,7 +224,7 @@ export default class WalletService {
     const wallets = this.getAll()
     const walletJSON = wallets.find(w => w.id === id)
     const current = this.getCurrent()
-    const currentId = current ? current.id : ''
+    const currentID = current ? current.id : ''
 
     if (!walletJSON) throw new WalletNotFound(id)
 
@@ -232,7 +232,7 @@ export default class WalletService {
 
     const newWallets = wallets.filter(w => w.id !== id)
 
-    if (currentId === id) {
+    if (currentID === id) {
       if (newWallets.length > 0) {
         this.setCurrent(newWallets[0].id)
       } else {

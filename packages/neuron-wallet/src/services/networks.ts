@@ -1,23 +1,21 @@
 import { v4 as uuid } from 'uuid'
-import { BehaviorSubject, fromEvent } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
+import { BehaviorSubject } from 'rxjs'
+import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from '../exceptions/network'
 
 import Store from '../models/store'
 import env from '../env'
 
-import windowManager from '../models/window-manager'
-import { Channel, ResponseCode } from '../utils/const'
-
 import { Validate, Required } from '../decorators'
 import NodeService from './node'
 import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
+import { NetworkListSubject, CurrentNetworkIDSubject } from '../models/subjects/networks'
 
 export type NetworkID = string
 export type NetworkName = string
 export type NetworkRemote = string
 export enum NetworksKey {
   List = 'list',
-  Active = 'active',
+  Current = 'current',
 }
 export enum NetworkType {
   Default,
@@ -31,8 +29,6 @@ export interface Network {
 export interface NetworkWithID extends Network {
   id: NetworkID
 }
-
-const DEBOUNCE_TIME = 50
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
 
@@ -48,44 +44,31 @@ export default class NetworksService extends Store {
 
   constructor() {
     super('networks', 'index.json', JSON.stringify(env.presetNetworks))
-    fromEvent<[NetworkWithID[], NetworkWithID[]]>(this, NetworksKey.List)
-      .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(async ([, newValue]) => {
-        windowManager.broadcast(Channel.Networks, 'getAll', {
-          status: ResponseCode.Success,
-          result: newValue,
-        })
-        const network = await this.activeId()
-        if (network) {
-          windowManager.broadcast(Channel.Networks, 'activeId', {
-            status: ResponseCode.Success,
-            result: network,
-          })
-        } else {
-          const defaultNetwork = await this.defaultOne()
-          if (defaultNetwork) {
-            this.activate(defaultNetwork.id)
-          }
-        }
-      })
 
-    fromEvent<[string, string]>(this, NetworksKey.Active)
-      .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(async ([, newActiveId]) => {
-        const network = await this.get(newActiveId)
-        if (network) {
-          NodeService.getInstance().setNetwork(network.remote)
-          networkSwitchSubject.next(network)
-        }
-        windowManager.broadcast(Channel.Networks, 'activeId', {
-          status: ResponseCode.Success,
-          result: newActiveId,
-        })
-      })
+    this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
+      NetworkListSubject.next({ currentNetworkList })
 
-    this.activeId().then(activeId => {
-      if (activeId) {
-        this.emit(NetworksKey.Active, null, activeId)
+      const currentID = await this.getCurrentID()
+      if (currentNetworkList.find(network => network.id === currentID)) return
+
+      const defaultNetwork = await this.defaultOne()
+      if (!defaultNetwork) throw new LackOfDefaultNetwork()
+      this.activate(defaultNetwork.id)
+    })
+
+    this.on(NetworksKey.Current, async (_, currentNetworkID: NetworkID) => {
+      const currentNetwork = await this.get(currentNetworkID)
+      if (!currentNetwork) {
+        throw new NetworkNotFound(currentNetworkID)
+      }
+      CurrentNetworkIDSubject.next({ currentNetworkID })
+      NodeService.getInstance().setNetwork(currentNetwork.remote)
+      networkSwitchSubject.next(currentNetwork)
+    })
+
+    this.getCurrentID().then(currentID => {
+      if (currentID) {
+        this.emit(NetworksKey.Current, null, currentID)
       }
     })
   }
@@ -136,16 +119,21 @@ export default class NetworksService extends Store {
     }
     Object.assign(network, options)
     this.updateAll(list)
-    const activeId = await this.activeId()
-    if (activeId === id) {
+    const currentID = await this.getCurrentID()
+    if (currentID === id) {
       await this.activate(id)
     }
   }
 
   @Validate
   public async delete(@Required id: NetworkID) {
-    const list = await this.getAll()
-    this.updateAll(list.filter(item => item.id !== id))
+    const networkToDelete = await this.get(id)
+    if (!networkToDelete) throw new NetworkNotFound(id)
+    if (networkToDelete.type === NetworkType.Default) throw new DefaultNetworkUnremovable()
+
+    const prevNetworkList = await this.getAll()
+    const currentNetworkList = prevNetworkList.filter(item => item.id !== id)
+    this.updateAll(currentNetworkList)
   }
 
   @Validate
@@ -154,11 +142,11 @@ export default class NetworksService extends Store {
     if (!network) {
       throw new NetworkNotFound(id)
     }
-    this.writeSync(NetworksKey.Active, id)
+    this.writeSync(NetworksKey.Current, id)
   }
 
-  public activeId = async () => {
-    return (await this.read<string>(NetworksKey.Active)) || null
+  public getCurrentID = async () => {
+    return (await this.read<string>(NetworksKey.Current)) || null
   }
 
   public defaultOne = async () => {

@@ -23,7 +23,7 @@ interface ENV {
   mainURL: string
   remote: string
   presetNetworks: {
-    active: 'testnet'
+    current: 'testnet'
     list: NetworkWithID[]
   }
   explorer: string
@@ -36,7 +36,7 @@ const env: ENV = {
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
   remote: 'http://localhost:8114',
   presetNetworks: {
-    active: 'testnet',
+    current: 'testnet',
     list: [
       {
         id: 'testnet',

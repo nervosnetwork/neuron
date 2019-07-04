@@ -35,14 +35,14 @@ const General = () => {
   const {
     wallet: { balance },
     chain: {
-      networkId,
+      networkID,
       transactions: { items },
       tipBlockNumber,
     },
     settings: { networks },
   } = useNeuronWallet()
   const [t] = useTranslation()
-  const activeNetwork = useMemo(() => networks.find(n => n.id === networkId), [networkId, networks])
+  const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
   return (
     <GeneralPanel>
       <Balance>
@@ -81,7 +81,7 @@ const General = () => {
       </Activity>
       <Blockchain>
         <h1>{t('general.blockchain-status')}</h1>
-        {activeNetwork ? (
+        {currentNetwork ? (
           <>
             <Field>
               <span>{t('general.blockchain-identity')}</span>
@@ -93,7 +93,7 @@ const General = () => {
             </Field>
             <Field>
               <span>{t('general.rpc-service')}</span>
-              <span>{activeNetwork.name}</span>
+              <span>{currentNetwork.name}</span>
             </Field>
           </>
         ) : null}

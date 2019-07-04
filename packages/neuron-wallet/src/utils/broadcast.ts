@@ -12,14 +12,14 @@ export const broadcastWalletList = (walletList: Controller.Wallet[]) => {
 
 export const broadcastCurrentWallet = (wallet: Controller.Wallet | null) => {
   const currentWallet = wallet ? { id: wallet.id, name: wallet.name } : null
-  windowManager.broadcast(Channel.Wallets, 'getActive', {
+  windowManager.broadcast(Channel.Wallets, 'getCurrent', {
     status: ResponseCode.Success,
     result: currentWallet,
   })
 }
 
-export const broadcastAddresses = async (currentId: string) => {
-  const addresses = await AddressService.allAddressesByWalletId(currentId).then(addrs =>
+export const broadcastAddressList = async (currentID: string) => {
+  const addresses = await AddressService.allAddressesByWalletId(currentID).then(addrs =>
     addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
       address,
       identifier,
@@ -35,8 +35,8 @@ export const broadcastAddresses = async (currentId: string) => {
   })
 }
 
-export const broadcastTransactions = async (currentId: string) => {
-  const addresses = await AddressService.usedAddresses(currentId)
+export const broadcastTransactions = async (currentID: string) => {
+  const addresses = await AddressService.usedAddresses(currentID)
   const params = {
     pageNo: 1,
     pageSize: 100,
@@ -49,9 +49,25 @@ export const broadcastTransactions = async (currentId: string) => {
   })
 }
 
+export const broadcastNetworkList = async (networkList: Controller.Network[]) => {
+  windowManager.broadcast(Channel.Networks, 'getAll', {
+    status: ResponseCode.Success,
+    result: networkList,
+  })
+}
+
+export const broadcastCurrentNetworkID = async (id: Controller.NetworkID) => {
+  windowManager.broadcast(Channel.Networks, 'currentID', {
+    status: ResponseCode.Success,
+    result: id,
+  })
+}
+
 export default {
   broadcastCurrentWallet,
   broadcastWalletList,
-  broadcastAddresses,
+  broadcastAddressList,
   broadcastTransactions,
+  broadcastNetworkList,
+  broadcastCurrentNetworkID,
 }

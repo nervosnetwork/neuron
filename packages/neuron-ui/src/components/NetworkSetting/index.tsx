@@ -38,8 +38,8 @@ const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Ro
             (network): IChoiceGroupOption => ({
               key: network.id,
               text: network.name,
-              checked: chain.networkId === network.id,
-              disabled: chain.networkId === network.id,
+              checked: chain.networkID === network.id,
+              disabled: chain.networkID === network.id,
               onRenderLabel: ({ text }: IChoiceGroupOption) => {
                 return (
                   <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(network.id)}>

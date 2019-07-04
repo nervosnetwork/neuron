@@ -18,9 +18,9 @@ export class LackOfDefaultNetwork extends Error {
   }
 }
 
-export class ActiveNetworkNotSet extends Error {
+export class CurrentNetworkNotSet extends Error {
   constructor() {
-    super(i18n.t('messages.active-network-not-set'))
+    super(i18n.t('messages.current-network-not-set'))
   }
 }
 
@@ -28,5 +28,5 @@ export default {
   NetworkNotFound,
   DefaultNetworkUnremovable,
   LackOfDefaultNetwork,
-  ActiveNetworkNotSet,
+  CurrentNetworkNotSet,
 }

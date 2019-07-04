@@ -1,14 +1,7 @@
 import NetworksService, { NetworkType, NetworkID, Network } from '../../services/networks'
 import { CatchControllerError, Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
-import {
-  IsRequired,
-  InvalidName,
-  NetworkNotFound,
-  DefaultNetworkUnremovable,
-  LackOfDefaultNetwork,
-  ActiveNetworkNotSet,
-} from '../../exceptions'
+import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from '../../exceptions'
 
 const networksService = NetworksService.getInstance()
 
@@ -65,16 +58,6 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async delete(id: NetworkID) {
-    const defaultNetwork = await networksService.defaultOne()
-
-    if (defaultNetwork && defaultNetwork.id === id) throw new DefaultNetworkUnremovable()
-
-    const activeId = await networksService.activeId()
-    if (activeId === id) {
-      if (!defaultNetwork) throw new LackOfDefaultNetwork()
-      await networksService.delete(id)
-      await NetworksController.activate(defaultNetwork.id)
-    }
     await networksService.delete(id)
 
     return {
@@ -84,15 +67,15 @@ export default class NetworksController {
   }
 
   @CatchControllerError
-  public static async activeId() {
-    const activeId = await networksService.activeId()
-    if (activeId) {
+  public static async currentID() {
+    const currentID = await networksService.getCurrentID()
+    if (currentID) {
       return {
         status: ResponseCode.Success,
-        result: activeId,
+        result: currentID,
       }
     }
-    throw new ActiveNetworkNotSet()
+    throw new CurrentNetworkNotSet()
   }
 
   @CatchControllerError
