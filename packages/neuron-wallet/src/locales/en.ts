@@ -94,7 +94,6 @@ export default {
       edit: 'Edit',
       delete: 'Delete',
       'copy-address': 'Copy Address',
-      'copy-identifier': 'Copy Identifier',
       'request-payment': 'Request Payment',
       'spend-from': 'Spend From',
       'view-on-explorer': 'View On Explorer',
