@@ -552,6 +552,22 @@ export default class TransactionsService {
     const previous = previousOutputs.filter(output => output) as OutputEntity[]
     await getConnection().manager.save([...txToUpdate, ...allOutputs, ...previous])
   }
+
+  public static updateDescription = async (hash: string, description: string) => {
+    const transactionEntity = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash,
+      })
+      .getOne()
+
+    if (!transactionEntity) {
+      return undefined
+    }
+    transactionEntity.description = description
+    return getConnection().manager.save(transactionEntity)
+  }
 }
 
 // listen to send tx event
