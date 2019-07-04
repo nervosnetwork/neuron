@@ -106,6 +106,7 @@ export default class TransactionsService {
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
         status: tx.status,
+        description: tx.description,
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
       }
@@ -566,6 +567,22 @@ export default class TransactionsService {
     const blake160s = txs.map(tx => TransactionsService.blake160sOfTx(tx.toInterface()))
     const uniqueBlake160s = [...new Set(blake160s.reduce((acc, val) => acc.concat(val), []))]
     return uniqueBlake160s
+  }
+
+  public static updateDescription = async (hash: string, description: string) => {
+    const transactionEntity = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash,
+      })
+      .getOne()
+
+    if (!transactionEntity) {
+      return undefined
+    }
+    transactionEntity.description = description
+    return getConnection().manager.save(transactionEntity)
   }
 }
 

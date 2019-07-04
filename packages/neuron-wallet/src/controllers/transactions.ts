@@ -94,7 +94,8 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async updateDescription({ hash, description }: { hash: string; description: string }) {
-    // TODO: update description of specified transaction
+    await TransactionsService.updateDescription(hash, description)
+
     return {
       status: ResponseCode.Success,
       result: {
