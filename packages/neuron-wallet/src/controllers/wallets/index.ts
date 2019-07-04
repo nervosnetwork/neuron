@@ -331,23 +331,23 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async updateAddressDescription({
-    id,
+    walletId,
     address,
     description,
   }: {
-    id: string
+    walletId: string
     address: string
     description: string
   }) {
     const walletService = WalletsService.getInstance()
-    const wallet = walletService.get(id)
+    const wallet = walletService.get(walletId)
 
     await AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,
       result: {
-        id,
+        walletId,
         address,
         description,
       },
