@@ -330,12 +330,24 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async updateAddressDescription({ address, description }: { address: string; description: string }) {
-    // TODO: update description of specified address
+  public static async updateAddressDescription({
+    walletId,
+    address,
+    description,
+  }: {
+    walletId: string
+    address: string
+    description: string
+  }) {
+    const walletService = WalletsService.getInstance()
+    const wallet = walletService.get(walletId)
+
+    await AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,
       result: {
+        walletId,
         address,
         description,
       },

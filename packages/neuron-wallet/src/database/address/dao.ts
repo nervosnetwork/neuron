@@ -189,4 +189,21 @@ export default class AddressDao {
 
     return addressEntity
   }
+
+  public static updateDescription = async (walletId: string, address: string, description: string) => {
+    const addressEntity = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        walletId,
+        address,
+      })
+      .getOne()
+
+    if (!addressEntity) {
+      return undefined
+    }
+    addressEntity.description = description
+    return getConnection().manager.save(addressEntity)
+  }
 }

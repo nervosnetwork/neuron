@@ -214,6 +214,10 @@ export default class AddressService {
     return addressEntities.map(addr => addr.toInterface())
   }
 
+  public static updateDescription = async (walletId: string, address: string, description: string) => {
+    return AddressDao.updateDescription(walletId, address, description)
+  }
+
   private static getAddressVersion = (): AddressVersion => {
     return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
   }
