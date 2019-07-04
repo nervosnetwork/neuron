@@ -218,6 +218,10 @@ export default class AddressService {
     return AddressDao.updateDescription(walletId, address, description)
   }
 
+  public static deleteByWalletId = async (walletId: string) => {
+    return AddressDao.deleteByWalletId(walletId)
+  }
+
   private static getAddressVersion = (): AddressVersion => {
     return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
   }
