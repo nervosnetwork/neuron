@@ -1,7 +1,7 @@
 body {
   display: grid;
   grid-template:
-    'navbar navbar navbar' 60px
+    'navbar navbar navbar' 44px
     'notification notification notification' auto
     'content content content' 1fr
     'content content content' 1fr
@@ -20,13 +20,12 @@ footer {
 
 .navbar {
   grid-area: navbar;
-  display:flex;
-  justify-content: flex-start;
 }
 
 .main-content {
   grid-area: content;
   overflow: auto;
+  padding: 15px 20px;
 }
 
 .notification {

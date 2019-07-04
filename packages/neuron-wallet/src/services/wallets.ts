@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid'
-import { fromEvent } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import TransactionsService from './transactions'
 import { AccountExtendedPublicKey, PathAndPrivateKey } from '../models/keys/key'
@@ -8,8 +7,6 @@ import Store from '../models/store'
 import NodeService from './node'
 import FileService from './file'
 import LockUtils from '../models/lock-utils'
-import windowManager from '../models/window-manager'
-import { Channel, ResponseCode } from '../utils/const'
 import { Witness, TransactionWithoutHash, Input } from '../types/cell-types'
 import ConvertTo from '../types/convert-to'
 import Blake2b from '../utils/blake2b'
@@ -17,9 +14,10 @@ import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../ex
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
-import { updateApplicationMenu } from '../utils/application-menu'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
+import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
+import { broadcastAddresses } from '../utils/broadcast'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -40,23 +38,6 @@ export interface WalletProperties {
   name: string
   extendedKey: string // Serialized account extended public key
   keystore?: Keystore
-}
-
-const broadcastCurrentAddresses = async (currentId: string) => {
-  const addresses = await AddressService.allAddressesByWalletId(currentId).then(addrs =>
-    addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
-      address,
-      identifier,
-      type,
-      txCount,
-      description,
-      balance,
-    }))
-  )
-  windowManager.broadcast(Channel.Wallets, 'allAddresses', {
-    status: ResponseCode.Success,
-    result: addresses,
-  })
 }
 
 export class FileKeystoreWallet implements Wallet {
@@ -115,39 +96,6 @@ export class FileKeystoreWallet implements Wallet {
   }
 }
 
-const onCurrentWalletUpdated = async (wallets: WalletProperties[], currentId: string) => {
-  const wallet = wallets.find(w => w.id === currentId)
-  if (!wallet) return
-  windowManager.broadcast(Channel.Wallets, 'getActive', {
-    status: ResponseCode.Success,
-    result: {
-      id: wallet.id,
-      name: wallet.name,
-    },
-  })
-  updateApplicationMenu(wallets, currentId)
-  const addresses = await AddressService.usedAddresses(wallet.id)
-  const params = {
-    pageNo: 1,
-    pageSize: 15,
-    addresses: addresses.map(addr => addr.address),
-  }
-  const transactions = await TransactionsService.getAllByAddresses(params)
-  windowManager.broadcast(Channel.Transactions, 'getAllByAddresses', {
-    status: ResponseCode.Success,
-    result: { ...params, keywords: '', ...transactions },
-  })
-}
-
-const onWalletsUpdated = (wallets: WalletProperties[], currentId: string | undefined) => {
-  const result = wallets.map(({ id, name }) => ({ id, name }))
-  windowManager.broadcast(Channel.Wallets, 'getAll', {
-    status: ResponseCode.Success,
-    result,
-  })
-  updateApplicationMenu(wallets, currentId)
-}
-
 export default class WalletService {
   private static instance: WalletService
   private listStore: Store // Save wallets (meta info except keystore, which is persisted separately)
@@ -164,31 +112,29 @@ export default class WalletService {
   constructor() {
     this.listStore = new Store(MODULE_NAME, 'wallets.json')
 
-    fromEvent<[any, WalletProperties[]]>(this.listStore, this.walletsKey)
-      .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(([, wallets]) => {
-        const wallet = this.getCurrent()
-        if (wallet) {
-          onCurrentWalletUpdated(wallets, wallet.id)
-        }
-        onWalletsUpdated(wallets, wallet && wallet.id)
+    this.listStore.on(
+      this.walletsKey,
+      (prevWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
+        const currentWallet = this.getCurrent()
+        WalletListSubject.next({ currentWallet, prevWalletList, currentWalletList })
+      }
+    )
+    this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentId: string | undefined) => {
+      if (undefined === currentId) return
+      const currentWallet = this.getCurrent() || null
+      const walletList = this.getAll()
+      CurrentWalletSubject.next({
+        currentWallet,
+        walletList,
       })
-
-    fromEvent(this.listStore, this.currentWalletKey)
-      .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(([, newId]) => {
-        if (newId === undefined) return
-        broadcastCurrentAddresses(newId)
-        const wallets = this.getAll()
-        onCurrentWalletUpdated(wallets, newId)
-      })
+    })
 
     AddressDbChangedSubject.getSubject()
       .pipe(debounceTime(DEBOUNCE_TIME))
       .subscribe(async () => {
         const currentWallet = this.getCurrent()
         if (currentWallet) {
-          broadcastCurrentAddresses(currentWallet.id)
+          broadcastAddresses(currentWallet.id)
         }
       })
   }

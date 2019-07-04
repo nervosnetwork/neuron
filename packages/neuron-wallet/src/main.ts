@@ -42,7 +42,7 @@ app.on('ready', async () => {
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
-  updateApplicationMenu(wallets, currentWallet && currentWallet.id)
+  updateApplicationMenu(wallets, currentWallet ? currentWallet.id : null)
   await initConnection()
   createSyncBlockTask()
   openWindow()
