@@ -20,6 +20,7 @@ import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManager from '../../models/window-manager'
 import AddressService from '../../services/addresses'
+import WalletCreatedSubject from '../../models/subjects/wallet-created-subject'
 
 const walletsService = WalletsService.getInstance()
 
@@ -53,6 +54,47 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async importMnemonic({
+    name,
+    password,
+    mnemonic,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    const result = await WalletsController.createByMnemonic({
+      name,
+      password,
+      mnemonic,
+    })
+
+    WalletCreatedSubject.getSubject().next('import')
+
+    return result
+  }
+
+  @CatchControllerError
+  public static async create({
+    name,
+    password,
+    mnemonic,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    const result = await WalletsController.createByMnemonic({
+      name,
+      password,
+      mnemonic,
+    })
+
+    WalletCreatedSubject.getSubject().next('create')
+
+    return result
+  }
+
+  private static async createByMnemonic({
     name,
     password,
     mnemonic,
@@ -98,23 +140,6 @@ export default class WalletsController {
         name: wallet.name,
       },
     }
-  }
-
-  @CatchControllerError
-  public static async create({
-    name,
-    password,
-    mnemonic,
-  }: {
-    name: string
-    password: string
-    mnemonic: string
-  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    return WalletsController.importMnemonic({
-      name,
-      password,
-      mnemonic,
-    })
   }
 
   @CatchControllerError
