@@ -13,10 +13,4 @@ module.exports = {
   "setupFilesAfterEnv": [
     "<rootDir>/setup-e2e-tests.ts"
   ],
-  "moduleFileExtensions": [
-    "ts",
-    "js",
-    "json",
-    "node"
-  ]
 };
