@@ -2,11 +2,11 @@ import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { appCalls } from 'services/UILayer'
-import { useNeuronWallet, useLocalDescription } from 'utils/hooks'
-import { ContentProps } from 'containers/MainContent'
+import { useLocalDescription } from 'utils/hooks'
 
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 const MIN_CELL_WIDTH = 100
 
@@ -55,10 +55,7 @@ const addressColumns: IColumn[] = [
   },
 ]
 
-const Addresses = ({ dispatch }: React.PropsWithoutRef<ContentProps>) => {
-  const {
-    wallet: { addresses },
-  } = useNeuronWallet()
+const Addresses = ({ dispatch, wallet: { addresses } }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(

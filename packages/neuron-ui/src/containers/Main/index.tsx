@@ -1,11 +1,9 @@
 import React from 'react'
-import { HashRouter as Router } from 'react-router-dom'
-import { createHashHistory } from 'history'
+import { Route, RouteComponentProps } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
-import Navbar from 'containers/Navbar'
-import MainContent from 'containers/MainContent'
-import Notification from 'containers/Notification'
-import Footer from 'containers/Footer'
+import { useState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import General from 'components/General'
 import WalletWizard from 'components/WalletWizard'
@@ -23,141 +21,124 @@ import WalletEditor from 'components/WalletEditor'
 import LaunchScreen from 'components/LaunchScreen'
 
 import { Routes } from 'utils/const'
-import RoutesWithProps from './RoutesWithProps'
 
-export interface CustomRoute {
-  name: string
-  path: string
-  params?: string
-  exact?: boolean
-  component: React.FunctionComponent<any>
-}
+import { useChannelListeners } from './hooks'
 
-export const history = createHashHistory()
-export const containers: CustomRoute[] = [
+export const mainContents: CustomRouter.Route[] = [
   {
-    name: 'Navbar',
-    path: '/',
-    exact: false,
-    component: Navbar,
-  },
-  {
-    name: 'Footer',
-    path: '/',
-    exact: false,
-    component: Footer,
-  },
-  {
-    name: 'Notification',
-    path: '/',
-    exact: false,
-    component: Notification,
-  },
-]
-
-export const mainContents: CustomRoute[] = [
-  {
-    name: 'launch',
+    name: `launch`,
     path: Routes.Launch,
     exact: true,
-    component: LaunchScreen,
+    comp: LaunchScreen,
   },
   {
     name: `General`,
     path: Routes.General,
     exact: true,
-    component: General,
+    comp: General,
   },
   {
     name: `Send`,
     path: Routes.Send,
     params: `/:address?`,
     exact: false,
-    component: Send,
+    comp: Send,
   },
   {
     name: `Receive`,
     path: Routes.Receive,
     params: `/:address?`,
     exact: false,
-    component: Receive,
+    comp: Receive,
   },
   {
     name: `History`,
     path: Routes.History,
     exact: false,
-    component: History,
+    comp: History,
   },
   {
     name: `Transaction`,
     path: Routes.Transaction,
     params: `/:hash`,
     exact: false,
-    component: Transaction,
+    comp: Transaction,
   },
   {
     name: `Addresses`,
     path: Routes.Addresses,
     exact: false,
-    component: Addresses,
+    comp: Addresses,
   },
   {
     name: `Settings`,
     path: Routes.Settings,
     exact: false,
-    component: Settings,
+    comp: Settings,
   },
   {
     name: `GeneralSetting`,
     path: Routes.SettingsGeneral,
     exact: false,
-    component: GeneralSetting,
+    comp: GeneralSetting,
   },
   {
-    name: `SettingsWallets`,
+    name: `WalletsSetting`,
     path: Routes.SettingsWallets,
     exact: false,
-    component: Wallets,
+    comp: Wallets,
   },
   {
     name: `NetworkSetting`,
     path: Routes.SettingsNetworks,
     exact: true,
-    component: NetworkSetting,
+    comp: NetworkSetting,
   },
   {
-    name: `NetorkEditor`,
+    name: `NetworkEditor`,
     path: Routes.NetworkEditor,
     params: '/:id',
     exact: false,
-    component: NetworkEditor,
+    comp: NetworkEditor,
   },
   {
     name: `WalletEditor`,
     path: Routes.WalletEditor,
     params: '/:id',
-    exact: true,
-    component: WalletEditor,
+    exact: false,
+    comp: WalletEditor,
   },
   {
     name: `WalletWizard`,
     path: Routes.WalletWizard,
     exact: false,
-    component: WalletWizard,
+    comp: WalletWizard,
   },
 ]
 
-const CustomRouter = (appProps: any) => {
+const MainContent = ({
+  history,
+  dispatch,
+}: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
+  const neuronWalletState = useState()
+  const [, i18n] = useTranslation()
+  useChannelListeners(i18n, history, neuronWalletState.chain, dispatch)
   return (
-    <Router>
-      <RoutesWithProps contents={containers} />
-      <MainContent {...appProps}>
-        <RoutesWithProps contents={mainContents} />
-      </MainContent>
-    </Router>
+    <>
+      {mainContents.map(container => (
+        <Route
+          exact={container.exact}
+          path={`${container.path}${container.params || ''}`}
+          key={container.name}
+          render={routerProps => {
+            return <container.comp {...routerProps} {...neuronWalletState} dispatch={dispatch} />
+          }}
+        />
+      ))}
+    </>
   )
 }
 
-CustomRouter.displayName = 'CustomRouter'
+MainContent.displayName = 'Main'
 
-export default CustomRouter
+export default MainContent

@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
-import { ConnectStatus } from 'utils/const'
-import { useNeuronWallet } from 'utils/hooks'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { ConnectStatus, FULL_SCREENS } from 'utils/const'
+import { NeuronWalletContext } from 'states/stateProvider'
 
-const CurrentNetwork = styled.div<{ online: boolean }>`
+export const CurrentNetwork = styled.div<{ online: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
@@ -21,18 +23,20 @@ const CurrentNetwork = styled.div<{ online: boolean }>`
   }
 `
 
-const Sync = () => (
+export const Sync = () => (
   <div style={{ display: 'flex', alignItems: 'center' }}>
     Synchronizing
     <progress value="80" max="100" />
   </div>
 )
 
-const Footer = () => {
+const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
     chain: { networkID, connectStatus },
     settings: { networks },
-  } = useNeuronWallet()
+  } = useContext(NeuronWalletContext)
+
+  if (FULL_SCREENS.find(url => pathname.startsWith(url))) return null
   const currentNetwork = networks.find(network => network.id === networkID)
 
   return (
@@ -47,5 +51,6 @@ const Footer = () => {
 
 Footer.displayName = 'Footer'
 
-const Container: React.SFC = () => createPortal(<Footer />, document.querySelector('footer') as HTMLElement)
+const Container: React.SFC = (props: any) =>
+  createPortal(<Footer {...props} />, document.querySelector('footer') as HTMLElement)
 export default Container

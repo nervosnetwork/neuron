@@ -5,7 +5,7 @@ import QRCode from 'widgets/QRCode'
 import { RouteComponentProps } from 'react-router-dom'
 import { Copy as CopyIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
-import { useNeuronWallet } from 'utils/hooks'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 declare global {
   interface Window {
@@ -22,13 +22,12 @@ const QRCodeModal = styled.div`
   text-align: center;
 `
 
-const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: string }>>) => {
-  const {
-    wallet: { addresses },
-  } = useNeuronWallet()
+const Receive = ({
+  wallet: { addresses },
+  match,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
-  const { match } = props
   const { params } = match
 
   const accountAddress = params.address || (addresses.find(addr => addr.type === 0) || { address: '' }).address

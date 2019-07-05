@@ -2,23 +2,22 @@ import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
-
-import { ContentProps } from 'containers/MainContent'
-import { actionCreators } from 'containers/MainContent/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
 
 import { appCalls } from 'services/UILayer'
 import { Routes } from 'utils/const'
-import { useNeuronWallet } from 'utils/hooks'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 const onContextMenu = (id: string) => () => {
   appCalls.contextMenu({ type: 'networkList', id })
 }
 
-const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    chain,
-    settings: { networks },
-  } = useNeuronWallet()
+const Networks = ({
+  dispatch,
+  history,
+  chain,
+  settings: { networks },
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
   const onChoiceChange = useCallback(

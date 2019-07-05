@@ -1,20 +1,5 @@
-import { useState, useCallback, useEffect, useContext } from 'react'
-import NeuronWalletContext from 'contexts/NeuronWallet'
-import { actionCreators } from 'containers/MainContent/reducer'
-
-export const useFullscreen = (fullscreen: boolean) => {
-  useEffect(() => {
-    const content = document.querySelector('.main-content') as HTMLElement
-    if (fullscreen) {
-      content.classList.add('full-screen')
-    }
-    return () => {
-      content.classList.remove('full-screen')
-    }
-  }, [fullscreen])
-}
-
-export const useNeuronWallet = () => useContext(NeuronWalletContext)
+import { useState, useCallback } from 'react'
+import actionCreators from 'states/stateProvider/actionCreators'
 
 export const useLocalDescription = (
   type: 'address' | 'transaction',
@@ -71,4 +56,4 @@ export const useLocalDescription = (
   }
 }
 
-export default { useLocalDescription, useFullscreen, useNeuronWallet }
+export default { useLocalDescription }

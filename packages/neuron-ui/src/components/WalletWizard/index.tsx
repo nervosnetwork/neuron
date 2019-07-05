@@ -7,7 +7,6 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
-import { useNeuronWallet } from 'utils/hooks'
 import { helpersCall, walletsCall } from 'services/UILayer'
 
 export enum WalletWizardPath {
@@ -97,11 +96,13 @@ const Mnemonic = ({
   }, [dispatch, type, history])
 
   const onChange = useCallback(
-    e => {
-      dispatch({
-        type: 'imported',
-        payload: e.target.value,
-      })
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: 'imported',
+          payload: value,
+        })
+      }
     },
     [dispatch]
   )
@@ -143,13 +144,11 @@ const Submission = ({
   match: {
     params: { type },
   },
+  wallets,
   history,
   state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
-  const {
-    settings: { wallets },
-  } = useNeuronWallet()
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
   const message = 'wizard.set-wallet-name-and-password'
@@ -178,11 +177,13 @@ const Submission = ({
 
   const onChange = useCallback(
     (field: keyof WithWizardState) => {
-      return ({ currentTarget: { value } }: React.FormEvent<{ value: string }>) => {
-        dispatch({
-          type: field,
-          payload: value,
-        })
+      return (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+        if (undefined !== value) {
+          dispatch({
+            type: field,
+            payload: value,
+          })
+        }
       }
     },
     [dispatch]
@@ -234,17 +235,17 @@ Submission.displayName = 'Submission'
 const elements = [
   {
     path: WalletWizardPath.Welcome,
-    Component: Welcome,
+    comp: Welcome,
   },
   {
     path: WalletWizardPath.Mnemonic,
     params: '/:type',
-    Component: Mnemonic,
+    comp: Mnemonic,
   },
   {
     path: WalletWizardPath.Submission,
     params: '/:type',
-    Component: Submission,
+    comp: Submission,
   },
 ]
 

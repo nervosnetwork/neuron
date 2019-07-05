@@ -10,10 +10,6 @@ export enum ConnectStatus {
   Online = 'online',
   Offline = 'offline',
 }
-export enum NetworkType {
-  Default,
-  Normal,
-}
 
 export enum Channel {
   Initiate = 'initiate',
@@ -47,10 +43,6 @@ export enum Routes {
   Prompt = '/prompt',
 }
 
-export enum LocalStorage {
-  Networks = 'networks',
-}
-
 export enum CapacityUnit {
   CKB = 'ckb',
   CKKB = 'ckkb',
@@ -64,24 +56,17 @@ export const PlaceHolders = {
   },
 }
 
-export const Tooltips = {
-  send: {
-    Address: 'Address to send amount',
-    Amount: 'Amount to send',
-  },
-}
-
 export enum Message {
-  NameIsRequired = 'name-is-required',
-  URLIsRequired = 'url-is-required',
-  LengthOfNameShouldBeLessThanOrEqualTo = 'length-of-name-should-be-less-than-or-equal-to',
-  NetworkNameExist = 'network-name-exists',
-  AtLeastOneAddressNeeded = 'at-least-one-address-needed',
-  InvalidAddress = 'invalid-address',
-  InvalidAmount = 'invalid-amount',
-  AmountNotEnough = 'amount-is-not-enough',
-  IsUnremovable = 'is-unremovable',
-  ProtocolIsRequired = 'protocol-is-required',
+  NameRequired = 'messages.name-required',
+  URLRequired = 'messages.url-required',
+  LengthOfNameShouldBeLessThanOrEqualTo = 'messages.length-of-name-should-be-less-than-or-equal-to',
+  NetworkNameUsed = 'messages.network-name-used',
+  AtLeastOneAddressNeeded = 'messages.at-least-one-address-needed',
+  InvalidAddress = 'messages.invalid-address',
+  InvalidAmount = 'messages.invalid-amount',
+  AmountNotEnough = 'messages.amount-not-enough',
+  IsUnremovable = 'messages.is-unremovable',
+  ProtocolRequired = 'messages.protocol-required',
 }
 
 export enum MnemonicAction {
@@ -89,3 +74,5 @@ export enum MnemonicAction {
   Verify = 'verify',
   Import = 'import',
 }
+
+export const FULL_SCREENS = [`${Routes.Transaction}/`, `/wizard/`]

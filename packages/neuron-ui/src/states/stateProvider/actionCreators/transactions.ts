@@ -1,24 +1,20 @@
 import { transactionsCall, GetTransactionsParams, walletsCall } from 'services/UILayer'
-import { MainActions } from '../reducer'
+import { AppActions } from '../reducer'
 
 export default {
   getTransaction: (walletID: string, hash: string) => {
     transactionsCall.get(walletID, hash)
     return {
-      type: MainActions.UpdateLoading,
-      payload: {
-        transaction: true,
-      },
+      type: AppActions.Ignore,
+      payload: null,
     }
   },
 
   getTransactions: (params: GetTransactionsParams) => {
     transactionsCall.getAllByKeywords(params)
     return {
-      type: MainActions.UpdateLoading,
-      payload: {
-        transactions: true,
-      },
+      type: AppActions.Ignore,
+      payload: null,
     }
   },
   updateDescription: ({
@@ -36,8 +32,8 @@ export default {
         description,
       })
       return {
-        type: MainActions.UpdateTransactionDescription,
-        payload: key,
+        type: AppActions.Ignore,
+        payload: null,
       }
     }
     if (type === 'transaction') {
@@ -46,12 +42,12 @@ export default {
         description,
       })
       return {
-        type: MainActions.UpdateTransactionDescription,
-        payload: key,
+        type: AppActions.Ignore,
+        payload: null,
       }
     }
     return {
-      type: null,
+      type: AppActions.Ignore,
       payload: null,
     }
   },

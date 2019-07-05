@@ -1,40 +1,26 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import {
-  Stack,
-  List,
-  MessageBar,
-  TextField,
-  Dropdown,
-  PrimaryButton,
-  DefaultButton,
-  Spinner,
-  MessageBarType,
-} from 'office-ui-fabric-react'
+import { Stack, List, TextField, Dropdown, PrimaryButton, DefaultButton, Spinner } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { ContentProps } from 'containers/MainContent'
 import { PlaceHolders, CapacityUnit } from 'utils/const'
-import { useNeuronWallet } from 'utils/hooks'
 
 import { useInitialize } from './hooks'
 
 const Send = ({
-  send,
+  app: { send },
+  wallet: { id: walletID, sending, balance },
   dispatch,
-  errorMsgs,
   history,
   match: {
     params: { address },
   },
-}: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ address: string }>>) => {
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
-  const {
-    wallet: { id: walletID, sending, balance },
-  } = useNeuronWallet()
   const {
     id,
     updateTransactionOutput,
@@ -51,9 +37,6 @@ const Send = ({
   return (
     <Stack>
       <Stack.Item>
-        {errorMsgs.send ? (
-          <MessageBar messageBarType={MessageBarType.warning}>{t(`messages.${errorMsgs.send}`)}</MessageBar>
-        ) : null}
         <List
           items={send.outputs}
           onRenderCell={(item, idx) => {

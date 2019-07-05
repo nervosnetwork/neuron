@@ -1,21 +1,12 @@
 import React, { useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import {
-  Stack,
-  MessageBar,
-  MessageBarType,
-  DetailsList,
-  DetailsListLayoutMode,
-  CheckboxVisibility,
-} from 'office-ui-fabric-react'
+import { Stack, DetailsList, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from 'containers/MainContent'
-import { actionCreators, MainActions } from 'containers/MainContent/reducer'
-import { ProviderActions } from 'containers/Providers/reducer'
+import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
 import Screen from 'widgets/Screen'
 
-import { useNeuronWallet } from 'utils/hooks'
 import { localNumberFormatter } from 'utils/formatters'
 
 const inputColumns = [
@@ -76,28 +67,21 @@ const outputColumns = [
     minWidth: 70,
   },
 ]
-const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ hash: string }>>) => {
-  const { match, errorMsgs, dispatch, providerDispatch } = props
+const Transaction = ({
+  wallet: { id: walletID },
+  chain: { transaction },
+  match,
+  dispatch,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ hash: string }>>) => {
   const [t] = useTranslation()
-  const {
-    wallet: { id: walletID },
-    chain: { transaction },
-  } = useNeuronWallet()
 
   useEffect(() => {
+    dispatch({
+      type: AppActions.CleanTransaction,
+      payload: null,
+    })
     dispatch(actionCreators.getTransaction(walletID, match.params.hash))
-    return () => {
-      providerDispatch({
-        type: ProviderActions.CleanTransaction,
-      })
-      dispatch({
-        type: MainActions.ErrorMessage,
-        payload: {
-          transaction: '',
-        },
-      })
-    }
-  }, [match.params.hash, dispatch, providerDispatch, walletID])
+  }, [match.params.hash, dispatch, walletID])
 
   return (
     <Screen mode="fullscreen">
@@ -107,12 +91,9 @@ const Transaction = (props: React.PropsWithoutRef<ContentProps & RouteComponentP
           {transaction.hash}
         </Stack.Item>
         <Stack.Item>
-          {errorMsgs.transaction ? (
-            <MessageBar messageBarType={MessageBarType.warning}>{t(`messages.${errorMsgs.transaction}`)}</MessageBar>
-          ) : null}
           <div>
             <b>{`${t('history.date')}: `}</b>
-            {transaction.timestamp ? new Date(+transaction.timestamp).toLocaleString() : null}
+            {+transaction.timestamp ? new Date(+transaction.timestamp).toLocaleString() : null}
           </div>
           <div>
             <b>{`${t('history.blockNumber')}: `}</b>

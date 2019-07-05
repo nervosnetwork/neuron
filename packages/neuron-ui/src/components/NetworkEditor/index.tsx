@@ -1,31 +1,20 @@
 import React, { useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, PrimaryButton, DefaultButton, MessageBar, MessageBarType, TextField } from 'office-ui-fabric-react'
+import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 
-import { ContentProps } from 'containers/MainContent'
-
-import { useNeuronWallet } from 'utils/hooks'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
-export interface RawNetwork {
-  name: string
-  remote: string
-}
-
-const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
-  const {
-    dispatch,
-    errorMsgs,
-    match: {
-      params: { id },
-    },
-    history,
-  } = props
+const NetworkEditor = ({
+  settings: { networks },
+  dispatch,
+  match: {
+    params: { id },
+  },
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
   const editor = useNetworkEditor()
-  const {
-    settings: { networks },
-  } = useNeuronWallet()
   const [t] = useTranslation()
   const inputs = useInputs(editor)
   useInitialize(id, networks, editor.initialize, dispatch)
@@ -37,9 +26,6 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
-      {errorMsgs.networks ? (
-        <MessageBar messageBarType={MessageBarType.warning}>{errorMsgs.networks}</MessageBar>
-      ) : null}
       <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
           <Stack.Item>

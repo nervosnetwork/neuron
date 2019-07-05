@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
 import i18n from 'utils/i18n'
-import { Network } from 'contexts/NeuronWallet'
 
 enum PlaceHolder {
   Name = 'My Custom Node',
@@ -47,12 +47,8 @@ export const useNetworkEditor = (
 }
 
 type EditorType = ReturnType<typeof useNetworkEditor>
-type DispatchType = React.Dispatch<{
-  type: MainActions
-  payload?: any
-}>
 
-export const useInitialize = (id: string, networks: Network[], initialize: Function, dispatch: DispatchType) => {
+export const useInitialize = (id: string, networks: State.Network[], initialize: Function, dispatch: StateDispatch) => {
   useEffect(() => {
     if (id !== 'new') {
       const network = networks.find(n => n.id === id)
@@ -60,20 +56,16 @@ export const useInitialize = (id: string, networks: Network[], initialize: Funct
         initialize(network)
       } else {
         dispatch({
-          type: MainActions.ErrorMessage,
+          type: AppActions.AddNotification,
           payload: {
-            networks: i18n.t('messages.network-is-not-found'),
+            networks: {
+              type: 'warning',
+              timestamp: Date.now(),
+              content: i18n.t('messages.network-is-not-found'),
+            },
           },
         })
       }
-    }
-    return () => {
-      dispatch({
-        type: MainActions.ErrorMessage,
-        payload: {
-          networks: '',
-        },
-      })
     }
   }, [dispatch, id, initialize, networks])
 }
@@ -98,7 +90,7 @@ export const useInputs = (editor: EditorType) => {
   )
 }
 
-export const useIsInputsValid = (editor: EditorType, cachedNetwork: Network | undefined) => {
+export const useIsInputsValid = (editor: EditorType, cachedNetwork: State.Network | undefined) => {
   const invalidParams = useMemo(() => !editor.name.value || !editor.remote.value, [
     editor.name.value,
     editor.remote.value,
@@ -115,8 +107,8 @@ export const useHandleSubmit = (
   id: string,
   name: string,
   remote: string,
-  networks: Network[],
-  dispatch: DispatchType
+  networks: State.Network[],
+  dispatch: StateDispatch
 ) =>
   useCallback(() => {
     dispatch(actionCreators.createOrUpdateNetwork({ id, name, remote }, networks))

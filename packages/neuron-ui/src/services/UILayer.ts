@@ -1,5 +1,4 @@
-import { Network } from 'contexts/NeuronWallet'
-import { RawNetwork } from 'components/NetworkEditor'
+// import { RawNetwork } from 'components/NetworkEditor'
 
 import { CapacityUnit, Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
@@ -107,8 +106,8 @@ export const networks = (method: NetworksMethod, ...params: any[]) => {
 export const networksCall = instantiateMethodCall(networks) as {
   getAll: () => void
   get: (id: string) => void
-  create: (network: RawNetwork) => void
-  update: (id: string, options: Partial<Network>) => void
+  create: (network: State.NetworkProperty) => void
+  update: (id: string, options: Partial<State.Network>) => void
   delete: (id: string) => void
   currentOne: () => void
   activate: (id: string) => void

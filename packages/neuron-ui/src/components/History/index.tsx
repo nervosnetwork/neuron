@@ -1,42 +1,33 @@
 import React from 'react'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
-import { Stack, MessageBar, MessageBarType, SearchBox, DefaultButton } from 'office-ui-fabric-react'
+import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { Search as SearchIcon } from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { ContentProps } from 'containers/MainContent'
-
-import { useNeuronWallet } from 'utils/hooks'
 import { Routes } from 'utils/const'
 
 import { useSearch } from './hooks'
 
 const History = ({
+  wallet: { addresses },
+  chain: {
+    transactions: { pageNo, pageSize, totalCount, items, keywords: incomingKeywords },
+  },
   history,
   location: { search },
-  errorMsgs,
   dispatch,
-  providerDispatch,
-}: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    wallet: { addresses },
-    chain: {
-      transactions: { pageNo, pageSize, totalCount, items, keywords: incomingKeywords },
-    },
-  } = useNeuronWallet()
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch, providerDispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch)
   const onSearch = () => history.push(`${Routes.History}?keywords=${keywords}`)
   const totalPages = Math.ceil(totalCount / pageSize) || 1
 
   return (
     <Stack>
-      {errorMsgs.transaction ? (
-        <MessageBar messageBarType={MessageBarType.warning}>{t(`messages.${errorMsgs.transactions}`)}</MessageBar>
-      ) : null}
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 15 }}>
         <SearchBox
           value={keywords}

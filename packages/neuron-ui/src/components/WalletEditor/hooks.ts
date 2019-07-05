@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react'
-import { MainActions } from 'containers/MainContent/reducer'
 import i18n from 'utils/i18n'
 
 export const useWalletEditor = () => {
@@ -38,19 +37,6 @@ export const useAreParamsValid = (name: string) => {
     return !(name === '')
   }, [name])
 }
-
-export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
-  useCallback(
-    (open: boolean) => {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open,
-        },
-      })
-    },
-    [dispatch]
-  )
 
 export default {
   useWalletEditor,

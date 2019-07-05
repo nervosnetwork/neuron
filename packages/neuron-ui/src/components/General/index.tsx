@@ -1,8 +1,11 @@
-import React, { useMemo } from 'react'
-import styled from 'styled-components'
-import { useNeuronWallet } from 'utils/hooks'
+import React, { useMemo, useEffect } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
 import { localNumberFormatter } from 'utils/formatters'
+import { PAGE_SIZE } from 'utils/const'
 
 const GeneralPanel = styled.div`
   display: grid;
@@ -31,18 +34,22 @@ const Field = styled.div`
   }
 `
 
-const General = () => {
-  const {
-    wallet: { balance },
-    chain: {
-      networkID,
-      transactions: { items },
-      tipBlockNumber,
-    },
-    settings: { networks },
-  } = useNeuronWallet()
+const General = ({
+  dispatch,
+  wallet: { addresses, balance },
+  chain: {
+    networkID,
+    transactions: { items },
+    tipBlockNumber,
+  },
+  settings: { networks },
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
+  const defaultKeywords = useMemo(() => addresses.map(addr => addr.address).join(','), [addresses])
+  useEffect(() => {
+    dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: defaultKeywords }))
+  }, [dispatch, defaultKeywords])
   return (
     <GeneralPanel>
       <Balance>

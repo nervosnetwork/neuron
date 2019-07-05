@@ -6,9 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { appCalls } from 'services/UILayer'
 import { Routes, MnemonicAction } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { useNeuronWallet } from 'utils/hooks'
-import { ContentProps } from 'containers/MainContent'
-import { actionCreators } from 'containers/MainContent/reducer'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
 
 const buttons = [
   {
@@ -21,12 +20,12 @@ const buttons = [
   },
 ]
 
-const Wallets = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    wallet: { id: currentID },
-    settings: { wallets },
-  } = useNeuronWallet()
-
+const Wallets = ({
+  wallet: { id: currentID },
+  settings: { wallets },
+  dispatch,
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const onChange = useCallback(
     (_e, option) => {
@@ -72,7 +71,7 @@ const Wallets = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Rou
       </Stack.Item>
       <Stack horizontal horizontalAlign="space-around">
         {buttons.map(({ label, url }) => (
-          <PrimaryButton onClick={navTo(url)} text={t(label)} />
+          <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
         ))}
       </Stack>
     </Stack>
