@@ -59,7 +59,7 @@
     "nodemon": "1.19.1",
     "prettier": "1.17.1",
     "ts-jest": "24.0.2",
-    "typescript": "3.5.1",
+    "typescript": "3.5.2",
     "wait-on": "3.2.0"
   },
   "dependencies": {},
