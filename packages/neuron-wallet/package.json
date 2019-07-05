@@ -21,7 +21,6 @@
     "test:e2e": "jest --config jest.e2e.config.js --color",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
-    "package": "./scripts/package.sh",
     "rebuild:nativemodules": "electron-builder install-app-deps"
   },
   "lint-staged": {
@@ -60,7 +59,6 @@
     "electron-builder": "20.43.0",
     "electron-devtools-installer": "2.2.4",
     "lint-staged": "8.1.7",
-    "ncp": "2.0.0",
     "rimraf": "2.6.3",
     "spectron": "7.0.0"
   }
