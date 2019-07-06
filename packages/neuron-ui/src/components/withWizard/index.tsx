@@ -1,13 +1,10 @@
 import React, { useReducer } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
-import { Panel, PanelType } from 'office-ui-fabric-react'
-import { useNeuronWallet } from 'utils/hooks'
-import ScreenMessages from 'components/ScreenMessages'
-// import Screen from 'widgets/Screen'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 export interface Element {
   path: string
-  Component: React.SFC<any>
+  comp: React.SFC<any>
 }
 
 export interface WithWizardState {
@@ -16,13 +13,14 @@ export interface WithWizardState {
 
 export interface WizardProps {
   state: WithWizardState
-  messages: any
   elements: Element[]
+  wallets: State.WalletIdentity[]
   rootPath: string
   dispatch: React.Dispatch<any>
 }
 
 export interface WizardElementProps<T = {}> extends RouteComponentProps<T> {
+  wallets: State.Wallet[]
   rootPath: string
   state: WithWizardState
   dispatch: React.Dispatch<any>
@@ -45,29 +43,29 @@ const reducer = (
   }
 }
 
-const Wizard = ({ state, messages, elements, rootPath, dispatch }: WizardProps) => (
-  <Panel isOpen type={PanelType.custom} customWidth="100%">
-    <ScreenMessages messages={messages} />
+const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) => (
+  <>
     {elements.map((element: any) => (
       <Route
         key={element.path}
         path={`${rootPath}${element.path || ''}${element.params || ''}`}
         render={(props: RouteComponentProps) => (
-          <element.Component {...props} rootPath={rootPath} state={state} dispatch={dispatch} />
+          <element.comp {...props} rootPath={rootPath} wallets={wallets} state={state} dispatch={dispatch} />
         )}
       />
     ))}
-  </Panel>
+  </>
 )
 
 Wizard.displayName = 'Wizard'
 
-const withWizard = (elements: Element[], initState: WithWizardState) => ({ match }: RouteComponentProps) => {
-  const { url: rootPath } = match
-  const { messages } = useNeuronWallet()
+const withWizard = (elements: Element[], initState: WithWizardState) => ({
+  settings: { wallets = [] },
+  match: { url: rootPath = '/wizard' },
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [state, dispatch] = useReducer(reducer, initState)
 
-  return <Wizard rootPath={rootPath} messages={messages} state={state} dispatch={dispatch} elements={elements} />
+  return <Wizard rootPath={rootPath} state={state} wallets={wallets} dispatch={dispatch} elements={elements} />
 }
 
 export default withWizard

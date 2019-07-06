@@ -1,21 +1,26 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Text, DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
+
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
-import { Transaction } from 'contexts/NeuronWallet'
 import { useLocalDescription } from 'utils/hooks'
-import { MainDispatch } from 'containers/MainContent/reducer'
-import { DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
 const MIN_CELL_WIDTH = 70
 
-interface FormatTransaction extends Transaction {
+interface FormatTransaction extends State.Transaction {
   date: string
 }
 
-const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: MainDispatch }) => {
+const onRenderHeader = ({ group }: any) => {
+  const { name } = group
+  return <Text variant="large">{name}</Text>
+}
+
+const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[]; dispatch: StateDispatch }) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
@@ -72,23 +77,25 @@ const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: 
         count: 0,
       },
     ]
-    const ts = items.map(item => {
-      if (item.status === 'pending') {
-        gs[0].count++
-      }
-      const date = timeFormatter.format(+item.timestamp)
-      if (date !== gs[gs.length - 1].key) {
-        gs.push({
-          key: date,
-          name: date,
-          startIndex: gs[gs.length - 1].count + gs[gs.length - 1].startIndex,
-          count: 1,
-        })
-      } else {
-        gs[gs.length - 1].count++
-      }
-      return { ...item, date }
-    })
+    const ts = items
+      .sort((item1, item2) => +item2.timestamp - +item1.timestamp)
+      .map(item => {
+        if (item.status === 'pending') {
+          gs[0].count++
+        }
+        const date = timeFormatter.format(+item.timestamp)
+        if (date !== gs[gs.length - 1].key) {
+          gs.push({
+            key: date,
+            name: date,
+            startIndex: gs[gs.length - 1].count + gs[gs.length - 1].startIndex,
+            count: 1,
+          })
+        } else {
+          gs[gs.length - 1].count++
+        }
+        return { ...item, date }
+      })
     return { groups: gs, txs: ts }
   }, [items])
 
@@ -97,6 +104,9 @@ const TransactionList = ({ items, dispatch }: { items: Transaction[]; dispatch: 
       columns={transactionColumns}
       items={txs}
       groups={groups}
+      groupProps={{
+        onRenderHeader,
+      }}
       checkboxVisibility={CheckboxVisibility.hidden}
       onItemContextMenu={item => {
         if (item) {

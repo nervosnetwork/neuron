@@ -1,18 +1,16 @@
 /* globals BigInt */
-import React, { useEffect } from 'react'
-import { history } from 'components/Router'
+import { useEffect } from 'react'
 
 import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
-import { Channel, ConnectStatus, Routes } from 'utils/const'
-import { Address } from 'contexts/NeuronWallet/wallet'
+import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ProviderActions } from './reducer'
+import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 
-const addressesToBalance = (addresses: Address[] = []) => {
+const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
 }
 
-export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispatch<any>) =>
+export const useChannelListeners = (i18n: any, history: any, chain: any, dispatch: StateDispatch) =>
   useEffect(() => {
     UILayer.on(
       Channel.Initiate,
@@ -24,7 +22,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           currentNetworkID: string
           wallets: [{ id: string; name: string }]
           currentWallet: { id: string; name: string } | null
-          addresses: Address[]
+          addresses: State.Address[]
           transactions: any
           locale: string
           tipNumber: string
@@ -48,7 +46,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           if (networks.length) {
             dispatch({
-              type: ProviderActions.Initiate,
+              type: NeuronWalletActions.Initiate,
               payload: {
                 networks,
                 networkID,
@@ -58,7 +56,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
             })
           }
           dispatch({
-            type: ProviderActions.Chain,
+            type: NeuronWalletActions.Chain,
             payload: {
               tipBlockNumber: tipNumber,
               connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
@@ -84,7 +82,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case AppMethod.ToggleAddressBook: {
             dispatch({
-              type: ProviderActions.Settings,
+              type: NeuronWalletActions.Settings,
               payload: {
                 toggleAddressBook: true,
               },
@@ -103,7 +101,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
         switch (method) {
           case ChainMethod.Status: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: {
                 connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
               },
@@ -112,7 +110,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case ChainMethod.TipBlockNumber: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: {
                 tipBlockNumber: args.result,
               },
@@ -131,14 +129,14 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
         switch (method) {
           case TransactionsMethod.GetAllByKeywords: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: { transactions: { ...chain.transactions, ...args.result } },
             })
             break
           }
           case TransactionsMethod.Get: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: { transaction: args.result },
             })
             break
@@ -165,21 +163,12 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
               template = 'messages.wallet-imported-successfully'
             }
             const content = i18n.t(template, { name: args.result.name })
-            const time = new Date().getTime()
             dispatch({
-              type: ProviderActions.AddMessage,
+              type: AppActions.AddNotification,
               payload: {
-                category: 'success',
-                title: 'Wallet',
+                type: 'success',
                 content,
-                actions: [],
-                time,
-                dismiss: () => {
-                  dispatch({
-                    type: ProviderActions.DismissMessage,
-                    payload: time,
-                  })
-                },
+                timestamp: Date.now(),
               },
             })
             history.push(Routes.SettingsWallets)
@@ -187,7 +176,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case WalletsMethod.GetAll: {
             dispatch({
-              type: ProviderActions.Settings,
+              type: NeuronWalletActions.Settings,
               payload: { wallets: args.result },
             })
             if (!args.result.length) {
@@ -197,18 +186,18 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case WalletsMethod.GetCurrent: {
             dispatch({
-              type: ProviderActions.Wallet,
+              type: NeuronWalletActions.Wallet,
               payload: args.result,
             })
             break
           }
           case WalletsMethod.Delete: {
             dispatch({
-              type: ProviderActions.Settings,
+              type: NeuronWalletActions.Settings,
               payload: { wallets: args.result.allWallets },
             })
             dispatch({
-              type: ProviderActions.Wallet,
+              type: NeuronWalletActions.Wallet,
               payload: args.result.currentWallet,
             })
             break
@@ -221,7 +210,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
           case WalletsMethod.SendingStatus: {
             dispatch({
-              type: ProviderActions.Wallet,
+              type: NeuronWalletActions.Wallet,
               payload: {
                 sending: args.result,
               },
@@ -231,7 +220,7 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           case WalletsMethod.AllAddresses: {
             const addresses = args.result || []
             dispatch({
-              type: ProviderActions.Wallet,
+              type: NeuronWalletActions.Wallet,
               payload: {
                 addresses,
                 balance: addressesToBalance(addresses),
@@ -245,29 +234,16 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
         }
       } else {
         if (!args.msg) return
-        const time = new Date().getTime()
         if (method === WalletsMethod.GetCurrent) {
           return
         }
-        const title = method === WalletsMethod.SendCapacity ? 'Transaction' : 'Wallet'
-        const { content, id } =
-          typeof args.msg === 'string' ? { content: args.msg, id: null } : args.msg || { content: '', id: null }
-
+        const { content } = typeof args.msg === 'string' ? { content: args.msg } : args.msg || { content: '' }
         dispatch({
-          type: ProviderActions.AddMessage,
+          type: AppActions.AddNotification,
           payload: {
-            category: 'danger',
-            title,
-            id,
+            type: 'alert',
             content,
-            time,
-            actions: [],
-            dismiss: () => {
-              dispatch({
-                type: ProviderActions.DismissMessage,
-                payload: time,
-              })
-            },
+            timestamp: Date.now(),
           },
         })
       }
@@ -278,27 +254,26 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
         switch (method) {
           case NetworksMethod.GetAll: {
             dispatch({
-              type: ProviderActions.Settings,
+              type: NeuronWalletActions.Settings,
               payload: { networks: args.result },
             })
             break
           }
           case NetworksMethod.CurrentID: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: { networkID: args.result },
             })
             break
           }
           case NetworksMethod.Create:
           case NetworksMethod.Update: {
-            // TODO: so imperative, better refactor
             history.push(Routes.SettingsNetworks)
             break
           }
           case NetworksMethod.Activate: {
             dispatch({
-              type: ProviderActions.Chain,
+              type: NeuronWalletActions.Chain,
               payload: { network: args.result },
             })
             break
@@ -308,31 +283,17 @@ export const useChannelListeners = (i18n: any, chain: any, dispatch: React.Dispa
           }
         }
       } else {
-        const time = new Date().getTime()
         dispatch({
-          type: ProviderActions.AddMessage,
+          type: AppActions.AddNotification,
           payload: {
-            category: 'danger',
-            title: 'Networks',
+            type: 'alert',
             content: args.msg,
-            time,
-            actions: [
-              {
-                label: 'view',
-                action: Routes.SettingsNetworks,
-              },
-            ],
-            dismiss: () => {
-              dispatch({
-                type: ProviderActions.DismissMessage,
-                payload: time,
-              })
-            },
+            timestamp: Date.now(),
           },
         })
       }
     })
-  }, [i18n, chain, dispatch])
+  }, [i18n, chain, dispatch, history])
 
 export default {
   useChannelListeners,

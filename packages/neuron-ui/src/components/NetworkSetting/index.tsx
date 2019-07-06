@@ -3,22 +3,23 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
-import { ContentProps } from 'containers/MainContent'
-import { actionCreators } from 'containers/MainContent/reducer'
-
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+import chainState from 'states/initStates/chain'
 import { appCalls } from 'services/UILayer'
-import { Routes } from 'utils/const'
-import { useNeuronWallet } from 'utils/hooks'
 
-const onContextMenu = (id: string) => () => {
+import { Routes } from 'utils/const'
+
+const onContextMenu = (id: string = '') => () => {
   appCalls.contextMenu({ type: 'networkList', id })
 }
 
-const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    chain,
-    settings: { networks },
-  } = useNeuronWallet()
+const NetworkSetting = ({
+  chain = chainState,
+  settings: { networks = [] },
+  dispatch,
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
   const onChoiceChange = useCallback(
@@ -29,6 +30,10 @@ const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Ro
     },
     [dispatch]
   )
+
+  const goToCreateNetwork = useCallback(() => {
+    history.push(`${Routes.NetworkEditor}/new`)
+  }, [history])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
@@ -55,7 +60,7 @@ const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Ro
       <Stack.Item>
         <PrimaryButton
           text={t('settings.network.add-network')}
-          onClick={() => history.push(`${Routes.NetworkEditor}/new`)}
+          onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"
         />
       </Stack.Item>
@@ -63,4 +68,6 @@ const Networks = ({ dispatch, history }: React.PropsWithoutRef<ContentProps & Ro
   )
 }
 
-export default Networks
+NetworkSetting.displayName = 'NetworkSetting'
+
+export default NetworkSetting

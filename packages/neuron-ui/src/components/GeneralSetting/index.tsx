@@ -1,5 +1,4 @@
 import React from 'react'
-import { PrimaryButton } from 'office-ui-fabric-react'
 import styled from 'styled-components'
 
 const ContentPanel = styled.div`
@@ -10,14 +9,10 @@ const ContentPanel = styled.div`
   margin: 30px;
 `
 
-const General = () => {
-  return (
-    <ContentPanel>
-      <PrimaryButton data-automation-id="test" disabled={false} checked={false} allowDisabledFocus>
-        This is a temporary button
-      </PrimaryButton>
-    </ContentPanel>
-  )
+const GeneralSetting = () => {
+  return <ContentPanel />
 }
 
-export default General
+GeneralSetting.displayName = 'GeneralSetting'
+
+export default GeneralSetting

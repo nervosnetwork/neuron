@@ -5,9 +5,9 @@ import { Label, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
+
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
-import { useNeuronWallet } from 'utils/hooks'
 import { helpersCall, walletsCall } from 'services/UILayer'
 
 export enum WalletWizardPath {
@@ -30,7 +30,7 @@ const submissionInputs = [
   { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
 ]
 
-const Welcome = ({ rootPath }: { rootPath: string }) => {
+const Welcome = ({ rootPath = '/wizard' }: { rootPath: string }) => {
   const [t] = useTranslation()
   const message = 'wizard.create-or-import-your-first-wallet'
 
@@ -59,12 +59,12 @@ const Welcome = ({ rootPath }: { rootPath: string }) => {
 Welcome.displayName = 'Welcome'
 
 const Mnemonic = ({
-  rootPath,
+  state = initState,
+  rootPath = '/wizard',
   match: {
-    params: { type },
+    params: { type = MnemonicAction.Create },
   },
   history,
-  state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
   const { generated, imported } = state
@@ -97,11 +97,13 @@ const Mnemonic = ({
   }, [dispatch, type, history])
 
   const onChange = useCallback(
-    e => {
-      dispatch({
-        type: 'imported',
-        payload: e.target.value,
-      })
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: 'imported',
+          payload: value,
+        })
+      }
     },
     [dispatch]
   )
@@ -109,7 +111,11 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
-      history.push(`${rootPath}${WalletWizardPath.Submission}/${type === MnemonicAction.Verify ? 'create' : 'import'}`)
+      history.push(
+        `${rootPath}${WalletWizardPath.Submission}/${
+          type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
+        }`
+      )
     }
   }, [isCreate, history, rootPath, type])
 
@@ -126,12 +132,8 @@ const Mnemonic = ({
         description={t(hint)}
       />
       <RightScreenButtonRow>
-        <DefaultButton role="button" onClick={history.goBack}>
-          {t('wizard.back')}
-        </DefaultButton>
-        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
-          {t('wizard.next')}
-        </PrimaryButton>
+        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
+        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </RightScreenButtonRow>
     </>
   )
@@ -140,16 +142,14 @@ const Mnemonic = ({
 Mnemonic.displayName = 'Mnemonic'
 
 const Submission = ({
+  state = initState,
+  wallets = [],
   match: {
-    params: { type },
+    params: { type = MnemonicAction.Create },
   },
   history,
-  state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
-  const {
-    settings: { wallets },
-  } = useNeuronWallet()
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
   const message = 'wizard.set-wallet-name-and-password'
@@ -178,11 +178,13 @@ const Submission = ({
 
   const onChange = useCallback(
     (field: keyof WithWizardState) => {
-      return ({ currentTarget: { value } }: React.FormEvent<{ value: string }>) => {
-        dispatch({
-          type: field,
-          payload: value,
-        })
+      return (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+        if (undefined !== value) {
+          dispatch({
+            type: field,
+            payload: value,
+          })
+        }
       }
     },
     [dispatch]
@@ -194,7 +196,7 @@ const Submission = ({
       password,
       mnemonic: imported,
     }
-    if (type === 'create') {
+    if (type === MnemonicAction.Create) {
       walletsCall.create(p)
     } else {
       walletsCall.importMnemonic(p)
@@ -218,12 +220,8 @@ const Submission = ({
         </div>
       ))}
       <RightScreenButtonRow>
-        <DefaultButton role="button" onClick={history.goBack} onKeyPress={history.goBack}>
-          {t('wizard.back')}
-        </DefaultButton>
-        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
-          {t('wizard.next')}
-        </PrimaryButton>
+        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
+        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </RightScreenButtonRow>
     </div>
   )
@@ -234,17 +232,17 @@ Submission.displayName = 'Submission'
 const elements = [
   {
     path: WalletWizardPath.Welcome,
-    Component: Welcome,
+    comp: Welcome,
   },
   {
     path: WalletWizardPath.Mnemonic,
     params: '/:type',
-    Component: Mnemonic,
+    comp: Mnemonic,
   },
   {
     path: WalletWizardPath.Submission,
     params: '/:type',
-    Component: Submission,
+    comp: Submission,
   },
 ]
 

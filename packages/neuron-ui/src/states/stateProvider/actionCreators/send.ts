@@ -1,17 +1,20 @@
-import { walletsCall, TransactionOutput } from 'services/UILayer'
+import { walletsCall } from 'services/UILayer'
 
 import { Message } from 'utils/const'
 import { verifyAddress } from 'utils/validators'
 import { CKBToShannonFormatter } from 'utils/formatters'
+import { TransactionOutput } from 'components/Send'
 
-import { MainActions } from '../reducer'
+import { AppActions } from '../reducer'
 
 export default {
   submitTransaction: (id: string, walletID: string, items: TransactionOutput[], description: string) => {
     const errorAction = {
-      type: MainActions.ErrorMessage,
+      type: AppActions.AddNotification,
       payload: {
-        send: Message.AtLeastOneAddressNeeded as string,
+        type: 'warning',
+        timestamp: Date.now(),
+        content: Message.AtLeastOneAddressNeeded,
       },
     }
     if (!items.length || !items[0].address) {
@@ -20,16 +23,16 @@ export default {
     const invalid = items.some(
       (item): boolean => {
         if (!verifyAddress(item.address)) {
-          errorAction.payload.send = Message.InvalidAddress
+          errorAction.payload.content = Message.InvalidAddress
           return true
         }
         if (Number.isNaN(+item.amount) || +item.amount < 0) {
-          errorAction.payload.send = Message.InvalidAmount
+          errorAction.payload.content = Message.InvalidAmount
           return true
         }
         const [, decimal = ''] = item.amount.split('.')
         if (decimal.length > 8) {
-          errorAction.payload.send = Message.InvalidAmount
+          errorAction.payload.content = Message.InvalidAmount
           return true
         }
         return false
@@ -49,10 +52,8 @@ export default {
       description,
     })
     return {
-      type: MainActions.UpdateSendState,
-      payload: {
-        submitting: true,
-      },
+      type: AppActions.UpdateSendLoading,
+      payload: true,
     }
   },
 }

@@ -120,6 +120,9 @@ export default {
         title: 'Backup the Keystore',
         password: 'Password',
       },
+      transaction: {
+        title: 'Transaction: {{hash}}',
+      },
     },
     prompt: {
       password: {

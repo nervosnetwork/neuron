@@ -1,7 +1,4 @@
-import { Network } from 'contexts/NeuronWallet'
-import { RawNetwork } from 'components/NetworkEditor'
-
-import { CapacityUnit, Channel } from 'utils/const'
+import { Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
@@ -57,12 +54,6 @@ export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
 }
 
-export interface TransactionOutput {
-  address: string
-  amount: string
-  unit: CapacityUnit
-}
-
 export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
@@ -107,8 +98,8 @@ export const networks = (method: NetworksMethod, ...params: any[]) => {
 export const networksCall = instantiateMethodCall(networks) as {
   getAll: () => void
   get: (id: string) => void
-  create: (network: RawNetwork) => void
-  update: (id: string, options: Partial<Network>) => void
+  create: (network: State.NetworkProperty) => void
+  update: (id: string, options: Partial<State.Network>) => void
   delete: (id: string) => void
   currentOne: () => void
   activate: (id: string) => void

@@ -44,12 +44,13 @@
       "more-transactions": "More"
     },
     "send": {
-      "address": "address",
-      "amount": "amount",
+      "address": "Address",
+      "amount": "Amount",
       "send": "Send",
+      "clear": "Clear",
       "confirm-password": "Confirm Password",
-      "to": "to",
-      "input-password-to-confirm": "input password to confirm",
+      "to": "To",
+      "input-password-to-confirm": "Input password to confirm",
       "this-transaction-will-send": "This transaction will send",
       "scan-to-get-address": "scan the qrcode to get address",
       "description": "Description",
@@ -85,7 +86,7 @@
       "blockNumber": "Block Number"
     },
     "transaction": {
-      "goBack": "go back"
+      "goBack": "Go back"
     },
     "addresses": {
       "addresses": "Addresses",
@@ -119,8 +120,8 @@
         }
       },
       "network": {
-        "online": "online",
-        "offline": "offline",
+        "online": "Online",
+        "offline": "Offline",
         "add-network": "Add Network",
         "edit-network": {
           "title": "Add Network",
@@ -130,14 +131,14 @@
       }
     },
     "menuitem": {
-      "add": "add",
-      "update": "update",
-      "delete": "delete",
-      "network": "network",
-      "select": "select",
-      "edit": "edit",
-      "backup": "backup",
-      "remove": "remove",
+      "add": "Add",
+      "update": "Update",
+      "delete": "Delete",
+      "network": "Network",
+      "select": "Select",
+      "edit": "Edit",
+      "backup": "Backup",
+      "remove": "Remove",
       "save": "Save",
       "management": "management"
     },
@@ -147,24 +148,23 @@
       "save": "Save"
     },
     "messages": {
-      "at-least-one-address-needed": "at least one address needed",
-      "name-is-required": "name is required",
-      "url-is-required": "url is required",
-      "length-of-name-should-be-less-than-or-equal-to": "length-of-name-should-be-less-than-or-equal-to {{length}}",
-      "network-name-exists": "network name exists",
-      "invalid-address": "invalid address",
-      "invalid-amount": "invalid amount",
-      "amount-is-not-enough": "amount is not enough",
+      "at-least-one-address-needed": "At least one address needed",
+      "name-required": "Name is required",
+      "url-required": "URL is required",
+      "protocol-required": "Protocol is required",
+      "length-of-name-should-be-less-than-or-equal-to": "Length of name should be less than or equal to {{length}}",
+      "network-name-used": "Network name is used",
+      "invalid-address": "Invalid address",
+      "invalid-amount": "Invalid amount",
+      "amount-not-enough": "Amount is not enough",
       "is-unremovable": "{{target}} is unremovable",
       "create-wallet-success": "You have created wallet '{{name}}' successfully",
       "network-is-not-found": "Network is not found",
-      "name-has-been-used": "Name has been used",
       "failed-to-initiate,-please-reopen-Neuron": "Failed to initiate, please reopen Neuron",
       "no-wallet": "No Wallet",
       "wallet-imported-successfully": "{{name}} imported successfully",
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
-      "protocol-is-required": "Protocol is required",
       "wallet-not-found": "Wallet not found",
       "no-transactions": "No transactions"
     }

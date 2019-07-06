@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { History } from 'history'
 import { IDropdownOption } from 'office-ui-fabric-react'
-import { TransactionOutput } from 'services/UILayer'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import initState from 'containers/MainContent/state'
-import { MainDispatch } from '../../containers/MainContent/reducer'
 
-const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+
+import { TransactionOutput } from '.'
+
+const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
     (field: string) => (idx: number) => (value: string) => {
       dispatch({
-        type: MainActions.UpdateSendOutput,
+        type: AppActions.UpdateSendOutput,
         payload: {
           idx,
           item: {
@@ -22,27 +22,28 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
     [dispatch]
   )
 
-const useAddTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
-      type: MainActions.AddSendOutput,
+      type: AppActions.AddSendOutput,
+      payload: null,
     })
   }, [dispatch])
 
-const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
-    (idx: number) => {
+    (idx: number = -1) => {
       dispatch({
-        type: MainActions.RemoveSendOutput,
+        type: AppActions.RemoveSendOutput,
         payload: idx,
       })
     },
     [dispatch]
   )
 
-const useOnSubmit = (dispatch: React.Dispatch<any>) =>
+const useOnSubmit = (dispatch: StateDispatch) =>
   useCallback(
-    (id: string, walletID: string, items: TransactionOutput[], description: string) => () => {
+    (id: string = '', walletID: string = '', items: TransactionOutput[] = [], description: string = '') => () => {
       setTimeout(() => {
         dispatch(actionCreators.submitTransaction(id, walletID, items, description))
       }, 10)
@@ -50,18 +51,18 @@ const useOnSubmit = (dispatch: React.Dispatch<any>) =>
     [dispatch]
   )
 
-const useOnItemChange = (updateTransactionOutput: Function) => (field: string, idx: number) => (
+const useOnItemChange = (updateTransactionOutput: Function) => (field: string = '', idx: number = -1) => (
   _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-  newValue?: string
+  value?: string
 ) => {
-  if (undefined !== newValue) {
-    updateTransactionOutput(field)(idx)(newValue)
+  if (undefined !== value) {
+    updateTransactionOutput(field)(idx)(value)
   }
 }
 
 const useCapacityUnitChange = (updateTransactionOutput: Function) =>
   useCallback(
-    (idx: number) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+    (idx: number = -1) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
       if (option) {
         updateTransactionOutput('unit')(idx)(option.key)
       }
@@ -69,40 +70,42 @@ const useCapacityUnitChange = (updateTransactionOutput: Function) =>
     [updateTransactionOutput]
   )
 
-const useUpdateTransactionPrice = (dispatch: any) =>
+const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
-    (e: any) => {
-      dispatch({
-        type: MainActions.UpdateSendPrice,
-        paylaod: e.currentTarget.value,
-      })
-    },
-    [dispatch]
-  )
-
-const useSendDescriptionChange = (dispatch: MainDispatch) =>
-  useCallback(
-    (_e, newValue?: string) => {
-      if (undefined !== newValue) {
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
         dispatch({
-          type: MainActions.UpdateSendDescription,
-          payload: newValue,
+          type: AppActions.UpdateSendPrice,
+          payload: value,
         })
       }
     },
     [dispatch]
   )
 
-const clear = (dispatch: MainDispatch) => {
+const useSendDescriptionChange = (dispatch: StateDispatch) =>
+  useCallback(
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: AppActions.UpdateSendDescription,
+          payload: value,
+        })
+      }
+    },
+    [dispatch]
+  )
+
+const clear = (dispatch: StateDispatch) => {
   dispatch({
-    type: MainActions.UpdateSendState,
-    payload: initState.send,
+    type: AppActions.ClearSendState,
+    payload: null,
   })
 }
 
-const useClear = (dispatch: MainDispatch) => useCallback(() => clear(dispatch), [dispatch])
+const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
 
-export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
+export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: any) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
   const onCapacityUnitChange = useCapacityUnitChange(updateTransactionOutput)
@@ -122,6 +125,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     }
   }, [address, dispatch, history, updateTransactionOutput])
 
+  // TODO: generate new id on every submission
   const id = useMemo(() => Math.round(Math.random() * 1000).toString(), [])
 
   return {

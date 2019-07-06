@@ -6,14 +6,6 @@ const ScreenButtonRow = styled.div`
   justify-content: space-between;
 `
 
-const LeftScreenButtonRow = styled(ScreenButtonRow)`
-  justify-content: flex-start;
-
-  button {
-    margin-right: 20px;
-  }
-`
-
 const RightScreenButtonRow = styled(ScreenButtonRow)`
   justify-content: flex-end;
 
@@ -22,5 +14,5 @@ const RightScreenButtonRow = styled(ScreenButtonRow)`
   }
 `
 
-export { LeftScreenButtonRow, RightScreenButtonRow }
+export { RightScreenButtonRow }
 export default ScreenButtonRow

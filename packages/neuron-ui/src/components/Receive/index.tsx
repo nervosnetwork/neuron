@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { Stack, TextField, TooltipHost, Modal } from 'office-ui-fabric-react'
-import QRCode from 'widgets/QRCode'
+import React, { useState, useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Copy as CopyIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
-import { useNeuronWallet } from 'utils/hooks'
+import { Stack, TextField, TooltipHost, Modal } from 'office-ui-fabric-react'
+import styled from 'styled-components'
+
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import QRCode from 'widgets/QRCode'
+import { Copy } from 'grommet-icons'
 
 declare global {
   interface Window {
@@ -22,23 +23,24 @@ const QRCodeModal = styled.div`
   text-align: center;
 `
 
-const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: string }>>) => {
-  const {
-    wallet: { addresses },
-  } = useNeuronWallet()
+const Receive = ({
+  wallet: { addresses = [] },
+  match: { params },
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
-  const { match } = props
-  const { params } = match
 
-  const accountAddress = params.address || (addresses.find(addr => addr.type === 0) || { address: '' }).address
+  const accountAddress = useMemo(
+    () => params.address || (addresses.find(addr => addr.type === 0) || { address: '' }).address || '',
+    [params, addresses]
+  )
+
+  const copyAddress = useCallback(() => {
+    window.clipboard.writeText(accountAddress)
+  }, [accountAddress])
 
   if (!accountAddress) {
     return <div>{t('receive.address-not-found')}</div>
-  }
-
-  const copyAddress = () => {
-    window.clipboard.writeText(accountAddress)
   }
 
   return (
@@ -51,12 +53,11 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
           <TextField
             styles={{ root: { flex: 1 } }}
             readOnly
-            type="text"
             placeholder={accountAddress}
-            onClick={() => copyAddress()}
+            onClick={copyAddress}
             description={t('receive.prompt')}
           />
-          <CopyIcon onClick={() => copyAddress()} />
+          <Copy onClick={copyAddress} />
         </Stack>
       </TooltipHost>
       <Modal isOpen={showLargeQRCode} onDismiss={() => setShowLargeQRCode(false)}>
@@ -70,5 +71,7 @@ const Receive = (props: React.PropsWithoutRef<RouteComponentProps<{ address: str
     </Stack>
   )
 }
+
+Receive.displayName = 'Receive'
 
 export default Receive

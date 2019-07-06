@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Panel, PanelType, Spinner, SpinnerSize } from 'office-ui-fabric-react'
-import { useNeuronWallet } from 'utils/hooks'
-import { Routes } from 'utils/const'
-import { WalletWizardPath } from 'components/WalletWizard'
 import { useTranslation } from 'react-i18next'
+import { Panel, PanelType, Spinner, SpinnerSize } from 'office-ui-fabric-react'
 
-const LaunchScreen = ({ history }: React.PropsWithoutRef<RouteComponentProps>) => {
-  const {
-    wallet: { id },
-    settings: { networks },
-  } = useNeuronWallet()
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { WalletWizardPath } from 'components/WalletWizard'
+import { Routes } from 'utils/const'
+
+export const LaunchScreen = ({
+  wallet: { id = '' },
+  settings: { networks = [] },
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const { t } = useTranslation()
 
   useEffect(() => {
