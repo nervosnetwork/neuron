@@ -28,7 +28,7 @@ files:
     to: "node_modules/escape-string-regexp"
 
 win:
-  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
   target:
     - target: nsis
@@ -40,12 +40,12 @@ nsis:
   createStartMenuShortcut: true
 
 mac:
-  artifactName: "${productName}-${version}-${os}.${ext}"
+  artifactName: "${productName}-v${version}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/images/icon.icns
 
 linux:
-  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+  artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
   category: Finance
   icon: assets/images/
   target:
