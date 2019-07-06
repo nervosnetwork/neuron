@@ -124,8 +124,25 @@ jobs:
     - script: |
         yarn global add lerna
         yarn bootstrap
+    - task: DownloadSecureFile@1
+      name: macSiginingCertificate
+      displayName: 'Download macOS Signing Certificate'
+      inputs:
+        secureFile: Neuron_mac.p12
+    - task: DownloadSecureFile@1
+      name: winSiginingCertificate
+      displayName: 'Download Windows Signing Certificate'
+      inputs:
+        secureFile: Neuron_win.p12
     - script: yarn package
       name: Build
+      env:
+        CSC_LINK: $(macSiginingCertificate.secureFilePath)
+        CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
+        CSC_IDENTITY_AUTO_DISCOVERY: false
+        WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
+        WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
+        WIN_CSC_IDENTITY_AUTO_DISCOVERY: false
     - task: GitHubRelease@0
       inputs:
         gitHubConnection: nervos-bot
