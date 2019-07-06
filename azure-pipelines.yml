@@ -122,8 +122,8 @@ jobs:
         versionSpec: 12.x
       displayName: 'Install Node.js'
     - script: |
-      yarn global add lerna
-      yarn bootstrap
+        yarn global add lerna
+        yarn bootstrap
     - script: yarn package
       name: Build
     - task: GitHubRelease@0
