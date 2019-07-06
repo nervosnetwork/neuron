@@ -47,6 +47,7 @@
       "address": "Address",
       "amount": "Amount",
       "send": "Send",
+      "clear": "Clear",
       "confirm-password": "Confirm Password",
       "to": "To",
       "input-password-to-confirm": "Input password to confirm",

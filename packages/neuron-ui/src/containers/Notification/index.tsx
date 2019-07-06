@@ -32,7 +32,7 @@ const DismissButton = ({ onDismiss }: { onDismiss: React.MouseEventHandler<HTMLB
 
 const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
-    app: { notifications },
+    app: { notifications = [] },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
   const onDismiss = useCallback(() => {

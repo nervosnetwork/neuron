@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { IDropdownOption } from 'office-ui-fabric-react'
-import { TransactionOutput } from 'services/UILayer'
+
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 
-const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
+import { TransactionOutput } from '.'
+
+const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
     (field: string) => (idx: number) => (value: string) => {
       dispatch({
@@ -20,16 +22,17 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
     [dispatch]
   )
 
-const useAddTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
       type: AppActions.AddSendOutput,
+      payload: null,
     })
   }, [dispatch])
 
-const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
-    (idx: number) => {
+    (idx: number = -1) => {
       dispatch({
         type: AppActions.RemoveSendOutput,
         payload: idx,
@@ -40,7 +43,7 @@ const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
 
 const useOnSubmit = (dispatch: StateDispatch) =>
   useCallback(
-    (id: string, walletID: string, items: TransactionOutput[], description: string) => () => {
+    (id: string = '', walletID: string = '', items: TransactionOutput[] = [], description: string = '') => () => {
       setTimeout(() => {
         dispatch(actionCreators.submitTransaction(id, walletID, items, description))
       }, 10)
@@ -48,18 +51,18 @@ const useOnSubmit = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
-const useOnItemChange = (updateTransactionOutput: Function) => (field: string, idx: number) => (
+const useOnItemChange = (updateTransactionOutput: Function) => (field: string = '', idx: number = -1) => (
   _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-  newValue?: string
+  value?: string
 ) => {
-  if (undefined !== newValue) {
-    updateTransactionOutput(field)(idx)(newValue)
+  if (undefined !== value) {
+    updateTransactionOutput(field)(idx)(value)
   }
 }
 
 const useCapacityUnitChange = (updateTransactionOutput: Function) =>
   useCallback(
-    (idx: number) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+    (idx: number = -1) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
       if (option) {
         updateTransactionOutput('unit')(idx)(option.key)
       }
@@ -67,24 +70,26 @@ const useCapacityUnitChange = (updateTransactionOutput: Function) =>
     [updateTransactionOutput]
   )
 
-const useUpdateTransactionPrice = (dispatch: any) =>
+const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
-    (e: any) => {
-      dispatch({
-        type: AppActions.UpdateSendPrice,
-        paylaod: e.currentTarget.value,
-      })
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: AppActions.UpdateSendPrice,
+          payload: value,
+        })
+      }
     },
     [dispatch]
   )
 
 const useSendDescriptionChange = (dispatch: StateDispatch) =>
   useCallback(
-    (_e, newValue?: string) => {
-      if (undefined !== newValue) {
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
         dispatch({
           type: AppActions.UpdateSendDescription,
-          payload: newValue,
+          payload: value,
         })
       }
     },
@@ -120,6 +125,7 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     }
   }, [address, dispatch, history, updateTransactionOutput])
 
+  // TODO: generate new id on every submission
   const id = useMemo(() => Math.round(Math.random() * 1000).toString(), [])
 
   return {

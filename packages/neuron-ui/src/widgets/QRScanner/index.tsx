@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Label, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
-import { Scan as ScanIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter } from 'office-ui-fabric-react'
+import { Scan as ScanIcon } from 'grommet-icons'
 import jsQR from 'jsqr'
 
 import { drawPolygon } from 'utils/canvasActions'
-import Dialog from '../Dialog'
+// import Dialog from '../Dialog'
 
 interface QRScannerProps {
   title: string
@@ -102,47 +102,41 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         <ScanIcon />
       </button>
       <Dialog
-        open={open}
-        onClick={() => {
+        hidden={!open}
+        onDismiss={() => {
           setOpen(false)
         }}
+        maxWidth="900px"
+        minWidth="500xp"
       >
-        <div
-          role="presentation"
-          onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-        >
-          <h1>{title}</h1>
-          <div>
-            <canvas ref={canvasRef} />
-          </div>
-          <div>
-            <Label>{label}</Label>
-            <TextField readOnly value={data} />
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
+        <h1>{title}</h1>
+        <div>
+          <canvas ref={canvasRef} />
+        </div>
+        <DialogFooter>
+          <TextField readOnly value={data} label={label} underlined />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            <PrimaryButton
+              onClick={() => {
+                onConfirm(data)
+                setOpen(false)
               }}
             >
-              <PrimaryButton
-                onClick={() => {
-                  onConfirm(data)
-                  setOpen(false)
-                }}
-              >
-                {t('common.confirm')}
-              </PrimaryButton>
-              <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
-            </div>
+              {t('common.confirm')}
+            </PrimaryButton>
+            <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
           </div>
-        </div>
+        </DialogFooter>
       </Dialog>
     </>
   )
 }
 
 QRScanner.displayName = 'QRScanner'
+
 export default QRScanner

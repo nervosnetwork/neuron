@@ -1,12 +1,13 @@
 import React, { useContext } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
 import { createPortal } from 'react-dom'
+import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
+
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectStatus, FULL_SCREENS } from 'utils/const'
 import { NeuronWalletContext } from 'states/stateProvider'
 
-export const CurrentNetwork = styled.div<{ online: boolean }>`
+const CurrentNetwork = styled.div<{ online: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
@@ -23,7 +24,7 @@ export const CurrentNetwork = styled.div<{ online: boolean }>`
   }
 `
 
-export const Sync = () => (
+const Sync = () => (
   <div style={{ display: 'flex', alignItems: 'center' }}>
     Synchronizing
     <progress value="80" max="100" />

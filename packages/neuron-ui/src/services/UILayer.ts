@@ -1,6 +1,4 @@
-// import { RawNetwork } from 'components/NetworkEditor'
-
-import { CapacityUnit, Channel } from 'utils/const'
+import { Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
@@ -54,12 +52,6 @@ export enum TransactionsMethod {
 
 export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
-}
-
-export interface TransactionOutput {
-  address: string
-  amount: string
-  unit: CapacityUnit
 }
 
 export interface GetTransactionsParams {

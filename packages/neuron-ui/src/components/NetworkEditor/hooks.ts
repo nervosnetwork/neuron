@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
+
 import i18n from 'utils/i18n'
 
 enum PlaceHolder {
@@ -33,14 +35,18 @@ export const useNetworkEditor = (
     initialize,
     name: {
       value: name,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => {
-        setName(e.currentTarget.value)
+      onChange: (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+        if (undefined !== value) {
+          setName(value)
+        }
       },
     },
     remote: {
       value: remote,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => {
-        setRemote(e.currentTarget.value)
+      onChange: (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+        if (undefined !== value) {
+          setRemote(value)
+        }
       },
     },
   }
@@ -48,7 +54,12 @@ export const useNetworkEditor = (
 
 type EditorType = ReturnType<typeof useNetworkEditor>
 
-export const useInitialize = (id: string, networks: State.Network[], initialize: Function, dispatch: StateDispatch) => {
+export const useInitialize = (
+  id: string = '',
+  networks: State.Network[] = [],
+  initialize: Function,
+  dispatch: StateDispatch
+) => {
   useEffect(() => {
     if (id !== 'new') {
       const network = networks.find(n => n.id === id)
@@ -104,10 +115,10 @@ export const useIsInputsValid = (editor: EditorType, cachedNetwork: State.Networ
 }
 
 export const useHandleSubmit = (
-  id: string,
-  name: string,
-  remote: string,
-  networks: State.Network[],
+  id: string = '',
+  name: string = '',
+  remote: string = '',
+  networks: State.Network[] = [],
   dispatch: StateDispatch
 ) =>
   useCallback(() => {

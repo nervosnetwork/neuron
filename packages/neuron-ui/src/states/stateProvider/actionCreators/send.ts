@@ -1,8 +1,9 @@
-import { walletsCall, TransactionOutput } from 'services/UILayer'
+import { walletsCall } from 'services/UILayer'
 
 import { Message } from 'utils/const'
 import { verifyAddress } from 'utils/validators'
 import { CKBToShannonFormatter } from 'utils/formatters'
+import { TransactionOutput } from 'components/Send'
 
 import { AppActions } from '../reducer'
 

@@ -119,6 +119,9 @@ export default {
         title: '备份 Keystore 文件',
         password: '密码',
       },
+      transaction: {
+        title: '交易: {{hash}}',
+      },
     },
     prompt: {
       password: {

@@ -1,23 +1,31 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, List, TextField, Dropdown, PrimaryButton, DefaultButton, Spinner } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { Stack, List, TextField, Dropdown, PrimaryButton, DefaultButton, Spinner } from 'office-ui-fabric-react'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
+
 import { StateWithDispatch } from 'states/stateProvider/reducer'
+import appState from 'states/initStates/app'
 
 import { PlaceHolders, CapacityUnit } from 'utils/const'
 
 import { useInitialize } from './hooks'
 
+export interface TransactionOutput {
+  address: string
+  amount: string
+  unit: CapacityUnit
+}
+
 const Send = ({
-  app: { send },
-  wallet: { id: walletID, sending, balance },
+  app: { send = appState.send },
+  wallet: { id: walletID = '', sending = false, balance = '' },
   dispatch,
   history,
   match: {
-    params: { address },
+    params: { address = '' },
   },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
@@ -38,7 +46,7 @@ const Send = ({
     <Stack>
       <Stack.Item>
         <List
-          items={send.outputs}
+          items={send.outputs || []}
           onRenderCell={(item, idx) => {
             if (undefined === item || undefined === idx) return null
             return (
@@ -127,7 +135,7 @@ const Send = ({
             />
           )}
           <DefaultButton type="reset" onClick={onClear}>
-            Clear
+            {t('send.clear')}
           </DefaultButton>
         </Stack>
       </Stack.Item>

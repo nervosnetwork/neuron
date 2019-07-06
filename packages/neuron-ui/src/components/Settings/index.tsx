@@ -1,6 +1,7 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+
 import { Pivot, PivotItem } from 'office-ui-fabric-react'
 import { Routes } from 'utils/const'
 
@@ -12,6 +13,7 @@ const pivotItems = [
 
 const Settings = ({ location, history }: React.PropsWithoutRef<RouteComponentProps>) => {
   const [t] = useTranslation()
+
   return (
     <Pivot
       selectedKey={location.pathname}
@@ -28,5 +30,7 @@ const Settings = ({ location, history }: React.PropsWithoutRef<RouteComponentPro
     </Pivot>
   )
 }
+
+Settings.displayName = 'Settings'
 
 export default Settings

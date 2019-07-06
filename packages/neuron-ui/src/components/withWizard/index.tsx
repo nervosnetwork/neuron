@@ -60,8 +60,8 @@ const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) =
 Wizard.displayName = 'Wizard'
 
 const withWizard = (elements: Element[], initState: WithWizardState) => ({
-  settings: { wallets },
-  match: { url: rootPath },
+  settings: { wallets = [] },
+  match: { url: rootPath = '/wizard' },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [state, dispatch] = useReducer(reducer, initState)
 

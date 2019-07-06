@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { AppActions } from 'states/stateProvider/reducer'
-import { queryParsers } from 'utils/parser'
 import actionCreators from 'states/stateProvider/actionCreators'
+import { queryParsers } from 'utils/parser'
 
 const backToTop = () => {
   const container = document.querySelector('main') as HTMLElement
@@ -15,9 +15,9 @@ const backToTop = () => {
 }
 
 export const useSearch = (
-  search: string,
-  incomingKeywords: string,
-  addresses: { address: string }[],
+  search: string = '',
+  incomingKeywords: string = '',
+  addresses: { address: string }[] = [],
   dispatch: React.Dispatch<any>
 ) => {
   const [keywords, setKeywords] = useState('')

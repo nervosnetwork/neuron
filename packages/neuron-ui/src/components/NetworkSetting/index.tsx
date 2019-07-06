@@ -2,21 +2,23 @@ import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
-import actionCreators from 'states/stateProvider/actionCreators'
 
-import { appCalls } from 'services/UILayer'
-import { Routes } from 'utils/const'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+import chainState from 'states/initStates/chain'
+import { appCalls } from 'services/UILayer'
 
-const onContextMenu = (id: string) => () => {
+import { Routes } from 'utils/const'
+
+const onContextMenu = (id: string = '') => () => {
   appCalls.contextMenu({ type: 'networkList', id })
 }
 
-const Networks = ({
+const NetworkSetting = ({
+  chain = chainState,
+  settings: { networks = [] },
   dispatch,
   history,
-  chain,
-  settings: { networks },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
@@ -28,6 +30,10 @@ const Networks = ({
     },
     [dispatch]
   )
+
+  const goToCreateNetwork = useCallback(() => {
+    history.push(`${Routes.NetworkEditor}/new`)
+  }, [history])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
@@ -54,7 +60,7 @@ const Networks = ({
       <Stack.Item>
         <PrimaryButton
           text={t('settings.network.add-network')}
-          onClick={() => history.push(`${Routes.NetworkEditor}/new`)}
+          onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"
         />
       </Stack.Item>
@@ -62,4 +68,6 @@ const Networks = ({
   )
 }
 
-export default Networks
+NetworkSetting.displayName = 'NetworkSetting'
+
+export default NetworkSetting

@@ -1,6 +1,12 @@
 import { useState, useCallback } from 'react'
 import actionCreators from 'states/stateProvider/actionCreators'
 
+export const useGoBack = (history: any) => {
+  return useCallback(() => {
+    history.goBack()
+  }, [history])
+}
+
 export const useLocalDescription = (
   type: 'address' | 'transaction',
   ownsers: { key: string; description: string }[],
@@ -56,4 +62,4 @@ export const useLocalDescription = (
   }
 }
 
-export default { useLocalDescription }
+export default { useGoBack, useLocalDescription }

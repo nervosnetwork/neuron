@@ -1,13 +1,15 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+
+import { WalletWizardPath } from 'components/WalletWizard'
 
 import { appCalls } from 'services/UILayer'
 import { Routes, MnemonicAction } from 'utils/const'
-import { WalletWizardPath } from 'components/WalletWizard'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
 
 const buttons = [
   {
@@ -20,9 +22,9 @@ const buttons = [
   },
 ]
 
-const Wallets = ({
-  wallet: { id: currentID },
-  settings: { wallets },
+const WalletSetting = ({
+  wallet: { id: currentID = '' },
+  settings: { wallets = [] },
   dispatch,
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -36,14 +38,14 @@ const Wallets = ({
     [dispatch]
   )
   const onContextMenu = useCallback(
-    (id: string) => () => {
+    (id: string = '') => () => {
       appCalls.contextMenu({ type: 'walletList', id })
     },
     []
   )
 
   const navTo = useCallback(
-    (url: string) => () => {
+    (url: string = '/') => () => {
       history.push(url)
     },
     [history]
@@ -78,4 +80,6 @@ const Wallets = ({
   )
 }
 
-export default Wallets
+WalletSetting.displayName = 'WalletSetting'
+
+export default WalletSetting

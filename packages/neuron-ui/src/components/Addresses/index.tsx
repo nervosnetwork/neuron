@@ -1,49 +1,52 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { appCalls } from 'services/UILayer'
-import { useLocalDescription } from 'utils/hooks'
-
-import DescriptionField from 'widgets/InlineInput/DescriptionField'
 import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
+
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-const MIN_CELL_WIDTH = 100
+import { appCalls } from 'services/UILayer'
+
+import { useLocalDescription } from 'utils/hooks'
+import DescriptionField from 'widgets/InlineInput/DescriptionField'
+import { MIN_CELL_WIDTH } from 'utils/const'
 
 const addressColumns: IColumn[] = [
   {
     name: 'addresses.type',
     key: 'type',
     fieldName: 'type',
-    isResizable: true,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 120,
+    isResizable: true,
+    isCollapsible: false,
   },
   {
     name: 'addresses.address',
     key: 'address',
     fieldName: 'address',
     className: 'fixedWidth',
-    isResizable: true,
-    isCollapsible: false,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 450,
+    isResizable: true,
+    isCollapsible: false,
   },
   {
     name: 'addresses.description',
     key: 'description',
     fieldName: 'description',
-    isResizable: true,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 350,
+    isResizable: true,
+    isCollapsible: false,
   },
   {
     name: 'addresses.balance',
     key: 'balance',
     fieldName: 'balance',
-    isResizable: true,
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 250,
+    isResizable: true,
+    isCollapsible: false,
   },
   {
     name: 'addresses.transactions',
@@ -52,24 +55,30 @@ const addressColumns: IColumn[] = [
     minWidth: MIN_CELL_WIDTH,
     maxWidth: 150,
     isResizable: true,
+    isCollapsible: false,
   },
 ]
 
-const Addresses = ({ dispatch, wallet: { addresses } }: React.PropsWithoutRef<StateWithDispatch>) => {
+const Addresses = ({ dispatch, wallet: { addresses = [] } }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'address',
-    addresses.map(({ address: key, description }) => ({
-      key,
-      description,
-    })),
+    useMemo(
+      () =>
+        addresses.map(({ address: key, description }) => ({
+          key,
+          description,
+        })),
+      [addresses]
+    ),
     dispatch
   )
 
   const addressesItems = useMemo(
     () =>
       addresses.map(({ type, identifier, address, txCount, balance, description }, idx) => ({
+        key: identifier,
         type: type === 0 ? t('addresses.receiving-address') : t('addresses.change-address'),
         address,
         identifier,
@@ -86,7 +95,6 @@ const Addresses = ({ dispatch, wallet: { addresses } }: React.PropsWithoutRef<St
         ),
         balance,
         transactions: txCount,
-        key: identifier,
       })),
     [addresses, onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t]
   )
@@ -103,5 +111,7 @@ const Addresses = ({ dispatch, wallet: { addresses } }: React.PropsWithoutRef<St
     />
   )
 }
+
+Addresses.displayName = 'Addresses'
 
 export default Addresses

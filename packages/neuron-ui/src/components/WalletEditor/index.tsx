@@ -1,15 +1,29 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { Stack, TextField, PrimaryButton } from 'office-ui-fabric-react'
+import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps, Link } from 'react-router-dom'
-import { Routes } from 'utils/const'
+import { Stack, TextField, PrimaryButton } from 'office-ui-fabric-react'
+
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
-import { useAreParamsValid, useInputs, useWalletEditor } from './hooks'
+
+import { Routes } from 'utils/const'
+
+import { useAreParamsValid, useOnConfirm, useInputs, useWalletEditor } from './hooks'
+
+const WalletNotFound = () => {
+  const [t] = useTranslation()
+  return (
+    <div>
+      <p>{t('messages.wallet-is-not-found')}</p>
+      <Link to={Routes.SettingsWallets} className="btn btn-primary">
+        {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
+      </Link>
+    </div>
+  )
+}
 
 const WalletEditor = ({
+  settings: { wallets = [] },
   dispatch,
-  settings: { wallets },
   match: {
     params: { id },
   },
@@ -27,26 +41,10 @@ const WalletEditor = ({
 
   const inputs = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value)
-
-  const handleConfirm = useCallback(() => {
-    dispatch(
-      actionCreators.updateWallet({
-        id: wallet.id,
-        name: editor.name.value,
-      })
-    )
-  }, [editor.name.value, wallet.id, dispatch])
+  const onConfirm = useOnConfirm(editor.name.value, wallet.id, dispatch)
 
   if (!wallet.id) {
-    const label = `${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`
-    return (
-      <div>
-        <p>{t('messages.wallet-is-not-found')}</p>
-        <Link to={Routes.SettingsWallets} className="btn btn-primary">
-          {label}
-        </Link>
-      </div>
-    )
+    return <WalletNotFound />
   }
 
   return (
@@ -56,7 +54,7 @@ const WalletEditor = ({
         {inputs.map(inputProps => (
           <TextField {...inputProps} key={inputProps.label} required />
         ))}
-        <PrimaryButton onClick={handleConfirm} disabled={!areParamsValid} text={t('common.save')} />
+        <PrimaryButton onClick={onConfirm} disabled={!areParamsValid} text={t('common.save')} />
       </Stack.Item>
     </Stack>
   )

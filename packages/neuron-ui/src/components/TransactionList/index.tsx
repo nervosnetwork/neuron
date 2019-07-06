@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Text, DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
+
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
-import { Text, DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
-import { StateDispatch } from 'states/stateProvider/reducer'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
@@ -19,7 +20,7 @@ const onRenderHeader = ({ group }: any) => {
   return <Text variant="large">{name}</Text>
 }
 
-const TransactionList = ({ items, dispatch }: { items: State.Transaction[]; dispatch: StateDispatch }) => {
+const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[]; dispatch: StateDispatch }) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(

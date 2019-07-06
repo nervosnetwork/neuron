@@ -1,9 +1,12 @@
 import React, { useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+
 import styled from 'styled-components'
+
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
+
 import { localNumberFormatter } from 'utils/formatters'
 import { PAGE_SIZE } from 'utils/const'
 
@@ -36,13 +39,13 @@ const Field = styled.div`
 
 const General = ({
   dispatch,
-  wallet: { addresses, balance },
+  wallet: { addresses = [], balance = '' },
   chain: {
-    networkID,
-    transactions: { items },
-    tipBlockNumber,
+    networkID = '',
+    transactions: { items = [] },
+    tipBlockNumber = '0',
   },
-  settings: { networks },
+  settings: { networks = [] },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])

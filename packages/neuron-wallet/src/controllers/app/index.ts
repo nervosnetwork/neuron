@@ -195,7 +195,6 @@ export default class AppController {
 
   public static async showTransactionDetails(hash: string) {
     const win = new BrowserWindow({
-      titleBarStyle: 'hiddenInset',
       width: 1200,
       show: false,
       webPreferences: {
@@ -204,6 +203,7 @@ export default class AppController {
     })
     win.loadURL(`${env.mainURL}#/transaction/${hash}`)
     win.on('ready-to-show', () => {
+      win.setTitle(i18n.t(`messageBox.transaction.title`, { hash }))
       win.show()
       win.focus()
       AppController.initWindow(win)

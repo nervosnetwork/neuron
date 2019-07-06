@@ -1,22 +1,24 @@
 import React, { useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useGoBack } from 'utils/hooks'
 import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
 const NetworkEditor = ({
-  settings: { networks },
-  dispatch,
+  settings: { networks = [] },
   match: {
-    params: { id },
+    params: { id = '' },
   },
   history,
+  dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
   const editor = useNetworkEditor()
   const [t] = useTranslation()
   const inputs = useInputs(editor)
+  const goBack = useGoBack(history)
   useInitialize(id, networks, editor.initialize, dispatch)
 
   const cachedNetworks = useRef(networks)
@@ -28,14 +30,14 @@ const NetworkEditor = ({
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
-          <Stack.Item>
+          <Stack.Item key={inputProps.label}>
             <TextField {...inputProps} key={inputProps.label} underlined required />
           </Stack.Item>
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="space-between">
         <PrimaryButton disabled={invalidParams || notModified} onClick={handleSubmit} text={t('common.save')} />
-        <DefaultButton onClick={() => history.goBack()} text={t('common.cancel')} />
+        <DefaultButton onClick={goBack} text={t('common.cancel')} />
       </Stack>
     </Stack>
   )

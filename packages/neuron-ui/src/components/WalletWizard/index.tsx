@@ -5,6 +5,7 @@ import { Label, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
+
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
 import { helpersCall, walletsCall } from 'services/UILayer'
@@ -29,7 +30,7 @@ const submissionInputs = [
   { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
 ]
 
-const Welcome = ({ rootPath }: { rootPath: string }) => {
+const Welcome = ({ rootPath = '/wizard' }: { rootPath: string }) => {
   const [t] = useTranslation()
   const message = 'wizard.create-or-import-your-first-wallet'
 
@@ -58,12 +59,12 @@ const Welcome = ({ rootPath }: { rootPath: string }) => {
 Welcome.displayName = 'Welcome'
 
 const Mnemonic = ({
-  rootPath,
+  state = initState,
+  rootPath = '/wizard',
   match: {
-    params: { type },
+    params: { type = MnemonicAction.Create },
   },
   history,
-  state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
   const { generated, imported } = state
@@ -110,7 +111,11 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
-      history.push(`${rootPath}${WalletWizardPath.Submission}/${type === MnemonicAction.Verify ? 'create' : 'import'}`)
+      history.push(
+        `${rootPath}${WalletWizardPath.Submission}/${
+          type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
+        }`
+      )
     }
   }, [isCreate, history, rootPath, type])
 
@@ -127,12 +132,8 @@ const Mnemonic = ({
         description={t(hint)}
       />
       <RightScreenButtonRow>
-        <DefaultButton role="button" onClick={history.goBack}>
-          {t('wizard.back')}
-        </DefaultButton>
-        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
-          {t('wizard.next')}
-        </PrimaryButton>
+        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
+        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </RightScreenButtonRow>
     </>
   )
@@ -141,12 +142,12 @@ const Mnemonic = ({
 Mnemonic.displayName = 'Mnemonic'
 
 const Submission = ({
+  state = initState,
+  wallets = [],
   match: {
-    params: { type },
+    params: { type = MnemonicAction.Create },
   },
-  wallets,
   history,
-  state,
   dispatch,
 }: WizardElementProps<{ type: string }>) => {
   const { name, password, confirmPassword, imported } = state
@@ -195,7 +196,7 @@ const Submission = ({
       password,
       mnemonic: imported,
     }
-    if (type === 'create') {
+    if (type === MnemonicAction.Create) {
       walletsCall.create(p)
     } else {
       walletsCall.importMnemonic(p)
@@ -219,12 +220,8 @@ const Submission = ({
         </div>
       ))}
       <RightScreenButtonRow>
-        <DefaultButton role="button" onClick={history.goBack} onKeyPress={history.goBack}>
-          {t('wizard.back')}
-        </DefaultButton>
-        <PrimaryButton role="button" onClick={onNext} disabled={disableNext}>
-          {t('wizard.next')}
-        </PrimaryButton>
+        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
+        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </RightScreenButtonRow>
     </div>
   )

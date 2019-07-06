@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
-import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
 import { Search as SearchIcon } from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
@@ -12,9 +12,9 @@ import { Routes } from 'utils/const'
 import { useSearch } from './hooks'
 
 const History = ({
-  wallet: { addresses },
+  wallet: { addresses = [] },
   chain: {
-    transactions: { pageNo, pageSize, totalCount, items, keywords: incomingKeywords },
+    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
   },
   history,
   location: { search },
@@ -23,8 +23,8 @@ const History = ({
   const [t] = useTranslation()
 
   const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch)
-  const onSearch = () => history.push(`${Routes.History}?keywords=${keywords}`)
-  const totalPages = Math.ceil(totalCount / pageSize) || 1
+  const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize) || 1, [totalCount, pageSize])
 
   return (
     <Stack>
@@ -66,5 +66,7 @@ const History = ({
     </Stack>
   )
 }
+
+History.displayName = 'History'
 
 export default History
