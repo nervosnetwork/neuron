@@ -13,7 +13,6 @@ const menuItems = [
   { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send },
   { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
   { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
-  { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
   { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
 ]
 
