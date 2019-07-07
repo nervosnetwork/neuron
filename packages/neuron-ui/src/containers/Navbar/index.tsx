@@ -47,16 +47,24 @@ const Navbar = ({
   } = neuronWallet
   const [t] = useTranslation()
 
-  const pivotItems = useMemo(
-    () => (showAddressBook || pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1)),
-    [showAddressBook, pathname]
-  )
+  const pivotItems = useMemo(() => (showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)), [
+    showAddressBook,
+    pathname,
+  ])
+
+  const selectedKey = useMemo(() => {
+    const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
+    if (selectedTab) {
+      return selectedTab.key
+    }
+    return null
+  }, [pathname])
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) return null
 
   return (
     <Pivot
-      selectedKey={pathname.split('/')[1]}
+      selectedKey={selectedKey}
       onLinkClick={(pivotItem?: PivotItem) => {
         if (pivotItem && pivotItem.props) {
           const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')

@@ -105,6 +105,11 @@
         "wallets": "Wallets",
         "network": "Network"
       },
+      "general": {
+        "display-address-book-in-the-navbar": "Display the address book in the navigation",
+        "show": "Show",
+        "hide": "Hide"
+      },
       "wallet-manager": {
         "edit-wallet": {
           "wallet-name": "Wallet Name",
