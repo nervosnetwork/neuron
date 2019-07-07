@@ -1,5 +1,7 @@
+import { addressBook } from 'utils/localCache'
+
 export const settingsState: State.Settings = {
-  showAddressBook: false,
+  showAddressBook: addressBook.isVisible(),
   networks: [],
   wallets: [],
 }
