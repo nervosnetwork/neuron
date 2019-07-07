@@ -5,6 +5,7 @@ import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, Wa
 import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
+import { actionCreators } from 'states/stateProvider/actionCreators'
 
 const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
@@ -81,12 +82,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
             break
           }
           case AppMethod.ToggleAddressBook: {
-            dispatch({
-              type: NeuronWalletActions.Settings,
-              payload: {
-                toggleAddressBook: true,
-              },
-            })
+            dispatch(actionCreators.toggleAddressBook())
             break
           }
           default: {

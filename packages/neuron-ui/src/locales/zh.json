@@ -105,6 +105,11 @@
         "wallets": "钱包",
         "network": "网络"
       },
+      "general": {
+        "display-address-book-in-the-navbar": "导航栏中显示地址簿",
+        "show": "显示",
+        "hide": "隐藏"
+      },
       "wallet-manager": {
         "edit-wallet": {
           "wallet-name": "钱包名称",
