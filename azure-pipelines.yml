@@ -31,12 +31,11 @@ jobs:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: yarn global add lerna
-      name: Install
     - script: |
+        yarn global add lerna
         yarn bootstrap
         CI=false yarn build
-      name: Build
+      name: Bootstrap
     - script: CI=true yarn test
       name: Test
 
@@ -54,12 +53,11 @@ jobs:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: yarn global add lerna
-      name: Install
     - script: |
+        yarn global add lerna
         yarn bootstrap
         CI=false yarn build
-      name: Build
+      name: Bootstrap
     - script: |
         export DISPLAY=':99.0'
         Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -81,7 +79,7 @@ jobs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
     - script: yarn global add lerna
-      name: Install
+      displayName: 'Install lerna'
     - script: |
         yarn bootstrap
         set CI=false
@@ -105,9 +103,9 @@ jobs:
       inputs:
         versionSpec: 12.x
       displayName: 'Install Node.js'
-    - script: yarn global add lerna
-      name: Install
-    - script: yarn bootstrap
+    - script: |
+        yarn global add lerna
+        yarn bootstrap
       name: Bootstrap
     - script: yarn test:e2e
       name: Test
@@ -124,6 +122,7 @@ jobs:
     - script: |
         yarn global add lerna
         yarn bootstrap
+      name: Bootstrap
     - task: DownloadSecureFile@1
       name: macSiginingCertificate
       displayName: 'Download macOS Signing Certificate'
@@ -139,10 +138,8 @@ jobs:
       env:
         CSC_LINK: $(macSiginingCertificate.secureFilePath)
         CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
-        CSC_IDENTITY_AUTO_DISCOVERY: false
         WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
         WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
-        WIN_CSC_IDENTITY_AUTO_DISCOVERY: false
     - task: GitHubRelease@0
       inputs:
         gitHubConnection: nervos-bot
@@ -150,10 +147,10 @@ jobs:
         action: edit
         tag: $(Build.SourceBranchName)
         assets: |
-          $(Build.ArtifactStagingDirectory)/release/*.zip
-          $(Build.ArtifactStagingDirectory)/release/*.exe
-          $(Build.ArtifactStagingDirectory)/release/*.deb
-          $(Build.ArtifactStagingDirectory)/release/*.AppImage
+          $(Build.SourcesDirectory)/release/*.zip
+          $(Build.SourcesDirectory)/release/*.exe
+          $(Build.SourcesDirectory)/release/*.deb
+          $(Build.SourcesDirectory)/release/*.AppImage
         assetUploadMode: replace
         isPreRelease: true
         addChangeLog: false
