@@ -137,10 +137,8 @@ jobs:
       env:
         CSC_LINK: $(macSiginingCertificate.secureFilePath)
         CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
-        CSC_IDENTITY_AUTO_DISCOVERY: false
         WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
         WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
-        WIN_CSC_IDENTITY_AUTO_DISCOVERY: false
     - task: GitHubRelease@0
       inputs:
         gitHubConnection: nervos-bot
