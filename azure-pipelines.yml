@@ -78,12 +78,13 @@ jobs:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      displayName: 'Install lerna'
     - script: |
-        yarn global add lerna
         yarn bootstrap
         set CI=false
         yarn build
-      name: Bootstrap
+      name: Build
     - script: |
         set CI=true
         yarn test
