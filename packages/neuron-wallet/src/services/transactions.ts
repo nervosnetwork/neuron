@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection, In } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
 import {
   OutPoint,
@@ -51,11 +51,12 @@ enum TxSaveType {
   Fetch = 'fetch',
 }
 
-enum OutputStatus {
+export enum OutputStatus {
   Sent = 'sent',
   Live = 'live',
   Pending = 'pending',
   Dead = 'dead',
+  Failed = 'failed',
 }
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -98,15 +99,14 @@ export default class TransactionsService {
         .map(i => BigInt(i.capacity))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
-      // TODO: add failed status
-      const status = tx.outputs[0].status === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
       return {
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
-        status,
+        status: tx.status,
+        description: tx.description,
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
       }
@@ -246,10 +246,11 @@ export default class TransactionsService {
 
       const previousOutputs: OutputEntity[] = previousOutputsWithUndefined.filter(o => !!o) as OutputEntity[]
 
-      // should update timestamp / blockNumber / blockHash
+      // should update timestamp / blockNumber / blockHash / status
       txEntity.timestamp = transaction.timestamp
       txEntity.blockHash = transaction.blockHash
       txEntity.blockNumber = transaction.blockNumber
+      txEntity.status = TransactionStatus.Success
       await connection.manager.save([txEntity, ...outputs.concat(previousOutputs)])
 
       return txEntity
@@ -274,6 +275,8 @@ export default class TransactionsService {
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnesses!
     tx.description = transaction.description
+    // update tx status here
+    tx.status = outputStatus === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
     tx.inputs = []
     tx.outputs = []
     const inputs: InputEntity[] = []
@@ -458,6 +461,18 @@ export default class TransactionsService {
     }
   }
 
+  public static blake160sOfTx = (tx: TransactionWithoutHash | Transaction) => {
+    let inputBlake160s: string[] = []
+    let outputBlake160s: string[] = []
+    if (tx.inputs) {
+      inputBlake160s = tx.inputs.map(input => input.lock!.args![0])
+    }
+    if (tx.outputs) {
+      outputBlake160s = tx.outputs.map(output => output.lock.args![0])
+    }
+    return [...new Set(inputBlake160s.concat(outputBlake160s))]
+  }
+
   // tx count with one lockHash
   public static getCountByLockHash = async (lockHash: string): Promise<number> => {
     const outputs: OutputEntity[] = await getConnection()
@@ -488,6 +503,86 @@ export default class TransactionsService {
   public static getCountByAddress = async (address: string): Promise<number> => {
     const lockHash: string = await LockUtils.addressToLockHash(address)
     return TransactionsService.getCountByLockHash(lockHash)
+  }
+
+  public static pendings = async (): Promise<TransactionEntity[]> => {
+    const pendingTransactions = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        status: TransactionStatus.Pending,
+      })
+      .getMany()
+
+    return pendingTransactions
+  }
+
+  // update tx status to TransactionStatus.Failed
+  // update outputs status to OutputStatus.Failed
+  // update previous outputs (inputs) to OutputStatus.Live
+  public static updateFailedTxs = async (hashes: string[]) => {
+    const txs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .leftJoinAndSelect('tx.inputs', 'input')
+      .leftJoinAndSelect('tx.outputs', 'output')
+      .where({
+        hash: In(hashes),
+        status: TransactionStatus.Pending,
+      })
+      .getMany()
+
+    const txToUpdate = txs.map(tx => {
+      const transaction = tx
+      transaction.status = TransactionStatus.Failed
+      return transaction
+    })
+    const allOutputs = txs
+      .map(tx => tx.outputs)
+      .reduce((acc, val) => acc.concat(val), [])
+      .map(o => {
+        const output = o
+        output.status = OutputStatus.Failed
+        return output
+      })
+    const allInputs = txs.map(tx => tx.inputs).reduce((acc, val) => acc.concat(val), [])
+    const previousOutputs = await Promise.all(
+      allInputs.map(async input => {
+        const output = await getConnection()
+          .getRepository(OutputEntity)
+          .createQueryBuilder('output')
+          .where({
+            outPointTxHash: input.outPointTxHash,
+            outPointIndex: input.outPointIndex,
+          })
+          .getOne()
+        if (output) {
+          output.status = OutputStatus.Live
+        }
+        return output
+      })
+    )
+    const previous = previousOutputs.filter(output => output) as OutputEntity[]
+    await getConnection().manager.save([...txToUpdate, ...allOutputs, ...previous])
+    const blake160s = txs.map(tx => TransactionsService.blake160sOfTx(tx.toInterface()))
+    const uniqueBlake160s = [...new Set(blake160s.reduce((acc, val) => acc.concat(val), []))]
+    return uniqueBlake160s
+  }
+
+  public static updateDescription = async (hash: string, description: string) => {
+    const transactionEntity = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash,
+      })
+      .getOne()
+
+    if (!transactionEntity) {
+      return undefined
+    }
+    transactionEntity.description = description
+    return getConnection().manager.save(transactionEntity)
   }
 }
 

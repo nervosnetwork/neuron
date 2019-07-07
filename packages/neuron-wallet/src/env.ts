@@ -4,9 +4,8 @@ import { NetworkWithID } from './services/networks'
 
 const { NODE_ENV } = process.env
 
-const isDevMode = !app.isPackaged
-
 const isTestMode = NODE_ENV === 'test'
+const isDevMode = !app.isPackaged && !isTestMode
 
 const fileBase = (() => {
   if (isTestMode) {
@@ -24,7 +23,7 @@ interface ENV {
   mainURL: string
   remote: string
   presetNetworks: {
-    active: 'testnet'
+    current: 'testnet'
     list: NetworkWithID[]
   }
   explorer: string
@@ -34,10 +33,10 @@ interface ENV {
 const env: ENV = {
   isDevMode,
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),
-  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../ui/index.html')}`,
+  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
   remote: 'http://localhost:8114',
   presetNetworks: {
-    active: 'testnet',
+    current: 'testnet',
     list: [
       {
         id: 'testnet',

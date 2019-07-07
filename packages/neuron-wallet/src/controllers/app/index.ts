@@ -24,25 +24,17 @@ const nodeService = NodeService.getInstance()
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
     const [
-      activeWallet,
-      wallets,
-      activeNetworkId,
-      networks,
-      transactions,
-      addresses,
-      tipNumber,
-      connectStatus,
+      currentWallet = null,
+      wallets = [],
+      currentNetworkID = '',
+      networks = [],
+      tipNumber = '0',
+      connectStatus = false,
     ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
-      networksService.activeId(),
+      networksService.getCurrentID(),
       networksService.getAll(),
-      TransactionsController.getAllByAddresses({
-        pageNo: 1,
-        pageSize: 15,
-        addresses: '',
-      }).then(res => res.result),
-      WalletsController.getAllAddresses().then(res => res.result),
       new Promise(resolve => {
         nodeService.tipNumberSubject.pipe(take(1)).subscribe(
           tipNum => {
@@ -64,15 +56,23 @@ export default class AppController {
         )
       }),
     ])
+    const addresses: Controller.Address[] = await (currentWallet
+      ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+      : [])
 
+    const transactions = await TransactionsController.getAllByKeywords({
+      pageNo: 1,
+      pageSize: 15,
+      keywords: addresses.map(addr => addr.address).join(','),
+    }).then(res => res.result)
     const locale = app.getLocale()
     const initState = {
-      activeWallet: activeWallet && {
-        ...activeWallet,
+      currentWallet: currentWallet && {
+        ...currentWallet,
       },
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
-      activeNetworkId,
+      currentNetworkID,
       networks,
       transactions,
       locale,
@@ -195,7 +195,6 @@ export default class AppController {
 
   public static async showTransactionDetails(hash: string) {
     const win = new BrowserWindow({
-      titleBarStyle: 'hiddenInset',
       width: 1200,
       show: false,
       webPreferences: {
@@ -204,6 +203,7 @@ export default class AppController {
     })
     win.loadURL(`${env.mainURL}#/transaction/${hash}`)
     win.on('ready-to-show', () => {
+      win.setTitle(i18n.t(`messageBox.transaction.title`, { hash }))
       win.show()
       win.focus()
       AppController.initWindow(win)

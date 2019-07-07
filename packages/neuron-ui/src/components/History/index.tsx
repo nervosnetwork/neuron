@@ -1,44 +1,45 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
-import { Container, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
-
-import TransactionList from 'components/TransactionList'
-
-import { ContentProps } from 'containers/MainContent'
+import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
 import { Search as SearchIcon } from 'grommet-icons'
 
-import { useNeuronWallet } from 'utils/hooks'
+import TransactionList from 'components/TransactionList'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+
 import { Routes } from 'utils/const'
 
 import { useSearch } from './hooks'
 
 const History = ({
+  wallet: { addresses = [] },
+  chain: {
+    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
+  },
+  history,
   location: { search },
-  errorMsgs,
   dispatch,
-  providerDispatch,
-}: React.PropsWithoutRef<ContentProps & RouteComponentProps>) => {
-  const {
-    chain: {
-      transactions: { pageNo, pageSize, totalCount, items, keywords: incomingKeywords },
-    },
-  } = useNeuronWallet()
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, dispatch, providerDispatch)
-  const totalPages = Math.ceil(totalCount / pageSize) || 1
+  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch)
+  const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize) || 1, [totalCount, pageSize])
 
   return (
-    <Container>
-      <h1>{t('navbar.history')}</h1>
-      {errorMsgs.transaction ? <Alert variant="warning">{t(`messages.${errorMsgs.transactions}`)}</Alert> : null}
-      <div style={{ display: 'flex' }}>
-        <input type="text" alt="search" value={keywords} onChange={onKeywordsChange} />
-        <NavLink to={`${Routes.History}?keywords=${keywords}`}>
+    <Stack>
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 15 }}>
+        <SearchBox
+          value={keywords}
+          styles={{ root: { width: 200 } }}
+          placeholder="Search"
+          onChange={onKeywordsChange}
+          onSearch={onSearch}
+        />
+        <DefaultButton onClick={onSearch}>
           <SearchIcon />
-        </NavLink>
-      </div>
+        </DefaultButton>
+      </Stack>
       <TransactionList items={items} dispatch={dispatch} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <NavLink to={`${Routes.History}?pageNo=1`}>{t('history.first')}</NavLink>
@@ -62,8 +63,10 @@ const History = ({
         </NavLink>
         <NavLink to={`${Routes.History}?pageNo=${totalPages}`}>{t('history.last')}</NavLink>
       </div>
-    </Container>
+    </Stack>
   )
 }
+
+History.displayName = 'History'
 
 export default History

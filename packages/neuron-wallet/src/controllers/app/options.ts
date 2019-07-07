@@ -31,14 +31,14 @@ export const contextMenuTemplate: {
 } = {
   networkList: async (id: string) => {
     const { result: network } = await NetworksController.get(id)
-    const { result: activeNetworkId } = await NetworksController.activeId()
-    const isActive = activeNetworkId === id
+    const { result: currentNetworkID } = await NetworksController.currentID()
+    const isCurrent = currentNetworkID === id
     const isDefault = network.type === 0
 
     return [
       {
         label: i18n.t('contextMenu.select'),
-        enabled: !isActive,
+        enabled: !isCurrent,
         click: () => {
           NetworksController.activate(id)
         },
@@ -63,7 +63,7 @@ export const contextMenuTemplate: {
                 name: network.name,
                 address: network.remote,
               }),
-              detail: isActive ? i18n.t('messageBox.remove-network.alert') : '',
+              detail: isCurrent ? i18n.t('messageBox.remove-network.alert') : '',
               buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
             },
             (btnIdx: number) => {
@@ -132,12 +132,6 @@ export const contextMenuTemplate: {
         label: i18n.t('contextMenu.copy-address'),
         click: () => {
           clipboard.writeText(address)
-        },
-      },
-      {
-        label: i18n.t('contextMenu.copy-identifier'),
-        click: () => {
-          clipboard.writeText(identifier)
         },
       },
       {

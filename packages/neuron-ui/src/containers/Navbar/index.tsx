@@ -1,54 +1,85 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { NavLink } from 'react-router-dom'
-import {
-  Local as IconGeneral,
-  Upload as IconSend,
-  Download as IconReceive,
-  History as IconHistory,
-  Database as IconAddresses,
-} from 'grommet-icons'
+import { RouteComponentProps } from 'react-router-dom'
+import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize, getTheme } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'states/stateProvider'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { useNeuronWallet } from 'utils/hooks'
-import { Routes } from 'utils/const'
+import { Routes, FULL_SCREENS } from 'utils/const'
 
 const menuItems = [
-  { name: 'navbar.general', route: Routes.General, icon: IconGeneral },
-  { name: 'navbar.send', route: Routes.Send, icon: IconSend },
-  { name: 'navbar.receive', route: Routes.Receive, icon: IconReceive },
-  { name: 'navbar.history', route: Routes.History, icon: IconHistory },
-  { name: 'navbar.addresses', route: Routes.Addresses, icon: IconAddresses },
+  { name: 'navbar.general', key: Routes.General.slice(1), url: Routes.General },
+  { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send },
+  { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
+  { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
+  { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
+  { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
 ]
 
-const Navbar = () => {
+const theme = getTheme()
+const styles = {
+  root: [
+    {
+      background: theme.palette.neutralLighter,
+      height: '44px',
+    },
+  ],
+  link: [
+    {
+      padding: '0 30px',
+    },
+  ],
+  linkIsSelected: [
+    {
+      padding: '0 30px',
+    },
+  ],
+}
+
+const Navbar = ({
+  location: { pathname },
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+  const neuronWallet = useState()
   const {
-    settings: { wallets, showAddressBook },
-  } = useNeuronWallet()
+    settings: { wallets = [], showAddressBook = false },
+  } = neuronWallet
   const [t] = useTranslation()
 
-  return wallets.length ? (
-    <>
-      {(showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)).map(menuItem => (
-        <NavLink
-          key={menuItem.name}
-          to={menuItem.route}
-          isActive={match => {
-            return !!match
-          }}
-          style={{
-            paddingRight: '15px',
-          }}
-          activeStyle={{
-            fontWeight: 'bolder',
-          }}
-        >
-          {<menuItem.icon size="20px" style={{ paddingRight: '5px' }} />}
-          {t(menuItem.name)}
-        </NavLink>
+  const pivotItems = useMemo(
+    () => (showAddressBook || pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1)),
+    [showAddressBook, pathname]
+  )
+
+  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) return null
+
+  return (
+    <Pivot
+      selectedKey={pathname.split('/')[1]}
+      onLinkClick={(pivotItem?: PivotItem) => {
+        if (pivotItem && pivotItem.props) {
+          const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')
+          if (linkDesc && typeof linkDesc.value === 'string') {
+            history.push(linkDesc.value)
+          }
+        }
+      }}
+      headersOnly
+      linkFormat={PivotLinkFormat.tabs}
+      linkSize={PivotLinkSize.large}
+      styles={styles}
+    >
+      {pivotItems.map(pivotItem => (
+        <PivotItem
+          headerText={t(pivotItem.name)}
+          itemKey={pivotItem.key}
+          key={pivotItem.key}
+          data-link={pivotItem.url}
+        />
       ))}
-    </>
-  ) : null
+    </Pivot>
+  )
 }
 
 Navbar.displayName = 'Navbar'

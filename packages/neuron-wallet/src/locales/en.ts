@@ -65,7 +65,7 @@ export default {
       'invalid-address': 'Address {{address}} is invalid',
       'codehash-not-loaded': 'codehash is not loaded',
       'wallet-not-found': 'Wallet {{id}} not found',
-      'no-active-wallet': 'No active wallet',
+      'no-current-wallet': 'No current wallet',
       'wallet-incorrect-password': 'Incorrect password',
       'failed-to-create-mnemonic': 'Failed to create mnemonic',
       'failed-to-activate-wallet': 'Failed to activate wallet',
@@ -74,7 +74,7 @@ export default {
       'invalid-name': '{{field}} name is invalid',
       'default-network-unremovable': 'Default network is unremovable',
       'lack-of-default-network': 'Lack of default network',
-      'active-network-not-set': 'Active network is not set',
+      'current-network-not-set': 'Current network is not set',
       'transaction-not-found': 'Transaction {{hash}} is not found',
       'service-not-respond': '{{service}} service not respond',
       'parameters-of-sending-transactions-are-required': 'Parameters of sending transactions are required',
@@ -94,7 +94,6 @@ export default {
       edit: 'Edit',
       delete: 'Delete',
       'copy-address': 'Copy Address',
-      'copy-identifier': 'Copy Identifier',
       'request-payment': 'Request Payment',
       'spend-from': 'Spend From',
       'view-on-explorer': 'View On Explorer',
@@ -120,6 +119,9 @@ export default {
       'backup-keystore': {
         title: 'Backup the Keystore',
         password: 'Password',
+      },
+      transaction: {
+        title: 'Transaction: {{hash}}',
       },
     },
     prompt: {

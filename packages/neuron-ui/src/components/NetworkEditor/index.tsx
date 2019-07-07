@@ -1,34 +1,24 @@
 import React, { useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Card, Form, Button, Alert } from 'react-bootstrap'
 import { useTranslation } from 'react-i18next'
+import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
 
-import { ContentProps } from 'containers/MainContent'
-
-import InlineInput, { InputProps } from 'widgets/InlineInput'
-import { useNeuronWallet } from 'utils/hooks'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useGoBack } from 'utils/hooks'
 import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
-export interface RawNetwork {
-  name: string
-  remote: string
-}
-
-const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
-  const {
-    dispatch,
-    errorMsgs,
-    match: {
-      params: { id },
-    },
-    history,
-  } = props
+const NetworkEditor = ({
+  settings: { networks = [] },
+  match: {
+    params: { id = '' },
+  },
+  history,
+  dispatch,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
   const editor = useNetworkEditor()
-  const {
-    settings: { networks },
-  } = useNeuronWallet()
   const [t] = useTranslation()
-  const inputs: InputProps[] = useInputs(editor)
+  const inputs = useInputs(editor)
+  const goBack = useGoBack(history)
   useInitialize(id, networks, editor.initialize, dispatch)
 
   const cachedNetworks = useRef(networks)
@@ -37,30 +27,19 @@ const NetworkEditor = (props: React.PropsWithoutRef<ContentProps & RouteComponen
   const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, dispatch)
 
   return (
-    <Card>
-      <Card.Header>{id === 'new' ? t('settings.network.edit-network.title') : 'name'}</Card.Header>
-      {errorMsgs.networks ? <Alert variant="warning">{errorMsgs.networks}</Alert> : null}
-      <Card.Body>
-        <Form>
-          {inputs.map(inputProps => (
-            <InlineInput {...inputProps} key={inputProps.label} />
-          ))}
-        </Form>
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          block
-          disabled={invalidParams || notModified}
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
-        <Button type="reset" variant="primary" size="lg" block onClick={() => history.goBack()}>
-          Cancel
-        </Button>
-      </Card.Body>
-    </Card>
+    <Stack tokens={{ childrenGap: 15 }}>
+      <Stack tokens={{ childrenGap: 15 }}>
+        {inputs.map(inputProps => (
+          <Stack.Item key={inputProps.label}>
+            <TextField {...inputProps} key={inputProps.label} underlined required />
+          </Stack.Item>
+        ))}
+      </Stack>
+      <Stack horizontal horizontalAlign="space-between">
+        <PrimaryButton disabled={invalidParams || notModified} onClick={handleSubmit} text={t('common.save')} />
+        <DefaultButton onClick={goBack} text={t('common.cancel')} />
+      </Stack>
+    </Stack>
   )
 }
 

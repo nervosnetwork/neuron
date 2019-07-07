@@ -4,7 +4,11 @@ trigger:
     include:
       - master
       - develop
+      - e2e-tests
       - rc/*
+  tags:
+    include:
+      - '*'
 
 pr:
   autoCancel: true
@@ -87,3 +91,69 @@ jobs:
         set CI=true
         yarn test
       name: Test
+
+  - job: Integration
+    condition: |
+      or(
+        eq(variables['build.sourceBranch'], 'refs/heads/e2e-tests'),
+        startsWith(variables['Build.SourceBranch'], 'refs/heads/rc/')
+      )
+    pool:
+      vmImage: 'macos-10.14'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 12.x
+      displayName: 'Install Node.js'
+    - script: yarn global add lerna
+      name: Install
+    - script: yarn bootstrap
+      name: Bootstrap
+    - script: yarn test:e2e
+      name: Test
+
+  - job: Package
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+    pool:
+      vmImage: 'macos-10.14'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 12.x
+      displayName: 'Install Node.js'
+    - script: |
+        yarn global add lerna
+        yarn bootstrap
+    - task: DownloadSecureFile@1
+      name: macSiginingCertificate
+      displayName: 'Download macOS Signing Certificate'
+      inputs:
+        secureFile: Neuron_mac.p12
+    - task: DownloadSecureFile@1
+      name: winSiginingCertificate
+      displayName: 'Download Windows Signing Certificate'
+      inputs:
+        secureFile: Neuron_win.p12
+    - script: yarn package
+      name: Build
+      env:
+        CSC_LINK: $(macSiginingCertificate.secureFilePath)
+        CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
+        CSC_IDENTITY_AUTO_DISCOVERY: false
+        WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
+        WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
+        WIN_CSC_IDENTITY_AUTO_DISCOVERY: false
+    - task: GitHubRelease@0
+      inputs:
+        gitHubConnection: nervos-bot
+        repositoryName: nervosnetwork/neuron
+        action: edit
+        tag: $(Build.SourceBranchName)
+        assets: |
+          $(Build.ArtifactStagingDirectory)/release/*.zip
+          $(Build.ArtifactStagingDirectory)/release/*.exe
+          $(Build.ArtifactStagingDirectory)/release/*.deb
+          $(Build.ArtifactStagingDirectory)/release/*.AppImage
+        assetUploadMode: replace
+        isPreRelease: true
+        addChangeLog: false

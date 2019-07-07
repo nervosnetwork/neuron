@@ -1,20 +1,11 @@
-import { useState, useCallback, useEffect, useContext } from 'react'
-import NeuronWalletContext from 'contexts/NeuronWallet'
-import { actionCreators } from 'containers/MainContent/reducer'
+import { useState, useCallback } from 'react'
+import actionCreators from 'states/stateProvider/actionCreators'
 
-export const useFullscreen = (fullscreen: boolean) => {
-  useEffect(() => {
-    const content = document.querySelector('.main-content') as HTMLElement
-    if (fullscreen) {
-      content.classList.add('full-screen')
-    }
-    return () => {
-      content.classList.remove('full-screen')
-    }
-  }, [fullscreen])
+export const useGoBack = (history: any) => {
+  return useCallback(() => {
+    history.goBack()
+  }, [history])
 }
-
-export const useNeuronWallet = () => useContext(NeuronWalletContext)
 
 export const useLocalDescription = (
   type: 'address' | 'transaction',
@@ -43,7 +34,6 @@ export const useLocalDescription = (
     },
     [submitDescription]
   )
-
   const onDescriptionPress = useCallback(
     (idx: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key && e.key === 'Enter') {
@@ -52,14 +42,15 @@ export const useLocalDescription = (
     },
     [submitDescription]
   )
-
   const onDescriptionChange = useCallback(
-    (idx: number) => (e: any) => {
-      const newDesc = localDescription.map((desc, index) => {
-        if (index !== idx) return desc
-        return e.currentTarget.value
-      })
-      setLocalDescription(newDesc)
+    (idx: number) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+      if (undefined !== newValue) {
+        const newDesc = localDescription.map((desc, index) => {
+          if (index !== idx) return desc
+          return newValue
+        })
+        setLocalDescription(newDesc)
+      }
     },
     [localDescription, setLocalDescription]
   )
@@ -71,4 +62,4 @@ export const useLocalDescription = (
   }
 }
 
-export default { useLocalDescription, useFullscreen, useNeuronWallet }
+export default { useGoBack, useLocalDescription }

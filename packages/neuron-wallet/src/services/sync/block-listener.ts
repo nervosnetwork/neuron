@@ -8,7 +8,7 @@ import Utils from './utils'
 export default class BlockListener {
   private lockHashes: string[]
   private tipBlockNumber: number = -1
-  private queue: Queue | undefined = undefined
+  private queue: Queue | undefined | null = undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
   private interval: number = 5000
@@ -40,18 +40,22 @@ export default class BlockListener {
   /* eslint no-await-in-loop: "off" */
   /* eslint no-constant-condition: "off" */
   public start = async () => {
-    while (true) {
+    while (this.queue !== null) {
       await this.regenerate()
       await Utils.sleep(this.interval)
     }
   }
 
-  public stop = async () => {
+  public stop = async (drainCall?: any) => {
     if (!this.queue) {
       return
     }
     await this.queue.kill()
-    this.queue = undefined
+    await this.queue.get().remove(() => true)
+    if (drainCall) {
+      this.queue.get().drain(drainCall)
+    }
+    this.queue = null
   }
 
   public pause = () => {

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
-import { MainActions } from 'containers/MainContent/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import i18n from 'utils/i18n'
 
 export const useWalletEditor = () => {
@@ -14,7 +15,8 @@ export const useWalletEditor = () => {
     initialize,
     name: {
       value: name,
-      onChange: (e: React.FormEvent<Pick<any, string>>) => setName(e.currentTarget.value),
+      onChange: (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) =>
+        undefined !== value && setName(value),
     },
   }
 }
@@ -33,27 +35,26 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
   )
 }
 
+export const useOnConfirm = (name: string = '', id: string = '', dispatch: StateDispatch) => {
+  return useCallback(() => {
+    dispatch(
+      actionCreators.updateWallet({
+        id,
+        name,
+      })
+    )
+  }, [name, id, dispatch])
+}
+
 export const useAreParamsValid = (name: string) => {
   return useMemo(() => {
     return !(name === '')
   }, [name])
 }
 
-export const useToggleDialog = (dispatch: React.Dispatch<any>) =>
-  useCallback(
-    (open: boolean) => {
-      dispatch({
-        type: MainActions.SetDialog,
-        payload: {
-          open,
-        },
-      })
-    },
-    [dispatch]
-  )
-
 export default {
   useWalletEditor,
   useInputs,
+  useOnConfirm,
   useAreParamsValid,
 }

@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { History } from 'history'
-import { TransactionOutput } from 'services/UILayer'
-import { MainActions, actionCreators } from 'containers/MainContent/reducer'
-import { CapacityUnit } from 'utils/const'
-import initState from 'containers/MainContent/state'
-import { MainDispatch } from '../../containers/MainContent/reducer'
+import { IDropdownOption } from 'office-ui-fabric-react'
 
-const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import actionCreators from 'states/stateProvider/actionCreators'
+
+import { TransactionOutput } from '.'
+
+const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
     (field: string) => (idx: number) => (value: string) => {
       dispatch({
-        type: MainActions.UpdateSendOutput,
+        type: AppActions.UpdateSendOutput,
         payload: {
           idx,
           item: {
@@ -22,88 +22,93 @@ const useUpdateTransactionOutput = (dispatch: React.Dispatch<any>) =>
     [dispatch]
   )
 
-const useAddTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
-      type: MainActions.AddSendOutput,
+      type: AppActions.AddSendOutput,
+      payload: null,
     })
   }, [dispatch])
 
-const useRemoveTransactionOutput = (dispatch: React.Dispatch<any>) =>
+const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
-    (idx: number) => {
+    (idx: number = -1) => {
       dispatch({
-        type: MainActions.RemoveSendOutput,
+        type: AppActions.RemoveSendOutput,
         payload: idx,
       })
     },
     [dispatch]
   )
 
-const useOnSubmit = (dispatch: React.Dispatch<any>) =>
+const useOnSubmit = (dispatch: StateDispatch) =>
   useCallback(
-    (id: string, items: TransactionOutput[], description: string) => () => {
+    (id: string = '', walletID: string = '', items: TransactionOutput[] = [], description: string = '') => () => {
       setTimeout(() => {
-        dispatch(actionCreators.submitTransaction(id, items, description))
+        dispatch(actionCreators.submitTransaction(id, walletID, items, description))
       }, 10)
     },
     [dispatch]
   )
 
-const useOnItemChange = (updateTransactionOutput: Function) => (field: string, idx: number) => (
-  e: React.FormEvent<{ value: string }>
+const useOnItemChange = (updateTransactionOutput: Function) => (field: string = '', idx: number = -1) => (
+  _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+  value?: string
 ) => {
-  updateTransactionOutput(field)(idx)(e.currentTarget.value)
+  if (undefined !== value) {
+    updateTransactionOutput(field)(idx)(value)
+  }
 }
 
-const useDropdownItems = (updateTransactionOutput: Function) =>
+const useCapacityUnitChange = (updateTransactionOutput: Function) =>
   useCallback(
-    (idx: number) =>
-      Object.values(CapacityUnit)
-        .filter(unit => typeof unit === 'string')
-        .map((unit: string) => ({
-          label: unit.toUpperCase(),
-          key: unit,
-          onClick: () => updateTransactionOutput('unit')(idx)(unit),
-        })),
+    (idx: number = -1) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+      if (option) {
+        updateTransactionOutput('unit')(idx)(option.key)
+      }
+    },
     [updateTransactionOutput]
   )
 
-const useUpdateTransactionPrice = (dispatch: any) =>
+const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
-    (e: any) => {
-      dispatch({
-        type: MainActions.UpdateSendPrice,
-        paylaod: e.currentTarget.value,
-      })
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: AppActions.UpdateSendPrice,
+          payload: value,
+        })
+      }
     },
     [dispatch]
   )
 
-const useSendDescriptionChange = (dispatch: MainDispatch) =>
+const useSendDescriptionChange = (dispatch: StateDispatch) =>
   useCallback(
-    (e: React.SyntheticEvent<HTMLInputElement>) => {
-      dispatch({
-        type: MainActions.UpdateSendDescription,
-        payload: e.currentTarget.value,
-      })
+    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        dispatch({
+          type: AppActions.UpdateSendDescription,
+          payload: value,
+        })
+      }
     },
     [dispatch]
   )
 
-const clear = (dispatch: MainDispatch) => {
+const clear = (dispatch: StateDispatch) => {
   dispatch({
-    type: MainActions.UpdateSendState,
-    payload: initState.send,
+    type: AppActions.ClearSendState,
+    payload: null,
   })
 }
 
-const useClear = (dispatch: MainDispatch) => useCallback(() => clear(dispatch), [dispatch])
+const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
 
-export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: History) => {
+export const useInitialize = (address: string, dispatch: React.Dispatch<any>, history: any) => {
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
-  const dropdownItems = useDropdownItems(updateTransactionOutput)
+  const onCapacityUnitChange = useCapacityUnitChange(updateTransactionOutput)
   const onSubmit = useOnSubmit(dispatch)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
@@ -120,13 +125,14 @@ export const useInitialize = (address: string, dispatch: React.Dispatch<any>, hi
     }
   }, [address, dispatch, history, updateTransactionOutput])
 
+  // TODO: generate new id on every submission
   const id = useMemo(() => Math.round(Math.random() * 1000).toString(), [])
 
   return {
     id,
     updateTransactionOutput,
     onItemChange,
-    dropdownItems,
+    onCapacityUnitChange,
     onSubmit,
     addTransactionOutput,
     removeTransactionOutput,

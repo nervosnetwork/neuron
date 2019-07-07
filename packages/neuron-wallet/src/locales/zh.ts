@@ -64,7 +64,7 @@ export default {
       'invalid-address': '地址 {{address}} 不合法',
       'codehash-not-loaded': 'codehash 还未加载完成',
       'wallet-not-found': '未找到钱包 {{id}}',
-      'no-active-wallet': '没有默认钱包',
+      'no-current-wallet': '没有默认钱包',
       'wallet-incorrect-password': '密码错误',
       'failed-to-create-mnemonic': '创建助记词失败',
       'failed-to-activate-wallet': '设置默认钱包失败',
@@ -73,7 +73,7 @@ export default {
       'invalid-name': '{{field}} 名称不合法',
       'default-network-unremovable': '默认网络不可删除',
       'lack-of-default-network': '缺少默认网络',
-      'active-network-not-set': '未设置当前网络',
+      'current-network-not-set': '未设置当前网络',
       'transaction-not-found': '未找到交易 {{hash}}',
       'service-not-respond': '{{service}} 服务未响应',
       'parameters-of-sending-transactions-are-required': '缺少交易参数',
@@ -93,7 +93,6 @@ export default {
       edit: '编辑',
       delete: '删除',
       'copy-address': '复制地址',
-      'copy-identifier': '复制 ID',
       'request-payment': '请求支付',
       'spend-from': '支付来源',
       'view-on-explorer': '在浏览器中查看',
@@ -119,6 +118,9 @@ export default {
       'backup-keystore': {
         title: '备份 Keystore 文件',
         password: '密码',
+      },
+      transaction: {
+        title: '交易: {{hash}}',
       },
     },
     prompt: {

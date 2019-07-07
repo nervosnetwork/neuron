@@ -1,38 +1,36 @@
-import { ContentProps } from 'containers/MainContent'
-import { actionCreators } from 'containers/MainContent/reducer'
-import React, { useCallback, useEffect, useMemo } from 'react'
-import { Button, Card, Form } from 'react-bootstrap'
+import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps, Link } from 'react-router-dom'
-import { useNeuronWallet } from 'utils/hooks'
-import InlineInput, { InputProps } from 'widgets/InlineInput'
-import { Routes } from 'utils/const'
-import { useAreParamsValid, useInputs, useToggleDialog, useWalletEditor } from './hooks'
+import { Stack, TextField, PrimaryButton } from 'office-ui-fabric-react'
 
-export default ({
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+
+import { Routes } from 'utils/const'
+
+import { useAreParamsValid, useOnConfirm, useInputs, useWalletEditor } from './hooks'
+
+const WalletNotFound = () => {
+  const [t] = useTranslation()
+  return (
+    <div>
+      <p>{t('messages.wallet-is-not-found')}</p>
+      <Link to={Routes.SettingsWallets} className="btn btn-primary">
+        {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
+      </Link>
+    </div>
+  )
+}
+
+const WalletEditor = ({
+  settings: { wallets = [] },
   dispatch,
   match: {
     params: { id },
   },
-}: React.PropsWithoutRef<ContentProps & RouteComponentProps<{ id: string }>>) => {
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
   const [t] = useTranslation()
-  const {
-    settings: { wallets },
-  } = useNeuronWallet()
 
-  const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets])
-
-  if (!wallet) {
-    const label = `${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`
-    return (
-      <div>
-        <p>{t('messages.wallet-is-not-found')}</p>
-        <Link to={Routes.SettingsWallets} className="btn btn-primary">
-          {label}
-        </Link>
-      </div>
-    )
-  }
+  const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets]) || { id: '', name: '' }
 
   const editor = useWalletEditor()
   const { initialize } = editor
@@ -41,33 +39,27 @@ export default ({
     initialize(wallet.name)
   }, [id, initialize, wallet.name])
 
-  const inputs: InputProps[] = useInputs(editor)
+  const inputs = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value)
-  const toggleDialog = useToggleDialog(dispatch)
+  const onConfirm = useOnConfirm(editor.name.value, wallet.id, dispatch)
 
-  const handleConfirm = useCallback(() => {
-    toggleDialog(false)
-    dispatch(
-      actionCreators.updateWallet({
-        id: wallet.id,
-        name: editor.name.value,
-      })
-    )
-  }, [editor.name.value, wallet.id, dispatch, toggleDialog])
+  if (!wallet.id) {
+    return <WalletNotFound />
+  }
 
   return (
-    <Card>
-      <Card.Header>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Card.Header>
-      <Card.Body>
-        <Form>
-          {inputs.map(inputProps => (
-            <InlineInput {...inputProps} key={inputProps.label} />
-          ))}
-        </Form>
-        <Button type="submit" variant="primary" size="lg" block onClick={handleConfirm} disabled={!areParamsValid}>
-          {t('common.save')}
-        </Button>
-      </Card.Body>
-    </Card>
+    <Stack>
+      <Stack.Item>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Stack.Item>
+      <Stack.Item>
+        {inputs.map(inputProps => (
+          <TextField {...inputProps} key={inputProps.label} required />
+        ))}
+        <PrimaryButton onClick={onConfirm} disabled={!areParamsValid} text={t('common.save')} />
+      </Stack.Item>
+    </Stack>
   )
 }
+
+WalletEditor.displayName = 'WalletEditor'
+
+export default WalletEditor

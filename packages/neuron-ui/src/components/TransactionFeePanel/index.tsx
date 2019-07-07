@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { CaretDown as DownIcon } from 'grommet-icons'
+import { CaretDown } from 'grommet-icons'
 
 const Panel = styled.div``
 const PanelHeader = styled.div`
@@ -52,7 +52,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
         Transaction Fee:
         {fee}
       </span>
-      <DownIcon />
+      <CaretDown />
     </PanelHeader>
     <PanelBody>
       <Price>

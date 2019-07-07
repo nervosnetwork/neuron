@@ -2,6 +2,7 @@ import { getConnection, In } from 'typeorm'
 import OutputEntity from '../database/chain/entities/output'
 import { Cell, OutPoint, Input } from '../types/cell-types'
 import { CapacityNotEnough } from '../exceptions'
+import { OutputStatus } from './transactions'
 
 const MIN_CELL_CAPACITY = '40'
 
@@ -9,13 +10,13 @@ const MIN_CELL_CAPACITY = '40'
 /* eslint no-await-in-loop: "warn" */
 /* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
-  public static getBalance = async (lockHashes: string[]): Promise<string> => {
+  public static getBalance = async (lockHashes: string[], status: OutputStatus): Promise<string> => {
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
-          status: 'live',
+          status,
         },
       })
 

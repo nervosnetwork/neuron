@@ -20,6 +20,7 @@ import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManager from '../../models/window-manager'
 import AddressService from '../../services/addresses'
+import WalletCreatedSubject from '../../models/subjects/wallet-created-subject'
 
 const walletsService = WalletsService.getInstance()
 
@@ -53,6 +54,47 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async importMnemonic({
+    name,
+    password,
+    mnemonic,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    const result = await WalletsController.createByMnemonic({
+      name,
+      password,
+      mnemonic,
+    })
+
+    WalletCreatedSubject.getSubject().next('import')
+
+    return result
+  }
+
+  @CatchControllerError
+  public static async create({
+    name,
+    password,
+    mnemonic,
+  }: {
+    name: string
+    password: string
+    mnemonic: string
+  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    const result = await WalletsController.createByMnemonic({
+      name,
+      password,
+      mnemonic,
+    })
+
+    WalletCreatedSubject.getSubject().next('create')
+
+    return result
+  }
+
+  private static async createByMnemonic({
     name,
     password,
     mnemonic,
@@ -98,23 +140,6 @@ export default class WalletsController {
         name: wallet.name,
       },
     }
-  }
-
-  @CatchControllerError
-  public static async create({
-    name,
-    password,
-    mnemonic,
-  }: {
-    name: string
-    password: string
-    mnemonic: string
-  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    return WalletsController.importMnemonic({
-      name,
-      password,
-      mnemonic,
-    })
   }
 
   @CatchControllerError
@@ -204,10 +229,6 @@ export default class WalletsController {
 
     return {
       status: ResponseCode.Success,
-      result: {
-        allWallets: walletsService.getAll(),
-        activeWallet: walletsService.getCurrent(),
-      },
     }
   }
 
@@ -232,45 +253,19 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async getActive() {
-    const activeWallet = walletsService.getCurrent()
-    if (!activeWallet) {
-      throw new CurrentWalletNotSet()
-    }
-    return {
-      status: ResponseCode.Success,
-      result: {
-        ...activeWallet,
-      },
-    }
-  }
-
-  @CatchControllerError
   public static async activate(id: string) {
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
-    if (!currentWallet) throw new CurrentWalletNotSet()
+    if (!currentWallet || id !== currentWallet.id) throw new CurrentWalletNotSet()
     return {
       status: ResponseCode.Success,
       result: currentWallet.toJSON(),
     }
-    // TODO: verification
   }
 
   @CatchControllerError
-  public static async getAllAddresses(id?: string) {
-    let walletId = id
-    if (walletId === undefined) {
-      const currentWallet = walletsService.getCurrent()
-      if (currentWallet) {
-        walletId = currentWallet.id
-      }
-    }
-
-    if (walletId === undefined) {
-      throw new CurrentWalletNotSet()
-    }
-    const addresses = await AddressService.allAddressesByWalletId(walletId).then(addrs =>
+  public static async getAllAddresses(id: string) {
+    const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
       addrs.map(({ address, blake160: identifier, addressType: type, txCount, balance, description = '' }) => ({
         address,
         identifier,
@@ -289,6 +284,7 @@ export default class WalletsController {
   @CatchControllerError
   public static async sendCapacity(params: {
     id: string
+    walletID: string
     items: {
       address: string
       capacity: string
@@ -308,7 +304,13 @@ export default class WalletsController {
         status: ResponseCode.Success,
         result: true,
       })
-      const hash = await walletsService.sendCapacity(params.items, password, params.fee, params.description)
+      const hash = await walletsService.sendCapacity(
+        params.walletID,
+        params.items,
+        password,
+        params.fee,
+        params.description
+      )
       return {
         status: ResponseCode.Success,
         result: hash,
@@ -330,12 +332,24 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async updateAddressDescription({ address, description }: { address: string; description: string }) {
-    // TODO: update description of specified address
+  public static async updateAddressDescription({
+    walletId,
+    address,
+    description,
+  }: {
+    walletId: string
+    address: string
+    description: string
+  }) {
+    const walletService = WalletsService.getInstance()
+    const wallet = walletService.get(walletId)
+
+    await AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,
       result: {
+        walletId,
         address,
         description,
       },

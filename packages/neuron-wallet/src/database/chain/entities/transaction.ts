@@ -1,7 +1,19 @@
-import { Entity, BaseEntity, PrimaryColumn, Column, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
-import { Witness, OutPoint, Transaction as TransactionInterface } from '../../../types/cell-types'
+import {
+  Entity,
+  BaseEntity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate,
+  AfterInsert,
+  AfterUpdate,
+  AfterRemove,
+} from 'typeorm'
+import { Witness, OutPoint, Transaction as TransactionInterface, TransactionStatus } from '../../../types/cell-types'
 import InputEntity from './input'
 import OutputEntity from './output'
+import TxDbChangedSubject from '../../../models/subjects/tx-db-changed-subject'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()
@@ -53,6 +65,11 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'varchar',
   })
+  status!: TransactionStatus
+
+  @Column({
+    type: 'varchar',
+  })
   createdAt!: string
 
   @Column({
@@ -78,6 +95,7 @@ export default class Transaction extends BaseEntity {
       blockHash: this.blockHash,
       witnesses: this.witnesses,
       description: this.description,
+      status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }
@@ -92,5 +110,24 @@ export default class Transaction extends BaseEntity {
   @BeforeUpdate()
   updateUpdatedAt() {
     this.updatedAt = Date.now().toString()
+  }
+
+  @AfterInsert()
+  emitInsert() {
+    this.changed('AfterInsert')
+  }
+
+  @AfterUpdate()
+  emitUpdate() {
+    this.changed('AfterUpdate')
+  }
+
+  @AfterRemove()
+  emitRemove() {
+    this.changed('AfterRemove')
+  }
+
+  private changed = (event: string) => {
+    TxDbChangedSubject.getSubject().next(event)
   }
 }

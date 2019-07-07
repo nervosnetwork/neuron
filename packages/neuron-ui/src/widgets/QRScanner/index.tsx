@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { Card, Button, InputGroup, FormControl } from 'react-bootstrap'
-import { Scan as ScanIcon } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter } from 'office-ui-fabric-react'
+import { Scan as ScanIcon } from 'grommet-icons'
 import jsQR from 'jsqr'
 
 import { drawPolygon } from 'utils/canvasActions'
-import Dialog from '../Dialog'
+// import Dialog from '../Dialog'
 
 interface QRScannerProps {
   title: string
@@ -102,54 +102,41 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         <ScanIcon />
       </button>
       <Dialog
-        open={open}
-        onClick={() => {
+        hidden={!open}
+        onDismiss={() => {
           setOpen(false)
         }}
+        maxWidth="900px"
+        minWidth="500xp"
       >
-        <Card
-          onClick={(e: React.SyntheticEvent<HTMLDivElement>) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-        >
-          <Card.Header>
-            <Card.Text>{title}</Card.Text>
-          </Card.Header>
-          <Card.Body>
-            <canvas ref={canvasRef} />
-          </Card.Body>
-          <Card.Footer>
-            <InputGroup>
-              <InputGroup.Prepend>
-                <InputGroup.Text>{label}</InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl readOnly value={data} />
-            </InputGroup>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
+        <h1>{title}</h1>
+        <div>
+          <canvas ref={canvasRef} />
+        </div>
+        <DialogFooter>
+          <TextField readOnly value={data} label={label} underlined />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            <PrimaryButton
+              onClick={() => {
+                onConfirm(data)
+                setOpen(false)
               }}
             >
-              <Button
-                onClick={() => {
-                  onConfirm(data)
-                  setOpen(false)
-                }}
-              >
-                {t('common.confirm')}
-              </Button>
-              <Button variant="light" onClick={() => setOpen(false)}>
-                {t('common.cancel')}
-              </Button>
-            </div>
-          </Card.Footer>
-        </Card>
+              {t('common.confirm')}
+            </PrimaryButton>
+            <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
+          </div>
+        </DialogFooter>
       </Dialog>
     </>
   )
 }
 
 QRScanner.displayName = 'QRScanner'
+
 export default QRScanner

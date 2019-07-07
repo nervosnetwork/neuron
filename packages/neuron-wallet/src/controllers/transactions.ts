@@ -30,6 +30,26 @@ export default class TransactionsController {
   }
 
   @CatchControllerError
+  public static async getAllByKeywords(
+    params: Controller.Params.TransactionsByKeywords
+  ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
+    const { keywords = '' } = params
+
+    // TODO: support date, hash, amount in the future
+    const res = await TransactionsController.getAllByAddresses({ ...params, addresses: keywords })
+    if (res.status === ResponseCode.Success && res.result) {
+      return {
+        ...res,
+        result: {
+          ...res.result,
+          keywords,
+        },
+      }
+    }
+    throw new Error(res.msg)
+  }
+
+  @CatchControllerError
   public static async getAllByAddresses(
     params: Controller.Params.TransactionsByAddresses
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
@@ -56,12 +76,12 @@ export default class TransactionsController {
   }
 
   @CatchControllerError
-  public static async get(hash: string): Promise<Controller.Response<Transaction>> {
+  public static async get(walletID: string, hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
 
     if (!transaction) throw new TransactionNotFound(hash)
 
-    const wallet = WalletsService.getInstance().getCurrent()
+    const wallet = WalletsService.getInstance().get(walletID)
     if (!wallet) throw new CurrentWalletNotSet()
     const addresses: string[] = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     const lockHashes: string[] = await Promise.all(
@@ -94,7 +114,8 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async updateDescription({ hash, description }: { hash: string; description: string }) {
-    // TODO: update description of specified transaction
+    await TransactionsService.updateDescription(hash, description)
+
     return {
       status: ResponseCode.Success,
       result: {

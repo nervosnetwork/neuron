@@ -1,7 +1,10 @@
 {
   "translation": {
+    "launch-screen": {
+      "loading-wallets": "加载钱包"
+    },
     "navbar": {
-      "general": "通用",
+      "general": "概观",
       "wallet": "钱包",
       "send": "转账",
       "receive": "收款",
@@ -44,13 +47,16 @@
       "address": "地址",
       "amount": "价值",
       "send": "发送",
+      "clear": "清楚",
       "confirm-password": "确认密码",
       "to": "至",
       "input-password-to-confirm": "输入密码以确认本次交易",
       "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫描二维码以获取地址",
       "description": "备注",
-      "balance": "余额"
+      "balance": "余额",
+      "add-one": "添加",
+      "remove-this": "删除"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
@@ -62,6 +68,7 @@
       "meta": "元信息",
       "type": "类型",
       "date": "时间",
+      "timestamp": "时间",
       "amount": "金额",
       "transaction-hash": "交易哈希",
       "send": "转账",
@@ -142,23 +149,22 @@
     },
     "messages": {
       "at-least-one-address-needed": "需要至少一个地址",
-      "name-is-required": "缺少名称",
-      "url-is-required": "缺少 URL",
+      "name-required": "缺少名称",
+      "url-required": "缺少 URL",
+      "protocol-required": "请指定 URL 协议",
       "length-of-name-should-be-less-than-or-equal-to": "名称长度应不大于 {{length}}",
-      "network-name-exists": "节点名称已存在",
+      "network-name-used": "节点名称已存在",
       "invalid-address": "无效的地址",
       "invalid-amount": "无效的价值",
-      "amount-is-not-enough": "余额不足",
+      "amount-not-enough": "余额不足",
       "is-unremovable": "{{target}}不可删除",
       "create-wallet-success": "您已成功创建钱包 '{{name}}'",
       "network-is-not-found": "未找到节点信息",
-      "name-has-been-used": "名称已被使用",
       "failed-to-initiate,-please-reopen-Neuron": "初始化失败, 请新打开 Neuron",
       "no-wallet": "没有钱包",
       "wallet-imported-successfully": "{{name}} 导入成功",
       "wallet-created-successfully": "{{name}} 创建成功",
       "wallet-updated-successfully": "{{name}} 更新成功",
-      "protocol-is-required": "请指定 URL 协议",
       "wallet-not-found": "未找到钱包",
       "no-transactions": "没有交易"
     }

@@ -9,6 +9,10 @@ import createMainWindow from './startup/create-main-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
 import initConnection from './database/address/ormconfig'
 import WalletsService from './services/wallets'
+import { register as registerAddressListener } from './listener/address'
+
+// register to listen address updates
+registerAddressListener()
 
 const walletsService = WalletsService.getInstance()
 
@@ -38,7 +42,7 @@ app.on('ready', async () => {
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
-  updateApplicationMenu(wallets, currentWallet && currentWallet.id)
+  updateApplicationMenu(wallets, currentWallet ? currentWallet.id : null)
   await initConnection()
   createSyncBlockTask()
   openWindow()

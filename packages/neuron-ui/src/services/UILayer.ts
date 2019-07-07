@@ -1,7 +1,4 @@
-import { Network } from 'contexts/NeuronWallet'
-import { RawNetwork } from 'components/NetworkEditor'
-
-import { CapacityUnit, Channel } from 'utils/const'
+import { Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
@@ -27,7 +24,7 @@ export enum WalletsMethod {
   Update = 'update',
   Delete = 'delete',
   Export = 'export',
-  GetActive = 'getActive',
+  GetCurrent = 'getCurrent',
   Activate = 'activate',
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
@@ -43,24 +40,18 @@ export enum NetworksMethod {
   Update = 'update',
   Delete = 'delete',
   Activate = 'activate',
-  ActiveId = 'activeId',
+  CurrentID = 'currentID',
 }
 
 export enum TransactionsMethod {
   GetAll = 'getAll',
-  GetAllByAddresses = 'getAllByAddresses',
+  GetAllByKeywords = 'getAllByKeywords',
   Get = 'get',
   UpdateDescription = 'updateDescription',
 }
 
 export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
-}
-
-export interface TransactionOutput {
-  address: string
-  amount: string
-  unit: CapacityUnit
 }
 
 export interface GetTransactionsParams {
@@ -107,10 +98,10 @@ export const networks = (method: NetworksMethod, ...params: any[]) => {
 export const networksCall = instantiateMethodCall(networks) as {
   getAll: () => void
   get: (id: string) => void
-  create: (network: RawNetwork) => void
-  update: (id: string, options: Partial<Network>) => void
+  create: (network: State.NetworkProperty) => void
+  update: (id: string, options: Partial<State.Network>) => void
   delete: (id: string) => void
-  activeOne: () => void
+  currentOne: () => void
   activate: (id: string) => void
 }
 
@@ -119,8 +110,8 @@ export const transactions = (method: TransactionsMethod, params: string | GetTra
 }
 
 export const transactionsCall = instantiateMethodCall(transactions) as {
-  getAllByAddresses: (params: GetTransactionsParams) => void
-  get: (hash: string) => void
+  getAllByKeywords: (params: GetTransactionsParams) => void
+  get: (walletID: string, hash: string) => void
   updateDescription: (params: { hash: string; description: string }) => void
 }
 
@@ -134,6 +125,7 @@ export const wallets = (
     | { mnemonic: string; password: string }
     | { id: string; password: string }
     | { id: string; name?: string; password: string; newPassword?: string }
+    | { id: string; walletID: string; items: { address: string; capacity: string }[]; fee: string; description: string }
 ) => {
   UILayer.send(Channel.Wallets, method, params)
 }
@@ -148,11 +140,12 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   update: (params: { id: string; password?: string; newPassword?: string; name?: string }) => void
   delete: (id: string) => void
   export: (id: string) => void
-  getActive: () => void
+  getCurrent: () => void
   activate: (id: string) => void
   backup: (id: string) => void
   sendCapacity: (params: {
     id: string
+    walletID: string
     items: {
       address: string
       capacity: string
