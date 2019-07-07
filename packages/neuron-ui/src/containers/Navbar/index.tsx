@@ -53,12 +53,12 @@ const Navbar = ({
   ])
 
   const selectedKey = useMemo(() => {
-    const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
+    const selectedTab = pivotItems.find(item => item.key === pathname.split('/')[1])
     if (selectedTab) {
       return selectedTab.key
     }
     return null
-  }, [pathname])
+  }, [pathname, pivotItems])
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) return null
 
