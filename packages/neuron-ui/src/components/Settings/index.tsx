@@ -1,14 +1,15 @@
 import React, { useCallback } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Stack, Text, Pivot, PivotItem, PrimaryButton } from 'office-ui-fabric-react'
+
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
 
-import { Stack, Text, Pivot, PivotItem, PrimaryButton } from 'office-ui-fabric-react'
 import { Routes } from 'utils/const'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 const pivotItems = [
   { label: 'settings.setting-tabs.general', url: Routes.SettingsGeneral },

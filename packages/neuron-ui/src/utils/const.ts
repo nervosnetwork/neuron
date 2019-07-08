@@ -76,4 +76,10 @@ export enum MnemonicAction {
   Import = 'import',
 }
 
-export const FULL_SCREENS = [`${Routes.Transaction}/`, `/wizard/`, `${Routes.Settings}/`]
+export const FULL_SCREENS = [
+  `${Routes.Transaction}/`,
+  `/wizard/`,
+  `${Routes.Settings}/`,
+  `${Routes.WalletEditor}/`,
+  `${Routes.NetworkEditor}/`,
+]
