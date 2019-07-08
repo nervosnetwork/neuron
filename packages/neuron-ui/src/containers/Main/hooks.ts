@@ -12,7 +12,7 @@ const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
 }
 
-export const useChannelListeners = (i18n: any, history: any, chain: any, dispatch: StateDispatch) =>
+export const useChannelListeners = (i18n: any, history: any, chain: State.Chain, dispatch: StateDispatch) =>
   useEffect(() => {
     UILayer.on(
       Channel.Initiate,
@@ -136,6 +136,36 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
               type: NeuronWalletActions.Chain,
               payload: { transaction: args.result },
             })
+            break
+          }
+          case TransactionsMethod.TransactionUpdated: {
+            const updatedTransaction: State.Transaction = args.result
+            if (updatedTransaction.timestamp === null && chain.transactions.pageNo === 1) {
+              const newTransactionItems = [updatedTransaction, ...chain.transactions.items].slice(
+                0,
+                chain.transactions.pageSize
+              )
+              dispatch({
+                type: NeuronWalletActions.Chain,
+                payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
+              })
+            } else {
+              const newTransactionItems = [...chain.transactions.items]
+              const idx = newTransactionItems.findIndex(item => item.hash === updatedTransaction.hash)
+              if (idx >= 0) {
+                newTransactionItems[idx] = updatedTransaction
+                dispatch({
+                  type: NeuronWalletActions.Chain,
+                  payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
+                })
+              }
+            }
+            if (chain.transaction.hash === updatedTransaction.hash) {
+              dispatch({
+                type: NeuronWalletActions.Chain,
+                payload: { transaction: updatedTransaction },
+              })
+            }
             break
           }
           default: {
