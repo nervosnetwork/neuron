@@ -10,7 +10,7 @@ import actionCreators from 'states/stateProvider/actionCreators'
 import { localNumberFormatter } from 'utils/formatters'
 import { PAGE_SIZE } from 'utils/const'
 
-const GeneralPanel = styled.div`
+const OverviewPanel = styled.div`
   display: grid;
   grid-gap: 50px;
   grid-template:
@@ -54,7 +54,7 @@ const General = ({
     dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: defaultKeywords }))
   }, [dispatch, defaultKeywords])
   return (
-    <GeneralPanel>
+    <OverviewPanel>
       <Balance>
         <h1>{t('general.balance')}</h1>
         <Field>
@@ -108,7 +108,7 @@ const General = ({
           </>
         ) : null}
       </Blockchain>
-    </GeneralPanel>
+    </OverviewPanel>
   )
 }
 

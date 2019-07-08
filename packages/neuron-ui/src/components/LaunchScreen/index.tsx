@@ -17,7 +17,7 @@ export const LaunchScreen = ({
   useEffect(() => {
     if (!networks.length) return
     if (id) {
-      history.push(Routes.General)
+      history.push(Routes.Overview)
     } else {
       history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     }

@@ -19,7 +19,7 @@ const Addresses = ({
   const [t] = useTranslation()
   useEffect(() => {
     if (!showAddressBook) {
-      history.push(Routes.General)
+      history.push(Routes.Overview)
     }
   }, [showAddressBook])
 

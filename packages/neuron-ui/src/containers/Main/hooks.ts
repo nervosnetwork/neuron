@@ -168,7 +168,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
                 timestamp: Date.now(),
               },
             })
-            history.push(Routes.SettingsWallets)
+            history.push(Routes.Overview)
             break
           }
           case WalletsMethod.GetAll: {
