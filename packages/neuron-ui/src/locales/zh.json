@@ -100,6 +100,7 @@
       "change-address": "找零地址"
     },
     "settings": {
+      "go-to-overview": "返回概观",
       "setting-tabs": {
         "general": "通用",
         "wallets": "钱包",

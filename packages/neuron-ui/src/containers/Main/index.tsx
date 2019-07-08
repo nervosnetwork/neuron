@@ -12,10 +12,7 @@ import Receive from 'components/Receive'
 import History from 'components/History'
 import Transaction from 'components/Transaction'
 import Settings from 'components/Settings'
-import GeneralSetting from 'components/GeneralSetting'
 import Addresses from 'components/Addresses'
-import Wallets from 'components/WalletSetting'
-import NetworkSetting from 'components/NetworkSetting'
 import NetworkEditor from 'components/NetworkEditor'
 import WalletEditor from 'components/WalletEditor'
 import LaunchScreen from 'components/LaunchScreen'
@@ -75,24 +72,6 @@ export const mainContents: CustomRouter.Route[] = [
     path: Routes.Settings,
     exact: false,
     comp: Settings,
-  },
-  {
-    name: `GeneralSetting`,
-    path: Routes.SettingsGeneral,
-    exact: false,
-    comp: GeneralSetting,
-  },
-  {
-    name: `WalletsSetting`,
-    path: Routes.SettingsWallets,
-    exact: false,
-    comp: Wallets,
-  },
-  {
-    name: `NetworkSetting`,
-    path: Routes.SettingsNetworks,
-    exact: true,
-    comp: NetworkSetting,
   },
   {
     name: `NetworkEditor`,
