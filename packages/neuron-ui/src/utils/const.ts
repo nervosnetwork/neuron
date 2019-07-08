@@ -6,6 +6,7 @@ export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
 export const MIN_CELL_WIDTH = 100
+export const BUTTON_GAP = 20
 
 export enum ConnectStatus {
   Online = 'online',
