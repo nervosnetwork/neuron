@@ -48,6 +48,7 @@ export enum TransactionsMethod {
   GetAllByKeywords = 'getAllByKeywords',
   Get = 'get',
   UpdateDescription = 'updateDescription',
+  TransactionUpdated = 'transactionUpdated',
 }
 
 export enum HelpersMethod {
