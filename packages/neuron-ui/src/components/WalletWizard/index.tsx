@@ -170,7 +170,7 @@ const Mnemonic = ({
         onChange={onChange}
         description={t(hint)}
         styles={{
-          root: {
+          field: {
             fontSize: FontSizes.xLarge,
           },
           description: {
