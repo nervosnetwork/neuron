@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DetailsList, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
 
@@ -8,7 +9,7 @@ import { appCalls } from 'services/UILayer'
 
 import { useLocalDescription } from 'utils/hooks'
 import DescriptionField from 'widgets/InlineInput/DescriptionField'
-import { MIN_CELL_WIDTH } from 'utils/const'
+import { MIN_CELL_WIDTH, Routes } from 'utils/const'
 
 const addressColumns: IColumn[] = [
   {
@@ -59,8 +60,18 @@ const addressColumns: IColumn[] = [
   },
 ]
 
-const Addresses = ({ dispatch, wallet: { addresses = [] } }: React.PropsWithoutRef<StateWithDispatch>) => {
+const Addresses = ({
+  wallet: { addresses = [] },
+  settings: { showAddressBook = false },
+  dispatch,
+  history,
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    if (!showAddressBook) {
+      history.push(Routes.General)
+    }
+  }, [showAddressBook])
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'address',
