@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Label, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
+import { Label, PrimaryButton, DefaultButton, TextField, Stack, FontSizes } from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
-import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
 
 import { MnemonicAction } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
@@ -43,16 +42,16 @@ const Welcome = ({ rootPath = '/wizard' }: { rootPath: string }) => {
   )
 
   return (
-    <div>
+    <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t(message)}</h1>
-      <ScreenButtonRow>
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         {buttons.map(({ label, href }) => (
           <Link key={label} className="btn btn-primary" to={href}>
             {t(label)}
           </Link>
         ))}
-      </ScreenButtonRow>
-    </div>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -120,22 +119,23 @@ const Mnemonic = ({
   }, [isCreate, history, rootPath, type])
 
   return (
-    <>
+    <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t(message)}</h1>
       <TextField
         multiline
         resizable={false}
         rows={3}
-        disabled={isCreate}
+        readOnly={isCreate}
         value={isCreate ? generated : imported}
         onChange={onChange}
         description={t(hint)}
+        style={{ fontSize: FontSizes.xLarge }}
       />
-      <RightScreenButtonRow>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-      </RightScreenButtonRow>
-    </>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -206,7 +206,7 @@ const Submission = ({
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 
   return (
-    <div>
+    <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t(message)}</h1>
       {submissionInputs.map(input => (
         <div key={input.key}>
@@ -219,11 +219,12 @@ const Submission = ({
           />
         </div>
       ))}
-      <RightScreenButtonRow>
+
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-      </RightScreenButtonRow>
-    </div>
+      </Stack>
+    </Stack>
   )
 }
 

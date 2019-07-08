@@ -130,7 +130,7 @@
         "offline": "Offline",
         "add-network": "Add Network",
         "edit-network": {
-          "title": "Add Network",
+          "title": "Add or Edit Network",
           "rpc-url": "RPC URL",
           "name": "Name"
         }

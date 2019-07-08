@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Pivot, PivotItem, PrimaryButton } from 'office-ui-fabric-react'
+import { Stack, Pivot, PivotItem, IconButton } from 'office-ui-fabric-react'
+import { FormPreviousLink } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
@@ -51,7 +52,17 @@ const Settings = ({
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
-      <Text variant="large">{t('navbar.settings')}</Text>
+      <Stack horizontal>
+        <Stack.Item align="center">
+          <IconButton onClick={goToOverview}>
+            <FormPreviousLink />
+          </IconButton>
+        </Stack.Item>
+        <Stack.Item align="center">
+          <h1>{t('navbar.settings')}</h1>
+        </Stack.Item>
+      </Stack>
+
       <Pivot
         selectedKey={location.pathname}
         onLinkClick={(pivotItem?: PivotItem) => {
@@ -76,9 +87,6 @@ const Settings = ({
           }}
         />
       ))}
-      <Stack horizontalAlign="start">
-        <PrimaryButton onClick={goToOverview} text={t('settings.go-to-overview')} />
-      </Stack>
     </Stack>
   )
 }

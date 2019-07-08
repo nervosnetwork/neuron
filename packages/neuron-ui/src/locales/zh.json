@@ -128,16 +128,16 @@
       "network": {
         "online": "在线",
         "offline": "离线",
-        "add-network": "新增网络",
+        "add-network": "添加网络",
         "edit-network": {
-          "title": "新增网络",
+          "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
           "name": "名字"
         }
       }
     },
     "menuitem": {
-      "add": "新增",
+      "add": "添加",
       "update": "更新",
       "delete": "删除",
       "network": "网络",

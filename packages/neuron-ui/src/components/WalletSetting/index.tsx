@@ -59,7 +59,6 @@ const WalletSetting = ({
             key: wallet.id,
             text: wallet.name,
             checked: wallet.id === currentID,
-            disabled: wallet.id === currentID,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
                 <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
@@ -71,7 +70,7 @@ const WalletSetting = ({
           onChange={onChange}
         />
       </Stack.Item>
-      <Stack horizontal horizontalAlign="space-around">
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         {buttons.map(({ label, url }) => (
           <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
         ))}
