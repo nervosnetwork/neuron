@@ -100,6 +100,7 @@
       "change-address": "Change Address"
     },
     "settings": {
+      "go-to-overview": "Go to Overview",
       "setting-tabs": {
         "general": "General",
         "wallets": "Wallets",
