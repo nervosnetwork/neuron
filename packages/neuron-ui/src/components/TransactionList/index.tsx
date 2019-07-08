@@ -20,17 +20,31 @@ const onRenderHeader = ({ group }: any) => {
   return <Text variant="large">{name}</Text>
 }
 
-const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[]; dispatch: StateDispatch }) => {
+const TransactionList = ({
+  walletID,
+  items = [],
+  dispatch,
+}: {
+  walletID: string
+  items: State.Transaction[]
+  dispatch: StateDispatch
+}) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'transaction',
-    items.map(({ hash: key, description = '' }) => ({
-      key,
-      description,
-    })),
+    walletID,
+    useMemo(
+      () =>
+        items.map(({ hash: key, description = '' }) => ({
+          key,
+          description,
+        })),
+      [items]
+    ),
     dispatch
   )
+
   const transactionColumns: IColumn[] = useMemo(
     (): IColumn[] => [
       { name: t('history.type'), key: 'type', fieldName: 'type', minWidth: MIN_CELL_WIDTH, maxWidth: 150 },
@@ -56,7 +70,7 @@ const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[];
           return item && undefined !== idx ? (
             <TextField
               title={item.description}
-              value={localDescription[idx]}
+              value={localDescription[idx] || ''}
               onKeyPress={onDescriptionPress(idx)}
               onBlur={onDescriptionFieldBlur(idx)}
               onChange={onDescriptionChange(idx)}
@@ -68,6 +82,7 @@ const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[];
     ],
     [localDescription, onDescriptionChange, onDescriptionFieldBlur, onDescriptionPress, t]
   )
+
   const { groups, txs } = useMemo(() => {
     const gs: IGroup[] = [
       {
@@ -77,25 +92,23 @@ const TransactionList = ({ items = [], dispatch }: { items: State.Transaction[];
         count: 0,
       },
     ]
-    const ts = items
-      .sort((item1, item2) => +item2.timestamp - +item1.timestamp)
-      .map(item => {
-        if (item.status === 'pending') {
-          gs[0].count++
-        }
-        const date = timeFormatter.format(+item.timestamp)
-        if (date !== gs[gs.length - 1].key) {
-          gs.push({
-            key: date,
-            name: date,
-            startIndex: gs[gs.length - 1].count + gs[gs.length - 1].startIndex,
-            count: 1,
-          })
-        } else {
-          gs[gs.length - 1].count++
-        }
-        return { ...item, date }
-      })
+    const ts = items.map(item => {
+      if (item.status === 'pending') {
+        gs[0].count++
+      }
+      const date = timeFormatter.format(+item.timestamp)
+      if (date !== gs[gs.length - 1].key) {
+        gs.push({
+          key: date,
+          name: date,
+          startIndex: gs[gs.length - 1].count + gs[gs.length - 1].startIndex,
+          count: 1,
+        })
+      } else {
+        gs[gs.length - 1].count++
+      }
+      return { ...item, date }
+    })
     return { groups: gs, txs: ts }
   }, [items])
 

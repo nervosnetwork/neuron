@@ -12,7 +12,7 @@ import { Routes } from 'utils/const'
 import { useSearch } from './hooks'
 
 const History = ({
-  wallet: { addresses = [] },
+  wallet: { id, addresses = [] },
   chain: {
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
   },
@@ -40,7 +40,7 @@ const History = ({
           <SearchIcon />
         </DefaultButton>
       </Stack>
-      <TransactionList items={items} dispatch={dispatch} />
+      <TransactionList walletID={id} items={items} dispatch={dispatch} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <NavLink to={`${Routes.History}?pageNo=1`}>{t('history.first')}</NavLink>
         <NavLink
