@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps, Link } from 'react-router-dom'
-import { Stack, TextField, PrimaryButton } from 'office-ui-fabric-react'
+import { Stack, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { Routes } from 'utils/const'
 
+import { useGoBack } from 'utils/hooks'
 import { useAreParamsValid, useOnConfirm, useInputs, useWalletEditor } from './hooks'
 
 const WalletNotFound = () => {
@@ -23,6 +24,7 @@ const WalletNotFound = () => {
 
 const WalletEditor = ({
   settings: { wallets = [] },
+  history,
   dispatch,
   match: {
     params: { id },
@@ -42,20 +44,26 @@ const WalletEditor = ({
   const inputs = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value)
   const onConfirm = useOnConfirm(editor.name.value, wallet.id, dispatch)
+  const goBack = useGoBack(history)
 
   if (!wallet.id) {
     return <WalletNotFound />
   }
 
   return (
-    <Stack>
-      <Stack.Item>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</Stack.Item>
-      <Stack.Item>
+    <Stack tokens={{ childrenGap: 15 }}>
+      <h1>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</h1>
+      <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
-          <TextField {...inputProps} key={inputProps.label} required />
+          <Stack.Item key={inputProps.label}>
+            <TextField {...inputProps} key={inputProps.label} required />
+          </Stack.Item>
         ))}
+      </Stack>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+        <DefaultButton onClick={goBack} text={t('common.cancel')} />
         <PrimaryButton onClick={onConfirm} disabled={!areParamsValid} text={t('common.save')} />
-      </Stack.Item>
+      </Stack>
     </Stack>
   )
 }
