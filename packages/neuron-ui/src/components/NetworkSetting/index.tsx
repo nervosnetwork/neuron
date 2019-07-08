@@ -57,13 +57,13 @@ const NetworkSetting = ({
           onChange={onChoiceChange}
         />
       </Stack.Item>
-      <Stack.Item>
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         <PrimaryButton
           text={t('settings.network.add-network')}
           onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"
         />
-      </Stack.Item>
+      </Stack>
     </Stack>
   )
 }

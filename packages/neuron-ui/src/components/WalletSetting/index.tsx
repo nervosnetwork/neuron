@@ -71,7 +71,7 @@ const WalletSetting = ({
           onChange={onChange}
         />
       </Stack.Item>
-      <Stack horizontal horizontalAlign="space-around">
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         {buttons.map(({ label, url }) => (
           <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
         ))}
