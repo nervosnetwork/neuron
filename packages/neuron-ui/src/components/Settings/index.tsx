@@ -46,7 +46,7 @@ const Settings = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const goToOverview = useCallback(() => {
-    history.push(Routes.General)
+    history.push(Routes.Overview)
   }, [history])
 
   return (

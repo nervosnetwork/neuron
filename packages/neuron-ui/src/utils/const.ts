@@ -25,7 +25,7 @@ export enum Channel {
 
 export enum Routes {
   Launch = '/',
-  General = '/general',
+  Overview = '/overview',
   WalletWizard = '/wizard',
   Wallet = '/wallet',
   Send = '/send',

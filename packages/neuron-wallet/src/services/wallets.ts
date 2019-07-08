@@ -192,9 +192,7 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, [...this.getAll(), wallet.toJSON()])
 
-    if (this.getAll().length === 1) {
-      this.setCurrent(wallet.id)
-    }
+    this.setCurrent(wallet.id)
     return wallet
   }
 

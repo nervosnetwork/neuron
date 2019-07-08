@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 
-import General from 'components/General'
+import Overview from 'components/Overview'
 import WalletWizard from 'components/WalletWizard'
 import Send from 'components/Send'
 import Receive from 'components/Receive'
@@ -30,9 +30,9 @@ export const mainContents: CustomRouter.Route[] = [
   },
   {
     name: `General`,
-    path: Routes.General,
+    path: Routes.Overview,
     exact: true,
-    comp: General,
+    comp: Overview,
   },
   {
     name: `Send`,
