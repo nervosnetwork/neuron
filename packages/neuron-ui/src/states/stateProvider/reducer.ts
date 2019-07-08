@@ -78,13 +78,17 @@ export const reducer = (
       }
     }
     case NeuronWalletActions.Chain: {
-      return {
+      const newState: State.AppWithNeuronWallet = {
         ...state,
         chain: {
           ...chain,
           ...payload,
         },
       }
+      newState.chain.transactions.items = newState.chain.transactions.items.sort(
+        (item1, item2) => +item2.timestamp - +item1.timestamp
+      )
+      return newState
     }
     case NeuronWalletActions.Settings: {
       if (payload.toggleAddressBook) {

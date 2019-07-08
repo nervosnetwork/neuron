@@ -153,7 +153,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     fee: string
     description: string
   }) => void
-  updateAddressDescription: (params: { address: string; description: string }) => void
+  updateAddressDescription: (params: { walletID: string; address: string; description: string }) => void
 }
 
 export const helpers = (method: HelpersMethod, ...params: any) => {

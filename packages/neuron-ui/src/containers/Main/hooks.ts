@@ -6,6 +6,7 @@ import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
+import initStates from 'states/initStates'
 
 const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
@@ -36,9 +37,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
             networks = [],
             currentNetworkID: networkID = '',
             wallets = [],
-            currentWallet: wallet = { id: '', name: '' },
+            currentWallet: wallet = initStates.wallet,
             addresses = [],
-            transactions = [],
+            transactions = initStates.chain.transactions,
             tipNumber = '0',
             connectStatus = false,
           } = args.result

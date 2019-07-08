@@ -48,7 +48,6 @@ const Navbar = ({
 
   const pivotItems = useMemo(() => (showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)), [
     showAddressBook,
-    pathname,
   ])
 
   const selectedKey = useMemo(() => {

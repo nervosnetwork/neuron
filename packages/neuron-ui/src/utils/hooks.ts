@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import actionCreators from 'states/stateProvider/actionCreators'
 
 export const useGoBack = (history: any) => {
@@ -9,23 +9,29 @@ export const useGoBack = (history: any) => {
 
 export const useLocalDescription = (
   type: 'address' | 'transaction',
-  ownsers: { key: string; description: string }[],
+  walletID: string,
+  owners: { key: string; description: string }[],
   dispatch: any
 ) => {
-  const [localDescription, setLocalDescription] = useState(ownsers.map(owner => owner.description))
+  const [localDescription, setLocalDescription] = useState<string[]>([])
+
+  useEffect(() => {
+    setLocalDescription(owners.map(owner => owner.description))
+  }, [owners])
 
   const submitDescription = useCallback(
     (idx: number) => {
-      if (ownsers[idx].description === localDescription[idx]) return
+      if (owners[idx].description === localDescription[idx]) return
       dispatch(
         actionCreators.updateDescription({
           type,
-          key: ownsers[idx].key,
+          walletID,
+          key: owners[idx].key,
           description: localDescription[idx],
         })
       )
     },
-    [type, dispatch, localDescription, ownsers]
+    [type, walletID, dispatch, localDescription, owners]
   )
 
   const onDescriptionFieldBlur = useCallback(
@@ -35,7 +41,7 @@ export const useLocalDescription = (
     [submitDescription]
   )
   const onDescriptionPress = useCallback(
-    (idx: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+    (idx: number) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (e.key && e.key === 'Enter') {
         submitDescription(idx)
       }
@@ -43,12 +49,10 @@ export const useLocalDescription = (
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
-    (idx: number) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-      if (undefined !== newValue) {
-        const newDesc = localDescription.map((desc, index) => {
-          if (index !== idx) return desc
-          return newValue
-        })
+    (idx: number) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+      if (undefined !== value) {
+        const newDesc = [...localDescription]
+        newDesc[idx] = value
         setLocalDescription(newDesc)
       }
     },
