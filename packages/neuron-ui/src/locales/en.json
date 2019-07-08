@@ -25,20 +25,23 @@
       "rpc-service": "RPC Service"
     },
     "wizard": {
+      "create-a-wallet-with-fresh-mnemonic": "Create a wallet with fresh mnemonic words",
+      "import-a-wallet-with-existing-mnemonic": "Import a wallet with existing mnemonic words",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create New Wallet",
       "import-wallet": "Import Wallet",
       "next": "Next",
       "back": "Back",
       "name": "Name",
-      "your-wallet-seed-is": "Your wallet seed is",
-      "input-your-seed": "Input your seed",
+      "your-wallet-seed-is": "Your new mnemonic words have been generated",
+      "input-your-seed": "Please input your mnemonic words",
       "password": "Password",
       "confirm-password": "Confirm Password",
-      "set-wallet-name-and-password": "Set name and password to protect your wallet",
+      "set-wallet-name-and-password": "Set name of the new wallet, and add a password for security",
+      "set-wallet-name": "Set name of the new wallet",
       "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}",
-      "write-down-seed": "Write down your seed and save it in a safe place"
+      "write-down-seed": "Write down your mnemonic words and save them in a safe place"
     },
     "detail": {
       "more-transactions": "More"
