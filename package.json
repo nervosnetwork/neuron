@@ -20,7 +20,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap && lerna link",
     "start:ui": "lerna run --scope=@nervosnetwork/neuron-ui start",
-    "start:wallet": "lerna run --scope=@nervosnetwork/neuron-wallet start:dev",
+    "start:wallet": "lerna exec --scope=@nervosnetwork/neuron-wallet -- yarn run start:dev",
     "start": "concurrently \"cross-env BROWSER=none yarn run start:ui\" \"wait-on http://localhost:3000 && yarn run start:wallet\"",
     "clean": "lerna run --stream clean",
     "prebuild": "yarn clean",
