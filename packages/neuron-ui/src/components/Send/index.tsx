@@ -52,7 +52,7 @@ const Send = ({
   } = useInitialize(address, dispatch, history)
 
   return (
-    <Stack verticalFill styles={{ root: { backgroundColor: 'white', padding: '15px' } }} tokens={{ childrenGap: 15 }}>
+    <Stack verticalFill tokens={{ childrenGap: 15 }}>
       <Stack.Item>
         <List
           items={send.outputs || []}
