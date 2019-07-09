@@ -21,7 +21,7 @@ const Addresses = ({
     if (!showAddressBook) {
       history.push(Routes.Overview)
     }
-  }, [showAddressBook])
+  }, [showAddressBook, history])
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'address',
@@ -113,7 +113,7 @@ const Addresses = ({
       columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
       items={addresses}
       onItemContextMenu={item => {
-        appCalls.contextMenu({ type: 'addressList', id: item.key })
+        appCalls.contextMenu({ type: 'addressList', id: item.identifier })
       }}
     />
   )
