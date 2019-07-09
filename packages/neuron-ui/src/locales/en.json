@@ -4,7 +4,7 @@
       "loading-wallets": "Loading wallets"
     },
     "navbar": {
-      "general": "Overview",
+      "overview": "Overview",
       "wallet": "Wallet",
       "send": "Send",
       "receive": "Receive",
@@ -12,17 +12,20 @@
       "addresses": "Addresses",
       "settings": "Settings"
     },
-    "general": {
+    "overview": {
       "balance": "Balance",
-      "amount": "Amount",
       "live-cells": "Live Cells",
       "cell-types": "Cell Types",
       "recent-activities": "Recent Activites",
       "no-recent-activities": "No Recent Activities",
       "blockchain-status": "Blockchain Status",
       "blockchain-identity": "Chain Identity",
-      "block-height": "Block Height",
-      "rpc-service": "RPC Service"
+      "block-number": "Block Number",
+      "rpc-service": "RPC Service",
+      "type": "Type",
+      "datetime": "Date & Time",
+      "status": "Status",
+      "amount": "Amount"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "Welcome to Nervos CKB",

@@ -9,7 +9,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes, FULL_SCREENS } from 'utils/const'
 
 const menuItems = [
-  { name: 'navbar.general', key: Routes.Overview.slice(1), url: Routes.Overview },
+  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview },
   { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send },
   { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
   { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
