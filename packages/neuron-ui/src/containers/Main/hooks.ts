@@ -140,7 +140,11 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
           }
           case TransactionsMethod.TransactionUpdated: {
             const updatedTransaction: State.Transaction = args.result
-            if (updatedTransaction.timestamp === null && chain.transactions.pageNo === 1) {
+            if (
+              (updatedTransaction.timestamp === null ||
+                +updatedTransaction.timestamp > +chain.transactions.items[0].timestamp) &&
+              chain.transactions.pageNo === 1
+            ) {
               const newTransactionItems = [updatedTransaction, ...chain.transactions.items].slice(
                 0,
                 chain.transactions.pageSize
