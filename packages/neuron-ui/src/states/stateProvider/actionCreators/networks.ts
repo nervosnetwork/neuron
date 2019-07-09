@@ -85,7 +85,9 @@ export default {
     }
   },
   deleteNetwork: (id?: string) => {
-    if (id === undefined) throw new Error('No network id found')
+    if (id === undefined) {
+      throw new Error('No network id found')
+    }
     if (id === UNREMOVABLE_NETWORK_ID) {
       return {
         type: AppActions.AddNotification,

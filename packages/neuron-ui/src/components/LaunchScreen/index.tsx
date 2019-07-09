@@ -15,7 +15,9 @@ export const LaunchScreen = ({
   const { t } = useTranslation()
 
   useEffect(() => {
-    if (!networks.length) return
+    if (!networks.length) {
+      return
+    }
     if (id) {
       history.push(Routes.Overview)
     } else {

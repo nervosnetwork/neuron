@@ -17,8 +17,9 @@ const ENTROPY_TOO_SHORT = `Entropy should be longer than ${MIN_ENTROPY_SIZE - 1}
 const WORDS_TOO_LONG = `Words should be shorter than ${MAX_WORDS_SIZE + 1}`
 const WORDS_TOO_SHORT = `Words should be longer than ${MIN_WORDS_SIZE - 1}`
 
-if (wordList.length !== RADIX)
+if (wordList.length !== RADIX) {
   throw new Error(`Word list should have ${RADIX} words, but ${wordList.length} received in fact`)
+}
 
 const bytesToBinary = (bytes: Buffer): string => {
   return bytes.reduce((binary, byte) => {
@@ -52,7 +53,9 @@ export function mnemonicToSeed(mnemonic: string = '', password: string = ''): Pr
       const mnemonicBuffer = Buffer.from(mnemonic.normalize('NFKD'), 'utf8')
       const saltBuffer = Buffer.from(salt(password.normalize('NFKD')), 'utf8')
       crypto.pbkdf2(mnemonicBuffer, saltBuffer, PBKDF2_ROUNDS, KEY_LEN, 'sha512', (err, data) => {
-        if (err) reject(err)
+        if (err) {
+          reject(err)
+        }
         resolve(data)
       })
     } catch (error) {
@@ -63,13 +66,21 @@ export function mnemonicToSeed(mnemonic: string = '', password: string = ''): Pr
 
 export function mnemonicToEntropy(mnemonic: string = '') {
   const words = mnemonic.normalize('NFKD').split(' ')
-  if (words.length < MIN_WORDS_SIZE) throw new Error(WORDS_TOO_SHORT)
-  if (words.length > MAX_WORDS_SIZE) throw new Error(WORDS_TOO_LONG)
-  if (words.length % 3 !== 0) throw new Error(INVALID_MNEMONIC)
+  if (words.length < MIN_WORDS_SIZE) {
+    throw new Error(WORDS_TOO_SHORT)
+  }
+  if (words.length > MAX_WORDS_SIZE) {
+    throw new Error(WORDS_TOO_LONG)
+  }
+  if (words.length % 3 !== 0) {
+    throw new Error(INVALID_MNEMONIC)
+  }
   const bits = words
     .map(word => {
       const index = wordList!.indexOf(word)
-      if (index === -1) throw new Error(INVALID_MNEMONIC)
+      if (index === -1) {
+        throw new Error(INVALID_MNEMONIC)
+      }
       return index.toString(2).padStart(11, '0')
     })
     .join('')
@@ -79,13 +90,21 @@ export function mnemonicToEntropy(mnemonic: string = '') {
   const checksumBits = bits.slice(dividerIndex)
 
   const entropyBytes = entropyBits.match(/(.{1,8})/g)!.map(byte => parseInt(byte, 2))
-  if (entropyBytes.length < MIN_ENTROPY_SIZE) throw new Error(ENTROPY_TOO_SHORT)
-  if (entropyBytes.length > MAX_ENTROPY_SIZE) throw new Error(ENTROPY_TOO_LONG)
-  if (entropyBytes.length % 4 !== 0) throw new Error(ENTROPY_NOT_DIVISIBLE)
+  if (entropyBytes.length < MIN_ENTROPY_SIZE) {
+    throw new Error(ENTROPY_TOO_SHORT)
+  }
+  if (entropyBytes.length > MAX_ENTROPY_SIZE) {
+    throw new Error(ENTROPY_TOO_LONG)
+  }
+  if (entropyBytes.length % 4 !== 0) {
+    throw new Error(ENTROPY_NOT_DIVISIBLE)
+  }
 
   const entropy = Buffer.from(entropyBytes)
   const newChecksum = deriveChecksumBits(entropy)
-  if (newChecksum !== checksumBits) throw new Error(INVALID_CHECKSUM)
+  if (newChecksum !== checksumBits) {
+    throw new Error(INVALID_CHECKSUM)
+  }
 
   return entropy.toString('hex')
 }
@@ -93,9 +112,15 @@ export function mnemonicToEntropy(mnemonic: string = '') {
 export function entropyToMnemonic(entropyStr: string) {
   const entropy = Buffer.from(entropyStr, 'hex')
 
-  if (entropy.length < MIN_ENTROPY_SIZE) throw new TypeError(ENTROPY_TOO_SHORT)
-  if (entropy.length > MAX_ENTROPY_SIZE) throw new TypeError(ENTROPY_TOO_LONG)
-  if (entropy.length % 4 !== 0) throw new TypeError(ENTROPY_NOT_DIVISIBLE)
+  if (entropy.length < MIN_ENTROPY_SIZE) {
+    throw new TypeError(ENTROPY_TOO_SHORT)
+  }
+  if (entropy.length > MAX_ENTROPY_SIZE) {
+    throw new TypeError(ENTROPY_TOO_LONG)
+  }
+  if (entropy.length % 4 !== 0) {
+    throw new TypeError(ENTROPY_NOT_DIVISIBLE)
+  }
 
   const entropyBytes = bytesToBinary(entropy)
   const checksumBytes = deriveChecksumBits(entropy)

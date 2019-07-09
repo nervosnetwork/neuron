@@ -118,7 +118,9 @@ export default class AppController {
   }
 
   public static async contextMenu(params: { type: string; id: string }) {
-    if (!params || params.id === undefined) return
+    if (!params || params.id === undefined) {
+      return
+    }
     const { id, type } = params
     switch (type) {
       case 'networkList':

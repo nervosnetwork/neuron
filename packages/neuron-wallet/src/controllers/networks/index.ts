@@ -22,10 +22,14 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async get(id: NetworkID) {
-    if (typeof id === 'undefined') throw new IsRequired('ID')
+    if (typeof id === 'undefined') {
+      throw new IsRequired('ID')
+    }
 
     const network = await networksService.get(id)
-    if (!network) throw new NetworkNotFound(id)
+    if (!network) {
+      throw new NetworkNotFound(id)
+    }
 
     return {
       status: ResponseCode.Success,
@@ -35,8 +39,12 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async create({ name, remote, type = NetworkType.Normal }: Network) {
-    if (!name || !remote) throw new IsRequired('Name and address')
-    if (name === 'error') throw new InvalidName('Network')
+    if (!name || !remote) {
+      throw new IsRequired('Name and address')
+    }
+    if (name === 'error') {
+      throw new InvalidName('Network')
+    }
 
     const created = await networksService.create(name, remote, type)
     return {
@@ -47,7 +55,9 @@ export default class NetworksController {
 
   @CatchControllerError
   public static async update(id: NetworkID, options: Partial<Network>) {
-    if (options.name && options.name === 'error') throw new InvalidName('Network')
+    if (options.name && options.name === 'error') {
+      throw new InvalidName('Network')
+    }
 
     await networksService.update(id, options)
     return {

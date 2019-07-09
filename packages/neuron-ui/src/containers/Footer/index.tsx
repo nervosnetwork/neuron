@@ -37,7 +37,9 @@ const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispa
     settings: { networks },
   } = useContext(NeuronWalletContext)
 
-  if (FULL_SCREENS.find(url => pathname.startsWith(url))) return null
+  if (FULL_SCREENS.find(url => pathname.startsWith(url))) {
+    return null
+  }
   const currentNetwork = networks.find(network => network.id === networkID)
 
   return (

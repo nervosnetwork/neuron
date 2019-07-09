@@ -260,7 +260,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
           }
         }
       } else {
-        if (!args.msg) return
+        if (!args.msg) {
+          return
+        }
         if (method === WalletsMethod.GetCurrent) {
           return
         }

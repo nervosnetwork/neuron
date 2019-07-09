@@ -48,8 +48,12 @@ export class FileKeystoreWallet implements Wallet {
   constructor(props: WalletProperties) {
     const { id, name, extendedKey } = props
 
-    if (id === undefined) throw new IsRequired('ID')
-    if (name === undefined) throw new IsRequired('Name')
+    if (id === undefined) {
+      throw new IsRequired('ID')
+    }
+    if (name === undefined) {
+      throw new IsRequired('Name')
+    }
 
     this.id = id
     this.name = name
@@ -120,7 +124,9 @@ export default class WalletService {
       }
     )
     this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentID: string | undefined) => {
-      if (undefined === currentID) return
+      if (undefined === currentID) {
+        return
+      }
       const currentWallet = this.getCurrent() || null
       const walletList = this.getAll()
       CurrentWalletSubject.next({
@@ -178,7 +184,9 @@ export default class WalletService {
   }
 
   public create = (props: WalletProperties) => {
-    if (!props) throw new IsRequired('wallet property')
+    if (!props) {
+      throw new IsRequired('wallet property')
+    }
 
     const index = this.getAll().findIndex(wallet => wallet.name === props.name)
 
@@ -224,7 +232,9 @@ export default class WalletService {
     const current = this.getCurrent()
     const currentID = current ? current.id : ''
 
-    if (!walletJSON) throw new WalletNotFound(id)
+    if (!walletJSON) {
+      throw new WalletNotFound(id)
+    }
 
     const wallet = FileKeystoreWallet.fromJSON(walletJSON)
 
@@ -244,10 +254,14 @@ export default class WalletService {
   }
 
   public setCurrent = (id: string) => {
-    if (id === undefined) throw new IsRequired('ID')
+    if (id === undefined) {
+      throw new IsRequired('ID')
+    }
 
     const wallet = this.get(id)
-    if (!wallet) throw new WalletNotFound(id)
+    if (!wallet) {
+      throw new WalletNotFound(id)
+    }
 
     this.listStore.writeSync(this.currentWalletKey, id)
   }

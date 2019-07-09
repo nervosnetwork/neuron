@@ -48,7 +48,9 @@ const Send = ({
         <List
           items={send.outputs || []}
           onRenderCell={(item, idx) => {
-            if (undefined === item || undefined === idx) return null
+            if (undefined === item || undefined === idx) {
+              return null
+            }
             return (
               <Stack tokens={{ childrenGap: 15 }}>
                 <Stack horizontal>

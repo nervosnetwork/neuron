@@ -103,7 +103,9 @@ export const reducer = (
       let currentWalletName = wallet.name
       if (payload.wallets) {
         const currentWallet = payload.wallets.find((w: { id: string; name: string }) => w.id === wallet.id)
-        if (currentWallet) currentWalletName = currentWallet.name
+        if (currentWallet) {
+          currentWalletName = currentWallet.name
+        }
       }
       return {
         ...state,

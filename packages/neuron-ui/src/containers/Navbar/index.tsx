@@ -58,7 +58,9 @@ const Navbar = ({
     return null
   }, [pathname, pivotItems])
 
-  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) return null
+  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
+    return null
+  }
 
   return (
     <Pivot
