@@ -55,7 +55,7 @@ const TransactionList = ({
         minWidth: MIN_CELL_WIDTH,
         maxWidth: 150,
         onRender: (item?: FormatTransaction) => {
-          return item ? <span>{new Date(+item.timestamp).toLocaleTimeString()}</span> : null
+          return item ? <span>{new Date(+(item.timestamp || item.createdAt)).toLocaleTimeString()}</span> : null
         },
       },
       { name: t('history.transaction-hash'), key: 'hash', fieldName: 'hash', minWidth: MIN_CELL_WIDTH, maxWidth: 200 },

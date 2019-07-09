@@ -141,10 +141,16 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
           case TransactionsMethod.TransactionUpdated: {
             const updatedTransaction: State.Transaction = args.result
             if (
-              (updatedTransaction.timestamp === null ||
-                +updatedTransaction.timestamp > +chain.transactions.items[0].timestamp) &&
+              (!chain.transactions.items.length ||
+                updatedTransaction.timestamp === null ||
+                +(updatedTransaction.timestamp || updatedTransaction.createdAt) >
+                  +(chain.transactions.items[0].timestamp || chain.transactions.items[0].createdAt)) &&
               chain.transactions.pageNo === 1
             ) {
+              /**
+               * 1. transaction list is empty or the coming transaction is pending or the coming transaction is later than latest transaction in current list
+               * 2. the current page number is 1
+               */
               const newTransactionItems = [updatedTransaction, ...chain.transactions.items].slice(
                 0,
                 chain.transactions.pageSize
