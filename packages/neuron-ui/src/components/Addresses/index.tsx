@@ -51,7 +51,10 @@ const Addresses = ({
           if (undefined === item) {
             return null
           }
-          return t(item.type === 0 ? 'addresses.receiving-address' : 'addresses.change-address')
+          if (item.type === 0) {
+            return <span style={{ color: '#28b463' }}>{t('addresses.receiving-address')}</span>
+          }
+          return <span style={{ color: '#cccc00' }}>{t('addresses.change-address')}</span>
         },
       },
       {
