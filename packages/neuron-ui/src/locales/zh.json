@@ -37,7 +37,7 @@
       "input-your-seed": "请输入您的助记词",
       "password": "密码",
       "confirm-password": "确认密码",
-      "set-wallet-name-and-password": "为新钱包命名, 并设置钱包的密码",
+      "set-wallet-name-and-password": "为新钱包命名, 并设置密码",
       "set-wallet-name": "为钱包设置名称",
       "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
       "wallet-suffix": "钱包 {{suffix}}",

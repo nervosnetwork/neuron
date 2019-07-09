@@ -37,8 +37,8 @@
       "input-your-seed": "Please input your wallet seed",
       "password": "Password",
       "confirm-password": "Confirm Password",
-      "set-wallet-name-and-password": "Set name of the new wallet, and add a password for security",
-      "set-wallet-name": "Set name of the new wallet",
+      "set-wallet-name-and-password": "Name your new wallet, and choose a strong password to protect it",
+      "set-wallet-name": "Give your new wallet a name",
       "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}",
       "write-down-seed": "Write down your wallet seed and save it in a safe place"
