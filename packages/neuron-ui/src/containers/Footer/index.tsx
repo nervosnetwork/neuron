@@ -19,15 +19,15 @@ const CurrentNetwork = styled.div<{ online: boolean }>`
     height: 10px;
     color: ${props => (props.online ? 'green' : 'red')};
     background-color: currentColor;
-    margin-right: 15px;
-    filter: drop-shadow(0 0 1px currentColor);
+    margin-right: 5px;
+    filter: drop-shadow(0 0 0.5px currentColor);
   }
 `
 
 const Sync = () => (
   <div style={{ display: 'flex', alignItems: 'center' }}>
     Synchronizing
-    <progress value="80" max="100" />
+    <progress value="80" max="100" style={{ marginLeft: '5px' }} />
   </div>
 )
 
