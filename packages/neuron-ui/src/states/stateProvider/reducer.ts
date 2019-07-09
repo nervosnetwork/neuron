@@ -86,7 +86,7 @@ export const reducer = (
         },
       }
       newState.chain.transactions.items = newState.chain.transactions.items.sort(
-        (item1, item2) => +item2.timestamp - +item1.timestamp
+        (item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt)
       )
       return newState
     }
