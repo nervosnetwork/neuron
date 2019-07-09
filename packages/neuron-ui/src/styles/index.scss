@@ -26,7 +26,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #f9f9f9;
+  background: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -34,12 +34,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.main-content {
-  background-color: white;
+navbar {
+  border-bottom: solid 1px #ccc;
 }
 
-footer {
-  font-size: 80%;
+.main-content {
+  background-color: white;
 }
 
 .form-control,
