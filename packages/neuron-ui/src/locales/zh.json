@@ -25,8 +25,8 @@
       "rpc-service": "RPC 服务"
     },
     "wizard": {
-      "create-a-wallet-with-fresh-mnemonic": "生成新的助记词并创建钱包",
-      "import-a-wallet-with-existing-mnemonic": "已有助记词, 导入钱包",
+      "welcome-to-nervos-ckb": "欢迎使用 Nervos CKB",
+      "please-setup-the-wallet": "请设置钱包",
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",
       "import-wallet": "导入钱包",
