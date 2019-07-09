@@ -57,6 +57,7 @@
       "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫描二维码以获取地址",
       "description": "备注",
+      "description-optional": "备注 (选填)",
       "balance": "余额",
       "add-one": "添加",
       "remove-this": "删除"

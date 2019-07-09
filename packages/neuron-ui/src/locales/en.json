@@ -47,7 +47,7 @@
       "more-transactions": "More"
     },
     "send": {
-      "address": "Address",
+      "address": "Send to",
       "amount": "Amount",
       "send": "Send",
       "clear": "Clear",
@@ -55,8 +55,9 @@
       "to": "To",
       "input-password-to-confirm": "Input password to confirm",
       "this-transaction-will-send": "This transaction will send",
-      "scan-to-get-address": "scan the qrcode to get address",
+      "scan-to-get-address": "Scan QR code to read the address to send to",
       "description": "Description",
+      "description-optional": "Description (optional)",
       "balance": "Balance",
       "add-one": "Add One More",
       "remove-this": "Remove This"
