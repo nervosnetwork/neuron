@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter } from 'office-ui-fabric-react'
+import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
 import { Scan as ScanIcon } from 'grommet-icons'
 import jsQR from 'jsqr'
 
 import { drawPolygon } from 'utils/canvasActions'
-// import Dialog from '../Dialog'
 
 interface QRScannerProps {
   title: string
@@ -115,12 +114,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         </div>
         <DialogFooter>
           <TextField readOnly value={data} label={label} underlined />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}
-          >
+          <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+            <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
             <PrimaryButton
               onClick={() => {
                 onConfirm(data)
@@ -129,8 +124,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
             >
               {t('common.confirm')}
             </PrimaryButton>
-            <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
-          </div>
+          </Stack>
         </DialogFooter>
       </Dialog>
     </>
