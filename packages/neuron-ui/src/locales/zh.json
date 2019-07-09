@@ -4,7 +4,7 @@
       "loading-wallets": "加载钱包"
     },
     "navbar": {
-      "general": "概观",
+      "overview": "概观",
       "wallet": "钱包",
       "send": "转账",
       "receive": "收款",
@@ -12,17 +12,20 @@
       "addresses": "地址管理",
       "settings": "设置"
     },
-    "general": {
+    "overview": {
       "balance": "余额",
-      "amount": "价值",
       "live-cells": "可用 Cells",
       "cell-types": "Cell 类型",
       "recent-activities": "近期活动",
       "no-recent-activities": "近期没有活动",
       "blockchain-status": "同步节点状态",
       "blockchain-identity": "链的 ID",
-      "block-height": "区块高度",
-      "rpc-service": "RPC 服务"
+      "block-number": "区块高度",
+      "rpc-service": "RPC 服务",
+      "type": "类型",
+      "datetime": "时间",
+      "status": "状态",
+      "amount": "金额"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Nervos CKB",
