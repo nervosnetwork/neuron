@@ -139,7 +139,7 @@ const Mnemonic = ({
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
-      <Text variant="xxLargePlus">{t(message)}</Text>
+      <Text variant="xLargePlus">{t(message)}</Text>
       <TextField
         autoFocus
         multiline
