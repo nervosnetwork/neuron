@@ -41,7 +41,9 @@ const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & R
       payload: null,
     })
   }, [dispatch])
-  if (!notifications.length) return null
+  if (!notifications.length) {
+    return null
+  }
 
   const notification = notifications[0]
 

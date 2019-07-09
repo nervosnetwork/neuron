@@ -49,10 +49,14 @@ export default class NetworksService extends Store {
       NetworkListSubject.next({ currentNetworkList })
 
       const currentID = await this.getCurrentID()
-      if (currentNetworkList.find(network => network.id === currentID)) return
+      if (currentNetworkList.find(network => network.id === currentID)) {
+        return
+      }
 
       const defaultNetwork = await this.defaultOne()
-      if (!defaultNetwork) throw new LackOfDefaultNetwork()
+      if (!defaultNetwork) {
+        throw new LackOfDefaultNetwork()
+      }
       this.activate(defaultNetwork.id)
     })
 
@@ -86,7 +90,9 @@ export default class NetworksService extends Store {
 
   @Validate
   public async updateAll(@Required networks: NetworkWithID[]) {
-    if (!Array.isArray(networks)) throw new InvalidFormat('Networks')
+    if (!Array.isArray(networks)) {
+      throw new InvalidFormat('Networks')
+    }
     await this.writeSync(NetworksKey.List, networks)
   }
 
@@ -128,8 +134,12 @@ export default class NetworksService extends Store {
   @Validate
   public async delete(@Required id: NetworkID) {
     const networkToDelete = await this.get(id)
-    if (!networkToDelete) throw new NetworkNotFound(id)
-    if (networkToDelete.type === NetworkType.Default) throw new DefaultNetworkUnremovable()
+    if (!networkToDelete) {
+      throw new NetworkNotFound(id)
+    }
+    if (networkToDelete.type === NetworkType.Default) {
+      throw new DefaultNetworkUnremovable()
+    }
 
     const prevNetworkList = await this.getAll()
     const currentNetworkList = prevNetworkList.filter(item => item.id !== id)

@@ -48,7 +48,9 @@ const Addresses = ({
         isResizable: true,
         isCollapsible: false,
         onRender: (item?: State.Address) => {
-          if (undefined === item) return null
+          if (undefined === item) {
+            return null
+          }
           return t(item.type === 0 ? 'addresses.receiving-address' : 'addresses.change-address')
         },
       },

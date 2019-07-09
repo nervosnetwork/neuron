@@ -21,7 +21,9 @@ export const useLocalDescription = (
 
   const submitDescription = useCallback(
     (idx: number) => {
-      if (owners[idx].description === localDescription[idx]) return
+      if (owners[idx].description === localDescription[idx]) {
+        return
+      }
       dispatch(
         actionCreators.updateDescription({
           type,
