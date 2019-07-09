@@ -1,15 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Stack,
-  Text,
-  Label,
-  CompoundButton,
-  PrimaryButton,
-  DefaultButton,
-  TextField,
-  FontSizes,
-} from 'office-ui-fabric-react'
+import { Stack, Text, Label, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 
@@ -45,19 +36,16 @@ const submissionInputs = [
 
 const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
-  const message = 'wizard.create-or-import-your-first-wallet'
 
   const buttons = useMemo(
     () => [
       {
-        text: 'wizard.create-new-wallet',
-        secondaryText: 'wizard.create-a-wallet-with-fresh-mnemonic',
-        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+        text: 'wizard.import-wallet',
+        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
       },
       {
-        text: 'wizard.import-wallet',
-        secondaryText: 'wizard.import-a-wallet-with-existing-mnemonic',
-        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+        text: 'wizard.create-new-wallet',
+        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
       },
     ],
     [rootPath]
@@ -71,21 +59,14 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
   )
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="center" tokens={{ childrenGap: 30 }}>
-      <Text variant="xxLargePlus">{t(message)}</Text>
-      <Stack tokens={{ childrenGap: 100 }} horizontal>
-        {buttons.map(({ text, secondaryText, link }) => (
-          <CompoundButton
-            primary
-            text={t(text)}
-            secondaryText={t(secondaryText)}
-            onClick={next(link)}
-            styles={{
-              root: {
-                width: '100%',
-              },
-            }}
-          />
+    <Stack verticalFill verticalAlign="center" horizontalAlign="start" padding="0 160px" tokens={{ childrenGap: 50 }}>
+      <Stack tokens={{ childrenGap: 5 }}>
+        <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-ckb')}</Text>
+        <Text variant="large">{t('wizard.please-setup-the-wallet')}</Text>
+      </Stack>
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 100 }} styles={{ root: { width: '100%' } }}>
+        {buttons.map(({ text, link }) => (
+          <DefaultButton text={t(text)} onClick={next(link)} />
         ))}
       </Stack>
     </Stack>
@@ -158,7 +139,7 @@ const Mnemonic = ({
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
-      <Text variant="xxLargePlus">{t(message)}</Text>
+      <Text variant="xLargePlus">{t(message)}</Text>
       <TextField
         autoFocus
         multiline
@@ -170,7 +151,7 @@ const Mnemonic = ({
         onChange={onChange}
         description={t(hint)}
         styles={{
-          root: {
+          field: {
             fontSize: FontSizes.xLarge,
           },
           description: {
