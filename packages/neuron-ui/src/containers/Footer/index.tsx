@@ -15,8 +15,8 @@ const CurrentNetwork = styled.div<{ online: boolean }>`
     display: block;
     content: '';
     border-radius: 50%;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     color: ${props => (props.online ? 'green' : 'red')};
     background-color: currentColor;
     margin-right: 5px;
