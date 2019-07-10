@@ -16,7 +16,9 @@
     "test": "react-app-rewired test --env=jsdom --color --watchAll=false",
     "build": "react-app-rewired build",
     "clean": "rimraf build/*",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -52,12 +54,18 @@
     "styled-components": "5.0.0-beta.0"
   },
   "devDependencies": {
+    "@storybook/addon-actions": "5.1.9",
+    "@storybook/addon-links": "5.1.9",
+    "@storybook/addons": "5.1.9",
+    "@storybook/cli": "5.1.9",
+    "@storybook/react": "5.1.9",
     "@types/enzyme": "3.9.3",
     "@types/enzyme-adapter-react-16": "1.0.5",
     "@types/node": "11.13.5",
     "@types/react": "16.8.19",
     "@types/react-dom": "16.8.4",
     "@types/react-router-dom": "4.3.3",
+    "@types/storybook__react": "4.0.2",
     "@types/styled-components": "4.1.16",
     "babel-jest": "24.8.0",
     "enzyme": "3.9.0",
