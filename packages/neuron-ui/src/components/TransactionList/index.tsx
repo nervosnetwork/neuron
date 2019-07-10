@@ -1,6 +1,14 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Text, DetailsList, TextField, IColumn, IGroup, CheckboxVisibility } from 'office-ui-fabric-react'
+import {
+  Text,
+  DetailsList,
+  TextField,
+  IColumn,
+  IGroup,
+  CheckboxVisibility,
+  ITextFieldStyleProps,
+} from 'office-ui-fabric-react'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 
@@ -74,6 +82,15 @@ const TransactionList = ({
               onKeyPress={onDescriptionPress(idx)}
               onBlur={onDescriptionFieldBlur(idx)}
               onChange={onDescriptionChange(idx)}
+              borderless
+              styles={(props: ITextFieldStyleProps) => {
+                return {
+                  fieldGroup: {
+                    borderColor: '#ccc',
+                    border: props.focused ? '1px solid' : 'none',
+                  },
+                }
+              }}
             />
           ) : null
         },
@@ -125,6 +142,16 @@ const TransactionList = ({
         if (item) {
           appCalls.contextMenu({ type: 'transactionList', id: item.hash })
         }
+      }}
+      styles={{
+        contentWrapper: {
+          selectors: {
+            '.ms-DetailsRow-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+          },
+        },
       }}
     />
   )
