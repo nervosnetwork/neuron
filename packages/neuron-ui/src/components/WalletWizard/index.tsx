@@ -146,7 +146,6 @@ const Mnemonic = ({
         resizable={false}
         rows={3}
         readOnly={isCreate}
-        borderless={isCreate}
         value={isCreate ? generated : imported}
         onChange={onChange}
         description={t(hint)}
