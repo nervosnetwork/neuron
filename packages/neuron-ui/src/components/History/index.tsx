@@ -12,7 +12,7 @@ import { Routes } from 'utils/const'
 import { useSearch } from './hooks'
 
 const History = ({
-  wallet: { id, addresses = [] },
+  wallet: { id },
   chain: {
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
   },
@@ -22,7 +22,7 @@ const History = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, id, dispatch)
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
   const totalPages = useMemo(() => Math.ceil(totalCount / pageSize) || 1, [totalCount, pageSize])
 

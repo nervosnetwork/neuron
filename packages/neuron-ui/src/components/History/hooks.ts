@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { AppActions } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 import { queryParsers } from 'utils/parser'
@@ -17,11 +17,10 @@ const backToTop = () => {
 export const useSearch = (
   search: string = '',
   incomingKeywords: string = '',
-  addresses: { address: string }[] = [],
+  walletID: string = '',
   dispatch: React.Dispatch<any>
 ) => {
   const [keywords, setKeywords] = useState('')
-  const defaultKeywords = useMemo(() => addresses.map(addr => addr.address).join(','), [addresses])
 
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     if (undefined !== newValue) {
@@ -42,9 +41,9 @@ export const useSearch = (
       payload: null,
     })
 
-    dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords || defaultKeywords }))
-  }, [search, dispatch, defaultKeywords])
-  return { keywords, addresses, onKeywordsChange }
+    dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords, walletID }))
+  }, [search, walletID, dispatch])
+  return { keywords, onKeywordsChange }
 }
 
 export default {

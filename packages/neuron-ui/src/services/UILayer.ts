@@ -59,6 +59,7 @@ export interface GetTransactionsParams {
   pageNo: number
   pageSize: number
   keywords?: string
+  walletID: string
 }
 
 const UILayer = (() => {

@@ -79,7 +79,7 @@ const PropertyList = ({
 )
 const General = ({
   dispatch,
-  wallet: { addresses = [], balance = '' },
+  wallet: { id, balance = '' },
   chain: {
     networkID = '',
     transactions: { items = [] },
@@ -89,11 +89,10 @@ const General = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
-  const defaultKeywords = useMemo(() => addresses.map(addr => addr.address).join(','), [addresses])
 
   useEffect(() => {
-    dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: defaultKeywords }))
-  }, [dispatch, defaultKeywords])
+    dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '', walletID: id }))
+  }, [id, dispatch])
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
     if (props) {

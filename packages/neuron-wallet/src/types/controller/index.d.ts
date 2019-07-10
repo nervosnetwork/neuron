@@ -10,6 +10,7 @@ declare module Controller {
       pageNo: number
       pageSize: number
       keywords: string
+      walletID: string
     }
     interface TransactionsByAddresses {
       pageNo: number
