@@ -1,7 +1,7 @@
 import { Transaction } from '../types/cell-types'
 import TransactionsService, { PaginationResult, TransactionsByLockHashesParam } from '../services/transactions'
 
-import AddressService from '../services/addresses'
+import AddressesService from '../services/addresses'
 import WalletsService from '../services/wallets'
 
 import { Controller as ControllerDecorator, CatchControllerError } from '../decorators'
@@ -35,16 +35,20 @@ export default class TransactionsController {
   public static async getAllByKeywords(
     params: Controller.Params.TransactionsByKeywords
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
-    const { keywords = '' } = params
+    const { keywords = '', walletID = '' } = params
+    const addresses =
+      (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address).join(',') || ''
 
-    // TODO: support date, hash, amount in the future
-    const res = await TransactionsController.getAllByAddresses({ ...params, addresses: keywords })
+    // TODO: keywords should be used in the search
+    // TODO: support addresses, date, hash, amount in the future
+    const res = await TransactionsController.getAllByAddresses({ ...params, addresses })
     if (res.status === ResponseCode.Success && res.result) {
       return {
         ...res,
         result: {
           ...res.result,
           keywords,
+          walletID,
         },
       }
     }
@@ -67,7 +71,7 @@ export default class TransactionsController {
       if (!wallet) {
         throw new CurrentWalletNotSet()
       }
-      searchAddresses = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
+      searchAddresses = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
@@ -93,7 +97,7 @@ export default class TransactionsController {
     if (!wallet) {
       throw new CurrentWalletNotSet()
     }
-    const addresses: string[] = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
+    const addresses: string[] = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     const lockHashes: string[] = await Promise.all(
       addresses.map(async addr => {
         return LockUtils.addressToLockHash(addr)

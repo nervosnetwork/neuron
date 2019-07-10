@@ -125,6 +125,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
       if (args.status) {
         switch (method) {
           case TransactionsMethod.GetAllByKeywords: {
+            // TODO: verify the wallet id the transactions belong to
             dispatch({
               type: NeuronWalletActions.Chain,
               payload: { transactions: { ...chain.transactions, ...args.result } },
