@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, DetailsList, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
+import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
@@ -9,27 +9,21 @@ import chainState from 'states/initStates/chain'
 
 import { localNumberFormatter } from 'utils/formatters'
 
+const MIN_CELL_WIDTH = 70
+
 const inputColumns: IColumn[] = [
   {
-    ariaLabel: 'lock hash',
     key: 'lockHash',
     name: 'Lock Hash',
-    fieldName: 'lockHash',
-    minWidth: 70,
-    isResizable: true,
-    isCollapsable: false,
+    maxWidth: 300,
   },
   {
-    ariaLabel: 'outpoint block hash',
     key: 'outPointBlockHash',
     name: 'OutPoint BlockHash',
+    maxWidth: 300,
     onRender: (item: any) => <span>{item.previousOutput.blockHash || 'none'}</span>,
-    minWidth: 70,
-    isResizable: true,
-    isCollapsable: false,
   },
   {
-    ariaLabel: 'outpoint cell',
     key: 'outPointCell',
     name: 'OutPoint Cell',
     onRender: (item: any) => (
@@ -37,50 +31,67 @@ const inputColumns: IColumn[] = [
         {item.previousOutput.cell ? `${item.previousOutput.cell.txHash}[${item.previousOutput.cell.index}]` : 'none'}
       </span>
     ),
-    minWidth: 70,
-    isResizable: true,
-    isCollapsable: false,
   },
   {
-    ariaLabel: 'capacity',
     key: 'capacity',
     name: 'Capacity',
-    fieldName: 'capacity',
-    minWidth: 70,
+  },
+].map(
+  (col): IColumn => ({
+    minWidth: MIN_CELL_WIDTH,
     isResizable: true,
     isCollapsable: false,
-  },
-]
-const outputColumns = [
+    ariaLabel: col.name,
+    fieldName: col.key,
+    ...col,
+  })
+)
+const outputColumns: IColumn[] = [
   {
-    ariaLabel: 'index',
     key: 'index',
     name: 'Index',
-    fieldName: 'index',
-    minWidth: 10,
-    maxWidth: 30,
-    isResizable: true,
-    isCollapsable: false,
+    minWidth: 80,
+    maxWidth: 150,
   },
   {
-    ariaLabel: 'lock hash',
     key: 'lockHash',
     name: 'Lock Hash',
-    fieldName: 'lockHash',
     minWidth: 70,
-    isResizable: true,
-    isCollapsable: false,
+    maxWidth: 300,
   },
   {
-    ariaLabel: 'capacity',
     key: 'capacity',
     name: 'Capacity',
-    fieldName: 'capacity',
-    minWidth: 70,
+    minWidth: 150,
+  },
+].map(col => ({
+  isResizable: true,
+  isCollapsable: false,
+  ariaLabel: col.name,
+  fieldName: col.key,
+  ...col,
+}))
+
+const basicInfoColumns: IColumn[] = [
+  {
+    key: 'label',
+    name: 'Label',
+  },
+  {
+    key: 'value',
+    name: 'value',
+    minWidth: 450,
+  },
+].map(
+  (col): IColumn => ({
     isResizable: true,
     isCollapsable: false,
-  },
-]
+    minWidth: MIN_CELL_WIDTH,
+    ariaLabel: col.name,
+    fieldName: col.key,
+    ...col,
+  })
+)
 const Transaction = ({
   wallet: { id: walletID = '' },
   chain: { transaction = chainState.transaction },
@@ -97,48 +108,70 @@ const Transaction = ({
     dispatch(actionCreators.getTransaction(walletID, match.params.hash))
   }, [match.params.hash, dispatch, walletID])
 
+  const basicInfoItems = useMemo(
+    () => [
+      { label: t('history.transaction-hash'), value: transaction.hash || 'none' },
+      {
+        label: t('history.date'),
+        value: +(transaction.timestamp || transaction.createdAt)
+          ? new Date(+transaction.timestamp || +transaction.createdAt).toLocaleString()
+          : 'none',
+      },
+      {
+        label: t('history.blockNumber'),
+        value: localNumberFormatter(transaction.blockNumber) || 'none',
+      },
+      {
+        label: t('history.amount'),
+        value: transaction.value,
+      },
+    ],
+    [t, transaction]
+  )
+
   return (
-    <Stack>
-      <Stack.Item>
-        <b>{`${t('history.transaction-hash')}: `}</b>
-        {transaction.hash}
-      </Stack.Item>
-      <Stack.Item>
-        <div>
-          <b>{`${t('history.date')}: `}</b>
-          {+transaction.timestamp ? new Date(+transaction.timestamp).toLocaleString() : null}
-        </div>
-        <div>
-          <b>{`${t('history.blockNumber')}: `}</b>
-          {localNumberFormatter(transaction.blockNumber)}
-        </div>
-        <div>
-          <b>{`${t('history.amount')}: `}</b>
-          {transaction.value}
-        </div>
-        <div>
-          <b>Inputs</b>
+    <Stack tokens={{ childrenGap: 15 }}>
+      <Stack tokens={{ childrenGap: 15 }}>
+        <Text variant="xLarge" as="h1">
+          {t('history.basic-information')}
+        </Text>
+        <DetailsList
+          columns={basicInfoColumns}
+          items={basicInfoItems}
+          layoutMode={DetailsListLayoutMode.justified}
+          checkboxVisibility={CheckboxVisibility.hidden}
+          compact
+          isHeaderVisible={false}
+        />
+      </Stack>
+      <Stack tokens={{ childrenGap: 15 }}>
+        <Stack.Item>
+          <Text variant="xLarge" as="h1">
+            Inputs
+          </Text>
           <DetailsList
-            checkboxVisibility={CheckboxVisibility.hidden}
             items={transaction.inputs}
-            compact
-            isHeaderVisible
             layoutMode={DetailsListLayoutMode.justified}
             columns={inputColumns}
-          />
-        </div>
-        <div>
-          <b>Outputs</b>
-          <DetailsList
-            items={transaction.outputs.map((output, index) => ({ ...output, index }))}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact
             isHeaderVisible
+          />
+        </Stack.Item>
+        <Stack.Item>
+          <Text variant="xLarge" as="h1">
+            Outputs
+          </Text>
+          <DetailsList
+            items={transaction.outputs.map((output, index) => ({ ...output, index }))}
             layoutMode={DetailsListLayoutMode.justified}
             columns={outputColumns}
+            checkboxVisibility={CheckboxVisibility.hidden}
+            compact
+            isHeaderVisible
           />
-        </div>
-      </Stack.Item>
+        </Stack.Item>
+      </Stack>
     </Stack>
   )
 }

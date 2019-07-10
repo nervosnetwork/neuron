@@ -90,7 +90,8 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
-      "blockNumber": "Block Number"
+      "blockNumber": "Block Number",
+      "basic-information": "Basic Information"
     },
     "transaction": {
       "goBack": "Go back"
