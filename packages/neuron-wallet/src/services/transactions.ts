@@ -114,7 +114,9 @@ export default class TransactionsService {
       const beginTimestamp = +new Date(value)
       const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
       return [
-        `${base[0]} AND (tx.timestamp >= :beginTimestamp AND tx.timestamp < :endTimestamp)`,
+        `${
+          base[0]
+        } AND (CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) < :endTimestamp)`,
         {
           lockHashes: params.lockHashes,
           beginTimestamp,
