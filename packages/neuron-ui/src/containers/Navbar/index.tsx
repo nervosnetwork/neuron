@@ -9,11 +9,10 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes, FULL_SCREENS } from 'utils/const'
 
 const menuItems = [
-  { name: 'navbar.general', key: Routes.General.slice(1), url: Routes.General },
+  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview },
   { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send },
   { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
   { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
-  { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
   { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
 ]
 
@@ -47,16 +46,25 @@ const Navbar = ({
   } = neuronWallet
   const [t] = useTranslation()
 
-  const pivotItems = useMemo(
-    () => (showAddressBook || pathname === Routes.Addresses ? menuItems : menuItems.slice(0, menuItems.length - 1)),
-    [showAddressBook, pathname]
-  )
+  const pivotItems = useMemo(() => (showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)), [
+    showAddressBook,
+  ])
 
-  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) return null
+  const selectedKey = useMemo(() => {
+    const selectedTab = pivotItems.find(item => item.key === pathname.split('/')[1])
+    if (selectedTab) {
+      return selectedTab.key
+    }
+    return null
+  }, [pathname, pivotItems])
+
+  if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
+    return null
+  }
 
   return (
     <Pivot
-      selectedKey={pathname.split('/')[1]}
+      selectedKey={selectedKey}
       onLinkClick={(pivotItem?: PivotItem) => {
         if (pivotItem && pivotItem.props) {
           const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')

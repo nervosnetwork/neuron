@@ -7,6 +7,7 @@ module.exports = {
       "printWidth": 120
     }],
     "semi": [2, "never"],
+    "curly": [2, "all"],
     "comma-dangle": [2, {
       "arrays": "always-multiline",
       "objects": "always-multiline",

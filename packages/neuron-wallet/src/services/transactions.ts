@@ -71,11 +71,13 @@ export default class TransactionsService {
     const query = getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
+      .addSelect(`ifnull('tx'.timestamp, 'tx'.createdAt)`, 'tt')
       .leftJoinAndSelect('tx.inputs', 'input')
       .leftJoinAndSelect('tx.outputs', 'output')
       .where('input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes)', {
         lockHashes: params.lockHashes,
       })
+      .orderBy(`tt`, 'DESC')
 
     const totalCount: number = await query.getCount()
 

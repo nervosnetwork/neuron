@@ -1,8 +1,15 @@
-import React from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import React, { useCallback } from 'react'
+import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Stack, Pivot, PivotItem, IconButton } from 'office-ui-fabric-react'
+import { FormPreviousLink } from 'grommet-icons'
 
-import { Pivot, PivotItem } from 'office-ui-fabric-react'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+
+import GeneralSetting from 'components/GeneralSetting'
+import Wallets from 'components/WalletSetting'
+import NetworkSetting from 'components/NetworkSetting'
+
 import { Routes } from 'utils/const'
 
 const pivotItems = [
@@ -11,23 +18,76 @@ const pivotItems = [
   { label: 'settings.setting-tabs.network', url: Routes.SettingsNetworks },
 ]
 
-const Settings = ({ location, history }: React.PropsWithoutRef<RouteComponentProps>) => {
+const settingPanels: CustomRouter.Route[] = [
+  {
+    name: `GeneralSetting`,
+    path: Routes.SettingsGeneral,
+    exact: false,
+    comp: GeneralSetting,
+  },
+  {
+    name: `WalletsSetting`,
+    path: Routes.SettingsWallets,
+    exact: false,
+    comp: Wallets,
+  },
+  {
+    name: `NetworkSetting`,
+    path: Routes.SettingsNetworks,
+    exact: true,
+    comp: NetworkSetting,
+  },
+]
+
+const Settings = ({
+  location,
+  history,
+  dispatch,
+  ...neuronWalletState
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const goToOverview = useCallback(() => {
+    history.push(Routes.Overview)
+  }, [history])
 
   return (
-    <Pivot
-      selectedKey={location.pathname}
-      onLinkClick={(pivotItem?: PivotItem) => {
-        if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
-          history.push(pivotItem.props.itemKey)
-        }
-      }}
-      headersOnly
-    >
-      {pivotItems.map(pivotItem => (
-        <PivotItem key={pivotItem.url} headerText={t(pivotItem.label)} itemKey={pivotItem.url} />
+    <Stack tokens={{ childrenGap: 15 }}>
+      <Stack horizontal>
+        <Stack.Item align="center">
+          <IconButton onClick={goToOverview}>
+            <FormPreviousLink />
+          </IconButton>
+        </Stack.Item>
+        <Stack.Item align="center">
+          <h1>{t('navbar.settings')}</h1>
+        </Stack.Item>
+      </Stack>
+
+      <Pivot
+        selectedKey={location.pathname}
+        onLinkClick={(pivotItem?: PivotItem) => {
+          if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
+            history.push(pivotItem.props.itemKey)
+          }
+        }}
+        headersOnly
+      >
+        {pivotItems.map(pivotItem => (
+          <PivotItem key={pivotItem.url} headerText={t(pivotItem.label)} itemKey={pivotItem.url} />
+        ))}
+      </Pivot>
+
+      {settingPanels.map(container => (
+        <Route
+          exact={container.exact}
+          path={`${container.path}${container.params || ''}`}
+          key={container.name}
+          render={routerProps => {
+            return <container.comp {...neuronWalletState} {...routerProps} dispatch={dispatch} />
+          }}
+        />
       ))}
-    </Pivot>
+    </Stack>
   )
 }
 

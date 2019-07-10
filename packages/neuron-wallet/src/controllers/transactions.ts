@@ -21,7 +21,9 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
-    if (!transactions) throw new ServiceHasNoResponse('Transactions')
+    if (!transactions) {
+      throw new ServiceHasNoResponse('Transactions')
+    }
 
     return {
       status: ResponseCode.Success,
@@ -62,13 +64,17 @@ export default class TransactionsController {
 
     if (!searchAddresses.length) {
       const wallet = WalletsService.getInstance().getCurrent()
-      if (!wallet) throw new CurrentWalletNotSet()
+      if (!wallet) {
+        throw new CurrentWalletNotSet()
+      }
       searchAddresses = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
 
-    if (!transactions) throw new ServiceHasNoResponse('Transactions')
+    if (!transactions) {
+      throw new ServiceHasNoResponse('Transactions')
+    }
     return {
       status: ResponseCode.Success,
       result: { ...params, ...transactions },
@@ -79,10 +85,14 @@ export default class TransactionsController {
   public static async get(walletID: string, hash: string): Promise<Controller.Response<Transaction>> {
     const transaction = await TransactionsService.get(hash)
 
-    if (!transaction) throw new TransactionNotFound(hash)
+    if (!transaction) {
+      throw new TransactionNotFound(hash)
+    }
 
     const wallet = WalletsService.getInstance().get(walletID)
-    if (!wallet) throw new CurrentWalletNotSet()
+    if (!wallet) {
+      throw new CurrentWalletNotSet()
+    }
     const addresses: string[] = (await AddressService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     const lockHashes: string[] = await Promise.all(
       addresses.map(async addr => {

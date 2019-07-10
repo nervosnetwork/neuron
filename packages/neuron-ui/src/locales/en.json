@@ -4,7 +4,7 @@
       "loading-wallets": "Loading wallets"
     },
     "navbar": {
-      "general": "Overview",
+      "overview": "Overview",
       "wallet": "Wallet",
       "send": "Send",
       "receive": "Receive",
@@ -12,39 +12,45 @@
       "addresses": "Addresses",
       "settings": "Settings"
     },
-    "general": {
+    "overview": {
       "balance": "Balance",
-      "amount": "Amount",
       "live-cells": "Live Cells",
       "cell-types": "Cell Types",
       "recent-activities": "Recent Activites",
       "no-recent-activities": "No Recent Activities",
       "blockchain-status": "Blockchain Status",
       "blockchain-identity": "Chain Identity",
-      "block-height": "Block Height",
-      "rpc-service": "RPC Service"
+      "block-number": "Block Number",
+      "rpc-service": "RPC Service",
+      "type": "Type",
+      "datetime": "Date & Time",
+      "status": "Status",
+      "amount": "Amount"
     },
     "wizard": {
+      "welcome-to-nervos-ckb": "Welcome to Nervos CKB",
+      "please-setup-the-wallet": "Please setup the wallet",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create New Wallet",
       "import-wallet": "Import Wallet",
       "next": "Next",
       "back": "Back",
       "name": "Name",
-      "your-wallet-seed-is": "Your wallet seed is",
-      "input-your-seed": "Input your seed",
+      "your-wallet-seed-is": "Your new wallet seed has been generated",
+      "input-your-seed": "Please input your wallet seed",
       "password": "Password",
       "confirm-password": "Confirm Password",
-      "set-wallet-name-and-password": "Set name and password to protect your wallet",
+      "set-wallet-name-and-password": "Name your new wallet, and choose a strong password to protect it",
+      "set-wallet-name": "Give your new wallet a name",
       "set-a-strong-password-to-protect-your-wallet": "Create a strong password to protect your wallet",
       "wallet-suffix": "Wallet {{suffix}}",
-      "write-down-seed": "Write down your seed and save it in a safe place"
+      "write-down-seed": "Write down your wallet seed and save it in a safe place"
     },
     "detail": {
       "more-transactions": "More"
     },
     "send": {
-      "address": "Address",
+      "address": "Send to",
       "amount": "Amount",
       "send": "Send",
       "clear": "Clear",
@@ -52,8 +58,9 @@
       "to": "To",
       "input-password-to-confirm": "Input password to confirm",
       "this-transaction-will-send": "This transaction will send",
-      "scan-to-get-address": "scan the qrcode to get address",
+      "scan-to-get-address": "Scan QR code to read the address to send to",
       "description": "Description",
+      "description-optional": "Description (optional)",
       "balance": "Balance",
       "add-one": "Add One More",
       "remove-this": "Remove This"
@@ -83,7 +90,8 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
-      "blockNumber": "Block Number"
+      "blockNumber": "Block Number",
+      "basic-information": "Basic Information"
     },
     "transaction": {
       "goBack": "Go back"
@@ -100,10 +108,16 @@
       "change-address": "Change Address"
     },
     "settings": {
+      "go-to-overview": "Go to Overview",
       "setting-tabs": {
         "general": "General",
         "wallets": "Wallets",
         "network": "Network"
+      },
+      "general": {
+        "display-address-book-in-the-navbar": "Display the address book in the navigation",
+        "show": "Show",
+        "hide": "Hide"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -124,7 +138,7 @@
         "offline": "Offline",
         "add-network": "Add Network",
         "edit-network": {
-          "title": "Add Network",
+          "title": "Add or Edit Network",
           "rpc-url": "RPC URL",
           "name": "Name"
         }

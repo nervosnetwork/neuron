@@ -1,16 +1,43 @@
 import { ReplaySubject } from 'rxjs'
+import { ResponseCode, Channel } from '../../utils/const'
+import { Transaction } from '../../types/cell-types'
+import windowManager from '../window-manager'
+
+export interface TransactionChangedMessage {
+  event: string
+  tx: Transaction
+}
 
 // subscribe this Subject to monitor any transaction table changes
 export class TxDbChangedSubject {
-  static subject = new ReplaySubject<string>(100)
+  static subject = new ReplaySubject<TransactionChangedMessage>(100)
 
   static getSubject() {
-    return this.subject
+    return TxDbChangedSubject.subject
   }
 
-  static setSubject(subject: ReplaySubject<string>) {
-    this.subject = subject
+  static setSubject(subject: ReplaySubject<TransactionChangedMessage>) {
+    TxDbChangedSubject.unsubscribe()
+    TxDbChangedSubject.subject = subject
+    TxDbChangedSubject.subscribe()
+  }
+
+  static subscribe = () => {
+    TxDbChangedSubject.subject.subscribe(({ tx }) => {
+      windowManager.broadcast(Channel.Transactions, 'transactionUpdated', {
+        status: ResponseCode.Success,
+        result: tx,
+      })
+    })
+  }
+
+  static unsubscribe = () => {
+    if (TxDbChangedSubject.subject) {
+      TxDbChangedSubject.subject.unsubscribe()
+    }
   }
 }
+
+TxDbChangedSubject.subscribe()
 
 export default TxDbChangedSubject

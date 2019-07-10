@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Label, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
+import { Stack, Text, Label, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
+import { FormAdd, FormUpload } from 'grommet-icons'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
-import ScreenButtonRow, { RightScreenButtonRow } from 'widgets/ScreenButtonRow'
 
-import { MnemonicAction } from 'utils/const'
+import { MnemonicAction, BUTTON_GAP } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
 import { helpersCall, walletsCall } from 'services/UILayer'
+import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -25,34 +25,66 @@ const initState: WithWizardState = {
 }
 
 const submissionInputs = [
-  { label: 'name', key: 'name', type: 'text' },
-  { label: 'password', key: 'password', type: 'password', hint: 'wizard.set-a-strong-password-to-protect-your-wallet' },
-  { label: 'confirm-password', key: 'confirmPassword', type: 'password' },
+  { label: 'name', key: 'name', type: 'text', hint: 'wizard.set-wallet-name', autoFocus: false },
+  {
+    label: 'password',
+    key: 'password',
+    type: 'password',
+    hint: 'wizard.set-a-strong-password-to-protect-your-wallet',
+    autoFocus: true,
+  },
+  { label: 'confirm-password', key: 'confirmPassword', type: 'password', autoFocus: false },
 ]
 
-const Welcome = ({ rootPath = '/wizard' }: { rootPath: string }) => {
+registerIcons({
+  icons: {
+    Add: <FormAdd />,
+    Import: <FormUpload />,
+  },
+})
+
+const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
-  const message = 'wizard.create-or-import-your-first-wallet'
 
   const buttons = useMemo(
     () => [
-      { label: 'wizard.create-new-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}` },
-      { label: 'wizard.import-wallet', href: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}` },
+      {
+        text: 'wizard.import-wallet',
+        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+        icon: 'Import',
+      },
+      {
+        text: 'wizard.create-new-wallet',
+        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+        icon: 'Add',
+      },
     ],
     [rootPath]
   )
 
+  const next = useCallback(
+    (link: string) => () => {
+      history.push(link)
+    },
+    [history]
+  )
+
   return (
-    <div>
-      <h1>{t(message)}</h1>
-      <ScreenButtonRow>
-        {buttons.map(({ label, href }) => (
-          <Link key={label} className="btn btn-primary" to={href}>
-            {t(label)}
-          </Link>
+    <Stack verticalFill verticalAlign="center" horizontalAlign="start" padding="0 160px" tokens={{ childrenGap: 50 }}>
+      <Stack tokens={{ childrenGap: 5 }}>
+        <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-ckb')}</Text>
+        <Text variant="large">{t('wizard.please-setup-the-wallet')}</Text>
+      </Stack>
+      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 100 }} styles={{ root: { width: '100%' } }}>
+        {buttons.map(({ text, link, icon }) => (
+          <DefaultButton
+            text={t(text)}
+            onClick={next(link)}
+            iconProps={{ iconName: icon, styles: buttonGrommetIconStyles }}
+          />
         ))}
-      </ScreenButtonRow>
-    </div>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -72,7 +104,8 @@ const Mnemonic = ({
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
   const hint = isCreate ? 'wizard.write-down-seed' : ''
-  const disableNext = type === MnemonicAction.Verify && !(generated === imported)
+  const disableNext =
+    (type === MnemonicAction.Import && imported === '') || (type === MnemonicAction.Verify && !(generated === imported))
 
   useEffect(() => {
     if (type === MnemonicAction.Create) {
@@ -120,22 +153,34 @@ const Mnemonic = ({
   }, [isCreate, history, rootPath, type])
 
   return (
-    <>
-      <h1>{t(message)}</h1>
+    <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
+      <Text variant="xLargePlus">{t(message)}</Text>
       <TextField
+        autoFocus
         multiline
         resizable={false}
         rows={3}
-        disabled={isCreate}
+        readOnly={isCreate}
         value={isCreate ? generated : imported}
         onChange={onChange}
         description={t(hint)}
+        styles={{
+          field: {
+            fontSize: FontSizes.xLarge,
+          },
+          description: {
+            top: '110%',
+            left: 0,
+            position: 'absolute',
+            fontSize: FontSizes.medium,
+          },
+        }}
       />
-      <RightScreenButtonRow>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: BUTTON_GAP }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-      </RightScreenButtonRow>
-    </>
+      </Stack>
+    </Stack>
   )
 }
 
@@ -206,12 +251,13 @@ const Submission = ({
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 
   return (
-    <div>
-      <h1>{t(message)}</h1>
+    <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
+      <Text variant="xxLargePlus">{t(message)}</Text>
       {submissionInputs.map(input => (
         <div key={input.key}>
-          <Label>{t(`wizard.${input.label}`)}</Label>
+          <Label required>{t(`wizard.${input.label}`)}</Label>
           <TextField
+            autoFocus={input.autoFocus}
             type={input.type}
             value={state[input.key]}
             onChange={onChange(input.key)}
@@ -219,11 +265,12 @@ const Submission = ({
           />
         </div>
       ))}
-      <RightScreenButtonRow>
+
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: BUTTON_GAP }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-      </RightScreenButtonRow>
-    </div>
+      </Stack>
+    </Stack>
   )
 }
 

@@ -19,15 +19,18 @@ export default {
   },
   updateDescription: ({
     type,
+    walletID,
     key,
     description,
   }: {
     type: 'address' | 'transaction'
+    walletID: string
     key: string
     description: string
   }) => {
     if (type === 'address') {
       walletsCall.updateAddressDescription({
+        walletID,
         address: key,
         description,
       })

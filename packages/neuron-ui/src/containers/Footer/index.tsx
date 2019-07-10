@@ -1,52 +1,74 @@
 import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
-import styled from 'styled-components'
+import { Stack, getTheme, Text } from 'office-ui-fabric-react'
+import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectStatus, FULL_SCREENS } from 'utils/const'
 import { NeuronWalletContext } from 'states/stateProvider'
 
-const CurrentNetwork = styled.div<{ online: boolean }>`
-  position: relative;
-  display: flex;
-  align-items: center;
-  &:before {
-    display: block;
-    content: '';
-    border-radius: 50%;
-    width: 10px;
-    height: 10px;
-    color: ${props => (props.online ? 'green' : 'red')};
-    background-color: currentColor;
-    margin-right: 15px;
-    filter: drop-shadow(0 0 1px currentColor);
-  }
-`
-
-const Sync = () => (
+// TODO: Listen to sync progress report and update
+const SyncStatus = () => (
   <div style={{ display: 'flex', alignItems: 'center' }}>
     Synchronizing
-    <progress value="80" max="100" />
+    <progress value="80" max="100" style={{ marginLeft: '5px' }} />
   </div>
 )
 
+// TODO: Handle click event and go to Preferences - Networks
+const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
+  return (
+    <>
+      {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
+      <Text styles={{ root: [{ marginLeft: '5px' }] }}>{name}</Text>
+    </>
+  )
+}
+
+// Status bar
 const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
     chain: { networkID, connectStatus },
     settings: { networks },
   } = useContext(NeuronWalletContext)
 
-  if (FULL_SCREENS.find(url => pathname.startsWith(url))) return null
+  if (FULL_SCREENS.find(url => pathname.startsWith(url))) {
+    return null
+  }
   const currentNetwork = networks.find(network => network.id === networkID)
+  const theme = getTheme()
+  const stackStyles = {
+    root: [
+      {
+        width: '100%',
+        background: theme.palette.neutralLighter,
+      },
+    ],
+  }
+  const stackItemStyles = {
+    root: [theme.fonts.small],
+  }
 
   return (
-    <>
-      <Sync />
-      {currentNetwork ? (
-        <CurrentNetwork online={connectStatus === ConnectStatus.Online}>{currentNetwork.name}</CurrentNetwork>
-      ) : null}
-    </>
+    <Stack
+      horizontal
+      horizontalAlign="space-between"
+      verticalFill
+      verticalAlign="center"
+      padding="0 15px"
+      styles={stackStyles}
+    >
+      <Stack.Item styles={stackItemStyles}>
+        <SyncStatus />
+      </Stack.Item>
+
+      <Stack.Item styles={stackItemStyles}>
+        {currentNetwork ? (
+          <NetworkStatus online={connectStatus === ConnectStatus.Online} name={currentNetwork.name} />
+        ) : null}
+      </Stack.Item>
+    </Stack>
   )
 }
 

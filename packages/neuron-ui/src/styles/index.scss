@@ -26,12 +26,20 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #f9f9f9;
+  background: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+navbar {
+  border-bottom: solid 1px #ccc;
+}
+
+.main-content {
+  background-color: white;
 }
 
 .form-control,

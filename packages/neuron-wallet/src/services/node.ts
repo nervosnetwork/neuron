@@ -83,7 +83,9 @@ class NodeService {
       )
       .subscribe(
         tipNumber => {
-          if (!this.delayTime) this.delayTime = 0
+          if (!this.delayTime) {
+            this.delayTime = 0
+          }
           this.tipNumberSubject.next(tipNumber)
         },
         () => {

@@ -28,16 +28,17 @@ const NetworkEditor = ({
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
+      <h1>{t('settings.network.edit-network.title')}</h1>
       <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
           <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} key={inputProps.label} underlined required />
+            <TextField {...inputProps} key={inputProps.label} required />
           </Stack.Item>
         ))}
       </Stack>
-      <Stack horizontal horizontalAlign="space-between">
-        <PrimaryButton disabled={invalidParams || notModified} onClick={handleSubmit} text={t('common.save')} />
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
+        <PrimaryButton disabled={invalidParams || notModified} onClick={handleSubmit} text={t('common.save')} />
       </Stack>
     </Stack>
   )

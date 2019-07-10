@@ -31,7 +31,9 @@ WalletListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentWallet =
 CurrentWalletSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(async ({ currentWallet = null, walletList = [] }) => {
   broadcastCurrentWallet(currentWallet)
   updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
-  if (!currentWallet) return
+  if (!currentWallet) {
+    return
+  }
   broadcastAddressList(currentWallet.id)
   broadcastTransactions(currentWallet.id)
 })

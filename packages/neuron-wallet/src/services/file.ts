@@ -40,32 +40,44 @@ export default class FileService {
   }
 
   public hasFile(moduleName: string, filename: string) {
-    if (!this.hasModule(moduleName)) throw new ModuleNotFound(moduleName)
+    if (!this.hasModule(moduleName)) {
+      throw new ModuleNotFound(moduleName)
+    }
     return fs.existsSync(path.join(this.basePath, moduleName, filename))
   }
 
   public readFileSync = (moduleName: string, filename: string) => {
-    if (!this.hasFile(moduleName, filename)) throw new FileNotFound(filename)
+    if (!this.hasFile(moduleName, filename)) {
+      throw new FileNotFound(filename)
+    }
     return fs.readFileSync(path.join(this.basePath, moduleName, filename), this.config)
   }
 
   public readFile = (moduleName: string, filename: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-      if (!this.hasFile(moduleName, filename)) reject(new FileNotFound(filename))
+      if (!this.hasFile(moduleName, filename)) {
+        reject(new FileNotFound(filename))
+      }
       fs.readFile(path.join(this.basePath, moduleName, filename), this.config, (err, file) => {
-        if (err) reject(err)
+        if (err) {
+          reject(err)
+        }
         resolve(file)
       })
     })
   }
 
   public writeFileSync = (moduleName: string, filename: string, data: string) => {
-    if (!this.hasModule(moduleName)) throw new ModuleNotFound(moduleName)
+    if (!this.hasModule(moduleName)) {
+      throw new ModuleNotFound(moduleName)
+    }
     return fs.writeFileSync(path.join(this.basePath, moduleName, filename), data, this.config)
   }
 
   public deleteFileSync = (moduleName: string, filename: string) => {
-    if (!this.hasFile(moduleName, filename)) throw new FileNotFound(filename)
+    if (!this.hasFile(moduleName, filename)) {
+      throw new FileNotFound(filename)
+    }
     return fs.unlinkSync(path.join(this.basePath, moduleName, filename))
   }
 }

@@ -6,6 +6,7 @@ export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
 export const MIN_CELL_WIDTH = 100
+export const BUTTON_GAP = 20
 
 export enum ConnectStatus {
   Online = 'online',
@@ -25,7 +26,7 @@ export enum Channel {
 
 export enum Routes {
   Launch = '/',
-  General = '/general',
+  Overview = '/overview',
   WalletWizard = '/wizard',
   Wallet = '/wallet',
   Send = '/send',
@@ -76,4 +77,10 @@ export enum MnemonicAction {
   Import = 'import',
 }
 
-export const FULL_SCREENS = [`${Routes.Transaction}/`, `/wizard/`]
+export const FULL_SCREENS = [
+  `${Routes.Transaction}/`,
+  `/wizard/`,
+  `${Routes.Settings}/`,
+  `${Routes.WalletEditor}/`,
+  `${Routes.NetworkEditor}/`,
+]

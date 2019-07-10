@@ -124,7 +124,9 @@ export const contextMenuTemplate: {
     ]
   },
   addressList: async (identifier: string) => {
-    if (identifier === undefined) return []
+    if (identifier === undefined) {
+      return []
+    }
 
     const address = bech32Address(identifier)
     return [

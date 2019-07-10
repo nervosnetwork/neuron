@@ -5,12 +5,14 @@ import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, Wa
 import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
+import { actionCreators } from 'states/stateProvider/actionCreators'
+import initStates from 'states/initStates'
 
 const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
 }
 
-export const useChannelListeners = (i18n: any, history: any, chain: any, dispatch: StateDispatch) =>
+export const useChannelListeners = (i18n: any, history: any, chain: State.Chain, dispatch: StateDispatch) =>
   useEffect(() => {
     UILayer.on(
       Channel.Initiate,
@@ -35,9 +37,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
             networks = [],
             currentNetworkID: networkID = '',
             wallets = [],
-            currentWallet: wallet = { id: '', name: '' },
+            currentWallet: wallet = initStates.wallet,
             addresses = [],
-            transactions = [],
+            transactions = initStates.chain.transactions,
             tipNumber = '0',
             connectStatus = false,
           } = args.result
@@ -81,12 +83,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
             break
           }
           case AppMethod.ToggleAddressBook: {
-            dispatch({
-              type: NeuronWalletActions.Settings,
-              payload: {
-                toggleAddressBook: true,
-              },
-            })
+            dispatch(actionCreators.toggleAddressBook())
             break
           }
           default: {
@@ -141,6 +138,46 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
             })
             break
           }
+          case TransactionsMethod.TransactionUpdated: {
+            const updatedTransaction: State.Transaction = args.result
+            if (
+              (!chain.transactions.items.length ||
+                updatedTransaction.timestamp === null ||
+                +(updatedTransaction.timestamp || updatedTransaction.createdAt) >
+                  +(chain.transactions.items[0].timestamp || chain.transactions.items[0].createdAt)) &&
+              chain.transactions.pageNo === 1
+            ) {
+              /**
+               * 1. transaction list is empty or the coming transaction is pending or the coming transaction is later than latest transaction in current list
+               * 2. the current page number is 1
+               */
+              const newTransactionItems = [updatedTransaction, ...chain.transactions.items].slice(
+                0,
+                chain.transactions.pageSize
+              )
+              dispatch({
+                type: NeuronWalletActions.Chain,
+                payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
+              })
+            } else {
+              const newTransactionItems = [...chain.transactions.items]
+              const idx = newTransactionItems.findIndex(item => item.hash === updatedTransaction.hash)
+              if (idx >= 0) {
+                newTransactionItems[idx] = updatedTransaction
+                dispatch({
+                  type: NeuronWalletActions.Chain,
+                  payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
+                })
+              }
+            }
+            if (chain.transaction.hash === updatedTransaction.hash) {
+              dispatch({
+                type: NeuronWalletActions.Chain,
+                payload: { transaction: updatedTransaction },
+              })
+            }
+            break
+          }
           default: {
             break
           }
@@ -171,7 +208,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
                 timestamp: Date.now(),
               },
             })
-            history.push(Routes.SettingsWallets)
+            history.push(Routes.Overview)
             break
           }
           case WalletsMethod.GetAll: {
@@ -233,7 +270,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: any, dispatc
           }
         }
       } else {
-        if (!args.msg) return
+        if (!args.msg) {
+          return
+        }
         if (method === WalletsMethod.GetCurrent) {
           return
         }

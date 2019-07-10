@@ -141,11 +141,11 @@ describe('wallet service', () => {
     expect(() => walletService.setCurrent(w1.id)).not.toThrowError()
   })
 
-  it('first wallet is active wallet', () => {
-    const w1 = walletService.create(wallet1)
-    walletService.create(wallet2)
+  it('the last created wallet is active wallet', () => {
+    walletService.create(wallet1)
+    const w2 = walletService.create(wallet2)
     const activeWallet = walletService.getCurrent()
-    expect(activeWallet && activeWallet.id).toEqual(w1.id)
+    expect(activeWallet && activeWallet.id).toEqual(w2.id)
   })
 
   it('delete current wallet', () => {
