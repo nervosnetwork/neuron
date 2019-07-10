@@ -29,7 +29,6 @@
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",
-      "please-setup-the-wallet": "请设置钱包",
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",
       "import-wallet": "导入钱包",

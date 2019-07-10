@@ -29,7 +29,6 @@
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
-      "please-setup-the-wallet": "Please setup the wallet",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create a Wallet",
       "import-wallet": "Import a Wallet",
