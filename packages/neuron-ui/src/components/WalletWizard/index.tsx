@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
+import { FormAdd, FormUpload } from 'grommet-icons'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 
 import { MnemonicAction, BUTTON_GAP } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
 import { helpersCall, walletsCall } from 'services/UILayer'
+import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -34,6 +36,13 @@ const submissionInputs = [
   { label: 'confirm-password', key: 'confirmPassword', type: 'password', autoFocus: false },
 ]
 
+registerIcons({
+  icons: {
+    Add: <FormAdd />,
+    Import: <FormUpload />,
+  },
+})
+
 const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
 
@@ -42,10 +51,12 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
       {
         text: 'wizard.import-wallet',
         link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+        icon: 'Import',
       },
       {
         text: 'wizard.create-new-wallet',
         link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+        icon: 'Add',
       },
     ],
     [rootPath]
@@ -65,8 +76,12 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
         <Text variant="large">{t('wizard.please-setup-the-wallet')}</Text>
       </Stack>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 100 }} styles={{ root: { width: '100%' } }}>
-        {buttons.map(({ text, link }) => (
-          <DefaultButton text={t(text)} onClick={next(link)} />
+        {buttons.map(({ text, link, icon }) => (
+          <DefaultButton
+            text={t(text)}
+            onClick={next(link)}
+            iconProps={{ iconName: icon, styles: buttonGrommetIconStyles }}
+          />
         ))}
       </Stack>
     </Stack>
