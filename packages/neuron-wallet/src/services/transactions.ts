@@ -91,7 +91,7 @@ export default class TransactionsService {
     if (value.match(/\d{4}-\d{2}-\d{2}/)) {
       return SearchType.Date
     }
-    if (value.match(/^\d+$/)) {
+    if (value.match(/^(\d+|-\d+)$/)) {
       return SearchType.Amount
     }
     return SearchType.Unknown
@@ -130,19 +130,27 @@ export default class TransactionsService {
 
   public static searchByAmount = async (params: TransactionsByLockHashesParam, amount: string) => {
     // 1. get all transactions
-    const result = await TransactionsService.getAll({
-      pageNo: 1,
-      pageSize: 100,
-      lockHashes: params.lockHashes,
-    })
+    const result = await TransactionsService.getAll(
+      {
+        pageNo: 1,
+        pageSize: 100,
+        lockHashes: params.lockHashes,
+      },
+      '',
+      true
+    )
 
     let transactions = result.items
     if (result.totalCount > 100) {
-      transactions = (await TransactionsService.getAll({
-        pageNo: 1,
-        pageSize: result.totalCount,
-        lockHashes: params.lockHashes,
-      })).items
+      transactions = (await TransactionsService.getAll(
+        {
+          pageNo: 1,
+          pageSize: result.totalCount,
+          lockHashes: params.lockHashes,
+        },
+        '',
+        true
+      )).items
     }
     // 2. filter by value
     const txs = transactions.filter(tx => tx.value === amount)
@@ -155,13 +163,20 @@ export default class TransactionsService {
 
   public static getAll = async (
     params: TransactionsByLockHashesParam,
-    searchValue: string = ''
+    searchValue: string = '',
+    baseOnUnknown: boolean = false
   ): Promise<PaginationResult<Transaction>> => {
     const skip = (params.pageNo - 1) * params.pageSize
 
     const type = TransactionsService.filterSearchType(searchValue)
     if (type === SearchType.Amount) {
       return TransactionsService.searchByAmount(params, searchValue)
+    }
+    if (!baseOnUnknown && type === SearchType.Unknown) {
+      return {
+        totalCount: 0,
+        items: [],
+      }
     }
     const searchParams = await TransactionsService.searchSQL(params, type, searchValue)
 
