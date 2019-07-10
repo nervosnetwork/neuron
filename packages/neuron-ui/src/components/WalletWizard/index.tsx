@@ -54,22 +54,17 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
   )
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="start" padding="0 160px" tokens={{ childrenGap: 50 }}>
-      <Stack horizontal styles={{ root: { width: '100%' } }}>
+    <Stack verticalFill verticalAlign="center" horizontalAlign="center" tokens={{ childrenGap: 50 }}>
+      <Stack.Item>
         {/* TODO: Make loading images work for packaged app */}
         <Image src="/icon.png" width="120px" />
-      </Stack>
-      <Stack tokens={{ childrenGap: 5 }}>
+      </Stack.Item>
+
+      <Stack.Item>
         <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-neuron')}</Text>
-        <Text variant="large">{t('wizard.please-setup-the-wallet')}</Text>
-      </Stack>
-      <Stack
-        horizontal
-        horizontalAlign="start"
-        verticalAlign="center"
-        tokens={{ childrenGap: 40 }}
-        styles={{ root: { width: '100%' } }}
-      >
+      </Stack.Item>
+
+      <Stack horizontal horizontalAlign="center" verticalAlign="center" tokens={{ childrenGap: 40 }}>
         <PrimaryButton
           styles={{ root: [{ height: '60px' }] }}
           text={t('wizard.import-wallet')}
