@@ -35,24 +35,24 @@ export default class TransactionsController {
   public static async getAllByKeywords(
     params: Controller.Params.TransactionsByKeywords
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
-    const { keywords = '', walletID = '' } = params
-    const addresses =
-      (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address).join(',') || ''
+    const { pageNo, pageSize, keywords = '', walletID = '' } = params
 
-    // TODO: keywords should be used in the search
-    // TODO: support addresses, date, hash, amount in the future
-    const res = await TransactionsController.getAllByAddresses({ ...params, addresses })
-    if (res.status === ResponseCode.Success && res.result) {
-      return {
-        ...res,
-        result: {
-          ...res.result,
-          keywords,
-          walletID,
-        },
-      }
+    const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
+
+    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords)
+
+    if (!transactions) {
+      throw new ServiceHasNoResponse('Transactions')
     }
-    throw new Error(res.msg)
+    return {
+      status: ResponseCode.Success,
+      result: {
+        ...params,
+        ...transactions,
+        keywords,
+        walletID,
+      },
+    }
   }
 
   @CatchControllerError

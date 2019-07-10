@@ -59,18 +59,12 @@ export enum OutputStatus {
   Failed = 'failed',
 }
 
-export interface SearchParam {
-  pageNo: number
-  pageSize: number
-  lockHashes: string[]
-  value: string
-}
-
 export enum SearchType {
   Address = 'address',
   TxHash = 'txHash',
   Date = 'date',
   Amount = 'amount',
+  Empty = 'empty',
   Unknown = 'unknown',
 }
 
@@ -81,6 +75,9 @@ export default class TransactionsService {
   public static txSentSubject = new ReplaySubject<{ transaction: TransactionWithoutHash; txHash: string }>(100)
 
   public static filterSearchType = (value: string) => {
+    if (value === '') {
+      return SearchType.Empty
+    }
     if (value.startsWith('ckb') || value.startsWith('ckt')) {
       return SearchType.Address
     }
@@ -103,7 +100,7 @@ export default class TransactionsService {
       '(input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes))',
       { lockHashes: params.lockHashes },
     ]
-    if (value === '') {
+    if (type === SearchType.Empty) {
       return base
     }
     if (type === SearchType.Address) {
@@ -130,27 +127,19 @@ export default class TransactionsService {
 
   public static searchByAmount = async (params: TransactionsByLockHashesParam, amount: string) => {
     // 1. get all transactions
-    const result = await TransactionsService.getAll(
-      {
-        pageNo: 1,
-        pageSize: 100,
-        lockHashes: params.lockHashes,
-      },
-      '',
-      true
-    )
+    const result = await TransactionsService.getAll({
+      pageNo: 1,
+      pageSize: 100,
+      lockHashes: params.lockHashes,
+    })
 
     let transactions = result.items
     if (result.totalCount > 100) {
-      transactions = (await TransactionsService.getAll(
-        {
-          pageNo: 1,
-          pageSize: result.totalCount,
-          lockHashes: params.lockHashes,
-        },
-        '',
-        true
-      )).items
+      transactions = (await TransactionsService.getAll({
+        pageNo: 1,
+        pageSize: result.totalCount,
+        lockHashes: params.lockHashes,
+      })).items
     }
     // 2. filter by value
     const txs = transactions.filter(tx => tx.value === amount)
@@ -163,8 +152,7 @@ export default class TransactionsService {
 
   public static getAll = async (
     params: TransactionsByLockHashesParam,
-    searchValue: string = '',
-    baseOnUnknown: boolean = false
+    searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     const skip = (params.pageNo - 1) * params.pageSize
 
@@ -172,7 +160,7 @@ export default class TransactionsService {
     if (type === SearchType.Amount) {
       return TransactionsService.searchByAmount(params, searchValue)
     }
-    if (!baseOnUnknown && type === SearchType.Unknown) {
+    if (type === SearchType.Unknown) {
       return {
         totalCount: 0,
         items: [],

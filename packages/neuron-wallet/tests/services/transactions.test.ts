@@ -47,7 +47,7 @@ describe('transactions service', () => {
     it('empty string', () => {
       const value = ''
       const type = TransactionsService.filterSearchType(value)
-      expect(type).toBe(SearchType.Unknown)
+      expect(type).toBe(SearchType.Empty)
     })
 
     it('2019-2-18', () => {
