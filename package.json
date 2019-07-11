@@ -2,7 +2,7 @@
   "name": "@nervosnetwork/neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -11,8 +11,8 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">= 11.10",
-    "yarn": ">= 1.12"
+    "node": ">= 12.0",
+    "yarn": ">= 1.14"
   },
   "workspaces": [
     "packages/*"
