@@ -56,8 +56,7 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="center" tokens={{ childrenGap: 50 }}>
       <Stack.Item>
-        {/* TODO: Make loading images work for packaged app */}
-        <Image src="/icon.png" width="120px" />
+        <Image src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" />
       </Stack.Item>
 
       <Stack.Item>
