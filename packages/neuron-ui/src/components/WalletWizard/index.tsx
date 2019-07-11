@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Label, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
+import { Stack, Text, Label, Image, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
 import { FormAdd, FormUpload } from 'grommet-icons'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -38,29 +38,13 @@ const submissionInputs = [
 
 registerIcons({
   icons: {
-    Add: <FormAdd />,
-    Import: <FormUpload />,
+    Import: <FormUpload color="white" />,
+    Create: <FormAdd />,
   },
 })
 
 const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
-
-  const buttons = useMemo(
-    () => [
-      {
-        text: 'wizard.import-wallet',
-        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
-        icon: 'Import',
-      },
-      {
-        text: 'wizard.create-new-wallet',
-        link: `${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
-        icon: 'Add',
-      },
-    ],
-    [rootPath]
-  )
 
   const next = useCallback(
     (link: string) => () => {
@@ -70,19 +54,29 @@ const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPat
   )
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="start" padding="0 160px" tokens={{ childrenGap: 50 }}>
-      <Stack tokens={{ childrenGap: 5 }}>
-        <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-ckb')}</Text>
-        <Text variant="large">{t('wizard.please-setup-the-wallet')}</Text>
-      </Stack>
-      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 100 }} styles={{ root: { width: '100%' } }}>
-        {buttons.map(({ text, link, icon }) => (
-          <DefaultButton
-            text={t(text)}
-            onClick={next(link)}
-            iconProps={{ iconName: icon, styles: buttonGrommetIconStyles }}
-          />
-        ))}
+    <Stack verticalFill verticalAlign="center" horizontalAlign="center" tokens={{ childrenGap: 50 }}>
+      <Stack.Item>
+        <Image src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" />
+      </Stack.Item>
+
+      <Stack.Item>
+        <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-neuron')}</Text>
+      </Stack.Item>
+
+      <Stack horizontal horizontalAlign="center" verticalAlign="center" tokens={{ childrenGap: 40 }}>
+        <PrimaryButton
+          styles={{ root: [{ height: '60px' }] }}
+          text={t('wizard.import-wallet')}
+          onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
+          iconProps={{ iconName: 'Import', styles: buttonGrommetIconStyles }}
+        />
+        <span>{t('common.or')}</span>
+        <DefaultButton
+          styles={{ root: [{ height: '60px' }] }}
+          text={t('wizard.create-new-wallet')}
+          onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`)}
+          iconProps={{ iconName: 'Create', styles: buttonGrommetIconStyles }}
+        />
       </Stack>
     </Stack>
   )

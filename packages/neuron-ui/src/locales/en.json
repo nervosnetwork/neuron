@@ -28,11 +28,10 @@
       "amount": "Amount"
     },
     "wizard": {
-      "welcome-to-nervos-ckb": "Welcome to Nervos CKB",
-      "please-setup-the-wallet": "Please setup the wallet",
+      "welcome-to-nervos-neuron": "Welcome to Neuron",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
-      "create-new-wallet": "Create New Wallet",
-      "import-wallet": "Import Wallet",
+      "create-new-wallet": "Create a Wallet",
+      "import-wallet": "Import a Wallet",
       "next": "Next",
       "back": "Back",
       "name": "Name",
@@ -157,6 +156,7 @@
       "management": "management"
     },
     "common": {
+      "or": "or",
       "confirm": "Confirm",
       "cancel": "Cancel",
       "save": "Save"

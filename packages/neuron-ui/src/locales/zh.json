@@ -28,8 +28,7 @@
       "amount": "金额"
     },
     "wizard": {
-      "welcome-to-nervos-ckb": "欢迎使用 Nervos CKB",
-      "please-setup-the-wallet": "请设置钱包",
+      "welcome-to-nervos-ckb": "欢迎使用 Neuron",
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",
       "import-wallet": "导入钱包",
@@ -157,6 +156,7 @@
       "management": "管理"
     },
     "common": {
+      "or": "或",
       "confirm": "确认",
       "cancel": "取消",
       "save": "保存"
