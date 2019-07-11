@@ -1,18 +1,27 @@
 import React, { useCallback, useMemo } from 'react'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
+import { Stack, SearchBox, getTheme } from 'office-ui-fabric-react'
 import { Search as SearchIcon } from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { Routes } from 'utils/const'
+import { registerIcons } from 'utils/icons'
 
 import { useSearch } from './hooks'
 
+const theme = getTheme()
+const { semanticColors } = theme
+registerIcons({
+  icons: {
+    Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
+  },
+})
+
 const History = ({
-  wallet: { id, addresses = [] },
+  wallet: { id },
   chain: {
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
   },
@@ -22,23 +31,21 @@ const History = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, addresses, dispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, id, dispatch)
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
   const totalPages = useMemo(() => Math.ceil(totalCount / pageSize) || 1, [totalCount, pageSize])
 
   return (
     <Stack>
-      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 15 }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <SearchBox
           value={keywords}
           styles={{ root: { width: 200 } }}
           placeholder="Search"
           onChange={onKeywordsChange}
           onSearch={onSearch}
+          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
-        <DefaultButton onClick={onSearch}>
-          <SearchIcon />
-        </DefaultButton>
       </Stack>
       <TransactionList walletID={id} items={items} dispatch={dispatch} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>

@@ -27,6 +27,10 @@ files:
   - from: "../../node_modules/escape-string-regexp"
     to: "node_modules/escape-string-regexp"
 
+nsis:
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+
 win:
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
@@ -35,19 +39,18 @@ win:
       arch:
         - x64
 
-nsis:
-  createDesktopShortcut: always
-  createStartMenuShortcut: true
-
 mac:
   artifactName: "${productName}-v${version}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/images/icon.icns
+  target:
+    - dmg
+    - zip
 
 linux:
   artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
   category: Finance
   icon: assets/images/
   target:
-    - "AppImage"
-    - "deb"
+    - AppImage
+    - deb

@@ -1,7 +1,15 @@
 import React, { useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { DetailsList, TextField, IColumn, DetailsListLayoutMode, CheckboxVisibility } from 'office-ui-fabric-react'
+import {
+  DetailsList,
+  TextField,
+  IColumn,
+  DetailsListLayoutMode,
+  CheckboxVisibility,
+  ITextFieldStyleProps,
+  getTheme,
+} from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
@@ -36,6 +44,9 @@ const Addresses = ({
     ),
     dispatch
   )
+
+  const theme = getTheme()
+  const { semanticColors } = theme
 
   const addressColumns: IColumn[] = useMemo(
     () => [
@@ -78,11 +89,23 @@ const Addresses = ({
         onRender: (item?: State.Address, idx?: number) => {
           return item && undefined !== idx ? (
             <TextField
+              borderless
               title={item.description}
               value={localDescription[idx] || ''}
               onKeyPress={onDescriptionPress(idx)}
               onBlur={onDescriptionFieldBlur(idx)}
               onChange={onDescriptionChange(idx)}
+              styles={(props: ITextFieldStyleProps) => {
+                return {
+                  root: {
+                    flex: 1,
+                  },
+                  fieldGroup: {
+                    borderColor: props.focused ? semanticColors.inputBorder : 'transparent',
+                    border: '1px solid',
+                  },
+                }
+              }}
             />
           ) : null
         },
@@ -106,7 +129,7 @@ const Addresses = ({
         isCollapsible: false,
       },
     ],
-    [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t]
+    [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t, semanticColors]
   )
 
   return (
@@ -117,6 +140,16 @@ const Addresses = ({
       items={addresses}
       onItemContextMenu={item => {
         appCalls.contextMenu({ type: 'addressList', id: item.identifier })
+      }}
+      styles={{
+        contentWrapper: {
+          selectors: {
+            '.ms-DetailsRow-cell': {
+              display: 'flex',
+              alignItems: 'center',
+            },
+          },
+        },
       }}
     />
   )

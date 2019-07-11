@@ -1,4 +1,4 @@
-import { getConnection, In } from 'typeorm'
+import { getConnection, In, ObjectLiteral } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
 import {
   OutPoint,
@@ -59,14 +59,116 @@ export enum OutputStatus {
   Failed = 'failed',
 }
 
+export enum SearchType {
+  Address = 'address',
+  TxHash = 'txHash',
+  Date = 'date',
+  Amount = 'amount',
+  Empty = 'empty',
+  Unknown = 'unknown',
+}
+
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
 export default class TransactionsService {
   public static txSentSubject = new ReplaySubject<{ transaction: TransactionWithoutHash; txHash: string }>(100)
 
-  public static getAll = async (params: TransactionsByLockHashesParam): Promise<PaginationResult<Transaction>> => {
+  public static filterSearchType = (value: string) => {
+    if (value === '') {
+      return SearchType.Empty
+    }
+    if (value.startsWith('ckb') || value.startsWith('ckt')) {
+      return SearchType.Address
+    }
+    if (value.startsWith('0x')) {
+      return SearchType.TxHash
+    }
+    // like '2019-02-09'
+    if (value.match(/\d{4}-\d{2}-\d{2}/)) {
+      return SearchType.Date
+    }
+    if (value.match(/^(\d+|-\d+)$/)) {
+      return SearchType.Amount
+    }
+    return SearchType.Unknown
+  }
+
+  // only deal with address / txHash / Date
+  private static searchSQL = async (params: TransactionsByLockHashesParam, type: SearchType, value: string = '') => {
+    const base = [
+      '(input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes))',
+      { lockHashes: params.lockHashes },
+    ]
+    if (type === SearchType.Empty) {
+      return base
+    }
+    if (type === SearchType.Address) {
+      const lockHash = await LockUtils.addressToLockHash(value)
+      return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
+    }
+    if (type === SearchType.TxHash) {
+      return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
+    }
+    if (type === SearchType.Date) {
+      const beginTimestamp = +new Date(value)
+      const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
+      return [
+        `${
+          base[0]
+        } AND (CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) < :endTimestamp)`,
+        {
+          lockHashes: params.lockHashes,
+          beginTimestamp,
+          endTimestamp,
+        },
+      ]
+    }
+    return base
+  }
+
+  public static searchByAmount = async (params: TransactionsByLockHashesParam, amount: string) => {
+    // 1. get all transactions
+    const result = await TransactionsService.getAll({
+      pageNo: 1,
+      pageSize: 100,
+      lockHashes: params.lockHashes,
+    })
+
+    let transactions = result.items
+    if (result.totalCount > 100) {
+      transactions = (await TransactionsService.getAll({
+        pageNo: 1,
+        pageSize: result.totalCount,
+        lockHashes: params.lockHashes,
+      })).items
+    }
+    // 2. filter by value
+    const txs = transactions.filter(tx => tx.value === amount)
     const skip = (params.pageNo - 1) * params.pageSize
+    return {
+      totalCount: txs.length || 0,
+      items: txs.slice(skip, skip + params.pageSize),
+    }
+  }
+
+  public static getAll = async (
+    params: TransactionsByLockHashesParam,
+    searchValue: string = ''
+  ): Promise<PaginationResult<Transaction>> => {
+    const skip = (params.pageNo - 1) * params.pageSize
+
+    const type = TransactionsService.filterSearchType(searchValue)
+    if (type === SearchType.Amount) {
+      return TransactionsService.searchByAmount(params, searchValue)
+    }
+    if (type === SearchType.Unknown) {
+      return {
+        totalCount: 0,
+        items: [],
+      }
+    }
+    const searchParams = await TransactionsService.searchSQL(params, type, searchValue)
 
     const query = getConnection()
       .getRepository(TransactionEntity)
@@ -74,9 +176,7 @@ export default class TransactionsService {
       .addSelect(`ifnull('tx'.timestamp, 'tx'.createdAt)`, 'tt')
       .leftJoinAndSelect('tx.inputs', 'input')
       .leftJoinAndSelect('tx.outputs', 'output')
-      .where('input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes)', {
-        lockHashes: params.lockHashes,
-      })
+      .where(searchParams[0], searchParams[1] as ObjectLiteral)
       .orderBy(`tt`, 'DESC')
 
     const totalCount: number = await query.getCount()
@@ -121,7 +221,8 @@ export default class TransactionsService {
   }
 
   public static getAllByAddresses = async (
-    params: TransactionsByAddressesParam
+    params: TransactionsByAddressesParam,
+    searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.addresses.map(async addr => {
@@ -130,15 +231,19 @@ export default class TransactionsService {
       })
     )
 
-    return TransactionsService.getAll({
-      pageNo: params.pageNo,
-      pageSize: params.pageSize,
-      lockHashes,
-    })
+    return TransactionsService.getAll(
+      {
+        pageNo: params.pageNo,
+        pageSize: params.pageSize,
+        lockHashes,
+      },
+      searchValue
+    )
   }
 
   public static getAllByPubkeys = async (
-    params: TransactionsByPubkeysParams
+    params: TransactionsByPubkeysParams,
+    searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = await Promise.all(
       params.pubkeys.map(async pubkey => {
@@ -148,11 +253,14 @@ export default class TransactionsService {
       })
     )
 
-    return TransactionsService.getAll({
-      pageNo: params.pageNo,
-      pageSize: params.pageSize,
-      lockHashes,
-    })
+    return TransactionsService.getAll(
+      {
+        pageNo: params.pageNo,
+        pageSize: params.pageSize,
+        lockHashes,
+      },
+      searchValue
+    )
   }
 
   public static get = async (hash: string): Promise<Transaction | undefined> => {
@@ -467,7 +575,9 @@ export default class TransactionsService {
     let inputBlake160s: string[] = []
     let outputBlake160s: string[] = []
     if (tx.inputs) {
-      inputBlake160s = tx.inputs.map(input => input.lock!.args![0])
+      inputBlake160s = tx.inputs
+        .map(input => input.lock && input.lock.args && input.lock.args[0])
+        .filter(blake160 => blake160) as string[]
     }
     if (tx.outputs) {
       outputBlake160s = tx.outputs.map(output => output.lock.args![0])

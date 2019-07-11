@@ -1,27 +1,34 @@
 import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, getTheme, Text } from 'office-ui-fabric-react'
+import { useTranslation } from 'react-i18next'
+import { Stack, getTheme, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectStatus, FULL_SCREENS } from 'utils/const'
 import { NeuronWalletContext } from 'states/stateProvider'
 
+const theme = getTheme()
+
 // TODO: Listen to sync progress report and update
-const SyncStatus = () => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    Synchronizing
-    <progress value="80" max="100" style={{ marginLeft: '5px' }} />
-  </div>
-)
+const SyncStatus = () => {
+  const [t] = useTranslation()
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', fontSize: theme.fonts.small.fontSize }}>
+      {t('sync.syncing')}
+      <ProgressIndicator percentComplete={0.1} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+    </div>
+  )
+}
 
 // TODO: Handle click event and go to Preferences - Networks
 const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
     <>
       {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
-      <Text styles={{ root: [{ marginLeft: '5px' }] }}>{name}</Text>
+      <Text styles={{ root: [theme.fonts.small, { marginLeft: '5px' }] }}>{name}</Text>
     </>
   )
 }
@@ -37,7 +44,6 @@ const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispa
     return null
   }
   const currentNetwork = networks.find(network => network.id === networkID)
-  const theme = getTheme()
   const stackStyles = {
     root: [
       {
