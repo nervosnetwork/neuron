@@ -8,6 +8,7 @@ import {
   DetailsListLayoutMode,
   CheckboxVisibility,
   ITextFieldStyleProps,
+  getTheme,
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -43,6 +44,9 @@ const Addresses = ({
     ),
     dispatch
   )
+
+  const theme = getTheme()
+  const { semanticColors } = theme
 
   const addressColumns: IColumn[] = useMemo(
     () => [
@@ -93,9 +97,12 @@ const Addresses = ({
               onChange={onDescriptionChange(idx)}
               styles={(props: ITextFieldStyleProps) => {
                 return {
+                  root: {
+                    flex: 1,
+                  },
                   fieldGroup: {
-                    borderColor: '#ccc',
-                    border: props.focused ? '1px solid' : 'none',
+                    borderColor: props.focused ? semanticColors.inputBorder : 'transparent',
+                    border: '1px solid',
                   },
                 }
               }}
