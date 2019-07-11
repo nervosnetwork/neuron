@@ -40,7 +40,6 @@ const Send = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
-    id,
     updateTransactionOutput,
     onItemChange,
     onSubmit,
@@ -49,7 +48,7 @@ const Send = ({
     updateTransactionPrice,
     onDescriptionChange,
     onClear,
-  } = useInitialize(address, dispatch, history)
+  } = useInitialize(address, send.outputs, dispatch, history)
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15 }}>
@@ -153,12 +152,7 @@ const Send = ({
         {sending ? (
           <Spinner />
         ) : (
-          <PrimaryButton
-            type="submit"
-            onClick={onSubmit(id, walletID, send.outputs, send.description)}
-            disabled={sending}
-            text={t('send.send')}
-          />
+          <PrimaryButton type="submit" onClick={onSubmit(walletID)} disabled={sending} text={t('send.send')} />
         )}
       </Stack>
     </Stack>

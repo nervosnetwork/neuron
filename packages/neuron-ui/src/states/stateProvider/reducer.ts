@@ -8,6 +8,7 @@ export enum NeuronWalletActions {
   Settings = 'settings',
 }
 export enum AppActions {
+  UpdateTransactionID = 'updateTransactionID',
   AddSendOutput = 'addSendOutput',
   RemoveSendOutput = 'removeSendOutput',
   UpdateSendOutput = 'updateSendOutput',
@@ -15,14 +16,15 @@ export enum AppActions {
   UpdateSendDescription = 'updateSendDescription',
   ClearSendState = 'clearSendState',
   UpdateSendLoading = 'updateSendLoading',
-  UpdatePassword = 'updatePassword',
-  UpdateConfirmPassword = 'updateConfirmPassword',
   UpdateMessage = 'updateMessage',
   AddNotification = 'addNotification',
   RemoveNotification = 'removeNotification',
   ClearNotifications = 'clearNotifications',
   CleanTransaction = 'cleanTransaction',
   CleanTransactions = 'cleanTransactions',
+  RequestPassword = 'requestPassword',
+  DismissPasswordRequest = 'dismissPasswordRequest',
+  UpdatePassword = 'updatePassword',
   Ignore = 'ignore',
 }
 
@@ -120,6 +122,18 @@ export const reducer = (
       }
     }
     // Actions of App
+    case AppActions.UpdateTransactionID: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          send: {
+            ...app.send,
+            txID: Math.round(Math.random() * 100000).toString(),
+          },
+        },
+      }
+    }
     case AppActions.AddSendOutput: {
       return {
         ...state,
@@ -233,6 +247,36 @@ export const reducer = (
         chain: {
           ...chain,
           transaction: initStates.chain.transaction,
+        },
+      }
+    }
+    case AppActions.RequestPassword: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          passwordRequest: payload,
+        },
+      }
+    }
+    case AppActions.DismissPasswordRequest: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          passwordRequest: initStates.app.passwordRequest,
+        },
+      }
+    }
+    case AppActions.UpdatePassword: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          passwordRequest: {
+            ...app.passwordRequest,
+            password: payload,
+          },
         },
       }
     }

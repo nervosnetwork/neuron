@@ -52,6 +52,7 @@ declare namespace State {
     content: string
   }
   interface Send {
+    txID: string
     outputs: Output[]
     price: string
     description: string
@@ -60,6 +61,11 @@ declare namespace State {
 
   interface App {
     send: Send
+    passwordRequest: {
+      actionType: 'send' | 'backup' | 'delete' | null
+      walletID: string
+      password: string
+    }
     messages: {
       [index: string]: Message | null
     }

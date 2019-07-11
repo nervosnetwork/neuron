@@ -17,6 +17,14 @@ declare module Controller {
       pageSize: number
       addresses: string
     }
+    interface BackupWallet {
+      id: string
+      password: string
+    }
+    interface DeleteWallet {
+      id: string
+      password: string
+    }
   }
 
   interface Wallet {
