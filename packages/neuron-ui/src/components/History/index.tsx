@@ -1,15 +1,24 @@
 import React, { useCallback, useMemo } from 'react'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, SearchBox, DefaultButton } from 'office-ui-fabric-react'
+import { Stack, SearchBox, getTheme } from 'office-ui-fabric-react'
 import { Search as SearchIcon } from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { Routes } from 'utils/const'
+import { registerIcons } from 'utils/icons'
 
 import { useSearch } from './hooks'
+
+const theme = getTheme()
+const { semanticColors } = theme
+registerIcons({
+  icons: {
+    Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
+  },
+})
 
 const History = ({
   wallet: { id },
@@ -28,17 +37,15 @@ const History = ({
 
   return (
     <Stack>
-      <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 15 }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <SearchBox
           value={keywords}
           styles={{ root: { width: 200 } }}
           placeholder="Search"
           onChange={onKeywordsChange}
           onSearch={onSearch}
+          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
-        <DefaultButton onClick={onSearch}>
-          <SearchIcon />
-        </DefaultButton>
       </Stack>
       <TransactionList walletID={id} items={items} dispatch={dispatch} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
