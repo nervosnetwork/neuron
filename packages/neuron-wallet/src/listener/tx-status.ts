@@ -1,12 +1,14 @@
+import { remote } from 'electron'
 import { interval } from 'rxjs'
 import TransactionsService from '../services/transactions'
-import NodeService from '../services/node'
 import { TransactionStatus } from '../types/cell-types'
 import LockUtils from '../models/lock-utils'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 
+const { nodeService } = remote.require('./startup/sync-block-task/params')
+
 const getTransactionStatus = async (hash: string) => {
-  const { core } = NodeService.getInstance()
+  const { core } = nodeService
   // getTransaction function return type seems error
   const tx = (await core.rpc.getTransaction(hash)) as any
   if (!tx) {
