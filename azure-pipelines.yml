@@ -148,6 +148,7 @@ jobs:
         tag: $(Build.SourceBranchName)
         assets: |
           $(Build.SourcesDirectory)/release/*.zip
+          $(Build.SourcesDirectory)/release/*.dmg
           $(Build.SourcesDirectory)/release/*.exe
           $(Build.SourcesDirectory)/release/*.deb
           $(Build.SourcesDirectory)/release/*.AppImage
