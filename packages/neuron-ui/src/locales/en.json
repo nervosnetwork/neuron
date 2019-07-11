@@ -181,6 +181,9 @@
       "wallet-updated-successfully": "{{name}} updated successfully",
       "wallet-not-found": "Wallet not found",
       "no-transactions": "No transactions"
+    },
+    "sync": {
+      "syncing": "Syncing"
     }
   }
 }

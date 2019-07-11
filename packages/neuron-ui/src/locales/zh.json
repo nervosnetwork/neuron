@@ -181,6 +181,9 @@
       "wallet-updated-successfully": "{{name}} 更新成功",
       "wallet-not-found": "未找到钱包",
       "no-transactions": "没有交易"
+    },
+    "sync": {
+      "syncing": "同步中"
     }
   }
 }
