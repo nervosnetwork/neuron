@@ -575,7 +575,9 @@ export default class TransactionsService {
     let inputBlake160s: string[] = []
     let outputBlake160s: string[] = []
     if (tx.inputs) {
-      inputBlake160s = tx.inputs.map(input => input.lock!.args![0])
+      inputBlake160s = tx.inputs
+        .map(input => input.lock && input.lock.args && input.lock.args[0])
+        .filter(blake160 => blake160) as string[]
     }
     if (tx.outputs) {
       outputBlake160s = tx.outputs.map(output => output.lock.args![0])

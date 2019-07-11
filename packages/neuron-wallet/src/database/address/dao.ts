@@ -1,4 +1,4 @@
-import { Not } from 'typeorm'
+import { Not, In } from 'typeorm'
 import AddressEntity, { AddressVersion } from './entities/address'
 import { AddressType } from '../../models/keys/address'
 import { getConnection } from './ormconfig'
@@ -165,6 +165,17 @@ export default class AddressDao {
       .getOne()
 
     return addressEntity
+  }
+
+  public static findByAddresses = async (addresses: string[]) => {
+    const addressEntities = await getConnection()
+      .getRepository(AddressEntity)
+      .createQueryBuilder('address')
+      .where({
+        address: In(addresses),
+      })
+      .getMany()
+    return addressEntities
   }
 
   public static maxAddressIndex = async (
