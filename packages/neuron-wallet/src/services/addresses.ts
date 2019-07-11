@@ -222,6 +222,11 @@ export default class AddressService {
     return AddressDao.deleteByWalletId(walletId)
   }
 
+  public static findByAddresses = async (addresses: string[]) => {
+    const entities = await AddressDao.findByAddresses(addresses)
+    return entities.map(entity => entity.toInterface())
+  }
+
   private static getAddressVersion = (): AddressVersion => {
     return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
   }
