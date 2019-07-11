@@ -32,7 +32,7 @@ const Receive = ({
 
   const accountAddress = useMemo(
     () =>
-      params.address || (addresses.find(addr => addr.type === 0 && addr.txCount > 0) || { address: '' }).address || '',
+      params.address || (addresses.find(addr => addr.type === 0 && addr.txCount === 0) || { address: '' }).address || '',
     [params, addresses]
   )
 
