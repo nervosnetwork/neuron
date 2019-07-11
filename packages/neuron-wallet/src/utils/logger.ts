@@ -4,7 +4,17 @@ import env from '../env'
 import app from '../app'
 
 const { isDevMode } = env
-const basePath = isDevMode ? './' : `${app.getPath('logs')}`
+
+let basePath
+if (isDevMode) {
+  basePath = './'
+} else {
+  try {
+    basePath = app.getPath('logs')
+  } catch {
+    basePath = path.join(app.getPath('userData'), 'logs')
+  }
+}
 
 const { combine, timestamp, json } = format
 
