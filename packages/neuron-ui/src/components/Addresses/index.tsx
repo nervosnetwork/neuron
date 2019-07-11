@@ -129,7 +129,7 @@ const Addresses = ({
         isCollapsible: false,
       },
     ],
-    [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t]
+    [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t, semanticColors]
   )
 
   return (
