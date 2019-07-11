@@ -8,7 +8,7 @@ interface SendMessage {
   (channel: Channel.App, method: Controller.AppMethod, params: any): void
   (
     channel: Channel.Wallets,
-    method: Controller.WalletsMethod | 'allAddresses' | 'sendingStatus' | 'getCurrent',
+    method: Controller.WalletsMethod | 'allAddresses' | 'sendingStatus' | 'getCurrent' | 'requestPassword',
     params: any
   ): void
   (channel: Channel.Transactions, method: Controller.TransactionsMethod | 'transactionUpdated', params: any): void

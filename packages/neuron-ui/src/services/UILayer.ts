@@ -31,6 +31,7 @@ export enum WalletsMethod {
   SendingStatus = 'sendingStatus',
   AllAddresses = 'allAddresses',
   UpdateAddressDescription = 'updateAddressDescription',
+  RequestPassword = 'requestPassword',
 }
 
 export enum NetworksMethod {
@@ -127,7 +128,14 @@ export const wallets = (
     | { mnemonic: string; password: string }
     | { id: string; password: string }
     | { id: string; name?: string; password: string; newPassword?: string }
-    | { id: string; walletID: string; items: { address: string; capacity: string }[]; fee: string; description: string }
+    | {
+        id: string
+        walletID: string
+        items: { address: string; capacity: string }[]
+        password: string
+        fee: string
+        description: string
+      }
 ) => {
   UILayer.send(Channel.Wallets, method, params)
 }
@@ -140,11 +148,10 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   importMnemonic: (params: { name: string; mnemonic: string; password: string }) => void
   create: (params: { name: string; mnemonic: string; password: string }) => void
   update: (params: { id: string; password?: string; newPassword?: string; name?: string }) => void
-  delete: (id: string) => void
-  export: (id: string) => void
+  delete: (params: { id: string; password: string }) => void
   getCurrent: () => void
   activate: (id: string) => void
-  backup: (id: string) => void
+  backup: (params: { id: string; password: string }) => void
   sendCapacity: (params: {
     id: string
     walletID: string
@@ -152,6 +159,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
       address: string
       capacity: string
     }[]
+    password: string
     fee: string
     description: string
   }) => void

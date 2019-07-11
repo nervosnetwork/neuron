@@ -1,8 +1,7 @@
 import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
 import { bech32Address } from '@nervosnetwork/ckb-sdk-utils'
 
-import NetworksController from '../networks'
-import WalletsController from '../wallets'
+import WalletsService from '../../services/wallets'
 import NetworksService from '../../services/networks'
 import AppController from '.'
 import i18n from '../../utils/i18n'
@@ -30,8 +29,19 @@ export const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
 } = {
   networkList: async (id: string) => {
-    const { result: network } = await NetworksController.get(id)
-    const { result: currentNetworkID } = await NetworksController.currentID()
+    const [network, currentNetworkID] = await Promise.all([
+      networksService.get(id).catch(() => null),
+      networksService.getCurrentID().catch(() => null),
+    ])
+
+    if (!network) {
+      AppController.showMessageBox({
+        type: 'error',
+        message: i18n.t('messages.network-not-found', { id }),
+      })
+      return []
+    }
+
     const isCurrent = currentNetworkID === id
     const isDefault = network.type === 0
 
@@ -40,7 +50,12 @@ export const contextMenuTemplate: {
         label: i18n.t('contextMenu.select'),
         enabled: !isCurrent,
         click: () => {
-          NetworksController.activate(id)
+          networksService.activate(id).catch((err: Error) => {
+            AppController.showMessageBox({
+              type: 'error',
+              message: err.message,
+            })
+          })
         },
       },
       {
@@ -84,23 +99,29 @@ export const contextMenuTemplate: {
     ]
   },
   walletList: async (id: string) => {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.get(id)
+    if (!wallet) {
+      AppController.showMessageBox({
+        type: 'error',
+        message: i18n.t('messages.wallet-not-found', { id }),
+      })
+    }
     return [
       {
         label: i18n.t('contextMenu.select'),
         click: () => {
-          WalletsController.activate(id)
+          try {
+            walletsService.setCurrent(id)
+          } catch (err) {
+            AppController.showMessageBox({ type: 'error', message: err.message })
+          }
         },
       },
       {
         label: i18n.t('contextMenu.backup'),
         click: async () => {
-          const res = await WalletsController.backup(id)
-          if (!res.status) {
-            AppController.showMessageBox({
-              type: 'error',
-              message: res.msg!,
-            })
-          }
+          walletsService.requestPassword(id, 'backup')
         },
       },
       {
@@ -112,13 +133,7 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.delete'),
         click: async () => {
-          const res = await WalletsController.delete(id)
-          if (!res.status) {
-            AppController.showMessageBox({
-              type: 'error',
-              message: res.msg!,
-            })
-          }
+          walletsService.requestPassword(id, 'delete')
         },
       },
     ]

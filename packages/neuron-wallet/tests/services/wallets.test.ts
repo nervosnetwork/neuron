@@ -1,5 +1,3 @@
-import '../../src/controllers/wallets'
-import '../../src/controllers/app'
 import WalletService, { WalletProperties } from '../../src/services/wallets'
 import { Witness } from '../../src/types/cell-types'
 import Keystore from '../../src/models/keys/keystore'
