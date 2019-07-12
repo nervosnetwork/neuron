@@ -3,3 +3,4 @@ dist
 src/database/**/migrations
 jest.config.js
 jest.e2e.config.js
+scripts/notarize.js

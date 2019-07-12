@@ -134,6 +134,8 @@ jobs:
         CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
         WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
         WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
+        APPLE_ID: $(appleId)
+        APPLE_ID_PASSWORD: $(appleIdPassword)
     - task: GitHubRelease@0
       inputs:
         gitHubConnection: nervos-bot
