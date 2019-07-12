@@ -22,34 +22,40 @@ const stackItemStyles = {
   root: [theme.fonts.small],
 }
 
-// TODO: Listen to sync progress report and update
-const SyncStatus = () => {
+const SyncStatus = ({
+  tipBlockNumber = '',
+  syncBlockNumber = '',
+}: React.PropsWithoutRef<{ tipBlockNumber: string; syncBlockNumber: string }>) => {
   const [t] = useTranslation()
+  if (tipBlockNumber === '') {
+    return <Text variant="small">{t('footer.fail-to-fetch-tip-block-number')}</Text>
+  }
+
+  const percentage = +syncBlockNumber / +tipBlockNumber
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', fontSize: theme.fonts.small.fontSize }}>
       {t('sync.syncing')}
-      <ProgressIndicator percentComplete={0.1} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+      <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
     </div>
   )
 }
 
-// TODO: Handle click event and go to Preferences - Networks
 const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
-    <>
+    <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
       {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
-      <Text styles={{ root: [theme.fonts.small, { marginLeft: '5px' }] }}>{name}</Text>
-    </>
+      <Text styles={{ root: [theme.fonts.small] }}>{name}</Text>
+    </Stack>
   )
 }
 
-// Status bar
 const Footer = ({
   history,
   location: { pathname },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
+    app: { tipBlockNumber },
     chain: { networkID, connectStatus },
     settings: { networks },
   } = useContext(NeuronWalletContext)
@@ -74,10 +80,10 @@ const Footer = ({
       styles={stackStyles}
     >
       <Stack.Item styles={stackItemStyles}>
-        <SyncStatus />
+        <SyncStatus tipBlockNumber={tipBlockNumber} syncBlockNumber="100" />
       </Stack.Item>
 
-      <Stack styles={stackItemStyles} onClick={goToNetworksSetting}>
+      <Stack styles={stackItemStyles} onClick={goToNetworksSetting} horizontal>
         {currentNetwork ? (
           <NetworkStatus online={connectStatus === ConnectStatus.Online} name={currentNetwork.name} />
         ) : (
