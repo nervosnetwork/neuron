@@ -30,8 +30,8 @@
     "test:e2e": "yarn build && ./scripts/copy-ui-files.sh && lerna run --parallel test:e2e",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules",
-    "db:migrate": "ts-node ./node_modules/.bin/typeorm migration:generate",
-    "address-db": "ts-node ./node_modules/.bin/typeorm --config ormconfig-address.json"
+    "db:chain": "ts-node ./node_modules/.bin/typeorm",
+    "db:address": "ts-node ./node_modules/.bin/typeorm --config ormconfig-address.json"
   },
   "husky": {
     "hooks": {
