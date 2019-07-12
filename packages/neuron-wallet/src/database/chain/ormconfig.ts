@@ -39,7 +39,7 @@ export const initConnection = async (genesisBlockHash: string) => {
   try {
     await getConnection().close()
   } catch (err) {
-    logger.log({ level: 'error', message: err.message })
+    // do nothing
   }
   const connectionOptions = await connectOptions(genesisBlockHash)
 

@@ -3,7 +3,7 @@ import app from '../app'
 import env from '../env'
 import i18n from './i18n'
 import AppController from '../controllers/app'
-import WalletsController from '../controllers/wallets'
+import WalletsService from '../services/wallets'
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
@@ -73,18 +73,26 @@ export const walletMenuItem: MenuItemConstructorOptions = {
       id: 'backup',
       label: i18n.t('application-menu.wallet.backup'),
       click: () => {
-        if (AppController) {
-          AppController.backupCurrentWallet()
+        const walletsService = WalletsService.getInstance()
+        const currentWallet = walletsService.getCurrent()
+        if (!currentWallet) {
+          // TODO: show the error message
+          return
         }
+        walletsService.requestPassword(currentWallet.id, 'backup')
       },
     },
     {
       id: 'delete',
       label: i18n.t('application-menu.wallet.delete'),
       click: () => {
-        if (AppController) {
-          AppController.deleteCurrentWallet()
+        const walletsService = WalletsService.getInstance()
+        const currentWallet = walletsService.getCurrent()
+        if (!currentWallet) {
+          // TODO: show the error message
+          return
         }
+        walletsService.requestPassword(currentWallet.id, 'delete')
       },
     },
     /**
@@ -222,9 +230,8 @@ export const updateApplicationMenu = (wallets: Controller.Wallet[], id: string |
         type: 'radio',
         checked: wallet.id === id,
         click: () => {
-          if (WalletsController) {
-            WalletsController.activate(wallet.id)
-          }
+          const walletsService = WalletsService.getInstance()
+          walletsService.setCurrent(wallet.id)
         },
       })
     )

@@ -11,18 +11,15 @@ import {
   CurrentWalletNotSet,
   IsRequired,
   WalletNotFound,
-  IncorrectPassword,
   InvalidMnemonic,
-  EmptyPassword,
   ServiceHasNoResponse,
+  EmptyPassword,
+  IncorrectPassword,
 } from '../../exceptions'
-import prompt from '../../utils/prompt'
 import i18n from '../../utils/i18n'
 import windowManager from '../../models/window-manager'
 import AddressService from '../../services/addresses'
 import WalletCreatedSubject from '../../models/subjects/wallet-created-subject'
-
-const walletsService = WalletsService.getInstance()
 
 /**
  * @class WalletsController
@@ -32,6 +29,7 @@ const walletsService = WalletsService.getInstance()
 export default class WalletsController {
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
+    const walletsService = WalletsService.getInstance()
     const wallets = walletsService.getAll()
     if (!wallets) {
       throw new ServiceHasNoResponse('Wallet')
@@ -44,6 +42,7 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async get(id: string): Promise<Controller.Response<Wallet>> {
+    const walletsService = WalletsService.getInstance()
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
     }
@@ -130,6 +129,7 @@ export default class WalletsController {
       accountKeychain.chainCode.toString('hex')
     )
 
+    const walletsService = WalletsService.getInstance()
     const wallet = walletsService.create({
       id: '',
       name,
@@ -174,6 +174,7 @@ export default class WalletsController {
       accountKeychain.chainCode.toString('hex')
     )
 
+    const walletsService = WalletsService.getInstance()
     const wallet = walletsService.create({
       id: '',
       name,
@@ -199,6 +200,7 @@ export default class WalletsController {
     name: string
     newPassword?: string
   }): Promise<Controller.Response<Wallet>> {
+    const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
     if (!wallet) {
       throw new WalletNotFound(id)
@@ -222,22 +224,17 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async delete(id: string): Promise<Controller.Response<any>> {
-    const password = await WalletsController.requestPassword(i18n.t('messageBox.remove-wallet.title'))
-    if (password === null) {
-      return {
-        status: ResponseCode.Success,
-        result: null,
-      }
-    }
-
+  public static async delete({
+    id = '',
+    password = '',
+  }: Controller.Params.DeleteWallet): Promise<Controller.Response<any>> {
     if (password === '') {
       throw new EmptyPassword()
     }
+    const walletsService = WalletsService.getInstance()
     if (!walletsService.validate({ id, password })) {
       throw new IncorrectPassword()
     }
-
     walletsService.delete(id)
 
     return {
@@ -246,30 +243,40 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async export({ id, password }: { id: string; password: string }): Promise<Controller.Response<string>> {
+  public static async backup({
+    id = '',
+    password = '',
+  }: Controller.Params.BackupWallet): Promise<Controller.Response<boolean>> {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.get(id)
+
     if (!walletsService.validate({ id, password })) {
       throw new IncorrectPassword()
     }
-    return {
-      status: ResponseCode.Success,
-      result: JSON.stringify(walletsService.get(id)),
-    }
-  }
 
-  @CatchControllerError
-  public static async backup(id: string): Promise<Controller.Response<boolean>> {
-    const password = await WalletsController.requestPassword(i18n.t('messageBox.backup-keystore.title'))
-    if (password === null) {
-      return {
-        status: ResponseCode.Success,
-        result: false,
-      }
-    }
-    return WalletsController.downloadKeystore(id, password)
+    const keystore = wallet.loadKeystore()
+    return new Promise(resolve => {
+      AppController.showSaveDialog(
+        {
+          title: i18n.t('messages.save-keystore'),
+          defaultPath: wallet.name,
+        },
+        (filename?: string) => {
+          if (filename) {
+            fs.writeFileSync(filename, JSON.stringify(keystore))
+            resolve({
+              status: ResponseCode.Success,
+              result: true,
+            })
+          }
+        }
+      )
+    })
   }
 
   @CatchControllerError
   public static async activate(id: string) {
+    const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
     if (!currentWallet || id !== currentWallet.id) {
@@ -307,16 +314,10 @@ export default class WalletsController {
       address: string
       capacity: string
     }[]
+    password: string
     fee: string
     description?: string
   }) {
-    const password = await WalletsController.requestPassword(i18n.t('messageBox.send-capacity.title'))
-    if (password === null) {
-      return {
-        status: ResponseCode.Success,
-        result: '',
-      }
-    }
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -325,10 +326,11 @@ export default class WalletsController {
         status: ResponseCode.Success,
         result: true,
       })
+      const walletsService = WalletsService.getInstance()
       const hash = await walletsService.sendCapacity(
         params.walletID,
         params.items,
-        password,
+        params.password,
         params.fee,
         params.description
       )
@@ -375,43 +377,6 @@ export default class WalletsController {
         description,
       },
     }
-  }
-
-  private static async requestPassword(title: string): Promise<string | null> {
-    const password = (await prompt('password', {
-      title,
-    })) as string | null
-    return password
-  }
-
-  private static async downloadKeystore(id: string, password: string): Promise<Controller.Response<boolean>> {
-    if (password === '') {
-      throw new EmptyPassword()
-    }
-    const wallet = await walletsService.get(id)
-
-    if (!walletsService.validate({ id, password })) {
-      throw new IncorrectPassword()
-    }
-
-    const keystore = wallet.loadKeystore()
-    return new Promise(resolve => {
-      AppController.showSaveDialog(
-        {
-          title: i18n.t('messages.save-keystore'),
-          defaultPath: wallet.name,
-        },
-        (filename?: string) => {
-          if (filename) {
-            fs.writeFileSync(filename, JSON.stringify(keystore))
-            resolve({
-              status: ResponseCode.Success,
-              result: true,
-            })
-          }
-        }
-      )
-    })
   }
 }
 

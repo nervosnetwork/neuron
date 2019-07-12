@@ -143,6 +143,19 @@
         }
       }
     },
+    "password-request": {
+      "wallet-not-found": "找不到该钱包",
+      "password": "密码",
+      "send": {
+        "title": "发起交易"
+      },
+      "delete": {
+        "title": "删除钱包 {{name}}"
+      },
+      "backup": {
+        "title": "备份钱包 {{name}}"
+      }
+    },
     "menuitem": {
       "add": "添加",
       "update": "更新",

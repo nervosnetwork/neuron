@@ -8,6 +8,8 @@ directories:
   buildResources: .
   output: ../../release
 
+afterSign: scripts/notarize.js
+
 files:
   - from: "../.."
     to: "."
@@ -31,6 +33,9 @@ nsis:
   createDesktopShortcut: always
   createStartMenuShortcut: true
 
+dmg:
+  sign: false
+
 win:
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
@@ -43,6 +48,10 @@ mac:
   artifactName: "${productName}-v${version}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/images/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: assets/entitlements.plist
+  entitlementsInherit: assets/entitlements.plist
   target:
     - dmg
     - zip

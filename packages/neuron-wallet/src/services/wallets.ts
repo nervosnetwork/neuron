@@ -18,6 +18,8 @@ import AddressDbChangedSubject from '../models/subjects/address-db-changed-subje
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
 import { broadcastAddressList } from '../utils/broadcast'
+import { Channel, ResponseCode } from '../utils/const'
+import windowManager from '../models/window-manager'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -229,16 +231,16 @@ export default class WalletService {
   public delete = (id: string) => {
     const wallets = this.getAll()
     const walletJSON = wallets.find(w => w.id === id)
-    const current = this.getCurrent()
-    const currentID = current ? current.id : ''
 
     if (!walletJSON) {
       throw new WalletNotFound(id)
     }
 
     const wallet = FileKeystoreWallet.fromJSON(walletJSON)
-
     const newWallets = wallets.filter(w => w.id !== id)
+
+    const current = this.getCurrent()
+    const currentID = current ? current.id : ''
 
     if (currentID === id) {
       if (newWallets.length > 0) {
@@ -292,21 +294,21 @@ export default class WalletService {
   }
 
   public sendCapacity = async (
-    walletID: string,
+    walletID: string = '',
     items: {
       address: string
       capacity: string
-    }[],
-    password: string,
+    }[] = [],
+    password: string = '',
     fee: string = '0',
-    description?: string
+    description: string = ''
   ) => {
     const wallet = await this.get(walletID)
     if (!wallet) {
       throw new CurrentWalletNotSet()
     }
 
-    if (password === undefined || password === '') {
+    if (password === '') {
       throw new IsRequired('Password')
     }
 
@@ -408,5 +410,15 @@ export default class WalletService {
       path,
       privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
     }))
+  }
+
+  public requestPassword = (walletID: string, actionType: 'delete' | 'backup') => {
+    windowManager.sendToMainWindow(Channel.Wallets, 'requestPassword', {
+      status: ResponseCode.Success,
+      result: {
+        walletID,
+        actionType,
+      },
+    })
   }
 }

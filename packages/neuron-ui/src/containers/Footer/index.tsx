@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -6,10 +6,21 @@ import { Stack, getTheme, Text, ProgressIndicator } from 'office-ui-fabric-react
 import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { ConnectStatus, FULL_SCREENS } from 'utils/const'
+import { ConnectStatus, FULL_SCREENS, Routes } from 'utils/const'
 import { NeuronWalletContext } from 'states/stateProvider'
 
 const theme = getTheme()
+const stackStyles = {
+  root: [
+    {
+      width: '100%',
+      background: theme.palette.neutralLighter,
+    },
+  ],
+}
+const stackItemStyles = {
+  root: [theme.fonts.small],
+}
 
 // TODO: Listen to sync progress report and update
 const SyncStatus = () => {
@@ -34,27 +45,24 @@ const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
 }
 
 // Status bar
-const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Footer = ({
+  history,
+  location: { pathname },
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
     chain: { networkID, connectStatus },
     settings: { networks },
   } = useContext(NeuronWalletContext)
+  const [t] = useTranslation()
+
+  const goToNetworksSetting = useCallback(() => {
+    history.push(Routes.SettingsNetworks)
+  }, [history])
 
   if (FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
   }
   const currentNetwork = networks.find(network => network.id === networkID)
-  const stackStyles = {
-    root: [
-      {
-        width: '100%',
-        background: theme.palette.neutralLighter,
-      },
-    ],
-  }
-  const stackItemStyles = {
-    root: [theme.fonts.small],
-  }
 
   return (
     <Stack
@@ -69,11 +77,13 @@ const Footer = ({ location: { pathname } }: React.PropsWithoutRef<StateWithDispa
         <SyncStatus />
       </Stack.Item>
 
-      <Stack.Item styles={stackItemStyles}>
+      <Stack styles={stackItemStyles} onClick={goToNetworksSetting}>
         {currentNetwork ? (
           <NetworkStatus online={connectStatus === ConnectStatus.Online} name={currentNetwork.name} />
-        ) : null}
-      </Stack.Item>
+        ) : (
+          <Text>{t('settings.setting-tabs.network')}</Text>
+        )}
+      </Stack>
     </Stack>
   )
 }

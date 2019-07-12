@@ -229,17 +229,6 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
             })
             break
           }
-          case WalletsMethod.Delete: {
-            dispatch({
-              type: NeuronWalletActions.Settings,
-              payload: { wallets: args.result.allWallets },
-            })
-            dispatch({
-              type: NeuronWalletActions.Wallet,
-              payload: args.result.currentWallet,
-            })
-            break
-          }
           case WalletsMethod.SendCapacity: {
             if (args.result) {
               history.push(Routes.History)
@@ -262,6 +251,16 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               payload: {
                 addresses,
                 balance: addressesToBalance(addresses),
+              },
+            })
+            break
+          }
+          case WalletsMethod.RequestPassword: {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: args.result.walletID || '',
+                actionType: args.result.actionType || '',
               },
             })
             break

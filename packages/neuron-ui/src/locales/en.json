@@ -143,6 +143,19 @@
         }
       }
     },
+    "password-request": {
+      "wallet-not-found": "The wallet is not found",
+      "password": "Password",
+      "send": {
+        "title": "Submit the transaction"
+      },
+      "delete": {
+        "title": "Delete the {{name}} wallet"
+      },
+      "backup": {
+        "title": "Backup the {{name}} wallet"
+      }
+    },
     "menuitem": {
       "add": "Add",
       "update": "Update",

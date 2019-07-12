@@ -23,4 +23,22 @@ export default {
       payload: null,
     }
   },
+  deleteWallet: (params: { id: string; password: string }) => {
+    setTimeout(() => {
+      walletsCall.delete(params)
+    }, 100)
+    return {
+      type: AppActions.DismissPasswordRequest,
+      payload: null,
+    }
+  },
+  backupWallet: (params: { id: string; password: string }) => {
+    setTimeout(() => {
+      walletsCall.backup(params)
+    }, 100)
+    return {
+      type: AppActions.DismissPasswordRequest,
+      payload: null,
+    }
+  },
 }

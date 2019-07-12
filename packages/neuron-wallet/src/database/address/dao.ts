@@ -5,6 +5,7 @@ import { getConnection } from './ormconfig'
 import TransactionsService, { OutputStatus } from '../../services/transactions'
 import CellsService from '../../services/cells'
 import LockUtils from '../../models/lock-utils'
+import { TransactionStatus } from '../../types/cell-types'
 
 export interface Address {
   walletId: string
@@ -55,7 +56,10 @@ export default class AddressDao {
         address,
       })
 
-    const txCount: number = await TransactionsService.getCountByAddress(address)
+    const txCount: number = await TransactionsService.getCountByAddressAndStatus(address, [
+      TransactionStatus.Pending,
+      TransactionStatus.Success,
+    ])
     const entities = await Promise.all(
       addressEntities.map(async entity => {
         const addressEntity = entity

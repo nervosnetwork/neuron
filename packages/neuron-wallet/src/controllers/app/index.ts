@@ -16,13 +16,13 @@ import windowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
 
-const walletsService = WalletsService.getInstance()
 const networksService = NetworksService.getInstance()
 const nodeService = NodeService.getInstance()
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static initWindow = async (win: BrowserWindow) => {
+    const walletsService = WalletsService.getInstance()
     const [
       currentWallet = null,
       wallets = [],
@@ -172,32 +172,6 @@ export default class AppController {
     AppController.navTo(URL.ImportWallet)
   }
 
-  public static async backupCurrentWallet() {
-    const currentWallet = AppController.getCurrentWallet()
-    if (currentWallet) {
-      const res = await WalletsController.backup(currentWallet.id)
-      if (!res.status) {
-        AppController.showMessageBox({
-          type: 'error',
-          message: res.msg!,
-        })
-      }
-    }
-  }
-
-  public static async deleteCurrentWallet() {
-    const currentWallet = AppController.getCurrentWallet()
-    if (currentWallet) {
-      const res = await WalletsController.delete(currentWallet.id)
-      if (!res.status) {
-        AppController.showMessageBox({
-          type: 'error',
-          message: res.msg!,
-        })
-      }
-    }
-  }
-
   public static async showTransactionDetails(hash: string) {
     const win = new BrowserWindow({
       width: 1200,
@@ -213,18 +187,6 @@ export default class AppController {
       win.focus()
       AppController.initWindow(win)
     })
-  }
-
-  private static getCurrentWallet() {
-    const currentWallet = walletsService.getCurrent()
-    if (!currentWallet) {
-      AppController.showMessageBox({
-        type: 'error',
-        message: i18n.t('messages.not-found', { field: i18n.t('keywords.wallet') }),
-      })
-      return null
-    }
-    return currentWallet
   }
 }
 

@@ -2,6 +2,7 @@ import { CapacityUnit } from 'utils/const'
 
 const appState: State.App = {
   send: {
+    txID: '',
     outputs: [
       {
         address: '',
@@ -12,6 +13,11 @@ const appState: State.App = {
     price: '0',
     description: '',
     loading: false,
+  },
+  passwordRequest: {
+    actionType: null,
+    walletID: '',
+    password: '',
   },
   messages: {
     networks: null,
