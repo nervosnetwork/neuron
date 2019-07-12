@@ -3278,6 +3278,59 @@
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
+"@uifabric/azure-themes@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@uifabric/azure-themes/-/azure-themes-7.0.2.tgz#4f1a46a2dc22246392bbcabb4ba6adc6107ee767"
+  integrity sha512-fljd7++ewOwEt4mkNM0AuDkw2VzdaGP6zevwHAXuY3Y/FMwHoFF0TSUSyQPcPIcHsltDTOv/IziqLdv9fXE4QA==
+  dependencies:
+    "@uifabric/merge-styles" "^7.0.2"
+    "@uifabric/set-version" "^7.0.0"
+    office-ui-fabric-react "^7.1.1"
+    tslib "^1.7.1"
+
+"@uifabric/experiments@7.4.2":
+  version "7.4.2"
+  resolved "https://registry.yarnpkg.com/@uifabric/experiments/-/experiments-7.4.2.tgz#4ff82fc4561d67a9f13e767b5f62a6937af8d257"
+  integrity sha512-gs5CqSAtKSryJy63DrHiBk4Rv6ufakN8zDizyqtJu8iBsYVUAP97Rbooix9Jj4vHYVDw1gyoCIqOWEvqLZpWVQ==
+  dependencies:
+    "@microsoft/load-themed-styles" "^1.7.13"
+    "@uifabric/azure-themes" "^7.0.2"
+    "@uifabric/file-type-icons" "^7.0.4"
+    "@uifabric/fluent-theme" "^7.0.3"
+    "@uifabric/foundation" "^7.0.2"
+    "@uifabric/icons" "^7.1.0"
+    "@uifabric/merge-styles" "^7.1.1"
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    "@uifabric/theme-samples" "^7.0.2"
+    "@uifabric/utilities" "^7.0.6"
+    "@uifabric/variants" "^7.0.2"
+    deep-assign "^2.0.0"
+    office-ui-fabric-react "^7.8.1"
+    prop-types "^15.5.10"
+    tslib "^1.7.1"
+
+"@uifabric/file-type-icons@^7.0.4":
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/@uifabric/file-type-icons/-/file-type-icons-7.0.4.tgz#250bc7b3f3182cae7f8dc46b89b65a1d367103c8"
+  integrity sha512-CyNSQ/d3p3Ma/E0+Z8VDLepFS/9o7p4gcVdOZ+HYJ2XzI8J2fHWwc576tvVYjgrzlyGO5TIvF18Ll5FqMDpP7Q==
+  dependencies:
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    tslib "^1.7.1"
+
+"@uifabric/fluent-theme@^7.0.3":
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@uifabric/fluent-theme/-/fluent-theme-7.0.3.tgz#4f82f8b268bbe173365b45b0368c97e02421dfbb"
+  integrity sha512-HaxqnnsfEZKqamt9t49W2hM9gh4uIRbZCHdq3t+gq++83L8/Z4jirgUXinFUGgLbgcLAhQfqYNj7AuUonB2nww==
+  dependencies:
+    "@uifabric/merge-styles" "^7.1.1"
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    "@uifabric/variants" "^7.0.2"
+    office-ui-fabric-react "^7.8.1"
+    tslib "^1.7.1"
+
 "@uifabric/foundation@^7.0.1":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@uifabric/foundation/-/foundation-7.0.1.tgz#4abf82c58f762d048f1612eb1039efc0405127fa"
@@ -3286,6 +3339,16 @@
     "@uifabric/set-version" "^7.0.0"
     "@uifabric/styling" "^7.0.2"
     "@uifabric/utilities" "^7.0.3"
+    tslib "^1.7.1"
+
+"@uifabric/foundation@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@uifabric/foundation/-/foundation-7.0.2.tgz#5696814804970e4f4968e6bf02cd982799a462c3"
+  integrity sha512-9ik+k8B+otG3t/FyUqdWiAZHQS0nIZQR8SrFfZfW3sEt6kITxg0bHb8jWEW+xqc0b2qEO2V5lJmtWz6nRp2CDQ==
+  dependencies:
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    "@uifabric/utilities" "^7.0.6"
     tslib "^1.7.1"
 
 "@uifabric/icons@^7.0.2":
@@ -3297,18 +3360,27 @@
     "@uifabric/styling" "^7.0.2"
     tslib "^1.7.1"
 
-"@uifabric/merge-styles@^7.1.0":
+"@uifabric/icons@^7.1.0":
   version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@uifabric/merge-styles/-/merge-styles-7.1.0.tgz#dff9b60986021d710592ca17353691c4fb93c8ef"
-  integrity sha512-mwGm5bDXfnnstFEep2/19KEMH9jf4tVx4btpTFRZoZPZcDFhe5Ia/vlqxRRgFVswBSo8Xk8G/E0y9FTRfIO/Ew==
+  resolved "https://registry.yarnpkg.com/@uifabric/icons/-/icons-7.1.0.tgz#484c9079f588debce0c33a22232436cf86abb5b3"
+  integrity sha512-hKGWPTkxZkGEuvfsFx5dh28yyWbYHf32BtvcwsFR5Tn8LEpTR1HZY/tc2aS+JjNMpX1m+R3SrrxLYT9rVkC77Q==
+  dependencies:
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    tslib "^1.7.1"
+
+"@uifabric/merge-styles@^7.0.2", "@uifabric/merge-styles@^7.1.1":
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@uifabric/merge-styles/-/merge-styles-7.1.1.tgz#8af9f5b7e7f6e5597d9d18c7f87077d1fe04e60c"
+  integrity sha512-FrQvdydkFPcwLkI4GykKdeUXMZJ6VlAsWl5McNDZq3UQEkwDS69OUwwA+zdwtNZMSrgo5TT1MshViUvwHvFFIA==
   dependencies:
     "@uifabric/set-version" "^7.0.0"
     tslib "^1.7.1"
 
-"@uifabric/merge-styles@^7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@uifabric/merge-styles/-/merge-styles-7.1.1.tgz#8af9f5b7e7f6e5597d9d18c7f87077d1fe04e60c"
-  integrity sha512-FrQvdydkFPcwLkI4GykKdeUXMZJ6VlAsWl5McNDZq3UQEkwDS69OUwwA+zdwtNZMSrgo5TT1MshViUvwHvFFIA==
+"@uifabric/merge-styles@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@uifabric/merge-styles/-/merge-styles-7.1.0.tgz#dff9b60986021d710592ca17353691c4fb93c8ef"
+  integrity sha512-mwGm5bDXfnnstFEep2/19KEMH9jf4tVx4btpTFRZoZPZcDFhe5Ia/vlqxRRgFVswBSo8Xk8G/E0y9FTRfIO/Ew==
   dependencies:
     "@uifabric/set-version" "^7.0.0"
     tslib "^1.7.1"
@@ -3320,7 +3392,7 @@
   dependencies:
     tslib "^1.7.1"
 
-"@uifabric/styling@7.1.1":
+"@uifabric/styling@7.1.1", "@uifabric/styling@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@uifabric/styling/-/styling-7.1.1.tgz#95cc5c40e340b0cfef8ee6cf4ec21b32952b4f0d"
   integrity sha512-UiBIj7HZwRk3qLKO+RcSnT59Vizu6+QPrv94e5MIFVIbh241J8N+PRFHK6U44Se+7ZjGON1DvZKs1ll57NWufg==
@@ -3342,6 +3414,16 @@
     "@uifabric/utilities" "^7.0.4"
     tslib "^1.7.1"
 
+"@uifabric/theme-samples@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@uifabric/theme-samples/-/theme-samples-7.0.2.tgz#9b201d55ee15aae2ebc7139c411431bf02a3950b"
+  integrity sha512-7TydSO5LeZrCOFaxoYyb+MxzP7JPcjFYylhiensWrVPTxTiUaHHSn5NlDvA0Y/U8gNgQ7+tyr4yFi/A+6hXseQ==
+  dependencies:
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/variants" "^7.0.2"
+    office-ui-fabric-react "^7.1.1"
+    tslib "^1.7.1"
+
 "@uifabric/utilities@^7.0.3", "@uifabric/utilities@^7.0.4":
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@uifabric/utilities/-/utilities-7.0.5.tgz#3e3d9a0e7a24ccd404b7e92d90b7ce3cbcec10ca"
@@ -3360,6 +3442,15 @@
     "@uifabric/merge-styles" "^7.1.1"
     "@uifabric/set-version" "^7.0.0"
     prop-types "^15.5.10"
+    tslib "^1.7.1"
+
+"@uifabric/variants@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@uifabric/variants/-/variants-7.0.2.tgz#6db64b7177bb5d290c9a64a90eda32714d76cd31"
+  integrity sha512-3PtVIyDS88Zu6rO02hdm5cUS0HWPcd3mNoHOkVFPU184VancJXWKMRvjuU7W8Gu9Gd7NKc+7UelUBPr1qPCpEg==
+  dependencies:
+    "@uifabric/set-version" "^7.0.0"
+    office-ui-fabric-react "^7.1.1"
     tslib "^1.7.1"
 
 "@webassemblyjs/ast@1.8.5":
@@ -6446,6 +6537,13 @@ dedent@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
   integrity sha1-JJXduvbrh0q7Dhvp3yLS5aVEMmw=
+
+deep-assign@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/deep-assign/-/deep-assign-2.0.0.tgz#ebe06b1f07f08dae597620e3dd1622f371a1c572"
+  integrity sha1-6+BrHwfwja5ZdiDj3RYi83GhxXI=
+  dependencies:
+    is-obj "^1.0.0"
 
 deep-equal@^1.0.1:
   version "1.0.1"
@@ -12066,6 +12164,21 @@ office-ui-fabric-react@7.6.1:
     "@uifabric/set-version" "^7.0.0"
     "@uifabric/styling" "^7.1.0"
     "@uifabric/utilities" "^7.0.4"
+    prop-types "^15.5.10"
+    tslib "^1.7.1"
+
+office-ui-fabric-react@^7.1.1, office-ui-fabric-react@^7.8.1:
+  version "7.8.2"
+  resolved "https://registry.yarnpkg.com/office-ui-fabric-react/-/office-ui-fabric-react-7.8.2.tgz#4e85d8df0e2bca6799dc8dc0b23cf1669c650ee9"
+  integrity sha512-e63yuh1jGHbI6FcvVIhXBEcwy6bD8dWQIlyFfDW45AJ/mM7fV8VDY3Fdg39vdjbNJOCP3y6ZoclxONjX35WMEQ==
+  dependencies:
+    "@microsoft/load-themed-styles" "^1.7.13"
+    "@uifabric/foundation" "^7.0.2"
+    "@uifabric/icons" "^7.1.0"
+    "@uifabric/merge-styles" "^7.1.1"
+    "@uifabric/set-version" "^7.0.0"
+    "@uifabric/styling" "^7.1.1"
+    "@uifabric/utilities" "^7.0.6"
     prop-types "^15.5.10"
     tslib "^1.7.1"
 

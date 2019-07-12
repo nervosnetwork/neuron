@@ -200,6 +200,14 @@
     },
     "sync": {
       "syncing": "同步中"
+    },
+    "pagination": {
+      "previous-page": "上一页",
+      "next-page": "下一页",
+      "first-page": "首页",
+      "last-page": "尾页",
+      "page": "页码",
+      "selected": "当前页"
     }
   }
 }

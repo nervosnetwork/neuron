@@ -1,8 +1,15 @@
-import React, { useCallback, useMemo } from 'react'
-import { NavLink, RouteComponentProps } from 'react-router-dom'
+import React, { useCallback } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox, getTheme } from 'office-ui-fabric-react'
-import { Search as SearchIcon } from 'grommet-icons'
+import { Pagination } from '@uifabric/experiments'
+import {
+  Search as SearchIcon,
+  LinkDown as LinkDownIcon,
+  LinkBottom as LinkBottomIcon,
+  LinkTop as LinkTopIcon,
+  LinkUp as LinkUpIcon,
+} from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -17,6 +24,10 @@ const { semanticColors } = theme
 registerIcons({
   icons: {
     Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
+    FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
+    LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
+    PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
+    NextPage: <LinkDownIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
   },
 })
 
@@ -33,7 +44,6 @@ const History = ({
 
   const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, id, dispatch)
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
-  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize) || 1, [totalCount, pageSize])
 
   return (
     <Stack>
@@ -48,28 +58,26 @@ const History = ({
         />
       </Stack>
       <TransactionList walletID={id} items={items} dispatch={dispatch} />
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <NavLink to={`${Routes.History}?pageNo=1`}>{t('history.first')}</NavLink>
-        <NavLink
-          to={`${Routes.History}?pageNo=${pageNo - 1}`}
-          style={{
-            pointerEvents: pageNo - 1 < 1 ? 'none' : 'auto',
-            color: pageNo - 1 < 1 ? 'grey' : '#007bff',
-          }}
-        >
-          {t('history.previous')}
-        </NavLink>
-        <NavLink
-          to={`${Routes.History}?pageNo=${pageNo + 1}`}
-          style={{
-            pointerEvents: pageNo + 1 > totalPages ? 'none' : 'auto',
-            color: pageNo + 1 > totalPages ? 'grey' : '#007bff',
-          }}
-        >
-          {t('history.next')}
-        </NavLink>
-        <NavLink to={`${Routes.History}?pageNo=${totalPages}`}>{t('history.last')}</NavLink>
-      </div>
+      <Pagination
+        selectedPageIndex={pageNo - 1}
+        pageCount={Math.ceil(totalCount / pageSize)}
+        itemsPerPage={pageSize}
+        totalItemCount={totalCount}
+        previousPageAriaLabel={t('pagination.previous-page')}
+        nextPageAriaLabel={t('pagination.next-page')}
+        firstPageAriaLabel={t('pagination.first-page')}
+        lastPageAriaLabel={t('pagination.last-page')}
+        pageAriaLabel={t('pagination-page')}
+        selectedAriaLabel={t('pagination-selected')}
+        firstPageIconProps={{ iconName: 'FirstPage' }}
+        previousPageIconProps={{ iconName: 'PrevPage' }}
+        nextPageIconProps={{ iconName: 'NextPage' }}
+        lastPageIconProps={{ iconName: 'LastPage' }}
+        format="buttons"
+        onPageChange={(idx: number) => {
+          history.push(`${Routes.History}?pageNo=${idx + 1}`)
+        }}
+      />
     </Stack>
   )
 }
