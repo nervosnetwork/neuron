@@ -62,7 +62,11 @@
       "description-optional": "备注 (选填)",
       "balance": "余额",
       "add-one": "添加",
-      "remove-this": "删除"
+      "remove-this": "删除",
+      "fee": "交易费",
+      "price": "单价",
+      "expected-speed": "预期成交速度",
+      "total-cycles": "RISC-V Cycles 总数"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
@@ -156,6 +160,9 @@
         "title": "备份钱包 {{name}}"
       }
     },
+    "footer": {
+      "fail-to-fetch-tip-block-number": "无法获取最新高度"
+    },
     "menuitem": {
       "add": "添加",
       "update": "更新",
@@ -197,6 +204,14 @@
     },
     "sync": {
       "syncing": "同步中"
+    },
+    "pagination": {
+      "previous-page": "上一页",
+      "next-page": "下一页",
+      "first-page": "首页",
+      "last-page": "尾页",
+      "page": "页码",
+      "selected": "当前页"
     }
   }
 }
