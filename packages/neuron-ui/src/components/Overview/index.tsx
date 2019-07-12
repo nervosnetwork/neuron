@@ -77,7 +77,7 @@ const PropertyList = ({
     {...props}
   />
 )
-const General = ({
+const Overview = ({
   dispatch,
   wallet: { id, balance = '' },
   chain: {
@@ -128,7 +128,7 @@ const General = ({
     if (item) {
       return (
         <Text variant="mediumPlus" as="span">
-          {item.timestamp ? timeFormatter.format(+item.timestamp).toLocaleString() : '-'}
+          {timeFormatter.format(+(item.timestamp || item.createdAt)).toLocaleString()}
         </Text>
       )
     }
@@ -183,7 +183,7 @@ const General = ({
         },
       ].map(col => ({
         isResizable: true,
-        minWidth: MIN_CELL_WIDTH,
+        minWidth: 200,
         fieldName: col.key,
         ariaLabel: col.name,
         ...col,
@@ -194,7 +194,7 @@ const General = ({
   const balanceItems = useMemo(
     () => [
       { label: t('overview.amount'), value: balance },
-      { label: t('overview.live-cells'), value: 'mock livigin cells' },
+      { label: t('overview.live-cells'), value: 'mock living cells' },
       { label: t('overview.cell-types'), value: 'mock cell typ' },
     ],
     [t, balance]
@@ -243,6 +243,6 @@ const General = ({
   )
 }
 
-General.displayName = 'General'
+Overview.displayName = 'Overview'
 
-export default General
+export default Overview
