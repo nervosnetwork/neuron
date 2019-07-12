@@ -2,11 +2,15 @@
 import { useEffect } from 'react'
 
 import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import { ckbCore, getTipBlockNumber } from 'services/chain'
 import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
 import initStates from 'states/initStates'
+
+let timer: NodeJS.Timeout
+const SYNC_INTERVAL_TIME = 10000
 
 const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
@@ -334,6 +338,43 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
     })
   }, [i18n, chain, dispatch, history])
 
+export const useSyncTipBlockNumber = ({
+  networks,
+  networkID,
+  dispatch,
+}: {
+  networks: State.Network[]
+  networkID: string
+  dispatch: StateDispatch
+}) => {
+  useEffect(() => {
+    const network = networks.find(n => n.id === networkID)
+    const syncTipNumber = () =>
+      getTipBlockNumber()
+        .then(tipBlockNumber => {
+          dispatch({
+            type: AppActions.UpdateTipBlockNumber,
+            payload: tipBlockNumber,
+          })
+        })
+        .catch(console.error)
+    clearInterval(timer)
+    if (network) {
+      ckbCore.setNode(network.remote)
+      syncTipNumber()
+      timer = setInterval(() => {
+        syncTipNumber()
+      }, SYNC_INTERVAL_TIME)
+    } else {
+      ckbCore.setNode('')
+    }
+    return () => {
+      clearInterval(timer)
+    }
+  }, [networks, networkID, dispatch])
+}
+
 export default {
   useChannelListeners,
+  useSyncTipBlockNumber,
 }

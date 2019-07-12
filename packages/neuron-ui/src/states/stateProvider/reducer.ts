@@ -25,6 +25,7 @@ export enum AppActions {
   RequestPassword = 'requestPassword',
   DismissPasswordRequest = 'dismissPasswordRequest',
   UpdatePassword = 'updatePassword',
+  UpdateTipBlockNumber = 'updateTipBlockNumber',
   Ignore = 'ignore',
 }
 
@@ -122,6 +123,18 @@ export const reducer = (
       }
     }
     // Actions of App
+    case AppActions.UpdateTipBlockNumber: {
+      /**
+       * paylaod: tipBlockNumber
+       */
+      return {
+        ...state,
+        app: {
+          ...state.app,
+          tipBlockNumber: payload,
+        },
+      }
+    }
     case AppActions.UpdateTransactionID: {
       return {
         ...state,

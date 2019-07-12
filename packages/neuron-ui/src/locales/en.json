@@ -156,6 +156,9 @@
         "title": "Backup the {{name}} wallet"
       }
     },
+    "footer": {
+      "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
+    },
     "menuitem": {
       "add": "Add",
       "update": "Update",

@@ -156,6 +156,9 @@
         "title": "备份钱包 {{name}}"
       }
     },
+    "footer": {
+      "fail-to-fetch-tip-block-number": "无法获取最新高度"
+    },
     "menuitem": {
       "add": "添加",
       "update": "更新",
