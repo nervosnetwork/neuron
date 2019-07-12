@@ -585,36 +585,28 @@ export default class TransactionsService {
     return [...new Set(inputBlake160s.concat(outputBlake160s))]
   }
 
-  // tx count with one lockHash
-  public static getCountByLockHash = async (lockHash: string): Promise<number> => {
-    const outputs: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .where(`output.lockHash = :lockHash`, { lockHash })
-      .select('DISTINCT output.outPointTxHash', 'outPointTxHash')
-      .getRawMany()
-
-    const outputTxHashes: string[] = outputs.map(output => output.outPointTxHash)
-
-    const inputs: InputEntity[] = await getConnection()
-      .getRepository(InputEntity)
-      .createQueryBuilder('input')
-      .where(`input.lockHash = :lockHash`, { lockHash })
-      .select(`DISTINCT input.transactionHash`, 'transactionHash')
-      .getRawMany()
-
-    const inputTxHashes: string[] = inputs.map((input: any) => input.transactionHash)
-
-    const hashes: string[] = [...new Set(outputTxHashes.concat(inputTxHashes))]
-
-    const count: number = hashes.length
+  // tx count with one lockHash and status
+  public static getCountByLockHashAndStatus = async (
+    lockHash: string,
+    status: TransactionStatus[]
+  ): Promise<number> => {
+    const count: number = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .leftJoinAndSelect('tx.inputs', 'input')
+      .leftJoinAndSelect('tx.outputs', 'output')
+      .where(`(input.lockHash = :lockHash OR output.lockHash = :lockHash) AND tx.status IN (:...status)`, {
+        lockHash,
+        status,
+      })
+      .getCount()
 
     return count
   }
 
-  public static getCountByAddress = async (address: string): Promise<number> => {
+  public static getCountByAddressAndStatus = async (address: string, status: TransactionStatus[]): Promise<number> => {
     const lockHash: string = await LockUtils.addressToLockHash(address)
-    return TransactionsService.getCountByLockHash(lockHash)
+    return TransactionsService.getCountByLockHashAndStatus(lockHash, status)
   }
 
   public static pendings = async (): Promise<TransactionEntity[]> => {
