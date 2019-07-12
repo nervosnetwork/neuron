@@ -1,5 +1,6 @@
 import './Overview.stories'
 import './Addresses.stories'
+import './History.stories'
 import './Receive.stories'
 import './TransactionList.stories'
 import './GeneralSetting.stories'

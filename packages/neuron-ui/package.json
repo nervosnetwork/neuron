@@ -40,6 +40,7 @@
   ],
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.15.1",
+    "@uifabric/experiments": "7.4.2",
     "@uifabric/styling": "7.1.1",
     "grommet-icons": "4.2.0",
     "i18next": "15.1.3",

@@ -204,6 +204,14 @@
     },
     "sync": {
       "syncing": "Syncing"
+    },
+    "pagination": {
+      "previous-page": "Previous page",
+      "next-page": "Next page",
+      "first-page": "First page",
+      "last-page": "Last page",
+      "page": "Page",
+      "selected": "Selected"
     }
   }
 }
