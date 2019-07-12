@@ -62,7 +62,11 @@
       "description-optional": "Description (optional)",
       "balance": "Balance",
       "add-one": "Add One More",
-      "remove-this": "Remove This"
+      "remove-this": "Remove This",
+      "fee": "Transaction Fee",
+      "price": "Price",
+      "expected-speed": "Expected speed",
+      "total-cycles": "Total RISC-V Cycles"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
