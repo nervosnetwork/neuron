@@ -62,7 +62,11 @@
       "description-optional": "备注 (选填)",
       "balance": "余额",
       "add-one": "添加",
-      "remove-this": "删除"
+      "remove-this": "删除",
+      "fee": "交易费",
+      "price": "单价",
+      "expected-speed": "预期成交速度",
+      "total-cycles": "RISC-V Cycles 总数"
     },
     "receive": {
       "click-to-copy": "点击复制地址",

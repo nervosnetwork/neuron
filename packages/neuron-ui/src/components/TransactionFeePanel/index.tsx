@@ -1,37 +1,7 @@
-import React from 'react'
-import styled from 'styled-components'
+import React, { useState } from 'react'
+import { Stack, Label, TextField, Dropdown } from 'office-ui-fabric-react'
 import { CaretDown } from 'grommet-icons'
-
-const Panel = styled.div``
-const PanelHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
-const PanelBody = styled.div`
-  display: grid;
-  grid-gap: 15px;
-  grid-template:
-    'price cycles' 1fr
-    'speed cycles' 1fr /
-    250px auto;
-  padding: 15px 0;
-`
-
-const Price = styled.div`
-  grid-area: price;
-  display: flex;
-  align-items: center;
-`
-
-const Speed = styled.div`
-  grid-area: speed;
-  display: flex;
-`
-
-const Cycles = styled.div`
-  grid-area: cycles;
-  display: flex;
-`
+import { useTranslation } from 'react-i18next'
 
 interface TransactionFee {
   fee: string
@@ -45,36 +15,70 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
   price,
   fee,
   onPriceChange,
-}: TransactionFee) => (
-  <Panel>
-    <PanelHeader>
-      <span>
-        Transaction Fee:
-        {fee}
-      </span>
-      <CaretDown />
-    </PanelHeader>
-    <PanelBody>
-      <Price>
-        Price:
-        <input value={price} type="string" onChange={onPriceChange} />
-      </Price>
-      <Speed>
-        Expected Speed:
-        <select>
-          <option value="0">immediately</option>
-          <option value="30">~ 30s</option>
-          <option value="60">~ 1min</option>
-          <option value="180">~ 3min</option>
-        </select>
-      </Speed>
-      <Cycles>
-        Total RISC-V Cycles:
-        {cycles}
-      </Cycles>
-    </PanelBody>
-  </Panel>
-)
+}: TransactionFee) => {
+  const [t] = useTranslation()
+  const [showDetail, setShowDetail] = useState(false)
+  return (
+    <Stack tokens={{ childrenGap: 15 }}>
+      <Stack horizontal tokens={{ childrenGap: 20 }}>
+        <Stack.Item>
+          <Label>{t('send.fee')}</Label>
+        </Stack.Item>
+        <Stack.Item grow>
+          <TextField value={fee} readOnly />
+        </Stack.Item>
+        <Stack.Item>
+          <CaretDown
+            onClick={() => setShowDetail(!showDetail)}
+            style={{
+              transform: showDetail ? 'rotate(180deg)' : 'none',
+            }}
+          />
+        </Stack.Item>
+      </Stack>
+      <Stack
+        tokens={{ childrenGap: 15 }}
+        styles={{
+          root: {
+            maxHeight: showDetail ? '100vw' : '0',
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <Stack horizontal tokens={{ childrenGap: 20 }}>
+          <Stack.Item>
+            <Label>{t('send.price')}</Label>
+          </Stack.Item>
+          <Stack.Item grow>
+            <TextField type="number" value={price} onChange={onPriceChange} />
+          </Stack.Item>
+        </Stack>
+        <Stack horizontal tokens={{ childrenGap: 20 }}>
+          <Stack.Item>
+            <Label>{t('send.expected-speed')}</Label>
+          </Stack.Item>
+          <Stack.Item>
+            <Dropdown
+              defaultSelectedKey="0"
+              options={[
+                { key: '0', text: 'immediately' },
+                { key: '30', text: '~ 30s' },
+                { key: '60', text: '~ 1min' },
+                { key: '180', text: '~ 3min' },
+              ]}
+            />
+          </Stack.Item>
+        </Stack>
+        <Stack>
+          <Stack horizontal tokens={{ childrenGap: 20 }}>
+            <Stack.Item>{t('send.total-cycles')}</Stack.Item>
+            <Stack.Item>{cycles}</Stack.Item>
+          </Stack>
+        </Stack>
+      </Stack>
+    </Stack>
+  )
+}
 
 TransactionFee.displayName = 'TransactionFee'
 
