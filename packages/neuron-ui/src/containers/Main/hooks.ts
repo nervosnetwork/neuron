@@ -1,13 +1,21 @@
 /* globals BigInt */
 import { useEffect } from 'react'
 
-import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
-import { ckbCore, getTipBlockNumber } from 'services/chain'
-import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
 import initStates from 'states/initStates'
+
+import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import { ckbCore, getTipBlockNumber } from 'services/chain'
+import { Routes, Channel, ConnectStatus } from 'utils/const'
+import {
+  wallets as walletsCache,
+  networks as networksCache,
+  addresses as addressesCache,
+  currentNetworkID as currentNetworkIDCache,
+  currentWallet as currentWalletCache,
+} from 'utils/localCache'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 10000
@@ -69,6 +77,12 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               transactions: { ...chain.transactions, ...transactions },
             },
           })
+
+          currentWalletCache.save(wallet)
+          currentNetworkIDCache.save(networkID)
+          walletsCache.save(wallets)
+          addressesCache.save(addresses)
+          networksCache.save(networks)
         } else {
           /* eslint-disable no-alert */
           // TODO: better prompt, prd required
@@ -221,6 +235,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Settings,
               payload: { wallets: args.result },
             })
+            walletsCache.save(args.result)
             if (!args.result.length) {
               history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
             }
@@ -231,6 +246,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Wallet,
               payload: args.result,
             })
+            currentWalletCache.save(args.result)
             break
           }
           case WalletsMethod.SendCapacity: {
@@ -257,6 +273,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
                 balance: addressesToBalance(addresses),
               },
             })
+            addressesCache.save(addresses)
             break
           }
           case WalletsMethod.RequestPassword: {
@@ -298,8 +315,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
           case NetworksMethod.GetAll: {
             dispatch({
               type: NeuronWalletActions.Settings,
-              payload: { networks: args.result },
+              payload: { networks: args.result || [] },
             })
+            networksCache.save(args.result || [])
             break
           }
           case NetworksMethod.CurrentID: {
@@ -307,6 +325,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Chain,
               payload: { networkID: args.result },
             })
+            currentNetworkIDCache.save(args.result)
             break
           }
           case NetworksMethod.Create:

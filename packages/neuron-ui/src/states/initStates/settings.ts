@@ -1,9 +1,9 @@
-import { addressBook } from 'utils/localCache'
+import { addressBook, wallets, networks } from 'utils/localCache'
 
 export const settingsState: State.Settings = {
   showAddressBook: addressBook.isVisible(),
-  networks: [],
-  wallets: [],
+  networks: networks.load(),
+  wallets: wallets.load(),
 }
 
 export default settingsState
