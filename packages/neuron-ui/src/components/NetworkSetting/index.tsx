@@ -44,7 +44,6 @@ const NetworkSetting = ({
               key: network.id,
               text: network.name,
               checked: chain.networkID === network.id,
-              disabled: chain.networkID === network.id,
               onRenderLabel: ({ text }: IChoiceGroupOption) => {
                 return (
                   <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(network.id)}>
