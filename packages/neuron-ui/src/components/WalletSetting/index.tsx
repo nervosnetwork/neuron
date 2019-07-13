@@ -59,7 +59,6 @@ const WalletSetting = ({
             key: wallet.id,
             text: wallet.name,
             checked: wallet.id === currentID,
-            disabled: wallet.id === currentID,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
                 <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
