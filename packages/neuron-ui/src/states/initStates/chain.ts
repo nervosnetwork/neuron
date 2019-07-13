@@ -1,5 +1,7 @@
+import { currentNetworkID } from 'utils/localCache'
+
 const chainState: State.Chain = {
-  networkID: '',
+  networkID: currentNetworkID.load(),
   connectStatus: 'offline',
   tipBlockNumber: '',
   transaction: {
