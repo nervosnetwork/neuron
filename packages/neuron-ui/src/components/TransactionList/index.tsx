@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  Stack,
   Text,
   DetailsList,
   TextField,
@@ -8,6 +9,7 @@ import {
   IGroup,
   CheckboxVisibility,
   ITextFieldStyleProps,
+  getTheme,
 } from 'office-ui-fabric-react'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
@@ -17,6 +19,7 @@ import { useLocalDescription } from 'utils/hooks'
 import { shannonToCKBFormatter } from 'utils/formatters'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
+const theme = getTheme()
 
 const MIN_CELL_WIDTH = 50
 
@@ -26,7 +29,20 @@ interface FormatTransaction extends State.Transaction {
 
 const onRenderHeader = ({ group }: any) => {
   const { name } = group
-  return <Text variant="large">{name}</Text>
+  return (
+    <Stack
+      tokens={{ padding: 15 }}
+      styles={{
+        root: {
+          background: theme.palette.neutralLighterAlt,
+          borderTop: `1px solid ${theme.palette.neutralSecondary}`,
+          borderBottom: `1px solid ${theme.palette.neutralLighter}`,
+        },
+      }}
+    >
+      <Text variant="large">{name}</Text>
+    </Stack>
+  )
 }
 
 const TransactionList = ({
