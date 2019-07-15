@@ -1,11 +1,7 @@
 import { ReplaySubject } from 'rxjs'
-import { delay } from 'rxjs/operators'
 import { ResponseCode, Channel } from '../../utils/const'
 import { Transaction } from '../../types/cell-types'
 import windowManager from '../window-manager'
-import TransactionsService from '../../services/transactions'
-import AddressService from '../../services/addresses'
-import LockUtils from '../lock-utils'
 
 export interface TransactionChangedMessage {
   event: string
@@ -27,20 +23,10 @@ export class TxDbChangedSubject {
   }
 
   static subscribe = () => {
-    // TODO: since typeorm not provide afterCommit hooks, delay for wait transaction committed
-    TxDbChangedSubject.subject.pipe(delay(100)).subscribe(async ({ tx }) => {
-      const transaction = await TransactionsService.get(tx.hash)
-      if (!transaction) {
-        return
-      }
-      const blake160s = TransactionsService.blake160sOfTx(transaction)
-      const addresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
-      const addrs = await AddressService.findByAddresses(addresses)
-      const walletIDs = addrs.map(addr => addr.walletId)
-      const uniqueWalletIDs = [...new Set(walletIDs)]
+    TxDbChangedSubject.subject.subscribe(({ event, tx }) => {
       const result = {
-        tx: transaction,
-        walletIDs: JSON.stringify(uniqueWalletIDs),
+        event,
+        txHash: tx.hash,
       }
       windowManager.broadcast(Channel.Transactions, 'transactionUpdated', {
         status: ResponseCode.Success,
