@@ -14,6 +14,7 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
+import { ShannonToCKBFormatter } from 'utils/formatters'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
@@ -102,7 +103,19 @@ const TransactionList = ({
             ) : null
           },
         },
-        { name: t('history.amount'), key: 'value', fieldName: 'value', minWidth: MIN_CELL_WIDTH, maxWidth: 300 },
+        {
+          name: t('history.amount'),
+          key: 'value',
+          fieldName: 'value',
+          minWidth: MIN_CELL_WIDTH,
+          maxWidth: 300,
+          onRender: (item?: FormatTransaction) => {
+            if (item) {
+              return <span title={`${item.value} shannon`}>{`${ShannonToCKBFormatter(item.value)} CKB`}</span>
+            }
+            return '-'
+          },
+        },
       ].map(
         (col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, isResizable: true, isCollapsable: false, ...col })
       ),
