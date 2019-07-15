@@ -32,6 +32,7 @@ export enum WalletsMethod {
   AllAddresses = 'allAddresses',
   UpdateAddressDescription = 'updateAddressDescription',
   RequestPassword = 'requestPassword',
+  GetAllAddresses = 'getAllAddresses',
 }
 
 export enum NetworksMethod {
@@ -163,6 +164,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     fee: string
     description: string
   }) => void
+  getAllAddresses: (id: string) => void
   updateAddressDescription: (params: { walletID: string; address: string; description: string }) => void
 }
 
