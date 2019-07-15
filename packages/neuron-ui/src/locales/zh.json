@@ -161,8 +161,8 @@
       }
     },
     "qrcode": {
-      "copy": "复制",
-      "save": "保存到本地"
+      "copy": "复制图片",
+      "save": "保存图片"
     },
     "footer": {
       "fail-to-fetch-tip-block-number": "无法获取最新高度"

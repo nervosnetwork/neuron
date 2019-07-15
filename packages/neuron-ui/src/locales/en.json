@@ -161,8 +161,8 @@
       }
     },
     "qrcode": {
-      "copy": "Copy",
-      "save": "Save"
+      "copy": "Copy image",
+      "save": "Save image"
     },
     "footer": {
       "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
