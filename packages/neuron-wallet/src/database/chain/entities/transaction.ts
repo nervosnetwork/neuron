@@ -90,12 +90,14 @@ export default class Transaction extends BaseEntity {
   outputs!: OutputEntity[]
 
   public toInterface(): TransactionInterface {
+    const inputs = this.inputs ? this.inputs.map(input => input.toInterface()) : []
+    const outputs = this.outputs ? this.outputs.map(output => output.toInterface()) : []
     return {
       hash: this.hash,
       version: this.version,
       deps: this.deps,
-      inputs: this.inputs.map(input => input.toInterface()),
-      outputs: this.outputs.map(output => output.toInterface()),
+      inputs,
+      outputs,
       timestamp: this.timestamp,
       blockNumber: this.blockNumber,
       blockHash: this.blockHash,
