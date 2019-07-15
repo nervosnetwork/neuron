@@ -6,7 +6,16 @@ import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProv
 import { actionCreators } from 'states/stateProvider/actionCreators'
 import initStates from 'states/initStates'
 
-import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
+import UILayer, {
+  AppMethod,
+  ChainMethod,
+  NetworksMethod,
+  TransactionsMethod,
+  WalletsMethod,
+  walletsCall,
+  transactionsCall,
+  networksCall,
+} from 'services/UILayer'
 import { ckbCore, getTipBlockNumber } from 'services/chain'
 import { Routes, Channel, ConnectStatus } from 'utils/const'
 import {
@@ -24,8 +33,55 @@ const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
 }
 
-export const useChannelListeners = (i18n: any, history: any, chain: State.Chain, dispatch: StateDispatch) =>
+export const useChannelListeners = ({
+  walletID,
+  chain,
+  dispatch,
+  history,
+  i18n,
+}: {
+  walletID: string
+  chain: State.Chain
+  dispatch: StateDispatch
+  history: any
+  i18n: any
+}) =>
   useEffect(() => {
+    UILayer.on(
+      Channel.DataUpdate,
+      (
+        _e: Event,
+        _actionType: 'create' | 'update' | 'delete',
+        dataType: 'address' | 'transaction' | 'wallet' | 'network'
+      ) => {
+        switch (dataType) {
+          case 'address': {
+            walletsCall.getAllAddresses(walletID)
+            break
+          }
+          case 'transaction': {
+            transactionsCall.getAllByKeywords({
+              walletID,
+              keywords: chain.transactions.keywords,
+              pageNo: chain.transactions.pageNo,
+              pageSize: chain.transactions.pageSize,
+            })
+            break
+          }
+          case 'wallet': {
+            walletsCall.getAll()
+            break
+          }
+          case 'network': {
+            networksCall.getAll()
+            break
+          }
+          default: {
+            break
+          }
+        }
+      }
+    )
     UILayer.on(
       Channel.Initiate,
       (
@@ -355,7 +411,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
         })
       }
     })
-  }, [i18n, chain, dispatch, history])
+  }, [walletID, i18n, chain, dispatch, history])
 
 export const useSyncTipBlockNumber = ({
   networks,

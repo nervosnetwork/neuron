@@ -108,7 +108,13 @@ const MainContent = ({
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
   const [, i18n] = useTranslation()
-  useChannelListeners(i18n, history, neuronWalletState.chain, dispatch)
+  useChannelListeners({
+    walletID: neuronWalletState.wallet.id,
+    chain: neuronWalletState.chain,
+    dispatch,
+    history,
+    i18n,
+  })
   useSyncTipBlockNumber({
     networkID: neuronWalletState.chain.networkID,
     networks: neuronWalletState.settings.networks,
