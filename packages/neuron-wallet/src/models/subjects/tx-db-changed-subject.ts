@@ -23,7 +23,7 @@ export class TxDbChangedSubject {
   }
 
   static subscribe = () => {
-    TxDbChangedSubject.subject.subscribe(async ({ event, tx }) => {
+    TxDbChangedSubject.subject.subscribe(({ event, tx }) => {
       const result = {
         event,
         txHash: tx.hash,
