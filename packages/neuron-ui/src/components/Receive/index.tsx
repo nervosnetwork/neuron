@@ -7,12 +7,6 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
 import { Copy } from 'grommet-icons'
 
-declare global {
-  interface Window {
-    clipboard: any
-  }
-}
-
 const Receive = ({
   wallet: { addresses = [] },
   match: { params },
@@ -38,8 +32,8 @@ const Receive = ({
 
   return (
     <Stack tokens={{ childrenGap: 15 }} horizontalAlign="center">
-      <Stack onClick={() => setShowLargeQRCode(true)} style={{ alignSelf: 'center' }}>
-        <QRCode value={accountAddress} size={256} />
+      <Stack style={{ alignSelf: 'center' }}>
+        <QRCode value={accountAddress} onQRCodeClick={() => setShowLargeQRCode(true)} size={256} exportable />
       </Stack>
       <Stack styles={{ root: { maxWidth: 500 } }}>
         <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>

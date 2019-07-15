@@ -160,6 +160,10 @@
         "title": "Backup the {{name}} wallet"
       }
     },
+    "qrcode": {
+      "copy": "Copy",
+      "save": "Save"
+    },
     "footer": {
       "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
     },
