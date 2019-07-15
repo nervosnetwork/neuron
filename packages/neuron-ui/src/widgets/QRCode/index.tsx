@@ -1,5 +1,8 @@
 /* eslint-disable no-bitwise */
-import React from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
+import canvg from 'canvg'
+import { Stack, DefaultButton } from 'office-ui-fabric-react'
+import { useTranslation } from 'react-i18next'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
 
@@ -73,33 +76,75 @@ const QRCode = ({
   level = ErrorCorrectLevel.Q,
   bgColor = '#FFF',
   fgColor = '#000',
+  onQRCodeClick,
   includeMargin = false,
-  ...otherProps
+  exportable = false,
 }: {
   value: string
   size: number
   level?: ErrorCorrectLevel
   bgColor?: string
   fgColor?: string
+  onQRCodeClick?: React.MouseEventHandler
   includeMargin?: boolean
+  exportable?: boolean
 }) => {
+  const [t] = useTranslation()
   const qrcode = new QRCodeImpl(-1, level)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   qrcode.addData(convertStr(value))
   qrcode.make()
 
-  const cells = qrcode.modules
-  if (cells === null) {
-    return null
-  }
+  const cells = qrcode.modules || []
   const margin = includeMargin ? 4 : 0
   const fgPath = generatePath(cells, margin)
   const numCells = cells.length + margin * 2
+
+  const svgStr = `<svg shapeRendering="crispEdges" height="${size}" width="${size}" viewBox="0 0 ${numCells} ${numCells}" ><path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" /><path fill="${fgColor}" d="${fgPath}" /></svg>`
+
+  const onDownload = useCallback(() => {
+    if (canvasRef.current === null) {
+      return
+    }
+    const dataURL = canvasRef.current.toDataURL('image/png')
+    const downloadLink = document.createElement('a')
+    downloadLink.download = 'Receive'
+    downloadLink.href = dataURL
+    window.document.body.appendChild(downloadLink)
+    downloadLink.click()
+    window.document.body.removeChild(downloadLink)
+  }, [])
+
+  const onCopy = useCallback(() => {
+    if (canvasRef.current === null) {
+      return
+    }
+    const dataURL = canvasRef.current.toDataURL('image/png')
+    const img = window.nativeImage.createFromDataURL(dataURL)
+    window.clipboard.writeImage(img)
+  }, [])
+
+  useEffect(() => {
+    if (canvasRef.current !== null) {
+      canvg(canvasRef.current, svgStr)
+    }
+  }, [svgStr])
+
   return (
-    <svg shapeRendering="crispEdges" height={size} width={size} viewBox={`0 0 ${numCells} ${numCells}`} {...otherProps}>
-      <path fill={bgColor} d={`M0,0 h${numCells}v${numCells}H0z`} />
-      <path fill={fgColor} d={fgPath} />
-    </svg>
+    <Stack tokens={{ childrenGap: 15 }}>
+      <Stack.Item>
+        <canvas ref={canvasRef} width={`${size}px`} height={`${size}px`} onClick={onQRCodeClick} />
+      </Stack.Item>
+      {exportable ? (
+        <Stack horizontal horizontalAlign="space-between">
+          <DefaultButton onClick={onCopy}>{t('qrcode.copy')}</DefaultButton>
+          <DefaultButton onClick={onDownload}>{t('qrcode.save')}</DefaultButton>
+        </Stack>
+      ) : null}
+    </Stack>
   )
 }
+
+QRCode.display = 'QRCode'
 
 export default QRCode

@@ -3,6 +3,7 @@ declare interface Window {
   remote: any
   require: any
   bridge: any
+  nativeImage: any
 }
 
 declare module '*.json' {
