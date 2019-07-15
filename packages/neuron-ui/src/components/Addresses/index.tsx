@@ -78,6 +78,16 @@ const Addresses = ({
         maxWidth: 450,
         isResizable: true,
         isCollapsible: false,
+        onRender: (item?: State.Address) => {
+          if (item) {
+            return (
+              <span className="text-overflow" title={item.address}>
+                {item.address}
+              </span>
+            )
+          }
+          return '-'
+        },
       },
       {
         name: 'addresses.description',
@@ -121,7 +131,11 @@ const Addresses = ({
         isCollapsible: false,
         onRender: (item?: State.Address) => {
           if (item) {
-            return <span title={`${item.balance} shannon`}>{`${ShannonToCKBFormatter(item.balance)} CKB`}</span>
+            return (
+              <span title={`${item.balance} shannon`} className="text-overflow">
+                {`${ShannonToCKBFormatter(item.balance)} CKB`}
+              </span>
+            )
           }
           return '-'
         },
@@ -160,6 +174,10 @@ const Addresses = ({
             '.ms-DetailsRow-cell': {
               display: 'flex',
               alignItems: 'center',
+            },
+            '.text-overflow': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             },
           },
         },

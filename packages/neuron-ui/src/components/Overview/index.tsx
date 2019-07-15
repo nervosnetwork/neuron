@@ -222,8 +222,17 @@ const Overview = ({
   )
 
   return (
-    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }}>
-      <Stack tokens={{ childrenGap: 15 }}>
+    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }} wrap>
+      <Stack
+        tokens={{
+          childrenGap: 15,
+        }}
+        styles={{
+          root: {
+            minWidth: '680px',
+          },
+        }}
+      >
         <Stack>
           <Text as="h1" variant={TITLE_FONT_SIZE}>
             {t('overview.balance')}
@@ -239,7 +248,14 @@ const Overview = ({
           ) : null}
         </Stack.Item>
       </Stack>
-      <Stack horizontalAlign="stretch">
+      <Stack
+        horizontalAlign="stretch"
+        styles={{
+          root: {
+            minWidth: '680px',
+          },
+        }}
+      >
         <Text as="h1" variant={TITLE_FONT_SIZE}>
           {t('overview.recent-activities')}
         </Text>
