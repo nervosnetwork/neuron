@@ -1,5 +1,5 @@
 import { CapacityUnit } from 'utils/const'
-import { currencyFormatter, currencyCode, CKBToShannonFormatter, ShannonToCKBFormatter } from 'utils/formatters'
+import { currencyFormatter, currencyCode, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 describe(`formatters`, () => {
   it(`currencyFormatter`, () => {
@@ -153,7 +153,7 @@ describe(`formatters`, () => {
       ]
 
       fixtures.forEach(fixture => {
-        expect(ShannonToCKBFormatter(fixture.source)).toBe(fixture.target)
+        expect(shannonToCKBFormatter(fixture.source)).toBe(fixture.target)
       })
     })
   })

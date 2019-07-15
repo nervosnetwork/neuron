@@ -72,7 +72,7 @@ export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
   }
 }
 
-export const ShannonToCKBFormatter = (shannon: string) => {
+export const shannonToCKBFormatter = (shannon: string) => {
   let ckbStr = [...shannon.padStart(8, '0')]
     .map((char, idx) => {
       if (idx === Math.max(shannon.length - 8, 0)) {
@@ -95,6 +95,6 @@ export default {
   queryFormatter,
   currencyFormatter,
   CKBToShannonFormatter,
-  ShannonToCKBFormatter,
+  shannonToCKBFormatter,
   localNumberFormatter,
 }

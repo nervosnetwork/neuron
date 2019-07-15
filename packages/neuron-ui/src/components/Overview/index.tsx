@@ -18,7 +18,7 @@ import {
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, ShannonToCKBFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
 
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
@@ -159,7 +159,7 @@ const Overview = ({
         minWidth: 2 * MIN_CELL_WIDTH,
         onRender: (item?: State.Transaction) => {
           if (item) {
-            return <span title={`${item.value} shannon`}>{`${ShannonToCKBFormatter(item.value)} CKB`}</span>
+            return <span title={`${item.value} shannon`}>{`${shannonToCKBFormatter(item.value)} CKB`}</span>
           }
           return '-'
         },
@@ -202,7 +202,7 @@ const Overview = ({
     () => [
       {
         label: t('overview.amount'),
-        value: <span title={`${balance} shannon`}>{`${ShannonToCKBFormatter(balance)} CKB`}</span>,
+        value: <span title={`${balance} shannon`}>{`${shannonToCKBFormatter(balance)} CKB`}</span>,
       },
       { label: t('overview.live-cells'), value: 'mock living cells' },
       { label: t('overview.cell-types'), value: 'mock cell typ' },

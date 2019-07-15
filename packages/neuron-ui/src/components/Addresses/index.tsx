@@ -17,7 +17,7 @@ import { appCalls } from 'services/UILayer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
-import { ShannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
   wallet: { id, addresses = [] },
@@ -133,7 +133,7 @@ const Addresses = ({
           if (item) {
             return (
               <span title={`${item.balance} shannon`} className="text-overflow">
-                {`${ShannonToCKBFormatter(item.balance)} CKB`}
+                {`${shannonToCKBFormatter(item.balance)} CKB`}
               </span>
             )
           }

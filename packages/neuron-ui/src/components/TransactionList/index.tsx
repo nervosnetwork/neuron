@@ -14,7 +14,7 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
-import { ShannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
@@ -123,7 +123,7 @@ const TransactionList = ({
             if (item) {
               return (
                 <span title={`${item.value} shannon`} className="text-overflow">
-                  {`${ShannonToCKBFormatter(item.value)} CKB`}
+                  {`${shannonToCKBFormatter(item.value)} CKB`}
                 </span>
               )
             }
