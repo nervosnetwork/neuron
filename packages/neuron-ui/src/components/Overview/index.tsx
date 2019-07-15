@@ -18,7 +18,7 @@ import {
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
 
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
@@ -155,7 +155,14 @@ const Overview = ({
       {
         key: 'value',
         name: t('overview.amount'),
+        title: 'value',
         minWidth: 2 * MIN_CELL_WIDTH,
+        onRender: (item?: State.Transaction) => {
+          if (item) {
+            return <span title={`${item.value} shannon`}>{`${shannonToCKBFormatter(item.value)} CKB`}</span>
+          }
+          return '-'
+        },
       },
     ].map(
       (col): IColumn => ({
@@ -193,7 +200,10 @@ const Overview = ({
 
   const balanceItems = useMemo(
     () => [
-      { label: t('overview.amount'), value: balance },
+      {
+        label: t('overview.amount'),
+        value: <span title={`${balance} shannon`}>{`${shannonToCKBFormatter(balance)} CKB`}</span>,
+      },
       { label: t('overview.live-cells'), value: 'mock living cells' },
       { label: t('overview.cell-types'), value: 'mock cell typ' },
     ],
@@ -212,8 +222,17 @@ const Overview = ({
   )
 
   return (
-    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }}>
-      <Stack tokens={{ childrenGap: 15 }}>
+    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }} wrap>
+      <Stack
+        tokens={{
+          childrenGap: 15,
+        }}
+        styles={{
+          root: {
+            minWidth: '680px',
+          },
+        }}
+      >
         <Stack>
           <Text as="h1" variant={TITLE_FONT_SIZE}>
             {t('overview.balance')}
@@ -229,7 +248,14 @@ const Overview = ({
           ) : null}
         </Stack.Item>
       </Stack>
-      <Stack horizontalAlign="stretch">
+      <Stack
+        horizontalAlign="stretch"
+        styles={{
+          root: {
+            minWidth: '680px',
+          },
+        }}
+      >
         <Text as="h1" variant={TITLE_FONT_SIZE}>
           {t('overview.recent-activities')}
         </Text>

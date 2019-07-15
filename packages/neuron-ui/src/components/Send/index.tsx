@@ -20,6 +20,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, CapacityUnit } from 'utils/const'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 import { useInitialize } from './hooks'
 
@@ -143,7 +144,7 @@ const Send = ({
 
       <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
 
-      <div>{`${t('send.balance')}: ${balance}`}</div>
+      <div>{`${t('send.balance')}: ${shannonToCKBFormatter(balance)} CKB`}</div>
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
         <DefaultButton type="reset" onClick={onClear}>

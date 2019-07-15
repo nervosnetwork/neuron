@@ -14,10 +14,11 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 const timeFormatter = new Intl.DateTimeFormat('en-GB')
 
-const MIN_CELL_WIDTH = 70
+const MIN_CELL_WIDTH = 50
 
 interface FormatTransaction extends State.Transaction {
   date: string
@@ -56,13 +57,13 @@ const TransactionList = ({
   const transactionColumns: IColumn[] = useMemo(
     (): IColumn[] =>
       [
-        { name: t('history.type'), key: 'type', fieldName: 'type', minWidth: MIN_CELL_WIDTH, maxWidth: 150 },
+        { name: t('history.type'), key: 'type', fieldName: 'type', minWidth: MIN_CELL_WIDTH, maxWidth: 50 },
         {
           name: t('history.timestamp'),
           key: 'timestamp',
           fieldName: 'timestamp',
-          minWidth: MIN_CELL_WIDTH,
-          maxWidth: 150,
+          minWidth: 80,
+          maxWidth: 80,
           onRender: (item?: FormatTransaction) => {
             return item ? <span>{new Date(+(item.timestamp || item.createdAt)).toLocaleTimeString()}</span> : null
           },
@@ -71,8 +72,18 @@ const TransactionList = ({
           name: t('history.transaction-hash'),
           key: 'hash',
           fieldName: 'hash',
-          minWidth: 300,
-          maxWidth: 450,
+          minWidth: 100,
+          maxWidth: 500,
+          onRender: (item?: FormatTransaction) => {
+            if (item) {
+              return (
+                <span className="text-overflow" title={item.hash}>
+                  {item.hash}
+                </span>
+              )
+            }
+            return '-'
+          },
         },
         { name: t('history.status'), key: 'status', fieldName: 'status', minWidth: MIN_CELL_WIDTH, maxWidth: 50 },
         {
@@ -102,7 +113,23 @@ const TransactionList = ({
             ) : null
           },
         },
-        { name: t('history.amount'), key: 'value', fieldName: 'value', minWidth: MIN_CELL_WIDTH, maxWidth: 300 },
+        {
+          name: t('history.amount'),
+          key: 'value',
+          fieldName: 'value',
+          minWidth: 100,
+          maxWidth: 300,
+          onRender: (item?: FormatTransaction) => {
+            if (item) {
+              return (
+                <span title={`${item.value} shannon`} className="text-overflow">
+                  {`${shannonToCKBFormatter(item.value)} CKB`}
+                </span>
+              )
+            }
+            return '-'
+          },
+        },
       ].map(
         (col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, isResizable: true, isCollapsable: false, ...col })
       ),
@@ -160,6 +187,10 @@ const TransactionList = ({
             '.ms-DetailsRow-cell': {
               display: 'flex',
               alignItems: 'center',
+            },
+            '.text-overflow': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             },
           },
         },
