@@ -71,7 +71,7 @@
     "receive": {
       "click-to-copy": "点击复制地址",
       "address-not-found": "未找到地址",
-      "prompt": "为了保护隐私，Neuron 会在每次收到转账后更新收款地址。如果您想引用用旧的收款地址，请访问高级页面。",
+      "prompt": "为了保护隐私，Neuron 会怎么选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
       "address-qrcode": "地址二维码"
     },
     "history": {
