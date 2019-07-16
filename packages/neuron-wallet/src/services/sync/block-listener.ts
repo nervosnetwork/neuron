@@ -1,9 +1,11 @@
+import { remote } from 'electron'
 import { BehaviorSubject } from 'rxjs'
 import NodeService from '../node'
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
+import { isRenderer } from '../../env'
 
 export default class BlockListener {
   private lockHashes: string[]
@@ -21,11 +23,17 @@ export default class BlockListener {
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck()
 
-    tipNumberSubject.subscribe(async num => {
+    const tipNumberListener = tipNumberSubject.subscribe(async num => {
       if (num) {
         this.tipBlockNumber = parseInt(num, 10)
       }
     })
+
+    // should unsubscribe if renderer window closed
+    if (isRenderer()) {
+      const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
+      onCloseEvent(remote.getCurrentWindow(), tipNumberListener)
+    }
   }
 
   public setLockHashes = (lockHashes: string[]) => {

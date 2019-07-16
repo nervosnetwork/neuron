@@ -1,5 +1,5 @@
 import { remote } from 'electron'
-import { Subject } from 'rxjs'
+import { Subject, Subscription } from 'rxjs'
 import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../models/lock-utils'
@@ -9,6 +9,13 @@ import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listener/tx-status'
 import BlockNumber from '../../services/sync/block-number'
+
+const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
+const currentWindow = remote.getCurrentWindow()
+
+const closeListener = (listener: Subscription) => {
+  onCloseEvent(currentWindow, listener)
+}
 
 const {
   nodeService,
@@ -47,13 +54,15 @@ export const switchNetwork = async () => {
   // start sync blocks service
   let blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  addressDbChangedSubject.subscribe(async (event: string) => {
+  const addressDBChangedListener = addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove
     if (event === 'AfterInsert') {
       const hashes: string[] = await loadAddressesAndConvert()
       blockListener.setLockHashes(hashes)
     }
   })
+
+  closeListener(addressDBChangedListener)
 
   const regenerateListener = async () => {
     const blockNumber = new BlockNumber()
@@ -63,13 +72,15 @@ export const switchNetwork = async () => {
     await blockListener.start()
   }
 
-  walletCreatedSubject.subscribe(async (type: string) => {
+  const walletCreatedListener = walletCreatedSubject.subscribe(async (type: string) => {
     if (type === 'import') {
       await blockListener.stop(regenerateListener)
       // may not call drain
       await regenerateListener()
     }
   })
+
+  closeListener(walletCreatedListener)
 
   stopLoopSubject.subscribe(() => {
     blockListener.stop()
@@ -80,11 +91,12 @@ export const switchNetwork = async () => {
 
 export const run = async () => {
   await initAddressConnection()
-  databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
+  const dbInitListener = databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
       await switchNetwork()
     }
   })
+  closeListener(dbInitListener)
   registerTxStatusListener()
 }
 
