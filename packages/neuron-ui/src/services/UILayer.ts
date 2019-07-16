@@ -105,7 +105,7 @@ export const networksCall = instantiateMethodCall(networks) as {
   create: (network: State.NetworkProperty) => void
   update: (id: string, options: Partial<State.Network>) => void
   delete: (id: string) => void
-  currentOne: () => void
+  currentID: () => void
   activate: (id: string) => void
 }
 
