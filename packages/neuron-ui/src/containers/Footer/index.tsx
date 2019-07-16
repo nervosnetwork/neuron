@@ -22,7 +22,7 @@ const stackItemStyles = {
   root: [theme.fonts.small],
 }
 
-const SyncStatus = ({
+export const SyncStatus = ({
   tipBlockNumber = '',
   syncedBlockNumber = '',
   bufferBlockNumber = 10,
@@ -36,13 +36,19 @@ const SyncStatus = ({
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', fontSize: theme.fonts.small.fontSize }}>
-      {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? t('sync.syncing') : t('sync.synced')}
-      <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+      {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
+        <>
+          {t('sync.syncing')}
+          <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+        </>
+      ) : (
+        t('sync.synced')
+      )}
     </div>
   )
 }
 
-const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
+export const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
     <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
       {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
