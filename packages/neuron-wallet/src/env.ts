@@ -57,4 +57,8 @@ const env: ENV = {
   isTestMode,
 }
 
+export const isRenderer = () => {
+  return process && process.type === 'renderer'
+}
+
 export default env
