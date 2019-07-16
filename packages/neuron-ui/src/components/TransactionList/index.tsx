@@ -187,7 +187,7 @@ const TransactionList = ({
     <DetailsList
       columns={transactionColumns}
       items={txs}
-      groups={groups}
+      groups={groups.filter(group => group.count !== 0)}
       groupProps={{
         onRenderHeader,
       }}
