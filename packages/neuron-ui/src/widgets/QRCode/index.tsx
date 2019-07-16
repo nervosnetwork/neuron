@@ -73,6 +73,7 @@ const generatePath = (cells: boolean[][], margin: number = 0): string => {
 const QRCode = ({
   value,
   size = 128,
+  scale = 4,
   level = ErrorCorrectLevel.Q,
   bgColor = '#FFF',
   fgColor = '#000',
@@ -82,6 +83,7 @@ const QRCode = ({
 }: {
   value: string
   size: number
+  scale?: number
   level?: ErrorCorrectLevel
   bgColor?: string
   fgColor?: string
@@ -100,7 +102,8 @@ const QRCode = ({
   const fgPath = generatePath(cells, margin)
   const numCells = cells.length + margin * 2
 
-  const svgStr = `<svg shapeRendering="crispEdges" height="${size}" width="${size}" viewBox="0 0 ${numCells} ${numCells}" ><path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" /><path fill="${fgColor}" d="${fgPath}" /></svg>`
+  const svgStr = `<svg shapeRendering="crispEdges" height="${scale * size}" width="${scale *
+    size}" viewBox="0 0 ${numCells} ${numCells}" ><path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" /><path fill="${fgColor}" d="${fgPath}" /></svg>`
 
   const onDownload = useCallback(() => {
     if (canvasRef.current === null) {
@@ -126,14 +129,22 @@ const QRCode = ({
 
   useEffect(() => {
     if (canvasRef.current !== null) {
-      canvg(canvasRef.current, svgStr)
+      canvg(canvasRef.current, svgStr, {
+        enableRedraw: false,
+        ignoreMouse: true,
+        renderCallback: () => {
+          if (canvasRef.current) {
+            canvasRef.current.setAttribute(`style`, `width:${size}p;height:${size}px`)
+          }
+        },
+      })
     }
-  }, [svgStr])
+  }, [svgStr, size])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack.Item>
-        <canvas ref={canvasRef} width={`${size}px`} height={`${size}px`} onClick={onQRCodeClick} />
+        <canvas ref={canvasRef} width={size} height={size} onClick={onQRCodeClick} />
       </Stack.Item>
       {exportable ? (
         <Stack horizontal horizontalAlign="space-between">
