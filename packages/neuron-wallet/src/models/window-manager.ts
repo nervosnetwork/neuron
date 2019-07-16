@@ -8,7 +8,7 @@ interface SendMessage {
   (channel: Channel.App, method: Controller.AppMethod, params: any): void
   (
     channel: Channel.Wallets,
-    method: Controller.WalletsMethod | 'allAddresses' | 'sendingStatus' | 'getCurrent' | 'requestPassword',
+    method: Controller.WalletsMethod | 'allAddresses' | 'sendingStatus' | 'requestPassword',
     params: any
   ): void
   (channel: Channel.Transactions, method: Controller.TransactionsMethod | 'transactionUpdated', params: any): void
@@ -27,6 +27,21 @@ export default class WindowManager {
     BrowserWindow.getAllWindows().forEach(window => {
       if (window && window.webContents) {
         window.webContents.send(channel, method, params)
+      }
+    })
+  }
+
+  public static broadcastDataUpdateMessage = (
+    actionType: 'create' | 'update' | 'delete',
+    dataType: 'address' | 'transaction' | 'wallet' | 'network'
+  ) => {
+    if (!BrowserWindow) {
+      logger.log(error)
+      return
+    }
+    BrowserWindow.getAllWindows().forEach(window => {
+      if (window && window.webContents) {
+        window.webContents.send(Channel.DataUpdate, actionType, dataType)
       }
     })
   }

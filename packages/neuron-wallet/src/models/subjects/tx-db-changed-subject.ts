@@ -1,7 +1,6 @@
 import { ReplaySubject } from 'rxjs'
-import { ResponseCode, Channel } from '../../utils/const'
 import { Transaction } from '../../types/cell-types'
-import windowManager from '../window-manager'
+import DataUpdateSubject from './data-update'
 
 export interface TransactionChangedMessage {
   event: string
@@ -23,14 +22,10 @@ export class TxDbChangedSubject {
   }
 
   static subscribe = () => {
-    TxDbChangedSubject.subject.subscribe(({ event, tx }) => {
-      const result = {
-        event,
-        txHash: tx.hash,
-      }
-      windowManager.broadcast(Channel.Transactions, 'transactionUpdated', {
-        status: ResponseCode.Success,
-        result,
+    TxDbChangedSubject.subject.subscribe(() => {
+      DataUpdateSubject.next({
+        dataType: 'transaction',
+        actionType: 'update',
       })
     })
   }

@@ -66,17 +66,32 @@ export const useChannelListeners = ({
               pageNo: chain.transactions.pageNo,
               pageSize: chain.transactions.pageSize,
             })
+            transactionsCall.get(walletID, chain.transaction.hash)
             break
           }
           case 'wallet': {
             walletsCall.getAll()
+            walletsCall.getCurrent()
             break
           }
           case 'network': {
             networksCall.getAll()
+            networksCall.currentID()
             break
           }
           default: {
+            walletsCall.getCurrent()
+            walletsCall.getAll()
+            walletsCall.getAllAddresses(walletID)
+            networksCall.currentID()
+            networksCall.getAll()
+            transactionsCall.getAllByKeywords({
+              walletID,
+              keywords: chain.transactions.keywords,
+              pageNo: chain.transactions.pageNo,
+              pageSize: chain.transactions.pageSize,
+            })
+            transactionsCall.get(walletID, chain.transaction.hash)
             break
           }
         }
@@ -449,7 +464,27 @@ export const useSyncTipBlockNumber = ({
   }, [networks, networkID, dispatch])
 }
 
+export const useOnCurrentWalletChange = ({ walletID, chain }: { walletID: string; chain: State.Chain }) => {
+  useEffect(() => {
+    walletsCall.getAllAddresses(walletID)
+    transactionsCall.getAllByKeywords({
+      walletID,
+      keywords: chain.transactions.keywords,
+      pageNo: chain.transactions.pageNo,
+      pageSize: chain.transactions.pageSize,
+    })
+    transactionsCall.get(walletID, chain.transaction.hash)
+  }, [
+    walletID,
+    chain.transactions.pageNo,
+    chain.transactions.pageSize,
+    chain.transactions.keywords,
+    chain.transaction.hash,
+  ])
+}
+
 export default {
   useChannelListeners,
   useSyncTipBlockNumber,
+  useOnCurrentWalletChange,
 }

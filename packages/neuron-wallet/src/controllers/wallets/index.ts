@@ -275,6 +275,15 @@ export default class WalletsController {
   }
 
   @CatchControllerError
+  public static async getCurrent() {
+    const currentWallet = WalletsService.getInstance().getCurrent() || null
+    return {
+      status: ResponseCode.Success,
+      result: currentWallet,
+    }
+  }
+
+  @CatchControllerError
   public static async activate(id: string) {
     const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)

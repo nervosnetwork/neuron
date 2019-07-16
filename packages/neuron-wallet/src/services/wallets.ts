@@ -17,9 +17,9 @@ import Keychain from '../models/keys/keychain'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { broadcastAddressList } from '../utils/broadcast'
 import { Channel, ResponseCode } from '../utils/const'
 import windowManager from '../models/window-manager'
+import dataUpdateSubject from '../models/subjects/data-update'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -139,11 +139,11 @@ export default class WalletService {
 
     AddressDbChangedSubject.getSubject()
       .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(async () => {
-        const currentWallet = this.getCurrent()
-        if (currentWallet) {
-          broadcastAddressList(currentWallet.id)
-        }
+      .subscribe(() => {
+        dataUpdateSubject.next({
+          dataType: 'address',
+          actionType: 'update',
+        })
       })
   }
 
