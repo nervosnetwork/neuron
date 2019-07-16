@@ -29,7 +29,6 @@ export enum WalletsMethod {
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
-  AllAddresses = 'allAddresses',
   UpdateAddressDescription = 'updateAddressDescription',
   RequestPassword = 'requestPassword',
   GetAllAddresses = 'getAllAddresses',

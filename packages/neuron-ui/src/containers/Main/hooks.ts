@@ -335,7 +335,7 @@ export const useChannelListeners = ({
             })
             break
           }
-          case WalletsMethod.AllAddresses: {
+          case WalletsMethod.GetAllAddresses: {
             const addresses = args.result || []
             dispatch({
               type: NeuronWalletActions.Wallet,
