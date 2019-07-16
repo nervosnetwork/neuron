@@ -52,8 +52,12 @@ export const useChannelListeners = ({
       (
         _e: Event,
         _actionType: 'create' | 'update' | 'delete',
-        dataType: 'address' | 'transaction' | 'wallet' | 'network'
+        dataType: 'address' | 'transaction' | 'wallet' | 'network',
+        walletIDOfMessage?: string
       ) => {
+        if (walletIDOfMessage && walletIDOfMessage !== walletID) {
+          return
+        }
         switch (dataType) {
           case 'address': {
             walletsCall.getAllAddresses(walletID)
