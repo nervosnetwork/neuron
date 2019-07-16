@@ -1,12 +1,7 @@
 import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { updateApplicationMenu } from '../../utils/application-menu'
-import {
-  broadcastCurrentWallet,
-  broadcastWalletList,
-  broadcastAddressList,
-  broadcastTransactions,
-} from '../../utils/broadcast'
+import dataUpdateSubject from './data-update'
 
 const DEBOUNCE_TIME = 50
 
@@ -24,18 +19,16 @@ export const CurrentWalletSubject = new Subject<{
 WalletListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentWallet = null, currentWalletList = [] }) => {
   const walletList = currentWalletList.map(({ id, name }) => ({ id, name }))
   const currentWalletId = currentWallet ? currentWallet.id : null
-  broadcastWalletList(walletList)
+  dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
   updateApplicationMenu(walletList, currentWalletId)
 })
 
 CurrentWalletSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(async ({ currentWallet = null, walletList = [] }) => {
-  broadcastCurrentWallet(currentWallet)
   updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
   if (!currentWallet) {
     return
   }
-  broadcastAddressList(currentWallet.id)
-  broadcastTransactions(currentWallet.id)
+  dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
 })
 
 export default {

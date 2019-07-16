@@ -17,6 +17,7 @@ import { appCalls } from 'services/UILayer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
   wallet: { id, addresses = [] },
@@ -77,6 +78,16 @@ const Addresses = ({
         maxWidth: 450,
         isResizable: true,
         isCollapsible: false,
+        onRender: (item?: State.Address) => {
+          if (item) {
+            return (
+              <span className="text-overflow" title={item.address}>
+                {item.address}
+              </span>
+            )
+          }
+          return '-'
+        },
       },
       {
         name: 'addresses.description',
@@ -118,6 +129,16 @@ const Addresses = ({
         maxWidth: 250,
         isResizable: true,
         isCollapsible: false,
+        onRender: (item?: State.Address) => {
+          if (item) {
+            return (
+              <span title={`${item.balance} shannon`} className="text-overflow">
+                {`${shannonToCKBFormatter(item.balance)} CKB`}
+              </span>
+            )
+          }
+          return '-'
+        },
       },
       {
         name: 'addresses.transactions',
@@ -127,6 +148,12 @@ const Addresses = ({
         maxWidth: 150,
         isResizable: true,
         isCollapsible: false,
+        onRender: (item?: State.Address) => {
+          if (item) {
+            return (+item.txCount).toLocaleString()
+          }
+          return '-'
+        },
       },
     ],
     [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t, semanticColors]
@@ -147,6 +174,10 @@ const Addresses = ({
             '.ms-DetailsRow-cell': {
               display: 'flex',
               alignItems: 'center',
+            },
+            '.text-overflow': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             },
           },
         },

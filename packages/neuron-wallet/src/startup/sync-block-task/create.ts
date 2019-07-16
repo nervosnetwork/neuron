@@ -4,16 +4,13 @@ import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
 import genesisBlockHash from './genesis'
-import CellsService from '../../services/cells'
-import LockUtils from '../../models/lock-utils'
 import AddressService from '../../services/addresses'
 import initDatabase from './init-database'
 
 export { genesisBlockHash }
 
 const updateAllAddressesTxCount = async () => {
-  const blake160s: string[] = await CellsService.allBlake160s()
-  const addresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
+  const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses)
 }
 

@@ -1,13 +1,30 @@
 /* globals BigInt */
 import { useEffect } from 'react'
 
-import UILayer, { AppMethod, ChainMethod, NetworksMethod, TransactionsMethod, WalletsMethod } from 'services/UILayer'
-import { ckbCore, getTipBlockNumber } from 'services/chain'
-import { Routes, Channel, ConnectStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
 import initStates from 'states/initStates'
+
+import UILayer, {
+  AppMethod,
+  ChainMethod,
+  NetworksMethod,
+  TransactionsMethod,
+  WalletsMethod,
+  walletsCall,
+  transactionsCall,
+  networksCall,
+} from 'services/UILayer'
+import { ckbCore, getTipBlockNumber } from 'services/chain'
+import { Routes, Channel, ConnectStatus } from 'utils/const'
+import {
+  wallets as walletsCache,
+  networks as networksCache,
+  addresses as addressesCache,
+  currentNetworkID as currentNetworkIDCache,
+  currentWallet as currentWalletCache,
+} from 'utils/localCache'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 10000
@@ -16,8 +33,70 @@ const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
 }
 
-export const useChannelListeners = (i18n: any, history: any, chain: State.Chain, dispatch: StateDispatch) =>
+export const useChannelListeners = ({
+  walletID,
+  chain,
+  dispatch,
+  history,
+  i18n,
+}: {
+  walletID: string
+  chain: State.Chain
+  dispatch: StateDispatch
+  history: any
+  i18n: any
+}) =>
   useEffect(() => {
+    UILayer.on(
+      Channel.DataUpdate,
+      (
+        _e: Event,
+        _actionType: 'create' | 'update' | 'delete',
+        dataType: 'address' | 'transaction' | 'wallet' | 'network'
+      ) => {
+        switch (dataType) {
+          case 'address': {
+            walletsCall.getAllAddresses(walletID)
+            break
+          }
+          case 'transaction': {
+            transactionsCall.getAllByKeywords({
+              walletID,
+              keywords: chain.transactions.keywords,
+              pageNo: chain.transactions.pageNo,
+              pageSize: chain.transactions.pageSize,
+            })
+            transactionsCall.get(walletID, chain.transaction.hash)
+            break
+          }
+          case 'wallet': {
+            walletsCall.getAll()
+            walletsCall.getCurrent()
+            break
+          }
+          case 'network': {
+            networksCall.getAll()
+            networksCall.currentID()
+            break
+          }
+          default: {
+            walletsCall.getCurrent()
+            walletsCall.getAll()
+            walletsCall.getAllAddresses(walletID)
+            networksCall.currentID()
+            networksCall.getAll()
+            transactionsCall.getAllByKeywords({
+              walletID,
+              keywords: chain.transactions.keywords,
+              pageNo: chain.transactions.pageNo,
+              pageSize: chain.transactions.pageSize,
+            })
+            transactionsCall.get(walletID, chain.transaction.hash)
+            break
+          }
+        }
+      }
+    )
     UILayer.on(
       Channel.Initiate,
       (
@@ -69,6 +148,12 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               transactions: { ...chain.transactions, ...transactions },
             },
           })
+
+          currentWalletCache.save(wallet)
+          currentNetworkIDCache.save(networkID)
+          walletsCache.save(wallets)
+          addressesCache.save(addresses)
+          networksCache.save(networks)
         } else {
           /* eslint-disable no-alert */
           // TODO: better prompt, prd required
@@ -221,6 +306,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Settings,
               payload: { wallets: args.result },
             })
+            walletsCache.save(args.result)
             if (!args.result.length) {
               history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
             }
@@ -231,6 +317,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Wallet,
               payload: args.result,
             })
+            currentWalletCache.save(args.result)
             break
           }
           case WalletsMethod.SendCapacity: {
@@ -257,6 +344,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
                 balance: addressesToBalance(addresses),
               },
             })
+            addressesCache.save(addresses)
             break
           }
           case WalletsMethod.RequestPassword: {
@@ -298,8 +386,9 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
           case NetworksMethod.GetAll: {
             dispatch({
               type: NeuronWalletActions.Settings,
-              payload: { networks: args.result },
+              payload: { networks: args.result || [] },
             })
+            networksCache.save(args.result || [])
             break
           }
           case NetworksMethod.CurrentID: {
@@ -307,6 +396,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
               type: NeuronWalletActions.Chain,
               payload: { networkID: args.result },
             })
+            currentNetworkIDCache.save(args.result)
             break
           }
           case NetworksMethod.Create:
@@ -336,7 +426,7 @@ export const useChannelListeners = (i18n: any, history: any, chain: State.Chain,
         })
       }
     })
-  }, [i18n, chain, dispatch, history])
+  }, [walletID, i18n, chain, dispatch, history])
 
 export const useSyncTipBlockNumber = ({
   networks,
@@ -374,7 +464,27 @@ export const useSyncTipBlockNumber = ({
   }, [networks, networkID, dispatch])
 }
 
+export const useOnCurrentWalletChange = ({ walletID, chain }: { walletID: string; chain: State.Chain }) => {
+  useEffect(() => {
+    walletsCall.getAllAddresses(walletID)
+    transactionsCall.getAllByKeywords({
+      walletID,
+      keywords: chain.transactions.keywords,
+      pageNo: chain.transactions.pageNo,
+      pageSize: chain.transactions.pageSize,
+    })
+    transactionsCall.get(walletID, chain.transaction.hash)
+  }, [
+    walletID,
+    chain.transactions.pageNo,
+    chain.transactions.pageSize,
+    chain.transactions.keywords,
+    chain.transaction.hash,
+  ])
+}
+
 export default {
   useChannelListeners,
   useSyncTipBlockNumber,
+  useOnCurrentWalletChange,
 }

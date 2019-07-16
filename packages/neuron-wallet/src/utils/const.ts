@@ -9,6 +9,7 @@ export enum Channel {
   Wallets = 'wallets',
   Transactions = 'transactions',
   Helpers = 'helpers',
+  DataUpdate = 'dataUpdate',
 }
 
 export enum ResponseCode {

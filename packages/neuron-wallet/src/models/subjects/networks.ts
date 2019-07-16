@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { broadcastCurrentNetworkID, broadcastNetworkList } from '../../utils/broadcast'
+import DataUpdateSubject from './data-update'
 
 const DEBOUNCE_TIME = 50
 
@@ -9,14 +9,12 @@ export const NetworkListSubject = new Subject<{
 }>()
 export const CurrentNetworkIDSubject = new Subject<{ currentNetworkID: Controller.NetworkID }>()
 
-NetworkListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(
-  ({ currentNetworkList = [] }: { currentNetworkList: Controller.Network[] }) => {
-    broadcastNetworkList(currentNetworkList)
-  }
-)
+NetworkListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(() => {
+  DataUpdateSubject.next({ dataType: 'network', actionType: 'update' })
+})
 
-CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkID = '' }) => {
-  broadcastCurrentNetworkID(currentNetworkID)
+CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(() => {
+  DataUpdateSubject.next({ dataType: 'network', actionType: 'update' })
 })
 
 export default {

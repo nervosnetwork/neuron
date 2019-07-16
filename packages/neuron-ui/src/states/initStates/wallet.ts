@@ -1,8 +1,12 @@
+import { addresses, currentWallet } from 'utils/localCache'
+
+const wallet = currentWallet.load()
+
 export const walletState: State.Wallet = {
-  name: '',
-  id: '',
+  name: wallet.name || '',
+  id: wallet.id || '',
   balance: '0',
-  addresses: [],
+  addresses: addresses.load(),
   sending: false,
 }
 

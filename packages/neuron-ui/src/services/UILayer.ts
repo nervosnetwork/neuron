@@ -32,6 +32,7 @@ export enum WalletsMethod {
   AllAddresses = 'allAddresses',
   UpdateAddressDescription = 'updateAddressDescription',
   RequestPassword = 'requestPassword',
+  GetAllAddresses = 'getAllAddresses',
 }
 
 export enum NetworksMethod {
@@ -104,7 +105,7 @@ export const networksCall = instantiateMethodCall(networks) as {
   create: (network: State.NetworkProperty) => void
   update: (id: string, options: Partial<State.Network>) => void
   delete: (id: string) => void
-  currentOne: () => void
+  currentID: () => void
   activate: (id: string) => void
 }
 
@@ -163,6 +164,7 @@ export const walletsCall = instantiateMethodCall(wallets) as {
     fee: string
     description: string
   }) => void
+  getAllAddresses: (id: string) => void
   updateAddressDescription: (params: { walletID: string; address: string; description: string }) => void
 }
 
