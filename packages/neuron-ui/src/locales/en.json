@@ -71,8 +71,8 @@
     "receive": {
       "click-to-copy": "Click to copy the address",
       "address-not-found": "Address not found",
-      "prompt": "Neuron will update the receiving address after transaction for the security sake. Please go to the advance view if used receiving addresses are needed",
-      "address-qrcode": "Address QRCode"
+      "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving addresses.",
+      "address-qrcode": "Address QR Code"
     },
     "history": {
       "meta": "Meta",
@@ -161,8 +161,8 @@
       }
     },
     "qrcode": {
-      "copy": "Copy",
-      "save": "Save"
+      "copy": "Copy image",
+      "save": "Save image"
     },
     "footer": {
       "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
