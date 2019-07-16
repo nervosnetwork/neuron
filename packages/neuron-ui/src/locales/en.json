@@ -207,7 +207,8 @@
       "no-transactions": "No transactions"
     },
     "sync": {
-      "syncing": "Syncing"
+      "syncing": "Syncing",
+      "synced": "Synced"
     },
     "pagination": {
       "previous-page": "Previous page",

@@ -207,7 +207,8 @@
       "no-transactions": "没有交易"
     },
     "sync": {
-      "syncing": "同步中"
+      "syncing": "同步中",
+      "synced": "同步完成"
     },
     "pagination": {
       "previous-page": "上一页",
