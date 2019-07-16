@@ -1,4 +1,5 @@
 import { ReplaySubject } from 'rxjs'
+import { debounceTime } from 'rxjs/operators'
 import { Transaction } from '../../types/cell-types'
 import DataUpdateSubject from './data-update'
 
@@ -22,10 +23,11 @@ export class TxDbChangedSubject {
   }
 
   static subscribe = () => {
-    TxDbChangedSubject.subject.subscribe(() => {
+    TxDbChangedSubject.subject.pipe(debounceTime(500)).subscribe(() => {
       DataUpdateSubject.next({
         dataType: 'transaction',
         actionType: 'update',
+        walletID: '',
       })
     })
   }
