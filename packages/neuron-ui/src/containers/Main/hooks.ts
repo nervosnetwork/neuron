@@ -198,7 +198,7 @@ export const useChannelListeners = ({
             dispatch({
               type: NeuronWalletActions.Chain,
               payload: {
-                tipBlockNumber: args.result,
+                tipBlockNumber: args.result || '0',
               },
             })
             break
