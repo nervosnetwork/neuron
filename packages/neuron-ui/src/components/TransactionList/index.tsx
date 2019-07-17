@@ -89,11 +89,11 @@ const TransactionList = ({
           key: 'hash',
           fieldName: 'hash',
           minWidth: 100,
-          maxWidth: 500,
+          maxWidth: 600,
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (
-                <span className="text-overflow" title={item.hash}>
+                <span className="text-overflow fixedWidth" title={item.hash}>
                   {item.hash}
                 </span>
               )
