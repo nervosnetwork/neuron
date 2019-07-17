@@ -11,7 +11,7 @@ const states = {
     bufferBlockNumber: 10,
   },
   '0/100': {
-    tipBlockNumber: '0',
+    tipBlockNumber: '100',
     syncedBlockNumber: '0',
     bufferBlockNumber: 10,
   },
