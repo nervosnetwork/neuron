@@ -7,6 +7,7 @@ export enum AppMethod {
   ContextMenu = 'contextMenu',
   NavTo = 'navTo',
   SetUILocale = 'setUILocale',
+  HandleViewError = 'handleViewError',
 }
 
 export enum ChainMethod {
@@ -29,7 +30,6 @@ export enum WalletsMethod {
   Backup = 'backup',
   SendCapacity = 'sendCapacity',
   SendingStatus = 'sendingStatus',
-  AllAddresses = 'allAddresses',
   UpdateAddressDescription = 'updateAddressDescription',
   RequestPassword = 'requestPassword',
   GetAllAddresses = 'getAllAddresses',
@@ -93,7 +93,8 @@ export const app = (method: AppMethod, ...params: any) => {
 }
 
 export const appCalls = instantiateMethodCall(app) as {
-  contextMenu: ({ type, id }: { type: string; id: string }) => Promise<void>
+  contextMenu: ({ type, id }: { type: string; id: string }) => void
+  handleViewError: (errorMessage: string) => void
 }
 
 export const networks = (method: NetworksMethod, ...params: any[]) => {

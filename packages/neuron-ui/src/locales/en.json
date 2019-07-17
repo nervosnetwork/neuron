@@ -16,7 +16,7 @@
       "balance": "Balance",
       "live-cells": "Live Cells",
       "cell-types": "Cell Types",
-      "recent-activities": "Recent Activites",
+      "recent-activities": "Recent Activities",
       "no-recent-activities": "No Recent Activities",
       "blockchain-status": "Blockchain Status",
       "blockchain-identity": "Chain Identity",
@@ -71,7 +71,7 @@
     "receive": {
       "click-to-copy": "Click to copy the address",
       "address-not-found": "Address not found",
-      "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving addresses.",
+      "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code"
     },
     "history": {
@@ -94,7 +94,10 @@
       "description": "Description",
       "status": "Status",
       "blockNumber": "Block Number",
-      "basic-information": "Basic Information"
+      "basic-information": "Basic Information",
+      "search": {
+        "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
+      }
     },
     "transaction": {
       "goBack": "Go back"
@@ -207,7 +210,8 @@
       "no-transactions": "No transactions"
     },
     "sync": {
-      "syncing": "Syncing"
+      "syncing": "Syncing",
+      "synced": "Synced"
     },
     "pagination": {
       "previous-page": "Previous page",

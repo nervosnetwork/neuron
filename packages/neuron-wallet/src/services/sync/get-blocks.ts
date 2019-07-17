@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import Core from '@nervosnetwork/ckb-sdk-core'
 
 import { Block } from '../../types/cell-types'
@@ -8,12 +9,16 @@ import Utils from './utils'
 
 import { networkSwitchSubject } from './renderer-params'
 
+const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
+
 let core: Core
-networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
+const networkSwitchListener = networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
   if (network) {
     core = new Core(network.remote)
   }
 })
+
+onCloseEvent(remote.getCurrentWindow(), networkSwitchListener)
 
 export default class GetBlocks {
   private retryTime: number

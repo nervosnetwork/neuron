@@ -22,26 +22,33 @@ const stackItemStyles = {
   root: [theme.fonts.small],
 }
 
-const SyncStatus = ({
+export const SyncStatus = ({
   tipBlockNumber = '',
-  syncBlockNumber = '',
-}: React.PropsWithoutRef<{ tipBlockNumber: string; syncBlockNumber: string }>) => {
+  syncedBlockNumber = '',
+  bufferBlockNumber = 10,
+}: React.PropsWithoutRef<{ tipBlockNumber: string; syncedBlockNumber: string; bufferBlockNumber?: number }>) => {
   const [t] = useTranslation()
   if (tipBlockNumber === '') {
     return <Text variant="small">{t('footer.fail-to-fetch-tip-block-number')}</Text>
   }
 
-  const percentage = +syncBlockNumber / +tipBlockNumber
+  const percentage = +syncedBlockNumber / +tipBlockNumber
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', fontSize: theme.fonts.small.fontSize }}>
-      {t('sync.syncing')}
-      <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+      {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
+        <>
+          {t('sync.syncing')}
+          <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+        </>
+      ) : (
+        t('sync.synced')
+      )}
     </div>
   )
 }
 
-const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
+export const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
     <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
       {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
@@ -56,7 +63,7 @@ const Footer = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
     app: { tipBlockNumber },
-    chain: { networkID, connectStatus },
+    chain: { networkID, connectStatus, tipBlockNumber: syncedBlockNumber },
     settings: { networks },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
@@ -80,7 +87,7 @@ const Footer = ({
       styles={stackStyles}
     >
       <Stack.Item styles={stackItemStyles}>
-        <SyncStatus tipBlockNumber={tipBlockNumber} syncBlockNumber="100" />
+        <SyncStatus tipBlockNumber={tipBlockNumber} syncedBlockNumber={syncedBlockNumber} />
       </Stack.Item>
 
       <Stack styles={stackItemStyles} onClick={goToNetworksSetting} horizontal>

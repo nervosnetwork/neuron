@@ -50,8 +50,8 @@ const History = ({
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <SearchBox
           value={keywords}
-          styles={{ root: { width: 200 } }}
-          placeholder="Search"
+          styles={{ root: { width: 500 } }}
+          placeholder={t('history.search.placeholder')}
           onChange={onKeywordsChange}
           onSearch={onSearch}
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}

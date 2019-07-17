@@ -28,12 +28,6 @@ class NodeService {
   }
 
   public syncConnectStatus = () => {
-    this.tipNumberSubject.subscribe(tipNumber => {
-      windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
-        status: ResponseCode.Success,
-        result: tipNumber,
-      })
-    })
     this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
       windowManager.broadcast(Channel.Chain, 'status', {
         status: ResponseCode.Success,

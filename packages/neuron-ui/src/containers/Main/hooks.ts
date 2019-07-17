@@ -52,8 +52,12 @@ export const useChannelListeners = ({
       (
         _e: Event,
         _actionType: 'create' | 'update' | 'delete',
-        dataType: 'address' | 'transaction' | 'wallet' | 'network'
+        dataType: 'address' | 'transaction' | 'wallet' | 'network',
+        walletIDOfMessage?: string
       ) => {
+        if (walletIDOfMessage && walletIDOfMessage !== walletID) {
+          return
+        }
         switch (dataType) {
           case 'address': {
             walletsCall.getAllAddresses(walletID)
@@ -198,7 +202,7 @@ export const useChannelListeners = ({
             dispatch({
               type: NeuronWalletActions.Chain,
               payload: {
-                tipBlockNumber: args.result,
+                tipBlockNumber: args.result || '0',
               },
             })
             break
@@ -335,7 +339,7 @@ export const useChannelListeners = ({
             })
             break
           }
-          case WalletsMethod.AllAddresses: {
+          case WalletsMethod.GetAllAddresses: {
             const addresses = args.result || []
             dispatch({
               type: NeuronWalletActions.Wallet,
