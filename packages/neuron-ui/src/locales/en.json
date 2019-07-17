@@ -94,7 +94,10 @@
       "description": "Description",
       "status": "Status",
       "blockNumber": "Block Number",
-      "basic-information": "Basic Information"
+      "basic-information": "Basic Information",
+      "search": {
+        "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
+      }
     },
     "transaction": {
       "goBack": "Go back"
