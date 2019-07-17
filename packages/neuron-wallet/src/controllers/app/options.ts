@@ -178,6 +178,12 @@ export const contextMenuTemplate: {
         click: () => AppController.showTransactionDetails(hash),
       },
       {
+        label: i18n.t('contextMenu.copy-transaction-hash'),
+        click: () => {
+          clipboard.writeText(hash)
+        },
+      },
+      {
         label: i18n.t('contextMenu.view-on-explorer'),
         click: () => {
           AppController.openExternal(`${env.explorer}/transaction/${hash}`)

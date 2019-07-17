@@ -98,6 +98,7 @@ export default {
       'spend-from': 'Spend From',
       'view-on-explorer': 'View On Explorer',
       detail: 'Detail',
+      'copy-transaction-hash': 'Copy Transaction Hash',
     },
     messageBox: {
       button: {
