@@ -18,7 +18,7 @@ import {
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
 
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
@@ -79,16 +79,12 @@ const PropertyList = ({
 )
 const Overview = ({
   dispatch,
-  wallet: { id, balance = '' },
+  wallet: { id, name, balance = '' },
   chain: {
-    networkID = '',
     transactions: { items = [] },
-    tipBlockNumber = '0',
   },
-  settings: { networks = [] },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
 
   useEffect(() => {
     dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '', walletID: id }))
@@ -201,70 +197,27 @@ const Overview = ({
   const balanceItems = useMemo(
     () => [
       {
-        label: t('overview.amount'),
+        label: t('overview.balance'),
         value: <span title={`${balance} shannon`}>{`${shannonToCKBFormatter(balance)} CKB`}</span>,
       },
-      { label: t('overview.live-cells'), value: 'mock living cells' },
-      { label: t('overview.cell-types'), value: 'mock cell typ' },
     ],
     [t, balance]
   )
 
-  const blockchainStatusColumns = balanceColumns
-
-  const blockchainStatusItems = useMemo(
-    () => [
-      { label: t('overview.blockchain-identity'), value: 'mock chain id' },
-      { label: t('overview.block-number'), value: localNumberFormatter(tipBlockNumber) },
-      { label: t('overview.rpc-service'), value: currentNetwork ? currentNetwork.name : '' },
-    ],
-    [t, currentNetwork, tipBlockNumber]
-  )
-
   return (
-    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }} wrap>
-      <Stack
-        tokens={{
-          childrenGap: 15,
-        }}
-        styles={{
-          root: {
-            minWidth: '680px',
-          },
-        }}
-      >
-        <Stack>
-          <Text as="h1" variant={TITLE_FONT_SIZE}>
-            {t('overview.balance')}
-          </Text>
-          <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
-        </Stack>
-        <Stack.Item>
-          <Text as="h1" variant={TITLE_FONT_SIZE}>
-            {t('overview.blockchain-status')}
-          </Text>
-          {currentNetwork ? (
-            <PropertyList columns={blockchainStatusColumns} items={blockchainStatusItems} isHeaderVisible={false} />
-          ) : null}
-        </Stack.Item>
-      </Stack>
-      <Stack
-        horizontalAlign="stretch"
-        styles={{
-          root: {
-            minWidth: '680px',
-          },
-        }}
-      >
-        <Text as="h1" variant={TITLE_FONT_SIZE}>
-          {t('overview.recent-activities')}
-        </Text>
-        {items.length ? (
-          <PropertyList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
-        ) : (
-          <div>{t('overview.no-recent-activities')}</div>
-        )}
-      </Stack>
+    <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
+      <Text as="h1" variant={TITLE_FONT_SIZE}>
+        {name}
+      </Text>
+      <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
+      <Text as="h2" variant={TITLE_FONT_SIZE}>
+        {t('overview.recent-activities')}
+      </Text>
+      {items.length ? (
+        <PropertyList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
+      ) : (
+        <div>{t('overview.no-recent-activities')}</div>
+      )}
     </Stack>
   )
 }

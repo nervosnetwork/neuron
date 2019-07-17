@@ -7,6 +7,7 @@ import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectStatus, FULL_SCREENS, Routes } from 'utils/const'
+import { localNumberFormatter } from 'utils/formatters'
 import { NeuronWalletContext } from 'states/stateProvider'
 
 const theme = getTheme()
@@ -40,9 +41,10 @@ export const SyncStatus = ({
         <>
           {t('sync.syncing')}
           <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+          {`${localNumberFormatter(syncedBlockNumber) || '0'}/${localNumberFormatter(tipBlockNumber) || '0'}`}
         </>
       ) : (
-        t('sync.synced')
+        <>{`${t('sync.synced')}, ${t('sync.block-number')}: ${localNumberFormatter(tipBlockNumber)}`}</>
       )}
     </div>
   )
