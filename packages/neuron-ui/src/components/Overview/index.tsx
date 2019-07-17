@@ -210,7 +210,7 @@ const Overview = ({
         {name}
       </Text>
       <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
-      <Text as="h1" variant={TITLE_FONT_SIZE}>
+      <Text as="h2" variant={TITLE_FONT_SIZE}>
         {t('overview.recent-activities')}
       </Text>
       {items.length ? (
