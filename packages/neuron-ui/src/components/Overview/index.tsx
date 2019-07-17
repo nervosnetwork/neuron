@@ -178,6 +178,7 @@ const Overview = ({
           key: 'label',
           name: 'label',
           fieldName: 'label',
+          maxWidth: 100,
         },
         {
           key: 'value',
