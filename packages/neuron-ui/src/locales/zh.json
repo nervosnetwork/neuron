@@ -94,7 +94,10 @@
       "description": "标签",
       "status": "状态",
       "blockNumber": "区块高度",
-      "basic-information": "基本信息"
+      "basic-information": "基本信息",
+      "search": {
+        "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
+      }
     },
     "transaction": {
       "goBack": "返回"
