@@ -97,6 +97,7 @@ export default {
       'spend-from': '支付来源',
       'view-on-explorer': '在浏览器中查看',
       detail: '详情',
+      'copy-transaction-hash': '复制交易哈希',
     },
     messageBox: {
       button: {
