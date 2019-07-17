@@ -12,7 +12,7 @@ import WalletsController from '../wallets'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
-import windowManager from '../../models/window-manager'
+import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
 
@@ -85,6 +85,17 @@ export default class AppController {
     win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })
   }
 
+  public static handleViewError = (error: string) => {
+    if (env.isDevMode) {
+      console.error(error)
+    }
+    setTimeout(() => {
+      if (WindowManager.mainWindow) {
+        AppController.initWindow(WindowManager.mainWindow)
+      }
+    }, 500)
+  }
+
   public static showMessageBox(
     options: MessageBoxOptions,
     callback?: (response: number, checkboxChecked: boolean) => void
@@ -97,20 +108,20 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    windowManager.broadcast(Channel.App, 'toggleAddressBook', {
+    WindowManager.broadcast(Channel.App, 'toggleAddressBook', {
       status: ResponseCode.Success,
     })
   }
 
   public static navTo(url: string) {
-    windowManager.sendToMainWindow(Channel.App, 'navTo', {
+    WindowManager.sendToMainWindow(Channel.App, 'navTo', {
       status: ResponseCode.Success,
       result: url,
     })
   }
 
   public static setUILocale(locale: string) {
-    windowManager.broadcast(Channel.App, 'setUILocale', {
+    WindowManager.broadcast(Channel.App, 'setUILocale', {
       status: ResponseCode.Success,
       result: locale,
     })
