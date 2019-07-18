@@ -205,7 +205,9 @@
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
       "wallet-not-found": "Wallet not found",
-      "no-transactions": "No transactions"
+      "no-transactions": "No transactions",
+      "error": "Error",
+      "invalid-mnemonic": "Invalid mnemonic words"
     },
     "sync": {
       "syncing": "Syncing",

@@ -8,6 +8,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import { MnemonicAction, BUTTON_GAP } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
 import { helpersCall, walletsCall } from 'services/UILayer'
+import { validateMnemonic, showErrorMessage } from 'services/remote'
 import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
 
 export enum WalletWizardPath {
@@ -138,13 +139,18 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
-      history.push(
-        `${rootPath}${WalletWizardPath.Submission}/${
-          type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
-        }`
-      )
+      const isMnemonicValid = validateMnemonic(imported)
+      if (isMnemonicValid) {
+        history.push(
+          `${rootPath}${WalletWizardPath.Submission}/${
+            type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
+          }`
+        )
+      } else {
+        showErrorMessage(t('messages.error'), t('messages.invalid-mnemonic'))
+      }
     }
-  }, [isCreate, history, rootPath, type])
+  }, [isCreate, history, rootPath, type, imported, t])
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>

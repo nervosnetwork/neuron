@@ -205,7 +205,9 @@
       "wallet-created-successfully": "{{name}} 创建成功",
       "wallet-updated-successfully": "{{name}} 更新成功",
       "wallet-not-found": "未找到钱包",
-      "no-transactions": "没有交易"
+      "no-transactions": "没有交易",
+      "error": "错误",
+      "invalid-mnemonic": "助记词不合法"
     },
     "sync": {
       "syncing": "同步中",
