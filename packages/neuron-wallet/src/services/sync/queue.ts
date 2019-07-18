@@ -4,6 +4,7 @@ import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
+import TransactionsService from '../transactions'
 
 export default class Queue {
   private q: any
@@ -36,11 +37,6 @@ export default class Queue {
 
   private generateQueue = () => {
     this.q = async.queue(this.getWorker(), this.concurrent)
-  }
-
-  private regenerateQueue = () => {
-    this.q.kill()
-    this.generateQueue()
   }
 
   public setLockHashes = (lockHashes: string[]): void => {
@@ -102,13 +98,14 @@ export default class Queue {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === 'first-not-match') {
-        // TODO: reset currentBlockNumber
         const range = await this.rangeForCheck.getRange()
         const rangeFirstBlockHeader: BlockHeader = range[0]
-        this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
-        this.regenerateQueue()
-        this.startBlockNumber = await this.currentBlockNumber.getCurrent()
-        this.batchPush()
+        await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
+        await this.rangeForCheck.setRange([])
+        await TransactionsService.deleteWhenFork(rangeFirstBlockHeader.number)
+
+        // then throw an error for restart
+        throw new Error('chain forked and first not match')
       } else if (checkResult.type === 'block-headers-not-match') {
         // TODO: throw here and retry 5 times
         throw new Error('chain forked')

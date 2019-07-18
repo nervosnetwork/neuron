@@ -453,6 +453,21 @@ export default class TransactionsService {
       .execute()
   }
 
+  public static deleteWhenFork = async (blockNumber: string) => {
+    const txs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where(
+        'CAST(tx.blockNumber AS UNSIGNED BIG INT) > CAST(:blockNumber AS UNSIGNED BIG INT) AND tx.status = :status',
+        {
+          blockNumber,
+          status: TransactionStatus.Success,
+        }
+      )
+      .getMany()
+    return getConnection().manager.remove(txs)
+  }
+
   // update previousOutput's status to 'dead' if found
   // calculate output lockHash, input lockHash and capacity
   // when send a transaction, use TxSaveType.Sent
