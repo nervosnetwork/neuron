@@ -61,6 +61,9 @@ declare namespace State {
 
   interface App {
     tipBlockNumber: string
+    chain: string
+    difficulty: string
+    epoch: string
     send: Send
     passwordRequest: {
       actionType: 'send' | 'backup' | 'delete' | null

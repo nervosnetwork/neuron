@@ -2,6 +2,9 @@ import { CapacityUnit } from 'utils/const'
 
 const appState: State.App = {
   tipBlockNumber: '',
+  chain: '',
+  difficulty: '',
+  epoch: '',
   send: {
     txID: '',
     outputs: [

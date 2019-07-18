@@ -19,7 +19,11 @@
       "type": "类型",
       "datetime": "时间",
       "status": "状态",
-      "amount": "金额"
+      "amount": "金额",
+      "chain-identity": "链的 ID",
+      "tip-block-number": "区块高度",
+      "epoch": "Epoch",
+      "difficulty": "难度"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",

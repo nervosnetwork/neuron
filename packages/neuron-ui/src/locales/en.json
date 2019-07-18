@@ -19,7 +19,11 @@
       "type": "Type",
       "datetime": "Date & Time",
       "status": "Status",
-      "amount": "Amount"
+      "amount": "Amount",
+      "chain-identity": "Chain Identity",
+      "tip-block-number": "Block Number",
+      "epoch": "Epoch",
+      "difficulty": "Difficulty"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",

@@ -40,7 +40,10 @@ export const SyncStatus = ({
       {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
         <>
           {t('sync.syncing')}
-          <ProgressIndicator percentComplete={percentage} styles={{ root: { width: '120px', marginLeft: '5px' } }} />
+          <ProgressIndicator
+            percentComplete={percentage}
+            styles={{ root: { width: '120px', marginLeft: '5px', marginRight: '5px' } }}
+          />
           {`${localNumberFormatter(syncedBlockNumber) || '0'}/${localNumberFormatter(tipBlockNumber) || '0'}`}
         </>
       ) : (
