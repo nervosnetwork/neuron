@@ -9,6 +9,7 @@ import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listener/tx-status'
 import BlockNumber from '../../services/sync/block-number'
+import Utils from '../../services/sync/utils'
 
 const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
 const currentWindow = remote.getCurrentWindow()
@@ -74,8 +75,9 @@ export const switchNetwork = async () => {
 
   const walletCreatedListener = walletCreatedSubject.subscribe(async (type: string) => {
     if (type === 'import') {
-      await blockListener.stop(regenerateListener)
-      // may not call drain
+      await blockListener.stop()
+      // wait former queue to be drained
+      await Utils.sleep(3000)
       await regenerateListener()
     }
   })
