@@ -9,21 +9,17 @@ import { Routes } from 'utils/const'
 
 export const LaunchScreen = ({
   wallet: { id = '' },
-  settings: { networks = [] },
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const { t } = useTranslation()
 
   useEffect(() => {
-    if (!networks.length) {
-      return
-    }
     if (id) {
       history.push(Routes.Overview)
     } else {
       history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     }
-  }, [networks.length, id, history])
+  }, [id, history])
 
   return (
     <Panel isOpen type={PanelType.custom} customWidth="100vw">

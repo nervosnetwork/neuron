@@ -311,9 +311,6 @@ export const useChannelListeners = ({
               payload: { wallets: args.result },
             })
             walletsCache.save(args.result)
-            if (!args.result.length) {
-              history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-            }
             break
           }
           case WalletsMethod.GetCurrent: {
@@ -484,22 +481,42 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
   }, [chainURL, dispatch])
 }
 
-export const useOnCurrentWalletChange = ({ walletID, chain }: { walletID: string; chain: State.Chain }) => {
+export const useOnCurrentWalletChange = ({
+  walletID,
+  chain,
+  dispatch,
+  history,
+}: {
+  walletID: string
+  chain: State.Chain
+  dispatch: StateDispatch
+  history: any
+}) => {
   useEffect(() => {
-    walletsCall.getAllAddresses(walletID)
-    transactionsCall.getAllByKeywords({
-      walletID,
-      keywords: chain.transactions.keywords,
-      pageNo: chain.transactions.pageNo,
-      pageSize: chain.transactions.pageSize,
-    })
-    transactionsCall.get(walletID, chain.transaction.hash)
+    if (walletID) {
+      walletsCall.getAllAddresses(walletID)
+      transactionsCall.getAllByKeywords({
+        walletID,
+        keywords: chain.transactions.keywords,
+        pageNo: chain.transactions.pageNo,
+        pageSize: chain.transactions.pageSize,
+      })
+      transactionsCall.get(walletID, chain.transaction.hash)
+    } else {
+      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+      dispatch({
+        type: NeuronWalletActions.Wallet,
+        payload: initStates.wallet,
+      })
+    }
   }, [
     walletID,
     chain.transactions.pageNo,
     chain.transactions.pageSize,
     chain.transactions.keywords,
     chain.transaction.hash,
+    dispatch,
+    history,
   ])
 }
 
