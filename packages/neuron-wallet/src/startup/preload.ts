@@ -1,10 +1,11 @@
-import { ipcRenderer, clipboard, nativeImage } from 'electron'
+import { remote, ipcRenderer, clipboard, nativeImage } from 'electron'
 
 declare global {
   interface Window {
     bridge: any
     clipboard: Electron.Clipboard
     nativeImage: any
+    remote: Electron.Remote
   }
 }
 
@@ -34,3 +35,4 @@ if (process.env.NODE_ENV === 'development') {
 window.clipboard = clipboard
 window.bridge = window.bridge || bridge
 window.nativeImage = nativeImage
+window.remote = remote

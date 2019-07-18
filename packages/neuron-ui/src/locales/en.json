@@ -14,18 +14,16 @@
     },
     "overview": {
       "balance": "Balance",
-      "live-cells": "Live Cells",
-      "cell-types": "Cell Types",
       "recent-activities": "Recent Activities",
       "no-recent-activities": "No Recent Activities",
-      "blockchain-status": "Blockchain Status",
-      "blockchain-identity": "Chain Identity",
-      "block-number": "Block Number",
-      "rpc-service": "RPC Service",
       "type": "Type",
       "datetime": "Date & Time",
       "status": "Status",
-      "amount": "Amount"
+      "amount": "Amount",
+      "chain-identity": "Chain Identity",
+      "tip-block-number": "Block Number",
+      "epoch": "Epoch",
+      "difficulty": "Difficulty"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -207,11 +205,14 @@
       "wallet-created-successfully": "{{name}} created successfully",
       "wallet-updated-successfully": "{{name}} updated successfully",
       "wallet-not-found": "Wallet not found",
-      "no-transactions": "No transactions"
+      "no-transactions": "No transactions",
+      "error": "Error",
+      "invalid-mnemonic": "Invalid mnemonic words"
     },
     "sync": {
       "syncing": "Syncing",
-      "synced": "Synced"
+      "synced": "Synced",
+      "block-number": "block number"
     },
     "pagination": {
       "previous-page": "Previous page",

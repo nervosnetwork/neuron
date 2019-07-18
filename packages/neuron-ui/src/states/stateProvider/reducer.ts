@@ -26,6 +26,7 @@ export enum AppActions {
   DismissPasswordRequest = 'dismissPasswordRequest',
   UpdatePassword = 'updatePassword',
   UpdateTipBlockNumber = 'updateTipBlockNumber',
+  UpdateChainInfo = 'updateChainInfo',
   Ignore = 'ignore',
 }
 

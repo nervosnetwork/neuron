@@ -11,7 +11,13 @@ import transactions from './data/transactions'
 const stateTemplate = {
   dispatch: (dispatchAction: any) => action(dispatchAction),
   ...initStates,
-  wallet: { ...initStates.wallet, id: 'wallet id', balance: '213' },
+  app: {
+    ...initStates.app,
+    epoch: '1',
+    difficulty: '0x111',
+    chain: 'chain_dev',
+  },
+  wallet: { ...initStates.wallet, id: 'wallet id', name: 'Current Wallet Name', balance: '213' },
   chain: {
     ...initStates.chain,
     networkID: 'testnet',

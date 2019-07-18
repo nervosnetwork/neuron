@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Stack,
   Text,
+  DefaultButton,
   DetailsList,
   DetailsRow,
   IColumn,
@@ -13,6 +14,7 @@ import {
   IDetailsRowProps,
   IDetailsRowStyles,
   FontSizes,
+  Callout,
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -79,16 +81,18 @@ const PropertyList = ({
 )
 const Overview = ({
   dispatch,
-  wallet: { id, balance = '' },
+  app: { tipBlockNumber, chain, epoch, difficulty },
+  wallet: { id, name, balance = '' },
   chain: {
-    networkID = '',
     transactions: { items = [] },
-    tipBlockNumber = '0',
   },
-  settings: { networks = [] },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const currentNetwork = useMemo(() => networks.find(n => n.id === networkID), [networkID, networks])
+  const [displayBlockchainInfo, setDisplayBlockchainInfo] = useState(false)
+  const [displayMinerInfo, setDisplayMinerInfo] = useState(false)
+
+  const blockchainInfoRef = useRef<HTMLDivElement>(null)
+  const minerInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '', walletID: id }))
@@ -182,6 +186,31 @@ const Overview = ({
           key: 'label',
           name: 'label',
           fieldName: 'label',
+          maxWidth: 100,
+        },
+        {
+          key: 'value',
+          name: 'value',
+          fieldName: 'value',
+        },
+      ].map(col => ({
+        isResizable: true,
+        minWidth: 200,
+        fieldName: col.key,
+        ariaLabel: col.name,
+        ...col,
+      })),
+    []
+  )
+
+  const blockchainStatusColumns: IColumn[] = useMemo(
+    () =>
+      [
+        {
+          key: 'label',
+          name: 'label',
+          fieldName: 'label',
+          maxWidth: 100,
         },
         {
           key: 'value',
@@ -201,70 +230,92 @@ const Overview = ({
   const balanceItems = useMemo(
     () => [
       {
-        label: t('overview.amount'),
+        label: t('overview.balance'),
         value: <span title={`${balance} shannon`}>{`${shannonToCKBFormatter(balance)} CKB`}</span>,
       },
-      { label: t('overview.live-cells'), value: 'mock living cells' },
-      { label: t('overview.cell-types'), value: 'mock cell typ' },
     ],
     [t, balance]
   )
-
-  const blockchainStatusColumns = balanceColumns
-
   const blockchainStatusItems = useMemo(
     () => [
-      { label: t('overview.blockchain-identity'), value: 'mock chain id' },
-      { label: t('overview.block-number'), value: localNumberFormatter(tipBlockNumber) },
-      { label: t('overview.rpc-service'), value: currentNetwork ? currentNetwork.name : '' },
+      {
+        label: t('overview.chain-identity'),
+        value: chain,
+      },
+      {
+        label: t('overview.tip-block-number'),
+        value: localNumberFormatter(tipBlockNumber),
+      },
+      {
+        label: t('overview.epoch'),
+        value: epoch,
+      },
+      {
+        label: t('overview.difficulty'),
+        value: difficulty,
+      },
     ],
-    [t, currentNetwork, tipBlockNumber]
+    [t, chain, epoch, difficulty, tipBlockNumber]
   )
 
+  const showBlockchainStatus = useCallback(() => {
+    setDisplayBlockchainInfo(true)
+  }, [setDisplayBlockchainInfo])
+  const hideBlockchainStatus = useCallback(() => {
+    setDisplayBlockchainInfo(false)
+  }, [setDisplayBlockchainInfo])
+  const showMinerInfo = useCallback(() => {
+    setDisplayMinerInfo(true)
+  }, [setDisplayMinerInfo])
+  const hideMinerInfo = useCallback(() => {
+    setDisplayMinerInfo(false)
+  }, [setDisplayMinerInfo])
+
   return (
-    <Stack horizontal horizontalAlign="space-evenly" verticalFill tokens={{ childrenGap: 15 }} wrap>
-      <Stack
-        tokens={{
-          childrenGap: 15,
-        }}
-        styles={{
-          root: {
-            minWidth: '680px',
-          },
-        }}
-      >
-        <Stack>
-          <Text as="h1" variant={TITLE_FONT_SIZE}>
-            {t('overview.balance')}
-          </Text>
-          <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
+    <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
+      <Text as="h1" variant={TITLE_FONT_SIZE}>
+        {name}
+      </Text>
+      <Stack horizontal>
+        <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
+        <Stack tokens={{ childrenGap: 15 }}>
+          <div ref={blockchainInfoRef}>
+            <DefaultButton onClick={showBlockchainStatus} styles={{ root: { width: '200px' } }}>
+              Blockchain Status
+            </DefaultButton>
+          </div>
+          <div ref={minerInfoRef}>
+            <DefaultButton onClick={showMinerInfo} styles={{ root: { width: '200px' } }}>
+              Miner Info
+            </DefaultButton>
+          </div>
         </Stack>
-        <Stack.Item>
-          <Text as="h1" variant={TITLE_FONT_SIZE}>
-            {t('overview.blockchain-status')}
-          </Text>
-          {currentNetwork ? (
+      </Stack>
+      <Text as="h2" variant={TITLE_FONT_SIZE}>
+        {t('overview.recent-activities')}
+      </Text>
+      {items.length ? (
+        <PropertyList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
+      ) : (
+        <div>{t('overview.no-recent-activities')}</div>
+      )}
+      {blockchainInfoRef.current ? (
+        <Callout
+          target={blockchainInfoRef.current}
+          hidden={!displayBlockchainInfo}
+          onDismiss={hideBlockchainStatus}
+          gapSpace={0}
+        >
+          <Stack>
             <PropertyList columns={blockchainStatusColumns} items={blockchainStatusItems} isHeaderVisible={false} />
-          ) : null}
-        </Stack.Item>
-      </Stack>
-      <Stack
-        horizontalAlign="stretch"
-        styles={{
-          root: {
-            minWidth: '680px',
-          },
-        }}
-      >
-        <Text as="h1" variant={TITLE_FONT_SIZE}>
-          {t('overview.recent-activities')}
-        </Text>
-        {items.length ? (
-          <PropertyList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
-        ) : (
-          <div>{t('overview.no-recent-activities')}</div>
-        )}
-      </Stack>
+          </Stack>
+        </Callout>
+      ) : null}
+      {minerInfoRef.current ? (
+        <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
+          Miner Info
+        </Callout>
+      ) : null}
     </Stack>
   )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -20,7 +20,7 @@ import PasswordRequest from 'components/PasswordRequest'
 
 import { Routes } from 'utils/const'
 
-import { useChannelListeners, useSyncTipBlockNumber, useOnCurrentWalletChange } from './hooks'
+import { useChannelListeners, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 export const mainContents: CustomRouter.Route[] = [
   {
@@ -107,6 +107,10 @@ const MainContent = ({
   dispatch,
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
+  const {
+    chain: { networkID },
+    settings: { networks },
+  } = neuronWalletState
   const [, i18n] = useTranslation()
   useChannelListeners({
     walletID: neuronWalletState.wallet.id,
@@ -115,14 +119,21 @@ const MainContent = ({
     history,
     i18n,
   })
-  useSyncTipBlockNumber({
-    networkID: neuronWalletState.chain.networkID,
-    networks: neuronWalletState.settings.networks,
+
+  const chainURL = useMemo(() => {
+    const network = networks.find(n => n.id === networkID)
+    return network ? network.remote : ''
+  }, [networks, networkID])
+
+  useSyncChainData({
+    chainURL,
     dispatch,
   })
   useOnCurrentWalletChange({
     walletID: neuronWalletState.wallet.id,
     chain: neuronWalletState.chain,
+    dispatch,
+    history,
   })
   return (
     <>

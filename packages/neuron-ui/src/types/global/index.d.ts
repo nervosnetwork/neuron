@@ -1,6 +1,12 @@
 declare interface Window {
   clipboard: any
-  remote: any
+  remote: {
+    getCurrentWebContents: Function
+    getCurrentWindow: Function
+    getGlobal: (name: string) => any
+    require: (module: string) => any
+    process?: any
+  }
   require: any
   bridge: any
   nativeImage: any
