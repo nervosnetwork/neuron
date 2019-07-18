@@ -132,6 +132,8 @@ const MainContent = ({
   useOnCurrentWalletChange({
     walletID: neuronWalletState.wallet.id,
     chain: neuronWalletState.chain,
+    dispatch,
+    history,
   })
   return (
     <>
