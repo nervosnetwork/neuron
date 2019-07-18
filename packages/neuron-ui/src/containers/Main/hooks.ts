@@ -16,7 +16,7 @@ import UILayer, {
   transactionsCall,
   networksCall,
 } from 'services/UILayer'
-import { ckbCore, getTipBlockNumber } from 'services/chain'
+import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectStatus } from 'utils/const'
 import {
   wallets as walletsCache,
@@ -432,17 +432,8 @@ export const useChannelListeners = ({
     })
   }, [walletID, i18n, chain, dispatch, history])
 
-export const useSyncTipBlockNumber = ({
-  networks,
-  networkID,
-  dispatch,
-}: {
-  networks: State.Network[]
-  networkID: string
-  dispatch: StateDispatch
-}) => {
+export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
-    const network = networks.find(n => n.id === networkID)
     const syncTipNumber = () =>
       getTipBlockNumber()
         .then(tipBlockNumber => {
@@ -452,12 +443,37 @@ export const useSyncTipBlockNumber = ({
           })
         })
         .catch(console.error)
+
+    const syncBlockchainInfo = () => {
+      getBlockchainInfo()
+        .then(info => {
+          if (info) {
+            const { chain = '', difficulty = '', epoch = '', alerts = [] } = info
+            if (alerts.length) {
+              alerts.forEach(a => {
+                // TODO: display alerts in Notification
+                console.info(a)
+              })
+            }
+            dispatch({
+              type: AppActions.UpdateChainInfo,
+              payload: {
+                chain,
+                difficulty,
+                epoch,
+              },
+            })
+          }
+        })
+        .catch(console.error)
+    }
     clearInterval(timer)
-    if (network) {
-      ckbCore.setNode(network.remote)
+    if (chainURL) {
+      ckbCore.setNode(chainURL)
       syncTipNumber()
       timer = setInterval(() => {
         syncTipNumber()
+        syncBlockchainInfo()
       }, SYNC_INTERVAL_TIME)
     } else {
       ckbCore.setNode('')
@@ -465,7 +481,7 @@ export const useSyncTipBlockNumber = ({
     return () => {
       clearInterval(timer)
     }
-  }, [networks, networkID, dispatch])
+  }, [chainURL, dispatch])
 }
 
 export const useOnCurrentWalletChange = ({ walletID, chain }: { walletID: string; chain: State.Chain }) => {
@@ -489,6 +505,6 @@ export const useOnCurrentWalletChange = ({ walletID, chain }: { walletID: string
 
 export default {
   useChannelListeners,
-  useSyncTipBlockNumber,
+  useSyncChainData,
   useOnCurrentWalletChange,
 }
