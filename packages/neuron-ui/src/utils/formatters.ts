@@ -84,6 +84,9 @@ export const shannonToCKBFormatter = (shannon: string) => {
     })
     .join('')
     .replace(/(^0+|\.?0+$)/g, '')
+  if (!unsignedCkbStr) {
+    return '0'
+  }
   if (unsignedCkbStr.startsWith('.')) {
     unsignedCkbStr = `0${unsignedCkbStr}`
   }
