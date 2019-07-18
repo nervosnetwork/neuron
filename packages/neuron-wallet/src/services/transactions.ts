@@ -324,6 +324,11 @@ export default class TransactionsService {
       .getRepository(TransactionEntity)
       .findOne(transaction.hash, { relations: ['inputs', 'outputs'] })
 
+    // return if success
+    if (txEntity && txEntity.status === TransactionStatus.Success) {
+      return txEntity
+    }
+
     if (txEntity) {
       // input -> previousOutput => dead
       // output => live
