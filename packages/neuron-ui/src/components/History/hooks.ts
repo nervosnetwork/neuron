@@ -14,12 +14,7 @@ const backToTop = () => {
   }
 }
 
-export const useSearch = (
-  search: string = '',
-  incomingKeywords: string = '',
-  walletID: string = '',
-  dispatch: React.Dispatch<any>
-) => {
+export const useSearch = (search: string = '', walletID: string = '', dispatch: React.Dispatch<any>) => {
   const [keywords, setKeywords] = useState('')
 
   const onKeywordsChange = (_e?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
@@ -27,10 +22,6 @@ export const useSearch = (
       setKeywords(newValue)
     }
   }
-
-  useEffect(() => {
-    setKeywords(incomingKeywords)
-  }, [incomingKeywords, setKeywords])
 
   useEffect(() => {
     backToTop()
