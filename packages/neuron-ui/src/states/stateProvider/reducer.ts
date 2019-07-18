@@ -136,6 +136,15 @@ export const reducer = (
         },
       }
     }
+    case AppActions.UpdateChainInfo: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          ...payload,
+        },
+      }
+    }
     case AppActions.UpdateTransactionID: {
       return {
         ...state,
