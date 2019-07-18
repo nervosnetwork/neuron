@@ -76,7 +76,7 @@ export const switchNetwork = async () => {
   const walletCreatedListener = walletCreatedSubject.subscribe(async (type: string) => {
     if (type === 'import') {
       await blockListener.stop()
-      // wait former queue drain
+      // wait former queue to be drained
       await Utils.sleep(3000)
       await regenerateListener()
     }
