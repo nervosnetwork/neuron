@@ -252,7 +252,7 @@ const Overview = ({
       },
       {
         label: t('overview.difficulty'),
-        value: difficulty,
+        value: (+difficulty).toLocaleString(),
       },
     ],
     [t, chain, epoch, difficulty, tipBlockNumber]
