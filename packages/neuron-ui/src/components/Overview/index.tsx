@@ -276,17 +276,17 @@ const Overview = ({
       <Text as="h1" variant={TITLE_FONT_SIZE}>
         {name}
       </Text>
-      <Stack horizontal>
+      <Stack horizontal horizontalAlign="space-between">
         <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
         <Stack tokens={{ childrenGap: 15 }}>
           <div ref={blockchainInfoRef}>
             <DefaultButton onClick={showBlockchainStatus} styles={{ root: { width: '200px' } }}>
-              Blockchain Status
+              {t('overview.blockchain-status')}
             </DefaultButton>
           </div>
           <div ref={minerInfoRef}>
             <DefaultButton onClick={showMinerInfo} styles={{ root: { width: '200px' } }}>
-              Miner Info
+              {t('overview.miner-info')}
             </DefaultButton>
           </div>
         </Stack>
@@ -311,9 +311,10 @@ const Overview = ({
           </Stack>
         </Callout>
       ) : null}
+      {/* TODO: Implement this */}
       {minerInfoRef.current ? (
         <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
-          Miner Info
+          {t('overview.miner-info')}
         </Callout>
       ) : null}
     </Stack>
