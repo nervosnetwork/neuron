@@ -34,7 +34,7 @@ export const useSearch = (search: string = '', walletID: string = '', dispatch: 
 
     dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords, walletID }))
   }, [search, walletID, dispatch])
-  return { keywords, onKeywordsChange }
+  return { keywords, onKeywordsChange, setKeywords }
 }
 
 export default {

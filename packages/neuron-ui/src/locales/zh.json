@@ -20,10 +20,12 @@
       "datetime": "时间",
       "status": "状态",
       "amount": "金额",
+      "blockchain-status": "链状态",
       "chain-identity": "链的 ID",
       "tip-block-number": "区块高度",
       "epoch": "Epoch",
-      "difficulty": "难度"
+      "difficulty": "难度",
+      "miner-info": "挖矿信息"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",

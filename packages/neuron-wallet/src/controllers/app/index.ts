@@ -9,6 +9,7 @@ import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
 import NodeService from '../../services/node'
 import WalletsController from '../wallets'
+import SyncInfoController from '../sync-info'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
@@ -35,16 +36,14 @@ export default class AppController {
       walletsService.getAll(),
       networksService.getCurrentID(),
       networksService.getAll(),
-      new Promise(resolve => {
-        nodeService.tipNumberSubject.pipe(take(1)).subscribe(
-          tipNum => {
-            resolve(tipNum || '0')
-          },
-          () => {
-            resolve('0')
+      SyncInfoController.currentBlockNumber()
+        .then(res => {
+          if (res.status) {
+            return res.result.currentBlockNumber
           }
-        )
-      }),
+          return '0'
+        })
+        .catch(() => '0'),
       new Promise(resolve => {
         nodeService.connectStatusSubject.pipe(take(1)).subscribe(
           status => {

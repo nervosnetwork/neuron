@@ -1,6 +1,6 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject } from 'rxjs'
-import { distinctUntilChanged, flatMap, delay, retry } from 'rxjs/operators'
+import { distinctUntilChanged, sampleTime, flatMap, delay, retry } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
 import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
@@ -28,7 +28,7 @@ class NodeService {
   }
 
   public syncConnectStatus = () => {
-    this.connectStatusSubject.pipe(distinctUntilChanged()).subscribe(connectStatus => {
+    this.connectStatusSubject.pipe(sampleTime(10000)).subscribe(connectStatus => {
       windowManager.broadcast(Channel.Chain, 'status', {
         status: ResponseCode.Success,
         result: connectStatus,

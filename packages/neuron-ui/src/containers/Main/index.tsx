@@ -108,7 +108,11 @@ const MainContent = ({
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
   const {
-    chain: { networkID },
+    wallet: { id: walletID },
+    chain: {
+      networkID,
+      transactions: { pageNo, pageSize },
+    },
     settings: { networks },
   } = neuronWalletState
   const [, i18n] = useTranslation()
@@ -129,12 +133,15 @@ const MainContent = ({
     chainURL,
     dispatch,
   })
+
   useOnCurrentWalletChange({
-    walletID: neuronWalletState.wallet.id,
-    chain: neuronWalletState.chain,
+    walletID,
+    pageNo,
+    pageSize,
     dispatch,
     history,
   })
+
   return (
     <>
       {mainContents.map(container => (

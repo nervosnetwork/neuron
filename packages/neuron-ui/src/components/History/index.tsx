@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox, getTheme } from 'office-ui-fabric-react'
@@ -42,7 +42,12 @@ const History = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
+  const { keywords, onKeywordsChange, setKeywords } = useSearch(search, id, dispatch)
+  useEffect(() => {
+    if (id) {
+      setKeywords('')
+    }
+  }, [id, setKeywords])
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
 
   return (

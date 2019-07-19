@@ -1,5 +1,5 @@
 import { ReplaySubject } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
+import { sampleTime } from 'rxjs/operators'
 import windowManager from '../window-manager'
 import { Channel, ResponseCode } from '../../utils/const'
 
@@ -16,7 +16,7 @@ export class CurrentBlockSubject {
   }
 
   static subscribe() {
-    CurrentBlockSubject.subject.pipe(debounceTime(500)).subscribe(({ blockNumber }) => {
+    CurrentBlockSubject.subject.pipe(sampleTime(500)).subscribe(({ blockNumber }) => {
       windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
         status: ResponseCode.Success,
         result: blockNumber,
