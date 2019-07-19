@@ -7,7 +7,7 @@ import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
-import { register as registerTxStatusListener } from '../../listener/tx-status'
+import { register as registerTxStatusListener } from '../../listeners/tx-status'
 import BlockNumber from '../../services/sync/block-number'
 import Utils from '../../services/sync/utils'
 
