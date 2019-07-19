@@ -15,7 +15,7 @@ const stateTemplate = {
   app: {
     ...initStates.app,
     epoch: '1',
-    difficulty: '0x111',
+    difficulty: '0x111111',
     chain: 'chain_dev',
   },
   wallet: { ...initStates.wallet, id: 'wallet id', name: 'Current Wallet Name', balance: '213' },

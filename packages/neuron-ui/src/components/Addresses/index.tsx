@@ -17,7 +17,7 @@ import { appCalls } from 'services/UILayer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
   wallet: { id, addresses = [] },
@@ -150,7 +150,7 @@ const Addresses = ({
         isCollapsible: false,
         onRender: (item?: State.Address) => {
           if (item) {
-            return (+item.txCount).toLocaleString()
+            return localNumberFormatter(item.txCount)
           }
           return '-'
         },

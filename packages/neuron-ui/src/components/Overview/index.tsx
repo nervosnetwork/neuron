@@ -252,7 +252,7 @@ const Overview = ({
       },
       {
         label: t('overview.difficulty'),
-        value: difficulty,
+        value: localNumberFormatter(+difficulty),
       },
     ],
     [t, chain, epoch, difficulty, tipBlockNumber]
