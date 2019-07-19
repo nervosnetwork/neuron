@@ -39,6 +39,12 @@ export default class Queue {
     this.q = async.queue(this.getWorker(), this.concurrent)
   }
 
+  private regenerateQueue = async () => {
+    this.kill()
+    await Utils.sleep(3000)
+    this.generateQueue()
+  }
+
   public setLockHashes = (lockHashes: string[]): void => {
     this.lockHashes = lockHashes
   }
@@ -80,7 +86,7 @@ export default class Queue {
     const blocks: Block[] = await this.getBlocksService.getRangeBlocks(blockNumbers)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
-    // TODO: 2. check blockHeaders
+    // 2. check blockHeaders
     await this.checkBlockHeader(blockHeaders)
 
     // 3. check and save
@@ -103,11 +109,11 @@ export default class Queue {
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
         await this.rangeForCheck.setRange([])
         await TransactionsService.deleteWhenFork(rangeFirstBlockHeader.number)
-
-        // then throw an error for restart
-        throw new Error('chain forked and first not match')
+        await this.regenerateQueue()
+        this.startBlockNumber = await this.currentBlockNumber.getCurrent()
+        this.batchPush()
       } else if (checkResult.type === 'block-headers-not-match') {
-        // TODO: throw here and retry 5 times
+        // throw here and retry 5 times
         throw new Error('chain forked')
       }
     }
