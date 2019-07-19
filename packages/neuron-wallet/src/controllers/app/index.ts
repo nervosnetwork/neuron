@@ -59,12 +59,12 @@ export default class AppController {
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
       : [])
 
-    const transactions = currentNetworkID
+    const transactions = currentWallet
       ? await TransactionsController.getAllByKeywords({
           pageNo: 1,
           pageSize: 15,
           keywords: '',
-          walletID: currentNetworkID,
+          walletID: currentWallet.id,
         }).then(res => res.result)
       : []
     const locale = app.getLocale()
