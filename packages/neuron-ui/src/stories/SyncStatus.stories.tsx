@@ -1,5 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { withKnobs, text, number } from '@storybook/addon-knobs'
 import { SyncStatus } from 'containers/Footer'
 
 const stories = storiesOf('SyncStatus', module)
@@ -39,4 +40,13 @@ const states = {
 
 Object.entries(states).forEach(([title, props]) => {
   stories.add(title, () => <SyncStatus {...props} />)
+})
+
+stories.addDecorator(withKnobs).add('With knobs', () => {
+  const props = {
+    tipBlockNumber: text('Tip block number', '100'),
+    syncedBlockNumber: text('Synced block number', '0'),
+    bufferBlockNumber: number('Buffer block number', 10),
+  }
+  return <SyncStatus {...props} />
 })

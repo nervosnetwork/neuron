@@ -34,7 +34,7 @@ registerIcons({
 const History = ({
   wallet: { id },
   chain: {
-    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [], keywords: incomingKeywords = '' },
+    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
   },
   history,
   location: { search },
@@ -42,7 +42,7 @@ const History = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange } = useSearch(search, incomingKeywords, id, dispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
 
   return (

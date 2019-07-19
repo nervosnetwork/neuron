@@ -468,6 +468,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
     if (chainURL) {
       ckbCore.setNode(chainURL)
       syncTipNumber()
+      syncBlockchainInfo()
       timer = setInterval(() => {
         syncTipNumber()
         syncBlockchainInfo()

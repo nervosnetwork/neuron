@@ -139,6 +139,10 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
+      dispatch({
+        type: 'imported',
+        payload: imported.trim().replace(/(\s+|\n+)/g, ' '),
+      })
       const isMnemonicValid = validateMnemonic(imported)
       if (isMnemonicValid) {
         history.push(
@@ -150,7 +154,7 @@ const Mnemonic = ({
         showErrorMessage(t('messages.error'), t('messages.invalid-mnemonic'))
       }
     }
-  }, [isCreate, history, rootPath, type, imported, t])
+  }, [isCreate, history, rootPath, type, imported, t, dispatch])
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>

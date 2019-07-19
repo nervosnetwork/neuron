@@ -54,6 +54,7 @@ export default class Queue {
           await this.pipeline(task.blockNumbers)
         })
       } catch {
+        this.q.kill()
         this.q.remove(() => true)
       }
       await callback()

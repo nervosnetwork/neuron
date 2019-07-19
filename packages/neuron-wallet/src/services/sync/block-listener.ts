@@ -54,15 +54,12 @@ export default class BlockListener {
     }
   }
 
-  public stop = async (drainCall?: any) => {
+  public stop = async () => {
     if (!this.queue) {
       return
     }
     await this.queue.kill()
     await this.queue.get().remove(() => true)
-    if (drainCall) {
-      this.queue.get().drain(drainCall)
-    }
     this.queue = null
   }
 

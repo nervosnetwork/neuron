@@ -73,18 +73,24 @@ export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
 }
 
 export const shannonToCKBFormatter = (shannon: string) => {
-  let ckbStr = [...shannon.padStart(8, '0')]
+  const sign = shannon.startsWith('-') ? '-' : ''
+  const unsignedShannon = shannon.replace(/^-/, '')
+  let unsignedCkbStr = [...unsignedShannon.padStart(8, '0')]
     .map((char, idx) => {
-      if (idx === Math.max(shannon.length - 8, 0)) {
+      if (idx === Math.max(unsignedShannon.length - 8, 0)) {
         return `.${char}`
       }
       return char
     })
     .join('')
-  if (ckbStr.startsWith('.')) {
-    ckbStr = `0${ckbStr}`
+    .replace(/(^0+|\.?0+$)/g, '')
+  if (!unsignedCkbStr) {
+    return '0'
   }
-  return ckbStr.replace(/\.?0+$/, '')
+  if (unsignedCkbStr.startsWith('.')) {
+    unsignedCkbStr = `0${unsignedCkbStr}`
+  }
+  return sign + unsignedCkbStr
 }
 
 export const localNumberFormatter = (num: string | number = 0) => {

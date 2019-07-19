@@ -89,9 +89,13 @@ export const reducer = (
           ...payload,
         },
       }
-      newState.chain.transactions.items = newState.chain.transactions.items.sort(
-        (item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt)
-      )
+      const pendingTxs = newState.chain.transactions.items
+        .filter(item => item.status === 'pending')
+        .sort((item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt))
+      const determinedTxs = newState.chain.transactions.items
+        .filter(item => item.status !== 'pending')
+        .sort((item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt))
+      newState.chain.transactions.items = [...pendingTxs, ...determinedTxs]
       return newState
     }
     case NeuronWalletActions.Settings: {
@@ -133,6 +137,15 @@ export const reducer = (
         app: {
           ...state.app,
           tipBlockNumber: payload,
+        },
+      }
+    }
+    case AppActions.UpdateChainInfo: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          ...payload,
         },
       }
     }
