@@ -9,7 +9,7 @@ import createMainWindow from './startup/create-main-window'
 import createSyncBlockTask from './startup/sync-block-task/create'
 import initConnection from './database/address/ormconfig'
 import WalletsService from './services/wallets'
-import { register as registerAddressListener } from './listener/address'
+import { register as registerAddressListener } from './listeners/address'
 
 // register to listen address updates
 registerAddressListener()
