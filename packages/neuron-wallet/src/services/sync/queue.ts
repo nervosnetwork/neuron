@@ -4,6 +4,7 @@ import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
+import TransactionsService from '../transactions'
 
 export default class Queue {
   private q: any
@@ -38,8 +39,9 @@ export default class Queue {
     this.q = async.queue(this.getWorker(), this.concurrent)
   }
 
-  private regenerateQueue = () => {
-    this.q.kill()
+  private regenerateQueue = async () => {
+    this.kill()
+    await Utils.sleep(3000)
     this.generateQueue()
   }
 
@@ -84,7 +86,7 @@ export default class Queue {
     const blocks: Block[] = await this.getBlocksService.getRangeBlocks(blockNumbers)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
-    // TODO: 2. check blockHeaders
+    // 2. check blockHeaders
     await this.checkBlockHeader(blockHeaders)
 
     // 3. check and save
@@ -102,15 +104,16 @@ export default class Queue {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === 'first-not-match') {
-        // TODO: reset currentBlockNumber
         const range = await this.rangeForCheck.getRange()
         const rangeFirstBlockHeader: BlockHeader = range[0]
-        this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
-        this.regenerateQueue()
+        await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
+        await this.rangeForCheck.setRange([])
+        await TransactionsService.deleteWhenFork(rangeFirstBlockHeader.number)
+        await this.regenerateQueue()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()
       } else if (checkResult.type === 'block-headers-not-match') {
-        // TODO: throw here and retry 5 times
+        // throw here and retry 5 times
         throw new Error('chain forked')
       }
     }
