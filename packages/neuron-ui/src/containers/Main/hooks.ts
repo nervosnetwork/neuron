@@ -484,12 +484,15 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
 
 export const useOnCurrentWalletChange = ({
   walletID,
-  chain,
+  pageNo,
+  pageSize,
   dispatch,
   history,
 }: {
   walletID: string
-  chain: State.Chain
+  pageNo: number
+  pageSize: number
+
   dispatch: StateDispatch
   history: any
 }) => {
@@ -498,11 +501,10 @@ export const useOnCurrentWalletChange = ({
       walletsCall.getAllAddresses(walletID)
       transactionsCall.getAllByKeywords({
         walletID,
-        keywords: chain.transactions.keywords,
-        pageNo: chain.transactions.pageNo,
-        pageSize: chain.transactions.pageSize,
+        keywords: '',
+        pageNo,
+        pageSize,
       })
-      transactionsCall.get(walletID, chain.transaction.hash)
     } else {
       history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
       dispatch({
@@ -510,15 +512,7 @@ export const useOnCurrentWalletChange = ({
         payload: initStates.wallet,
       })
     }
-  }, [
-    walletID,
-    chain.transactions.pageNo,
-    chain.transactions.pageSize,
-    chain.transactions.keywords,
-    chain.transaction.hash,
-    dispatch,
-    history,
-  ])
+  }, [walletID, pageNo, pageSize, dispatch, history])
 }
 
 export default {

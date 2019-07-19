@@ -78,7 +78,7 @@ const Receive = ({
             {t('receive.address-qrcode')}
           </Text>
         </Stack>
-        <Stack padding="15px">
+        <Stack tokens={{ padding: '15px' }}>
           <QRCode value={accountAddress} size={400} />
         </Stack>
       </Modal>
