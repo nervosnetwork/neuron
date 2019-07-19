@@ -30,6 +30,7 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     type: number(`${idx}-Type`, addr.type) as 0 | 1,
     txCount: number(`${idx}-Tx count`, addr.txCount),
     balance: text(`${idx}-Balance`, addr.balance),
+    index: number(`${idx}-Index`, addr.index),
   }))
   return <AddressWithRouteProps addresses={addrs} />
 })

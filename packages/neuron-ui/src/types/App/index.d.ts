@@ -97,6 +97,7 @@ declare namespace State {
     type: 0 | 1 // 0 for receiving, 1 for change
     txCount: number
     balance: string
+    index: number
   }
 
   interface Wallet extends WalletIdentity {
