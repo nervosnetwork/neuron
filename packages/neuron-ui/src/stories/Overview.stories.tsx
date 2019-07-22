@@ -8,6 +8,7 @@ import Overview from 'components/Overview'
 import initStates from 'states/initStates'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import transactions from './data/transactions'
+import addresses from './data/addresses'
 
 const stateTemplate = {
   dispatch: (dispatchAction: any) => action(dispatchAction),
@@ -15,10 +16,16 @@ const stateTemplate = {
   app: {
     ...initStates.app,
     epoch: '1',
-    difficulty: '0x111',
+    difficulty: '0x111111',
     chain: 'chain_dev',
   },
-  wallet: { ...initStates.wallet, id: 'wallet id', name: 'Current Wallet Name', balance: '213' },
+  wallet: {
+    ...initStates.wallet,
+    id: 'wallet id',
+    name: 'Current Wallet Name',
+    balance: '213',
+    addresses: addresses['Content List'],
+  },
   chain: {
     ...initStates.chain,
     networkID: 'testnet',

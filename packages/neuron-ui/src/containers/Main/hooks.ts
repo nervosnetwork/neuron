@@ -24,6 +24,7 @@ import {
   addresses as addressesCache,
   currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
+  systemScript as systemScriptCache,
 } from 'utils/localCache'
 
 let timer: NodeJS.Timeout
@@ -116,6 +117,7 @@ export const useChannelListeners = ({
           locale: string
           tipNumber: string
           connectStatus: boolean
+          codeHash: string
         }>
       ) => {
         if (args.status) {
@@ -129,6 +131,7 @@ export const useChannelListeners = ({
             transactions = initStates.chain.transactions,
             tipNumber = '0',
             connectStatus = false,
+            codeHash = '',
           } = args.result
           if (locale !== i18n.language) {
             i18n.changeLanguage(locale)
@@ -148,6 +151,7 @@ export const useChannelListeners = ({
             type: NeuronWalletActions.Chain,
             payload: {
               tipBlockNumber: tipNumber,
+              codeHash,
               connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
               transactions: { ...chain.transactions, ...transactions },
             },
@@ -158,6 +162,7 @@ export const useChannelListeners = ({
           walletsCache.save(wallets)
           addressesCache.save(addresses)
           networksCache.save(networks)
+          systemScriptCache.save({ codeHash })
         } else {
           /* eslint-disable no-alert */
           // TODO: better prompt, prd required
@@ -203,6 +208,16 @@ export const useChannelListeners = ({
               type: NeuronWalletActions.Chain,
               payload: {
                 tipBlockNumber: args.result || '0',
+              },
+            })
+            break
+          }
+          case ChainMethod.SystemScript: {
+            const { codeHash = '' } = args.result
+            dispatch({
+              type: NeuronWalletActions.Chain,
+              payload: {
+                codeHash,
               },
             })
             break

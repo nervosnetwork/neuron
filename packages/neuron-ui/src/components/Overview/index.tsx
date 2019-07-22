@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Copy } from 'grommet-icons'
 import {
   Stack,
   Text,
+  ActionButton,
   DefaultButton,
   DetailsList,
   DetailsRow,
@@ -15,13 +17,24 @@ import {
   IDetailsRowStyles,
   FontSizes,
   Callout,
+  MessageBar,
+  MessageBarType,
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 
+import { showErrorMessage } from 'services/remote'
+
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
+import { registerIcons } from 'utils/icons'
+
+registerIcons({
+  icons: {
+    Copy: <Copy size="small" />,
+  },
+})
 
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
@@ -82,8 +95,9 @@ const PropertyList = ({
 const Overview = ({
   dispatch,
   app: { tipBlockNumber, chain, epoch, difficulty },
-  wallet: { id, name, balance = '' },
+  wallet: { id, name, balance = '', addresses = [] },
   chain: {
+    codeHash = '',
     transactions: { items = [] },
   },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -252,7 +266,7 @@ const Overview = ({
       },
       {
         label: t('overview.difficulty'),
-        value: difficulty,
+        value: localNumberFormatter(+difficulty),
       },
     ],
     [t, chain, epoch, difficulty, tipBlockNumber]
@@ -270,6 +284,20 @@ const Overview = ({
   const hideMinerInfo = useCallback(() => {
     setDisplayMinerInfo(false)
   }, [setDisplayMinerInfo])
+
+  const defaultAddress = useMemo(() => {
+    return addresses.find(addr => addr.type === 0 && addr.index === 0)
+  }, [addresses])
+
+  const onCopyPubkeyHash = useCallback(() => {
+    if (defaultAddress) {
+      window.navigator.clipboard.writeText(defaultAddress.identifier)
+      hideMinerInfo()
+      // TODO: Add notification
+    } else {
+      showErrorMessage(t('messages.error'), t('messages.can-not-find-the-default-address'))
+    }
+  }, [defaultAddress, t, hideMinerInfo])
 
   return (
     <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
@@ -306,15 +334,46 @@ const Overview = ({
           onDismiss={hideBlockchainStatus}
           gapSpace={0}
         >
-          <Stack>
+          <Stack tokens={{ padding: 15 }}>
             <PropertyList columns={blockchainStatusColumns} items={blockchainStatusItems} isHeaderVisible={false} />
           </Stack>
         </Callout>
       ) : null}
-      {/* TODO: Implement this */}
       {minerInfoRef.current ? (
         <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
-          {t('overview.miner-info')}
+          <Stack tokens={{ padding: 15 }}>
+            {defaultAddress ? (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="medium">{t('overview.address')}</Text>
+                  <Text variant="small" className="fixedWidth">
+                    {defaultAddress.address}
+                  </Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="medium">{t('overview.code-hash')}</Text>
+                  <Text variant="small" className="fixedWidth">
+                    {codeHash}
+                  </Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="medium">{t('overview.lock-arg')}</Text>
+                  <Text variant="small" className="fixedWidth">
+                    {defaultAddress.identifier}
+                  </Text>
+                </Stack>
+                <Stack horizontalAlign="end">
+                  <ActionButton iconProps={{ iconName: 'Copy' }} onClick={onCopyPubkeyHash}>
+                    {t('overview.copy-pubkey-hash')}
+                  </ActionButton>
+                </Stack>
+              </Stack>
+            ) : (
+              <MessageBar messageBarType={MessageBarType.error}>
+                {t('messages.can-not-find-the-default-address')}
+              </MessageBar>
+            )}
+          </Stack>
         </Callout>
       ) : null}
     </Stack>

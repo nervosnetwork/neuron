@@ -25,7 +25,12 @@
       "tip-block-number": "Block Number",
       "epoch": "Epoch",
       "difficulty": "Difficulty",
-      "miner-info": "Miner Info"
+      "miner-info": "Miner Info",
+      "lock-arg": "Lock Arg",
+      "address": "Address",
+      "code-hash": "Code Hash",
+      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)",
+      "can-not-find-the-default-address": "Cannot find the default address"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",

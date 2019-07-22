@@ -14,7 +14,7 @@ interface SendMessage {
   (channel: Channel.Transactions, method: Controller.TransactionsMethod | 'transactionUpdated', params: any): void
   (channel: Channel.Networks, method: Controller.NetworksMethod, params: any): void
   (channel: Channel.Helpers, method: Controller.HelpersMethod, params: any): void
-  (channel: Channel.Chain, method: 'status' | 'tipBlockNumber', params: any): void
+  (channel: Channel.Chain, method: 'status' | 'tipBlockNumber' | 'systemScript', params: any): void
 }
 
 export default class WindowManager {

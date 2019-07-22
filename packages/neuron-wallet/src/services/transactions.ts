@@ -1,14 +1,6 @@
 import { getConnection, In, ObjectLiteral } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import {
-  OutPoint,
-  Script,
-  Transaction,
-  TransactionWithoutHash,
-  Input,
-  Cell,
-  TransactionStatus,
-} from '../types/cell-types'
+import { OutPoint, Transaction, TransactionWithoutHash, Input, Cell, TransactionStatus } from '../types/cell-types'
 import CellsService from './cells'
 import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
@@ -277,29 +269,6 @@ export default class TransactionsService {
     return transaction
   }
 
-  // check whether the address has history transactions
-  public static hasTransactions = async (address: string): Promise<boolean> => {
-    const blake160 = core.utils.parseAddress(address, core.utils.AddressPrefix.Testnet, 'hex') as string
-    const contractInfo = await LockUtils.systemScript()
-
-    const lock: Script = {
-      codeHash: contractInfo.codeHash,
-      args: [blake160],
-    }
-    const lockHash: string = LockUtils.lockScriptToHash(lock)
-
-    const output: OutputEntity | undefined = await getConnection()
-      .getRepository(OutputEntity)
-      .findOne({
-        where: { lockHash },
-      })
-
-    if (output) {
-      return true
-    }
-    return false
-  }
-
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
@@ -439,18 +408,6 @@ export default class TransactionsService {
 
     await connection.manager.save([tx, ...inputs, ...previousOutputs, ...outputs])
     return tx
-  }
-
-  // delete transaction and it's inputs and outputs
-  public static deleteByBlockNumbers = async (blockNumbers: string[]) => {
-    await getConnection()
-      .createQueryBuilder()
-      .delete()
-      .from(TransactionEntity)
-      .where('blockNumber in (:...blockNumbers)', {
-        blockNumbers,
-      })
-      .execute()
   }
 
   public static deleteWhenFork = async (blockNumber: string) => {

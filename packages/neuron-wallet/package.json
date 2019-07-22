@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -15,7 +15,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "tsc && ./scripts/copy-renderer-html.sh",
+    "build": "tsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "test:e2e": "jest --config jest.e2e.config.js --color",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "0.15.1",
-    "@nervosnetwork/neuron-ui": "0.1.0-alpha.12",
+    "@nervosnetwork/neuron-ui": "0.1.0-alpha.13",
     "@types/async": "3.0.0",
     "@types/electron-devtools-installer": "2.2.0",
     "@types/elliptic": "6.4.8",

@@ -55,6 +55,7 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
         type: number(`Type`, addr.type) as 0 | 1,
         txCount: number(`Tx count`, 0),
         balance: text(`Balance`, addr.balance),
+        index: number(`Index`, addr.index),
       })),
     },
   }
