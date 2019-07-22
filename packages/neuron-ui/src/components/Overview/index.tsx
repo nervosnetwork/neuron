@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Copy } from 'grommet-icons'
 import {
   Stack,
   Text,
@@ -27,6 +28,13 @@ import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
+import { registerIcons } from 'utils/icons'
+
+registerIcons({
+  icons: {
+    Copy: <Copy size="small" />,
+  },
+})
 
 const timeFormatter = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
@@ -326,7 +334,7 @@ const Overview = ({
           onDismiss={hideBlockchainStatus}
           gapSpace={0}
         >
-          <Stack>
+          <Stack tokens={{ padding: 15 }}>
             <PropertyList columns={blockchainStatusColumns} items={blockchainStatusItems} isHeaderVisible={false} />
           </Stack>
         </Callout>
@@ -337,25 +345,27 @@ const Overview = ({
             {defaultAddress ? (
               <Stack tokens={{ childrenGap: 15 }}>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="large">{t('overview.address')}</Text>
-                  <Text variant="medium" className="fixedWidth">
+                  <Text variant="medium">{t('overview.address')}</Text>
+                  <Text variant="small" className="fixedWidth">
                     {defaultAddress.address}
                   </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="large">{t('overview.code-hash')}</Text>
-                  <Text variant="medium" className="fixedWidth">
+                  <Text variant="medium">{t('overview.code-hash')}</Text>
+                  <Text variant="small" className="fixedWidth">
                     {codeHash}
                   </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="large">{t('overview.lock-arg')}</Text>
-                  <Text variant="medium" className="fixedWidth">
+                  <Text variant="medium">{t('overview.lock-arg')}</Text>
+                  <Text variant="small" className="fixedWidth">
                     {defaultAddress.identifier}
                   </Text>
                 </Stack>
                 <Stack horizontalAlign="end">
-                  <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
+                  <ActionButton iconProps={{ iconName: 'Copy' }} onClick={onCopyPubkeyHash}>
+                    {t('overview.copy-pubkey-hash')}
+                  </ActionButton>
                 </Stack>
               </Stack>
             ) : (
