@@ -15,7 +15,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "tsc && ./scripts/copy-renderer-html.sh",
+    "build": "tsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "test:e2e": "jest --config jest.e2e.config.js --color",
