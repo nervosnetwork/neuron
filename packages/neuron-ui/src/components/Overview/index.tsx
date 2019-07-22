@@ -338,15 +338,21 @@ const Overview = ({
               <Stack tokens={{ childrenGap: 15 }}>
                 <Stack tokens={{ childrenGap: 15 }}>
                   <Text variant="large">{t('overview.address')}</Text>
-                  <Text variant="medium">{defaultAddress.address}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {defaultAddress.address}
+                  </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
                   <Text variant="large">{t('overview.code-hash')}</Text>
-                  <Text variant="medium">{codeHash}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {codeHash}
+                  </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
                   <Text variant="large">{t('overview.lock-arg')}</Text>
-                  <Text variant="medium">{defaultAddress.identifier}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {defaultAddress.identifier}
+                  </Text>
                 </Stack>
                 <Stack horizontalAlign="end">
                   <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
