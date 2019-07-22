@@ -8,6 +8,7 @@ const addresses: { [title: string]: State.Address[] } = {
       type: 0,
       txCount: 0,
       balance: '0',
+      index: 0,
     },
     {
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j3',
@@ -16,6 +17,7 @@ const addresses: { [title: string]: State.Address[] } = {
       type: 0,
       txCount: 123,
       balance: '10000',
+      index: 1,
     },
     {
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j2',
@@ -24,6 +26,7 @@ const addresses: { [title: string]: State.Address[] } = {
       type: 1,
       txCount: 0,
       balance: '0',
+      index: 2,
     },
     {
       address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2jd',
@@ -32,6 +35,7 @@ const addresses: { [title: string]: State.Address[] } = {
       type: 1,
       txCount: 123,
       balance: '10000',
+      index: 3,
     },
   ],
 }

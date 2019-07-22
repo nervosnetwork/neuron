@@ -25,7 +25,12 @@
       "tip-block-number": "区块高度",
       "epoch": "Epoch",
       "difficulty": "难度",
-      "miner-info": "挖矿信息"
+      "miner-info": "挖矿信息",
+      "lock-arg": "Lock Arg",
+      "address": "地址",
+      "code-hash": "Code Hash",
+      "copy-pubkey-hash": "复制 Pubkey Hash",
+      "can-not-find-the-default-address": "未获得默认地址"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",
@@ -209,7 +214,8 @@
       "wallet-not-found": "未找到钱包",
       "no-transactions": "没有交易",
       "error": "错误",
-      "invalid-mnemonic": "助记词不合法"
+      "invalid-mnemonic": "助记词不合法",
+      "can-not-find-the-default-address": "找不到默认地址"
     },
     "sync": {
       "syncing": "同步中",

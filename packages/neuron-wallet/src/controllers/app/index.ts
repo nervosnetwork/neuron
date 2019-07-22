@@ -1,6 +1,7 @@
 import path from 'path'
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
 import { take } from 'rxjs/operators'
+import systemScriptSubject from '../../models/subjects/system-script'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
@@ -31,6 +32,7 @@ export default class AppController {
       networks = [],
       tipNumber = '0',
       connectStatus = false,
+      codeHash = '',
     ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
@@ -53,6 +55,9 @@ export default class AppController {
             resolve(false)
           }
         )
+      }),
+      new Promise(resolve => {
+        systemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
       }),
     ])
     const addresses: Controller.Address[] = await (currentWallet
@@ -80,6 +85,7 @@ export default class AppController {
       locale,
       tipNumber,
       connectStatus,
+      codeHash,
     }
     win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })
   }

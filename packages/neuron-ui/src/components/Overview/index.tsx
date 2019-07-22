@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Stack,
   Text,
+  ActionButton,
   DefaultButton,
   DetailsList,
   DetailsRow,
@@ -15,10 +16,14 @@ import {
   IDetailsRowStyles,
   FontSizes,
   Callout,
+  MessageBar,
+  MessageBarType,
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
+
+import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
@@ -82,8 +87,9 @@ const PropertyList = ({
 const Overview = ({
   dispatch,
   app: { tipBlockNumber, chain, epoch, difficulty },
-  wallet: { id, name, balance = '' },
+  wallet: { id, name, balance = '', addresses = [] },
   chain: {
+    codeHash = '',
     transactions: { items = [] },
   },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -271,6 +277,20 @@ const Overview = ({
     setDisplayMinerInfo(false)
   }, [setDisplayMinerInfo])
 
+  const defaultAddress = useMemo(() => {
+    return addresses.find(addr => addr.type === 0 && addr.index === 0)
+  }, [addresses])
+
+  const onCopyPubkeyHash = useCallback(() => {
+    if (defaultAddress) {
+      window.navigator.clipboard.writeText(defaultAddress.identifier)
+      hideMinerInfo()
+      // TODO: Add notification
+    } else {
+      showErrorMessage(t('messages.error'), t('messages.can-not-find-the-default-address'))
+    }
+  }, [defaultAddress, t, hideMinerInfo])
+
   return (
     <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
       <Text as="h1" variant={TITLE_FONT_SIZE}>
@@ -311,10 +331,39 @@ const Overview = ({
           </Stack>
         </Callout>
       ) : null}
-      {/* TODO: Implement this */}
       {minerInfoRef.current ? (
         <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
-          {t('overview.miner-info')}
+          <Stack tokens={{ padding: 15 }}>
+            {defaultAddress ? (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.address')}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {defaultAddress.address}
+                  </Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.code-hash')}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {codeHash}
+                  </Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.lock-arg')}</Text>
+                  <Text variant="medium" className="fixedWidth">
+                    {defaultAddress.identifier}
+                  </Text>
+                </Stack>
+                <Stack horizontalAlign="end">
+                  <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
+                </Stack>
+              </Stack>
+            ) : (
+              <MessageBar messageBarType={MessageBarType.error}>
+                {t('messages.can-not-find-the-default-address')}
+              </MessageBar>
+            )}
+          </Stack>
         </Callout>
       ) : null}
     </Stack>

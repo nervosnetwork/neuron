@@ -23,7 +23,7 @@ const Receive = ({
   )
 
   const copyAddress = useCallback(() => {
-    window.clipboard.writeText(accountAddress)
+    window.navigator.clipboard.writeText(accountAddress)
   }, [accountAddress])
 
   if (!accountAddress) {
