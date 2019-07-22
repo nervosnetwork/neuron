@@ -331,7 +331,21 @@ const Overview = ({
       {minerInfoRef.current ? (
         <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
           <Stack tokens={{ padding: 15 }}>
-            <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
+            {defaultAddress ? (
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.address')}</Text>
+                  <Text variant="medium">{defaultAddress.address}</Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.lock-arg')}</Text>
+                  <Text variant="medium">{defaultAddress.identifier}</Text>
+                </Stack>
+                <Stack horizontalAlign="end">
+                  <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
+                </Stack>
+              </Stack>
+            ) : null}
           </Stack>
         </Callout>
       ) : null}

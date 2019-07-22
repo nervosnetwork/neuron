@@ -26,7 +26,10 @@
       "epoch": "Epoch",
       "difficulty": "难度",
       "miner-info": "挖矿信息",
-      "copy-pubkey-hash": "复制 Pubkey Hash"
+      "lock-arg": "Lock Arg",
+      "address": "地址",
+      "copy-pubkey-hash": "复制 Pubkey Hash",
+      "can-not-find-the-default-address": "未获得默认地址"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",
