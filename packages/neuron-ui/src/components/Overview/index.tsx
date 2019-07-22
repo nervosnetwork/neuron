@@ -16,6 +16,8 @@ import {
   IDetailsRowStyles,
   FontSizes,
   Callout,
+  MessageBar,
+  MessageBarType,
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -87,6 +89,7 @@ const Overview = ({
   app: { tipBlockNumber, chain, epoch, difficulty },
   wallet: { id, name, balance = '', addresses = [] },
   chain: {
+    codeHash = '',
     transactions: { items = [] },
   },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -338,6 +341,10 @@ const Overview = ({
                   <Text variant="medium">{defaultAddress.address}</Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
+                  <Text variant="large">{t('overview.code-hash')}</Text>
+                  <Text variant="medium">{codeHash}</Text>
+                </Stack>
+                <Stack tokens={{ childrenGap: 15 }}>
                   <Text variant="large">{t('overview.lock-arg')}</Text>
                   <Text variant="medium">{defaultAddress.identifier}</Text>
                 </Stack>
@@ -345,7 +352,11 @@ const Overview = ({
                   <ActionButton onClick={onCopyPubkeyHash}>{t('overview.copy-pubkey-hash')}</ActionButton>
                 </Stack>
               </Stack>
-            ) : null}
+            ) : (
+              <MessageBar messageBarType={MessageBarType.error}>
+                {t('messages.can-not-find-the-default-address')}
+              </MessageBar>
+            )}
           </Stack>
         </Callout>
       ) : null}

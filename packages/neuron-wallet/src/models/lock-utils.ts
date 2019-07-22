@@ -1,6 +1,7 @@
 import NodeService from '../services/node'
 import { OutPoint, Script } from '../types/cell-types'
 import env from '../env'
+import systemScriptSubject from './subjects/system-script'
 
 const { core } = NodeService.getInstance()
 
@@ -54,6 +55,7 @@ export default class LockUtils {
 
   static setSystemScript(info: SystemScript) {
     LockUtils.systemScriptInfo = info
+    systemScriptSubject.next({ codeHash: info.codeHash })
   }
 
   // use SDK lockScriptToHash

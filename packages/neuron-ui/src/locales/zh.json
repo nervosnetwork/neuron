@@ -28,6 +28,7 @@
       "miner-info": "挖矿信息",
       "lock-arg": "Lock Arg",
       "address": "地址",
+      "code-hash": "Code Hash",
       "copy-pubkey-hash": "复制 Pubkey Hash",
       "can-not-find-the-default-address": "未获得默认地址"
     },

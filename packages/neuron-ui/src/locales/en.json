@@ -28,6 +28,7 @@
       "miner-info": "Miner Info",
       "lock-arg": "Lock Arg",
       "address": "Address",
+      "code-hash": "Code Hash",
       "copy-pubkey-hash": "Copy Pubkey Hash",
       "can-not-find-the-default-address": "Cannot find the default address"
     },

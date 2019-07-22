@@ -110,6 +110,7 @@ declare namespace State {
     networkID: string
     connectStatus: 'online' | 'offline'
     tipBlockNumber: string
+    codeHash: string
     transaction: DetailedTransaction
     transactions: {
       pageNo: number

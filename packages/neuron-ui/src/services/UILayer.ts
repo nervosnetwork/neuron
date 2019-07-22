@@ -13,6 +13,7 @@ export enum AppMethod {
 export enum ChainMethod {
   Status = 'status',
   TipBlockNumber = 'tipBlockNumber',
+  SystemScript = 'systemScript',
 }
 
 export enum WalletsMethod {
