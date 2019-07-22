@@ -1,3 +1,12 @@
+export const initWindow = () => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return Promise.reject(new Error('remote is not supported'))
+  }
+  const appController = window.remote.require('./controllers/app').default
+  return appController.getInitState()
+}
+
 export const validateMnemonic = (mnemonic: string): boolean => {
   if (!window.remote) {
     console.warn('remote is not supported')
@@ -26,6 +35,7 @@ export const showErrorMessage = (title: string, content: string) => {
 }
 
 export default {
+  initWindow,
   validateMnemonic,
   showMessage,
   showErrorMessage,

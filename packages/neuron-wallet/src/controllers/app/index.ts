@@ -23,7 +23,7 @@ const nodeService = NodeService.getInstance()
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
-  public static initWindow = async (win: BrowserWindow) => {
+  public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
     const [
       currentWallet = null,
@@ -87,18 +87,13 @@ export default class AppController {
       connectionStatus,
       codeHash,
     }
-    win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })
+    return initState
   }
 
   public static handleViewError = (error: string) => {
     if (env.isDevMode) {
       console.error(error)
     }
-    setTimeout(() => {
-      if (WindowManager.mainWindow) {
-        AppController.initWindow(WindowManager.mainWindow)
-      }
-    }, 500)
   }
 
   public static showMessageBox(
@@ -201,7 +196,6 @@ export default class AppController {
       win.setTitle(i18n.t(`messageBox.transaction.title`, { hash }))
       win.show()
       win.focus()
-      AppController.initWindow(win)
     })
   }
 }

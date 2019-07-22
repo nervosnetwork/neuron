@@ -1,10 +1,8 @@
-/* globals BigInt */
 import { useEffect } from 'react'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
-import initStates from 'states/initStates'
 
 import UILayer, {
   AppMethod,
@@ -16,6 +14,7 @@ import UILayer, {
   transactionsCall,
   networksCall,
 } from 'services/UILayer'
+import { initWindow } from 'services/remote'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
 import {
@@ -24,15 +23,12 @@ import {
   addresses as addressesCache,
   currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
-  systemScript as systemScriptCache,
 } from 'utils/localCache'
+import addressesToBalance from 'utils/addressesToBalance'
+import initializeApp from 'utils/initializeApp'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 10000
-
-const addressesToBalance = (addresses: State.Address[] = []) => {
-  return addresses.reduce((total, addr) => total + BigInt(addr.balance || 0), BigInt(0)).toString()
-}
 
 export const useChannelListeners = ({
   walletID,
@@ -99,76 +95,6 @@ export const useChannelListeners = ({
             transactionsCall.get(walletID, chain.transaction.hash)
             break
           }
-        }
-      }
-    )
-    UILayer.on(
-      Channel.Initiate,
-      (
-        _e: Event,
-        args: ChannelResponse<{
-          networks: any
-          balance: string
-          currentNetworkID: string
-          wallets: [{ id: string; name: string }]
-          currentWallet: { id: string; name: string } | null
-          addresses: State.Address[]
-          transactions: any
-          locale: string
-          tipNumber: string
-          connectionStatus: boolean
-          codeHash: string
-        }>
-      ) => {
-        if (args.status) {
-          const {
-            locale = 'zh-CN',
-            networks = [],
-            currentNetworkID: networkID = '',
-            wallets = [],
-            currentWallet: wallet = initStates.wallet,
-            addresses = [],
-            transactions = initStates.chain.transactions,
-            tipNumber = '0',
-            connectionStatus = false,
-            codeHash = '',
-          } = args.result
-          if (locale !== i18n.language) {
-            i18n.changeLanguage(locale)
-          }
-          if (networks.length) {
-            dispatch({
-              type: NeuronWalletActions.Initiate,
-              payload: {
-                networks,
-                networkID,
-                wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
-                wallets,
-              },
-            })
-          }
-          dispatch({
-            type: NeuronWalletActions.Chain,
-            payload: {
-              tipBlockNumber: tipNumber,
-              codeHash,
-              connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
-              transactions: { ...chain.transactions, ...transactions },
-            },
-          })
-
-          currentWalletCache.save(wallet)
-          currentNetworkIDCache.save(networkID)
-          walletsCache.save(wallets)
-          addressesCache.save(addresses)
-          networksCache.save(networks)
-          systemScriptCache.save({ codeHash })
-        } else {
-          /* eslint-disable no-alert */
-          // TODO: better prompt, prd required
-          window.alert(i18n.t('messages.failed-to-initiate,-please-reopen-Neuron'))
-          /* eslint-enable no-alert */
-          window.close()
         }
       }
     )
@@ -499,18 +425,19 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
 
 export const useOnCurrentWalletChange = ({
   walletID,
-  pageNo,
-  pageSize,
-  dispatch,
+  chain,
+  i18n,
   history,
+  dispatch,
 }: {
   walletID: string
-  pageNo: number
-  pageSize: number
+  chain: State.Chain
+  i18n: any
+  history: any
 
   dispatch: StateDispatch
-  history: any
 }) => {
+  const { pageNo, pageSize } = chain.transactions
   useEffect(() => {
     if (walletID) {
       walletsCall.getAllAddresses(walletID)
@@ -521,13 +448,21 @@ export const useOnCurrentWalletChange = ({
         pageSize,
       })
     } else {
-      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-      dispatch({
-        type: NeuronWalletActions.Wallet,
-        payload: initStates.wallet,
-      })
+      initWindow()
+        .then((initializedState: any) => {
+          initializeApp({
+            initializedState,
+            i18n,
+            history,
+            dispatch,
+          })
+        })
+        .catch((err: Error) => {
+          console.error(err)
+          history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+        })
     }
-  }, [walletID, pageNo, pageSize, dispatch, history])
+  }, [walletID, pageNo, pageSize, dispatch, i18n, history])
 }
 
 export default {
