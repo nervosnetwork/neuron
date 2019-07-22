@@ -31,7 +31,7 @@ export default class AppController {
       currentNetworkID = '',
       networks = [],
       tipNumber = '0',
-      connectStatus = false,
+      connectionStatus = false,
       codeHash = '',
     ] = await Promise.all([
       walletsService.getCurrent(),
@@ -47,7 +47,7 @@ export default class AppController {
         })
         .catch(() => '0'),
       new Promise(resolve => {
-        nodeService.connectStatusSubject.pipe(take(1)).subscribe(
+        nodeService.connectionStatusSubject.pipe(take(1)).subscribe(
           status => {
             resolve(status)
           },
@@ -84,7 +84,7 @@ export default class AppController {
       transactions,
       locale,
       tipNumber,
-      connectStatus,
+      connectionStatus,
       codeHash,
     }
     win.webContents.send(Channel.Initiate, { status: ResponseCode.Success, result: initState })

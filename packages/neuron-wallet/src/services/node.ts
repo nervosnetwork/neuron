@@ -1,6 +1,6 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { interval, BehaviorSubject } from 'rxjs'
-import { distinctUntilChanged, sampleTime, flatMap, delay, retry } from 'rxjs/operators'
+import { interval, BehaviorSubject, merge } from 'rxjs'
+import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
 import windowManager from '../models/window-manager'
 import { Channel, ResponseCode } from '../utils/const'
@@ -18,22 +18,26 @@ class NodeService {
   public delayTime = 0
   public intervalTime = 1000
   public tipNumberSubject = new BehaviorSubject<string>('0')
-  public connectStatusSubject = new BehaviorSubject<boolean>(false)
+  public connectionStatusSubject = new BehaviorSubject<boolean>(false)
 
   public core: Core = new Core('')
 
   constructor() {
     this.start()
-    this.syncConnectStatus()
+    this.syncConnectionStatus()
   }
 
-  public syncConnectStatus = () => {
-    this.connectStatusSubject.pipe(sampleTime(10000)).subscribe(connectStatus => {
-      windowManager.broadcast(Channel.Chain, 'status', {
-        status: ResponseCode.Success,
-        result: connectStatus,
+  public syncConnectionStatus = () => {
+    const periodSync = this.connectionStatusSubject.pipe(sampleTime(10000))
+    const realtimeSync = this.connectionStatusSubject.pipe(distinctUntilChanged())
+    merge(periodSync, realtimeSync)
+      .pipe(debounceTime(500))
+      .subscribe(connectionStatus => {
+        windowManager.broadcast(Channel.Chain, 'status', {
+          status: ResponseCode.Success,
+          result: connectionStatus,
+        })
       })
-    })
   }
 
   public setNetwork = (url: string) => {
@@ -45,7 +49,7 @@ class NodeService {
     }
     this.core.setNode({ url })
     this.tipNumberSubject.next('0')
-    this.connectStatusSubject.next(false)
+    this.connectionStatusSubject.next(false)
     return this.core
   }
 
@@ -64,11 +68,11 @@ class NodeService {
           return this.core.rpc
             .getTipBlockNumber()
             .then(tipNumber => {
-              this.connectStatusSubject.next(true)
+              this.connectionStatusSubject.next(true)
               return tipNumber
             })
             .catch(err => {
-              this.connectStatusSubject.next(false)
+              this.connectionStatusSubject.next(false)
               throw err
             })
         }),

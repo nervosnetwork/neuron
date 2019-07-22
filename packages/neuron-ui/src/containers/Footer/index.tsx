@@ -6,7 +6,7 @@ import { Stack, getTheme, Text, ProgressIndicator } from 'office-ui-fabric-react
 import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { ConnectStatus, FULL_SCREENS, Routes } from 'utils/const'
+import { ConnectionStatus, FULL_SCREENS, Routes } from 'utils/const'
 import { localNumberFormatter } from 'utils/formatters'
 import { NeuronWalletContext } from 'states/stateProvider'
 
@@ -68,7 +68,7 @@ const Footer = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
     app: { tipBlockNumber },
-    chain: { networkID, connectStatus, tipBlockNumber: syncedBlockNumber },
+    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
     settings: { networks },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
@@ -97,7 +97,7 @@ const Footer = ({
 
       <Stack styles={stackItemStyles} onClick={goToNetworksSetting} horizontal>
         {currentNetwork ? (
-          <NetworkStatus online={connectStatus === ConnectStatus.Online} name={currentNetwork.name} />
+          <NetworkStatus online={connectionStatus === ConnectionStatus.Online} name={currentNetwork.name} />
         ) : (
           <Text>{t('settings.setting-tabs.network')}</Text>
         )}

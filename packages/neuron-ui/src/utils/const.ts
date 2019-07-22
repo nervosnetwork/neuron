@@ -8,7 +8,7 @@ export const UNREMOVABLE_NETWORK_ID = '0'
 export const MIN_CELL_WIDTH = 100
 export const BUTTON_GAP = 20
 
-export enum ConnectStatus {
+export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',
 }
