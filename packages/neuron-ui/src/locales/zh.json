@@ -29,7 +29,7 @@
       "lock-arg": "Lock Arg",
       "address": "地址",
       "code-hash": "Code Hash",
-      "copy-pubkey-hash": "复制 Pubkey Hash",
+      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)",
       "can-not-find-the-default-address": "未获得默认地址"
     },
     "wizard": {
