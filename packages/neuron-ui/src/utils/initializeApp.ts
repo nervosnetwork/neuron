@@ -9,7 +9,7 @@ import {
   currentWallet as currentWalletCache,
   systemScript as systemScriptCache,
 } from 'utils/localCache'
-import { Routes, ConnectStatus } from 'utils/const'
+import { Routes, ConnectionStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import addressesToBalance from 'utils/addressesToBalance'
 
@@ -33,7 +33,7 @@ const intializeApp = ({
     addresses = [],
     transactions = initStates.chain.transactions,
     tipNumber = '0',
-    connectStatus = false,
+    connectionStatus = false,
     codeHash = '',
   } = initializedState
   if (locale !== i18n.language) {
@@ -60,7 +60,7 @@ const intializeApp = ({
     payload: {
       tipBlockNumber: tipNumber,
       codeHash,
-      connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
+      connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
       transactions: { ...initStates.chain.transactions, ...transactions },
     },
   })
