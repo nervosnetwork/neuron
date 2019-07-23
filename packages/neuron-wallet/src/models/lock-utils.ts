@@ -10,7 +10,19 @@ export interface SystemScript {
   outPoint: OutPoint
 }
 
+const subscribed = (target: any, propertyName: string) => {
+  let value: any
+  Object.defineProperty(target, propertyName, {
+    get: () => value,
+    set: (info: { codeHash: string }) => {
+      systemScriptSubject.next({ codeHash: info.codeHash })
+      value = info
+    },
+  })
+}
+
 export default class LockUtils {
+  @subscribed
   static systemScriptInfo: SystemScript | undefined
 
   static async systemScript(): Promise<SystemScript> {

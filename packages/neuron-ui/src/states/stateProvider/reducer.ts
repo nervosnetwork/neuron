@@ -6,6 +6,7 @@ export enum NeuronWalletActions {
   Chain = 'chain',
   Wallet = 'wallet',
   Settings = 'settings',
+  UpdateCodeHash = 'updateCodeHash',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -124,6 +125,15 @@ export const reducer = (
         settings: {
           ...settings,
           ...payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateCodeHash: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          codeHash: payload,
         },
       }
     }
