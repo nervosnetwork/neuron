@@ -214,7 +214,8 @@
       "wallet-not-found": "Wallet not found",
       "no-transactions": "No transactions",
       "error": "Error",
-      "invalid-mnemonic": "Invalid mnemonic words"
+      "invalid-mnemonic": "Invalid mnemonic words",
+      "camera-not-available-or-disabled": "Camera is not available or disabled"
     },
     "sync": {
       "syncing": "Syncing",

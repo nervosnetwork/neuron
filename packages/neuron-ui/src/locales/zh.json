@@ -215,7 +215,8 @@
       "no-transactions": "没有交易",
       "error": "错误",
       "invalid-mnemonic": "助记词不合法",
-      "can-not-find-the-default-address": "找不到默认地址"
+      "can-not-find-the-default-address": "找不到默认地址",
+      "camera-not-available-or-disabled": "摄像头不可用或被禁用"
     },
     "sync": {
       "syncing": "同步中",
