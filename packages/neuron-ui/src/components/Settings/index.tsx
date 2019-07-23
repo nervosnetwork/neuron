@@ -59,7 +59,9 @@ const Settings = ({
           </IconButton>
         </Stack.Item>
         <Stack.Item align="center">
-          <Text variant="xLarge" as="h1">{t('navbar.settings')}</Text>
+          <Text variant="xLarge" as="h1">
+            {t('navbar.settings')}
+          </Text>
         </Stack.Item>
       </Stack>
 

@@ -108,7 +108,7 @@ declare namespace State {
 
   interface Chain {
     networkID: string
-    connectStatus: 'online' | 'offline'
+    connectionStatus: 'online' | 'offline'
     tipBlockNumber: string
     codeHash: string
     transaction: DetailedTransaction

@@ -11,14 +11,21 @@ import {
   ITextFieldStyleProps,
   getTheme,
 } from 'office-ui-fabric-react'
+import { FormUp as ExpandIcon } from 'grommet-icons'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { registerIcons } from 'utils/icons'
 
-const timeFormatter = new Intl.DateTimeFormat('en-GB')
+registerIcons({
+  icons: {
+    ChevronRightMed: <ExpandIcon size="16px" style={{ transform: 'rotate(90deg) translate(2px, 0px)' }} />,
+  },
+})
+
 const theme = getTheme()
 
 const MIN_CELL_WIDTH = 50
@@ -81,7 +88,7 @@ const TransactionList = ({
           minWidth: 80,
           maxWidth: 80,
           onRender: (item?: FormatTransaction) => {
-            return item ? <span>{new Date(+(item.timestamp || item.createdAt)).toLocaleTimeString()}</span> : null
+            return item ? <span>{uniformTimeFormatter(item.timestamp || item.createdAt).split(' ')[1]}</span> : null
           },
         },
         {
@@ -162,7 +169,7 @@ const TransactionList = ({
       },
     ]
     const txItems = items.map(item => {
-      const date = timeFormatter.format(+(item.timestamp || item.createdAt))
+      const date = timeFormatter(+(item.timestamp || item.createdAt)).split(' ')[0]
       if (item.status === 'pending') {
         groupItems[0].count++
         return { ...item, date }

@@ -9,6 +9,7 @@ import {
   LinkBottom as LinkBottomIcon,
   LinkTop as LinkTopIcon,
   LinkUp as LinkUpIcon,
+  FormClose as ClearIcon,
 } from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
@@ -28,6 +29,7 @@ registerIcons({
     LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     NextPage: <LinkDownIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
+    Clear: <ClearIcon size="16px" />,
   },
 })
 

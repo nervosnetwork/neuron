@@ -45,7 +45,6 @@ export default {
         'force-reload': '强制刷新',
         reload: '刷新',
         'toggle-dev-tools': '开发者工具',
-        'initialize-window': ' 初始化窗口',
       },
     },
     services: {

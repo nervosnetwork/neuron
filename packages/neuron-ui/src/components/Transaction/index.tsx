@@ -7,7 +7,7 @@ import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
 import chainState from 'states/initStates/chain'
 
-import { localNumberFormatter } from 'utils/formatters'
+import { localNumberFormatter, uniformTimeFormatter } from 'utils/formatters'
 
 const MIN_CELL_WIDTH = 70
 
@@ -114,7 +114,7 @@ const Transaction = ({
       {
         label: t('history.date'),
         value: +(transaction.timestamp || transaction.createdAt)
-          ? new Date(+transaction.timestamp || +transaction.createdAt).toLocaleString()
+          ? uniformTimeFormatter(+(transaction.timestamp || transaction.createdAt))
           : 'none',
       },
       {

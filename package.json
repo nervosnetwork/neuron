@@ -2,7 +2,7 @@
   "name": "@nervosnetwork/neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.1.0-alpha.13",
+  "version": "0.1.0-alpha.14",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -43,7 +43,7 @@
     "@types/jest": "24.0.13",
     "@typescript-eslint/eslint-plugin": "1.10.2",
     "@typescript-eslint/parser": "1.10.2",
-    "concurrently": "4.1.0",
+    "concurrently": "4.1.1",
     "cross-env": "5.2.0",
     "cz-conventional-changelog": "2.1.0",
     "eslint": "5.16.0",
@@ -53,14 +53,14 @@
     "eslint-plugin-jsx-a11y": "6.2.1",
     "eslint-plugin-prettier": "3.1.0",
     "eslint-plugin-react": "7.13.0",
-    "husky": "2.3.0",
-    "lerna": "3.15.0",
+    "husky": "3.0.1",
+    "lerna": "3.16.2",
     "ncp": "2.0.0",
     "nodemon": "1.19.1",
     "prettier": "1.17.1",
     "ts-jest": "24.0.2",
-    "typescript": "3.5.2",
-    "wait-on": "3.2.0"
+    "typescript": "3.5.3",
+    "wait-on": "3.3.0"
   },
   "dependencies": {},
   "config": {

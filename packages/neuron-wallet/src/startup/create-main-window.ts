@@ -3,7 +3,6 @@ import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import WindowManager from '../models/window-manager'
 import env from '../env'
-import AppController from '../controllers/app'
 import logger from '../utils/logger'
 
 function createWindow() {
@@ -36,7 +35,6 @@ function createWindow() {
     if (WindowManager.mainWindow) {
       WindowManager.mainWindow.show()
       WindowManager.mainWindow.focus()
-      AppController.initWindow(WindowManager.mainWindow!)
     } else {
       logger.log({
         level: 'error',

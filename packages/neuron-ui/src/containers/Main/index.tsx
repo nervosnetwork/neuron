@@ -20,7 +20,7 @@ import PasswordRequest from 'components/PasswordRequest'
 
 import { Routes } from 'utils/const'
 
-import { useChannelListeners, useSyncChainData, useOnCurrentWalletChange } from './hooks'
+import { useChannelListeners, useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 export const mainContents: CustomRouter.Route[] = [
   {
@@ -109,12 +109,10 @@ const MainContent = ({
   const neuronWalletState = useState()
   const {
     wallet: { id: walletID },
-    chain: {
-      networkID,
-      transactions: { pageNo, pageSize },
-    },
+    chain,
     settings: { networks },
   } = neuronWalletState
+  const { networkID } = chain
   const [, i18n] = useTranslation()
   useChannelListeners({
     walletID: neuronWalletState.wallet.id,
@@ -122,6 +120,10 @@ const MainContent = ({
     dispatch,
     history,
     i18n,
+  })
+
+  useSubscription({
+    dispatch,
   })
 
   const chainURL = useMemo(() => {
@@ -136,10 +138,10 @@ const MainContent = ({
 
   useOnCurrentWalletChange({
     walletID,
-    pageNo,
-    pageSize,
-    dispatch,
+    chain,
+    i18n,
     history,
+    dispatch,
   })
 
   return (
