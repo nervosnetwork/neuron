@@ -4,6 +4,7 @@ import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter, Stack } 
 import { Scan as ScanIcon } from 'grommet-icons'
 import jsQR from 'jsqr'
 
+import { showErrorMessage } from 'services/remote'
 import { drawPolygon } from 'utils/canvasActions'
 
 interface QRScannerProps {
@@ -70,7 +71,11 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         }
         requestAnimationFrame(tick)
       })
-  }, [video])
+      .catch((err: Error) => {
+        showErrorMessage(t('messages.camera-not-available-or-disabled'), err.message)
+        setOpen(false)
+      })
+  }, [video, t])
 
   useEffect(() => {
     if (open) {
