@@ -26,7 +26,7 @@ import actionCreators from 'states/stateProvider/actionCreators'
 
 import { showErrorMessage } from 'services/remote'
 
-import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
 import { registerIcons } from 'utils/icons'
 
@@ -34,15 +34,6 @@ registerIcons({
   icons: {
     Copy: <Copy size="small" />,
   },
-})
-
-const timeFormatter = new Intl.DateTimeFormat(undefined, {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
 })
 
 const TITLE_FONT_SIZE = 'xxLarge'
@@ -146,7 +137,7 @@ const Overview = ({
     if (item) {
       return (
         <Text variant="mediumPlus" as="span">
-          {timeFormatter.format(+(item.timestamp || item.createdAt)).toLocaleString()}
+          {timeFormatter(item.timestamp || item.createdAt)}
         </Text>
       )
     }

@@ -11,6 +11,15 @@ const numberParser = (value: string, exchange: string) => {
 }
 
 const numberFormatter = new Intl.NumberFormat('en-US')
+const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+})
 
 export const queryFormatter = (params: { [index: string]: any }) => {
   const newQuery = new URLSearchParams()
@@ -97,10 +106,15 @@ export const localNumberFormatter = (num: string | number = 0) => {
   return numberFormatter.format(+num)
 }
 
+export const uniformTimeFormatter = (time: string | number | Date) => {
+  return timeFormatter.format(+time).replace(/\//g, '-')
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
   CKBToShannonFormatter,
   shannonToCKBFormatter,
   localNumberFormatter,
+  uniformTimeFormatter,
 }
