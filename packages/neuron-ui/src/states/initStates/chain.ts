@@ -1,8 +1,9 @@
 import { currentNetworkID, systemScript } from 'utils/localCache'
+import { ConnectionStatus } from 'utils/const'
 
 const chainState: State.Chain = {
   networkID: currentNetworkID.load(),
-  connectStatus: 'offline',
+  connectionStatus: ConnectionStatus.Offline,
   tipBlockNumber: '',
   codeHash: systemScript.load().codeHash,
   transaction: {

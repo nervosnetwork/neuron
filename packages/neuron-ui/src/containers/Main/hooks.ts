@@ -17,7 +17,7 @@ import UILayer, {
   networksCall,
 } from 'services/UILayer'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
-import { Routes, Channel, ConnectStatus } from 'utils/const'
+import { Routes, Channel, ConnectionStatus } from 'utils/const'
 import {
   wallets as walletsCache,
   networks as networksCache,
@@ -116,7 +116,7 @@ export const useChannelListeners = ({
           transactions: any
           locale: string
           tipNumber: string
-          connectStatus: boolean
+          connectionStatus: boolean
           codeHash: string
         }>
       ) => {
@@ -130,7 +130,7 @@ export const useChannelListeners = ({
             addresses = [],
             transactions = initStates.chain.transactions,
             tipNumber = '0',
-            connectStatus = false,
+            connectionStatus = false,
             codeHash = '',
           } = args.result
           if (locale !== i18n.language) {
@@ -152,7 +152,7 @@ export const useChannelListeners = ({
             payload: {
               tipBlockNumber: tipNumber,
               codeHash,
-              connectStatus: connectStatus ? ConnectStatus.Online : ConnectStatus.Offline,
+              connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
               transactions: { ...chain.transactions, ...transactions },
             },
           })
@@ -198,7 +198,7 @@ export const useChannelListeners = ({
             dispatch({
               type: NeuronWalletActions.Chain,
               payload: {
-                connectStatus: args.result ? ConnectStatus.Online : ConnectStatus.Offline,
+                connectionStatus: args.result ? ConnectionStatus.Online : ConnectionStatus.Offline,
               },
             })
             break
