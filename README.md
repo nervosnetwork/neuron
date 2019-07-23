@@ -36,7 +36,7 @@ $ yarn bootstrap
 
 A local CKB node is required for Neuron wallet to talk to it via RPC APIs and get data. Please follow the [CKB Nervos doc](https://docs.nervos.org/getting-started/introduction) to get CKB node up and running first.
 
-### Start Neuron in development mode
+### Start Neuron in Development Mode
 
 ```sh
 $ yarn start
@@ -66,7 +66,7 @@ $ yarn start:wallet
 $ yarn test
 ```
 
-## Binary
+## Download Neuron Binary
 
 If you don't want to bother building from source, you can download a binary from [releases](https://github.com/nervosnetwork/neuron/releases). We offer pre-built binaries for Windows, Linux and macOS.
 
