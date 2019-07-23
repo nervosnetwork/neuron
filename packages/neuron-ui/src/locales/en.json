@@ -215,7 +215,7 @@
       "no-transactions": "No transactions",
       "error": "Error",
       "invalid-mnemonic": "Invalid mnemonic words",
-      "camera-not-available-or-disabled": "Camera is not available or disabled"
+      "camera-not-available-or-disabled": "Camera is unavailable or disabled"
     },
     "sync": {
       "syncing": "Syncing",
