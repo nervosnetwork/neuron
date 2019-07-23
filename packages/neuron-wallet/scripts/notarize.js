@@ -6,12 +6,19 @@ exports.default = async function notarizing(context) {
     return;
   }
 
+  const appleId = process.env.APPLE_ID;
+  const appleIdPassword = process.env.APPLE_ID_PASSWORD;
+
+  if (!appleId || !appleIdPassword) {
+    return;
+  }
+
   const appName = context.packager.appInfo.productFilename;
 
   return await notarize({
     appBundleId: 'com.nervos.neuron',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: process.env.APPLE_ID,
-    appleIdPassword: process.env.APPLE_ID_PASSWORD,
+    appleId: appldId,
+    appleIdPassword: appleIdPassword,
   });
 };
