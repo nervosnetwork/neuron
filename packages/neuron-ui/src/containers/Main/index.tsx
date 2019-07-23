@@ -20,7 +20,7 @@ import PasswordRequest from 'components/PasswordRequest'
 
 import { Routes } from 'utils/const'
 
-import { useChannelListeners, useSyncChainData, useOnCurrentWalletChange } from './hooks'
+import { useChannelListeners, useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 export const mainContents: CustomRouter.Route[] = [
   {
@@ -120,6 +120,10 @@ const MainContent = ({
     dispatch,
     history,
     i18n,
+  })
+
+  useSubscription({
+    dispatch,
   })
 
   const chainURL = useMemo(() => {

@@ -15,6 +15,7 @@ import UILayer, {
   networksCall,
 } from 'services/UILayer'
 import { initWindow } from 'services/remote'
+import { systemScript as systemScriptSubject } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
 import {
@@ -23,6 +24,7 @@ import {
   addresses as addressesCache,
   currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
+  systemScript as systemScriptCache,
 } from 'utils/localCache'
 import addressesToBalance from 'utils/addressesToBalance'
 import initializeApp from 'utils/initializeApp'
@@ -134,16 +136,6 @@ export const useChannelListeners = ({
               type: NeuronWalletActions.Chain,
               payload: {
                 tipBlockNumber: args.result || '0',
-              },
-            })
-            break
-          }
-          case ChainMethod.SystemScript: {
-            const { codeHash = '' } = args.result
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: {
-                codeHash,
               },
             })
             break
@@ -465,8 +457,24 @@ export const useOnCurrentWalletChange = ({
   }, [walletID, pageNo, pageSize, dispatch, i18n, history])
 }
 
+export const useSubscription = ({ dispatch }: { dispatch: StateDispatch }) => {
+  useEffect(() => {
+    systemScriptSubject().subscribe(({ codeHash = '' }: { codeHash: string }) => {
+      systemScriptCache.save({ codeHash })
+      dispatch({
+        type: NeuronWalletActions.UpdateCodeHash,
+        payload: codeHash,
+      })
+    })
+    return () => {
+      systemScriptSubject().unsubscribe()
+    }
+  }, [dispatch])
+}
+
 export default {
   useChannelListeners,
   useSyncChainData,
   useOnCurrentWalletChange,
+  useSubscription,
 }
