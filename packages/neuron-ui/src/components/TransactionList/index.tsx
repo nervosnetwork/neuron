@@ -11,12 +11,20 @@ import {
   ITextFieldStyleProps,
   getTheme,
 } from 'office-ui-fabric-react'
+import { FormUp as ExpandIcon } from 'grommet-icons'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
 import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { registerIcons } from 'utils/icons'
+
+registerIcons({
+  icons: {
+    ChevronRightMed: <ExpandIcon size="16px" style={{ transform: 'rotate(90deg) translate(2px, 0px)' }} />,
+  },
+})
 
 const theme = getTheme()
 
