@@ -109,12 +109,10 @@ const MainContent = ({
   const neuronWalletState = useState()
   const {
     wallet: { id: walletID },
-    chain: {
-      networkID,
-      transactions: { pageNo, pageSize },
-    },
+    chain,
     settings: { networks },
   } = neuronWalletState
+  const { networkID } = chain
   const [, i18n] = useTranslation()
   useChannelListeners({
     walletID: neuronWalletState.wallet.id,
@@ -136,10 +134,10 @@ const MainContent = ({
 
   useOnCurrentWalletChange({
     walletID,
-    pageNo,
-    pageSize,
-    dispatch,
+    chain,
+    i18n,
     history,
+    dispatch,
   })
 
   return (

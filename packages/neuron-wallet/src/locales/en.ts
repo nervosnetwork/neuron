@@ -45,7 +45,6 @@ export default {
         'force-reload': 'Force Reload',
         reload: 'Reload',
         'toggle-dev-tools': 'Toggle DevTools',
-        'initialize-window': 'Initialize Window',
       },
     },
     services: {

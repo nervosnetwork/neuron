@@ -14,7 +14,6 @@ export enum ConnectionStatus {
 }
 
 export enum Channel {
-  Initiate = 'initiate',
   NavTo = 'navTo',
   App = 'app',
   Chain = 'chain',

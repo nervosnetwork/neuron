@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Panel, PanelType, Spinner, SpinnerSize } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { WalletWizardPath } from 'components/WalletWizard'
 import { Routes } from 'utils/const'
 
 export const LaunchScreen = ({
@@ -16,8 +15,6 @@ export const LaunchScreen = ({
   useEffect(() => {
     if (id) {
       history.push(Routes.Overview)
-    } else {
-      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     }
   }, [id, history])
 

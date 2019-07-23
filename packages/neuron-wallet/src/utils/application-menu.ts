@@ -194,14 +194,6 @@ export const developMenuItem: MenuItemConstructorOptions = {
       label: i18n.t('application-menu.develop.toggle-dev-tools'),
       role: 'toggleDevTools' as 'toggledevtools',
     },
-    {
-      label: i18n.t('application-menu.develop.initialize-window'),
-      click: (_, win) => {
-        if (AppController) {
-          AppController.initWindow(win)
-        }
-      },
-    },
   ],
 }
 
