@@ -34,7 +34,7 @@ $ yarn bootstrap
 
 ### Start Neuron
 
-A local CKB node is required for Neuron wallet to talk to it via RPC APIs and get data. Please follow the [CKB Nervos doc](https://docs.nervos.org/getting-started/introduction) to get CKB node up and running first.
+A local CKB node is required for Neuron wallet to talk to it via RPC APIs and get data. Please follow the [Nervos CKB doc](https://docs.nervos.org/getting-started/introduction) to get CKB node up and running first.
 
 ### Start Neuron in Development Mode
 
