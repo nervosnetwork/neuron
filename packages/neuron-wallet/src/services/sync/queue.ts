@@ -1,10 +1,10 @@
-import async from 'async'
 import GetBlocks from './get-blocks'
 import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import TransactionsService from '../transactions'
+import QueueAdapter from '../queue-adapter'
 
 export default class Queue {
   private q: any
@@ -36,7 +36,7 @@ export default class Queue {
   }
 
   private generateQueue = () => {
-    this.q = async.queue(this.getWorker(), this.concurrent)
+    this.q = new QueueAdapter(this.getWorker(), this.concurrent)
   }
 
   private regenerateQueue = async () => {
