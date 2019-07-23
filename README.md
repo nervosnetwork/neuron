@@ -66,6 +66,10 @@ $ yarn start:wallet
 $ yarn test
 ```
 
+## Binary
+
+If you don't want to bother building from source, you can download a binary from [releases](https://github.com/nervosnetwork/neuron/releases). We offer pre-built binaries for Windows, Linux and macOS.
+
 ## License
 
 Neuron is released under the terms of the MIT license. See [COPYING](COPYING) for more information or see [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT).
