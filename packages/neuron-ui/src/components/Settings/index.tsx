@@ -46,15 +46,15 @@ const Settings = ({
   ...neuronWalletState
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const goToOverview = useCallback(() => {
-    history.push(Routes.Overview)
+  const goBack = useCallback(() => {
+    history.goBack()
   }, [history])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack horizontal>
         <Stack.Item align="center">
-          <IconButton onClick={goToOverview} styles={{ root: { marginRight: 20 } }}>
+          <IconButton onClick={goBack} styles={{ root: { marginRight: 20 } }}>
             <FormPreviousLink />
           </IconButton>
         </Stack.Item>
@@ -69,7 +69,7 @@ const Settings = ({
         selectedKey={location.pathname}
         onLinkClick={(pivotItem?: PivotItem) => {
           if (pivotItem && pivotItem.props && pivotItem.props.itemKey) {
-            history.push(pivotItem.props.itemKey)
+            history.replace(pivotItem.props.itemKey)
           }
         }}
         headersOnly
