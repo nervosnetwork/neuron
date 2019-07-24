@@ -7,15 +7,7 @@ import en from 'locales/en.json'
 i18n.use(initReactI18next).init({
   resources: {
     en,
-    'en-AU': en,
-    'en-CA': en,
-    'en-GB': en,
-    'en-NZ': en,
-    'en-US': en,
-    'en-ZA': en,
     zh,
-    'zh-CN': zh,
-    'zh-TW': zh,
   },
   fallbackLng: language.load(),
   interpolation: {
