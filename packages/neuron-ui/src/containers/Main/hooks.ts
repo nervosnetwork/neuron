@@ -15,7 +15,11 @@ import UILayer, {
   networksCall,
 } from 'services/UILayer'
 import { initWindow } from 'services/remote'
-import { SystemScript as SystemScriptSubject, DataUpdate as DataUpdateSubject } from 'services/subjects'
+import {
+  SystemScript as SystemScriptSubject,
+  DataUpdate as DataUpdateSubject,
+  NetworkList as NetworkListSubject,
+} from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
 import {
@@ -262,14 +266,6 @@ export const useChannelListeners = ({
     UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
-          case NetworksMethod.GetAll: {
-            dispatch({
-              type: NeuronWalletActions.Settings,
-              payload: { networks: args.result || [] },
-            })
-            networksCache.save(args.result || [])
-            break
-          }
           case NetworksMethod.CurrentID: {
             dispatch({
               type: NeuronWalletActions.Chain,
@@ -455,9 +451,17 @@ export const useSubscription = ({
         }
       }
     })
+    const networkListSubscription = NetworkListSubject.subscribe(({ currentNetworkList = [] }) => {
+      dispatch({
+        type: NeuronWalletActions.UpdateNetworkList,
+        payload: currentNetworkList,
+      })
+      networksCache.save(currentNetworkList)
+    })
     return () => {
       systemScriptSubscription.unsubscribe()
       dataUpdateSubscription.unsubscribe()
+      networkListSubscription.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, txHash, dispatch])
 }

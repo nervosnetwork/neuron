@@ -29,7 +29,6 @@ export default class AppController {
       currentWallet = null,
       wallets = [],
       currentNetworkID = '',
-      networks = [],
       tipNumber = '0',
       connectionStatus = false,
       codeHash = '',
@@ -37,7 +36,6 @@ export default class AppController {
       walletsService.getCurrent(),
       walletsService.getAll(),
       networksService.getCurrentID(),
-      networksService.getAll(),
       SyncInfoController.currentBlockNumber()
         .then(res => {
           if (res.status) {
@@ -80,7 +78,6 @@ export default class AppController {
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
       currentNetworkID,
-      networks,
       transactions,
       locale,
       tipNumber,

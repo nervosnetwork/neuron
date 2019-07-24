@@ -3,7 +3,6 @@ import initStates from 'states/initStates'
 
 import {
   wallets as walletsCache,
-  networks as networksCache,
   addresses as addressesCache,
   currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
@@ -27,8 +26,6 @@ const intializeApp = ({
 }) => {
   const {
     locale = '',
-    networks = [],
-    currentNetworkID: networkID = '',
     wallets = [],
     currentWallet: wallet = initStates.wallet,
     addresses = [],
@@ -47,17 +44,14 @@ const intializeApp = ({
   } else {
     history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
   }
-  if (networks.length) {
-    dispatch({
-      type: NeuronWalletActions.Initiate,
-      payload: {
-        networks,
-        networkID,
-        wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
-        wallets,
-      },
-    })
-  }
+  dispatch({
+    type: NeuronWalletActions.Initiate,
+    payload: {
+      networkID,
+      wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
+      wallets,
+    },
+  })
   dispatch({
     type: NeuronWalletActions.Chain,
     payload: {
@@ -69,10 +63,8 @@ const intializeApp = ({
   })
 
   currentWalletCache.save(wallet)
-  currentNetworkIDCache.save(networkID)
   walletsCache.save(wallets)
   addressesCache.save(addresses)
-  networksCache.save(networks)
   systemScriptCache.save({ codeHash })
 }
 export default intializeApp

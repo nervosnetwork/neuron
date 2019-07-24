@@ -36,7 +36,6 @@ export enum WalletsMethod {
 }
 
 export enum NetworksMethod {
-  GetAll = 'getAll',
   Get = 'get',
   Create = 'create',
   Update = 'update',
