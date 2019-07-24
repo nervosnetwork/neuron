@@ -32,7 +32,7 @@ const Receive = ({
 
   return (
     <>
-      <Stack horizontal tokens={{ childrenGap: 40 }} padding="20px 0 0 0 " horizontalAlign="space-between">
+      <Stack horizontal tokens={{ childrenGap: 40 }} padding="20px 0 0 0" horizontalAlign="space-between">
         <Stack styles={{ root: { flex: 1 } }}>
           <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
             <Stack horizontal horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>

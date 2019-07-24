@@ -3,6 +3,8 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Stack,
+  Label,
+  Text,
   List,
   TextField,
   PrimaryButton,
@@ -50,9 +52,15 @@ const Send = ({
     onDescriptionChange,
     onClear,
   } = useInitialize(address, send.outputs, dispatch, history)
+  const labelWidthStyles = { root: { width: '140px' } }
+  const actionSpacer = (
+    <Stack.Item styles={{ root: { width: '48px' } }}>
+      <span> </span>
+    </Stack.Item>
+  )
 
   return (
-    <Stack verticalFill tokens={{ childrenGap: 15 }}>
+    <Stack verticalFill tokens={{ childrenGap: 15 }} padding="20px 0 0 0">
       <Stack.Item>
         <List
           items={send.outputs || []}
@@ -63,14 +71,21 @@ const Send = ({
             return (
               <Stack tokens={{ childrenGap: 15 }}>
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-                  <Stack horizontal verticalAlign="end" styles={{ root: { width: '70%' } }}>
+                  <Stack
+                    horizontal
+                    verticalAlign="end"
+                    styles={{ root: { width: '70%' } }}
+                    tokens={{ childrenGap: 20 }}
+                  >
+                    <Stack.Item styles={labelWidthStyles}>
+                      <Label>{t('send.address')}</Label>
+                    </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
                       <TextField
                         disabled={sending}
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
                         placeholder={PlaceHolders.send.Address}
-                        label={t('send.address')}
                         required
                       />
                     </Stack.Item>
@@ -86,17 +101,24 @@ const Send = ({
                   <Stack.Item>
                     {send.outputs.length > 1 ? (
                       <IconButton text={t('send.remove-this')} onClick={() => removeTransactionOutput(idx)}>
-                        <RemoveIcon />
+                        <RemoveIcon color="red" />
                       </IconButton>
                     ) : null}
                   </Stack.Item>
                 </Stack>
 
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-                  <Stack horizontal verticalAlign="end" styles={{ root: { width: '70%' } }}>
+                  <Stack
+                    horizontal
+                    verticalAlign="end"
+                    styles={{ root: { width: '70%' } }}
+                    tokens={{ childrenGap: 20 }}
+                  >
+                    <Stack.Item styles={labelWidthStyles}>
+                      <Label>{t('send.amount')}</Label>
+                    </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
                       <TextField
-                        label={t('send.amount')}
                         value={item.amount}
                         placeholder={PlaceHolders.send.Amount}
                         onChange={onItemChange('amount', idx)}
@@ -126,25 +148,27 @@ const Send = ({
       </Stack.Item>
 
       <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-        <Stack horizontal verticalAlign="end" styles={{ root: { width: '70%' } }}>
+        <Stack horizontal verticalAlign="end" styles={{ root: { width: '70%' } }} tokens={{ childrenGap: 20 }}>
+          <Stack.Item styles={labelWidthStyles}>
+            <Label>{t('send.description')}</Label>
+          </Stack.Item>
           <Stack.Item styles={{ root: { flex: 1 } }}>
-            <TextField
-              label={t('send.description-optional')}
-              id="description"
-              alt="description"
-              value={send.description}
-              onChange={onDescriptionChange}
-            />
+            <TextField id="description" alt="description" value={send.description} onChange={onDescriptionChange} />
           </Stack.Item>
-          <Stack.Item styles={{ root: { width: '43px', paddingLeft: '5px' } }}>
-            <span> </span>
-          </Stack.Item>
+          {actionSpacer}
         </Stack>
       </Stack>
 
       <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
 
-      <div>{`${t('send.balance')}: ${shannonToCKBFormatter(balance)} CKB`}</div>
+      <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 20 }}>
+        <Stack.Item styles={labelWidthStyles}>
+          <Label>{t('send.balance')}</Label>
+        </Stack.Item>
+        <Stack.Item>
+          <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
+        </Stack.Item>
+      </Stack>
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
         <DefaultButton type="reset" onClick={onClear}>
