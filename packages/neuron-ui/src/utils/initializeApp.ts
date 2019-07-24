@@ -26,7 +26,7 @@ const intializeApp = ({
   dispatch: StateDispatch
 }) => {
   const {
-    locale,
+    locale = '',
     networks = [],
     currentNetworkID: networkID = '',
     wallets = [],
@@ -37,9 +37,10 @@ const intializeApp = ({
     connectionStatus = false,
     codeHash = '',
   } = initializedState
-  if (locale && locale !== i18n.language) {
-    i18n.changeLanguage(locale)
-    languageCache.save(locale)
+  const lng = (locale as string).startsWith('zh') ? 'zh' : 'en'
+  if (lng !== i18n.language) {
+    i18n.changeLanguage(lng)
+    languageCache.save(lng)
   }
   if (wallet && wallet.id) {
     history.push(Routes.Overview)
