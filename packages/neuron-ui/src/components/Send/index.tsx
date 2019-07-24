@@ -52,7 +52,8 @@ const Send = ({
     onDescriptionChange,
     onClear,
   } = useInitialize(address, send.outputs, dispatch, history)
-  const labelWidthStyles = { root: { width: '140px' } }
+  const leftStackWidth = '70%'
+  const labelWidth = '140px'
   const actionSpacer = (
     <Stack.Item styles={{ root: { width: '48px' } }}>
       <span> </span>
@@ -74,10 +75,10 @@ const Send = ({
                   <Stack
                     horizontal
                     verticalAlign="end"
-                    styles={{ root: { width: '70%' } }}
+                    styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
-                    <Stack.Item styles={labelWidthStyles}>
+                    <Stack.Item styles={{ root: { width: labelWidth } }}>
                       <Label>{t('send.address')}</Label>
                     </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
@@ -111,10 +112,10 @@ const Send = ({
                   <Stack
                     horizontal
                     verticalAlign="end"
-                    styles={{ root: { width: '70%' } }}
+                    styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
-                    <Stack.Item styles={labelWidthStyles}>
+                    <Stack.Item styles={{ root: { width: labelWidth } }}>
                       <Label>{t('send.amount')}</Label>
                     </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
@@ -148,8 +149,8 @@ const Send = ({
       </Stack.Item>
 
       <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-        <Stack horizontal verticalAlign="end" styles={{ root: { width: '70%' } }} tokens={{ childrenGap: 20 }}>
-          <Stack.Item styles={labelWidthStyles}>
+        <Stack horizontal verticalAlign="end" styles={{ root: { width: leftStackWidth } }} tokens={{ childrenGap: 20 }}>
+          <Stack.Item styles={{ root: { width: labelWidth } }}>
             <Label>{t('send.description')}</Label>
           </Stack.Item>
           <Stack.Item styles={{ root: { flex: 1 } }}>
@@ -162,7 +163,7 @@ const Send = ({
       <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
 
       <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 20 }}>
-        <Stack.Item styles={labelWidthStyles}>
+        <Stack.Item styles={{ root: { width: labelWidth } }}>
           <Label>{t('send.balance')}</Label>
         </Stack.Item>
         <Stack.Item>
