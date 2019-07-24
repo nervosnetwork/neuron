@@ -9,6 +9,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
+import { WalletWizardPath } from 'components/WalletWizard'
 
 import { Routes } from 'utils/const'
 
@@ -46,15 +47,16 @@ const Settings = ({
   ...neuronWalletState
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const goBack = useCallback(() => {
-    history.goBack()
-  }, [history])
+  const { id } = neuronWalletState.wallet
+  const onLeave = useCallback(() => {
+    return id ? history.push(Routes.Overview) : history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+  }, [id, history])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack horizontal>
         <Stack.Item align="center">
-          <IconButton onClick={goBack} styles={{ root: { marginRight: 20 } }}>
+          <IconButton onClick={onLeave} styles={{ root: { marginRight: 20 } }}>
             <FormPreviousLink />
           </IconButton>
         </Stack.Item>
