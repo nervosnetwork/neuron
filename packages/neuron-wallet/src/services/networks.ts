@@ -6,7 +6,6 @@ import Store from '../models/store'
 import env from '../env'
 
 import { Validate, Required } from '../decorators'
-import NodeService from './node'
 import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from '../models/subjects/networks'
 
@@ -80,7 +79,6 @@ export default class NetworksService extends Store {
         throw new NetworkNotFound(currentNetworkID)
       }
       CurrentNetworkIDSubject.next({ currentNetworkID })
-      NodeService.getInstance().setNetwork(currentNetwork.remote)
       networkSwitchSubject.next(currentNetwork)
     })
   }

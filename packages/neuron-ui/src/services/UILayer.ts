@@ -10,11 +10,6 @@ export enum AppMethod {
   HandleViewError = 'handleViewError',
 }
 
-export enum ChainMethod {
-  Status = 'status',
-  TipBlockNumber = 'tipBlockNumber',
-}
-
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',

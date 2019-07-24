@@ -13,6 +13,9 @@ export enum NeuronWalletActions {
   // networks
   UpdateNetworkList = 'updateNetworkList',
   UpdateCurrentNetworkID = 'updateCurrentNetworkID',
+  // Connection
+  UpdateConnectionStatus = 'updateConnectionStatus',
+  UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -174,6 +177,24 @@ export const reducer = (
         chain: {
           ...chain,
           networkID: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateConnectionStatus: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          connectionStatus: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateSyncedBlockNumber: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          tipBlockNumber: payload,
         },
       }
     }

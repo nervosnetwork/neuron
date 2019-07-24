@@ -38,9 +38,19 @@ export const CurrentNetworkID = window.remote
     }>)
   : FallbackSubject
 
+export const ConnectionStatus = window.remote
+  ? (window.remote.require(`${SUBJECT_PATH}/node`).ConnectionStatusSubject as NeuronWalletSubject<boolean>)
+  : FallbackSubject
+
+export const SyncedBlockNumber = window.remote
+  ? (window.remote.require(`${SUBJECT_PATH}/node`).SyncedBlockNumberSubject as NeuronWalletSubject<string>)
+  : FallbackSubject
+
 export default {
   SystemScript,
   DataUpdate,
   NetworkList,
   CurrentNetworkID,
+  ConnectionStatus,
+  SyncedBlockNumber,
 }

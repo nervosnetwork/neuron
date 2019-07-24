@@ -2,8 +2,9 @@ import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import { ShouldBeTypeOf } from '../exceptions'
-import windowManager from '../models/window-manager'
-import { Channel, ResponseCode } from '../utils/const'
+import { ConnectionStatusSubject } from '../models/subjects/node'
+import { CurrentNetworkIDSubject } from '../models/subjects/networks'
+import NetworksService from './networks'
 
 class NodeService {
   private static instance: NodeService
@@ -25,6 +26,12 @@ class NodeService {
   constructor() {
     this.start()
     this.syncConnectionStatus()
+    CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
+      const currentNetwork = await NetworksService.getInstance().get(currentNetworkID)
+      if (currentNetwork) {
+        this.setNetwork(currentNetwork.remote)
+      }
+    })
   }
 
   public syncConnectionStatus = () => {
@@ -33,10 +40,7 @@ class NodeService {
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
       .subscribe(connectionStatus => {
-        windowManager.broadcast(Channel.Chain, 'status', {
-          status: ResponseCode.Success,
-          result: connectionStatus,
-        })
+        ConnectionStatusSubject.next(connectionStatus)
       })
   }
 

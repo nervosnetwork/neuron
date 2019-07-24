@@ -4,13 +4,15 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
 
-import UILayer, { AppMethod, ChainMethod, WalletsMethod, walletsCall } from 'services/UILayer'
+import UILayer, { AppMethod, WalletsMethod, walletsCall } from 'services/UILayer'
 import { initWindow, getTransactionList, getTransaction } from 'services/remote'
 import {
   SystemScript as SystemScriptSubject,
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
   CurrentNetworkID as CurrentNetworkIDSubject,
+  ConnectionStatus as ConnectionStatusSubject,
+  SyncedBlockNumber as SyncedBlockNumberSubject,
 } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
@@ -51,34 +53,6 @@ export const useChannelListeners = ({
           }
           case AppMethod.ToggleAddressBook: {
             dispatch(actionCreators.toggleAddressBook())
-            break
-          }
-          default: {
-            break
-          }
-        }
-      }
-    })
-
-    UILayer.on(Channel.Chain, (_e: Event, method: ChainMethod, args: ChannelResponse<any>) => {
-      if (args && args.status) {
-        switch (method) {
-          case ChainMethod.Status: {
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: {
-                connectionStatus: args.result ? ConnectionStatus.Online : ConnectionStatus.Offline,
-              },
-            })
-            break
-          }
-          case ChainMethod.TipBlockNumber: {
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: {
-                tipBlockNumber: args.result || '0',
-              },
-            })
             break
           }
           default: {
@@ -361,11 +335,26 @@ export const useSubscription = ({
       })
       currentNetworkIDCache.save(currentNetworkID)
     })
+    const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
+      dispatch({
+        type: NeuronWalletActions.UpdateConnectionStatus,
+        payload: status ? ConnectionStatus.Online : ConnectionStatus.Offline,
+      })
+    })
+
+    const syncedBlockNumberSubscription = SyncedBlockNumberSubject.subscribe(syncedBlockNumber => {
+      dispatch({
+        type: NeuronWalletActions.UpdateSyncedBlockNumber,
+        payload: syncedBlockNumber,
+      })
+    })
     return () => {
       systemScriptSubscription.unsubscribe()
       dataUpdateSubscription.unsubscribe()
       networkListSubscription.unsubscribe()
       currentNetworkIDSubscription.unsubscribe()
+      connectionStatusSubscription.unsubscribe()
+      syncedBlockNumberSubscription.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, txHash, dispatch])
 }
