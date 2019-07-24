@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import { Stack, Label, TextField, Dropdown, IconButton } from 'office-ui-fabric-react'
-import { CaretDown } from 'grommet-icons'
+import { Stack, Label, TextField, Dropdown, IconButton, Icon } from 'office-ui-fabric-react'
+import { CaretDown, Down } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
+
+import { registerIcons } from 'utils/icons'
 
 interface TransactionFee {
   fee: string
@@ -9,6 +11,12 @@ interface TransactionFee {
   price: string
   onPriceChange: any
 }
+
+registerIcons({
+  icons: {
+    ArrowDown: <Down size="small" />,
+  },
+})
 
 const TransactionFee: React.FunctionComponent<TransactionFee> = ({
   cycles,
@@ -84,6 +92,9 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
                 { key: '60', text: '~ 1min' },
                 { key: '180', text: '~ 3min' },
               ]}
+              onRenderCaretDown={() => {
+                return <Icon iconName="ArrowDown" />
+              }}
             />
           </Stack.Item>
         </Stack>
