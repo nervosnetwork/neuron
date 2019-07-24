@@ -8,7 +8,6 @@ import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listeners/tx-status'
-import BlockNumber from '../../services/sync/block-number'
 import Utils from '../../services/sync/utils'
 
 const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
@@ -66,11 +65,9 @@ export const switchNetwork = async () => {
   closeListener(addressDBChangedListener)
 
   const regenerateListener = async () => {
-    const blockNumber = new BlockNumber()
-    await blockNumber.updateCurrent(BigInt(0))
     const hashes: string[] = await loadAddressesAndConvert()
     blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
-    await blockListener.start()
+    await blockListener.start(true)
   }
 
   const walletCreatedListener = walletCreatedSubject.subscribe(async (type: string) => {

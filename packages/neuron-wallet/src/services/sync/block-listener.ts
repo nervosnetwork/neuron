@@ -47,7 +47,10 @@ export default class BlockListener {
   // start listening
   /* eslint no-await-in-loop: "off" */
   /* eslint no-constant-condition: "off" */
-  public start = async () => {
+  public start = async (restart: boolean = false) => {
+    if (restart) {
+      await this.currentBlockNumber.updateCurrent(BigInt(0))
+    }
     while (this.queue !== null) {
       await this.regenerate()
       await Utils.sleep(this.interval)

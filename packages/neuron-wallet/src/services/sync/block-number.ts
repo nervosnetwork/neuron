@@ -9,7 +9,7 @@ const currentBlockSubject = isRenderer
   : CurrentBlockSubject.getSubject()
 
 export default class BlockNumber {
-  private current: bigint = BigInt(0)
+  private current: bigint | undefined = undefined
 
   public getCurrent = async (): Promise<bigint> => {
     if (this.current) {
