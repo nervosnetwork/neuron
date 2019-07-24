@@ -35,23 +35,8 @@ export enum WalletsMethod {
   GetAllAddresses = 'getAllAddresses',
 }
 
-export enum TransactionsMethod {
-  GetAll = 'getAll',
-  GetAllByKeywords = 'getAllByKeywords',
-  Get = 'get',
-  UpdateDescription = 'updateDescription',
-  TransactionUpdated = 'transactionUpdated',
-}
-
 export enum HelpersMethod {
   GenerateMnemonic = 'generateMnemonic',
-}
-
-export interface GetTransactionsParams {
-  pageNo: number
-  pageSize: number
-  keywords?: string
-  walletID: string
 }
 
 const UILayer = (() => {
@@ -85,16 +70,6 @@ export const app = (method: AppMethod, ...params: any) => {
 export const appCalls = instantiateMethodCall(app) as {
   contextMenu: ({ type, id }: { type: string; id: string }) => void
   handleViewError: (errorMessage: string) => void
-}
-
-export const transactions = (method: TransactionsMethod, params: string | GetTransactionsParams) => {
-  UILayer.send(Channel.Transactions, method, params)
-}
-
-export const transactionsCall = instantiateMethodCall(transactions) as {
-  getAllByKeywords: (params: GetTransactionsParams) => void
-  get: (walletID: string, hash: string) => void
-  updateDescription: (params: { hash: string; description: string }) => void
 }
 
 export const wallets = (

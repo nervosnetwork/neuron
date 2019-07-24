@@ -193,9 +193,12 @@ export const useHandleSubmit = (
           },
         })
       }
-      res = await updateNetwork(id!, {
-        name,
-        remote,
+      res = await updateNetwork({
+        networkID: id!,
+        options: {
+          name,
+          remote,
+        },
       })
     }
     if (res && res.status) {

@@ -3,11 +3,11 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 
-import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { AppActions, StateWithDispatch, NeuronWalletActions } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { getTransaction } from 'services/remote'
 
 const MIN_CELL_WIDTH = 70
 
@@ -105,7 +105,16 @@ const Transaction = ({
       type: AppActions.CleanTransaction,
       payload: null,
     })
-    dispatch(actionCreators.getTransaction(walletID, match.params.hash))
+    getTransaction({ walletID, hash: match.params.hash }).then(res => {
+      if (res.status) {
+        dispatch({
+          type: NeuronWalletActions.UpdateTransaction,
+          payload: res.result,
+        })
+      } else {
+        // TODO: notification
+      }
+    })
   }, [match.params.hash, dispatch, walletID])
 
   const basicInfoItems = useMemo(

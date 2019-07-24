@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { AppActions } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { NeuronWalletActions, AppActions } from 'states/stateProvider/reducer'
 import { queryParsers } from 'utils/parser'
+import { getTransactionList } from 'services/remote'
 
 const backToTop = () => {
   const container = document.querySelector('main') as HTMLElement
@@ -31,8 +31,16 @@ export const useSearch = (search: string = '', walletID: string = '', dispatch: 
       type: AppActions.CleanTransactions,
       payload: null,
     })
-
-    dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords, walletID }))
+    getTransactionList({ ...params, keywords: params.keywords, walletID }).then(res => {
+      if (res.status) {
+        dispatch({
+          type: NeuronWalletActions.UpdateTransactionList,
+          payload: res.result,
+        })
+      } else {
+        // TODO: notification
+      }
+    })
   }, [search, walletID, dispatch])
   return { keywords, onKeywordsChange, setKeywords }
 }

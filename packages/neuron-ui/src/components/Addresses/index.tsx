@@ -20,9 +20,8 @@ import { MIN_CELL_WIDTH, Routes } from 'utils/const'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
-  wallet: { id, addresses = [] },
+  wallet: { addresses = [] },
   settings: { showAddressBook = false },
-  dispatch,
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
@@ -33,8 +32,6 @@ const Addresses = ({
   }, [showAddressBook, history])
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
-    'address',
-    id,
     useMemo(
       () =>
         addresses.map(({ address: key = '', description = '' }) => ({
@@ -42,8 +39,7 @@ const Addresses = ({
           description,
         })),
       [addresses]
-    ),
-    dispatch
+    )
   )
 
   const theme = getTheme()

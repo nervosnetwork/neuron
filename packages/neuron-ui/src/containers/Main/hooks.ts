@@ -4,15 +4,8 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { actionCreators } from 'states/stateProvider/actionCreators'
 
-import UILayer, {
-  AppMethod,
-  ChainMethod,
-  TransactionsMethod,
-  WalletsMethod,
-  walletsCall,
-  transactionsCall,
-} from 'services/UILayer'
-import { initWindow } from 'services/remote'
+import UILayer, { AppMethod, ChainMethod, WalletsMethod, walletsCall } from 'services/UILayer'
+import { initWindow, getTransactionList, getTransaction } from 'services/remote'
 import {
   SystemScript as SystemScriptSubject,
   DataUpdate as DataUpdateSubject,
@@ -86,71 +79,6 @@ export const useChannelListeners = ({
                 tipBlockNumber: args.result || '0',
               },
             })
-            break
-          }
-          default: {
-            break
-          }
-        }
-      }
-    })
-
-    UILayer.on(Channel.Transactions, (_e: Event, method: TransactionsMethod, args: ChannelResponse<any>) => {
-      if (args.status) {
-        switch (method) {
-          case TransactionsMethod.GetAllByKeywords: {
-            // TODO: verify the wallet id the transactions belong to
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: { transactions: { ...chain.transactions, ...args.result } },
-            })
-            break
-          }
-          case TransactionsMethod.Get: {
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: { transaction: args.result },
-            })
-            break
-          }
-          case TransactionsMethod.TransactionUpdated: {
-            const updatedTransaction: State.Transaction = args.result
-            if (
-              (!chain.transactions.items.length ||
-                updatedTransaction.timestamp === null ||
-                +(updatedTransaction.timestamp || updatedTransaction.createdAt) >
-                  +(chain.transactions.items[0].timestamp || chain.transactions.items[0].createdAt)) &&
-              chain.transactions.pageNo === 1
-            ) {
-              /**
-               * 1. transaction list is empty or the coming transaction is pending or the coming transaction is later than latest transaction in current list
-               * 2. the current page number is 1
-               */
-              const newTransactionItems = [updatedTransaction, ...chain.transactions.items].slice(
-                0,
-                chain.transactions.pageSize
-              )
-              dispatch({
-                type: NeuronWalletActions.Chain,
-                payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
-              })
-            } else {
-              const newTransactionItems = [...chain.transactions.items]
-              const idx = newTransactionItems.findIndex(item => item.hash === updatedTransaction.hash)
-              if (idx >= 0) {
-                newTransactionItems[idx] = updatedTransaction
-                dispatch({
-                  type: NeuronWalletActions.Chain,
-                  payload: { transactions: { ...chain.transactions, items: newTransactionItems } },
-                })
-              }
-            }
-            if (chain.transaction.hash === updatedTransaction.hash) {
-              dispatch({
-                type: NeuronWalletActions.Chain,
-                payload: { transaction: updatedTransaction },
-              })
-            }
             break
           }
           default: {
@@ -334,11 +262,18 @@ export const useOnCurrentWalletChange = ({
   useEffect(() => {
     if (walletID) {
       walletsCall.getAllAddresses(walletID)
-      transactionsCall.getAllByKeywords({
+      getTransactionList({
         walletID,
         keywords: '',
         pageNo,
         pageSize,
+      }).then(res => {
+        if (res.status) {
+          dispatch({
+            type: NeuronWalletActions.UpdateTransactionList,
+            payload: res.result,
+          })
+        }
       })
     } else {
       initWindow()
@@ -387,13 +322,19 @@ export const useSubscription = ({
           break
         }
         case 'transaction': {
-          transactionsCall.getAllByKeywords({
+          getTransactionList({
             walletID,
             keywords,
             pageNo,
             pageSize,
+          }).then(res => {
+            if (res.status) {
+              dispatch({ type: NeuronWalletActions.UpdateTransactionList, payload: res.result })
+            } else {
+              // TODO: notification
+            }
           })
-          transactionsCall.get(walletID, txHash)
+          getTransaction({ walletID, hash: txHash })
           break
         }
         case 'wallet': {

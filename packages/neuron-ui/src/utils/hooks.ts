@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { updateTransactionDescription } from 'services/remote'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -7,12 +7,7 @@ export const useGoBack = (history: any) => {
   }, [history])
 }
 
-export const useLocalDescription = (
-  type: 'address' | 'transaction',
-  walletID: string,
-  owners: { key: string; description: string }[],
-  dispatch: any
-) => {
+export const useLocalDescription = (owners: { key: string; description: string }[]) => {
   const [localDescription, setLocalDescription] = useState<string[]>([])
 
   useEffect(() => {
@@ -24,16 +19,12 @@ export const useLocalDescription = (
       if (owners[idx].description === localDescription[idx]) {
         return
       }
-      dispatch(
-        actionCreators.updateDescription({
-          type,
-          walletID,
-          key: owners[idx].key,
-          description: localDescription[idx],
-        })
-      )
+      updateTransactionDescription({
+        hash: owners[idx].key,
+        description: localDescription[idx],
+      })
     },
-    [type, walletID, dispatch, localDescription, owners]
+    [localDescription, owners]
   )
 
   const onDescriptionFieldBlur = useCallback(

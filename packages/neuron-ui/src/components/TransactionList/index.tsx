@@ -52,20 +52,10 @@ const onRenderHeader = ({ group }: any) => {
   )
 }
 
-const TransactionList = ({
-  walletID,
-  items = [],
-  dispatch,
-}: {
-  walletID: string
-  items: State.Transaction[]
-  dispatch: StateDispatch
-}) => {
+const TransactionList = ({ items = [] }: { walletID: string; items: State.Transaction[]; dispatch: StateDispatch }) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
-    'transaction',
-    walletID,
     useMemo(
       () =>
         items.map(({ hash: key, description = '' }) => ({
@@ -73,8 +63,7 @@ const TransactionList = ({
           description,
         })),
       [items]
-    ),
-    dispatch
+    )
   )
 
   const transactionColumns: IColumn[] = useMemo(
