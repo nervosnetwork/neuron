@@ -1,5 +1,5 @@
 import { remote } from 'electron'
-import { Subject, Subscription } from 'rxjs'
+import { Subject } from 'rxjs'
 import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../models/lock-utils'
@@ -9,13 +9,6 @@ import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listeners/tx-status'
 import Utils from '../../services/sync/utils'
-
-const { onCloseEvent } = remote.require('./startup/sync-block-task/create')
-const currentWindow = remote.getCurrentWindow()
-
-const closeListener = (listener: Subscription) => {
-  onCloseEvent(currentWindow, listener)
-}
 
 const {
   nodeService,
@@ -54,7 +47,7 @@ export const switchNetwork = async () => {
   // start sync blocks service
   let blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  const addressDBChangedListener = addressDbChangedSubject.subscribe(async (event: string) => {
+  addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove
     if (event === 'AfterInsert') {
       const hashes: string[] = await loadAddressesAndConvert()
@@ -62,15 +55,13 @@ export const switchNetwork = async () => {
     }
   })
 
-  closeListener(addressDBChangedListener)
-
   const regenerateListener = async () => {
     const hashes: string[] = await loadAddressesAndConvert()
     blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
     await blockListener.start(true)
   }
 
-  const walletCreatedListener = walletCreatedSubject.subscribe(async (type: string) => {
+  walletCreatedSubject.subscribe(async (type: string) => {
     if (type === 'import') {
       await blockListener.stop()
       // wait former queue to be drained
@@ -78,8 +69,6 @@ export const switchNetwork = async () => {
       await regenerateListener()
     }
   })
-
-  closeListener(walletCreatedListener)
 
   stopLoopSubject.subscribe(() => {
     blockListener.stop()
@@ -90,12 +79,11 @@ export const switchNetwork = async () => {
 
 export const run = async () => {
   await initAddressConnection()
-  const dbInitListener = databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
+  databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
       await switchNetwork()
     }
   })
-  closeListener(dbInitListener)
   registerTxStatusListener()
 }
 

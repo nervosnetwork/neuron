@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron'
-import { ReplaySubject, Subscription } from 'rxjs'
+import { ReplaySubject } from 'rxjs'
 import path from 'path'
 import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
 import env from '../../env'
@@ -54,16 +54,9 @@ const createSyncBlockTask = () => {
 
   syncBlockBackgroundWindow.on('closed', () => {
     syncBlockBackgroundWindow = null
-    createSyncBlockTask()
   })
 
   return syncBlockBackgroundWindow
-}
-
-export const onCloseEvent = (window: BrowserWindow, listener: Subscription) => {
-  window.once('close', () => {
-    listener.unsubscribe()
-  })
 }
 
 export default createSyncBlockTask
