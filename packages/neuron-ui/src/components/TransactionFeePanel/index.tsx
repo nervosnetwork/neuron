@@ -85,6 +85,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
           </Stack.Item>
           <Stack.Item>
             <Dropdown
+              dropdownWidth={140}
               defaultSelectedKey="0"
               options={[
                 { key: '0', text: 'immediately' },
