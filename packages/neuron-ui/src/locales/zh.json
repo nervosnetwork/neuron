@@ -69,6 +69,7 @@
       "add-one": "添加",
       "remove-this": "删除",
       "fee": "交易费",
+      "advanced-fee-settings": "交易费高级设置",
       "price": "单价",
       "expected-speed": "预期成交速度",
       "total-cycles": "RISC-V Cycles 总数"

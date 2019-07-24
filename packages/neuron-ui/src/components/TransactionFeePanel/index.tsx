@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Stack, Label, TextField, Dropdown, IconButton, Icon } from 'office-ui-fabric-react'
-import { CaretDown, Down } from 'grommet-icons'
+import { Stack, Label, TextField, Dropdown, Toggle, Icon } from 'office-ui-fabric-react'
+import { Down } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
 import { registerIcons } from 'utils/icons'
@@ -48,14 +48,13 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
         </Stack>
 
         <Stack.Item>
-          <IconButton onClick={() => setShowDetail(!showDetail)}>
-            <CaretDown
-              onClick={() => setShowDetail(!showDetail)}
-              style={{
-                transform: showDetail ? 'rotate(180deg)' : 'none',
-              }}
-            />
-          </IconButton>
+          <Toggle
+            onChange={() => {
+              setShowDetail(!showDetail)
+            }}
+            label={t('send.advanced-fee-settings')}
+            inlineLabel
+          />
         </Stack.Item>
       </Stack>
 
