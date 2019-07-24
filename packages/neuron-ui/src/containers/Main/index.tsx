@@ -123,6 +123,8 @@ const MainContent = ({
   })
 
   useSubscription({
+    walletID,
+    chain,
     dispatch,
   })
 

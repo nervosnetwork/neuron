@@ -31,21 +31,6 @@ export default class WindowManager {
     })
   }
 
-  public static broadcastDataUpdateMessage = (
-    actionType: 'create' | 'update' | 'delete',
-    dataType: 'address' | 'transaction' | 'wallet' | 'network'
-  ) => {
-    if (!BrowserWindow) {
-      logger.log(error)
-      return
-    }
-    BrowserWindow.getAllWindows().forEach(window => {
-      if (window && window.webContents) {
-        window.webContents.send(Channel.DataUpdate, actionType, dataType)
-      }
-    })
-  }
-
   public static sendToFocusedWindow: SendMessage = (channel: Channel, method: string, params: any): void => {
     if (!BrowserWindow) {
       logger.log(error)

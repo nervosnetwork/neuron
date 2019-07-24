@@ -21,7 +21,6 @@ export enum Channel {
   Transactions = 'transactions',
   Wallets = 'wallets',
   Helpers = 'helpers',
-  DataUpdate = 'dataUpdate',
 }
 
 export enum Routes {
