@@ -4,7 +4,6 @@ import initStates from 'states/initStates'
 import {
   wallets as walletsCache,
   addresses as addressesCache,
-  currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
   systemScript as systemScriptCache,
   language as languageCache,
@@ -47,7 +46,6 @@ const intializeApp = ({
   dispatch({
     type: NeuronWalletActions.Initiate,
     payload: {
-      networkID,
       wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
       wallets,
     },

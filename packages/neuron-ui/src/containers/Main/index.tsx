@@ -108,9 +108,9 @@ const MainContent = ({
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
   const {
-    wallet: { id: walletID },
+    wallet: { id: walletID = '' },
     chain,
-    settings: { networks },
+    settings: { networks = [] },
   } = neuronWalletState
   const { networkID } = chain
   const [, i18n] = useTranslation()

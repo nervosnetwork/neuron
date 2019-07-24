@@ -16,6 +16,7 @@ class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError
   }
 
   static getDerivedStateFromError(error: Error) {
+    window.alert(error.stack)
     return handleError(error)
   }
 

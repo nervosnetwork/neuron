@@ -6,7 +6,6 @@ import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
 import TransactionsController from '../transactions'
-import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
 import NodeService from '../../services/node'
 import WalletsController from '../wallets'
@@ -18,7 +17,6 @@ import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
 
-const networksService = NetworksService.getInstance()
 const nodeService = NodeService.getInstance()
 
 @ControllerDecorator(Channel.App)
@@ -28,14 +26,12 @@ export default class AppController {
     const [
       currentWallet = null,
       wallets = [],
-      currentNetworkID = '',
       tipNumber = '0',
       connectionStatus = false,
       codeHash = '',
     ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
-      networksService.getCurrentID(),
       SyncInfoController.currentBlockNumber()
         .then(res => {
           if (res.status) {
@@ -77,7 +73,6 @@ export default class AppController {
       },
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
-      currentNetworkID,
       transactions,
       locale,
       tipNumber,

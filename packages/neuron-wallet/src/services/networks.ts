@@ -45,6 +45,20 @@ export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(env.presetNetworks))
 
+    this.getAll().then(currentNetworkList => {
+      if (currentNetworkList) {
+        NetworkListSubject.next({
+          currentNetworkList,
+        })
+      }
+    })
+
+    this.getCurrentID().then(currentNetworkID => {
+      if (currentNetworkID) {
+        CurrentNetworkIDSubject.next({ currentNetworkID })
+      }
+    })
+
     this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
       NetworkListSubject.next({ currentNetworkList })
 
@@ -68,12 +82,6 @@ export default class NetworksService extends Store {
       CurrentNetworkIDSubject.next({ currentNetworkID })
       NodeService.getInstance().setNetwork(currentNetwork.remote)
       networkSwitchSubject.next(currentNetwork)
-    })
-
-    this.getCurrentID().then(currentID => {
-      if (currentID) {
-        this.emit(NetworksKey.Current, null, currentID)
-      }
     })
   }
 

@@ -32,8 +32,15 @@ export const NetworkList = window.remote
     }>)
   : FallbackSubject
 
+export const CurrentNetworkID = window.remote
+  ? (window.remote.require(`${SUBJECT_PATH}/networks`).CurrentNetworkIDSubject as NeuronWalletSubject<{
+      currentNetworkID: string
+    }>)
+  : FallbackSubject
+
 export default {
   SystemScript,
   DataUpdate,
   NetworkList,
+  CurrentNetworkID,
 }

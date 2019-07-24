@@ -8,6 +8,7 @@ export enum NeuronWalletActions {
   Settings = 'settings',
   UpdateCodeHash = 'updateCodeHash',
   UpdateNetworkList = 'updateNetworkList',
+  UpdateCurrentNetworkID = 'updateCurrentNetworkID',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -53,18 +54,16 @@ export const reducer = (
   switch (type) {
     // Actions of Neuron Wallet
     case NeuronWalletActions.Initiate: {
-      const { networks, networkID, wallets, wallet: incomingWallet } = payload
+      const { wallets, wallet: incomingWallet } = payload
       return {
         ...state,
         wallet: incomingWallet || wallet,
         chain: {
           ...state.chain,
-          networkID,
         },
         settings: {
           ...state.settings,
           wallets,
-          networks,
         },
       }
     }
@@ -144,6 +143,15 @@ export const reducer = (
         settings: {
           ...settings,
           networks: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateCurrentNetworkID: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          networkID: payload,
         },
       }
     }
