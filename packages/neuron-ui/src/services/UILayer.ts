@@ -35,15 +35,6 @@ export enum WalletsMethod {
   GetAllAddresses = 'getAllAddresses',
 }
 
-export enum NetworksMethod {
-  Get = 'get',
-  Create = 'create',
-  Update = 'update',
-  Delete = 'delete',
-  Activate = 'activate',
-  CurrentID = 'currentID',
-}
-
 export enum TransactionsMethod {
   GetAll = 'getAll',
   GetAllByKeywords = 'getAllByKeywords',
@@ -94,19 +85,6 @@ export const app = (method: AppMethod, ...params: any) => {
 export const appCalls = instantiateMethodCall(app) as {
   contextMenu: ({ type, id }: { type: string; id: string }) => void
   handleViewError: (errorMessage: string) => void
-}
-
-export const networks = (method: NetworksMethod, ...params: any[]) => {
-  UILayer.send(Channel.Networks, method, ...params)
-}
-export const networksCall = instantiateMethodCall(networks) as {
-  getAll: () => void
-  get: (id: string) => void
-  create: (network: State.NetworkProperty) => void
-  update: (id: string, options: Partial<State.Network>) => void
-  delete: (id: string) => void
-  currentID: () => void
-  activate: (id: string) => void
 }
 
 export const transactions = (method: TransactionsMethod, params: string | GetTransactionsParams) => {

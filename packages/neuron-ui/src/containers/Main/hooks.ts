@@ -7,12 +7,10 @@ import { actionCreators } from 'states/stateProvider/actionCreators'
 import UILayer, {
   AppMethod,
   ChainMethod,
-  NetworksMethod,
   TransactionsMethod,
   WalletsMethod,
   walletsCall,
   transactionsCall,
-  networksCall,
 } from 'services/UILayer'
 import { initWindow } from 'services/remote'
 import {
@@ -263,37 +261,6 @@ export const useChannelListeners = ({
         })
       }
     })
-
-    UILayer.on(Channel.Networks, (_e: Event, method: NetworksMethod, args: ChannelResponse<any>) => {
-      if (args.status) {
-        switch (method) {
-          case NetworksMethod.Create:
-          case NetworksMethod.Update: {
-            history.push(Routes.SettingsNetworks)
-            break
-          }
-          case NetworksMethod.Activate: {
-            dispatch({
-              type: NeuronWalletActions.Chain,
-              payload: { network: args.result },
-            })
-            break
-          }
-          default: {
-            break
-          }
-        }
-      } else {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            content: args.msg,
-            timestamp: Date.now(),
-          },
-        })
-      }
-    })
   }, [walletID, i18n, chain, dispatch, history])
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
@@ -432,11 +399,6 @@ export const useSubscription = ({
         case 'wallet': {
           walletsCall.getAll()
           walletsCall.getCurrent()
-          break
-        }
-        case 'network': {
-          networksCall.getAll()
-          networksCall.currentID()
           break
         }
         default: {

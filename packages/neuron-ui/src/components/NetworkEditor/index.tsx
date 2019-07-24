@@ -24,7 +24,7 @@ const NetworkEditor = ({
   const cachedNetworks = useRef(networks)
   const cachedNetwork = cachedNetworks.current.find(network => network.id === id)
   const { invalidParams, notModified } = useIsInputsValid(editor, cachedNetwork)
-  const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, dispatch)
+  const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, history, dispatch)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>

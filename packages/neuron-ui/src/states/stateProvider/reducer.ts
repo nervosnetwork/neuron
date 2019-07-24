@@ -7,6 +7,7 @@ export enum NeuronWalletActions {
   Wallet = 'wallet',
   Settings = 'settings',
   UpdateCodeHash = 'updateCodeHash',
+  // networks
   UpdateNetworkList = 'updateNetworkList',
   UpdateCurrentNetworkID = 'updateCurrentNetworkID',
 }
