@@ -18,6 +18,15 @@ export const validateMnemonic = (mnemonic: string): boolean => {
   return remoteValidateMnemonic(mnemonic)
 }
 
+export const generateMnemonic = (): string => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return ''
+  }
+  const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
+  return remoteGenerateMnemonic()
+}
+
 export const showMessage = (options: any, callback: Function) => {
   if (!window.remote) {
     console.warn('remote is not supported')
@@ -39,6 +48,7 @@ export const showErrorMessage = (title: string, content: string) => {
 export default {
   initWindow,
   validateMnemonic,
+  generateMnemonic,
   showMessage,
   showErrorMessage,
 }

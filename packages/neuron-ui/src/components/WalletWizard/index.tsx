@@ -7,8 +7,8 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 
 import { MnemonicAction, BUTTON_GAP } from 'utils/const'
 import { verifyWalletSubmission } from 'utils/validators'
-import { helpersCall, walletsCall } from 'services/UILayer'
-import { validateMnemonic, showErrorMessage } from 'services/remote'
+import { walletsCall } from 'services/UILayer'
+import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
 
 export enum WalletWizardPath {
@@ -104,18 +104,11 @@ const Mnemonic = ({
 
   useEffect(() => {
     if (type === MnemonicAction.Create) {
-      helpersCall
-        .generateMnemonic()
-        .then((res: string) => {
-          dispatch({
-            type: 'generated',
-            payload: res,
-          })
-        })
-        .catch(err => {
-          console.error(err)
-          history.goBack()
-        })
+      const mnemonic = generateMnemonic()
+      dispatch({
+        type: 'generated',
+        payload: mnemonic,
+      })
     } else {
       dispatch({
         type: 'imported',
