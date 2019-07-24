@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
-import { actionCreators } from 'states/stateProvider/actionCreators'
+import { toggleAddressBook, updateTransactionList, updateTransaction } from 'states/stateProvider/actionCreators'
 
-import UILayer, { AppMethod, WalletsMethod, walletsCall } from 'services/UILayer'
-import { initWindow, getTransactionList, getTransaction } from 'services/remote'
+import UILayer, { WalletsMethod, walletsCall } from 'services/UILayer'
+import { initWindow, getWinID } from 'services/remote'
 import {
   SystemScript as SystemScriptSubject,
   DataUpdate as DataUpdateSubject,
@@ -13,6 +13,7 @@ import {
   CurrentNetworkID as CurrentNetworkIDSubject,
   ConnectionStatus as ConnectionStatusSubject,
   SyncedBlockNumber as SyncedBlockNumberSubject,
+  Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
@@ -44,24 +45,6 @@ export const useChannelListeners = ({
   i18n: any
 }) =>
   useEffect(() => {
-    UILayer.on(Channel.App, (_e: Event, method: AppMethod, args: ChannelResponse<any>) => {
-      if (args && args.status) {
-        switch (method) {
-          case AppMethod.NavTo: {
-            history.push(args.result)
-            break
-          }
-          case AppMethod.ToggleAddressBook: {
-            dispatch(actionCreators.toggleAddressBook())
-            break
-          }
-          default: {
-            break
-          }
-        }
-      }
-    })
-
     UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
       if (args.status) {
         switch (method) {
@@ -236,19 +219,12 @@ export const useOnCurrentWalletChange = ({
   useEffect(() => {
     if (walletID) {
       walletsCall.getAllAddresses(walletID)
-      getTransactionList({
+      updateTransactionList({
         walletID,
         keywords: '',
         pageNo,
         pageSize,
-      }).then(res => {
-        if (res.status) {
-          dispatch({
-            type: NeuronWalletActions.UpdateTransactionList,
-            payload: res.result,
-          })
-        }
-      })
+      })(dispatch)
     } else {
       initWindow()
         .then((initializedState: any) => {
@@ -270,10 +246,12 @@ export const useOnCurrentWalletChange = ({
 export const useSubscription = ({
   walletID,
   chain,
+  history,
   dispatch,
 }: {
   walletID: string
   chain: State.Chain
+  history: any
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
@@ -296,19 +274,13 @@ export const useSubscription = ({
           break
         }
         case 'transaction': {
-          getTransactionList({
+          updateTransactionList({
             walletID,
             keywords,
             pageNo,
             pageSize,
-          }).then(res => {
-            if (res.status) {
-              dispatch({ type: NeuronWalletActions.UpdateTransactionList, payload: res.result })
-            } else {
-              // TODO: notification
-            }
-          })
-          getTransaction({ walletID, hash: txHash })
+          })(dispatch)
+          updateTransaction({ walletID, hash: txHash })
           break
         }
         case 'wallet': {
@@ -348,6 +320,25 @@ export const useSubscription = ({
         payload: syncedBlockNumber,
       })
     })
+    const commandSubscription = CommandSubject.subscribe(
+      ({ winID, type, payload }: { winID: number; type: 'nav' | 'toggleAddressBook'; payload: string | null }) => {
+        if (getWinID() === winID) {
+          switch (type) {
+            case 'nav': {
+              history.push(payload)
+              break
+            }
+            case 'toggleAddressBook': {
+              dispatch(toggleAddressBook())
+              break
+            }
+            default: {
+              break
+            }
+          }
+        }
+      }
+    )
     return () => {
       systemScriptSubscription.unsubscribe()
       dataUpdateSubscription.unsubscribe()
@@ -355,8 +346,9 @@ export const useSubscription = ({
       currentNetworkIDSubscription.unsubscribe()
       connectionStatusSubscription.unsubscribe()
       syncedBlockNumberSubscription.unsubscribe()
+      commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, txHash, dispatch])
+  }, [walletID, pageNo, pageSize, keywords, txHash, history, dispatch])
 }
 
 export default {

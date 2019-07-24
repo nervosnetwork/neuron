@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { activateWallet } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 
-import { appCalls } from 'services/UILayer'
+import { contextMenu } from 'services/remote'
 import { Routes, MnemonicAction } from 'utils/const'
 
 const buttons = [
@@ -32,14 +32,14 @@ const WalletSetting = ({
   const onChange = useCallback(
     (_e, option) => {
       if (option) {
-        dispatch(actionCreators.activateWallet(option.key))
+        activateWallet(option.key)(dispatch)
       }
     },
     [dispatch]
   )
   const onContextMenu = useCallback(
     (id: string = '') => () => {
-      appCalls.contextMenu({ type: 'walletList', id })
+      contextMenu({ type: 'walletList', id })
     },
     []
   )

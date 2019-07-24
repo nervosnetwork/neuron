@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { Message, MAX_NETWORK_NAME_LENGTH, Routes } from 'utils/const'
 import { createNetwork, updateNetwork } from 'services/remote'
+import { Message, MAX_NETWORK_NAME_LENGTH, Routes } from 'utils/const'
 
 import i18n from 'utils/i18n'
 

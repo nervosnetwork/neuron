@@ -55,6 +55,11 @@ export default class NetworksService extends Store {
     this.getCurrentID().then(currentNetworkID => {
       if (currentNetworkID) {
         CurrentNetworkIDSubject.next({ currentNetworkID })
+        this.get(currentNetworkID).then(network => {
+          if (network) {
+            networkSwitchSubject.next(network)
+          }
+        })
       }
     })
 

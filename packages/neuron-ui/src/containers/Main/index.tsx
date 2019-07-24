@@ -125,6 +125,7 @@ const MainContent = ({
   useSubscription({
     walletID,
     chain,
+    history,
     dispatch,
   })
 

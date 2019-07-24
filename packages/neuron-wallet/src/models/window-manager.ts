@@ -5,15 +5,11 @@ import logger from '../utils/logger'
 const error = { level: 'error', message: 'Electron is not loaded' }
 
 interface SendMessage {
-  (channel: Channel.App, method: Controller.AppMethod, params: any): void
   (
     channel: Channel.Wallets,
     method: Controller.WalletsMethod | 'allAddresses' | 'sendingStatus' | 'requestPassword',
     params: any
   ): void
-  (channel: Channel.Transactions, method: Controller.TransactionsMethod | 'transactionUpdated', params: any): void
-  (channel: Channel.Networks, method: Controller.NetworksMethod, params: any): void
-  (channel: Channel.Helpers, method: Controller.HelpersMethod, params: any): void
 }
 
 export default class WindowManager {

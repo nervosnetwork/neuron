@@ -37,10 +37,16 @@ export const controllerMethodWrapper = (controllerName: string) => (
     return controllerNotLoaded(controllerName)
   }
   const res = await callControllerMethod(controller)(realParams)
+  if (!res) {
+    return {
+      status: 1,
+      result: null,
+    }
+  }
   if (res.status) {
     return {
       status: 1,
-      result: res.result || true,
+      result: res.result || null,
     }
   }
   return {

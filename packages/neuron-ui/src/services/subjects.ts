@@ -46,6 +46,14 @@ export const SyncedBlockNumber = window.remote
   ? (window.remote.require(`${SUBJECT_PATH}/node`).SyncedBlockNumberSubject as NeuronWalletSubject<string>)
   : FallbackSubject
 
+export const Command = window.remote
+  ? (window.remote.require(`${SUBJECT_PATH}/command`).default as NeuronWalletSubject<{
+      winID: number
+      type: 'nav' | 'toggleAddressBook'
+      payload: string | null
+    }>)
+  : FallbackSubject
+
 export default {
   SystemScript,
   DataUpdate,
@@ -53,4 +61,5 @@ export default {
   CurrentNetworkID,
   ConnectionStatus,
   SyncedBlockNumber,
+  Command,
 }

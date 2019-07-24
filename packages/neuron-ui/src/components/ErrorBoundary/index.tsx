@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { appCalls } from 'services/UILayer'
 import { Stack, Spinner } from 'office-ui-fabric-react'
+import { handleViewError } from 'services/remote'
 
 const handleError = (error: Error) => {
-  appCalls.handleViewError(error.toString())
+  handleViewError(error.toString())
   setTimeout(() => {
     window.location.reload()
   }, 0)
@@ -16,7 +16,6 @@ class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError
   }
 
   static getDerivedStateFromError(error: Error) {
-    window.alert(error.stack)
     return handleError(error)
   }
 

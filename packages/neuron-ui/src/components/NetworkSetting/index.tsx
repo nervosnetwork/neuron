@@ -5,13 +5,12 @@ import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
-import { appCalls } from 'services/UILayer'
-import { setCurrentNetowrk } from 'services/remote'
+import { setCurrentNetowrk, contextMenu } from 'services/remote'
 
 import { Routes } from 'utils/const'
 
 const onContextMenu = (id: string = '') => () => {
-  appCalls.contextMenu({ type: 'networkList', id })
+  contextMenu({ type: 'networkList', id })
 }
 
 const NetworkSetting = ({

@@ -2,14 +2,6 @@ import { Channel } from 'utils/const'
 import SyntheticEventEmitter from 'utils/SyntheticEventEmitter'
 import instantiateMethodCall from 'utils/instantiateMethodCall'
 
-export enum AppMethod {
-  ToggleAddressBook = 'toggleAddressBook',
-  ContextMenu = 'contextMenu',
-  NavTo = 'navTo',
-  SetUILocale = 'setUILocale',
-  HandleViewError = 'handleViewError',
-}
-
 export enum WalletsMethod {
   GetAll = 'getAll',
   Get = 'get',
@@ -28,10 +20,6 @@ export enum WalletsMethod {
   UpdateAddressDescription = 'updateAddressDescription',
   RequestPassword = 'requestPassword',
   GetAllAddresses = 'getAllAddresses',
-}
-
-export enum HelpersMethod {
-  GenerateMnemonic = 'generateMnemonic',
 }
 
 const UILayer = (() => {
@@ -57,15 +45,6 @@ const UILayer = (() => {
     addEventListener: (event: string, cb: EventListenerOrEventListenerObject) => window.addEventListener(event, cb),
   }
 })()
-
-export const app = (method: AppMethod, ...params: any) => {
-  UILayer.send(Channel.App, method, ...params)
-}
-
-export const appCalls = instantiateMethodCall(app) as {
-  contextMenu: ({ type, id }: { type: string; id: string }) => void
-  handleViewError: (errorMessage: string) => void
-}
 
 export const wallets = (
   method: WalletsMethod,
@@ -114,23 +93,6 @@ export const walletsCall = instantiateMethodCall(wallets) as {
   }) => void
   getAllAddresses: (id: string) => void
   updateAddressDescription: (params: { walletID: string; address: string; description: string }) => void
-}
-
-export const helpers = (method: HelpersMethod, ...params: any) => {
-  return new Promise((res, rej) => {
-    UILayer.send(Channel.Helpers, method, ...params)
-    UILayer.once(Channel.Helpers, (_e: Event, _method: HelpersMethod, args: ChannelResponse<any>) => {
-      if (args.status) {
-        res(args.result)
-      } else {
-        rej(args.msg)
-      }
-    })
-  })
-}
-
-export const helpersCall = instantiateMethodCall(helpers) as {
-  generateMnemonic: () => Promise<string>
 }
 
 export default UILayer

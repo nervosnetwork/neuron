@@ -14,8 +14,8 @@ import {
 import { FormUp as ExpandIcon } from 'grommet-icons'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
+import { contextMenu } from 'services/remote'
 
-import { appCalls } from 'services/UILayer'
 import { useLocalDescription } from 'utils/hooks'
 import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
 import { registerIcons } from 'utils/icons'
@@ -190,7 +190,7 @@ const TransactionList = ({ items = [] }: { walletID: string; items: State.Transa
       checkboxVisibility={CheckboxVisibility.hidden}
       onItemContextMenu={item => {
         if (item) {
-          appCalls.contextMenu({ type: 'transactionList', id: item.hash })
+          contextMenu({ type: 'transactionList', id: item.hash })
         }
       }}
       styles={{

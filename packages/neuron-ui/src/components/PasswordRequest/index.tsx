@@ -23,20 +23,9 @@ const PasswordRequest = ({
   }, [dispatch])
 
   const onConfirm = useCallback(() => {
-    const params = { id: walletID, password }
     switch (actionType) {
-      case 'delete': {
-        dispatch(actionCreators.deleteWallet(params))
-        break
-      }
-      case 'backup': {
-        dispatch(actionCreators.backupWallet(params))
-        break
-      }
       case 'send': {
-        dispatch(
-          actionCreators.submitTransaction(txID, walletID, outputs, description, password, priceToFee(price, cycles))
-        )
+        submitTransaction(txID, walletID, outputs, description, password, priceToFee(price, cycles))(dispatch)
         break
       }
       default: {

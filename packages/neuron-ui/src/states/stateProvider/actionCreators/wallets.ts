@@ -1,44 +1,26 @@
-import { AppActions } from 'states/stateProvider/reducer'
+import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { walletsCall } from 'services/UILayer'
 import { NeuronWalletActions } from '../reducer'
 
+export const activateWallet = (id: string) => (dispatch: StateDispatch) => {
+  walletsCall.activate(id)
+  dispatch({
+    type: NeuronWalletActions.Wallet,
+    payload: id,
+  })
+}
+
+export const updateWallet = (params: { id: string; password?: string; newPassword?: string; name?: string }) => (
+  dispatch: StateDispatch
+) => {
+  walletsCall.update(params)
+  dispatch({
+    type: AppActions.Ignore,
+    payload: null,
+  })
+}
+
 export default {
-  getAll: () => {
-    walletsCall.getAll()
-    return {
-      type: NeuronWalletActions.Wallet,
-    }
-  },
-  activateWallet: (id: string) => {
-    walletsCall.activate(id)
-    return {
-      type: NeuronWalletActions.Wallet,
-      payload: id,
-    }
-  },
-  updateWallet: (params: { id: string; password?: string; newPassword?: string; name?: string }) => {
-    walletsCall.update(params)
-    return {
-      type: AppActions.Ignore,
-      payload: null,
-    }
-  },
-  deleteWallet: (params: { id: string; password: string }) => {
-    setTimeout(() => {
-      walletsCall.delete(params)
-    }, 100)
-    return {
-      type: AppActions.DismissPasswordRequest,
-      payload: null,
-    }
-  },
-  backupWallet: (params: { id: string; password: string }) => {
-    setTimeout(() => {
-      walletsCall.backup(params)
-    }, 100)
-    return {
-      type: AppActions.DismissPasswordRequest,
-      payload: null,
-    }
-  },
+  updateWallet,
+  activateWallet,
 }

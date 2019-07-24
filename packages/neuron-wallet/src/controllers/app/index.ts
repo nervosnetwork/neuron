@@ -12,10 +12,11 @@ import WalletsController from '../wallets'
 import SyncInfoController from '../sync-info'
 
 import { Controller as ControllerDecorator } from '../../decorators'
-import { Channel, ResponseCode } from '../../utils/const'
+import { Channel } from '../../utils/const'
 import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
+import CommandSubject from '../../models/subjects/command'
 
 const nodeService = NodeService.getInstance()
 
@@ -100,23 +101,19 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    WindowManager.broadcast(Channel.App, 'toggleAddressBook', {
-      status: ResponseCode.Success,
-    })
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({
+        winID: WindowManager.mainWindow.id,
+        type: 'toggleAddressBook',
+        payload: null,
+      })
+    }
   }
 
   public static navTo(url: string) {
-    WindowManager.sendToMainWindow(Channel.App, 'navTo', {
-      status: ResponseCode.Success,
-      result: url,
-    })
-  }
-
-  public static setUILocale(locale: string) {
-    WindowManager.broadcast(Channel.App, 'setUILocale', {
-      status: ResponseCode.Success,
-      result: locale,
-    })
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({ winID: WindowManager.mainWindow.id, type: 'nav', payload: url })
+    }
   }
 
   public static openExternal(url: string) {

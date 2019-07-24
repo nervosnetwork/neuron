@@ -1,5 +1,14 @@
+export * from './app'
 export * from './networks'
 export * from './transactions'
+
+export const getWinID = () => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return -1
+  }
+  return window.remote.getCurrentWindow().id
+}
 export const initWindow = () => {
   if (!window.remote) {
     console.warn('remote is not supported')
@@ -51,4 +60,5 @@ export default {
   generateMnemonic,
   showMessage,
   showErrorMessage,
+  getWinID,
 }

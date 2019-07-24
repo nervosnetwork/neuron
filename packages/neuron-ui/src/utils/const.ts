@@ -14,12 +14,7 @@ export enum ConnectionStatus {
 }
 
 export enum Channel {
-  NavTo = 'navTo',
-  App = 'app',
-  Networks = 'networks',
-  Transactions = 'transactions',
   Wallets = 'wallets',
-  Helpers = 'helpers',
 }
 
 export enum Routes {

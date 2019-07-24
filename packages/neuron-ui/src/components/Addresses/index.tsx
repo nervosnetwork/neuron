@@ -12,8 +12,7 @@ import {
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-
-import { appCalls } from 'services/UILayer'
+import { contextMenu } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
@@ -162,7 +161,7 @@ const Addresses = ({
       columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
       items={addresses}
       onItemContextMenu={item => {
-        appCalls.contextMenu({ type: 'addressList', id: item.identifier })
+        contextMenu({ type: 'addressList', id: item.identifier })
       }}
       styles={{
         contentWrapper: {

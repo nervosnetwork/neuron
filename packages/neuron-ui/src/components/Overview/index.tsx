@@ -21,9 +21,10 @@ import {
   MessageBarType,
 } from 'office-ui-fabric-react'
 
-import { StateWithDispatch, NeuronWalletActions } from 'states/stateProvider/reducer'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { showErrorMessage, getTransactionList } from 'services/remote'
+import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
@@ -99,18 +100,12 @@ const Overview = ({
   const minerInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    getTransactionList({
+    updateTransactionList({
       pageNo: 1,
       pageSize: PAGE_SIZE,
       keywords: '',
       walletID: id,
-    }).then(res => {
-      if (res.status) {
-        dispatch({ type: NeuronWalletActions.UpdateTransactionList, payload: res.result })
-      } else {
-        // TODO: notification
-      }
-    })
+    })(dispatch)
   }, [id, dispatch])
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
