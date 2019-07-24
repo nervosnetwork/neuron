@@ -69,6 +69,7 @@
       "add-one": "Add One More",
       "remove-this": "Remove This",
       "fee": "Transaction Fee",
+      "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
       "expected-speed": "Expected speed",
       "total-cycles": "Total RISC-V Cycles"
