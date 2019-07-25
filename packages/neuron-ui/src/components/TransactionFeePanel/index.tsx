@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Stack, Label, TextField, Dropdown, Toggle, Icon } from 'office-ui-fabric-react'
+import { Stack, Label, TextField, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
 import { Down } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
 
@@ -18,6 +18,16 @@ registerIcons({
   },
 })
 
+const calculateSpeed = (price: number) => {
+  if (price >= 160) {
+    return '180'
+  }
+  if (price >= 40) {
+    return '60'
+  }
+  return '0'
+}
+
 const TransactionFee: React.FunctionComponent<TransactionFee> = ({
   cycles,
   price,
@@ -33,6 +43,8 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
       <span> </span>
     </Stack.Item>
   )
+
+  const selectedSpeed = calculateSpeed(+price)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
@@ -85,7 +97,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
           <Stack.Item>
             <Dropdown
               dropdownWidth={140}
-              defaultSelectedKey="0"
+              selectedKey={selectedSpeed}
               options={[
                 { key: '0', text: 'immediately' },
                 { key: '30', text: '~ 30s' },
@@ -94,6 +106,11 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
               ]}
               onRenderCaretDown={() => {
                 return <Icon iconName="ArrowDown" />
+              }}
+              onChange={(e: any, item?: IDropdownOption) => {
+                if (item) {
+                  onPriceChange(e, item.key)
+                }
               }}
             />
           </Stack.Item>

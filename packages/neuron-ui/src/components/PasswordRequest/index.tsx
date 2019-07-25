@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, Modal, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
 import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
 import actionCreators from 'states/stateProvider/actionCreators'
+import { priceToFee } from 'utils/formatters'
 
 const PasswordRequest = ({
   app: {
-    send: { txID, outputs, description },
+    send: { txID, outputs, description, price, cycles },
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
   settings: { wallets = [] },
@@ -33,14 +34,16 @@ const PasswordRequest = ({
         break
       }
       case 'send': {
-        dispatch(actionCreators.submitTransaction(txID, walletID, outputs, description, password))
+        dispatch(
+          actionCreators.submitTransaction(txID, walletID, outputs, description, password, priceToFee(price, cycles))
+        )
         break
       }
       default: {
         break
       }
     }
-  }, [dispatch, walletID, password, actionType, txID, description, outputs])
+  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price])
 
   const onChange = useCallback(
     (_e, value?: string) => {
