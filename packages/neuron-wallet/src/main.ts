@@ -38,7 +38,7 @@ const openWindow = () => {
 }
 
 app.on('ready', async () => {
-  i18n.changeLanguage(app.getLocale())
+  i18n.changeLanguage(['zh', 'zh-CN'].includes(app.getLocale()) ? 'zh' : 'en')
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
