@@ -110,6 +110,10 @@ export const uniformTimeFormatter = (time: string | number | Date) => {
   return timeFormatter.format(+time).replace(/\//g, '-')
 }
 
+export const priceToFee = (price: string, cycles: string) => {
+  return (BigInt(price) * BigInt(cycles)).toString()
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
@@ -117,4 +121,5 @@ export default {
   shannonToCKBFormatter,
   localNumberFormatter,
   uniformTimeFormatter,
+  priceToFee,
 }
