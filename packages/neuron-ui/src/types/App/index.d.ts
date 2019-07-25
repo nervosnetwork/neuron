@@ -55,6 +55,7 @@ declare namespace State {
     txID: string
     outputs: Output[]
     price: string
+    cycles: string
     description: string
     loading: boolean
   }

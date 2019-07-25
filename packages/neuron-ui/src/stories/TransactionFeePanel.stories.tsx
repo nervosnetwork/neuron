@@ -5,8 +5,8 @@ import TransactionFeePanel from 'components/TransactionFeePanel'
 
 const states = {
   default: {
-    cycles: '0',
-    price: '0',
+    cycles: '180',
+    price: '10',
     fee: '0',
     onPriceChange: (args: any) => action(args),
   },

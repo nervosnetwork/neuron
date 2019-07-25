@@ -18,7 +18,7 @@ exports.default = async function notarizing(context) {
   return await notarize({
     appBundleId: 'com.nervos.neuron',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: appldId,
+    appleId: appleId,
     appleIdPassword: appleIdPassword,
   });
 };

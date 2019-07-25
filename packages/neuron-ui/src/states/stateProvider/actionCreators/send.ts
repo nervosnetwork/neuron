@@ -11,7 +11,8 @@ export default {
     walletID: string = '',
     items: TransactionOutput[] = [],
     description: string = '',
-    password: string = ''
+    password: string = '',
+    fee: string = '0'
   ) => {
     walletsCall.sendCapacity({
       id,
@@ -21,7 +22,7 @@ export default {
         capacity: CKBToShannonFormatter(item.amount, item.unit),
       })),
       password,
-      fee: '0',
+      fee,
       description,
     })
     return {

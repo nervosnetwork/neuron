@@ -15,6 +15,7 @@ const appState: State.App = {
       },
     ],
     price: '0',
+    cycles: '0',
     description: '',
     loading: false,
   },

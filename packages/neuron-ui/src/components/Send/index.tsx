@@ -22,7 +22,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, CapacityUnit } from 'utils/const'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter, priceToFee } from 'utils/formatters'
 
 import { useInitialize } from './hooks'
 
@@ -160,7 +160,12 @@ const Send = ({
         </Stack>
       </Stack>
 
-      <TransactionFeePanel fee="10" cycles="10" price={send.price} onPriceChange={updateTransactionPrice} />
+      <TransactionFeePanel
+        fee={shannonToCKBFormatter(priceToFee(send.price, send.cycles))}
+        cycles={send.cycles}
+        price={send.price}
+        onPriceChange={updateTransactionPrice}
+      />
 
       <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 20 }}>
         <Stack.Item styles={{ root: { width: labelWidth } }}>
