@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Stack,
   Text,
-  DetailsList,
+  ShimmeredDetailsList,
   TextField,
   IColumn,
   IGroup,
@@ -52,10 +52,22 @@ const onRenderHeader = ({ group }: any) => {
   )
 }
 
-const TransactionList = ({ items = [] }: { walletID: string; items: State.Transaction[]; dispatch: StateDispatch }) => {
+const TransactionList = ({
+  isLoading = false,
+  items = [],
+  walletID,
+  dispatch,
+}: {
+  isLoading: boolean
+  walletID: string
+  items: State.Transaction[]
+  dispatch: StateDispatch
+}) => {
   const [t] = useTranslation()
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
+    'transaction',
+    walletID,
     useMemo(
       () =>
         items.map(({ hash: key, description = '' }) => ({
@@ -63,7 +75,8 @@ const TransactionList = ({ items = [] }: { walletID: string; items: State.Transa
           description,
         })),
       [items]
-    )
+    ),
+    dispatch
   )
 
   const transactionColumns: IColumn[] = useMemo(
@@ -104,14 +117,16 @@ const TransactionList = ({ items = [] }: { walletID: string; items: State.Transa
           fieldName: 'description',
           minWidth: MIN_CELL_WIDTH,
           maxWidth: 200,
-          onRender: (item?: FormatTransaction, idx?: number) => {
-            return item && undefined !== idx ? (
+          onRender: (item?: FormatTransaction) => {
+            return item ? (
               <TextField
                 title={item.description}
-                value={localDescription[idx] || ''}
-                onKeyPress={onDescriptionPress(idx)}
-                onBlur={onDescriptionFieldBlur(idx)}
-                onChange={onDescriptionChange(idx)}
+                value={
+                  (localDescription.find(local => local.key === item.hash) || { description: '' }).description || ''
+                }
+                onKeyPress={onDescriptionPress(item.hash)}
+                onBlur={onDescriptionFieldBlur(item.hash)}
+                onChange={onDescriptionChange(item.hash)}
                 borderless
                 styles={(props: ITextFieldStyleProps) => {
                   return {
@@ -180,7 +195,8 @@ const TransactionList = ({ items = [] }: { walletID: string; items: State.Transa
   }, [items])
 
   return (
-    <DetailsList
+    <ShimmeredDetailsList
+      enableShimmer={isLoading}
       columns={transactionColumns}
       items={txs}
       groups={groups.filter(group => group.count !== 0)}
@@ -192,20 +208,6 @@ const TransactionList = ({ items = [] }: { walletID: string; items: State.Transa
         if (item) {
           contextMenu({ type: 'transactionList', id: item.hash })
         }
-      }}
-      styles={{
-        contentWrapper: {
-          selectors: {
-            '.ms-DetailsRow-cell': {
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '.text-overflow': {
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            },
-          },
-        },
       }}
     />
   )

@@ -21,7 +21,7 @@ export const getTransaction = controllerMethodWrapper(CONTROLLER_NAME)(
   }
 )
 export const updateTransactionDescription = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: { hash: string; description: string }) => {
+  controller => (params: Controller.UpdateTransactionDescriptionParams) => {
     return controller.updateDescription(params)
   }
 )

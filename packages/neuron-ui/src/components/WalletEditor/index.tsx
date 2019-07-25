@@ -43,7 +43,7 @@ const WalletEditor = ({
 
   const inputs = useInputs(editor)
   const areParamsValid = useAreParamsValid(editor.name.value)
-  const onConfirm = useOnConfirm(editor.name.value, wallet.id, dispatch)
+  const onConfirm = useOnConfirm(editor.name.value, wallet.id, history, dispatch)
   const goBack = useGoBack(history)
 
   if (!wallet.id) {

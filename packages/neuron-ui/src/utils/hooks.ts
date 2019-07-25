@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { updateTransactionDescription } from 'services/remote'
+import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -7,45 +8,68 @@ export const useGoBack = (history: any) => {
   }, [history])
 }
 
-export const useLocalDescription = (owners: { key: string; description: string }[]) => {
-  const [localDescription, setLocalDescription] = useState<string[]>([])
+export const useLocalDescription = (
+  type: 'address' | 'transaction',
+  walletID: string,
+  owners: { key: string; description: string }[],
+  dispatch: StateDispatch
+) => {
+  const [localDescription, setLocalDescription] = useState<{ description: string; key: string }[]>([])
 
   useEffect(() => {
-    setLocalDescription(owners.map(owner => owner.description))
-  }, [owners])
+    setLocalDescription(
+      owners.map(owner => {
+        const local = localDescription.find(localDesc => localDesc.key === owner.key)
+        if (local && local.description) {
+          return local
+        }
+        return owner
+      })
+    )
+  }, [owners, localDescription])
 
   const submitDescription = useCallback(
-    (idx: number) => {
-      if (owners[idx].description === localDescription[idx]) {
+    (key: string) => {
+      const ownerDesc = owners.find(owner => owner.key === key)
+      const localDesc = localDescription.find(local => local.key === key)
+      if (ownerDesc && localDesc && ownerDesc.description === localDesc.description) {
         return
       }
-      updateTransactionDescription({
-        hash: owners[idx].key,
-        description: localDescription[idx],
-      })
+      if (localDesc && type === 'transaction') {
+        updateTransactionDescription({
+          hash: key,
+          description: localDesc.description,
+        })(dispatch)
+      }
+      if (localDesc && type === 'address') {
+        updateAddressDescription({
+          walletID,
+          address: key,
+          description: localDesc.description,
+        })(dispatch)
+      }
     },
-    [localDescription, owners]
+    [type, walletID, localDescription, owners, dispatch]
   )
 
   const onDescriptionFieldBlur = useCallback(
-    (idx: number): React.FocusEventHandler => () => {
-      submitDescription(idx)
+    (key: string): React.FocusEventHandler => () => {
+      submitDescription(key)
     },
     [submitDescription]
   )
   const onDescriptionPress = useCallback(
-    (idx: number) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (key: string) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (e.key && e.key === 'Enter') {
-        submitDescription(idx)
+        submitDescription(key)
       }
     },
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
-    (idx: number) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+    (key: string) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
       if (undefined !== value) {
-        const newDesc = [...localDescription]
-        newDesc[idx] = value
+        const newDesc = [...localDescription].map(desc => (desc.key === key ? { key, description: value } : desc))
         setLocalDescription(newDesc)
       }
     },

@@ -32,6 +32,11 @@ const appState: State.App = {
     wizard: null,
   },
   notifications: [],
+  loadings: {
+    sending: false,
+    addressList: false,
+    transactionList: false,
+  },
 }
 
 export default appState

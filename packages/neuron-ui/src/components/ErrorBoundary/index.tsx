@@ -4,9 +4,7 @@ import { handleViewError } from 'services/remote'
 
 const handleError = (error: Error) => {
   handleViewError(error.toString())
-  setTimeout(() => {
-    window.location.reload()
-  }, 0)
+  window.location.reload()
   return { hasError: true }
 }
 

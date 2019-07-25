@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { updateWallet } from 'states/stateProvider/actionCreators'
+import { updateWalletProperty } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import i18n from 'utils/i18n'
 
@@ -35,13 +35,13 @@ export const useInputs = ({ name }: ReturnType<typeof useWalletEditor>) => {
   )
 }
 
-export const useOnConfirm = (name: string = '', id: string = '', dispatch: StateDispatch) => {
+export const useOnConfirm = (name: string = '', id: string = '', history: any, dispatch: StateDispatch) => {
   return useCallback(() => {
-    updateWallet({
+    updateWalletProperty({
       id,
       name,
-    })(dispatch)
-  }, [name, id, dispatch])
+    })(dispatch, history)
+  }, [name, id, history, dispatch])
 }
 
 export const useAreParamsValid = (name: string) => {

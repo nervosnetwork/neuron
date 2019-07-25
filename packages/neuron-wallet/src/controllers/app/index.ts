@@ -1,59 +1,26 @@
 import path from 'path'
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
-import { take } from 'rxjs/operators'
-import systemScriptSubject from '../../models/subjects/system-script'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
 import TransactionsController from '../transactions'
 import WalletsService from '../../services/wallets'
-import NodeService from '../../services/node'
 import WalletsController from '../wallets'
-import SyncInfoController from '../sync-info'
 
 import { Controller as ControllerDecorator } from '../../decorators'
-import { Channel } from '../../utils/const'
+import { Channel, ResponseCode } from '../../utils/const'
 import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
 import CommandSubject from '../../models/subjects/command'
 
-const nodeService = NodeService.getInstance()
-
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
-    const [
-      currentWallet = null,
-      wallets = [],
-      tipNumber = '0',
-      connectionStatus = false,
-      codeHash = '',
-    ] = await Promise.all([
+    const [currentWallet = null, wallets = []] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
-      SyncInfoController.currentBlockNumber()
-        .then(res => {
-          if (res.status) {
-            return res.result.currentBlockNumber
-          }
-          return '0'
-        })
-        .catch(() => '0'),
-      new Promise(resolve => {
-        nodeService.connectionStatusSubject.pipe(take(1)).subscribe(
-          status => {
-            resolve(status)
-          },
-          () => {
-            resolve(false)
-          }
-        )
-      }),
-      new Promise(resolve => {
-        systemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
-      }),
     ])
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
@@ -76,11 +43,8 @@ export default class AppController {
       addresses,
       transactions,
       locale,
-      tipNumber,
-      connectionStatus,
-      codeHash,
     }
-    return initState
+    return { status: ResponseCode.Success, result: initState }
   }
 
   public static handleViewError = (error: string) => {

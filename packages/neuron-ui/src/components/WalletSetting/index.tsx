@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { activateWallet } from 'states/stateProvider/actionCreators'
+import { setCurrentWallet } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 
@@ -32,7 +32,7 @@ const WalletSetting = ({
   const onChange = useCallback(
     (_e, option) => {
       if (option) {
-        activateWallet(option.key)(dispatch)
+        setCurrentWallet(option.key)(dispatch)
       }
     },
     [dispatch]

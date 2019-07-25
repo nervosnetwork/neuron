@@ -88,7 +88,9 @@ const Footer = ({
       horizontalAlign="space-between"
       verticalFill
       verticalAlign="center"
-      padding="0 15px"
+      tokens={{
+        padding: '0 15px',
+      }}
       styles={stackStyles}
     >
       <Stack.Item styles={stackItemStyles}>

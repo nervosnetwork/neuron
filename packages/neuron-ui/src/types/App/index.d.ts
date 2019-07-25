@@ -75,6 +75,11 @@ declare namespace State {
       [index: string]: Message | null
     }
     notifications: Message[]
+    loadings: {
+      sending: boolean
+      addressList: boolean
+      transactionList: boolean
+    }
   }
 
   interface NetworkProperty {
@@ -104,7 +109,6 @@ declare namespace State {
   interface Wallet extends WalletIdentity {
     balance: string
     addresses: Address[]
-    sending: boolean
   }
 
   interface Chain {

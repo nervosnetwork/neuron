@@ -7,7 +7,6 @@ export const walletState: State.Wallet = {
   id: wallet.id || '',
   balance: '0',
   addresses: addresses.load(),
-  sending: false,
 }
 
 export default walletState

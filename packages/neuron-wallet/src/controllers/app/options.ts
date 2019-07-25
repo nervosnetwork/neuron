@@ -121,7 +121,7 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.backup'),
         click: async () => {
-          walletsService.requestPassword(id, 'backup')
+          walletsService.requestPassword(id, 'backupWallet')
         },
       },
       {
@@ -133,7 +133,7 @@ export const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.delete'),
         click: async () => {
-          walletsService.requestPassword(id, 'delete')
+          walletsService.requestPassword(id, 'deleteWallet')
         },
       },
     ]

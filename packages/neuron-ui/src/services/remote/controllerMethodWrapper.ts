@@ -28,7 +28,7 @@ export const controllerNotLoaded = (controllerName: string) => ({
 
 export const controllerMethodWrapper = (controllerName: string) => (
   callControllerMethod: (controller: any) => (params: any) => Promise<{ status: any; result: any; msg: string }>
-) => async (realParams: any): Promise<ControllerResponse> => {
+) => async (realParams?: any): Promise<ControllerResponse> => {
   if (!window.remote) {
     return RemoteNotLoadError
   }
@@ -37,6 +37,13 @@ export const controllerMethodWrapper = (controllerName: string) => (
     return controllerNotLoaded(controllerName)
   }
   const res = await callControllerMethod(controller)(realParams)
+  if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
+    /* eslint-disable no-console */
+    console.group(`${controllerName} controller`)
+    console.info(JSON.stringify(res, null, 2))
+    console.groupEnd()
+    /* eslint-enable no-console */
+  }
   if (!res) {
     return {
       status: 1,
@@ -51,7 +58,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
   }
   return {
     status: 0,
-    message: res.status.msg || '',
+    message: { title: (res && res.msg) || '' },
   }
 }
 

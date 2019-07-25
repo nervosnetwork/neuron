@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { createNetwork, updateNetwork } from 'services/remote'
-import { Message, MAX_NETWORK_NAME_LENGTH, Routes } from 'utils/const'
+import { createNetwork, updateNetwork } from 'states/stateProvider/actionCreators'
+
+import { Message, MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 
 import i18n from 'utils/i18n'
 
@@ -129,7 +130,6 @@ export const useHandleSubmit = (
       timestamp: Date.now(),
       content: '',
     }
-    let res
     if (!name) {
       return dispatch({
         type: AppActions.AddNotification,
@@ -179,32 +179,27 @@ export const useHandleSubmit = (
           },
         })
       }
-      res = await createNetwork({
+      return createNetwork({
         name,
         remote,
-      })
-    } else {
-      if (networks.some(network => network.name === name && network.id !== id)) {
-        return dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            ...warning,
-            content: i18n.t(Message.NetworkNameUsed),
-          },
-        })
-      }
-      res = await updateNetwork({
-        networkID: id!,
-        options: {
-          name,
-          remote,
+      })(dispatch, history)
+    }
+    if (networks.some(network => network.name === name && network.id !== id)) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.NetworkNameUsed),
         },
       })
     }
-    if (res && res.status) {
-      history.push(Routes.SettingsNetworks)
-    }
-    return res
+    return updateNetwork({
+      networkID: id!,
+      options: {
+        name,
+        remote,
+      },
+    })(dispatch, history)
   }, [id, name, remote, networks, history, dispatch])
 
 export default {

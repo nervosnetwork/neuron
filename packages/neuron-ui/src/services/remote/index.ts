@@ -1,6 +1,15 @@
 export * from './app'
+export * from './wallets'
 export * from './networks'
 export * from './transactions'
+
+export const getLocale = () => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return window.navigator.language
+  }
+  return window.remote.require('electron').app.getLocale()
+}
 
 export const getWinID = () => {
   if (!window.remote) {
@@ -8,14 +17,6 @@ export const getWinID = () => {
     return -1
   }
   return window.remote.getCurrentWindow().id
-}
-export const initWindow = () => {
-  if (!window.remote) {
-    console.warn('remote is not supported')
-    return Promise.reject(new Error('remote is not supported'))
-  }
-  const appController = window.remote.require('./controllers/app').default
-  return appController.getInitState()
 }
 
 export const validateMnemonic = (mnemonic: string): boolean => {
@@ -55,7 +56,7 @@ export const showErrorMessage = (title: string, content: string) => {
 }
 
 export default {
-  initWindow,
+  getLocale,
   validateMnemonic,
   generateMnemonic,
   showMessage,

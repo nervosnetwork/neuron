@@ -1,11 +1,17 @@
 import { useEffect } from 'react'
 
-import { WalletWizardPath } from 'components/WalletWizard'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
-import { toggleAddressBook, updateTransactionList, updateTransaction } from 'states/stateProvider/actionCreators'
+import {
+  toggleAddressBook,
+  updateTransactionList,
+  updateTransaction,
+  updateCurrentWallet,
+  updateWalletList,
+  updateAddressList,
+  initAppState,
+} from 'states/stateProvider/actionCreators'
 
-import UILayer, { WalletsMethod, walletsCall } from 'services/UILayer'
-import { initWindow, getWinID } from 'services/remote'
+import { getWinID } from 'services/remote'
 import {
   SystemScript as SystemScriptSubject,
   DataUpdate as DataUpdateSubject,
@@ -16,137 +22,16 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
-import { Routes, Channel, ConnectionStatus } from 'utils/const'
+import { Routes, ConnectionStatus } from 'utils/const'
+import { WalletWizardPath } from 'components/WalletWizard'
 import {
-  wallets as walletsCache,
   networks as networksCache,
-  addresses as addressesCache,
   currentNetworkID as currentNetworkIDCache,
-  currentWallet as currentWalletCache,
   systemScript as systemScriptCache,
 } from 'utils/localCache'
-import addressesToBalance from 'utils/addressesToBalance'
-import initializeApp from 'utils/initializeApp'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 10000
-
-export const useChannelListeners = ({
-  walletID,
-  chain,
-  dispatch,
-  history,
-  i18n,
-}: {
-  walletID: string
-  chain: State.Chain
-  dispatch: StateDispatch
-  history: any
-  i18n: any
-}) =>
-  useEffect(() => {
-    UILayer.on(Channel.Wallets, (_e: Event, method: WalletsMethod, args: ChannelResponse<any>) => {
-      if (args.status) {
-        switch (method) {
-          case WalletsMethod.Create:
-          case WalletsMethod.ImportMnemonic:
-          case WalletsMethod.Update: {
-            let template = ''
-            if (method === WalletsMethod.Create) {
-              template = 'messages.wallet-created-successfully'
-            } else if (method === WalletsMethod.Update) {
-              template = 'messages.wallet-updated-successfully'
-            } else {
-              template = 'messages.wallet-imported-successfully'
-            }
-            const content = i18n.t(template, { name: args.result.name })
-            dispatch({
-              type: AppActions.AddNotification,
-              payload: {
-                type: 'success',
-                content,
-                timestamp: Date.now(),
-              },
-            })
-            history.push(Routes.Overview)
-            break
-          }
-          case WalletsMethod.GetAll: {
-            dispatch({
-              type: NeuronWalletActions.Settings,
-              payload: { wallets: args.result },
-            })
-            walletsCache.save(args.result)
-            break
-          }
-          case WalletsMethod.GetCurrent: {
-            dispatch({
-              type: NeuronWalletActions.Wallet,
-              payload: args.result,
-            })
-            currentWalletCache.save(args.result)
-            break
-          }
-          case WalletsMethod.SendCapacity: {
-            if (args.result) {
-              history.push(Routes.History)
-            }
-            break
-          }
-          case WalletsMethod.SendingStatus: {
-            dispatch({
-              type: NeuronWalletActions.Wallet,
-              payload: {
-                sending: args.result,
-              },
-            })
-            break
-          }
-          case WalletsMethod.GetAllAddresses: {
-            const addresses = args.result || []
-            dispatch({
-              type: NeuronWalletActions.Wallet,
-              payload: {
-                addresses,
-                balance: addressesToBalance(addresses),
-              },
-            })
-            addressesCache.save(addresses)
-            break
-          }
-          case WalletsMethod.RequestPassword: {
-            dispatch({
-              type: AppActions.RequestPassword,
-              payload: {
-                walletID: args.result.walletID || '',
-                actionType: args.result.actionType || '',
-              },
-            })
-            break
-          }
-          default: {
-            break
-          }
-        }
-      } else {
-        if (!args.msg) {
-          return
-        }
-        if (method === WalletsMethod.GetCurrent) {
-          return
-        }
-        const { content } = typeof args.msg === 'string' ? { content: args.msg } : args.msg || { content: '' }
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            type: 'alert',
-            content,
-            timestamp: Date.now(),
-          },
-        })
-      }
-    })
-  }, [walletID, i18n, chain, dispatch, history])
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
@@ -203,8 +88,6 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
 
 export const useOnCurrentWalletChange = ({
   walletID,
-  chain,
-  i18n,
   history,
   dispatch,
 }: {
@@ -215,32 +98,14 @@ export const useOnCurrentWalletChange = ({
 
   dispatch: StateDispatch
 }) => {
-  const { pageNo, pageSize } = chain.transactions
   useEffect(() => {
     if (walletID) {
-      walletsCall.getAllAddresses(walletID)
-      updateTransactionList({
-        walletID,
-        keywords: '',
-        pageNo,
-        pageSize,
-      })(dispatch)
+      initAppState()(dispatch, history)
     } else {
-      initWindow()
-        .then((initializedState: any) => {
-          initializeApp({
-            initializedState,
-            i18n,
-            history,
-            dispatch,
-          })
-        })
-        .catch((err: Error) => {
-          console.error(err)
-          history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-        })
+      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+      initAppState()(dispatch, history)
     }
-  }, [walletID, pageNo, pageSize, dispatch, i18n, history])
+  }, [walletID, dispatch, history])
 }
 
 export const useSubscription = ({
@@ -270,7 +135,7 @@ export const useSubscription = ({
       }
       switch (dataType) {
         case 'address': {
-          walletsCall.getAllAddresses(walletID)
+          updateAddressList(walletID)(dispatch)
           break
         }
         case 'transaction': {
@@ -284,8 +149,8 @@ export const useSubscription = ({
           break
         }
         case 'wallet': {
-          walletsCall.getAll()
-          walletsCall.getCurrent()
+          updateWalletList()(dispatch)
+          updateCurrentWallet()(dispatch)
           break
         }
         default: {
@@ -321,7 +186,7 @@ export const useSubscription = ({
       })
     })
     const commandSubscription = CommandSubject.subscribe(
-      ({ winID, type, payload }: { winID: number; type: 'nav' | 'toggleAddressBook'; payload: string | null }) => {
+      ({ winID, type, payload }: { winID: number; type: Command.Type; payload: Command.payload }) => {
         if (getWinID() === winID) {
           switch (type) {
             case 'nav': {
@@ -330,6 +195,26 @@ export const useSubscription = ({
             }
             case 'toggleAddressBook': {
               dispatch(toggleAddressBook())
+              break
+            }
+            case 'deleteWallet': {
+              dispatch({
+                type: AppActions.RequestPassword,
+                payload: {
+                  walletID: payload || '',
+                  actionType: 'delete',
+                },
+              })
+              break
+            }
+            case 'backupWallet': {
+              dispatch({
+                type: AppActions.RequestPassword,
+                payload: {
+                  walletID: payload || '',
+                  actionType: 'backup',
+                },
+              })
               break
             }
             default: {
@@ -352,7 +237,6 @@ export const useSubscription = ({
 }
 
 export default {
-  useChannelListeners,
   useSyncChainData,
   useOnCurrentWalletChange,
   useSubscription,

@@ -7,13 +7,13 @@ export const setCurrentNetowrk = controllerMethodWrapper(CONTROLLER_NAME)((contr
 })
 
 export const createNetwork = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => ({ name, remote }: { name: string; remote: string }) => {
-    return controller.create({ name, remote })
+  controller => (params: Controller.CreateNetworkParams) => {
+    return controller.create(params)
   }
 )
 
 export const updateNetwork = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => ({ networkID, options }: { networkID: string; options: Partial<{ name: string; remote: string }> }) => {
+  controller => ({ networkID, options }: Controller.UpdateNetworkParams) => {
     return controller.update(networkID, options)
   }
 )

@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
+import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, Modal, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
 import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
-import { priceToFee } from 'utils/formatters'
+import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
+import { priceToFee, CKBToShannonFormatter } from 'utils/formatters'
 
 const PasswordRequest = ({
   app: {
@@ -11,8 +12,9 @@ const PasswordRequest = ({
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
   settings: { wallets = [] },
+  history,
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch>) => {
+}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
   const onDismiss = useCallback(() => {
@@ -25,14 +27,38 @@ const PasswordRequest = ({
   const onConfirm = useCallback(() => {
     switch (actionType) {
       case 'send': {
-        submitTransaction(txID, walletID, outputs, description, password, priceToFee(price, cycles))(dispatch)
+        sendTransaction({
+          id: txID,
+          walletID,
+          items: outputs.map(output => ({
+            address: output.address,
+            capacity: CKBToShannonFormatter(output.amount, output.unit),
+          })),
+          description,
+          password,
+          fee: priceToFee(price, cycles),
+        })(dispatch, history)
+        break
+      }
+      case 'delete': {
+        deleteWallet({
+          id: walletID,
+          password,
+        })(dispatch)
+        break
+      }
+      case 'backup': {
+        backupWallet({
+          id: walletID,
+          password,
+        })(dispatch)
         break
       }
       default: {
         break
       }
     }
-  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price])
+  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price, history])
 
   const onChange = useCallback(
     (_e, value?: string) => {
