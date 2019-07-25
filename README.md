@@ -1,6 +1,6 @@
 # Neuron
 
-Nervos CKB Wallet
+Nervos CKB Desktop Wallet
 
 [![Azure Pipelines Build Status](https://dev.azure.com/nervosnetwork/neuron/_apis/build/status/nervosnetwork.neuron?branchName=develop)](https://dev.azure.com/nervosnetwork/neuron/_build/latest?definitionId=8&branchName=develop)
 [![TravisCI](https://travis-ci.com/nervosnetwork/neuron.svg?branch=develop)](https://travis-ci.com/nervosnetwork/neuron)
@@ -14,21 +14,19 @@ Nervos CKB Wallet
 
 You will need `node >= 12` and `yarn >= 1.14` to build and run Neuron.
 
-Please be noted that Neuron depends on [node-gyp](https://github.com/nodejs/node-gyp) to build native NPM modules. Follow [this](https://github.com/nodejs/node-gyp#installation) to install node-gyp dependencies.
-
 #### Lerna
 
-Neuron project uses [lerna](https://github.com/lerna/lerna/) for packages management. It can be installed globally, or locally in the project.
+This project uses [lerna](https://github.com/lerna/lerna/) for package management. It can be installed either globally or locally within the project:
 
 ```sh
 $ yarn global add lerna # install lerna globally
 # or
-$ yarn add lerna --exact --ignore-workspace-root-check # install lerna locally in the project
+$ yarn add lerna --exact --ignore-workspace-root-check # install lerna locally within the project
 ```
 
 #### Install Dependencies
 
-After lerna installed, the dependencies can be installed by
+After lerna has been installed, run this to install and link dependencies:
 
 ```sh
 $ yarn bootstrap
@@ -36,35 +34,41 @@ $ yarn bootstrap
 
 ### Start Neuron
 
-### Start Neuron in development mode
+A local CKB node is required for Neuron wallet to talk to it via RPC APIs and get data. Please follow the [Nervos CKB doc](https://docs.nervos.org/getting-started/introduction) to get CKB node up and running first.
+
+### Start Neuron in Development Mode
 
 ```sh
 $ yarn start
 ```
 
-This command will start two tasks
+This command will start two tasks:
 
-1. start `neuron-ui`, which works for the user interface.
-2. start `neuron-wallet`, works for the wallet functionality.
+1. start `neuron-ui`, which is the React UI layer.
+2. start `neuron-wallet`, which is the core wallet layer.
 
-They are also able to start independently:
+You can also start them independently:
 
 ```sh
 # start neuron-ui at `http://localhost:3000`
-$ cd packages/neuron-ui && yarn start
+$ yarn start:ui
 ```
 
 ```sh
 # start neuron-wallet
-$ cd packages/neuron-wallet && yarn start:dev
+$ yarn start:wallet
 ```
 
 ### Test
 
 ```sh
-# launch the test runner in the watch mode.
+# launch the test runner.
 $ yarn test
 ```
+
+## Download Neuron Binary
+
+If you don't want to bother building from source, you can download a binary from [releases](https://github.com/nervosnetwork/neuron/releases). We offer pre-built binaries for Windows, Linux and macOS.
 
 ## License
 

@@ -1,5 +1,5 @@
 appId: com.nervos.neuron
-copyright: Copyright (C) 2019 Nervos Foundation. All rights reserved
+copyright: Copyright (C) 2019 Nervos Foundation.
 productName: Neuron
 
 asar: true
@@ -30,8 +30,10 @@ files:
     to: "node_modules/escape-string-regexp"
 
 nsis:
+  oneClick: false
   createDesktopShortcut: always
   createStartMenuShortcut: true
+  runAfterFinish: false
 
 dmg:
   sign: false
@@ -39,6 +41,7 @@ dmg:
 win:
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
+  publisherName: Nervos Foundation
   target:
     - target: nsis
       arch:

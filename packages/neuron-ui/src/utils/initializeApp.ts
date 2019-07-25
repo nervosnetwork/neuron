@@ -8,6 +8,7 @@ import {
   currentNetworkID as currentNetworkIDCache,
   currentWallet as currentWalletCache,
   systemScript as systemScriptCache,
+  language as languageCache,
 } from 'utils/localCache'
 import { Routes, ConnectionStatus } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
@@ -25,7 +26,7 @@ const intializeApp = ({
   dispatch: StateDispatch
 }) => {
   const {
-    locale = 'zh-CN',
+    locale = '',
     networks = [],
     currentNetworkID: networkID = '',
     wallets = [],
@@ -36,8 +37,10 @@ const intializeApp = ({
     connectionStatus = false,
     codeHash = '',
   } = initializedState
-  if (locale !== i18n.language) {
-    i18n.changeLanguage(locale)
+  const lng = (locale as string).startsWith('zh') ? 'zh' : 'en'
+  if (lng !== i18n.language) {
+    i18n.changeLanguage(lng)
+    languageCache.save(lng)
   }
   if (wallet && wallet.id) {
     history.push(Routes.Overview)

@@ -15,7 +15,7 @@ import UILayer, {
   networksCall,
 } from 'services/UILayer'
 import { initWindow } from 'services/remote'
-import { systemScript as systemScriptSubject } from 'services/subjects'
+import { SystemScript as SystemScriptSubject, DataUpdate as DataUpdateSubject } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
 import { Routes, Channel, ConnectionStatus } from 'utils/const'
 import {
@@ -46,61 +46,6 @@ export const useChannelListeners = ({
   i18n: any
 }) =>
   useEffect(() => {
-    UILayer.on(
-      Channel.DataUpdate,
-      (
-        _e: Event,
-        _actionType: 'create' | 'update' | 'delete',
-        dataType: 'address' | 'transaction' | 'wallet' | 'network',
-        walletIDOfMessage?: string
-      ) => {
-        if (walletIDOfMessage && walletIDOfMessage !== walletID) {
-          return
-        }
-        switch (dataType) {
-          case 'address': {
-            walletsCall.getAllAddresses(walletID)
-            break
-          }
-          case 'transaction': {
-            transactionsCall.getAllByKeywords({
-              walletID,
-              keywords: chain.transactions.keywords,
-              pageNo: chain.transactions.pageNo,
-              pageSize: chain.transactions.pageSize,
-            })
-            transactionsCall.get(walletID, chain.transaction.hash)
-            break
-          }
-          case 'wallet': {
-            walletsCall.getAll()
-            walletsCall.getCurrent()
-            break
-          }
-          case 'network': {
-            networksCall.getAll()
-            networksCall.currentID()
-            break
-          }
-          default: {
-            walletsCall.getCurrent()
-            walletsCall.getAll()
-            walletsCall.getAllAddresses(walletID)
-            networksCall.currentID()
-            networksCall.getAll()
-            transactionsCall.getAllByKeywords({
-              walletID,
-              keywords: chain.transactions.keywords,
-              pageNo: chain.transactions.pageNo,
-              pageSize: chain.transactions.pageSize,
-            })
-            transactionsCall.get(walletID, chain.transaction.hash)
-            break
-          }
-        }
-      }
-    )
-
     UILayer.on(Channel.App, (_e: Event, method: AppMethod, args: ChannelResponse<any>) => {
       if (args && args.status) {
         switch (method) {
@@ -457,19 +402,64 @@ export const useOnCurrentWalletChange = ({
   }, [walletID, pageNo, pageSize, dispatch, i18n, history])
 }
 
-export const useSubscription = ({ dispatch }: { dispatch: StateDispatch }) => {
+export const useSubscription = ({
+  walletID,
+  chain,
+  dispatch,
+}: {
+  walletID: string
+  chain: State.Chain
+  dispatch: StateDispatch
+}) => {
+  const { pageNo, pageSize, keywords } = chain.transactions
+  const { hash: txHash } = chain.transaction
   useEffect(() => {
-    systemScriptSubject().subscribe(({ codeHash = '' }: { codeHash: string }) => {
+    const systemScriptSubscription = SystemScriptSubject.subscribe(({ codeHash = '' }: { codeHash: string }) => {
       systemScriptCache.save({ codeHash })
       dispatch({
         type: NeuronWalletActions.UpdateCodeHash,
         payload: codeHash,
       })
     })
+    const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
+      if (walletIDOfMessage && walletIDOfMessage !== walletID) {
+        return
+      }
+      switch (dataType) {
+        case 'address': {
+          walletsCall.getAllAddresses(walletID)
+          break
+        }
+        case 'transaction': {
+          transactionsCall.getAllByKeywords({
+            walletID,
+            keywords,
+            pageNo,
+            pageSize,
+          })
+          transactionsCall.get(walletID, txHash)
+          break
+        }
+        case 'wallet': {
+          walletsCall.getAll()
+          walletsCall.getCurrent()
+          break
+        }
+        case 'network': {
+          networksCall.getAll()
+          networksCall.currentID()
+          break
+        }
+        default: {
+          break
+        }
+      }
+    })
     return () => {
-      systemScriptSubject().unsubscribe()
+      systemScriptSubscription.unsubscribe()
+      dataUpdateSubscription.unsubscribe()
     }
-  }, [dispatch])
+  }, [walletID, pageNo, pageSize, keywords, txHash, dispatch])
 }
 
 export default {
