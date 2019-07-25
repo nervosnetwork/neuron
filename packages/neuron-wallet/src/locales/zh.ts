@@ -84,6 +84,7 @@ export default {
       'invalid-mnemonic': '助记词不合法',
       'unsupported-cipher': '不支持的 Cipher',
       'capacity-not-enough': '余额不足',
+      'capacity-too-small': '金额小于最低金额',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型',
     },
     contextMenu: {

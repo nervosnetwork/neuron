@@ -10,7 +10,7 @@ import LockUtils from '../models/lock-utils'
 import { Witness, TransactionWithoutHash, Input } from '../types/cell-types'
 import ConvertTo from '../types/convert-to'
 import Blake2b from '../utils/blake2b'
-import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
+import { WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
@@ -305,7 +305,7 @@ export default class WalletService {
   ) => {
     const wallet = await this.get(walletID)
     if (!wallet) {
-      throw new CurrentWalletNotSet()
+      throw new WalletNotFound(walletID)
     }
 
     if (password === '') {
@@ -320,7 +320,7 @@ export default class WalletService {
 
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: (BigInt(item.capacity) * BigInt(1)).toString(),
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const changeAddress: string = await this.getChangeAddress()

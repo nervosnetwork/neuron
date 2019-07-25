@@ -1,12 +1,13 @@
 import { getConnection, In, ObjectLiteral } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
 import { OutPoint, Transaction, TransactionWithoutHash, Input, Cell, TransactionStatus } from '../types/cell-types'
-import CellsService from './cells'
+import CellsService, { MIN_CELL_CAPACITY } from './cells'
 import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
 import TransactionEntity from '../database/chain/entities/transaction'
 import NodeService from './node'
 import LockUtils from '../models/lock-utils'
+import { CapacityTooSmall } from '../exceptions'
 
 const { core } = NodeService.getInstance()
 
@@ -504,10 +505,14 @@ export default class TransactionsService {
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const { inputs, capacities } = await CellsService.gatherInputs(needCapacities.toString(), lockHashes)
+    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
 
     const outputs: Cell[] = targetOutputs.map(o => {
       const { capacity, address } = o
+
+      if (BigInt(capacity) < minCellCapacity) {
+        throw new CapacityTooSmall()
+      }
 
       const blake160: string = LockUtils.addressToBlake160(address)
 
@@ -522,6 +527,8 @@ export default class TransactionsService {
 
       return output
     })
+
+    const { inputs, capacities } = await CellsService.gatherInputs(needCapacities.toString(), lockHashes, fee)
 
     // change
     if (BigInt(capacities) > needCapacities + BigInt(fee)) {
