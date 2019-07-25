@@ -85,6 +85,7 @@ export default {
       'invalid-mnemonic': 'Mnemonic is invalid',
       'unsupported-cipher': 'Unsupported cipher',
       'capacity-not-enough': 'Capacity is not enough',
+      'capacity-too-small': 'Capacity less than min',
       'should-be-type-of': '{{field}} should be type of {{type}}',
     },
     contextMenu: {

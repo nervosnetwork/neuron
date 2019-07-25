@@ -4,7 +4,7 @@ import { Cell, OutPoint, Input } from '../types/cell-types'
 import { CapacityNotEnough } from '../exceptions'
 import { OutputStatus } from './transactions'
 
-const MIN_CELL_CAPACITY = '40'
+export const MIN_CELL_CAPACITY = '6000000000'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "warn" */
@@ -51,12 +51,18 @@ export default class CellsService {
   // gather inputs for generateTx
   public static gatherInputs = async (
     capacity: string,
-    lockHashes: string[]
+    lockHashes: string[],
+    fee: string = '0'
   ): Promise<{
     inputs: Input[]
     capacities: string
   }> => {
     const capacityInt = BigInt(capacity)
+    const feeInt = BigInt(fee)
+    const totalCapacities: bigint = capacityInt + feeInt
+
+    // use min secp size (without data)
+    const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
     if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
       throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
@@ -92,7 +98,9 @@ export default class CellsService {
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
-      if (inputCapacities > capacityInt) {
+
+      const diff = inputCapacities - totalCapacities
+      if (diff >= minChangeCapacity || diff === BigInt(0)) {
         return false
       }
       return true
