@@ -37,7 +37,7 @@ const intializeApp = ({
     connectionStatus = false,
     codeHash = '',
   } = initializedState
-  const lng = (locale as string).startsWith('zh') ? 'zh' : 'en'
+  const lng = ['zh', 'zh-CN'].includes(locale) ? 'zh' : 'en'
   if (lng !== i18n.language) {
     i18n.changeLanguage(lng)
     languageCache.save(lng)
