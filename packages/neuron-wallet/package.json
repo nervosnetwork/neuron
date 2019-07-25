@@ -30,8 +30,8 @@
     ]
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-core": "0.15.1",
-    "@nervosnetwork/ckb-sdk-utils": "0.15.1",
+    "@nervosnetwork/ckb-sdk-core": "0.16.0",
+    "@nervosnetwork/ckb-sdk-utils": "0.16.0",
     "async": "3.0.1",
     "bn.js": "4.11.8",
     "chalk": "2.4.2",
@@ -47,7 +47,7 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@nervosnetwork/ckb-types": "0.15.1",
+    "@nervosnetwork/ckb-types": "0.16.0",
     "@nervosnetwork/neuron-ui": "0.1.0-alpha.15",
     "@types/async": "3.0.0",
     "@types/electron-devtools-installer": "2.2.0",
