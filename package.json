@@ -29,7 +29,7 @@
     "clean": "lerna run --stream clean",
     "prebuild": "yarn clean",
     "build": "lerna run --stream build",
-    "package": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package.sh",
+    "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "test": "lerna run --parallel test",
     "test:e2e": "yarn build && ./scripts/copy-ui-files.sh && lerna run --parallel test:e2e",
     "lint": "lerna run --stream lint",
