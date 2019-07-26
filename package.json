@@ -9,6 +9,10 @@
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/nervosnetwork/neuron"
+  },
   "license": "MIT",
   "engines": {
     "node": ">= 12.0",
