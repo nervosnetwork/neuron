@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, TextField, TooltipHost, Modal, FontSizes } from 'office-ui-fabric-react'
+import { Stack, Text, TextField, TooltipHost, Modal, FontSizes, IconButton } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
-import { Copy } from 'grommet-icons'
 
 const Receive = ({
   wallet: { addresses = [] },
@@ -50,7 +49,7 @@ const Receive = ({
                 onClick={copyAddress}
                 description={t('receive.prompt')}
               />
-              <Copy onClick={copyAddress} />
+              <IconButton iconProps={{ iconName: 'Copy' }} onClick={copyAddress} />
             </Stack>
           </TooltipHost>
         </Stack>

@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
-import { Scan as ScanIcon } from 'grommet-icons'
+import {
+  TextField,
+  PrimaryButton,
+  DefaultButton,
+  Dialog,
+  DialogFooter,
+  Stack,
+  IconButton,
+} from 'office-ui-fabric-react'
 import jsQR from 'jsqr'
 
 import { showErrorMessage } from 'services/remote'
@@ -103,7 +110,13 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         onKeyPress={() => {}}
         type="button"
       >
-        <ScanIcon />
+        <IconButton
+          iconProps={{ iconName: 'Scan' }}
+          styles={{
+            root: { padding: 0 },
+            flexContainer: { display: 'block', width: '32px' },
+          }}
+        />
       </button>
       <Dialog
         hidden={!open}

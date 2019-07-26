@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import { Stack, Label, TextField, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
-import { Down } from 'grommet-icons'
 import { useTranslation } from 'react-i18next'
-
-import { registerIcons } from 'utils/icons'
 
 interface TransactionFee {
   fee: string
@@ -11,12 +8,6 @@ interface TransactionFee {
   price: string
   onPriceChange: any
 }
-
-registerIcons({
-  icons: {
-    ArrowDown: <Down size="small" />,
-  },
-})
 
 const calculateSpeed = (price: number) => {
   if (price >= 160) {

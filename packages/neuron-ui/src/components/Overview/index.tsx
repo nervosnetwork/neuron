@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Copy } from 'grommet-icons'
 import {
   Stack,
   Text,
@@ -28,13 +27,6 @@ import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
-import { registerIcons } from 'utils/icons'
-
-registerIcons({
-  icons: {
-    Copy: <Copy size="small" />,
-  },
-})
 
 const TITLE_FONT_SIZE = 'xxLarge'
 
@@ -359,7 +351,7 @@ const Overview = ({
                   </Text>
                 </Stack>
                 <Stack horizontalAlign="end">
-                  <ActionButton iconProps={{ iconName: 'Copy' }} onClick={onCopyPubkeyHash}>
+                  <ActionButton iconProps={{ iconName: 'MiniCopy' }} onClick={onCopyPubkeyHash}>
                     {t('overview.copy-pubkey-hash')}
                   </ActionButton>
                 </Stack>

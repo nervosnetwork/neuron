@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, Image, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
-import { FormAdd, FormUpload } from 'grommet-icons'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
 import { Routes, MnemonicAction, BUTTON_GAP } from 'utils/const'
-import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
+import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyWalletSubmission } from 'utils/validators'
 
 export enum WalletWizardPath {
@@ -36,13 +35,6 @@ const submissionInputs = [
   },
   { label: 'confirm-password', key: 'confirmPassword', type: 'password', autoFocus: false },
 ]
-
-registerIcons({
-  icons: {
-    Import: <FormUpload color="white" />,
-    Create: <FormAdd />,
-  },
-})
 
 const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
