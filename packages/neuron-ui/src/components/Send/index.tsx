@@ -13,7 +13,6 @@ import {
   Spinner,
   Separator,
 } from 'office-ui-fabric-react'
-import { AddCircle as AddIcon, SubtractCircle as RemoveIcon } from 'grommet-icons'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
@@ -104,9 +103,11 @@ const Send = ({
 
                   <Stack.Item>
                     {send.outputs.length > 1 ? (
-                      <IconButton text={t('send.remove-this')} onClick={() => removeTransactionOutput(idx)}>
-                        <RemoveIcon color="red" />
-                      </IconButton>
+                      <IconButton
+                        iconProps={{ iconName: 'Remove' }}
+                        text={t('send.remove-this')}
+                        onClick={() => removeTransactionOutput(idx)}
+                      />
                     ) : null}
                   </Stack.Item>
                 </Stack>
@@ -137,9 +138,11 @@ const Send = ({
 
                   <Stack.Item>
                     {idx === send.outputs.length - 1 ? (
-                      <IconButton onClick={() => addTransactionOutput()} ariaLabel={t('send.add-one')}>
-                        <AddIcon />
-                      </IconButton>
+                      <IconButton
+                        iconProps={{ iconName: 'Add' }}
+                        onClick={() => addTransactionOutput()}
+                        ariaLabel={t('send.add-one')}
+                      />
                     ) : null}
                   </Stack.Item>
                 </Stack>
