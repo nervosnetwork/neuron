@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
 
@@ -8,78 +8,66 @@ export const useGoBack = (history: any) => {
   }, [history])
 }
 
-export const useLocalDescription = (
-  type: 'address' | 'transaction',
-  walletID: string,
-  owners: { key: string; description: string }[],
-  dispatch: StateDispatch
-) => {
-  const [localDescription, setLocalDescription] = useState<{ description: string; key: string }[]>([])
-
-  useEffect(() => {
-    setLocalDescription(
-      owners.map(owner => {
-        const local = localDescription.find(localDesc => localDesc.key === owner.key)
-        if (local && local.description) {
-          return local
-        }
-        return owner
-      })
-    )
-  }, [owners, localDescription])
+export const useLocalDescription = (type: 'address' | 'transaction', walletID: string, dispatch: StateDispatch) => {
+  const [localDescription, setLocalDescription] = useState<{ description: string; key: string }>({
+    key: '',
+    description: '',
+  })
 
   const submitDescription = useCallback(
-    (key: string) => {
-      const ownerDesc = owners.find(owner => owner.key === key)
-      const localDesc = localDescription.find(local => local.key === key)
-      if (ownerDesc && localDesc && ownerDesc.description === localDesc.description) {
+    (key: string, originDesc: string) => {
+      if ((key && key !== localDescription.key) || localDescription.description === originDesc) {
         return
       }
-      if (localDesc && type === 'transaction') {
+      if (localDescription.key && type === 'transaction') {
         updateTransactionDescription({
-          hash: key,
-          description: localDesc.description,
+          hash: localDescription.key,
+          description: localDescription.description,
         })(dispatch)
       }
-      if (localDesc && type === 'address') {
+      if (localDescription.key && type === 'address') {
         updateAddressDescription({
           walletID,
-          address: key,
-          description: localDesc.description,
+          address: localDescription.key,
+          description: localDescription.description,
         })(dispatch)
       }
     },
-    [type, walletID, localDescription, owners, dispatch]
+    [type, walletID, localDescription, dispatch]
   )
 
   const onDescriptionFieldBlur = useCallback(
-    (key: string): React.FocusEventHandler => () => {
-      submitDescription(key)
+    (key: string, originDesc: string): React.FocusEventHandler => () => {
+      submitDescription(key, originDesc)
     },
     [submitDescription]
   )
   const onDescriptionPress = useCallback(
-    (key: string) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (key: string, originDesc: string) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (e.key && e.key === 'Enter') {
-        submitDescription(key)
+        submitDescription(key, originDesc)
       }
     },
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
     (key: string) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
-      if (undefined !== value) {
-        const newDesc = [...localDescription].map(desc => (desc.key === key ? { key, description: value } : desc))
-        setLocalDescription(newDesc)
-      }
+      setLocalDescription({
+        key,
+        description: value || '',
+      })
     },
-    [localDescription, setLocalDescription]
+    [setLocalDescription]
   )
+  const onDescriptionFocus = useCallback(() => {
+    setLocalDescription({ key: '', description: '' })
+  }, [setLocalDescription])
   return {
     localDescription,
     onDescriptionFieldBlur,
     onDescriptionPress,
     onDescriptionChange,
+    onDescriptionFocus,
   }
 }
 

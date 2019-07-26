@@ -13,7 +13,7 @@ import { useSearch } from './hooks'
 
 const History = ({
   app: {
-    loadings: { transactionList: isLoading },
+    loadings: { transactionList: isLoading, updateDescription: isUpdatingDescription },
   },
   wallet: { id },
   chain: {
@@ -45,7 +45,13 @@ const History = ({
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
       </Stack>
-      <TransactionList isLoading={isLoading} walletID={id} items={items} dispatch={dispatch} />
+      <TransactionList
+        isLoading={isLoading}
+        isUpdatingDescription={isUpdatingDescription}
+        walletID={id}
+        items={items}
+        dispatch={dispatch}
+      />
       <Pagination
         selectedPageIndex={pageNo - 1}
         pageCount={Math.ceil(totalCount / pageSize)}

@@ -46,30 +46,26 @@ const onRenderHeader = ({ group }: any) => {
 
 const TransactionList = ({
   isLoading = false,
+  isUpdatingDescription = false,
   items = [],
   walletID,
   dispatch,
 }: {
-  isLoading: boolean
+  isLoading?: boolean
+  isUpdatingDescription?: boolean
   walletID: string
   items: State.Transaction[]
   dispatch: StateDispatch
 }) => {
   const [t] = useTranslation()
 
-  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
-    'transaction',
-    walletID,
-    useMemo(
-      () =>
-        items.map(({ hash: key, description = '' }) => ({
-          key,
-          description,
-        })),
-      [items]
-    ),
-    dispatch
-  )
+  const {
+    localDescription,
+    onDescriptionPress,
+    onDescriptionFieldBlur,
+    onDescriptionChange,
+    onDescriptionFocus,
+  } = useLocalDescription('transaction', walletID, dispatch)
 
   const transactionColumns: IColumn[] = useMemo(
     (): IColumn[] =>
@@ -113,12 +109,15 @@ const TransactionList = ({
             return item ? (
               <TextField
                 title={item.description}
-                value={
-                  (localDescription.find(local => local.key === item.hash) || { description: '' }).description || ''
-                }
-                onKeyPress={onDescriptionPress(item.hash)}
-                onBlur={onDescriptionFieldBlur(item.hash)}
+                value={localDescription.key === item.hash ? localDescription.description : item.description || ''}
+                onFocus={onDescriptionFocus}
+                onBlur={onDescriptionFieldBlur(item.hash, item.description)}
+                onKeyPress={onDescriptionPress(item.hash, item.description)}
                 onChange={onDescriptionChange(item.hash)}
+                disabled={localDescription.key === item.hash && isUpdatingDescription}
+                iconProps={{
+                  iconName: localDescription.key === item.hash && isUpdatingDescription ? 'Updating' : '',
+                }}
                 borderless
                 styles={(props: ITextFieldStyleProps) => {
                   return {
@@ -152,7 +151,15 @@ const TransactionList = ({
       ].map(
         (col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, isResizable: true, isCollapsable: false, ...col })
       ),
-    [localDescription, onDescriptionChange, onDescriptionFieldBlur, onDescriptionPress, t]
+    [
+      localDescription,
+      onDescriptionChange,
+      onDescriptionFieldBlur,
+      onDescriptionPress,
+      onDescriptionFocus,
+      isUpdatingDescription,
+      t,
+    ]
   )
 
   const { groups, txs } = useMemo(() => {
