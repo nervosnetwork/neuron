@@ -29,6 +29,9 @@ files:
   - from: "../../node_modules/escape-string-regexp"
     to: "node_modules/escape-string-regexp"
 
+publish:
+  - github
+
 nsis:
   oneClick: false
   createDesktopShortcut: always

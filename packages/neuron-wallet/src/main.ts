@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import 'reflect-metadata'
 import i18n from './utils/i18n'
 import { updateApplicationMenu } from './utils/application-menu'
@@ -46,6 +47,8 @@ app.on('ready', async () => {
   await initConnection()
   createSyncBlockTask()
   openWindow()
+
+  autoUpdater.checkForUpdatesAndNotify()
 })
 
 app.on('activate', openWindow)
