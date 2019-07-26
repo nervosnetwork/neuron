@@ -83,23 +83,26 @@ export const CKBToShannonFormatter = (amount: string, uint: CapacityUnit) => {
 
 export const shannonToCKBFormatter = (shannon: string) => {
   const sign = shannon.startsWith('-') ? '-' : ''
-  const unsignedShannon = shannon.replace(/^-/, '')
-  let unsignedCkbStr = [...unsignedShannon.padStart(8, '0')]
-    .map((char, idx) => {
-      if (idx === Math.max(unsignedShannon.length - 8, 0)) {
-        return `.${char}`
-      }
-      return char
-    })
-    .join('')
-    .replace(/(^0+|\.?0+$)/g, '')
-  if (!unsignedCkbStr) {
-    return '0'
+  const unsignedShannon = shannon.replace(/^-?0*/, '')
+  let unsignedCKB = ''
+  if (unsignedShannon.length <= 8) {
+    unsignedCKB = `0.${unsignedShannon.padStart(8, '0')}`.replace(/\.?0+$/, '')
+  } else {
+    const decimal = `.${unsignedShannon.slice(-8)}`.replace(/\.?0+$/, '')
+    const int = unsignedShannon.slice(0, -8).replace(/\^0+/, '')
+    unsignedCKB = `${(
+      int
+        .split('')
+        .reverse()
+        .join('')
+        .match(/\d{1,3}/g) || ['0']
+    )
+      .join(',')
+      .split('')
+      .reverse()
+      .join('')}${decimal}`
   }
-  if (unsignedCkbStr.startsWith('.')) {
-    unsignedCkbStr = `0${unsignedCkbStr}`
-  }
-  return sign + unsignedCkbStr
+  return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
 }
 
 export const localNumberFormatter = (num: string | number = 0) => {
