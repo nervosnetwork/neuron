@@ -1,10 +1,22 @@
-export const initWindow = () => {
+export * from './app'
+export * from './wallets'
+export * from './networks'
+export * from './transactions'
+
+export const getLocale = () => {
   if (!window.remote) {
     console.warn('remote is not supported')
-    return Promise.reject(new Error('remote is not supported'))
+    return window.navigator.language
   }
-  const appController = window.remote.require('./controllers/app').default
-  return appController.getInitState()
+  return window.remote.require('electron').app.getLocale()
+}
+
+export const getWinID = () => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return -1
+  }
+  return window.remote.getCurrentWindow().id
 }
 
 export const validateMnemonic = (mnemonic: string): boolean => {
@@ -14,6 +26,15 @@ export const validateMnemonic = (mnemonic: string): boolean => {
   }
   const { validateMnemonic: remoteValidateMnemonic } = window.remote.require('./models/keys/mnemonic')
   return remoteValidateMnemonic(mnemonic)
+}
+
+export const generateMnemonic = (): string => {
+  if (!window.remote) {
+    console.warn('remote is not supported')
+    return ''
+  }
+  const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
+  return remoteGenerateMnemonic()
 }
 
 export const showMessage = (options: any, callback: Function) => {
@@ -35,8 +56,10 @@ export const showErrorMessage = (title: string, content: string) => {
 }
 
 export default {
-  initWindow,
+  getLocale,
   validateMnemonic,
+  generateMnemonic,
   showMessage,
   showErrorMessage,
+  getWinID,
 }

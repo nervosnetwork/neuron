@@ -34,6 +34,9 @@ registerIcons({
 })
 
 const History = ({
+  app: {
+    loadings: { transactionList: isLoading },
+  },
   wallet: { id },
   chain: {
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
@@ -64,7 +67,7 @@ const History = ({
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
       </Stack>
-      <TransactionList walletID={id} items={items} dispatch={dispatch} />
+      <TransactionList isLoading={isLoading} walletID={id} items={items} dispatch={dispatch} />
       <Pagination
         selectedPageIndex={pageNo - 1}
         pageCount={Math.ceil(totalCount / pageSize)}

@@ -29,8 +29,7 @@
       "lock-arg": "Lock Arg",
       "address": "Address",
       "code-hash": "Code Hash",
-      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)",
-      "can-not-find-the-default-address": "Cannot find the default address"
+      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -216,7 +215,8 @@
       "no-transactions": "No transactions",
       "error": "Error",
       "invalid-mnemonic": "Invalid mnemonic words",
-      "camera-not-available-or-disabled": "Camera is unavailable or disabled"
+      "camera-not-available-or-disabled": "Camera is unavailable or disabled",
+      "can-not-find-the-default-address": "Cannot find the default address"
     },
     "sync": {
       "syncing": "Syncing",

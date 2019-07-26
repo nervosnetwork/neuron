@@ -1,7 +1,6 @@
 import { ReplaySubject } from 'rxjs'
 import { sampleTime } from 'rxjs/operators'
-import windowManager from '../window-manager'
-import { Channel, ResponseCode } from '../../utils/const'
+import { SyncedBlockNumberSubject } from './node'
 
 export interface CurrentBlockInfo {
   blockNumber: string
@@ -17,10 +16,7 @@ export class CurrentBlockSubject {
 
   static subscribe() {
     CurrentBlockSubject.subject.pipe(sampleTime(500)).subscribe(({ blockNumber }) => {
-      windowManager.broadcast(Channel.Chain, 'tipBlockNumber', {
-        status: ResponseCode.Success,
-        result: blockNumber,
-      })
+      SyncedBlockNumberSubject.next(blockNumber)
     })
   }
 }

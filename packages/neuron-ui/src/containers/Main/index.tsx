@@ -20,7 +20,7 @@ import PasswordRequest from 'components/PasswordRequest'
 
 import { Routes } from 'utils/const'
 
-import { useChannelListeners, useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
+import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 export const mainContents: CustomRouter.Route[] = [
   {
@@ -108,23 +108,17 @@ const MainContent = ({
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
   const {
-    wallet: { id: walletID },
+    wallet: { id: walletID = '' },
     chain,
-    settings: { networks },
+    settings: { networks = [] },
   } = neuronWalletState
   const { networkID } = chain
   const [, i18n] = useTranslation()
-  useChannelListeners({
-    walletID: neuronWalletState.wallet.id,
-    chain: neuronWalletState.chain,
-    dispatch,
-    history,
-    i18n,
-  })
 
   useSubscription({
     walletID,
     chain,
+    history,
     dispatch,
   })
 

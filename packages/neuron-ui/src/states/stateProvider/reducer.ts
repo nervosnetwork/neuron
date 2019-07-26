@@ -1,14 +1,24 @@
-import emptyWalletState from 'states/initStates/wallet'
 import initStates from 'states/initStates'
 
 export enum NeuronWalletActions {
-  Initiate = 'initiate',
-  Chain = 'chain',
-  Wallet = 'wallet',
-  Settings = 'settings',
+  InitiateCurrentWalletAndWalletList = 'initiateCurrentWalletAndWalletList',
   UpdateCodeHash = 'updateCodeHash',
+  // wallets
+  UpdateCurrentWallet = 'updateCurrentWallet',
+  UpdateWalletList = 'updateWalletList',
+  UpdateAddressList = 'updateAddressList',
+  // transactions
+  UpdateTransactionList = 'updateTransactionList',
+  UpdateTransaction = 'updateTransaction',
+  // networks
+  UpdateNetworkList = 'updateNetworkList',
+  UpdateCurrentNetworkID = 'updateCurrentNetworkID',
+  // Connection
+  UpdateConnectionStatus = 'updateConnectionStatus',
+  UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
 }
 export enum AppActions {
+  ToggleAddressBookVisibility = 'toggleAddressBookVisibility',
   UpdateTransactionID = 'updateTransactionID',
   AddSendOutput = 'addSendOutput',
   RemoveSendOutput = 'removeSendOutput',
@@ -28,6 +38,7 @@ export enum AppActions {
   UpdatePassword = 'updatePassword',
   UpdateTipBlockNumber = 'updateTipBlockNumber',
   UpdateChainInfo = 'updateChainInfo',
+  UpdateLoadings = 'updateLoadings',
   Ignore = 'ignore',
 }
 
@@ -41,90 +52,35 @@ export const reducer = (
   { type, payload }: { type: StateActions; payload: any }
 ): State.AppWithNeuronWallet => {
   const { app, wallet, settings, chain } = state
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-action')) {
     /* eslint-disable no-console */
-    console.group()
-    console.info('type', type)
-    console.info('payload', payload)
+    console.group(`type: ${type}`)
+    console.info(payload)
     console.groupEnd()
     /* eslint-enable no-console */
   }
   switch (type) {
     // Actions of Neuron Wallet
-    case NeuronWalletActions.Initiate: {
-      const { networks, networkID, wallets, wallet: incomingWallet } = payload
+    case NeuronWalletActions.InitiateCurrentWalletAndWalletList: {
+      const { wallets, wallet: incomingWallet } = payload
       return {
         ...state,
         wallet: incomingWallet || wallet,
         chain: {
           ...state.chain,
-          networkID,
         },
         settings: {
           ...state.settings,
           wallets,
-          networks,
         },
       }
     }
-    case NeuronWalletActions.Wallet: {
-      if (!payload) {
-        return {
-          ...state,
-          wallet: emptyWalletState,
-        }
-      }
+    case AppActions.ToggleAddressBookVisibility: {
       return {
         ...state,
-        wallet: {
-          ...state.wallet,
-          ...payload,
-        },
-      }
-    }
-    case NeuronWalletActions.Chain: {
-      const newState: State.AppWithNeuronWallet = {
-        ...state,
-        chain: {
-          ...chain,
-          ...payload,
-        },
-      }
-      const pendingTxs = newState.chain.transactions.items
-        .filter(item => item.status === 'pending')
-        .sort((item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt))
-      const determinedTxs = newState.chain.transactions.items
-        .filter(item => item.status !== 'pending')
-        .sort((item1, item2) => +(item2.timestamp || item2.createdAt) - +(item1.timestamp || item1.createdAt))
-      newState.chain.transactions.items = [...pendingTxs, ...determinedTxs]
-      return newState
-    }
-    case NeuronWalletActions.Settings: {
-      if (payload.toggleAddressBook) {
-        return {
-          ...state,
-          settings: {
-            ...settings,
-            showAddressBook: !state.settings.showAddressBook,
-          },
-        }
-      }
-      let currentWalletName = wallet.name
-      if (payload.wallets) {
-        const currentWallet = payload.wallets.find((w: { id: string; name: string }) => w.id === wallet.id)
-        if (currentWallet) {
-          currentWalletName = currentWallet.name
-        }
-      }
-      return {
-        ...state,
-        wallet: {
-          ...wallet,
-          name: currentWalletName,
-        },
         settings: {
           ...settings,
-          ...payload,
+          showAddressBook: !settings.showAddressBook,
         },
       }
     }
@@ -134,6 +90,87 @@ export const reducer = (
         chain: {
           ...chain,
           codeHash: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateCurrentWallet: {
+      return {
+        ...state,
+        wallet: {
+          ...wallet,
+          ...payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateWalletList: {
+      return {
+        ...state,
+        settings: {
+          ...settings,
+          wallets: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateAddressList: {
+      return {
+        ...state,
+        wallet: {
+          ...wallet,
+          addresses: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateTransactionList: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          transactions: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateTransaction: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          transaction: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateNetworkList: {
+      return {
+        ...state,
+        settings: {
+          ...settings,
+          networks: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateCurrentNetworkID: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          networkID: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateConnectionStatus: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          connectionStatus: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateSyncedBlockNumber: {
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          tipBlockNumber: payload,
         },
       }
     }
@@ -378,6 +415,18 @@ export const reducer = (
         chain: {
           ...chain,
           transactions: initStates.chain.transactions,
+        },
+      }
+    }
+    case AppActions.UpdateLoadings: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          loadings: {
+            ...app.loadings,
+            ...payload,
+          },
         },
       }
     }

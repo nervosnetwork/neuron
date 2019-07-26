@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AppActions } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
 import { queryParsers } from 'utils/parser'
 
 const backToTop = () => {
@@ -31,8 +31,7 @@ export const useSearch = (search: string = '', walletID: string = '', dispatch: 
       type: AppActions.CleanTransactions,
       payload: null,
     })
-
-    dispatch(actionCreators.getTransactions({ ...params, keywords: params.keywords, walletID }))
+    updateTransactionList({ ...params, keywords: params.keywords, walletID })(dispatch)
   }, [search, walletID, dispatch])
   return { keywords, onKeywordsChange, setKeywords }
 }

@@ -1,13 +1,15 @@
+import app from './app'
 import wallets from './wallets'
-import networks from './networks'
-import send from './send'
 import transactions from './transactions'
 import settings from './settings'
 
+export * from './app'
+export * from './wallets'
+export * from './transactions'
+export * from './settings'
 export const actionCreators = {
+  ...app,
   ...wallets,
-  ...networks,
-  ...send,
   ...transactions,
   ...settings,
 }

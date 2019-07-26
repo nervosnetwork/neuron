@@ -13,16 +13,6 @@ export enum ConnectionStatus {
   Offline = 'offline',
 }
 
-export enum Channel {
-  NavTo = 'navTo',
-  App = 'app',
-  Chain = 'chain',
-  Networks = 'networks',
-  Transactions = 'transactions',
-  Wallets = 'wallets',
-  Helpers = 'helpers',
-}
-
 export enum Routes {
   Launch = '/',
   Overview = '/overview',

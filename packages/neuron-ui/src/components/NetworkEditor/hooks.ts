@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { createNetwork, updateNetwork } from 'states/stateProvider/actionCreators'
+
+import { Message, MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 
 import i18n from 'utils/i18n'
 
@@ -119,11 +121,86 @@ export const useHandleSubmit = (
   name: string = '',
   remote: string = '',
   networks: State.Network[] = [],
+  history: any,
   dispatch: StateDispatch
 ) =>
-  useCallback(() => {
-    dispatch(actionCreators.createOrUpdateNetwork({ id, name, remote }, networks))
-  }, [id, name, remote, networks, dispatch])
+  useCallback(async () => {
+    const warning = {
+      type: 'warning',
+      timestamp: Date.now(),
+      content: '',
+    }
+    if (!name) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.NameRequired),
+        },
+      })
+    }
+    if (name.length > MAX_NETWORK_NAME_LENGTH) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo, {
+            length: MAX_NETWORK_NAME_LENGTH,
+          }),
+        },
+      })
+    }
+    if (!remote) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.URLRequired),
+        },
+      })
+    }
+    if (!remote.startsWith('http')) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.ProtocolRequired),
+        },
+      })
+    }
+    // verification, for now, only name is unique
+    if (id === 'new') {
+      if (networks.some(network => network.name === name)) {
+        return dispatch({
+          type: AppActions.AddNotification,
+          payload: {
+            ...warning,
+            content: i18n.t(Message.NetworkNameUsed),
+          },
+        })
+      }
+      return createNetwork({
+        name,
+        remote,
+      })(dispatch, history)
+    }
+    if (networks.some(network => network.name === name && network.id !== id)) {
+      return dispatch({
+        type: AppActions.AddNotification,
+        payload: {
+          ...warning,
+          content: i18n.t(Message.NetworkNameUsed),
+        },
+      })
+    }
+    return updateNetwork({
+      networkID: id!,
+      options: {
+        name,
+        remote,
+      },
+    })(dispatch, history)
+  }, [id, name, remote, networks, history, dispatch])
 
 export default {
   useInitialize,

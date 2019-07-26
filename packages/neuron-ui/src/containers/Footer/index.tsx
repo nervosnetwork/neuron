@@ -67,9 +67,9 @@ const Footer = ({
   location: { pathname },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
-    app: { tipBlockNumber },
-    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
-    settings: { networks },
+    app: { tipBlockNumber = '0' },
+    chain: { networkID = '', connectionStatus = ConnectionStatus.Offline, tipBlockNumber: syncedBlockNumber = '0' },
+    settings: { networks = [] },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
 
@@ -88,7 +88,9 @@ const Footer = ({
       horizontalAlign="space-between"
       verticalFill
       verticalAlign="center"
-      padding="0 15px"
+      tokens={{
+        padding: '0 15px',
+      }}
       styles={stackStyles}
     >
       <Stack.Item styles={stackItemStyles}>

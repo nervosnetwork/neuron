@@ -33,8 +33,11 @@ export interface TransactionOutput {
 }
 
 const Send = ({
-  app: { send = appState.send },
-  wallet: { id: walletID = '', sending = false, balance = '' },
+  app: {
+    send = appState.send,
+    loadings: { sending = false },
+  },
+  wallet: { id: walletID = '', balance = '' },
   dispatch,
   history,
   match: {
@@ -61,7 +64,7 @@ const Send = ({
   )
 
   return (
-    <Stack verticalFill tokens={{ childrenGap: 15 }} padding="20px 0 0 0">
+    <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
       <Stack.Item>
         <List
           items={send.outputs || []}

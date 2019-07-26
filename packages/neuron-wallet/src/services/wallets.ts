@@ -17,9 +17,9 @@ import Keychain from '../models/keys/keychain'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { Channel, ResponseCode } from '../utils/const'
-import windowManager from '../models/window-manager'
 import dataUpdateSubject from '../models/subjects/data-update'
+import CommandSubject from '../models/subjects/command'
+import WindowManager from '../models/window-manager'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -412,13 +412,13 @@ export default class WalletService {
     }))
   }
 
-  public requestPassword = (walletID: string, actionType: 'delete' | 'backup') => {
-    windowManager.sendToMainWindow(Channel.Wallets, 'requestPassword', {
-      status: ResponseCode.Success,
-      result: {
-        walletID,
-        actionType,
-      },
-    })
+  public requestPassword = (walletID: string, actionType: 'deleteWallet' | 'backupWallet') => {
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({
+        winID: WindowManager.mainWindow.id,
+        type: actionType,
+        payload: walletID,
+      })
+    }
   }
 }

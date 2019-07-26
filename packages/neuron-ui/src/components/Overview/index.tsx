@@ -22,7 +22,7 @@ import {
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
 import { showErrorMessage } from 'services/remote'
 
@@ -100,7 +100,12 @@ const Overview = ({
   const minerInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '', walletID: id }))
+    updateTransactionList({
+      pageNo: 1,
+      pageSize: PAGE_SIZE,
+      keywords: '',
+      walletID: id,
+    })(dispatch)
   }, [id, dispatch])
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
