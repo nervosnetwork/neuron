@@ -21,6 +21,7 @@ import {
   Scan as ScanIcon,
   Search as SearchIcon,
   SubtractCircle as RemoveIcon,
+  Update as UpdateIcon,
 } from 'grommet-icons'
 
 import 'styles/index.scss'
@@ -76,6 +77,7 @@ registerIcons({
     Leave: <LeaveIcon />,
     Connected: <ConnectedIcon size="small" color="green" />,
     Disconnected: <AlertIcon size="small" color="red" />,
+    Updating: <UpdateIcon size="16px" style={{ animation: 'rotate360 3s linear infinite' }} />,
   },
 })
 

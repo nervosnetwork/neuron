@@ -20,7 +20,7 @@ import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
   app: {
-    loadings: { addressList: isLoading },
+    loadings: { addressList: isLoading, updateDescription: isUpdatingDescription },
   },
   wallet: { addresses = [], id: walletID },
   settings: { showAddressBook = false },
@@ -34,19 +34,13 @@ const Addresses = ({
     }
   }, [showAddressBook, history])
 
-  const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
-    'address',
-    walletID,
-    useMemo(
-      () =>
-        addresses.map(({ address: key = '', description = '' }) => ({
-          key,
-          description,
-        })),
-      [addresses]
-    ),
-    dispatch
-  )
+  const {
+    localDescription,
+    onDescriptionPress,
+    onDescriptionFieldBlur,
+    onDescriptionChange,
+    onDescriptionFocus,
+  } = useLocalDescription('address', walletID, dispatch)
 
   const theme = getTheme()
   const { semanticColors } = theme
@@ -104,12 +98,15 @@ const Addresses = ({
             <TextField
               borderless
               title={item.description}
-              value={
-                (localDescription.find(local => local.key === item.address) || { description: '' }).description || ''
-              }
-              onKeyPress={onDescriptionPress(item.address)}
-              onBlur={onDescriptionFieldBlur(item.address)}
+              value={localDescription.key === item.address ? localDescription.description : item.description || ''}
+              onBlur={onDescriptionFieldBlur(item.address, item.description)}
+              onFocus={onDescriptionFocus}
+              onKeyPress={onDescriptionPress(item.address, item.description)}
               onChange={onDescriptionChange(item.address)}
+              disabled={localDescription.key === item.address && isUpdatingDescription}
+              iconProps={{
+                iconName: localDescription.key === item.address && isUpdatingDescription ? 'Updating' : '',
+              }}
               styles={(props: ITextFieldStyleProps) => {
                 return {
                   root: {
@@ -160,7 +157,16 @@ const Addresses = ({
         },
       },
     ],
-    [onDescriptionChange, localDescription, onDescriptionFieldBlur, onDescriptionPress, t, semanticColors]
+    [
+      onDescriptionChange,
+      localDescription,
+      onDescriptionFieldBlur,
+      onDescriptionPress,
+      onDescriptionFocus,
+      isUpdatingDescription,
+      t,
+      semanticColors,
+    ]
   )
 
   return (

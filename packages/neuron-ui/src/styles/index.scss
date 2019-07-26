@@ -65,3 +65,13 @@ navbar {
     text-overflow: ellipsis
   }
 }
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0)
+  }
+
+  to {
+    transform: rotate(360deg)
+  }
+}

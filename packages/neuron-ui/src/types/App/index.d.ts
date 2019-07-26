@@ -79,6 +79,7 @@ declare namespace State {
       sending: boolean
       addressList: boolean
       transactionList: boolean
+      updateDescription: boolean
     }
   }
 

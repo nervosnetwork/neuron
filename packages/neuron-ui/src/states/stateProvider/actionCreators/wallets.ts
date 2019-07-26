@@ -156,16 +156,31 @@ export const updateAddressList = (params: Controller.GetAddressesByWalletIDParam
 export const updateAddressDescription = (params: Controller.UpdateAddressDescriptionParams) => (
   dispatch: StateDispatch
 ) => {
-  updateRemoteAddressDescription(params).then(res => {
-    if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
-    } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
-    }
+  dispatch({
+    type: AppActions.UpdateLoadings,
+    payload: {
+      updateDescription: true,
+    },
   })
+  updateRemoteAddressDescription(params)
+    .then(res => {
+      if (res.status) {
+        dispatch({
+          type: AppActions.Ignore,
+          payload: null,
+        })
+      } else {
+        addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      }
+    })
+    .finally(() => {
+      dispatch({
+        type: AppActions.UpdateLoadings,
+        payload: {
+          updateDescription: false,
+        },
+      })
+    })
 }
 
 export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch: StateDispatch) => {

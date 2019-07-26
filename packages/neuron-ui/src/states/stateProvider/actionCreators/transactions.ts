@@ -20,19 +20,31 @@ export const updateTransaction = (params: { walletID: string; hash: string }) =>
   })
 }
 export const updateTransactionList = (params: GetTransactionListParams) => (dispatch: StateDispatch) => {
+  getTransactionList(params).then(res => {
+    if (res.status) {
+      dispatch({
+        type: NeuronWalletActions.UpdateTransactionList,
+        payload: res.result,
+      })
+    } else {
+      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+    }
+  })
+}
+
+export const updateTransactionDescription = (params: Controller.UpdateTransactionDescriptionParams) => (
+  dispatch: StateDispatch
+) => {
   dispatch({
     type: AppActions.UpdateLoadings,
     payload: {
-      transactionList: true,
+      updateDescription: true,
     },
   })
-  getTransactionList(params)
+  updateRemoteTransactionDescription(params)
     .then(res => {
       if (res.status) {
-        dispatch({
-          type: NeuronWalletActions.UpdateTransactionList,
-          payload: res.result,
-        })
+        dispatch({ type: AppActions.Ignore, payload: null })
       } else {
         addNotification({ type: 'alert', content: res.message.title })(dispatch)
       }
@@ -41,22 +53,10 @@ export const updateTransactionList = (params: GetTransactionListParams) => (disp
       dispatch({
         type: AppActions.UpdateLoadings,
         payload: {
-          transactionList: false,
+          updateDescription: false,
         },
       })
     })
-}
-
-export const updateTransactionDescription = (params: Controller.UpdateTransactionDescriptionParams) => (
-  dispatch: StateDispatch
-) => {
-  updateRemoteTransactionDescription(params).then(res => {
-    if (res.status) {
-      dispatch({ type: AppActions.Ignore, payload: null })
-    } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
-    }
-  })
 }
 
 export default {
