@@ -32,7 +32,7 @@
       "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)"
     },
     "wizard": {
-      "welcome-to-nervos-ckb": "欢迎使用 Neuron",
+      "welcome-to-nervos-neuron": "欢迎使用 Neuron",
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",
       "import-wallet": "导入钱包",
