@@ -53,3 +53,15 @@ navbar {
 .fixedWidth {
   font-family: monospace;
 }
+
+.listWithDesc {
+  .ms-DetailsRow-cell {
+    display: flex;
+    align-items: center;
+  }
+
+  .text-overflow {
+    overflow: hidden;
+    text-overflow: ellipsis
+  }
+}

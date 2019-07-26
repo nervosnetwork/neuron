@@ -209,6 +209,7 @@ const TransactionList = ({
           contextMenu({ type: 'transactionList', id: item.hash })
         }
       }}
+      className="listWithDesc"
     />
   )
 }

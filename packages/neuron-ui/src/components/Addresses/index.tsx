@@ -173,6 +173,7 @@ const Addresses = ({
       onItemContextMenu={item => {
         contextMenu({ type: 'addressList', id: item.identifier })
       }}
+      className="listWithDesc"
     />
   )
 }
