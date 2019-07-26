@@ -3,12 +3,16 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.16.0-alpha.0",
+  "version": "0.16.0-alpha.1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/nervosnetwork/neuron"
   },
   "main": "dist/main.js",
   "license": "MIT",
@@ -35,6 +39,7 @@
     "async": "3.0.1",
     "bn.js": "4.11.8",
     "chalk": "2.4.2",
+    "electron-updater": "^4.1.2",
     "electron-window-state": "5.0.3",
     "elliptic": "6.4.1",
     "i18next": "15.1.3",
@@ -48,7 +53,7 @@
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "0.16.0",
-    "@nervosnetwork/neuron-ui": "0.16.0-alpha.0",
+    "@nervosnetwork/neuron-ui": "0.16.0-alpha.1",
     "@types/async": "3.0.0",
     "@types/electron-devtools-installer": "2.2.0",
     "@types/elliptic": "6.4.8",

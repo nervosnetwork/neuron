@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { updateTransaction } from 'states/stateProvider/actionCreators'
 import chainState from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter } from 'utils/formatters'
@@ -105,7 +105,7 @@ const Transaction = ({
       type: AppActions.CleanTransaction,
       payload: null,
     })
-    dispatch(actionCreators.getTransaction(walletID, match.params.hash))
+    updateTransaction({ walletID, hash: match.params.hash })(dispatch)
   }, [match.params.hash, dispatch, walletID])
 
   const basicInfoItems = useMemo(

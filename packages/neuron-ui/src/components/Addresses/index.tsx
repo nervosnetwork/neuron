@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  DetailsList,
+  ShimmeredDetailsList,
   TextField,
   IColumn,
   DetailsListLayoutMode,
@@ -11,19 +11,21 @@ import {
   getTheme,
 } from 'office-ui-fabric-react'
 
+import { contextMenu } from 'services/remote'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-
-import { appCalls } from 'services/UILayer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 const Addresses = ({
-  wallet: { id, addresses = [] },
+  app: {
+    loadings: { addressList: isLoading },
+  },
+  wallet: { addresses = [], id: walletID },
   settings: { showAddressBook = false },
-  dispatch,
   history,
+  dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   useEffect(() => {
@@ -34,7 +36,7 @@ const Addresses = ({
 
   const { localDescription, onDescriptionPress, onDescriptionFieldBlur, onDescriptionChange } = useLocalDescription(
     'address',
-    id,
+    walletID,
     useMemo(
       () =>
         addresses.map(({ address: key = '', description = '' }) => ({
@@ -97,15 +99,17 @@ const Addresses = ({
         maxWidth: 350,
         isResizable: true,
         isCollapsible: false,
-        onRender: (item?: State.Address, idx?: number) => {
-          return item && undefined !== idx ? (
+        onRender: (item?: State.Address) => {
+          return item ? (
             <TextField
               borderless
               title={item.description}
-              value={localDescription[idx] || ''}
-              onKeyPress={onDescriptionPress(idx)}
-              onBlur={onDescriptionFieldBlur(idx)}
-              onChange={onDescriptionChange(idx)}
+              value={
+                (localDescription.find(local => local.key === item.address) || { description: '' }).description || ''
+              }
+              onKeyPress={onDescriptionPress(item.address)}
+              onBlur={onDescriptionFieldBlur(item.address)}
+              onChange={onDescriptionChange(item.address)}
               styles={(props: ITextFieldStyleProps) => {
                 return {
                   root: {
@@ -160,27 +164,14 @@ const Addresses = ({
   )
 
   return (
-    <DetailsList
+    <ShimmeredDetailsList
+      enableShimmer={isLoading}
       checkboxVisibility={CheckboxVisibility.hidden}
       layoutMode={DetailsListLayoutMode.justified}
       columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
       items={addresses}
       onItemContextMenu={item => {
-        appCalls.contextMenu({ type: 'addressList', id: item.identifier })
-      }}
-      styles={{
-        contentWrapper: {
-          selectors: {
-            '.ms-DetailsRow-cell': {
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '.text-overflow': {
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            },
-          },
-        },
+        contextMenu({ type: 'addressList', id: item.identifier })
       }}
     />
   )

@@ -4,32 +4,27 @@ import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
 import chainState from 'states/initStates/chain'
-import { appCalls } from 'services/UILayer'
+import { setCurrentNetowrk, contextMenu } from 'services/remote'
 
 import { Routes } from 'utils/const'
 
 const onContextMenu = (id: string = '') => () => {
-  appCalls.contextMenu({ type: 'networkList', id })
+  contextMenu({ type: 'networkList', id })
 }
 
 const NetworkSetting = ({
   chain = chainState,
   settings: { networks = [] },
-  dispatch,
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const onChoiceChange = useCallback(
-    (_e, option?: IChoiceGroupOption) => {
-      if (option) {
-        dispatch(actionCreators.setNetwork(option.key))
-      }
-    },
-    [dispatch]
-  )
+  const onChoiceChange = useCallback((_e, option?: IChoiceGroupOption) => {
+    if (option) {
+      setCurrentNetowrk(option.key)
+    }
+  }, [])
 
   const goToCreateNetwork = useCallback(() => {
     history.push(`${Routes.NetworkEditor}/new`)

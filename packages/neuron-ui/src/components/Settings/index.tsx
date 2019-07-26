@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem, IconButton, Text } from 'office-ui-fabric-react'
-import { FormPreviousLink } from 'grommet-icons'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
@@ -56,9 +55,11 @@ const Settings = ({
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack horizontal>
         <Stack.Item align="center">
-          <IconButton onClick={onLeave} styles={{ root: { marginRight: 20 } }}>
-            <FormPreviousLink />
-          </IconButton>
+          <IconButton
+            iconProps={{ iconName: 'Leave' }}
+            onClick={onLeave}
+            styles={{ root: { marginRight: 20 }, flexContainer: { display: 'block', width: '32px' } }}
+          />
         </Stack.Item>
         <Stack.Item align="center">
           <Text variant="xLarge" as="h1">

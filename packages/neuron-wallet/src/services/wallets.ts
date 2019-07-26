@@ -10,16 +10,16 @@ import LockUtils from '../models/lock-utils'
 import { Witness, TransactionWithoutHash, Input } from '../types/cell-types'
 import ConvertTo from '../types/convert-to'
 import Blake2b from '../utils/blake2b'
-import { CurrentWalletNotSet, WalletNotFound, IsRequired, UsedName } from '../exceptions'
+import { WalletNotFound, IsRequired, UsedName } from '../exceptions'
 import AddressService from './addresses'
 import { Address as AddressInterface } from '../database/address/dao'
 import Keychain from '../models/keys/keychain'
 import AddressDbChangedSubject from '../models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wallets'
-import { Channel, ResponseCode } from '../utils/const'
-import windowManager from '../models/window-manager'
 import dataUpdateSubject from '../models/subjects/data-update'
+import CommandSubject from '../models/subjects/command'
+import WindowManager from '../models/window-manager'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -305,7 +305,7 @@ export default class WalletService {
   ) => {
     const wallet = await this.get(walletID)
     if (!wallet) {
-      throw new CurrentWalletNotSet()
+      throw new WalletNotFound(walletID)
     }
 
     if (password === '') {
@@ -320,7 +320,7 @@ export default class WalletService {
 
     const targetOutputs = items.map(item => ({
       ...item,
-      capacity: (BigInt(item.capacity) * BigInt(1)).toString(),
+      capacity: BigInt(item.capacity).toString(),
     }))
 
     const changeAddress: string = await this.getChangeAddress()
@@ -412,13 +412,13 @@ export default class WalletService {
     }))
   }
 
-  public requestPassword = (walletID: string, actionType: 'delete' | 'backup') => {
-    windowManager.sendToMainWindow(Channel.Wallets, 'requestPassword', {
-      status: ResponseCode.Success,
-      result: {
-        walletID,
-        actionType,
-      },
-    })
+  public requestPassword = (walletID: string, actionType: 'deleteWallet' | 'backupWallet') => {
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({
+        winID: WindowManager.mainWindow.id,
+        type: actionType,
+        payload: walletID,
+      })
+    }
   }
 }

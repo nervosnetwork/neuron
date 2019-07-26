@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, Image, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
-import { FormAdd, FormUpload } from 'grommet-icons'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
+import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
+import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { MnemonicAction, BUTTON_GAP } from 'utils/const'
+import { Routes, MnemonicAction, BUTTON_GAP } from 'utils/const'
+import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyWalletSubmission } from 'utils/validators'
-import { helpersCall, walletsCall } from 'services/UILayer'
-import { validateMnemonic, showErrorMessage } from 'services/remote'
-import { registerIcons, buttonGrommetIconStyles } from 'utils/icons'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -37,15 +36,13 @@ const submissionInputs = [
   { label: 'confirm-password', key: 'confirmPassword', type: 'password', autoFocus: false },
 ]
 
-registerIcons({
-  icons: {
-    Import: <FormUpload color="white" />,
-    Create: <FormAdd />,
-  },
-})
-
-const Welcome = ({ rootPath = '/wizard', history }: WizardElementProps<{ rootPath: string }>) => {
+const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementProps<{ rootPath: string }>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    if (wallets.length) {
+      history.push(Routes.Overview)
+    }
+  }, [wallets, history])
 
   const next = useCallback(
     (link: string) => () => {
@@ -104,18 +101,11 @@ const Mnemonic = ({
 
   useEffect(() => {
     if (type === MnemonicAction.Create) {
-      helpersCall
-        .generateMnemonic()
-        .then((res: string) => {
-          dispatch({
-            type: 'generated',
-            payload: res,
-          })
-        })
-        .catch(err => {
-          console.error(err)
-          history.goBack()
-        })
+      const mnemonic = generateMnemonic()
+      dispatch({
+        type: 'generated',
+        payload: mnemonic,
+      })
     } else {
       dispatch({
         type: 'imported',
@@ -246,11 +236,11 @@ const Submission = ({
       mnemonic: imported,
     }
     if (type === MnemonicAction.Create) {
-      walletsCall.create(p)
+      createWalletWithMnemonic(p)(dispatch, history)
     } else {
-      walletsCall.importMnemonic(p)
+      importWalletWithMnemonic(p)(dispatch, history)
     }
-  }, [type, name, password, imported])
+  }, [type, name, password, imported, history, dispatch])
 
   const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
 

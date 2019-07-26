@@ -2,12 +2,16 @@
   "name": "@nervosnetwork/neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.16.0-alpha.0",
+  "version": "0.16.0-alpha.1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
     "email": "dev@nervos.org",
     "url": "https://github.com/nervosnetwork/neuron"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/nervosnetwork/neuron"
   },
   "license": "MIT",
   "engines": {
@@ -25,7 +29,7 @@
     "clean": "lerna run --stream clean",
     "prebuild": "yarn clean",
     "build": "lerna run --stream build",
-    "package": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/package.sh",
+    "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "test": "lerna run --parallel test",
     "test:e2e": "yarn build && ./scripts/copy-ui-files.sh && lerna run --parallel test:e2e",
     "lint": "lerna run --stream lint",
@@ -45,7 +49,6 @@
     "@typescript-eslint/parser": "1.10.2",
     "concurrently": "4.1.1",
     "cross-env": "5.2.0",
-    "cz-conventional-changelog": "2.1.0",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-config-prettier": "4.3.0",
@@ -62,10 +65,5 @@
     "typescript": "3.5.3",
     "wait-on": "3.3.0"
   },
-  "dependencies": {},
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+  "dependencies": {}
 }

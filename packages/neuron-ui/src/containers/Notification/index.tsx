@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { MessageBar, MessageBarType, IconButton } from 'office-ui-fabric-react'
 import { NeuronWalletContext } from 'states/stateProvider'
 import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
-import { Close } from 'grommet-icons'
 
 const notificationType = (type: 'success' | 'warning' | 'alert') => {
   switch (type) {
@@ -25,9 +24,7 @@ const notificationType = (type: 'success' | 'warning' | 'alert') => {
 }
 
 const DismissButton = ({ onDismiss }: { onDismiss: React.MouseEventHandler<HTMLButtonElement> }) => (
-  <IconButton onClick={onDismiss}>
-    <Close />
-  </IconButton>
+  <IconButton iconProps={{ iconName: 'Dismiss' }} onClick={onDismiss} />
 )
 
 const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {

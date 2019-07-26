@@ -1,39 +1,20 @@
 import React, { useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, SearchBox, getTheme } from 'office-ui-fabric-react'
+import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
-import {
-  Search as SearchIcon,
-  LinkDown as LinkDownIcon,
-  LinkBottom as LinkBottomIcon,
-  LinkTop as LinkTopIcon,
-  LinkUp as LinkUpIcon,
-  FormClose as ClearIcon,
-} from 'grommet-icons'
 
 import TransactionList from 'components/TransactionList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { Routes } from 'utils/const'
-import { registerIcons } from 'utils/icons'
 
 import { useSearch } from './hooks'
 
-const theme = getTheme()
-const { semanticColors } = theme
-registerIcons({
-  icons: {
-    Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
-    FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    NextPage: <LinkDownIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    Clear: <ClearIcon size="16px" />,
-  },
-})
-
 const History = ({
+  app: {
+    loadings: { transactionList: isLoading },
+  },
   wallet: { id },
   chain: {
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
@@ -64,7 +45,7 @@ const History = ({
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
       </Stack>
-      <TransactionList walletID={id} items={items} dispatch={dispatch} />
+      <TransactionList isLoading={isLoading} walletID={id} items={items} dispatch={dispatch} />
       <Pagination
         selectedPageIndex={pageNo - 1}
         pageCount={Math.ceil(totalCount / pageSize)}

@@ -2,8 +2,7 @@ import React, { useCallback, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, getTheme, Text, ProgressIndicator } from 'office-ui-fabric-react'
-import { Alert as AlertIcon, Nodes as ConnectIcon } from 'grommet-icons'
+import { Stack, getTheme, Text, ProgressIndicator, Icon } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectionStatus, FULL_SCREENS, Routes } from 'utils/const'
@@ -56,7 +55,11 @@ export const SyncStatus = ({
 export const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
     <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
-      {online ? <ConnectIcon size="small" color="green" /> : <AlertIcon size="small" color="red" />}
+      <Icon iconName="T" styles={{ root: { display: 'flex', alignItems: 'center' } }} />
+      <Icon
+        iconName={online ? 'Connected' : 'Disconnected'}
+        styles={{ root: { display: 'flex', alignItems: 'center' } }}
+      />
       <Text styles={{ root: [theme.fonts.small] }}>{name}</Text>
     </Stack>
   )
@@ -67,9 +70,9 @@ const Footer = ({
   location: { pathname },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
-    app: { tipBlockNumber },
-    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
-    settings: { networks },
+    app: { tipBlockNumber = '0' },
+    chain: { networkID = '', connectionStatus = ConnectionStatus.Offline, tipBlockNumber: syncedBlockNumber = '0' },
+    settings: { networks = [] },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
 
@@ -88,7 +91,9 @@ const Footer = ({
       horizontalAlign="space-between"
       verticalFill
       verticalAlign="center"
-      padding="0 15px"
+      tokens={{
+        padding: '0 15px',
+      }}
       styles={stackStyles}
     >
       <Stack.Item styles={stackItemStyles}>

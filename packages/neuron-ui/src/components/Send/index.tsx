@@ -13,7 +13,6 @@ import {
   Spinner,
   Separator,
 } from 'office-ui-fabric-react'
-import { AddCircle as AddIcon, SubtractCircle as RemoveIcon } from 'grommet-icons'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
@@ -33,8 +32,11 @@ export interface TransactionOutput {
 }
 
 const Send = ({
-  app: { send = appState.send },
-  wallet: { id: walletID = '', sending = false, balance = '' },
+  app: {
+    send = appState.send,
+    loadings: { sending = false },
+  },
+  wallet: { id: walletID = '', balance = '' },
   dispatch,
   history,
   match: {
@@ -61,7 +63,7 @@ const Send = ({
   )
 
   return (
-    <Stack verticalFill tokens={{ childrenGap: 15 }} padding="20px 0 0 0">
+    <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
       <Stack.Item>
         <List
           items={send.outputs || []}
@@ -101,9 +103,11 @@ const Send = ({
 
                   <Stack.Item>
                     {send.outputs.length > 1 ? (
-                      <IconButton text={t('send.remove-this')} onClick={() => removeTransactionOutput(idx)}>
-                        <RemoveIcon color="red" />
-                      </IconButton>
+                      <IconButton
+                        iconProps={{ iconName: 'Remove' }}
+                        text={t('send.remove-this')}
+                        onClick={() => removeTransactionOutput(idx)}
+                      />
                     ) : null}
                   </Stack.Item>
                 </Stack>
@@ -134,9 +138,11 @@ const Send = ({
 
                   <Stack.Item>
                     {idx === send.outputs.length - 1 ? (
-                      <IconButton onClick={() => addTransactionOutput()} ariaLabel={t('send.add-one')}>
-                        <AddIcon />
-                      </IconButton>
+                      <IconButton
+                        iconProps={{ iconName: 'Add' }}
+                        onClick={() => addTransactionOutput()}
+                        ariaLabel={t('send.add-one')}
+                      />
                     ) : null}
                   </Stack.Item>
                 </Stack>

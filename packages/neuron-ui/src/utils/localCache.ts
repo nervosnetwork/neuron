@@ -6,7 +6,6 @@ export enum LocalCacheKey {
   CurrentWallet = 'currentWallet',
   CurrentNetworkID = 'currentNetworkID',
   SystemScript = 'systemScript',
-  Language = 'lng',
 }
 enum AddressBookVisibility {
   Invisible = '0',
@@ -142,16 +141,6 @@ export const systemScript = {
   },
 }
 
-export const language = {
-  save: (lng: string) => {
-    window.localStorage.setItem(LocalCacheKey.Language, lng)
-    return true
-  },
-  load: () => {
-    return window.localStorage.getItem(LocalCacheKey.Language) || 'en'
-  },
-}
-
 export default {
   LocalCacheKey,
   addressBook,
@@ -161,5 +150,4 @@ export default {
   currentWallet,
   currentNetworkID,
   systemScript,
-  language,
 }

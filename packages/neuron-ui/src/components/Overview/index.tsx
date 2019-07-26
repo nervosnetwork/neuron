@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Copy } from 'grommet-icons'
 import {
   Stack,
   Text,
@@ -22,19 +21,12 @@ import {
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import actionCreators from 'states/stateProvider/actionCreators'
+import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
 import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
-import { registerIcons } from 'utils/icons'
-
-registerIcons({
-  icons: {
-    Copy: <Copy size="small" />,
-  },
-})
 
 const TITLE_FONT_SIZE = 'xxLarge'
 
@@ -100,7 +92,12 @@ const Overview = ({
   const minerInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    dispatch(actionCreators.getTransactions({ pageNo: 1, pageSize: PAGE_SIZE, keywords: '', walletID: id }))
+    updateTransactionList({
+      pageNo: 1,
+      pageSize: PAGE_SIZE,
+      keywords: '',
+      walletID: id,
+    })(dispatch)
   }, [id, dispatch])
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
@@ -354,7 +351,7 @@ const Overview = ({
                   </Text>
                 </Stack>
                 <Stack horizontalAlign="end">
-                  <ActionButton iconProps={{ iconName: 'Copy' }} onClick={onCopyPubkeyHash}>
+                  <ActionButton iconProps={{ iconName: 'MiniCopy' }} onClick={onCopyPubkeyHash}>
                     {t('overview.copy-pubkey-hash')}
                   </ActionButton>
                 </Stack>

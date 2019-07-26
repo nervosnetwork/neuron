@@ -29,8 +29,7 @@
       "lock-arg": "Lock Arg",
       "address": "地址",
       "code-hash": "Code Hash",
-      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)",
-      "can-not-find-the-default-address": "未获得默认地址"
+      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)"
     },
     "wizard": {
       "welcome-to-nervos-ckb": "欢迎使用 Neuron",
@@ -216,8 +215,8 @@
       "no-transactions": "没有交易",
       "error": "错误",
       "invalid-mnemonic": "助记词不合法",
-      "can-not-find-the-default-address": "找不到默认地址",
-      "camera-not-available-or-disabled": "摄像头不可用或被禁用"
+      "camera-not-available-or-disabled": "摄像头不可用或被禁用",
+      "can-not-find-the-default-address": "未获得默认地址"
     },
     "sync": {
       "syncing": "同步中",

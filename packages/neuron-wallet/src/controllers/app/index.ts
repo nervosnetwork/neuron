@@ -1,64 +1,26 @@
 import path from 'path'
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
-import { take } from 'rxjs/operators'
-import systemScriptSubject from '../../models/subjects/system-script'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
 import TransactionsController from '../transactions'
-import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
-import NodeService from '../../services/node'
 import WalletsController from '../wallets'
-import SyncInfoController from '../sync-info'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
 import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
-
-const networksService = NetworksService.getInstance()
-const nodeService = NodeService.getInstance()
+import CommandSubject from '../../models/subjects/command'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
-    const [
-      currentWallet = null,
-      wallets = [],
-      currentNetworkID = '',
-      networks = [],
-      tipNumber = '0',
-      connectionStatus = false,
-      codeHash = '',
-    ] = await Promise.all([
+    const [currentWallet = null, wallets = []] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
-      networksService.getCurrentID(),
-      networksService.getAll(),
-      SyncInfoController.currentBlockNumber()
-        .then(res => {
-          if (res.status) {
-            return res.result.currentBlockNumber
-          }
-          return '0'
-        })
-        .catch(() => '0'),
-      new Promise(resolve => {
-        nodeService.connectionStatusSubject.pipe(take(1)).subscribe(
-          status => {
-            resolve(status)
-          },
-          () => {
-            resolve(false)
-          }
-        )
-      }),
-      new Promise(resolve => {
-        systemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
-      }),
     ])
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
@@ -79,15 +41,10 @@ export default class AppController {
       },
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       addresses,
-      currentNetworkID,
-      networks,
       transactions,
       locale,
-      tipNumber,
-      connectionStatus,
-      codeHash,
     }
-    return initState
+    return { status: ResponseCode.Success, result: initState }
   }
 
   public static handleViewError = (error: string) => {
@@ -108,23 +65,19 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    WindowManager.broadcast(Channel.App, 'toggleAddressBook', {
-      status: ResponseCode.Success,
-    })
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({
+        winID: WindowManager.mainWindow.id,
+        type: 'toggleAddressBook',
+        payload: null,
+      })
+    }
   }
 
   public static navTo(url: string) {
-    WindowManager.sendToMainWindow(Channel.App, 'navTo', {
-      status: ResponseCode.Success,
-      result: url,
-    })
-  }
-
-  public static setUILocale(locale: string) {
-    WindowManager.broadcast(Channel.App, 'setUILocale', {
-      status: ResponseCode.Success,
-      result: locale,
-    })
+    if (WindowManager.mainWindow) {
+      CommandSubject.next({ winID: WindowManager.mainWindow.id, type: 'nav', payload: url })
+    }
   }
 
   public static openExternal(url: string) {

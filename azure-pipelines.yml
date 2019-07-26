@@ -104,8 +104,8 @@ jobs:
     - script: yarn test:e2e
       name: Test
 
-  - job: Package
-    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+  - job: Release
+    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     pool:
       vmImage: 'macos-10.14'
     steps:
@@ -127,8 +127,9 @@ jobs:
       displayName: 'Download Windows Signing Certificate'
       inputs:
         secureFile: Neuron_win.p12
-    - script: yarn package
-      name: Build
+    - script: yarn release
+      name: Release
+      displayName: 'Sign and Release'
       env:
         CSC_LINK: $(macSiginingCertificate.secureFilePath)
         CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
@@ -136,18 +137,4 @@ jobs:
         WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
         APPLE_ID: $(appleId)
         APPLE_ID_PASSWORD: $(appleIdPassword)
-    - task: GitHubRelease@0
-      inputs:
-        gitHubConnection: nervos-bot
-        repositoryName: nervosnetwork/neuron
-        action: edit
-        tag: $(Build.SourceBranchName)
-        assets: |
-          $(Build.SourcesDirectory)/release/*.zip
-          $(Build.SourcesDirectory)/release/*.dmg
-          $(Build.SourcesDirectory)/release/*.exe
-          $(Build.SourcesDirectory)/release/*.deb
-          $(Build.SourcesDirectory)/release/*.AppImage
-        assetUploadMode: replace
-        isPreRelease: true
-        addChangeLog: false
+        GH_TOKEN: $(ghToken)

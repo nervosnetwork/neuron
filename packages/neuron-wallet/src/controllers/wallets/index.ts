@@ -17,7 +17,6 @@ import {
   IncorrectPassword,
 } from '../../exceptions'
 import i18n from '../../utils/i18n'
-import windowManager from '../../models/window-manager'
 import AddressService from '../../services/addresses'
 import WalletCreatedSubject from '../../models/subjects/wallet-created-subject'
 
@@ -342,10 +341,6 @@ export default class WalletsController {
       throw new IsRequired('Parameters')
     }
     try {
-      windowManager.broadcast(Channel.Wallets, 'sendingStatus', {
-        status: ResponseCode.Success,
-        result: true,
-      })
       const walletsService = WalletsService.getInstance()
       const hash = await walletsService.sendCapacity(
         params.walletID,
@@ -361,16 +356,8 @@ export default class WalletsController {
     } catch (err) {
       return {
         status: ResponseCode.Fail,
-        msg: {
-          content: `Error: "${err.message}"`,
-          id: params.id,
-        },
+        msg: `Error: "${err.message}"`,
       }
-    } finally {
-      windowManager.broadcast(Channel.Wallets, 'sendingStatus', {
-        status: ResponseCode.Success,
-        result: false,
-      })
     }
   }
 
