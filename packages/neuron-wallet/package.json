@@ -1,5 +1,5 @@
 {
-  "name": "@nervosnetwork/neuron-wallet",
+  "name": "neuron-wallet",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
@@ -53,7 +53,6 @@
   },
   "devDependencies": {
     "@nervosnetwork/ckb-types": "0.16.0",
-    "@nervosnetwork/neuron-ui": "0.16.0-alpha.2",
     "@types/async": "3.0.0",
     "@types/electron-devtools-installer": "2.2.0",
     "@types/elliptic": "6.4.8",
@@ -65,6 +64,7 @@
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.1.1",
     "lint-staged": "9.2.0",
+    "neuron-ui": "0.16.0-alpha.2",
     "rimraf": "2.6.3",
     "spectron": "7.0.0"
   }
