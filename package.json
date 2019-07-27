@@ -1,5 +1,5 @@
 {
-  "name": "@nervosnetwork/neuron",
+  "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "version": "0.16.0-alpha.2",
