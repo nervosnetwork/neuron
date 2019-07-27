@@ -129,11 +129,12 @@ const Mnemonic = ({
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
+      const trimmedMnemonic = imported.trim().replace(/(\s+|\n+)/g, ' ')
       dispatch({
         type: 'imported',
-        payload: imported.trim().replace(/(\s+|\n+)/g, ' '),
+        payload: trimmedMnemonic,
       })
-      const isMnemonicValid = validateMnemonic(imported)
+      const isMnemonicValid = validateMnemonic(trimmedMnemonic)
       if (isMnemonicValid) {
         history.push(
           `${rootPath}${WalletWizardPath.Submission}/${
