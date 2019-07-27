@@ -216,7 +216,8 @@
       "error": "错误",
       "invalid-mnemonic": "助记词不合法",
       "camera-not-available-or-disabled": "摄像头不可用或被禁用",
-      "can-not-find-the-default-address": "未获得默认地址"
+      "can-not-find-the-default-address": "未获得默认地址",
+      "amount-too-small": "金额应不小于 61 CKB"
     },
     "sync": {
       "syncing": "同步中",
