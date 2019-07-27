@@ -10,6 +10,11 @@ import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listeners/tx-status'
 import Utils from '../../services/sync/utils'
 
+import { register as registerAddressListener } from '../../listeners/address'
+
+// register to listen address updates
+registerAddressListener()
+
 const {
   nodeService,
   addressDbChangedSubject,
