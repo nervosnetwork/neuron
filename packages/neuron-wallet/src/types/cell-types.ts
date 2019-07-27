@@ -75,4 +75,5 @@ export interface CellOutPoint {
 export interface Script {
   args?: string[]
   codeHash?: string | null
+  hashType: string
 }

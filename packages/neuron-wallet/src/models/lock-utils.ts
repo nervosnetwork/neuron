@@ -112,8 +112,8 @@ export default class LockUtils {
     const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
     return core.utils.bech32Address(blake160, {
       prefix,
-      type: core.utils.AddressType.BinIdx,
-      binIdx: core.utils.AddressBinIdx.P2PH,
+      type: core.utils.AddressType.HashIdx,
+      codeHashIndex: '0x00',
     })
   }
 

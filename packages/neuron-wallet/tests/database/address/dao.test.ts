@@ -6,7 +6,7 @@ import AddressDao, { Address } from '../../../src/database/address/dao'
 describe('Address Dao tests', () => {
   const address: Address = {
     walletId: '1',
-    address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -21,7 +21,7 @@ describe('Address Dao tests', () => {
 
   const usedAddress: Address = {
     walletId: '2',
-    address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
     addressIndex: 0,

@@ -19,7 +19,7 @@ describe('LockUtils Test', () => {
       args: ['0x36c329ed630d6ce750712a477543672adab57f4c'],
     },
     lockHash: '0x3dbdeb3538b7abe1b1f85a86b150805728c29b26faceb5051fb6c7f92c346ed8',
-    address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
   }
 
