@@ -4,7 +4,7 @@ import { IDropdownOption } from 'office-ui-fabric-react'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 
 import { Message } from 'utils/const'
-import { verifyAddress } from 'utils/validators'
+import { verifyAddress, verifyAmountRange } from 'utils/validators'
 import { TransactionOutput } from '.'
 
 const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch: StateDispatch }) => {
@@ -28,6 +28,10 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       }
       if (Number.isNaN(+item.amount) || +item.amount < 0) {
         errorAction.payload.content = Message.InvalidAmount
+        return true
+      }
+      if (!verifyAmountRange(item.amount)) {
+        errorAction.payload.content = Message.AmountTooSmall
         return true
       }
       const [, decimal = ''] = item.amount.split('.')
