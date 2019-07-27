@@ -15,7 +15,9 @@ const FallbackSubject = {
   },
 }
 export const SystemScript = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/system-script`).default as NeuronWalletSubject<{ codeHash: string }>)
+  ? (window.remote.require(`${SUBJECT_PATH}/system-script`).DebouncedSystemScriptSubject as NeuronWalletSubject<{
+      codeHash: string
+    }>)
   : FallbackSubject
 
 export const DataUpdate = window.remote
@@ -27,23 +29,23 @@ export const DataUpdate = window.remote
   : FallbackSubject
 
 export const NetworkList = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/networks`).NetworkListSubject as NeuronWalletSubject<{
+  ? (window.remote.require(`${SUBJECT_PATH}/networks`).DebouncedNetworkListSubject as NeuronWalletSubject<{
       currentNetworkList: State.Network[]
     }>)
   : FallbackSubject
 
 export const CurrentNetworkID = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/networks`).CurrentNetworkIDSubject as NeuronWalletSubject<{
+  ? (window.remote.require(`${SUBJECT_PATH}/networks`).DebouncedCurrentNetworkIDSubject as NeuronWalletSubject<{
       currentNetworkID: string
     }>)
   : FallbackSubject
 
 export const ConnectionStatus = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/node`).ConnectionStatusSubject as NeuronWalletSubject<boolean>)
+  ? (window.remote.require(`${SUBJECT_PATH}/node`).DebouncedConnectionStatusSubject as NeuronWalletSubject<boolean>)
   : FallbackSubject
 
 export const SyncedBlockNumber = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/node`).SyncedBlockNumberSubject as NeuronWalletSubject<string>)
+  ? (window.remote.require(`${SUBJECT_PATH}/node`).SampledSyncedBlockNumberSubject as NeuronWalletSubject<string>)
   : FallbackSubject
 
 export const Command = window.remote
