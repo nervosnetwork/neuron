@@ -66,7 +66,11 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
             })
           }
         })
-        .catch(console.error)
+        .catch((err: Error) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(err)
+          }
+        })
     }
     clearInterval(timer)
     if (chainURL) {
