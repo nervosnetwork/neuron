@@ -55,7 +55,6 @@ export const SyncStatus = ({
 export const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
     <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
-      <Icon iconName="T" styles={{ root: { display: 'flex', alignItems: 'center' } }} />
       <Icon
         iconName={online ? 'Connected' : 'Disconnected'}
         styles={{ root: { display: 'flex', alignItems: 'center' } }}
