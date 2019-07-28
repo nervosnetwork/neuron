@@ -1,5 +1,4 @@
 import { ReplaySubject } from 'rxjs'
-import { sampleTime } from 'rxjs/operators'
 import { SyncedBlockNumberSubject } from './node'
 
 export interface CurrentBlockInfo {
@@ -15,7 +14,7 @@ export class CurrentBlockSubject {
   }
 
   static subscribe() {
-    CurrentBlockSubject.subject.pipe(sampleTime(500)).subscribe(({ blockNumber }) => {
+    CurrentBlockSubject.subject.subscribe(({ blockNumber }) => {
       SyncedBlockNumberSubject.next(blockNumber)
     })
   }
