@@ -1,4 +1,4 @@
-import { Transaction, Input, Cell, Script, TransactionWithoutHash } from './cell-types'
+import { Transaction, Input, Cell, Script, TransactionWithoutHash, ScriptHashType } from './cell-types'
 
 export default class ConvertTo {
   public static toSdkTransaction = (tx: Transaction): CKBComponents.Transaction => {
@@ -6,7 +6,7 @@ export default class ConvertTo {
       ...tx,
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
-      deps: tx.deps!,
+      deps: tx.deps! as CKBComponents.OutPoint[],
       witnesses: tx.witnesses!,
     }
     return transaction
@@ -26,7 +26,7 @@ export default class ConvertTo {
   public static toSdkInput = (input: Input): CKBComponents.CellInput => {
     return {
       since: input.since!,
-      previousOutput: input.previousOutput!,
+      previousOutput: input.previousOutput! as CKBComponents.OutPoint,
     }
   }
 
@@ -46,6 +46,7 @@ export default class ConvertTo {
       ...script,
       args: script.args!,
       codeHash: script.codeHash!,
+      hashType: ScriptHashType.Data,
     }
   }
 }
