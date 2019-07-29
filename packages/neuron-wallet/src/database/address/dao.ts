@@ -64,10 +64,10 @@ export default class AddressDao {
       addressEntities.map(async entity => {
         const addressEntity = entity
         addressEntity.txCount = txCount
-        const lockHash: string = await LockUtils.addressToLockHash(addressEntity.address)
-        addressEntity.liveBalance = await CellsService.getBalance([lockHash], OutputStatus.Live)
-        addressEntity.sentBalance = await CellsService.getBalance([lockHash], OutputStatus.Sent)
-        addressEntity.pendingBalance = await CellsService.getBalance([lockHash], OutputStatus.Pending)
+        const lockHashes: string[] = await LockUtils.addressToAllLockHashes(addressEntity.address)
+        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
+        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
+        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
         return addressEntity
       })
     )

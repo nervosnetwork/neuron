@@ -105,8 +105,8 @@ export default class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHash = await LockUtils.addressToLockHash(value)
-      return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
+      const lockHashes: string[] = await LockUtils.addressToAllLockHashes(value)
+      return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
     }
     if (type === SearchType.TxHash) {
       return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
@@ -225,12 +225,7 @@ export default class TransactionsService {
     params: TransactionsByAddressesParam,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = await Promise.all(
-      params.addresses.map(async addr => {
-        const lockHash: string = await LockUtils.addressToLockHash(addr)
-        return lockHash
-      })
-    )
+    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(params.addresses)
 
     return TransactionsService.getAll(
       {
@@ -246,13 +241,12 @@ export default class TransactionsService {
     params: TransactionsByPubkeysParams,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = await Promise.all(
-      params.pubkeys.map(async pubkey => {
-        const addr = core.utils.pubkeyToAddress(pubkey)
-        const lockHash = await LockUtils.addressToLockHash(addr)
-        return lockHash
-      })
-    )
+    const addresses: string[] = params.pubkeys.map(pubkey => {
+      const addr = core.utils.pubkeyToAddress(pubkey)
+      return addr
+    })
+
+    const lockHashes = await LockUtils.addressesToAllLockHashes(addresses)
 
     return TransactionsService.getAll(
       {
@@ -580,8 +574,8 @@ export default class TransactionsService {
   }
 
   // tx count with one lockHash and status
-  public static getCountByLockHashAndStatus = async (
-    lockHash: string,
+  public static getCountByLockHashesAndStatus = async (
+    lockHashes: string[],
     status: TransactionStatus[]
   ): Promise<number> => {
     const count: number = await getConnection()
@@ -589,18 +583,21 @@ export default class TransactionsService {
       .createQueryBuilder('tx')
       .leftJoinAndSelect('tx.inputs', 'input')
       .leftJoinAndSelect('tx.outputs', 'output')
-      .where(`(input.lockHash = :lockHash OR output.lockHash = :lockHash) AND tx.status IN (:...status)`, {
-        lockHash,
-        status,
-      })
+      .where(
+        `(input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)) AND tx.status IN (:...status)`,
+        {
+          lockHashes,
+          status,
+        }
+      )
       .getCount()
 
     return count
   }
 
   public static getCountByAddressAndStatus = async (address: string, status: TransactionStatus[]): Promise<number> => {
-    const lockHash: string = await LockUtils.addressToLockHash(address)
-    return TransactionsService.getCountByLockHashAndStatus(lockHash, status)
+    const lockHashes: string[] = await LockUtils.addressToAllLockHashes(address)
+    return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 
   public static pendings = async (): Promise<TransactionEntity[]> => {

@@ -74,10 +74,12 @@ export default class LockUtils {
   static lockScriptToHash = (lock: Script) => {
     const codeHash: string = lock!.codeHash!
     const args: string[] = lock.args!
+    const { hashType } = lock
+    // TODO: should support ScriptHashType.Type in the future
     const lockHash: string = core.utils.lockScriptToHash({
       codeHash,
       args,
-      hashType: ScriptHashType.Data,
+      hashType,
     })
 
     if (lockHash.startsWith('0x')) {
@@ -87,22 +89,37 @@ export default class LockUtils {
     return `0x${lockHash}`
   }
 
-  static async addressToLockScript(address: string): Promise<Script> {
+  static async addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Data): Promise<Script> {
     const systemScript = await this.systemScript()
 
     const lock: Script = {
       codeHash: systemScript.codeHash,
       args: [LockUtils.addressToBlake160(address)],
-      hashType: ScriptHashType.Data,
+      hashType,
     }
     return lock
   }
 
-  static async addressToLockHash(address: string): Promise<string> {
-    const lock: Script = await this.addressToLockScript(address)
+  static async addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Data): Promise<string> {
+    const lock: Script = await this.addressToLockScript(address, hashType)
     const lockHash: string = await this.lockScriptToHash(lock)
 
     return lockHash
+  }
+
+  static async addressToAllLockHashes(address: string): Promise<string[]> {
+    const dataLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Data)
+    const typeLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Type)
+    return [dataLockHash, typeLockHash]
+  }
+
+  static async addressesToAllLockHashes(addresses: string[]): Promise<string[]> {
+    const lockHashes: string[] = (await Promise.all(
+      addresses.map(async addr => {
+        return LockUtils.addressToAllLockHashes(addr)
+      })
+    )).reduce((acc, val) => acc.concat(val), [])
+    return lockHashes
   }
 
   static lockScriptToAddress(lock: Script): string {

@@ -27,11 +27,7 @@ export const stopLoopSubject = new Subject()
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await Promise.all(
-    addresses.map(async addr => {
-      return LockUtils.addressToLockHash(addr)
-    })
-  )
+  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
   return lockHashes
 }
 
