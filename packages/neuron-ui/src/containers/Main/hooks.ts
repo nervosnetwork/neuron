@@ -7,7 +7,7 @@ import {
   updateTransaction,
   updateCurrentWallet,
   updateWalletList,
-  updateAddressList,
+  updateAddressListAndBalance,
   initAppState,
 } from 'states/stateProvider/actionCreators'
 
@@ -137,7 +137,7 @@ export const useSubscription = ({
       }
       switch (dataType) {
         case 'address': {
-          updateAddressList(walletID)(dispatch)
+          updateAddressListAndBalance(walletID)(dispatch)
           break
         }
         case 'transaction': {

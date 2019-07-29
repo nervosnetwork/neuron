@@ -88,7 +88,6 @@ const Send = ({
                         disabled={sending}
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
-                        placeholder={PlaceHolders.send.Address}
                         required
                       />
                     </Stack.Item>
