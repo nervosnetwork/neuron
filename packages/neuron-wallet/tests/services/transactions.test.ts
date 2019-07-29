@@ -3,7 +3,7 @@ import TransactionsService, { SearchType } from '../../src/services/transactions
 describe('transactions service', () => {
   describe('filterSearchType', () => {
     it('ckt prefix', () => {
-      const address = 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf'
+      const address = 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83'
       const type = TransactionsService.filterSearchType(address)
       expect(type).toBe(SearchType.Address)
     })

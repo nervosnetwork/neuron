@@ -158,12 +158,6 @@ export const contextMenuTemplate: {
         },
       },
       {
-        label: i18n.t('contextMenu.spend-from'),
-        click: () => {
-          AppController.navTo(`/send/${address}`)
-        },
-      },
-      {
         label: i18n.t('contextMenu.view-on-explorer'),
         click: () => {
           AppController.openExternal(`${env.explorer}/address/${address}`)

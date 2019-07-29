@@ -22,8 +22,7 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
-import { Routes, ConnectionStatus } from 'utils/const'
-import { WalletWizardPath } from 'components/WalletWizard'
+import { ConnectionStatus } from 'utils/const'
 import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
@@ -66,7 +65,11 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
             })
           }
         })
-        .catch(console.error)
+        .catch((err: Error) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(err)
+          }
+        })
     }
     clearInterval(timer)
     if (chainURL) {
@@ -102,7 +105,6 @@ export const useOnCurrentWalletChange = ({
     if (walletID) {
       initAppState()(dispatch, history)
     } else {
-      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
       initAppState()(dispatch, history)
     }
   }, [walletID, dispatch, history])

@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import { Entity, BaseEntity, PrimaryColumn, Column, AfterInsert, AfterUpdate, AfterRemove } from 'typeorm'
 import { AddressType } from '../../../models/keys/address'
 import { Address as AddressInterface } from '../dao'
@@ -7,6 +8,11 @@ export enum AddressVersion {
   Testnet = 'testnet',
   Mainnet = 'mainnet',
 }
+
+const isRenderer = process && process.type === 'renderer'
+const addressDbChangedSubject = isRenderer
+  ? remote.require('./models/subjects/address-db-changed-subject').default.getSubject()
+  : AddressDbChangedSubject.getSubject()
 
 @Entity()
 export default class Address extends BaseEntity {
@@ -105,6 +111,6 @@ export default class Address extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    AddressDbChangedSubject.getSubject().next(event)
+    addressDbChangedSubject.next(event)
   }
 }

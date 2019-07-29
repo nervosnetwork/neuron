@@ -53,3 +53,25 @@ navbar {
 .fixedWidth {
   font-family: monospace;
 }
+
+.listWithDesc {
+  .ms-DetailsRow-cell {
+    display: flex;
+    align-items: center;
+  }
+
+  .text-overflow {
+    overflow: hidden;
+    text-overflow: ellipsis
+  }
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0)
+  }
+
+  to {
+    transform: rotate(360deg)
+  }
+}

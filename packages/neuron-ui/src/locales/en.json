@@ -216,7 +216,8 @@
       "error": "Error",
       "invalid-mnemonic": "Invalid mnemonic words",
       "camera-not-available-or-disabled": "Camera is unavailable or disabled",
-      "can-not-find-the-default-address": "Cannot find the default address"
+      "can-not-find-the-default-address": "Cannot find the default address",
+      "amount-too-small": "Amount should not be less than 61 CKB"
     },
     "sync": {
       "syncing": "Syncing",

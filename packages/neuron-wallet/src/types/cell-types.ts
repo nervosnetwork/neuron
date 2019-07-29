@@ -1,5 +1,10 @@
 // define types in app
 
+export enum ScriptHashType {
+  Data = 'Data',
+  Type = 'Type',
+}
+
 export interface Block {
   header: BlockHeader
   transactions: Transaction[]
@@ -75,4 +80,5 @@ export interface CellOutPoint {
 export interface Script {
   args?: string[]
   codeHash?: string | null
+  hashType: ScriptHashType
 }

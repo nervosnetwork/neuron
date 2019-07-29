@@ -18,7 +18,6 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
       transactionList: true,
     },
   })
-  setTimeout(() => {})
   getNeuronWalletState()
     .then(res => {
       if (res.status) {
@@ -39,6 +38,9 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           type: NeuronWalletActions.UpdateTransactionList,
           payload: transactions,
         })
+        if (!wallet) {
+          history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+        }
 
         currentWalletCache.save(wallet)
         walletsCache.save(wallets)
@@ -46,6 +48,9 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
       } else {
         history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
       }
+    })
+    .catch(() => {
+      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
     })
     .finally(() => {
       dispatch({

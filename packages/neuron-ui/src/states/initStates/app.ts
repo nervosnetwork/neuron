@@ -36,6 +36,7 @@ const appState: State.App = {
     sending: false,
     addressList: false,
     transactionList: false,
+    updateDescription: false,
   },
 }
 

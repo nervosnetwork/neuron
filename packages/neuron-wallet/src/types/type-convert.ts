@@ -66,6 +66,7 @@ export default class TypeConvert {
     return {
       args: script.args,
       codeHash: script.codeHash,
+      hashType: script.hashType,
     }
   }
 }

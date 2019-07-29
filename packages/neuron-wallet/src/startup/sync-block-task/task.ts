@@ -10,6 +10,11 @@ import { initDatabase } from './init-database'
 import { register as registerTxStatusListener } from '../../listeners/tx-status'
 import Utils from '../../services/sync/utils'
 
+import { register as registerAddressListener } from '../../listeners/address'
+
+// register to listen address updates
+registerAddressListener()
+
 const {
   nodeService,
   addressDbChangedSubject,
@@ -27,11 +32,7 @@ export const stopLoopSubject = new Subject()
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await Promise.all(
-    addresses.map(async addr => {
-      return LockUtils.addressToLockHash(addr)
-    })
-  )
+  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
   return lockHashes
 }
 

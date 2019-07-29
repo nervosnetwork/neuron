@@ -17,12 +17,12 @@ describe('Key tests', () => {
 
     expect(2).toBe(addresses.testnetReceiving.length)
     expect("m/44'/309'/0'/0/0").toBe(addresses.testnetReceiving[0].path)
-    expect('ckt1q9gry5zgqt5rp0t0uxv39lahkzcnfjl9x9utn683yv9zxs').toBe(addresses.testnetReceiving[0].address)
+    expect('ckt1qyqq96psh4h7rxgjl7mmpvf5e0jnz79earcsyrlxrx').toBe(addresses.testnetReceiving[0].address)
 
     // will include testnet address and mainnet address, [0] and [1] will be same
     expect(2).toBe(addresses.testnetChange.length)
     expect("m/44'/309'/0'/1/1").toBe(addresses.testnetChange[1].path)
-    expect('ckt1q9gry5zg7r0qgqc3vnvy8pwr0q8mkgvgywfjazg9xlz2ev').toBe(addresses.testnetChange[1].address)
+    expect('ckt1qyq0phsyqvgkfkzrshphsramyxyz8yew3yzsl76naf').toBe(addresses.testnetChange[1].address)
   })
 
   it('toAddress', () => {
@@ -45,7 +45,7 @@ describe('Key tests', () => {
 describe('Key tests with db', () => {
   const address: Address = {
     walletId: '1',
-    address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
     addressIndex: 0,
@@ -60,7 +60,7 @@ describe('Key tests with db', () => {
 
   const usedAddress: Address = {
     walletId: '2',
-    address: 'ckt1q9gry5zgxmpjnmtrp4kww5r39frh2sm89tdt2l6v234ygf',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     path: "m/44'/309'/0'/0/0",
     addressType: AddressType.Receiving,
     addressIndex: 0,
