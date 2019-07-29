@@ -56,7 +56,6 @@ export default class LockUtils {
         cell: {
           txHash,
           index,
-          hashType: ScriptHashType.Data,
         },
       },
     }

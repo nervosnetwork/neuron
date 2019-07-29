@@ -75,7 +75,6 @@ export interface OutPoint {
 export interface CellOutPoint {
   txHash: string
   index: string
-  hashType: ScriptHashType
 }
 
 export interface Script {

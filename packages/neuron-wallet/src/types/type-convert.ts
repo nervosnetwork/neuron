@@ -48,7 +48,6 @@ export default class TypeConvert {
     const cell: CellOutPoint = {
       txHash: outPoint.cell!.txHash,
       index: outPoint.cell!.index,
-      hashType: outPoint.cell!.hashType,
     }
     return {
       blockHash: null,

@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface, CellOutPoint, ScriptHashType } from '../../../types/cell-types'
+import { OutPoint, Input as InputInterface, CellOutPoint } from '../../../types/cell-types'
 import Transaction from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -42,14 +42,6 @@ export default class Input extends BaseEntity {
   })
   capacity: string | null = null
 
-  @Column({
-    type: 'enum',
-    enum: ScriptHashType,
-    default: ScriptHashType.Data,
-    nullable: false,
-  })
-  hashType: ScriptHashType = ScriptHashType.Data
-
   public cellOutPoint(): CellOutPoint | null {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
@@ -57,7 +49,6 @@ export default class Input extends BaseEntity {
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
-      hashType: this.hashType,
     }
   }
 

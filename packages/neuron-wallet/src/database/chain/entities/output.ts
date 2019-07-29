@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint, Cell, CellOutPoint, ScriptHashType } from '../../../types/cell-types'
+import { Script, OutPoint, Cell, CellOutPoint } from '../../../types/cell-types'
 import TransactionEntity from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -35,19 +35,10 @@ export default class Output extends BaseEntity {
   })
   status!: string
 
-  @Column({
-    type: 'enum',
-    enum: ScriptHashType,
-    default: ScriptHashType.Data,
-    nullable: false,
-  })
-  hashType!: ScriptHashType
-
   public cellOutPoint(): CellOutPoint {
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
-      hashType: this.hashType,
     }
   }
 
