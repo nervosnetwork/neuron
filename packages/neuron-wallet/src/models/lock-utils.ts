@@ -1,5 +1,5 @@
 import NodeService from '../services/node'
-import { OutPoint, Script } from '../types/cell-types'
+import { OutPoint, Script, ScriptHashType } from '../types/cell-types'
 import env from '../env'
 import systemScriptSubject from './subjects/system-script'
 
@@ -56,6 +56,7 @@ export default class LockUtils {
         cell: {
           txHash,
           index,
+          hashType: ScriptHashType.Data,
         },
       },
     }
@@ -77,6 +78,7 @@ export default class LockUtils {
     const lockHash: string = core.utils.lockScriptToHash({
       codeHash,
       args,
+      hashType: ScriptHashType.Data,
     })
 
     if (lockHash.startsWith('0x')) {
@@ -92,6 +94,7 @@ export default class LockUtils {
     const lock: Script = {
       codeHash: systemScript.codeHash,
       args: [LockUtils.addressToBlake160(address)],
+      hashType: ScriptHashType.Data,
     }
     return lock
   }
@@ -120,7 +123,7 @@ export default class LockUtils {
   static addressToBlake160(address: string): string {
     const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
     const result: string = core.utils.parseAddress(address, prefix, 'hex') as string
-    const hrp: string = `01${Buffer.from('P2PH').toString('hex')}`
+    const hrp: string = `0100`
     let blake160: string = result.slice(hrp.length, result.length)
     if (!blake160.startsWith('0x')) {
       blake160 = `0x${blake160}`

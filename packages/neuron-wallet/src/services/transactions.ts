@@ -1,6 +1,14 @@
 import { getConnection, In, ObjectLiteral } from 'typeorm'
 import { ReplaySubject } from 'rxjs'
-import { OutPoint, Transaction, TransactionWithoutHash, Input, Cell, TransactionStatus } from '../types/cell-types'
+import {
+  OutPoint,
+  Transaction,
+  TransactionWithoutHash,
+  Input,
+  Cell,
+  TransactionStatus,
+  ScriptHashType,
+} from '../types/cell-types'
 import CellsService, { MIN_CELL_CAPACITY } from './cells'
 import InputEntity from '../database/chain/entities/input'
 import OutputEntity from '../database/chain/entities/output'
@@ -522,6 +530,7 @@ export default class TransactionsService {
         lock: {
           codeHash,
           args: [blake160],
+          hashType: ScriptHashType.Data,
         },
       }
 
@@ -540,6 +549,7 @@ export default class TransactionsService {
         lock: {
           codeHash,
           args: [changeBlake160],
+          hashType: ScriptHashType.Data,
         },
       }
 
