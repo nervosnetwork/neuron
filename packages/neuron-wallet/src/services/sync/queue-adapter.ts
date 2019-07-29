@@ -26,6 +26,10 @@ export default class QueueAdapter {
     this.q.remove(callback)
   }
 
+  public removeAll = () => {
+    this.remove(() => true)
+  }
+
   public pause = () => {
     this.q.pause()
   }

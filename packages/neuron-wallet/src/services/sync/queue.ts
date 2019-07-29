@@ -4,7 +4,7 @@ import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import TransactionsService from '../transactions'
-import QueueAdapter from '../queue-adapter'
+import QueueAdapter from './queue-adapter'
 
 export default class Queue {
   private q: any
@@ -39,10 +39,8 @@ export default class Queue {
     this.q = new QueueAdapter(this.getWorker(), this.concurrent)
   }
 
-  private regenerateQueue = async () => {
-    this.kill()
-    await Utils.sleep(3000)
-    this.generateQueue()
+  public cleanQueue = () => {
+    this.q.removeAll()
   }
 
   public setLockHashes = (lockHashes: string[]): void => {
@@ -78,7 +76,7 @@ export default class Queue {
 
   public kill = () => {
     this.q.kill()
-    this.q.remove(() => true)
+    this.q.removeAll()
   }
 
   public pipeline = async (blockNumbers: string[]) => {
@@ -109,7 +107,7 @@ export default class Queue {
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
         await this.rangeForCheck.setRange([])
         await TransactionsService.deleteWhenFork(rangeFirstBlockHeader.number)
-        await this.regenerateQueue()
+        await this.cleanQueue()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()
       } else if (checkResult.type === 'block-headers-not-match') {
@@ -131,6 +129,18 @@ export default class Queue {
     slice.forEach(async arr => {
       await this.push(arr)
     })
+  }
+
+  public reset = (startBlockNumber: string, endBlockNumber: string) => {
+    this.startBlockNumber = BigInt(startBlockNumber)
+    this.endBlockNumber = BigInt(endBlockNumber)
+
+    if (this.startBlockNumber > this.endBlockNumber) {
+      return
+    }
+
+    this.q.removeAll()
+    this.batchPush()
   }
 
   public process = () => {
