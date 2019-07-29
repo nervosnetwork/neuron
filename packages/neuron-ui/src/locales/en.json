@@ -217,7 +217,17 @@
       "invalid-mnemonic": "Invalid mnemonic words",
       "camera-not-available-or-disabled": "Camera is unavailable or disabled",
       "can-not-find-the-default-address": "Cannot find the default address",
-      "amount-too-small": "Amount should not be less than 61 CKB"
+      "amount-too-small": "Amount should not be less than 61 CKB",
+      "create-wallet-successfully": "Create a wallet successfully",
+      "import-wallet-successfully": "Import a wallet successfully",
+      "update-wallet-successfully": "Update the wallet successfully",
+      "delete-wallet-successfully": "Delete the wallet successfully",
+      "create-network-successfully": "Create a network successfully",
+      "update-network-successfully": "Update the network successfully",
+      "delete-network-successfully": "Delete the network successfully",
+      "addr-copied": "Address has been copied to the clipboard",
+      "qrcode-copied": "QR Code has been copied to the clipboard",
+      "lock-arg-copid": "Lock Arg has been copied to the clipboard"
     },
     "sync": {
       "syncing": "Syncing",

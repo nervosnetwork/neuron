@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useCallback } from 'react'
 import canvg from 'canvg'
 import { Stack, DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { addPopup } from 'states/stateProvider/actionCreators'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
 
@@ -80,6 +82,7 @@ const QRCode = ({
   onQRCodeClick,
   includeMargin = false,
   exportable = false,
+  dispatch,
 }: {
   value: string
   size: number
@@ -90,6 +93,7 @@ const QRCode = ({
   onQRCodeClick?: React.MouseEventHandler
   includeMargin?: boolean
   exportable?: boolean
+  dispatch: StateDispatch
 }) => {
   const [t] = useTranslation()
   const qrcode = new QRCodeImpl(-1, level)
@@ -125,7 +129,8 @@ const QRCode = ({
     const dataURL = canvasRef.current.toDataURL('image/png')
     const img = window.nativeImage.createFromDataURL(dataURL)
     window.clipboard.writeImage(img)
-  }, [])
+    addPopup('qrcode-copied')(dispatch)
+  }, [dispatch])
 
   useEffect(() => {
     if (canvasRef.current !== null) {

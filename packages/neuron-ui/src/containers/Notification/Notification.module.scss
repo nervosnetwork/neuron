@@ -1,0 +1,33 @@
+.autoDismissMessages {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: absolute;
+  right: 0;
+
+  &>div {
+    max-width: auto;
+    margin: 3px;
+    animation: autoDismiss 2.5s ease-out forwards;
+    transform-origin: center top;
+    box-sizing: border-box;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@keyframes autoDismiss {
+  from {
+    transform: translateX(110%)
+  }
+
+  15%,
+  85% {
+
+    transform: translateX(0)
+  }
+
+
+  100% {
+    transform: translateX(110%)
+  }
+}

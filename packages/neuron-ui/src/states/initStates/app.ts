@@ -31,6 +31,7 @@ const appState: State.App = {
     transactions: null,
     wizard: null,
   },
+  popups: [],
   notifications: [],
   loadings: {
     sending: false,
