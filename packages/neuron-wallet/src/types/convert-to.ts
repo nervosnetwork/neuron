@@ -6,7 +6,7 @@ export default class ConvertTo {
       ...tx,
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
-      deps: tx.deps! as CKBComponents.OutPoint[],
+      deps: tx.deps!,
       witnesses: tx.witnesses!,
     }
     return transaction
@@ -26,7 +26,7 @@ export default class ConvertTo {
   public static toSdkInput = (input: Input): CKBComponents.CellInput => {
     return {
       since: input.since!,
-      previousOutput: input.previousOutput! as CKBComponents.OutPoint,
+      previousOutput: input.previousOutput!,
     }
   }
 
