@@ -1,9 +1,13 @@
 import { Subject } from 'rxjs'
+import WindowManager from '../window-manager'
 
 export const DataUpdateSubject = new Subject<{
   dataType: 'address' | 'transaction' | 'wallet' | 'network'
   actionType: 'create' | 'update' | 'delete'
-  walletID?: string
 }>()
+
+DataUpdateSubject.subscribe(data => {
+  WindowManager.dataUpdated(data)
+})
 
 export default DataUpdateSubject

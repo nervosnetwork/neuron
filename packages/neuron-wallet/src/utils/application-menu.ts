@@ -79,7 +79,7 @@ export const walletMenuItem: MenuItemConstructorOptions = {
           // TODO: show the error message
           return
         }
-        walletsService.requestPassword(currentWallet.id, 'backupWallet')
+        walletsService.requestPassword(currentWallet.id, 'backup-wallet')
       },
     },
     {
@@ -92,7 +92,7 @@ export const walletMenuItem: MenuItemConstructorOptions = {
           // TODO: show the error message
           return
         }
-        walletsService.requestPassword(currentWallet.id, 'deleteWallet')
+        walletsService.requestPassword(currentWallet.id, 'delete-wallet')
       },
     },
     /**

@@ -412,7 +412,7 @@ export default class WalletService {
     }))
   }
 
-  public requestPassword = (walletID: string, actionType: 'deleteWallet' | 'backupWallet') => {
+  public requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
     if (WindowManager.mainWindow) {
       CommandSubject.next({
         winID: WindowManager.mainWindow.id,
