@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Subscription } from 'rxjs'
 import NodeService from '../node'
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
@@ -12,6 +12,7 @@ export default class BlockListener {
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
   private interval: number = 5000
+  private tipNumberListener: Subscription
 
   constructor(
     lockHashes: string[],
@@ -21,7 +22,7 @@ export default class BlockListener {
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck()
 
-    tipNumberSubject.subscribe(async num => {
+    this.tipNumberListener = tipNumberSubject.subscribe(async num => {
       if (num) {
         this.tipBlockNumber = parseInt(num, 10)
       }
@@ -50,11 +51,11 @@ export default class BlockListener {
   }
 
   public stop = async () => {
+    this.tipNumberListener.unsubscribe()
     if (!this.queue) {
       return
     }
     await this.queue.kill()
-    await this.queue.get().remove(() => true)
     this.queue = null
   }
 
@@ -74,10 +75,7 @@ export default class BlockListener {
   }
 
   public regenerate = async (): Promise<void> => {
-    if (this.queue) {
-      if (this.queue.get().length() <= 0) {
-        this.queue = undefined
-      }
+    if (this.queue && this.queue.get().length() > 0) {
       return
     }
 
@@ -86,11 +84,7 @@ export default class BlockListener {
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
     // TODO: check this queue stopped
-    const queue: Queue | undefined = this.generateQueue(startBlockNumber, endBlockNumber)
-
-    if (queue) {
-      queue.process()
-    }
+    this.generateQueue(startBlockNumber, endBlockNumber)
   }
 
   public generateQueue = (startBlockNumber: string, endBlockNumber: string): Queue | undefined => {
@@ -98,17 +92,18 @@ export default class BlockListener {
       return undefined
     }
 
-    this.queue = new Queue(
-      this.lockHashes,
-      startBlockNumber,
-      endBlockNumber,
-      this.currentBlockNumber,
-      this.rangeForCheck
-    )
-
-    this.queue.get().drain(() => {
-      this.queue = undefined
-    })
+    if (!this.queue) {
+      this.queue = new Queue(
+        this.lockHashes,
+        startBlockNumber,
+        endBlockNumber,
+        this.currentBlockNumber,
+        this.rangeForCheck
+      )
+      this.queue.process()
+    } else {
+      this.queue.reset(startBlockNumber, endBlockNumber)
+    }
 
     return this.queue
   }
