@@ -157,15 +157,6 @@ export const contextMenuTemplate: {
           AppController.navTo(`/receive/${address}`)
         },
       },
-      /**
-       * This function is not determined, remove it from the app for now
-       */
-      // {
-      //   label: i18n.t('contextMenu.spend-from'),
-      //   click: () => {
-      //     AppController.navTo(`/send/${address}`)
-      //   },
-      // },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
         click: () => {
