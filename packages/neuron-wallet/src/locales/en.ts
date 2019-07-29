@@ -39,12 +39,13 @@ export default {
       help: {
         label: 'Help',
         sourceCode: 'Source Code',
+        settings: 'Settings',
       },
       develop: {
         develop: 'Develop',
         'force-reload': 'Force Reload',
         reload: 'Reload',
-        'toggle-dev-tools': 'Toggle DevTools',
+        'toggle-dev-tools': 'Toggle Developer Tools',
       },
     },
     services: {

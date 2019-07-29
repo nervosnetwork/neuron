@@ -5,6 +5,8 @@ import i18n from './i18n'
 import AppController from '../controllers/app'
 import WalletsService from '../services/wallets'
 
+const isMac = process.platform === 'darwin'
+
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
@@ -45,6 +47,7 @@ export const appMenuItem: MenuItemConstructorOptions = {
     },
   ],
 }
+
 export const walletMenuItem: MenuItemConstructorOptions = {
   id: 'wallet',
   label: 'Wallet',
@@ -95,10 +98,6 @@ export const walletMenuItem: MenuItemConstructorOptions = {
         walletsService.requestPassword(currentWallet.id, 'deleteWallet')
       },
     },
-    /**
-     * TODO: implement this menu item after alpha release
-     * { id: 'change-password', label: i18n.t('application-menu.wallet.change-password') },
-     */
   ],
 }
 
@@ -120,6 +119,7 @@ export const editMenuItem: MenuItemConstructorOptions = {
     },
   ],
 }
+
 export const viewMenuItem: MenuItemConstructorOptions = {
   id: 'view',
   label: i18n.t('application-menu.view.label'),
@@ -154,28 +154,55 @@ export const windowMenuItem: MenuItemConstructorOptions = {
     },
   ],
 }
+
+const helpSubmenu: MenuItemConstructorOptions[] = [
+  {
+    label: 'Nervos',
+    click: () => {
+      if (AppController) {
+        AppController.openWebsite()
+      }
+    },
+  },
+  {
+    label: i18n.t('application-menu.help.sourceCode'),
+    click: () => {
+      if (AppController) {
+        AppController.openRepository()
+      }
+    },
+  },
+]
+if (!isMac) {
+  helpSubmenu.push(separator)
+  helpSubmenu.push({
+    id: 'preference',
+    label: i18n.t('application-menu.help.settings'),
+    click: () => {
+      if (AppController) {
+        AppController.showPreference()
+      }
+    },
+  })
+  helpSubmenu.push({
+    id: 'about',
+    label: i18n.t('application-menu.neuron.about', {
+      app: app.getName(),
+    }),
+    role: 'about',
+    click: () => {
+      if (AppController) {
+        AppController.showAbout()
+      }
+    },
+  })
+}
+
 export const helpMenuItem: MenuItemConstructorOptions = {
   id: 'help',
   label: i18n.t('application-menu.help.label'),
   role: 'help',
-  submenu: [
-    {
-      label: 'Nervos',
-      click: () => {
-        if (AppController) {
-          AppController.openWebsite()
-        }
-      },
-    },
-    {
-      label: i18n.t('application-menu.help.sourceCode'),
-      click: () => {
-        if (AppController) {
-          AppController.openRepository()
-        }
-      },
-    },
-  ],
+  submenu: helpSubmenu,
 }
 
 export const developMenuItem: MenuItemConstructorOptions = {
@@ -197,17 +224,12 @@ export const developMenuItem: MenuItemConstructorOptions = {
   ],
 }
 
-export const applicationMenuTemplate = [
-  appMenuItem,
-  walletMenuItem,
-  editMenuItem,
-  viewMenuItem,
-  windowMenuItem,
-  helpMenuItem,
-]
+export const applicationMenuTemplate = env.isDevMode
+  ? [walletMenuItem, editMenuItem, viewMenuItem, developMenuItem, windowMenuItem, helpMenuItem]
+  : [walletMenuItem, editMenuItem, viewMenuItem, windowMenuItem, helpMenuItem]
 
-if (env.isDevMode) {
-  applicationMenuTemplate.push(developMenuItem)
+if (isMac) {
+  applicationMenuTemplate.unshift(appMenuItem)
 }
 
 export const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
