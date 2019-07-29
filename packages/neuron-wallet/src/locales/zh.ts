@@ -8,7 +8,7 @@ export default {
     'application-menu': {
       neuron: {
         about: '关于{{app}}',
-        preferences: '设置...',
+        preferences: '偏好设置...',
         quit: '退出{{app}}',
       },
       wallet: {
@@ -39,6 +39,7 @@ export default {
       help: {
         label: '帮助',
         sourceCode: '源代码',
+        settings: '设置',
       },
       develop: {
         develop: '开发',
