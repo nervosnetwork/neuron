@@ -1,9 +1,14 @@
 import { Subject } from 'rxjs'
+import WindowManager from '../window-manager'
 
 const CommandSubject = new Subject<{
   winID: number
-  type: 'nav' | 'toggleAddressBook' | 'deleteWallet' | 'backupWallet'
+  type: 'nav' | 'toggle-address-book' | 'delete-wallet' | 'backup-wallet'
   payload: string | null
 }>()
+
+CommandSubject.subscribe(params => {
+  WindowManager.sendCommand(params)
+})
 
 export default CommandSubject

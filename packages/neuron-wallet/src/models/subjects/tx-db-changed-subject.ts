@@ -27,7 +27,6 @@ export class TxDbChangedSubject {
       DataUpdateSubject.next({
         dataType: 'transaction',
         actionType: 'update',
-        walletID: '',
       })
     })
   }

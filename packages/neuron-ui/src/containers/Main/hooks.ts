@@ -42,7 +42,11 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
             payload: tipBlockNumber,
           })
         })
-        .catch(console.error)
+        .catch((err: Error) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(err)
+          }
+        })
 
     const syncBlockchainInfo = () => {
       getBlockchainInfo()
@@ -160,14 +164,14 @@ export const useSubscription = ({
         }
       }
     })
-    const networkListSubscription = NetworkListSubject.subscribe(({ currentNetworkList = [] }) => {
+    const networkListSubscription = NetworkListSubject.subscribe((currentNetworkList = []) => {
       dispatch({
         type: NeuronWalletActions.UpdateNetworkList,
         payload: currentNetworkList,
       })
       networksCache.save(currentNetworkList)
     })
-    const currentNetworkIDSubscription = CurrentNetworkIDSubject.subscribe(({ currentNetworkID = '' }) => {
+    const currentNetworkIDSubscription = CurrentNetworkIDSubject.subscribe((currentNetworkID = '') => {
       dispatch({
         type: NeuronWalletActions.UpdateCurrentNetworkID,
         payload: currentNetworkID,
@@ -187,45 +191,44 @@ export const useSubscription = ({
         payload: syncedBlockNumber,
       })
     })
-    const commandSubscription = CommandSubject.subscribe(
-      ({ winID, type, payload }: { winID: number; type: Command.Type; payload: Command.payload }) => {
-        if (getWinID() === winID) {
-          switch (type) {
-            case 'nav': {
-              history.push(payload)
-              break
-            }
-            case 'toggleAddressBook': {
-              dispatch(toggleAddressBook())
-              break
-            }
-            case 'deleteWallet': {
-              dispatch({
-                type: AppActions.RequestPassword,
-                payload: {
-                  walletID: payload || '',
-                  actionType: 'delete',
-                },
-              })
-              break
-            }
-            case 'backupWallet': {
-              dispatch({
-                type: AppActions.RequestPassword,
-                payload: {
-                  walletID: payload || '',
-                  actionType: 'backup',
-                },
-              })
-              break
-            }
-            default: {
-              break
-            }
+
+    const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
+      if (winID && getWinID() === winID) {
+        switch (type) {
+          case 'nav': {
+            history.push(payload)
+            break
+          }
+          case 'toggle-address-book': {
+            dispatch(toggleAddressBook())
+            break
+          }
+          case 'delete-wallet': {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: payload || '',
+                actionType: 'delete',
+              },
+            })
+            break
+          }
+          case 'backup-wallet': {
+            dispatch({
+              type: AppActions.RequestPassword,
+              payload: {
+                walletID: payload || '',
+                actionType: 'backup',
+              },
+            })
+            break
+          }
+          default: {
+            break
           }
         }
       }
-    )
+    })
     return () => {
       systemScriptSubscription.unsubscribe()
       dataUpdateSubscription.unsubscribe()

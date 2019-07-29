@@ -8,6 +8,8 @@ import {
   wallets as walletsCache,
   addresses as addressesCache,
   currentWallet as currentWalletCache,
+  currentNetworkID as currentNetworkIDCache,
+  networks as networksCache,
 } from 'utils/localCache'
 
 export const initAppState = () => (dispatch: StateDispatch, history: any) => {
@@ -26,17 +28,24 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           currentWallet: wallet = initStates.wallet,
           addresses = [],
           transactions = initStates.chain.transactions,
+          networks = [],
+          currentNetworkID = '',
+          syncedBlockNumber = '',
+          connectionStatus = false,
+          codeHash = '',
         } = res.result
         dispatch({
-          type: NeuronWalletActions.InitiateCurrentWalletAndWalletList,
+          type: NeuronWalletActions.InitAppState,
           payload: {
             wallet: { ...wallet, balance: addressesToBalance(addresses), addresses },
             wallets,
+            transactions,
+            networks,
+            currentNetworkID,
+            syncedBlockNumber,
+            connectionStatus,
+            codeHash,
           },
-        })
-        dispatch({
-          type: NeuronWalletActions.UpdateTransactionList,
-          payload: transactions,
         })
         if (!wallet) {
           history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
@@ -45,6 +54,8 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
         currentWalletCache.save(wallet)
         walletsCache.save(wallets)
         addressesCache.save(addresses)
+        networksCache.save(networks)
+        currentNetworkIDCache.save(currentNetworkID)
       } else {
         history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
       }

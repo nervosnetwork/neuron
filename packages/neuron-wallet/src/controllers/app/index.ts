@@ -1,11 +1,14 @@
 import path from 'path'
 import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
+import { take } from 'rxjs/operators'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
 
 import TransactionsController from '../transactions'
+import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
 import WalletsController from '../wallets'
+import SyncInfoController from '../sync-info'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
@@ -13,14 +16,49 @@ import WindowManager from '../../models/window-manager'
 import i18n from '../../utils/i18n'
 import env from '../../env'
 import CommandSubject from '../../models/subjects/command'
+import { ConnectionStatusSubject } from '../../models/subjects/node'
+import { SystemScriptSubject } from '../../models/subjects/system-script'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
   public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
-    const [currentWallet = null, wallets = []] = await Promise.all([
+    const networksService = NetworksService.getInstance()
+    const [
+      currentWallet = null,
+      wallets = [],
+      currentNetworkID = '',
+      networks = [],
+      syncedBlockNumber = '0',
+      connectionStatus = false,
+      codeHash = '',
+    ] = await Promise.all([
       walletsService.getCurrent(),
       walletsService.getAll(),
+      networksService.getCurrentID(),
+      networksService.getAll(),
+
+      SyncInfoController.currentBlockNumber()
+        .then(res => {
+          if (res.status) {
+            return res.result.currentBlockNumber
+          }
+          return '0'
+        })
+        .catch(() => '0'),
+      new Promise(resolve => {
+        ConnectionStatusSubject.pipe(take(1)).subscribe(
+          status => {
+            resolve(status)
+          },
+          () => {
+            resolve(false)
+          }
+        )
+      }),
+      new Promise(resolve => {
+        SystemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
+      }),
     ])
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
@@ -34,15 +72,16 @@ export default class AppController {
           walletID: currentWallet.id,
         }).then(res => res.result)
       : []
-    const locale = app.getLocale()
     const initState = {
-      currentWallet: currentWallet && {
-        ...currentWallet,
-      },
+      currentWallet,
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
+      currentNetworkID,
+      networks,
       addresses,
       transactions,
-      locale,
+      syncedBlockNumber,
+      connectionStatus,
+      codeHash,
     }
     return { status: ResponseCode.Success, result: initState }
   }
@@ -68,7 +107,7 @@ export default class AppController {
     if (WindowManager.mainWindow) {
       CommandSubject.next({
         winID: WindowManager.mainWindow.id,
-        type: 'toggleAddressBook',
+        type: 'toggle-address-book',
         payload: null,
       })
     }

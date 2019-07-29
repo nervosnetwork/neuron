@@ -1,26 +1,12 @@
-import { remote, ipcRenderer, clipboard, nativeImage } from 'electron'
+import { remote, clipboard, nativeImage, ipcRenderer, IpcRenderer } from 'electron'
 
 declare global {
   interface Window {
-    bridge: any
     clipboard: Electron.Clipboard
     nativeImage: any
+    ipcRenderer: IpcRenderer
     remote: Electron.Remote
   }
-}
-
-const bridge = {
-  ipcRenderer: {
-    send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
-    sendSync: (channel: string, ...args: any[]) => ipcRenderer.sendSync(channel, ...args),
-    on: (channel: string, cb: Function) => {
-      ipcRenderer.on(channel, cb)
-    },
-    once: (channel: string, cb: Function) => {
-      ipcRenderer.on(channel, cb)
-    },
-    removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel),
-  },
 }
 
 if (process.env.NODE_ENV === 'development') {
@@ -33,6 +19,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 window.clipboard = clipboard
-window.bridge = window.bridge || bridge
 window.nativeImage = nativeImage
+window.ipcRenderer = ipcRenderer
 window.remote = remote
