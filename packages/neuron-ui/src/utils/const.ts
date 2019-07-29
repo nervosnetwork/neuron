@@ -1,5 +1,5 @@
 export const MAX_NETWORK_NAME_LENGTH = 28
-export const ADDRESS_LENGTH = 50
+export const ADDRESS_LENGTH = 46
 export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 50
 export const MIN_AMOUNT = 61

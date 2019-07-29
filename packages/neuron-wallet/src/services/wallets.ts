@@ -316,7 +316,7 @@ export default class WalletService {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = await Promise.all(addresses.map(async addr => LockUtils.addressToLockHash(addr)))
+    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
