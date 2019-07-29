@@ -11,9 +11,10 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import initStates from 'states/initStates'
+import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
+import addressesToBalance from 'utils/addressesToBalance'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification } from './app'
 
@@ -140,12 +141,16 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
     })
 }
 
-export const updateAddressList = (params: Controller.GetAddressesByWalletIDParams) => (dispatch: StateDispatch) => {
+export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (
+  dispatch: StateDispatch
+) => {
   getAddressesByWalletID(params).then(res => {
     if (res.status) {
+      const addresses = res.result || []
+      const balance = addressesToBalance(addresses)
       dispatch({
-        type: NeuronWalletActions.UpdateAddressList,
-        payload: res.result,
+        type: NeuronWalletActions.UpdateAddressListAndBalance,
+        payload: { addresses, balance },
       })
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
@@ -224,7 +229,7 @@ export default {
   updateWallet,
   setCurrentWallet,
   sendTransaction,
-  updateAddressList,
+  updateAddressListAndBalance,
   updateAddressDescription,
   deleteWallet,
   backupWallet,

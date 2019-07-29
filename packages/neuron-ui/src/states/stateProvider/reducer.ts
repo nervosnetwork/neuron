@@ -6,7 +6,7 @@ export enum NeuronWalletActions {
   // wallets
   UpdateCurrentWallet = 'updateCurrentWallet',
   UpdateWalletList = 'updateWalletList',
-  UpdateAddressList = 'updateAddressList',
+  UpdateAddressListAndBalance = 'updateAddressListAndBalance',
   // transactions
   UpdateTransactionList = 'updateTransactionList',
   UpdateTransaction = 'updateTransaction',
@@ -111,12 +111,12 @@ export const reducer = (
         },
       }
     }
-    case NeuronWalletActions.UpdateAddressList: {
+    case NeuronWalletActions.UpdateAddressListAndBalance: {
       return {
         ...state,
         wallet: {
           ...wallet,
-          addresses: payload,
+          ...payload,
         },
       }
     }
