@@ -227,7 +227,7 @@
       "delete-network-successfully": "Delete the network successfully",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
-      "lock-arg-copid": "Lock Arg has been copied to the clipboard"
+      "lock-arg-copied": "Lock Arg has been copied to the clipboard"
     },
     "sync": {
       "syncing": "Syncing",
