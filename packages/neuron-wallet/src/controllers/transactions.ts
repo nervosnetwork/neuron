@@ -35,7 +35,7 @@ export default class TransactionsController {
   public static async getAllByKeywords(
     params: Controller.Params.TransactionsByKeywords
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
-    const { pageNo, pageSize, keywords = '', walletID = '' } = params
+    const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
 
