@@ -1,5 +1,4 @@
 import { getConnection, In, ObjectLiteral } from 'typeorm'
-import { ReplaySubject } from 'rxjs'
 import {
   OutPoint,
   Transaction,
@@ -73,8 +72,6 @@ export enum SearchType {
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
 export default class TransactionsService {
-  public static txSentSubject = new ReplaySubject<{ transaction: TransactionWithoutHash; txHash: string }>(100)
-
   public static filterSearchType = (value: string) => {
     if (value === '') {
       return SearchType.Empty
@@ -680,8 +677,3 @@ export default class TransactionsService {
     return getConnection().manager.save(transactionEntity)
   }
 }
-
-// listen to send tx event
-TransactionsService.txSentSubject.subscribe(msg => {
-  TransactionsService.saveSentTx(msg.transaction, msg.txHash)
-})
