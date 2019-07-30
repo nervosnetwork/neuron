@@ -30,7 +30,7 @@ const SubjectConstructor = <T>(
           })
           return {
             unsubscribe: () => {
-              window.ipcRenderer.removeListener(channel, handler)
+              window.ipcRenderer.removeAllListeners(channel)
             },
           }
         },
