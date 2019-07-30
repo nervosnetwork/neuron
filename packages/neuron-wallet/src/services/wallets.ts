@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import { debounceTime } from 'rxjs/operators'
-import TransactionsService from './transactions'
+import TransactionsService from './tx/transaction-service'
 import { AccountExtendedPublicKey, PathAndPrivateKey } from '../models/keys/key'
 import Keystore from '../models/keys/keystore'
 import Store from '../models/store'
@@ -20,6 +20,8 @@ import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wall
 import dataUpdateSubject from '../models/subjects/data-update'
 import CommandSubject from '../models/subjects/command'
 import WindowManager from '../models/window-manager'
+import SaveTransaction from './tx/save-transaction'
+import GenerateTransaction from './tx/generate-transaction'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -325,7 +327,7 @@ export default class WalletService {
 
     const changeAddress: string = await this.getChangeAddress()
 
-    const tx: TransactionWithoutHash = await TransactionsService.generateTx(
+    const tx: TransactionWithoutHash = await GenerateTransaction.generateTx(
       lockHashes,
       targetOutputs,
       changeAddress,
@@ -358,7 +360,7 @@ export default class WalletService {
     await core.rpc.sendTransaction(txToSend)
 
     tx.description = description
-    await TransactionsService.saveSentTx(tx, txHash)
+    await SaveTransaction.saveSentTx(tx, txHash)
 
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
