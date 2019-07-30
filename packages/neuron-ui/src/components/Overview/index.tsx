@@ -281,7 +281,7 @@ const Overview = ({
     if (defaultAddress) {
       window.navigator.clipboard.writeText(defaultAddress.identifier)
       hideMinerInfo()
-      addPopup('lock-arg-copid')(dispatch)
+      addPopup('lock-arg-copied')(dispatch)
     } else {
       showErrorMessage(t('messages.error'), t('messages.can-not-find-the-default-address'))
     }
