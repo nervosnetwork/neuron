@@ -1,9 +1,8 @@
 import path from 'path'
 import { dialog, shell, Menu, MenuItem, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
-import { take, debounceTime } from 'rxjs/operators'
+import { take } from 'rxjs/operators'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
-import { updateApplicationMenu } from '../../utils/application-menu'
 
 import TransactionsController from '../transactions'
 import NetworksService from '../../services/networks'
@@ -20,8 +19,6 @@ import env from '../../env'
 import CommandSubject from '../../models/subjects/command'
 import { ConnectionStatusSubject } from '../../models/subjects/node'
 import { SystemScriptSubject } from '../../models/subjects/system-script'
-import { WalletListSubject, CurrentWalletSubject } from '../../models/subjects/wallets'
-import dataUpdateSubject from '../../models/subjects/data-update'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {
@@ -87,8 +84,6 @@ export default class AppController {
       connectionStatus,
       codeHash,
     }
-
-    AppController.handleWalletListChange()
 
     return { status: ResponseCode.Success, result: initState }
   }
@@ -200,29 +195,6 @@ export default class AppController {
       win.show()
       win.focus()
     })
-  }
-
-  private static handleWalletListChange() {
-    const DEBOUNCE_TIME = 50
-
-    WalletListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(
-      ({ currentWallet = null, currentWalletList = [] }) => {
-        const walletList = currentWalletList.map(({ id, name }) => ({ id, name }))
-        const currentWalletId = currentWallet ? currentWallet.id : null
-        dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
-        updateApplicationMenu(walletList, currentWalletId)
-      }
-    )
-
-    CurrentWalletSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(
-      async ({ currentWallet = null, walletList = [] }) => {
-        updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
-        if (!currentWallet) {
-          return
-        }
-        dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
-      }
-    )
   }
 }
 
