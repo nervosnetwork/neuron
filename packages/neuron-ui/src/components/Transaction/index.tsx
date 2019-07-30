@@ -76,6 +76,8 @@ const basicInfoColumns: IColumn[] = [
   {
     key: 'label',
     name: 'Label',
+    minWidth: 100,
+    maxWidth: 150,
   },
   {
     key: 'value',
