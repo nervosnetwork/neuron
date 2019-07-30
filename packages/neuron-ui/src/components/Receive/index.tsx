@@ -5,10 +5,12 @@ import { Stack, Text, TextField, TooltipHost, Modal, FontSizes, IconButton } fro
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
+import { addPopup } from 'states/stateProvider/actionCreators'
 
 const Receive = ({
   wallet: { addresses = [] },
   match: { params },
+  dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const [t] = useTranslation()
   const [showLargeQRCode, setShowLargeQRCode] = useState(false)
@@ -23,7 +25,8 @@ const Receive = ({
 
   const copyAddress = useCallback(() => {
     window.navigator.clipboard.writeText(accountAddress)
-  }, [accountAddress])
+    addPopup('addr-copied')(dispatch)
+  }, [accountAddress, dispatch])
 
   if (!accountAddress) {
     return <div>{t('receive.address-not-found')}</div>
@@ -55,7 +58,13 @@ const Receive = ({
         </Stack>
 
         <Stack style={{ alignSelf: 'center' }}>
-          <QRCode value={accountAddress} onQRCodeClick={() => setShowLargeQRCode(true)} size={256} exportable />
+          <QRCode
+            value={accountAddress}
+            onQRCodeClick={() => setShowLargeQRCode(true)}
+            size={256}
+            exportable
+            dispatch={dispatch}
+          />
         </Stack>
       </Stack>
 
@@ -78,7 +87,7 @@ const Receive = ({
           </Text>
         </Stack>
         <Stack tokens={{ padding: '15px' }}>
-          <QRCode value={accountAddress} size={400} />
+          <QRCode value={accountAddress} size={400} dispatch={dispatch} />
         </Stack>
       </Modal>
     </>

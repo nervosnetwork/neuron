@@ -1,12 +1,13 @@
 import initStates from 'states/initStates'
+import { ConnectionStatus } from '../../utils/const'
 
 export enum NeuronWalletActions {
-  InitiateCurrentWalletAndWalletList = 'initiateCurrentWalletAndWalletList',
+  InitAppState = 'initAppState',
   UpdateCodeHash = 'updateCodeHash',
   // wallets
   UpdateCurrentWallet = 'updateCurrentWallet',
   UpdateWalletList = 'updateWalletList',
-  UpdateAddressList = 'updateAddressList',
+  UpdateAddressListAndBalance = 'updateAddressListAndBalance',
   // transactions
   UpdateTransactionList = 'updateTransactionList',
   UpdateTransaction = 'updateTransaction',
@@ -39,6 +40,9 @@ export enum AppActions {
   UpdateTipBlockNumber = 'updateTipBlockNumber',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
+
+  PopIn = 'popIn',
+  PopOut = 'popOut',
   Ignore = 'ignore',
 }
 
@@ -61,16 +65,31 @@ export const reducer = (
   }
   switch (type) {
     // Actions of Neuron Wallet
-    case NeuronWalletActions.InitiateCurrentWalletAndWalletList: {
-      const { wallets, wallet: incomingWallet } = payload
+    case NeuronWalletActions.InitAppState: {
+      const {
+        wallets,
+        wallet: incomingWallet,
+        networks,
+        currentNetworkID: networkID,
+        transactions,
+        syncedBlockNumber,
+        connectionStatus,
+        codeHash,
+      } = payload
       return {
         ...state,
         wallet: incomingWallet || wallet,
         chain: {
           ...state.chain,
+          networkID,
+          transactions,
+          codeHash,
+          connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
+          tipBlockNumber: syncedBlockNumber,
         },
         settings: {
           ...state.settings,
+          networks,
           wallets,
         },
       }
@@ -111,12 +130,12 @@ export const reducer = (
         },
       }
     }
-    case NeuronWalletActions.UpdateAddressList: {
+    case NeuronWalletActions.UpdateAddressListAndBalance: {
       return {
         ...state,
         wallet: {
           ...wallet,
-          addresses: payload,
+          ...payload,
         },
       }
     }
@@ -150,6 +169,13 @@ export const reducer = (
     case NeuronWalletActions.UpdateCurrentNetworkID: {
       return {
         ...state,
+        app: {
+          ...app,
+          tipBlockNumber: '0',
+          chain: '',
+          difficulty: '',
+          epoch: '',
+        },
         chain: {
           ...chain,
           networkID: payload,
@@ -427,6 +453,24 @@ export const reducer = (
             ...app.loadings,
             ...payload,
           },
+        },
+      }
+    }
+    case AppActions.PopIn: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          popups: [...app.popups, payload],
+        },
+      }
+    }
+    case AppActions.PopOut: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          popups: app.popups.slice(1),
         },
       }
     }

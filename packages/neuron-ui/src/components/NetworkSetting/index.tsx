@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { Stack, Text, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
@@ -41,9 +41,19 @@ const NetworkSetting = ({
               checked: chain.networkID === network.id,
               onRenderLabel: ({ text }: IChoiceGroupOption) => {
                 return (
-                  <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(network.id)}>
-                    {text}
-                  </span>
+                  <Stack
+                    horizontal
+                    tokens={{ childrenGap: 5 }}
+                    onContextMenu={onContextMenu(network.id)}
+                    title={`${text}: ${network.remote}`}
+                  >
+                    <Text as="span" className="ms-ChoiceFieldLabel">
+                      {text}
+                    </Text>
+                    <Text as="span" style={{ color: '#999' }}>
+                      {`(${network.remote})`}
+                    </Text>
+                  </Stack>
                 )
               },
             })

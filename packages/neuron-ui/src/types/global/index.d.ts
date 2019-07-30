@@ -8,11 +8,16 @@ declare interface Window {
     process?: any
   }
   require: any
-  bridge: any
   nativeImage: any
+  ipcRenderer: {
+    on(channel: string, listener: Function)
+    removeListener(channel: string, listener: Function)
+  }
 }
 
 declare module '*.json' {
   const value: any
   export default value
 }
+
+declare module '*.scss'

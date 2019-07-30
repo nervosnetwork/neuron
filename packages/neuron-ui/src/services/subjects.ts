@@ -1,5 +1,3 @@
-const SUBJECT_PATH = `./models/subjects`
-
 const FallbackSubject = {
   subscribe: (args: any) => {
     console.warn('remote is not supported')
@@ -10,55 +8,50 @@ const FallbackSubject = {
       },
     }
   },
-  unsubscribe: () => {
-    console.info('unsubscribe')
-  },
 }
-export const SystemScript = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/system-script`).DebouncedSystemScriptSubject as NeuronWalletSubject<{
-      codeHash: string
-    }>)
-  : FallbackSubject
 
-export const DataUpdate = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/data-update`).default as NeuronWalletSubject<{
-      dataType: 'address' | 'transaction' | 'wallet' | 'network'
-      actionType: 'create' | 'update' | 'delete'
-      walletID?: string
-    }>)
-  : FallbackSubject
-
-export const NetworkList = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/networks`).DebouncedNetworkListSubject as NeuronWalletSubject<{
-      currentNetworkList: State.Network[]
-    }>)
-  : FallbackSubject
-
-export const CurrentNetworkID = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/networks`).DebouncedCurrentNetworkIDSubject as NeuronWalletSubject<{
-      currentNetworkID: string
-    }>)
-  : FallbackSubject
-
-export const ConnectionStatus = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/node`).DebouncedConnectionStatusSubject as NeuronWalletSubject<boolean>)
-  : FallbackSubject
-
-export const SyncedBlockNumber = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/node`).SampledSyncedBlockNumberSubject as NeuronWalletSubject<string>)
-  : FallbackSubject
-
-export const Command = window.remote
-  ? (window.remote.require(`${SUBJECT_PATH}/command`).default as NeuronWalletSubject<{
-      winID: number
-      type: Command.Type
-      payload: Command.payload
-    }>)
-  : FallbackSubject
+const SubjectConstructor = <T>(
+  channel:
+    | 'system-script-updated'
+    | 'data-updated'
+    | 'current-wallet-updated'
+    | 'wallet-list-updated'
+    | 'current-network-id-updated'
+    | 'network-list-updated'
+    | 'connection-status-updated'
+    | 'synced-block-number-updated'
+    | 'command'
+) => {
+  return window.ipcRenderer
+    ? {
+        subscribe: (handler: (data: T) => void) => {
+          window.ipcRenderer.on(channel, (_e: Event, data: T) => {
+            handler(data)
+          })
+          return {
+            unsubscribe: () => {
+              window.ipcRenderer.removeListener(channel, handler)
+            },
+          }
+        },
+      }
+    : FallbackSubject
+}
+export const SystemScript = SubjectConstructor<Subject.SystemScript>('system-script-updated')
+export const DataUpdate = SubjectConstructor<Subject.DataUpdateMetaInfo>('data-updated')
+export const CurrentWallet = SubjectConstructor<any>('current-wallet-updated')
+export const WalletList = SubjectConstructor<any[]>('wallet-list-updated')
+export const NetworkList = SubjectConstructor<Subject.NetworkList>('network-list-updated')
+export const CurrentNetworkID = SubjectConstructor<Subject.CurrentNetworkID>('current-network-id-updated')
+export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('connection-status-updated')
+export const SyncedBlockNumber = SubjectConstructor<Subject.BlockNumber>('synced-block-number-updated')
+export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 
 export default {
   SystemScript,
   DataUpdate,
+  CurrentWallet,
+  WalletList,
   NetworkList,
   CurrentNetworkID,
   ConnectionStatus,

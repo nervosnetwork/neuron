@@ -6,7 +6,6 @@ import { Stack, getTheme, Text, ProgressIndicator, Icon } from 'office-ui-fabric
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectionStatus, FULL_SCREENS, Routes } from 'utils/const'
-import { localNumberFormatter } from 'utils/formatters'
 import { NeuronWalletContext } from 'states/stateProvider'
 
 const theme = getTheme()
@@ -43,10 +42,9 @@ export const SyncStatus = ({
             percentComplete={percentage}
             styles={{ root: { width: '120px', marginLeft: '5px', marginRight: '5px' } }}
           />
-          {`${localNumberFormatter(syncedBlockNumber) || '0'}/${localNumberFormatter(tipBlockNumber) || '0'}`}
         </>
       ) : (
-        <>{`${t('sync.synced')}, ${t('sync.block-number')}: ${localNumberFormatter(tipBlockNumber)}`}</>
+        <>{t('sync.synced')}</>
       )}
     </div>
   )

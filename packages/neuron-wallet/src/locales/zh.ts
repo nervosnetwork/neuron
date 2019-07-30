@@ -8,7 +8,8 @@ export default {
     'application-menu': {
       neuron: {
         about: '关于{{app}}',
-        preferences: '设置...',
+        preferences: '偏好设置...',
+        'check-updates': '检查更新...',
         quit: '退出{{app}}',
       },
       wallet: {
@@ -39,6 +40,7 @@ export default {
       help: {
         label: '帮助',
         sourceCode: '源代码',
+        settings: '设置',
       },
       develop: {
         develop: '开发',
@@ -130,6 +132,16 @@ export default {
         submit: '提交',
         cancel: '取消',
       },
+    },
+    updater: {
+      'update-not-available': '没有可供升级的新版本。',
+      'updates-found-do-you-want-to-update': '有可供升级的新版本。马上进行升级吗？',
+      'update-now': '马上升级',
+      'updates-downloaded-about-to-quit-and-install': '下载完成。Neuron 将退出并安装新版本...',
+    },
+    common: {
+      yes: '是',
+      no: '否',
     },
   },
 }

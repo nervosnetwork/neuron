@@ -60,6 +60,11 @@ declare namespace State {
     loading: boolean
   }
 
+  interface Popup {
+    timestamp: Date
+    text: string
+  }
+
   interface App {
     tipBlockNumber: string
     chain: string
@@ -74,6 +79,7 @@ declare namespace State {
     messages: {
       [index: string]: Message | null
     }
+    popups: Popup[]
     notifications: Message[]
     loadings: {
       sending: boolean

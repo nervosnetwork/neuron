@@ -43,7 +43,6 @@ export enum CapacityUnit {
 
 export const PlaceHolders = {
   send: {
-    Address: 'eg: ckt1q9gry5zgzrccrjnvnhktjx6remmktn9h6s2fupurhzmgm9',
     Amount: 'eg: 100',
   },
 }
