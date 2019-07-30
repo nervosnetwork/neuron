@@ -1,5 +1,5 @@
 import path from 'path'
-import { dialog, shell, Menu, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
+import { dialog, shell, Menu, MenuItem, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
 import { take } from 'rxjs/operators'
 import app from '../../app'
 import { URL, contextMenuTemplate } from './options'
@@ -9,6 +9,7 @@ import NetworksService from '../../services/networks'
 import WalletsService from '../../services/wallets'
 import WalletsController from '../wallets'
 import SyncInfoController from '../sync-info'
+import UpdateController from '../update'
 
 import { Controller as ControllerDecorator } from '../../decorators'
 import { Channel, ResponseCode } from '../../utils/const'
@@ -83,6 +84,7 @@ export default class AppController {
       connectionStatus,
       codeHash,
     }
+
     return { status: ResponseCode.Success, result: initState }
   }
 
@@ -153,6 +155,10 @@ export default class AppController {
       cancelId: 0,
     }
     AppController.showMessageBox(options)
+  }
+
+  public static checkUpdates(menuItem: MenuItem) {
+    UpdateController.checkUpdates(menuItem)
   }
 
   public static openWebsite() {
