@@ -4,6 +4,13 @@ import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
+import AddressService from '../../src/services/addresses'
+
+const mockDeleteAddressByWalletId = () => {
+  const mockDeleteAddress = jest.fn()
+  mockDeleteAddress.mockReturnValue(undefined)
+  AddressService.deleteByWalletId = mockDeleteAddress.bind(AddressService)
+}
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -115,6 +122,7 @@ describe('wallet service', () => {
   })
 
   it('delete wallet', () => {
+    mockDeleteAddressByWalletId()
     const w1 = walletService.create(wallet1)
     walletService.create(wallet2)
     expect(walletService.getAll().length).toBe(2)
@@ -147,6 +155,7 @@ describe('wallet service', () => {
   })
 
   it('delete current wallet', () => {
+    mockDeleteAddressByWalletId()
     const w1 = walletService.create(wallet1)
     const w2 = walletService.create(wallet2)
     walletService.delete(w1.id)
@@ -156,6 +165,7 @@ describe('wallet service', () => {
   })
 
   it('delete none current wallet', () => {
+    mockDeleteAddressByWalletId()
     const w1 = walletService.create(wallet1)
     const w2 = walletService.create(wallet2)
     walletService.delete(w2.id)
