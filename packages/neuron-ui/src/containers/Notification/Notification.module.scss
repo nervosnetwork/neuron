@@ -8,7 +8,7 @@
   &>div {
     max-width: auto;
     margin: 3px;
-    animation: autoDismiss 2.5s ease-out forwards;
+    animation: autoDismiss 6.8s ease-out forwards;
     transform-origin: center top;
     box-sizing: border-box;
     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.25);
@@ -20,8 +20,8 @@
     transform: translateX(110%)
   }
 
-  15%,
-  85% {
+  5%,
+  90% {
 
     transform: translateX(0)
   }
