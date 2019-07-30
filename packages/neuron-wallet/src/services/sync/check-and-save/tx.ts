@@ -18,7 +18,7 @@ export default class CheckTx {
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
     const outputs: Cell[] = this.filterOutputs(lockHashes)
-    const inputAddresses = await this.filterInputs()
+    const inputAddresses = await this.filterInputs(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(output.lock)
@@ -48,24 +48,23 @@ export default class CheckTx {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "warn" */
-  public filterInputs = async (): Promise<string[]> => {
+  public filterInputs = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
       const { cell } = outPoint
-      if (!cell) {
-        break
-      }
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .findOne({
-          outPointTxHash: cell.txHash,
-          outPointIndex: cell.index,
-        })
-      if (output) {
-        addresses.push(LockUtils.lockScriptToAddress(output.lock))
+      if (cell) {
+        const output = await getConnection()
+          .getRepository(OutputEntity)
+          .findOne({
+            outPointTxHash: cell.txHash,
+            outPointIndex: cell.index,
+          })
+        if (output && lockHashes.includes(output.lockHash)) {
+          addresses.push(LockUtils.lockScriptToAddress(output.lock))
+        }
       }
     }
 

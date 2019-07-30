@@ -213,7 +213,10 @@ export class TransactionPersistor {
   }
 
   public static saveFetchTx = async (transaction: Transaction): Promise<TransactionEntity> => {
-    const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(transaction, TxSaveType.Fetch)
+    const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(
+      transaction,
+      TxSaveType.Fetch
+    )
     return txEntity
   }
 
