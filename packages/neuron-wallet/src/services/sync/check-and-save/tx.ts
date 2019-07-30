@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import { Subject } from 'rxjs'
 import { Transaction, Cell, OutPoint } from '../../../types/cell-types'
 import OutputEntity from '../../../database/chain/entities/output'
-import { SaveTransaction } from '../../tx'
+import { TransactionPersistor } from '../../tx'
 import CheckOutput from './output'
 import LockUtils from '../../../models/lock-utils'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
@@ -32,7 +32,7 @@ export default class CheckTx {
   public checkAndSave = async (lockHashes: string[]): Promise<boolean> => {
     const addresses = await this.check(lockHashes)
     if (addresses.length > 0) {
-      await SaveTransaction.saveFetchTx(this.tx)
+      await TransactionPersistor.saveFetchTx(this.tx)
       this.addressesUsedSubject.next(addresses)
       return true
     }

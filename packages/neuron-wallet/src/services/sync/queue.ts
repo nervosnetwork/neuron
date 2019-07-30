@@ -4,7 +4,7 @@ import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import QueueAdapter from './queue-adapter'
-import { SaveTransaction } from '../tx'
+import { TransactionPersistor } from '../tx'
 
 export default class Queue {
   private q: any
@@ -106,7 +106,7 @@ export default class Queue {
         const rangeFirstBlockHeader: BlockHeader = range[0]
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
         await this.rangeForCheck.setRange([])
-        await SaveTransaction.deleteWhenFork(rangeFirstBlockHeader.number)
+        await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
         await this.cleanQueue()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()

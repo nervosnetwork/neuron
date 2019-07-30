@@ -9,7 +9,7 @@ import { OutputStatus, TxSaveType } from './params'
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
-export class SaveTransaction {
+export class TransactionPersistor {
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
@@ -22,7 +22,7 @@ export class SaveTransaction {
       // nothing to do if exists already
       return txEntity
     }
-    return SaveTransaction.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
+    return TransactionPersistor.create(transaction, OutputStatus.Sent, OutputStatus.Pending)
   }
 
   // After the tx is fetched:
@@ -81,7 +81,7 @@ export class SaveTransaction {
       return txEntity
     }
 
-    return SaveTransaction.create(transaction, OutputStatus.Live, OutputStatus.Dead)
+    return TransactionPersistor.create(transaction, OutputStatus.Live, OutputStatus.Dead)
   }
 
   // only create, check exist before this
@@ -203,9 +203,9 @@ export class SaveTransaction {
     )
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
-      txEntity = await SaveTransaction.saveWithSent(transaction)
+      txEntity = await TransactionPersistor.saveWithSent(transaction)
     } else if (saveType === TxSaveType.Fetch) {
-      txEntity = await SaveTransaction.saveWithFetch(transaction)
+      txEntity = await TransactionPersistor.saveWithFetch(transaction)
     } else {
       throw new Error('Error TxSaveType!')
     }
@@ -213,7 +213,7 @@ export class SaveTransaction {
   }
 
   public static saveFetchTx = async (transaction: Transaction): Promise<TransactionEntity> => {
-    const txEntity: TransactionEntity = await SaveTransaction.convertTransactionAndSave(transaction, TxSaveType.Fetch)
+    const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(transaction, TxSaveType.Fetch)
     return txEntity
   }
 
@@ -225,9 +225,9 @@ export class SaveTransaction {
       hash: txHash,
       ...transaction,
     }
-    const txEntity: TransactionEntity = await SaveTransaction.convertTransactionAndSave(tx, TxSaveType.Sent)
+    const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
   }
 }
 
-export default SaveTransaction
+export default TransactionPersistor
