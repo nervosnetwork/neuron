@@ -95,7 +95,7 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
       type: AppActions.PopOut,
       payload: null,
     })
-  }, 3000)
+  }, 8000)
 }
 
 export default {
