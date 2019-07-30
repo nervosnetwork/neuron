@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import { debounceTime } from 'rxjs/operators'
-import TransactionsService from './tx/transaction-service'
+import { TransactionsService, SaveTransaction, GenerateTransaction } from './tx'
 import { AccountExtendedPublicKey, PathAndPrivateKey } from '../models/keys/key'
 import Keystore from '../models/keys/keystore'
 import Store from '../models/store'
@@ -20,8 +20,6 @@ import { WalletListSubject, CurrentWalletSubject } from '../models/subjects/wall
 import dataUpdateSubject from '../models/subjects/data-update'
 import CommandSubject from '../models/subjects/command'
 import WindowManager from '../models/window-manager'
-import SaveTransaction from './tx/save-transaction'
-import GenerateTransaction from './tx/generate-transaction'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()

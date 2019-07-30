@@ -4,7 +4,7 @@ import LockUtils from '../../models/lock-utils'
 import { CapacityTooSmall } from '../../exceptions'
 import { TargetOutput } from './params'
 
-export default class GenerateTransaction {
+export class GenerateTransaction {
   // lockHashes for each inputs
   public static generateTx = async (
     lockHashes: string[],
@@ -70,3 +70,5 @@ export default class GenerateTransaction {
     }
   }
 }
+
+export default GenerateTransaction

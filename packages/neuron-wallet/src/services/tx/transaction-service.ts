@@ -41,7 +41,7 @@ export enum SearchType {
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
-export default class TransactionsService {
+export class TransactionsService {
   public static filterSearchType = (value: string) => {
     if (value === '') {
       return SearchType.Empty
@@ -296,3 +296,5 @@ export default class TransactionsService {
     return getConnection().manager.save(transactionEntity)
   }
 }
+
+export default TransactionsService

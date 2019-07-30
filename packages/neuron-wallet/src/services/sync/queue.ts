@@ -4,7 +4,7 @@ import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import QueueAdapter from './queue-adapter'
-import SaveTransaction from '../tx/save-transaction'
+import { SaveTransaction } from '../tx'
 
 export default class Queue {
   private q: any

@@ -5,7 +5,7 @@ import TransactionEntity from '../../database/chain/entities/transaction'
 import { OutputStatus } from './params'
 import TransactionsService from './transaction-service'
 
-export default class FailedTransaction {
+export class FailedTransaction {
   public static pendings = async (): Promise<TransactionEntity[]> => {
     const pendingTransactions = await getConnection()
       .getRepository(TransactionEntity)
@@ -70,3 +70,5 @@ export default class FailedTransaction {
     return uniqueBlake160s
   }
 }
+
+export default FailedTransaction

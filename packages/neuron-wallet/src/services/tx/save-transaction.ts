@@ -9,7 +9,7 @@ import { OutputStatus, TxSaveType } from './params'
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "off" */
 /* eslint no-restricted-syntax: "off" */
-export default class SaveTransaction {
+export class SaveTransaction {
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
@@ -229,3 +229,5 @@ export default class SaveTransaction {
     return txEntity
   }
 }
+
+export default SaveTransaction

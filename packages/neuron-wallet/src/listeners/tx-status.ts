@@ -3,7 +3,7 @@ import { interval } from 'rxjs'
 import { TransactionStatus } from '../types/cell-types'
 import LockUtils from '../models/lock-utils'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
-import FailedTransaction from '../services/tx/failed-transaction'
+import { FailedTransaction } from '../services/tx'
 
 const { nodeService } = remote.require('./startup/sync-block-task/params')
 
