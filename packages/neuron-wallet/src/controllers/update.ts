@@ -6,12 +6,15 @@ autoUpdater.autoDownload = false
 
 let updaterMenuItem: MenuItem | null
 const enableUpdaterMenuItem = () => {
-  updaterMenuItem!.enabled = true
+  if (updaterMenuItem) {
+    updaterMenuItem.enabled = true
+  }
   updaterMenuItem = null
 }
 
 autoUpdater.on('error', error => {
   dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
+  enableUpdaterMenuItem()
 })
 
 autoUpdater.on('update-available', () => {
