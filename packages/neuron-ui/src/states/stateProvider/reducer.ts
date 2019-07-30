@@ -40,6 +40,9 @@ export enum AppActions {
   UpdateTipBlockNumber = 'updateTipBlockNumber',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
+
+  PopIn = 'popIn',
+  PopOut = 'popOut',
   Ignore = 'ignore',
 }
 
@@ -450,6 +453,24 @@ export const reducer = (
             ...app.loadings,
             ...payload,
           },
+        },
+      }
+    }
+    case AppActions.PopIn: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          popups: [...app.popups, payload],
+        },
+      }
+    }
+    case AppActions.PopOut: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          popups: app.popups.slice(1),
         },
       }
     }

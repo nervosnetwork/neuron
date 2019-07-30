@@ -21,7 +21,7 @@ import {
 } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { updateTransactionList } from 'states/stateProvider/actionCreators'
+import { updateTransactionList, addPopup } from 'states/stateProvider/actionCreators'
 
 import { showErrorMessage } from 'services/remote'
 
@@ -281,11 +281,11 @@ const Overview = ({
     if (defaultAddress) {
       window.navigator.clipboard.writeText(defaultAddress.identifier)
       hideMinerInfo()
-      // TODO: Add notification
+      addPopup('lock-arg-copied')(dispatch)
     } else {
       showErrorMessage(t('messages.error'), t('messages.can-not-find-the-default-address'))
     }
-  }, [defaultAddress, t, hideMinerInfo])
+  }, [defaultAddress, t, hideMinerInfo, dispatch])
 
   return (
     <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">

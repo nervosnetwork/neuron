@@ -85,7 +85,21 @@ export const addNotification = ({ type, content }: { type: 'alert'; content: str
   })
 }
 
+export const addPopup = (text: string) => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.PopIn,
+    payload: { text: `messages.${text}`, timestamp: Date.now() },
+  })
+  setTimeout(() => {
+    dispatch({
+      type: AppActions.PopOut,
+      payload: null,
+    })
+  }, 3000)
+}
+
 export default {
   initAppState,
   addNotification,
+  addPopup,
 }

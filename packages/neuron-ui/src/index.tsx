@@ -5,6 +5,7 @@ import { loadTheme, getTheme } from 'office-ui-fabric-react'
 import {
   AddCircle as AddIcon,
   Alert as AlertIcon,
+  Checkmark as SuccessIcon,
   Close as DismissIcon,
   Copy as CopyIcon,
   Down as ArrowDownIcon,
@@ -58,6 +59,7 @@ const { semanticColors } = theme
 registerIcons({
   icons: {
     errorbadge: <AlertIcon size="16px" />,
+    completed: <SuccessIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" />,
     Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
     FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,

@@ -16,7 +16,7 @@ import { wallets as walletsCache, currentWallet as currentWalletCache } from 'ut
 import { Routes } from 'utils/const'
 import addressesToBalance from 'utils/addressesToBalance'
 import { NeuronWalletActions } from '../reducer'
-import { addNotification } from './app'
+import { addNotification, addPopup } from './app'
 
 export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
   getCurrentWallet().then(res => {
@@ -39,10 +39,6 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
 ) => {
   importMnemonic(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
       history.push(Routes.Overview)
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
@@ -56,10 +52,6 @@ export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams
 ) => {
   importMnemonic(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
       history.push(Routes.Overview)
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
@@ -87,10 +79,7 @@ export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
 ) => {
   updateWallet(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
+      addPopup('update-wallet-successfully')(dispatch)
       if (history) {
         history.push(Routes.SettingsWallets)
       }
@@ -195,10 +184,7 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
   })
   deleteRemoteWallet(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
+      addPopup('delete-wallet-successfully')(dispatch)
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
     }

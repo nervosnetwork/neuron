@@ -1,7 +1,7 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
 import { addressBook } from 'utils/localCache'
 import { Routes } from 'utils/const'
-import { addNotification } from './app'
+import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
 
@@ -20,6 +20,7 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
         type: AppActions.Ignore,
         payload: null,
       })
+      addPopup('create-network-successfully')(dispatch)
       history.push(Routes.SettingsNetworks)
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
@@ -30,10 +31,7 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
 export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispatch: StateDispatch, history: any) => {
   updateRemoteNetwork(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
+      addPopup('update-network-successfully')(dispatch)
       history.push(Routes.SettingsNetworks)
     } else {
       addNotification({ type: 'alert', content: res.message.title })(dispatch)
