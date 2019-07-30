@@ -1,10 +1,8 @@
 import { getConnection, ObjectLiteral } from 'typeorm'
+import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { Transaction, TransactionWithoutHash, TransactionStatus } from '../../types/cell-types'
 import TransactionEntity from '../../database/chain/entities/transaction'
-import NodeService from '../node'
 import LockUtils from '../../models/lock-utils'
-
-const { core } = NodeService.getInstance()
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -209,7 +207,7 @@ export class TransactionsService {
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     const addresses: string[] = params.pubkeys.map(pubkey => {
-      const addr = core.utils.pubkeyToAddress(pubkey)
+      const addr = pubkeyToAddress(pubkey)
       return addr
     })
 
