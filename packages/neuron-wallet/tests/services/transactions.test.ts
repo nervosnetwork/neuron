@@ -1,4 +1,4 @@
-import TransactionsService, { SearchType } from '../../src/services/transactions'
+import TransactionsService, { SearchType } from '../../src/services/tx/transaction-service'
 
 describe('transactions service', () => {
   describe('filterSearchType', () => {

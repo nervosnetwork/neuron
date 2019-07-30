@@ -3,8 +3,8 @@ import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
-import TransactionsService from '../transactions'
 import QueueAdapter from './queue-adapter'
+import { TransactionPersistor } from '../tx'
 
 export default class Queue {
   private q: any
@@ -106,7 +106,7 @@ export default class Queue {
         const rangeFirstBlockHeader: BlockHeader = range[0]
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
         await this.rangeForCheck.setRange([])
-        await TransactionsService.deleteWhenFork(rangeFirstBlockHeader.number)
+        await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
         await this.cleanQueue()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()
