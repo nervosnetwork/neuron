@@ -124,8 +124,8 @@ export class TransactionsService {
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     try {
-      // if connection not found, may means no database to connection
-      // it will happend when first connection to database and no network.
+      // if connection not found, may means no database to connect
+      // it happened when no node connected and no previous database found.
       getConnection()
     } catch (err) {
       if (err.name === CONNECTION_NOT_FOUND_NAME) {
@@ -240,8 +240,8 @@ export class TransactionsService {
 
   public static get = async (hash: string): Promise<Transaction | undefined> => {
     try {
-      // if connection not found, may means no database to connection
-      // it will happend when first connection to database and no network.
+      // if connection not found, may means no database to connect
+      // it happened when no node connected and no previous database found.
       getConnection()
     } catch (err) {
       if (err.name === CONNECTION_NOT_FOUND_NAME) {
