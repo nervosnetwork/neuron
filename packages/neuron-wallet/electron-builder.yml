@@ -68,4 +68,3 @@ linux:
   icon: assets/images/
   target:
     - AppImage
-    - deb
