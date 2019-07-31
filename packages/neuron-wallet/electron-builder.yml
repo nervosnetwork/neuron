@@ -44,7 +44,6 @@ dmg:
 win:
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
-  publisherName: Nervos Foundation
   target:
     - target: nsis
       arch:
