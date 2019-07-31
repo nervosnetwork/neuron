@@ -59,23 +59,8 @@ export default class BlockListener {
     this.queue = null
   }
 
-  public pause = () => {
-    if (!this.queue) {
-      return
-    }
-    this.queue.pause()
-  }
-
-  public resume = () => {
-    if (!this.queue) {
-      return
-    }
-
-    this.queue.resume()
-  }
-
   public regenerate = async (): Promise<void> => {
-    if (this.queue && this.queue.get().length() > 0) {
+    if (this.queue && this.queue.length() > 0) {
       return
     }
 
@@ -83,7 +68,6 @@ export default class BlockListener {
     const startBlockNumber: string = (current + BigInt(1)).toString()
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
-    // TODO: check this queue stopped
     this.generateQueue(startBlockNumber, endBlockNumber)
   }
 

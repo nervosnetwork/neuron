@@ -16,33 +16,16 @@ export default class QueueAdapter {
   }
 
   public kill = () => {
-    this.push = () => {}
-    this.pause()
-    this.remove(() => true)
+    this.push = (value: any) => value
+    this.clear()
     this.q.kill()
   }
 
-  public remove = (callback: any) => {
-    this.q.remove(callback)
-  }
-
-  public removeAll = () => {
-    this.remove(() => true)
-  }
-
-  public pause = () => {
-    this.q.pause()
-  }
-
-  public resume = () => {
-    this.q.resume()
+  public clear = () => {
+    this.q.remove(() => true)
   }
 
   public length = (): number => {
     return this.q.length()
-  }
-
-  public drain = (callback: any) => {
-    this.q.drain(callback)
   }
 }

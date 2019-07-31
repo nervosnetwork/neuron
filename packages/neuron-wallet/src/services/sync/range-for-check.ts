@@ -34,6 +34,10 @@ export default class RangeForCheck {
     this.range = range
   }
 
+  public clearRange = () => {
+    this.range = []
+  }
+
   public pushRange = (range: BlockHeader[]) => {
     if (range.length <= 0) {
       return

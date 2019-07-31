@@ -7,7 +7,7 @@ import QueueAdapter from './queue-adapter'
 import { TransactionPersistor } from '../tx'
 
 export default class Queue {
-  private q: any
+  private q: QueueAdapter
   private concurrent: number = 1
   private lockHashes: string[]
   private getBlocksService: GetBlocks
@@ -26,21 +26,13 @@ export default class Queue {
     currentBlockNumber: BlockNumber = new BlockNumber(),
     rangeForCheck: RangeForCheck = new RangeForCheck()
   ) {
-    this.generateQueue()
+    this.q = new QueueAdapter(this.getWorker(), this.concurrent)
     this.lockHashes = lockHashes
     this.getBlocksService = new GetBlocks()
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck
     this.currentBlockNumber = currentBlockNumber
-  }
-
-  private generateQueue = () => {
-    this.q = new QueueAdapter(this.getWorker(), this.concurrent)
-  }
-
-  public cleanQueue = () => {
-    this.q.removeAll()
   }
 
   public setLockHashes = (lockHashes: string[]): void => {
@@ -53,30 +45,28 @@ export default class Queue {
         await Utils.retry(this.retryTime, 0, async () => {
           await this.pipeline(task.blockNumbers)
         })
+        await callback()
       } catch {
-        this.q.kill()
-        this.q.remove(() => true)
+        this.clear()
       }
-      await callback()
     }
     return worker
+  }
+
+  public clear = () => {
+    this.q.clear()
   }
 
   public get = () => {
     return this.q
   }
 
-  public pause = () => {
-    this.q.pause()
-  }
-
-  public resume = () => {
-    this.q.resume()
+  public length = (): number => {
+    return this.q.length()
   }
 
   public kill = () => {
     this.q.kill()
-    this.q.removeAll()
   }
 
   public pipeline = async (blockNumbers: string[]) => {
@@ -105,9 +95,9 @@ export default class Queue {
         const range = await this.rangeForCheck.getRange()
         const rangeFirstBlockHeader: BlockHeader = range[0]
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
-        await this.rangeForCheck.setRange([])
+        await this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        await this.cleanQueue()
+        await this.clear()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()
       } else if (checkResult.type === 'block-headers-not-match') {
@@ -122,9 +112,9 @@ export default class Queue {
   }
 
   public batchPush = (): void => {
-    const rangeArr = this.range(this.startBlockNumber, this.endBlockNumber)
+    const rangeArr = Utils.rangeForBigInt(this.startBlockNumber, this.endBlockNumber)
 
-    const slice = this.eachSlice(rangeArr, this.fetchSize)
+    const slice = Utils.eachSlice(rangeArr, this.fetchSize)
 
     slice.forEach(async arr => {
       await this.push(arr)
@@ -139,7 +129,7 @@ export default class Queue {
       return
     }
 
-    this.q.removeAll()
+    this.clear()
     this.batchPush()
   }
 
@@ -148,18 +138,5 @@ export default class Queue {
       return undefined
     }
     return this.batchPush()
-  }
-
-  private eachSlice = (array: any[], size: number) => {
-    const arr = []
-    for (let i = 0, l = array.length; i < l; i += size) {
-      arr.push(array.slice(i, i + size))
-    }
-    return arr
-  }
-
-  private range = (startNumber: bigint, endNumber: bigint): bigint[] => {
-    const size = +(endNumber - startNumber + BigInt(1)).toString()
-    return [...Array(size).keys()].map(i => BigInt(i) + startNumber)
   }
 }

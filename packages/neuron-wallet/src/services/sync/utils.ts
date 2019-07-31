@@ -8,10 +8,13 @@ export default class Utils {
   }
 
   public static range = (startNumber: string, endNumber: string): string[] => {
-    const startNumberInt = BigInt(startNumber)
-    const endNumberInt = BigInt(endNumber)
-    const size = +(endNumberInt - startNumberInt + BigInt(1)).toString()
-    return [...Array(size).keys()].map(i => (BigInt(i) + startNumber).toString())
+    const result = Utils.rangeForBigInt(BigInt(startNumber), BigInt(endNumber))
+    return result.map(num => num.toString())
+  }
+
+  public static rangeForBigInt = (startNumber: bigint, endNumber: bigint): bigint[] => {
+    const size = +(endNumber - startNumber + BigInt(1)).toString()
+    return [...Array(size).keys()].map(i => BigInt(i) + startNumber)
   }
 
   public static sleep = (ms: number) => {
