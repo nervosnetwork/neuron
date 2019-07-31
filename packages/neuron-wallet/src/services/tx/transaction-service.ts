@@ -124,7 +124,7 @@ export class TransactionsService {
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
     try {
-      // if connection not found, may means no database to connect
+      // if connection not found, which means no database to connect
       // it happened when no node connected and no previous database found.
       getConnection()
     } catch (err) {
