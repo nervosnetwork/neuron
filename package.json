@@ -10,8 +10,8 @@
     "url": "https://github.com/nervosnetwork/neuron"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/nervosnetwork/neuron"
+    "type": "git",
+    "url": "https://github.com/nervosnetwork/neuron"
   },
   "license": "MIT",
   "engines": {
