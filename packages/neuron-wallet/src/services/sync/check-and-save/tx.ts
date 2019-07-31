@@ -2,7 +2,7 @@ import { getConnection } from 'typeorm'
 import { Subject } from 'rxjs'
 import { Transaction, Cell, OutPoint } from '../../../types/cell-types'
 import OutputEntity from '../../../database/chain/entities/output'
-import TransactionsService from '../../transactions'
+import { TransactionPersistor } from '../../tx'
 import CheckOutput from './output'
 import LockUtils from '../../../models/lock-utils'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
@@ -18,7 +18,7 @@ export default class CheckTx {
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
     const outputs: Cell[] = this.filterOutputs(lockHashes)
-    const inputAddresses = await this.filterInputs()
+    const inputAddresses = await this.filterInputs(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(output.lock)
@@ -32,7 +32,7 @@ export default class CheckTx {
   public checkAndSave = async (lockHashes: string[]): Promise<boolean> => {
     const addresses = await this.check(lockHashes)
     if (addresses.length > 0) {
-      await TransactionsService.saveFetchTx(this.tx)
+      await TransactionPersistor.saveFetchTx(this.tx)
       this.addressesUsedSubject.next(addresses)
       return true
     }
@@ -48,24 +48,23 @@ export default class CheckTx {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "warn" */
-  public filterInputs = async (): Promise<string[]> => {
+  public filterInputs = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput
       const { cell } = outPoint
-      if (!cell) {
-        break
-      }
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .findOne({
-          outPointTxHash: cell.txHash,
-          outPointIndex: cell.index,
-        })
-      if (output) {
-        addresses.push(LockUtils.lockScriptToAddress(output.lock))
+      if (cell) {
+        const output = await getConnection()
+          .getRepository(OutputEntity)
+          .findOne({
+            outPointTxHash: cell.txHash,
+            outPointIndex: cell.index,
+          })
+        if (output && lockHashes.includes(output.lockHash)) {
+          addresses.push(LockUtils.lockScriptToAddress(output.lock))
+        }
       }
     }
 

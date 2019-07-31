@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.17.0-alpha.1",
+  "version": "0.17.0-alpha.2",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -8,8 +8,8 @@
     "url": "https://github.com/nervosnetwork/neuron"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/nervosnetwork/neuron"
+    "type": "git",
+    "url": "https://github.com/nervosnetwork/neuron"
   },
   "homepage": "./",
   "main": "./build",

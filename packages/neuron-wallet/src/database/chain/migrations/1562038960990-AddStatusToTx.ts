@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner, TableColumn, getConnection} from "typeorm";
 import TransactionEntity from '../entities/transaction'
-import { OutputStatus } from '../../../services/transactions'
+import { OutputStatus } from '../../../services/tx/params'
 import { TransactionStatus } from '../../../types/cell-types'
 
 export class AddStatusToTx1562038960990 implements MigrationInterface {

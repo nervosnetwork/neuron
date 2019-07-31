@@ -12,6 +12,7 @@ declare interface Window {
   ipcRenderer: {
     on(channel: string, listener: Function)
     removeListener(channel: string, listener: Function)
+    removeAllListeners(channel: string)
   }
 }
 

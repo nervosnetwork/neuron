@@ -25,12 +25,12 @@ const History = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
 
-  const { keywords, onKeywordsChange, setKeywords } = useSearch(search, id, dispatch)
+  const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   useEffect(() => {
     if (id) {
-      setKeywords('')
+      history.push(`${Routes.History}?pageNo=1&keywords=${''}`)
     }
-  }, [id, setKeywords])
+  }, [id, history])
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
 
   return (

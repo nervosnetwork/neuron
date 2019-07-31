@@ -1,5 +1,5 @@
 import { Transaction } from '../types/cell-types'
-import TransactionsService, { PaginationResult, TransactionsByLockHashesParam } from '../services/transactions'
+import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } from '../services/tx'
 
 import AddressesService from '../services/addresses'
 import WalletsService from '../services/wallets'
@@ -35,7 +35,7 @@ export default class TransactionsController {
   public static async getAllByKeywords(
     params: Controller.Params.TransactionsByKeywords
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
-    const { pageNo, pageSize, keywords = '', walletID = '' } = params
+    const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
 
