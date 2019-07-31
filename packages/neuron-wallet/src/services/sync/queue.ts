@@ -107,8 +107,8 @@ export default class Queue {
     }
   }
 
-  public push = async (blockNumbers: string[]): Promise<void> => {
-    await this.q.push({ blockNumbers })
+  public push = (blockNumbers: string[]): void => {
+    this.q.push({ blockNumbers })
   }
 
   public batchPush = (): void => {
@@ -116,8 +116,8 @@ export default class Queue {
 
     const slice = Utils.eachSlice(rangeArr, this.fetchSize)
 
-    slice.forEach(async arr => {
-      await this.push(arr)
+    slice.forEach(arr => {
+      this.push(arr)
     })
   }
 

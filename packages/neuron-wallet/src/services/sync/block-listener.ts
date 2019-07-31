@@ -7,7 +7,7 @@ import Utils from './utils'
 
 export default class BlockListener {
   private lockHashes: string[]
-  private tipBlockNumber: number = -1
+  private tipBlockNumber: bigint = BigInt(-1)
   private queue: Queue | undefined | null = undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
@@ -24,7 +24,7 @@ export default class BlockListener {
 
     this.tipNumberListener = tipNumberSubject.subscribe(async num => {
       if (num) {
-        this.tipBlockNumber = parseInt(num, 10)
+        this.tipBlockNumber = BigInt(num)
       }
     })
   }
