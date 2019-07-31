@@ -87,6 +87,8 @@ declare namespace State {
       transactionList: boolean
       updateDescription: boolean
     }
+    showTopAlert: boolean
+    showAllNotifications: boolean
   }
 
   interface NetworkProperty {
