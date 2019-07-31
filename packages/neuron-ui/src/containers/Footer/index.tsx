@@ -57,7 +57,16 @@ export const NetworkStatus = ({ name, online }: { name: string; online: boolean 
         iconName={online ? 'Connected' : 'Disconnected'}
         styles={{ root: { display: 'flex', alignItems: 'center' } }}
       />
-      <Text styles={{ root: [theme.fonts.small] }}>{name}</Text>
+      <Text
+        styles={{
+          root: {
+            fontSize: '14px',
+            lineHeight: '14px',
+          },
+        }}
+      >
+        {name}
+      </Text>
     </Stack>
   )
 }
