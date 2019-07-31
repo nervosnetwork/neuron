@@ -1,9 +1,11 @@
 import { remote } from 'electron'
 import { interval } from 'rxjs'
+import { getConnection } from 'typeorm'
 import { TransactionStatus } from '../types/cell-types'
 import LockUtils from '../models/lock-utils'
 import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
 import { FailedTransaction } from '../services/tx'
+import { CONNECTION_NOT_FOUND_NAME } from '../database/chain/ormconfig'
 
 const { nodeService } = remote.require('./startup/sync-block-task/params')
 
@@ -47,7 +49,14 @@ const trackingStatus = async () => {
 export const register = () => {
   // every 5 seconds
   interval(5000).subscribe(async () => {
-    await trackingStatus()
+    try {
+      getConnection()
+      await trackingStatus()
+    } catch (err) {
+      if (err.name !== CONNECTION_NOT_FOUND_NAME) {
+        throw err
+      }
+    }
   })
 }
 
