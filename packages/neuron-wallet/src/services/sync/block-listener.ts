@@ -13,7 +13,7 @@ export default class BlockListener {
   private currentBlockNumber: BlockNumber
   private interval: number = 5000
   private tipNumberListener: Subscription
-  private stopFlag = false
+  private stopped = false
 
   constructor(
     lockHashes: string[],
@@ -45,14 +45,14 @@ export default class BlockListener {
     if (restart) {
       await this.currentBlockNumber.updateCurrent(BigInt(0))
     }
-    while (!this.stopFlag) {
+    while (!this.stopped) {
       await this.regenerate()
       await Utils.sleep(this.interval)
     }
   }
 
   public stop = async () => {
-    this.stopFlag = true
+    this.stopped = true
     this.tipNumberListener.unsubscribe()
     if (!this.queue) {
       return
