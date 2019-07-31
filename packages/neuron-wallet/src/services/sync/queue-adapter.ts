@@ -3,7 +3,7 @@ import async from 'async'
 export default class QueueAdapter {
   private q: any
 
-  constructor(worker: async.AsyncWorker<any, Error>, concurrency?: number | undefined) {
+  constructor(worker: async.AsyncWorker<any, Error>, concurrency: number) {
     this.q = async.queue(worker, concurrency)
   }
 
@@ -27,5 +27,9 @@ export default class QueueAdapter {
 
   public length = (): number => {
     return this.q.length()
+  }
+
+  public drain = async () => {
+    return this.q.drain()
   }
 }

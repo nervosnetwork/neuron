@@ -69,6 +69,10 @@ export default class Queue {
     this.q.kill()
   }
 
+  public drain = async () => {
+    return this.q.drain()
+  }
+
   public pipeline = async (blockNumbers: string[]) => {
     // 1. get blocks
     const blocks: Block[] = await this.getBlocksService.getRangeBlocks(blockNumbers)
