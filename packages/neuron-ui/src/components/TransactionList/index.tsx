@@ -13,7 +13,7 @@ import {
 } from 'office-ui-fabric-react'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { contextMenu } from 'services/remote'
+import { contextMenu, showTransactionDetails } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
@@ -203,6 +203,9 @@ const TransactionList = ({
         onRenderHeader,
       }}
       checkboxVisibility={CheckboxVisibility.hidden}
+      onItemInvoked={item => {
+        showTransactionDetails(item.hash)
+      }}
       onItemContextMenu={item => {
         if (item) {
           contextMenu({ type: 'transactionList', id: item.hash })
