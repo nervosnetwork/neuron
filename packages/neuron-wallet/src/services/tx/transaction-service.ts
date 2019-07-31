@@ -3,6 +3,7 @@ import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { Transaction, TransactionWithoutHash, TransactionStatus } from '../../types/cell-types'
 import TransactionEntity from '../../database/chain/entities/transaction'
 import LockUtils from '../../models/lock-utils'
+import { CONNECTION_NOT_FOUND_NAME } from '../../database/chain/ormconfig'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -122,6 +123,20 @@ export class TransactionsService {
     params: TransactionsByLockHashesParam,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
+    try {
+      // if connection not found, which means no database to connect
+      // it happened when no node connected and no previous database found.
+      getConnection()
+    } catch (err) {
+      if (err.name === CONNECTION_NOT_FOUND_NAME) {
+        return {
+          totalCount: 0,
+          items: [],
+        }
+      }
+      throw err
+    }
+
     const skip = (params.pageNo - 1) * params.pageSize
 
     const type = TransactionsService.filterSearchType(searchValue)
@@ -224,6 +239,17 @@ export class TransactionsService {
   }
 
   public static get = async (hash: string): Promise<Transaction | undefined> => {
+    try {
+      // if connection not found, may means no database to connect
+      // it happened when no node connected and no previous database found.
+      getConnection()
+    } catch (err) {
+      if (err.name === CONNECTION_NOT_FOUND_NAME) {
+        return undefined
+      }
+      throw err
+    }
+
     const tx = await getConnection()
       .getRepository(TransactionEntity)
       .findOne(hash, { relations: ['inputs', 'outputs'] })
