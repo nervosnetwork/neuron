@@ -19,6 +19,7 @@ import {
   MessageBar,
   MessageBarType,
 } from 'office-ui-fabric-react'
+import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransactionList, addPopup } from 'states/stateProvider/actionCreators'
@@ -30,7 +31,7 @@ import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
 
 const TITLE_FONT_SIZE = 'xxLarge'
 
-const PropertyList = ({
+const ActivityList = ({
   columns,
   items,
   ...props
@@ -181,64 +182,16 @@ const Overview = ({
     )
   }, [t, onTimestampRender, onTransactionTypeRender])
 
-  const balanceColumns: IColumn[] = useMemo(
-    () =>
-      [
-        {
-          key: 'label',
-          name: 'label',
-          fieldName: 'label',
-          maxWidth: 100,
-        },
-        {
-          key: 'value',
-          name: 'value',
-          fieldName: 'value',
-        },
-      ].map(col => ({
-        isResizable: true,
-        minWidth: 200,
-        fieldName: col.key,
-        ariaLabel: col.name,
-        ...col,
-      })),
-    []
-  )
-
-  const blockchainStatusColumns: IColumn[] = useMemo(
-    () =>
-      [
-        {
-          key: 'label',
-          name: 'label',
-          fieldName: 'label',
-          maxWidth: 100,
-        },
-        {
-          key: 'value',
-          name: 'value',
-          fieldName: 'value',
-        },
-      ].map(col => ({
-        isResizable: true,
-        minWidth: 200,
-        fieldName: col.key,
-        ariaLabel: col.name,
-        ...col,
-      })),
-    []
-  )
-
-  const balanceItems = useMemo(
+  const balanceProperties: Property[] = useMemo(
     () => [
       {
         label: t('overview.balance'),
-        value: <span title={`${balance} shannon`}>{`${shannonToCKBFormatter(balance)} CKB`}</span>,
+        value: `${shannonToCKBFormatter(balance)} CKB`,
       },
     ],
     [t, balance]
   )
-  const blockchainStatusItems = useMemo(
+  const blockchainStatusProperties = useMemo(
     () => [
       {
         label: t('overview.chain-identity'),
@@ -293,7 +246,7 @@ const Overview = ({
         {name}
       </Text>
       <Stack horizontal horizontalAlign="space-between">
-        <PropertyList columns={balanceColumns} items={balanceItems} isHeaderVisible={false} />
+        <PropertyList properties={balanceProperties} />
         <Stack tokens={{ childrenGap: 15 }}>
           <div ref={blockchainInfoRef}>
             <DefaultButton onClick={showBlockchainStatus} styles={{ root: { width: '200px' } }}>
@@ -311,7 +264,7 @@ const Overview = ({
         {t('overview.recent-activities')}
       </Text>
       {items.length ? (
-        <PropertyList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
+        <ActivityList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
       ) : (
         <div>{t('overview.no-recent-activities')}</div>
       )}
@@ -323,7 +276,7 @@ const Overview = ({
           gapSpace={0}
         >
           <Stack tokens={{ padding: 15 }}>
-            <PropertyList columns={blockchainStatusColumns} items={blockchainStatusItems} isHeaderVisible={false} />
+            <PropertyList properties={blockchainStatusProperties} />
           </Stack>
         </Callout>
       ) : null}
