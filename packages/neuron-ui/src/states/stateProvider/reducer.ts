@@ -424,6 +424,10 @@ export const reducer = (
           },
           notifications: app.notifications.filter(({ timestamp }) => timestamp !== payload),
           showAllNotifications: app.notifications.length > 1,
+          showTopAlert:
+            app.notifications.findIndex(message => message.timestamp === payload) === app.notifications.length - 1
+              ? false
+              : app.showTopAlert,
         },
       }
     }
