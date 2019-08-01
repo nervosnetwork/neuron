@@ -1,1 +1,3 @@
-publish: github
+provider: github
+owner: nervosnetwork
+repo: neuron
