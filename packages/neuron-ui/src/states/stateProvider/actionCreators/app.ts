@@ -13,13 +13,6 @@ import {
 } from 'utils/localCache'
 
 export const initAppState = () => (dispatch: StateDispatch, history: any) => {
-  dispatch({
-    type: AppActions.UpdateLoadings,
-    payload: {
-      addressList: true,
-      transactionList: true,
-    },
-  })
   getNeuronWalletState()
     .then(res => {
       if (res.status) {
@@ -49,6 +42,8 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
         })
         if (!wallet) {
           history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+        } else {
+          history.push(Routes.Overview)
         }
 
         currentWalletCache.save(wallet)
@@ -62,15 +57,6 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
     })
     .catch(() => {
       history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-    })
-    .finally(() => {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: {
-          addressList: false,
-          transactionList: false,
-        },
-      })
     })
 }
 
