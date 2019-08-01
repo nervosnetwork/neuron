@@ -44,7 +44,6 @@ dmg:
 win:
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
-  publisherName: Nervos Foundation
   target:
     - target: nsis
       arch:
@@ -58,6 +57,7 @@ mac:
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
   entitlementsInherit: assets/entitlements.plist
+  electronLanguages: ["en", "zh", "zh_CN"]
   target:
     - dmg
     - zip

@@ -13,6 +13,8 @@ import env from '../../env'
 import { InitMigration1561695143591 } from './migrations/1561695143591-InitMigration'
 import { AddStatusToTx1562038960990 } from './migrations/1562038960990-AddStatusToTx'
 
+export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
+
 const dbPath = (networkName: string): string => {
   const name = `cell-${networkName}.sqlite`
   return path.join(env.fileBasePath, 'cells', name)

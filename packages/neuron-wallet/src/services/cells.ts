@@ -4,7 +4,7 @@ import { Cell, OutPoint, Input } from '../types/cell-types'
 import { CapacityNotEnough } from '../exceptions'
 import { OutputStatus } from './tx/params'
 
-export const MIN_CELL_CAPACITY = '6000000000'
+export const MIN_CELL_CAPACITY = '6100000000'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "warn" */
