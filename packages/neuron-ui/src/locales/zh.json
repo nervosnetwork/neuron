@@ -193,6 +193,14 @@
       "cancel": "取消",
       "save": "保存"
     },
+    "notification-panel": {
+      "title": "通知中心"
+    },
+    "message-types": {
+      "warning": "警告",
+      "alert": "错误",
+      "success": "成功"
+    },
     "messages": {
       "at-least-one-address-needed": "需要至少一个地址",
       "name-required": "缺少名称",

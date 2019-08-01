@@ -39,6 +39,8 @@ const appState: State.App = {
     transactionList: false,
     updateDescription: false,
   },
+  showTopAlert: false,
+  showAllNotifications: false,
 }
 
 export default appState

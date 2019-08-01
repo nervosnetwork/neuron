@@ -5,6 +5,7 @@ import {
   AddCircle as AddIcon,
   Alert as AlertIcon,
   Checkmark as SuccessIcon,
+  CircleInformation as InfoIcon,
   Close as DismissIcon,
   Copy as CopyIcon,
   Down as ArrowDownIcon,
@@ -17,6 +18,7 @@ import {
   LinkDown as LinkDownIcon,
   LinkTop as LinkTopIcon,
   LinkUp as LinkUpIcon,
+  More as MoreIcon,
   Nodes as ConnectedIcon,
   Scan as ScanIcon,
   Search as SearchIcon,
@@ -47,6 +49,7 @@ const { semanticColors } = theme
 
 registerIcons({
   icons: {
+    info: <InfoIcon size="16px" />,
     errorbadge: <AlertIcon size="16px" />,
     completed: <SuccessIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" />,
@@ -69,6 +72,7 @@ registerIcons({
     Connected: <ConnectedIcon size="small" color="green" />,
     Disconnected: <AlertIcon size="small" color="red" />,
     Updating: <UpdateIcon size="16px" style={{ animation: 'rotate360 3s linear infinite' }} />,
+    More: <MoreIcon size="16px" />,
   },
 })
 
