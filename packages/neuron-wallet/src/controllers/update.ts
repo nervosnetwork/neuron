@@ -36,7 +36,9 @@ autoUpdater.on('update-available', () => {
 
 autoUpdater.on('update-not-available', () => {
   dialog.showMessageBox({
+    type: 'info',
     message: i18n.t('updater.update-not-available'),
+    buttons: [i18n.t('common.ok')],
   })
   enableUpdaterMenuItem()
 })
@@ -44,7 +46,9 @@ autoUpdater.on('update-not-available', () => {
 autoUpdater.on('update-downloaded', () => {
   dialog.showMessageBox(
     {
+      type: 'info',
       message: i18n.t('updater.updates-downloaded-about-to-quit-and-install'),
+      buttons: [i18n.t('common.ok')],
     },
     () => {
       setImmediate(() => autoUpdater.quitAndInstall())
