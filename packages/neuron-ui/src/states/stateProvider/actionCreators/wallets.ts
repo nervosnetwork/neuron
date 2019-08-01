@@ -113,7 +113,8 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
       if (res.status) {
         history.push(Routes.History)
       } else {
-        addNotification({ type: 'alert', content: JSON.stringify(res.message.title) })(dispatch)
+        // TODO: the pretreatment is unnecessary once the error code is implemented
+        addNotification({ type: 'alert', content: res.message.title.replace(/(\b"|"\b)/g, '') })(dispatch)
       }
       dispatch({
         type: AppActions.DismissPasswordRequest,
