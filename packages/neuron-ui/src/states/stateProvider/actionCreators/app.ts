@@ -74,17 +74,6 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
     })
 }
 
-export const addNotification = ({ type, content }: { type: 'alert'; content: string }) => (dispatch: StateDispatch) => {
-  dispatch({
-    type: AppActions.AddNotification,
-    payload: {
-      type,
-      content,
-      timestamp: Date.now(),
-    },
-  })
-}
-
 export const addPopup = (text: string) => (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.PopIn,
@@ -98,8 +87,44 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
   }, 8000)
 }
 
+export const addNotification = ({ type, content }: { type: 'alert' | 'warning'; content: string }) => (
+  dispatch: StateDispatch
+) => {
+  dispatch({
+    type: AppActions.AddNotification,
+    payload: {
+      type,
+      content,
+      timestamp: Date.now(),
+    },
+  })
+}
+export const dismissNotification = (timestamp: number) => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.DismissNotification,
+    payload: timestamp,
+  })
+}
+
+export const toggleTopAlertVisibility = (show?: boolean) => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.ToggleTopAlertVisibility,
+    payload: show,
+  })
+}
+
+export const toggleAllNotificationVisibility = (show?: boolean) => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.ToggleAllNotificationVisibility,
+    payload: show,
+  })
+}
+
 export default {
   initAppState,
   addNotification,
   addPopup,
+  dismissNotification,
+  toggleTopAlertVisibility,
+  toggleAllNotificationVisibility,
 }

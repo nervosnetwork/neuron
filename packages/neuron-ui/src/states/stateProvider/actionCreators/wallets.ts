@@ -10,8 +10,10 @@ import {
   updateAddressDescription as updateRemoteAddressDescription,
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
+  showErrorMessage,
 } from 'services/remote'
 import initStates from 'states/initStates'
+import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
 import addressesToBalance from 'utils/addressesToBalance'
@@ -34,27 +36,27 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
 }
 
 export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  dispatch: StateDispatch,
+  _dispatch: StateDispatch,
   history: any
 ) => {
   importMnemonic(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      showErrorMessage(i18n.t('error'), i18n.t(res.message.title))
     }
   })
 }
 
 export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  dispatch: StateDispatch,
+  _dispatch: StateDispatch,
   history: any
 ) => {
   importMnemonic(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      showErrorMessage(i18n.t('error'), i18n.t(res.message.title))
     }
   })
 }
@@ -113,7 +115,8 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
       if (res.status) {
         history.push(Routes.History)
       } else {
-        addNotification({ type: 'alert', content: JSON.stringify(res.message.title) })(dispatch)
+        // TODO: the pretreatment is unnecessary once the error code is implemented
+        addNotification({ type: 'alert', content: res.message.title.replace(/(\b"|"\b)/g, '') })(dispatch)
       }
       dispatch({
         type: AppActions.DismissPasswordRequest,

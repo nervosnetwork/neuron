@@ -30,7 +30,7 @@ export enum AppActions {
   UpdateSendLoading = 'updateSendLoading',
   UpdateMessage = 'updateMessage',
   AddNotification = 'addNotification',
-  RemoveNotification = 'removeNotification',
+  DismissNotification = 'dismissNotification',
   ClearNotifications = 'clearNotifications',
   CleanTransaction = 'cleanTransaction',
   CleanTransactions = 'cleanTransactions',
@@ -43,6 +43,8 @@ export enum AppActions {
 
   PopIn = 'popIn',
   PopOut = 'popOut',
+  ToggleTopAlertVisibility = 'toggleTopAlertVisibility',
+  ToggleAllNotificationVisibility = 'toggleAllNotificationVisibility',
   Ignore = 'ignore',
 }
 
@@ -404,11 +406,12 @@ export const reducer = (
         ...state,
         app: {
           ...app,
-          notifications: [payload],
+          notifications: [...app.notifications, payload],
+          showTopAlert: true,
         },
       }
     }
-    case AppActions.RemoveNotification: {
+    case AppActions.DismissNotification: {
       /**
        * payload: timstamp
        */
@@ -420,6 +423,7 @@ export const reducer = (
             ...app.messages,
           },
           notifications: app.notifications.filter(({ timestamp }) => timestamp !== payload),
+          showAllNotifications: app.notifications.length > 1,
         },
       }
     }
@@ -471,6 +475,26 @@ export const reducer = (
         app: {
           ...app,
           popups: app.popups.slice(1),
+        },
+      }
+    }
+    case AppActions.ToggleTopAlertVisibility: {
+      const showTopAlert = payload === undefined ? !app.showTopAlert : payload
+      return {
+        ...state,
+        app: {
+          ...app,
+          showTopAlert,
+          notifications: showTopAlert ? app.notifications : app.notifications.slice(0, -1),
+        },
+      }
+    }
+    case AppActions.ToggleAllNotificationVisibility: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          showAllNotifications: payload === undefined ? !app.showAllNotifications : payload,
         },
       }
     }

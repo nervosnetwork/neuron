@@ -193,6 +193,14 @@
       "cancel": "Cancel",
       "save": "Save"
     },
+    "notification-panel": {
+      "title": "Notifications"
+    },
+    "message-types": {
+      "warning": "warning",
+      "alert": "alert",
+      "success": "success"
+    },
     "messages": {
       "at-least-one-address-needed": "At least one address needed",
       "name-required": "Name is required",

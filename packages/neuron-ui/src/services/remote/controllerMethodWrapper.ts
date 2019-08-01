@@ -56,9 +56,17 @@ export const controllerMethodWrapper = (controllerName: string) => (
       result: res.result || null,
     }
   }
+
+  let title = ''
+
+  if (typeof res === 'string') {
+    title = res
+  } else if (typeof res.msg === 'string') {
+    title = res.msg
+  }
   return {
     status: 0,
-    message: { title: (res && res.msg) || '' },
+    message: { title },
   }
 }
 

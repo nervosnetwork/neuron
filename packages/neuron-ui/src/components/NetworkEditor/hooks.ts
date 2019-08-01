@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { createNetwork, updateNetwork } from 'states/stateProvider/actionCreators'
+import { StateDispatch } from 'states/stateProvider/reducer'
+import { createNetwork, updateNetwork, addNotification } from 'states/stateProvider/actionCreators'
 
 import { Message, MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 
@@ -68,15 +68,9 @@ export const useInitialize = (
       if (network) {
         initialize(network)
       } else {
-        dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            networks: {
-              type: 'warning',
-              timestamp: Date.now(),
-              content: i18n.t('messages.network-is-not-found'),
-            },
-          },
+        addNotification({
+          type: 'warning',
+          content: i18n.t('messages.network-is-not-found'),
         })
       }
     }
@@ -126,58 +120,43 @@ export const useHandleSubmit = (
 ) =>
   useCallback(async () => {
     const warning = {
-      type: 'warning',
+      type: 'warning' as 'warning',
       timestamp: Date.now(),
       content: '',
     }
     if (!name) {
-      return dispatch({
-        type: AppActions.AddNotification,
-        payload: {
-          ...warning,
-          content: i18n.t(Message.NameRequired),
-        },
-      })
+      return addNotification({
+        ...warning,
+        content: i18n.t(Message.NameRequired),
+      })(dispatch)
     }
     if (name.length > MAX_NETWORK_NAME_LENGTH) {
-      return dispatch({
-        type: AppActions.AddNotification,
-        payload: {
-          ...warning,
-          content: i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo, {
-            length: MAX_NETWORK_NAME_LENGTH,
-          }),
-        },
-      })
+      return addNotification({
+        ...warning,
+        content: i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo, {
+          length: MAX_NETWORK_NAME_LENGTH,
+        }),
+      })(dispatch)
     }
     if (!remote) {
-      return dispatch({
-        type: AppActions.AddNotification,
-        payload: {
-          ...warning,
-          content: i18n.t(Message.URLRequired),
-        },
-      })
+      return addNotification({
+        ...warning,
+        content: i18n.t(Message.URLRequired),
+      })(dispatch)
     }
     if (!remote.startsWith('http')) {
-      return dispatch({
-        type: AppActions.AddNotification,
-        payload: {
-          ...warning,
-          content: i18n.t(Message.ProtocolRequired),
-        },
-      })
+      return addNotification({
+        ...warning,
+        content: i18n.t(Message.ProtocolRequired),
+      })(dispatch)
     }
     // verification, for now, only name is unique
     if (id === 'new') {
       if (networks.some(network => network.name === name)) {
-        return dispatch({
-          type: AppActions.AddNotification,
-          payload: {
-            ...warning,
-            content: i18n.t(Message.NetworkNameUsed),
-          },
-        })
+        return addNotification({
+          ...warning,
+          content: i18n.t(Message.NetworkNameUsed),
+        })(dispatch)
       }
       return createNetwork({
         name,
@@ -185,13 +164,10 @@ export const useHandleSubmit = (
       })(dispatch, history)
     }
     if (networks.some(network => network.name === name && network.id !== id)) {
-      return dispatch({
-        type: AppActions.AddNotification,
-        payload: {
-          ...warning,
-          content: i18n.t(Message.NetworkNameUsed),
-        },
-      })
+      return addNotification({
+        ...warning,
+        content: i18n.t(Message.NetworkNameUsed),
+      })(dispatch)
     }
     return updateNetwork({
       networkID: id!,
