@@ -1,0 +1,26 @@
+.propertyCell {
+  display: flex;
+  padding: 5px 5px;
+  font-size: 14px;
+
+  &:hover {
+    background-color: rgb(237, 235, 233);
+  }
+
+  .label,
+  .value {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .label {
+    grid-area: label;
+    padding-right: 15px;
+  }
+
+  .value {
+    grid-area: value;
+  }
+}
