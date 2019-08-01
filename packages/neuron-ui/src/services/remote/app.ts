@@ -16,9 +16,14 @@ export const showTransactionDetails = controllerMethodWrapper(CONTROLLER_NAME)(c
   controller.showTransactionDetails(hash)
 )
 
+export const isMainWindow = controllerMethodWrapper(CONTROLLER_NAME)(controller => (winID: number) =>
+  controller.isMainWindow(winID)
+)
+
 export default {
   getNeuronWalletState,
   handleViewError,
   contextMenu,
   showTransactionDetails,
+  isMainWindow,
 }
