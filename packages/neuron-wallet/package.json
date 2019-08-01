@@ -58,7 +58,7 @@
     "@types/uuid": "3.4.4",
     "@types/webdriverio": "4.13.0",
     "devtron": "1.4.0",
-    "electron": "5.0.7",
+    "electron": "6.0.0",
     "electron-builder": "21.2.0",
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.1.1",

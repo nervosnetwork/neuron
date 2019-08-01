@@ -1,4 +1,4 @@
-import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
+import { MenuItemConstructorOptions, clipboard, dialog, MessageBoxReturnValue } from 'electron'
 import { bech32Address } from '@nervosnetwork/ckb-sdk-utils'
 
 import WalletsService from 'services/wallets'
@@ -80,8 +80,8 @@ export const contextMenuTemplate: {
               detail: isCurrent ? i18n.t('messageBox.remove-network.alert') : '',
               buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
             },
-            (btnIdx: number) => {
-              if (btnIdx === 0) {
+            (returnValue: MessageBoxReturnValue) => {
+              if (returnValue.response === 0) {
                 try {
                   networksService.delete(id)
                 } catch (err) {
