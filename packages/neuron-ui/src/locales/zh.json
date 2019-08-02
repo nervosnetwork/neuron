@@ -47,7 +47,10 @@
       "set-wallet-name": "为钱包设置名称",
       "set-a-strong-password-to-protect-your-wallet": "请设置一个强密码用于保护您的钱包",
       "wallet-suffix": "钱包 {{suffix}}",
-      "write-down-seed": "请记下您的助记词并保存到安全的地方"
+      "write-down-seed": "请记下您的助记词并保存到安全的地方",
+      "new-name": "输入新的钱包名称",
+      "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中三类字符组成的字符串, 且必须以字母或者数字开头",
+      "same-password": "两次输入密码应一致"
     },
     "detail": {
       "more-transactions": "更多交易记录"

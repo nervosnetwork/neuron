@@ -154,7 +154,11 @@ export const useSubscription = ({
           updateTransaction({ walletID, hash: txHash })
           break
         }
-        case 'wallet': {
+        case 'current-wallet': {
+          updateCurrentWallet()(dispatch)
+          break
+        }
+        case 'wallets': {
           updateWalletList()(dispatch)
           updateCurrentWallet()(dispatch)
           break

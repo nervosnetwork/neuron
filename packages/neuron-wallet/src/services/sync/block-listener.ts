@@ -60,13 +60,6 @@ export default class BlockListener {
     await this.queue.kill()
   }
 
-  public drain = async () => {
-    if (this.queue) {
-      return this.queue.drain()
-    }
-    return undefined
-  }
-
   public regenerate = async (): Promise<void> => {
     if (this.queue && this.queue.length() > 0) {
       return

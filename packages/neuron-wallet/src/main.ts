@@ -40,14 +40,14 @@ app.on('ready', async () => {
   WalletListSubject.pipe(debounceTime(50)).subscribe(({ currentWallet = null, currentWalletList = [] }) => {
     const walletList = currentWalletList.map(({ id, name }) => ({ id, name }))
     const currentWalletId = currentWallet ? currentWallet.id : null
-    dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
+    dataUpdateSubject.next({ dataType: 'wallets', actionType: 'update' })
     updateApplicationMenu(walletList, currentWalletId)
   })
 
   CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async ({ currentWallet = null, walletList = [] }) => {
     updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
     if (currentWallet) {
-      dataUpdateSubject.next({ dataType: 'wallet', actionType: 'update' })
+      dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
   })
 

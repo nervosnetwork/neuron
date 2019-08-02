@@ -17,7 +17,7 @@ declare namespace Subject {
   }
   interface DataUpdateMetaInfo {
     walletID?: string
-    dataType: 'address' | 'transaction' | 'wallet' | 'network'
+    dataType: 'address' | 'transaction' | 'current-wallet' | 'wallets' | 'network'
     actionType: 'create' | 'update' | 'delete'
   }
   type NetworkList = State.Network[]

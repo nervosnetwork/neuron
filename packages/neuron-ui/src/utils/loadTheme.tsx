@@ -22,6 +22,7 @@ import {
   Nodes as ConnectedIcon,
   Scan as ScanIcon,
   Search as SearchIcon,
+  StatusGood as MatchedIcon,
   SubtractCircle as RemoveIcon,
   Update as UpdateIcon,
 } from 'grommet-icons'
@@ -73,6 +74,8 @@ registerIcons({
     Disconnected: <AlertIcon size="small" color="red" />,
     Updating: <UpdateIcon size="16px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     More: <MoreIcon size="16px" />,
+    Matched: <MatchedIcon size="16px" color="green" />,
+    Unmatched: <InfoIcon size="16px" color="#d50000" />,
   },
 })
 

@@ -245,8 +245,6 @@ export default class WalletService {
     if (currentID === id) {
       if (newWallets.length > 0) {
         this.setCurrent(newWallets[0].id)
-      } else {
-        this.listStore.clear()
       }
     }
 
