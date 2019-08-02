@@ -44,7 +44,13 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
   updateRemoteTransactionDescription(params)
     .then(res => {
       if (res.status) {
-        dispatch({ type: AppActions.Ignore, payload: null })
+        dispatch({
+          type: NeuronWalletActions.UpdateTransactionDescription,
+          payload: {
+            hash: params.hash,
+            description: params.description,
+          },
+        })
       } else {
         addNotification({ type: 'alert', content: res.message.title })(dispatch)
       }
