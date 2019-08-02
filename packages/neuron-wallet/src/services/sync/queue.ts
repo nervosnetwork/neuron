@@ -137,4 +137,8 @@ export default class Queue {
     }
     return this.batchPush()
   }
+
+  public waitForDrained = async () => {
+    return this.q.waitForDrained()
+  }
 }
