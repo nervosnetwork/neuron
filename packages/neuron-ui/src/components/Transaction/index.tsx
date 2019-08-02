@@ -1,13 +1,10 @@
-import React, { useEffect, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
+import { currentWallet as currentWalletCache } from 'utils/localCache'
+import { getTransaction } from 'services/remote'
 
-import { isMainWindow, getWinID } from 'services/remote'
-
-import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
-import { updateTransaction } from 'states/stateProvider/actionCreators'
-import chainState from 'states/initStates/chain'
+import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter } from 'utils/formatters'
 
@@ -96,26 +93,38 @@ const basicInfoColumns: IColumn[] = [
     ...col,
   })
 )
-const Transaction = ({
-  wallet: { id: walletID = '' },
-  chain: { transaction = chainState.transaction },
-  match,
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ hash: string }>>) => {
+const Transaction = () => {
   const [t] = useTranslation()
+  const [transaction, setTransaction] = useState(transactionState)
+  const [error, setError] = useState({ code: '', message: '' })
   useEffect(() => {
-    if ((walletID && !isMainWindow(getWinID())) || !walletID) {
-      window.close()
+    const currentWallet = currentWalletCache.load()
+    if (currentWallet) {
+      const hash = window.location.href.split('/').pop()
+      getTransaction({ hash, walletID: currentWallet.id })
+        .then(res => {
+          if (res.status) {
+            setTransaction(res.result)
+          } else {
+            throw new Error(res.message.title)
+          }
+        })
+        .catch((err: Error) => {
+          setError({
+            code: '-1',
+            message: err.message,
+          })
+        })
     }
-  }, [walletID])
+  }, [])
 
   useEffect(() => {
-    dispatch({
-      type: AppActions.CleanTransaction,
-      payload: null,
+    window.addEventListener('storage', (e: StorageEvent) => {
+      if (e.key === 'currentWallet') {
+        window.close()
+      }
     })
-    updateTransaction({ walletID, hash: match.params.hash })(dispatch)
-  }, [match.params.hash, dispatch, walletID])
+  }, [])
 
   const basicInfoItems = useMemo(
     () => [
@@ -137,6 +146,14 @@ const Transaction = ({
     ],
     [t, transaction]
   )
+
+  if (error.code) {
+    return (
+      <Stack verticalFill verticalAlign="center" horizontalAlign="center">
+        {error.message || t('messages.transaction-not-found')}
+      </Stack>
+    )
+  }
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>

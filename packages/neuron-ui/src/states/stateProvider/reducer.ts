@@ -11,7 +11,6 @@ export enum NeuronWalletActions {
   UpdateAddressDescription = 'updateAddressDescription',
   // transactions
   UpdateTransactionList = 'updateTransactionList',
-  UpdateTransaction = 'updateTransaction',
   UpdateTransactionDescription = 'updateTransactionDescription',
   // networks
   UpdateNetworkList = 'updateNetworkList',
@@ -186,15 +185,6 @@ export const reducer = (
               tx.hash === payload.hash ? { ...tx, description: payload.description } : tx
             ),
           },
-        },
-      }
-    }
-    case NeuronWalletActions.UpdateTransaction: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          transaction: payload,
         },
       }
     }
@@ -379,15 +369,6 @@ export const reducer = (
         app: {
           ...app,
           send: initStates.app.send,
-        },
-      }
-    }
-    case AppActions.CleanTransaction: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          transaction: initStates.chain.transaction,
         },
       }
     }
