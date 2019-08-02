@@ -1,6 +1,16 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Label, Image, PrimaryButton, DefaultButton, TextField, FontSizes } from 'office-ui-fabric-react'
+import {
+  Stack,
+  Icon,
+  Text,
+  Label,
+  Image,
+  PrimaryButton,
+  DefaultButton,
+  TextField,
+  FontSizes,
+} from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
@@ -8,7 +18,7 @@ import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/state
 
 import { Routes, MnemonicAction, BUTTON_GAP } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
-import { verifyWalletSubmission } from 'utils/validators'
+import { verifyPasswordComplexity } from 'utils/validators'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -243,7 +253,10 @@ const Submission = ({
     }
   }, [type, name, password, imported, history, dispatch])
 
-  const disableNext = !verifyWalletSubmission({ name, password, confirmPassword })
+  const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
+  const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
+  const isPwdSame = useMemo(() => password && password === confirmPassword, [password, confirmPassword])
+  const disableNext = !(isNameUnused && isPwdComplex && isPwdSame)
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
@@ -260,6 +273,21 @@ const Submission = ({
           />
         </div>
       ))}
+
+      <Stack>
+        <Stack horizontal tokens={{ childrenGap: 3 }}>
+          {isNameUnused ? <Icon iconName="Matched" /> : <Icon iconName="Unmatched" />}
+          <Text variant="xSmall">{t('wizard.new-name')}</Text>
+        </Stack>
+        <Stack horizontal tokens={{ childrenGap: 3 }}>
+          {isPwdComplex ? <Icon iconName="Matched" /> : <Icon iconName="Unmatched" />}
+          <Text variant="xSmall">{t('wizard.complex-password')}</Text>
+        </Stack>
+        <Stack horizontal tokens={{ childrenGap: 3 }}>
+          {isPwdSame ? <Icon iconName="Matched" /> : <Icon iconName="Unmatched" />}
+          <Text variant="xSmall">{t('wizard.same-password')}</Text>
+        </Stack>
+      </Stack>
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: BUTTON_GAP }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
