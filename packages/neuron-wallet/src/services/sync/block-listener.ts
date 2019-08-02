@@ -60,6 +60,13 @@ export default class BlockListener {
     await this.queue.kill()
   }
 
+  public stopAndWait = async () => {
+    await this.stop()
+    if (this.queue) {
+      await this.queue.waitForDrained()
+    }
+  }
+
   public regenerate = async (): Promise<void> => {
     if (this.queue && this.queue.length() > 0) {
       return
