@@ -2,7 +2,7 @@ import { Subject } from 'rxjs'
 import WindowManager from '../window-manager'
 
 export const DataUpdateSubject = new Subject<{
-  dataType: 'address' | 'transaction' | 'wallet' | 'network'
+  dataType: 'address' | 'transaction' | 'wallets' | 'current-wallet' | 'network'
   actionType: 'create' | 'update' | 'delete'
 }>()
 
