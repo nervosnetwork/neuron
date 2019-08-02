@@ -3,12 +3,11 @@ import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
-import QueueAdapter from './queue-adapter'
+import SimpleQueue from './simple-queue'
 import { TransactionPersistor } from '../tx'
 
 export default class Queue {
-  private q: QueueAdapter
-  private concurrent: number = 1
+  private q: SimpleQueue
   private lockHashes: string[]
   private getBlocksService: GetBlocks
   private startBlockNumber: bigint
@@ -26,7 +25,7 @@ export default class Queue {
     currentBlockNumber: BlockNumber = new BlockNumber(),
     rangeForCheck: RangeForCheck = new RangeForCheck()
   ) {
-    this.q = new QueueAdapter(this.getWorker(), this.concurrent)
+    this.q = new SimpleQueue(this.getWorker())
     this.lockHashes = lockHashes
     this.getBlocksService = new GetBlocks()
     this.startBlockNumber = BigInt(startBlockNumber)
@@ -40,12 +39,11 @@ export default class Queue {
   }
 
   private getWorker = () => {
-    const worker = async (task: any, callback: any) => {
+    const worker = async (task: any) => {
       try {
         await Utils.retry(this.retryTime, 0, async () => {
           await this.pipeline(task.blockNumbers)
         })
-        await callback()
       } catch {
         this.clear()
       }
@@ -67,10 +65,6 @@ export default class Queue {
 
   public kill = () => {
     this.q.kill()
-  }
-
-  public drain = async () => {
-    return this.q.drain()
   }
 
   public pipeline = async (blockNumbers: string[]) => {
