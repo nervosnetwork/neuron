@@ -1,5 +1,4 @@
 import { remote } from 'electron'
-import { Subject } from 'rxjs'
 import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
 import AddressService from '../../services/addresses'
 import LockUtils from '../../models/lock-utils'
@@ -25,8 +24,6 @@ const {
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
 
-export const stopLoopSubject = new Subject()
-
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (): Promise<string[]> => {
@@ -36,27 +33,34 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
 }
 
 // call this after network switched
-// TODO: listen to network switch
+let blockListener: BlockListener | undefined
 export const switchNetwork = async () => {
   // stop all blocks service
-  stopLoopSubject.next('stop')
+  if (blockListener) {
+    await blockListener.stopAndWait()
+  }
+
   // disconnect old connection and connect to new database
   await initDatabase()
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  let blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
+  blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
   addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove
     if (event === 'AfterInsert') {
       const hashes: string[] = await loadAddressesAndConvert()
-      blockListener.setLockHashes(hashes)
+      if (blockListener) {
+        blockListener.setLockHashes(hashes)
+      }
     }
   })
 
   const regenerateListener = async () => {
-    await blockListener.stopAndWait()
+    if (blockListener) {
+      await blockListener.stopAndWait()
+    }
     // wait former queue to be drained
     const hashes: string[] = await loadAddressesAndConvert()
     blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
@@ -67,10 +71,6 @@ export const switchNetwork = async () => {
     if (type === 'import') {
       await regenerateListener()
     }
-  })
-
-  stopLoopSubject.subscribe(() => {
-    blockListener.stop()
   })
 
   blockListener.start()
