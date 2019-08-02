@@ -8,7 +8,9 @@ export default class WindowManager {
     }
   }
 
-  public static dataUpdated = (meta: { dataType: 'wallet' | 'address' | 'transaction' | 'network' }) => {
+  public static dataUpdated = (meta: {
+    dataType: 'current-wallet' | 'wallets' | 'address' | 'transaction' | 'network'
+  }) => {
     if (WindowManager.mainWindow) {
       WindowManager.mainWindow.webContents.send('data-updated', meta)
     }

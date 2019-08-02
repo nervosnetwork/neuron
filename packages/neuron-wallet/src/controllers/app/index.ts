@@ -94,6 +94,10 @@ export default class AppController {
     }
   }
 
+  public static isMainWindow = (winID: number) => {
+    return WindowManager.mainWindow && winID === WindowManager.mainWindow.id
+  }
+
   public static showMessageBox(
     options: MessageBoxOptions,
     callback?: (response: number, checkboxChecked: boolean) => void

@@ -3,6 +3,8 @@ import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 
+import { isMainWindow, getWinID } from 'services/remote'
+
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransaction } from 'states/stateProvider/actionCreators'
 import chainState from 'states/initStates/chain'
@@ -101,6 +103,11 @@ const Transaction = ({
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ hash: string }>>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    if ((walletID && !isMainWindow(getWinID())) || !walletID) {
+      window.close()
+    }
+  }, [walletID])
 
   useEffect(() => {
     dispatch({
