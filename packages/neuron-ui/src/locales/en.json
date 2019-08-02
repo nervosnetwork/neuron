@@ -50,7 +50,7 @@
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password is a string of 8 to 50 characters consisting of three types of characters: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
-      "same-password": "Confirm the password"
+      "same-password": "The password and confirm-password should be same"
     },
     "detail": {
       "more-transactions": "More"
