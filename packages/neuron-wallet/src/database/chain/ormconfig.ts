@@ -20,6 +20,13 @@ const dbPath = (networkName: string): string => {
   return path.join(env.fileBasePath, 'cells', name)
 }
 
+const enableWalMode = async () => {
+  const result = await getConnection().manager.query(`PRAGMA journal_mode;`)
+  if (!(result[0] && result[0].journal_mode === 'wal')) {
+    await getConnection().manager.query(`PRAGMA journal_mode=wal;`)
+  }
+}
+
 const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
   const connectionOptions = await getConnectionOptions()
 
@@ -47,6 +54,7 @@ export const initConnection = async (genesisBlockHash: string) => {
 
   try {
     await createConnection(connectionOptions)
+    await enableWalMode()
   } catch (err) {
     logger.log({ level: 'error', message: err.message })
   }

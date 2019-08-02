@@ -27,13 +27,21 @@ const connectOptions = (): SqliteConnectionOptions => {
   }
 }
 
+export const getConnection = () => {
+  return ormGetConnection(connectionName)
+}
+
+const enableWalMode = async () => {
+  const result = await getConnection().manager.query(`PRAGMA journal_mode;`)
+  if (!(result[0] && result[0].journal_mode === 'wal')) {
+    await getConnection().manager.query(`PRAGMA journal_mode=wal;`)
+  }
+}
+
 export const initConnection = async () => {
   const connectionOptions = connectOptions()
   await createConnection(connectionOptions)
-}
-
-export const getConnection = () => {
-  return ormGetConnection(connectionName)
+  await enableWalMode()
 }
 
 export default initConnection
