@@ -7,6 +7,7 @@ import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
 import BlockListener from '../../services/sync/block-listener'
 import { NetworkWithID } from '../../services/networks'
 import { initDatabase } from './init-database'
+import Utils from '../../services/sync/utils'
 import { register as registerTxStatusListener } from '../../listeners/tx-status'
 
 import { register as registerAddressListener } from '../../listeners/address'
@@ -58,7 +59,7 @@ export const switchNetwork = async () => {
   const regenerateListener = async () => {
     await blockListener.stop()
     // wait former queue to be drained
-    await blockListener.drain()
+    await Utils.sleep(3000)
     const hashes: string[] = await loadAddressesAndConvert()
     blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
     await blockListener.start(true)
