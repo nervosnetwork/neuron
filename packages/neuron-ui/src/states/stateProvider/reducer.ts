@@ -8,9 +8,11 @@ export enum NeuronWalletActions {
   UpdateCurrentWallet = 'updateCurrentWallet',
   UpdateWalletList = 'updateWalletList',
   UpdateAddressListAndBalance = 'updateAddressListAndBalance',
+  UpdateAddressDescription = 'updateAddressDescription',
   // transactions
   UpdateTransactionList = 'updateTransactionList',
   UpdateTransaction = 'updateTransaction',
+  UpdateTransactionDescription = 'updateTransactionDescription',
   // networks
   UpdateNetworkList = 'updateNetworkList',
   UpdateCurrentNetworkID = 'updateCurrentNetworkID',
@@ -132,6 +134,23 @@ export const reducer = (
         },
       }
     }
+    case NeuronWalletActions.UpdateAddressDescription: {
+      /**
+       * payload:{
+       *   address: string
+       *   description: string
+       * }
+       */
+      return {
+        ...state,
+        wallet: {
+          ...wallet,
+          addresses: wallet.addresses.map(addr =>
+            addr.address === payload.address ? { ...addr, description: payload.description } : addr
+          ),
+        },
+      }
+    }
     case NeuronWalletActions.UpdateAddressListAndBalance: {
       return {
         ...state,
@@ -147,6 +166,26 @@ export const reducer = (
         chain: {
           ...chain,
           transactions: payload,
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateTransactionDescription: {
+      /**
+       * payload: {
+       *   hash: string,
+       *   description: string
+       * }
+       */
+      return {
+        ...state,
+        chain: {
+          ...chain,
+          transactions: {
+            ...chain.transactions,
+            items: chain.transactions.items.map(tx =>
+              tx.hash === payload.hash ? { ...tx, description: payload.description } : tx
+            ),
+          },
         },
       }
     }

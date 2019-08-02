@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { AppActions } from 'states/stateProvider/reducer'
 import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
 import { queryParsers } from 'utils/parser'
 
@@ -27,10 +26,6 @@ export const useSearch = (search: string = '', walletID: string = '', dispatch: 
     backToTop()
     const params = queryParsers.history(search)
     setKeywords(params.keywords)
-    dispatch({
-      type: AppActions.CleanTransactions,
-      payload: null,
-    })
     updateTransactionList({ ...params, keywords: params.keywords, walletID })(dispatch)
   }, [search, walletID, dispatch])
   return { keywords, onKeywordsChange, setKeywords }
