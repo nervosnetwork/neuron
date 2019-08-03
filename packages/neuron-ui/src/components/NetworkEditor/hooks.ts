@@ -77,7 +77,7 @@ export const useInitialize = (
   }, [dispatch, id, initialize, networks])
 }
 
-export const useInputs = (editor: EditorType) => {
+export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any) => {
   return useMemo(
     () => [
       {
@@ -85,29 +85,46 @@ export const useInputs = (editor: EditorType) => {
         label: i18n.t('settings.network.edit-network.rpc-url'),
         tooltip: TooltipText.URL,
         placeholder: PlaceHolder.URL,
+        onGetErrorMessage: (url: string) => {
+          if (!url) {
+            return t('messages.url-required')
+          }
+          if (!/^https?:\/\//.test(url)) {
+            return t('messages.rpc-url-should-have-protocol')
+          }
+          if (/\s/.test(url)) {
+            return t('messages.rpc-url-should-have-no-whitespaces')
+          }
+          return ''
+        },
       },
       {
         ...editor.name,
         label: i18n.t('settings.network.edit-network.name'),
         tooltip: TooltipText.Name,
         placeholder: PlaceHolder.Name,
+        onGetErrorMessage: (name: string) => {
+          if (!name) {
+            return t('messages.name-required')
+          }
+          if (usedNetworkNames.includes(name)) {
+            return t('messages.network-name-used')
+          }
+          return ''
+        },
       },
     ],
-    [editor.remote, editor.name]
+    [editor.remote, editor.name, usedNetworkNames, t]
   )
 }
 
 export const useIsInputsValid = (editor: EditorType, cachedNetwork: State.Network | undefined) => {
-  const invalidParams = useMemo(() => !editor.name.value || !editor.remote.value, [
-    editor.name.value,
-    editor.remote.value,
-  ])
-
+  const [errors, setErrors] = useState([!cachedNetwork && !editor.name.value, !cachedNetwork && !editor.remote.value])
   const notModified = useMemo(
     () => cachedNetwork && (cachedNetwork.name === editor.name.value && cachedNetwork.remote === editor.remote.value),
     [cachedNetwork, editor.name.value, editor.remote.value]
   )
-  return { invalidParams, notModified }
+  return { errors, setErrors, notModified }
 }
 
 export const useHandleSubmit = (
