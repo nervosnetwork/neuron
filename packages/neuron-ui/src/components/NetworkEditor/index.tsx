@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
@@ -17,28 +17,42 @@ const NetworkEditor = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
   const editor = useNetworkEditor()
   const [t] = useTranslation()
-  const inputs = useInputs(editor)
+  const cachedNetworks = useRef(networks)
+  const cachedNetwork = cachedNetworks.current.find(network => network.id === id)
+  const usedNetworkNames = useMemo(
+    () => networks.map(n => n.name).filter(name => name !== ((cachedNetwork && cachedNetwork.name) || '')),
+    [networks]
+  )
+  const inputs = useInputs(editor, usedNetworkNames, t)
   const goBack = useGoBack(history)
   useInitialize(id, networks, editor.initialize, dispatch)
 
-  const cachedNetworks = useRef(networks)
-  const cachedNetwork = cachedNetworks.current.find(network => network.id === id)
-  const { invalidParams, notModified } = useIsInputsValid(editor, cachedNetwork)
+  const { errors, setErrors, notModified } = useIsInputsValid(editor, cachedNetwork)
   const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, history, dispatch)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t('settings.network.edit-network.title')}</h1>
       <Stack tokens={{ childrenGap: 15 }}>
-        {inputs.map(inputProps => (
+        {inputs.map((inputProps, idx) => (
           <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} key={inputProps.label} required />
+            <TextField
+              {...inputProps}
+              key={inputProps.label}
+              required
+              validateOnLoad={false}
+              onNotifyValidationResult={(msg: any) => {
+                const errs = [...errors]
+                errs.splice(idx, 1, msg !== '')
+                setErrors(errs)
+              }}
+            />
           </Stack.Item>
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        <PrimaryButton disabled={invalidParams || notModified} onClick={handleSubmit} text={t('common.save')} />
+        <PrimaryButton disabled={errors.includes(true) || notModified} onClick={handleSubmit} text={t('common.save')} />
       </Stack>
     </Stack>
   )

@@ -239,7 +239,9 @@
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "lock-arg-copied": "Lock Arg has been copied to the clipboard",
-      "transaction-not-found": "The transaction is not found"
+      "transaction-not-found": "The transaction is not found",
+      "rpc-url-should-have-protocol": "The RPC URL should start with http(s)://",
+      "rpc-url-should-have-no-whitespaces": "The RPC URL should have no whitespaces"
     },
     "sync": {
       "syncing": "Syncing",
