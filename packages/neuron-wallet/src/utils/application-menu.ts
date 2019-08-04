@@ -1,9 +1,9 @@
 import { Menu, MenuItem, MenuItemConstructorOptions } from 'electron'
-import app from '../app'
-import env from '../env'
-import i18n from './i18n'
-import AppController from '../controllers/app'
-import WalletsService from '../services/wallets'
+import app from 'app'
+import env from 'env'
+import i18n from 'utils/i18n'
+import AppController from 'controllers/app'
+import WalletsService from 'services/wallets'
 
 const isMac = process.platform === 'darwin'
 

@@ -1,10 +1,10 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
-import { ShouldBeTypeOf } from '../exceptions'
-import { ConnectionStatusSubject } from '../models/subjects/node'
-import { CurrentNetworkIDSubject } from '../models/subjects/networks'
-import NetworksService from './networks'
+import { ShouldBeTypeOf } from 'exceptions'
+import { ConnectionStatusSubject } from 'models/subjects/node'
+import { CurrentNetworkIDSubject } from 'models/subjects/networks'
+import NetworksService from 'services/networks'
 
 class NodeService {
   private static instance: NodeService

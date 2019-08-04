@@ -1,10 +1,10 @@
+import { Block, BlockHeader } from 'types/cell-types'
+import { TransactionPersistor } from 'services/tx'
 import GetBlocks from './get-blocks'
-import { Block, BlockHeader } from '../../types/cell-types'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import SimpleQueue from './simple-queue'
-import { TransactionPersistor } from '../tx'
 
 export default class Queue {
   private q: SimpleQueue

@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
-import controllers from './controllers'
-import logger from './utils/logger'
+import controllers from 'controllers'
+import logger from 'utils/logger'
 
 export default class Router {
   constructor(controllerSet: typeof controllers = controllers) {

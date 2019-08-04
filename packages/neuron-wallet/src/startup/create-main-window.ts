@@ -1,9 +1,9 @@
 import { BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import path from 'path'
-import WindowManager from '../models/window-manager'
-import env from '../env'
-import logger from '../utils/logger'
+import WindowManager from 'models/window-manager'
+import env from 'env'
+import logger from 'utils/logger'
 
 function createWindow() {
   const windowState = windowStateKeeper({

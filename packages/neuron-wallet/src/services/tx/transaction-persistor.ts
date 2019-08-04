@@ -1,9 +1,9 @@
 import { getConnection } from 'typeorm'
-import { OutPoint, Transaction, TransactionWithoutHash, Input, TransactionStatus } from '../../types/cell-types'
-import InputEntity from '../../database/chain/entities/input'
-import OutputEntity from '../../database/chain/entities/output'
-import TransactionEntity from '../../database/chain/entities/transaction'
-import LockUtils from '../../models/lock-utils'
+import { OutPoint, Transaction, TransactionWithoutHash, Input, TransactionStatus } from 'types/cell-types'
+import InputEntity from 'database/chain/entities/input'
+import OutputEntity from 'database/chain/entities/output'
+import TransactionEntity from 'database/chain/entities/transaction'
+import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */

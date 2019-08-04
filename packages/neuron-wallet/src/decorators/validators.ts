@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 
-import i18n from '../utils/i18n'
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '../utils/const'
-import { MissingRequiredArgument } from '../exceptions'
+import i18n from 'utils/i18n'
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import { MissingRequiredArgument } from 'exceptions'
 
 const requiredMetadataKey = Symbol('required')
 const passwordMetadataKey = Symbol('password')

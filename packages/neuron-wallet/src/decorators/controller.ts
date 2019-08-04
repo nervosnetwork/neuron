@@ -1,4 +1,4 @@
-import { Channel } from '../utils/const'
+import { Channel } from 'utils/const'
 
 export const Controller: (channel: Channel) => ClassDecorator = channel => target => {
   Reflect.defineMetadata('channel', channel, target)

@@ -1,6 +1,6 @@
 import { MenuItem, dialog } from 'electron'
 import { autoUpdater } from 'electron-updater'
-import i18n from '../utils/i18n'
+import i18n from 'utils/i18n'
 
 autoUpdater.autoDownload = false
 

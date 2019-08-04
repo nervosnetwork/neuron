@@ -1,14 +1,14 @@
 import { remote } from 'electron'
-import { initConnection as initAddressConnection } from '../../database/address/ormconfig'
-import AddressService from '../../services/addresses'
-import LockUtils from '../../models/lock-utils'
-import AddressesUsedSubject from '../../models/subjects/addresses-used-subject'
-import BlockListener from '../../services/sync/block-listener'
-import { NetworkWithID } from '../../services/networks'
-import { initDatabase } from './init-database'
-import { register as registerTxStatusListener } from '../../listeners/tx-status'
+import { initConnection as initAddressConnection } from 'database/address/ormconfig'
+import AddressService from 'services/addresses'
+import LockUtils from 'models/lock-utils'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
+import BlockListener from 'services/sync/block-listener'
+import { NetworkWithID } from 'services/networks'
+import { register as registerTxStatusListener } from 'listeners/tx-status'
+import { register as registerAddressListener } from 'listeners/address'
 
-import { register as registerAddressListener } from '../../listeners/address'
+import { initDatabase } from './init-database'
 
 // register to listen address updates
 registerAddressListener()

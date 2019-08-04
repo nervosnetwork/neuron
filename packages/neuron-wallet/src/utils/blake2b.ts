@@ -1,5 +1,5 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
-import NodeService from '../services/node'
+import NodeService from 'services/node'
 
 export default class Blake2b {
   private blake2b: any

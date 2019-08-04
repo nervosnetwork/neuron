@@ -1,10 +1,10 @@
 import { BrowserWindow } from 'electron'
 import { ReplaySubject } from 'rxjs'
 import path from 'path'
-import { networkSwitchSubject, NetworkWithID } from '../../services/networks'
-import env from '../../env'
+import { networkSwitchSubject, NetworkWithID } from 'services/networks'
+import env from 'env'
+import AddressService from 'services/addresses'
 import genesisBlockHash from './genesis'
-import AddressService from '../../services/addresses'
 import initDatabase from './init-database'
 
 export { genesisBlockHash }

@@ -1,6 +1,6 @@
 import * as path from 'path'
-import app from './app'
-import { NetworkWithID } from './services/networks'
+import app from 'app'
+import { NetworkWithID } from 'services/networks'
 
 const { NODE_ENV } = process.env
 

@@ -1,10 +1,10 @@
 import { remote } from 'electron'
 import { ReplaySubject } from 'rxjs'
 import { bufferTime } from 'rxjs/operators'
-import AddressesUsedSubject from '../models/subjects/addresses-used-subject'
-import AddressService from '../services/addresses'
-import WalletService from '../services/wallets'
-import { AccountExtendedPublicKey } from '../models/keys/key'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
+import AddressService from 'services/addresses'
+import WalletService from 'services/wallets'
+import { AccountExtendedPublicKey } from 'models/keys/key'
 
 const isRenderer = process && process.type === 'renderer'
 const addressesUsedSubject = isRenderer

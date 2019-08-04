@@ -1,5 +1,5 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
-import NodeService from '../node'
+import NodeService from 'services/node'
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
