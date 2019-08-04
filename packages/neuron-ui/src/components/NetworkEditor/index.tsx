@@ -50,7 +50,7 @@ const NetworkEditor = ({
           </Stack.Item>
         ))}
       </Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
         <PrimaryButton disabled={errors.includes(true) || notModified} onClick={handleSubmit} text={t('common.save')} />
       </Stack>
