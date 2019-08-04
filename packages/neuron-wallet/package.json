@@ -19,7 +19,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "tsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
+    "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
     "test:e2e": "jest --config jest.e2e.config.js --color",
@@ -64,6 +64,8 @@
     "lint-staged": "9.2.0",
     "neuron-ui": "0.17.0-alpha.5",
     "rimraf": "2.6.3",
-    "spectron": "7.0.0"
+    "spectron": "7.0.0",
+    "ts-transformer-imports": "^0.4.3",
+    "ttypescript": "^1.5.7"
   }
 }

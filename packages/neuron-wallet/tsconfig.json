@@ -5,12 +5,14 @@
     "sourceMap": true,
     "declaration": true,
     "emitDecoratorMetadata": true,
-    "noEmit": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "*": ["./src/*", "node_modules/*"]
-    }
+    },
+    "plugins": [
+      { "transform": "ts-transformer-imports" }
+    ]
   },
   "include": ["src/**/*"]
 }
