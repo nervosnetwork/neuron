@@ -15,8 +15,6 @@
     "strictPropertyInitialization": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "allowJs": false,
-    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
   }
