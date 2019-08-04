@@ -5,7 +5,6 @@ import { HashRouter as Router, Route } from 'react-router-dom'
 import 'styles/index.scss'
 import 'utils/i18n'
 import 'utils/loadTheme'
-import * as serviceWorker from 'serviceWorker'
 
 import Navbar from 'containers/Navbar'
 import Notification from 'containers/Notification'
@@ -69,7 +68,5 @@ if (window.location.hash.startsWith('#/transaction/')) {
 } else {
   ReactDOM.render(<App />, document.getElementById('root'))
 }
-
-serviceWorker.register()
 
 export default undefined
