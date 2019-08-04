@@ -1,20 +1,20 @@
-import { MenuItem, dialog } from 'electron'
+import { dialog } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import i18n from '../utils/i18n'
 
 export default class UpdateController {
-  updaterMenuItem: MenuItem | null
+  sender: { enabled: boolean } | null
 
   constructor() {
     autoUpdater.autoDownload = false
-    this.updaterMenuItem = null
+    this.sender = null
 
     this.bindEvents()
   }
 
-  public checkUpdates(menuItem: MenuItem) {
-    this.updaterMenuItem = menuItem
-    this.updaterMenuItem.enabled = false
+  public checkUpdates(sender: { enabled: boolean }) {
+    this.sender = sender
+    this.sender.enabled = false
 
     autoUpdater.checkForUpdates()
   }
@@ -24,7 +24,7 @@ export default class UpdateController {
 
     autoUpdater.on('error', error => {
       dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
-      this.enableUpdaterMenuItem()
+      this.enableSender()
     })
 
     autoUpdater.on('update-available', () => {
@@ -38,7 +38,7 @@ export default class UpdateController {
           if (buttonIndex === 0) {
             autoUpdater.downloadUpdate()
           } else {
-            this.enableUpdaterMenuItem()
+            this.enableSender()
           }
         }
       )
@@ -50,7 +50,7 @@ export default class UpdateController {
         message: i18n.t('updater.update-not-available'),
         buttons: [i18n.t('common.ok')],
       })
-      this.enableUpdaterMenuItem()
+      this.enableSender()
     })
 
     autoUpdater.on('update-downloaded', () => {
@@ -67,10 +67,10 @@ export default class UpdateController {
     })
   }
 
-  enableUpdaterMenuItem() {
-    if (this.updaterMenuItem) {
-      this.updaterMenuItem.enabled = true
+  enableSender() {
+    if (this.sender) {
+      this.sender.enabled = true
     }
-    this.updaterMenuItem = null
+    this.sender = null
   }
 }
