@@ -1,9 +1,23 @@
 {
-  "extends": "@cryptape/sdk-ts-config/tsconfig.json",
   "compilerOptions": {
     "target": "es6",
-    "moduleResolution": "node",
     "esModuleInterop": true,
-    "incremental": true
+    "incremental": true,
+    "module": "commonjs",
+    "alwaysStrict": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "classic",
+    "skipLibCheck": true
   }
 }
