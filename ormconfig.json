@@ -5,13 +5,13 @@
   "logging": true,
   "database": "cell-dev.sqlite",
   "entities": [
-     "packages/neuron-wallet/src/database/chain/entities/**/*.ts"
+     "packages/neuron-wallet/dist/database/chain/entities/**/*.js"
   ],
   "migrations": [
-     "packages/neuron-wallet/src/database/chain/migrations/**/*.ts"
+     "packages/neuron-wallet/dist/database/chain/migrations/**/*.js"
   ],
   "subscribers": [
-     "packages/neuron-wallet/src/database/chain/subscriber/**/*.ts"
+     "packages/neuron-wallet/dist/database/chain/subscriber/**/*.js"
   ],
   "cli": {
      "entitiesDir": "packages/neuron-wallet/src/database/chain/entities",

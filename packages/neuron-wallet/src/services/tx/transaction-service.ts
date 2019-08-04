@@ -3,7 +3,7 @@ import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
-import { CONNECTION_NOT_FOUND_NAME } from '../../database/chain/ormconfig'
+import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
