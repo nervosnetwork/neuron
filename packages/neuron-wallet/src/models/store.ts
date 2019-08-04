@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import FileService from 'services/file'
-import logger from 'utils/logger'
 
 class Store extends EventEmitter {
   public moduleName: string
@@ -49,12 +48,8 @@ class Store extends EventEmitter {
         const content = JSON.parse(data)
         return content[key as string]
       })
-      .catch(err => {
+      .catch(() => {
         this.backup()
-        logger.log({
-          level: 'error',
-          message: err.message,
-        })
         return this.read(key)
       })
 
@@ -67,12 +62,8 @@ class Store extends EventEmitter {
           this.service.writeFileSync(this.moduleName, this.filename, JSON.stringify(newContent))
         }
       })
-      .catch(err => {
+      .catch(() => {
         this.backup()
-        logger.log({
-          level: 'error',
-          message: err.message,
-        })
         this.write(key, data)
       })
 
@@ -83,10 +74,6 @@ class Store extends EventEmitter {
       return key ? content[key] : content
     } catch (err) {
       this.backup()
-      logger.log({
-        level: 'error',
-        message: err.message,
-      })
       return this.readSync(key)
     }
   }
@@ -99,10 +86,6 @@ class Store extends EventEmitter {
       this.emit(key, oldValue, data)
     } catch (err) {
       this.backup()
-      logger.log({
-        level: 'error',
-        message: err.message,
-      })
       this.writeSync(key, data)
     }
   }
