@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "incremental": true,
-    "module": "commonjs",
     "alwaysStrict": true,
-    "declaration": true,
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
@@ -18,6 +17,7 @@
     "preserveConstEnums": true,
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   }
 }
