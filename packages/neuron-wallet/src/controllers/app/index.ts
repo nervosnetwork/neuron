@@ -162,7 +162,7 @@ export default class AppController {
   }
 
   public static checkUpdates(menuItem: MenuItem) {
-    UpdateController.checkUpdates(menuItem)
+    new UpdateController().checkUpdates(menuItem)
   }
 
   public static openWebsite() {
