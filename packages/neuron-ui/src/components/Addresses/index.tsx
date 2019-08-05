@@ -17,6 +17,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useLocalDescription } from 'utils/hooks'
 import { MIN_CELL_WIDTH, Routes } from 'utils/const'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import { onRenderRow } from 'utils/fabricUIRender'
 
 const Addresses = ({
   app: {
@@ -180,6 +181,7 @@ const Addresses = ({
         contextMenu({ type: 'addressList', id: item.identifier })
       }}
       className="listWithDesc"
+      onRenderRow={onRenderRow}
     />
   )
 }

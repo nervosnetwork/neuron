@@ -103,9 +103,14 @@ const Overview = ({
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
     if (props) {
-      const customStyles: Partial<IDetailsRowStyles> = {}
+      const customStyles: Partial<IDetailsRowStyles> = {
+        root: {
+          animationDuration: '0!important',
+        },
+      }
       if (props.item.status === 'failed') {
         customStyles.root = {
+          animationDuration: '0!important',
           color: 'red',
         }
       }
