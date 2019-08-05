@@ -42,8 +42,7 @@ dmg:
   sign: false
 
 win:
-  publisherName:
-    - 杭州秘猿科技有限公司
+  verifyUpdateCodeSignature: false
   artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
   icon: assets/images/icon.ico
   target:
