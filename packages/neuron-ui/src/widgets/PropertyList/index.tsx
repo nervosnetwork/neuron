@@ -1,6 +1,8 @@
 import React from 'react'
-import { List } from 'office-ui-fabric-react'
+import { List, getTheme } from 'office-ui-fabric-react'
 import styles from './PropertyList.module.scss'
+
+const theme = getTheme()
 
 export interface Property {
   label: string
@@ -18,7 +20,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
     <div className={styles.propertyCell} style={{ height: item.height || 'auto' }} aria-label="property">
       <span
         className={styles.label}
-        style={{ width: item.labelWidth || 'auto' }}
+        style={{ width: item.labelWidth || 'auto', fontWeight: 600, fontSize: theme.fonts.small.fontSize }}
         title={item.label}
         aria-label={item.label}
       >
@@ -26,7 +28,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
       </span>
       <span
         className={styles.value}
-        style={{ width: item.valueWidth || 'auto' }}
+        style={{ width: item.valueWidth || 'auto', fontSize: theme.fonts.small.fontSize }}
         title={`${item.value}`}
         aria-label={item.label}
       >

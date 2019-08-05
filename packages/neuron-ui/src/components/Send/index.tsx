@@ -181,7 +181,7 @@ const Send = ({
         </Stack.Item>
       </Stack>
 
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton type="reset" onClick={onClear}>
           {t('send.clear')}
         </DefaultButton>

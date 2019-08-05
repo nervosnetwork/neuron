@@ -16,7 +16,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { Routes, MnemonicAction, BUTTON_GAP } from 'utils/const'
+import { Routes, MnemonicAction } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 
@@ -181,7 +181,7 @@ const Mnemonic = ({
           },
         }}
       />
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: BUTTON_GAP }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>
@@ -289,7 +289,7 @@ const Submission = ({
         </Stack>
       </Stack>
 
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: BUTTON_GAP }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
         <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>

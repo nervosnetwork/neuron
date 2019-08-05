@@ -132,7 +132,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         </div>
         <DialogFooter>
           <TextField readOnly value={data} label={label} underlined />
-          <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+          <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
             <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
             <PrimaryButton
               onClick={() => {
