@@ -125,6 +125,11 @@ export const editMenuItem: MenuItemConstructorOptions = {
       label: i18n.t('application-menu.edit.paste'),
       role: 'paste',
     },
+    separator,
+    {
+      label: i18n.t('application-menu.edit.selectall'),
+      role: 'selectall',
+    },
   ],
 }
 

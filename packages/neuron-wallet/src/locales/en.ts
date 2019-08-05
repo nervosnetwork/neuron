@@ -26,6 +26,7 @@ export default {
         cut: 'Cut',
         copy: 'Copy',
         paste: 'Paste',
+        selectall: 'Select All',
       },
       view: {
         label: 'View',
