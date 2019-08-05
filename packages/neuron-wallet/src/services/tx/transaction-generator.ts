@@ -1,7 +1,7 @@
-import { TransactionWithoutHash, Cell, ScriptHashType } from '../../types/cell-types'
-import CellsService, { MIN_CELL_CAPACITY } from '../cells'
-import LockUtils from '../../models/lock-utils'
-import { CapacityTooSmall } from '../../exceptions'
+import { TransactionWithoutHash, Cell, ScriptHashType } from 'types/cell-types'
+import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
+import LockUtils from 'models/lock-utils'
+import { CapacityTooSmall } from 'exceptions'
 import { TargetOutput } from './params'
 
 export class TransactionGenerator {

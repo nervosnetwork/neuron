@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import env from '../env'
-import { FileNotFound, ModuleNotFound } from '../exceptions'
+import env from 'env'
+import { FileNotFound, ModuleNotFound } from 'exceptions'
 
 export default class FileService {
   private static instance: FileService

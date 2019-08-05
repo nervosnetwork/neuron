@@ -1,4 +1,4 @@
-import i18n from '../utils/i18n'
+import i18n from 'utils/i18n'
 
 export class InvalidName extends Error {
   constructor(field: string) {

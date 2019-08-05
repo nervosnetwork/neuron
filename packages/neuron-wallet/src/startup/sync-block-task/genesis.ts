@@ -1,5 +1,5 @@
-import Utils from '../../services/sync/utils'
-import NodeService from '../../services/node'
+import Utils from 'services/sync/utils'
+import NodeService from 'services/node'
 
 const { core } = NodeService.getInstance()
 

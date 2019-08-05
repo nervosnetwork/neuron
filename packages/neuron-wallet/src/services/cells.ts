@@ -1,7 +1,7 @@
 import { getConnection, In } from 'typeorm'
-import OutputEntity from '../database/chain/entities/output'
-import { Cell, OutPoint, Input } from '../types/cell-types'
-import { CapacityNotEnough } from '../exceptions'
+import OutputEntity from 'database/chain/entities/output'
+import { Cell, OutPoint, Input } from 'types/cell-types'
+import { CapacityNotEnough } from 'exceptions'
 import { OutputStatus } from './tx/params'
 
 export const MIN_CELL_CAPACITY = '6100000000'

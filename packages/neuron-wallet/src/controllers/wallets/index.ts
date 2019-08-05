@@ -1,12 +1,12 @@
 import fs from 'fs'
-import AppController from '../app'
-import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from '../../services/wallets'
-import Keystore from '../../models/keys/keystore'
-import Keychain from '../../models/keys/keychain'
-import { validateMnemonic, mnemonicToSeedSync } from '../../models/keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey } from '../../models/keys/key'
-import { Controller as ControllerDecorator, CatchControllerError } from '../../decorators'
-import { ResponseCode, Channel } from '../../utils/const'
+import AppController from 'controllers/app'
+import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
+import Keystore from 'models/keys/keystore'
+import Keychain from 'models/keys/keychain'
+import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
+import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
+import { Controller as ControllerDecorator, CatchControllerError } from 'decorators'
+import { ResponseCode, Channel } from 'utils/const'
 import {
   CurrentWalletNotSet,
   IsRequired,
@@ -15,10 +15,10 @@ import {
   ServiceHasNoResponse,
   EmptyPassword,
   IncorrectPassword,
-} from '../../exceptions'
-import i18n from '../../utils/i18n'
-import AddressService from '../../services/addresses'
-import WalletCreatedSubject from '../../models/subjects/wallet-created-subject'
+} from 'exceptions'
+import i18n from 'utils/i18n'
+import AddressService from 'services/addresses'
+import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 
 /**
  * @class WalletsController

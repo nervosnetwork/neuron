@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 import { getConnection } from 'typeorm'
-import SyncInfoEntity from '../../database/chain/entities/sync-info'
-import CurrentBlockSubject from '../../models/subjects/current-block-subject'
+import SyncInfoEntity from 'database/chain/entities/sync-info'
+import CurrentBlockSubject from 'models/subjects/current-block-subject'
 
 const isRenderer = process && process.type === 'renderer'
 const currentBlockSubject = isRenderer

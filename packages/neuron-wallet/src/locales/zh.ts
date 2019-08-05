@@ -26,6 +26,7 @@ export default {
         cut: '剪切',
         copy: '复制',
         paste: '粘贴',
+        selectall: '全部选中',
       },
       view: {
         label: '视图',

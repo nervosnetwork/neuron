@@ -103,9 +103,14 @@ const Overview = ({
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
     if (props) {
-      const customStyles: Partial<IDetailsRowStyles> = {}
+      const customStyles: Partial<IDetailsRowStyles> = {
+        root: {
+          animationDuration: '0!important',
+        },
+      }
       if (props.item.status === 'failed') {
         customStyles.root = {
+          animationDuration: '0!important',
           color: 'red',
         }
       }
@@ -284,21 +289,27 @@ const Overview = ({
         <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
           <Stack tokens={{ padding: 15 }}>
             {defaultAddress ? (
-              <Stack tokens={{ childrenGap: 15 }}>
+              <Stack tokens={{ childrenGap: 15 }} styles={{ root: { padding: 5 } }}>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="medium">{t('overview.address')}</Text>
+                  <Text variant="small" style={{ fontWeight: 600 }}>
+                    {t('overview.address')}
+                  </Text>
                   <Text variant="small" className="fixedWidth">
                     {defaultAddress.address}
                   </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="medium">{t('overview.code-hash')}</Text>
+                  <Text variant="small" style={{ fontWeight: 600 }}>
+                    {t('overview.code-hash')}
+                  </Text>
                   <Text variant="small" className="fixedWidth">
                     {codeHash}
                   </Text>
                 </Stack>
                 <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="medium">{t('overview.lock-arg')}</Text>
+                  <Text variant="small" style={{ fontWeight: 600 }}>
+                    {t('overview.lock-arg')}
+                  </Text>
                   <Text variant="small" className="fixedWidth">
                     {defaultAddress.identifier}
                   </Text>

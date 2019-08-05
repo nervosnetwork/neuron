@@ -1,6 +1,6 @@
-import { CatchControllerError } from '../decorators'
-import BlockNumber from '../services/sync/block-number'
-import { ResponseCode } from '../utils/const'
+import { CatchControllerError } from 'decorators'
+import BlockNumber from 'services/sync/block-number'
+import { ResponseCode } from 'utils/const'
 
 export default class SyncInfoController {
   @CatchControllerError

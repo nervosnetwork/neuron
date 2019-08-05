@@ -1,5 +1,5 @@
-import FileService from '../../services/file'
-import { SystemScript } from '../../models/lock-utils'
+import FileService from 'services/file'
+import { SystemScript } from 'models/lock-utils'
 
 const moduleName = 'cells'
 const fileName = 'meta-info.json'

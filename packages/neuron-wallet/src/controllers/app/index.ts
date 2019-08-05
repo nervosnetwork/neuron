@@ -1,24 +1,25 @@
 import path from 'path'
 import { dialog, shell, Menu, MenuItem, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
 import { take } from 'rxjs/operators'
-import app from '../../app'
+import app from 'app'
+
+import TransactionsController from 'controllers/transactions'
+import NetworksService from 'services/networks'
+import WalletsService from 'services/wallets'
+import WalletsController from 'controllers/wallets'
+import SyncInfoController from 'controllers/sync-info'
+import UpdateController from 'controllers/update'
+
+import { Controller as ControllerDecorator } from 'decorators'
+import { Channel, ResponseCode } from 'utils/const'
+import WindowManager from 'models/window-manager'
+import i18n from 'utils/i18n'
+import env from 'env'
+import CommandSubject from 'models/subjects/command'
+import { ConnectionStatusSubject } from 'models/subjects/node'
+import { SystemScriptSubject } from 'models/subjects/system-script'
+
 import { URL, contextMenuTemplate } from './options'
-
-import TransactionsController from '../transactions'
-import NetworksService from '../../services/networks'
-import WalletsService from '../../services/wallets'
-import WalletsController from '../wallets'
-import SyncInfoController from '../sync-info'
-import UpdateController from '../update'
-
-import { Controller as ControllerDecorator } from '../../decorators'
-import { Channel, ResponseCode } from '../../utils/const'
-import WindowManager from '../../models/window-manager'
-import i18n from '../../utils/i18n'
-import env from '../../env'
-import CommandSubject from '../../models/subjects/command'
-import { ConnectionStatusSubject } from '../../models/subjects/node'
-import { SystemScriptSubject } from '../../models/subjects/system-script'
 
 @ControllerDecorator(Channel.App)
 export default class AppController {

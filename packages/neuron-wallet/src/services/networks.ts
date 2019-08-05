@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid'
 import { BehaviorSubject } from 'rxjs'
-import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from '../exceptions/network'
+import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from 'exceptions/network'
 
-import Store from '../models/store'
-import env from '../env'
+import Store from 'models/store'
+import env from 'env'
 
-import { Validate, Required } from '../decorators'
-import { UsedName, NetworkNotFound, InvalidFormat } from '../exceptions'
-import { NetworkListSubject, CurrentNetworkIDSubject } from '../models/subjects/networks'
+import { Validate, Required } from 'decorators'
+import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
+import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
 
 export type NetworkID = string
 export type NetworkName = string

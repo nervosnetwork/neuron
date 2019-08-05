@@ -13,11 +13,10 @@ const GeneralSetting = ({ settings: { showAddressBook }, dispatch }: React.Props
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Toggle
-        inlineLabel
         checked={showAddressBook}
         label={t('settings.general.display-address-book-in-the-navbar')}
-        onText={t('settings.general.show')}
-        offText={t('settings.general.hide')}
+        onText={t('common.toggle.on')}
+        offText={t('common.toggle.off')}
         onChange={onToggle}
       />
     </Stack>

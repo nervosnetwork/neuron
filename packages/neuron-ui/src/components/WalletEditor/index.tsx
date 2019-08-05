@@ -60,7 +60,7 @@ const WalletEditor = ({
           </Stack.Item>
         ))}
       </Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 20 }}>
+      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
         <PrimaryButton onClick={onConfirm} disabled={!areParamsValid} text={t('common.save')} />
       </Stack>

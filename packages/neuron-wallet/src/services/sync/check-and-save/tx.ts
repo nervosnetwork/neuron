@@ -1,10 +1,10 @@
 import { getConnection } from 'typeorm'
 import { Subject } from 'rxjs'
-import { Transaction, Cell, OutPoint } from '../../../types/cell-types'
-import OutputEntity from '../../../database/chain/entities/output'
-import { TransactionPersistor } from '../../tx'
+import { Transaction, Cell, OutPoint } from 'types/cell-types'
+import OutputEntity from 'database/chain/entities/output'
+import { TransactionPersistor } from 'services/tx'
+import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
-import LockUtils from '../../../models/lock-utils'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
 
 export default class CheckTx {

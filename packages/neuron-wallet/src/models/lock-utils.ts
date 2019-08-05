@@ -1,6 +1,6 @@
-import NodeService from '../services/node'
-import { OutPoint, Script, ScriptHashType } from '../types/cell-types'
-import env from '../env'
+import NodeService from 'services/node'
+import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
+import env from 'env'
 import { SystemScriptSubject } from './subjects/system-script'
 
 const { core } = NodeService.getInstance()

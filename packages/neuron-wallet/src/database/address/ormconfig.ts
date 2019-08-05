@@ -2,7 +2,7 @@ import { createConnection, getConnection as ormGetConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 
-import env from '../../env'
+import env from 'env'
 
 import Address from './entities/address'
 

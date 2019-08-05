@@ -129,7 +129,7 @@
         "network": "网络"
       },
       "general": {
-        "display-address-book-in-the-navbar": "导航栏中显示地址簿",
+        "display-address-book-in-the-navbar": "显示地址簿",
         "show": "显示",
         "hide": "隐藏"
       },
@@ -194,7 +194,11 @@
       "or": "或",
       "confirm": "确认",
       "cancel": "取消",
-      "save": "保存"
+      "save": "保存",
+      "toggle": {
+        "on": "开",
+        "off": "关"
+      }
     },
     "notification-panel": {
       "title": "通知中心"

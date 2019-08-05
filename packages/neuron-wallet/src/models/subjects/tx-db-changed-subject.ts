@@ -1,6 +1,6 @@
 import { ReplaySubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import { Transaction } from '../../types/cell-types'
+import { Transaction } from 'types/cell-types'
 import DataUpdateSubject from './data-update'
 
 export interface TransactionChangedMessage {

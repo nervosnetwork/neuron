@@ -129,7 +129,7 @@
         "network": "Network"
       },
       "general": {
-        "display-address-book-in-the-navbar": "Display the address book in the navigation",
+        "display-address-book-in-the-navbar": "Show the address book",
         "show": "Show",
         "hide": "Hide"
       },
@@ -194,7 +194,11 @@
       "or": "or",
       "confirm": "Confirm",
       "cancel": "Cancel",
-      "save": "Save"
+      "save": "Save",
+      "toggle": {
+        "on": "On",
+        "off": "Off"
+      }
     },
     "notification-panel": {
       "title": "Notifications"

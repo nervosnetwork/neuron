@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime, sampleTime } from 'rxjs/operators'
-import WindowManager from '../window-manager'
+import WindowManager from 'models/window-manager'
 
 const DEBOUNCE_TIME = 50
 const SAMPLE_TIME = 500

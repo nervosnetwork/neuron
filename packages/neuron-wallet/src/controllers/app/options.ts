@@ -1,11 +1,11 @@
 import { MenuItemConstructorOptions, clipboard, dialog } from 'electron'
 import { bech32Address } from '@nervosnetwork/ckb-sdk-utils'
 
-import WalletsService from '../../services/wallets'
-import NetworksService from '../../services/networks'
+import WalletsService from 'services/wallets'
+import NetworksService from 'services/networks'
+import i18n from 'utils/i18n'
+import env from 'env'
 import AppController from '.'
-import i18n from '../../utils/i18n'
-import env from '../../env'
 
 export enum MenuCommand {
   ShowAbout = 'show-about',

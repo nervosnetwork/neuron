@@ -1,10 +1,10 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { AccountExtendedPublicKey } from '../models/keys/key'
-import Address, { AddressType } from '../models/keys/address'
-import LockUtils from '../models/lock-utils'
-import AddressDao, { Address as AddressInterface } from '../database/address/dao'
-import env from '../env'
-import AddressEntity, { AddressVersion } from '../database/address/entities/address'
+import { AccountExtendedPublicKey } from 'models/keys/key'
+import Address, { AddressType } from 'models/keys/address'
+import LockUtils from 'models/lock-utils'
+import AddressDao, { Address as AddressInterface } from 'database/address/dao'
+import env from 'env'
+import AddressEntity, { AddressVersion } from 'database/address/entities/address'
 
 const MAX_ADDRESS_COUNT = 30
 

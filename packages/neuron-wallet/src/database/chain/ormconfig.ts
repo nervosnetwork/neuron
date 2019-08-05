@@ -2,13 +2,13 @@ import { createConnection, getConnectionOptions, getConnection } from 'typeorm'
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import path from 'path'
 
+import logger from 'utils/logger'
+import env from 'env'
+
 import Transaction from './entities/transaction'
 import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
-
-import logger from '../../utils/logger'
-import env from '../../env'
 
 import { InitMigration1561695143591 } from './migrations/1561695143591-InitMigration'
 import { AddStatusToTx1562038960990 } from './migrations/1562038960990-AddStatusToTx'
