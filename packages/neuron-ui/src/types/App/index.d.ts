@@ -125,7 +125,6 @@ declare namespace State {
     connectionStatus: 'online' | 'offline'
     tipBlockNumber: string
     codeHash: string
-    transaction: DetailedTransaction
     transactions: {
       pageNo: number
       pageSize: number

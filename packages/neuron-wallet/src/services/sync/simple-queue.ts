@@ -4,6 +4,7 @@ export default class SimpleQueue {
   private q: any[] = []
   private worker: any
   private stopped = false
+  private inProcess = false
 
   constructor(worker: any, start: boolean = true) {
     this.worker = worker
@@ -15,12 +16,19 @@ export default class SimpleQueue {
   /* eslint no-await-in-loop: "off" */
   public start = async () => {
     while (!this.stopped) {
-      const nextValue = this.shift()
-      if (nextValue) {
-        await this.worker(nextValue)
-        await this.yield()
-      } else {
-        await this.yield(50)
+      try {
+        this.inProcess = true
+        const nextValue = this.shift()
+        if (nextValue) {
+          await this.worker(nextValue)
+          await this.yield()
+        } else {
+          await this.yield(50)
+        }
+      } catch (err) {
+        throw err
+      } finally {
+        this.inProcess = false
       }
     }
   }
@@ -56,5 +64,16 @@ export default class SimpleQueue {
 
   public length = (): number => {
     return this.q.length
+  }
+
+  public waitForDrained = async (timeout: number = 5000) => {
+    const startAt = +new Date()
+    while (!(this.length() === 0 && !this.inProcess)) {
+      const now = +new Date()
+      if (now - startAt > timeout) {
+        return
+      }
+      await this.yield(50)
+    }
   }
 }

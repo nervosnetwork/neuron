@@ -2,7 +2,7 @@
   "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.17.0-alpha.5",
+  "version": "0.17.0-alpha.6",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -43,7 +43,6 @@
     }
   },
   "devDependencies": {
-    "@cryptape/sdk-ts-config": "0.0.1",
     "@types/jest": "24.0.13",
     "@typescript-eslint/eslint-plugin": "1.10.2",
     "@typescript-eslint/parser": "1.10.2",

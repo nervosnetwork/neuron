@@ -163,8 +163,11 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
     .then(res => {
       if (res.status) {
         dispatch({
-          type: AppActions.Ignore,
-          payload: null,
+          type: NeuronWalletActions.UpdateAddressDescription,
+          payload: {
+            address: params.address,
+            description: params.description,
+          },
         })
       } else {
         addNotification({ type: 'alert', content: res.message.title })(dispatch)

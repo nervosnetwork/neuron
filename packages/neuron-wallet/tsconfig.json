@@ -3,9 +3,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "sourceMap": true,
+    "declaration": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {

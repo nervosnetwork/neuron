@@ -4,7 +4,6 @@ import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProv
 import {
   toggleAddressBook,
   updateTransactionList,
-  updateTransaction,
   updateCurrentWallet,
   updateWalletList,
   updateAddressListAndBalance,
@@ -126,7 +125,6 @@ export const useSubscription = ({
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
-  const { hash: txHash } = chain.transaction
   useEffect(() => {
     const systemScriptSubscription = SystemScriptSubject.subscribe(({ codeHash = '' }: { codeHash: string }) => {
       systemScriptCache.save({ codeHash })
@@ -151,7 +149,6 @@ export const useSubscription = ({
             pageNo,
             pageSize,
           })(dispatch)
-          updateTransaction({ walletID, hash: txHash })
           break
         }
         case 'current-wallet': {
@@ -242,7 +239,7 @@ export const useSubscription = ({
       syncedBlockNumberSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, txHash, history, dispatch])
+  }, [walletID, pageNo, pageSize, keywords, history, dispatch])
 }
 
 export default {

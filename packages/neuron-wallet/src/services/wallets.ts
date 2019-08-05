@@ -245,6 +245,8 @@ export default class WalletService {
     if (currentID === id) {
       if (newWallets.length > 0) {
         this.setCurrent(newWallets[0].id)
+      } else {
+        this.setCurrent('')
       }
     }
 
@@ -258,9 +260,11 @@ export default class WalletService {
       throw new IsRequired('ID')
     }
 
-    const wallet = this.get(id)
-    if (!wallet) {
-      throw new WalletNotFound(id)
+    if (id !== '') {
+      const wallet = this.get(id)
+      if (!wallet) {
+        throw new WalletNotFound(id)
+      }
     }
 
     this.listStore.writeSync(this.currentWalletKey, id)

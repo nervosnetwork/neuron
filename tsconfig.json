@@ -1,9 +1,21 @@
 {
-  "extends": "@cryptape/sdk-ts-config/tsconfig.json",
   "compilerOptions": {
     "target": "es6",
+    "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "incremental": true
+    "incremental": true,
+    "alwaysStrict": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   }
 }

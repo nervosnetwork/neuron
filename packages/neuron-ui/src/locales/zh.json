@@ -238,7 +238,10 @@
       "delete-network-successfully": "节点已删除",
       "addr-copied": "地址已复制到剪贴板",
       "qrcode-copied": "二维码已复制到剪贴板",
-      "lock-arg-copied": "Lock Arg 已复制到剪贴板"
+      "lock-arg-copied": "Lock Arg 已复制到剪贴板",
+      "transaction-not-found": "未找到交易",
+      "network-address-should-have-protocol": "RPC 地址应以 http(s)//: 开始",
+      "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格"
     },
     "sync": {
       "syncing": "同步中",
