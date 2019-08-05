@@ -1,4 +1,4 @@
-import { ResponseCode } from '../utils/const'
+import { ResponseCode } from 'utils/const'
 
 export const CatchControllerError = (_target: any, _name: string, descriptor: PropertyDescriptor) => {
   const originalMethod = descriptor.value

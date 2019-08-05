@@ -1,12 +1,12 @@
 import { Not, In } from 'typeorm'
+import { AddressType } from 'models/keys/address'
+import { TransactionsService } from 'services/tx'
+import CellsService from 'services/cells'
+import LockUtils from 'models/lock-utils'
+import { TransactionStatus } from 'types/cell-types'
+import { OutputStatus } from 'services/tx/params'
 import AddressEntity, { AddressVersion } from './entities/address'
-import { AddressType } from '../../models/keys/address'
 import { getConnection } from './ormconfig'
-import { TransactionsService } from '../../services/tx'
-import CellsService from '../../services/cells'
-import LockUtils from '../../models/lock-utils'
-import { TransactionStatus } from '../../types/cell-types'
-import { OutputStatus } from '../../services/tx/params'
 
 export interface Address {
   walletId: string

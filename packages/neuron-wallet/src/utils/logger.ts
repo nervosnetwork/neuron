@@ -1,12 +1,10 @@
 import winston, { format } from 'winston'
 import path from 'path'
-import env from '../env'
-import app from '../app'
-
-const { isDevMode } = env
+import app from 'app'
+import env from 'env'
 
 let basePath
-if (isDevMode) {
+if (env.isDevMode) {
   basePath = './'
 } else {
   try {

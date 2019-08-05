@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface, CellOutPoint } from '../../../types/cell-types'
+import { OutPoint, Input as InputInterface, CellOutPoint } from 'types/cell-types'
 import Transaction from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */

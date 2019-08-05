@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import WindowManager from '../window-manager'
+import WindowManager from 'models/window-manager'
 
 const CommandSubject = new Subject<{
   winID: number

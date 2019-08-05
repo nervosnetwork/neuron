@@ -1,8 +1,8 @@
 import { remote } from 'electron'
 import { Entity, BaseEntity, PrimaryColumn, Column, AfterInsert, AfterUpdate, AfterRemove } from 'typeorm'
-import { AddressType } from '../../../models/keys/address'
+import { AddressType } from 'models/keys/address'
+import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { Address as AddressInterface } from '../dao'
-import AddressDbChangedSubject from '../../../models/subjects/address-db-changed-subject'
 
 export enum AddressVersion {
   Testnet = 'testnet',

@@ -1,4 +1,4 @@
-import i18n from '../utils/i18n'
+import i18n from 'utils/i18n'
 
 export class TransactionNotFound extends Error {
   constructor(hash: string) {
