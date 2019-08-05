@@ -17,6 +17,7 @@ import { contextMenu, showTransactionDetails } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { onRenderRow } from 'utils/fabricUIRender'
 
 const theme = getTheme()
 
@@ -212,6 +213,7 @@ const TransactionList = ({
         }
       }}
       className="listWithDesc"
+      onRenderRow={onRenderRow}
     />
   )
 }
