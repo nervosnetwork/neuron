@@ -21,7 +21,7 @@ const NetworkEditor = ({
   const cachedNetwork = cachedNetworks.current.find(network => network.id === id)
   const usedNetworkNames = useMemo(
     () => networks.map(n => n.name).filter(name => name !== ((cachedNetwork && cachedNetwork.name) || '')),
-    [networks]
+    [networks, cachedNetwork]
   )
   const inputs = useInputs(editor, usedNetworkNames, t)
   const goBack = useGoBack(history)
