@@ -4,7 +4,6 @@ import { debounceTime } from 'rxjs/operators'
 
 import i18n from 'utils/i18n'
 import { updateApplicationMenu } from 'utils/application-menu'
-import Router from 'router'
 import WindowManager from 'models/window-manager'
 import createMainWindow from 'startup/create-main-window'
 import createSyncBlockTask from 'startup/sync-block-task/create'
@@ -14,12 +13,6 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import dataUpdateSubject from 'models/subjects/data-update'
 
 const walletsService = WalletsService.getInstance()
-
-const router = new Router()
-
-Object.defineProperty(app, 'router', {
-  value: router,
-})
 
 const openWindow = () => {
   if (!WindowManager.mainWindow) {
