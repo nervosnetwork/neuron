@@ -47,11 +47,15 @@ export default class RangeForCheck {
       const lastBlockHeader = this.range[this.range.length - 1]
       const firstBlockHeader = range[0]
       if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
-        // TODO: should re generate range here, should ensure currentBlockNumber before
-        throw new Error('not match')
+        this.clearRange()
+        return
       }
     }
-    this.range = this.range.slice(range.length).concat(range)
+    if (this.range.length >= this.checkSize) {
+      this.range = this.range.slice(range.length).concat(range)
+    } else {
+      this.range = this.range.concat(range)
+    }
   }
 
   public check = (blockHeaders: BlockHeader[]) => {
