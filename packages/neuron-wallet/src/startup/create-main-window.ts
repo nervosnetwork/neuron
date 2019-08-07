@@ -35,11 +35,9 @@ function createWindow() {
     if (WindowManager.mainWindow) {
       WindowManager.mainWindow.show()
       WindowManager.mainWindow.focus()
+      logger.info('The main window is ready to show')
     } else {
-      logger.log({
-        level: 'error',
-        message: 'The main window is not initialized on ready to show',
-      })
+      logger.error('The main window is not initialized on ready to show')
     }
   })
 
