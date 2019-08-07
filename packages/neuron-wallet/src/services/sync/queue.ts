@@ -73,7 +73,11 @@ export default class Queue {
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
     // 2. check blockHeaders
-    await this.checkBlockHeader(blockHeaders)
+    const checkResult = await this.checkBlockHeader(blockHeaders)
+
+    if (checkResult.type === 'first-not-match') {
+      return
+    }
 
     // 3. check and save
     await this.getBlocksService.checkAndSave(blocks, this.lockHashes)
@@ -103,6 +107,8 @@ export default class Queue {
         throw new Error('chain forked')
       }
     }
+
+    return checkResult
   }
 
   public push = (blockNumbers: string[]): void => {
