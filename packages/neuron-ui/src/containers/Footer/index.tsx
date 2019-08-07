@@ -18,7 +18,7 @@ const stackStyles = {
   ],
 }
 const stackItemStyles = {
-  root: [theme.fonts.small],
+  root: [theme.fonts.xSmall],
 }
 
 export const SyncStatus = ({
@@ -28,13 +28,13 @@ export const SyncStatus = ({
 }: React.PropsWithoutRef<{ tipBlockNumber: string; syncedBlockNumber: string; bufferBlockNumber?: number }>) => {
   const [t] = useTranslation()
   if (tipBlockNumber === '') {
-    return <Text variant="small">{t('footer.fail-to-fetch-tip-block-number')}</Text>
+    return <Text variant="xSmall">{t('footer.fail-to-fetch-tip-block-number')}</Text>
   }
 
   const percentage = +syncedBlockNumber / +tipBlockNumber
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', fontSize: theme.fonts.small.fontSize }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
         <>
           {t('sync.syncing')}
@@ -52,21 +52,12 @@ export const SyncStatus = ({
 
 export const NetworkStatus = ({ name, online }: { name: string; online: boolean }) => {
   return (
-    <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }}>
+    <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 5 }} styles={stackItemStyles}>
       <Icon
         iconName={online ? 'Connected' : 'Disconnected'}
         styles={{ root: { display: 'flex', alignItems: 'center' } }}
       />
-      <Text
-        styles={{
-          root: {
-            fontSize: '14px',
-            lineHeight: '14px',
-          },
-        }}
-      >
-        {name}
-      </Text>
+      <Text variant="xSmall">{name}</Text>
     </Stack>
   )
 }
