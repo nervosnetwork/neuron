@@ -2,7 +2,6 @@ import { app } from 'electron'
 import 'reflect-metadata'
 import { debounceTime } from 'rxjs/operators'
 
-import i18n from 'utils/i18n'
 import { updateApplicationMenu } from 'utils/application-menu'
 import WindowManager from 'models/window-manager'
 import createMainWindow from 'startup/create-main-window'
@@ -44,7 +43,6 @@ app.on('ready', async () => {
     }
   })
 
-  i18n.changeLanguage(['zh', 'zh-CN'].includes(app.getLocale()) ? 'zh' : 'en')
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
