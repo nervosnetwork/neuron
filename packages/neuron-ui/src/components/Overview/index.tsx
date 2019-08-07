@@ -298,7 +298,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.address')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {defaultAddress.address}
                   </Text>
                 </Stack>
@@ -306,7 +306,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.code-hash')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {codeHash}
                   </Text>
                 </Stack>
@@ -314,7 +314,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.lock-arg')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {defaultAddress.identifier}
                   </Text>
                 </Stack>
