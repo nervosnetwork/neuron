@@ -1,7 +1,7 @@
 import { Block, BlockHeader } from 'types/cell-types'
 import { TransactionPersistor } from 'services/tx'
 import GetBlocks from './get-blocks'
-import RangeForCheck from './range-for-check'
+import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
 import SimpleQueue from './simple-queue'
@@ -73,7 +73,11 @@ export default class Queue {
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
     // 2. check blockHeaders
-    await this.checkBlockHeader(blockHeaders)
+    const checkResult = await this.checkBlockHeader(blockHeaders)
+
+    if (checkResult.type === CheckResultType.FirstNotMatch) {
+      return
+    }
 
     // 3. check and save
     await this.getBlocksService.checkAndSave(blocks, this.lockHashes)
@@ -89,7 +93,7 @@ export default class Queue {
   public checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
-      if (checkResult.type === 'first-not-match') {
+      if (checkResult.type === CheckResultType.FirstNotMatch) {
         const range = await this.rangeForCheck.getRange()
         const rangeFirstBlockHeader: BlockHeader = range[0]
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
@@ -98,11 +102,13 @@ export default class Queue {
         await this.clear()
         this.startBlockNumber = await this.currentBlockNumber.getCurrent()
         this.batchPush()
-      } else if (checkResult.type === 'block-headers-not-match') {
+      } else if (checkResult.type === CheckResultType.BlockHeadersNotMatch) {
         // throw here and retry 5 times
         throw new Error('chain forked')
       }
     }
+
+    return checkResult
   }
 
   public push = (blockNumbers: string[]): void => {

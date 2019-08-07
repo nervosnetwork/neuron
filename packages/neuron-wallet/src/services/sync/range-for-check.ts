@@ -3,6 +3,11 @@ import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
 import Utils from './utils'
 
+export enum CheckResultType {
+  FirstNotMatch = 'first-not-match',
+  BlockHeadersNotMatch = 'block-headers-not-match',
+}
+
 export default class RangeForCheck {
   private range: BlockHeader[] = []
   private checkSize = 12
@@ -69,7 +74,7 @@ export default class RangeForCheck {
     if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
       return {
         success: false,
-        type: 'first-not-match',
+        type: CheckResultType.FirstNotMatch,
       }
     }
 
@@ -80,7 +85,7 @@ export default class RangeForCheck {
       if (currentBlockHeader.parentHash !== previousBlockHeader.hash) {
         return {
           success: false,
-          type: 'block-headers-not-match',
+          type: CheckResultType.BlockHeadersNotMatch,
         }
       }
     }
