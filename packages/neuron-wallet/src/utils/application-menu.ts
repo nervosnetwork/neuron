@@ -58,7 +58,7 @@ export const appMenuItem: MenuItemConstructorOptions = {
 
 export const walletMenuItem: MenuItemConstructorOptions = {
   id: 'wallet',
-  label: 'Wallet',
+  label: i18n.t('application-menu.wallet.label'),
   submenu: [
     { id: 'select', label: i18n.t('application-menu.wallet.select'), submenu: [] },
     {
