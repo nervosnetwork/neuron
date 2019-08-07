@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, DetailsList, Text, DetailsListLayoutMode, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
+import { Stack, DetailsList, Text, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'utils/localCache'
 import { getTransaction } from 'services/remote'
 
 import { transactionState } from 'states/initStates/chain'
 
-import { localNumberFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 
 const MIN_CELL_WIDTH = 70
 
@@ -14,17 +14,19 @@ const inputColumns: IColumn[] = [
   {
     key: 'lockHash',
     name: 'Lock Hash',
-    maxWidth: 300,
+    minWidth: 100,
+    maxWidth: 525,
   },
   {
     key: 'outPointBlockHash',
     name: 'OutPoint BlockHash',
-    maxWidth: 300,
+    minWidth: 150,
     onRender: (item: any) => <span>{item.previousOutput.blockHash || 'none'}</span>,
   },
   {
     key: 'outPointCell',
     name: 'OutPoint Cell',
+    minWidth: 150,
     onRender: (item: any) => (
       <span>
         {item.previousOutput.cell ? `${item.previousOutput.cell.txHash}[${item.previousOutput.cell.index}]` : 'none'}
@@ -34,12 +36,11 @@ const inputColumns: IColumn[] = [
   {
     key: 'capacity',
     name: 'Capacity',
+    minWidth: 300,
+    maxWidth: 500,
   },
 ].map(
   (col): IColumn => ({
-    minWidth: MIN_CELL_WIDTH,
-    isResizable: true,
-    isCollapsable: false,
     ariaLabel: col.name,
     fieldName: col.key,
     ...col,
@@ -55,17 +56,15 @@ const outputColumns: IColumn[] = [
   {
     key: 'lockHash',
     name: 'Lock Hash',
-    minWidth: 70,
-    maxWidth: 300,
+    minWidth: 150,
   },
   {
     key: 'capacity',
     name: 'Capacity',
-    minWidth: 150,
+    minWidth: 300,
+    maxWidth: 500,
   },
 ].map(col => ({
-  isResizable: true,
-  isCollapsable: false,
   ariaLabel: col.name,
   fieldName: col.key,
   ...col,
@@ -85,8 +84,6 @@ const basicInfoColumns: IColumn[] = [
   },
 ].map(
   (col): IColumn => ({
-    isResizable: true,
-    isCollapsable: false,
     minWidth: MIN_CELL_WIDTH,
     ariaLabel: col.name,
     fieldName: col.key,
@@ -141,7 +138,7 @@ const Transaction = () => {
       },
       {
         label: t('history.amount'),
-        value: transaction.value,
+        value: `${shannonToCKBFormatter(transaction.value)} CKB`,
       },
     ],
     [t, transaction]
@@ -164,7 +161,6 @@ const Transaction = () => {
         <DetailsList
           columns={basicInfoColumns}
           items={basicInfoItems}
-          layoutMode={DetailsListLayoutMode.justified}
           checkboxVisibility={CheckboxVisibility.hidden}
           compact
           isHeaderVisible={false}
@@ -177,7 +173,6 @@ const Transaction = () => {
           </Text>
           <DetailsList
             items={transaction.inputs}
-            layoutMode={DetailsListLayoutMode.justified}
             columns={inputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact
@@ -189,8 +184,11 @@ const Transaction = () => {
             Outputs
           </Text>
           <DetailsList
-            items={transaction.outputs.map((output, index) => ({ ...output, index }))}
-            layoutMode={DetailsListLayoutMode.justified}
+            items={transaction.outputs.map((output, index) => ({
+              ...output,
+              index,
+              capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
+            }))}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact
