@@ -58,7 +58,7 @@ export default class Queue {
           await this.pipeline(rangeArr)
         }
       } catch (err) {
-        logger.error(`sync error: ${err}`)
+        logger.error(`sync error:`, err)
       } finally {
         await this.yield()
         this.inProcess = false

@@ -48,7 +48,7 @@ export default class BlockListener {
       const startBlockNumber = await this.getStartBlockNumber()
       this.queue = new Queue(this.lockHashes, startBlockNumber, currentTip, this.currentBlockNumber, this.rangeForCheck)
     } catch (err) {
-      logger.error(`BlockListener start error: ${err}`)
+      logger.error(`BlockListener start error:`, err)
     }
 
     this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
