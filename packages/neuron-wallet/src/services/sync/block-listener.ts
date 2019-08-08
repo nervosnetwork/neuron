@@ -10,7 +10,7 @@ import GetBlocks from './get-blocks'
 export default class BlockListener {
   private lockHashes: string[]
   private tipBlockNumber: bigint = BigInt(-1)
-  private queue: Queue | undefined | null = undefined
+  private queue: Queue | undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
   private tipNumberSubject: BehaviorSubject<string | undefined>
@@ -35,8 +35,6 @@ export default class BlockListener {
   }
 
   // start listening
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-constant-condition: "off" */
   public start = async (restart: boolean = false) => {
     if (restart) {
       await this.currentBlockNumber.updateCurrent(BigInt(0))
@@ -82,18 +80,12 @@ export default class BlockListener {
   }
 
   public regenerate = async (): Promise<void> => {
-    const startBlockNumber: string = await this.getStartBlockNumber()
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
-    this.generateQueue(startBlockNumber, endBlockNumber)
-  }
-
-  public generateQueue = (startBlockNumber: string, endBlockNumber: string): Queue | undefined => {
-    if (BigInt(startBlockNumber) > BigInt(endBlockNumber)) {
-      return undefined
-    }
-
-    if (!this.queue) {
+    if (this.queue) {
+      this.queue.resetEndBlockNumber(endBlockNumber)
+    } else {
+      const startBlockNumber: string = await this.getStartBlockNumber()
       this.queue = new Queue(
         this.lockHashes,
         startBlockNumber,
@@ -101,10 +93,6 @@ export default class BlockListener {
         this.currentBlockNumber,
         this.rangeForCheck
       )
-    } else {
-      this.queue.resetEndBlockNumber(endBlockNumber)
     }
-
-    return this.queue
   }
 }
