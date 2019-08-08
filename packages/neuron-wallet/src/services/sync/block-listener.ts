@@ -1,9 +1,11 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
 import NodeService from 'services/node'
+import logger from 'utils/logger'
+
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
-import Utils from './utils'
+import GetBlocks from './get-blocks'
 
 export default class BlockListener {
   private lockHashes: string[]
@@ -11,9 +13,8 @@ export default class BlockListener {
   private queue: Queue | undefined | null = undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
-  private interval: number = 5000
-  private tipNumberListener: Subscription
-  private stopped = false
+  private tipNumberSubject: BehaviorSubject<string | undefined>
+  private tipNumberListener: Subscription | undefined
 
   constructor(
     lockHashes: string[],
@@ -22,12 +23,7 @@ export default class BlockListener {
     this.lockHashes = lockHashes
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck()
-
-    this.tipNumberListener = tipNumberSubject.subscribe(async num => {
-      if (num) {
-        this.tipBlockNumber = BigInt(num)
-      }
-    })
+    this.tipNumberSubject = tipNumberSubject
   }
 
   public setLockHashes = (lockHashes: string[]) => {
@@ -45,35 +41,48 @@ export default class BlockListener {
     if (restart) {
       await this.currentBlockNumber.updateCurrent(BigInt(0))
     }
-    while (!this.stopped) {
-      await this.regenerate()
-      await Utils.sleep(this.interval)
+
+    try {
+      const getBlocksService = new GetBlocks()
+      const currentTip = await getBlocksService.getTipBlockNumber()
+      const startBlockNumber = await this.getStartBlockNumber()
+      this.queue = new Queue(this.lockHashes, startBlockNumber, currentTip, this.currentBlockNumber, this.rangeForCheck)
+    } catch (err) {
+      logger.error(`BlockListener start error: ${err}`)
     }
+
+    this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
+      if (num) {
+        this.tipBlockNumber = BigInt(num)
+        await this.regenerate()
+      }
+    })
   }
 
-  public stop = async () => {
-    this.stopped = true
-    this.tipNumberListener.unsubscribe()
-    if (!this.queue) {
-      return
+  public stop = () => {
+    if (this.tipNumberListener) {
+      this.tipNumberListener.unsubscribe()
     }
-    await this.queue.kill()
+    if (this.queue) {
+      this.queue.stop()
+    }
   }
 
   public stopAndWait = async () => {
-    await this.stop()
+    this.stop()
     if (this.queue) {
       await this.queue.waitForDrained()
     }
   }
 
-  public regenerate = async (): Promise<void> => {
-    if (this.queue && this.queue.length() > 0) {
-      return
-    }
-
+  public getStartBlockNumber = async (): Promise<string> => {
     const current = await this.currentBlockNumber.getCurrent()
     const startBlockNumber: string = (current + BigInt(1)).toString()
+    return startBlockNumber
+  }
+
+  public regenerate = async (): Promise<void> => {
+    const startBlockNumber: string = await this.getStartBlockNumber()
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
     this.generateQueue(startBlockNumber, endBlockNumber)
@@ -92,9 +101,8 @@ export default class BlockListener {
         this.currentBlockNumber,
         this.rangeForCheck
       )
-      this.queue.process()
     } else {
-      this.queue.reset(startBlockNumber, endBlockNumber)
+      this.queue.resetEndBlockNumber(endBlockNumber)
     }
 
     return this.queue
