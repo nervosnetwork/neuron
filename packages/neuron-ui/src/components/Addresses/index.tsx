@@ -67,7 +67,7 @@ const Addresses = ({
         name: 'addresses.address',
         key: 'address',
         fieldName: 'address',
-        className: 'fixedWidth',
+        className: 'monospacedFont',
         minWidth: 100,
         maxWidth: 400,
         onRender: (item?: State.Address) => {

@@ -91,7 +91,7 @@ const TransactionList = ({
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (
-                <span className="text-overflow fixedWidth" title={item.hash}>
+                <span className="text-overflow monospacedFont" title={item.hash}>
                   {item.hash}
                 </span>
               )
