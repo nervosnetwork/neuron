@@ -50,7 +50,7 @@ export default class Queue {
         this.inProcess = true
         const current: bigint = await this.currentBlockNumber.getCurrent()
         const startNumber: bigint = current + BigInt(1)
-        const endNumber: bigint = current + BigInt(this.fetchSize) - BigInt(1)
+        const endNumber: bigint = current + BigInt(this.fetchSize)
         const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
 
         if (realEndNumber >= startNumber) {
