@@ -24,7 +24,6 @@ export default class GetBlocks {
     this.retryInterval = retryInterval
   }
 
-  // TODO: if retryGetBlock() failed, this will also failed
   public getRangeBlocks = async (blockNumbers: string[]): Promise<Block[]> => {
     const blocks: Block[] = await Promise.all(
       blockNumbers.map(async num => {
@@ -35,6 +34,11 @@ export default class GetBlocks {
     return blocks
   }
 
+  public getTipBlockNumber = async (): Promise<string> => {
+    const tip: string = await core.rpc.getTipBlockNumber()
+    return tip
+  }
+
   public checkAndSave = async (blocks: Block[], lockHashes: string[]) => {
     return Utils.mapSeries(blocks, async (block: Block) => {
       const checkAndSave = new CheckAndSave(block, lockHashes)
@@ -42,7 +46,6 @@ export default class GetBlocks {
     })
   }
 
-  // TODO: if get any error after retry, should pause queue
   public retryGetBlock = async (num: string): Promise<Block> => {
     const block: Block = await Utils.retry(this.retryTime, this.retryInterval, async () => {
       const b: Block = await GetBlocks.getBlockByNumber(num)

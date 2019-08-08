@@ -10,7 +10,7 @@ const fakeApp = {
     return 'Fake App'
   },
   getLocale(): string {
-    return 'zh-CN'
+    return 'en'
   },
 }
 const app = electronApp || (remote && remote.app) || fakeApp

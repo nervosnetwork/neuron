@@ -91,7 +91,7 @@ const TransactionList = ({
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (
-                <span className="text-overflow fixedWidth" title={item.hash}>
+                <span className="text-overflow monospacedFont" title={item.hash}>
                   {item.hash}
                 </span>
               )
@@ -99,13 +99,13 @@ const TransactionList = ({
             return '-'
           },
         },
-        { name: t('history.status'), key: 'status', fieldName: 'status', minWidth: MIN_CELL_WIDTH, maxWidth: 50 },
+        { name: t('history.status'), key: 'status', fieldName: 'status', minWidth: 50, maxWidth: 50 },
         {
           name: t('history.description'),
           key: 'description',
           fieldName: 'description',
-          minWidth: MIN_CELL_WIDTH,
-          maxWidth: 200,
+          minWidth: 100,
+          maxWidth: 100,
           onRender: (item?: FormatTransaction) => {
             return item ? (
               <TextField
@@ -136,8 +136,8 @@ const TransactionList = ({
           name: t('history.amount'),
           key: 'value',
           fieldName: 'value',
-          minWidth: 100,
-          maxWidth: 300,
+          minWidth: 200,
+          maxWidth: 500,
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (
@@ -149,9 +149,7 @@ const TransactionList = ({
             return '-'
           },
         },
-      ].map(
-        (col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, isResizable: true, isCollapsable: false, ...col })
-      ),
+      ].map((col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, ...col })),
     [
       localDescription,
       onDescriptionChange,

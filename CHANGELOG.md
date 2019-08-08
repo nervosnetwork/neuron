@@ -1,3 +1,22 @@
+# [0.17.0-alpha.9](https://github.com/nervosnetwork/neuron/compare/v0.17.0-alpha.8...v0.17.0-alpha.9) (2019-08-08)
+
+
+### Bug Fixes
+
+* early return when first-not-match ([08a708e](https://github.com/nervosnetwork/neuron/commit/08a708e))
+* fetch size ([abdc01f](https://github.com/nervosnetwork/neuron/commit/abdc01f))
+* not throw when push check range ([e2e6c90](https://github.com/nervosnetwork/neuron/commit/e2e6c90))
+* waitForDrained ([b6712ff](https://github.com/nervosnetwork/neuron/commit/b6712ff))
+* **neuron-ui:** set the font-size of footer to 12px ([c250678](https://github.com/nervosnetwork/neuron/commit/c250678))
+* **neuron-wallet:** enable the i18n and update the wallet label of the application menu ([664ccc8](https://github.com/nervosnetwork/neuron/commit/664ccc8))
+
+
+### Features
+
+* Remove winston logger in favor of electron-log ([f3c228a](https://github.com/nervosnetwork/neuron/commit/f3c228a))
+
+
+
 # [0.17.0-alpha.8](https://github.com/nervosnetwork/neuron/compare/v0.17.0-alpha.7...v0.17.0-alpha.8) (2019-08-06)
 
 

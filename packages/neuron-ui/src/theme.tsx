@@ -32,7 +32,7 @@ import { registerIcons } from 'utils/icons'
 loadTheme({
   fonts: {
     tiny: { fontSize: '11px' },
-    xSmall: { fontSize: '12px' },
+    xSmall: { fontSize: '12px', lineHeight: '12px' },
     small: { fontSize: '14px' },
     smallPlus: { fontSize: '15px' },
     medium: { fontSize: '16px' },

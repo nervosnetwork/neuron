@@ -27,7 +27,7 @@ import { updateTransactionList, addPopup } from 'states/stateProvider/actionCrea
 import { showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
-import { PAGE_SIZE, MIN_CELL_WIDTH } from 'utils/const'
+import { PAGE_SIZE } from 'utils/const'
 
 const TITLE_FONT_SIZE = 'xxLarge'
 
@@ -43,7 +43,7 @@ const ActivityList = ({
   [index: string]: any
 }>) => (
   <DetailsList
-    layoutMode={DetailsListLayoutMode.justified}
+    layoutMode={DetailsListLayoutMode.fixedColumns}
     checkboxVisibility={CheckboxVisibility.hidden}
     compact
     items={items}
@@ -152,23 +152,29 @@ const Overview = ({
       {
         key: 'timestamp',
         name: t('overview.datetime'),
-        minWidth: 2 * MIN_CELL_WIDTH,
+        minWidth: 180,
+        maxWidth: 180,
         onRender: onTimestampRender,
       },
       {
         key: 'type',
         name: t('overview.type'),
+        minWidth: 100,
+        maxWidth: 100,
         onRender: onTransactionTypeRender,
       },
       {
         key: 'status',
         name: t('overview.status'),
+        minWidth: 100,
+        maxWidth: 100,
       },
       {
         key: 'value',
         name: t('overview.amount'),
         title: 'value',
-        minWidth: 2 * MIN_CELL_WIDTH,
+        minWidth: 100,
+        maxWidth: 500,
         onRender: (item?: State.Transaction) => {
           if (item) {
             return <span title={`${item.value} shannon`}>{`${shannonToCKBFormatter(item.value)} CKB`}</span>
@@ -178,8 +184,6 @@ const Overview = ({
       },
     ].map(
       (col): IColumn => ({
-        isResizable: true,
-        minWidth: MIN_CELL_WIDTH,
         fieldName: col.key,
         ariaLabel: col.name,
         ...col,
@@ -294,7 +298,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.address')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {defaultAddress.address}
                   </Text>
                 </Stack>
@@ -302,7 +306,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.code-hash')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {codeHash}
                   </Text>
                 </Stack>
@@ -310,7 +314,7 @@ const Overview = ({
                   <Text variant="small" style={{ fontWeight: 600 }}>
                     {t('overview.lock-arg')}
                   </Text>
-                  <Text variant="small" className="fixedWidth">
+                  <Text variant="small" className="monospacedFont">
                     {defaultAddress.identifier}
                   </Text>
                 </Stack>

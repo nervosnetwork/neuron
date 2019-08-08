@@ -3,6 +3,11 @@ import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
 import Utils from './utils'
 
+export enum CheckResultType {
+  FirstNotMatch = 'first-not-match',
+  BlockHeadersNotMatch = 'block-headers-not-match',
+}
+
 export default class RangeForCheck {
   private range: BlockHeader[] = []
   private checkSize = 12
@@ -47,11 +52,15 @@ export default class RangeForCheck {
       const lastBlockHeader = this.range[this.range.length - 1]
       const firstBlockHeader = range[0]
       if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
-        // TODO: should re generate range here, should ensure currentBlockNumber before
-        throw new Error('not match')
+        this.clearRange()
+        return
       }
     }
-    this.range = this.range.slice(range.length).concat(range)
+    if (this.range.length >= this.checkSize) {
+      this.range = this.range.slice(range.length).concat(range)
+    } else {
+      this.range = this.range.concat(range)
+    }
   }
 
   public check = (blockHeaders: BlockHeader[]) => {
@@ -65,7 +74,7 @@ export default class RangeForCheck {
     if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
       return {
         success: false,
-        type: 'first-not-match',
+        type: CheckResultType.FirstNotMatch,
       }
     }
 
@@ -76,7 +85,7 @@ export default class RangeForCheck {
       if (currentBlockHeader.parentHash !== previousBlockHeader.hash) {
         return {
           success: false,
-          type: 'block-headers-not-match',
+          type: CheckResultType.BlockHeadersNotMatch,
         }
       }
     }
