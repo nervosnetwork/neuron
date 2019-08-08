@@ -16,7 +16,6 @@ export default class Queue {
   private currentBlockNumber: BlockNumber
 
   private fetchSize: number = 4
-  private retryTime: number = 5
 
   private stopped: boolean = false
   private inProcess: boolean = false
@@ -56,15 +55,12 @@ export default class Queue {
 
         if (realEndNumber >= startNumber) {
           const rangeArr = Utils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
-          await Utils.retry(this.retryTime, 0, async () => {
-            await this.pipeline(rangeArr)
-          })
+          await this.pipeline(rangeArr)
         }
-
-        await this.yield()
       } catch (err) {
         logger.error(`sync error: ${err}`)
       } finally {
+        await this.yield()
         this.inProcess = false
       }
     }
