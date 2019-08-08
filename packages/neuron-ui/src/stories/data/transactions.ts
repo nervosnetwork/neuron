@@ -5,7 +5,7 @@ const transactions: {
   'Content List': [
     {
       type: 'send',
-      createdAt: (Date.now() - 100000).toString(),
+      createdAt: (new Date(1565240655845).getTime() - 100000).toString(),
       updatedAt: '',
       timestamp: '',
       value: '10000',
@@ -15,7 +15,7 @@ const transactions: {
     },
     {
       type: 'receive',
-      createdAt: (Date.now() - 200000).toString(),
+      createdAt: (new Date(1565240655845).getTime() - 200000).toString(),
       updatedAt: '',
       timestamp: '',
       value: '10000',
@@ -27,7 +27,7 @@ const transactions: {
       type: 'send',
       createdAt: '',
       updatedAt: '',
-      timestamp: (Date.now() - 300000).toString(),
+      timestamp: (new Date(1565240655845).getTime() - 300000).toString(),
       value: '10000',
       hash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab63',
       description: 'description of sending transaction',
@@ -37,7 +37,7 @@ const transactions: {
       type: 'receive',
       createdAt: '',
       updatedAt: '',
-      timestamp: (Date.now() - 400000).toString(),
+      timestamp: (new Date(1565240655845).getTime() - 400000).toString(),
       value: '10000',
       hash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab64',
       description: 'description of receiving transaction',
@@ -45,7 +45,7 @@ const transactions: {
     },
     {
       type: 'send',
-      createdAt: (Date.now() - 500000).toString(),
+      createdAt: (new Date(1565240655845).getTime() - 500000).toString(),
       updatedAt: '',
       timestamp: '',
       value: '10000',
@@ -55,7 +55,7 @@ const transactions: {
     },
     {
       type: 'receive',
-      createdAt: (Date.now() - 600000).toString(),
+      createdAt: (new Date(1565240655845).getTime() - 600000).toString(),
       updatedAt: '',
       timestamp: '',
       value: '10000',

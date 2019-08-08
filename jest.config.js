@@ -7,6 +7,6 @@ module.exports = {
   verbose: true,
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   projects: [
-    "<rootDir>/packages/neuron-wallet"
+    "<rootDir>/packages/neuron-*",
   ]
 };
