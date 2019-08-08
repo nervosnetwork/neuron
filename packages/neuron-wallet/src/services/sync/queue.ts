@@ -76,7 +76,7 @@ export default class Queue {
 
   public waitForDrained = async (timeout: number = 5000) => {
     const startAt: number = +new Date()
-    while (!this.inProcess) {
+    while (this.inProcess) {
       const now: number = +new Date()
       if (now - startAt > timeout) {
         return
