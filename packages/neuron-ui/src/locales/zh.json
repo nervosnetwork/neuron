@@ -33,7 +33,7 @@
       "confirmation": "已确认 {{confirmationCount}} 次数",
       "confirmations": "已确认 {{confirmationCount}} 次数",
       "sent": "已发送",
-      "sending": "发送",
+      "sending": "正在发送",
       "received": "已收款",
       "receiving": "收款",
       "more": "查看更多交易"
