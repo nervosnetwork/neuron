@@ -151,14 +151,7 @@ const Overview = ({
     if (item) {
       return (
         <>
-          <Text
-            variant="mediumPlus"
-            as="span"
-            style={{
-              color: item.type === 'receive' ? '#28b463' : '#e66465',
-            }}
-            title={`${item.value} shannon`}
-          >
+          <Text variant="mediumPlus" as="span" title={`${item.value} shannon`}>
             {`${item.typeLabel} ${shannonToCKBFormatter(item.value)} CKB`}
           </Text>
           <Text variant="mediumPlus" as="span" title={item.confirmations} styles={{ root: [{ paddingLeft: '5px' }] }}>
