@@ -192,6 +192,7 @@ export class TransactionsService {
         description: tx.description,
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
+        blockNumber: tx.blockNumber,
       }
     })
 
