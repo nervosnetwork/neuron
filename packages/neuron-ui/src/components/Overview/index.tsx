@@ -97,11 +97,9 @@ const ActivityList = ({
       {...props}
     />
     {items.length > 10 ? (
-      <Stack horizontalAlign="stretch">
-        <DefaultButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
-          {t('overview.more')}
-        </DefaultButton>
-      </Stack>
+      <ActionButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
+        {t('overview.more')}
+      </ActionButton>
     ) : null}
   </Stack>
 )
