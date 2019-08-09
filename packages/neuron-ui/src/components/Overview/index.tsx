@@ -8,6 +8,7 @@ import {
   DefaultButton,
   DetailsList,
   DetailsRow,
+  Icon,
   IColumn,
   CheckboxVisibility,
   DetailsListLayoutMode,
@@ -24,66 +25,96 @@ import PropertyList, { Property } from 'widgets/PropertyList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransactionList, addPopup } from 'states/stateProvider/actionCreators'
 
-import { showErrorMessage } from 'services/remote'
+import { showTransactionDetails, showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
-import { PAGE_SIZE } from 'utils/const'
+import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 
 const TITLE_FONT_SIZE = 'xxLarge'
+export type ActivityItem = State.Transaction & { confirmations: string; typeLabel: string }
+
+const genTypeLabel = (type: 'send' | 'receive', confirmationCount: number) => {
+  switch (type) {
+    case 'send': {
+      if (confirmationCount < CONFIRMATION_THRESHOLD) {
+        return 'sending'
+      }
+      return 'sent'
+    }
+    case 'receive': {
+      if (confirmationCount < CONFIRMATION_THRESHOLD) {
+        return 'receiving'
+      }
+      return 'received'
+    }
+    default: {
+      return type
+    }
+  }
+}
 
 const ActivityList = ({
   columns,
   items,
+  onGoToHistory,
+  t,
   ...props
 }: React.PropsWithoutRef<{
   columns: IColumn[]
   items: any
+  onGoToHistory: any
+  t: any
   isHeaderVisible?: boolean
   onRenderRow?: IRenderFunction<IDetailsRowProps>
   [index: string]: any
 }>) => (
-  <DetailsList
-    layoutMode={DetailsListLayoutMode.fixedColumns}
-    checkboxVisibility={CheckboxVisibility.hidden}
-    compact
-    items={items}
-    columns={columns}
-    styles={{
-      root: {
-        backgroundColor: 'transparent',
-      },
-      headerWrapper: {
-        selectors: {
-          '.ms-DetailsHeader': {
-            backgroundColor: 'transparent',
-          },
-          '.ms-DetailsHeader-cellName': {
-            fontSize: FontSizes.xLarge,
+  <Stack>
+    <DetailsList
+      isHeaderVisible={false}
+      layoutMode={DetailsListLayoutMode.justified}
+      checkboxVisibility={CheckboxVisibility.hidden}
+      compact
+      items={items.slice(0, 10)}
+      columns={columns}
+      onItemInvoked={item => {
+        showTransactionDetails(item.hash)
+      }}
+      styles={{
+        root: {
+          backgroundColor: 'transparent',
+        },
+        contentWrapper: {
+          selectors: {
+            '.ms-DetailsRow': {
+              backgroundColor: 'transparent',
+            },
+            '.ms-DetailsRow-cell': {
+              fontSize: FontSizes.mediumPlus,
+            },
           },
         },
-      },
-      contentWrapper: {
-        selectors: {
-          '.ms-DetailsRow': {
-            backgroundColor: 'transparent',
-          },
-          '.ms-DetailsRow-cell': {
-            fontSize: FontSizes.mediumPlus,
-          },
-        },
-      },
-    }}
-    {...props}
-  />
+      }}
+      {...props}
+    />
+    {items.length > 10 ? (
+      <Stack horizontalAlign="stretch">
+        <DefaultButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
+          {t('overview.more')}
+        </DefaultButton>
+      </Stack>
+    ) : null}
+  </Stack>
 )
 const Overview = ({
   dispatch,
   app: { tipBlockNumber, chain, epoch, difficulty },
   wallet: { id, name, balance = '', addresses = [] },
   chain: {
+    tipBlockNumber: syncedBlockNumber,
     codeHash = '',
     transactions: { items = [] },
   },
+  history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const [displayBlockchainInfo, setDisplayBlockchainInfo] = useState(false)
@@ -100,6 +131,9 @@ const Overview = ({
       walletID: id,
     })(dispatch)
   }, [id, dispatch])
+  const onGoToHistory = useCallback(() => {
+    history.push(Routes.History)
+  }, [history])
 
   const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
     if (props) {
@@ -108,29 +142,29 @@ const Overview = ({
           animationDuration: '0!important',
         },
       }
-      if (props.item.status === 'failed') {
-        customStyles.root = {
-          animationDuration: '0!important',
-          color: 'red',
-        }
-      }
       return <DetailsRow {...props} styles={customStyles} />
     }
     return null
   }, [])
 
-  const onTransactionTypeRender = useCallback((item?: any) => {
+  const onTransactionActivityRender = useCallback((item?: ActivityItem) => {
     if (item) {
       return (
-        <Text
-          variant="mediumPlus"
-          as="span"
-          style={{
-            color: item.type === 'receive' ? '#28b463' : '#e66465',
-          }}
-        >
-          {item.type}
-        </Text>
+        <>
+          <Text
+            variant="mediumPlus"
+            as="span"
+            style={{
+              color: item.type === 'receive' ? '#28b463' : '#e66465',
+            }}
+            title={`${item.value} shannon`}
+          >
+            {`${item.typeLabel} ${shannonToCKBFormatter(item.value)} CKB`}
+          </Text>
+          <Text variant="mediumPlus" as="span" title={item.confirmations} styles={{ root: [{ paddingLeft: '5px' }] }}>
+            {item.confirmations}
+          </Text>
+        </>
       )
     }
     return null
@@ -150,6 +184,24 @@ const Overview = ({
   const activityColumns: IColumn[] = useMemo(() => {
     return [
       {
+        key: 'status',
+        name: t('overview.status'),
+        minWidth: 20,
+        maxWidth: 20,
+        onRender: (item?: State.Transaction) => {
+          if (!item) {
+            return null
+          }
+          let iconName = 'TransactionPending'
+          if (item.status === 'success') {
+            iconName = 'TransactionSuccess'
+          } else if (item.status === 'failed') {
+            iconName = 'TransactionFailure'
+          }
+          return <Icon iconName={iconName} title={item.status} />
+        },
+      },
+      {
         key: 'timestamp',
         name: t('overview.datetime'),
         minWidth: 180,
@@ -157,30 +209,11 @@ const Overview = ({
         onRender: onTimestampRender,
       },
       {
-        key: 'type',
-        name: t('overview.type'),
+        key: 'activity',
+        name: t('overview.activity'),
         minWidth: 100,
-        maxWidth: 100,
-        onRender: onTransactionTypeRender,
-      },
-      {
-        key: 'status',
-        name: t('overview.status'),
-        minWidth: 100,
-        maxWidth: 100,
-      },
-      {
-        key: 'value',
-        name: t('overview.amount'),
-        title: 'value',
-        minWidth: 100,
-        maxWidth: 500,
-        onRender: (item?: State.Transaction) => {
-          if (item) {
-            return <span title={`${item.value} shannon`}>{`${shannonToCKBFormatter(item.value)} CKB`}</span>
-          }
-          return '-'
-        },
+        maxWidth: 600,
+        onRender: onTransactionActivityRender,
       },
     ].map(
       (col): IColumn => ({
@@ -189,7 +222,7 @@ const Overview = ({
         ...col,
       })
     )
-  }, [t, onTimestampRender, onTransactionTypeRender])
+  }, [t, onTimestampRender, onTransactionActivityRender])
 
   const balanceProperties: Property[] = useMemo(
     () => [
@@ -249,6 +282,24 @@ const Overview = ({
     }
   }, [defaultAddress, t, hideMinerInfo, dispatch])
 
+  const activityItems = useMemo(
+    () =>
+      items.map(item => {
+        let confirmations = '(-)'
+        let typeLabel: string = item.type
+        if (item.blockNumber !== undefined) {
+          const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+          typeLabel = genTypeLabel(item.type, confirmationCount)
+          confirmations =
+            confirmationCount > 1
+              ? `(${t('overview.confirmations', { confirmationCount: localNumberFormatter(confirmationCount) })})`
+              : `(${t('overview.confirmation', { confirmationCount: localNumberFormatter(confirmationCount) })})`
+        }
+        return { ...item, confirmations, typeLabel: t(`overview.${typeLabel}`) }
+      }),
+    [items, t, syncedBlockNumber, tipBlockNumber]
+  )
+
   return (
     <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
       <Text as="h1" variant={TITLE_FONT_SIZE}>
@@ -273,7 +324,13 @@ const Overview = ({
         {t('overview.recent-activities')}
       </Text>
       {items.length ? (
-        <ActivityList columns={activityColumns} items={items} onRenderRow={onTransactionRowRender} />
+        <ActivityList
+          columns={activityColumns}
+          items={activityItems}
+          onRenderRow={onTransactionRowRender}
+          onGoToHistory={onGoToHistory}
+          t={t}
+        />
       ) : (
         <div>{t('overview.no-recent-activities')}</div>
       )}

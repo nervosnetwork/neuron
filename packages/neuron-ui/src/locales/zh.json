@@ -16,7 +16,7 @@
       "balance": "余额",
       "recent-activities": "近期活动",
       "no-recent-activities": "近期没有活动",
-      "type": "类型",
+      "activity": "行为",
       "datetime": "时间",
       "status": "状态",
       "amount": "金额",
@@ -29,7 +29,14 @@
       "lock-arg": "Lock Arg",
       "address": "地址",
       "code-hash": "Code Hash",
-      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)"
+      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)",
+      "confirmation": "已确认 {{confirmationCount}} 次数",
+      "confirmations": "已确认 {{confirmationCount}} 次数",
+      "sent": "已发送",
+      "sending": "发送",
+      "received": "已收款",
+      "receiving": "收款",
+      "more": "查看更多交易"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
