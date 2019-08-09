@@ -286,7 +286,11 @@ const Overview = ({
               ? `(${t('overview.confirmations', { confirmationCount: localNumberFormatter(confirmationCount) })})`
               : `(${t('overview.confirmation', { confirmationCount: localNumberFormatter(confirmationCount) })})`
         }
-        return { ...item, confirmations, typeLabel: t(`overview.${typeLabel}`) }
+        return {
+          ...item,
+          confirmations: item.status === 'success' ? confirmations : '',
+          typeLabel: t(`overview.${typeLabel}`),
+        }
       }),
     [items, t, syncedBlockNumber, tipBlockNumber]
   )

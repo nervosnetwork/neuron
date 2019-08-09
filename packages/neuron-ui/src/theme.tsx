@@ -78,9 +78,9 @@ registerIcons({
     More: <MoreIcon size="16px" />,
     Matched: <MatchedIcon size="16px" color="green" />,
     Unmatched: <InfoIcon size="16px" color="#d50000" />,
-    TransactionSuccess: <SuccessIcon size="16px" color="green" />,
-    TransactionFailure: <FailIcon size="16px" color="#d50000" />,
-    TransactionPending: <PendingIcon size="16px" style={{ animation: 'rotate360 3s linear infinite' }} />,
+    TransactionSuccess: <SuccessIcon size="14px" color="green" />,
+    TransactionFailure: <FailIcon size="14px" color="#d50000" />,
+    TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
   },
 })
 
