@@ -7,6 +7,7 @@ import {
   Checkmark as SuccessIcon,
   CircleInformation as InfoIcon,
   Close as DismissIcon,
+  Close as FailIcon,
   Copy as CopyIcon,
   Down as ArrowDownIcon,
   FormClose as ClearIcon,
@@ -25,6 +26,7 @@ import {
   StatusGood as MatchedIcon,
   SubtractCircle as RemoveIcon,
   Update as UpdateIcon,
+  Update as PendingIcon,
 } from 'grommet-icons'
 
 import { registerIcons } from 'utils/icons'
@@ -76,6 +78,9 @@ registerIcons({
     More: <MoreIcon size="16px" />,
     Matched: <MatchedIcon size="16px" color="green" />,
     Unmatched: <InfoIcon size="16px" color="#d50000" />,
+    TransactionSuccess: <SuccessIcon size="14px" color="green" />,
+    TransactionFailure: <FailIcon size="14px" color="#d50000" />,
+    TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
   },
 })
 

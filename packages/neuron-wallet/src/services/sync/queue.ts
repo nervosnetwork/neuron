@@ -20,6 +20,8 @@ export default class Queue {
   private stopped: boolean = false
   private inProcess: boolean = false
 
+  private yieldTime = 1
+
   constructor(
     lockHashes: string[],
     startBlockNumber: string,
@@ -48,10 +50,17 @@ export default class Queue {
     while (!this.stopped) {
       try {
         this.inProcess = true
+
         const current: bigint = await this.currentBlockNumber.getCurrent()
         const startNumber: bigint = current + BigInt(1)
         const endNumber: bigint = current + BigInt(this.fetchSize)
         const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
+
+        if (realEndNumber >= this.endBlockNumber) {
+          this.yieldTime = 1000
+        } else {
+          this.yieldTime = 1
+        }
 
         if (realEndNumber >= startNumber) {
           const rangeArr = Utils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
@@ -60,7 +69,7 @@ export default class Queue {
       } catch (err) {
         logger.error(`sync error:`, err)
       } finally {
-        await this.yield()
+        await this.yield(this.yieldTime)
         this.inProcess = false
       }
     }

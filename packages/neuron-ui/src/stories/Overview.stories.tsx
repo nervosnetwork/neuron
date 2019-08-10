@@ -49,7 +49,14 @@ const states = {
     ...stateTemplate,
     chain: { ...stateTemplate.chain, transactions: { ...stateTemplate.chain.transactions, items: [] } },
   },
-  'Has Activities': stateTemplate,
+  'Has 10 Activities': {
+    ...stateTemplate,
+    chain: {
+      ...stateTemplate.chain,
+      transactions: { ...stateTemplate.chain.transactions, items: stateTemplate.chain.transactions.items.slice(0, 10) },
+    },
+  },
+  'Has more than 10 Activities': stateTemplate,
 }
 
 const OverviewWithRouteProps = (props: StateWithDispatch) => (
@@ -84,13 +91,14 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       transactions: {
         ...initStates.chain.transactions,
         items: transactions[`Content List`].map((tx, idx) => ({
-          type: text(`${idx}-Type`, tx.type) as 'send' | 'receive' | 'other',
+          type: text(`${idx}-Type`, tx.type) as 'send' | 'receive',
           createdAt: text(`${idx}-Created at`, tx.createdAt),
           updatedAt: text(`${idx}-Updated at`, tx.updatedAt),
           timestamp: text(`${idx}-Timestamp`, tx.timestamp),
           value: text(`${idx}-Value`, tx.value),
           hash: text(`${idx}-Hash`, tx.hash),
           description: text(`${idx}-Description`, tx.description),
+          blockNumber: text(`${idx}-BlockNumber`, tx.blockNumber),
           status: text(`${idx}-Status`, tx.status) as 'pending' | 'success' | 'failed',
         })),
       },
