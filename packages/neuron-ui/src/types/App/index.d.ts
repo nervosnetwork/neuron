@@ -1,12 +1,13 @@
 declare namespace State {
   interface Transaction {
-    type: 'send' | 'receive' | 'other'
+    type: 'send' | 'receive'
     createdAt: string
     updatedAt: string
     timestamp: string
     value: string
     hash: string
     description: string
+    blockNumber: string
     status: 'pending' | 'success' | 'failed'
   }
   interface DetailedTransaction extends Transaction {

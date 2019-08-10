@@ -4,7 +4,7 @@ import { ConnectionStatus } from 'utils/const'
 export const transactionState: State.DetailedTransaction = {
   value: '',
   hash: '',
-  type: 'other',
+  type: 'receive',
   createdAt: '0',
   updatedAt: '0',
   timestamp: '0',
