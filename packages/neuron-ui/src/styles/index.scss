@@ -66,6 +66,20 @@ navbar {
   }
 }
 
+
+.customScrollBar {
+  &::-webkit-scrollbar {
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    width: 10px
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: #bdbdbd;
+  }
+}
+
 @keyframes rotate360 {
   from {
     transform: rotate(0)

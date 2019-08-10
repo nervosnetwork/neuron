@@ -80,9 +80,11 @@ const ActivityList = ({
       onItemInvoked={item => {
         showTransactionDetails(item.hash)
       }}
+      className="customScrollBar"
       styles={{
         root: {
-          overflow: 'auto',
+          overflowX: 'hidden',
+          overflowY: 'auto',
           height: '100%',
           backgroundColor: 'transparent',
         },
