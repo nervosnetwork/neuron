@@ -29,6 +29,7 @@ import { showTransactionDetails, showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import { backToTop } from 'utils/animations'
 
 const TITLE_FONT_SIZE = 'xxLarge'
 export type ActivityItem = State.Transaction & { confirmations: string; typeLabel: string }
@@ -68,7 +69,7 @@ const ActivityList = ({
   onRenderRow?: IRenderFunction<IDetailsRowProps>
   [index: string]: any
 }>) => (
-  <Stack>
+  <Stack verticalFill>
     <DetailsList
       isHeaderVisible={false}
       layoutMode={DetailsListLayoutMode.justified}
@@ -81,6 +82,8 @@ const ActivityList = ({
       }}
       styles={{
         root: {
+          overflow: 'auto',
+          height: '100%',
           backgroundColor: 'transparent',
         },
         contentWrapper: {
@@ -120,6 +123,15 @@ const Overview = ({
 
   const blockchainInfoRef = useRef<HTMLDivElement>(null)
   const minerInfoRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (id) {
+      const activityListContainer = document.querySelector('.ms-DetailsList>div') as HTMLElement
+      if (activityListContainer) {
+        backToTop(activityListContainer)
+      }
+    }
+  }, [id])
 
   useEffect(() => {
     updateTransactionList({
@@ -281,10 +293,15 @@ const Overview = ({
         if (item.blockNumber !== undefined) {
           const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
           typeLabel = genTypeLabel(item.type, confirmationCount)
-          confirmations =
-            confirmationCount > 1
-              ? `(${t('overview.confirmations', { confirmationCount: localNumberFormatter(confirmationCount) })})`
-              : `(${t('overview.confirmation', { confirmationCount: localNumberFormatter(confirmationCount) })})`
+          if (confirmationCount === 1) {
+            confirmations = `(${t('overview.confirmation', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+            })})`
+          } else if (confirmationCount > 1) {
+            confirmations = `(${t('overview.confirmations', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+            })})`
+          }
         }
         return {
           ...item,
