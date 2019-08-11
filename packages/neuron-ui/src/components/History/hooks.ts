@@ -1,17 +1,7 @@
 import { useState, useEffect } from 'react'
 import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
 import { queryParsers } from 'utils/parser'
-
-const backToTop = () => {
-  const container = document.querySelector('main') as HTMLElement
-  if (container) {
-    container.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest',
-    })
-  }
-}
+import { backToTop } from 'utils/animations'
 
 export const useSearch = (search: string = '', walletID: string = '', dispatch: React.Dispatch<any>) => {
   const [keywords, setKeywords] = useState('')
