@@ -3,7 +3,7 @@ import path from 'path'
 import { getElementByTagName } from './utils'
 import menuAddon from 'spectron-menu-addon'
 
-// Test create/import/switch/edit wallet
+// Test create/import/switch/delete/edit wallet
 describe('wallet tests', () => {
   let app: Application
 
