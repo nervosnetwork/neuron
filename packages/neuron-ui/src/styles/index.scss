@@ -44,7 +44,6 @@ navbar {
 
 .form-control,
 .btn {
-
   &:focus {
     box-shadow: none !important;
   }
@@ -62,30 +61,16 @@ navbar {
 
   .text-overflow {
     overflow: hidden;
-    text-overflow: ellipsis
-  }
-}
-
-
-.customScrollBar {
-  &::-webkit-scrollbar {
-    border-radius: 5px;
-    background-color: #e0e0e0;
-    width: 10px
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background-color: #bdbdbd;
+    text-overflow: ellipsis;
   }
 }
 
 @keyframes rotate360 {
   from {
-    transform: rotate(0)
+    transform: rotate(0);
   }
 
   to {
-    transform: rotate(360deg)
+    transform: rotate(360deg);
   }
 }

@@ -80,12 +80,8 @@ const ActivityList = ({
       onItemInvoked={item => {
         showTransactionDetails(item.hash)
       }}
-      className="customScrollBar"
       styles={{
         root: {
-          overflowX: 'hidden',
-          overflowY: 'auto',
-          height: '100%',
           backgroundColor: 'transparent',
         },
         contentWrapper: {
@@ -128,10 +124,7 @@ const Overview = ({
 
   useEffect(() => {
     if (id) {
-      const activityListContainer = document.querySelector('.ms-DetailsList>div') as HTMLElement
-      if (activityListContainer) {
-        backToTop(activityListContainer)
-      }
+      backToTop()
     }
   }, [id])
 
@@ -315,7 +308,7 @@ const Overview = ({
   )
 
   return (
-    <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
+    <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
       <Text as="h1" variant={TITLE_FONT_SIZE}>
         {name}
       </Text>
