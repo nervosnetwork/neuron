@@ -1,6 +1,6 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 
-import { Block } from 'types/cell-types'
+import { Block, BlockHeader } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import { NetworkWithID } from 'services/networks'
 import CheckAndSave from './check-and-save'
@@ -53,6 +53,16 @@ export default class GetBlocks {
     })
 
     return block
+  }
+
+  public getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
+    const tx = await core.rpc.getTransaction(hash)
+    return tx
+  }
+
+  public getHeader = async (hash: string): Promise<BlockHeader> => {
+    const result = await core.rpc.getHeader(hash)
+    return TypeConvert.toBlockHeader(result)
   }
 
   public static getBlockByNumber = async (num: string): Promise<Block> => {
