@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import 'reflect-metadata'
 import { debounceTime } from 'rxjs/operators'
 
@@ -10,6 +9,8 @@ import initConnection from 'database/address/ormconfig'
 import WalletsService from 'services/wallets'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
+import app from 'app'
+import { changeLanguage } from 'utils/i18n'
 
 const walletsService = WalletsService.getInstance()
 
@@ -29,6 +30,8 @@ const openWindow = () => {
 }
 
 app.on('ready', async () => {
+  changeLanguage(app.getLocale())
+
   WalletListSubject.pipe(debounceTime(50)).subscribe(({ currentWallet = null, currentWalletList = [] }) => {
     const walletList = currentWalletList.map(({ id, name }) => ({ id, name }))
     const currentWalletId = currentWallet ? currentWallet.id : null
