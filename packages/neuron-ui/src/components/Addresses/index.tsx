@@ -69,7 +69,7 @@ const Addresses = ({
         fieldName: 'address',
         className: 'monospacedFont',
         minWidth: 100,
-        maxWidth: 400,
+        maxWidth: 500,
         onRender: (item?: State.Address) => {
           if (item) {
             return (
@@ -121,7 +121,7 @@ const Addresses = ({
         key: 'balance',
         fieldName: 'balance',
         minWidth: 200,
-        maxWidth: 400,
+        maxWidth: 250,
         onRender: (item?: State.Address) => {
           if (item) {
             return (

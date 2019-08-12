@@ -36,8 +36,8 @@ const inputColumns: IColumn[] = [
   {
     key: 'capacity',
     name: 'Capacity',
-    minWidth: 300,
-    maxWidth: 500,
+    minWidth: 200,
+    maxWidth: 250,
   },
 ].map(
   (col): IColumn => ({
@@ -61,8 +61,8 @@ const outputColumns: IColumn[] = [
   {
     key: 'capacity',
     name: 'Capacity',
-    minWidth: 300,
-    maxWidth: 500,
+    minWidth: 200,
+    maxWidth: 250,
   },
 ].map(col => ({
   ariaLabel: col.name,
