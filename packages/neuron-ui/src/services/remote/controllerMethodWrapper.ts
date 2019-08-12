@@ -66,7 +66,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
   }
   return {
     status: 0,
-    message: { title },
+    message: { title: title.replace(/(\.|:)/g, '_') },
   }
 }
 
