@@ -137,7 +137,7 @@ const TransactionList = ({
           key: 'value',
           fieldName: 'value',
           minWidth: 200,
-          maxWidth: 500,
+          maxWidth: 250,
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (

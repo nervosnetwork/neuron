@@ -29,6 +29,7 @@ import { showTransactionDetails, showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import { backToTop } from 'utils/animations'
 
 const TITLE_FONT_SIZE = 'xxLarge'
 export type ActivityItem = State.Transaction & { confirmations: string; typeLabel: string }
@@ -68,7 +69,7 @@ const ActivityList = ({
   onRenderRow?: IRenderFunction<IDetailsRowProps>
   [index: string]: any
 }>) => (
-  <Stack>
+  <Stack verticalFill>
     <DetailsList
       isHeaderVisible={false}
       layoutMode={DetailsListLayoutMode.justified}
@@ -120,6 +121,12 @@ const Overview = ({
 
   const blockchainInfoRef = useRef<HTMLDivElement>(null)
   const minerInfoRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (id) {
+      backToTop()
+    }
+  }, [id])
 
   useEffect(() => {
     updateTransactionList({
@@ -278,16 +285,30 @@ const Overview = ({
       items.map(item => {
         let confirmations = '(-)'
         let typeLabel: string = item.type
+        let { status } = item
         if (item.blockNumber !== undefined) {
           const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+
+          if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
+            status = 'pending'
+          }
+
           typeLabel = genTypeLabel(item.type, confirmationCount)
-          confirmations =
-            confirmationCount > 1
-              ? `(${t('overview.confirmations', { confirmationCount: localNumberFormatter(confirmationCount) })})`
-              : `(${t('overview.confirmation', { confirmationCount: localNumberFormatter(confirmationCount) })})`
+
+          if (confirmationCount === 1) {
+            confirmations = `(${t('overview.confirmation', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+            })})`
+          } else if (confirmationCount > 1) {
+            confirmations = `(${t('overview.confirmations', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+            })})`
+          }
         }
+
         return {
           ...item,
+          status,
           confirmations: item.status === 'success' ? confirmations : '',
           typeLabel: t(`overview.${typeLabel}`),
         }
@@ -296,7 +317,7 @@ const Overview = ({
   )
 
   return (
-    <Stack tokens={{ childrenGap: 15 }} verticalFill horizontalAlign="stretch">
+    <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
       <Text as="h1" variant={TITLE_FONT_SIZE}>
         {name}
       </Text>
