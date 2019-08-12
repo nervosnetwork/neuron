@@ -124,10 +124,7 @@ const Overview = ({
 
   useEffect(() => {
     if (id) {
-      const activityListContainer = document.querySelector('.ms-DetailsList>div') as HTMLElement
-      if (activityListContainer) {
-        backToTop(activityListContainer)
-      }
+      backToTop()
     }
   }, [id])
 
