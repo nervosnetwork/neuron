@@ -42,7 +42,7 @@ const genTypeLabel = (
   switch (type) {
     case 'send': {
       if (status === 'failed') {
-        return 'send'
+        return 'sent'
       }
       if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
         return 'sending'
@@ -51,7 +51,7 @@ const genTypeLabel = (
     }
     case 'receive': {
       if (status === 'failed') {
-        return 'receive'
+        return 'received'
       }
       if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
         return 'receiving'
@@ -297,7 +297,8 @@ const Overview = ({
         let typeLabel: string = item.type
         let { status } = item
         if (item.blockNumber !== undefined) {
-          const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+          const confirmationCount =
+            item.blockNumber === undefined ? 0 : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
           if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
             status = 'pending'
