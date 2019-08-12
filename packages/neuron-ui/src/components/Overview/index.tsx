@@ -285,9 +285,16 @@ const Overview = ({
       items.map(item => {
         let confirmations = '(-)'
         let typeLabel: string = item.type
+        let { status } = item
         if (item.blockNumber !== undefined) {
           const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+
+          if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
+            status = 'pending'
+          }
+
           typeLabel = genTypeLabel(item.type, confirmationCount)
+
           if (confirmationCount === 1) {
             confirmations = `(${t('overview.confirmation', {
               confirmationCount: localNumberFormatter(confirmationCount),
@@ -298,8 +305,10 @@ const Overview = ({
             })})`
           }
         }
+
         return {
           ...item,
+          status,
           confirmations: item.status === 'success' ? confirmations : '',
           typeLabel: t(`overview.${typeLabel}`),
         }
