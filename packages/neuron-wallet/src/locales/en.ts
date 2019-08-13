@@ -21,7 +21,7 @@ export default {
         delete: 'Delete Current Wallet',
         'change-password': 'Change Password',
         'import-mnemonic': 'Import Mnemonic Words',
-        'import-keystore': 'Import Keystore File',
+        'import-keystore': 'Import from Keystore',
       },
       edit: {
         label: 'Edit',
