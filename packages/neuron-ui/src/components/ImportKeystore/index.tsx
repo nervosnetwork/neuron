@@ -54,7 +54,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   }, [fields.name, fields.password, fields.path, history, dispatch])
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
+    <Stack verticalFill verticalAlign="center" tokens={{ childrenGap: 15 }}>
       <Stack tokens={{ childrenGap: 15 }}>
         {Object.entries(fields).map(([key, value]) => {
           return (
