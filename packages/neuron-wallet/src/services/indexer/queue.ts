@@ -23,9 +23,9 @@ export default class Queue {
 
   private inProcess = false
 
-  constructor(lockHashes: string[]) {
+  constructor(url: string, lockHashes: string[]) {
     this.lockHashes = lockHashes
-    this.indexerRPC = new IndexerRPC()
+    this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks()
     this.blockNumberService = new BlockNumber()
   }

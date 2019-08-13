@@ -17,7 +17,7 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
 
 // call this after network switched
 let indexerQueue: IndexerQueue | undefined
-export const switchNetwork = async () => {
+export const switchNetwork = async (nodeURL: string) => {
   // stop all blocks service
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
@@ -28,7 +28,7 @@ export const switchNetwork = async () => {
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  indexerQueue = new IndexerQueue(lockHashes)
+  indexerQueue = new IndexerQueue(nodeURL, lockHashes)
 
   addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove

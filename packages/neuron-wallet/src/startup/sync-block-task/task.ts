@@ -18,8 +18,8 @@ const { addressesUsedSubject, databaseInitSubject } = remote.require('./startup/
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)
 
-export const testIndexer = async (): Promise<boolean> => {
-  const indexerRPC = new IndexerRPC()
+export const testIndexer = async (url: string): Promise<boolean> => {
+  const indexerRPC = new IndexerRPC(url)
   try {
     await Utils.retry(3, 100, () => {
       return indexerRPC.getLockHashIndexStates()
@@ -34,9 +34,9 @@ export const run = async () => {
   await initAddressConnection()
   databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
-      const indexerEnable = await testIndexer()
+      const indexerEnable = await testIndexer(network.remote)
       if (indexerEnable) {
-        await indexerSwitchNetwork()
+        await indexerSwitchNetwork(network.remote)
       } else {
         await syncSwitchNetwork()
       }
