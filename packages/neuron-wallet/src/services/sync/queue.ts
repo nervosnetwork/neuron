@@ -67,7 +67,11 @@ export default class Queue {
           await this.pipeline(rangeArr)
         }
       } catch (err) {
-        logger.error(`sync error:`, err)
+        if (err.message.startsWith('connect ECONNREFUSED')) {
+          logger.debug(`sync error:`, err)
+        } else {
+          logger.error(`sync error:`, err)
+        }
       } finally {
         await this.yield(this.yieldTime)
         this.inProcess = false
