@@ -152,12 +152,12 @@ export const useSubscription = ({
           break
         }
         case 'current-wallet': {
-          updateCurrentWallet()(dispatch)
+          updateCurrentWallet()(dispatch, history)
           break
         }
         case 'wallets': {
-          updateWalletList()(dispatch)
-          updateCurrentWallet()(dispatch)
+          updateWalletList()(dispatch, history)
+          updateCurrentWallet()(dispatch, history)
           break
         }
         default: {

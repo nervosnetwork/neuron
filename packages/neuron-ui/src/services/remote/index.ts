@@ -55,11 +55,25 @@ export const showErrorMessage = (title: string, content: string) => {
   }
 }
 
+export const showOpenDialog = (opt: { title: string; message?: string; onUpload: Function }) => {
+  if (!window.remote) {
+    window.alert('remote is not supported')
+  }
+  const { onUpload, ...options } = opt
+  return window.remote.require('electron').dialog.showOpenDialog(
+    {
+      ...options,
+    },
+    onUpload
+  )
+}
+
 export default {
   getLocale,
   validateMnemonic,
   generateMnemonic,
   showMessage,
   showErrorMessage,
+  showOpenDialog,
   getWinID,
 }

@@ -29,6 +29,7 @@ export enum Routes {
   SettingsNetworks = '/settings/networks',
   CreateWallet = '/wallets/new',
   ImportWallet = '/wallets/import',
+  ImportKeystore = '/keystore/import',
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
   Prompt = '/prompt',
@@ -69,6 +70,7 @@ export enum MnemonicAction {
 export const FULL_SCREENS = [
   `${Routes.Transaction}/`,
   `/wizard/`,
+  `/keystore/`,
   `${Routes.Settings}/`,
   `${Routes.WalletEditor}/`,
   `${Routes.NetworkEditor}/`,

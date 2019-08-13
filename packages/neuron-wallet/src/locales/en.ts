@@ -20,6 +20,8 @@ export default {
         backup: 'Backup Current Wallet',
         delete: 'Delete Current Wallet',
         'change-password': 'Change Password',
+        'import-mnemonic': 'Import Mnemonic Seed',
+        'import-keystore': 'Import from Keystore',
       },
       edit: {
         label: 'Edit',
@@ -90,6 +92,7 @@ export default {
       'capacity-not-enough': 'Capacity is not enough',
       'capacity-too-small': 'Capacity less than min',
       'should-be-type-of': '{{field}} should be type of {{type}}',
+      'invalid-keystore': 'Keystore is invalid',
     },
     contextMenu: {
       select: 'Select',

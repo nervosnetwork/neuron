@@ -182,8 +182,12 @@ export default class AppController {
     AppController.navTo(URL.CreateWallet)
   }
 
-  public static importWallet() {
-    AppController.navTo(URL.ImportWallet)
+  public static importWallet(type: 'mnemonic' | 'keystore') {
+    if (type === 'mnemonic') {
+      AppController.navTo(URL.ImportMnemonic)
+    } else if (type === 'keystore') {
+      AppController.navTo(URL.ImportKeystore)
+    }
   }
 
   public static async showTransactionDetails(hash: string) {

@@ -4,6 +4,12 @@ declare namespace Controller {
     mnemonic: string
     password: string
   }
+
+  interface ImportKeystoreParams {
+    name: string
+    keystorePath: string
+    password: string
+  }
   interface UpdateWalletParams {
     id: string
     password?: string
