@@ -11,6 +11,11 @@ import TransactionPersistor from 'services/tx/transaction-persistor'
 
 import IndexerRPC from './indexer-rpc'
 
+enum TxPointType {
+  CreatedBy = 'createdBy',
+  ConsumedBy = 'consumedBy',
+}
+
 export default class Queue {
   private lockHashes: string[]
   private indexerRPC: IndexerRPC
@@ -58,10 +63,10 @@ export default class Queue {
           }
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, 'createdBy', currentBlockNumber)
+            await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber)
           }
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, 'consumedBy', currentBlockNumber)
+            await this.pipeline(lockHash, TxPointType.ConsumedBy, currentBlockNumber)
           }
           if (minBlockNumber) {
             await this.blockNumberService.updateCurrent(minBlockNumber)
@@ -100,7 +105,7 @@ export default class Queue {
   }
 
   // type: 'createdBy' | 'consumedBy'
-  public pipeline = async (lockHash: string, type: string, startBlockNumber: bigint) => {
+  public pipeline = async (lockHash: string, type: TxPointType, startBlockNumber: bigint) => {
     let page = 0
     let stopped = false
     while (!stopped) {
@@ -110,9 +115,9 @@ export default class Queue {
       }
       for (const tx of txs) {
         let txPoint: CKBComponents.TransactionPoint | null = null
-        if (type === 'createdBy') {
+        if (type === TxPointType.CreatedBy) {
           txPoint = tx.createdBy
-        } else if (type === 'consumedBy') {
+        } else if (type === TxPointType.ConsumedBy) {
           txPoint = tx.consumedBy
         }
         if (txPoint && BigInt(txPoint.blockNumber) > startBlockNumber) {
