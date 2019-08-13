@@ -63,21 +63,26 @@ describe('wallet tests', () => {
     const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
     await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
     await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
+    await client.pause(200)
+
     // Next
     const setupWalletNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(setupWalletNextButton).not.toBeNull()
     await client.elementIdClick(setupWalletNextButton!.ELEMENT)
-    await client.pause(200)
+    await client.pause(400)
+    await client.waitUntilWindowLoaded()
 
     // Check wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     expect(walletName.value).toBe(walletNameInputText.value)
+    console.log(`walletName = ${walletName.value}`);
   })
 
   it('import wallet', async () => {
     const { client } = app
+    await client.waitUntilWindowLoaded()
 
     // Go to setting page
     const networkElement = await client.element('//FOOTER/DIV[1]/DIV[2]')
@@ -111,11 +116,13 @@ describe('wallet tests', () => {
     const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
     await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
     await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
+    console.log(`walletNameInputText - ${walletNameInputText.value}`);
     // Next
     const setupWalletNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(setupWalletNextButton).not.toBeNull()
     await client.elementIdClick(setupWalletNextButton!.ELEMENT)
-    await client.pause(200)
+    // await client.pause(200)
+    await client.waitUntilWindowLoaded()
 
     // Check wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
@@ -125,12 +132,12 @@ describe('wallet tests', () => {
   })
 
   it('switch to first wallet', async () => {
-    const { client } = app
+    const { client, electron } = app
+    await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
-    expect(networkElement).not.toBeNull()
-    await client.elementIdClick(networkElement.value.ELEMENT)
+    await clickMenu(electron, ['Electron', 'Preferences...'])
+    await client.pause(200)
 
     // Switch to wallet setting
     const walletSettingButton = await getElementByTagName(client, 'button', 'Wallets')
@@ -154,6 +161,7 @@ describe('wallet tests', () => {
 
   it('delete wallet from menu', async () => {
     const { client, electron } = app
+    await client.waitUntilWindowLoaded()
 
     // Get current wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
@@ -183,6 +191,7 @@ describe('wallet tests', () => {
 
   it('edit wallet', async () => {
     const { client, electron } = app
+    await client.waitUntilWindowLoaded()
 
     // Go to setting page
     await clickMenu(electron, ['Electron', 'Preferences...'])
@@ -210,6 +219,8 @@ describe('wallet tests', () => {
     expect(walletNameInputElement.value).not.toBeNull()
     await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
+    console.log(`walletNameInputText - ${walletNameInputText}`);
+    
     // Save
     const saveButton = await getElementByTagName(client, 'button', 'Save')
     expect(saveButton).not.toBeNull()
@@ -221,5 +232,6 @@ describe('wallet tests', () => {
     expect(newWalletNameElement).not.toBeNull()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).toBe(walletNameInputText.value)
+    console.log(`newWalletName - ${newWalletName}`);
   })
 })
