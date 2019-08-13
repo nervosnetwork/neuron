@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var electron_1 = require("electron");
+const electron = require("electron");
 const app = require("../dist/controllers/app/index");
-electron_1.ipcMain.on('E2E_WALLET_EDIT', function (event, arg) {
+
+electron.ipcMain.on('E2E_WALLET_EDIT', function (event, arg) {
     const walletId = arg[0];
     app.default.navTo(`/editwallet/${walletId}`);
 });
 
-/// ApplicationMenu
 function findItem(menuItems, labels) {
     var target = labels[0];
     var rest = labels.slice(1);
@@ -17,10 +17,10 @@ function findItem(menuItems, labels) {
     }
     return findItem(foundItem.submenu.items, rest);
 }
-electron_1.ipcMain.on('E2E_GET_MENU_ITEM', function (e, labels) {
-    var menuItem = findItem(electron_1.Menu.getApplicationMenu().items, labels);
+electron.ipcMain.on('E2E_GET_MENU_ITEM', function (e, labels) {
+    var menuItem = findItem(electron.Menu.getApplicationMenu().items, labels);
     if (menuItem) {
-        e.returnValue = new electron_1.MenuItem({
+        e.returnValue = new electron.MenuItem({
             checked: menuItem.checked,
             enabled: menuItem.enabled,
             label: menuItem.label,
@@ -33,7 +33,7 @@ electron_1.ipcMain.on('E2E_GET_MENU_ITEM', function (e, labels) {
         });
     }
 });
-electron_1.ipcMain.on('E2E_CLICK_MENU_ITEM', function (e, labels) {
-    var item = findItem(electron_1.Menu.getApplicationMenu().items, labels);
+electron.ipcMain.on('E2E_CLICK_MENU_ITEM', function (e, labels) {
+    var item = findItem(electron.Menu.getApplicationMenu().items, labels);
     item.click();
 });
