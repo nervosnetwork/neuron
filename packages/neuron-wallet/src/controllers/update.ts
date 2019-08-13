@@ -1,5 +1,5 @@
 import { dialog } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater, UpdateInfo } from 'electron-updater'
 import i18n from 'utils/i18n'
 
 export default class UpdateController {
@@ -27,11 +27,13 @@ export default class UpdateController {
       this.enableSender()
     })
 
-    autoUpdater.on('update-available', () => {
+    autoUpdater.on('update-available', (info: UpdateInfo) => {
+      const { version } = info
       dialog.showMessageBox(
         {
           type: 'info',
-          message: i18n.t('updater.updates-found-do-you-want-to-update'),
+          title: version,
+          message: i18n.t('updater.updates-found-do-you-want-to-update', { version }),
           buttons: [i18n.t('updater.update-now'), i18n.t('common.no')],
         },
         buttonIndex => {

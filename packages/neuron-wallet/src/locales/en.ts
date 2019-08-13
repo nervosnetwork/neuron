@@ -137,7 +137,7 @@ export default {
     },
     updater: {
       'update-not-available': 'There are currently no updates available.',
-      'updates-found-do-you-want-to-update': 'An update is available, do you want to update now?',
+      'updates-found-do-you-want-to-update': 'An update ({{version}}) is available, do you want to update now?',
       'update-now': 'Update now',
       'updates-downloaded-about-to-quit-and-install': 'Update downloaded. Neuron will quit and install the update...',
     },
