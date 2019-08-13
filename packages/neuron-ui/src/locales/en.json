@@ -42,7 +42,7 @@
       "welcome-to-nervos-neuron": "Welcome to Neuron",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create a Wallet",
-      "import-mnemonic": "Import mnemonic words",
+      "import-mnemonic": "Import Mnemonic Seed",
       "import-keystore": "Import a keystore file",
       "import-wallet": "Import a Wallet",
       "next": "Next",
