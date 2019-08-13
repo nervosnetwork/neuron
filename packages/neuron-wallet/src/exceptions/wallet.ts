@@ -35,6 +35,12 @@ export class CapacityNotEnough extends Error {
   }
 }
 
+export class InvalidKeystore extends Error {
+  constructor() {
+    super(i18n.t('messages.invalid-keystore'))
+  }
+}
+
 export default {
   WalletNotFound,
   CurrentWalletNotSet,
@@ -42,4 +48,5 @@ export default {
   EmptyPassword,
   CodeHashNotLoaded,
   CapacityNotEnough,
+  InvalidKeystore,
 }

@@ -74,9 +74,16 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
       <Stack horizontal horizontalAlign="center" verticalAlign="center" tokens={{ childrenGap: 40 }}>
         <PrimaryButton
           styles={{ root: [{ height: '60px' }] }}
-          text={t('wizard.import-wallet')}
+          text={t('wizard.import-mnemonic')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
           iconProps={{ iconName: 'Import', styles: buttonGrommetIconStyles }}
+        />
+        <span>{t('common.or')}</span>
+        <PrimaryButton
+          styles={{ root: [{ height: '60px' }] }}
+          text={t('wizard.import-keystore')}
+          onClick={next(Routes.ImportKeystore)}
+          iconProps={{ iconName: 'Keystore', styles: buttonGrommetIconStyles }}
         />
         <span>{t('common.or')}</span>
         <DefaultButton

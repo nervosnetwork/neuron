@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import SHA3 from 'sha3'
 import { v4 as uuid } from 'uuid'
 
-import { UnsupportedCipher, IncorrectPassword } from 'exceptions'
+import { UnsupportedCipher, IncorrectPassword, InvalidKeystore } from 'exceptions'
 import { ExtendedPrivateKey } from './key'
 
 const CIPHER = 'aes-128-ctr'
@@ -40,8 +40,12 @@ export default class Keystore {
   }
 
   static fromJson = (json: string) => {
-    const object = JSON.parse(json)
-    return new Keystore(object.crypto, object.id)
+    try {
+      const object = JSON.parse(json)
+      return new Keystore(object.crypto, object.id)
+    } catch {
+      throw new InvalidKeystore()
+    }
   }
 
   static create = (extendedPrivateKey: ExtendedPrivateKey, password: string) => {
