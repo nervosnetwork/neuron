@@ -40,6 +40,12 @@ export class ShouldBeTypeOf extends Error {
   }
 }
 
+export class InvalidJSON extends Error {
+  constructor() {
+    super(i18n.t('messages.invalid-JSON'))
+  }
+}
+
 export default {
   InvalidName,
   UsedName,
@@ -47,4 +53,5 @@ export default {
   MissingRequiredArgument,
   ServiceHasNoResponse,
   ShouldBeTypeOf,
+  InvalidJSON,
 }
