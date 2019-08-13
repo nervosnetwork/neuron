@@ -46,15 +46,16 @@ export default class Queue {
           await this.indexLockHashes(lockHashes)
           this.indexed = true
         }
-        const currentBlockNumber = await this.getCurrentBlockNumber(lockHashes)
+        const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
+        const currentBlockNumber = await this.blockNumberService.getCurrent()
         for (const lockHash of lockHashes) {
-          await this.pipeline(lockHash, 'createdBy')
+          await this.pipeline(lockHash, 'createdBy', currentBlockNumber)
         }
         for (const lockHash of lockHashes) {
-          await this.pipeline(lockHash, 'consumedBy')
+          await this.pipeline(lockHash, 'consumedBy', currentBlockNumber)
         }
-        if (currentBlockNumber) {
-          await this.blockNumberService.updateCurrent(currentBlockNumber)
+        if (minBlockNumber) {
+          await this.blockNumberService.updateCurrent(minBlockNumber)
         }
         await this.yield(this.interval)
       } catch (err) {
@@ -79,13 +80,17 @@ export default class Queue {
   }
 
   public indexLockHashes = async (lockHashes: string[]) => {
-    await Utils.mapSeries(lockHashes, async (lockHash: string) => {
+    const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
+    const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
+    const nonIndexedLockHashes = lockHashes.filter(i => !indexedLockHashes.includes(i))
+
+    await Utils.mapSeries(nonIndexedLockHashes, async (lockHash: string) => {
       await this.indexerRPC.indexLockHash(lockHash)
     })
   }
 
   // type: 'createdBy' | 'consumedBy'
-  public pipeline = async (lockHash: string, type: string) => {
+  public pipeline = async (lockHash: string, type: string, startBlockNumber: bigint) => {
     let page = 0
     let stopped = false
     while (!stopped) {
@@ -100,7 +105,7 @@ export default class Queue {
         } else if (type === 'consumedBy') {
           txPoint = tx.consumedBy
         }
-        if (txPoint) {
+        if (txPoint && BigInt(txPoint.blockNumber) > startBlockNumber) {
           const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
           const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
           const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)
