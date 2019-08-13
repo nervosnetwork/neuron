@@ -20,7 +20,7 @@ export default {
         backup: 'Backup Current Wallet',
         delete: 'Delete Current Wallet',
         'change-password': 'Change Password',
-        'import-mnemonic': 'Import Mnemonic Words',
+        'import-mnemonic': 'Import Mnemonic Seed',
         'import-keystore': 'Import from Keystore',
       },
       edit: {
