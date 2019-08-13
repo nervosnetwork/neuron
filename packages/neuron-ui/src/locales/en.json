@@ -42,6 +42,8 @@
       "welcome-to-nervos-neuron": "Welcome to Neuron",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create a Wallet",
+      "import-mnemonic": "Import mnemonic words",
+      "import-keystore": "Import a keystore file",
       "import-wallet": "Import a Wallet",
       "next": "Next",
       "back": "Back",
@@ -58,6 +60,22 @@
       "new-name": "Use an unused name for the new wallet",
       "complex-password": "The password is a string of 8 to 50 characters consisting of three types of characters: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
       "same-password": "The password and confirm password should be same"
+    },
+    "import-keystore": {
+      "label": {
+        "path": "Keystore File",
+        "name": "Wallet Name",
+        "password": "Password"
+      },
+      "placeholder": {
+        "path": "Click to select the Keystore",
+        "name": "Name for the new wallet",
+        "password": "Password to verify the keystore"
+      },
+      "button": {
+        "back": "Back",
+        "submit": "Submit"
+      }
     },
     "detail": {
       "more-transactions": "More"
@@ -252,7 +270,9 @@
       "lock-arg-copied": "Lock Arg has been copied to the clipboard",
       "transaction-not-found": "The transaction is not found",
       "rpc-url-should-have-protocol": "The RPC URL should start with http(s)://",
-      "rpc-url-should-have-no-whitespaces": "The RPC URL should have no whitespaces"
+      "rpc-url-should-have-no-whitespaces": "The RPC URL should have no whitespaces",
+      "is-required": "{{field}} is required",
+      "is-used": "{{field}} is used"
     },
     "sync": {
       "syncing": "Syncing",

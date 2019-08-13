@@ -11,6 +11,10 @@ export const importMnemonic = controllerMethodWrapper(CONTROLLER_NAME)(
   controller => (params: Controller.ImportMnemonicParams) => controller.importMnemonic(params)
 )
 
+export const importKeystore = controllerMethodWrapper(CONTROLLER_NAME)(
+  controller => (params: Controller.ImportKeystoreParams) => controller.importKeystore(params)
+)
+
 export const deleteWallet = controllerMethodWrapper(CONTROLLER_NAME)(
   controller => (params: Controller.DeleteWalletParams) => controller.delete(params)
 )
@@ -38,6 +42,7 @@ export default {
   updateWallet,
   getWalletList,
   importMnemonic,
+  importKeystore,
   deleteWallet,
   backupWallet,
   getCurrentWallet,

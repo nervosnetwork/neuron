@@ -74,11 +74,26 @@ const generateTemplate = () => {
       {
         id: 'import',
         label: i18n.t('application-menu.wallet.import'),
-        click: () => {
-          if (AppController) {
-            AppController.importWallet()
-          }
-        },
+        submenu: [
+          {
+            id: 'import-with-mnemonic',
+            label: i18n.t('application-menu.wallet.import-mnemonic'),
+            click: () => {
+              if (AppController) {
+                AppController.importWallet('mnemonic')
+              }
+            },
+          },
+          {
+            id: 'import-with-keystore',
+            label: i18n.t('application-menu.wallet.import-keystore'),
+            click: () => {
+              if (AppController) {
+                AppController.importWallet('keystore')
+              }
+            },
+          },
+        ],
       },
       separator,
       {

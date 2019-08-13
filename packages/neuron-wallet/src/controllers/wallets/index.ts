@@ -151,16 +151,16 @@ export default class WalletsController {
   public static async importKeystore({
     name,
     password,
-    keystore,
+    keystorePath,
   }: {
     name: string
     password: string
-    keystore: string
+    keystorePath: string
   }): Promise<Controller.Response<Wallet>> {
     if (password === undefined) {
       throw new IsRequired('Password')
     }
-
+    const keystore = fs.readFileSync(keystorePath, 'utf8')
     const keystoreObject = Keystore.fromJson(keystore)
     const masterPrivateKey = keystoreObject.extendedPrivateKey(password)
     const masterKeychain = new Keychain(
