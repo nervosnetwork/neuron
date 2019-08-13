@@ -1,7 +1,6 @@
 import { Application } from 'spectron'
 import path from 'path'
-import { getElementByTagName } from './utils'
-import menuAddon from 'spectron-menu-addon'
+import { getElementByTagName, clickMenu, editWallet } from './utils'
 
 // Test create/import/switch/delete/edit wallet
 describe('wallet tests', () => {
@@ -12,8 +11,12 @@ describe('wallet tests', () => {
     if (process.platform === 'win32') {
       electronPath += '.cmd'
     }
-    app = menuAddon.createApplication({ 
-      args: [path.join(__dirname, '..', 'dist', 'main.js')], 
+    app = new Application({ 
+      args: [
+        '--require',
+        path.join(__dirname, 'preload.js'),
+        path.join(__dirname, '..', 'dist', 'main.js')
+      ], 
       path: electronPath 
     })
     return app.start()
@@ -124,7 +127,7 @@ describe('wallet tests', () => {
     const { client } = app
 
     // Go to setting page
-    const networkElement = await client.element('//FOOTER/DIV[1]/DIV[2]')
+    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
     expect(networkElement).not.toBeNull()
     await client.elementIdClick(networkElement.value.ELEMENT)
 
@@ -135,7 +138,7 @@ describe('wallet tests', () => {
     await client.pause(200)
 
     // Switch to first wallet
-    const firstWallet = await client.element('//MAIN/DIV[1]/DIV[3]/DIV[1]/DIV[1]/DIV[1]/DIV[1]/DIV[1]')
+    const firstWallet = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV')
     expect(firstWallet).not.toBeNull()
     const firstWalletName = await client.elementIdText(firstWallet.value.ELEMENT)
     await client.elementIdClick(firstWallet.value.ELEMENT)
@@ -149,7 +152,7 @@ describe('wallet tests', () => {
   })
 
   it('delete wallet from menu', async () => {
-    const { client } = app
+    const { client, electron } = app
 
     // Get current wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
@@ -157,7 +160,7 @@ describe('wallet tests', () => {
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     
     // Click delete wallet menu item
-    await menuAddon.clickMenu('Wallet', 'Delete Current Wallet')
+    await clickMenu(electron, ['Wallet', 'Delete Current Wallet'])
     await client.pause(200)
     
     // Input password
@@ -168,6 +171,7 @@ describe('wallet tests', () => {
     const confirmButton = await getElementByTagName(client, 'button', '确认')
     expect(confirmButton).not.toBeNull()
     await client.elementIdClick(confirmButton!.ELEMENT)
+    await client.pause(200)
 
     // Check wallet name
     const newWalletNameElement = await client.element('//MAIN/DIV/H1')
@@ -176,15 +180,11 @@ describe('wallet tests', () => {
     expect(newWalletName.value).not.toBe(walletName.value)
   })
 
-
-  // TODO: edit wallet
-  // Unable to get context menu directly
   it('edit wallet', async () => {
-    return
-    const { client } = app
+    const { client, electron } = app
 
     // Go to setting page
-    await menuAddon.clickMenu('Electron', 'Preferences...')
+    await clickMenu(electron, ['Electron', 'Preferences...'])
     await client.pause(200)
 
     // Switch to wallet setting
@@ -193,10 +193,32 @@ describe('wallet tests', () => {
     await client.elementIdClick(walletSettingButton!.ELEMENT)
     await client.pause(200)
 
-    // Trigger context menu
-    await client.rightClick('//MAIN/DIV[1]/DIV[3]/DIV[1]/DIV[1]/DIV[1]/DIV[1]/DIV[2]', 40, 5 + 10)
+    // Get wallet id
+    const walletItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]/DIV/INPUT')
+    expect(walletItemElement.value).not.toBeNull()
+    const walletItemElementId = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'id')
+    const walletItemElementName = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'name')
+    const walletId = walletItemElementId.value.slice(walletItemElementName.value.length + 1)
+
+    // Go to edit wallet page
+    await editWallet(electron, walletId)
     await client.pause(200)
 
-    // TODO: Click edit menu item
+    // Update wallet name
+    const walletNameInputElement = await client.element('<input />')
+    expect(walletNameInputElement.value).not.toBeNull()
+    await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
+    const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
+    // Save
+    const saveButton = await getElementByTagName(client, 'button', '保存')
+    expect(saveButton).not.toBeNull()
+    await client.elementIdClick(saveButton!.ELEMENT)
+    await client.pause(200)
+
+    // Check wallet name
+    const newWalletNameElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]')
+    expect(newWalletNameElement).not.toBeNull()
+    const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
+    expect(newWalletName.value).toBe(walletNameInputText.value)
   })
 })

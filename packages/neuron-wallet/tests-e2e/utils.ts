@@ -1,4 +1,5 @@
 import { SpectronClient } from 'spectron'
+import { AllElectron } from 'electron'
 
 export const getElementByTagName = async (client: SpectronClient, tagName: string, textContent: string) => {
   const elements = await client.elements(`<${tagName} />`)        
@@ -10,4 +11,16 @@ export const getElementByTagName = async (client: SpectronClient, tagName: strin
     }
   }
   return null
+}
+
+export const clickMenu = (electron: AllElectron, labels: string[]) => {
+  return electron.ipcRenderer.send('E2E_CLICK_MENU_ITEM', labels)
+}
+
+export const getMenuItem = (electron: AllElectron, labels: string[]) => {
+  return electron.ipcRenderer.sendSync('E2E_GET_MENU_ITEM', labels)
+}
+
+export const editWallet = (electron: AllElectron, walletId: string) => {
+  return electron.ipcRenderer.send('E2E_WALLET_EDIT', [walletId])
 }
