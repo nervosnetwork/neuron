@@ -92,7 +92,7 @@ export default {
       'capacity-too-small': '金额小于最低金额',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型',
       'invalid-keystore': 'Keystore 格式不正确',
-      'invalid-JSON': 'JSON 文件格式不正确',
+      'invalid-json': 'JSON 文件格式不正确',
     },
     contextMenu: {
       select: '选择',

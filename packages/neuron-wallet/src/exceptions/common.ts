@@ -42,7 +42,7 @@ export class ShouldBeTypeOf extends Error {
 
 export class InvalidJSON extends Error {
   constructor() {
-    super(i18n.t('messages.invalid-JSON'))
+    super(i18n.t('messages.invalid-json'))
   }
 }
 
