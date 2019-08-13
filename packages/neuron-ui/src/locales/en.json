@@ -68,7 +68,7 @@
         "password": "Password"
       },
       "placeholder": {
-        "path": "Click to select the Keystore",
+        "path": "Click to select the keystore file",
         "name": "Name for the new wallet",
         "password": "Password to verify the keystore"
       },
