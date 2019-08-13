@@ -15,7 +15,8 @@ describe('wallet tests', () => {
       args: [
         '--require',
         path.join(__dirname, 'preload.js'),
-        path.join(__dirname, '..', 'dist', 'main.js')
+        path.join(__dirname, '..', 'dist', 'main.js'),
+        '--lang=en'
       ], 
       path: electronPath 
     })
@@ -33,7 +34,7 @@ describe('wallet tests', () => {
     await client.waitUntilWindowLoaded()
 
     // Click create wallet
-    const createWalletButton = await getElementByTagName(client, 'button', '创建新钱包')
+    const createWalletButton = await getElementByTagName(client, 'button', 'Create a Wallet')
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
 
@@ -42,7 +43,7 @@ describe('wallet tests', () => {
     const mnemonic = await client.elementIdText(mnemonicTextarea.value.ELEMENT)
     const mnemonicText = mnemonic.value
     // Next
-    const mnemonicNextButton = await getElementByTagName(client, 'button', '下一步')
+    const mnemonicNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(mnemonicNextButton).not.toBeNull()
     await client.elementIdClick(mnemonicNextButton!.ELEMENT)
 
@@ -51,7 +52,7 @@ describe('wallet tests', () => {
     expect(inputMnemonicTextarea.value).not.toBeNull()
     await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, mnemonicText)
     // Next
-    const inputMnemonicNextButton = await getElementByTagName(client, 'button', '下一步')
+    const inputMnemonicNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(inputMnemonicNextButton).not.toBeNull()
     await client.elementIdClick(inputMnemonicNextButton!.ELEMENT)
 
@@ -63,7 +64,7 @@ describe('wallet tests', () => {
     await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
     await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
     // Next
-    const setupWalletNextButton = await getElementByTagName(client, 'button', '下一步')
+    const setupWalletNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(setupWalletNextButton).not.toBeNull()
     await client.elementIdClick(setupWalletNextButton!.ELEMENT)
     await client.pause(200)
@@ -84,12 +85,12 @@ describe('wallet tests', () => {
     await client.elementIdClick(networkElement.value.ELEMENT)
 
     // Switch to wallet setting
-    const walletSettingButton = await getElementByTagName(client, 'button', '钱包')
+    const walletSettingButton = await getElementByTagName(client, 'button', 'Wallets')
     expect(walletSettingButton).not.toBeNull()
     await client.elementIdClick(walletSettingButton!.ELEMENT)
 
     // Go to import wallet page
-    const importWalletButton = await getElementByTagName(client, 'button', '导入钱包')
+    const importWalletButton = await getElementByTagName(client, 'button', 'Import a Wallet')
     expect(importWalletButton).not.toBeNull()
     await client.elementIdClick(importWalletButton!.ELEMENT)
 
@@ -99,7 +100,7 @@ describe('wallet tests', () => {
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     // Next
     await client.elementIdValue(mnemonicTextarea.value.ELEMENT, mnemonicText)
-    const mnemonicNextButton = await getElementByTagName(client, 'button', '下一步')
+    const mnemonicNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(mnemonicNextButton).not.toBeNull()
     await client.elementIdClick(mnemonicNextButton!.ELEMENT)
 
@@ -111,7 +112,7 @@ describe('wallet tests', () => {
     await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
     await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
     // Next
-    const setupWalletNextButton = await getElementByTagName(client, 'button', '下一步')
+    const setupWalletNextButton = await getElementByTagName(client, 'button', 'Next')
     expect(setupWalletNextButton).not.toBeNull()
     await client.elementIdClick(setupWalletNextButton!.ELEMENT)
     await client.pause(200)
@@ -132,7 +133,7 @@ describe('wallet tests', () => {
     await client.elementIdClick(networkElement.value.ELEMENT)
 
     // Switch to wallet setting
-    const walletSettingButton = await getElementByTagName(client, 'button', '钱包')
+    const walletSettingButton = await getElementByTagName(client, 'button', 'Wallets')
     expect(walletSettingButton).not.toBeNull()
     await client.elementIdClick(walletSettingButton!.ELEMENT)
     await client.pause(200)
@@ -168,7 +169,7 @@ describe('wallet tests', () => {
     expect(inputElement.value).not.toBeNull()
     await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
     // Confirm
-    const confirmButton = await getElementByTagName(client, 'button', '确认')
+    const confirmButton = await getElementByTagName(client, 'button', 'Confirm')
     expect(confirmButton).not.toBeNull()
     await client.elementIdClick(confirmButton!.ELEMENT)
     await client.pause(200)
@@ -188,7 +189,7 @@ describe('wallet tests', () => {
     await client.pause(200)
 
     // Switch to wallet setting
-    const walletSettingButton = await getElementByTagName(client, 'button', '钱包')
+    const walletSettingButton = await getElementByTagName(client, 'button', 'Wallets')
     expect(walletSettingButton).not.toBeNull()
     await client.elementIdClick(walletSettingButton!.ELEMENT)
     await client.pause(200)
@@ -210,7 +211,7 @@ describe('wallet tests', () => {
     await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
     // Save
-    const saveButton = await getElementByTagName(client, 'button', '保存')
+    const saveButton = await getElementByTagName(client, 'button', 'Save')
     expect(saveButton).not.toBeNull()
     await client.elementIdClick(saveButton!.ELEMENT)
     await client.pause(200)
