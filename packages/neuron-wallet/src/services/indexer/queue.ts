@@ -1,3 +1,4 @@
+import { Subject, Subscription } from 'rxjs'
 import Utils from 'services/sync/utils'
 import logger from 'utils/logger'
 import GetBlocks from 'services/sync/get-blocks'
@@ -15,19 +16,26 @@ export default class Queue {
   private indexerRPC: IndexerRPC
   private getBlocksService: GetBlocks
   private per = 50
-  private interval = 5000
+  private interval = 1000
   private blockNumberService: BlockNumber
+  private tipNumberListener: Subscription
+  private tipBlockNumber: bigint = BigInt(-1)
 
   private stopped = false
   private indexed = false
 
   private inProcess = false
 
-  constructor(url: string, lockHashes: string[]) {
+  constructor(url: string, lockHashes: string[], tipNumberSubject: Subject<string | undefined>) {
     this.lockHashes = lockHashes
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks()
     this.blockNumberService = new BlockNumber()
+    this.tipNumberListener = tipNumberSubject.subscribe(async (num: string) => {
+      if (num) {
+        this.tipBlockNumber = BigInt(num)
+      }
+    })
   }
 
   public setLockHashes = (lockHashes: string[]): void => {
@@ -42,20 +50,22 @@ export default class Queue {
       try {
         this.inProcess = true
         const { lockHashes } = this
-        if (!this.indexed) {
-          await this.indexLockHashes(lockHashes)
-          this.indexed = true
-        }
-        const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
-        const currentBlockNumber = await this.blockNumberService.getCurrent()
-        for (const lockHash of lockHashes) {
-          await this.pipeline(lockHash, 'createdBy', currentBlockNumber)
-        }
-        for (const lockHash of lockHashes) {
-          await this.pipeline(lockHash, 'consumedBy', currentBlockNumber)
-        }
-        if (minBlockNumber) {
-          await this.blockNumberService.updateCurrent(minBlockNumber)
+        const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
+        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber) {
+          if (!this.indexed) {
+            await this.indexLockHashes(lockHashes)
+            this.indexed = true
+          }
+          const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
+          for (const lockHash of lockHashes) {
+            await this.pipeline(lockHash, 'createdBy', currentBlockNumber)
+          }
+          for (const lockHash of lockHashes) {
+            await this.pipeline(lockHash, 'consumedBy', currentBlockNumber)
+          }
+          if (minBlockNumber) {
+            await this.blockNumberService.updateCurrent(minBlockNumber)
+          }
         }
         await this.yield(this.interval)
       } catch (err) {
@@ -128,6 +138,7 @@ export default class Queue {
   }
 
   public stop = () => {
+    this.tipNumberListener.unsubscribe()
     this.stopped = true
   }
 

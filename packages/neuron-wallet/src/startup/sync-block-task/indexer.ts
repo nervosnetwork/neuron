@@ -5,7 +5,7 @@ import IndexerQueue from 'services/indexer/queue'
 
 import { initDatabase } from './init-database'
 
-const { addressDbChangedSubject } = remote.require('./startup/sync-block-task/params')
+const { nodeService, addressDbChangedSubject } = remote.require('./startup/sync-block-task/params')
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -28,7 +28,7 @@ export const switchNetwork = async (nodeURL: string) => {
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  indexerQueue = new IndexerQueue(nodeURL, lockHashes)
+  indexerQueue = new IndexerQueue(nodeURL, lockHashes, nodeService.tipNumberSubject)
 
   addressDbChangedSubject.subscribe(async (event: string) => {
     // ignore update and remove
