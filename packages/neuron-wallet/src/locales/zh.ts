@@ -136,7 +136,7 @@ export default {
     },
     updater: {
       'update-not-available': '没有可供升级的新版本。',
-      'updates-found-do-you-want-to-update': '有可供升级的新版本。马上进行升级吗？',
+      'updates-found-do-you-want-to-update': '有可供升级的新版本({{version}})。现在进行升级吗？',
       'update-now': '马上升级',
       'updates-downloaded-about-to-quit-and-install': '下载完成。Neuron 将退出并安装新版本...',
     },
