@@ -5,7 +5,6 @@ import {
   ShimmeredDetailsList,
   TextField,
   IColumn,
-  DetailsListLayoutMode,
   CheckboxVisibility,
   ITextFieldStyleProps,
   getTheme,
@@ -15,7 +14,7 @@ import { contextMenu } from 'services/remote'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
-import { MIN_CELL_WIDTH, Routes } from 'utils/const'
+import { Routes } from 'utils/const'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { onRenderRow } from 'utils/fabricUIRender'
 
@@ -52,10 +51,8 @@ const Addresses = ({
         name: 'addresses.type',
         key: 'type',
         fieldName: 'type',
-        minWidth: MIN_CELL_WIDTH,
-        maxWidth: 120,
-        isResizable: true,
-        isCollapsible: false,
+        minWidth: 150,
+        maxWidth: 150,
         onRender: (item?: State.Address) => {
           if (undefined === item) {
             return null
@@ -70,11 +67,9 @@ const Addresses = ({
         name: 'addresses.address',
         key: 'address',
         fieldName: 'address',
-        className: 'fixedWidth',
-        minWidth: MIN_CELL_WIDTH,
-        maxWidth: 450,
-        isResizable: true,
-        isCollapsible: false,
+        className: 'monospacedFont',
+        minWidth: 100,
+        maxWidth: 500,
         onRender: (item?: State.Address) => {
           if (item) {
             return (
@@ -90,10 +85,8 @@ const Addresses = ({
         name: 'addresses.description',
         key: 'description',
         fieldName: 'description',
-        minWidth: MIN_CELL_WIDTH,
-        maxWidth: 350,
-        isResizable: true,
-        isCollapsible: false,
+        minWidth: 100,
+        maxWidth: 300,
         onRender: (item?: State.Address) => {
           return item ? (
             <TextField
@@ -127,10 +120,8 @@ const Addresses = ({
         name: 'addresses.balance',
         key: 'balance',
         fieldName: 'balance',
-        minWidth: MIN_CELL_WIDTH,
+        minWidth: 200,
         maxWidth: 250,
-        isResizable: true,
-        isCollapsible: false,
         onRender: (item?: State.Address) => {
           if (item) {
             return (
@@ -146,10 +137,8 @@ const Addresses = ({
         name: 'addresses.transactions',
         key: 'transactions',
         fieldName: 'txCount',
-        minWidth: MIN_CELL_WIDTH,
-        maxWidth: 150,
-        isResizable: true,
-        isCollapsible: false,
+        minWidth: 100,
+        maxWidth: 200,
         onRender: (item?: State.Address) => {
           if (item) {
             return localNumberFormatter(item.txCount)
@@ -174,7 +163,6 @@ const Addresses = ({
     <ShimmeredDetailsList
       enableShimmer={isLoading}
       checkboxVisibility={CheckboxVisibility.hidden}
-      layoutMode={DetailsListLayoutMode.justified}
       columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
       items={addresses}
       onItemContextMenu={item => {

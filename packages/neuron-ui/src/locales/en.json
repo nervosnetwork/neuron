@@ -16,7 +16,7 @@
       "balance": "Balance",
       "recent-activities": "Recent Activities",
       "no-recent-activities": "No Recent Activities",
-      "type": "Type",
+      "activity": "Activity",
       "datetime": "Date & Time",
       "status": "Status",
       "amount": "Amount",
@@ -29,7 +29,14 @@
       "lock-arg": "Lock Arg",
       "address": "Address",
       "code-hash": "Code Hash",
-      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)"
+      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)",
+      "confirmation": "{{confirmationCount}} Confirmation",
+      "confirmations": "{{confirmationCount}} Confirmations",
+      "sent": "Sent",
+      "sending": "Sending",
+      "received": "Received",
+      "receiving": "Receiving",
+      "more": "More activities"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",

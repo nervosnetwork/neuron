@@ -2,9 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 
+import 'theme'
 import 'styles/index.scss'
 import 'utils/i18n'
-import 'utils/loadTheme'
 
 import Navbar from 'containers/Navbar'
 import Notification from 'containers/Notification'

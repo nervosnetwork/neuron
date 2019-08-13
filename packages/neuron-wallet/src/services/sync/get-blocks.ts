@@ -34,6 +34,11 @@ export default class GetBlocks {
     return blocks
   }
 
+  public getTipBlockNumber = async (): Promise<string> => {
+    const tip: string = await core.rpc.getTipBlockNumber()
+    return tip
+  }
+
   public checkAndSave = async (blocks: Block[], lockHashes: string[]) => {
     return Utils.mapSeries(blocks, async (block: Block) => {
       const checkAndSave = new CheckAndSave(block, lockHashes)
