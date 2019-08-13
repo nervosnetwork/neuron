@@ -27,6 +27,10 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
     return wallets.map(w => w.name)
   }, [wallets])
 
+  const isNameUsed = useMemo(() => {
+    return exsitingNames.includes(fields.name || '')
+  }, [exsitingNames, fields.name])
+
   const onFileClick = useCallback(() => {
     showOpenDialog({
       title: 'import keystore',
@@ -71,7 +75,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
                 if (text === '') {
                   return t('messages.is-required', { field: t(`import-keystore.label.${key}`) })
                 }
-                if (key === 'name' && exsitingNames.includes(text || '')) {
+                if (key === 'name' && isNameUsed) {
                   return t('messages.is-used', { field: t(`import-keystore.label.${key}`) })
                 }
                 return ''
@@ -90,7 +94,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <DefaultButton onClick={goBack}>{t('import-keystore.button.back')}</DefaultButton>
-        <PrimaryButton disabled={!(fields.name && fields.path && fields.password)} onClick={onSubmit}>
+        <PrimaryButton disabled={!(fields.name && fields.path && fields.password && !isNameUsed)} onClick={onSubmit}>
           {t('import-keystore.button.submit')}
         </PrimaryButton>
       </Stack>
