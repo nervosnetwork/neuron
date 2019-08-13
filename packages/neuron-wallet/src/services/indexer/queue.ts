@@ -4,9 +4,11 @@ import GetBlocks from 'services/sync/get-blocks'
 import { Transaction } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import BlockNumber from 'services/sync/block-number'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
+import LockUtils from 'models/lock-utils'
+import TransactionPersistor from 'services/tx/transaction-persistor'
 
 import IndexerRPC from './indexer-rpc'
-import TransactionPersistor from '../tx/transaction-persistor'
 
 export default class Queue {
   private lockHashes: string[]
@@ -110,6 +112,9 @@ export default class Queue {
             transaction.blockNumber = blockHeader.number
             transaction.timestamp = blockHeader.timestamp
           }
+          // broadcast address used
+          const address = LockUtils.lockScriptToAddress(transaction.outputs![+txPoint.index].lock)
+          AddressesUsedSubject.getSubject().next([address])
           await TransactionPersistor.saveFetchTx(transaction)
         }
       }
