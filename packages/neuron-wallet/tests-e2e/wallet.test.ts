@@ -1,6 +1,7 @@
 import { Application } from 'spectron'
 import path from 'path'
 import { getElementByTagName, clickMenu, editWallet } from './utils'
+import fs from 'fs'
 
 // Test create/import/switch/delete/edit wallet
 describe('wallet tests', () => {
@@ -74,6 +75,10 @@ describe('wallet tests', () => {
 
     // Check wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
+    if (walletNameElement.value === null) {
+      const imageBuffer = await app.browserWindow.capturePage()
+      fs.writeFileSync(path.join(__dirname, 'fail-create-wallet_check-wallet-name.png'), imageBuffer)
+    }
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     expect(walletName.value).toBe(walletNameInputText.value)
