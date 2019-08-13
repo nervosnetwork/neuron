@@ -34,16 +34,26 @@ import { backToTop } from 'utils/animations'
 const TITLE_FONT_SIZE = 'xxLarge'
 export type ActivityItem = State.Transaction & { confirmations: string; typeLabel: string }
 
-const genTypeLabel = (type: 'send' | 'receive', confirmationCount: number) => {
+const genTypeLabel = (
+  type: 'send' | 'receive',
+  confirmationCount: number,
+  status: 'pending' | 'success' | 'failed'
+) => {
   switch (type) {
     case 'send': {
-      if (confirmationCount < CONFIRMATION_THRESHOLD) {
+      if (status === 'failed') {
+        return 'sent'
+      }
+      if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
         return 'sending'
       }
       return 'sent'
     }
     case 'receive': {
-      if (confirmationCount < CONFIRMATION_THRESHOLD) {
+      if (status === 'failed') {
+        return 'received'
+      }
+      if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
         return 'receiving'
       }
       return 'received'
@@ -287,13 +297,14 @@ const Overview = ({
         let typeLabel: string = item.type
         let { status } = item
         if (item.blockNumber !== undefined) {
-          const confirmationCount = 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+          const confirmationCount =
+            item.blockNumber === undefined ? 0 : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
           if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
             status = 'pending'
           }
 
-          typeLabel = genTypeLabel(item.type, confirmationCount)
+          typeLabel = genTypeLabel(item.type, confirmationCount, status)
 
           if (confirmationCount === 1) {
             confirmations = `(${t('overview.confirmation', {
