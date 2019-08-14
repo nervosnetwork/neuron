@@ -8,6 +8,7 @@ import BlockNumber from 'services/sync/block-number'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
+import IndexerTransaction from 'services/tx/indexer-transaction'
 
 import IndexerRPC from './indexer-rpc'
 
@@ -78,6 +79,27 @@ export default class Queue {
       } finally {
         await this.yield()
         this.inProcess = false
+      }
+    }
+  }
+
+  public processFork = async () => {
+    while (!this.stopped) {
+      try {
+        const tip = this.tipBlockNumber
+        const txs = await IndexerTransaction.txHashes()
+        for (const tx of txs) {
+          const result = await this.getBlocksService.getTransaction(tx.hash)
+          if (!result) {
+            await IndexerTransaction.deleteTxWhenFork(tx.hash)
+          } else if (tip - BigInt(tx.blockNumber) >= 1000) {
+            await IndexerTransaction.confirm(tx.hash)
+          }
+        }
+      } catch (err) {
+        logger.error(`indexer delete forked tx:`, err)
+      } finally {
+        await this.yield(10000)
       }
     }
   }

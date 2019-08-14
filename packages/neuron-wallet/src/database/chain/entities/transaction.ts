@@ -83,6 +83,12 @@ export default class Transaction extends BaseEntity {
   })
   updatedAt!: string
 
+  // only used for check fork in indexer mode
+  @Column({
+    type: 'boolean',
+  })
+  confirmed: boolean = false
+
   @OneToMany(_type => InputEntity, input => input.transaction)
   inputs!: InputEntity[]
 

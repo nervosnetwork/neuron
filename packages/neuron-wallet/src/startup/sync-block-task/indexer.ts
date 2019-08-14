@@ -41,4 +41,5 @@ export const switchNetwork = async (nodeURL: string) => {
   })
 
   indexerQueue.start()
+  indexerQueue.processFork()
 }
