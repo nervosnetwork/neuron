@@ -80,6 +80,11 @@ describe('wallet tests', () => {
     // Check wallet name
     const walletNameElement = await client.element('//MAIN/DIV/H1')
     if (walletNameElement.value === null) {
+      const mainElement = await client.element('//MAIN')
+      expect(mainElement.value).not.toBeNull()
+      const mainText = await client.elementIdText(mainElement.value.ELEMENT)
+      console.log(`mainText = ${mainText.value}`);
+      
       const imageBuffer = await app.browserWindow.capturePage()
       fs.writeFileSync(path.join(__dirname, 'fail-create-wallet_check-wallet-name.png'), imageBuffer)
     }
