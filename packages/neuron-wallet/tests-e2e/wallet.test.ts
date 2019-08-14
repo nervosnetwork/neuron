@@ -32,7 +32,7 @@ describe('wallet tests', () => {
 
   const waitUntilLoaded = async () => {
     const { client } = app
-    await client.pause(100)
+    await client.pause(200)
     await client.waitUntilWindowLoaded()
   }
 
