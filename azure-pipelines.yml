@@ -85,11 +85,6 @@ jobs:
       name: Test
 
   - job: Integration
-    condition: |
-      or(
-        eq(variables['build.sourceBranch'], 'refs/heads/e2e-tests'),
-        startsWith(variables['Build.SourceBranch'], 'refs/heads/rc/')
-      )
     pool:
       vmImage: 'macos-10.14'
     steps:
