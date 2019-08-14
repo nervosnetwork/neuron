@@ -75,7 +75,11 @@ export default class Queue {
         }
         await this.yield(this.interval)
       } catch (err) {
-        logger.error('sync indexer error:', err)
+        if (err.message.startsWith('connect ECONNREFUSED')) {
+          logger.debug('sync indexer error:', err)
+        } else {
+          logger.error('sync indexer error:', err)
+        }
       } finally {
         await this.yield()
         this.inProcess = false
