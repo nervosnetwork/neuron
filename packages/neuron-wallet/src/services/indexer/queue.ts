@@ -159,9 +159,21 @@ export default class Queue {
             transaction.timestamp = blockHeader.timestamp
           }
           // broadcast address used
-          const address = LockUtils.lockScriptToAddress(transaction.outputs![+txPoint.index].lock)
-          AddressesUsedSubject.getSubject().next([address])
-          await TransactionPersistor.saveFetchTx(transaction)
+          const txEntity = await TransactionPersistor.saveFetchTx(transaction)
+
+          let address: string | undefined
+          if (type === TxPointType.CreatedBy) {
+            address = LockUtils.lockScriptToAddress(transaction.outputs![+txPoint.index].lock)
+          } else if (type === TxPointType.ConsumedBy) {
+            const input = txEntity.inputs[+txPoint.index]
+            const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
+            if (output) {
+              address = LockUtils.lockScriptToAddress(output.lock)
+            }
+          }
+          if (address) {
+            AddressesUsedSubject.getSubject().next([address])
+          }
         }
       }
       page += 1

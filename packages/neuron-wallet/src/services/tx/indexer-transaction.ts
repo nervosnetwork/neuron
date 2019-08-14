@@ -49,4 +49,33 @@ export default class IndexerTransaction {
       await transactionalEntityManager.remove([tx, ...tx.inputs, ...tx.outputs])
     })
   }
+
+  public static updateInputLockHash = async (txHash: string, index: string) => {
+    const output = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        outPointTxHash: txHash,
+        outPointIndex: index,
+      })
+      .getOne()
+
+    if (output) {
+      await getConnection().manager.update(
+        InputEntity,
+        {
+          outPointTxHash: txHash,
+          outPointIndex: index,
+        },
+        {
+          lockHash: output.lockHash,
+          capacity: output.capacity,
+        }
+      )
+      output.status = OutputStatus.Dead
+      await getConnection().manager.save(output)
+    }
+
+    return output
+  }
 }
