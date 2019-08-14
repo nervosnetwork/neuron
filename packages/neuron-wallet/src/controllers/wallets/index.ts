@@ -15,6 +15,7 @@ import {
   ServiceHasNoResponse,
   EmptyPassword,
   IncorrectPassword,
+  InvalidJSON,
 } from 'exceptions'
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
@@ -161,6 +162,11 @@ export default class WalletsController {
       throw new IsRequired('Password')
     }
     const keystore = fs.readFileSync(keystorePath, 'utf8')
+    try {
+      JSON.parse(keystore)
+    } catch {
+      throw new InvalidJSON()
+    }
     const keystoreObject = Keystore.fromJson(keystore)
     const masterPrivateKey = keystoreObject.extendedPrivateKey(password)
     const masterKeychain = new Keychain(

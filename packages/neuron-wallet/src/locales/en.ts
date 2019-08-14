@@ -93,6 +93,7 @@ export default {
       'capacity-too-small': 'Capacity less than min',
       'should-be-type-of': '{{field}} should be type of {{type}}',
       'invalid-keystore': 'Keystore is invalid',
+      'invalid-json': 'Invalid JSON file',
     },
     contextMenu: {
       select: 'Select',
