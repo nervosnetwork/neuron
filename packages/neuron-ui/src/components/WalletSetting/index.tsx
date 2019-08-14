@@ -17,8 +17,12 @@ const buttons = [
     url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
   },
   {
-    label: 'wizard.import-wallet',
+    label: 'wizard.import-mnemonic',
     url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+  },
+  {
+    label: 'wizard.import-keystore',
+    url: Routes.ImportKeystore,
   },
 ]
 

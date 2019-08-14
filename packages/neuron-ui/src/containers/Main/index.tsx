@@ -7,6 +7,7 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 
 import Overview from 'components/Overview'
 import WalletWizard from 'components/WalletWizard'
+import ImportKeystore from 'components/ImportKeystore'
 import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
@@ -24,7 +25,7 @@ import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './h
 
 export const mainContents: CustomRouter.Route[] = [
   {
-    name: `launch`,
+    name: `Launch`,
     path: Routes.Launch,
     exact: true,
     comp: LaunchScreen,
@@ -93,6 +94,12 @@ export const mainContents: CustomRouter.Route[] = [
     path: Routes.WalletWizard,
     exact: false,
     comp: WalletWizard,
+  },
+  {
+    name: `ImportKeystore`,
+    path: Routes.ImportKeystore,
+    exact: false,
+    comp: ImportKeystore,
   },
   {
     name: `PasswordRequest`,

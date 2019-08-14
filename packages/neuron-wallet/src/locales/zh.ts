@@ -20,6 +20,8 @@ export default {
         backup: '备份当前钱包',
         delete: '删除当前钱包',
         'change-password': '修改密码',
+        'import-mnemonic': '导入助记词',
+        'import-keystore': '导入 Keystore 文件',
       },
       edit: {
         label: '编辑',
@@ -89,6 +91,8 @@ export default {
       'capacity-not-enough': '余额不足',
       'capacity-too-small': '金额小于最低金额',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型',
+      'invalid-keystore': 'Keystore 格式不正确',
+      'invalid-json': 'JSON 文件格式不正确',
     },
     contextMenu: {
       select: '选择',
@@ -136,7 +140,7 @@ export default {
     },
     updater: {
       'update-not-available': '没有可供升级的新版本。',
-      'updates-found-do-you-want-to-update': '有可供升级的新版本。马上进行升级吗？',
+      'updates-found-do-you-want-to-update': '有可供升级的新版本({{version}})。现在进行升级吗？',
       'update-now': '马上升级',
       'updates-downloaded-about-to-quit-and-install': '下载完成。Neuron 将退出并安装新版本...',
     },
