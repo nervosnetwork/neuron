@@ -32,6 +32,8 @@ export default class Queue {
 
   private inProcess = false
 
+  private resetFlag = false
+
   constructor(url: string, lockHashes: string[], tipNumberSubject: Subject<string | undefined>) {
     this.lockHashes = lockHashes
     this.indexerRPC = new IndexerRPC(url)
@@ -49,12 +51,20 @@ export default class Queue {
     this.indexed = false
   }
 
+  public reset = () => {
+    this.resetFlag = true
+  }
+
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "off" */
   public start = async () => {
     while (!this.stopped) {
       try {
         this.inProcess = true
+        if (this.resetFlag) {
+          await this.blockNumberService.updateCurrent(BigInt(0))
+          this.resetFlag = false
+        }
         const { lockHashes } = this
         const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
         if (!this.indexed || currentBlockNumber !== this.tipBlockNumber) {

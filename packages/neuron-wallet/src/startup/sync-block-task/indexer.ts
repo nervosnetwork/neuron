@@ -5,7 +5,9 @@ import IndexerQueue from 'services/indexer/queue'
 
 import { initDatabase } from './init-database'
 
-const { nodeService, addressDbChangedSubject } = remote.require('./startup/sync-block-task/params')
+const { nodeService, addressDbChangedSubject, walletCreatedSubject } = remote.require(
+  './startup/sync-block-task/params'
+)
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -36,6 +38,14 @@ export const switchNetwork = async (nodeURL: string) => {
       const hashes: string[] = await loadAddressesAndConvert()
       if (indexerQueue) {
         indexerQueue.setLockHashes(hashes)
+      }
+    }
+  })
+
+  walletCreatedSubject.subscribe(async (type: string) => {
+    if (type === 'import') {
+      if (indexerQueue) {
+        indexerQueue.reset()
       }
     }
   })
