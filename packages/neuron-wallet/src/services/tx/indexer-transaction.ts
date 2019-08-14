@@ -74,6 +74,17 @@ export default class IndexerTransaction {
       )
       output.status = OutputStatus.Dead
       await getConnection().manager.save(output)
+
+      const tx = await getConnection()
+        .getRepository(TransactionEntity)
+        .createQueryBuilder('tx')
+        .where({
+          hash: output.outPointTxHash,
+        })
+        .getOne()
+      if (tx) {
+        tx.emitUpdate()
+      }
     }
 
     return output
