@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
@@ -33,47 +33,65 @@ const History = ({
   }, [id, history])
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
 
-  return (
-    <Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
-        <SearchBox
-          value={keywords}
-          styles={{ root: { width: 500 } }}
-          placeholder={t('history.search.placeholder')}
-          onChange={onKeywordsChange}
-          onSearch={onSearch}
-          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
+  const List = useMemo(() => {
+    return (
+      <Stack>
+        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
+          <SearchBox
+            value={keywords}
+            styles={{ root: { width: 500 } }}
+            placeholder={t('history.search.placeholder')}
+            onChange={onKeywordsChange}
+            onSearch={onSearch}
+            iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
+          />
+        </Stack>
+        <TransactionList
+          isLoading={isLoading}
+          isUpdatingDescription={isUpdatingDescription}
+          walletID={id}
+          items={items}
+          dispatch={dispatch}
+        />
+        <Pagination
+          selectedPageIndex={pageNo - 1}
+          pageCount={Math.ceil(totalCount / pageSize)}
+          itemsPerPage={pageSize}
+          totalItemCount={totalCount}
+          previousPageAriaLabel={t('pagination.previous-page')}
+          nextPageAriaLabel={t('pagination.next-page')}
+          firstPageAriaLabel={t('pagination.first-page')}
+          lastPageAriaLabel={t('pagination.last-page')}
+          pageAriaLabel={t('pagination-page')}
+          selectedAriaLabel={t('pagination-selected')}
+          firstPageIconProps={{ iconName: 'FirstPage' }}
+          previousPageIconProps={{ iconName: 'PrevPage' }}
+          nextPageIconProps={{ iconName: 'NextPage' }}
+          lastPageIconProps={{ iconName: 'LastPage' }}
+          format="buttons"
+          onPageChange={(idx: number) => {
+            history.push(`${Routes.History}?pageNo=${idx + 1}`)
+          }}
         />
       </Stack>
-      <TransactionList
-        isLoading={isLoading}
-        isUpdatingDescription={isUpdatingDescription}
-        walletID={id}
-        items={items}
-        dispatch={dispatch}
-      />
-      <Pagination
-        selectedPageIndex={pageNo - 1}
-        pageCount={Math.ceil(totalCount / pageSize)}
-        itemsPerPage={pageSize}
-        totalItemCount={totalCount}
-        previousPageAriaLabel={t('pagination.previous-page')}
-        nextPageAriaLabel={t('pagination.next-page')}
-        firstPageAriaLabel={t('pagination.first-page')}
-        lastPageAriaLabel={t('pagination.last-page')}
-        pageAriaLabel={t('pagination-page')}
-        selectedAriaLabel={t('pagination-selected')}
-        firstPageIconProps={{ iconName: 'FirstPage' }}
-        previousPageIconProps={{ iconName: 'PrevPage' }}
-        nextPageIconProps={{ iconName: 'NextPage' }}
-        lastPageIconProps={{ iconName: 'LastPage' }}
-        format="buttons"
-        onPageChange={(idx: number) => {
-          history.push(`${Routes.History}?pageNo=${idx + 1}`)
-        }}
-      />
-    </Stack>
-  )
+    )
+  }, [
+    keywords,
+    onKeywordsChange,
+    onSearch,
+    isLoading,
+    isUpdatingDescription,
+    id,
+    items,
+    dispatch,
+    pageNo,
+    totalCount,
+    pageSize,
+    history,
+    t,
+  ])
+
+  return List
 }
 
 History.displayName = 'History'
