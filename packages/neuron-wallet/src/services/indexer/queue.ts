@@ -146,7 +146,11 @@ export default class Queue {
         } else if (type === TxPointType.ConsumedBy) {
           txPoint = tx.consumedBy
         }
-        if (txPoint && BigInt(txPoint.blockNumber) > startBlockNumber) {
+
+        if (
+          txPoint &&
+          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < 1000)
+        ) {
           const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
           const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
           const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)
