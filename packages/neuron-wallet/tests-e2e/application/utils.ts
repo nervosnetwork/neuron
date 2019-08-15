@@ -24,3 +24,7 @@ export const getMenuItem = (electron: AllElectron, labels: string[]) => {
 export const editWallet = (electron: AllElectron, walletId: string) => {
   return electron.ipcRenderer.send('E2E_WALLET_EDIT', [walletId])
 }
+
+export const quitApp = (electron: AllElectron, ) => {
+  return electron.ipcRenderer.send('E2E_QUIT_APP')
+}
