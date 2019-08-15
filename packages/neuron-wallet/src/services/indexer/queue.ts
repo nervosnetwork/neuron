@@ -126,7 +126,7 @@ export default class Queue {
       .map(state => state.blockNumber)
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
     const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
-    const minBlockNumber = blockNumbersBigInt.sort()[0]
+    const minBlockNumber = Utils.min(blockNumbersBigInt)
     return minBlockNumber
   }
 
