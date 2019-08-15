@@ -45,6 +45,7 @@ const Send = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
+    useOnTransactionChange,
     updateTransactionOutput,
     onItemChange,
     onSubmit,
@@ -54,6 +55,7 @@ const Send = ({
     onDescriptionChange,
     onClear,
   } = useInitialize(address, send.outputs, dispatch, history)
+  useOnTransactionChange(walletID, send.outputs, dispatch)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
   const actionSpacer = (

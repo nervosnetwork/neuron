@@ -42,6 +42,10 @@ export const updateAddressDescription = controllerMethodWrapper(CONTROLLER_NAME)
   controller => (params: Controller.UpdateAddressDescriptionParams) => controller.updateAddressDescription(params)
 )
 
+export const calculateCycles = controllerMethodWrapper(CONTROLLER_NAME)(
+  controller => (params: Controller.CalculateCycles) => controller.calculateCycles(params)
+)
+
 export default {
   updateWallet,
   getWalletList,
@@ -52,6 +56,7 @@ export default {
   backupWallet,
   getCurrentWallet,
   sendCapacity,
+  calculateCycles,
   getAddressesByWalletID,
   updateAddressDescription,
 }

@@ -393,6 +393,16 @@ export default class WalletsController {
   }
 
   @CatchControllerError
+  public static async calculateCycles(params: { walletID: string; items: { address: string; capacity: string }[] }) {
+    // TODO: This is a mock cycles
+    const cycles = params.items.filter(item => +item.capacity > 0).length.toString()
+    return {
+      status: ResponseCode.Success,
+      result: cycles,
+    }
+  }
+
+  @CatchControllerError
   public static async updateAddressDescription({
     walletID,
     address,

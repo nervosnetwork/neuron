@@ -2,12 +2,16 @@ import React, { useCallback, useEffect } from 'react'
 import { IDropdownOption } from 'office-ui-fabric-react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { calculateCycles } from 'services/remote/wallets'
 
 import { Message } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
+import { CKBToShannonFormatter } from 'utils/formatters'
 import { TransactionOutput } from '.'
 
-const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch: StateDispatch }) => {
+let cyclesTimer: ReturnType<typeof setTimeout>
+
+const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
   const errorAction = {
     type: AppActions.AddNotification,
     payload: {
@@ -17,7 +21,9 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
     },
   }
   if (!items.length || !items[0].address) {
-    dispatch(errorAction)
+    if (dispatch) {
+      dispatch(errorAction)
+    }
     return false
   }
   const invalid = items.some(
@@ -42,7 +48,7 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       return false
     }
   )
-  if (invalid) {
+  if (invalid && dispatch) {
     dispatch(errorAction)
     return false
   }
@@ -83,6 +89,42 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
     },
     [dispatch]
   )
+
+const useOnTransactionChange = (walletID: string, items: TransactionOutput[], dispatch: StateDispatch) => {
+  useEffect(() => {
+    clearTimeout(cyclesTimer)
+    cyclesTimer = setTimeout(() => {
+      if (validateTransactionParams({ items })) {
+        calculateCycles({
+          walletID,
+          items: items.map(item => ({
+            address: item.address,
+            capacity: CKBToShannonFormatter(item.amount, item.unit),
+          })),
+        })
+          .then(response => {
+            if (response.status) {
+              if (Number.isNaN(+response.result)) {
+                throw new Error('Invalid Cycles')
+              }
+              dispatch({
+                type: AppActions.UpdateSendCycles,
+                payload: response.result,
+              })
+            } else {
+              throw new Error('Cycles Not Calculated')
+            }
+          })
+          .catch(() => {
+            dispatch({
+              type: AppActions.UpdateSendCycles,
+              payload: '0',
+            })
+          })
+      }
+    }, 300)
+  }, [walletID, items, dispatch])
+}
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
   useCallback(
@@ -188,6 +230,7 @@ export const useInitialize = (
   }, [address, dispatch, history, updateTransactionOutput])
 
   return {
+    useOnTransactionChange,
     updateTransactionOutput,
     onItemChange,
     onCapacityUnitChange,
