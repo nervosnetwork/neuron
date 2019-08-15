@@ -1,6 +1,6 @@
 import { Application as SpectronApplication} from 'spectron'
 import path from 'path'
-import { quitApp } from './utils'
+import { quitApp, getElementByTagName, editWallet, clickMenu } from './utils'
 
 let runningAppCount = 0
 
@@ -57,16 +57,15 @@ export default class Application {
 
   // utils
 
-  async getElementByTagName(tagName: string, textContent: string) {
-    const { client } = this.spectron
-    const elements = await client.elements(`<${tagName} />`)        
-    for (let index = 0; index < elements.value.length; index++) {
-      const element = elements.value[index];
-      const text = await client.elementIdText(element.ELEMENT)    
-      if (text.value === textContent) {
-        return element
-      }
-    }
-    return null
+  getElementByTagName(tagName: string, textContent: string) {
+    return getElementByTagName(this.spectron.client, tagName, textContent)
+  }
+
+  editWallet(walletId: string) {
+    return editWallet(this.spectron.electron, walletId)
+  }
+
+  clickMenu(labels: string[]) {
+    return clickMenu(this.spectron.electron, labels)
   }
 }

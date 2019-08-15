@@ -5,7 +5,7 @@ export const getElementByTagName = async (client: SpectronClient, tagName: strin
   const elements = await client.elements(`<${tagName} />`)        
   for (let index = 0; index < elements.value.length; index++) {
     const element = elements.value[index];
-    const text = await client.elementIdText(element.ELEMENT)    
+    const text = await client.elementIdText(element.ELEMENT)
     if (text.value === textContent) {
       return element
     }
@@ -25,6 +25,6 @@ export const editWallet = (electron: AllElectron, walletId: string) => {
   return electron.ipcRenderer.send('E2E_WALLET_EDIT', [walletId])
 }
 
-export const quitApp = (electron: AllElectron, ) => {
+export const quitApp = (electron: AllElectron) => {
   return electron.ipcRenderer.send('E2E_QUIT_APP')
 }

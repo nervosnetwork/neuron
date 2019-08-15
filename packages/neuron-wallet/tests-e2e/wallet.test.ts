@@ -1,6 +1,5 @@
 import Application from './application'
 import path from 'path'
-import { clickMenu, editWallet } from './application/utils'
 import fs from 'fs'
 
 // Test create/import/switch/delete/edit wallet
@@ -126,11 +125,11 @@ describe('wallet tests', () => {
   })
 
   it('switch to first wallet', async () => {
-    const { client, electron } = app.spectron
+    const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await clickMenu(electron, ['Electron', 'Preferences...'])
+    await app.clickMenu(['Electron', 'Preferences...'])
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
@@ -154,7 +153,7 @@ describe('wallet tests', () => {
   })
 
   it('delete wallet from menu', async () => {
-    const { client, electron } = app.spectron
+    const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
     // Get current wallet name
@@ -163,7 +162,7 @@ describe('wallet tests', () => {
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     
     // Click delete wallet menu item
-    await clickMenu(electron, ['Wallet', 'Delete Current Wallet'])
+    await app.clickMenu(['Wallet', 'Delete Current Wallet'])
     await app.waitUntilLoaded()
     
     // Input password
@@ -184,11 +183,11 @@ describe('wallet tests', () => {
   })
 
   it('edit wallet', async () => {
-    const { client, electron } = app.spectron
+    const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await clickMenu(electron, ['Electron', 'Preferences...'])
+    await app.clickMenu(['Electron', 'Preferences...'])
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
@@ -205,7 +204,7 @@ describe('wallet tests', () => {
     const walletId = walletItemElementId.value.slice(walletItemElementName.value.length + 1)
 
     // Go to edit wallet page
-    await editWallet(electron, walletId)
+    await app.editWallet(walletId)
     await app.waitUntilLoaded()
 
     // Update wallet name

@@ -1,5 +1,4 @@
 import Application from './application'
-import { getElementByTagName } from './application/utils'
 
 describe('wallet tests', () => {
   let app: Application
@@ -18,7 +17,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Go to import wallet page
-    const createWalletButton = await getElementByTagName(client, 'button', 'Import Mnemonic Seed')
+    const createWalletButton = await app.getElementByTagName('button', 'Import Mnemonic Seed')
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
 
@@ -28,7 +27,7 @@ describe('wallet tests', () => {
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     // Next
     await client.elementIdValue(mnemonicTextarea.value.ELEMENT, mnemonicText)
-    const mnemonicNextButton = await getElementByTagName(client, 'button', 'Next')
+    const mnemonicNextButton = await app.getElementByTagName('button', 'Next')
     expect(mnemonicNextButton).not.toBeNull()
     await client.elementIdClick(mnemonicNextButton!.ELEMENT)
 
@@ -41,7 +40,7 @@ describe('wallet tests', () => {
     await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
     console.log(`walletNameInputText - ${walletNameInputText.value}`);
     // Next
-    const setupWalletNextButton = await getElementByTagName(client, 'button', 'Next')
+    const setupWalletNextButton = await app.getElementByTagName('button', 'Next')
     expect(setupWalletNextButton).not.toBeNull()
     await client.elementIdClick(setupWalletNextButton!.ELEMENT)
     await app.waitUntilLoaded()
