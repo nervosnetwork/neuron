@@ -16,8 +16,6 @@ export enum MenuCommand {
 }
 
 export enum URL {
-  Website = 'https://www.nervos.org/',
-  Repository = 'https://github.com/nervosnetwork/neuron',
   Preference = '/settings/general',
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',

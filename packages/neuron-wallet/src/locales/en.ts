@@ -42,7 +42,8 @@ export default {
       },
       help: {
         label: 'Help',
-        sourceCode: 'Source Code',
+        'source-code': 'Source Code',
+        'report-issue': 'Report Issue',
         settings: 'Settings',
       },
       develop: {

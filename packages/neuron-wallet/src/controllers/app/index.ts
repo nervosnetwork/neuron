@@ -166,14 +166,6 @@ export default class AppController {
     new UpdateController().checkUpdates(menuItem)
   }
 
-  public static openWebsite() {
-    AppController.openExternal(URL.Website)
-  }
-
-  public static openRepository() {
-    AppController.openExternal(URL.Repository)
-  }
-
   public static showPreference() {
     AppController.navTo(URL.Preference)
   }
