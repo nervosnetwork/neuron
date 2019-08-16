@@ -1,8 +1,7 @@
 import { Application as SpectronApplication} from 'spectron'
 import path from 'path'
 import { quitApp, getElementByTagName, editWallet, clickMenu } from './utils'
-
-let runningAppCount = 0
+import { increaseRunningAppCount, decreaseRunningAppCount, exitServer } from './utils'
 
 export default class Application {
   spectron: SpectronApplication
@@ -36,8 +35,8 @@ export default class Application {
     }
     await this.spectron.start()
     await this.spectron.client.waitUntilWindowLoaded(10000)
-    runningAppCount += 1
-    console.log(`start ${new Date().toTimeString()}`);
+    const runningAppCount = await increaseRunningAppCount()
+    console.log(`start ${runningAppCount} ${new Date().toTimeString()}`);
   }
 
   async stop() {
@@ -45,14 +44,16 @@ export default class Application {
       console.log(`rrrrrrr so`);
       return
     }
-    if (runningAppCount > 1) {
-      console.log(`quit app`);
+
+    const runningAppCount = await decreaseRunningAppCount()
+    if (runningAppCount > 0) {
+      console.log(`quit ${runningAppCount} app`);
       quitApp(this.spectron.electron)
     } else {
-      console.log(`quit spectron`);
+      console.log(`quit ${runningAppCount} spectron`);
       await this.spectron.stop()
+      await exitServer()
     }
-    runningAppCount -= 1
   }
 
   // utils

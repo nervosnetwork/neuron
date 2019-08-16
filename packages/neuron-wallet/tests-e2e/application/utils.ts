@@ -1,5 +1,30 @@
 import { SpectronClient } from 'spectron'
 import { AllElectron } from 'electron'
+import axios, { AxiosResponse } from 'axios'
+
+var port = 22333;
+axios.defaults.baseURL = location.protocol + '//' + location.hostname + ':' + port;
+
+export const fetchRunningAppCount = () => {
+  return axios.get('/app/count').then((res: AxiosResponse) => {
+    return parseInt(res.data)
+  })
+}
+export const increaseRunningAppCount = () => {
+  return axios.get("/app/count/increase").then((res: AxiosResponse) => {
+    return parseInt(res.data)
+  })
+}
+export const decreaseRunningAppCount = () => {
+  return axios.get('/app/count/decrease').then((res: AxiosResponse) => {
+    return parseInt(res.data)
+  })
+}
+export const exitServer = () => {
+  return axios.get('/exit').then((res: AxiosResponse) => {
+    return parseInt(res.data)
+  })
+}
 
 export const getElementByTagName = async (client: SpectronClient, tagName: string, textContent: string) => {
   const elements = await client.elements(`<${tagName} />`)        
