@@ -37,7 +37,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   console.log(`next finish ${new Date().toTimeString()}`);
 
 
-  // 
+  //
 
   // Input mnemonic
 
