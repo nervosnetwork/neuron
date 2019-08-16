@@ -29,3 +29,10 @@ server.on('clientError', (err, socket) => {
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
 });
 server.listen(22333);
+
+// Make sure to exit the program in the event of an error
+const util = require('util');
+const setTimeoutPromise = util.promisify(setTimeout);
+setTimeoutPromise(1000 * 60 * 0.4).then(() => {
+  process.exit(1)
+});
