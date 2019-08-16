@@ -23,7 +23,7 @@ export default class Application {
   }
 
   async waitUntilLoaded() {
-    await this.spectron.client.pause(200)
+    await this.spectron.client.pause(400)
     await this.spectron.client.waitUntilWindowLoaded()
   }
 
