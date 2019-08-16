@@ -19,6 +19,7 @@ import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/state
 import { Routes, MnemonicAction } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
+import generateWalletName from 'utils/generateWalletName'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -212,16 +213,9 @@ const Submission = ({
   const message = 'wizard.set-wallet-name-and-password'
 
   useEffect(() => {
-    const genName = (baseNum: number = 0): string => {
-      const walletName = t('wizard.wallet-suffix', { suffix: baseNum })
-      if (wallets.some(wallet => wallet.name === walletName)) {
-        return genName(baseNum + 1)
-      }
-      return walletName
-    }
     dispatch({
       type: 'name',
-      payload: genName(wallets.length + 1),
+      payload: generateWalletName(wallets, wallets.length + 1, t),
     })
     dispatch({
       type: 'password',
