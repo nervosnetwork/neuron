@@ -36,6 +36,10 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   }
 }
 
+const setBusyTimeout = async () => {
+  await getConnection().manager.query(`PRAGMA busy_timeout = 3000;`)
+}
+
 export const initConnection = async (genesisBlockHash: string) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
@@ -47,6 +51,7 @@ export const initConnection = async (genesisBlockHash: string) => {
 
   try {
     await createConnection(connectionOptions)
+    await setBusyTimeout()
   } catch (err) {
     logger.error(err.message)
   }

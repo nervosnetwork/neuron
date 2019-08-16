@@ -27,13 +27,18 @@ const connectOptions = (): SqliteConnectionOptions => {
   }
 }
 
+export const getConnection = () => {
+  return ormGetConnection(connectionName)
+}
+
+const setBusyTimeout = async () => {
+  await getConnection().manager.query(`PRAGMA busy_timeout = 3000;`)
+}
+
 export const initConnection = async () => {
   const connectionOptions = connectOptions()
   await createConnection(connectionOptions)
-}
-
-export const getConnection = () => {
-  return ormGetConnection(connectionName)
+  await setBusyTimeout()
 }
 
 export default initConnection
