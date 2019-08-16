@@ -4,6 +4,7 @@ import env from 'env'
 import i18n from 'utils/i18n'
 import AppController from 'controllers/app'
 import WalletsService from 'services/wallets'
+import { ExternalURL } from 'utils/const'
 
 const isMac = process.platform === 'darwin'
 
@@ -189,15 +190,23 @@ const generateTemplate = () => {
       label: 'Nervos',
       click: () => {
         if (AppController) {
-          AppController.openWebsite()
+          AppController.openExternal(ExternalURL.Website)
         }
       },
     },
     {
-      label: i18n.t('application-menu.help.sourceCode'),
+      label: i18n.t('application-menu.help.source-code'),
       click: () => {
         if (AppController) {
-          AppController.openRepository()
+          AppController.openExternal(ExternalURL.Repository)
+        }
+      },
+    },
+    {
+      label: i18n.t('application-menu.help.report-issue'),
+      click: () => {
+        if (AppController) {
+          AppController.openExternal(ExternalURL.Issues)
         }
       },
     },

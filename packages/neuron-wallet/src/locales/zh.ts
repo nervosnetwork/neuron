@@ -42,7 +42,8 @@ export default {
       },
       help: {
         label: '帮助',
-        sourceCode: '源代码',
+        'source-code': '源代码',
+        'report-issue': '报告问题',
         settings: '设置',
       },
       develop: {
