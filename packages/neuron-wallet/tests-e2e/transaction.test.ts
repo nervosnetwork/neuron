@@ -20,6 +20,7 @@ describe('transaction tests', () => {
     const createWalletButton = await app.getElementByTagName('button', 'Import Mnemonic Seed')
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
+    console.log(`Go to import wallet page ${new Date().toLocaleTimeString()}`);
 
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     await importWallet(app, mnemonicText)
