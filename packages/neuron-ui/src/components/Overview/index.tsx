@@ -320,6 +320,7 @@ const Overview = ({
         return {
           ...item,
           status,
+          value: item.value.replace(/^-/, ''),
           confirmations: item.status === 'success' ? confirmations : '',
           typeLabel: t(`overview.${typeLabel}`),
         }
