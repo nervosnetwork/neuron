@@ -49,15 +49,17 @@ export default class Application {
     if (!this.spectron.isRunning()) {
       return
     }
+    console.log(`will stop ${new Date().toTimeString()}`);
     const runningAppCount = await decreaseRunningAppCount()
     if (runningAppCount > 0) {
       console.log(`quit ${runningAppCount} app ${new Date().toTimeString()}`);
       quitApp(this.spectron.electron)
     } else {
       console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
-      exitServer()
+      await exitServer()
       await this.spectron.stop()
     }
+    console.log(`did stop ${new Date().toTimeString()}`);
   }
 
   // ipc
@@ -81,15 +83,17 @@ export default class Application {
   test(name: string, func: () => void) {
     it(name, async () => {
       if (this.errorOccurred) {
-        console.log(`skip - ${name}`);
+        console.log(`skip - [${name}] ${new Date().toTimeString()}`);
         return
       }
 
       try {
+        console.log(`will test [${name}] ${new Date().toTimeString()}`);
         await func()
+        console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
         this.errorOccurred = true
-        console.log(`error:\n${error.stack}`);
+        console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
         
         // print main text
         const { client, browserWindow } = this.spectron
@@ -111,8 +115,10 @@ export default class Application {
         // save screenshot
         const imageBuffer = await browserWindow.capturePage()
         await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.png`), imageBuffer)
+
+        console.log(`did save error log ${new Date().toTimeString()}\n${error}\n${error.stack}`);
       }
-    }, 1000 * 60 * 6)
+    }, 1000 * 60 * 4)
   }
 
   // Element

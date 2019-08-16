@@ -1,4 +1,5 @@
 const http = require('http');
+const util = require('util');
 
 let runningAppCount = 0
 
@@ -17,13 +18,17 @@ const server = http.createServer((req, res) => {
     res.end(`${runningAppCount}`);
   }
   else if (req.url === '/exit') {
-    process.exit(0)
     res.end()
+    const setTimeoutPromise = util.promisify(setTimeout);
+    setTimeoutPromise(1000).then(() => {
+      console.log(`server - exit ${runningAppCount} ${new Date().toTimeString()}`);
+      process.exit(0)
+    });
   }
   else {
     res.end()
   }
-  console.log(`server - ${url} = ${runningAppCount}`);
+  console.log(`server - ${url} = ${runningAppCount} ${new Date().toTimeString()}`);
 });
 server.on('clientError', (err, socket) => {
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
@@ -31,7 +36,6 @@ server.on('clientError', (err, socket) => {
 server.listen(22333);
 
 // Make sure to exit the program in the event of an error
-const util = require('util');
 const setTimeoutPromise = util.promisify(setTimeout);
 setTimeoutPromise(1000 * 60 * 30).then(() => {
   process.exit(1)

@@ -20,6 +20,7 @@ describe('network tests', () => {
     const createWalletButton = await app.getElementByTagName('button', 'Create a Wallet')
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
+    console.log(`clicked create wallet button ${new Date().toTimeString()}`);
 
     await createWallet(app)
     await app.waitUntilLoaded()
