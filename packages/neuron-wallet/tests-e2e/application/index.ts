@@ -22,7 +22,10 @@ export default class Application {
         path.join(__dirname, '../..', 'dist', 'main.js'),
         '--lang=en'
       ], 
-      path: electronPath 
+      path: electronPath,
+      webdriverOptions: {
+        headless: true
+      }
     })
   }
 
