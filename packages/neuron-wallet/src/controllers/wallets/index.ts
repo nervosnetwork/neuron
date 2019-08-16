@@ -368,6 +368,26 @@ export default class WalletsController {
   }
 
   @CatchControllerError
+  public static async computeCycles(params: { id: string; walletID: string; capacities: string }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    try {
+      const walletsService = WalletsService.getInstance()
+      const cycles = await walletsService.computeCycles(params.walletID, params.capacities)
+      return {
+        status: ResponseCode.Success,
+        result: cycles,
+      }
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: `Error: "${err.message}"`,
+      }
+    }
+  }
+
+  @CatchControllerError
   public static async updateAddressDescription({
     walletID,
     address,

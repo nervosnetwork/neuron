@@ -16,6 +16,7 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import dataUpdateSubject from 'models/subjects/data-update'
 import CommandSubject from 'models/subjects/command'
 import WindowManager from 'models/window-manager'
+import CellsService from 'services/cells'
 
 import NodeService from './node'
 import FileService from './file'
@@ -315,7 +316,7 @@ export default class WalletService {
       throw new IsRequired('Password')
     }
 
-    const addressInfos = await this.getAddressInfos()
+    const addressInfos = await this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
@@ -371,10 +372,31 @@ export default class WalletService {
     return txHash
   }
 
+  public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+
+    const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
+    const cycles = BigInt(1387008) * BigInt(inputs.length)
+
+    return cycles.toString()
+  }
+
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
-  public getAddressInfos = async (): Promise<AddressInterface[]> => {
-    const walletId = this.getCurrent()!.id
-    const addrs = await AddressService.allAddressesByWalletId(walletId)
+  public getAddressInfos = async (walletID: string): Promise<AddressInterface[]> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+    const addrs = await AddressService.allAddressesByWalletId(walletID)
     return addrs
   }
 
