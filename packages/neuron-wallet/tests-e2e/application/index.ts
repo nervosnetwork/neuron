@@ -29,8 +29,6 @@ export default class Application {
 
   async start() {
     if (this.spectron.isRunning()) {
-      console.log(`rrrrrrr sa`);
-      
       return
     }
     await this.spectron.start()
@@ -39,9 +37,12 @@ export default class Application {
     console.log(`start ${runningAppCount} ${new Date().toTimeString()}`);
   }
 
+  // Start multiple test applications at the same time, calling `spectron.stop()` will stop `ChromeDriver` when the first application finishes executing.
+  // Other test applications will get an error `Error: connect ECONNREFUSED 127.0.0.1:9515`.
+  // So need to close `spectron` after the last test.
+  // Similar issue: https://github.com/electron-userland/spectron/issues/356
   async stop() {
     if (!this.spectron.isRunning()) {
-      console.log(`rrrrrrr so`);
       return
     }
 
