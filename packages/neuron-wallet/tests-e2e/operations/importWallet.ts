@@ -1,4 +1,5 @@
 import Application from '../application'
+import { sleep } from '../application/utils'
 
 export const importWallet = async (app: Application, mnemonic: string, password: string = 'Azusa2233') => {
   const { client } = app.spectron
@@ -7,7 +8,14 @@ export const importWallet = async (app: Application, mnemonic: string, password:
     const mnemonicTextarea = await app.element('<textarea />')
     expect(mnemonicTextarea.value).not.toBeNull()
     // Next
-    await client.elementIdValue(mnemonicTextarea.value.ELEMENT, mnemonic)
+    // await client.elementIdValue(mnemonicTextarea.value.ELEMENT, mnemonic)
+    for (let index = 0; index < Math.ceil(mnemonic.length / 6); index++) {
+      const text = mnemonic.slice(index * 6, Math.min(index * 6 + 6, mnemonic.length))
+      console.log(`text = ${text}]  ${index}  ${index * 6}`);
+      await client.elementIdValue(mnemonicTextarea.value.ELEMENT, text)
+      sleep(200)
+    }
+    app.waitUntilLoaded()
     const mnemonicNextButton = await app.getElementByTagName('button', 'Next')
     expect(mnemonicNextButton).not.toBeNull()
     await client.elementIdClick(mnemonicNextButton!.ELEMENT)

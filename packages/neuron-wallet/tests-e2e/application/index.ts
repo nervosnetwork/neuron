@@ -24,13 +24,15 @@ export default class Application {
       ], 
       path: electronPath,
       webdriverOptions: {
-        headless: true
+        // headless: true,
+        // logLevel: 'trace'
       }
     })
   }
 
   async waitUntilLoaded() {
-    await this.spectron.client.pause(400)
+    // await this.spectron.client.pause(400)
+    sleep(400)
     await this.spectron.client.waitUntilWindowLoaded()
   }
 
@@ -95,7 +97,7 @@ export default class Application {
         await func()
         console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
-        // this.errorOccurred = true
+        this.errorOccurred = true
         // console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
         console.log(`error: ${name} ${new Date().toTimeString()}\n${error}`);
         
