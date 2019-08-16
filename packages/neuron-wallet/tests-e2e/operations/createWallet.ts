@@ -1,5 +1,5 @@
 import Application from '../application'
-import { sleep } from '../application/utils'
+// import { sleep } from '../application/utils'
 
 export const createWallet = async (app: Application, password: string = 'Azusa2233') => {
   const { client } = app.spectron
@@ -40,16 +40,51 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   // 
 
   // Input mnemonic
+
+  const res = await client.selectorExecute('<textarea />', (elements: any, args) => {
+    const element = elements[0]
+    console.log(`element = ${element}`);
+    console.log(`args = ${args}`);
+
+    element.focus();
+    element.value = args;
+    // element.fireEvent("onchange");
+
+    // if ("createEvent" in document) {
+    //   var evt = document.createEvent("HTMLEvents");
+    //   evt.initEvent("input", false, true);
+    //   element.dispatchEvent(evt);
+    // }
+    // else {
+    //   element.fireEvent("onchange");
+    // }
+
+    // var evt = document.createEvent("HTMLEvents");
+    // evt.initEvent("input", false, true);
+    // element.dispatchEvent(event);
+
+
+    var ev = new Event('input', { bubbles: true}) as any;
+    ev.simulated = true;
+    element.value = args;
+    element.dispatchEvent(ev);
+
+
+    return `${element}  ${args}`
+  }, mnemonicText)
+  console.log(`res = ${res}`);
+
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   console.log(`will input mnemonic ${new Date().toTimeString()}`);
-  // await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, mnemonicText)
-  for (let index = 0; index < Math.ceil(mnemonicText.length / 6); index++) {
-    const text = mnemonicText.slice(index * 6, Math.min(index * 6 + 6, mnemonicText.length))
-    console.log(`input text = ${text}`);
-    await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, text)
-    sleep(200)
-  }
+  // await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, '')
+  // for (let index = 0; index < Math.ceil(mnemonicText.length / 6); index++) {
+  //   const text = mnemonicText.slice(index * 6, Math.min(index * 6 + 6, mnemonicText.length))
+  //   console.log(`input text = ${text}`);
+  //   await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, text)
+  //   sleep(200)
+  // }
+  
   console.log(`input mnemonic finish ${new Date().toTimeString()}`);
   app.waitUntilLoaded()
   // Next
