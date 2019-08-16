@@ -1,6 +1,6 @@
 import { Application as SpectronApplication} from 'spectron'
 import path from 'path'
-import { quitApp, getElementByTagName, editWallet, clickMenu } from './utils'
+import { clickMenu, editNetwork, editWallet, deleteNetwork, getElementByTagName, quitApp } from './utils';
 import { increaseRunningAppCount, decreaseRunningAppCount, exitServer } from './utils'
 
 export default class Application {
@@ -45,13 +45,12 @@ export default class Application {
     if (!this.spectron.isRunning()) {
       return
     }
-
     const runningAppCount = await decreaseRunningAppCount()
     if (runningAppCount > 0) {
-      console.log(`quit ${runningAppCount} app`);
+      console.log(`quit ${runningAppCount} app ${new Date().toTimeString()}`);
       quitApp(this.spectron.electron)
     } else {
-      console.log(`quit ${runningAppCount} spectron`);
+      console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
       await this.spectron.stop()
       await exitServer()
     }
@@ -69,5 +68,13 @@ export default class Application {
 
   clickMenu(labels: string[]) {
     return clickMenu(this.spectron.electron, labels)
+  }
+
+  editNetwork(networkId: string) {
+    return editNetwork(this.spectron.electron, networkId)
+  }
+
+  deleteNetwork(networkId: string) {
+    return deleteNetwork(this.spectron.electron, networkId)
   }
 }

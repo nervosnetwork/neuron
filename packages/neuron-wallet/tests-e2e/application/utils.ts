@@ -47,9 +47,17 @@ export const getMenuItem = (electron: AllElectron, labels: string[]) => {
 }
 
 export const editWallet = (electron: AllElectron, walletId: string) => {
-  return electron.ipcRenderer.send('E2E_WALLET_EDIT', [walletId])
+  return electron.ipcRenderer.send('E2E_EDIT_WALLET', [walletId])
 }
 
 export const quitApp = (electron: AllElectron) => {
   return electron.ipcRenderer.send('E2E_QUIT_APP')
+}
+
+export const editNetwork = (electron: AllElectron, networkId: string) => {
+  return electron.ipcRenderer.send('E2E_EDIT_NETWORK', [networkId])
+}
+
+export const deleteNetwork = (electron: AllElectron, networkId: string) => {
+  return electron.ipcRenderer.send('E2E_DELETE_NETWORK', [networkId])
 }

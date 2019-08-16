@@ -18,6 +18,7 @@ const server = http.createServer((req, res) => {
   }
   else if (req.url === '/exit') {
     process.exit(0)
+    res.end()
   }
   else {
     res.end()

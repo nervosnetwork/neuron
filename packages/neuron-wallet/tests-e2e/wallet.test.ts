@@ -1,6 +1,5 @@
 import Application from './application'
-import path from 'path'
-import fs from 'fs'
+import { createWallet, importWallet } from './operations'
 
 // Test create/import/switch/delete/edit wallet
 describe('wallet tests', () => {
@@ -24,52 +23,8 @@ describe('wallet tests', () => {
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
 
-    // Copy mnemonic
-    const mnemonicTextarea = await client.element('<textarea />')
-    const mnemonic = await client.elementIdText(mnemonicTextarea.value.ELEMENT)
-    const mnemonicText = mnemonic.value
-    // Next
-    const mnemonicNextButton = await app.getElementByTagName('button', 'Next')
-    expect(mnemonicNextButton).not.toBeNull()
-    await client.elementIdClick(mnemonicNextButton!.ELEMENT)
+    await createWallet(app)
     await app.waitUntilLoaded()
-
-    // Input mnemonic
-    const inputMnemonicTextarea = await client.element('<textarea />')
-    expect(inputMnemonicTextarea.value).not.toBeNull()
-    await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, mnemonicText)
-    // Next
-    const inputMnemonicNextButton = await app.getElementByTagName('button', 'Next')
-    expect(inputMnemonicNextButton).not.toBeNull()
-    await client.elementIdClick(inputMnemonicNextButton!.ELEMENT)
-
-    // Setup wallet
-    const inputElements = await client.elements('<input />')
-    expect(inputElements.value).not.toBeNull()
-    expect(inputElements.value.length).toBe(3)
-    const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-    await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
-    await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
-    // Next
-    const setupWalletNextButton = await app.getElementByTagName('button', 'Next')
-    expect(setupWalletNextButton).not.toBeNull()
-    await client.elementIdClick(setupWalletNextButton!.ELEMENT)
-    await app.waitUntilLoaded()
-
-    // Check wallet name
-    const walletNameElement = await client.element('//MAIN/DIV/H1')
-    if (walletNameElement.value === null) {
-      const mainElement = await client.element('//MAIN')
-      expect(mainElement.value).not.toBeNull()
-      const mainText = await client.elementIdText(mainElement.value.ELEMENT)
-      console.log(`mainText = ${mainText.value}`);
-      const imageBuffer = await app.spectron.browserWindow.capturePage()
-      fs.writeFileSync(path.join(__dirname, 'fail-create-wallet_check-wallet-name.png'), imageBuffer)
-    }
-    expect(walletNameElement.value).not.toBeNull()
-    const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
-    expect(walletName.value).toBe(walletNameInputText.value)
-    console.log(`walletName = ${walletName.value} ${new Date().toTimeString()}`);
   })
 
   it('import wallet', async () => {
@@ -93,35 +48,9 @@ describe('wallet tests', () => {
     expect(importWalletButton).not.toBeNull()
     await client.elementIdClick(importWalletButton!.ELEMENT)
 
-    // Input mnemonic
-    const mnemonicTextarea = await client.element('<textarea />')
-    expect(mnemonicTextarea.value).not.toBeNull()
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
-    // Next
-    await client.elementIdValue(mnemonicTextarea.value.ELEMENT, mnemonicText)
-    const mnemonicNextButton = await app.getElementByTagName('button', 'Next')
-    expect(mnemonicNextButton).not.toBeNull()
-    await client.elementIdClick(mnemonicNextButton!.ELEMENT)
-
-    // Setup wallet
-    const inputElements = await client.elements('<input />')
-    expect(inputElements.value).not.toBeNull()
-    expect(inputElements.value.length).toBe(3)
-    const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-    await client.elementIdValue(inputElements.value[1].ELEMENT, 'Azusa2233')
-    await client.elementIdValue(inputElements.value[2].ELEMENT, 'Azusa2233')
-    console.log(`walletNameInputText - ${walletNameInputText.value}`);
-    // Next
-    const setupWalletNextButton = await app.getElementByTagName('button', 'Next')
-    expect(setupWalletNextButton).not.toBeNull()
-    await client.elementIdClick(setupWalletNextButton!.ELEMENT)
-    await app.waitUntilLoaded()
-
-    // Check wallet name
-    const walletNameElement = await client.element('//MAIN/DIV/H1')
-    expect(walletNameElement.value).not.toBeNull()
-    const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
-    expect(walletName.value).toBe(walletNameInputText.value)
+    await importWallet(app, mnemonicText)
+    app.waitUntilLoaded()
   })
 
   it('switch to first wallet', async () => {
@@ -213,6 +142,7 @@ describe('wallet tests', () => {
     await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
     console.log(`walletNameInputText - ${walletNameInputText.value}`);
+    await app.waitUntilLoaded()
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
     expect(saveButton).not.toBeNull()
