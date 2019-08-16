@@ -33,6 +33,6 @@ server.listen(22333);
 // Make sure to exit the program in the event of an error
 const util = require('util');
 const setTimeoutPromise = util.promisify(setTimeout);
-setTimeoutPromise(1000 * 60 * 0.4).then(() => {
+setTimeoutPromise(1000 * 60 * 4).then(() => {
   process.exit(1)
 });
