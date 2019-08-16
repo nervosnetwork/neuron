@@ -31,7 +31,7 @@ describe('wallet tests', () => {
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    const networkElement = await client.element('//FOOTER/DIV[1]/DIV[2]')
+    const networkElement = await app.element('//FOOTER/DIV[1]/DIV[2]')
     expect(networkElement.value).not.toBeNull()
     await client.elementIdClick(networkElement.value.ELEMENT)
     await app.waitUntilLoaded()
@@ -67,14 +67,14 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Switch to first wallet
-    const firstWallet = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV')
+    const firstWallet = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV')
     expect(firstWallet).not.toBeNull()
     const firstWalletName = await client.elementIdText(firstWallet.value.ELEMENT)
     await client.elementIdClick(firstWallet.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const walletNameElement = await client.element('//MAIN/DIV/H1')
+    const walletNameElement = await app.element('//MAIN/DIV/H1')
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     expect(walletName.value).toBe(firstWalletName.value)
@@ -85,7 +85,7 @@ describe('wallet tests', () => {
     await client.waitUntilWindowLoaded()
 
     // Get current wallet name
-    const walletNameElement = await client.element('//MAIN/DIV/H1')
+    const walletNameElement = await app.element('//MAIN/DIV/H1')
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     
@@ -94,7 +94,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
     
     // Input password
-    const inputElement = await client.element('//INPUT')
+    const inputElement = await app.element('//INPUT')
     expect(inputElement.value).not.toBeNull()
     await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
     // Confirm
@@ -104,7 +104,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const newWalletNameElement = await client.element('//MAIN/DIV/H1')
+    const newWalletNameElement = await app.element('//MAIN/DIV/H1')
     expect(newWalletNameElement.value).not.toBeNull()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).not.toBe(walletName.value)
@@ -125,7 +125,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Get wallet id
-    const walletItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]/DIV/INPUT')
+    const walletItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]/DIV/INPUT')
     expect(walletItemElement.value).not.toBeNull()
     const walletItemElementId = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'id')
     const walletItemElementName = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'name')
@@ -136,7 +136,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Update wallet name
-    const walletNameInputElement = await client.element('<input />')
+    const walletNameInputElement = await app.element('<input />')
     expect(walletNameInputElement.value).not.toBeNull()
     await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
@@ -149,7 +149,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const newWalletNameElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]')
+    const newWalletNameElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]')
     expect(newWalletNameElement).not.toBeNull()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).toBe(walletNameInputText.value)

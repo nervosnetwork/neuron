@@ -4,7 +4,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   const { client } = app.spectron
   
   // Copy mnemonic
-  const mnemonicTextarea = await client.element('<textarea />')
+  const mnemonicTextarea = await app.element('<textarea />')
   const mnemonic = await client.elementIdText(mnemonicTextarea.value.ELEMENT)
   const mnemonicText = mnemonic.value
   // Next
@@ -14,7 +14,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   await app.waitUntilLoaded()
 
   // Input mnemonic
-  const inputMnemonicTextarea = await client.element('<textarea />')
+  const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, mnemonicText)
   // Next
@@ -23,7 +23,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   await client.elementIdClick(inputMnemonicNextButton!.ELEMENT)
 
   // Setup wallet
-  const inputElements = await client.elements('<input />')
+  const inputElements = await app.elements('<input />')
   expect(inputElements.value).not.toBeNull()
   expect(inputElements.value.length).toBe(3)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
@@ -36,9 +36,9 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   await app.waitUntilLoaded()
 
   // Check wallet name
-  const walletNameElement = await client.element('//MAIN/DIV/H1')
+  const walletNameElement = await app.element('//MAIN/DIV/H1')
   if (walletNameElement.value === null) {
-    const mainElement = await client.element('//MAIN')
+    const mainElement = await app.element('//MAIN')
     expect(mainElement.value).not.toBeNull()
     const mainText = await client.elementIdText(mainElement.value.ELEMENT)
     console.log(`mainText = ${mainText.value}`);

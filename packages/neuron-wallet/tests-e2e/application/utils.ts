@@ -21,9 +21,7 @@ export const decreaseRunningAppCount = () => {
   })
 }
 export const exitServer = () => {
-  return axios.get('/exit').then((res: AxiosResponse) => {
-    return parseInt(res.data)
-  })
+  return axios.get('/exit')
 }
 
 export const getElementByTagName = async (client: SpectronClient, tagName: string, textContent: string) => {
@@ -60,4 +58,11 @@ export const editNetwork = (electron: AllElectron, networkId: string) => {
 
 export const deleteNetwork = (electron: AllElectron, networkId: string) => {
   return electron.ipcRenderer.send('E2E_DELETE_NETWORK', [networkId])
+}
+
+export const sleep = (delay: number) => {
+  var start = (new Date()).getTime();
+  while ((new Date()).getTime() - start < delay) {
+    continue;
+  }
 }

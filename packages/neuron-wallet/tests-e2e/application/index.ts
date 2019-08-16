@@ -1,8 +1,10 @@
-import { Application as SpectronApplication} from 'spectron'
+import { Application as SpectronApplication } from 'spectron'
 import path from 'path'
-import { clickMenu, editNetwork, editWallet, deleteNetwork, getElementByTagName, quitApp } from './utils';
+import { clickMenu, editNetwork, editWallet, deleteNetwork, quitApp, sleep } from './utils';
 import { increaseRunningAppCount, decreaseRunningAppCount, exitServer } from './utils'
 import fs from 'fs'
+import { RawResult, Element } from 'webdriverio'
+import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const'
 
 export default class Application {
   spectron: SpectronApplication
@@ -53,16 +55,12 @@ export default class Application {
       quitApp(this.spectron.electron)
     } else {
       console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
+      exitServer()
       await this.spectron.stop()
-      await exitServer()
     }
   }
 
-  // utils
-
-  getElementByTagName(tagName: string, textContent: string) {
-    return getElementByTagName(this.spectron.client, tagName, textContent)
-  }
+  // ipc
 
   editWallet(walletId: string) {
     return editWallet(this.spectron.electron, walletId)
@@ -101,14 +99,90 @@ export default class Application {
           console.log(`mainText: [\n${mainText.value}\n]`);
         }
 
-        // save screenshot
-        const imageBuffer = await browserWindow.capturePage()
+        // create dir
         try {
-          fs.mkdirSync(path.join(__dirname, '../errors'))
+          await fs.mkdirSync(path.join(__dirname, '../errors'))
         } catch {
         }
-        fs.writeFileSync(path.join(__dirname, '../errors', `${name.replace(/ /g, '_')}-${new Date().getTime()}.png`), imageBuffer)
+        const errorFileName = `${name.replace(/ /g, '_')}-${new Date().getTime()}`
+        // save error log
+        await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.txt`), error.stack)
+
+        // save screenshot
+        const imageBuffer = await browserWindow.capturePage()
+        await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.png`), imageBuffer)
       }
-    })
+    }, 1000 * 60 * 6)
+  }
+
+  // Element
+
+  async element(selector: string, retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT): Promise<RawResult<Element>> {
+    const { client } = this.spectron
+    let result: RawResult<Element> | undefined
+    let error: Error | undefined
+    try {
+      result = await client.element(selector)
+    } catch (_error) {
+      error = _error
+    }
+    
+    if ((error || (result && !result.value)) && retryCount > 0) {
+      console.log(`${selector} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
+      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
+      return this.element(selector, retryCount - 1)
+    } else {
+      return new Promise((resolve, reject) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(result)
+        }
+      })
+    }
+  }
+
+  async elements(selector: string, retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT): Promise<RawResult<Element[]>> {
+    const { client } = this.spectron
+    let result: RawResult<Element[]> | undefined
+    let error: Error | undefined
+    try {
+      result = await client.elements(selector)
+    } catch (_error) {
+      error = _error
+    }
+    
+    if ((error || (result && !result.value)) && retryCount > 0) {
+      console.log(`${selector} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
+      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
+      return this.elements(selector, retryCount - 1)
+    } else {
+      return new Promise((resolve, reject) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(result)
+        }
+      })
+    }
+  }
+
+  async getElementByTagName(tagName: string, textContent: string, retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT): Promise<Element | null> {
+    const { client } = this.spectron
+    const elements = await this.elements(`<${tagName} />`)        
+    for (let index = 0; index < elements.value.length; index++) {
+      const element = elements.value[index];
+      const text = await client.elementIdText(element.ELEMENT)
+      if (text.value === textContent) {
+        return element
+      }
+    }
+    if (retryCount > 0) {
+      console.log(`${tagName}-${textContent} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
+      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
+      return this.getElementByTagName(tagName, textContent, retryCount - 1)
+    } else {
+      return null
+    }
   }
 }

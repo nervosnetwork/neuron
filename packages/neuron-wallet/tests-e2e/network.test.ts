@@ -41,13 +41,13 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
     
     // Click Add-Network
-    const addNetworkButton = await client.element('//MAIN/DIV/DIV[3]/DIV[2]/BUTTON')
+    const addNetworkButton = await app.element('//MAIN/DIV/DIV[3]/DIV[2]/BUTTON')
     expect(addNetworkButton.value).not.toBeNull()
     await client.elementIdClick(addNetworkButton.value.ELEMENT)
     await app.waitUntilLoaded()
     
     // Setup Network
-    const inputElements = await client.elements('<input />')
+    const inputElements = await app.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
     await client.elementIdValue(inputElements.value[0].ELEMENT, newNodeRpcUrl)
@@ -60,7 +60,7 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
 
     // Check network name
-    const newNetworkItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV')
+    const newNetworkItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV')
     expect(newNetworkItemElement).not.toBeNull()
     const netowrkItemTitle = await client.elementIdAttribute(newNetworkItemElement.value.ELEMENT, 'title')
     expect(netowrkItemTitle.value).toBe(`${newNodeName}: ${newNodeRpcUrl}`)
@@ -71,7 +71,7 @@ describe('network tests', () => {
     const { client } = app.spectron
 
     // Get network id
-    const networkItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/INPUT')
+    const networkItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/INPUT')
     expect(networkItemElement.value).not.toBeNull()
     const networkItemElementId = await client.elementIdAttribute(networkItemElement.value.ELEMENT, 'id')
     const networkItemElementName = await client.elementIdAttribute(networkItemElement.value.ELEMENT, 'name')
@@ -83,7 +83,7 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
 
     // Setup Network
-    const inputElements = await client.elements('<input />')
+    const inputElements = await app.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
     await client.elementIdValue(inputElements.value[0].ELEMENT, '22')
@@ -98,7 +98,7 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
 
     // Check network name
-    const newNetworkItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV')
+    const newNetworkItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV')
     expect(newNetworkItemElement).not.toBeNull()
     const netowrkItemTitle = await client.elementIdAttribute(newNetworkItemElement.value.ELEMENT, 'title')
     expect(netowrkItemTitle.value).toBe(`${networkNameInputText.value}: ${networkRpcUrlInputText.value}`)
@@ -109,25 +109,25 @@ describe('network tests', () => {
     const { client } = app.spectron
 
     // Get target network name
-    const targetNetworkNameElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV/SPAN')
+    const targetNetworkNameElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV/SPAN')
     expect(targetNetworkNameElement).not.toBeNull()
     const targetNetowrkName = await client.elementIdText(targetNetworkNameElement.value.ELEMENT)
     console.log(`targetNetowrkName = ${targetNetowrkName.value}`);
 
     // switch network
-    const targetNetworkElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]')
+    const targetNetworkElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]')
     expect(targetNetworkElement.value).not.toBeNull()
     await client.elementIdClick(targetNetworkElement.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // back
-    const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
+    const backButton = await app.element('//MAIN/DIV/DIV/DIV/BUTTON')
     expect(backButton.value).not.toBeNull()
     await client.elementIdClick(backButton.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check network name
-    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
+    const networkElement = await app.element('//FOOTER/DIV/DIV[2]')
     expect(networkElement).not.toBeNull()
     const networkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(networkName.value).toBe(targetNetowrkName.value)
@@ -148,13 +148,13 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
 
     // Get network name
-    const networkNameElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV/SPAN')
+    const networkNameElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV/SPAN')
     expect(networkNameElement).not.toBeNull()
     const netowrkName = await client.elementIdText(networkNameElement.value.ELEMENT)
     console.log(`netowrkName = ${netowrkName.value}`);
 
     // Get network id
-    const networkItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/INPUT')
+    const networkItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/INPUT')
     expect(networkItemElement.value).not.toBeNull()
     const networkItemElementId = await client.elementIdAttribute(networkItemElement.value.ELEMENT, 'id')
     const networkItemElementName = await client.elementIdAttribute(networkItemElement.value.ELEMENT, 'name')
@@ -166,13 +166,13 @@ describe('network tests', () => {
     app.waitUntilLoaded()
 
     // Back
-    const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
+    const backButton = await app.element('//MAIN/DIV/DIV/DIV/BUTTON')
     expect(backButton.value).not.toBeNull()
     await client.elementIdClick(backButton.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check network name
-    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
+    const networkElement = await app.element('//FOOTER/DIV/DIV[2]')
     expect(networkElement).not.toBeNull()
     const newNetworkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(newNetworkName.value).not.toBe(netowrkName.value)
