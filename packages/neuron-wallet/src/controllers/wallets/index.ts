@@ -186,6 +186,10 @@ export default class WalletsController {
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore: keystoreObject,
     })
+
+    await walletsService.generateAddressesById(wallet.id)
+    WalletCreatedSubject.getSubject().next('import')
+
     return {
       status: ResponseCode.Success,
       result: wallet,
