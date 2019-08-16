@@ -20,6 +20,8 @@ export default {
         backup: 'Backup Current Wallet',
         delete: 'Delete Current Wallet',
         'change-password': 'Change Password',
+        'import-mnemonic': 'Import Mnemonic Seed',
+        'import-keystore': 'Import from Keystore',
       },
       edit: {
         label: 'Edit',
@@ -40,7 +42,8 @@ export default {
       },
       help: {
         label: 'Help',
-        sourceCode: 'Source Code',
+        'source-code': 'Source Code',
+        'report-issue': 'Report Issue',
         settings: 'Settings',
       },
       develop: {
@@ -90,6 +93,8 @@ export default {
       'capacity-not-enough': 'Capacity is not enough',
       'capacity-too-small': 'Capacity less than min',
       'should-be-type-of': '{{field}} should be type of {{type}}',
+      'invalid-keystore': 'Keystore is invalid',
+      'invalid-json': 'Invalid JSON file',
     },
     contextMenu: {
       select: 'Select',
@@ -137,7 +142,7 @@ export default {
     },
     updater: {
       'update-not-available': 'There are currently no updates available.',
-      'updates-found-do-you-want-to-update': 'An update is available, do you want to update now?',
+      'updates-found-do-you-want-to-update': 'An update ({{version}}) is available, do you want to update now?',
       'update-now': 'Update now',
       'updates-downloaded-about-to-quit-and-install': 'Update downloaded. Neuron will quit and install the update...',
     },

@@ -158,20 +158,24 @@ const Addresses = ({
       semanticColors,
     ]
   )
-
-  return (
-    <ShimmeredDetailsList
-      enableShimmer={isLoading}
-      checkboxVisibility={CheckboxVisibility.hidden}
-      columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
-      items={addresses}
-      onItemContextMenu={item => {
-        contextMenu({ type: 'addressList', id: item.identifier })
-      }}
-      className="listWithDesc"
-      onRenderRow={onRenderRow}
-    />
+  const List = useMemo(
+    () => (
+      <ShimmeredDetailsList
+        enableShimmer={isLoading}
+        checkboxVisibility={CheckboxVisibility.hidden}
+        columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
+        items={addresses}
+        onItemContextMenu={item => {
+          contextMenu({ type: 'addressList', id: item.identifier })
+        }}
+        className="listWithDesc"
+        onRenderRow={onRenderRow}
+      />
+    ),
+    [isLoading, addressColumns, addresses, t]
   )
+
+  return List
 }
 
 Addresses.displayName = 'Addresses'

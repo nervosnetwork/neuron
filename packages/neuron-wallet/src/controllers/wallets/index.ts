@@ -15,6 +15,7 @@ import {
   ServiceHasNoResponse,
   EmptyPassword,
   IncorrectPassword,
+  InvalidJSON,
 } from 'exceptions'
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
@@ -151,16 +152,21 @@ export default class WalletsController {
   public static async importKeystore({
     name,
     password,
-    keystore,
+    keystorePath,
   }: {
     name: string
     password: string
-    keystore: string
+    keystorePath: string
   }): Promise<Controller.Response<Wallet>> {
     if (password === undefined) {
       throw new IsRequired('Password')
     }
-
+    const keystore = fs.readFileSync(keystorePath, 'utf8')
+    try {
+      JSON.parse(keystore)
+    } catch {
+      throw new InvalidJSON()
+    }
     const keystoreObject = Keystore.fromJson(keystore)
     const masterPrivateKey = keystoreObject.extendedPrivateKey(password)
     const masterKeychain = new Keychain(
@@ -180,6 +186,10 @@ export default class WalletsController {
       extendedKey: accountExtendedPublicKey.serialize(),
       keystore: keystoreObject,
     })
+
+    await walletsService.generateAddressesById(wallet.id)
+    WalletCreatedSubject.getSubject().next('import')
+
     return {
       status: ResponseCode.Success,
       result: wallet,

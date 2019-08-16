@@ -15,6 +15,7 @@ import {
   FormPreviousLink as LeaveIcon,
   FormUp as ExpandIcon,
   FormUpload as ImportIcon,
+  License as KeystoreIcon,
   LinkBottom as LinkBottomIcon,
   LinkDown as LinkDownIcon,
   LinkTop as LinkTopIcon,
@@ -81,6 +82,7 @@ registerIcons({
     TransactionSuccess: <SuccessIcon size="14px" color="green" />,
     TransactionFailure: <FailIcon size="14px" color="#d50000" />,
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
+    Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
   },
 })
 

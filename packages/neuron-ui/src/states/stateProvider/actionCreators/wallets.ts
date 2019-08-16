@@ -2,6 +2,7 @@ import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
   importMnemonic,
+  importKeystore,
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
@@ -13,6 +14,7 @@ import {
   showErrorMessage,
 } from 'services/remote'
 import initStates from 'states/initStates'
+import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
@@ -20,10 +22,13 @@ import addressesToBalance from 'utils/addressesToBalance'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
-export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
+export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any) => {
   getCurrentWallet().then(res => {
     if (res.status) {
       const payload = res.result || initStates.wallet
+      if (!payload || !payload.id) {
+        history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+      }
       dispatch({
         type: NeuronWalletActions.UpdateCurrentWallet,
         payload,
@@ -43,7 +48,7 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
     if (res.status) {
       history.push(Routes.Overview)
     } else {
-      showErrorMessage(i18n.t('error'), i18n.t(res.message.title))
+      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
     }
   })
 }
@@ -56,14 +61,31 @@ export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams
     if (res.status) {
       history.push(Routes.Overview)
     } else {
-      showErrorMessage(i18n.t('error'), i18n.t(res.message.title))
+      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
     }
   })
 }
-export const updateWalletList = () => (dispatch: StateDispatch) => {
+
+export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
+  _dispatch: StateDispatch,
+  history: any
+) => {
+  importKeystore(params).then(res => {
+    if (res.status) {
+      history.push(Routes.Overview)
+    } else {
+      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
+    }
+  })
+}
+
+export const updateWalletList = () => (dispatch: StateDispatch, history: any) => {
   getWalletList().then(res => {
     if (res.status) {
       const payload = res.result || []
+      if (!payload.length) {
+        history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+      }
       dispatch({
         type: NeuronWalletActions.UpdateWalletList,
         payload,

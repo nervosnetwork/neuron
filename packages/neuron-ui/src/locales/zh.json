@@ -42,6 +42,8 @@
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
       "create-or-import-your-first-wallet": "创建或导入您的第一个钱包",
       "create-new-wallet": "创建新钱包",
+      "import-mnemonic": "导入助记词",
+      "import-keystore": "导入 Keystore 文件",
       "import-wallet": "导入钱包",
       "next": "下一步",
       "back": "上一步",
@@ -58,6 +60,22 @@
       "new-name": "输入新的钱包名称",
       "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中三类字符组成的字符串, 且必须以字母或者数字开头",
       "same-password": "两次输入密码应一致"
+    },
+    "import-keystore": {
+      "label": {
+        "path": "Keystore 文件",
+        "name": "钱包名称",
+        "password": "密码"
+      },
+      "placeholder": {
+        "path": "选择 Keystore 文件",
+        "name": "新钱包名称",
+        "password": "输入密码以验证 Keystore"
+      },
+      "button": {
+        "back": "返回",
+        "submit": "提交"
+      }
     },
     "detail": {
       "more-transactions": "更多交易记录"
@@ -252,7 +270,9 @@
       "lock-arg-copied": "Lock Arg 已复制到剪贴板",
       "transaction-not-found": "未找到交易",
       "network-address-should-have-protocol": "RPC 地址应以 http(s)//: 开始",
-      "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格"
+      "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格",
+      "is-required": "{{field}}是必须的",
+      "is-used": "{{field}}已使用"
     },
     "sync": {
       "syncing": "同步中",

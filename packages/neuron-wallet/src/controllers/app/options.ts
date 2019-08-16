@@ -16,11 +16,10 @@ export enum MenuCommand {
 }
 
 export enum URL {
-  Website = 'https://www.nervos.org/',
-  Repository = 'https://github.com/nervosnetwork/neuron',
   Preference = '/settings/general',
   CreateWallet = '/wizard/mnemonic/create',
-  ImportWallet = '/wizard/mnemonic/import',
+  ImportMnemonic = '/wizard/mnemonic/import',
+  ImportKeystore = '/keystore/import',
 }
 
 const networksService = NetworksService.getInstance()
