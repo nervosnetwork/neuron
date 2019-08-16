@@ -95,7 +95,7 @@ export default class Application {
         await func()
         console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
-        this.errorOccurred = true
+        // this.errorOccurred = true
         // console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
         console.log(`error: ${name} ${new Date().toTimeString()}\n${error}`);
         
@@ -124,7 +124,7 @@ export default class Application {
 
         throw error
       }
-    }, 1000 * 60 * 4)
+    }, 1000 * 60 * 1)
   }
 
   // Element

@@ -20,6 +20,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, mnemonicText)
+  console.log(`input mnemonic finish ${new Date().toTimeString()}`);
   // Next
   const inputMnemonicNextButton = await app.getElementByTagName('button', 'Next')
   expect(inputMnemonicNextButton).not.toBeNull()
