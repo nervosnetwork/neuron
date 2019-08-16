@@ -93,7 +93,8 @@ export default class Application {
         console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
         this.errorOccurred = true
-        console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
+        // console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
+        console.log(`error: ${name} ${new Date().toTimeString()}\n${error}`);
         
         // print main text
         const { client, browserWindow } = this.spectron
@@ -117,6 +118,8 @@ export default class Application {
         await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.png`), imageBuffer)
 
         console.log(`did save error log ${new Date().toTimeString()}\n${error}\n${error.stack}`);
+
+        throw error
       }
     }, 1000 * 60 * 4)
   }

@@ -36,17 +36,21 @@ describe('wallet tests', () => {
     expect(networkElement.value).not.toBeNull()
     await client.elementIdClick(networkElement.value.ELEMENT)
     await app.waitUntilLoaded()
+    console.log(`Go to setting page ${new Date().toLocaleTimeString()}`);
+    
 
     // Switch to wallet setting
     const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
     expect(walletSettingButton).not.toBeNull()
     await client.elementIdClick(walletSettingButton!.ELEMENT)
     await app.waitUntilLoaded()
+    console.log(`Switch to wallet setting ${new Date().toLocaleTimeString()}`);
 
     // Go to import wallet page
     const importWalletButton = await app.getElementByTagName('button', 'Import Mnemonic Seed')
     expect(importWalletButton).not.toBeNull()
     await client.elementIdClick(importWalletButton!.ELEMENT)
+    console.log(`Go to import wallet page ${new Date().toLocaleTimeString()}`);
 
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     await importWallet(app, mnemonicText)

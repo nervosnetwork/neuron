@@ -14,7 +14,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   expect(mnemonicNextButton).not.toBeNull()
   await client.elementIdClick(mnemonicNextButton!.ELEMENT)
   await app.waitUntilLoaded()
-  console.log(`clicked mnemonic next ${new Date().toTimeString()}`);
+  console.log(`copy mnemonic finish ${new Date().toTimeString()}`);
 
   // Input mnemonic
   const inputMnemonicTextarea = await app.element('<textarea />')
@@ -24,6 +24,8 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   const inputMnemonicNextButton = await app.getElementByTagName('button', 'Next')
   expect(inputMnemonicNextButton).not.toBeNull()
   await client.elementIdClick(inputMnemonicNextButton!.ELEMENT)
+  console.log(`input mnemonic finish ${new Date().toTimeString()}`);
+  
 
   // Setup wallet
   const inputElements = await app.elements('<input />')
@@ -37,6 +39,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   expect(setupWalletNextButton).not.toBeNull()
   await client.elementIdClick(setupWalletNextButton!.ELEMENT)
   await app.waitUntilLoaded()
+  console.log(`setup wallet finish ${new Date().toTimeString()}`);
 
   // Check wallet name
   const walletNameElement = await app.element('//MAIN/DIV/H1')
@@ -49,5 +52,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   expect(walletNameElement.value).not.toBeNull()
   const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
   expect(walletName.value).toBe(walletNameInputText.value)
+  console.log(`new wallet name ${walletName.value} ${new Date().toTimeString()}`);
+  
   return walletName.value
 }
