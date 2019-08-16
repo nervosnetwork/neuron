@@ -2,10 +2,9 @@ import Application from './application'
 import { importWallet } from './operations'
 
 describe('transaction tests', () => {
-  let app: Application
+  let app = new Application()
 
   beforeAll(() => {
-    app = new Application()
     return app.start()
   })
 
@@ -13,7 +12,7 @@ describe('transaction tests', () => {
     return app.stop()
   })
 
-  it('import wallet', async () => {
+  app.test('import wallet', async () => {
     const { client } = app.spectron
     await app.waitUntilLoaded()
 

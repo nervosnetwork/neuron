@@ -2,10 +2,9 @@ import Application from './application'
 import { createWallet } from './operations'
 
 describe('network tests', () => {
-  let app: Application
+  let app = new Application()
 
   beforeAll(() => {
-    app = new Application()
     return app.start()
   })
 
@@ -13,7 +12,7 @@ describe('network tests', () => {
     return app.stop()
   })
 
-  it('create wallet', async () => {
+  app.test('create wallet', async () => {
     const { client } = app.spectron
     await app.waitUntilLoaded()
 
@@ -26,7 +25,7 @@ describe('network tests', () => {
     await app.waitUntilLoaded()
   })
 
-  it('add network', async () => {
+  app.test('add network', async () => {
     const { client } = app.spectron
     const newNodeName = 'Node-2233'
     const newNodeRpcUrl = 'http://localhost:8114'
@@ -68,7 +67,7 @@ describe('network tests', () => {
     console.log(`netowrkItemTitle - ${netowrkItemTitle.value}`);
   })
 
-  it('edit network', async () => {
+  app.test('edit network', async () => {
     const { client } = app.spectron
 
     // Get network id
@@ -106,7 +105,7 @@ describe('network tests', () => {
     console.log(`netowrkItemTitle - ${netowrkItemTitle.value}`);
   })
 
-  it('switch network', async () => {
+  app.test('switch network', async () => {
     const { client } = app.spectron
 
     // Get target network name
@@ -135,7 +134,7 @@ describe('network tests', () => {
     console.log(`networkName = ${networkName.value}`);
   })
 
-  it('delete network', async () => {
+  app.test('delete network', async () => {
     const { client } = app.spectron
 
     // Go to setting page

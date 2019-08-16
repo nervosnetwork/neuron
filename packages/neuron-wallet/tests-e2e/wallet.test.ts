@@ -3,10 +3,9 @@ import { createWallet, importWallet } from './operations'
 
 // Test create/import/switch/delete/edit wallet
 describe('wallet tests', () => {
-  let app: Application
+  let app = new Application()
 
   beforeAll(() => {
-    app = new Application()
     return app.start()
   })
 
@@ -14,7 +13,7 @@ describe('wallet tests', () => {
     return app.stop()
   })
 
-  it('create wallet', async () => {
+  app.test('create wallet', async () => {
     const { client } = app.spectron
     await app.waitUntilLoaded()
 
@@ -27,7 +26,7 @@ describe('wallet tests', () => {
     await app.waitUntilLoaded()
   })
 
-  it('import wallet', async () => {
+  app.test('import wallet', async () => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
@@ -53,7 +52,7 @@ describe('wallet tests', () => {
     app.waitUntilLoaded()
   })
 
-  it('switch to first wallet', async () => {
+  app.test('switch to first wallet', async () => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
@@ -81,7 +80,7 @@ describe('wallet tests', () => {
     expect(walletName.value).toBe(firstWalletName.value)
   })
 
-  it('delete wallet from menu', async () => {
+  app.test('delete wallet from menu', async () => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
@@ -111,7 +110,7 @@ describe('wallet tests', () => {
     expect(newWalletName.value).not.toBe(walletName.value)
   })
 
-  it('edit wallet', async () => {
+  app.test('edit wallet', async () => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 

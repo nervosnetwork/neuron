@@ -2,9 +2,11 @@ import { Application as SpectronApplication} from 'spectron'
 import path from 'path'
 import { clickMenu, editNetwork, editWallet, deleteNetwork, getElementByTagName, quitApp } from './utils';
 import { increaseRunningAppCount, decreaseRunningAppCount, exitServer } from './utils'
+import fs from 'fs'
 
 export default class Application {
   spectron: SpectronApplication
+  errorOccurred: boolean = false
 
   constructor() {
     let electronPath = path.join(__dirname, '../..', 'node_modules', '.bin', 'electron')
@@ -76,5 +78,37 @@ export default class Application {
 
   deleteNetwork(networkId: string) {
     return deleteNetwork(this.spectron.electron, networkId)
+  }
+
+  test(name: string, func: () => void) {
+    it(name, async () => {
+      if (this.errorOccurred) {
+        console.log(`skip - ${name}`);
+        return
+      }
+
+      try {
+        await func()
+      } catch (error) {
+        this.errorOccurred = true
+        console.log(`error:\n${error.stack}`);
+        
+        // print main text
+        const { client, browserWindow } = this.spectron
+        const mainElement = await client.element('//MAIN')
+        if (mainElement.value) {
+          const mainText = await client.elementIdText(mainElement.value.ELEMENT)
+          console.log(`mainText: [\n${mainText.value}\n]`);
+        }
+
+        // save screenshot
+        const imageBuffer = await browserWindow.capturePage()
+        try {
+          fs.mkdirSync(path.join(__dirname, '../errors'))
+        } catch {
+        }
+        fs.writeFileSync(path.join(__dirname, '../errors', `${name.replace(/ /g, '_')}-${new Date().getTime()}.png`), imageBuffer)
+      }
+    })
   }
 }
