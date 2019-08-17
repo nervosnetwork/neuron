@@ -13,6 +13,7 @@ import jsQR from 'jsqr'
 
 import { showErrorMessage } from 'services/remote'
 import { drawPolygon } from 'utils/canvasActions'
+import { verifyAddress } from 'utils/validators'
 
 interface QRScannerProps {
   title: string
@@ -37,6 +38,21 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
   const [t] = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const video = useMemo(() => document.createElement('video'), [])
+
+  const onOpen = useCallback(() => {
+    setData('')
+    setOpen(true)
+  }, [setOpen])
+
+  const onDismiss = useCallback(() => {
+    setOpen(false)
+  }, [setOpen])
+
+  const onSubmit = useCallback(() => {
+    onConfirm(data)
+    onDismiss()
+  }, [data, onConfirm, onDismiss])
+
   const scan = useCallback(() => {
     navigator.mediaDevices
       .getUserMedia({
@@ -70,7 +86,12 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
                 drawPolygon(canvas, [topLeftCorner, topRightCorner, bottomRightCorner, bottomLeftCorner], {
                   color,
                 })
-                setData(code.data)
+                if (verifyAddress(code.data)) {
+                  onConfirm(code.data)
+                  onDismiss()
+                } else {
+                  setData(code.data)
+                }
               }
             }
           }
@@ -82,7 +103,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         showErrorMessage(t('messages.camera-not-available-or-disabled'), err.message)
         setOpen(false)
       })
-  }, [video, t])
+  }, [video, t, onConfirm, onDismiss])
 
   useEffect(() => {
     if (open) {
@@ -104,10 +125,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
             outline: 'none',
           }
         }
-        onClick={() => {
-          setOpen(true)
-        }}
-        onKeyPress={() => {}}
+        onClick={onOpen}
         type="button"
       >
         <IconButton
@@ -118,14 +136,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
           }}
         />
       </button>
-      <Dialog
-        hidden={!open}
-        onDismiss={() => {
-          setOpen(false)
-        }}
-        maxWidth="900px"
-        minWidth="500xp"
-      >
+      <Dialog hidden={!open} onDismiss={onDismiss} maxWidth="900px" minWidth="500xp">
         <h1>{title}</h1>
         <div>
           <canvas ref={canvasRef} />
@@ -133,15 +144,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         <DialogFooter>
           <TextField readOnly value={data} label={label} underlined />
           <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-            <DefaultButton onClick={() => setOpen(false)}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton
-              onClick={() => {
-                onConfirm(data)
-                setOpen(false)
-              }}
-            >
-              {t('common.confirm')}
-            </PrimaryButton>
+            <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
+            <PrimaryButton onClick={onSubmit}>{t('common.confirm')}</PrimaryButton>
           </Stack>
         </DialogFooter>
       </Dialog>
