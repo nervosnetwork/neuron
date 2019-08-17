@@ -3,7 +3,7 @@ import Application from '../application'
 export const currentWalletAddress = async (app: Application) => {
   const { client } = app.spectron
 
-  // Switch to wallet setting
+  // Switch to receive page
   const receiveButton = await app.getElementByTagName('button', 'Receive')
   expect(receiveButton).not.toBeNull()
   await client.elementIdClick(receiveButton!.ELEMENT)

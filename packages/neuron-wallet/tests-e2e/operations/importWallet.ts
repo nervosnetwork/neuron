@@ -38,5 +38,5 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   expect(walletName.value).toBe(walletNameInputText.value)
   console.log(`walletName - ${walletName.value}  ${new Date().toTimeString()}`);
 
-  return walletName
+  return walletName.value
 }
