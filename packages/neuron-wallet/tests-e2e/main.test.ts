@@ -1,7 +1,7 @@
 import Application from './application'
 import tests from './tests'
 
-describe('wallet tests', () => {
+describe('neuron wallet tests', () => {
   let app = new Application()
 
   beforeAll(() => {

@@ -28,8 +28,6 @@ export default (app: Application) => {
     const inputElements = await app.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
-    // await client.elementIdValue(inputElements.value[0].ELEMENT, newNodeRpcUrl)
-    // await client.elementIdValue(inputElements.value[1].ELEMENT, newNodeName)
     await app.setElementValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newNodeRpcUrl)
     await app.setElementValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newNodeName)
     await app.waitUntilLoaded()
