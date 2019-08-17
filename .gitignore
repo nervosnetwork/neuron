@@ -8,6 +8,7 @@ node_modules
 # testing
 /coverage
 *.snap
+/packages/neuron-wallet/tests-e2e/errors
 
 # production
 build
