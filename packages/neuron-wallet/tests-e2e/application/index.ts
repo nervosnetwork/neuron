@@ -1,10 +1,20 @@
-import { Application as SpectronApplication } from 'spectron'
-import path from 'path'
-import { clickMenu, editNetwork, editWallet, deleteNetwork, quitApp, sleep } from './utils';
-import { increaseRunningAppCount, decreaseRunningAppCount, exitServer, fetchRunningAppCount } from './utils'
-import fs from 'fs'
-import { RawResult, Element } from 'webdriverio'
-import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const'
+import fs from 'fs';
+import path from 'path';
+import { Application as SpectronApplication } from 'spectron';
+import { Element, RawResult } from 'webdriverio';
+import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const';
+import { 
+  clickMenu, 
+  decreaseRunningAppCount, 
+  deleteNetwork, 
+  editNetwork, 
+  editWallet, 
+  exitServer, 
+  fetchRunningAppCount, 
+  increaseRunningAppCount, 
+  quitApp, 
+  sleep 
+} from './utils';
 
 export default class Application {
   spectron: SpectronApplication
@@ -23,15 +33,10 @@ export default class Application {
         '--lang=en'
       ], 
       path: electronPath,
-      webdriverOptions: {
-        // headless: true,
-        // logLevel: 'trace'
-      }
     })
   }
 
   async waitUntilLoaded() {
-    // await this.spectron.client.pause(400)
     sleep(400)
     await this.spectron.client.waitUntilWindowLoaded()
   }
@@ -48,7 +53,7 @@ export default class Application {
 
   // Start multiple test applications at the same time, calling `spectron.stop()` will stop `ChromeDriver` when the first application finishes executing.
   // Other test applications will get an error `Error: connect ECONNREFUSED 127.0.0.1:9515`.
-  // So need to close `spectron` after the last test.
+  // So need to exit `ChromeDriver` after all tests are over.
   // Similar issue: https://github.com/electron-userland/spectron/issues/356
   async stop() {
     if (!this.spectron.isRunning()) {
@@ -63,33 +68,11 @@ export default class Application {
       runningAppCount = await fetchRunningAppCount()
     }
 
-    if (runningAppCount > 0) {
-      console.log(`quit ${runningAppCount} app ${new Date().toTimeString()}`);
-      quitApp(this.spectron.electron)
-    } else {
-      console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
-      await exitServer()
-      await this.spectron.stop()
-    }
+    console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
+    await exitServer()
+    await this.spectron.stop()
+
     console.log(`did stop ${new Date().toTimeString()}`);
-  }
-
-  // ipc
-
-  editWallet(walletId: string) {
-    return editWallet(this.spectron.electron, walletId)
-  }
-
-  clickMenu(labels: string[]) {
-    return clickMenu(this.spectron.electron, labels)
-  }
-
-  editNetwork(networkId: string) {
-    return editNetwork(this.spectron.electron, networkId)
-  }
-
-  deleteNetwork(networkId: string) {
-    return deleteNetwork(this.spectron.electron, networkId)
   }
 
   test(name: string, func: () => void) {
@@ -105,7 +88,6 @@ export default class Application {
         console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
         this.errorOccurred = true
-        // console.log(`error: ${new Date().toTimeString()}\n${error}\n${error.stack}`);
         console.log(`error: ${name} ${new Date().toTimeString()}\n${error}`);
         
         // print main text
@@ -134,6 +116,24 @@ export default class Application {
         throw error
       }
     }, 1000 * 60 * 1)
+  }
+
+  // ipc
+
+  editWallet(walletId: string) {
+    return editWallet(this.spectron.electron, walletId)
+  }
+
+  clickMenu(labels: string[]) {
+    return clickMenu(this.spectron.electron, labels)
+  }
+
+  editNetwork(networkId: string) {
+    return editNetwork(this.spectron.electron, networkId)
+  }
+
+  deleteNetwork(networkId: string) {
+    return deleteNetwork(this.spectron.electron, networkId)
   }
 
   // Element
@@ -217,6 +217,6 @@ export default class Application {
       element.dispatchEvent(event);
       return `${element} ${args}`
     }, text)
-    console.log(`setValue = ${result}`);
+    console.log(`setValue - ${selector} = ${result}`);
   }
 }

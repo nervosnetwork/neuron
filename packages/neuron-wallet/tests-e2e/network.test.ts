@@ -1,6 +1,7 @@
 import Application from './application'
 import { createWallet } from './operations'
 
+// Test add/edit/switch/delete/ network
 describe('network tests', () => {
   let app = new Application()
 

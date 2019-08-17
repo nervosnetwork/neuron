@@ -1,6 +1,7 @@
 import Application from './application'
 import { importWallet } from './operations'
 
+// TODO: Transaction tests
 describe('transaction tests', () => {
   let app = new Application()
 
