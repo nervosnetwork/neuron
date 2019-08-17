@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { SaveDialogReturnValue } from 'electron'
 import AppController from 'controllers/app'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import Keystore from 'models/keys/keystore'
@@ -270,9 +271,9 @@ export default class WalletsController {
           title: i18n.t('messages.save-keystore'),
           defaultPath: wallet.name,
         },
-        (filename?: string) => {
-          if (filename) {
-            fs.writeFileSync(filename, JSON.stringify(keystore))
+        (returnValue: SaveDialogReturnValue) => {
+          if (returnValue.filePath) {
+            fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
             resolve({
               status: ResponseCode.Success,
               result: true,
