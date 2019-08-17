@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { Stack, DefaultButton, PrimaryButton, TextField } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +6,7 @@ import { showOpenDialog } from 'services/remote'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
+import generateWalletName from 'utils/generateWalletName'
 
 const defaultFields = {
   path: '',
@@ -23,6 +24,16 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   const [fields, setFields] = useState(defaultFields)
   const goBack = useGoBack(history)
 
+  useEffect(() => {
+    if (fields.name === '') {
+      const name = generateWalletName(wallets, wallets.length + 1, t)
+      setFields({
+        ...fields,
+        name,
+      })
+    }
+  }, [wallets, fields, setFields, t])
+
   const exsitingNames = useMemo(() => {
     return wallets.map(w => w.name)
   }, [wallets])
@@ -39,11 +50,9 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
           return
         }
         const filePath = filePaths[0]
-        const filename = filePath.split('/').pop() || 'Imported wallet'
         setFields({
           ...fields,
           path: filePath,
-          name: filename,
         })
       },
     })
