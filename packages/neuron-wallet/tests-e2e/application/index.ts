@@ -25,7 +25,7 @@ export default class Application {
       path: electronPath,
       webdriverOptions: {
         // headless: true,
-        // logLevel: 'trace'
+        // logLevel: 'trace' 
       }
     })
   }
