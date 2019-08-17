@@ -29,21 +29,20 @@ export default class UpdateController {
 
     autoUpdater.on('update-available', (info: UpdateInfo) => {
       const { version } = info
-      dialog.showMessageBox(
-        {
+      dialog
+        .showMessageBox({
           type: 'info',
           title: version,
           message: i18n.t('updater.updates-found-do-you-want-to-update', { version }),
           buttons: [i18n.t('updater.update-now'), i18n.t('common.no')],
-        },
-        buttonIndex => {
-          if (buttonIndex === 0) {
+        })
+        .then(returnValue => {
+          if (returnValue.response === 0) {
             autoUpdater.downloadUpdate()
           } else {
             this.enableSender()
           }
-        }
-      )
+        })
     })
 
     autoUpdater.on('update-not-available', () => {
@@ -56,16 +55,15 @@ export default class UpdateController {
     })
 
     autoUpdater.on('update-downloaded', () => {
-      dialog.showMessageBox(
-        {
+      dialog
+        .showMessageBox({
           type: 'info',
           message: i18n.t('updater.updates-downloaded-about-to-quit-and-install'),
           buttons: [i18n.t('common.ok')],
-        },
-        () => {
+        })
+        .then(() => {
           setImmediate(() => autoUpdater.quitAndInstall())
-        }
-      )
+        })
     })
   }
 

@@ -1,5 +1,15 @@
 import path from 'path'
-import { dialog, shell, Menu, MenuItem, MessageBoxOptions, SaveDialogOptions, BrowserWindow } from 'electron'
+import {
+  dialog,
+  shell,
+  Menu,
+  MenuItem,
+  MessageBoxOptions,
+  MessageBoxReturnValue,
+  SaveDialogOptions,
+  SaveDialogReturnValue,
+  BrowserWindow,
+} from 'electron'
 import { take } from 'rxjs/operators'
 import app from 'app'
 
@@ -99,15 +109,12 @@ export default class AppController {
     return WindowManager.mainWindow && winID === WindowManager.mainWindow.id
   }
 
-  public static showMessageBox(
-    options: MessageBoxOptions,
-    callback?: (response: number, checkboxChecked: boolean) => void
-  ) {
-    dialog.showMessageBox(options, callback)
+  public static showMessageBox(options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) {
+    dialog.showMessageBox(options).then(callback)
   }
 
-  public static showSaveDialog(options: SaveDialogOptions, callback?: (filename?: string, bookmark?: string) => void) {
-    dialog.showSaveDialog(options, callback)
+  public static showSaveDialog(options: SaveDialogOptions, callback?: (returnValue: SaveDialogReturnValue) => void) {
+    dialog.showSaveDialog(options).then(callback)
   }
 
   public static toggleAddressBook() {
