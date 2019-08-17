@@ -3,13 +3,7 @@ import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
 import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const';
-import { 
-  clickMenu, 
-  deleteNetwork, 
-  editNetwork, 
-  editWallet, 
-  sleep 
-} from './utils';
+import { clickMenu, deleteNetwork, editNetwork, editWallet, sleep } from './utils';
 
 export default class Application {
   spectron: SpectronApplication
