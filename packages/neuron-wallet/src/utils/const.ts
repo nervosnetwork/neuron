@@ -13,6 +13,12 @@ export enum ResponseCode {
   Success,
 }
 
+export enum ExternalURL {
+  Website = 'https://www.nervos.org/',
+  Repository = 'https://github.com/nervosnetwork/neuron',
+  Issues = 'https://github.com/nervosnetwork/neuron/issues',
+}
+
 export default {
   Channel,
   ResponseCode,
