@@ -3,6 +3,7 @@ import TransactionEntity from 'database/chain/entities/transaction'
 import Utils from 'services/sync/utils'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
+import { TransactionStatus } from 'types/cell-types'
 import { OutputStatus } from './params'
 
 export default class IndexerTransaction {
@@ -10,7 +11,10 @@ export default class IndexerTransaction {
     const txs = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
-      .where(`tx.confirmed = false`)
+      .where({
+        confirmed: false,
+        status: TransactionStatus.Success,
+      })
       .getMany()
 
     return txs
