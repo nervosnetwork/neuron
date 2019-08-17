@@ -1,32 +1,8 @@
-import Application from './application'
-import { createWallet } from './operations'
+import Application from '../application';
 
-// Test add/edit/switch/delete/ network
-describe('network tests', () => {
-  let app = new Application()
-
-  beforeAll(() => {
-    return app.start()
-  })
-
-  afterAll(() => {
-    return app.stop()
-  })
-
-  app.test('create wallet', async () => {
-    const { client } = app.spectron
-    await app.waitUntilLoaded()
-
-    // Click create wallet button
-    const createWalletButton = await app.getElementByTagName('button', 'Create a Wallet')
-    expect(createWalletButton).not.toBeNull()
-    await client.elementIdClick(createWalletButton!.ELEMENT)
-    console.log(`clicked create wallet button ${new Date().toTimeString()}`);
-
-    await createWallet(app)
-    await app.waitUntilLoaded()
-  })
-
+// Start: Overview page
+// End: Overview page
+export default (app: Application) => {
   app.test('add network', async () => {
     const { client } = app.spectron
     const newNodeName = 'Node-2233'
@@ -185,4 +161,4 @@ describe('network tests', () => {
     expect(newNetworkName.value).not.toBe(netowrkName.value)
     console.log(`newNetworkName = ${newNetworkName.value}`);
   })
-})
+}

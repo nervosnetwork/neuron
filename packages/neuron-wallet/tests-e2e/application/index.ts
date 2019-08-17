@@ -5,13 +5,9 @@ import { Element, RawResult } from 'webdriverio';
 import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const';
 import { 
   clickMenu, 
-  decreaseRunningAppCount, 
   deleteNetwork, 
   editNetwork, 
   editWallet, 
-  exitServer, 
-  fetchRunningAppCount, 
-  increaseRunningAppCount, 
   sleep 
 } from './utils';
 
@@ -46,32 +42,15 @@ export default class Application {
     }
     await this.spectron.start()
     await this.spectron.client.waitUntilWindowLoaded(10000)
-    const runningAppCount = await increaseRunningAppCount()
-    console.log(`start ${runningAppCount} ${new Date().toTimeString()}`);
+    console.log(`start ${new Date().toTimeString()}`);
   }
 
-  // Start multiple test applications at the same time, calling `spectron.stop()` will stop `ChromeDriver` when the first application finishes executing.
-  // Other test applications will get an error `Error: connect ECONNREFUSED 127.0.0.1:9515`.
-  // So need to exit `ChromeDriver` after all tests are over.
-  // Similar issue: https://github.com/electron-userland/spectron/issues/356
   async stop() {
     if (!this.spectron.isRunning()) {
       return
     }
-    console.log(`will stop ${new Date().toTimeString()}`);
-    let runningAppCount = await decreaseRunningAppCount()
-
-    // sync exit
-    while (runningAppCount !== 0) {
-      sleep(1000)
-      runningAppCount = await fetchRunningAppCount()
-    }
-
-    console.log(`quit ${runningAppCount} spectron ${new Date().toTimeString()}`);
-    await exitServer()
+    console.log(`stop ${new Date().toTimeString()}`);
     await this.spectron.stop()
-
-    console.log(`did stop ${new Date().toTimeString()}`);
   }
 
   test(name: string, func: () => void) {

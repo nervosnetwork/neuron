@@ -1,18 +1,9 @@
-import Application from './application'
-import { createWallet, importWallet } from './operations'
+import Application from '../application';
+import { createWallet, importWallet } from '../operations'
 
-// Test create/import/switch/delete/edit wallet
-describe('wallet tests', () => {
-  let app = new Application()
-
-  beforeAll(() => {
-    return app.start()
-  })
-
-  afterAll(() => {
-    return app.stop()
-  })
-
+// Start: Guide page
+// End: Overview page
+export default (app: Application) => {
   app.test('create wallet', async () => {
     const { client } = app.spectron
     await app.waitUntilLoaded()
@@ -160,4 +151,4 @@ describe('wallet tests', () => {
     expect(newWalletName.value).toBe(walletNameInputText.value)
     console.log(`newWalletName - ${newWalletName.value}`);
   })
-})
+}

@@ -22,7 +22,7 @@
     "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --color",
-    "test:e2e": "concurrently \"node ./tests-e2e/application/server.js\" \"jest --config jest.e2e.config.js --color\"",
+    "test:e2e": "jest --config jest.e2e.config.js --color",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
