@@ -12,7 +12,6 @@ import {
   exitServer, 
   fetchRunningAppCount, 
   increaseRunningAppCount, 
-  quitApp, 
   sleep 
 } from './utils';
 
