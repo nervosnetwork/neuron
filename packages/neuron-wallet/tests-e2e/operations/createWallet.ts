@@ -1,5 +1,4 @@
 import Application from '../application'
-// import { sleep } from '../application/utils'
 
 export const createWallet = async (app: Application, password: string = 'Azusa2233') => {
   const { client } = app.spectron
@@ -17,75 +16,12 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   await app.waitUntilLoaded()
   console.log(`copy mnemonic finish ${new Date().toTimeString()}`);
 
-  // back
-  const backButton = await app.getElementByTagName('button', 'Back')
-  expect(backButton).not.toBeNull()
-  await client.elementIdClick(backButton!.ELEMENT)
-  await app.waitUntilLoaded()
-  console.log(`back finish ${new Date().toTimeString()}`);
-  // Copy mnemonic
-  const mnemonicTextarea2 = await app.element('<textarea />')
-  expect(mnemonicTextarea2.value).not.toBeNull()
-  const mnemonic2 = await client.elementIdText(mnemonicTextarea2.value.ELEMENT)
-  mnemonicText = mnemonic2.value
-  console.log(`mnemonicText2 = ${mnemonicText} ${new Date().toTimeString()}`);
-  // next
-  const nextButton = await app.getElementByTagName('button', 'Next')
-  expect(nextButton).not.toBeNull()
-  await client.elementIdClick(nextButton!.ELEMENT)
-  await app.waitUntilLoaded()
-  console.log(`next finish ${new Date().toTimeString()}`);
-
-
-  //
-
   // Input mnemonic
-
-  const res = await client.selectorExecute('<textarea />', (elements: any, args) => {
-    const element = elements[0]
-    console.log(`element = ${element}`);
-    console.log(`args = ${args}`);
-
-    element.focus();
-    element.value = args;
-    // element.fireEvent("onchange");
-
-    // if ("createEvent" in document) {
-    //   var evt = document.createEvent("HTMLEvents");
-    //   evt.initEvent("input", false, true);
-    //   element.dispatchEvent(evt);
-    // }
-    // else {
-    //   element.fireEvent("onchange");
-    // }
-
-    // var evt = document.createEvent("HTMLEvents");
-    // evt.initEvent("input", false, true);
-    // element.dispatchEvent(event);
-
-
-    var ev = new Event('input', { bubbles: true}) as any;
-    ev.simulated = true;
-    element.value = args;
-    element.dispatchEvent(ev);
-
-
-    return `${element}  ${args}`
-  }, mnemonicText)
-  console.log(`res = ${res}`);
-
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   console.log(`will input mnemonic ${new Date().toTimeString()}`);
-  // await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, '')
-  // for (let index = 0; index < Math.ceil(mnemonicText.length / 6); index++) {
-  //   const text = mnemonicText.slice(index * 6, Math.min(index * 6 + 6, mnemonicText.length))
-  //   console.log(`input text = ${text}`);
-  //   await client.elementIdValue(inputMnemonicTextarea.value.ELEMENT, text)
-  //   sleep(200)
-  // }
-  
-  console.log(`input mnemonic finish ${new Date().toTimeString()}`);
+  await app.setValue('<textarea />', mnemonicText)
+  console.log(`did input mnemonic ${new Date().toTimeString()}`);
   app.waitUntilLoaded()
   // Next
   const inputMnemonicNextButton = await app.getElementByTagName('button', 'Next')
@@ -98,8 +34,9 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   expect(inputElements.value).not.toBeNull()
   expect(inputElements.value.length).toBe(3)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-  await client.elementIdValue(inputElements.value[1].ELEMENT, password)
-  await client.elementIdValue(inputElements.value[2].ELEMENT, password)
+  await app.setValue('//MAIN/DIV/DIV[2]//INPUT', password)
+  await app.setValue('//MAIN/DIV/DIV[3]//INPUT', password)
+  await app.waitUntilLoaded()
   // Next
   const setupWalletNextButton = await app.getElementByTagName('button', 'Next')
   expect(setupWalletNextButton).not.toBeNull()

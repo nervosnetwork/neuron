@@ -51,8 +51,10 @@ describe('network tests', () => {
     const inputElements = await app.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
-    await client.elementIdValue(inputElements.value[0].ELEMENT, newNodeRpcUrl)
-    await client.elementIdValue(inputElements.value[1].ELEMENT, newNodeName)
+    // await client.elementIdValue(inputElements.value[0].ELEMENT, newNodeRpcUrl)
+    // await client.elementIdValue(inputElements.value[1].ELEMENT, newNodeName)
+    await app.setValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newNodeRpcUrl)
+    await app.setValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newNodeName)
     await app.waitUntilLoaded()
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
@@ -87,11 +89,14 @@ describe('network tests', () => {
     const inputElements = await app.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
-    await client.elementIdValue(inputElements.value[0].ELEMENT, '22')
-    await client.elementIdValue(inputElements.value[1].ELEMENT, '33')
-    await app.waitUntilLoaded()
     const networkRpcUrlInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
     const networkNameInputText = await client.elementIdAttribute(inputElements.value[1].ELEMENT, 'value')
+    const newRpcUrl = `${networkRpcUrlInputText.value}22`
+    const newName = `${networkNameInputText.value}33`
+    await app.setValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newRpcUrl)
+    await app.setValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newName)
+    await app.waitUntilLoaded()
+
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
     expect(saveButton).not.toBeNull()
@@ -102,7 +107,7 @@ describe('network tests', () => {
     const newNetworkItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[3]/DIV/LABEL/DIV')
     expect(newNetworkItemElement).not.toBeNull()
     const netowrkItemTitle = await client.elementIdAttribute(newNetworkItemElement.value.ELEMENT, 'title')
-    expect(netowrkItemTitle.value).toBe(`${networkNameInputText.value}: ${networkRpcUrlInputText.value}`)
+    expect(netowrkItemTitle.value).toBe(`${newName}: ${newRpcUrl}`)
     console.log(`netowrkItemTitle - ${netowrkItemTitle.value}`);
   })
 

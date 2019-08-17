@@ -1,7 +1,7 @@
 import { Application as SpectronApplication } from 'spectron'
 import path from 'path'
 import { clickMenu, editNetwork, editWallet, deleteNetwork, quitApp, sleep } from './utils';
-import { increaseRunningAppCount, decreaseRunningAppCount, exitServer } from './utils'
+import { increaseRunningAppCount, decreaseRunningAppCount, exitServer, fetchRunningAppCount } from './utils'
 import fs from 'fs'
 import { RawResult, Element } from 'webdriverio'
 import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const'
@@ -55,7 +55,14 @@ export default class Application {
       return
     }
     console.log(`will stop ${new Date().toTimeString()}`);
-    const runningAppCount = await decreaseRunningAppCount()
+    let runningAppCount = await decreaseRunningAppCount()
+
+    // sync exit
+    while (runningAppCount !== 0) {
+      sleep(1000)
+      runningAppCount = await fetchRunningAppCount()
+    }
+
     if (runningAppCount > 0) {
       console.log(`quit ${runningAppCount} app ${new Date().toTimeString()}`);
       quitApp(this.spectron.electron)
@@ -198,5 +205,18 @@ export default class Application {
     } else {
       return null
     }
+  }
+
+  async setValue(selector: string, text: string) {
+    const { client } = this.spectron
+    const result = await client.selectorExecute(selector, (elements: any, args) => {
+      const element = elements[0]  
+      var event = new Event('input', { bubbles: true}) as any;
+      event.simulated = true;
+      element.value = args;
+      element.dispatchEvent(event);
+      return `${element} ${args}`
+    }, text)
+    console.log(`setValue = ${result}`);
   }
 }

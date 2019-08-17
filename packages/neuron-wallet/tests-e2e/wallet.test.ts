@@ -101,7 +101,7 @@ describe('wallet tests', () => {
     // Input password
     const inputElement = await app.element('//INPUT')
     expect(inputElement.value).not.toBeNull()
-    await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
+    await app.setValue('//INPUT', 'Azusa2233')
     // Confirm
     const confirmButton = await app.getElementByTagName('button', 'Confirm')
     expect(confirmButton).not.toBeNull()
@@ -143,10 +143,10 @@ describe('wallet tests', () => {
     // Update wallet name
     const walletNameInputElement = await app.element('<input />')
     expect(walletNameInputElement.value).not.toBeNull()
-    await client.elementIdValue(walletNameInputElement.value.ELEMENT, 'Azusa')
+    await app.setValue('<input />', 'Azusa')
+    await app.waitUntilLoaded()
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
     console.log(`walletNameInputText - ${walletNameInputText.value}`);
-    await app.waitUntilLoaded()
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
     expect(saveButton).not.toBeNull()

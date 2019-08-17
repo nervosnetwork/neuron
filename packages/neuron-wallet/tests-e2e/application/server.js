@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
   else if (req.url === '/exit') {
     res.end()
     const setTimeoutPromise = util.promisify(setTimeout);
-    setTimeoutPromise(1000).then(() => {
+    setTimeoutPromise(4000).then(() => {
       console.log(`server - exit ${runningAppCount} ${new Date().toTimeString()}`);
       process.exit(0)
     });
