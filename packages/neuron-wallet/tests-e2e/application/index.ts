@@ -47,7 +47,7 @@ export default class Application {
     await this.spectron.stop()
   }
 
-  test(name: string, func: () => void) {
+  test(name: string, func: () => void, timeout: number = 1000 * 60 * 1) {
     it(name, async () => {
       if (this.errorOccurred) {
         console.log(`skip - [${name}] ${new Date().toTimeString()}`);
@@ -87,7 +87,7 @@ export default class Application {
 
         throw error
       }
-    }, 1000 * 60 * 1)
+    }, timeout)
   }
 
   // ipc
