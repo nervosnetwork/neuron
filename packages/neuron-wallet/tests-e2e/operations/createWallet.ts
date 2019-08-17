@@ -20,7 +20,7 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   console.log(`will input mnemonic ${new Date().toTimeString()}`);
-  await app.setValue('<textarea />', mnemonicText)
+  await app.setElementValue('<textarea />', mnemonicText)
   console.log(`did input mnemonic ${new Date().toTimeString()}`);
   app.waitUntilLoaded()
   // Next
@@ -34,8 +34,8 @@ export const createWallet = async (app: Application, password: string = 'Azusa22
   expect(inputElements.value).not.toBeNull()
   expect(inputElements.value.length).toBe(3)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-  await app.setValue('//MAIN/DIV/DIV[2]//INPUT', password)
-  await app.setValue('//MAIN/DIV/DIV[3]//INPUT', password)
+  await app.setElementValue('//MAIN/DIV/DIV[2]//INPUT', password)
+  await app.setElementValue('//MAIN/DIV/DIV[3]//INPUT', password)
   await app.waitUntilLoaded()
   // Next
   const setupWalletNextButton = await app.getElementByTagName('button', 'Next')

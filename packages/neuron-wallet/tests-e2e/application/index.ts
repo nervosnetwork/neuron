@@ -206,7 +206,7 @@ export default class Application {
     }
   }
 
-  async setValue(selector: string, text: string) {
+  async setElementValue(selector: string, text: string) {
     const { client } = this.spectron
     const result = await client.selectorExecute(selector, (elements: any, args) => {
       const element = elements[0]  

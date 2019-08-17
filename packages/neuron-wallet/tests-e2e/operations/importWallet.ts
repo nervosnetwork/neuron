@@ -6,7 +6,7 @@ export const importWallet = async (app: Application, mnemonic: string, password:
   // Input mnemonic
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
-  app.setValue('<textarea />', mnemonic)
+  app.setElementValue('<textarea />', mnemonic)
   app.waitUntilLoaded()
   // Next
   const mnemonicNextButton = await app.getElementByTagName('button', 'Next')
@@ -18,8 +18,8 @@ export const importWallet = async (app: Application, mnemonic: string, password:
   expect(inputElements.value).not.toBeNull()
   expect(inputElements.value.length).toBe(3)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-  await app.setValue('//MAIN/DIV/DIV[2]//INPUT', password)
-  await app.setValue('//MAIN/DIV/DIV[3]//INPUT', password)
+  await app.setElementValue('//MAIN/DIV/DIV[2]//INPUT', password)
+  await app.setElementValue('//MAIN/DIV/DIV[3]//INPUT', password)
   await app.waitUntilLoaded()
   console.log(`walletNameInputText - ${walletNameInputText.value}`);
   // Next

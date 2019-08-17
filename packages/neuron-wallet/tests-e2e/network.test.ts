@@ -54,8 +54,8 @@ describe('network tests', () => {
     expect(inputElements.value.length).toBe(2)
     // await client.elementIdValue(inputElements.value[0].ELEMENT, newNodeRpcUrl)
     // await client.elementIdValue(inputElements.value[1].ELEMENT, newNodeName)
-    await app.setValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newNodeRpcUrl)
-    await app.setValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newNodeName)
+    await app.setElementValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newNodeRpcUrl)
+    await app.setElementValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newNodeName)
     await app.waitUntilLoaded()
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
@@ -94,8 +94,8 @@ describe('network tests', () => {
     const networkNameInputText = await client.elementIdAttribute(inputElements.value[1].ELEMENT, 'value')
     const newRpcUrl = `${networkRpcUrlInputText.value}22`
     const newName = `${networkNameInputText.value}33`
-    await app.setValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newRpcUrl)
-    await app.setValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newName)
+    await app.setElementValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newRpcUrl)
+    await app.setElementValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newName)
     await app.waitUntilLoaded()
 
     // Save
