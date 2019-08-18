@@ -8,7 +8,8 @@ export default (app: Application, env: TransactionTestEnv) => {
   const password = 'Azusa2233'
 
   if (env.sendTo.length < 1 || env.mnemonic.length === 0) {
-    throw 'Invalid parameter `env`'
+    console.log('Invalid parameter `env`');
+    return
   }
 
   app.test('import wallet', async () => {
