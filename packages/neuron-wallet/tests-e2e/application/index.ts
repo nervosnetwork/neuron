@@ -23,8 +23,7 @@ export default class Application {
       ], 
       path: electronPath,
       env: {
-        NODE_ENV: 'test'
-        // NODE_ENV: 'development'
+        // NODE_ENV: 'test'
       }
     })
   }
