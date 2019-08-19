@@ -48,4 +48,20 @@ export default class Utils {
     }
     return result
   }
+
+  public static min = (array: bigint[]): bigint | undefined => {
+    let minValue = array[0]
+    if (!minValue) {
+      return undefined
+    }
+
+    for (let i = 1; i < array.length; ++i) {
+      const value = array[i]
+      if (value < minValue) {
+        minValue = value
+      }
+    }
+
+    return minValue
+  }
 }
