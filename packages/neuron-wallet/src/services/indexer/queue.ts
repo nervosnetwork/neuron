@@ -17,7 +17,7 @@ enum TxPointType {
   ConsumedBy = 'consumedBy',
 }
 
-export default class Queue {
+export default class IndexerQueue {
   private lockHashes: string[]
   private indexerRPC: IndexerRPC
   private getBlocksService: GetBlocks
