@@ -28,6 +28,7 @@ const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
 const DEBOUNCE_TIME = 200
+const SECP_CYCLES = BigInt('1440000')
 
 export interface Wallet {
   id: string
@@ -385,7 +386,7 @@ export default class WalletService {
     const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
 
     const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
-    const cycles = BigInt(1387008) * BigInt(inputs.length)
+    const cycles = SECP_CYCLES * BigInt(inputs.length)
 
     return cycles.toString()
   }
