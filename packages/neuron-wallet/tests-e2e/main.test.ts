@@ -1,7 +1,8 @@
 import Application from './application'
 import tests from './tests'
+import env from './env'
 
-describe('wallet tests', () => {
+describe('neuron wallet tests', () => {
   let app = new Application()
 
   beforeAll(() => {
@@ -14,4 +15,5 @@ describe('wallet tests', () => {
 
   tests.Wallet(app)
   tests.Network(app)
+  tests.Transaction(app, env.transaction)
 })

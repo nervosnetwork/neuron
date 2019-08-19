@@ -19,15 +19,13 @@ export default class Application {
         '--require',
         path.join(__dirname, 'preload.js'),
         path.join(__dirname, '../..', 'dist', 'main.js'),
-        '--lang=en'
+        '--lang=en',
       ], 
       path: electronPath,
+      env: {
+        // NODE_ENV: 'test'
+      }
     })
-  }
-
-  async waitUntilLoaded() {
-    sleep(400)
-    await this.spectron.client.waitUntilWindowLoaded()
   }
 
   async start() {
@@ -47,7 +45,7 @@ export default class Application {
     await this.spectron.stop()
   }
 
-  test(name: string, func: () => void) {
+  test(name: string, func: () => void, timeout: number = 1000 * 60 * 1) {
     it(name, async () => {
       if (this.errorOccurred) {
         console.log(`skip - [${name}] ${new Date().toTimeString()}`);
@@ -56,6 +54,7 @@ export default class Application {
 
       try {
         console.log(`will test [${name}] ${new Date().toTimeString()}`);
+        this.waitUntilLoaded()
         await func()
         console.log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
@@ -87,7 +86,16 @@ export default class Application {
 
         throw error
       }
-    }, 1000 * 60 * 1)
+    }, timeout)
+  }
+
+  // wait
+  async waitUntilLoaded() {
+    sleep(400)
+    await this.spectron.client.waitUntilWindowLoaded()
+  }
+  wait(delay: number) {
+    sleep(delay)
   }
 
   // ipc
