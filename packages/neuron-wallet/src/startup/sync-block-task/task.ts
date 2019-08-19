@@ -34,8 +34,8 @@ export const run = async () => {
   await initAddressConnection()
   databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
     if (network) {
-      const indexerEnable = await testIndexer(network.remote)
-      if (indexerEnable) {
+      const indexerEnabled = await testIndexer(network.remote)
+      if (indexerEnabled) {
         await indexerSwitchNetwork(network.remote)
       } else {
         await syncSwitchNetwork()
