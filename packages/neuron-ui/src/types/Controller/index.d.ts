@@ -1,4 +1,9 @@
 declare namespace Controller {
+  interface CreateWalletParams {
+    name: string
+    mnemonic: string
+    password: string
+  }
   interface ImportMnemonicParams {
     name: string
     mnemonic: string

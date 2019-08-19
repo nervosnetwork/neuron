@@ -1,6 +1,7 @@
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
+  createWallet,
   importMnemonic,
   importKeystore,
   getCurrentWallet,
@@ -44,7 +45,7 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   _dispatch: StateDispatch,
   history: any
 ) => {
-  importMnemonic(params).then(res => {
+  createWallet(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
     } else {
