@@ -109,8 +109,7 @@ export default class LockUtils {
 
   static async addressToAllLockHashes(address: string): Promise<string[]> {
     const dataLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Data)
-    const typeLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Type)
-    return [dataLockHash, typeLockHash]
+    return [dataLockHash]
   }
 
   static async addressesToAllLockHashes(addresses: string[]): Promise<string[]> {
