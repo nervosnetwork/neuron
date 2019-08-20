@@ -1,13 +1,16 @@
 import { remote } from 'electron'
-import AddressService from 'services/addresses'
+import AddressService, { AddressWithWay } from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
 
 import { initDatabase } from './init-database'
 
-const { nodeService, addressDbChangedSubject, walletCreatedSubject } = remote.require(
-  './startup/sync-block-task/params'
-)
+const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
+
+export interface LockHashInfo {
+  lockHash: string
+  isImport: boolean | undefined
+}
 
 // pass to task a main process subject
 // AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -35,13 +38,26 @@ export const switchNetwork = async () => {
   // start sync blocks service
   blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  addressDbChangedSubject.subscribe(async (event: string) => {
-    // ignore update and remove
-    if (event === 'AfterInsert') {
-      const hashes: string[] = await loadAddressesAndConvert()
-      if (blockListener) {
-        blockListener.setLockHashes(hashes)
+  // listen to address created
+  addressCreatedSubject.subscribe(async (addressWithWay: AddressWithWay[]) => {
+    if (blockListener) {
+      const infos: LockHashInfo[] = (await Promise.all(
+        addressWithWay.map(async aw => {
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
+          return hashes.map(h => {
+            return {
+              lockHash: h,
+              isImport: aw.isImport,
+            }
+          })
+        })
+      )).reduce((acc, val) => acc.concat(val), [])
+      const oldLockHashes: string[] = blockListener.getLockHashes()
+      const anyIsImport: boolean = infos.some(info => info.isImport === true)
+      if (oldLockHashes.length === 0 && !anyIsImport) {
+        await blockListener.setToTip()
       }
+      blockListener.appendLockHashes(infos.map(info => info.lockHash))
     }
   })
 

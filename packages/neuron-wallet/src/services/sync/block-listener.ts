@@ -6,6 +6,7 @@ import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
+import Utils from './utils'
 
 export default class BlockListener {
   private lockHashes: string[]
@@ -34,6 +35,15 @@ export default class BlockListener {
     this.queue.setLockHashes(lockHashes)
   }
 
+  public appendLockHashes = (lockHashes: string[]) => {
+    const hashes = this.lockHashes.concat(lockHashes)
+    this.setLockHashes(hashes)
+  }
+
+  public getLockHashes = (): string[] => {
+    return this.lockHashes
+  }
+
   // start listening
   public start = async (restart: boolean = false) => {
     if (restart) {
@@ -55,6 +65,28 @@ export default class BlockListener {
         await this.regenerate()
       }
     })
+  }
+
+  /* eslint no-await-in-loop: "off" */
+  /* eslint no-restricted-syntax: "off" */
+  public setToTip = async () => {
+    const timeout = 5000
+    let number: bigint = BigInt(0)
+    const tipNumberListener = this.tipNumberSubject.subscribe(async num => {
+      if (num) {
+        number = BigInt(num)
+      }
+    })
+    const startAt = +new Date()
+    while (number === BigInt(0)) {
+      const now = +new Date()
+      if (now - startAt > timeout) {
+        return
+      }
+      await Utils.sleep(100)
+    }
+    await this.currentBlockNumber.updateCurrent(this.tipBlockNumber)
+    tipNumberListener.unsubscribe()
   }
 
   public stop = () => {
