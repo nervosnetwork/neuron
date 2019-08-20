@@ -51,7 +51,7 @@ export const switchNetwork = async (nodeURL: string) => {
           })
         })
       )).reduce((acc, val) => acc.concat(val), [])
-      indexerQueue.setLockHashInfos(infos)
+      indexerQueue.appendLockHashInfos(infos)
     }
   })
 

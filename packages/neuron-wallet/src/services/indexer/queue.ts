@@ -59,6 +59,11 @@ export default class IndexerQueue {
     this.indexed = false
   }
 
+  public appendLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
+    const infos = this.lockHashInfos.concat(lockHashInfos)
+    this.setLockHashInfos(infos)
+  }
+
   public reset = () => {
     this.resetFlag = true
   }
