@@ -1,8 +1,8 @@
 import { remote } from 'electron'
-import AddressService, { AddressWithWay } from 'services/addresses'
+import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
-// import { Address } from 'database/address/dao'
+import { Address } from 'database/address/dao'
 
 import { initDatabase } from './init-database'
 
@@ -38,13 +38,13 @@ export const switchNetwork = async (nodeURL: string) => {
   indexerQueue = new IndexerQueue(nodeURL, lockHashInfos, nodeService.tipNumberSubject)
 
   // listen to address created
-  addressCreatedSubject.subscribe(async (addressWithWay: AddressWithWay[]) => {
+  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (indexerQueue) {
       const infos: LockHashInfo[] = (await Promise.all(
-        addressWithWay.map(async aw => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
+        addresses.map(async addr => {
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
           // undefined means true
-          const isImporting: boolean = aw.isImporting !== false
+          const isImporting: boolean = addr.isImporting !== false
           return hashes.map(h => {
             return {
               lockHash: h,

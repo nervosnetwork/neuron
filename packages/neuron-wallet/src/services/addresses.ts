@@ -9,11 +9,6 @@ import AddressCreatedSubject from 'models/subjects/address-created-subject'
 
 const MAX_ADDRESS_COUNT = 30
 
-export interface AddressWithWay {
-  address: AddressInterface
-  isImporting: boolean | undefined
-}
-
 export interface AddressMetaInfo {
   walletId: string
   addressType: AddressType
@@ -58,15 +53,14 @@ export default class AddressService {
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
     const version = AddressService.getAddressVersion()
-    const addressesWithWay: AddressWithWay[] = addresses
+    const addrs = addresses
       .filter(addr => addr.version === version)
       .map(addr => {
-        return {
-          address: addr,
-          isImporting,
-        }
+        const address = addr
+        address.isImporting = isImporting
+        return address
       })
-    AddressCreatedSubject.getSubject().next(addressesWithWay)
+    AddressCreatedSubject.getSubject().next(addrs)
   }
 
   public static checkAndGenerateSave = async (

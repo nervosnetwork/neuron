@@ -1,7 +1,8 @@
 import { remote } from 'electron'
-import AddressService, { AddressWithWay } from 'services/addresses'
+import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
+import { Address } from 'database/address/dao'
 
 import { initDatabase } from './init-database'
 
@@ -39,13 +40,13 @@ export const switchNetwork = async () => {
   blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
   // listen to address created
-  addressCreatedSubject.subscribe(async (addressWithWay: AddressWithWay[]) => {
+  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (blockListener) {
       const infos: LockHashInfo[] = (await Promise.all(
-        addressWithWay.map(async aw => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
+        addresses.map(async addr => {
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
           // undefined means false
-          const isImporting: boolean = aw.isImporting === true
+          const isImporting: boolean = addr.isImporting === true
           return hashes.map(h => {
             return {
               lockHash: h,
@@ -55,8 +56,8 @@ export const switchNetwork = async () => {
         })
       )).reduce((acc, val) => acc.concat(val), [])
       const oldLockHashes: string[] = blockListener.getLockHashes()
-      const anyisImporting: boolean = infos.some(info => info.isImporting === true)
-      if (oldLockHashes.length === 0 && !anyisImporting) {
+      const anyIsImporting: boolean = infos.some(info => info.isImporting === true)
+      if (oldLockHashes.length === 0 && !anyIsImporting) {
         await blockListener.setToTip()
       }
       blockListener.appendLockHashes(infos.map(info => info.lockHash))
