@@ -103,11 +103,11 @@ describe('Key tests with db', () => {
   })
 
   const generate = async (id: string = walletId) => {
-    await AddressService.generateAndSave(id, extendedKey, 0, 0, 2, 1)
+    await AddressService.generateAndSave(id, extendedKey, undefined, 0, 0, 2, 1)
   }
 
   const checkAndGenerate = async (id: string = walletId) => {
-    await AddressService.checkAndGenerateSave(id, extendedKey, 2, 1)
+    await AddressService.checkAndGenerateSave(id, extendedKey, undefined, 2, 1)
   }
 
   it('generateAndSave', async () => {
