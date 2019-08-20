@@ -18,6 +18,7 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       type: 'warning',
       timestamp: Date.now(),
       content: Message.AtLeastOneAddressNeeded,
+      meta: {},
     },
   }
   if (!items.length || !items[0].address) {
@@ -28,8 +29,18 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
   }
   const invalid = items.some(
     (item): boolean => {
-      if (!verifyAddress(item.address)) {
-        errorAction.payload.content = Message.InvalidAddress
+      const isAddressValid = verifyAddress(item.address)
+      if (typeof isAddressValid === 'string') {
+        if (isAddressValid.startsWith('Invalid checksum')) {
+          errorAction.payload.content = Message.InvalidChecksum
+          errorAction.payload.meta = { address: item.address }
+        } else if (isAddressValid === 'Address length is incorrect') {
+          errorAction.payload.content = Message.AddressLengthError
+          errorAction.payload.meta = { address: item.address }
+        } else {
+          errorAction.payload.content = Message.InvalidAddress
+          errorAction.payload.meta = { address: item.address }
+        }
         return true
       }
       if (Number.isNaN(+item.amount) || +item.amount < 0) {
