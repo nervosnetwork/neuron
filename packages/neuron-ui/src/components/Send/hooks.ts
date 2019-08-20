@@ -2,12 +2,16 @@ import React, { useCallback, useEffect } from 'react'
 import { IDropdownOption } from 'office-ui-fabric-react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { calculateCycles } from 'services/remote/wallets'
 
 import { Message } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
+import { outputsToTotalCapacity } from 'utils/formatters'
 import { TransactionOutput } from '.'
 
-const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch: StateDispatch }) => {
+let cyclesTimer: ReturnType<typeof setTimeout>
+
+const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
   const errorAction = {
     type: AppActions.AddNotification,
     payload: {
@@ -17,7 +21,9 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
     },
   }
   if (!items.length || !items[0].address) {
-    dispatch(errorAction)
+    if (dispatch) {
+      dispatch(errorAction)
+    }
     return false
   }
   const invalid = items.some(
@@ -42,7 +48,7 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       return false
     }
   )
-  if (invalid) {
+  if (invalid && dispatch) {
     dispatch(errorAction)
     return false
   }
@@ -84,6 +90,39 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
+const useOnTransactionChange = (walletID: string, items: TransactionOutput[], dispatch: StateDispatch) => {
+  useEffect(() => {
+    clearTimeout(cyclesTimer)
+    cyclesTimer = setTimeout(() => {
+      if (validateTransactionParams({ items })) {
+        calculateCycles({
+          walletID,
+          capacities: outputsToTotalCapacity(items),
+        })
+          .then(response => {
+            if (response.status) {
+              if (Number.isNaN(+response.result)) {
+                throw new Error('Invalid Cycles')
+              }
+              dispatch({
+                type: AppActions.UpdateSendCycles,
+                payload: response.result,
+              })
+            } else {
+              throw new Error('Cycles Not Calculated')
+            }
+          })
+          .catch(() => {
+            dispatch({
+              type: AppActions.UpdateSendCycles,
+              payload: '0',
+            })
+          })
+      }
+    }, 300)
+  }, [walletID, items, dispatch])
+}
+
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
   useCallback(
     (walletID: string = '') => () => {
@@ -111,7 +150,12 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
       value?: string
     ) => {
       if (undefined !== value) {
-        updateTransactionOutput(field)(idx)(value)
+        if (field === 'amount') {
+          const amount = value.replace(/[^\d.]/g, '')
+          updateTransactionOutput(field)(idx)(amount)
+        } else {
+          updateTransactionOutput(field)(idx)(value)
+        }
       }
     },
     [updateTransactionOutput]
@@ -131,9 +175,10 @@ const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
     (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
       if (undefined !== value) {
+        const price = value.replace(/[^\d]/g, '')
         dispatch({
           type: AppActions.UpdateSendPrice,
-          payload: value.trim(),
+          payload: price,
         })
       }
     },
@@ -188,6 +233,7 @@ export const useInitialize = (
   }, [address, dispatch, history, updateTransactionOutput])
 
   return {
+    useOnTransactionChange,
     updateTransactionOutput,
     onItemChange,
     onCapacityUnitChange,

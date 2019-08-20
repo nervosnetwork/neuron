@@ -76,7 +76,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
             <Label>{t('send.price')}</Label>
           </Stack.Item>
           <Stack.Item grow>
-            <TextField type="number" value={price} onChange={onPriceChange} />
+            <TextField value={price} onChange={onPriceChange} />
           </Stack.Item>
           {actionSpacer}
         </Stack>

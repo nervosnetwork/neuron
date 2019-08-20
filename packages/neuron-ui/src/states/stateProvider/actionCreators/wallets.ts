@@ -19,7 +19,7 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
-import addressesToBalance from 'utils/addressesToBalance'
+import { addressesToBalance } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 

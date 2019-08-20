@@ -373,7 +373,7 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async computeCycles(params: { id: string; walletID: string; capacities: string }) {
+  public static async computeCycles(params: { walletID: string; capacities: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
