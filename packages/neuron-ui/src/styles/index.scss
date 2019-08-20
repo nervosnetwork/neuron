@@ -65,6 +65,19 @@ navbar {
   }
 }
 
+// hack fabric ui experimental pagination style
+.ms-Pagination-container {
+  button[aria-selected=false] {
+    color: #0078d4 !important;
+    text-decoration: underline;
+  }
+
+  button[aria-selected=true] {
+    color: rgb(96, 94, 92) !important;
+    text-decoration: none !important;
+  }
+}
+
 @keyframes rotate360 {
   from {
     transform: rotate(0);
