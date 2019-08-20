@@ -272,9 +272,7 @@
       "rpc-url-should-have-no-whitespaces": "The RPC URL should have no whitespaces",
       "is-required": "{{field}} is required",
       "is-used": "{{field}} is used",
-      "invalid-address": "{address}} is an invalid address",
-      "invalid-checksum": "{{address}} has an invalid checksum",
-      "address-length-error": "{{address}} has an invalid length"
+      "invalid-address": "{{address}} is an invalid address"
     },
     "sync": {
       "syncing": "Syncing",

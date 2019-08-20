@@ -59,8 +59,6 @@ export enum Message {
   IsUnremovable = 'messages.is-unremovable',
   ProtocolRequired = 'messages.protocol-required',
   AmountTooSmall = 'messages.amount-too-small',
-  InvalidChecksum = 'messages.invalid-checksum',
-  AddressLengthError = 'messages.address-length-error',
 }
 
 export enum MnemonicAction {

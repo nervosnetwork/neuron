@@ -272,9 +272,7 @@
       "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格",
       "is-required": "{{field}}是必须的",
       "is-used": "{{field}}已使用",
-      "invalid-address": "{{address}} 是无效的地址",
-      "invalid-checksum": "{{address}} 的校验码不正确",
-      "address-length-error": "{{address}} 长度不正确"
+      "invalid-address": "{{address}} 是无效的地址"
     },
     "sync": {
       "syncing": "同步中",
