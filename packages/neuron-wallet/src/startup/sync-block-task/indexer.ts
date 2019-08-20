@@ -43,10 +43,12 @@ export const switchNetwork = async (nodeURL: string) => {
       const infos: LockHashInfo[] = (await Promise.all(
         addressWithWay.map(async aw => {
           const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
+          // undefined means true
+          const isImport: boolean = aw.isImport !== false
           return hashes.map(h => {
             return {
               lockHash: h,
-              isImport: aw.isImport,
+              isImport,
             }
           })
         })
