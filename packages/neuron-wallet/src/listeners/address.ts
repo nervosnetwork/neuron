@@ -28,7 +28,7 @@ export const register = () => {
       walletIds.map(async id => {
         const wallet = WalletService.getInstance().get(id)
         const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-        // set isImport to undefined means unknown
+        // set isImporting to undefined means unknown
         await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
       })
     )

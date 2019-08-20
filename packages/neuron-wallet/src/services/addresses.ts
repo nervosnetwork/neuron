@@ -11,7 +11,7 @@ const MAX_ADDRESS_COUNT = 30
 
 export interface AddressWithWay {
   address: AddressInterface
-  isImport: boolean | undefined
+  isImporting: boolean | undefined
 }
 
 export interface AddressMetaInfo {
@@ -30,7 +30,7 @@ export default class AddressService {
   public static generateAndSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
-    isImport: boolean | undefined,
+    isImporting: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = 20,
@@ -53,17 +53,17 @@ export default class AddressService {
     await AddressDao.create(allAddresses)
 
     // TODO: notify address created and pass addressWay
-    AddressService.notifyAddressCreated(allAddresses, isImport)
+    AddressService.notifyAddressCreated(allAddresses, isImporting)
   }
 
-  private static notifyAddressCreated = (addresses: AddressInterface[], isImport: boolean | undefined) => {
+  private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
     const version = AddressService.getAddressVersion()
     const addressesWithWay: AddressWithWay[] = addresses
       .filter(addr => addr.version === version)
       .map(addr => {
         return {
           address: addr,
-          isImport,
+          isImporting,
         }
       })
     AddressCreatedSubject.getSubject().next(addressesWithWay)
@@ -72,7 +72,7 @@ export default class AddressService {
   public static checkAndGenerateSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
-    isImport: boolean | undefined,
+    isImporting: boolean | undefined,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -92,7 +92,7 @@ export default class AddressService {
     return AddressService.generateAndSave(
       walletId,
       extendedKey,
-      isImport,
+      isImporting,
       nextReceivingIndex,
       nextChangeIndex,
       receivingAddressCount,

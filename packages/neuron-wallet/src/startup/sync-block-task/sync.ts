@@ -9,7 +9,7 @@ const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.requ
 
 export interface LockHashInfo {
   lockHash: string
-  isImport: boolean | undefined
+  isImporting: boolean | undefined
 }
 
 // pass to task a main process subject
@@ -45,18 +45,18 @@ export const switchNetwork = async () => {
         addressWithWay.map(async aw => {
           const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
           // undefined means false
-          const isImport: boolean = aw.isImport === true
+          const isImporting: boolean = aw.isImporting === true
           return hashes.map(h => {
             return {
               lockHash: h,
-              isImport,
+              isImporting,
             }
           })
         })
       )).reduce((acc, val) => acc.concat(val), [])
       const oldLockHashes: string[] = blockListener.getLockHashes()
-      const anyIsImport: boolean = infos.some(info => info.isImport === true)
-      if (oldLockHashes.length === 0 && !anyIsImport) {
+      const anyisImporting: boolean = infos.some(info => info.isImporting === true)
+      if (oldLockHashes.length === 0 && !anyisImporting) {
         await blockListener.setToTip()
       }
       blockListener.appendLockHashes(infos.map(info => info.lockHash))

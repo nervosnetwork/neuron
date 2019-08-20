@@ -72,7 +72,7 @@ export default class WalletsController {
       name,
       password,
       mnemonic,
-      isImport: true,
+      isImporting: true,
     })
 
     WalletCreatedSubject.getSubject().next('import')
@@ -94,7 +94,7 @@ export default class WalletsController {
       name,
       password,
       mnemonic,
-      isImport: false,
+      isImporting: false,
     })
 
     WalletCreatedSubject.getSubject().next('create')
@@ -106,12 +106,12 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
-    isImport,
+    isImporting,
   }: {
     name: string
     password: string
     mnemonic: string
-    isImport: boolean
+    isImporting: boolean
   }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
     if (!validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
@@ -142,7 +142,7 @@ export default class WalletsController {
       keystore,
     })
 
-    await walletsService.generateAddressesById(wallet.id, isImport)
+    await walletsService.generateAddressesById(wallet.id, isImporting)
 
     return {
       status: ResponseCode.Success,

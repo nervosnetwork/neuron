@@ -14,7 +14,7 @@ import IndexerRPC from './indexer-rpc'
 
 export interface LockHashInfo {
   lockHash: string
-  isImport: boolean | undefined
+  isImporting: boolean | undefined
 }
 
 enum TxPointType {
@@ -150,7 +150,7 @@ export default class IndexerQueue {
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
     await Utils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
-      const indexFrom: string | undefined = info.isImport ? '0' : undefined
+      const indexFrom: string | undefined = info.isImporting ? '0' : undefined
       await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
     })
   }

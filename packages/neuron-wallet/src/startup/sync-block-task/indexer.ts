@@ -31,7 +31,7 @@ export const switchNetwork = async (nodeURL: string) => {
   const lockHashInfos: LockHashInfo[] = lockHashes.map(lockHash => {
     return {
       lockHash,
-      isImport: true,
+      isImporting: true,
     }
   })
   // start sync blocks service
@@ -44,11 +44,11 @@ export const switchNetwork = async (nodeURL: string) => {
         addressWithWay.map(async aw => {
           const hashes: string[] = await LockUtils.addressToAllLockHashes(aw.address.address)
           // undefined means true
-          const isImport: boolean = aw.isImport !== false
+          const isImporting: boolean = aw.isImporting !== false
           return hashes.map(h => {
             return {
               lockHash: h,
-              isImport,
+              isImporting,
             }
           })
         })
