@@ -6,7 +6,7 @@ import { calculateCycles } from 'services/remote/wallets'
 
 import { Message } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
-import { CKBToShannonFormatter } from 'utils/formatters'
+import { outputsToTotalCapacity } from 'utils/formatters'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
@@ -97,10 +97,7 @@ const useOnTransactionChange = (walletID: string, items: TransactionOutput[], di
       if (validateTransactionParams({ items })) {
         calculateCycles({
           walletID,
-          items: items.map(item => ({
-            address: item.address,
-            capacity: CKBToShannonFormatter(item.amount, item.unit),
-          })),
+          capacities: outputsToTotalCapacity(items),
         })
           .then(response => {
             if (response.status) {
@@ -153,7 +150,12 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
       value?: string
     ) => {
       if (undefined !== value) {
-        updateTransactionOutput(field)(idx)(value)
+        if (field === 'amount') {
+          const amount = value.replace(/[^\d.]/g, '')
+          updateTransactionOutput(field)(idx)(amount)
+        } else {
+          updateTransactionOutput(field)(idx)(value)
+        }
       }
     },
     [updateTransactionOutput]
@@ -173,9 +175,10 @@ const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
     (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
       if (undefined !== value) {
+        const price = value.replace(/[^\d]/g, '')
         dispatch({
           type: AppActions.UpdateSendPrice,
-          payload: value.trim(),
+          payload: price,
         })
       }
     },

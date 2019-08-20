@@ -373,7 +373,7 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async computeCycles(params: { id: string; walletID: string; capacities: string }) {
+  public static async computeCycles(params: { walletID: string; capacities: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -389,16 +389,6 @@ export default class WalletsController {
         status: ResponseCode.Fail,
         msg: `Error: "${err.message}"`,
       }
-    }
-  }
-
-  @CatchControllerError
-  public static async calculateCycles(params: { walletID: string; items: { address: string; capacity: string }[] }) {
-    // TODO: This is a mock cycles
-    const cycles = params.items.filter(item => +item.capacity > 0).length.toString()
-    return {
-      status: ResponseCode.Success,
-      result: cycles,
     }
   }
 

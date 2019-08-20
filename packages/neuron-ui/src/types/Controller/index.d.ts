@@ -45,12 +45,9 @@ declare namespace Controller {
     description: string
   }
 
-  interface CalculateCycles {
+  interface ComputeCycles {
     walletID: string
-    items: {
-      address: string
-      capacity: string
-    }
+    capacities: string
   }
 
   type GetAddressesByWalletIDParams = string
