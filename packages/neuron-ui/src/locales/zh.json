@@ -240,7 +240,6 @@
       "protocol-required": "请指定 URL 协议",
       "length-of-name-should-be-less-than-or-equal-to": "名称长度应不大于 {{length}}",
       "network-name-used": "节点名称已存在",
-      "invalid-address": "无效的地址",
       "invalid-amount": "无效的价值",
       "amount-not-enough": "余额不足",
       "is-unremovable": "{{target}}不可删除",
@@ -272,7 +271,8 @@
       "network-address-should-have-protocol": "RPC 地址应以 http(s)//: 开始",
       "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格",
       "is-required": "{{field}}是必须的",
-      "is-used": "{{field}}已使用"
+      "is-used": "{{field}}已使用",
+      "invalid-address": "{{address}} 是无效的地址"
     },
     "sync": {
       "syncing": "同步中",

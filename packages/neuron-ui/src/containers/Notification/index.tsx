@@ -99,7 +99,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
             <TopAlertActions dispatch={dispatch} count={notificationsInDesc.length} onDismiss={onTopAlertDismiss} />
           }
         >
-          {t(notification.content)}
+          {t(notification.content, notification.meta)}
         </MessageBar>
       ) : null}
 
@@ -154,7 +154,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
                 </Text>
                 <IconButton iconProps={{ iconName: 'Dismiss' }} onClick={onNotificationDismiss(n.timestamp)} />
               </Stack>
-              <Text as="p">{t(n.content)}</Text>
+              <Text as="p">{t(n.content, n.meta)}</Text>
             </Stack>
           )
         })}

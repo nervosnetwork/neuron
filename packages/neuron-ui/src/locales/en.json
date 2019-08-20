@@ -240,7 +240,6 @@
       "protocol-required": "Protocol is required",
       "length-of-name-should-be-less-than-or-equal-to": "Length of name should be less than or equal to {{length}}",
       "network-name-used": "Network name is used",
-      "invalid-address": "Invalid address",
       "invalid-amount": "Invalid amount",
       "amount-not-enough": "Amount is not enough",
       "is-unremovable": "{{target}} is unremovable",
@@ -272,7 +271,8 @@
       "rpc-url-should-have-protocol": "The RPC URL should start with http(s)://",
       "rpc-url-should-have-no-whitespaces": "The RPC URL should have no whitespaces",
       "is-required": "{{field}} is required",
-      "is-used": "{{field}} is used"
+      "is-used": "{{field}} is used",
+      "invalid-address": "{{address}} is an invalid address"
     },
     "sync": {
       "syncing": "Syncing",
