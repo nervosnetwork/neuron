@@ -5,8 +5,14 @@ import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface } from 'database/address/dao'
 import env from 'env'
 import AddressEntity, { AddressVersion } from 'database/address/entities/address'
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
 
 const MAX_ADDRESS_COUNT = 30
+
+export interface AddressWithWay {
+  address: AddressInterface
+  isImport: boolean | undefined
+}
 
 export interface AddressMetaInfo {
   walletId: string
@@ -24,6 +30,7 @@ export default class AddressService {
   public static generateAndSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    isImport: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = 20,
@@ -37,18 +44,35 @@ export default class AddressService {
       receivingAddressCount,
       changeAddressCount
     )
-    const allAddresses = [
+    const allAddresses: AddressInterface[] = [
       ...addresses.testnetReceiving,
       ...addresses.mainnetReceiving,
       ...addresses.testnetChange,
       ...addresses.mainnetChange,
     ]
     await AddressDao.create(allAddresses)
+
+    // TODO: notify address created and pass addressWay
+    AddressService.notifyAddressCreated(allAddresses, isImport)
+  }
+
+  private static notifyAddressCreated = (addresses: AddressInterface[], isImport: boolean | undefined) => {
+    const version = AddressService.getAddressVersion()
+    const addressesWithWay: AddressWithWay[] = addresses
+      .filter(addr => addr.version === version)
+      .map(addr => {
+        return {
+          address: addr,
+          isImport,
+        }
+      })
+    AddressCreatedSubject.getSubject().next(addressesWithWay)
   }
 
   public static checkAndGenerateSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    isImport: boolean | undefined,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -68,6 +92,7 @@ export default class AddressService {
     return AddressService.generateAndSave(
       walletId,
       extendedKey,
+      isImport,
       nextReceivingIndex,
       nextChangeIndex,
       receivingAddressCount,

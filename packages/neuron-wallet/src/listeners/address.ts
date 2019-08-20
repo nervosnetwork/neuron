@@ -28,7 +28,7 @@ export const register = () => {
       walletIds.map(async id => {
         const wallet = WalletService.getInstance().get(id)
         const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-        await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, 20, 10)
+        await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, true, 20, 10)
       })
     )
   })

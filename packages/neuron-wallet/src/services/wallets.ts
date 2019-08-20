@@ -169,15 +169,23 @@ export default class WalletService {
 
   public generateAddressesById = async (
     id: string,
+    isImport: boolean,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
     const wallet: Wallet = this.get(id)
     const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, receivingAddressCount, changeAddressCount)
+    await AddressService.checkAndGenerateSave(
+      id,
+      accountExtendedPublicKey,
+      isImport,
+      receivingAddressCount,
+      changeAddressCount
+    )
   }
 
   public generateCurrentWalletAddresses = async (
+    isImport: boolean,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -185,7 +193,7 @@ export default class WalletService {
     if (!wallet) {
       return undefined
     }
-    return this.generateAddressesById(wallet.id, receivingAddressCount, changeAddressCount)
+    return this.generateAddressesById(wallet.id, isImport, receivingAddressCount, changeAddressCount)
   }
 
   public create = (props: WalletProperties) => {
