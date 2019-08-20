@@ -99,12 +99,17 @@ export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit) 
   }
 }
 
-export const shannonToCKBFormatter = (shannon: string = '0') => {
+export const shannonToCKBFormatter = (shannon: string = '0', showSign?: boolean) => {
   if (Number.isNaN(+shannon)) {
     console.warn(`Shannon is not a valid number`)
     return shannon
   }
-  const sign = shannon.startsWith('-') ? '-' : ''
+  let sign = ''
+  if (shannon.startsWith('-')) {
+    sign = '-'
+  } else if (showSign) {
+    sign = '+'
+  }
   const unsignedShannon = shannon.replace(/^-?0*/, '')
   let unsignedCKB = ''
   if (unsignedShannon.length <= 8) {

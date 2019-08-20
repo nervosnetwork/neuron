@@ -142,7 +142,7 @@ const TransactionList = ({
             if (item) {
               return (
                 <span title={`${item.value} shannon`} className="text-overflow">
-                  {`${shannonToCKBFormatter(item.value)} CKB`}
+                  {`${shannonToCKBFormatter(item.value, true)} CKB`}
                 </span>
               )
             }
