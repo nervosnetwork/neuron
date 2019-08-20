@@ -206,6 +206,9 @@ describe(`formatters`, () => {
 
       fixtures.forEach(fixture => {
         expect(shannonToCKBFormatter(fixture.source)).toBe(fixture.target)
+        expect(shannonToCKBFormatter(fixture.source, true)).toBe(
+          +fixture.source > 0 ? `+${fixture.target}` : fixture.target
+        )
       })
     })
 
