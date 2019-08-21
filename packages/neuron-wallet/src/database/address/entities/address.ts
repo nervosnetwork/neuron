@@ -74,7 +74,7 @@ export default class Address extends BaseEntity {
   pendingBalance: string = '0'
 
   public balance = (): string => {
-    return (BigInt(this.liveBalance) + BigInt(this.sentBalance) - BigInt(this.pendingBalance)).toString()
+    return (BigInt(this.liveBalance) + BigInt(this.sentBalance)).toString()
   }
 
   public toInterface = (): AddressInterface => {
