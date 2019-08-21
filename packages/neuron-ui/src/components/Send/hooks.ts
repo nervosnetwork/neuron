@@ -11,6 +11,8 @@ import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
 
+const MAX_DECIMAL_DIGITS = 8
+
 const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
   const errorAction = {
     type: AppActions.AddNotification,
@@ -44,7 +46,7 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
         return true
       }
       const [, decimal = ''] = item.amount.split('.')
-      if (decimal.length > 8) {
+      if (decimal.length > MAX_DECIMAL_DIGITS) {
         errorAction.payload.content = Message.InvalidAmount
         return true
       }
@@ -155,6 +157,15 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
       if (undefined !== value) {
         if (field === 'amount') {
           const amount = value.replace(/[^\d.]/g, '')
+          if (Number.isNaN(+amount)) {
+            return
+          }
+
+          const [, decimal] = amount.split('.')
+          if (typeof decimal === 'string' && decimal.length > MAX_DECIMAL_DIGITS) {
+            return
+          }
+
           updateTransactionOutput(field)(idx)(amount)
         } else {
           updateTransactionOutput(field)(idx)(value)
