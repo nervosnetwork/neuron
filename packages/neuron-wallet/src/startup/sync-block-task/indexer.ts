@@ -1,13 +1,12 @@
 import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
-import IndexerQueue from 'services/indexer/queue'
+import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
+import { Address } from 'database/address/dao'
 
 import { initDatabase } from './init-database'
 
-const { nodeService, addressDbChangedSubject, walletCreatedSubject } = remote.require(
-  './startup/sync-block-task/params'
-)
+const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -29,16 +28,32 @@ export const switchNetwork = async (nodeURL: string) => {
   await initDatabase()
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
+  const lockHashInfos: LockHashInfo[] = lockHashes.map(lockHash => {
+    return {
+      lockHash,
+      isImporting: true,
+    }
+  })
   // start sync blocks service
-  indexerQueue = new IndexerQueue(nodeURL, lockHashes, nodeService.tipNumberSubject)
+  indexerQueue = new IndexerQueue(nodeURL, lockHashInfos, nodeService.tipNumberSubject)
 
-  addressDbChangedSubject.subscribe(async (event: string) => {
-    // ignore update and remove
-    if (event === 'AfterInsert') {
-      const hashes: string[] = await loadAddressesAndConvert()
-      if (indexerQueue) {
-        indexerQueue.setLockHashes(hashes)
-      }
+  // listen to address created
+  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
+    if (indexerQueue) {
+      const infos: LockHashInfo[] = (await Promise.all(
+        addresses.map(async addr => {
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
+          // undefined means true
+          const isImporting: boolean = addr.isImporting !== false
+          return hashes.map(h => {
+            return {
+              lockHash: h,
+              isImporting,
+            }
+          })
+        })
+      )).reduce((acc, val) => acc.concat(val), [])
+      indexerQueue.appendLockHashInfos(infos)
     }
   })
 

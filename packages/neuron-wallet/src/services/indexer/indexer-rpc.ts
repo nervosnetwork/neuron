@@ -11,7 +11,7 @@ export default class IndexerRPC {
     return this.core.rpc.deindexLockHash(lockHash)
   }
 
-  public indexLockHash = async (lockHash: string, indexFrom = '0') => {
+  public indexLockHash = async (lockHash: string, indexFrom?: string | undefined) => {
     return this.core.rpc.indexLockHash(lockHash, indexFrom)
   }
 

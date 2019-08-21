@@ -12,13 +12,19 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 
 import IndexerRPC from './indexer-rpc'
 
+export interface LockHashInfo {
+  lockHash: string
+  isImporting: boolean | undefined
+}
+
 enum TxPointType {
   CreatedBy = 'createdBy',
   ConsumedBy = 'consumedBy',
 }
 
 export default class IndexerQueue {
-  private lockHashes: string[]
+  // private lockHashes: string[]
+  private lockHashInfos: LockHashInfo[]
   private indexerRPC: IndexerRPC
   private getBlocksService: GetBlocks
   private per = 50
@@ -34,8 +40,9 @@ export default class IndexerQueue {
 
   private resetFlag = false
 
-  constructor(url: string, lockHashes: string[], tipNumberSubject: Subject<string | undefined>) {
-    this.lockHashes = lockHashes
+  constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
+    // this.lockHashes = lockHashes
+    this.lockHashInfos = lockHashInfos
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks()
     this.blockNumberService = new BlockNumber()
@@ -46,9 +53,15 @@ export default class IndexerQueue {
     })
   }
 
-  public setLockHashes = (lockHashes: string[]): void => {
-    this.lockHashes = lockHashes
+  public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
+    // this.lockHashes = lockHashes
+    this.lockHashInfos = lockHashInfos
     this.indexed = false
+  }
+
+  public appendLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
+    const infos = this.lockHashInfos.concat(lockHashInfos)
+    this.setLockHashInfos(infos)
   }
 
   public reset = () => {
@@ -65,13 +78,14 @@ export default class IndexerQueue {
           await this.blockNumberService.updateCurrent(BigInt(0))
           this.resetFlag = false
         }
-        const { lockHashes } = this
+        const { lockHashInfos } = this
         const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
         if (!this.indexed || currentBlockNumber !== this.tipBlockNumber) {
           if (!this.indexed) {
-            await this.indexLockHashes(lockHashes)
+            await this.indexLockHashes(lockHashInfos)
             this.indexed = true
           }
+          const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
             await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber)
@@ -130,13 +144,14 @@ export default class IndexerQueue {
     return minBlockNumber
   }
 
-  public indexLockHashes = async (lockHashes: string[]) => {
+  public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
     const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
-    const nonIndexedLockHashes = lockHashes.filter(i => !indexedLockHashes.includes(i))
+    const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
-    await Utils.mapSeries(nonIndexedLockHashes, async (lockHash: string) => {
-      await this.indexerRPC.indexLockHash(lockHash)
+    await Utils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
+      const indexFrom: string | undefined = info.isImporting ? '0' : undefined
+      await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
     })
   }
 

@@ -2,12 +2,16 @@ import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
+import { Address } from 'database/address/dao'
 
 import { initDatabase } from './init-database'
 
-const { nodeService, addressDbChangedSubject, walletCreatedSubject } = remote.require(
-  './startup/sync-block-task/params'
-)
+const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
+
+export interface LockHashInfo {
+  lockHash: string
+  isImporting: boolean | undefined
+}
 
 // pass to task a main process subject
 // AddressesUsedSubject.setSubject(addressesUsedSubject)
@@ -35,13 +39,28 @@ export const switchNetwork = async () => {
   // start sync blocks service
   blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
 
-  addressDbChangedSubject.subscribe(async (event: string) => {
-    // ignore update and remove
-    if (event === 'AfterInsert') {
-      const hashes: string[] = await loadAddressesAndConvert()
-      if (blockListener) {
-        blockListener.setLockHashes(hashes)
+  // listen to address created
+  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
+    if (blockListener) {
+      const infos: LockHashInfo[] = (await Promise.all(
+        addresses.map(async addr => {
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
+          // undefined means false
+          const isImporting: boolean = addr.isImporting === true
+          return hashes.map(h => {
+            return {
+              lockHash: h,
+              isImporting,
+            }
+          })
+        })
+      )).reduce((acc, val) => acc.concat(val), [])
+      const oldLockHashes: string[] = blockListener.getLockHashes()
+      const anyIsImporting: boolean = infos.some(info => info.isImporting === true)
+      if (oldLockHashes.length === 0 && !anyIsImporting) {
+        await blockListener.setToTip()
       }
+      blockListener.appendLockHashes(infos.map(info => info.lockHash))
     }
   })
 
