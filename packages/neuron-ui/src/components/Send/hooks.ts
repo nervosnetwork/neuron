@@ -126,6 +126,11 @@ const useOnTransactionChange = (walletID: string, items: TransactionOutput[], di
               payload: '0',
             })
           })
+      } else {
+        dispatch({
+          type: AppActions.UpdateSendCycles,
+          payload: '0',
+        })
       }
     }, 300)
   }, [walletID, items, dispatch])
