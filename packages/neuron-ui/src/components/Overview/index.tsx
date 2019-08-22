@@ -64,6 +64,45 @@ const genTypeLabel = (
   }
 }
 
+const onTransactionActivityRender = (item?: ActivityItem) => {
+  if (!item) {
+    return null
+  }
+  return (
+    <>
+      <Text variant="mediumPlus" as="span" title={`${item.value} shannon`}>
+        {`${item.typeLabel} ${shannonToCKBFormatter(item.value)} CKB`}
+      </Text>
+      <Text variant="mediumPlus" as="span" title={item.confirmations} styles={{ root: [{ paddingLeft: '5px' }] }}>
+        {item.confirmations}
+      </Text>
+    </>
+  )
+}
+
+const onTransactionRowRender = (props?: IDetailsRowProps) => {
+  if (!props) {
+    return null
+  }
+  const customStyles: Partial<IDetailsRowStyles> = {
+    root: {
+      animationDuration: '0!important',
+    },
+  }
+  return <DetailsRow {...props} styles={customStyles} />
+}
+
+const onTimestampRender = (item?: any) => {
+  if (!item) {
+    return null
+  }
+  return (
+    <Text variant="mediumPlus" as="span">
+      {timeFormatter(item.timestamp || item.createdAt)}
+    </Text>
+  )
+}
+
 const ActivityList = ({
   columns,
   items,
@@ -114,6 +153,7 @@ const ActivityList = ({
     ) : null}
   </Stack>
 )
+
 const Overview = ({
   dispatch,
   app: { tipBlockNumber, chain, epoch, difficulty },
@@ -149,45 +189,6 @@ const Overview = ({
   const onGoToHistory = useCallback(() => {
     history.push(Routes.History)
   }, [history])
-
-  const onTransactionRowRender = useCallback((props?: IDetailsRowProps) => {
-    if (props) {
-      const customStyles: Partial<IDetailsRowStyles> = {
-        root: {
-          animationDuration: '0!important',
-        },
-      }
-      return <DetailsRow {...props} styles={customStyles} />
-    }
-    return null
-  }, [])
-
-  const onTransactionActivityRender = useCallback((item?: ActivityItem) => {
-    if (item) {
-      return (
-        <>
-          <Text variant="mediumPlus" as="span" title={`${item.value} shannon`}>
-            {`${item.typeLabel} ${shannonToCKBFormatter(item.value)} CKB`}
-          </Text>
-          <Text variant="mediumPlus" as="span" title={item.confirmations} styles={{ root: [{ paddingLeft: '5px' }] }}>
-            {item.confirmations}
-          </Text>
-        </>
-      )
-    }
-    return null
-  }, [])
-
-  const onTimestampRender = useCallback((item?: any) => {
-    if (item) {
-      return (
-        <Text variant="mediumPlus" as="span">
-          {timeFormatter(item.timestamp || item.createdAt)}
-        </Text>
-      )
-    }
-    return null
-  }, [])
 
   const activityColumns: IColumn[] = useMemo(() => {
     return [
@@ -230,7 +231,7 @@ const Overview = ({
         ...col,
       })
     )
-  }, [t, onTimestampRender, onTransactionActivityRender])
+  }, [t])
 
   const balanceProperties: Property[] = useMemo(
     () => [
@@ -263,18 +264,15 @@ const Overview = ({
     [t, chain, epoch, difficulty, tipBlockNumber]
   )
 
-  const showBlockchainStatus = useCallback(() => {
-    setDisplayBlockchainInfo(true)
-  }, [setDisplayBlockchainInfo])
-  const hideBlockchainStatus = useCallback(() => {
-    setDisplayBlockchainInfo(false)
-  }, [setDisplayBlockchainInfo])
-  const showMinerInfo = useCallback(() => {
-    setDisplayMinerInfo(true)
-  }, [setDisplayMinerInfo])
-  const hideMinerInfo = useCallback(() => {
-    setDisplayMinerInfo(false)
-  }, [setDisplayMinerInfo])
+  const [showBlockchainStatus, hideBlockchainStatus, showMinerInfo, hideMinerInfo] = useMemo(
+    () => [
+      () => setDisplayBlockchainInfo(true),
+      () => setDisplayBlockchainInfo(false),
+      () => setDisplayMinerInfo(true),
+      () => setDisplayMinerInfo(false),
+    ],
+    [setDisplayBlockchainInfo, setDisplayMinerInfo]
+  )
 
   const defaultAddress = useMemo(() => {
     return addresses.find(addr => addr.type === 0 && addr.index === 0)
