@@ -4,7 +4,7 @@ import { IDropdownOption } from 'office-ui-fabric-react'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { Message } from 'utils/const'
+import { Message, MAX_DECIMAL_DIGITS } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
 import { outputsToTotalCapacity } from 'utils/formatters'
 import { TransactionOutput } from '.'
@@ -37,22 +37,27 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       }
       if (Number.isNaN(+item.amount) || +item.amount < 0) {
         errorAction.payload.content = Message.InvalidAmount
+        errorAction.payload.meta = { amount: item.amount }
+        return true
+      }
+      const [, decimal = ''] = item.amount.split('.')
+      if (decimal.length > MAX_DECIMAL_DIGITS) {
+        errorAction.payload.content = Message.DecimalExceed
+        errorAction.payload.meta = { amount: item.amount }
         return true
       }
       if (!verifyAmountRange(item.amount)) {
         errorAction.payload.content = Message.AmountTooSmall
-        return true
-      }
-      const [, decimal = ''] = item.amount.split('.')
-      if (decimal.length > 8) {
-        errorAction.payload.content = Message.InvalidAmount
+        errorAction.payload.meta = { amount: item.amount }
         return true
       }
       return false
     }
   )
-  if (invalid && dispatch) {
-    dispatch(errorAction)
+  if (invalid) {
+    if (dispatch) {
+      dispatch(errorAction)
+    }
     return false
   }
   return true
@@ -154,8 +159,10 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
     ) => {
       if (undefined !== value) {
         if (field === 'amount') {
-          const amount = value.replace(/[^\d.]/g, '')
-          updateTransactionOutput(field)(idx)(amount)
+          if (Number.isNaN(+value) || /[^\d.]/.test(value)) {
+            return
+          }
+          updateTransactionOutput(field)(idx)(value)
         } else {
           updateTransactionOutput(field)(idx)(value)
         }
