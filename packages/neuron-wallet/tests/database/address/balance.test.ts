@@ -81,7 +81,7 @@ describe('balance', () => {
     expect(balance).toEqual(BigInt(1000))
   })
 
-  it('sent to others with 10shannon fee', async () => {
+  it('sent to others with 10 shannon fee', async () => {
     // have 1000, sent to others 200, and refund 790, with 10 shannon fee
     const addresses = [
       generateAddress('0', '0', '1000'),
