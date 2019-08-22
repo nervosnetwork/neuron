@@ -270,9 +270,9 @@
       "is-required": "{{field}} is required",
       "is-used": "{{field}} is used",
       "invalid-address": "{{address}} is an invalid address",
-      "amount-decimal-exceed": "The amount {{amount}} CKB should has less than 9 decimal digits",
+      "amount-decimal-exceed": "The amount {{amount}} CKB is invalid, please enter an amount with no more than 8 decimal places",
       "invalid-amount": "The amount {{amount}} CKB is invalid",
-      "amount-too-small": "The amount {{amount}} CKB is too small, please set a value large than or equal to 61 CKB"
+      "amount-too-small": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB"
     },
     "sync": {
       "syncing": "Syncing",

@@ -270,9 +270,9 @@
       "is-required": "{{field}}是必须的",
       "is-used": "{{field}}已使用",
       "invalid-address": "{{address}} 是无效的地址",
-      "amount-decimal-exceed": "金额 {{amount}} 的小数不应超过 8 位",
+      "amount-decimal-exceed": "金额 {{amount}} 是个无效的值, 其小数位应不超过 8 位",
       "invalid-amount": "金额 {{amount} 是无效的数字",
-      "amount-too-small": "金额 {{amount}} 太小, 请设定一个不小于 61 CKB 的值"
+      "amount-too-small": "金额 {{amount}} 太小, 请输入一个不小于 61 CKB 的值"
     },
     "sync": {
       "syncing": "同步中",
