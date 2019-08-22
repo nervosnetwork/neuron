@@ -13,10 +13,12 @@ import { useSearch } from './hooks'
 
 const History = ({
   app: {
+    tipBlockNumber: chainBlockNumber,
     loadings: { transactionList: isLoading, updateDescription: isUpdatingDescription },
   },
   wallet: { id },
   chain: {
+    tipBlockNumber: syncedBlockNumber,
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
   },
   history,
@@ -32,6 +34,10 @@ const History = ({
     }
   }, [id, history])
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
+
+  const tipBlockNumber = useMemo(() => {
+    return Math.max(+syncedBlockNumber, +chainBlockNumber).toString()
+  }, [syncedBlockNumber, chainBlockNumber])
 
   const List = useMemo(() => {
     return (
@@ -51,6 +57,7 @@ const History = ({
           isUpdatingDescription={isUpdatingDescription}
           walletID={id}
           items={items}
+          tipBlockNumber={tipBlockNumber}
           dispatch={dispatch}
         />
         <Pagination
@@ -83,6 +90,7 @@ const History = ({
     isUpdatingDescription,
     id,
     items,
+    tipBlockNumber,
     dispatch,
     pageNo,
     totalCount,

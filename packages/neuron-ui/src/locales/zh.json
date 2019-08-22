@@ -126,11 +126,17 @@
       "last": "最后一页",
       "description": "标签",
       "status": "状态",
+      "pending": "已提交",
+      "success": "成功",
+      "failed": "失败",
+      "confirming": "确认中",
       "blockNumber": "区块高度",
       "basic-information": "基本信息",
       "search": {
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
-      }
+      },
+      "confirmations": "确认次数",
+      "confirming-with-count": " 已确认 {{confirmations}} 次"
     },
     "transaction": {
       "goBack": "返回"
