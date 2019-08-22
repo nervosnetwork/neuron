@@ -126,11 +126,17 @@
       "last": "Last",
       "description": "Description",
       "status": "Status",
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "confirming": "Confirming",
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
-      }
+      },
+      "confirmations": "Confirmations",
+      "confirming-with-count": "{{confirmations}} confirmations"
     },
     "transaction": {
       "goBack": "Go back"

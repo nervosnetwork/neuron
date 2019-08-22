@@ -16,8 +16,14 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 import { contextMenu, showTransactionDetails } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
-import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, uniformTimeFormatter } from 'utils/formatters'
+import {
+  shannonToCKBFormatter,
+  uniformTimeFormatter as timeFormatter,
+  uniformTimeFormatter,
+  localNumberFormatter,
+} from 'utils/formatters'
 import { onRenderRow } from 'utils/fabricUIRender'
+import { CONFIRMATION_THRESHOLD } from 'utils/const'
 
 const theme = getTheme()
 
@@ -50,12 +56,14 @@ const TransactionList = ({
   isUpdatingDescription = false,
   items = [],
   walletID,
+  tipBlockNumber,
   dispatch,
 }: {
   isLoading?: boolean
   isUpdatingDescription?: boolean
   walletID: string
   items: State.Transaction[]
+  tipBlockNumber: string
   dispatch: StateDispatch
 }) => {
   const [t] = useTranslation()
@@ -71,7 +79,20 @@ const TransactionList = ({
   const transactionColumns: IColumn[] = useMemo(
     (): IColumn[] =>
       [
-        { name: t('history.type'), key: 'type', fieldName: 'type', minWidth: MIN_CELL_WIDTH, maxWidth: 50 },
+        {
+          name: t('history.type'),
+          key: 'type',
+          fieldName: 'type',
+          minWidth: MIN_CELL_WIDTH,
+          maxWidth: 50,
+          onRender: (item?: FormatTransaction) => {
+            if (!item) {
+              return null
+            }
+            const type = t(`history.${item.type}`)
+            return <span title={type}>{type}</span>
+          },
+        },
         {
           name: t('history.timestamp'),
           key: 'timestamp',
@@ -79,27 +100,74 @@ const TransactionList = ({
           minWidth: 80,
           maxWidth: 80,
           onRender: (item?: FormatTransaction) => {
-            return item ? <span>{uniformTimeFormatter(item.timestamp || item.createdAt).split(' ')[1]}</span> : null
+            if (!item) {
+              return null
+            }
+            const time = uniformTimeFormatter(item.timestamp || item.createdAt).split(' ')[1]
+            return <span title={time}>{time}</span>
           },
         },
         {
           name: t('history.transaction-hash'),
           key: 'hash',
           fieldName: 'hash',
-          minWidth: 100,
-          maxWidth: 600,
+          minWidth: 150,
+          maxWidth: 150,
           onRender: (item?: FormatTransaction) => {
-            if (item) {
-              return (
-                <span className="text-overflow monospacedFont" title={item.hash}>
-                  {item.hash}
-                </span>
-              )
+            if (!item) {
+              return '-'
             }
-            return '-'
+            return (
+              <span className="text-overflow monospacedFont" title={item.hash}>
+                {`${item.hash.slice(0, 8)}...${item.hash.slice(-6)}`}
+              </span>
+            )
           },
         },
-        { name: t('history.status'), key: 'status', fieldName: 'status', minWidth: 50, maxWidth: 50 },
+        {
+          name: t('history.confirmations'),
+          key: 'confirmation',
+          minWidth: 100,
+          maxWidth: +tipBlockNumber > 1e12 ? undefined : 150,
+          onRender: (item?: FormatTransaction) => {
+            if (!item || item.status !== 'success') {
+              return null
+            }
+            const confirmationCount = 1 + +tipBlockNumber - +item.blockNumber
+            if (confirmationCount < CONFIRMATION_THRESHOLD) {
+              return t(`history.confirming-with-count`, {
+                confirmations: `${confirmationCount} / ${CONFIRMATION_THRESHOLD}`,
+              })
+            }
+            const confirmations = localNumberFormatter(confirmationCount)
+            return (
+              <span title={`${confirmations}`} className="text-overflow">
+                {confirmations}
+              </span>
+            )
+          },
+        },
+        {
+          name: t('history.status'),
+          key: 'status',
+          fieldName: 'status',
+          minWidth: 80,
+          maxWidth: 80,
+          onRender: (item?: FormatTransaction) => {
+            if (!item) {
+              return null
+            }
+            if (item.status !== 'success') {
+              const status = t(`history.${item.status}`)
+              return <span title={status}>{status}</span>
+            }
+            const confirmationCount = 1 + +tipBlockNumber - +item.blockNumber
+            if (confirmationCount < CONFIRMATION_THRESHOLD) {
+              return t(`history.confirming`)
+            }
+            return t(`history.success`)
+          },
+        },
         {
           name: t('history.description'),
           key: 'description',
@@ -151,6 +219,7 @@ const TransactionList = ({
         },
       ].map((col): IColumn => ({ fieldName: col.key, ariaLabel: col.name, ...col })),
     [
+      tipBlockNumber,
       localDescription,
       onDescriptionChange,
       onDescriptionFieldBlur,
