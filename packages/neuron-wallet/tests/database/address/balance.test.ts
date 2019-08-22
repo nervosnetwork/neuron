@@ -44,7 +44,7 @@ describe('balance', () => {
     expect(addr.balance()).toEqual((1000 + 100).toString())
   })
 
-  it('balance is right in interface', async () => {
+  it('the balance returned by the toInterface() is correct', async () => {
     const address = generateAddress('1000', '100', '300')
     const addrs: AddressEntity[] = await AddressDao.create([address])
     const addr = addrs[0]
@@ -96,7 +96,7 @@ describe('balance', () => {
     expect(balance).toEqual(BigInt(790))
   })
 
-  it('sent to self with 10shannon fee', async () => {
+  it('sent to self with 10 shannon fee', async () => {
     // have 1000, sent to self 200, and refund 790, with 10 shannon fee
     const addresses = [
       generateAddress('0', '0', '1000'),
