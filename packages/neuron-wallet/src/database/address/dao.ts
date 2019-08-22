@@ -22,6 +22,7 @@ export interface Address {
   blake160: string
   version: AddressVersion
   description?: string
+  isImporting?: boolean | undefined
 }
 
 export default class AddressDao {

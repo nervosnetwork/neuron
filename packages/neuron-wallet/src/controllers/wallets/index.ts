@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { SaveDialogReturnValue } from 'electron'
 import AppController from 'controllers/app'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import Keystore from 'models/keys/keystore'
@@ -71,6 +72,7 @@ export default class WalletsController {
       name,
       password,
       mnemonic,
+      isImporting: true,
     })
 
     WalletCreatedSubject.getSubject().next('import')
@@ -92,6 +94,7 @@ export default class WalletsController {
       name,
       password,
       mnemonic,
+      isImporting: false,
     })
 
     WalletCreatedSubject.getSubject().next('create')
@@ -103,10 +106,12 @@ export default class WalletsController {
     name,
     password,
     mnemonic,
+    isImporting,
   }: {
     name: string
     password: string
     mnemonic: string
+    isImporting: boolean
   }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
     if (!validateMnemonic(mnemonic)) {
       throw new InvalidMnemonic()
@@ -137,7 +142,7 @@ export default class WalletsController {
       keystore,
     })
 
-    await walletsService.generateAddressesById(wallet.id)
+    await walletsService.generateAddressesById(wallet.id, isImporting)
 
     return {
       status: ResponseCode.Success,
@@ -187,7 +192,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    await walletsService.generateAddressesById(wallet.id)
+    await walletsService.generateAddressesById(wallet.id, true)
     WalletCreatedSubject.getSubject().next('import')
 
     return {
@@ -270,9 +275,9 @@ export default class WalletsController {
           title: i18n.t('messages.save-keystore'),
           defaultPath: wallet.name,
         },
-        (filename?: string) => {
-          if (filename) {
-            fs.writeFileSync(filename, JSON.stringify(keystore))
+        (returnValue: SaveDialogReturnValue) => {
+          if (returnValue.filePath) {
+            fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
             resolve({
               status: ResponseCode.Success,
               result: true,
@@ -362,6 +367,26 @@ export default class WalletsController {
       return {
         status: ResponseCode.Success,
         result: hash,
+      }
+    } catch (err) {
+      return {
+        status: ResponseCode.Fail,
+        msg: `Error: "${err.message}"`,
+      }
+    }
+  }
+
+  @CatchControllerError
+  public static async computeCycles(params: { walletID: string; capacities: string }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    try {
+      const walletsService = WalletsService.getInstance()
+      const cycles = await walletsService.computeCycles(params.walletID, params.capacities)
+      return {
+        status: ResponseCode.Success,
+        result: cycles,
       }
     } catch (err) {
       return {

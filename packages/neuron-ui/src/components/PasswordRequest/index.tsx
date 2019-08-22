@@ -8,7 +8,7 @@ import { priceToFee, CKBToShannonFormatter } from 'utils/formatters'
 
 const PasswordRequest = ({
   app: {
-    send: { txID, outputs, description, price, cycles },
+    send: { txID, outputs, description, price, cycles, loading: isSending },
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
   settings: { wallets = [] },
@@ -27,6 +27,9 @@ const PasswordRequest = ({
   const onConfirm = useCallback(() => {
     switch (actionType) {
       case 'send': {
+        if (isSending) {
+          break
+        }
         sendTransaction({
           id: txID,
           walletID,
@@ -58,7 +61,7 @@ const PasswordRequest = ({
         break
       }
     }
-  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price, history])
+  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price, history, isSending])
 
   const onChange = useCallback(
     (_e, value?: string) => {
@@ -100,7 +103,7 @@ const PasswordRequest = ({
           <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
           <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
             <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton onClick={onConfirm} disabled={!password}>
+            <PrimaryButton onClick={onConfirm} disabled={!password || (actionType === 'send' && isSending)}>
               {t('common.confirm')}
             </PrimaryButton>
           </Stack>

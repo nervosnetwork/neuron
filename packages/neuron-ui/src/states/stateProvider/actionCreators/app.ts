@@ -3,7 +3,7 @@ import { getNeuronWalletState } from 'services/remote'
 import initStates from 'states/initStates'
 import { Routes } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
-import addressesToBalance from 'utils/addressesToBalance'
+import { addressesToBalance } from 'utils/formatters'
 import {
   wallets as walletsCache,
   addresses as addressesCache,

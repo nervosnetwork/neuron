@@ -26,6 +26,7 @@ export enum AppActions {
   RemoveSendOutput = 'removeSendOutput',
   UpdateSendOutput = 'updateSendOutput',
   UpdateSendPrice = 'updateSendPrice',
+  UpdateSendCycles = 'updateSendCycles',
   UpdateSendDescription = 'updateSendDescription',
   ClearSendState = 'clearSendState',
   UpdateSendLoading = 'updateSendLoading',
@@ -332,6 +333,21 @@ export const reducer = (
           send: {
             ...app.send,
             price: payload,
+          },
+        },
+      }
+    }
+    case AppActions.UpdateSendCycles: {
+      /**
+       * payload: new cycles
+       */
+      return {
+        ...state,
+        app: {
+          ...app,
+          send: {
+            ...app.send,
+            cycles: payload,
           },
         },
       }

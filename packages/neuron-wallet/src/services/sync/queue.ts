@@ -51,20 +51,22 @@ export default class Queue {
       try {
         this.inProcess = true
 
-        const current: bigint = await this.currentBlockNumber.getCurrent()
-        const startNumber: bigint = current + BigInt(1)
-        const endNumber: bigint = current + BigInt(this.fetchSize)
-        const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
+        if (this.lockHashes.length !== 0) {
+          const current: bigint = await this.currentBlockNumber.getCurrent()
+          const startNumber: bigint = current + BigInt(1)
+          const endNumber: bigint = current + BigInt(this.fetchSize)
+          const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
 
-        if (realEndNumber >= this.endBlockNumber) {
-          this.yieldTime = 1000
-        } else {
-          this.yieldTime = 1
-        }
+          if (realEndNumber >= this.endBlockNumber) {
+            this.yieldTime = 1000
+          } else {
+            this.yieldTime = 1
+          }
 
-        if (realEndNumber >= startNumber) {
-          const rangeArr = Utils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
-          await this.pipeline(rangeArr)
+          if (realEndNumber >= startNumber) {
+            const rangeArr = Utils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
+            await this.pipeline(rangeArr)
+          }
         }
       } catch (err) {
         if (err.message.startsWith('connect ECONNREFUSED')) {

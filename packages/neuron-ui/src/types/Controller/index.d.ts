@@ -1,4 +1,9 @@
 declare namespace Controller {
+  interface CreateWalletParams {
+    name: string
+    mnemonic: string
+    password: string
+  }
   interface ImportMnemonicParams {
     name: string
     mnemonic: string
@@ -38,6 +43,11 @@ declare namespace Controller {
     password: string
     fee: string
     description: string
+  }
+
+  interface ComputeCycles {
+    walletID: string
+    capacities: string
   }
 
   type GetAddressesByWalletIDParams = string

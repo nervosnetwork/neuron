@@ -81,7 +81,7 @@ describe('LockUtils Test', () => {
 
     const lockHashes: string[] = await LockUtils.addressToAllLockHashes(bob.address)
 
-    expect(lockHashes).toEqual([bob.lockHash, bob.lockHashWhenType])
+    expect(lockHashes).toEqual([bob.lockHash])
   })
 
   it('addressesToAllLockHashes', async () => {
@@ -91,12 +91,7 @@ describe('LockUtils Test', () => {
 
     const lockHashes: string[] = await LockUtils.addressesToAllLockHashes([bob.address, alice.address])
 
-    const expectedResult = [
-      bob.lockHash,
-      bob.lockHashWhenType,
-      alice.lockHash,
-      alice.lockHashWhenType,
-    ]
+    const expectedResult = [bob.lockHash, alice.lockHash]
 
     expect(lockHashes).toEqual(expectedResult)
   })

@@ -5,6 +5,7 @@ import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface } from 'database/address/dao'
 import env from 'env'
 import AddressEntity, { AddressVersion } from 'database/address/entities/address'
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -24,6 +25,7 @@ export default class AddressService {
   public static generateAndSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    isImporting: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
     receivingAddressCount: number = 20,
@@ -37,18 +39,34 @@ export default class AddressService {
       receivingAddressCount,
       changeAddressCount
     )
-    const allAddresses = [
+    const allAddresses: AddressInterface[] = [
       ...addresses.testnetReceiving,
       ...addresses.mainnetReceiving,
       ...addresses.testnetChange,
       ...addresses.mainnetChange,
     ]
     await AddressDao.create(allAddresses)
+
+    // TODO: notify address created and pass addressWay
+    AddressService.notifyAddressCreated(allAddresses, isImporting)
+  }
+
+  private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
+    const version = AddressService.getAddressVersion()
+    const addrs = addresses
+      .filter(addr => addr.version === version)
+      .map(addr => {
+        const address = addr
+        address.isImporting = isImporting
+        return address
+      })
+    AddressCreatedSubject.getSubject().next(addrs)
   }
 
   public static checkAndGenerateSave = async (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
+    isImporting: boolean | undefined,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -68,6 +86,7 @@ export default class AddressService {
     return AddressService.generateAndSave(
       walletId,
       extendedKey,
+      isImporting,
       nextReceivingIndex,
       nextChangeIndex,
       receivingAddressCount,

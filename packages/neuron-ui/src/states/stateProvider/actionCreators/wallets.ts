@@ -1,6 +1,7 @@
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
+  createWallet,
   importMnemonic,
   importKeystore,
   getCurrentWallet,
@@ -18,7 +19,7 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
-import addressesToBalance from 'utils/addressesToBalance'
+import { addressesToBalance } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
@@ -44,7 +45,7 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   _dispatch: StateDispatch,
   history: any
 ) => {
-  importMnemonic(params).then(res => {
+  createWallet(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
     } else {

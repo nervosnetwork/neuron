@@ -51,6 +51,7 @@ declare namespace State {
     type: 'success' | 'warning' | 'alert'
     timestamp: number
     content: string
+    meta?: { [key: string]: string }
   }
   interface Send {
     txID: string

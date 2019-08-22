@@ -1,8 +1,17 @@
+import { ckbCore } from 'services/chain'
 import { ADDRESS_LENGTH, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT } from './const'
 
-export const verifyAddress = (address: string): boolean => {
+export const verifyAddress = (address: string): boolean | string => {
   // TODO: verify address, prd required
-  return address.length === ADDRESS_LENGTH
+  try {
+    if (address.length !== ADDRESS_LENGTH) {
+      throw new Error('Address length is incorrect')
+    }
+    ckbCore.utils.parseAddress(address)
+    return true
+  } catch (err) {
+    return err.message
+  }
 }
 
 export const verifyAmountRange = (amount: string) => {

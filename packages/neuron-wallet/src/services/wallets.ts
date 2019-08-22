@@ -16,6 +16,7 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import dataUpdateSubject from 'models/subjects/data-update'
 import CommandSubject from 'models/subjects/command'
 import WindowManager from 'models/window-manager'
+import CellsService from 'services/cells'
 
 import NodeService from './node'
 import FileService from './file'
@@ -27,6 +28,7 @@ const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
 const DEBOUNCE_TIME = 200
+const SECP_CYCLES = BigInt('1440000')
 
 export interface Wallet {
   id: string
@@ -167,15 +169,23 @@ export default class WalletService {
 
   public generateAddressesById = async (
     id: string,
+    isImporting: boolean,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
     const wallet: Wallet = this.get(id)
     const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, receivingAddressCount, changeAddressCount)
+    await AddressService.checkAndGenerateSave(
+      id,
+      accountExtendedPublicKey,
+      isImporting,
+      receivingAddressCount,
+      changeAddressCount
+    )
   }
 
   public generateCurrentWalletAddresses = async (
+    isImporting: boolean,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
@@ -183,7 +193,7 @@ export default class WalletService {
     if (!wallet) {
       return undefined
     }
-    return this.generateAddressesById(wallet.id, receivingAddressCount, changeAddressCount)
+    return this.generateAddressesById(wallet.id, isImporting, receivingAddressCount, changeAddressCount)
   }
 
   public create = (props: WalletProperties) => {
@@ -315,7 +325,7 @@ export default class WalletService {
       throw new IsRequired('Password')
     }
 
-    const addressInfos = await this.getAddressInfos()
+    const addressInfos = await this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
@@ -371,10 +381,31 @@ export default class WalletService {
     return txHash
   }
 
+  public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+
+    const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
+    const cycles = SECP_CYCLES * BigInt(inputs.length)
+
+    return cycles.toString()
+  }
+
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
-  public getAddressInfos = async (): Promise<AddressInterface[]> => {
-    const walletId = this.getCurrent()!.id
-    const addrs = await AddressService.allAddressesByWalletId(walletId)
+  public getAddressInfos = async (walletID: string): Promise<AddressInterface[]> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+    const addrs = await AddressService.allAddressesByWalletId(walletID)
     return addrs
   }
 

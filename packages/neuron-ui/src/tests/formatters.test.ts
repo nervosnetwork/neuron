@@ -1,5 +1,12 @@
 import { CapacityUnit } from 'utils/const'
-import { currencyFormatter, currencyCode, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import {
+  currencyFormatter,
+  currencyCode,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+  addressesToBalance,
+  outputsToTotalCapacity,
+} from 'utils/formatters'
 
 describe(`formatters`, () => {
   it(`currencyFormatter`, () => {
@@ -199,7 +206,74 @@ describe(`formatters`, () => {
 
       fixtures.forEach(fixture => {
         expect(shannonToCKBFormatter(fixture.source)).toBe(fixture.target)
+        expect(shannonToCKBFormatter(fixture.source, true)).toBe(
+          +fixture.source > 0 ? `+${fixture.target}` : fixture.target
+        )
       })
+    })
+
+    it('addresses to balance', () => {
+      const fixture = [
+        {
+          address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j1',
+          identifier: '4040ba0ed8a361c59c30bb92f46128f95eaa9bcb',
+          description: 'description',
+          type: 0 as 0 | 1,
+          txCount: 0,
+          balance: '100',
+          index: 0,
+        },
+        {
+          address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j3',
+          identifier: '4040ba0ed8a361c59c30bb92f46128f95eaa9bcb',
+          description: 'description',
+          type: 0 as 0 | 1,
+          txCount: 123,
+          balance: '10000',
+          index: 1,
+        },
+        {
+          address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2j2',
+          identifier: '4040ba0ed8a361c59c30bb92f46128f95eaa9bcd',
+          description: 'description',
+          type: 1 as 0 | 1,
+          txCount: 0,
+          balance: '200',
+          index: 2,
+        },
+        {
+          address: 'ckt1q9gry5zg8stq8ruq5wfz3lm5wn2k7qw3ulsfmdhe98f2jd',
+          identifier: '4040ba0ed8a361c59c30bb92f46128f95eaa9bcd',
+          description: 'description',
+          type: 1 as 0 | 1,
+          txCount: 123,
+          balance: '10000',
+          index: 3,
+        },
+      ]
+      expect(addressesToBalance(fixture)).toBe('20300')
+    })
+
+    it('outputsToTotalCapacity', () => {
+      const fixture: any = [
+        {
+          amount: '100',
+          unit: 'CKB',
+        },
+        {
+          amount: '10000',
+          unit: 'CKB',
+        },
+        {
+          amount: '200',
+          unit: 'CKB',
+        },
+        {
+          amount: '10000',
+          unit: 'CKB',
+        },
+      ]
+      expect(outputsToTotalCapacity(fixture)).toBe('20300')
     })
   })
 })

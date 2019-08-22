@@ -240,9 +240,6 @@
       "protocol-required": "请指定 URL 协议",
       "length-of-name-should-be-less-than-or-equal-to": "名称长度应不大于 {{length}}",
       "network-name-used": "节点名称已存在",
-      "invalid-address": "无效的地址",
-      "invalid-amount": "无效的价值",
-      "amount-not-enough": "余额不足",
       "is-unremovable": "{{target}}不可删除",
       "create-wallet-success": "您已成功创建钱包 '{{name}}'",
       "network-is-not-found": "未找到节点信息",
@@ -257,7 +254,6 @@
       "invalid-mnemonic": "助记词不合法",
       "camera-not-available-or-disabled": "摄像头不可用或被禁用",
       "can-not-find-the-default-address": "未获得默认地址",
-      "amount-too-small": "金额应不小于 61 CKB",
       "create-wallet-successfully": "新建钱包成功",
       "import-wallet-successfully": "导入钱包成功",
       "update-wallet-successfully": "已更新钱包信息",
@@ -272,7 +268,11 @@
       "network-address-should-have-protocol": "RPC 地址应以 http(s)//: 开始",
       "network-address-should-have-no-whitespaces": "RPC 地址不能包含空格",
       "is-required": "{{field}}是必须的",
-      "is-used": "{{field}}已使用"
+      "is-used": "{{field}}已使用",
+      "invalid-address": "{{address}} 是无效的地址",
+      "amount-decimal-exceed": "金额 {{amount}} 是个无效的值, 其小数位应不超过 8 位",
+      "invalid-amount": "金额 {{amount} 是无效的数字",
+      "amount-too-small": "金额 {{amount}} 太小, 请输入一个不小于 61 CKB 的值"
     },
     "sync": {
       "syncing": "同步中",
