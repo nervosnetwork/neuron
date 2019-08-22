@@ -4,14 +4,12 @@ import { IDropdownOption } from 'office-ui-fabric-react'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { Message } from 'utils/const'
+import { Message, MAX_DECIMAL_DIGITS } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
 import { outputsToTotalCapacity } from 'utils/formatters'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
-
-const MAX_DECIMAL_DIGITS = 8
 
 const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
   const errorAction = {
@@ -39,22 +37,27 @@ const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutp
       }
       if (Number.isNaN(+item.amount) || +item.amount < 0) {
         errorAction.payload.content = Message.InvalidAmount
-        return true
-      }
-      if (!verifyAmountRange(item.amount)) {
-        errorAction.payload.content = Message.AmountTooSmall
+        errorAction.payload.meta = { amount: item.amount }
         return true
       }
       const [, decimal = ''] = item.amount.split('.')
       if (decimal.length > MAX_DECIMAL_DIGITS) {
-        errorAction.payload.content = Message.InvalidAmount
+        errorAction.payload.content = Message.DecimalExceed
+        errorAction.payload.meta = { amount: item.amount }
+        return true
+      }
+      if (!verifyAmountRange(item.amount)) {
+        errorAction.payload.content = Message.AmountTooSmall
+        errorAction.payload.meta = { amount: item.amount }
         return true
       }
       return false
     }
   )
-  if (invalid && dispatch) {
-    dispatch(errorAction)
+  if (invalid) {
+    if (dispatch) {
+      dispatch(errorAction)
+    }
     return false
   }
   return true
@@ -156,17 +159,10 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
     ) => {
       if (undefined !== value) {
         if (field === 'amount') {
-          const amount = value.replace(/[^\d.]/g, '')
-          if (Number.isNaN(+amount)) {
+          if (Number.isNaN(+value) || /[^\d.]/.test(value)) {
             return
           }
-
-          const [, decimal] = amount.split('.')
-          if (typeof decimal === 'string' && decimal.length > MAX_DECIMAL_DIGITS) {
-            return
-          }
-
-          updateTransactionOutput(field)(idx)(amount)
+          updateTransactionOutput(field)(idx)(value)
         } else {
           updateTransactionOutput(field)(idx)(value)
         }

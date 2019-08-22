@@ -8,6 +8,8 @@ export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
 export const CONFIRMATION_THRESHOLD = 10
 
+export const MAX_DECIMAL_DIGITS = 8
+
 export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',
@@ -55,7 +57,7 @@ export enum Message {
   AtLeastOneAddressNeeded = 'messages.at-least-one-address-needed',
   InvalidAddress = 'messages.invalid-address',
   InvalidAmount = 'messages.invalid-amount',
-  AmountNotEnough = 'messages.amount-not-enough',
+  DecimalExceed = 'messages.amount-decimal-exceed',
   IsUnremovable = 'messages.is-unremovable',
   ProtocolRequired = 'messages.protocol-required',
   AmountTooSmall = 'messages.amount-too-small',
