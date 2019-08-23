@@ -77,3 +77,23 @@ export const FULL_SCREENS = [
   `${Routes.WalletEditor}/`,
   `${Routes.NetworkEditor}/`,
 ]
+
+export enum ErrorCode {
+  // Errors from RPC
+  ErrorFromRPC = -3,
+  // Errors from neuron-wallet
+  CapacityNotEnough = 100,
+  CapacityTooSmall = 101,
+  FieldIsInvalid = 102,
+  // Parameter validation errors from neuron-ui
+  FieldRequired = 201,
+  FieldUsed = 202,
+  FieldTooLong = 203,
+  FieldTooShort = 204,
+  FieldInvalid = 205,
+  // Other errors
+  FieldIrremovable = 301,
+  FailToLaunch = 302,
+  FieldNotFound = 303,
+  CameraUnavailable = 304,
+}
