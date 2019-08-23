@@ -6,8 +6,9 @@ interface SuccessFromController {
 interface FailureFromController {
   status: 0
   message: {
-    title: string
+    code?: number
     content?: string
+    meta?: { [key: string]: string }
   }
 }
 export type ControllerResponse = SuccessFromController | FailureFromController
@@ -15,19 +16,27 @@ export type ControllerResponse = SuccessFromController | FailureFromController
 export const RemoteNotLoadError = {
   status: 0 as 0,
   message: {
-    title: 'remote is not supported',
+    content: 'remote is not supported',
   },
 }
 
 export const controllerNotLoaded = (controllerName: string) => ({
   status: 0 as 0,
   message: {
-    title: `${controllerName} controller not loaded`,
+    content: `${controllerName} controller not loaded`,
   },
 })
 
 export const controllerMethodWrapper = (controllerName: string) => (
-  callControllerMethod: (controller: any) => (params: any) => Promise<{ status: any; result: any; msg: string }>
+  callControllerMethod: (
+    controller: any
+  ) => (
+    params: any
+  ) => Promise<{
+    status: any
+    result: any
+    message: { code?: number; content?: string; meta?: { [key: string]: string } }
+  }>
 ) => async (realParams?: any): Promise<ControllerResponse> => {
   if (!window.remote) {
     return RemoteNotLoadError
@@ -57,16 +66,9 @@ export const controllerMethodWrapper = (controllerName: string) => (
     }
   }
 
-  let title = ''
-
-  if (typeof res === 'string') {
-    title = res
-  } else if (typeof res.msg === 'string') {
-    title = res.msg
-  }
   return {
     status: 0,
-    message: { title },
+    message: res.message || {},
   }
 }
 

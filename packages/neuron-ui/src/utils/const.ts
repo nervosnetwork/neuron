@@ -49,20 +49,6 @@ export const PlaceHolders = {
   },
 }
 
-export enum Message {
-  NameRequired = 'messages.name-required',
-  URLRequired = 'messages.url-required',
-  LengthOfNameShouldBeLessThanOrEqualTo = 'messages.length-of-name-should-be-less-than-or-equal-to',
-  NetworkNameUsed = 'messages.network-name-used',
-  AtLeastOneAddressNeeded = 'messages.at-least-one-address-needed',
-  InvalidAddress = 'messages.invalid-address',
-  InvalidAmount = 'messages.invalid-amount',
-  DecimalExceed = 'messages.amount-decimal-exceed',
-  IsUnremovable = 'messages.is-unremovable',
-  ProtocolRequired = 'messages.protocol-required',
-  AmountTooSmall = 'messages.amount-too-small',
-}
-
 export enum MnemonicAction {
   Create = 'create',
   Verify = 'verify',
@@ -82,18 +68,22 @@ export enum ErrorCode {
   // Errors from RPC
   ErrorFromRPC = -3,
   // Errors from neuron-wallet
-  CapacityNotEnough = 100,
-  CapacityTooSmall = 101,
-  FieldIsInvalid = 102,
+  AmountNotEnough = 100,
+  AmountTooSmall = 101,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
   FieldTooLong = 203,
   FieldTooShort = 204,
   FieldInvalid = 205,
+  DecimalExceed = 206,
+  NotNegative = 207,
+  ProtocolRequired = 208,
+  NoWhiteSpaces = 209,
   // Other errors
   FieldIrremovable = 301,
   FailToLaunch = 302,
   FieldNotFound = 303,
   CameraUnavailable = 304,
+  AddressIsEmpty = 305,
 }

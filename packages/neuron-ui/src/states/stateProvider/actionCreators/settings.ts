@@ -16,14 +16,12 @@ export const toggleAddressBook = () => {
 export const createNetwork = (params: Controller.CreateNetworkParams) => (dispatch: StateDispatch, history: any) => {
   createRemoteNetwork(params).then(res => {
     if (res.status) {
-      dispatch({
-        type: AppActions.Ignore,
-        payload: null,
-      })
       addPopup('create-network-successfully')(dispatch)
       history.push(Routes.SettingsNetworks)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({ type: 'alert', timestamp: +new Date(), code: res.message.code, content: res.message.content })(
+        dispatch
+      )
     }
   })
 }
@@ -34,7 +32,9 @@ export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispat
       addPopup('update-network-successfully')(dispatch)
       history.push(Routes.SettingsNetworks)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({ type: 'alert', timestamp: +new Date(), code: res.message.code, content: res.message.content })(
+        dispatch
+      )
     }
   })
 }

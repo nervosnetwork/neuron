@@ -278,7 +278,41 @@
       "invalid-address": "{{address}} is an invalid address",
       "amount-decimal-exceed": "The amount {{amount}} CKB is invalid, please enter an amount with no more than 8 decimal places",
       "invalid-amount": "The amount {{amount}} CKB is invalid",
-      "amount-too-small": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB"
+      "amount-too-small": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB",
+      "fields": {
+        "wallet": "Wallet",
+        "name": "Name",
+        "remote": "RPC URL",
+        "network": "Network",
+        "address": "Address",
+        "amount": "Amount",
+        "transaction": "Transaction",
+        "default-address": "Default Address",
+        "mnemonic": "Mnemonic",
+        "keystore-path": "Keystore File",
+        "keystore-name": "Wallet name",
+        "keystore-password": "Password"
+      },
+      "codes": {
+        "-3": "",
+        "100": "Amount is not enough",
+        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB",
+        "102": "$t(messages.fields.{{fieldName}}) is invalid",
+        "201": "$t(messages.fields.{{fieldName}}) is required",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too short, it should be longer than or equal to {{length}}",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
+        "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is irremovable",
+        "302": "Fail to launch the app",
+        "303": "$t(messages.fields.{{fieldName}}) is not found",
+        "304": "Camera is unavailable or disabled",
+        "305": "$t(messages.fields.address) cannot be empty"
+      }
     },
     "sync": {
       "syncing": "Syncing",

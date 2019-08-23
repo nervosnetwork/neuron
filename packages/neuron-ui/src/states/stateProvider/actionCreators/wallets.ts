@@ -36,7 +36,13 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any)
       })
       currentWalletCache.save(payload)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -48,8 +54,12 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   createWallet(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
-    } else {
-      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
+    } else if (res.message) {
+      if (res.message.code) {
+        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
+      } else if (res.message.content) {
+        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      }
     }
   })
 }
@@ -61,8 +71,12 @@ export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   importMnemonic(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
-    } else {
-      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
+    } else if (res.message) {
+      if (res.message.code) {
+        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
+      } else if (res.message.content) {
+        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      }
     }
   })
 }
@@ -74,8 +88,12 @@ export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams
   importKeystore(params).then(res => {
     if (res.status) {
       history.push(Routes.Overview)
-    } else {
-      showErrorMessage(i18n.t('messages.error'), i18n.t(res.message.title))
+    } else if (res.message) {
+      if (res.message.code) {
+        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
+      } else if (res.message.content) {
+        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      }
     }
   })
 }
@@ -93,7 +111,13 @@ export const updateWalletList = () => (dispatch: StateDispatch, history: any) =>
       })
       walletsCache.save(payload)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -109,7 +133,13 @@ export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
         history.push(Routes.SettingsWallets)
       }
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -121,7 +151,13 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
         payload: null,
       })
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -139,7 +175,13 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
         history.push(Routes.History)
       } else {
         // TODO: the pretreatment is unnecessary once the error code is implemented
-        addNotification({ type: 'alert', content: res.message.title.replace(/(\b"|"\b)/g, '') })(dispatch)
+        addNotification({
+          type: 'alert',
+          timestamp: +new Date(),
+          code: res.message.code,
+          content: (res.message.content || '').replace(/(\b"|"\b)/g, ''),
+          meta: res.message.meta,
+        })(dispatch)
       }
       dispatch({
         type: AppActions.DismissPasswordRequest,
@@ -168,7 +210,13 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
         payload: { addresses, balance },
       })
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -193,7 +241,13 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
           },
         })
       } else {
-        addNotification({ type: 'alert', content: res.message.title })(dispatch)
+        addNotification({
+          type: 'alert',
+          timestamp: +new Date(),
+          code: res.message.code,
+          content: res.message.content,
+          meta: res.message.meta,
+        })(dispatch)
       }
     })
     .finally(() => {
@@ -215,7 +269,13 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
     if (res.status) {
       addPopup('delete-wallet-successfully')(dispatch)
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -232,7 +292,13 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
         payload: null,
       })
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }

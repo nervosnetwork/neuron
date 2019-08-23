@@ -278,7 +278,13 @@
       "invalid-address": "{{address}} 是无效的地址",
       "amount-decimal-exceed": "金额 {{amount}} 是个无效的值, 其小数位应不超过 8 位",
       "invalid-amount": "金额 {{amount} 是无效的数字",
-      "amount-too-small": "金额 {{amount}} 太小, 请输入一个不小于 61 CKB 的值"
+      "amount-too-small": "金额 {{amount}} 太小, 请输入一个不小于 61 CKB 的值",
+      "fields": {
+        "name": "Name"
+      },
+      "codes": {
+        "201": "缺少{{fieldName}} $t('messages.fields.name')"
+      }
     },
     "sync": {
       "syncing": "同步中",

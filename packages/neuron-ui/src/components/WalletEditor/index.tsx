@@ -5,7 +5,7 @@ import { Stack, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { Routes } from 'utils/const'
+import { Routes, ErrorCode } from 'utils/const'
 
 import { useGoBack } from 'utils/hooks'
 import { useAreParamsValid, useOnConfirm, useInputs, useWalletEditor } from './hooks'
@@ -14,7 +14,7 @@ const WalletNotFound = () => {
   const [t] = useTranslation()
   return (
     <div>
-      <p>{t('messages.wallet-is-not-found')}</p>
+      <p>{t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' })}</p>
       <Link to={Routes.SettingsWallets} className="btn btn-primary">
         {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
       </Link>

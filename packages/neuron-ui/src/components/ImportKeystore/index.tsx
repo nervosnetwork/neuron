@@ -7,10 +7,17 @@ import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
+import { ErrorCode } from 'utils/const'
 
-const defaultFields = {
+interface KeystoreFields {
+  path: string
+  name: string | undefined
+  password: string
+}
+
+const defaultFields: KeystoreFields = {
   path: '',
-  name: '',
+  name: undefined,
   password: '',
 }
 
@@ -25,7 +32,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   const goBack = useGoBack(history)
 
   useEffect(() => {
-    if (fields.name === '') {
+    if (fields.name === undefined) {
       const name = generateWalletName(wallets, wallets.length + 1, t)
       setFields({
         ...fields,
@@ -60,7 +67,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
 
   const onSubmit = useCallback(() => {
     importWalletWithKeystore({
-      name: fields.name,
+      name: fields.name || '',
       keystorePath: fields.path,
       password: fields.password,
     })(dispatch, history)
@@ -82,10 +89,10 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
               validateOnLoad={false}
               onGetErrorMessage={(text?: string) => {
                 if (text === '') {
-                  return t('messages.is-required', { field: t(`import-keystore.label.${key}`) })
+                  return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: `keystore-${key}` })
                 }
                 if (key === 'name' && isNameUsed) {
-                  return t('messages.is-used', { field: t(`import-keystore.label.${key}`) })
+                  return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `name`, fieldValue: text })
                 }
                 return ''
               }}

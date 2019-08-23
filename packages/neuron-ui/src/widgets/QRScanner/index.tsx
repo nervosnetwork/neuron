@@ -14,6 +14,7 @@ import jsQR from 'jsqr'
 import { showErrorMessage } from 'services/remote'
 import { drawPolygon } from 'utils/canvasActions'
 import { verifyAddress } from 'utils/validators'
+import { ErrorCode } from 'utils/const'
 
 interface QRScannerProps {
   title: string
@@ -100,7 +101,7 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         requestAnimationFrame(tick)
       })
       .catch((err: Error) => {
-        showErrorMessage(t('messages.camera-not-available-or-disabled'), err.message)
+        showErrorMessage(t(`messages.codes.${ErrorCode.CameraUnavailable}`), err.message)
         setOpen(false)
       })
   }, [video, t, onConfirm, onDismiss])

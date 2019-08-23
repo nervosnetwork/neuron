@@ -14,7 +14,13 @@ export const updateTransactionList = (params: GetTransactionListParams) => (disp
         payload: res.result,
       })
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.message.code,
+        content: res.message.content,
+        meta: res.message.meta,
+      })(dispatch)
     }
   })
 }
@@ -39,7 +45,13 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
           },
         })
       } else {
-        addNotification({ type: 'alert', content: res.message.title })(dispatch)
+        addNotification({
+          type: 'alert',
+          timestamp: +new Date(),
+          code: res.message.code,
+          content: res.message.content,
+          meta: res.message.meta,
+        })(dispatch)
       }
     })
     .finally(() => {

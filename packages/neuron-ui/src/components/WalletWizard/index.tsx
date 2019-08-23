@@ -16,7 +16,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { Routes, MnemonicAction } from 'utils/const'
+import { Routes, MnemonicAction, ErrorCode } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
@@ -160,7 +160,7 @@ const Mnemonic = ({
           }`
         )
       } else {
-        showErrorMessage(t('messages.error'), t('messages.invalid-mnemonic'))
+        showErrorMessage(t(`messages.error`), t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic' }))
       }
     }
   }, [isCreate, history, rootPath, type, imported, t, dispatch])

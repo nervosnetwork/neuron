@@ -28,7 +28,7 @@ import { updateTransactionList, addPopup } from 'states/stateProvider/actionCrea
 import { showTransactionDetails, showErrorMessage } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, ErrorCode } from 'utils/const'
 import { backToTop } from 'utils/animations'
 
 const TITLE_FONT_SIZE = 'xxLarge'
@@ -284,7 +284,10 @@ const Overview = ({
       hideMinerInfo()
       addPopup('lock-arg-copied')(dispatch)
     } else {
-      showErrorMessage(t('messages.error'), t('messages.can-not-find-the-default-address'))
+      showErrorMessage(
+        t(`messages.error`),
+        t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: `default-address` })
+      )
     }
   }, [defaultAddress, t, hideMinerInfo, dispatch])
 
@@ -409,7 +412,7 @@ const Overview = ({
               </Stack>
             ) : (
               <MessageBar messageBarType={MessageBarType.error}>
-                {t('messages.can-not-find-the-default-address')}
+                {t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: `default-address` })}
               </MessageBar>
             )}
           </Stack>

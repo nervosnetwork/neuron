@@ -2,11 +2,12 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'utils/localCache'
-import { getTransaction } from 'services/remote'
+import { getTransaction, showErrorMessage } from 'services/remote'
 
 import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import { ErrorCode } from 'utils/const'
 
 const MIN_CELL_WIDTH = 70
 
@@ -103,7 +104,9 @@ const Transaction = () => {
           if (res.status) {
             setTransaction(res.result)
           } else {
-            throw new Error(res.message.title)
+            // TODO: use error code
+            showErrorMessage(t(`messages.error`), t(`messages.transaction-not-found`))
+            window.close()
           }
         })
         .catch((err: Error) => {
@@ -113,7 +116,7 @@ const Transaction = () => {
           })
         })
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     window.addEventListener('storage', (e: StorageEvent) => {
@@ -147,7 +150,7 @@ const Transaction = () => {
   if (error.code) {
     return (
       <Stack verticalFill verticalAlign="center" horizontalAlign="center">
-        {error.message || t('messages.transaction-not-found')}
+        {error.message || t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' })}
       </Stack>
     )
   }

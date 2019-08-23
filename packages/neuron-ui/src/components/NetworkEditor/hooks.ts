@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { createNetwork, updateNetwork, addNotification } from 'states/stateProvider/actionCreators'
 
-import { Message, MAX_NETWORK_NAME_LENGTH } from 'utils/const'
+import { MAX_NETWORK_NAME_LENGTH, ErrorCode } from 'utils/const'
 
 import i18n from 'utils/i18n'
 
@@ -69,8 +69,12 @@ export const useInitialize = (
         initialize(network)
       } else {
         addNotification({
-          type: 'warning',
-          content: i18n.t('messages.network-is-not-found'),
+          type: 'warning' as State.MessageType,
+          timestamp: +new Date(),
+          code: ErrorCode.FieldNotFound,
+          meta: {
+            fieldName: 'network',
+          },
         })
       }
     }
@@ -87,13 +91,13 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
         placeholder: PlaceHolder.URL,
         onGetErrorMessage: (url: string) => {
           if (!url) {
-            return t('messages.url-required')
+            return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'remote' })
           }
           if (!/^https?:\/\//.test(url)) {
-            return t('messages.rpc-url-should-have-protocol')
+            return t(`messages.codes.${ErrorCode.ProtocolRequired}`, { fieldName: 'remote', fieldValue: url })
           }
           if (/\s/.test(url)) {
-            return t('messages.rpc-url-should-have-no-whitespaces')
+            return t(`messages.codes.${ErrorCode.NoWhiteSpaces}`, { fieldName: 'remote' })
           }
           return ''
         },
@@ -105,10 +109,17 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
         placeholder: PlaceHolder.Name,
         onGetErrorMessage: (name: string) => {
           if (!name) {
-            return t('messages.name-required')
+            return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })
           }
           if (usedNetworkNames.includes(name)) {
-            return t('messages.network-name-used')
+            return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: 'name', fieldValue: name })
+          }
+          if (name.length > MAX_NETWORK_NAME_LENGTH) {
+            return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
+              fieldName: 'name',
+              fieldValue: name,
+              length: MAX_NETWORK_NAME_LENGTH,
+            })
           }
           return ''
         },
@@ -136,44 +147,67 @@ export const useHandleSubmit = (
   dispatch: StateDispatch
 ) =>
   useCallback(async () => {
-    const warning = {
-      type: 'warning' as 'warning',
-      timestamp: Date.now(),
-      content: '',
-    }
+    let errorMessage: State.Message<ErrorCode, { fieldName: string; fieldValue?: string; length?: string }> | undefined
     if (!name) {
-      return addNotification({
-        ...warning,
-        content: i18n.t(Message.NameRequired),
-      })(dispatch)
+      errorMessage = {
+        type: 'warning',
+        timestamp: +new Date(),
+        code: ErrorCode.FieldRequired,
+        meta: {
+          fieldName: 'name',
+        },
+      }
+      return addNotification(errorMessage)(dispatch)
     }
     if (name.length > MAX_NETWORK_NAME_LENGTH) {
-      return addNotification({
-        ...warning,
-        content: i18n.t(Message.LengthOfNameShouldBeLessThanOrEqualTo, {
-          length: MAX_NETWORK_NAME_LENGTH,
-        }),
-      })(dispatch)
+      errorMessage = {
+        type: 'warning',
+        timestamp: +new Date(),
+        code: ErrorCode.FieldTooLong,
+        meta: {
+          fieldName: 'name',
+          fieldValue: name,
+          length: `${MAX_NETWORK_NAME_LENGTH}`,
+        },
+      }
+      return addNotification(errorMessage)(dispatch)
     }
     if (!remote) {
-      return addNotification({
-        ...warning,
-        content: i18n.t(Message.URLRequired),
-      })(dispatch)
+      errorMessage = {
+        type: 'warning',
+        timestamp: +new Date(),
+        code: ErrorCode.FieldRequired,
+        meta: {
+          fieldName: 'remote',
+        },
+      }
+      return addNotification(errorMessage)(dispatch)
     }
     if (!remote.startsWith('http')) {
-      return addNotification({
-        ...warning,
-        content: i18n.t(Message.ProtocolRequired),
-      })(dispatch)
+      errorMessage = {
+        type: 'warning',
+        timestamp: +new Date(),
+        code: ErrorCode.ProtocolRequired,
+        meta: {
+          fieldName: 'remote',
+          fieldValue: remote,
+        },
+      }
+      return addNotification(errorMessage)(dispatch)
     }
     // verification, for now, only name is unique
     if (id === 'new') {
       if (networks.some(network => network.name === name)) {
-        return addNotification({
-          ...warning,
-          content: i18n.t(Message.NetworkNameUsed),
-        })(dispatch)
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.FieldUsed,
+          meta: {
+            fieldName: 'name',
+            fieldValue: name,
+          },
+        }
+        return addNotification(errorMessage)(dispatch)
       }
       return createNetwork({
         name,
@@ -181,10 +215,16 @@ export const useHandleSubmit = (
       })(dispatch, history)
     }
     if (networks.some(network => network.name === name && network.id !== id)) {
-      return addNotification({
-        ...warning,
-        content: i18n.t(Message.NetworkNameUsed),
-      })(dispatch)
+      errorMessage = {
+        type: 'warning',
+        timestamp: +new Date(),
+        code: ErrorCode.FieldUsed,
+        meta: {
+          fieldName: 'name',
+          fieldValue: name,
+        },
+      }
+      return addNotification(errorMessage)(dispatch)
     }
     return updateNetwork({
       networkID: id!,

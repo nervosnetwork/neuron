@@ -2,61 +2,90 @@ import React, { useCallback, useEffect } from 'react'
 import { IDropdownOption } from 'office-ui-fabric-react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { addNotification } from 'states/stateProvider/actionCreators'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { Message, MAX_DECIMAL_DIGITS } from 'utils/const'
+import { MAX_DECIMAL_DIGITS, ErrorCode } from 'utils/const'
 import { verifyAddress, verifyAmountRange } from 'utils/validators'
 import { outputsToTotalCapacity } from 'utils/formatters'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
 
-const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
-  const errorAction = {
-    type: AppActions.AddNotification,
-    payload: {
-      type: 'warning',
-      timestamp: Date.now(),
-      content: Message.AtLeastOneAddressNeeded,
-      meta: {},
-    },
-  }
-  if (!items.length || !items[0].address) {
-    if (dispatch) {
-      dispatch(errorAction)
-    }
-    return false
-  }
+const validateTransactionParams = ({
+  items = [],
+  dispatch,
+}: {
+  items: TransactionOutput[]
+  dispatch?: StateDispatch
+}) => {
+  let errorMessage: State.Message<ErrorCode, { fieldName: string; fieldValue: string } | { amount: string }> | undefined
+
   const invalid = items.some(
     (item): boolean => {
+      if (!item.address) {
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.AddressIsEmpty,
+        }
+        return true
+      }
       const isAddressValid = verifyAddress(item.address)
       if (typeof isAddressValid === 'string') {
-        errorAction.payload.content = Message.InvalidAddress
-        errorAction.payload.meta = { address: item.address }
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.FieldInvalid,
+          meta: {
+            fieldName: 'address',
+            fieldValue: item.address,
+          },
+        }
         return true
       }
       if (Number.isNaN(+item.amount) || +item.amount < 0) {
-        errorAction.payload.content = Message.InvalidAmount
-        errorAction.payload.meta = { amount: item.amount }
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.NotNegative,
+          meta: {
+            fieldName: 'amount',
+            fieldValue: item.amount || '0',
+          },
+        }
         return true
       }
       const [, decimal = ''] = item.amount.split('.')
       if (decimal.length > MAX_DECIMAL_DIGITS) {
-        errorAction.payload.content = Message.DecimalExceed
-        errorAction.payload.meta = { amount: item.amount }
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.DecimalExceed,
+          meta: {
+            fieldName: 'amount',
+            fieldValue: item.amount,
+          },
+        }
         return true
       }
       if (!verifyAmountRange(item.amount)) {
-        errorAction.payload.content = Message.AmountTooSmall
-        errorAction.payload.meta = { amount: item.amount }
+        errorMessage = {
+          type: 'warning',
+          timestamp: +new Date(),
+          code: ErrorCode.AmountTooSmall,
+          meta: {
+            amount: item.amount || '0',
+          },
+        }
         return true
       }
       return false
     }
   )
-  if (invalid) {
+  if (invalid && errorMessage) {
     if (dispatch) {
-      dispatch(errorAction)
+      addNotification(errorMessage)(dispatch)
     }
     return false
   }
