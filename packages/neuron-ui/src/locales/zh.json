@@ -280,10 +280,38 @@
       "invalid-amount": "金额 {{amount} 是无效的数字",
       "amount-too-small": "金额 {{amount}} 太小, 请输入一个不小于 61 CKB 的值",
       "fields": {
-        "name": "Name"
+        "wallet": "钱包",
+        "name": "名称",
+        "remote": "RPC URL",
+        "network": "网络",
+        "address": "地址",
+        "amount": "金额",
+        "transaction": "交易",
+        "default-address": "默认地址",
+        "mnemonic": "助记词",
+        "keystore-path": "Keystore 文件",
+        "keystore-name": "钱包名称",
+        "keystore-password": "密码"
       },
       "codes": {
-        "201": "缺少{{fieldName}} $t('messages.fields.name')"
+        "-3": "",
+        "100": "余额不足",
+        "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 61 CKB 的值",
+        "102": "$t(messages.fields.{{fieldName}})无效",
+        "201": "缺少$t(messages.fields.{{fieldName}})",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短, 其长度应不小于 {{length}}",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 请输入小数位不超过 {{length}} 的$t(messages.fields.{{fieldName}})",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值不能为负数",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值应以 http(s):// 开始",
+        "209": "$t(messages.fields.{{fieldName}})不能包含空格",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除",
+        "302": "无法启动应用",
+        "303": "未找到$t(messages.fields.{{fieldName}})",
+        "304": "摄像头不可用或被禁用",
+        "305": "$t(messages.fields.address)不能为空"
       }
     },
     "sync": {
