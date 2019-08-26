@@ -104,8 +104,10 @@ const Transaction = () => {
           if (res.status) {
             setTransaction(res.result)
           } else {
-            // TODO: use error code
-            showErrorMessage(t(`messages.error`), t(`messages.transaction-not-found`))
+            showErrorMessage(
+              t(`messages.error`),
+              t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' })
+            )
             window.close()
           }
         })
