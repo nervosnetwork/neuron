@@ -4,7 +4,7 @@ const fixtures: {
     expected: boolean
   }
 } = {
-  'valid address and valid amount': {
+  'Valid address and valid amount': {
     outputs: [
       {
         address: 'ckt1qyqg5w7emdntvnnk7utzqkz3kx276um0j4qs525t0y',
@@ -13,7 +13,7 @@ const fixtures: {
     ],
     expected: true,
   },
-  'empty address and valid amount': {
+  'Empty address and valid amount': {
     outputs: [
       {
         address: '',
@@ -22,7 +22,7 @@ const fixtures: {
     ],
     expected: false,
   },
-  'invalid address and valid amount': {
+  'Invalid address and valid amount': {
     outputs: [
       {
         address: 'abcdefg',
@@ -31,7 +31,7 @@ const fixtures: {
     ],
     expected: false,
   },
-  'valid address and amount of invalid number': {
+  'Valid address and amount of invalid number': {
     outputs: [
       {
         address: 'abcdefg',
@@ -40,7 +40,7 @@ const fixtures: {
     ],
     expected: false,
   },
-  'valid address and negative amount': {
+  'Valid address and negative amount': {
     outputs: [
       {
         address: 'abcdefg',
@@ -49,7 +49,7 @@ const fixtures: {
     ],
     expected: false,
   },
-  'valid address and amount less than 61': {
+  'Valid address and amount less than 61': {
     outputs: [
       {
         address: 'abcdefg',

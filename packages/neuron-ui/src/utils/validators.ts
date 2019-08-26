@@ -17,14 +17,16 @@ export const verifyAmountRange = (amount: string = '') => {
 }
 
 export const verifyAmount = (amount: string = '0') => {
-  if (Number.isNaN(+amount) || +amount < 0) {
-    return { code: ErrorCode.NotNegative, meta: { fieldName: 'amount', fieldValue: amount } }
+  if (Number.isNaN(+amount)) {
+    return { code: ErrorCode.FieldInvalid }
+  }
+  if (+amount < 0) {
+    return { code: ErrorCode.NotNegative }
   }
   const [, decimal = ''] = amount.split('.')
   if (decimal.length > MAX_DECIMAL_DIGITS) {
     return {
       code: ErrorCode.DecimalExceed,
-      meta: { fieldName: 'amount', fieldValue: amount },
     }
   }
   return true
@@ -73,7 +75,7 @@ export const verifyTransactionOutputs = (items: { address: string; amount: strin
     if (item.address === '' || verifyAddress(item.address) !== true) {
       return true
     }
-    if (Number.isNaN(+item.amount) || verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
       return true
     }
     return false

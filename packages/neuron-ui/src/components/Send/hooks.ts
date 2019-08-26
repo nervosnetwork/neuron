@@ -207,7 +207,10 @@ export const useInitialize = (
 
       const msg = verifyAmount(amount)
       if (typeof msg === 'object') {
-        return t(`messages.codes.${msg.code}`, msg.meta)
+        return t(`messages.codes.${msg.code}`, {
+          fieldName: 'amount',
+          fieldValue: amount,
+        })
       }
       if (!verifyAmountRange(amount)) {
         return t(`messages.codes.${ErrorCode.AmountTooSmall}`, {
