@@ -68,9 +68,22 @@ export const verifyPasswordComplexity = (password: string) => {
   return true
 }
 
+export const verifyTransactionOutputs = (items: { address: string; amount: string }[] = []) => {
+  return !items.some(item => {
+    if (item.address === '' || verifyAddress(item.address) !== true) {
+      return true
+    }
+    if (Number.isNaN(+item.amount) || verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+      return true
+    }
+    return false
+  })
+}
+
 export default {
   verifyAddress,
   verifyAmountRange,
   verifyTotalAmount,
   verifyPasswordComplexity,
+  verifyTransactionOutputs,
 }

@@ -4,23 +4,11 @@ import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { calculateCycles } from 'services/remote/wallets'
 
 import { outputsToTotalCapacity, priceToFee } from 'utils/formatters'
-import { verifyAddress, verifyAmount, verifyAmountRange } from 'utils/validators'
+import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
 import { ErrorCode } from 'utils/const'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
-
-const verifyTransactionParams = (items: TransactionOutput[] = []) => {
-  return !items.some(item => {
-    if (item.address === '' || verifyAddress(item.address) !== true) {
-      return true
-    }
-    if (Number.isNaN(+item.amount) || verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
-      return true
-    }
-    return false
-  })
-}
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
@@ -66,7 +54,7 @@ const useOnTransactionChange = (
   useEffect(() => {
     clearTimeout(cyclesTimer)
     cyclesTimer = setTimeout(() => {
-      if (verifyTransactionParams(items)) {
+      if (verifyTransactionOutputs(items)) {
         setIsTransactionValid(true)
         calculateCycles({
           walletID,
@@ -99,13 +87,13 @@ const useOnTransactionChange = (
         })
       }
     }, 300)
-  }, [walletID, items, dispatch])
+  }, [walletID, items, dispatch, setIsTransactionValid])
 }
 
-const useOnSubmit = (items: TransactionOutput[], balance: string, fee: string, dispatch: StateDispatch) =>
+const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
   useCallback(
     (walletID: string = '') => () => {
-      if (verifyTransactionParams(items)) {
+      if (verifyTransactionOutputs(items)) {
         dispatch({
           type: AppActions.UpdateTransactionID,
           payload: null,
@@ -119,7 +107,7 @@ const useOnSubmit = (items: TransactionOutput[], balance: string, fee: string, d
         })
       }
     },
-    [dispatch, items, balance, fee]
+    [dispatch, items]
   )
 
 const useOnItemChange = (updateTransactionOutput: Function) =>
@@ -182,7 +170,6 @@ export const useInitialize = (
   items: TransactionOutput[],
   price: string,
   cycles: string,
-  balance: string,
   dispatch: React.Dispatch<any>,
   t: any
 ) => {
@@ -195,7 +182,7 @@ export const useInitialize = (
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
-  const onSubmit = useOnSubmit(items, balance, fee, dispatch)
+  const onSubmit = useOnSubmit(items, dispatch)
   const onClear = useClear(dispatch)
 
   const onGetAddressErrorMessage = useCallback(
