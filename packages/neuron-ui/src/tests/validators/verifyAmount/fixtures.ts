@@ -14,19 +14,19 @@ const fixtures: {
     amount: '100000000000000000000000000000000000000000000000.00000001',
     expected: true,
   },
-  'Amount should be number': {
+  'Amount which is not a number should fail': {
     amount: 'not a number',
     expected: {
       code: ErrorCode.FieldInvalid,
     },
   },
-  'Amount should not be negative': {
+  'Negative amount should fail': {
     amount: '-1',
     expected: {
       code: ErrorCode.NotNegative,
     },
   },
-  'Amount should have no more than 8 decimal places': {
+  'Amount has  more than 8 decimal places should fail': {
     amount: '0.000000001',
     expected: {
       code: ErrorCode.DecimalExceed,

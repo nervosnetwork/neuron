@@ -11,7 +11,7 @@ const fixtureTable = Object.entries(fixtures).map(([title, { name, usedNames, ex
 
 describe(`Verify network name`, () => {
   test.each(fixtureTable)(
-    `%s, name: %s, used names: %j, expected: %s`,
+    `%s`,
     (_title: string, name: string, usedNames: string[], expected: boolean | { code: ErrorCode }) => {
       expect(verifyNetworkName(name, usedNames)).toEqual(expected)
     }

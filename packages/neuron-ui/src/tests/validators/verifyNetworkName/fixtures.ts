@@ -12,7 +12,7 @@ const fixtures: {
     usedNames: ['Local'],
     expected: true,
   },
-  'Name cannot be empty': {
+  'Empty name should fail': {
     name: '',
     usedNames: ['Local'],
     expected: {
@@ -24,14 +24,14 @@ const fixtures: {
     usedNames: ['Local'],
     expected: true,
   },
-  'Name is too long': {
+  'Name consists of more than 28 characters should fail': {
     name: '12345678901234567890123456789',
     usedNames: ['Local'],
     expected: {
       code: ErrorCode.FieldTooLong,
     },
   },
-  'Name is used': {
+  'Name which is used should fail': {
     name: 'Testnet',
     usedNames: ['Testnet', 'Local'],
     expected: {
