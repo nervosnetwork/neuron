@@ -6,6 +6,7 @@ import { createNetwork, updateNetwork, addNotification } from 'states/stateProvi
 import { MAX_NETWORK_NAME_LENGTH, ErrorCode } from 'utils/const'
 
 import i18n from 'utils/i18n'
+import { verifyNetworkName, verifyURL } from 'utils/validators'
 
 enum PlaceHolder {
   Name = 'My Custom Node',
@@ -90,14 +91,9 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
         tooltip: TooltipText.URL,
         placeholder: PlaceHolder.URL,
         onGetErrorMessage: (url: string) => {
-          if (!url) {
-            return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'remote' })
-          }
-          if (!/^https?:\/\//.test(url)) {
-            return t(`messages.codes.${ErrorCode.ProtocolRequired}`, { fieldName: 'remote', fieldValue: url })
-          }
-          if (/\s/.test(url)) {
-            return t(`messages.codes.${ErrorCode.NoWhiteSpaces}`, { fieldName: 'remote' })
+          const res = verifyURL(url)
+          if (typeof res === 'object') {
+            return t(`messages.codes.${res.code}`, { fieldName: 'remote', fieldValue: url })
           }
           return ''
         },
@@ -108,14 +104,9 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
         tooltip: TooltipText.Name,
         placeholder: PlaceHolder.Name,
         onGetErrorMessage: (name: string) => {
-          if (!name) {
-            return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: 'name' })
-          }
-          if (usedNetworkNames.includes(name)) {
-            return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: 'name', fieldValue: name })
-          }
-          if (name.length > MAX_NETWORK_NAME_LENGTH) {
-            return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
+          const res = verifyNetworkName(name, usedNetworkNames)
+          if (typeof res === 'object') {
+            return t(`messages.codes.${res.code}`, {
               fieldName: 'name',
               fieldValue: name,
               length: MAX_NETWORK_NAME_LENGTH,
@@ -129,13 +120,21 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
   )
 }
 
-export const useIsInputsValid = (editor: EditorType, cachedNetwork: State.Network | undefined) => {
-  const [errors, setErrors] = useState([!cachedNetwork && !editor.name.value, !cachedNetwork && !editor.remote.value])
+export const useIsInputsValid = (
+  editor: EditorType,
+  usedNetworkNames: string[],
+  cachedNetwork: State.Network | undefined
+) => {
+  const hasError = useMemo(() => {
+    const nameRes = verifyNetworkName(editor.name.value, usedNetworkNames)
+    const URLRes = verifyURL(editor.remote.value)
+    return !(nameRes === true && URLRes === true)
+  }, [editor.name.value, editor.remote.value, usedNetworkNames])
   const notModified = useMemo(
     () => cachedNetwork && (cachedNetwork.name === editor.name.value && cachedNetwork.remote === editor.remote.value),
     [cachedNetwork, editor.name.value, editor.remote.value]
   )
-  return { errors, setErrors, notModified }
+  return { hasError, notModified }
 }
 
 export const useHandleSubmit = (
@@ -214,6 +213,7 @@ export const useHandleSubmit = (
         remote,
       })(dispatch, history)
     }
+
     if (networks.some(network => network.name === name && network.id !== id)) {
       errorMessage = {
         type: 'warning',

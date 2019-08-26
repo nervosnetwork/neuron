@@ -1,3 +1,4 @@
+import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 /* global BigInt */
 import { ckbCore } from 'services/chain'
 import { outputsToTotalCapacity } from 'utils/formatters'
@@ -82,10 +83,49 @@ export const verifyTransactionOutputs = (items: { address: string; amount: strin
   })
 }
 
+export const verifyNetworkName = (name: string, usedNames: string[]) => {
+  if (!name) {
+    return {
+      code: ErrorCode.FieldRequired,
+    }
+  }
+  if (usedNames.includes(name)) {
+    return {
+      code: ErrorCode.FieldUsed,
+    }
+  }
+  if (name.length > MAX_NETWORK_NAME_LENGTH) {
+    return {
+      code: ErrorCode.FieldTooLong,
+    }
+  }
+  return true
+}
+
+export const verifyURL = (url: string) => {
+  if (!url) {
+    return {
+      code: ErrorCode.FieldRequired,
+    }
+  }
+  if (!/^https?:\/\//.test(url)) {
+    return {
+      code: ErrorCode.ProtocolRequired,
+    }
+  }
+  if (/\s/.test(url)) {
+    return {
+      code: ErrorCode.NoWhiteSpaces,
+    }
+  }
+  return true
+}
+
 export default {
   verifyAddress,
   verifyAmountRange,
   verifyTotalAmount,
   verifyPasswordComplexity,
   verifyTransactionOutputs,
+  verifyNetworkName,
 }

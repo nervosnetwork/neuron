@@ -27,32 +27,22 @@ const NetworkEditor = ({
   const goBack = useGoBack(history)
   useInitialize(id, networks, editor.initialize, dispatch)
 
-  const { errors, setErrors, notModified } = useIsInputsValid(editor, cachedNetwork)
+  const { hasError, notModified } = useIsInputsValid(editor, usedNetworkNames, cachedNetwork)
   const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, history, dispatch)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t('settings.network.edit-network.title')}</h1>
       <Stack tokens={{ childrenGap: 15 }}>
-        {inputs.map((inputProps, idx) => (
+        {inputs.map(inputProps => (
           <Stack.Item key={inputProps.label}>
-            <TextField
-              {...inputProps}
-              key={inputProps.label}
-              required
-              validateOnLoad={false}
-              onNotifyValidationResult={(message: any) => {
-                const errs = [...errors]
-                errs.splice(idx, 1, message !== '')
-                setErrors(errs)
-              }}
-            />
+            <TextField {...inputProps} key={inputProps.label} required validateOnLoad={false} />
           </Stack.Item>
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        <PrimaryButton disabled={errors.includes(true) || notModified} onClick={handleSubmit} text={t('common.save')} />
+        <PrimaryButton disabled={hasError || notModified} onClick={handleSubmit} text={t('common.save')} />
       </Stack>
     </Stack>
   )
