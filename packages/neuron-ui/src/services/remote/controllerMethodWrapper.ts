@@ -5,11 +5,12 @@ interface SuccessFromController {
 }
 interface FailureFromController {
   status: 0
-  message: {
-    code?: number
-    content?: string
-    meta?: { [key: string]: string }
-  }
+  message:
+    | string
+    | {
+        content?: string
+        meta?: { [key: string]: string }
+      }
 }
 export type ControllerResponse = SuccessFromController | FailureFromController
 
@@ -53,12 +54,14 @@ export const controllerMethodWrapper = (controllerName: string) => (
     console.groupEnd()
     /* eslint-enable no-console */
   }
+
   if (!res) {
     return {
       status: 1,
       result: null,
     }
   }
+
   if (res.status) {
     return {
       status: 1,
@@ -68,7 +71,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
 
   return {
     status: 0,
-    message: res.message || {},
+    message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
   }
 }
 

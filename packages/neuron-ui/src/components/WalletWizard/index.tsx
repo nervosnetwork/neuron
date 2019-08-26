@@ -16,7 +16,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { Routes, MnemonicAction, ErrorCode } from 'utils/const'
+import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
@@ -36,15 +36,29 @@ const initState: WithWizardState = {
 }
 
 const submissionInputs = [
-  { label: 'name', key: 'name', type: 'text', hint: 'wizard.set-wallet-name', autoFocus: false },
+  {
+    label: 'name',
+    key: 'name',
+    type: 'text',
+    hint: 'wizard.set-wallet-name',
+    autoFocus: false,
+    maxLength: MAX_WALLET_NAME_LENGTH,
+  },
   {
     label: 'password',
     key: 'password',
     type: 'password',
     hint: 'wizard.set-a-strong-password-to-protect-your-wallet',
     autoFocus: true,
+    maxLength: MAX_PASSWORD_LENGTH,
   },
-  { label: 'confirm-password', key: 'confirmPassword', type: 'password', autoFocus: false },
+  {
+    label: 'confirm-password',
+    key: 'confirmPassword',
+    type: 'password',
+    autoFocus: false,
+    maxLength: MAX_PASSWORD_LENGTH,
+  },
 ]
 
 const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementProps<{ rootPath: string }>) => {
@@ -271,6 +285,7 @@ const Submission = ({
             value={state[input.key]}
             onChange={onChange(input.key)}
             description={t(input.hint || '')}
+            maxLength={input.maxLength}
           />
         </div>
       ))}

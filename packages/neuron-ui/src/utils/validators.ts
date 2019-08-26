@@ -1,21 +1,38 @@
+/* global BigInt */
 import { ckbCore } from 'services/chain'
-import { ADDRESS_LENGTH, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT } from './const'
+import { outputsToTotalCapacity } from 'utils/formatters'
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 
-export const verifyAddress = (address: string): boolean | string => {
-  // TODO: verify address, prd required
+export const verifyAddress = (address: string): boolean => {
   try {
-    if (address.length !== ADDRESS_LENGTH) {
-      throw new Error('Address length is incorrect')
-    }
     ckbCore.utils.parseAddress(address)
     return true
   } catch (err) {
-    return err.message
+    return false
   }
 }
 
-export const verifyAmountRange = (amount: string) => {
+export const verifyAmountRange = (amount: string = '') => {
   return +amount >= MIN_AMOUNT
+}
+
+export const verifyAmount = (amount: string = '0') => {
+  if (Number.isNaN(+amount) || +amount < 0) {
+    return { code: ErrorCode.NotNegative, meta: { fieldName: 'amount', fieldValue: amount } }
+  }
+  const [, decimal = ''] = amount.split('.')
+  if (decimal.length > MAX_DECIMAL_DIGITS) {
+    return {
+      code: ErrorCode.DecimalExceed,
+      meta: { fieldName: 'amount', fieldValue: amount },
+    }
+  }
+  return true
+}
+
+export const verifyTotalAmount = (items: any, fee: string, balance: string) => {
+  const totalAmount = outputsToTotalCapacity(items)
+  return BigInt(totalAmount) + BigInt(fee) <= BigInt(balance)
 }
 
 export const verifyPasswordComplexity = (password: string) => {
@@ -54,5 +71,6 @@ export const verifyPasswordComplexity = (password: string) => {
 export default {
   verifyAddress,
   verifyAmountRange,
+  verifyTotalAmount,
   verifyPasswordComplexity,
 }

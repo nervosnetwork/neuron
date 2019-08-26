@@ -7,7 +7,7 @@ import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
-import { ErrorCode } from 'utils/const'
+import { ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 
 interface KeystoreFields {
   path: string
@@ -77,6 +77,12 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
     <Stack verticalFill verticalAlign="center" tokens={{ childrenGap: 15 }}>
       <Stack tokens={{ childrenGap: 15 }}>
         {Object.entries(fields).map(([key, value]) => {
+          let maxLength: number | undefined
+          if (key === 'name') {
+            maxLength = MAX_WALLET_NAME_LENGTH
+          } else if (key === 'password') {
+            maxLength = MAX_PASSWORD_LENGTH
+          }
           return (
             <TextField
               key={key}
@@ -85,6 +91,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
               placeholder={t(`import-keystore.placeholder.${key}`)}
               type={key === 'password' ? 'password' : 'text'}
               readOnly={key === 'path'}
+              maxLength={maxLength}
               value={value}
               validateOnLoad={false}
               onGetErrorMessage={(text?: string) => {

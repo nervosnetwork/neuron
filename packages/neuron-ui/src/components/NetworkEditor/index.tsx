@@ -41,9 +41,9 @@ const NetworkEditor = ({
               key={inputProps.label}
               required
               validateOnLoad={false}
-              onNotifyValidationResult={(msg: any) => {
+              onNotifyValidationResult={(message: any) => {
                 const errs = [...errors]
-                errs.splice(idx, 1, msg !== '')
+                errs.splice(idx, 1, message !== '')
                 setErrors(errs)
               }}
             />

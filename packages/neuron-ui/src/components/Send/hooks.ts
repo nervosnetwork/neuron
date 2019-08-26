@@ -1,95 +1,25 @@
-import React, { useCallback, useEffect } from 'react'
-import { IDropdownOption } from 'office-ui-fabric-react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { addNotification } from 'states/stateProvider/actionCreators'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { MAX_DECIMAL_DIGITS, ErrorCode } from 'utils/const'
-import { verifyAddress, verifyAmountRange } from 'utils/validators'
-import { outputsToTotalCapacity } from 'utils/formatters'
+import { outputsToTotalCapacity, priceToFee } from 'utils/formatters'
+import { verifyAddress, verifyAmount, verifyAmountRange } from 'utils/validators'
+import { ErrorCode } from 'utils/const'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
 
-const validateTransactionParams = ({
-  items = [],
-  dispatch,
-}: {
-  items: TransactionOutput[]
-  dispatch?: StateDispatch
-}) => {
-  let errorMessage: State.Message<ErrorCode, { fieldName: string; fieldValue: string } | { amount: string }> | undefined
-
-  const invalid = items.some(
-    (item): boolean => {
-      if (!item.address) {
-        errorMessage = {
-          type: 'warning',
-          timestamp: +new Date(),
-          code: ErrorCode.AddressIsEmpty,
-        }
-        return true
-      }
-      const isAddressValid = verifyAddress(item.address)
-      if (typeof isAddressValid === 'string') {
-        errorMessage = {
-          type: 'warning',
-          timestamp: +new Date(),
-          code: ErrorCode.FieldInvalid,
-          meta: {
-            fieldName: 'address',
-            fieldValue: item.address,
-          },
-        }
-        return true
-      }
-      if (Number.isNaN(+item.amount) || +item.amount < 0) {
-        errorMessage = {
-          type: 'warning',
-          timestamp: +new Date(),
-          code: ErrorCode.NotNegative,
-          meta: {
-            fieldName: 'amount',
-            fieldValue: item.amount || '0',
-          },
-        }
-        return true
-      }
-      const [, decimal = ''] = item.amount.split('.')
-      if (decimal.length > MAX_DECIMAL_DIGITS) {
-        errorMessage = {
-          type: 'warning',
-          timestamp: +new Date(),
-          code: ErrorCode.DecimalExceed,
-          meta: {
-            fieldName: 'amount',
-            fieldValue: item.amount,
-          },
-        }
-        return true
-      }
-      if (!verifyAmountRange(item.amount)) {
-        errorMessage = {
-          type: 'warning',
-          timestamp: +new Date(),
-          code: ErrorCode.AmountTooSmall,
-          meta: {
-            amount: item.amount || '0',
-          },
-        }
-        return true
-      }
-      return false
+const verifyTransactionParams = (items: TransactionOutput[] = []) => {
+  return !items.some(item => {
+    if (item.address === '' || verifyAddress(item.address) !== true) {
+      return true
     }
-  )
-  if (invalid && errorMessage) {
-    if (dispatch) {
-      addNotification(errorMessage)(dispatch)
+    if (Number.isNaN(+item.amount) || verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+      return true
     }
     return false
-  }
-  return true
+  })
 }
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
@@ -100,7 +30,7 @@ const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
         payload: {
           idx,
           item: {
-            [field]: value.trim(),
+            [field]: value.replace(/\s/, ''),
           },
         },
       })
@@ -127,11 +57,17 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
-const useOnTransactionChange = (walletID: string, items: TransactionOutput[], dispatch: StateDispatch) => {
+const useOnTransactionChange = (
+  walletID: string,
+  items: TransactionOutput[],
+  dispatch: StateDispatch,
+  setIsTransactionValid: Function
+) => {
   useEffect(() => {
     clearTimeout(cyclesTimer)
     cyclesTimer = setTimeout(() => {
-      if (validateTransactionParams({ items })) {
+      if (verifyTransactionParams(items)) {
+        setIsTransactionValid(true)
         calculateCycles({
           walletID,
           capacities: outputsToTotalCapacity(items),
@@ -156,6 +92,7 @@ const useOnTransactionChange = (walletID: string, items: TransactionOutput[], di
             })
           })
       } else {
+        setIsTransactionValid(false)
         dispatch({
           type: AppActions.UpdateSendCycles,
           payload: '0',
@@ -165,10 +102,10 @@ const useOnTransactionChange = (walletID: string, items: TransactionOutput[], di
   }, [walletID, items, dispatch])
 }
 
-const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
+const useOnSubmit = (items: TransactionOutput[], balance: string, fee: string, dispatch: StateDispatch) =>
   useCallback(
     (walletID: string = '') => () => {
-      if (validateTransactionParams({ items, dispatch })) {
+      if (verifyTransactionParams(items)) {
         dispatch({
           type: AppActions.UpdateTransactionID,
           payload: null,
@@ -182,7 +119,7 @@ const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
         })
       }
     },
-    [dispatch, items]
+    [dispatch, items, balance, fee]
   )
 
 const useOnItemChange = (updateTransactionOutput: Function) =>
@@ -193,23 +130,13 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
     ) => {
       if (undefined !== value) {
         if (field === 'amount') {
-          if (Number.isNaN(+value) || /[^\d.]/.test(value)) {
+          if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
             return
           }
           updateTransactionOutput(field)(idx)(value)
         } else {
           updateTransactionOutput(field)(idx)(value)
         }
-      }
-    },
-    [updateTransactionOutput]
-  )
-
-const useCapacityUnitChange = (updateTransactionOutput: Function) =>
-  useCallback(
-    (idx: number = -1) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
-      if (option) {
-        updateTransactionOutput('unit')(idx)(option.key)
       }
     },
     [updateTransactionOutput]
@@ -252,40 +179,73 @@ const clear = (dispatch: StateDispatch) => {
 const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
 
 export const useInitialize = (
-  address: string,
   items: TransactionOutput[],
+  price: string,
+  cycles: string,
+  balance: string,
   dispatch: React.Dispatch<any>,
-  history: any
+  t: any
 ) => {
+  const fee = useMemo(() => priceToFee(price, cycles), [price, cycles]) // in shannon
+  const [isTransactionValid, setIsTransactionValid] = useState(false)
+
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
-  const onCapacityUnitChange = useCapacityUnitChange(updateTransactionOutput)
-  const onSubmit = useOnSubmit(items, dispatch)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
+  const onSubmit = useOnSubmit(items, balance, fee, dispatch)
   const onClear = useClear(dispatch)
 
-  useEffect(() => {
-    if (address) {
-      updateTransactionOutput('address')(0)(address)
-    }
-    return () => {
-      clear(dispatch)
-    }
-  }, [address, dispatch, history, updateTransactionOutput])
+  const onGetAddressErrorMessage = useCallback(
+    (addr: string) => {
+      if (addr === '') {
+        return t(`messages.codes.${ErrorCode.AddressIsEmpty}`)
+      }
+      if (!verifyAddress(addr)) {
+        return t(`messages.codes.${ErrorCode.FieldInvalid}`, {
+          fieldName: 'address',
+          fieldValue: addr,
+        })
+      }
+      return ''
+    },
+    [t]
+  )
+
+  const onGetAmountErrorMessage = useCallback(
+    (text: string) => {
+      const amount = text || '0'
+
+      const msg = verifyAmount(amount)
+      if (typeof msg === 'object') {
+        return t(`messages.codes.${msg.code}`, msg.meta)
+      }
+      if (!verifyAmountRange(amount)) {
+        return t(`messages.codes.${ErrorCode.AmountTooSmall}`, {
+          amount,
+        })
+      }
+
+      return undefined
+    },
+    [t]
+  )
 
   return {
+    fee,
+    isTransactionValid,
+    setIsTransactionValid,
     useOnTransactionChange,
-    updateTransactionOutput,
     onItemChange,
-    onCapacityUnitChange,
-    onSubmit,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onGetAddressErrorMessage,
+    onGetAmountErrorMessage,
+    onSubmit,
     onClear,
   }
 }

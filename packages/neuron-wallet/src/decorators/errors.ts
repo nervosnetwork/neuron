@@ -10,7 +10,7 @@ export const CatchControllerError = (_target: any, _name: string, descriptor: Pr
       } catch (err) {
         return {
           status: ResponseCode.Fail,
-          message: { content: err.message },
+          message: typeof err.message === 'string' ? { content: err.message } : err.message,
         }
       }
     },

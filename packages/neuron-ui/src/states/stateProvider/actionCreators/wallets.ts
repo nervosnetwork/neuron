@@ -19,13 +19,13 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
 import { Routes } from 'utils/const'
-import { addressesToBalance } from 'utils/formatters'
+import { addressesToBalance, failureResToNotification } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
 export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any) => {
   getCurrentWallet().then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       const payload = res.result || initStates.wallet
       if (!payload || !payload.id) {
         history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
@@ -36,13 +36,7 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any)
       })
       currentWalletCache.save(payload)
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -52,13 +46,14 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   history: any
 ) => {
   createWallet(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
-      if (res.message.code) {
-        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
-      } else if (res.message.content) {
-        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
       }
     }
   })
@@ -69,13 +64,14 @@ export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   history: any
 ) => {
   importMnemonic(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
-      if (res.message.code) {
-        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
-      } else if (res.message.content) {
-        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
       }
     }
   })
@@ -86,13 +82,14 @@ export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams
   history: any
 ) => {
   importKeystore(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
-      if (res.message.code) {
-        showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.message.code}`))
-      } else if (res.message.content) {
-        showErrorMessage(i18n.t(`messages.error`), res.message.content)
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
       }
     }
   })
@@ -100,7 +97,7 @@ export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams
 
 export const updateWalletList = () => (dispatch: StateDispatch, history: any) => {
   getWalletList().then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       const payload = res.result || []
       if (!payload.length) {
         history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
@@ -111,13 +108,7 @@ export const updateWalletList = () => (dispatch: StateDispatch, history: any) =>
       })
       walletsCache.save(payload)
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -133,13 +124,7 @@ export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
         history.push(Routes.SettingsWallets)
       }
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -151,13 +136,7 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
         payload: null,
       })
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -171,22 +150,28 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
   })
   sendCapacity(params)
     .then(res => {
-      if (res.status) {
+      if (res.status === 1) {
         history.push(Routes.History)
       } else {
         // TODO: the pretreatment is unnecessary once the error code is implemented
         addNotification({
           type: 'alert',
           timestamp: +new Date(),
-          code: res.message.code,
-          content: (res.message.content || '').replace(/(\b"|"\b)/g, ''),
-          meta: res.message.meta,
+          code: res.status,
+          content: (typeof res.message === 'string' ? res.message : res.message.content || '').replace(
+            /(\b"|"\b)/g,
+            ''
+          ),
+          meta: typeof res.message === 'string' ? undefined : res.message.meta,
         })(dispatch)
       }
       dispatch({
         type: AppActions.DismissPasswordRequest,
         payload: null,
       })
+    })
+    .catch(err => {
+      console.warn(err)
     })
     .finally(() => {
       dispatch({
@@ -210,13 +195,7 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
         payload: { addresses, balance },
       })
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -241,13 +220,7 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
           },
         })
       } else {
-        addNotification({
-          type: 'alert',
-          timestamp: +new Date(),
-          code: res.message.code,
-          content: res.message.content,
-          meta: res.message.meta,
-        })(dispatch)
+        addNotification(failureResToNotification(res))(dispatch)
       }
     })
     .finally(() => {
@@ -269,13 +242,7 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
     if (res.status) {
       addPopup('delete-wallet-successfully')(dispatch)
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -292,13 +259,7 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
         payload: null,
       })
     } else {
-      addNotification({
-        type: 'alert',
-        timestamp: +new Date(),
-        code: res.message.code,
-        content: res.message.content,
-        meta: res.message.meta,
-      })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }

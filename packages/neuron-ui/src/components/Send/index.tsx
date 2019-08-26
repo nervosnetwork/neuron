@@ -21,7 +21,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, CapacityUnit } from 'utils/const'
-import { shannonToCKBFormatter, priceToFee } from 'utils/formatters'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
 import { useInitialize } from './hooks'
 
@@ -38,24 +38,24 @@ const Send = ({
   },
   wallet: { id: walletID = '', balance = '' },
   dispatch,
-  history,
-  match: {
-    params: { address = '' },
-  },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
+    fee,
+    isTransactionValid,
+    setIsTransactionValid,
     useOnTransactionChange,
-    updateTransactionOutput,
     onItemChange,
     onSubmit,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onGetAddressErrorMessage,
+    onGetAmountErrorMessage,
     onClear,
-  } = useInitialize(address, send.outputs, dispatch, history)
-  useOnTransactionChange(walletID, send.outputs, dispatch)
+  } = useInitialize(send.outputs, send.price, send.cycles, balance, dispatch, t)
+  useOnTransactionChange(walletID, send.outputs, dispatch, setIsTransactionValid)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
   const actionSpacer = (
@@ -78,7 +78,7 @@ const Send = ({
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
                   <Stack
                     horizontal
-                    verticalAlign="end"
+                    verticalAlign="start"
                     styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
@@ -91,15 +91,17 @@ const Send = ({
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
                         required
+                        validateOnLoad={false}
+                        onGetErrorMessage={onGetAddressErrorMessage}
                       />
                     </Stack.Item>
-                    <Stack.Item styles={{ root: { width: '48px' } }}>
+                    <Stack styles={{ root: { width: '48px' } }} verticalAlign="start">
                       <QRScanner
                         title={t('send.scan-to-get-address')}
                         label={t('send.address')}
-                        onConfirm={(data: string) => updateTransactionOutput('address')(idx)(data)}
+                        onConfirm={(data: string) => onItemChange('address', idx)(undefined as any, data)}
                       />
-                    </Stack.Item>
+                    </Stack>
                   </Stack>
 
                   <Stack.Item>
@@ -116,7 +118,7 @@ const Send = ({
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
                   <Stack
                     horizontal
-                    verticalAlign="end"
+                    verticalAlign="start"
                     styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
@@ -130,6 +132,8 @@ const Send = ({
                         onChange={onItemChange('amount', idx)}
                         disabled={sending}
                         required
+                        validateOnLoad={false}
+                        onGetErrorMessage={onGetAmountErrorMessage}
                       />
                     </Stack.Item>
                     <Stack.Item styles={{ root: { width: '43px', paddingLeft: '5px' } }}>
@@ -168,7 +172,7 @@ const Send = ({
       </Stack>
 
       <TransactionFeePanel
-        fee={shannonToCKBFormatter(priceToFee(send.price, send.cycles))}
+        fee={shannonToCKBFormatter(fee)}
         cycles={send.cycles}
         price={send.price}
         onPriceChange={updateTransactionPrice}
@@ -190,7 +194,12 @@ const Send = ({
         {sending ? (
           <Spinner />
         ) : (
-          <PrimaryButton type="submit" onClick={onSubmit(walletID)} disabled={sending} text={t('send.send')} />
+          <PrimaryButton
+            type="submit"
+            onClick={onSubmit(walletID)}
+            disabled={sending || !isTransactionValid}
+            text={t('send.send')}
+          />
         )}
       </Stack>
     </Stack>

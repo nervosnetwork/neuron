@@ -1,7 +1,12 @@
 declare module Controller {
   interface Response<T = any> {
     status: number
-    msg?: string
+    message?:
+      | string
+      | {
+          content?: string
+          meta?: { [key: string]: string }
+        }
     result?: T
   }
 
