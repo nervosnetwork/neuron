@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint, Cell, CellOutPoint } from 'types/cell-types'
+import { Script, OutPoint, Cell } from 'types/cell-types'
 import TransactionEntity from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -35,17 +35,10 @@ export default class Output extends BaseEntity {
   })
   status!: string
 
-  public cellOutPoint(): CellOutPoint {
+  public outPoint(): OutPoint {
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
-    }
-  }
-
-  public outPoint(): OutPoint {
-    return {
-      blockHash: null,
-      cell: this.cellOutPoint(),
     }
   }
 

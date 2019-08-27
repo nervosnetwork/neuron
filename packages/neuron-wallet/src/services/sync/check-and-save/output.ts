@@ -6,19 +6,20 @@ export default class CheckOutput {
 
   constructor(output: Cell) {
     this.output = output
-    this.calcLockHash()
+    // this.calcLockHash()
   }
 
-  public calcLockHash = (): Cell => {
+  public calcLockHash = async (): Promise<Cell> => {
     if (this.output.lockHash) {
       return this.output
     }
 
-    this.output.lockHash = LockUtils.lockScriptToHash(this.output.lock)
+    this.output.lockHash = await LockUtils.lockScriptToHash(this.output.lock)
     return this.output
   }
 
-  public checkLockHash = (lockHashList: string[]): boolean | undefined => {
+  public checkLockHash = async (lockHashList: string[]): Promise<boolean | undefined> => {
+    await this.calcLockHash()
     return lockHashList.includes(this.output.lockHash!)
   }
 }

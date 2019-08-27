@@ -13,6 +13,7 @@ import SyncInfo from './entities/sync-info'
 import { InitMigration1561695143591 } from './migrations/1561695143591-InitMigration'
 import { AddStatusToTx1562038960990 } from './migrations/1562038960990-AddStatusToTx'
 import { AddConfirmed1565693320664 } from './migrations/1565693320664-AddConfirmed'
+import { AlterDepsFromTransaction1566900661931 } from './migrations/1566900661931-AlterDepsFromTransaction'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -32,7 +33,12 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     type: 'sqlite',
     database: dbPath(genesisBlockHash),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1561695143591, AddStatusToTx1562038960990, AddConfirmed1565693320664],
+    migrations: [
+      InitMigration1561695143591,
+      AddStatusToTx1562038960990,
+      AddConfirmed1565693320664,
+      AlterDepsFromTransaction1566900661931,
+    ],
     logging,
   }
 }

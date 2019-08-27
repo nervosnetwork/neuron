@@ -1,13 +1,15 @@
 import NodeService from 'services/node'
 import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import env from 'env'
-import { SystemScriptSubject } from './subjects/system-script'
+import ConvertTo from 'types/convert-to'
+import { SystemScriptSubject } from 'models/subjects/system-script'
 
 const { core } = NodeService.getInstance()
 
 export interface SystemScript {
   codeHash: string
   outPoint: OutPoint
+  hashType: ScriptHashType
 }
 
 const subscribed = (target: any, propertyName: string) => {
@@ -30,19 +32,14 @@ export default class LockUtils {
       return this.systemScriptInfo
     }
 
-    const systemCell = await core.loadSystemCell()
+    const systemCell = await core.loadSecp256k1Dep()
     let { codeHash } = systemCell
-    const { outPoint } = systemCell
-    let { blockHash } = outPoint
-    let { txHash } = outPoint.cell
-    const { index } = outPoint.cell
+    const { outPoint, hashType } = systemCell
+    let { txHash } = outPoint
+    const { index } = outPoint
 
     if (!codeHash.startsWith('0x')) {
       codeHash = `0x${codeHash}`
-    }
-
-    if (!blockHash.startsWith('0x')) {
-      blockHash = `0x${blockHash}`
     }
 
     if (!txHash.startsWith('0x')) {
@@ -52,12 +49,10 @@ export default class LockUtils {
     const systemScriptInfo = {
       codeHash,
       outPoint: {
-        blockHash,
-        cell: {
-          txHash,
-          index,
-        },
+        txHash,
+        index,
       },
+      hashType: hashType as ScriptHashType,
     }
 
     this.systemScriptInfo = systemScriptInfo
@@ -70,23 +65,18 @@ export default class LockUtils {
     SystemScriptSubject.next({ codeHash: info.codeHash })
   }
 
-  // use SDK lockScriptToHash
-  static lockScriptToHash = (lock: Script) => {
-    const codeHash: string = lock!.codeHash!
-    const args: string[] = lock.args!
-    const { hashType } = lock
-    // TODO: should support ScriptHashType.Type in the future
-    const lockHash: string = core.utils.lockScriptToHash({
-      codeHash,
-      args,
-      hashType,
-    })
-
-    if (lockHash.startsWith('0x')) {
-      return lockHash
+  static computeScriptHash = async (script: Script): Promise<string> => {
+    const ckbScript: CKBComponents.Script = ConvertTo.toSdkScript(script)
+    const hash: string = await (core.rpc as any).computeScriptHash(ckbScript)
+    if (!hash.startsWith('0x')) {
+      return `0x${hash}`
     }
+    return hash
+  }
 
-    return `0x${lockHash}`
+  // use SDK lockScriptToHash
+  static lockScriptToHash = async (lock: Script) => {
+    return LockUtils.computeScriptHash(lock)
   }
 
   static async addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Data): Promise<Script> {

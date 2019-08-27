@@ -1,4 +1,4 @@
-import { TransactionWithoutHash, Cell, ScriptHashType } from 'types/cell-types'
+import { TransactionWithoutHash, Cell, ScriptHashType, DepType } from 'types/cell-types'
 import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
@@ -63,7 +63,12 @@ export class TransactionGenerator {
 
     return {
       version: '0',
-      deps: [outPoint],
+      cellDeps: [
+        {
+          outPoint,
+          depType: DepType.DepGroup,
+        },
+      ],
       inputs,
       outputs,
       witnesses: [],

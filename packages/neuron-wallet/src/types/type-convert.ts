@@ -1,4 +1,15 @@
-import { Block, BlockHeader, Transaction, Input, OutPoint, Cell, Script, CellOutPoint } from './cell-types'
+import {
+  Block,
+  BlockHeader,
+  Transaction,
+  Input,
+  OutPoint,
+  Cell,
+  Script,
+  CellDep,
+  DepType,
+  ScriptHashType,
+} from './cell-types'
 
 // convert CKBComponents to types
 export default class TypeConvert {
@@ -24,7 +35,9 @@ export default class TypeConvert {
     const tx: Transaction = {
       hash: transaction.hash,
       version: transaction.version,
-      deps: transaction.deps,
+      // deps: transaction.deps,
+      cellDeps: transaction.cellDeps.map(cellDep => TypeConvert.toCellDep(cellDep)),
+      headerDeps: transaction.headerDeps,
       witnesses: transaction.witnesses,
       inputs: transaction.inputs.map(input => TypeConvert.toInput(input)),
       outputs: transaction.outputs.map(output => TypeConvert.toOutput(output)),
@@ -37,6 +50,13 @@ export default class TypeConvert {
     return tx
   }
 
+  static toCellDep(cellDep: CKBComponents.CellDep): CellDep {
+    return {
+      outPoint: cellDep.outPoint,
+      depType: cellDep.depType as DepType,
+    }
+  }
+
   static toInput(input: CKBComponents.CellInput): Input {
     return {
       previousOutput: input.previousOutput,
@@ -45,13 +65,9 @@ export default class TypeConvert {
   }
 
   static toOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
-    const cell: CellOutPoint = {
-      txHash: outPoint.cell!.txHash,
-      index: outPoint.cell!.index,
-    }
     return {
-      blockHash: null,
-      cell,
+      txHash: outPoint.txHash,
+      index: outPoint.index,
     }
   }
 
@@ -66,7 +82,7 @@ export default class TypeConvert {
     return {
       args: script.args,
       codeHash: script.codeHash,
-      hashType: script.hashType,
+      hashType: script.hashType as ScriptHashType,
     }
   }
 }
