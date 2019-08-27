@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { outputsToTotalCapacity, priceToFee } from 'utils/formatters'
+import { outputsToTotalAmount, priceToFee } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
 import { ErrorCode } from 'utils/const'
 import { MAX_DECIMAL_DIGITS } from '../../utils/const'
@@ -58,7 +58,7 @@ const useOnTransactionChange = (
     cyclesTimer = setTimeout(() => {
       if (verifyTransactionOutputs(items)) {
         setIsTransactionValid(true)
-        const totalAmount = outputsToTotalCapacity(items)
+        const totalAmount = outputsToTotalAmount(items)
         setTotalAmount(totalAmount)
         calculateCycles({
           walletID,

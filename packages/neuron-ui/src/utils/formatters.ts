@@ -163,7 +163,7 @@ export const addressesToBalance = (addresses: State.Address[] = []) => {
     .toString()
 }
 
-export const outputsToTotalCapacity = (outputs: { amount: string; unit: CapacityUnit }[]) => {
+export const outputsToTotalAmount = (outputs: { amount: string; unit: CapacityUnit }[]) => {
   const totalCapacity = outputs.reduce((total, cur) => {
     if (Number.isNaN(+cur.amount)) {
       return total
@@ -192,6 +192,6 @@ export default {
   uniformTimeFormatter,
   priceToFee,
   addressesToBalance,
-  outputsToTotalCapacity,
+  outputsToTotalAmount,
   failureResToNotification,
 }
