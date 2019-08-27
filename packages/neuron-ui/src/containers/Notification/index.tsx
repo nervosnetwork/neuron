@@ -83,7 +83,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
 
   return (
     <div>
-      {showTopAlert && notificationsInDesc.length ? (
+      {showTopAlert && notification ? (
         <MessageBar
           messageBarType={notificationType(notification.type)}
           styles={{
@@ -99,7 +99,9 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
             <TopAlertActions dispatch={dispatch} count={notificationsInDesc.length} onDismiss={onTopAlertDismiss} />
           }
         >
-          {t(notification.content, notification.meta)}
+          {notification.code
+            ? t(`messages.codes.${notification.code}`, notification.meta)
+            : notification.content || t('messages.unknown-error')}
         </MessageBar>
       ) : null}
 
@@ -154,7 +156,11 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
                 </Text>
                 <IconButton iconProps={{ iconName: 'Dismiss' }} onClick={onNotificationDismiss(n.timestamp)} />
               </Stack>
-              <Text as="p">{t(n.content, n.meta)}</Text>
+              <Text as="p">
+                {notification.code
+                  ? t(`messages.codes.${notification.code}`, notification.meta)
+                  : notification.content || t('messages.unknown-error')}
+              </Text>
             </Stack>
           )
         })}

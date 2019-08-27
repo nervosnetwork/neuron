@@ -5,16 +5,16 @@ import { Stack, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { Routes } from 'utils/const'
+import { Routes, ErrorCode } from 'utils/const'
 
 import { useGoBack } from 'utils/hooks'
-import { useAreParamsValid, useOnConfirm, useInputs, useWalletEditor } from './hooks'
+import { useHint, useOnConfirm, useInputs, useWalletEditor } from './hooks'
 
 const WalletNotFound = () => {
   const [t] = useTranslation()
   return (
     <div>
-      <p>{t('messages.wallet-is-not-found')}</p>
+      <p>{t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' })}</p>
       <Link to={Routes.SettingsWallets} className="btn btn-primary">
         {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
       </Link>
@@ -33,6 +33,7 @@ const WalletEditor = ({
   const [t] = useTranslation()
 
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets]) || { id: '', name: '' }
+  const usedNames = wallets.map(w => w.name).filter(n => n !== wallet.name)
 
   const editor = useWalletEditor()
   const { initialize } = editor
@@ -42,7 +43,7 @@ const WalletEditor = ({
   }, [id, initialize, wallet.name])
 
   const inputs = useInputs(editor)
-  const areParamsValid = useAreParamsValid(editor.name.value)
+  const hint = useHint(editor.name.value, usedNames, t)
   const onConfirm = useOnConfirm(editor.name.value, wallet.id, history, dispatch)
   const goBack = useGoBack(history)
 
@@ -56,13 +57,17 @@ const WalletEditor = ({
       <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
           <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} key={inputProps.label} required />
+            <TextField {...inputProps} key={inputProps.label} required errorMessage={hint || undefined} />
           </Stack.Item>
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        <PrimaryButton onClick={onConfirm} disabled={!areParamsValid} text={t('common.save')} />
+        <PrimaryButton
+          onClick={onConfirm}
+          disabled={hint !== null || editor.name.value === wallet.name}
+          text={t('common.save')}
+        />
       </Stack>
     </Stack>
   )

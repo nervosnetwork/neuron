@@ -1,7 +1,7 @@
 import { NeuronWalletActions, AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { getNeuronWalletState } from 'services/remote'
 import initStates from 'states/initStates'
-import { Routes } from 'utils/const'
+import { Routes, ErrorCode } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { addressesToBalance } from 'utils/formatters'
 import {
@@ -73,16 +73,10 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
   }, 8000)
 }
 
-export const addNotification = ({ type, content }: { type: 'alert' | 'warning'; content: string }) => (
-  dispatch: StateDispatch
-) => {
+export const addNotification = (message: State.Message<ErrorCode>) => (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.AddNotification,
-    payload: {
-      type,
-      content,
-      timestamp: Date.now(),
-    },
+    payload: message,
   })
 }
 export const dismissNotification = (timestamp: number) => (dispatch: StateDispatch) => {
