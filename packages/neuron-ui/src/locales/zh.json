@@ -186,7 +186,7 @@
         "edit-network": {
           "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
-          "name": "名字"
+          "name": "名称"
         }
       }
     },
@@ -242,6 +242,7 @@
     },
     "messages": {
       "error": "错误",
+      "unknown-error": "未知错误",
       "update-wallet-successfully": "已更新钱包信息",
       "delete-wallet-successfully": "已删除钱包",
       "create-network-successfully": "新节点已添加",

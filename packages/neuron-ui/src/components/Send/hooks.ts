@@ -6,6 +6,7 @@ import { calculateCycles } from 'services/remote/wallets'
 import { outputsToTotalCapacity, priceToFee } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
 import { ErrorCode } from 'utils/const'
+import { MAX_DECIMAL_DIGITS } from '../../utils/const'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
@@ -90,7 +91,7 @@ const useOnTransactionChange = (
         })
       }
     }, 300)
-  }, [walletID, items, dispatch, setIsTransactionValid])
+  }, [walletID, items, dispatch, setIsTransactionValid, setTotalAmount])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
@@ -214,6 +215,7 @@ export const useInitialize = (
         return t(`messages.codes.${msg.code}`, {
           fieldName: 'amount',
           fieldValue: amount,
+          length: MAX_DECIMAL_DIGITS,
         })
       }
       if (!verifyAmountRange(amount)) {

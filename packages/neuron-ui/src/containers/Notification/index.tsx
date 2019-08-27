@@ -101,7 +101,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
         >
           {notification.code
             ? t(`messages.codes.${notification.code}`, notification.meta)
-            : notification.content || 'Unknonw'}
+            : notification.content || t('messages.unknown-error')}
         </MessageBar>
       ) : null}
 
@@ -159,7 +159,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
               <Text as="p">
                 {notification.code
                   ? t(`messages.codes.${notification.code}`, notification.meta)
-                  : notification.content || 'Unknonw'}
+                  : notification.content || t('messages.unknown-error')}
               </Text>
             </Stack>
           )

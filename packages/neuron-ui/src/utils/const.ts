@@ -81,7 +81,6 @@ export enum ErrorCode {
   NotNegative = 207,
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
-  // Other errors
   FieldIrremovable = 301,
   FailToLaunch = 302,
   FieldNotFound = 303,

@@ -242,6 +242,7 @@
     },
     "messages": {
       "error": "Error",
+      "unknown-error": "Unknown error",
       "update-wallet-successfully": "Update the wallet successfully",
       "delete-wallet-successfully": "Delete the wallet successfully",
       "create-network-successfully": "Create a network successfully",
