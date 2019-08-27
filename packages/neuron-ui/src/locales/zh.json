@@ -90,6 +90,7 @@
       "input-password-to-confirm": "输入密码以确认本次交易",
       "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫描二维码以获取地址",
+      "total-amount": "总金额",
       "description": "备注",
       "description-optional": "备注 (选填)",
       "balance": "余额",

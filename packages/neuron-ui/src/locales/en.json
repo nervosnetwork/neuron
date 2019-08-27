@@ -90,6 +90,7 @@
       "input-password-to-confirm": "Input password to confirm",
       "this-transaction-will-send": "This transaction will send",
       "scan-to-get-address": "Scan QR code to read the address to send to",
+      "total-amount": "Total Amount",
       "description": "Description",
       "description-optional": "Description (optional)",
       "balance": "Balance",

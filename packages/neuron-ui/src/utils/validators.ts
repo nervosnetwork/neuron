@@ -1,7 +1,6 @@
 import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 /* global BigInt */
 import { ckbCore } from 'services/chain'
-import { outputsToTotalCapacity } from 'utils/formatters'
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 
 export const verifyAddress = (address: string): boolean => {
@@ -33,8 +32,10 @@ export const verifyAmount = (amount: string = '0') => {
   return true
 }
 
-export const verifyTotalAmount = (items: any, fee: string, balance: string) => {
-  const totalAmount = outputsToTotalCapacity(items)
+export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
+  if (+balance < 0) {
+    return false
+  }
   return BigInt(totalAmount) + BigInt(fee) <= BigInt(balance)
 }
 

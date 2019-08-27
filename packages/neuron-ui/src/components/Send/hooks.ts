@@ -49,16 +49,19 @@ const useOnTransactionChange = (
   walletID: string,
   items: TransactionOutput[],
   dispatch: StateDispatch,
-  setIsTransactionValid: Function
+  setIsTransactionValid: Function,
+  setTotalAmount: Function
 ) => {
   useEffect(() => {
     clearTimeout(cyclesTimer)
     cyclesTimer = setTimeout(() => {
       if (verifyTransactionOutputs(items)) {
         setIsTransactionValid(true)
+        const totalAmount = outputsToTotalCapacity(items)
+        setTotalAmount(totalAmount)
         calculateCycles({
           walletID,
-          capacities: outputsToTotalCapacity(items),
+          capacities: totalAmount,
         })
           .then(response => {
             if (response.status) {
@@ -175,6 +178,7 @@ export const useInitialize = (
 ) => {
   const fee = useMemo(() => priceToFee(price, cycles), [price, cycles]) // in shannon
   const [isTransactionValid, setIsTransactionValid] = useState(false)
+  const [totalAmount, setTotalAmount] = useState('0')
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -225,6 +229,8 @@ export const useInitialize = (
 
   return {
     fee,
+    totalAmount,
+    setTotalAmount,
     isTransactionValid,
     setIsTransactionValid,
     useOnTransactionChange,

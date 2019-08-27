@@ -20,9 +20,10 @@ import QRScanner from 'widgets/QRScanner'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, CapacityUnit } from 'utils/const'
+import { PlaceHolders, CapacityUnit, ErrorCode } from 'utils/const'
 import { shannonToCKBFormatter } from 'utils/formatters'
 
+import { verifyTotalAmount } from 'utils/validators'
 import { useInitialize } from './hooks'
 
 export interface TransactionOutput {
@@ -42,6 +43,8 @@ const Send = ({
   const { t } = useTranslation()
   const {
     fee,
+    totalAmount,
+    setTotalAmount,
     isTransactionValid,
     setIsTransactionValid,
     useOnTransactionChange,
@@ -55,14 +58,11 @@ const Send = ({
     onGetAmountErrorMessage,
     onClear,
   } = useInitialize(send.outputs, send.price, send.cycles, dispatch, t)
-  useOnTransactionChange(walletID, send.outputs, dispatch, setIsTransactionValid)
+  useOnTransactionChange(walletID, send.outputs, dispatch, setIsTransactionValid, setTotalAmount)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
-  const actionSpacer = (
-    <Stack.Item styles={{ root: { width: '48px' } }}>
-      <span> </span>
-    </Stack.Item>
-  )
+
+  const isAffordable = verifyTotalAmount(totalAmount, fee, balance)
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
@@ -159,15 +159,48 @@ const Send = ({
         />
       </Stack.Item>
 
-      <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
+      <Stack
+        verticalAlign="start"
+        horizontalAlign="space-between"
+        tokens={{ childrenGap: 20 }}
+        styles={{ root: { marginRight: '97px' } }}
+      >
+        <Stack
+          horizontal
+          verticalAlign="start"
+          styles={{
+            root: {
+              width: leftStackWidth,
+              display: send.outputs.length > 1 || !isAffordable ? 'flex' : 'none',
+            },
+          }}
+          tokens={{ childrenGap: 20 }}
+        >
+          <Stack.Item styles={{ root: { width: labelWidth } }}>
+            <Label>{t('send.total-amount')}</Label>
+          </Stack.Item>
+          <Stack.Item styles={{ root: { flex: 1 } }}>
+            <TextField
+              id="total-amount"
+              alt={t('send.total-amount')}
+              value={`${shannonToCKBFormatter(totalAmount)} CKB`}
+              readOnly
+              errorMessage={isAffordable ? '' : t(`messages.codes.${ErrorCode.AmountNotEnough}`)}
+            />
+          </Stack.Item>
+        </Stack>
         <Stack horizontal verticalAlign="end" styles={{ root: { width: leftStackWidth } }} tokens={{ childrenGap: 20 }}>
           <Stack.Item styles={{ root: { width: labelWidth } }}>
             <Label>{t('send.description')}</Label>
           </Stack.Item>
           <Stack.Item styles={{ root: { flex: 1 } }}>
-            <TextField id="description" alt="description" value={send.description} onChange={onDescriptionChange} />
+            <TextField
+              id="description"
+              alt={t('send.description')}
+              value={send.description}
+              onChange={onDescriptionChange}
+            />
           </Stack.Item>
-          {actionSpacer}
         </Stack>
       </Stack>
 
@@ -197,7 +230,7 @@ const Send = ({
           <PrimaryButton
             type="submit"
             onClick={onSubmit(walletID)}
-            disabled={sending || !isTransactionValid}
+            disabled={sending || !isTransactionValid || !isAffordable}
             text={t('send.send')}
           />
         )}
