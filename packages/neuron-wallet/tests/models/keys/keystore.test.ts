@@ -42,3 +42,14 @@ describe('load ckb cli light keystore', () => {
     expect(keystore.checkPassword(password)).toBe(true)
   })
 })
+
+describe('load ckb cli standard keystore', () => {
+  const password = '123'
+  const keystoreString =
+    '{"address":"02bf67769d8e12bd956550c71e7a4e344755afd9","crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"4e530f7bc3b59909ce97d4e7baced7ad"},"ciphertext":"e26a1e4affd919c4c00a46920a44113a526d29aa4472d0d0f84e169841853b3f350a5d76f0de6c0a0a5bdd7b03495bb904b49c11d1e241090b77792480ba255d","kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"37495d0caf3a816db294dc3f97ad8b4dd266820cccbabd7593356ff19be99e8d"},"mac":"5054f1fe0bf13cf6a1e3e4d7538eee451e263e61a935163a5b80a962849e6af3"},"id":"7f60eca5-3128-45e0-95be-08ee34c9ab37","version":3}'
+  const keystore = Keystore.fromJson(keystoreString)
+
+  it('checks correct password', () => {
+    expect(keystore.checkPassword(password)).toBe(true)
+  })
+})
