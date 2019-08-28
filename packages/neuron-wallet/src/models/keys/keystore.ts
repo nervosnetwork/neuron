@@ -58,7 +58,7 @@ export default class Keystore {
     const kdfparams: KdfParams = {
       dklen: 32,
       salt: salt.toString('hex'),
-      n: 8192,
+      n: 2 ** 18,
       r: 8,
       p: 1,
     }
