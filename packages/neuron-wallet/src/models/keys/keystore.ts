@@ -48,9 +48,13 @@ export default class Keystore {
     }
   }
 
-  static create = (extendedPrivateKey: ExtendedPrivateKey, password: string) => {
-    const salt = crypto.randomBytes(32)
-    const iv = crypto.randomBytes(16)
+  static create = (
+    extendedPrivateKey: ExtendedPrivateKey,
+    password: string,
+    options: { salt?: Buffer; iv?: Buffer } = {}
+  ) => {
+    const salt = options.salt || crypto.randomBytes(32)
+    const iv = options.iv || crypto.randomBytes(16)
     const kdfparams: KdfParams = {
       dklen: 32,
       salt: salt.toString('hex'),
