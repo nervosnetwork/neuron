@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import SHA3 from 'sha3'
+import { Keccak } from 'sha3'
 import { v4 as uuid } from 'uuid'
 
 import { UnsupportedCipher, IncorrectPassword, InvalidKeystore } from 'exceptions'
@@ -51,17 +51,14 @@ export default class Keystore {
   static create = (extendedPrivateKey: ExtendedPrivateKey, password: string) => {
     const salt = crypto.randomBytes(32)
     const iv = crypto.randomBytes(16)
-    const params = {
+    const kdfparams: KdfParams = {
+      dklen: 32,
+      salt: salt.toString('hex'),
       n: 8192,
       r: 8,
       p: 1,
     }
-    const kdfparams: KdfParams = {
-      dklen: 32,
-      salt: salt.toString('hex'),
-      ...params,
-    }
-    const derivedKey: Buffer = crypto.scryptSync(password, salt, kdfparams.dklen, {
+    const derivedKey = crypto.scryptSync(password, salt, kdfparams.dklen, {
       N: kdfparams.n,
       r: kdfparams.r,
       p: kdfparams.p,
@@ -75,11 +72,7 @@ export default class Keystore {
       cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'hex')),
       cipher.final(),
     ])
-    const hash = new SHA3(256)
-    const mac = hash
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
+    const mac = new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
 
     return new Keystore(
       {
@@ -98,18 +91,9 @@ export default class Keystore {
 
   // Decrypt and return serialized extended private key.
   decrypt(password: string): string {
-    const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
-      N: kdfparams.n,
-      r: kdfparams.r,
-      p: kdfparams.p,
-    })
+    const derivedKey = this.derivedKey(password)
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    const mac = new SHA3(256)
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
-    if (mac !== this.crypto.mac) {
+    if (this.mac(derivedKey, ciphertext) !== this.crypto.mac) {
       throw new IncorrectPassword()
     }
     const decipher = crypto.createDecipheriv(
@@ -125,17 +109,21 @@ export default class Keystore {
   }
 
   checkPassword = (password: string) => {
+    const derivedKey = this.derivedKey(password)
+    const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
+    return this.mac(derivedKey, ciphertext) === this.crypto.mac
+  }
+
+  derivedKey = (password: string) => {
     const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
+    return crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
       N: kdfparams.n,
       r: kdfparams.r,
       p: kdfparams.p,
     })
-    const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    const mac = new SHA3(256)
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
-    return mac === this.crypto.mac
+  }
+
+  mac = (derivedKey: Buffer, ciphertext: Buffer) => {
+    return new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
   }
 }
