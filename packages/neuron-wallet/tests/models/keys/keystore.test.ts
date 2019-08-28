@@ -35,7 +35,7 @@ describe('load and check password', () => {
 describe('load ckb cli light keystore', () => {
   const password = '123'
   const keystoreString =
-    '{"address":"c99d0619cc212febaf347eb265ae9517c9099ee0","crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"aeaff7e3cecb7bb10fcc9b46a107f15e"},"ciphertext":"9d6aec2980833a6ee52bcdab4dd6f0945a838f66ef4e300e2b0bf32c56249bd8ce32007d47441ac4b8ea307c2a8a131b5f6c53690c1e51ff71b44ce73ab68d68","kdf":"scrypt","kdfparams":{"dklen":32,"n":4096,"p":6,"r":8,"salt":"9c6ab8596703e6934faaa1a48f41dbc96ee590dc7b1f3dc3c05139ef588dde6d"},"mac":"f2a3975897d4794b8b4e74ca5f1be09cd5069d90165ec3acf53bda11ac37338e"},"id":"af3de9c9-530e-4304-9db0-d4e5596cf2c6","version":3}'
+    '{"crypto":{"cipher": "aes-128-ctr", "ciphertext": "253397209cae86474e368720f9baa30f448767047d2cc5a7672ef121861974ed", "cipherparams": {"iv": "8bd8523e0048db3a4ae2534aec6d303a"}, "kdf": "scrypt", "kdfparams": {"dklen": 32, "n": 4096, "p": 6, "r": 8, "salt": "be3d86c99f4895f99d1a0048afb61a34153fa83d5edd033fc914de2c502f57e7"}, "mac": "4453cf5d4f6ec43d0664c3895c4ab9b1c9bcd2d02c7abb190c84375a42739099" },"id": "id", "version": 3}'
   const keystore = Keystore.fromJson(keystoreString)
 
   it('checks correct password', () => {
