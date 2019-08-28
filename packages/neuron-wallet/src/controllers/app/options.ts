@@ -7,14 +7,6 @@ import i18n from 'utils/i18n'
 import env from 'env'
 import AppController from '.'
 
-export enum MenuCommand {
-  ShowAbout = 'show-about',
-  ShowPreferences = 'show-preferences',
-  OpenNervosWebsite = 'open-nervos-website',
-  OpenSourceCodeRepository = 'open-sourcecode-repository',
-  SetUILocale = 'set-ui-language',
-}
-
 export enum URL {
   Preference = '/settings/general',
   CreateWallet = '/wizard/mnemonic/create',
@@ -186,4 +178,4 @@ export const contextMenuTemplate: {
   },
 }
 
-export default { MenuCommand, URL }
+export default { URL }
