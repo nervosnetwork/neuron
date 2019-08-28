@@ -61,7 +61,7 @@ export default class Keystore {
       salt: salt.toString('hex'),
       ...params,
     }
-    const derivedKey: Buffer = crypto.scryptSync(Buffer.from(password), salt, kdfparams.dklen, {
+    const derivedKey: Buffer = crypto.scryptSync(password, salt, kdfparams.dklen, {
       N: kdfparams.n,
       r: kdfparams.r,
       p: kdfparams.p,
@@ -99,16 +99,11 @@ export default class Keystore {
   // Decrypt and return serialized extended private key.
   decrypt(password: string): string {
     const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(
-      Buffer.from(password),
-      Buffer.from(kdfparams.salt, 'hex'),
-      kdfparams.dklen,
-      {
-        N: kdfparams.n,
-        r: kdfparams.r,
-        p: kdfparams.p,
-      }
-    )
+    const derivedKey: Buffer = crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
+      N: kdfparams.n,
+      r: kdfparams.r,
+      p: kdfparams.p,
+    })
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
     const mac = new SHA3(256)
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
@@ -131,16 +126,11 @@ export default class Keystore {
 
   checkPassword = (password: string) => {
     const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(
-      Buffer.from(password),
-      Buffer.from(kdfparams.salt, 'hex'),
-      kdfparams.dklen,
-      {
-        N: kdfparams.n,
-        r: kdfparams.r,
-        p: kdfparams.p,
-      }
-    )
+    const derivedKey: Buffer = crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
+      N: kdfparams.n,
+      r: kdfparams.r,
+      p: kdfparams.p,
+    })
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
     const mac = new SHA3(256)
       .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
