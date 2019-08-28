@@ -76,7 +76,6 @@ export default class Keystore {
       cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'hex')),
       cipher.final(),
     ])
-    const mac = new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
 
     return new Keystore(
       {
@@ -87,7 +86,7 @@ export default class Keystore {
         cipher: CIPHER,
         kdf: 'scrypt',
         kdfparams,
-        mac,
+        mac: Keystore.mac(derivedKey, ciphertext),
       },
       uuid()
     )
@@ -97,7 +96,7 @@ export default class Keystore {
   decrypt(password: string): string {
     const derivedKey = this.derivedKey(password)
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    if (this.mac(derivedKey, ciphertext) !== this.crypto.mac) {
+    if (Keystore.mac(derivedKey, ciphertext) !== this.crypto.mac) {
       throw new IncorrectPassword()
     }
     const decipher = crypto.createDecipheriv(
@@ -115,7 +114,7 @@ export default class Keystore {
   checkPassword = (password: string) => {
     const derivedKey = this.derivedKey(password)
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    return this.mac(derivedKey, ciphertext) === this.crypto.mac
+    return Keystore.mac(derivedKey, ciphertext) === this.crypto.mac
   }
 
   derivedKey = (password: string) => {
@@ -127,7 +126,7 @@ export default class Keystore {
     })
   }
 
-  mac = (derivedKey: Buffer, ciphertext: Buffer) => {
+  static mac = (derivedKey: Buffer, ciphertext: Buffer) => {
     return new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
   }
 }
