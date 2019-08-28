@@ -37,12 +37,12 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  cellDeps!: CellDep[]
+  cellDeps: CellDep[] = []
 
   @Column({
     type: 'simple-json',
   })
-  headerDeps!: string[]
+  headerDeps: string[] = []
 
   @Column({
     type: 'simple-json',
