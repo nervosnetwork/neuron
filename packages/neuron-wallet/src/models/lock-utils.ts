@@ -79,7 +79,7 @@ export default class LockUtils {
     return LockUtils.computeScriptHash(lock)
   }
 
-  static async addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Data): Promise<Script> {
+  static async addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Promise<Script> {
     const systemScript = await this.systemScript()
 
     const lock: Script = {
@@ -90,7 +90,7 @@ export default class LockUtils {
     return lock
   }
 
-  static async addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Data): Promise<string> {
+  static async addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): Promise<string> {
     const lock: Script = await this.addressToLockScript(address, hashType)
     const lockHash: string = await this.lockScriptToHash(lock)
 
@@ -98,7 +98,7 @@ export default class LockUtils {
   }
 
   static async addressToAllLockHashes(address: string): Promise<string[]> {
-    const dataLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Data)
+    const dataLockHash = await LockUtils.addressToLockHash(address)
     return [dataLockHash]
   }
 
