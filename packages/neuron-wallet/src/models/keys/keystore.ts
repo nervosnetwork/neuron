@@ -62,11 +62,7 @@ export default class Keystore {
       r: 8,
       p: 1,
     }
-    const derivedKey = crypto.scryptSync(password, salt, kdfparams.dklen, {
-      N: kdfparams.n,
-      r: kdfparams.r,
-      p: kdfparams.p,
-    })
+    const derivedKey = crypto.scryptSync(password, salt, kdfparams.dklen, Keystore.scryptOptions(kdfparams))
 
     const cipher = crypto.createCipheriv(CIPHER, derivedKey.slice(0, 16), iv)
     if (!cipher) {
@@ -119,14 +115,24 @@ export default class Keystore {
 
   derivedKey = (password: string) => {
     const { kdfparams } = this.crypto
-    return crypto.scryptSync(password, Buffer.from(kdfparams.salt, 'hex'), kdfparams.dklen, {
-      N: kdfparams.n,
-      r: kdfparams.r,
-      p: kdfparams.p,
-    })
+    return crypto.scryptSync(
+      password,
+      Buffer.from(kdfparams.salt, 'hex'),
+      kdfparams.dklen,
+      Keystore.scryptOptions(kdfparams)
+    )
   }
 
   static mac = (derivedKey: Buffer, ciphertext: Buffer) => {
     return new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
+  }
+
+  static scryptOptions = (kdfparams: KdfParams) => {
+    return {
+      N: kdfparams.n,
+      r: kdfparams.r,
+      p: kdfparams.p,
+      maxmem: 128 * (kdfparams.n + kdfparams.p + 2) * kdfparams.r,
+    }
   }
 }
