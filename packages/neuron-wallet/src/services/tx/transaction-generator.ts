@@ -69,8 +69,10 @@ export class TransactionGenerator {
           depType: DepType.DepGroup,
         },
       ],
+      headerDeps: [],
       inputs,
       outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
     }
   }
