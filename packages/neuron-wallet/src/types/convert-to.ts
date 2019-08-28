@@ -1,4 +1,4 @@
-import { Transaction, Input, Cell, Script, TransactionWithoutHash, ScriptHashType } from './cell-types'
+import { Transaction, Input, Cell, Script, TransactionWithoutHash, CellDep, OutPoint } from './cell-types'
 
 export default class ConvertTo {
   public static toSdkTransaction = (tx: Transaction): CKBComponents.Transaction => {
@@ -6,10 +6,19 @@ export default class ConvertTo {
       ...tx,
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
-      deps: tx.deps!,
+      cellDeps: tx.cellDeps ? tx.cellDeps.map(cellDep => ConvertTo.toSdkCellDep(cellDep)) : [],
+      headerDeps: tx.headerDeps || [],
+      outputsData: tx.outputsData as string[],
       witnesses: tx.witnesses!,
     }
     return transaction
+  }
+
+  static toSdkCellDep(cellDep: CellDep): CKBComponents.CellDep {
+    return {
+      outPoint: cellDep.outPoint as OutPoint,
+      depType: cellDep.depType as CKBComponents.DepType,
+    }
   }
 
   public static toSdkTxWithoutHash = (tx: TransactionWithoutHash): any => {
@@ -17,7 +26,9 @@ export default class ConvertTo {
       ...tx,
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
-      deps: tx.deps!,
+      cellDeps: tx.cellDeps ? tx.cellDeps.map(cellDep => ConvertTo.toSdkCellDep(cellDep)) : [],
+      headerDeps: tx.headerDeps || [],
+      outputsData: tx.outputsData as string[],
       witnesses: tx.witnesses!,
     }
     return transaction
@@ -35,7 +46,6 @@ export default class ConvertTo {
 
     return {
       ...output,
-      data: output.data!,
       lock: ConvertTo.toSdkScript(output.lock!),
       type,
     }
@@ -43,10 +53,9 @@ export default class ConvertTo {
 
   public static toSdkScript = (script: Script): CKBComponents.Script => {
     return {
-      ...script,
       args: script.args!,
       codeHash: script.codeHash!,
-      hashType: ScriptHashType.Data,
+      hashType: script.hashType,
     }
   }
 }

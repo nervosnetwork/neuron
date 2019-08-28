@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface, CellOutPoint } from 'types/cell-types'
+import { OutPoint, Input as InputInterface } from 'types/cell-types'
 import Transaction from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -42,20 +42,13 @@ export default class Input extends BaseEntity {
   })
   capacity: string | null = null
 
-  public cellOutPoint(): CellOutPoint | null {
+  public previousOutput(): OutPoint | null {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
     }
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
-    }
-  }
-
-  public previousOutput(): OutPoint {
-    return {
-      blockHash: null,
-      cell: this.cellOutPoint(),
     }
   }
 

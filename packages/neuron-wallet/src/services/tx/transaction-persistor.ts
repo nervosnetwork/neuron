@@ -52,13 +52,12 @@ export class TransactionPersistor {
 
       const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
         txEntity.inputs.map(async input => {
-          const outPoint: OutPoint = input.previousOutput()
-          const { cell } = outPoint
+          const outPoint: OutPoint | null = input.previousOutput()
 
-          if (cell) {
+          if (outPoint) {
             const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-              outPointTxHash: cell.txHash,
-              outPointIndex: cell.index,
+              outPointTxHash: outPoint.txHash,
+              outPointIndex: outPoint.index,
             })
             if (outputEntity) {
               outputEntity.status = OutputStatus.Dead
@@ -94,7 +93,8 @@ export class TransactionPersistor {
     const tx = new TransactionEntity()
     tx.hash = transaction.hash
     tx.version = transaction.version
-    tx.deps = transaction.deps!
+    tx.headerDeps = transaction.headerDeps!
+    tx.cellDeps = transaction.cellDeps!
     tx.timestamp = transaction.timestamp!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
@@ -108,10 +108,10 @@ export class TransactionPersistor {
     const previousOutputs: OutputEntity[] = []
     for (const i of transaction.inputs!) {
       const input = new InputEntity()
-      const { cell } = i.previousOutput
-      if (cell) {
-        input.outPointTxHash = cell.txHash
-        input.outPointIndex = cell.index
+      const outPoint = i.previousOutput
+      if (outPoint) {
+        input.outPointTxHash = outPoint.txHash
+        input.outPointIndex = outPoint.index
       }
       input.transaction = tx
       input.capacity = i.capacity || null
@@ -119,10 +119,10 @@ export class TransactionPersistor {
       input.since = i.since!
       inputs.push(input)
 
-      if (cell) {
+      if (outPoint) {
         const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
-          outPointTxHash: input.previousOutput().cell!.txHash,
-          outPointIndex: input.previousOutput().cell!.index,
+          outPointTxHash: outPoint.txHash,
+          outPointIndex: outPoint.index,
         })
 
         if (previousOutput) {
@@ -175,23 +175,25 @@ export class TransactionPersistor {
     saveType: TxSaveType
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    tx.outputs = tx.outputs!.map(o => {
-      const output = o
-      output.lockHash = LockUtils.lockScriptToHash(output.lock!)
-      return output
-    })
+    tx.outputs = await Promise.all(
+      tx.outputs!.map(async o => {
+        const output = o
+        output.lockHash = await LockUtils.lockScriptToHash(output.lock!)
+        return output
+      })
+    )
 
     tx.inputs = await Promise.all(
       tx.inputs!.map(async i => {
         const input: Input = i
-        const { cell } = i.previousOutput
+        const outPoint = i.previousOutput
 
-        if (cell) {
+        if (outPoint) {
           const outputEntity: OutputEntity | undefined = await getConnection()
             .getRepository(OutputEntity)
             .findOne({
-              outPointTxHash: cell.txHash,
-              outPointIndex: cell.index,
+              outPointTxHash: outPoint.txHash,
+              outPointIndex: outPoint.index,
             })
           if (outputEntity) {
             input.capacity = outputEntity.capacity

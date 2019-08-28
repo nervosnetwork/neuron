@@ -1,8 +1,13 @@
 // define types in app
 
 export enum ScriptHashType {
-  Data = 'Data',
-  Type = 'Type',
+  Data = 'data',
+  Type = 'type',
+}
+
+export enum DepType {
+  Code = 'code',
+  DepGroup = 'depGroup',
 }
 
 export interface Block {
@@ -24,11 +29,18 @@ export enum TransactionStatus {
   Failed = 'failed',
 }
 
+export interface CellDep {
+  outPoint?: OutPoint | null
+  depType: DepType
+}
+
 export interface TransactionWithoutHash {
   version: string
-  deps?: OutPoint[]
+  cellDeps?: CellDep[]
+  headerDeps?: string[]
   inputs?: Input[]
   outputs?: Cell[]
+  outputsData?: string[]
   timestamp?: string
   value?: string
   blockNumber?: string
@@ -46,7 +58,7 @@ export interface Transaction extends TransactionWithoutHash {
 }
 
 export interface Input {
-  previousOutput: OutPoint
+  previousOutput: OutPoint | null
   since?: string
   capacity?: string | null
   lockHash?: string | null
@@ -68,11 +80,6 @@ export interface Cell {
 }
 
 export interface OutPoint {
-  blockHash?: string | null
-  cell?: CellOutPoint | null
-}
-
-export interface CellOutPoint {
   txHash: string
   index: string
 }

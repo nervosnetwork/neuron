@@ -1,4 +1,4 @@
-import { TransactionWithoutHash, Cell, ScriptHashType } from 'types/cell-types'
+import { TransactionWithoutHash, Cell, DepType } from 'types/cell-types'
 import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
@@ -12,7 +12,7 @@ export class TransactionGenerator {
     changeAddress: string,
     fee: string = '0'
   ): Promise<TransactionWithoutHash> => {
-    const { codeHash, outPoint } = await LockUtils.systemScript()
+    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
@@ -35,7 +35,7 @@ export class TransactionGenerator {
         lock: {
           codeHash,
           args: [blake160],
-          hashType: ScriptHashType.Data,
+          hashType,
         },
       }
 
@@ -54,7 +54,7 @@ export class TransactionGenerator {
         lock: {
           codeHash,
           args: [changeBlake160],
-          hashType: ScriptHashType.Data,
+          hashType,
         },
       }
 
@@ -63,9 +63,16 @@ export class TransactionGenerator {
 
     return {
       version: '0',
-      deps: [outPoint],
+      cellDeps: [
+        {
+          outPoint,
+          depType: DepType.DepGroup,
+        },
+      ],
+      headerDeps: [],
       inputs,
       outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
     }
   }
