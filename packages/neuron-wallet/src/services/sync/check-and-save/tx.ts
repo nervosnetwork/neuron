@@ -17,7 +17,7 @@ export default class CheckTx {
   }
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
-    const outputs: Cell[] = this.filterOutputs(lockHashes)
+    const outputs: Cell[] = await this.filterOutputs(lockHashes)
     const inputAddresses = await this.filterInputs(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
@@ -39,12 +39,17 @@ export default class CheckTx {
     return false
   }
 
-  public filterOutputs = (lockHashes: string[]) => {
-    const cells: Cell[] = this.tx.outputs!.filter(async output => {
-      const checkOutput = new CheckOutput(output)
-      const result = await checkOutput.checkLockHash(lockHashes)
-      return result
-    })
+  public filterOutputs = async (lockHashes: string[]) => {
+    const cells: Cell[] = (await Promise.all(
+      this.tx.outputs!.map(async output => {
+        const checkOutput = new CheckOutput(output)
+        const result = await checkOutput.checkLockHash(lockHashes)
+        if (result) {
+          return output
+        }
+        return false
+      })
+    )).filter(cell => !!cell) as Cell[]
     return cells
   }
 
