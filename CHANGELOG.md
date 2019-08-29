@@ -3,7 +3,7 @@
 ### BREAKING CHANGES
 
 * Code signing certification was updated. Manual installation of this version is required as automatic update won't work.
-* There was a bug that calculated keystore mac incorrectly. Older exported keystore files might not be able to be imported.
+* There was a bug that caused the keystore mac to calculate incorrectly. Older exported keystore files might not be able to be imported.
 * DB structure was changed per CKB transaction and other types' changes.
 
 ### Bug Fixes
