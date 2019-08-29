@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import SHA3 from 'sha3'
+import { Keccak } from 'sha3'
 import { v4 as uuid } from 'uuid'
 
 import { UnsupportedCipher, IncorrectPassword, InvalidKeystore } from 'exceptions'
@@ -48,24 +48,21 @@ export default class Keystore {
     }
   }
 
-  static create = (extendedPrivateKey: ExtendedPrivateKey, password: string) => {
-    const salt = crypto.randomBytes(32)
-    const iv = crypto.randomBytes(16)
-    const params = {
-      n: 8192,
-      r: 8,
-      p: 1,
-    }
+  static create = (
+    extendedPrivateKey: ExtendedPrivateKey,
+    password: string,
+    options: { salt?: Buffer; iv?: Buffer } = {}
+  ) => {
+    const salt = options.salt || crypto.randomBytes(32)
+    const iv = options.iv || crypto.randomBytes(16)
     const kdfparams: KdfParams = {
       dklen: 32,
       salt: salt.toString('hex'),
-      ...params,
+      n: 2 ** 18,
+      r: 8,
+      p: 1,
     }
-    const derivedKey: Buffer = crypto.scryptSync(Buffer.from(password), salt, kdfparams.dklen, {
-      N: kdfparams.n,
-      r: kdfparams.r,
-      p: kdfparams.p,
-    })
+    const derivedKey = crypto.scryptSync(password, salt, kdfparams.dklen, Keystore.scryptOptions(kdfparams))
 
     const cipher = crypto.createCipheriv(CIPHER, derivedKey.slice(0, 16), iv)
     if (!cipher) {
@@ -75,11 +72,6 @@ export default class Keystore {
       cipher.update(Buffer.from(extendedPrivateKey.serialize(), 'hex')),
       cipher.final(),
     ])
-    const hash = new SHA3(256)
-    const mac = hash
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
 
     return new Keystore(
       {
@@ -90,7 +82,7 @@ export default class Keystore {
         cipher: CIPHER,
         kdf: 'scrypt',
         kdfparams,
-        mac,
+        mac: Keystore.mac(derivedKey, ciphertext),
       },
       uuid()
     )
@@ -98,23 +90,9 @@ export default class Keystore {
 
   // Decrypt and return serialized extended private key.
   decrypt(password: string): string {
-    const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(
-      Buffer.from(password),
-      Buffer.from(kdfparams.salt, 'hex'),
-      kdfparams.dklen,
-      {
-        N: kdfparams.n,
-        r: kdfparams.r,
-        p: kdfparams.p,
-      }
-    )
+    const derivedKey = this.derivedKey(password)
     const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    const mac = new SHA3(256)
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
-    if (mac !== this.crypto.mac) {
+    if (Keystore.mac(derivedKey, ciphertext) !== this.crypto.mac) {
       throw new IncorrectPassword()
     }
     const decipher = crypto.createDecipheriv(
@@ -130,22 +108,31 @@ export default class Keystore {
   }
 
   checkPassword = (password: string) => {
+    const derivedKey = this.derivedKey(password)
+    const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
+    return Keystore.mac(derivedKey, ciphertext) === this.crypto.mac
+  }
+
+  derivedKey = (password: string) => {
     const { kdfparams } = this.crypto
-    const derivedKey: Buffer = crypto.scryptSync(
-      Buffer.from(password),
+    return crypto.scryptSync(
+      password,
       Buffer.from(kdfparams.salt, 'hex'),
       kdfparams.dklen,
-      {
-        N: kdfparams.n,
-        r: kdfparams.r,
-        p: kdfparams.p,
-      }
+      Keystore.scryptOptions(kdfparams)
     )
-    const ciphertext = Buffer.from(this.crypto.ciphertext, 'hex')
-    const mac = new SHA3(256)
-      .update(Buffer.concat([derivedKey.slice(16, 32), ciphertext]))
-      .digest()
-      .toString('hex')
-    return mac === this.crypto.mac
+  }
+
+  static mac = (derivedKey: Buffer, ciphertext: Buffer) => {
+    return new Keccak(256).update(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).digest('hex')
+  }
+
+  static scryptOptions = (kdfparams: KdfParams) => {
+    return {
+      N: kdfparams.n,
+      r: kdfparams.r,
+      p: kdfparams.p,
+      maxmem: 128 * (kdfparams.n + kdfparams.p + 2) * kdfparams.r,
+    }
   }
 }
