@@ -1,4 +1,5 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
+import { generateCore } from 'services/sdk-core'
 
 import { Block, BlockHeader } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
@@ -11,7 +12,7 @@ import { networkSwitchSubject } from './renderer-params'
 let core: Core
 networkSwitchSubject.subscribe((network: NetworkWithID | undefined) => {
   if (network) {
-    core = new Core(network.remote)
+    core = generateCore(network.remote)
   }
 })
 
