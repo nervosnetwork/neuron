@@ -26,7 +26,7 @@ export const loadAddressesAndConvert = async (): Promise<string[]> => {
 
 // call this after network switched
 let blockListener: BlockListener | undefined
-export const switchNetwork = async () => {
+export const switchNetwork = async (url: string) => {
   // stop all blocks service
   if (blockListener) {
     await blockListener.stopAndWait()
@@ -37,7 +37,7 @@ export const switchNetwork = async () => {
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert()
   // start sync blocks service
-  blockListener = new BlockListener(lockHashes, nodeService.tipNumberSubject)
+  blockListener = new BlockListener(url, lockHashes, nodeService.tipNumberSubject)
 
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
@@ -70,7 +70,7 @@ export const switchNetwork = async () => {
     }
     // wait former queue to be drained
     const hashes: string[] = await loadAddressesAndConvert()
-    blockListener = new BlockListener(hashes, nodeService.tipNumberSubject)
+    blockListener = new BlockListener(url, hashes, nodeService.tipNumberSubject)
     await blockListener.start(true)
   }
 

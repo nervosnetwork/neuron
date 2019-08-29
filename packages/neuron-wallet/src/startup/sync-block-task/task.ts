@@ -38,7 +38,7 @@ export const run = async () => {
       if (indexerEnabled) {
         await indexerSwitchNetwork(network.remote)
       } else {
-        await syncSwitchNetwork()
+        await syncSwitchNetwork(network.remote)
       }
     }
   })
