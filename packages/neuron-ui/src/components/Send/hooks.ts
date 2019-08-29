@@ -1,67 +1,15 @@
-import React, { useCallback, useEffect } from 'react'
-import { IDropdownOption } from 'office-ui-fabric-react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { calculateCycles } from 'services/remote/wallets'
 
-import { Message, MAX_DECIMAL_DIGITS } from 'utils/const'
-import { verifyAddress, verifyAmountRange } from 'utils/validators'
-import { outputsToTotalCapacity } from 'utils/formatters'
+import { outputsToTotalAmount, priceToFee } from 'utils/formatters'
+import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
+import { ErrorCode } from 'utils/const'
+import { MAX_DECIMAL_DIGITS } from '../../utils/const'
 import { TransactionOutput } from '.'
 
 let cyclesTimer: ReturnType<typeof setTimeout>
-
-const validateTransactionParams = ({ items, dispatch }: { items: TransactionOutput[]; dispatch?: StateDispatch }) => {
-  const errorAction = {
-    type: AppActions.AddNotification,
-    payload: {
-      type: 'warning',
-      timestamp: Date.now(),
-      content: Message.AtLeastOneAddressNeeded,
-      meta: {},
-    },
-  }
-  if (!items.length || !items[0].address) {
-    if (dispatch) {
-      dispatch(errorAction)
-    }
-    return false
-  }
-  const invalid = items.some(
-    (item): boolean => {
-      const isAddressValid = verifyAddress(item.address)
-      if (typeof isAddressValid === 'string') {
-        errorAction.payload.content = Message.InvalidAddress
-        errorAction.payload.meta = { address: item.address }
-        return true
-      }
-      if (Number.isNaN(+item.amount) || +item.amount < 0) {
-        errorAction.payload.content = Message.InvalidAmount
-        errorAction.payload.meta = { amount: item.amount }
-        return true
-      }
-      const [, decimal = ''] = item.amount.split('.')
-      if (decimal.length > MAX_DECIMAL_DIGITS) {
-        errorAction.payload.content = Message.DecimalExceed
-        errorAction.payload.meta = { amount: item.amount }
-        return true
-      }
-      if (!verifyAmountRange(item.amount)) {
-        errorAction.payload.content = Message.AmountTooSmall
-        errorAction.payload.meta = { amount: item.amount }
-        return true
-      }
-      return false
-    }
-  )
-  if (invalid) {
-    if (dispatch) {
-      dispatch(errorAction)
-    }
-    return false
-  }
-  return true
-}
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
@@ -71,7 +19,7 @@ const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
         payload: {
           idx,
           item: {
-            [field]: value.trim(),
+            [field]: value.replace(/\s/, ''),
           },
         },
       })
@@ -98,14 +46,23 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
     [dispatch]
   )
 
-const useOnTransactionChange = (walletID: string, items: TransactionOutput[], dispatch: StateDispatch) => {
+const useOnTransactionChange = (
+  walletID: string,
+  items: TransactionOutput[],
+  dispatch: StateDispatch,
+  setIsTransactionValid: Function,
+  setTotalAmount: Function
+) => {
   useEffect(() => {
     clearTimeout(cyclesTimer)
     cyclesTimer = setTimeout(() => {
-      if (validateTransactionParams({ items })) {
+      if (verifyTransactionOutputs(items)) {
+        setIsTransactionValid(true)
+        const totalAmount = outputsToTotalAmount(items)
+        setTotalAmount(totalAmount)
         calculateCycles({
           walletID,
-          capacities: outputsToTotalCapacity(items),
+          capacities: totalAmount,
         })
           .then(response => {
             if (response.status) {
@@ -126,15 +83,21 @@ const useOnTransactionChange = (walletID: string, items: TransactionOutput[], di
               payload: '0',
             })
           })
+      } else {
+        setIsTransactionValid(false)
+        dispatch({
+          type: AppActions.UpdateSendCycles,
+          payload: '0',
+        })
       }
     }, 300)
-  }, [walletID, items, dispatch])
+  }, [walletID, items, dispatch, setIsTransactionValid, setTotalAmount])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
   useCallback(
     (walletID: string = '') => () => {
-      if (validateTransactionParams({ items, dispatch })) {
+      if (verifyTransactionOutputs(items)) {
         dispatch({
           type: AppActions.UpdateTransactionID,
           payload: null,
@@ -159,23 +122,13 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
     ) => {
       if (undefined !== value) {
         if (field === 'amount') {
-          if (Number.isNaN(+value) || /[^\d.]/.test(value)) {
+          if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
             return
           }
           updateTransactionOutput(field)(idx)(value)
         } else {
           updateTransactionOutput(field)(idx)(value)
         }
-      }
-    },
-    [updateTransactionOutput]
-  )
-
-const useCapacityUnitChange = (updateTransactionOutput: Function) =>
-  useCallback(
-    (idx: number = -1) => (_e: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
-      if (option) {
-        updateTransactionOutput('unit')(idx)(option.key)
       }
     },
     [updateTransactionOutput]
@@ -218,40 +171,79 @@ const clear = (dispatch: StateDispatch) => {
 const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
 
 export const useInitialize = (
-  address: string,
   items: TransactionOutput[],
+  price: string,
+  cycles: string,
   dispatch: React.Dispatch<any>,
-  history: any
+  t: any
 ) => {
+  const fee = useMemo(() => priceToFee(price, cycles), [price, cycles]) // in shannon
+  const [isTransactionValid, setIsTransactionValid] = useState(false)
+  const [totalAmount, setTotalAmount] = useState('0')
+
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
-  const onCapacityUnitChange = useCapacityUnitChange(updateTransactionOutput)
-  const onSubmit = useOnSubmit(items, dispatch)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
   const onDescriptionChange = useSendDescriptionChange(dispatch)
+  const onSubmit = useOnSubmit(items, dispatch)
   const onClear = useClear(dispatch)
 
-  useEffect(() => {
-    if (address) {
-      updateTransactionOutput('address')(0)(address)
-    }
-    return () => {
-      clear(dispatch)
-    }
-  }, [address, dispatch, history, updateTransactionOutput])
+  const onGetAddressErrorMessage = useCallback(
+    (addr: string) => {
+      if (addr === '') {
+        return t(`messages.codes.${ErrorCode.AddressIsEmpty}`)
+      }
+      if (!verifyAddress(addr)) {
+        return t(`messages.codes.${ErrorCode.FieldInvalid}`, {
+          fieldName: 'address',
+          fieldValue: addr,
+        })
+      }
+      return ''
+    },
+    [t]
+  )
+
+  const onGetAmountErrorMessage = useCallback(
+    (text: string) => {
+      const amount = text || '0'
+
+      const msg = verifyAmount(amount)
+      if (typeof msg === 'object') {
+        return t(`messages.codes.${msg.code}`, {
+          fieldName: 'amount',
+          fieldValue: amount,
+          length: MAX_DECIMAL_DIGITS,
+        })
+      }
+      if (!verifyAmountRange(amount)) {
+        return t(`messages.codes.${ErrorCode.AmountTooSmall}`, {
+          amount,
+        })
+      }
+
+      return undefined
+    },
+    [t]
+  )
 
   return {
+    fee,
+    totalAmount,
+    setTotalAmount,
+    isTransactionValid,
+    setIsTransactionValid,
     useOnTransactionChange,
-    updateTransactionOutput,
     onItemChange,
-    onCapacityUnitChange,
-    onSubmit,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onGetAddressErrorMessage,
+    onGetAmountErrorMessage,
+    onSubmit,
     onClear,
   }
 }

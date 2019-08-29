@@ -4,6 +4,7 @@ import {
   getTransactionList,
   updateTransactionDescription as updateRemoteTransactionDescription,
 } from 'services/remote'
+import { failureResToNotification } from 'utils/formatters'
 import { addNotification } from './app'
 
 export const updateTransactionList = (params: GetTransactionListParams) => (dispatch: StateDispatch) => {
@@ -14,7 +15,7 @@ export const updateTransactionList = (params: GetTransactionListParams) => (disp
         payload: res.result,
       })
     } else {
-      addNotification({ type: 'alert', content: res.message.title })(dispatch)
+      addNotification(failureResToNotification(res))(dispatch)
     }
   })
 }
@@ -39,7 +40,7 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
           },
         })
       } else {
-        addNotification({ type: 'alert', content: res.message.title })(dispatch)
+        addNotification(failureResToNotification(res))(dispatch)
       }
     })
     .finally(() => {

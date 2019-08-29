@@ -371,7 +371,7 @@ export default class WalletsController {
     } catch (err) {
       return {
         status: ResponseCode.Fail,
-        msg: `Error: "${err.message}"`,
+        message: `Error: "${err.message}"`,
       }
     }
   }
@@ -391,7 +391,7 @@ export default class WalletsController {
     } catch (err) {
       return {
         status: ResponseCode.Fail,
-        msg: `Error: "${err.message}"`,
+        message: `Error: "${err.message}"`,
       }
     }
   }

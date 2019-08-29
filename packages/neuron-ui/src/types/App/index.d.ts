@@ -47,11 +47,13 @@ declare namespace State {
     amount: string
     unit: any
   }
-  interface Message {
-    type: 'success' | 'warning' | 'alert'
+  type MessageType = 'success' | 'warning' | 'alert'
+  interface Message<Code = number, Meta = { [key: string]: string | undefined }> {
+    type: MessageType
     timestamp: number
-    content: string
-    meta?: { [key: string]: string }
+    code?: Code
+    content?: string
+    meta?: Meta
   }
   interface Send {
     txID: string

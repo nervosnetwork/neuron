@@ -163,7 +163,7 @@ export const addressesToBalance = (addresses: State.Address[] = []) => {
     .toString()
 }
 
-export const outputsToTotalCapacity = (outputs: { amount: string; unit: CapacityUnit }[]) => {
+export const outputsToTotalAmount = (outputs: { amount: string; unit: CapacityUnit }[]) => {
   const totalCapacity = outputs.reduce((total, cur) => {
     if (Number.isNaN(+cur.amount)) {
       return total
@@ -171,6 +171,16 @@ export const outputsToTotalCapacity = (outputs: { amount: string; unit: Capacity
     return total + BigInt(CKBToShannonFormatter(cur.amount, cur.unit))
   }, BigInt(0))
   return totalCapacity.toString()
+}
+
+export const failureResToNotification = (res: any): State.Message => {
+  return {
+    type: 'alert',
+    timestamp: +new Date(),
+    code: res.status,
+    content: typeof res.message !== 'string' ? res.message.content : res.message,
+    meta: typeof res.message !== 'string' ? res.message.meta : undefined,
+  }
 }
 
 export default {
@@ -182,5 +192,6 @@ export default {
   uniformTimeFormatter,
   priceToFee,
   addressesToBalance,
-  outputsToTotalCapacity,
+  outputsToTotalAmount,
+  failureResToNotification,
 }

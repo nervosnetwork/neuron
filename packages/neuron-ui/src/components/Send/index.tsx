@@ -20,9 +20,10 @@ import QRScanner from 'widgets/QRScanner'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, CapacityUnit } from 'utils/const'
-import { shannonToCKBFormatter, priceToFee } from 'utils/formatters'
+import { PlaceHolders, CapacityUnit, ErrorCode } from 'utils/const'
+import { shannonToCKBFormatter } from 'utils/formatters'
 
+import { verifyTotalAmount } from 'utils/validators'
 import { useInitialize } from './hooks'
 
 export interface TransactionOutput {
@@ -38,31 +39,30 @@ const Send = ({
   },
   wallet: { id: walletID = '', balance = '' },
   dispatch,
-  history,
-  match: {
-    params: { address = '' },
-  },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
+    fee,
+    totalAmount,
+    setTotalAmount,
+    isTransactionValid,
+    setIsTransactionValid,
     useOnTransactionChange,
-    updateTransactionOutput,
     onItemChange,
     onSubmit,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
+    onGetAddressErrorMessage,
+    onGetAmountErrorMessage,
     onClear,
-  } = useInitialize(address, send.outputs, dispatch, history)
-  useOnTransactionChange(walletID, send.outputs, dispatch)
+  } = useInitialize(send.outputs, send.price, send.cycles, dispatch, t)
+  useOnTransactionChange(walletID, send.outputs, dispatch, setIsTransactionValid, setTotalAmount)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
-  const actionSpacer = (
-    <Stack.Item styles={{ root: { width: '48px' } }}>
-      <span> </span>
-    </Stack.Item>
-  )
+
+  const isAffordable = verifyTotalAmount(totalAmount, fee, balance)
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
@@ -78,7 +78,7 @@ const Send = ({
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
                   <Stack
                     horizontal
-                    verticalAlign="end"
+                    verticalAlign="start"
                     styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
@@ -91,15 +91,17 @@ const Send = ({
                         value={item.address || ''}
                         onChange={onItemChange('address', idx)}
                         required
+                        validateOnLoad={false}
+                        onGetErrorMessage={onGetAddressErrorMessage}
                       />
                     </Stack.Item>
-                    <Stack.Item styles={{ root: { width: '48px' } }}>
+                    <Stack styles={{ root: { width: '48px' } }} verticalAlign="start">
                       <QRScanner
                         title={t('send.scan-to-get-address')}
                         label={t('send.address')}
-                        onConfirm={(data: string) => updateTransactionOutput('address')(idx)(data)}
+                        onConfirm={(data: string) => onItemChange('address', idx)(undefined as any, data)}
                       />
-                    </Stack.Item>
+                    </Stack>
                   </Stack>
 
                   <Stack.Item>
@@ -116,7 +118,7 @@ const Send = ({
                 <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
                   <Stack
                     horizontal
-                    verticalAlign="end"
+                    verticalAlign="start"
                     styles={{ root: { width: leftStackWidth } }}
                     tokens={{ childrenGap: 20 }}
                   >
@@ -130,6 +132,8 @@ const Send = ({
                         onChange={onItemChange('amount', idx)}
                         disabled={sending}
                         required
+                        validateOnLoad={false}
+                        onGetErrorMessage={onGetAmountErrorMessage}
                       />
                     </Stack.Item>
                     <Stack.Item styles={{ root: { width: '43px', paddingLeft: '5px' } }}>
@@ -155,20 +159,53 @@ const Send = ({
         />
       </Stack.Item>
 
-      <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
+      <Stack
+        verticalAlign="start"
+        horizontalAlign="space-between"
+        tokens={{ childrenGap: 20 }}
+        styles={{ root: { marginRight: '97px' } }}
+      >
+        <Stack
+          horizontal
+          verticalAlign="start"
+          styles={{
+            root: {
+              width: leftStackWidth,
+              display: send.outputs.length > 1 || !isAffordable ? 'flex' : 'none',
+            },
+          }}
+          tokens={{ childrenGap: 20 }}
+        >
+          <Stack.Item styles={{ root: { width: labelWidth } }}>
+            <Label>{t('send.total-amount')}</Label>
+          </Stack.Item>
+          <Stack.Item styles={{ root: { flex: 1 } }}>
+            <TextField
+              id="total-amount"
+              alt={t('send.total-amount')}
+              value={`${shannonToCKBFormatter(totalAmount)} CKB`}
+              readOnly
+              errorMessage={isAffordable ? '' : t(`messages.codes.${ErrorCode.AmountNotEnough}`)}
+            />
+          </Stack.Item>
+        </Stack>
         <Stack horizontal verticalAlign="end" styles={{ root: { width: leftStackWidth } }} tokens={{ childrenGap: 20 }}>
           <Stack.Item styles={{ root: { width: labelWidth } }}>
             <Label>{t('send.description')}</Label>
           </Stack.Item>
           <Stack.Item styles={{ root: { flex: 1 } }}>
-            <TextField id="description" alt="description" value={send.description} onChange={onDescriptionChange} />
+            <TextField
+              id="description"
+              alt={t('send.description')}
+              value={send.description}
+              onChange={onDescriptionChange}
+            />
           </Stack.Item>
-          {actionSpacer}
         </Stack>
       </Stack>
 
       <TransactionFeePanel
-        fee={shannonToCKBFormatter(priceToFee(send.price, send.cycles))}
+        fee={shannonToCKBFormatter(fee)}
         cycles={send.cycles}
         price={send.price}
         onPriceChange={updateTransactionPrice}
@@ -190,7 +227,12 @@ const Send = ({
         {sending ? (
           <Spinner />
         ) : (
-          <PrimaryButton type="submit" onClick={onSubmit(walletID)} disabled={sending} text={t('send.send')} />
+          <PrimaryButton
+            type="submit"
+            onClick={onSubmit(walletID)}
+            disabled={sending || !isTransactionValid || !isAffordable}
+            text={t('send.send')}
+          />
         )}
       </Stack>
     </Stack>

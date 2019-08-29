@@ -1,21 +1,42 @@
+import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
+/* global BigInt */
 import { ckbCore } from 'services/chain'
-import { ADDRESS_LENGTH, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT } from './const'
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 
-export const verifyAddress = (address: string): boolean | string => {
-  // TODO: verify address, prd required
+export const verifyAddress = (address: string): boolean => {
   try {
-    if (address.length !== ADDRESS_LENGTH) {
-      throw new Error('Address length is incorrect')
-    }
     ckbCore.utils.parseAddress(address)
     return true
   } catch (err) {
-    return err.message
+    return false
   }
 }
 
-export const verifyAmountRange = (amount: string) => {
+export const verifyAmountRange = (amount: string = '') => {
   return +amount >= MIN_AMOUNT
+}
+
+export const verifyAmount = (amount: string = '0') => {
+  if (Number.isNaN(+amount)) {
+    return { code: ErrorCode.FieldInvalid }
+  }
+  if (+amount < 0) {
+    return { code: ErrorCode.NotNegative }
+  }
+  const [, decimal = ''] = amount.split('.')
+  if (decimal.length > MAX_DECIMAL_DIGITS) {
+    return {
+      code: ErrorCode.DecimalExceed,
+    }
+  }
+  return true
+}
+
+export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
+  if (+balance < 0) {
+    return false
+  }
+  return BigInt(totalAmount) + BigInt(fee) <= BigInt(balance)
 }
 
 export const verifyPasswordComplexity = (password: string) => {
@@ -51,8 +72,61 @@ export const verifyPasswordComplexity = (password: string) => {
   return true
 }
 
+export const verifyTransactionOutputs = (items: { address: string; amount: string }[] = []) => {
+  return !items.some(item => {
+    if (item.address === '' || verifyAddress(item.address) !== true) {
+      return true
+    }
+    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+      return true
+    }
+    return false
+  })
+}
+
+export const verifyNetworkName = (name: string, usedNames: string[]) => {
+  if (!name) {
+    return {
+      code: ErrorCode.FieldRequired,
+    }
+  }
+  if (usedNames.includes(name)) {
+    return {
+      code: ErrorCode.FieldUsed,
+    }
+  }
+  if (name.length > MAX_NETWORK_NAME_LENGTH) {
+    return {
+      code: ErrorCode.FieldTooLong,
+    }
+  }
+  return true
+}
+
+export const verifyURL = (url: string) => {
+  if (!url) {
+    return {
+      code: ErrorCode.FieldRequired,
+    }
+  }
+  if (!/^https?:\/\//.test(url)) {
+    return {
+      code: ErrorCode.ProtocolRequired,
+    }
+  }
+  if (/\s/.test(url)) {
+    return {
+      code: ErrorCode.NoWhiteSpaces,
+    }
+  }
+  return true
+}
+
 export default {
   verifyAddress,
   verifyAmountRange,
+  verifyTotalAmount,
   verifyPasswordComplexity,
+  verifyTransactionOutputs,
+  verifyNetworkName,
 }

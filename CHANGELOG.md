@@ -1,3 +1,33 @@
+# [0.19.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.18.0-beta.1...v0.19.0-beta.0) (2019-08-29)
+
+### BREAKING CHANGES
+
+* Code signing certification was updated. Manual installation of this version is required as automatic update won't work.
+* There was a bug that caused the keystore mac to calculate incorrectly. Older exported keystore files might not be able to be imported.
+* DB structure was changed per CKB transaction and other types' changes.
+
+### Bug Fixes
+
+* Fix keystore mac calculation
+* add outputsData and headerDeps ([f2432eb](https://github.com/nervosnetwork/neuron/commit/f2432eb))
+* Error when handling crypto.scryptSync with N > 16384 ([eac4339](https://github.com/nervosnetwork/neuron/commit/eac4339))
+* fix filterOutputs for async filter ([c851963](https://github.com/nervosnetwork/neuron/commit/c851963))
+* hide some tests in lock utils tests ([19c6673](https://github.com/nervosnetwork/neuron/commit/19c6673))
+* remove default hash_type=data ([33cc4cf](https://github.com/nervosnetwork/neuron/commit/33cc4cf))
+
+
+### Features
+
+* bump sdk to v0.19.0 in neuron-ui ([3b6ede9](https://github.com/nervosnetwork/neuron/commit/3b6ede9))
+* bump sdk to v0.19.0 in neuron-wallet ([6ca8200](https://github.com/nervosnetwork/neuron/commit/6ca8200))
+* Increase KDF params N value to 2**18 to produce more secure keystore ([06f5ac6](https://github.com/nervosnetwork/neuron/commit/06f5ac6))
+* Remove MenuCommand enum ([#900](https://github.com/nervosnetwork/neuron/issues/900)) ([e40c5cf](https://github.com/nervosnetwork/neuron/commit/e40c5cf))
+* Update TypeScript to 3.6 ([ac61a5b](https://github.com/nervosnetwork/neuron/commit/ac61a5b))
+* **neuron-ui:** set the cycles to empty if the transaction is invalid ([64166cc](https://github.com/nervosnetwork/neuron/commit/64166cc))
+* **neuron-ui:** show confirmations on the History View ([84692c7](https://github.com/nervosnetwork/neuron/commit/84692c7))
+
+
+
 # [0.18.0-beta.1](https://github.com/nervosnetwork/neuron/compare/v0.18.0-beta.0...v0.18.0-beta.1) (2019-08-22)
 
 
