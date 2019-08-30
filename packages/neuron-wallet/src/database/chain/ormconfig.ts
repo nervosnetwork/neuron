@@ -10,6 +10,7 @@ import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
+import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -29,7 +30,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     type: 'sqlite',
     database: dbPath(genesisBlockHash),
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1566959757554],
+    migrations: [InitMigration1566959757554, AddTypeAndHasData1567144517514],
     logging,
   }
 }
