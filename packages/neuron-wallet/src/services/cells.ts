@@ -70,13 +70,15 @@ export default class CellsService {
       throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
     }
 
-    // only live cells
+    // only live cells, skip which has data or type
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
           status: 'live',
+          hasData: false,
+          typeScript: null,
         },
       })
     cellEntities.sort((a, b) => {
