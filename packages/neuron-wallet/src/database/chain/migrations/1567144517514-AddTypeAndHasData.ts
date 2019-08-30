@@ -5,7 +5,7 @@ export class AddTypeAndHasData1567144517514 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<any> {
       await queryRunner.addColumn('output', new TableColumn({
         name: 'typeScript',
-        type: 'varchar',
+        type: 'text',
         isNullable: true,
       }))
 
