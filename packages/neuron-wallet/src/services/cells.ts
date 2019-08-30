@@ -10,12 +10,15 @@ export const MIN_CELL_CAPACITY = '6100000000'
 /* eslint no-await-in-loop: "warn" */
 /* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
+  // exclude hasData = true and typeScript != null
   public static getBalance = async (lockHashes: string[], status: OutputStatus): Promise<string> => {
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
+          hasData: false,
+          typeScript: null,
           status,
         },
       })
