@@ -11,6 +11,11 @@ export enum CheckResultType {
 export default class RangeForCheck {
   private range: BlockHeader[] = []
   private checkSize = 12
+  private url: string
+
+  constructor(url: string) {
+    this.url = url
+  }
 
   public getRange = async (): Promise<BlockHeader[]> => {
     if (this.range.length <= 0) {
@@ -26,7 +31,7 @@ export default class RangeForCheck {
     const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
     const blockNumbers = Utils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
 
-    const getBlocksService = new GetBlocks()
+    const getBlocksService = new GetBlocks(this.url)
     const blocks: Block[] = await getBlocksService.getRangeBlocks(blockNumbers)
     const blockHeaders: BlockHeader[] = blocks.map((block: Block) => {
       return block.header

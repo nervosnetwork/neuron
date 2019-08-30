@@ -1,17 +1,14 @@
-import Core from '@nervosnetwork/ckb-sdk-core'
-import NodeService from 'services/node'
+import { blake2b, PERSONAL, hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
 
 export default class Blake2b {
   private blake2b: any
-  private core: Core
 
   constructor() {
-    this.core = NodeService.getInstance().core
-    this.blake2b = this.core.utils.blake2b(32, null, null, this.core.utils.PERSONAL)
+    this.blake2b = blake2b(32, null, null, PERSONAL)
   }
 
   public update = (message: string): void => {
-    const msg = this.core.utils.hexToBytes(message.replace(/0x/, ''))
+    const msg = hexToBytes(message.replace(/0x/, ''))
     this.blake2b.update(msg)
   }
 
@@ -20,8 +17,8 @@ export default class Blake2b {
   }
 
   public static digest = (message: string): string => {
-    const blake2b = new Blake2b()
-    blake2b.update(message)
-    return blake2b.digest()
+    const blake2bHash = new Blake2b()
+    blake2bHash.update(message)
+    return blake2bHash.digest()
   }
 }

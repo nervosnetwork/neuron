@@ -44,7 +44,7 @@ export default class IndexerQueue {
     // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
     this.indexerRPC = new IndexerRPC(url)
-    this.getBlocksService = new GetBlocks()
+    this.getBlocksService = new GetBlocks(url)
     this.blockNumberService = new BlockNumber()
     this.tipNumberListener = tipNumberSubject.subscribe(async (num: string) => {
       if (num) {

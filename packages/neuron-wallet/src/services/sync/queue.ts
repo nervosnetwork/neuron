@@ -23,15 +23,16 @@ export default class Queue {
   private yieldTime = 1
 
   constructor(
+    url: string,
     lockHashes: string[],
     startBlockNumber: string,
     endBlockNumber: string,
     currentBlockNumber: BlockNumber = new BlockNumber(),
-    rangeForCheck: RangeForCheck = new RangeForCheck(),
+    rangeForCheck: RangeForCheck = new RangeForCheck(url),
     start: boolean = true
   ) {
     this.lockHashes = lockHashes
-    this.getBlocksService = new GetBlocks()
+    this.getBlocksService = new GetBlocks(url)
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck

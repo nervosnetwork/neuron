@@ -1,10 +1,11 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
+import { generateCore } from 'services/sdk-core'
 
 export default class IndexerRPC {
   private core: Core
 
   constructor(url: string) {
-    this.core = new Core(url)
+    this.core = generateCore(url)
   }
 
   public deindexLockHash = async (lockHash: string) => {
