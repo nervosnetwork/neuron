@@ -8,26 +8,7 @@ import env from 'env'
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
-
-export type NetworkID = string
-export type NetworkName = string
-export type NetworkRemote = string
-export enum NetworksKey {
-  List = 'list',
-  Current = 'current',
-}
-export enum NetworkType {
-  Default,
-  Normal,
-}
-export interface Network {
-  name: NetworkName
-  remote: NetworkRemote
-  type: NetworkType
-}
-export interface NetworkWithID extends Network {
-  id: NetworkID
-}
+import { NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
 
