@@ -1,4 +1,5 @@
-import NetworksService, { NetworkType, NetworkID, Network } from 'services/networks'
+import { NetworkType, NetworkID, Network } from 'types/network'
+import NetworksService from 'services/networks'
 import { CatchControllerError, Controller as ControllerDecorator } from 'decorators'
 import { Channel, ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'

@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 import { initConnection as initAddressConnection } from 'database/address/ormconfig'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
-import { NetworkWithID } from 'services/networks'
+import { NetworkWithID } from 'types/network'
 import { register as registerTxStatusListener } from 'listeners/tx-status'
 import { register as registerAddressListener } from 'listeners/address'
 import IndexerRPC from 'services/indexer/indexer-rpc'
