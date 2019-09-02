@@ -6,7 +6,7 @@ import {
   TextField,
   IColumn,
   CheckboxVisibility,
-  ITextFieldStyleProps,
+  IconButton,
   getTheme,
 } from 'office-ui-fabric-react'
 
@@ -39,7 +39,7 @@ const Addresses = ({
     onDescriptionPress,
     onDescriptionFieldBlur,
     onDescriptionChange,
-    onDescriptionFocus,
+    onDescriptionSelected,
   } = useLocalDescription('address', walletID, dispatch)
 
   const theme = getTheme()
@@ -88,31 +88,40 @@ const Addresses = ({
         minWidth: 100,
         maxWidth: 300,
         onRender: (item?: State.Address) => {
+          const isSelected = item && localDescription.key === item.address
           return item ? (
-            <TextField
-              borderless
-              title={item.description}
-              value={localDescription.key === item.address ? localDescription.description : item.description || ''}
-              onBlur={onDescriptionFieldBlur(item.address, item.description)}
-              onFocus={onDescriptionFocus}
-              onKeyPress={onDescriptionPress(item.address, item.description)}
-              onChange={onDescriptionChange(item.address)}
-              disabled={localDescription.key === item.address && isUpdatingDescription}
-              iconProps={{
-                iconName: localDescription.key === item.address && isUpdatingDescription ? 'Updating' : '',
-              }}
-              styles={(props: ITextFieldStyleProps) => {
-                return {
+            <>
+              <TextField
+                borderless
+                title={item.description}
+                value={isSelected ? localDescription.description : item.description || ''}
+                onBlur={isSelected ? onDescriptionFieldBlur(item.address, item.description) : undefined}
+                onKeyPress={isSelected ? onDescriptionPress(item.address, item.description) : undefined}
+                onChange={isSelected ? onDescriptionChange(item.address) : undefined}
+                disabled={isSelected && isUpdatingDescription}
+                iconProps={{
+                  iconName: isSelected && isUpdatingDescription ? 'Updating' : '',
+                }}
+                readOnly={!isSelected}
+                styles={{
                   root: {
                     flex: 1,
                   },
                   fieldGroup: {
-                    borderColor: props.focused ? semanticColors.inputBorder : 'transparent',
-                    border: '1px solid',
+                    backgroundColor: isSelected ? '#fff' : 'transparent',
+                    borderColor: 'transparent',
+                    border: isSelected ? '1px solid' : 'none',
                   },
-                }
-              }}
-            />
+                }}
+              />
+              {isSelected ? null : (
+                <IconButton
+                  iconProps={{ iconName: 'Edit' }}
+                  className="editButton"
+                  onClick={onDescriptionSelected(item.address, item.description)}
+                />
+              )}
+            </>
           ) : null
         },
       },
@@ -152,7 +161,7 @@ const Addresses = ({
       localDescription,
       onDescriptionFieldBlur,
       onDescriptionPress,
-      onDescriptionFocus,
+      // onDescriptionFocus,
       isUpdatingDescription,
       t,
       semanticColors,

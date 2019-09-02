@@ -10,6 +10,7 @@ import {
   Close as FailIcon,
   Copy as CopyIcon,
   Down as ArrowDownIcon,
+  FormEdit as EditIcon,
   FormClose as ClearIcon,
   FormAdd as CreateIcon,
   FormPreviousLink as LeaveIcon,
@@ -56,6 +57,7 @@ registerIcons({
     info: <InfoIcon size="16px" />,
     errorbadge: <AlertIcon size="16px" />,
     completed: <SuccessIcon size="16px" />,
+    cancel: <DismissIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" color={semanticColors.primaryButtonBackground} />,
     Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
     FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
@@ -83,6 +85,7 @@ registerIcons({
     TransactionFailure: <FailIcon size="14px" color="#d50000" />,
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
+    Edit: <EditIcon color="#000" size="20px" />,
   },
 })
 

@@ -209,15 +209,20 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
       updateDescription: true,
     },
   })
+  const descriptionParams = {
+    address: params.address,
+    description: params.description,
+  }
+  dispatch({
+    type: NeuronWalletActions.UpdateAddressDescription,
+    payload: descriptionParams,
+  })
   updateRemoteAddressDescription(params)
     .then(res => {
       if (res.status) {
         dispatch({
           type: NeuronWalletActions.UpdateAddressDescription,
-          payload: {
-            address: params.address,
-            description: params.description,
-          },
+          payload: descriptionParams,
         })
       } else {
         addNotification(failureResToNotification(res))(dispatch)

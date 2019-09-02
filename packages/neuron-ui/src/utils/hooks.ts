@@ -32,6 +32,8 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
           description: localDescription.description,
         })(dispatch)
       }
+
+      setLocalDescription({ key: '', description: '' })
     },
     [type, walletID, localDescription, dispatch]
   )
@@ -59,15 +61,18 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     },
     [setLocalDescription]
   )
-  const onDescriptionFocus = useCallback(() => {
-    setLocalDescription({ key: '', description: '' })
-  }, [setLocalDescription])
+  const onDescriptionSelected = useCallback(
+    (hash: string, originDesc: string) => () => {
+      setLocalDescription({ key: hash, description: originDesc })
+    },
+    [setLocalDescription]
+  )
   return {
     localDescription,
     onDescriptionFieldBlur,
     onDescriptionPress,
     onDescriptionChange,
-    onDescriptionFocus,
+    onDescriptionSelected,
   }
 }
 

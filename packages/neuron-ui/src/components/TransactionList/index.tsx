@@ -5,10 +5,10 @@ import {
   Text,
   ShimmeredDetailsList,
   TextField,
+  IconButton,
   IColumn,
   IGroup,
   CheckboxVisibility,
-  ITextFieldStyleProps,
   getTheme,
 } from 'office-ui-fabric-react'
 
@@ -73,7 +73,7 @@ const TransactionList = ({
     onDescriptionPress,
     onDescriptionFieldBlur,
     onDescriptionChange,
-    onDescriptionFocus,
+    onDescriptionSelected,
   } = useLocalDescription('transaction', walletID, dispatch)
 
   const transactionColumns: IColumn[] = useMemo(
@@ -175,28 +175,37 @@ const TransactionList = ({
           minWidth: 100,
           maxWidth: 100,
           onRender: (item?: FormatTransaction) => {
+            const isSelected = item && localDescription.key === item.hash
             return item ? (
-              <TextField
-                title={item.description}
-                value={localDescription.key === item.hash ? localDescription.description : item.description || ''}
-                onFocus={onDescriptionFocus}
-                onBlur={onDescriptionFieldBlur(item.hash, item.description)}
-                onKeyPress={onDescriptionPress(item.hash, item.description)}
-                onChange={onDescriptionChange(item.hash)}
-                disabled={localDescription.key === item.hash && isUpdatingDescription}
-                iconProps={{
-                  iconName: localDescription.key === item.hash && isUpdatingDescription ? 'Updating' : '',
-                }}
-                borderless
-                styles={(props: ITextFieldStyleProps) => {
-                  return {
+              <>
+                <TextField
+                  title={item.description}
+                  value={isSelected ? localDescription.description : item.description || ''}
+                  onBlur={isSelected ? onDescriptionFieldBlur(item.hash, item.description) : undefined}
+                  onKeyPress={isSelected ? onDescriptionPress(item.hash, item.description) : undefined}
+                  onChange={isSelected ? onDescriptionChange(item.hash) : undefined}
+                  disabled={isSelected && isUpdatingDescription}
+                  iconProps={{
+                    iconName: isSelected && isUpdatingDescription ? 'Updating' : '',
+                  }}
+                  borderless
+                  readOnly={!isSelected}
+                  styles={{
                     fieldGroup: {
-                      borderColor: '#ccc',
-                      border: props.focused ? '1px solid' : 'none',
+                      backgroundColor: isSelected ? '#fff' : 'transparent',
+                      borderColor: 'transparent',
+                      border: isSelected ? '1px solid' : 'none',
                     },
-                  }
-                }}
-              />
+                  }}
+                />
+                {isSelected ? null : (
+                  <IconButton
+                    iconProps={{ iconName: 'Edit' }}
+                    className="editButton"
+                    onClick={onDescriptionSelected(item.hash, item.description)}
+                  />
+                )}
+              </>
             ) : null
           },
         },
@@ -224,7 +233,7 @@ const TransactionList = ({
       onDescriptionChange,
       onDescriptionFieldBlur,
       onDescriptionPress,
-      onDescriptionFocus,
+      onDescriptionSelected,
       isUpdatingDescription,
       t,
     ]

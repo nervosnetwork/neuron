@@ -29,15 +29,20 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
       updateDescription: true,
     },
   })
+  const descriptionParams = {
+    hash: params.hash,
+    description: params.description,
+  }
+  dispatch({
+    type: NeuronWalletActions.UpdateTransactionDescription,
+    payload: descriptionParams,
+  }) // update local description before remote description to avoid the flicker on the field
   updateRemoteTransactionDescription(params)
     .then(res => {
       if (res.status) {
         dispatch({
           type: NeuronWalletActions.UpdateTransactionDescription,
-          payload: {
-            hash: params.hash,
-            description: params.description,
-          },
+          payload: descriptionParams,
         })
       } else {
         addNotification(failureResToNotification(res))(dispatch)
