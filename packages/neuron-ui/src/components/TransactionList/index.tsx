@@ -26,6 +26,7 @@ import { onRenderRow } from 'utils/fabricUIRender'
 import { CONFIRMATION_THRESHOLD } from 'utils/const'
 
 const theme = getTheme()
+const { semanticColors } = theme
 
 const MIN_CELL_WIDTH = 50
 
@@ -53,14 +54,12 @@ const onRenderHeader = ({ group }: any) => {
 
 const TransactionList = ({
   isLoading = false,
-  isUpdatingDescription = false,
   items = [],
   walletID,
   tipBlockNumber,
   dispatch,
 }: {
   isLoading?: boolean
-  isUpdatingDescription?: boolean
   walletID: string
   items: State.Transaction[]
   tipBlockNumber: string
@@ -184,17 +183,13 @@ const TransactionList = ({
                   onBlur={isSelected ? onDescriptionFieldBlur(item.hash, item.description) : undefined}
                   onKeyPress={isSelected ? onDescriptionPress(item.hash, item.description) : undefined}
                   onChange={isSelected ? onDescriptionChange(item.hash) : undefined}
-                  disabled={isSelected && isUpdatingDescription}
-                  iconProps={{
-                    iconName: isSelected && isUpdatingDescription ? 'Updating' : '',
-                  }}
                   borderless
                   readOnly={!isSelected}
                   styles={{
                     fieldGroup: {
                       backgroundColor: isSelected ? '#fff' : 'transparent',
                       borderColor: 'transparent',
-                      border: isSelected ? '1px solid' : 'none',
+                      border: isSelected ? `1px solid ${semanticColors.inputBorder}!important` : 'none',
                     },
                   }}
                 />
@@ -234,7 +229,6 @@ const TransactionList = ({
       onDescriptionFieldBlur,
       onDescriptionPress,
       onDescriptionSelected,
-      isUpdatingDescription,
       t,
     ]
   )

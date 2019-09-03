@@ -47,6 +47,7 @@ export enum AppActions {
   PopOut = 'popOut',
   ToggleTopAlertVisibility = 'toggleTopAlertVisibility',
   ToggleAllNotificationVisibility = 'toggleAllNotificationVisibility',
+  ToggleIsAllowedToFetchList = 'toggleIsAllowedToFetchList',
   Ignore = 'ignore',
 }
 
@@ -535,6 +536,15 @@ export const reducer = (
         app: {
           ...app,
           showAllNotifications: payload === undefined ? !app.showAllNotifications : payload,
+        },
+      }
+    }
+    case AppActions.ToggleIsAllowedToFetchList: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          isAllowedToFetchList: payload === undefined ? !app.isAllowedToFetchList : payload,
         },
       }
     }

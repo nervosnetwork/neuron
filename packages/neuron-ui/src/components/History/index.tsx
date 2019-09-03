@@ -14,7 +14,7 @@ import { useSearch } from './hooks'
 const History = ({
   app: {
     tipBlockNumber: chainBlockNumber,
-    loadings: { transactionList: isLoading, updateDescription: isUpdatingDescription },
+    loadings: { transactionList: isLoading },
   },
   wallet: { id },
   chain: {
@@ -54,7 +54,6 @@ const History = ({
         </Stack>
         <TransactionList
           isLoading={isLoading}
-          isUpdatingDescription={isUpdatingDescription}
           walletID={id}
           items={items}
           tipBlockNumber={tipBlockNumber}
@@ -87,7 +86,6 @@ const History = ({
     onKeywordsChange,
     onSearch,
     isLoading,
-    isUpdatingDescription,
     id,
     items,
     tipBlockNumber,

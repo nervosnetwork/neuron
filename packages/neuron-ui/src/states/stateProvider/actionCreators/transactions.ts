@@ -1,4 +1,4 @@
-import { NeuronWalletActions, AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { NeuronWalletActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   GetTransactionListParams,
   getTransactionList,
@@ -23,12 +23,6 @@ export const updateTransactionList = (params: GetTransactionListParams) => (disp
 export const updateTransactionDescription = (params: Controller.UpdateTransactionDescriptionParams) => (
   dispatch: StateDispatch
 ) => {
-  dispatch({
-    type: AppActions.UpdateLoadings,
-    payload: {
-      updateDescription: true,
-    },
-  })
   const descriptionParams = {
     hash: params.hash,
     description: params.description,
@@ -37,25 +31,16 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
     type: NeuronWalletActions.UpdateTransactionDescription,
     payload: descriptionParams,
   }) // update local description before remote description to avoid the flicker on the field
-  updateRemoteTransactionDescription(params)
-    .then(res => {
-      if (res.status) {
-        dispatch({
-          type: NeuronWalletActions.UpdateTransactionDescription,
-          payload: descriptionParams,
-        })
-      } else {
-        addNotification(failureResToNotification(res))(dispatch)
-      }
-    })
-    .finally(() => {
+  updateRemoteTransactionDescription(params).then(res => {
+    if (res.status) {
       dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: {
-          updateDescription: false,
-        },
+        type: NeuronWalletActions.UpdateTransactionDescription,
+        payload: descriptionParams,
       })
-    })
+    } else {
+      addNotification(failureResToNotification(res))(dispatch)
+    }
+  })
 }
 
 export default {

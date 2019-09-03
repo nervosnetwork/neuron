@@ -20,7 +20,7 @@ import { onRenderRow } from 'utils/fabricUIRender'
 
 const Addresses = ({
   app: {
-    loadings: { addressList: isLoading, updateDescription: isUpdatingDescription },
+    loadings: { addressList: isLoading },
   },
   wallet: { addresses = [], id: walletID },
   settings: { showAddressBook = false },
@@ -98,10 +98,6 @@ const Addresses = ({
                 onBlur={isSelected ? onDescriptionFieldBlur(item.address, item.description) : undefined}
                 onKeyPress={isSelected ? onDescriptionPress(item.address, item.description) : undefined}
                 onChange={isSelected ? onDescriptionChange(item.address) : undefined}
-                disabled={isSelected && isUpdatingDescription}
-                iconProps={{
-                  iconName: isSelected && isUpdatingDescription ? 'Updating' : '',
-                }}
                 readOnly={!isSelected}
                 styles={{
                   root: {
@@ -110,7 +106,7 @@ const Addresses = ({
                   fieldGroup: {
                     backgroundColor: isSelected ? '#fff' : 'transparent',
                     borderColor: 'transparent',
-                    border: isSelected ? '1px solid' : 'none',
+                    border: isSelected ? `1px solid ${semanticColors.inputBorder}!important` : 'none',
                   },
                 }}
               />
@@ -161,8 +157,7 @@ const Addresses = ({
       localDescription,
       onDescriptionFieldBlur,
       onDescriptionPress,
-      // onDescriptionFocus,
-      isUpdatingDescription,
+      onDescriptionSelected,
       t,
       semanticColors,
     ]
