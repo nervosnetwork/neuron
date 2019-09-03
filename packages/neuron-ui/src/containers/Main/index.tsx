@@ -115,6 +115,7 @@ const MainContent = ({
 }: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
   const neuronWalletState = useState()
   const {
+    app: { isAllowedToFetchList = true },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
@@ -125,6 +126,7 @@ const MainContent = ({
   useSubscription({
     walletID,
     chain,
+    isAllowedToFetchList,
     history,
     dispatch,
   })

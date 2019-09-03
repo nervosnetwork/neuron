@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
+import { AppActions } from 'states/stateProvider/reducer'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -17,20 +18,30 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
   const submitDescription = useCallback(
     (key: string, originDesc: string) => {
       if ((key && key !== localDescription.key) || localDescription.description === originDesc) {
-        return
-      }
-      if (localDescription.key && type === 'transaction') {
-        updateTransactionDescription({
-          hash: localDescription.key,
-          description: localDescription.description,
-        })(dispatch)
-      }
-      if (localDescription.key && type === 'address') {
-        updateAddressDescription({
-          walletID,
-          address: localDescription.key,
-          description: localDescription.description,
-        })(dispatch)
+        dispatch({
+          type: AppActions.ToggleIsAllowedToFetchList,
+          payload: true,
+        })
+        setLocalDescription({ key: '', description: '' })
+      } else {
+        dispatch({
+          type: AppActions.ToggleIsAllowedToFetchList,
+          payload: true,
+        })
+        if (localDescription.key && type === 'transaction') {
+          updateTransactionDescription({
+            hash: localDescription.key,
+            description: localDescription.description,
+          })(dispatch)
+        }
+        if (localDescription.key && type === 'address') {
+          updateAddressDescription({
+            walletID,
+            address: localDescription.key,
+            description: localDescription.description,
+          })(dispatch)
+        }
+        setLocalDescription({ key: '', description: '' })
       }
     },
     [type, walletID, localDescription, dispatch]
@@ -59,15 +70,22 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     },
     [setLocalDescription]
   )
-  const onDescriptionFocus = useCallback(() => {
-    setLocalDescription({ key: '', description: '' })
-  }, [setLocalDescription])
+  const onDescriptionSelected = useCallback(
+    (hash: string, originDesc: string) => () => {
+      dispatch({
+        type: AppActions.ToggleIsAllowedToFetchList,
+        payload: false,
+      })
+      setLocalDescription({ key: hash, description: originDesc })
+    },
+    [setLocalDescription, dispatch]
+  )
   return {
     localDescription,
     onDescriptionFieldBlur,
     onDescriptionPress,
     onDescriptionChange,
-    onDescriptionFocus,
+    onDescriptionSelected,
   }
 }
 

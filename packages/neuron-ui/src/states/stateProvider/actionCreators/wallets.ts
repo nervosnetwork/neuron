@@ -203,34 +203,24 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
 export const updateAddressDescription = (params: Controller.UpdateAddressDescriptionParams) => (
   dispatch: StateDispatch
 ) => {
+  const descriptionParams = {
+    address: params.address,
+    description: params.description,
+  }
   dispatch({
-    type: AppActions.UpdateLoadings,
-    payload: {
-      updateDescription: true,
-    },
+    type: NeuronWalletActions.UpdateAddressDescription,
+    payload: descriptionParams,
   })
-  updateRemoteAddressDescription(params)
-    .then(res => {
-      if (res.status) {
-        dispatch({
-          type: NeuronWalletActions.UpdateAddressDescription,
-          payload: {
-            address: params.address,
-            description: params.description,
-          },
-        })
-      } else {
-        addNotification(failureResToNotification(res))(dispatch)
-      }
-    })
-    .finally(() => {
+  updateRemoteAddressDescription(params).then(res => {
+    if (res.status) {
       dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: {
-          updateDescription: false,
-        },
+        type: NeuronWalletActions.UpdateAddressDescription,
+        payload: descriptionParams,
       })
-    })
+    } else {
+      addNotification(failureResToNotification(res))(dispatch)
+    }
+  })
 }
 
 export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch: StateDispatch) => {

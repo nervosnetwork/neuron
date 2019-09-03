@@ -89,10 +89,10 @@ declare namespace State {
       sending: boolean
       addressList: boolean
       transactionList: boolean
-      updateDescription: boolean
     }
     showTopAlert: boolean
     showAllNotifications: boolean
+    isAllowedToFetchList: boolean
   }
 
   interface NetworkProperty {

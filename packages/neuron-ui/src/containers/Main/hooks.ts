@@ -116,11 +116,13 @@ export const useOnCurrentWalletChange = ({
 export const useSubscription = ({
   walletID,
   chain,
+  isAllowedToFetchList,
   history,
   dispatch,
 }: {
   walletID: string
   chain: State.Chain
+  isAllowedToFetchList: boolean
   history: any
   dispatch: StateDispatch
 }) => {
@@ -139,10 +141,16 @@ export const useSubscription = ({
       }
       switch (dataType) {
         case 'address': {
+          if (!isAllowedToFetchList) {
+            break
+          }
           updateAddressListAndBalance(walletID)(dispatch)
           break
         }
         case 'transaction': {
+          if (!isAllowedToFetchList) {
+            break
+          }
           updateTransactionList({
             walletID,
             keywords,
@@ -239,7 +247,7 @@ export const useSubscription = ({
       syncedBlockNumberSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
-  }, [walletID, pageNo, pageSize, keywords, history, dispatch])
+  }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch])
 }
 
 export default {

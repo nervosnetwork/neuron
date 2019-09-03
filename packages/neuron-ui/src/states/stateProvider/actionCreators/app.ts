@@ -100,6 +100,13 @@ export const toggleAllNotificationVisibility = (show?: boolean) => (dispatch: St
   })
 }
 
+export const toggleIsAllowedToFetchList = (allowed?: boolean) => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.ToggleIsAllowedToFetchList,
+    payload: allowed,
+  })
+}
+
 export default {
   initAppState,
   addNotification,
@@ -107,4 +114,5 @@ export default {
   dismissNotification,
   toggleTopAlertVisibility,
   toggleAllNotificationVisibility,
+  toggleIsAllowedToFetchList,
 }
