@@ -8,7 +8,6 @@ import {
   CircleInformation as InfoIcon,
   Close as DismissIcon,
   Close as FailIcon,
-  ContactInfo as MinerInfoIcon,
   Copy as CopyIcon,
   Down as ArrowDownIcon,
   FormEdit as EditIcon,
@@ -87,7 +86,6 @@ registerIcons({
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
     Edit: <EditIcon color="#000" size="20px" />,
-    MinerInfo: <MinerInfoIcon size="14px" />,
   },
 })
 

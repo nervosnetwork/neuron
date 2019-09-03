@@ -6,7 +6,6 @@ import {
   PrimaryButton,
   ChoiceGroup,
   IChoiceGroupOption,
-  IconButton,
   Text,
   Callout,
   MessageBar,
@@ -102,27 +101,29 @@ const WalletSetting = ({
             checked: wallet.id === currentID,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
-                <>
+                <Stack>
                   <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
                     {text}
                   </span>
                   {wallet.minerAddress ? (
-                    <IconButton
-                      iconProps={{ iconName: 'MinerInfo' }}
+                    <Text
+                      variant="tiny"
+                      className="ms-ChoiceFieldLabel"
                       onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.preventDefault()
                         setTarget(e.target)
                         if (wallet.minerAddress) {
                           showMinerInfo(wallet.minerAddress)
                         }
                       }}
                       styles={{
-                        root: {
-                          height: theme.fonts.xLarge.fontSize,
-                        },
+                        root: [{ color: theme.semanticColors.bodySubtext, fontSize: '12px!important' }],
                       }}
-                    />
+                    >
+                      {t('overview.miner-info')}
+                    </Text>
                   ) : null}
-                </>
+                </Stack>
               )
             },
           }))}
