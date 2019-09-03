@@ -1,15 +1,29 @@
-import React, { useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import {
+  Stack,
+  PrimaryButton,
+  ChoiceGroup,
+  IChoiceGroupOption,
+  IconButton,
+  Text,
+  Callout,
+  MessageBar,
+  MessageBarType,
+  ActionButton,
+  getTheme,
+} from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { setCurrentWallet } from 'states/stateProvider/actionCreators'
+import { setCurrentWallet, addPopup } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 
 import { contextMenu } from 'services/remote'
-import { Routes, MnemonicAction } from 'utils/const'
+import { Routes, MnemonicAction, ErrorCode } from 'utils/const'
+
+const theme = getTheme()
 
 const buttons = [
   {
@@ -28,11 +42,34 @@ const buttons = [
 
 const WalletSetting = ({
   wallet: { id: currentID = '' },
+  chain: { codeHash = '' },
   settings: { wallets = [] },
   dispatch,
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const [target, setTarget] = useState<any>(null)
+  const [minerInfo, setMinerInfo] = useState<{ address: string; identifier: string }>({
+    address: '',
+    identifier: '',
+  })
+
+  const [showMinerInfo, hideMinerInfo] = useMemo(
+    () => [
+      (info: { address: string; identifier: string }) => setMinerInfo(info),
+      () => setMinerInfo({ address: '', identifier: '' }),
+    ],
+    [setMinerInfo]
+  )
+
+  const onCopyPubkeyHash = useCallback(() => {
+    if (minerInfo) {
+      window.navigator.clipboard.writeText(minerInfo.identifier)
+      hideMinerInfo()
+      addPopup('lock-arg-copied')(dispatch)
+    }
+  }, [minerInfo, t, hideMinerInfo, dispatch])
+
   const onChange = useCallback(
     (_e, option) => {
       if (option) {
@@ -65,9 +102,27 @@ const WalletSetting = ({
             checked: wallet.id === currentID,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
-                <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
-                  {text}
-                </span>
+                <>
+                  <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
+                    {text}
+                  </span>
+                  {wallet.minerAddress ? (
+                    <IconButton
+                      iconProps={{ iconName: 'MinerInfo' }}
+                      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                        setTarget(e.target)
+                        if (wallet.minerAddress) {
+                          showMinerInfo(wallet.minerAddress)
+                        }
+                      }}
+                      styles={{
+                        root: {
+                          height: theme.fonts.xLarge.fontSize,
+                        },
+                      }}
+                    />
+                  ) : null}
+                </>
               )
             },
           }))}
@@ -79,6 +134,47 @@ const WalletSetting = ({
           <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
         ))}
       </Stack>
+      <Callout target={target} hidden={!minerInfo.address} onDismiss={hideMinerInfo} gapSpace={0}>
+        <Stack tokens={{ padding: 15 }}>
+          {minerInfo.address ? (
+            <Stack tokens={{ childrenGap: 15 }} styles={{ root: { padding: 5 } }}>
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="small" style={{ fontWeight: 600 }}>
+                  {t('overview.address')}
+                </Text>
+                <Text variant="small" className="monospacedFont">
+                  {minerInfo.address}
+                </Text>
+              </Stack>
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="small" style={{ fontWeight: 600 }}>
+                  {t('overview.code-hash')}
+                </Text>
+                <Text variant="small" className="monospacedFont">
+                  {codeHash}
+                </Text>
+              </Stack>
+              <Stack tokens={{ childrenGap: 15 }}>
+                <Text variant="small" style={{ fontWeight: 600 }}>
+                  {t('overview.lock-arg')}
+                </Text>
+                <Text variant="small" className="monospacedFont">
+                  {minerInfo.identifier}
+                </Text>
+              </Stack>
+              <Stack horizontalAlign="end">
+                <ActionButton iconProps={{ iconName: 'MiniCopy' }} onClick={onCopyPubkeyHash}>
+                  {t('overview.copy-pubkey-hash')}
+                </ActionButton>
+              </Stack>
+            </Stack>
+          ) : (
+            <MessageBar messageBarType={MessageBarType.error}>
+              {t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: `default-address` })}
+            </MessageBar>
+          )}
+        </Stack>
+      </Callout>
     </Stack>
   )
 }
