@@ -151,7 +151,7 @@ export default class AddressService {
     }
   }
 
-  private static toAddress = (addressMetaInfo: AddressMetaInfo) => {
+  private static toAddress = (addressMetaInfo: AddressMetaInfo): AddressInterface[] => {
     const path: string = Address.pathFor(addressMetaInfo.addressType, addressMetaInfo.addressIndex)
     const testnetAddress: string = addressMetaInfo.accountExtendedPublicKey.address(
       addressMetaInfo.addressType,
@@ -167,7 +167,7 @@ export default class AddressService {
 
     const blake160: string = LockUtils.addressToBlake160(testnetAddress)
 
-    const testnetAddressInfo = {
+    const testnetAddressInfo: AddressInterface = {
       walletId: addressMetaInfo.walletId,
       address: testnetAddress,
       path,
@@ -178,6 +178,7 @@ export default class AddressService {
       sentBalance: '0',
       pendingBalance: '0',
       balance: '0',
+      totalBalance: '0',
       blake160,
       version: AddressVersion.Testnet,
     }

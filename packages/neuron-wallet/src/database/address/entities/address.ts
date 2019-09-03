@@ -94,6 +94,7 @@ export default class Address extends BaseEntity {
       sentBalance: this.sentBalance,
       pendingBalance: this.pendingBalance,
       balance: this.balance(),
+      totalBalance: this.totalBalance,
       description: this.description,
     }
   }

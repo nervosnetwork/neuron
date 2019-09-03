@@ -19,6 +19,7 @@ export interface Address {
   sentBalance: string
   pendingBalance: string
   balance: string
+  totalBalance: string
   blake160: string
   version: AddressVersion
   description?: string
