@@ -16,7 +16,7 @@ export default class SkipDataAndType {
     return SkipDataAndType.instance
   }
 
-  // open means can use cells with data and type
+  // skip means can use cells with data and type
   public update(skip: boolean) {
     FileService.getInstance().writeFileSync(
       SkipDataAndType.moduleName,
