@@ -4,7 +4,7 @@ export default class SkipDataAndType {
   private static moduleName = ''
   private static fileName = 'skip-data-and-type.json'
 
-  private open: boolean | undefined = undefined
+  private skip: boolean | undefined = undefined
 
   private static instance: SkipDataAndType
 
@@ -17,30 +17,30 @@ export default class SkipDataAndType {
   }
 
   // open means can use cells with data and type
-  public update(open: boolean) {
+  public update(skip: boolean) {
     FileService.getInstance().writeFileSync(
       SkipDataAndType.moduleName,
       SkipDataAndType.fileName,
       JSON.stringify({
-        open,
+        skip,
       })
     )
     // cache this variable
-    this.open = open
+    this.skip = skip
   }
 
   public get(): boolean {
     // if cached, don't to read file
-    if (this.open !== undefined) {
-      return this.open
+    if (this.skip !== undefined) {
+      return this.skip
     }
     const fileService = FileService.getInstance()
     const { moduleName, fileName } = SkipDataAndType
 
     if (fileService.hasFile(moduleName, fileName)) {
       const info = FileService.getInstance().readFileSync(moduleName, fileName)
-      const { open } = JSON.parse(info)
-      if (open === false) {
+      const { skip } = JSON.parse(info)
+      if (skip === false) {
         return false
       }
     }

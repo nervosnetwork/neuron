@@ -29,28 +29,28 @@ describe(`SkipDataAndType`, () => {
   describe('with instance cache', () => {
     it('get true', () => {
       skipDataAndType!.update(true)
-      const open = skipDataAndType!.get()
-      expect(open).toBe(true)
+      const skip = skipDataAndType!.get()
+      expect(skip).toBe(true)
     })
 
     it('get false', () => {
       skipDataAndType!.update(false)
-      const open = skipDataAndType!.get()
-      expect(open).toBe(false)
+      const skip = skipDataAndType!.get()
+      expect(skip).toBe(false)
     })
   })
 
   describe('without cache', () => {
     it('first time open', () => {
-      const open = skipDataAndType!.get()
-      expect(open).toBe(true)
+      const skip = skipDataAndType!.get()
+      expect(skip).toBe(true)
     })
 
     it('new instance', () => {
       skipDataAndType!.update(false)
       const newInstance = new SkipDataAndType()
-      const open = newInstance.get()
-      expect(open).toBe(false)
+      const skip = newInstance.get()
+      expect(skip).toBe(false)
     })
   })
 })
