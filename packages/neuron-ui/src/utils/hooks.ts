@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { AppActions } from '../states/stateProvider/reducer'
+import { AppActions } from 'states/stateProvider/reducer'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
