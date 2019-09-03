@@ -73,6 +73,9 @@ export default class Address extends BaseEntity {
   @Column()
   pendingBalance: string = '0'
 
+  @Column()
+  totalBalance: string = '0'
+
   public balance = (): string => {
     return (BigInt(this.liveBalance) + BigInt(this.sentBalance)).toString()
   }
