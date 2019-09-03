@@ -165,7 +165,8 @@ export default class AddressService {
       AddressPrefix.Mainnet
     ).address
 
-    const blake160: string = LockUtils.addressToBlake160(testnetAddress)
+    const addressToParse = env.testnet ? testnetAddress : mainnetAddress
+    const blake160: string = LockUtils.addressToBlake160(addressToParse)
 
     const testnetAddressInfo = {
       walletId: addressMetaInfo.walletId,

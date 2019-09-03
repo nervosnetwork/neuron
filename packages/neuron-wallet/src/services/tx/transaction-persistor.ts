@@ -205,9 +205,9 @@ export class TransactionPersistor {
     )
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
-      txEntity = await TransactionPersistor.saveWithSent(transaction)
+      txEntity = await TransactionPersistor.saveWithSent(tx)
     } else if (saveType === TxSaveType.Fetch) {
-      txEntity = await TransactionPersistor.saveWithFetch(transaction)
+      txEntity = await TransactionPersistor.saveWithFetch(tx)
     } else {
       throw new Error('Error TxSaveType!')
     }
