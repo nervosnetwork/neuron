@@ -4,22 +4,22 @@ import SkipDataAndType from 'services/skip-data-and-type'
 
 export default class SkipDataAndTypeController {
   @CatchControllerError
-  public static async update(open: boolean): Promise<Controller.Response<boolean>> {
-    SkipDataAndType.getInstance().update(open)
+  public static async update(skip: boolean): Promise<Controller.Response<boolean>> {
+    SkipDataAndType.getInstance().update(skip)
 
     return {
       status: ResponseCode.Success,
-      result: open,
+      result: skip,
     }
   }
 
   @CatchControllerError
   public static async get(): Promise<Controller.Response<boolean>> {
-    const open = SkipDataAndType.getInstance().get()
+    const skip = SkipDataAndType.getInstance().get()
 
     return {
       status: ResponseCode.Success,
-      result: open,
+      result: skip,
     }
   }
 }
