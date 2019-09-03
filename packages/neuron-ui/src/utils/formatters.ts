@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 /* global BigInt */
 
 import { CapacityUnit } from './const'
