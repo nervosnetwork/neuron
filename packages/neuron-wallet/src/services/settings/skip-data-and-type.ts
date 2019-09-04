@@ -22,7 +22,7 @@ export default class SkipDataAndType {
   }
 
   public get(): boolean {
-    // if cached, don't to read file
+    // if cached, don't read file
     if (this.skip !== undefined) {
       return this.skip
     }
