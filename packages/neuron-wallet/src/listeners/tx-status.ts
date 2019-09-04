@@ -1,12 +1,14 @@
 import { remote } from 'electron'
 import { interval } from 'rxjs'
 import { getConnection } from 'typeorm'
+import Core from '@nervosnetwork/ckb-sdk-core'
 import { TransactionStatus } from 'types/cell-types'
 import LockUtils from 'models/lock-utils'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import TypeConvert from 'types/type-convert'
+import GetBlocks from 'services/sync/get-blocks'
 
 const { nodeService } = remote.require('./startup/sync-block-task/params')
 
@@ -17,17 +19,20 @@ const getTransactionStatus = async (hash: string) => {
     return {
       tx,
       status: TransactionStatus.Failed,
+      blockHash: null,
     }
   }
   if (tx.txStatus.status === 'committed') {
     return {
       tx: tx.transaction,
       status: TransactionStatus.Success,
+      blockHash: tx.txStatus.blockHash,
     }
   }
   return {
     tx: tx.transaction,
     status: TransactionStatus.Pending,
+    blockHash: null,
   }
 }
 
@@ -46,6 +51,7 @@ const trackingStatus = async () => {
         hash,
         tx: txWithStatus.tx,
         status: txWithStatus.status,
+        blockHash: txWithStatus.blockHash,
       }
     })
   )
@@ -58,9 +64,18 @@ const trackingStatus = async () => {
     AddressesUsedSubject.getSubject().next(usedAddresses)
   }
 
-  for (const successTx of successTxs) {
-    const transaction = TypeConvert.toTransaction(successTx.tx)
-    await TransactionPersistor.saveFetchTx(transaction)
+  if (successTxs.length > 0) {
+    const { core }: { core: Core } = nodeService
+    const getBlockService = new GetBlocks(core.rpc.node.url)
+    for (const successTx of successTxs) {
+      const transaction = TypeConvert.toTransaction(successTx.tx)
+      const { blockHash } = successTx
+      const blockHeader = await getBlockService.getHeader(blockHash!)
+      transaction.blockHash = blockHash!
+      transaction.blockNumber = blockHeader.number
+      transaction.timestamp = blockHeader.timestamp
+      await TransactionPersistor.saveFetchTx(transaction)
+    }
   }
 }
 

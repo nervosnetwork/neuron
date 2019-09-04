@@ -21,6 +21,7 @@ import {
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
+import logger from 'utils/logger'
 
 /**
  * @class WalletsController
@@ -385,6 +386,7 @@ export default class WalletsController {
         result: hash,
       }
     } catch (err) {
+      logger.error(`sendCapacity:`, err)
       return {
         status: ResponseCode.Fail,
         message: `Error: "${err.message}"`,
