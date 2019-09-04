@@ -3,7 +3,7 @@ import OutputEntity from 'database/chain/entities/output'
 import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough } from 'exceptions'
 import { OutputStatus } from './tx/params'
-import SkipDataAndType from './skip-data-and-type'
+import SkipDataAndType from './settings/skip-data-and-type'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 

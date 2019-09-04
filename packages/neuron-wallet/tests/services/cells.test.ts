@@ -5,7 +5,7 @@ import { OutputStatus } from '../../src/services/tx/params'
 import { ScriptHashType, Script } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
 import { CapacityNotEnough } from '../../src/exceptions/wallet'
-import SkipDataAndType from '../../src/services/skip-data-and-type'
+import SkipDataAndType from '../../src/services/settings/skip-data-and-type'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })

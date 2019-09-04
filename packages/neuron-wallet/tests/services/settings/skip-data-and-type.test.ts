@@ -1,5 +1,6 @@
-import SkipDataAndType from '../../src/services/skip-data-and-type'
-import FileService from '../../src/services/file'
+import SkipDataAndType from '../../../src/services/settings/skip-data-and-type'
+import FileService from '../../../src/services/file'
+import BaseSettings from '../../../src/services/settings/base'
 
 describe(`SkipDataAndType`, () => {
   let skipDataAndType: SkipDataAndType | undefined
@@ -7,7 +8,7 @@ describe(`SkipDataAndType`, () => {
   beforeEach(() => {
     const fileService = FileService.getInstance()
     // @ts-ignore: Private method
-    const { moduleName, fileName } = SkipDataAndType
+    const { moduleName, fileName } = BaseSettings
     if (fileService.hasFile(moduleName, fileName)) {
       fileService.deleteFileSync(moduleName, fileName)
     }

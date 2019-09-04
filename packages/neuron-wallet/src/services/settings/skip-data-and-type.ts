@@ -1,10 +1,8 @@
-import FileService from './file'
+import BaseSettings from './base'
 
 export default class SkipDataAndType {
-  private static moduleName = ''
-  private static fileName = 'skip-data-and-type.json'
-
   private skip: boolean | undefined = undefined
+  private keyName = 'skip'
 
   private static instance: SkipDataAndType
 
@@ -18,13 +16,7 @@ export default class SkipDataAndType {
 
   // skip means can use cells with data and type
   public update(skip: boolean) {
-    FileService.getInstance().writeFileSync(
-      SkipDataAndType.moduleName,
-      SkipDataAndType.fileName,
-      JSON.stringify({
-        skip,
-      })
-    )
+    BaseSettings.getInstance().updateSetting(this.keyName, skip)
     // cache this variable
     this.skip = skip
   }
@@ -34,15 +26,11 @@ export default class SkipDataAndType {
     if (this.skip !== undefined) {
       return this.skip
     }
-    const fileService = FileService.getInstance()
-    const { moduleName, fileName } = SkipDataAndType
 
-    if (fileService.hasFile(moduleName, fileName)) {
-      const info = FileService.getInstance().readFileSync(moduleName, fileName)
-      const { skip } = JSON.parse(info)
-      if (skip === false) {
-        return false
-      }
+    const skip = BaseSettings.getInstance().getSetting(this.keyName)
+
+    if (skip === false) {
+      return false
     }
 
     // default is true

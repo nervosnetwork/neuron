@@ -1,6 +1,6 @@
 import { CatchControllerError } from 'decorators/errors'
 import { ResponseCode } from 'utils/const'
-import SkipDataAndType from 'services/skip-data-and-type'
+import SkipDataAndType from 'services/settings/skip-data-and-type'
 
 export default class SkipDataAndTypeController {
   @CatchControllerError
