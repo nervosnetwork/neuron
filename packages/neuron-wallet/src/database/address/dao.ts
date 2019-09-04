@@ -52,8 +52,8 @@ export default class AddressDao {
   // sentBalance means balance of OutputStatus.Sent cells (sent to me but not committed)
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
-  // balance is the balance which skipped data and type
-  // totalBalance means balance with data and type
+  // balance is the balance of the cells those who don't hold data or type script
+  // totalBalance means balance of all cells, including those who hold data and type script
   public static updateTxCountAndBalance = async (address: string): Promise<AddressEntity[]> => {
     const addressEntities = await getConnection()
       .getRepository(AddressEntity)
