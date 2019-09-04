@@ -37,10 +37,10 @@ const appState: State.App = {
     sending: false,
     addressList: false,
     transactionList: false,
-    updateDescription: false,
   },
   showTopAlert: false,
   showAllNotifications: false,
+  isAllowedToFetchList: true,
 }
 
 export default appState

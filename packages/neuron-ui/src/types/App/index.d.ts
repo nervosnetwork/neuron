@@ -89,10 +89,10 @@ declare namespace State {
       sending: boolean
       addressList: boolean
       transactionList: boolean
-      updateDescription: boolean
     }
     showTopAlert: boolean
     showAllNotifications: boolean
+    isAllowedToFetchList: boolean
   }
 
   interface NetworkProperty {
@@ -107,6 +107,7 @@ declare namespace State {
   interface WalletIdentity {
     id: string
     name: string
+    minerAddress?: { address: string; identifier: string }
   }
 
   interface Address {

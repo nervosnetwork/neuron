@@ -8,6 +8,7 @@ import Address from './entities/address'
 
 import { AddAddress1561461669542 } from './migrations/1561461669542-AddAddress'
 import { extendBalance1562126909151 } from './migrations/1562126909151-extendBalance'
+import { AddTotalBalance1567485550388 } from './migrations/1567485550388-AddTotalBalance'
 
 const dbPath = path.join(env.fileBasePath, 'address.sqlite')
 
@@ -20,7 +21,7 @@ const connectOptions = (): SqliteConnectionOptions => {
     type: 'sqlite',
     database,
     entities: [Address],
-    migrations: [AddAddress1561461669542, extendBalance1562126909151],
+    migrations: [AddAddress1561461669542, extendBalance1562126909151, AddTotalBalance1567485550388],
     synchronize: false,
     migrationsRun: true,
     logging: ['error'],

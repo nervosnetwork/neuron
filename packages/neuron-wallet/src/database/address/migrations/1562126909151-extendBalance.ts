@@ -13,8 +13,8 @@ export class extendBalance1562126909151 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-      await queryRunner.dropColumn('transaction', 'sentBalance')
-      await queryRunner.dropColumn('transaction', 'pendingBalance')
+      await queryRunner.dropColumn('address', 'sentBalance')
+      await queryRunner.dropColumn('address', 'pendingBalance')
       await queryRunner.changeColumn('address', 'liveBalance', new TableColumn({
         name: 'balance',
         type: 'varchar',

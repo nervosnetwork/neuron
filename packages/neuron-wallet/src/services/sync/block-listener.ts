@@ -16,14 +16,17 @@ export default class BlockListener {
   private currentBlockNumber: BlockNumber
   private tipNumberSubject: BehaviorSubject<string | undefined>
   private tipNumberListener: Subscription | undefined
+  private url: string
 
   constructor(
+    url: string,
     lockHashes: string[],
     tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject
   ) {
+    this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = new BlockNumber()
-    this.rangeForCheck = new RangeForCheck()
+    this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = tipNumberSubject
   }
 
@@ -51,10 +54,17 @@ export default class BlockListener {
     }
 
     try {
-      const getBlocksService = new GetBlocks()
+      const getBlocksService = new GetBlocks(this.url)
       const currentTip = await getBlocksService.getTipBlockNumber()
       const startBlockNumber = await this.getStartBlockNumber()
-      this.queue = new Queue(this.lockHashes, startBlockNumber, currentTip, this.currentBlockNumber, this.rangeForCheck)
+      this.queue = new Queue(
+        this.url,
+        this.lockHashes,
+        startBlockNumber,
+        currentTip,
+        this.currentBlockNumber,
+        this.rangeForCheck
+      )
     } catch (err) {
       logger.error(`BlockListener start error:`, err)
     }
@@ -119,6 +129,7 @@ export default class BlockListener {
     } else {
       const startBlockNumber: string = await this.getStartBlockNumber()
       this.queue = new Queue(
+        this.url,
         this.lockHashes,
         startBlockNumber,
         endBlockNumber,

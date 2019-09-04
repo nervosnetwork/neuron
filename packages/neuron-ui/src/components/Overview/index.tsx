@@ -17,18 +17,16 @@ import {
   IDetailsRowStyles,
   FontSizes,
   Callout,
-  MessageBar,
-  MessageBarType,
 } from 'office-ui-fabric-react'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
-import { updateTransactionList, addPopup } from 'states/stateProvider/actionCreators'
+import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { showTransactionDetails, showErrorMessage } from 'services/remote'
+import { showTransactionDetails } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, ErrorCode } from 'utils/const'
+import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 
 const TITLE_FONT_SIZE = 'xxLarge'
@@ -157,20 +155,17 @@ const ActivityList = ({
 const Overview = ({
   dispatch,
   app: { tipBlockNumber, chain, epoch, difficulty },
-  wallet: { id, name, balance = '', addresses = [] },
+  wallet: { id, name, balance = '' },
   chain: {
     tipBlockNumber: syncedBlockNumber,
-    codeHash = '',
     transactions: { items = [] },
   },
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const [displayBlockchainInfo, setDisplayBlockchainInfo] = useState(false)
-  const [displayMinerInfo, setDisplayMinerInfo] = useState(false)
 
   const blockchainInfoRef = useRef<HTMLDivElement>(null)
-  const minerInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (id) {
@@ -264,32 +259,10 @@ const Overview = ({
     [t, chain, epoch, difficulty, tipBlockNumber]
   )
 
-  const [showBlockchainStatus, hideBlockchainStatus, showMinerInfo, hideMinerInfo] = useMemo(
-    () => [
-      () => setDisplayBlockchainInfo(true),
-      () => setDisplayBlockchainInfo(false),
-      () => setDisplayMinerInfo(true),
-      () => setDisplayMinerInfo(false),
-    ],
-    [setDisplayBlockchainInfo, setDisplayMinerInfo]
+  const [showBlockchainStatus, hideBlockchainStatus] = useMemo(
+    () => [() => setDisplayBlockchainInfo(true), () => setDisplayBlockchainInfo(false)],
+    [setDisplayBlockchainInfo]
   )
-
-  const defaultAddress = useMemo(() => {
-    return addresses.find(addr => addr.type === 0 && addr.index === 0)
-  }, [addresses])
-
-  const onCopyPubkeyHash = useCallback(() => {
-    if (defaultAddress) {
-      window.navigator.clipboard.writeText(defaultAddress.identifier)
-      hideMinerInfo()
-      addPopup('lock-arg-copied')(dispatch)
-    } else {
-      showErrorMessage(
-        t(`messages.error`),
-        t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: `default-address` })
-      )
-    }
-  }, [defaultAddress, t, hideMinerInfo, dispatch])
 
   const activityItems = useMemo(
     () =>
@@ -342,11 +315,6 @@ const Overview = ({
               {t('overview.blockchain-status')}
             </DefaultButton>
           </div>
-          <div ref={minerInfoRef}>
-            <DefaultButton onClick={showMinerInfo} styles={{ root: { width: '200px' } }}>
-              {t('overview.miner-info')}
-            </DefaultButton>
-          </div>
         </Stack>
       </Stack>
       <Text as="h2" variant={TITLE_FONT_SIZE}>
@@ -372,49 +340,6 @@ const Overview = ({
         >
           <Stack tokens={{ padding: 15 }}>
             <PropertyList properties={blockchainStatusProperties} />
-          </Stack>
-        </Callout>
-      ) : null}
-      {minerInfoRef.current ? (
-        <Callout target={minerInfoRef.current} hidden={!displayMinerInfo} onDismiss={hideMinerInfo} gapSpace={0}>
-          <Stack tokens={{ padding: 15 }}>
-            {defaultAddress ? (
-              <Stack tokens={{ childrenGap: 15 }} styles={{ root: { padding: 5 } }}>
-                <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="small" style={{ fontWeight: 600 }}>
-                    {t('overview.address')}
-                  </Text>
-                  <Text variant="small" className="monospacedFont">
-                    {defaultAddress.address}
-                  </Text>
-                </Stack>
-                <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="small" style={{ fontWeight: 600 }}>
-                    {t('overview.code-hash')}
-                  </Text>
-                  <Text variant="small" className="monospacedFont">
-                    {codeHash}
-                  </Text>
-                </Stack>
-                <Stack tokens={{ childrenGap: 15 }}>
-                  <Text variant="small" style={{ fontWeight: 600 }}>
-                    {t('overview.lock-arg')}
-                  </Text>
-                  <Text variant="small" className="monospacedFont">
-                    {defaultAddress.identifier}
-                  </Text>
-                </Stack>
-                <Stack horizontalAlign="end">
-                  <ActionButton iconProps={{ iconName: 'MiniCopy' }} onClick={onCopyPubkeyHash}>
-                    {t('overview.copy-pubkey-hash')}
-                  </ActionButton>
-                </Stack>
-              </Stack>
-            ) : (
-              <MessageBar messageBarType={MessageBarType.error}>
-                {t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: `default-address` })}
-              </MessageBar>
-            )}
           </Stack>
         </Callout>
       ) : null}

@@ -1,4 +1,5 @@
-import NetworksService, { NetworkWithID } from '../../src/services/networks'
+import NetworksService from '../../src/services/networks'
+import { NetworkWithID } from '../../src/types/network'
 import env from '../../src/env'
 import i18n from '../../src/utils/i18n'
 

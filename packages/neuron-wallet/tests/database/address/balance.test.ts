@@ -18,7 +18,11 @@ describe('balance', () => {
     await connection.synchronize()
   })
 
-  const generateAddress = (liveBalance: string | bigint, sentBalance: string | bigint, pendingBalance: string | bigint) => {
+  const generateAddress = (
+    liveBalance: string | bigint,
+    sentBalance: string | bigint,
+    pendingBalance: string | bigint
+  ) => {
     const addr = Math.round(Math.random() * 100000000).toString()
     const address: Address = {
       walletId: '1',
@@ -31,6 +35,7 @@ describe('balance', () => {
       sentBalance: sentBalance.toString(),
       pendingBalance: pendingBalance.toString(),
       balance: '0',
+      totalBalance: '0',
       blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
       version: AddressVersion.Testnet,
     }
@@ -53,15 +58,10 @@ describe('balance', () => {
 
   it('sent to others', async () => {
     // have 1000, sent to others 200, and refund 800
-    const addresses = [
-      generateAddress('0', '0', '1000'),
-      generateAddress('0', '800', '0'),
-    ]
+    const addresses = [generateAddress('0', '0', '1000'), generateAddress('0', '800', '0')]
 
     const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs
-      .map(addr => BigInt(addr.balance()))
-      .reduce((result, c) => result + c, BigInt(0))
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(800))
   })
@@ -74,24 +74,17 @@ describe('balance', () => {
       generateAddress('0', '800', '0'),
     ]
     const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs
-      .map(addr => BigInt(addr.balance()))
-      .reduce((result, c) => result + c, BigInt(0))
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(1000))
   })
 
   it('sent to others with 10 shannon fee', async () => {
     // have 1000, sent to others 200, and refund 790, with 10 shannon fee
-    const addresses = [
-      generateAddress('0', '0', '1000'),
-      generateAddress('0', '790', '0'),
-    ]
+    const addresses = [generateAddress('0', '0', '1000'), generateAddress('0', '790', '0')]
 
     const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs
-      .map(addr => BigInt(addr.balance()))
-      .reduce((result, c) => result + c, BigInt(0))
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(790))
   })
@@ -105,9 +98,7 @@ describe('balance', () => {
     ]
 
     const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs
-      .map(addr => BigInt(addr.balance()))
-      .reduce((result, c) => result + c, BigInt(0))
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(990))
   })

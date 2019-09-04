@@ -1,6 +1,8 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
+import https from 'https'
+import http from 'http'
 import { ShouldBeTypeOf } from 'exceptions'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
@@ -51,7 +53,13 @@ class NodeService {
     if (!url.startsWith('http')) {
       throw new Error('Protocol of url should be specified')
     }
-    this.core.setNode({ url })
+    if (url.startsWith('https')) {
+      const httpsAgent = new https.Agent({ keepAlive: true })
+      this.core.setNode({ url, httpsAgent })
+    } else {
+      const httpAgent = new http.Agent({ keepAlive: true })
+      this.core.setNode({ url, httpAgent })
+    }
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
     return this.core

@@ -57,12 +57,28 @@ navbar {
   .ms-DetailsRow-cell {
     display: flex;
     align-items: center;
+
+    .editButton {
+      position: absolute;
+      right: 0;
+      justify-content: center;
+      align-items: center;
+      display: none;
+      background-color: transparent;
+    }
+
+    &:hover {
+      .editButton {
+        display: flex;
+      }
+    }
   }
 
   .text-overflow {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
 }
 
 // hack fabric ui experimental pagination style

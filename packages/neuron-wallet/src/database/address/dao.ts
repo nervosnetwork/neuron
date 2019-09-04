@@ -19,6 +19,7 @@ export interface Address {
   sentBalance: string
   pendingBalance: string
   balance: string
+  totalBalance: string
   blake160: string
   version: AddressVersion
   description?: string
@@ -51,6 +52,8 @@ export default class AddressDao {
   // sentBalance means balance of OutputStatus.Sent cells (sent to me but not committed)
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
+  // balance is the balance of the cells those who don't hold data or type script
+  // totalBalance means balance of all cells, including those who hold data and type script
   public static updateTxCountAndBalance = async (address: string): Promise<AddressEntity[]> => {
     const addressEntities = await getConnection()
       .getRepository(AddressEntity)
@@ -67,9 +70,12 @@ export default class AddressDao {
         const addressEntity = entity
         addressEntity.txCount = txCount
         const lockHashes: string[] = await LockUtils.addressToAllLockHashes(addressEntity.address)
-        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
-        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
-        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
+        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, true)
+        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, true)
+        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending, true)
+        const totalLiveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, false)
+        const totalSentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, false)
+        addressEntity.totalBalance = (BigInt(totalLiveBalance) - BigInt(totalSentBalance)).toString()
         return addressEntity
       })
     )

@@ -54,7 +54,8 @@ module.exports = {
     "no-console": [2, {
       "allow": ["warn", "error", "info"]
     }],
-    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }]
+    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
+    "max-classes-per-file": [0]
   },
   "globals": {
     "BigInt": "readonly"

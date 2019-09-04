@@ -21,6 +21,7 @@ import {
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
+import logger from 'utils/logger'
 
 /**
  * @class WalletsController
@@ -35,9 +36,25 @@ export default class WalletsController {
     if (!wallets) {
       throw new ServiceHasNoResponse('Wallet')
     }
+    const minerAddresses = await Promise.all(
+      wallets.map(({ id }) =>
+        WalletsController.getAllAddresses(id).then(addrRes => {
+          if (addrRes.result) {
+            const minerAddr = addrRes.result.find(addr => addr.type === 0 && addr.index === 0)
+            if (minerAddr) {
+              return {
+                address: minerAddr.address,
+                identifier: minerAddr.identifier,
+              }
+            }
+          }
+          return undefined
+        })
+      )
+    )
     return {
       status: ResponseCode.Success,
-      result: wallets.map(({ name, id }) => ({ name, id })),
+      result: wallets.map(({ name, id }, idx) => ({ name, id, minerAddress: minerAddresses[idx] })),
     }
   }
 
@@ -369,6 +386,7 @@ export default class WalletsController {
         result: hash,
       }
     } catch (err) {
+      logger.error(`sendCapacity:`, err)
       return {
         status: ResponseCode.Fail,
         message: `Error: "${err.message}"`,

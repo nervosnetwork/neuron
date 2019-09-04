@@ -133,6 +133,7 @@ export class TransactionPersistor {
       }
     }
 
+    const outputsData = transaction.outputsData!
     const outputs: OutputEntity[] = await Promise.all(
       transaction.outputs!.map(async (o, index) => {
         const output = new OutputEntity()
@@ -143,6 +144,15 @@ export class TransactionPersistor {
         output.lockHash = o.lockHash!
         output.transaction = tx
         output.status = outputStatus
+        if (o.type) {
+          output.typeScript = o.type
+        }
+        const data = outputsData[index]
+        if (data && data !== '0x') {
+          output.hasData = true
+        } else {
+          output.hasData = false
+        }
         return output
       })
     )
@@ -205,9 +215,9 @@ export class TransactionPersistor {
     )
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
-      txEntity = await TransactionPersistor.saveWithSent(transaction)
+      txEntity = await TransactionPersistor.saveWithSent(tx)
     } else if (saveType === TxSaveType.Fetch) {
-      txEntity = await TransactionPersistor.saveWithFetch(transaction)
+      txEntity = await TransactionPersistor.saveWithFetch(tx)
     } else {
       throw new Error('Error TxSaveType!')
     }
