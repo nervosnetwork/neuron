@@ -72,6 +72,23 @@ export default class AppController {
         SystemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
       }),
     ])
+
+    const minerAddresses = await Promise.all(
+      wallets.map(({ id }) =>
+        WalletsController.getAllAddresses(id).then(addrRes => {
+          if (addrRes.result) {
+            const minerAddr = addrRes.result.find(addr => addr.type === 0 && addr.index === 0)
+            if (minerAddr) {
+              return {
+                address: minerAddr.address,
+                identifier: minerAddr.identifier,
+              }
+            }
+          }
+          return undefined
+        })
+      )
+    )
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
       : [])
@@ -86,7 +103,7 @@ export default class AppController {
       : []
     const initState = {
       currentWallet,
-      wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
+      wallets: [...wallets.map(({ name, id }, idx: number) => ({ id, name, minerAddress: minerAddresses[idx] }))],
       currentNetworkID,
       networks,
       addresses,

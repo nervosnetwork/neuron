@@ -107,6 +107,7 @@ declare namespace State {
   interface WalletIdentity {
     id: string
     name: string
+    minerAddress?: { address: string; identifier: string }
   }
 
   interface Address {
