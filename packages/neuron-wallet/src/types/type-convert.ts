@@ -41,6 +41,7 @@ export default class TypeConvert {
       witnesses: transaction.witnesses,
       inputs: transaction.inputs.map(input => TypeConvert.toInput(input)),
       outputs: transaction.outputs.map(output => TypeConvert.toOutput(output)),
+      outputsData: transaction.outputsData,
     }
     if (blockHeader) {
       tx.timestamp = blockHeader.timestamp
@@ -72,9 +73,14 @@ export default class TypeConvert {
   }
 
   static toOutput(output: CKBComponents.CellOutput): Cell {
+    let type: Script | undefined
+    if (output.type) {
+      type = TypeConvert.toScript(output.type)
+    }
     return {
       capacity: output.capacity.toString(),
       lock: TypeConvert.toScript(output.lock),
+      type,
     }
   }
 

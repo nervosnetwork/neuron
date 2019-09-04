@@ -54,6 +54,7 @@ describe('Key tests with db', () => {
     sentBalance: '0',
     pendingBalance: '0',
     balance: '0',
+    totalBalance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }
@@ -69,6 +70,7 @@ describe('Key tests with db', () => {
     sentBalance: '0',
     pendingBalance: '0',
     balance: '0',
+    totalBalance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }
@@ -84,6 +86,7 @@ describe('Key tests with db', () => {
     sentBalance: '0',
     pendingBalance: '0',
     balance: '0',
+    totalBalance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
     version: AddressVersion.Testnet,
   }

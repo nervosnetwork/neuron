@@ -35,6 +35,17 @@ export default class Output extends BaseEntity {
   })
   status!: string
 
+  @Column({
+    type: 'simple-json',
+    nullable: true,
+  })
+  typeScript: Script | null = null
+
+  @Column({
+    type: 'boolean',
+  })
+  hasData!: boolean
+
   public outPoint(): OutPoint {
     return {
       txHash: this.outPointTxHash,

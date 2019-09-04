@@ -10,6 +10,7 @@ import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
+import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -20,6 +21,7 @@ const dbPath = (networkName: string): string => {
 
 const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
   const connectionOptions = await getConnectionOptions()
+  const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] =
     process.env.SHOW_CHAIN_DB_LOG && (env.isDevMode || env.isTestMode) ? true : ['warn', 'error']
@@ -27,9 +29,9 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   return {
     ...connectionOptions,
     type: 'sqlite',
-    database: dbPath(genesisBlockHash),
+    database,
     entities: [Transaction, Input, Output, SyncInfo],
-    migrations: [InitMigration1566959757554],
+    migrations: [InitMigration1566959757554, AddTypeAndHasData1567144517514],
     logging,
   }
 }
