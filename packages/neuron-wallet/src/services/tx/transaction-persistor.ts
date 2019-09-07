@@ -185,13 +185,11 @@ export class TransactionPersistor {
     saveType: TxSaveType
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    tx.outputs = await Promise.all(
-      tx.outputs!.map(async o => {
-        const output = o
-        output.lockHash = await LockUtils.lockScriptToHash(output.lock!)
-        return output
-      })
-    )
+    tx.outputs = tx.outputs!.map(o => {
+      const output = o
+      output.lockHash = LockUtils.lockScriptToHash(output.lock!)
+      return output
+    })
 
     tx.inputs = await Promise.all(
       tx.inputs!.map(async i => {

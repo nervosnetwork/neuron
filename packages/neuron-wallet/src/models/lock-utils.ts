@@ -1,3 +1,4 @@
+import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
 import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import env from 'env'
@@ -65,9 +66,9 @@ export default class LockUtils {
     SystemScriptSubject.next({ codeHash: info.codeHash })
   }
 
-  static computeScriptHash = async (script: Script): Promise<string> => {
+  static computeScriptHash = (script: Script): string => {
     const ckbScript: CKBComponents.Script = ConvertTo.toSdkScript(script)
-    const hash: string = await (core.rpc as any).computeScriptHash(ckbScript)
+    const hash: string = scriptToHash(ckbScript)
     if (!hash.startsWith('0x')) {
       return `0x${hash}`
     }
@@ -75,7 +76,7 @@ export default class LockUtils {
   }
 
   // use SDK lockScriptToHash
-  static lockScriptToHash = async (lock: Script) => {
+  static lockScriptToHash = (lock: Script) => {
     return LockUtils.computeScriptHash(lock)
   }
 
@@ -92,7 +93,7 @@ export default class LockUtils {
 
   static async addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): Promise<string> {
     const lock: Script = await this.addressToLockScript(address, hashType)
-    const lockHash: string = await this.lockScriptToHash(lock)
+    const lockHash: string = this.lockScriptToHash(lock)
 
     return lockHash
   }
