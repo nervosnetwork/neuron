@@ -31,22 +31,39 @@ describe('CellsService', () => {
 
   const bob = {
     lockScript: {
-      codeHash: '0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88',
+      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
       args: ['0x36c329ed630d6ce750712a477543672adab57f4c'],
       hashType: ScriptHashType.Type,
     },
-    lockHash: '0x024b0fd0c4912e98aab6808f6474cacb1969255d526b3cac5d3bdd15962a8818',
+    lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
     address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
   }
 
-  const generateCell = (capacity: string, status: OutputStatus, hasData: boolean, typeScript: Script | null) => {
+  const alice = {
+    lockScript: {
+      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+      args: ['0xe2193df51d78411601796b35b17b4f8f2cd85bd0'],
+      hashType: ScriptHashType.Type,
+    },
+    lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
+    address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
+    blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+  }
+
+  const generateCell = (
+    capacity: string,
+    status: OutputStatus,
+    hasData: boolean,
+    typeScript: Script | null,
+    who: any = bob
+  ) => {
     const output = new OutputEntity()
     output.outPointTxHash = randomHex()
     output.outPointIndex = '0'
     output.capacity = capacity
-    output.lock = bob.lockScript
-    output.lockHash = bob.lockHash
+    output.lock = who.lockScript
+    output.lockHash = who.lockHash
     output.status = status
     output.hasData = hasData
     output.typeScript = typeScript
@@ -54,8 +71,14 @@ describe('CellsService', () => {
     return output
   }
 
-  const createCell = async (capacity: string, status: OutputStatus, hasData: boolean, typeScript: Script | null) => {
-    const cell = generateCell(capacity, status, hasData, typeScript)
+  const createCell = async (
+    capacity: string,
+    status: OutputStatus,
+    hasData: boolean,
+    typeScript: Script | null,
+    who: any = bob
+  ) => {
+    const cell = generateCell(capacity, status, hasData, typeScript, who)
     await getConnection().manager.save(cell)
     return cell
   }
@@ -88,8 +111,6 @@ describe('CellsService', () => {
     const blake160s = await CellsService.allBlake160s()
     expect(blake160s).toEqual([bob.blake160])
   })
-
-
 
   const lockHashes = [bob.lockHash]
 
@@ -195,6 +216,31 @@ describe('CellsService', () => {
       } catch (e) {
         error = e
       }
+      expect(error).toBeInstanceOf(CapacityNotEnough)
+    })
+
+    it(`bob's and alice's cells`, async () => {
+      SkipDataAndType.getInstance().update(true)
+      await createCells()
+      await createCell(toShannon('5000'), OutputStatus.Live, false, null, alice)
+
+      const result = await CellsService.gatherInputs(toShannon('6000'), [alice.lockHash, bob.lockHash])
+
+      expect(result.capacities).toEqual('600000000000')
+    })
+
+    it(`only bob's cells`, async () => {
+      SkipDataAndType.getInstance().update(true)
+      await createCells()
+      await createCell(toShannon('5000'), OutputStatus.Live, false, null, alice)
+
+      let error
+      try {
+        await CellsService.gatherInputs(toShannon('1001'), [bob.lockHash])
+      } catch (e) {
+        error = e
+      }
+
       expect(error).toBeInstanceOf(CapacityNotEnough)
     })
   })

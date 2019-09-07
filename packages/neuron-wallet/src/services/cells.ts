@@ -83,7 +83,7 @@ export default class CellsService {
     }
 
     const queryParams = {
-      lockHashes: In(lockHashes),
+      lockHash: In(lockHashes),
       status: OutputStatus.Live,
     }
     const skipDataAndType = SkipDataAndType.getInstance().get()
