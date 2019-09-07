@@ -160,6 +160,22 @@ describe('CellsService', () => {
       const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Pending, false)
       expect(balance).toEqual('33300')
     })
+
+    it('getBalance with alice', async () => {
+      await createCells()
+      await createCell('2222', OutputStatus.Live, false, null, alice)
+
+      const balance: string = await CellsService.getBalance([alice.lockHash, bob.lockHash], OutputStatus.Live, true)
+      expect(balance).toEqual((100 + 2222).toString())
+    })
+
+    it(`get alice's balance`, async () => {
+      await createCells()
+      await createCell('2222', OutputStatus.Live, false, null, alice)
+
+      const balance: string = await CellsService.getBalance([alice.lockHash], OutputStatus.Live, true)
+      expect(balance).toEqual('2222')
+    })
   })
 
   describe('gatherInputs', () => {
