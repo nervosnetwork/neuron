@@ -345,7 +345,7 @@ export default class WalletService {
       fee
     )
 
-    let txHash: string = await core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
+    let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
     if (!txHash.startsWith('0x')) {
       txHash = `0x${txHash}`
     }
