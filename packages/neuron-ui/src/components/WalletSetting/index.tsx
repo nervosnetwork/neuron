@@ -67,7 +67,7 @@ const WalletSetting = ({
       hideMinerInfo()
       addPopup('lock-arg-copied')(dispatch)
     }
-  }, [minerInfo, t, hideMinerInfo, dispatch])
+  }, [minerInfo, hideMinerInfo, dispatch])
 
   const onChange = useCallback(
     (_e, option) => {
