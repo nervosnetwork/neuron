@@ -1,31 +1,15 @@
-# [0.20.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.19.0-beta.0...v0.20.0-beta.0) (2019-09-09)
+# [0.20.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.19.0-beta.1...v0.20.0-beta.0) (2019-09-09)
 
 
 ### Bug Fixes
 
-* add totalBalance to address test ([90184aa](https://github.com/nervosnetwork/neuron/commit/90184aa))
-* change typeScript type to `text` from `varchar` ([e334085](https://github.com/nervosnetwork/neuron/commit/e334085))
-* fix balance tests ([11dcac7](https://github.com/nervosnetwork/neuron/commit/11dcac7))
 * fix gatherInputs select error ([a104618](https://github.com/nervosnetwork/neuron/commit/a104618))
-* network test import ([c4cb7e4](https://github.com/nervosnetwork/neuron/commit/c4cb7e4))
 
 
 ### Features
 
 * **neuron-ui:** set the default font style to use system fonts ([70f4680](https://github.com/nervosnetwork/neuron/commit/70f4680))
-* add an edit button by the side of description ([031fed0](https://github.com/nervosnetwork/neuron/commit/031fed0))
-* add base settings and move skip config to here ([37d82fb](https://github.com/nervosnetwork/neuron/commit/37d82fb))
-* add controller for skip data and type ([834390f](https://github.com/nervosnetwork/neuron/commit/834390f))
-* add hasData and typeScript to output entity ([9fe535b](https://github.com/nervosnetwork/neuron/commit/9fe535b))
-* add SkipDataAndType class ([a952152](https://github.com/nervosnetwork/neuron/commit/a952152))
-* add totalBalance to address entity ([5746438](https://github.com/nervosnetwork/neuron/commit/5746438))
-* add totalBalance to address interface ([7a29c03](https://github.com/nervosnetwork/neuron/commit/7a29c03))
 * bump sdk to v0.20.0 ([607558b](https://github.com/nervosnetwork/neuron/commit/607558b))
-* **neuron-ui:** move the miner info from overview to wallet list ([#907](https://github.com/nervosnetwork/neuron/issues/907)) ([1378768](https://github.com/nervosnetwork/neuron/commit/1378768))
-* calculate totalBalance and check skip data and type in gather inputs ([f455545](https://github.com/nervosnetwork/neuron/commit/f455545))
-* **neuron-ui:** prevent updating tx and addr list when user is editing the description ([6c4ea72](https://github.com/nervosnetwork/neuron/commit/6c4ea72))
-* skip cells which has data or type ([6a85705](https://github.com/nervosnetwork/neuron/commit/6a85705))
-* using keep alive connection ([f3fbe15](https://github.com/nervosnetwork/neuron/commit/f3fbe15))
 
 
 
