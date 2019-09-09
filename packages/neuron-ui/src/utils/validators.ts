@@ -1,6 +1,4 @@
 import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
-/* eslint-disable no-redeclare */
-/* global BigInt */
 import { ckbCore } from 'services/chain'
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 

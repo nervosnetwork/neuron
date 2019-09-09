@@ -9,9 +9,11 @@ const handleError = (error: Error) => {
 }
 
 class ErrorBoundary extends Component<{ children: React.ReactChild }, { hasError: boolean }> {
-  /* eslint-disable react/state-in-constructor */
-  state = {
-    hasError: false,
+  constructor(props: { children: React.ReactChild }) {
+    super(props)
+    this.state = {
+      hasError: false,
+    }
   }
 
   static getDerivedStateFromError(error: Error) {
