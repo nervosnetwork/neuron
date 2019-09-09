@@ -21,7 +21,7 @@ export default class ConvertTo {
     }
   }
 
-  public static toSdkTxWithoutHash = (tx: TransactionWithoutHash): any => {
+  public static toSdkTxWithoutHash = (tx: TransactionWithoutHash): CKBComponents.RawTransaction => {
     const transaction = {
       ...tx,
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),

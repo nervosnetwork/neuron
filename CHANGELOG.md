@@ -1,3 +1,18 @@
+# [0.20.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.19.0-beta.1...v0.20.0-beta.0) (2019-09-09)
+
+
+### Bug Fixes
+
+* fix gatherInputs select error ([a104618](https://github.com/nervosnetwork/neuron/commit/a104618))
+
+
+### Features
+
+* **neuron-ui:** set the default font style to use system fonts ([70f4680](https://github.com/nervosnetwork/neuron/commit/70f4680))
+* bump sdk to v0.20.0 ([607558b](https://github.com/nervosnetwork/neuron/commit/607558b))
+
+
+
 # [0.19.0-beta.1](https://github.com/nervosnetwork/neuron/compare/v0.19.0-beta.0...v0.19.0-beta.1) (2019-09-04)
 
 

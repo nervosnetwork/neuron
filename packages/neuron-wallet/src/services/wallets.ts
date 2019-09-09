@@ -345,7 +345,10 @@ export default class WalletService {
       fee
     )
 
-    const txHash: string = await (core.rpc as any).computeTransactionHash(ConvertTo.toSdkTxWithoutHash(tx))
+    let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
+    if (!txHash.startsWith('0x')) {
+      txHash = `0x${txHash}`
+    }
 
     const { inputs } = tx
 

@@ -145,7 +145,7 @@ const generateTemplate = () => {
       separator,
       {
         label: i18n.t('application-menu.edit.selectall'),
-        role: 'selectall',
+        role: 'selectAll',
       },
     ],
   }
@@ -261,11 +261,11 @@ const generateTemplate = () => {
       },
       {
         label: i18n.t('application-menu.develop.force-reload'),
-        role: 'forceReload' as 'forcereload',
+        role: 'forceReload',
       },
       {
         label: i18n.t('application-menu.develop.toggle-dev-tools'),
-        role: 'toggleDevTools' as 'toggledevtools',
+        role: 'toggleDevTools',
       },
     ],
   }

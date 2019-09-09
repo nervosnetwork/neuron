@@ -48,11 +48,9 @@ export const controllerMethodWrapper = (controllerName: string) => (
   }
   const res = await callControllerMethod(controller)(realParams)
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
-    /* eslint-disable no-console */
     console.group(`${controllerName} controller`)
     console.info(JSON.stringify(res, null, 2))
     console.groupEnd()
-    /* eslint-enable no-console */
   }
 
   if (!res) {

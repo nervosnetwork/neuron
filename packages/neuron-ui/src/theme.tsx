@@ -34,6 +34,7 @@ import {
 import { registerIcons } from 'utils/icons'
 
 loadTheme({
+  defaultFontStyle: { fontFamily: 'inherit' },
   fonts: {
     tiny: { fontSize: '11px' },
     xSmall: { fontSize: '12px', lineHeight: '12px' },
