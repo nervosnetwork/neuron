@@ -62,11 +62,9 @@ export const reducer = (
 ): State.AppWithNeuronWallet => {
   const { app, wallet, settings, chain } = state
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-action')) {
-    /* eslint-disable no-console */
     console.group(`type: ${type}`)
     console.info(payload)
     console.groupEnd()
-    /* eslint-enable no-console */
   }
   switch (type) {
     // Actions of Neuron Wallet

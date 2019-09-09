@@ -3,8 +3,6 @@ export * from './wallets'
 export * from './networks'
 export * from './transactions'
 
-/* eslint-disable no-alert */
-
 export const getLocale = () => {
   if (!window.remote) {
     console.warn('remote is not supported')

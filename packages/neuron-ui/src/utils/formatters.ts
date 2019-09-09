@@ -1,6 +1,3 @@
-/* eslint-disable no-redeclare */
-/* global BigInt */
-
 import { CapacityUnit } from './const'
 
 const base = 10e9
