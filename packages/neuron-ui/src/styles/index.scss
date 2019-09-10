@@ -53,6 +53,14 @@ navbar {
   font-family: monospace;
 }
 
+.listNoHover {
+  .ms-DetailsRow {
+    &:hover {
+      background-color: inherit;
+    }
+  }
+}
+
 .listWithDesc {
   .ms-DetailsRow-cell {
     display: flex;
