@@ -127,6 +127,7 @@ const ActivityList = ({
       onItemInvoked={item => {
         showTransactionDetails(item.hash)
       }}
+      className="listNoHover"
       styles={{
         root: {
           backgroundColor: 'transparent',
@@ -326,6 +327,7 @@ const Overview = ({
           items={activityItems}
           onRenderRow={onTransactionRowRender}
           onGoToHistory={onGoToHistory}
+          className="listNoHover"
           t={t}
         />
       ) : (
