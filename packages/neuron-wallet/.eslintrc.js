@@ -7,9 +7,9 @@ module.exports = {
   "plugins": ["@typescript-eslint"],
   "rules": {
     "no-console": 0,
-		"no-cond-assign": 0,
-		"no-extra-semi": "warn",
-		"semi": 0,
+    "no-cond-assign": 0,
+    "no-extra-semi": "warn",
+    "semi": 0,
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
       "vars": "local",
