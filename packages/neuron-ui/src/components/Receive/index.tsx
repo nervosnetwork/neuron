@@ -63,6 +63,7 @@ const Receive = ({
             onQRCodeClick={() => setShowLargeQRCode(true)}
             size={256}
             exportable
+            includeMargin
             dispatch={dispatch}
           />
         </Stack>

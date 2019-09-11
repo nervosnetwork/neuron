@@ -102,12 +102,18 @@ const QRCode = ({
   qrcode.make()
 
   const cells = qrcode.modules || []
-  const margin = includeMargin ? 4 : 0
+  const margin = includeMargin ? 1 : 0
   const fgPath = generatePath(cells, margin)
   const numCells = cells.length + margin * 2
 
-  const svgStr = `<svg shapeRendering="crispEdges" height="${scale * size}" width="${scale *
-    size}" viewBox="0 0 ${numCells} ${numCells}" ><path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" /><path fill="${fgColor}" d="${fgPath}" /></svg>`
+  const svgStr = `<svg shapeRendering="crispEdges"
+    width="${scale * size}"
+    height="${scale * size}"
+    viewBox="0 0 ${numCells} ${numCells}"
+  >
+    <path fill="${bgColor}" d="M0, 0 h${numCells} v${numCells} H0z" />
+    <path fill="${fgColor}" d="${fgPath}" />
+  </svg>`
 
   const onDownload = useCallback(() => {
     if (canvasRef.current === null) {
@@ -147,7 +153,7 @@ const QRCode = ({
   }, [svgStr, size])
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
+    <Stack tokens={{ childrenGap: 15 }} horizontalAlign="center" verticalAlign="center">
       <Stack.Item>
         <canvas ref={canvasRef} width={size} height={size} onClick={onQRCodeClick} />
       </Stack.Item>
