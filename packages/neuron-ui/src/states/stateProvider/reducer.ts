@@ -29,7 +29,6 @@ export enum AppActions {
   UpdateSendCycles = 'updateSendCycles',
   UpdateSendDescription = 'updateSendDescription',
   ClearSendState = 'clearSendState',
-  UpdateSendLoading = 'updateSendLoading',
   UpdateMessage = 'updateMessage',
   AddNotification = 'addNotification',
   DismissNotification = 'dismissNotification',
@@ -362,18 +361,6 @@ export const reducer = (
           send: {
             ...app.send,
             description: payload,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateSendLoading: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            loading: payload,
           },
         },
       }

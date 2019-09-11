@@ -8,7 +8,8 @@ import { priceToFee, CKBToShannonFormatter } from 'utils/formatters'
 
 const PasswordRequest = ({
   app: {
-    send: { txID, outputs, description, price, cycles, loading: isSending },
+    send: { txID, outputs, description, price, cycles },
+    loadings: { sending: isSending = false },
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
   settings: { wallets = [] },
