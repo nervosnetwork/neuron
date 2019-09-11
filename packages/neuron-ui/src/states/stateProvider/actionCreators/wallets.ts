@@ -148,39 +148,40 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
       sending: true,
     },
   })
-  sendCapacity(params)
-    .then(res => {
-      if (res.status === 1) {
-        history.push(Routes.History)
-      } else {
-        // TODO: the pretreatment is unnecessary once the error code is implemented
-        addNotification({
-          type: 'alert',
-          timestamp: +new Date(),
-          code: res.status,
-          content: (typeof res.message === 'string' ? res.message : res.message.content || '').replace(
-            /(\b"|"\b)/g,
-            ''
-          ),
-          meta: typeof res.message === 'string' ? undefined : res.message.meta,
-        })(dispatch)
-      }
-      dispatch({
-        type: AppActions.DismissPasswordRequest,
-        payload: null,
+  setTimeout(() => {
+    sendCapacity(params)
+      .then(res => {
+        if (res.status === 1) {
+          history.push(Routes.History)
+        } else {
+          addNotification({
+            type: 'alert',
+            timestamp: +new Date(),
+            code: res.status,
+            content: (typeof res.message === 'string' ? res.message : res.message.content || '').replace(
+              /(\b"|"\b)/g,
+              ''
+            ),
+            meta: typeof res.message === 'string' ? undefined : res.message.meta,
+          })(dispatch)
+        }
+        dispatch({
+          type: AppActions.DismissPasswordRequest,
+          payload: null,
+        })
       })
-    })
-    .catch(err => {
-      console.warn(err)
-    })
-    .finally(() => {
-      dispatch({
-        type: AppActions.UpdateLoadings,
-        payload: {
-          sending: false,
-        },
+      .catch(err => {
+        console.warn(err)
       })
-    })
+      .finally(() => {
+        dispatch({
+          type: AppActions.UpdateLoadings,
+          payload: {
+            sending: false,
+          },
+        })
+      })
+  }, 0)
 }
 
 export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (

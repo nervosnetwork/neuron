@@ -61,7 +61,6 @@ declare namespace State {
     price: string
     cycles: string
     description: string
-    loading: boolean
   }
 
   interface Popup {
