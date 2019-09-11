@@ -17,11 +17,14 @@ import dataUpdateSubject from 'models/subjects/data-update'
 import CommandSubject from 'models/subjects/command'
 import WindowManager from 'models/window-manager'
 import CellsService from 'services/cells'
+import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import env from 'env'
 
 import NodeService from './node'
 import FileService from './file'
 import { TransactionsService, TransactionPersistor, TransactionGenerator } from './tx'
 import AddressService from './addresses'
+import { deindexLockHashes } from './indexer/deindex'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -263,7 +266,30 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
-    AddressService.deleteByWalletId(id)
+    this.deleteAddressesAndDeindex(id)
+  }
+
+  private deleteAddressesAndDeindex = async (walletID: string) => {
+    const addressInterfaces = await AddressService.deleteByWalletId(walletID)
+    const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
+    const addresses: string[] = addressInterfaces.map(addr => addr.address).filter(addr => addr.startsWith(prefix))
+
+    // const firstAddress = addresses[0]
+    if (addresses.length === 0) {
+      return
+    }
+    const addrs: string[] = (await AddressService.findByAddresses(addresses)).map(addr => addr.address)
+    const deindexAddresses: string[] = addresses.filter(item => addrs.indexOf(item) < 0);
+    // only deindex if no same wallet
+    if (deindexAddresses.length !== 0) {
+      const lockHashes: string[] = await Promise.all(
+        deindexAddresses.map(async address => {
+          return LockUtils.addressToLockHash(address)
+        })
+      )
+      // don't await
+      deindexLockHashes(lockHashes)
+    }
   }
 
   public setCurrent = (id: string) => {

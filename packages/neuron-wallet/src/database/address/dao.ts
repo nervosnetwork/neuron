@@ -238,6 +238,8 @@ export default class AddressDao {
         walletId,
       })
       .getMany()
-    return getConnection().manager.remove(addresses)
+    const result = addresses.map(addr => addr.toInterface())
+    await getConnection().manager.remove(addresses)
+    return result
   }
 }
