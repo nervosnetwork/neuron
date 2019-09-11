@@ -117,7 +117,7 @@ const TransactionList = ({
               return '-'
             }
             return (
-              <span className="text-overflow monospacedFont" title={item.hash}>
+              <span className="textOverflow monospacedFont" title={item.hash}>
                 {`${item.hash.slice(0, 8)}...${item.hash.slice(-6)}`}
               </span>
             )
@@ -140,7 +140,7 @@ const TransactionList = ({
             }
             const confirmations = localNumberFormatter(confirmationCount)
             return (
-              <span title={`${confirmations}`} className="text-overflow">
+              <span title={`${confirmations}`} className="textOverflow">
                 {confirmations}
               </span>
             )
@@ -213,7 +213,7 @@ const TransactionList = ({
           onRender: (item?: FormatTransaction) => {
             if (item) {
               return (
-                <span title={`${item.value} shannon`} className="text-overflow">
+                <span title={`${item.value} shannon`} className="textOverflow">
                   {`${shannonToCKBFormatter(item.value, true)} CKB`}
                 </span>
               )
