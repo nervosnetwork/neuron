@@ -53,6 +53,10 @@ navbar {
   font-family: monospace;
 }
 
+.ms-DetailsHeader-cell:hover {
+  background-color: inherit
+}
+
 .listNoHover {
   .ms-DetailsRow {
     &:hover {
