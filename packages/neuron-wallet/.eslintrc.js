@@ -17,13 +17,6 @@ module.exports = {
       "ignoreRestSiblings": false
     }],
     "curly": [2, "all"],
-    "comma-dangle": [2, {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "always-multiline",
-      "exports": "always-multiline",
-      "functions": "ignore"
-    }],
     "implicit-arrow-linebreak": "off",
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
@@ -55,9 +48,6 @@ module.exports = {
     "max-classes-per-file": [0],
     "@typescript-eslint/no-angle-bracket-type-assertion": [0],
     "no-alert": [0],
-    "no-console": [2, {
-      "allow": ["info", "warn", "error", "group", "groupEnd"]
-    }],
     "require-atomic-updates": [0]
   },
   "globals": {
