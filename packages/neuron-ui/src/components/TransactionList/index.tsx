@@ -172,7 +172,6 @@ const TransactionList = ({
           key: 'description',
           fieldName: 'description',
           minWidth: 100,
-          maxWidth: 100,
           onRender: (item?: FormatTransaction) => {
             const isSelected = item && localDescription.key === item.hash
             return item ? (
