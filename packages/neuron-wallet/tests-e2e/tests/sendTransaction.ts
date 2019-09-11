@@ -70,7 +70,7 @@ export default (app: Application) => {
 
   describe('Test amount field boundary validation', () => {
     const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
-    app.test('Test amount field boundary validation', async () => {
+    app.test('Amount 60.99999999 is too small, 61 CKB is required', async () => {
       const smallAmount = '60.99999999'
       const { client } = app.spectron
       const inputs = await app.elements('input')
@@ -83,7 +83,7 @@ export default (app: Application) => {
       expect(msg.value).toBe(`The amount ${smallAmount} CKB is too small, please enter an amount no less than 61 CKB`)
     })
 
-    app.test('Test amount field boundary validation', async () => {
+    app.test('Amount 0.123456789 is invalid, decimal places cannot be more than 8', async () => {
       const invalidAmount = '0.123456789'
       const { client } = app.spectron
       const inputs = await app.elements('input')
