@@ -2,7 +2,7 @@ import { SpectronClient } from 'spectron'
 import { AllElectron } from 'electron'
 
 export const getElementByTagName = async (client: SpectronClient, tagName: string, textContent: string) => {
-  const elements = await client.elements(`<${tagName} />`)        
+  const elements = await client.elements(`<${tagName} />`)
   for (let index = 0; index < elements.value.length; index++) {
     const element = elements.value[index];
     const text = await client.elementIdText(element.ELEMENT)

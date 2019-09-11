@@ -28,12 +28,12 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   // Check balance
   let sendAmount = 0
   for (let index = 0; index < sendToArr.length; index++) {
-    sendAmount += sendToArr[index].amount; 
+    sendAmount += sendToArr[index].amount;
   }
   if (sendAmount > balance) {
     throw `The amount sent exceeds the balance. balance: ${balance} send_amount: ${sendAmount}`
   }
-  
+
   // Setup send elements
   const sendItemGroupElementPath = '//MAIN/DIV/DIV[1]/DIV/DIV/DIV'
   for (let index = 0; index < sendToArr.length; index++) {

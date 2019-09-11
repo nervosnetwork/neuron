@@ -13,7 +13,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   expect(walletSettingButton).not.toBeNull()
   await client.elementIdClick(walletSettingButton!.ELEMENT)
   await app.waitUntilLoaded()
-  
+
   // Get wallet count
   const groupElementPath = '//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV'
   const result = await client.selectorExecute(groupElementPath, (elements: any) => `${elements[0].childElementCount}`)

@@ -20,6 +20,6 @@ export const currentWalletAddress = async (app: Application) => {
   expect(overviewButton).not.toBeNull()
   await client.elementIdClick(overviewButton!.ELEMENT)
   await app.waitUntilLoaded()
-  
+
   return address.value
 }
