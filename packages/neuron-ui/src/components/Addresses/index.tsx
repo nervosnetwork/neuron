@@ -73,7 +73,7 @@ const Addresses = ({
         onRender: (item?: State.Address) => {
           if (item) {
             return (
-              <span className="text-overflow" title={item.address}>
+              <span className="textOverflow" title={item.address}>
                 {item.address}
               </span>
             )
@@ -130,7 +130,7 @@ const Addresses = ({
         onRender: (item?: State.Address) => {
           if (item) {
             return (
-              <span title={`${item.balance} shannon`} className="text-overflow">
+              <span title={`${item.balance} shannon`} className="textOverflow">
                 {`${shannonToCKBFormatter(item.balance)} CKB`}
               </span>
             )
