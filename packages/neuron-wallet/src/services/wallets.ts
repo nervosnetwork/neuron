@@ -242,7 +242,7 @@ export default class WalletService {
     this.listStore.writeSync(this.walletsKey, wallets)
   }
 
-  public delete = (id: string) => {
+  public delete = async (id: string) => {
     const wallets = this.getAll()
     const walletJSON = wallets.find(w => w.id === id)
 
@@ -266,19 +266,18 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
-    this.deleteAddressesAndDeindex(id)
+    const addressInterfaces = await AddressService.deleteByWalletId(id)
+    this.deindexAddresses(addressInterfaces.map(addr => addr.address))
   }
 
-  private deleteAddressesAndDeindex = async (walletID: string) => {
-    const addressInterfaces = await AddressService.deleteByWalletId(walletID)
+  private deindexAddresses = async (addresses: string[]) => {
     const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
-    const addresses: string[] = addressInterfaces.map(addr => addr.address).filter(addr => addr.startsWith(prefix))
+    const addressesWithEnvPrefix: string[] = addresses.filter(addr => addr.startsWith(prefix))
 
-    // const firstAddress = addresses[0]
-    if (addresses.length === 0) {
+    if (addressesWithEnvPrefix.length === 0) {
       return
     }
-    const addrs: string[] = (await AddressService.findByAddresses(addresses)).map(addr => addr.address)
+    const addrs: string[] = (await AddressService.findByAddresses(addressesWithEnvPrefix)).map(addr => addr.address)
     const deindexAddresses: string[] = addresses.filter(item => addrs.indexOf(item) < 0);
     // only deindex if no same wallet
     if (deindexAddresses.length !== 0) {

@@ -266,7 +266,7 @@ export default class WalletsController {
     if (!walletsService.validate({ id, password })) {
       throw new IncorrectPassword()
     }
-    walletsService.delete(id)
+    await walletsService.delete(id)
 
     return {
       status: ResponseCode.Success,
