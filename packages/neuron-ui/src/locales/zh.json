@@ -21,7 +21,7 @@
       "status": "状态",
       "amount": "金额",
       "blockchain-status": "链状态",
-      "chain-identity": "链的 ID",
+      "chain-identity": "链 ID",
       "tip-block-number": "区块高度",
       "epoch": "Epoch",
       "difficulty": "难度",
