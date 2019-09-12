@@ -191,6 +191,43 @@ describe('BIP32 Keychain tests', () => {
     )
   })
 
+  it('derive ckb keys from master extended key', () => {
+    const privateKey = Buffer.from('37d25afe073a6ba17badc2df8e91fc0de59ed88bcad6b9a0c2210f325fafca61', 'hex')
+    const chainCode = Buffer.from('5f772d1e3cfee5821911aefa5e8f79d20d4cf6678378d744efd08b66b2633b80', 'hex')
+    const master = new Keychain(privateKey, chainCode)
+    expect(master.publicKey.toString('hex')).toEqual(
+      '020720a7a11a9ac4f0330e2b9537f594388ea4f1cd660301f40b5a70e0bc231065'
+    )
+
+    expect(master.derivePath(`m/44'/309'/0'`).privateKey.toString('hex')).toEqual(
+      '2925f5dfcbee3b6ad29100a37ed36cbe92d51069779cc96164182c779c5dc20e'
+    )
+
+    expect(
+      master
+        .derivePath(`m/44'/309'/0'`)
+        .deriveChild(0, false)
+        .privateKey.toString('hex')
+    ).toEqual('047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1')
+
+    expect(master.derivePath(`m/44'/309'/0'/0`).privateKey.toString('hex')).toEqual(
+      '047fae4f38b3204f93a6b39d6dbcfbf5901f2b09f6afec21cbef6033d01801f1'
+    )
+
+    expect(
+      master
+        .derivePath(`m/44'/309'/0'`)
+        .deriveChild(0, false)
+        .deriveChild(0, false)
+        .privateKey.toString('hex')
+    ).toEqual('848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14')
+
+    expect(master.derivePath(`m/44'/309'/0'/0/0`).privateKey.toString('hex')).toEqual(
+      '848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14'
+    )
+  })
+
+
   it('private key add', () => {
     const privateKey = Buffer.from('9e919c96ac5a4caea7ba0ea1f7dd7bca5dca8a11e66ed633690c71e483a6e3c9', 'hex')
     const toAdd = Buffer.from('36e92e33659808bf06c3e4302b657f39ca285f6bb5393019bb4e2f7b96e3f914', 'hex')
