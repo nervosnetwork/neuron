@@ -37,7 +37,7 @@ export default (app: Application) => {
     console.info(`Switch to wallet setting ${new Date().toLocaleTimeString()}`)
 
     // Go to import wallet page
-    const importWalletButton = await app.getElementByTagName('button', 'Import Mnemonic Seed')
+    const importWalletButton = await app.getElementByTagName('button', 'Import Wallet Seed')
     expect(importWalletButton).not.toBeNull()
     await client.elementIdClick(importWalletButton!.ELEMENT)
     console.info(`Go to import wallet page ${new Date().toLocaleTimeString()}`)
