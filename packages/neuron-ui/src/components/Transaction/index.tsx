@@ -16,23 +16,25 @@ const inputColumns: IColumn[] = [
     key: 'lockHash',
     name: 'Lock Hash',
     minWidth: 100,
-    maxWidth: 525,
-  },
-  {
-    key: 'outPointBlockHash',
-    name: 'OutPoint BlockHash',
-    minWidth: 150,
-    onRender: (item: any) => <span>{item.previousOutput.blockHash || 'none'}</span>,
+    maxWidth: 200,
+    onRender: (item: any) => (
+      <span title={item.lockHash || 'none'} className="text-overflow">
+        {item.lockHash || 'none'}
+      </span>
+    ),
   },
   {
     key: 'outPointCell',
     name: 'OutPoint Cell',
     minWidth: 150,
-    onRender: (item: any) => (
-      <span>
-        {item.previousOutput.cell ? `${item.previousOutput.cell.txHash}[${item.previousOutput.cell.index}]` : 'none'}
-      </span>
-    ),
+    onRender: (item: any) => {
+      const text = item.previousOutput ? `${item.previousOutput.txHash}[${item.previousOutput.index}]` : 'none'
+      return (
+        <span title={text} className="text-overflow">
+          {text}
+        </span>
+      )
+    },
   },
   {
     key: 'capacity',
