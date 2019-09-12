@@ -42,7 +42,7 @@
       "welcome-to-nervos-neuron": "Welcome to Neuron",
       "create-or-import-your-first-wallet": "Create or import your first wallet",
       "create-new-wallet": "Create a Wallet",
-      "import-mnemonic": "Import Mnemonic Seed",
+      "import-mnemonic": "Import Wallet Seed",
       "import-keystore": "Import from Keystore",
       "import-wallet": "Import a Wallet",
       "next": "Next",
@@ -58,8 +58,8 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
-      "complex-password": "The password is a string of 8 to 50 characters consisting of three types of characters: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
-      "same-password": "The password and confirm password should be same"
+      "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
+      "same-password": "The password and confirm password should match"
     },
     "import-keystore": {
       "label": {
@@ -88,7 +88,6 @@
       "confirm-password": "Confirm Password",
       "to": "To",
       "input-password-to-confirm": "Input password to confirm",
-      "this-transaction-will-send": "This transaction will send",
       "scan-to-get-address": "Scan QR code to read the address to send to",
       "total-amount": "Total Amount",
       "description": "Description",
@@ -210,18 +209,6 @@
     "footer": {
       "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
     },
-    "menuitem": {
-      "add": "Add",
-      "update": "Update",
-      "delete": "Delete",
-      "network": "Network",
-      "select": "Select",
-      "edit": "Edit",
-      "backup": "Backup",
-      "remove": "Remove",
-      "save": "Save",
-      "management": "management"
-    },
     "common": {
       "or": "or",
       "confirm": "Confirm",
@@ -243,10 +230,10 @@
     "messages": {
       "error": "Error",
       "unknown-error": "Unknown error",
-      "update-wallet-successfully": "Update the wallet successfully",
-      "delete-wallet-successfully": "Delete the wallet successfully",
-      "create-network-successfully": "Create a network successfully",
-      "update-network-successfully": "Update the network successfully",
+      "update-wallet-successfully": "The wallet was updated",
+      "delete-wallet-successfully": "The wallet was deleted",
+      "create-network-successfully": "The network was created",
+      "update-network-successfully": "The network was updated",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "lock-arg-copied": "Lock Arg has been copied to the clipboard",
@@ -296,7 +283,7 @@
       "first-page": "First page",
       "last-page": "Last page",
       "page": "Page",
-      "selected": "Selected"
+      "selected": "Current page"
     }
   }
 }

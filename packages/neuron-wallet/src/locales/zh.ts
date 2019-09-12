@@ -32,7 +32,7 @@ export default {
       },
       view: {
         label: '视图',
-        fullscreen: ' 全屏',
+        fullscreen: '进入全屏模式',
         'address-book': '地址簿',
       },
       window: {
@@ -60,7 +60,7 @@ export default {
     messages: {
       'failed-to-load-networks': '加载节点失败',
       'Networks-will-be-reset': '节点列表将被重置',
-      'wallet-password-less-than-min-length': '密码至少{{minPasswordLength}}位字符',
+      'wallet-password-less-than-min-length': '密码应至少包含{{minPasswordLength}}位字符',
       'wallet-password-more-than-max-length': '密码不能超过{{maxPasswordLength}}位字符',
       'wallet-password-letter-complexity': '密码包含大写字母、小写字母、数字、特殊符号的至少三类',
       'current-wallet-not-set': '未设置当前钱包',
@@ -97,7 +97,7 @@ export default {
     },
     contextMenu: {
       select: '选择',
-      backup: ' 备份',
+      backup: '备份',
       edit: '编辑',
       delete: '删除',
       'copy-address': '复制地址',
@@ -117,7 +117,7 @@ export default {
       },
       'remove-network': {
         title: '删除网络',
-        message: '网络名称: {{name}}, 地址: {{address}} 的网络设置将被删除.',
+        message: '将删除网络 {{name}}(地址: {{address}})的设置.',
         alert: '这是当前连接网络, 删除后会连接到默认网络',
       },
       'remove-wallet': {
