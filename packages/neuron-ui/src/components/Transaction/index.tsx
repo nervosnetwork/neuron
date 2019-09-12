@@ -191,11 +191,13 @@ const Transaction = () => {
             Outputs
           </Text>
           <DetailsList
-            items={transaction.outputs.map((output, index) => ({
-              ...output,
-              index,
-              capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
-            }))}
+            items={transaction.outputs
+              .map(output => ({
+                ...output,
+                index: output.outPoint.index,
+                capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
+              }))
+              .sort((o1, o2) => +o1.index - +o2.index)}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact
