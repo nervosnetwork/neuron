@@ -231,7 +231,7 @@
       "error": "Error",
       "unknown-error": "Unknown error",
       "update-wallet-successfully": "The wallet was updated",
-      "delete-wallet-successfully": "The Wallet was deleted",
+      "delete-wallet-successfully": "The wallet was deleted",
       "create-network-successfully": "The network was created",
       "update-network-successfully": "The network was updated",
       "addr-copied": "Address has been copied to the clipboard",
