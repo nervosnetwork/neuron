@@ -70,8 +70,22 @@ const Addresses = ({
         className: 'monospacedFont',
         minWidth: 100,
         maxWidth: 500,
-        onRender: (item?: State.Address) => {
+        onRender: (item?: State.Address, _index?: number, column?: IColumn) => {
           if (item) {
+            if (column && (column.calculatedWidth || 0) < 400) {
+              return (
+                <div
+                  title={item.address}
+                  style={{
+                    overflow: 'hidden',
+                    display: 'flex',
+                  }}
+                >
+                  <span className="text-overflow">{item.address.slice(0, -6)}</span>
+                  <span>{item.address.slice(-6)}</span>
+                </div>
+              )
+            }
             return (
               <span className="textOverflow" title={item.address}>
                 {item.address}
@@ -86,7 +100,6 @@ const Addresses = ({
         key: 'description',
         fieldName: 'description',
         minWidth: 100,
-        maxWidth: 300,
         onRender: (item?: State.Address) => {
           const isSelected = item && localDescription.key === item.address
           return item ? (
