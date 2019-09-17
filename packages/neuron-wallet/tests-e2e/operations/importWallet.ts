@@ -1,8 +1,10 @@
+import { debuglog } from 'util'
 import Application from '../application'
+const log = debuglog(__filename)
 
 export const importWallet = async (app: Application, mnemonic: string, name: string | undefined = undefined, password: string = 'Azusa2233') => {
   const { client } = app.spectron
-  
+
   // Input mnemonic
   const inputMnemonicTextarea = await app.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
@@ -24,7 +26,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   await app.setElementValue('//MAIN/DIV/DIV[3]//INPUT', password)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
   await app.waitUntilLoaded()
-  console.log(`walletNameInputText - ${walletNameInputText.value}`);
+  log(`walletNameInputText - ${walletNameInputText.value}`);
   // Next
   const setupWalletNextButton = await app.getElementByTagName('button', 'Next')
   expect(setupWalletNextButton).not.toBeNull()
@@ -36,7 +38,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   expect(walletNameElement.value).not.toBeNull()
   const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
   expect(walletName.value).toBe(walletNameInputText.value)
-  console.log(`walletName - ${walletName.value}  ${new Date().toTimeString()}`);
+  log(`walletName - ${walletName.value}  ${new Date().toTimeString()}`);
 
   return walletName.value
 }

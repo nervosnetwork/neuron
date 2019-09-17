@@ -88,8 +88,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
                   color,
                 })
                 if (verifyAddress(code.data)) {
-                  onConfirm(code.data)
                   onDismiss()
+                  onConfirm(code.data)
                 } else {
                   setData(code.data)
                 }

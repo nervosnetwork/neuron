@@ -1,5 +1,5 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
-import { addressBook } from 'utils/localCache'
+import { addressBook } from 'services/localCache'
 import { Routes } from 'utils/const'
 import { failureResToNotification } from 'utils/formatters'
 import { addNotification, addPopup } from './app'

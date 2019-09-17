@@ -20,7 +20,7 @@ export default {
         backup: 'Backup Current Wallet',
         delete: 'Delete Current Wallet',
         'change-password': 'Change Password',
-        'import-mnemonic': 'Import Mnemonic Seed',
+        'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
       },
       edit: {
@@ -32,7 +32,7 @@ export default {
       },
       view: {
         label: 'View',
-        fullscreen: 'Fullscreen',
+        fullscreen: 'Enter Full Screen',
         'address-book': 'Address Book',
       },
       window: {
@@ -88,7 +88,7 @@ export default {
       'used-name': '{{field}} name is used',
       'missing-required-argument': 'Missing required argument',
       'save-keystore': 'Save Keystore',
-      'invalid-mnemonic': 'Mnemonic is invalid',
+      'invalid-mnemonic': 'Wallet seed is invalid',
       'unsupported-cipher': 'Unsupported cipher',
       'capacity-not-enough': 'Capacity is not enough',
       'capacity-too-small': 'Capacity less than min',
@@ -103,8 +103,8 @@ export default {
       delete: 'Delete',
       'copy-address': 'Copy Address',
       'request-payment': 'Request Payment',
-      'spend-from': 'Spend From',
-      'view-on-explorer': 'View On Explorer',
+      'spend-from': 'Spend from',
+      'view-on-explorer': 'View on Explorer',
       detail: 'Detail',
       'copy-transaction-hash': 'Copy Transaction Hash',
     },
@@ -118,7 +118,7 @@ export default {
       },
       'remove-network': {
         title: 'Remove Network',
-        message: 'Network of name: {{name}}, address: {{address}} will be removed.',
+        message: 'Network {{name}} (address: {{address}}) will be removed.',
         alert: 'This is the current network, by removing it, the connection will be switched to the default network',
       },
       'remove-wallet': {

@@ -33,11 +33,8 @@ declare namespace State {
       }
       lockHash: string
       outPoint: {
-        blockHash: string | null
-        cell: {
-          index: string
-          txHash: string
-        }
+        index: string
+        txHash: string
       }
     }[]
     witnesses: string[]
@@ -61,7 +58,6 @@ declare namespace State {
     price: string
     cycles: string
     description: string
-    loading: boolean
   }
 
   interface Popup {

@@ -13,12 +13,11 @@ export default (app: Application, env: TransactionTestEnv) => {
   }
 
   app.test('import wallet', async () => {
-    
+
     const res = await app.spectron.electron.ipcRenderer.sendSync('E2E_ENV')
     console.log(`ENV.isTestMode = ${res}`);
-    
 
-    await app.clickMenu(['Wallet', 'Import Wallet', 'Import Mnemonic Seed'])
+    await app.clickMenu(['Wallet', 'Import Wallet', 'Import Wallet Seed'])
     await app.waitUntilLoaded()
     await importWallet(app, env.mnemonic, undefined, password)
   })

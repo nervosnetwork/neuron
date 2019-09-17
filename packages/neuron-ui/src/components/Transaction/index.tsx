@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
-import { currentWallet as currentWalletCache } from 'utils/localCache'
+import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage } from 'services/remote'
 
 import { transactionState } from 'states/initStates/chain'
@@ -16,23 +16,25 @@ const inputColumns: IColumn[] = [
     key: 'lockHash',
     name: 'Lock Hash',
     minWidth: 100,
-    maxWidth: 525,
-  },
-  {
-    key: 'outPointBlockHash',
-    name: 'OutPoint BlockHash',
-    minWidth: 150,
-    onRender: (item: any) => <span>{item.previousOutput.blockHash || 'none'}</span>,
+    maxWidth: 200,
+    onRender: (item: any) => (
+      <span title={item.lockHash || 'none'} className="text-overflow">
+        {item.lockHash || 'none'}
+      </span>
+    ),
   },
   {
     key: 'outPointCell',
     name: 'OutPoint Cell',
     minWidth: 150,
-    onRender: (item: any) => (
-      <span>
-        {item.previousOutput.cell ? `${item.previousOutput.cell.txHash}[${item.previousOutput.cell.index}]` : 'none'}
-      </span>
-    ),
+    onRender: (item: any) => {
+      const text = item.previousOutput ? `${item.previousOutput.txHash}[${item.previousOutput.index}]` : 'none'
+      return (
+        <span title={text} className="text-overflow">
+          {text}
+        </span>
+      )
+    },
   },
   {
     key: 'capacity',
@@ -189,11 +191,13 @@ const Transaction = () => {
             Outputs
           </Text>
           <DetailsList
-            items={transaction.outputs.map((output, index) => ({
-              ...output,
-              index,
-              capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
-            }))}
+            items={transaction.outputs
+              .map(output => ({
+                ...output,
+                index: output.outPoint.index,
+                capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
+              }))
+              .sort((o1, o2) => +o1.index - +o2.index)}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact

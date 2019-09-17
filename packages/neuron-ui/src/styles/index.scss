@@ -53,6 +53,18 @@ navbar {
   font-family: monospace;
 }
 
+.ms-DetailsHeader-cell:hover {
+  background-color: inherit
+}
+
+.listNoHover {
+  .ms-DetailsRow {
+    &:hover {
+      background-color: inherit;
+    }
+  }
+}
+
 .listWithDesc {
   .ms-DetailsRow-cell {
     display: flex;
@@ -74,7 +86,7 @@ navbar {
     }
   }
 
-  .text-overflow {
+  .textOverflow {
     overflow: hidden;
     text-overflow: ellipsis;
   }

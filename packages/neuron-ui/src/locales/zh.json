@@ -1,10 +1,10 @@
 {
   "translation": {
     "launch-screen": {
-      "loading-wallets": "加载钱包"
+      "loading-wallets": "钱包加载中"
     },
     "navbar": {
-      "overview": "概观",
+      "overview": "总览",
       "wallet": "钱包",
       "send": "转账",
       "receive": "收款",
@@ -14,14 +14,14 @@
     },
     "overview": {
       "balance": "余额",
-      "recent-activities": "近期活动",
-      "no-recent-activities": "近期没有活动",
-      "activity": "活动",
+      "recent-activities": "最近收支",
+      "no-recent-activities": "没有收支记录",
+      "activity": "收支活动",
       "datetime": "时间",
       "status": "状态",
       "amount": "金额",
       "blockchain-status": "链状态",
-      "chain-identity": "链的 ID",
+      "chain-identity": "链 ID",
       "tip-block-number": "区块高度",
       "epoch": "Epoch",
       "difficulty": "难度",
@@ -30,13 +30,13 @@
       "address": "地址",
       "code-hash": "Code Hash",
       "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)",
-      "confirmation": "已确认 {{confirmationCount}} 次数",
-      "confirmations": "已确认 {{confirmationCount}} 次数",
+      "confirmation": "{{confirmationCount}} 个确认",
+      "confirmations": "{{confirmationCount}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
       "receiving": "正在收款",
-      "more": "查看更多交易"
+      "more": "查看更多记录"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -58,7 +58,7 @@
       "wallet-suffix": "钱包 {{suffix}}",
       "write-down-seed": "请记下您的助记词并保存到安全的地方",
       "new-name": "输入新的钱包名称",
-      "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中三类字符组成的字符串, 且必须以字母或者数字开头",
+      "complex-password": "密码为 8 至 50 位由大写字母、小写字母、数字、特殊符号中至少三类字符组成的字符串, 且必须以字母或者数字开头",
       "same-password": "两次输入密码应一致"
     },
     "import-keystore": {
@@ -82,13 +82,12 @@
     },
     "send": {
       "address": "地址",
-      "amount": "价值",
+      "amount": "金额",
       "send": "发送",
       "clear": "清除",
       "confirm-password": "确认密码",
-      "to": "至",
+      "to": "收款地址",
       "input-password-to-confirm": "输入密码以确认本次交易",
-      "this-transaction-will-send": "本次交易将发送",
       "scan-to-get-address": "扫描二维码以获取地址",
       "total-amount": "总金额",
       "description": "备注",
@@ -154,7 +153,7 @@
       "change-address": "找零地址"
     },
     "settings": {
-      "go-to-overview": "返回概观",
+      "go-to-overview": "返回总览画面",
       "setting-tabs": {
         "general": "通用",
         "wallets": "钱包",
@@ -210,18 +209,6 @@
     "footer": {
       "fail-to-fetch-tip-block-number": "无法获取最新高度"
     },
-    "menuitem": {
-      "add": "添加",
-      "update": "更新",
-      "delete": "删除",
-      "network": "网络",
-      "select": "选择",
-      "edit": "编辑",
-      "backup": "备份",
-      "remove": "移除",
-      "Save": "保存",
-      "management": "管理"
-    },
     "common": {
       "or": "或",
       "confirm": "确认",
@@ -245,11 +232,11 @@
       "unknown-error": "未知错误",
       "update-wallet-successfully": "已更新钱包信息",
       "delete-wallet-successfully": "已删除钱包",
-      "create-network-successfully": "新节点已添加",
+      "create-network-successfully": "已添加新节点",
       "update-network-successfully": "已更新节点信息",
-      "addr-copied": "地址已复制到剪贴板",
-      "qrcode-copied": "二维码已复制到剪贴板",
-      "lock-arg-copied": "Lock Arg 已复制到剪贴板",
+      "addr-copied": "已复制地址到剪贴板",
+      "qrcode-copied": "已复制二维码到剪贴板",
+      "lock-arg-copied": "已复制 Lock Arg 到剪贴板",
       "fields": {
         "wallet": "钱包",
         "name": "名称",

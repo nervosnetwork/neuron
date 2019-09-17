@@ -1,30 +1,23 @@
 module.exports = {
-  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "extends": "eslint:recommended",
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "prettier/prettier": [2, {
-      "printWidth": 120
-    }],
-    "semi": [2, "never"],
-    "curly": [2, "all"],
-    "comma-dangle": [2, {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "always-multiline",
-      "exports": "always-multiline",
-      "functions": "ignore"
-    }],
-    "import/no-extraneous-dependencies": [2, {
-      "devDependencies": true
-    }],
+    "no-console": 0,
+    "no-cond-assign": 0,
+    "no-extra-semi": "warn",
+    "semi": 0,
     "no-unused-vars": "off",
-    "implicit-arrow-linebreak": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
       "vars": "local",
       "args": "after-used",
       "ignoreRestSiblings": false
     }],
+    "curly": [2, "all"],
+    "implicit-arrow-linebreak": "off",
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
       "code": 120,
@@ -51,25 +44,26 @@ module.exports = {
       }
     }],
     "no-plusplus": [0],
-    "no-console": [2, {
-      "allow": ["warn", "error", "info"]
-    }],
     "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
-    "max-classes-per-file": [0]
+    "max-classes-per-file": [0],
+    "@typescript-eslint/no-angle-bracket-type-assertion": [0],
+    "no-alert": [0],
+    "require-atomic-updates": [0]
   },
   "globals": {
     "BigInt": "readonly"
   },
   "env": {
-    "jest": true,
+    "es6": true,
+    "node": true,
     "browser": true,
-    "node": true
+    "jest": true
   },
   "settings": {
     "import/resolver": {
       "node": {
         "paths": ["src"],
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [".js", ".ts"]
       }
     }
   }
