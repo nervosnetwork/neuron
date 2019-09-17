@@ -1,4 +1,4 @@
-import { currentNetworkID, systemScript } from 'utils/localCache'
+import { currentNetworkID, systemScript } from 'services/localCache'
 import { ConnectionStatus } from 'utils/const'
 
 export const transactionState: State.DetailedTransaction = {

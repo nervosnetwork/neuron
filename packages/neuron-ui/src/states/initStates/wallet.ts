@@ -1,4 +1,4 @@
-import { addresses, currentWallet } from 'utils/localCache'
+import { addresses, currentWallet } from 'services/localCache'
 
 const wallet = currentWallet.load()
 

@@ -17,7 +17,7 @@ import {
 import initStates from 'states/initStates'
 import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
-import { wallets as walletsCache, currentWallet as currentWalletCache } from 'utils/localCache'
+import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
 import { Routes } from 'utils/const'
 import { addressesToBalance, failureResToNotification } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'

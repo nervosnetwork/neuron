@@ -10,7 +10,7 @@ import {
   currentWallet as currentWalletCache,
   currentNetworkID as currentNetworkIDCache,
   networks as networksCache,
-} from 'utils/localCache'
+} from 'services/localCache'
 
 export const initAppState = () => (dispatch: StateDispatch, history: any) => {
   getNeuronWalletState()
