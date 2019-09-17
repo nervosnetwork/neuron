@@ -18,7 +18,7 @@ const inputColumns: IColumn[] = [
     minWidth: 100,
     maxWidth: 200,
     onRender: (item: any) => (
-      <span title={item.lockHash || 'none'} className="text-overflow">
+      <span title={item.lockHash || 'none'} className="textOverflow">
         {item.lockHash || 'none'}
       </span>
     ),
@@ -30,7 +30,7 @@ const inputColumns: IColumn[] = [
     onRender: (item: any) => {
       const text = item.previousOutput ? `${item.previousOutput.txHash}[${item.previousOutput.index}]` : 'none'
       return (
-        <span title={text} className="text-overflow">
+        <span title={text} className="textOverflow">
           {text}
         </span>
       )
