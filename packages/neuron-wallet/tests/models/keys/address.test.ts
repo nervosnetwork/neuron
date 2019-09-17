@@ -24,12 +24,12 @@ describe('address', () => {
   it('Generate testnet address from public key', () => {
     const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
     const address = publicKeyToAddress(publicKey)
-    expect('ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83').toBe(address)
+    expect(address).toEqual('ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83')
   })
 
   it('Generate mainnet address from public key', () => {
     const publicKey = '0x024a501efd328e062c8675f2365970728c859c592beeefd6be8ead3d901330bc01'
     const address = publicKeyToAddress(publicKey, AddressPrefix.Mainnet)
-    expect('ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd').toBe(address)
+    expect(address).toEqual('ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd')
   })
 })
