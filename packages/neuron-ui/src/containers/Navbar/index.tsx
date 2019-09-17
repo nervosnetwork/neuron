@@ -94,6 +94,8 @@ const Navbar = ({
         styles={{
           root: {
             height: 'auto',
+            width: '44px',
+            marginRight: '8px',
           },
           icon: {
             height: '20px',
