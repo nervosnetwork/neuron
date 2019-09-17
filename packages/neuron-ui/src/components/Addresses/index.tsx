@@ -81,7 +81,7 @@ const Addresses = ({
                     display: 'flex',
                   }}
                 >
-                  <span className="text-overflow">{item.address.slice(0, -6)}</span>
+                  <span className="textOverflow">{item.address.slice(0, -6)}</span>
                   <span>{item.address.slice(-6)}</span>
                 </div>
               )
