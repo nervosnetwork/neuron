@@ -75,13 +75,14 @@ const PasswordRequest = ({
     },
     [dispatch]
   )
+  const disabled = !password || (actionType === 'send' && isSending)
   const onKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !disabled) {
         onConfirm()
       }
     },
-    [onConfirm]
+    [onConfirm, disabled]
   )
   if (!wallet) {
     return null
@@ -104,7 +105,7 @@ const PasswordRequest = ({
           <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
           <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
             <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton onClick={onConfirm} disabled={!password || (actionType === 'send' && isSending)}>
+            <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled}>
               {t('common.confirm')}
             </PrimaryButton>
           </Stack>
