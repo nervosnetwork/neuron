@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, CheckboxVisibility, IColumn } from 'office-ui-fabric-react'
-import { currentWallet as currentWalletCache } from 'utils/localCache'
+import { currentWallet as currentWalletCache } from 'services/localCache'
 import { getTransaction, showErrorMessage } from 'services/remote'
 
 import { transactionState } from 'states/initStates/chain'

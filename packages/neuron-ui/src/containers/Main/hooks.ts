@@ -26,7 +26,7 @@ import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
   systemScript as systemScriptCache,
-} from 'utils/localCache'
+} from 'services/localCache'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 10000
