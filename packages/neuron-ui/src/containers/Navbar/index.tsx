@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
-import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize, getTheme } from 'office-ui-fabric-react'
+import { Stack, Pivot, PivotItem, PivotLinkFormat, PivotLinkSize, IconButton, getTheme } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -63,30 +63,44 @@ const Navbar = ({
   }
 
   return (
-    <Pivot
-      selectedKey={selectedKey}
-      onLinkClick={(pivotItem?: PivotItem) => {
-        if (pivotItem && pivotItem.props) {
-          const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')
-          if (linkDesc && typeof linkDesc.value === 'string') {
-            history.push(linkDesc.value)
+    <Stack horizontal horizontalAlign="space-between" verticalAlign="stretch">
+      <Pivot
+        selectedKey={selectedKey}
+        onLinkClick={(pivotItem?: PivotItem) => {
+          if (pivotItem && pivotItem.props) {
+            const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')
+            if (linkDesc && typeof linkDesc.value === 'string') {
+              history.push(linkDesc.value)
+            }
           }
-        }
-      }}
-      headersOnly
-      linkFormat={PivotLinkFormat.tabs}
-      linkSize={PivotLinkSize.large}
-      styles={styles}
-    >
-      {pivotItems.map(pivotItem => (
-        <PivotItem
-          headerText={t(pivotItem.name)}
-          itemKey={pivotItem.key}
-          key={pivotItem.key}
-          data-link={pivotItem.url}
-        />
-      ))}
-    </Pivot>
+        }}
+        headersOnly
+        linkFormat={PivotLinkFormat.tabs}
+        linkSize={PivotLinkSize.large}
+        styles={styles}
+      >
+        {pivotItems.map(pivotItem => (
+          <PivotItem
+            headerText={t(pivotItem.name)}
+            itemKey={pivotItem.key}
+            key={pivotItem.key}
+            data-link={pivotItem.url}
+          />
+        ))}
+      </Pivot>
+      <IconButton
+        iconProps={{ iconName: 'Settings' }}
+        onClick={() => history.push(Routes.SettingsGeneral)}
+        styles={{
+          root: {
+            height: 'auto',
+          },
+          icon: {
+            height: '20px',
+          },
+        }}
+      />
+    </Stack>
   )
 }
 
