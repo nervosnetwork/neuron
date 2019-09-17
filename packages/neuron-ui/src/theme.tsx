@@ -25,6 +25,7 @@ import {
   Nodes as ConnectedIcon,
   Scan as ScanIcon,
   Search as SearchIcon,
+  SettingsOption as SettingsIcon,
   StatusGood as MatchedIcon,
   SubtractCircle as RemoveIcon,
   Update as UpdateIcon,
@@ -87,6 +88,7 @@ registerIcons({
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
     Edit: <EditIcon color="#000" size="20px" />,
+    Settings: <SettingsIcon size="20px" />,
   },
 })
 
