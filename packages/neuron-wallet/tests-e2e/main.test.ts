@@ -38,3 +38,10 @@ describe('Test notification', () => {
   afterAll(() => app.stop())
   tests.Notification(app)
 })
+
+describe('Test address book', () => {
+  let app = new Application()
+  beforeAll(() => app.start())
+  afterAll(() => app.stop())
+  tests.AddressBook(app)
+})
