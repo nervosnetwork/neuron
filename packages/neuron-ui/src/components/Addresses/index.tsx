@@ -27,10 +27,12 @@ const Addresses = ({
     loadings: { addressList: isLoading },
   },
   wallet: { addresses = [], id: walletID },
-  settings: { showAddressBook = false },
+  chain: { networkID },
+  settings: { showAddressBook = false, networks = [] },
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+  const isMainnet = (networks.find(n => n.id === networkID) || {}).type === 'mainnet'
   const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
   useEffect(() => {
@@ -211,11 +213,13 @@ const Addresses = ({
   return (
     <>
       <Stack verticalAlign="center" horizontalAlign="start" tokens={{ childrenGap: 15 }}>
-        <DefaultButton
-          text={t(`addresses.display-${showMainnetAddress ? 'testnet' : 'mainnet'}-addresses`)}
-          onClick={() => setShowMainnetAddress(!showMainnetAddress)}
-        />
-        {showMainnetAddress ? (
+        {!isMainnet ? (
+          <DefaultButton
+            text={t(`addresses.display-${showMainnetAddress ? 'testnet' : 'mainnet'}-addresses`)}
+            onClick={() => setShowMainnetAddress(!showMainnetAddress)}
+          />
+        ) : null}
+        {showMainnetAddress && !isMainnet ? (
           <Text variant="medium" style={{ color: semanticColors.errorText }}>
             {t('addresses.mainnet-address-caution')}
           </Text>
