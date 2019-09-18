@@ -150,7 +150,10 @@
       "balance": "Balance",
       "transactions": "Transactions",
       "receiving-address": "Receiving Address",
-      "change-address": "Change Address"
+      "change-address": "Change Address",
+      "display-testnet-addresses": "Display Testnet Addresses",
+      "display-mainnet-addresses": "Display Mainnet Addresses",
+      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses"
     },
     "settings": {
       "go-to-overview": "Go to Overview",

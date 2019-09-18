@@ -94,6 +94,7 @@ declare namespace State {
   interface NetworkProperty {
     name: string
     remote: string
+    type?: 'mainnet' | 'testnet'
   }
 
   interface Network extends NetworkProperty {

@@ -1,16 +1,20 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
+  Stack,
   ShimmeredDetailsList,
   TextField,
   IColumn,
   CheckboxVisibility,
+  DefaultButton,
   IconButton,
+  Text,
   getTheme,
 } from 'office-ui-fabric-react'
 
 import { contextMenu } from 'services/remote'
+import { ckbCore } from 'services/chain'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
@@ -23,10 +27,13 @@ const Addresses = ({
     loadings: { addressList: isLoading },
   },
   wallet: { addresses = [], id: walletID },
-  settings: { showAddressBook = false },
+  chain: { networkID },
+  settings: { showAddressBook = false, networks = [] },
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+  const isMainnet = (networks.find(n => n.id === networkID) || {}).type === 'mainnet'
+  const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
   useEffect(() => {
     if (!showAddressBook) {
@@ -181,18 +188,46 @@ const Addresses = ({
         enableShimmer={isLoading}
         checkboxVisibility={CheckboxVisibility.hidden}
         columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
-        items={addresses}
+        items={addresses.map(addr => ({
+          ...addr,
+          address: showMainnetAddress
+            ? ckbCore.utils.bech32Address(addr.identifier, {
+                prefix: ckbCore.utils.AddressPrefix.Mainnet,
+                type: ckbCore.utils.AddressType.HashIdx,
+                codeHashIndex: '0x00',
+              }) || ''
+            : addr.address,
+        }))}
         onItemContextMenu={item => {
-          contextMenu({ type: 'addressList', id: item.identifier })
+          if (!showMainnetAddress) {
+            contextMenu({ type: 'addressList', id: item.identifier })
+          }
         }}
         className="listWithDesc"
         onRenderRow={onRenderRow}
       />
     ),
-    [isLoading, addressColumns, addresses, t]
+    [isLoading, addressColumns, addresses, showMainnetAddress, t]
   )
 
-  return List
+  return (
+    <>
+      <Stack verticalAlign="center" horizontalAlign="start" tokens={{ childrenGap: 15 }}>
+        {!isMainnet ? (
+          <DefaultButton
+            text={t(`addresses.display-${showMainnetAddress ? 'testnet' : 'mainnet'}-addresses`)}
+            onClick={() => setShowMainnetAddress(!showMainnetAddress)}
+          />
+        ) : null}
+        {showMainnetAddress && !isMainnet ? (
+          <Text variant="medium" style={{ color: semanticColors.errorText }}>
+            {t('addresses.mainnet-address-caution')}
+          </Text>
+        ) : null}
+      </Stack>
+      {List}
+    </>
+  )
 }
 
 Addresses.displayName = 'Addresses'
