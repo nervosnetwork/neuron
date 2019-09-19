@@ -1,10 +1,11 @@
-import { getConnection } from 'typeorm'
+import { getConnection, QueryRunner } from 'typeorm';
 import { OutPoint, Transaction, TransactionWithoutHash, Input, TransactionStatus } from 'types/cell-types'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
+import Utils from 'services/sync/utils'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
 /* eslint no-await-in-loop: "off" */
@@ -157,8 +158,42 @@ export class TransactionPersistor {
       })
     )
 
-    await connection.manager.save([tx, ...inputs, ...previousOutputs, ...outputs])
+    const sliceSize = 100
+    const sleepTime = 10
+    const queryRunner = connection.createQueryRunner()
+    await TransactionPersistor.waitTransaction(queryRunner)
+    await queryRunner.startTransaction()
+    try {
+      await queryRunner.manager.save(tx)
+      for (const slice of Utils.eachSlice(inputs, sliceSize)) {
+        await queryRunner.manager.save(slice)
+        await Utils.sleep(sleepTime)
+      }
+      for (const slice of Utils.eachSlice(previousOutputs, sliceSize)) {
+        await queryRunner.manager.save(slice)
+        await Utils.sleep(sleepTime)
+      }
+      for (const slice of Utils.eachSlice(outputs, sliceSize)) {
+        await queryRunner.manager.save(slice)
+        await Utils.sleep(sleepTime)
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction()
+    } finally {
+      await queryRunner.release()
+    }
     return tx
+  }
+
+  private static waitTransaction = async(queryRunner: QueryRunner, timeout: number = 5000) => {
+    const startAt: number = +new Date()
+    while (queryRunner.isTransactionActive) {
+      const now: number = +new Date()
+      if (now - startAt < timeout) {
+        await Utils.sleep(50)
+      }
+    }
   }
 
   public static deleteWhenFork = async (blockNumber: string) => {
