@@ -161,7 +161,7 @@ export class TransactionPersistor {
     const sliceSize = 100
     const sleepTime = 10
     const queryRunner = connection.createQueryRunner()
-    await TransactionPersistor.waitTransaction(queryRunner)
+    await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
     await queryRunner.startTransaction()
     try {
       await queryRunner.manager.save(tx)
@@ -186,7 +186,7 @@ export class TransactionPersistor {
     return tx
   }
 
-  private static waitTransaction = async(queryRunner: QueryRunner, timeout: number = 5000) => {
+  private static waitUntilTransactionFinished = async(queryRunner: QueryRunner, timeout: number = 5000) => {
     const startAt: number = +new Date()
     while (queryRunner.isTransactionActive) {
       const now: number = +new Date()
