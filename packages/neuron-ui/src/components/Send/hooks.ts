@@ -116,10 +116,8 @@ const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
 
 const useOnItemChange = (updateTransactionOutput: Function) =>
   useCallback(
-    (field: string = '', idx: number = -1) => (
-      _e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-      value?: string
-    ) => {
+    (e: any, value?: string) => {
+      const { field = '', idx = -1 } = e.target.dataset
       if (undefined !== value) {
         if (field === 'amount') {
           if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
