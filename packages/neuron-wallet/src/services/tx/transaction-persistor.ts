@@ -159,7 +159,6 @@ export class TransactionPersistor {
     )
 
     const sliceSize = 100
-    const sleepTime = 10
     const queryRunner = connection.createQueryRunner()
     await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
     await queryRunner.startTransaction()
@@ -167,15 +166,12 @@ export class TransactionPersistor {
       await queryRunner.manager.save(tx)
       for (const slice of Utils.eachSlice(inputs, sliceSize)) {
         await queryRunner.manager.save(slice)
-        await Utils.sleep(sleepTime)
       }
       for (const slice of Utils.eachSlice(previousOutputs, sliceSize)) {
         await queryRunner.manager.save(slice)
-        await Utils.sleep(sleepTime)
       }
       for (const slice of Utils.eachSlice(outputs, sliceSize)) {
         await queryRunner.manager.save(slice)
-        await Utils.sleep(sleepTime)
       }
       await queryRunner.commitTransaction();
     } catch (err) {
