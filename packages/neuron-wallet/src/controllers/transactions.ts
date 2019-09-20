@@ -115,6 +115,11 @@ export default class TransactionsController {
       .reduce((result, c) => result + c, BigInt(0))
     const value: bigint = outputCapacities - inputCapacities
     transaction.value = value.toString()
+    if (transaction.outputs) {
+      transaction.outputs = transaction
+        .outputs.sort((o1, o2) => +o1.outPoint!.index - +o2.outPoint!.index)
+        .slice(0, 200)
+    }
 
     return {
       status: ResponseCode.Success,

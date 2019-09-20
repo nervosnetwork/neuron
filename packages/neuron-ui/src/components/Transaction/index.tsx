@@ -55,6 +55,12 @@ const outputColumns: IColumn[] = [
     name: 'Index',
     minWidth: 80,
     maxWidth: 150,
+    onRender: (item?: any | State.DetailedOutput) => {
+      if (item) {
+        return item.outPoint.index
+      }
+      return null
+    },
   },
   {
     key: 'lockHash',
@@ -66,6 +72,12 @@ const outputColumns: IColumn[] = [
     name: 'Capacity',
     minWidth: 200,
     maxWidth: 250,
+    onRender: (output?: State.DetailedOutput) => {
+      if (output) {
+        return `${shannonToCKBFormatter(output.capacity)} CKB`
+      }
+      return null
+    },
   },
 ].map(col => ({
   ariaLabel: col.name,
@@ -191,13 +203,7 @@ const Transaction = () => {
             Outputs
           </Text>
           <DetailsList
-            items={transaction.outputs
-              .map(output => ({
-                ...output,
-                index: output.outPoint.index,
-                capacity: `${shannonToCKBFormatter(output.capacity)} CKB`,
-              }))
-              .sort((o1, o2) => +o1.index - +o2.index)}
+            items={transaction.outputs}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             compact
