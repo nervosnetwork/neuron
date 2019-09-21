@@ -47,13 +47,15 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
   )
 
   const onDescriptionFieldBlur = useCallback(
-    (key: string, originDesc: string): React.FocusEventHandler => () => {
+    (e: any) => {
+      const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       submitDescription(key, originDesc)
     },
     [submitDescription]
   )
   const onDescriptionPress = useCallback(
-    (key: string, originDesc: string) => (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (e: any) => {
+      const { descriptionKey: key, descriptionValue: originDesc } = e.target.dataset
       if (e.key && e.key === 'Enter') {
         submitDescription(key, originDesc)
       }
@@ -61,7 +63,8 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
-    (key: string) => (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+    (e: any, value?: string) => {
+      const key = e.target.dataset.descriptionKey
       setLocalDescription({
         key,
         description: value || '',

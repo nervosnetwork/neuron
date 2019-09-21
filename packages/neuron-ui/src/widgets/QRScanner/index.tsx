@@ -139,10 +139,16 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
       </button>
       <Dialog hidden={!open} onDismiss={onDismiss} maxWidth="900px" minWidth="500xp">
         <h1>{title}</h1>
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <canvas ref={canvasRef} />
         </div>
-        <DialogFooter>
+        <DialogFooter
+          styles={{
+            actionsRight: {
+              width: '100%',
+            },
+          }}
+        >
           <TextField readOnly value={data} label={label} underlined />
           <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
             <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
