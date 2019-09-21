@@ -112,12 +112,14 @@ const Addresses = ({
           return item ? (
             <>
               <TextField
+                data-description-key={item.address}
+                data-description-value={item.description}
                 borderless
                 title={item.description}
                 value={isSelected ? localDescription.description : item.description || ''}
-                onBlur={isSelected ? onDescriptionFieldBlur(item.address, item.description) : undefined}
-                onKeyPress={isSelected ? onDescriptionPress(item.address, item.description) : undefined}
-                onChange={isSelected ? onDescriptionChange(item.address) : undefined}
+                onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                onKeyPress={isSelected ? onDescriptionPress : undefined}
+                onChange={isSelected ? onDescriptionChange : undefined}
                 readOnly={!isSelected}
                 styles={{
                   root: {
