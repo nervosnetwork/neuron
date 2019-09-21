@@ -150,4 +150,21 @@ export default (app: Application) => {
     expect(newWalletName.value).toBe(walletNameInputText.value)
     console.info(`newWalletName - ${newWalletName.value}`)
   })
+
+  app.test('field boundary', async () => {
+    const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
+    const password = 'Aa11 1111 111'
+    const { client } = app.spectron
+    app.clickMenu(['Wallet', 'Import Wallet', 'Import Wallet Seed'])
+    await app.waitUntilLoaded()
+    client.setValue('textarea', mnemonicText)
+    await app.waitUntilLoaded()
+    client.click('button[type=submit]')
+    await app.waitUntilLoaded()
+    client.setValue('input[type=password]', password)
+    await app.waitUntilLoaded()
+    expect(await client.getValue('input[type=password]')).toEqual(
+      Array.from({ length: 2 }, () => password.replace(/\s/g, '')),
+    )
+  })
 }

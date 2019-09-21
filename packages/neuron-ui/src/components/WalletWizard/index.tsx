@@ -205,7 +205,7 @@ const Mnemonic = ({
       />
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>
     </Stack>
   )
@@ -242,14 +242,16 @@ const Submission = ({
   }, [dispatch, wallets, t])
 
   const onChange = useCallback(
-    (field: keyof WithWizardState) => {
-      return (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
-        if (undefined !== value) {
-          dispatch({
-            type: field,
-            payload: value,
-          })
+    (e: any, value?: string) => {
+      const { field } = e.target.dataset
+      if (undefined !== value) {
+        if (['password', 'confirmPassword'].includes(field) && /\s/.test(value)) {
+          return
         }
+        dispatch({
+          type: field,
+          payload: value,
+        })
       }
     },
     [dispatch]
@@ -280,10 +282,11 @@ const Submission = ({
         <div key={input.key}>
           <Label required>{t(`wizard.${input.label}`)}</Label>
           <TextField
+            data-field={input.key}
             autoFocus={input.autoFocus}
             type={input.type}
             value={state[input.key]}
-            onChange={onChange(input.key)}
+            onChange={onChange}
             description={t(input.hint || '')}
             maxLength={input.maxLength}
           />
@@ -307,7 +310,7 @@ const Submission = ({
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>
     </Stack>
   )
