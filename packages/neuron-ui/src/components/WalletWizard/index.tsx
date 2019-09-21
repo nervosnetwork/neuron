@@ -205,7 +205,7 @@ const Mnemonic = ({
       />
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>
     </Stack>
   )
@@ -245,6 +245,9 @@ const Submission = ({
     (e: any, value?: string) => {
       const { field } = e.target.dataset
       if (undefined !== value) {
+        if (['password', 'confirmPassword'].includes(field) && /\s/.test(value)) {
+          return
+        }
         dispatch({
           type: field,
           payload: value,
@@ -307,7 +310,7 @@ const Submission = ({
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
       </Stack>
     </Stack>
   )
