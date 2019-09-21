@@ -35,6 +35,12 @@ export class CapacityNotEnough extends Error {
   }
 }
 
+export class CapacityNotEnoughForChange extends Error {
+  constructor() {
+    super(i18n.t('messages.capacity-not-enough-for-change'))
+  }
+}
+
 export class InvalidKeystore extends Error {
   constructor() {
     super(i18n.t('messages.invalid-keystore'))
@@ -48,5 +54,6 @@ export default {
   EmptyPassword,
   CodeHashNotLoaded,
   CapacityNotEnough,
+  CapacityNotEnoughForChange,
   InvalidKeystore,
 }

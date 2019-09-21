@@ -1,7 +1,7 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
 import { Cell, OutPoint, Input } from 'types/cell-types'
-import { CapacityNotEnough } from 'exceptions'
+import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import SkipDataAndType from './settings/skip-data-and-type'
 
@@ -129,8 +129,13 @@ export default class CellsService {
       return true
     })
 
-    if (inputCapacities < capacityInt) {
+    if (inputCapacities < totalCapacities) {
       throw new CapacityNotEnough()
+    }
+
+    const diffCapacities = inputCapacities - totalCapacities
+    if (!(diffCapacities >= minChangeCapacity || diffCapacities === BigInt(0))) {
+      throw new CapacityNotEnoughForChange()
     }
 
     return {
