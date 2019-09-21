@@ -179,6 +179,8 @@ export default (app: Application) => {
       client.setValue(dialogPasswordSelector, password)
       await app.waitUntilLoaded()
       expect(await client.getValue(dialogPasswordSelector)).toBe(password.replace(/\s/g, ''))
+      client.keys(['Escape'])
+      await app.waitUntilLoaded()
     })
   })
 }
