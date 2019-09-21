@@ -67,6 +67,9 @@ const PasswordRequest = ({
   const onChange = useCallback(
     (_e, value?: string) => {
       if (undefined !== value) {
+        if (/\s/.test(value)) {
+          return
+        }
         dispatch({
           type: AppActions.UpdatePassword,
           payload: value,

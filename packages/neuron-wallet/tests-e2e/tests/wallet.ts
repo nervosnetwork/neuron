@@ -151,20 +151,34 @@ export default (app: Application) => {
     console.info(`newWalletName - ${newWalletName.value}`)
   })
 
-  app.test('field boundary', async () => {
-    const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
-    const password = 'Aa11 1111 111'
-    const { client } = app.spectron
-    app.clickMenu(['Wallet', 'Import Wallet', 'Import Wallet Seed'])
-    await app.waitUntilLoaded()
-    client.setValue('textarea', mnemonicText)
-    await app.waitUntilLoaded()
-    client.click('button[type=submit]')
-    await app.waitUntilLoaded()
-    client.setValue('input[type=password]', password)
-    await app.waitUntilLoaded()
-    expect(await client.getValue('input[type=password]')).toEqual(
-      Array.from({ length: 2 }, () => password.replace(/\s/g, '')),
-    )
+  describe('Test field boundary', () => {
+    app.test('Whitespace is disallowed in password when creating wallets', async () => {
+      const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
+      const password = ' Aa11 1111 111 '
+      const { client } = app.spectron
+      app.clickMenu(['Wallet', 'Import Wallet', 'Import Wallet Seed'])
+      await app.waitUntilLoaded()
+      client.setValue('textarea', mnemonicText)
+      await app.waitUntilLoaded()
+      client.click('button[type=submit]')
+      await app.waitUntilLoaded()
+      client.setValue('input[type=password]', password)
+      await app.waitUntilLoaded()
+      expect(await client.getValue('input[type=password]')).toEqual(
+        Array.from({ length: 2 }, () => password.replace(/\s/g, '')),
+      )
+    })
+
+    app.test('Whitespace is disallowed in password when requesting the password', async () => {
+      const password = ' Aa22 222 222 '
+      const dialogPasswordSelector = 'div[role=dialog] input[type=password]'
+      const { client } = app.spectron
+
+      app.clickMenu(['Wallet', 'Delete Current Wallet'])
+      await app.waitUntilLoaded()
+      client.setValue(dialogPasswordSelector, password)
+      await app.waitUntilLoaded()
+      expect(await client.getValue(dialogPasswordSelector)).toBe(password.replace(/\s/g, ''))
+    })
   })
 }
