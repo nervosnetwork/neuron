@@ -134,7 +134,7 @@ export default class CellsService {
     }
 
     const diffCapacities = inputCapacities - totalCapacities
-    if (!(diffCapacities >= minChangeCapacity || diffCapacities === BigInt(0))) {
+    if (diffCapacities < minChangeCapacity && diffCapacities !== BigInt(0)) {
       throw new CapacityNotEnoughForChange()
     }
 
