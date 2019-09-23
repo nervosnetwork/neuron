@@ -11,6 +11,7 @@ import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
 
 import IndexerRPC from './indexer-rpc'
+import HexUtils from 'utils/hex'
 
 export interface LockHashInfo {
   lockHash: string
@@ -137,7 +138,7 @@ export default class IndexerQueue {
     const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
     const blockNumbers = lockHashIndexStates
       .filter(state => lockHashes.includes(state.lockHash))
-      .map(state => state.blockNumber)
+      .map(state => HexUtils.toDecimal(state.blockNumber))
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
     const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
     const minBlockNumber = Utils.min(blockNumbersBigInt)
@@ -192,9 +193,9 @@ export default class IndexerQueue {
 
           let address: string | undefined
           if (type === TxPointType.CreatedBy) {
-            address = LockUtils.lockScriptToAddress(transaction.outputs![+txPoint.index].lock)
+            address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
           } else if (type === TxPointType.ConsumedBy) {
-            const input = txEntity.inputs[+txPoint.index]
+            const input = txEntity.inputs[parseInt(txPoint.index, 16)]
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
             if (output) {
               address = LockUtils.lockScriptToAddress(output.lock)

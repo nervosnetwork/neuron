@@ -9,12 +9,14 @@ export enum AddressType {
   Change = 1, // Internal chain
 }
 
-export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Testnet) =>
-  pubkeyToAddress(publicKey, {
+export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Testnet) => {
+  const pubkey = publicKey.startsWith('0x') ? publicKey : `0x${publicKey}`
+  return pubkeyToAddress(pubkey, {
     prefix,
     type: Type.HashIdx,
     codeHashIndex: '0x00',
   })
+}
 
 export default class Address {
   publicKey?: string

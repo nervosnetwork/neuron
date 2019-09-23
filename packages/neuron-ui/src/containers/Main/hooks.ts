@@ -38,7 +38,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
         .then(tipBlockNumber => {
           dispatch({
             type: AppActions.UpdateTipBlockNumber,
-            payload: tipBlockNumber,
+            payload: BigInt(tipBlockNumber).toString(),
           })
         })
         .catch((err: Error) => {
@@ -51,7 +51,9 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
       getBlockchainInfo()
         .then(info => {
           if (info) {
-            const { chain = '', difficulty = '', epoch = '', alerts = [] } = info
+            const { chain = '', difficulty: difficultyHex = '', epoch: epochHex = '', alerts = [] } = info
+            const difficulty = BigInt(difficultyHex).toString()
+            const epoch = BigInt(epochHex).toString()
             if (alerts.length) {
               alerts.forEach(a => {
                 // TODO: display alerts in Notification

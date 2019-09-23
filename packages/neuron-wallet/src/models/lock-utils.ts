@@ -130,7 +130,7 @@ export default class LockUtils {
     const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
     const result: string = core.utils.parseAddress(address, prefix, 'hex') as string
     const hrp: string = `0100`
-    let blake160: string = result.slice(hrp.length, result.length)
+    let blake160: string = result.slice(hrp.length + 2, result.length)
     if (!blake160.startsWith('0x')) {
       blake160 = `0x${blake160}`
     }

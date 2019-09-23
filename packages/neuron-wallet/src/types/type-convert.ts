@@ -1,3 +1,4 @@
+import HexUtils from 'utils/hex';
 import {
   Block,
   BlockHeader,
@@ -23,19 +24,18 @@ export default class TypeConvert {
 
   static toBlockHeader(blockHeader: CKBComponents.BlockHeader): BlockHeader {
     return {
-      version: blockHeader.version,
-      timestamp: blockHeader.timestamp.toString(),
+      version: HexUtils.toDecimal(blockHeader.version),
+      timestamp: HexUtils.toDecimal(blockHeader.timestamp),
       hash: blockHeader.hash,
       parentHash: blockHeader.parentHash,
-      number: blockHeader.number.toString(),
+      number: HexUtils.toDecimal(blockHeader.number),
     }
   }
 
   static toTransaction(transaction: CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
     const tx: Transaction = {
       hash: transaction.hash,
-      version: transaction.version,
-      // deps: transaction.deps,
+      version: HexUtils.toDecimal(transaction.version),
       cellDeps: transaction.cellDeps.map(cellDep => TypeConvert.toCellDep(cellDep)),
       headerDeps: transaction.headerDeps,
       witnesses: transaction.witnesses,
@@ -44,8 +44,8 @@ export default class TypeConvert {
       outputsData: transaction.outputsData,
     }
     if (blockHeader) {
-      tx.timestamp = blockHeader.timestamp
-      tx.blockNumber = blockHeader.number
+      tx.timestamp = HexUtils.toDecimal(blockHeader.timestamp)
+      tx.blockNumber = HexUtils.toDecimal(blockHeader.number)
       tx.blockHash = blockHeader.hash
     }
     return tx
@@ -59,16 +59,20 @@ export default class TypeConvert {
   }
 
   static toInput(input: CKBComponents.CellInput): Input {
+    let previousOutput: OutPoint | null = null
+    if (input.previousOutput) {
+      previousOutput = TypeConvert.toOutPoint(input.previousOutput)
+    }
     return {
-      previousOutput: input.previousOutput,
-      since: input.since,
+      previousOutput,
+      since: HexUtils.toDecimal(input.since),
     }
   }
 
   static toOutPoint(outPoint: CKBComponents.OutPoint): OutPoint {
     return {
       txHash: outPoint.txHash,
-      index: outPoint.index,
+      index: HexUtils.toDecimal(outPoint.index),
     }
   }
 
@@ -78,7 +82,7 @@ export default class TypeConvert {
       type = TypeConvert.toScript(output.type)
     }
     return {
-      capacity: output.capacity.toString(),
+      capacity: HexUtils.toDecimal(output.capacity),
       lock: TypeConvert.toScript(output.lock),
       type,
     }
