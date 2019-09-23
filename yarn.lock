@@ -2079,45 +2079,45 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-address@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-address/-/ckb-sdk-address-0.20.0.tgz#3de8824c860e22e185664f2f4c39001648431f56"
-  integrity sha512-3FEP1I/+fRVuvafD6h1adRlv/6lfbRVwpgA/XrW4jYQBqghlaBcHVZbYqVAn5HFKAcJWtk9r9Xb8avCzfjaobg==
+"@nervosnetwork/ckb-sdk-address@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-address/-/ckb-sdk-address-0.21.0.tgz#bf78b3bcb84f80566d9167c5b38d9dac8b5eb81f"
+  integrity sha512-2sYFh38/DYHbb2OCvyTB3UGbrdbGU2qj47dQY82lsznDphblC6h/VLwISlaE/xQ04de/idb0Uc0fHVAqA4lkEg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.20.0"
-    "@nervosnetwork/ckb-types" "0.20.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
+    "@nervosnetwork/ckb-types" "0.21.0"
 
-"@nervosnetwork/ckb-sdk-core@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.20.0.tgz#c05faef381ba10f6efa246943237fe3b8aef5e16"
-  integrity sha512-My0xdhRZcXVzrQRk8pi00guyaf9kGaVdKhKE+oTLthyPHxAqGtbyl7sc4Fx0RNuQhVtwe1jmh6LEtPgZbqbiLw==
+"@nervosnetwork/ckb-sdk-core@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.21.0.tgz#60d5bb5bb2c80b31a77c221ab06fded4d34b72c0"
+  integrity sha512-zS8vp01t5iYqXDsAjlhcdZafIXaYkJoYXSC1cnCh3dr23iaYuYjDz9/mbe2j/fZ4p46c1NSqQRpo4TGubhSm1g==
   dependencies:
-    "@nervosnetwork/ckb-sdk-address" "0.20.0"
-    "@nervosnetwork/ckb-sdk-rpc" "0.20.0"
-    "@nervosnetwork/ckb-sdk-utils" "0.20.0"
-    "@nervosnetwork/ckb-types" "0.20.0"
+    "@nervosnetwork/ckb-sdk-address" "0.21.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.21.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
+    "@nervosnetwork/ckb-types" "0.21.0"
 
-"@nervosnetwork/ckb-sdk-rpc@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.20.0.tgz#3fa2bb17f4d81e56569859c40f147eb6b53a11b4"
-  integrity sha512-0F6j/hop1JOTLGalX+0LsjXRKc4+4gMBV7cdSOZh9O56Qd4m1yZS+2t6+nrN9Xi9+pAC+8wkhKvGJl2B3mXBnQ==
+"@nervosnetwork/ckb-sdk-rpc@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.21.0.tgz#4ff7d8e16b716c49ad5e9cc32868324921ba6b3b"
+  integrity sha512-0Dz871S9slwFPASs3Dz/07kkRK99T3uFo60zgyt1GSEmGoSREqXOwzaXbEU2lqPLvmFz1GP+T/mHt4TtIf7nWg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.20.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
     axios "0.19.0"
 
-"@nervosnetwork/ckb-sdk-utils@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.20.0.tgz#0acbed3caef1f9c5180336efed13c6083246c7f7"
-  integrity sha512-CGXQFCSyZFTtF9yDeNnk6NR9Seq5Sk1haZgLwk0jRHzmZdD/v3PQNnonOBywaVEWNKcsVXrCBJEUAvOBKeaP3g==
+"@nervosnetwork/ckb-sdk-utils@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.21.0.tgz#461c9864d511bd4b9fb4469f4f0a35b4e631e589"
+  integrity sha512-MNMG1cx8w+qLrF1iKJLT8NgpZ+gaFrbvgtYF9SCqQiChqZI2iQyBdT7QyBQ/XPIRi5EKyEjyFH5+ofPwukWDFA==
   dependencies:
-    "@nervosnetwork/ckb-types" "0.20.0"
+    "@nervosnetwork/ckb-types" "0.21.0"
     blake2b-wasm "1.1.7"
-    elliptic "6.4.1"
+    elliptic "6.5.1"
 
-"@nervosnetwork/ckb-types@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.20.0.tgz#d172904262011fdbc0b4970c0a34fbe2842da73e"
-  integrity sha512-ZqiLayu2wg1vJVt3gXXsRxwYQ/B9nur7WniCBsnQswDVs9hM5lZ628Ov50PIISOLSR//B7dxpnsr4rd/oz4yMA==
+"@nervosnetwork/ckb-types@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.21.0.tgz#20cfc81f2eef8c7baa36f0ada4f7642aee0eaf39"
+  integrity sha512-1VhtubsnTkY+rP+CiQ25nXoK+5SLWlf+aUsGJ7HhWhjP1gzlBJKXB3EAoa92FZzmfARJ7U3QKJoAEV4Bo6KXkQ==
 
 "@nodelib/fs.scandir@2.1.2":
   version "2.1.2"
@@ -6960,19 +6960,6 @@ elegant-spinner@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/elegant-spinner/-/elegant-spinner-1.0.1.tgz#db043521c95d7e303fd8f345bedc3349cfb0729e"
   integrity sha1-2wQ1IcldfjA/2PNFvtwzSc+wcp4=
-
-elliptic@6.4.1:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.4.1.tgz#c2d0b7776911b86722c632c3c06c60f2f819939a"
-  integrity sha512-BsXLz5sqX8OHcsh7CqBMztyXARmGQ3LWPtGjJi6DiJHq5C/qvi9P3OqgswKSDftbu8+IoI/QDTAm2fFnQ9SZSQ==
-  dependencies:
-    bn.js "^4.4.0"
-    brorand "^1.0.1"
-    hash.js "^1.0.0"
-    hmac-drbg "^1.0.0"
-    inherits "^2.0.1"
-    minimalistic-assert "^1.0.0"
-    minimalistic-crypto-utils "^1.0.0"
 
 elliptic@6.5.1, elliptic@^6.0.0:
   version "6.5.1"

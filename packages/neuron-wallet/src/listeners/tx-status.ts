@@ -24,13 +24,13 @@ const getTransactionStatus = async (hash: string) => {
   }
   if (tx.txStatus.status === 'committed') {
     return {
-      tx: tx.transaction,
+      tx: TypeConvert.toTransaction(tx.transaction),
       status: TransactionStatus.Success,
       blockHash: tx.txStatus.blockHash,
     }
   }
   return {
-    tx: tx.transaction,
+    tx: TypeConvert.toTransaction(tx.transaction),
     status: TransactionStatus.Pending,
     blockHash: null,
   }
@@ -68,7 +68,7 @@ const trackingStatus = async () => {
     const { core }: { core: Core } = nodeService
     const getBlockService = new GetBlocks(core.rpc.node.url)
     for (const successTx of successTxs) {
-      const transaction = TypeConvert.toTransaction(successTx.tx)
+      const transaction = successTx.tx
       const { blockHash } = successTx
       const blockHeader = await getBlockService.getHeader(blockHash!)
       transaction.blockHash = blockHash!

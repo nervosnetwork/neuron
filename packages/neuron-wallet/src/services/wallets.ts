@@ -452,7 +452,7 @@ export default class WalletService {
       blake2b.update(data)
     })
     const message = blake2b.digest()
-    const signature = `0x${addrObj.signRecoverable(message)}`
+    const signature = addrObj.signRecoverable(message)
     const newWitness: Witness = {
       data: [signature],
     }

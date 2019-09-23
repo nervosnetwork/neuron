@@ -43,7 +43,7 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-core": "0.20.0",
+    "@nervosnetwork/ckb-sdk-core": "0.21.0",
     "@uifabric/experiments": "7.16.1",
     "@uifabric/styling": "7.6.2",
     "canvg": "2.0.0",

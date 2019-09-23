@@ -7,6 +7,7 @@ import { ShouldBeTypeOf } from 'exceptions'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import NetworksService from 'services/networks'
+import HexUtils from 'utils/hex'
 
 class NodeService {
   private static instance: NodeService
@@ -96,7 +97,7 @@ class NodeService {
           if (!this.delayTime) {
             this.delayTime = 0
           }
-          this.tipNumberSubject.next(tipNumber)
+          this.tipNumberSubject.next(HexUtils.toDecimal(tipNumber))
         },
         () => {
           if (this.delayTime < 10 * this.intervalTime) {
