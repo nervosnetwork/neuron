@@ -151,7 +151,7 @@ export default class IndexerQueue {
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
     await Utils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
-      const indexFrom: string | undefined = info.isImporting ? '0' : undefined
+      const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
       await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
     })
   }
@@ -161,7 +161,7 @@ export default class IndexerQueue {
     let page = 0
     let stopped = false
     while (!stopped) {
-      const txs = await this.indexerRPC.getTransactionByLockHash(lockHash, page.toString(), this.per.toString())
+      const txs = await this.indexerRPC.getTransactionByLockHash(lockHash, `0x${page.toString(16)}`, `0x${this.per.toString(16)}`)
       if (txs.length < this.per) {
         stopped = true
       }
