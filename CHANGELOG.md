@@ -1,3 +1,35 @@
+# [0.21.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.20.0-beta.0...v0.21.0-beta.0) (2019-09-24)
+
+
+### Bug Fixes
+
+* create tx in several SQLs ([d012cc5](https://github.com/nervosnetwork/neuron/commit/d012cc5))
+* hex number in indexer mode ([9d56aee](https://github.com/nervosnetwork/neuron/commit/9d56aee))
+* rename class name from text-overflow to textOverflow ([747fdcf](https://github.com/nervosnetwork/neuron/commit/747fdcf))
+* throw when capacity not enough for change ([3629787](https://github.com/nervosnetwork/neuron/commit/3629787))
+* **neuron-ui:** disable scroll on notification dismission ([0c754ad](https://github.com/nervosnetwork/neuron/commit/0c754ad))
+* **neuron-ui:** disable the submit button once a sending request is sent ([0c72b01](https://github.com/nervosnetwork/neuron/commit/0c72b01))
+* **neuron-ui:** fix the repetition of notification ([aa9e800](https://github.com/nervosnetwork/neuron/commit/aa9e800))
+* **neuron-ui:** fix the transaction detail view ([9e6da54](https://github.com/nervosnetwork/neuron/commit/9e6da54))
+* **neuron-ui:** fix typo in class name ([3417445](https://github.com/nervosnetwork/neuron/commit/3417445))
+* **neuron-ui:** sort outputs of a transaction by outPoint.index ([c9aef30](https://github.com/nervosnetwork/neuron/commit/c9aef30))
+
+
+### Features
+
+* bump sdk to v0.21.0 ([3abf7ca](https://github.com/nervosnetwork/neuron/commit/3abf7ca))
+* **neuron-ui:** add a blank margin around the QRCode for improving recognization ([8a7b246](https://github.com/nervosnetwork/neuron/commit/8a7b246))
+* **neuron-ui:** add a condition of isMainnet for displaying addresses ([5be0335](https://github.com/nervosnetwork/neuron/commit/5be0335))
+* **neuron-ui:** add a settings icon in the navbar component ([8d929a3](https://github.com/nervosnetwork/neuron/commit/8d929a3))
+* **neuron-ui:** add mainnet/testnet addresses toggle ([d55a415](https://github.com/nervosnetwork/neuron/commit/d55a415))
+* **neuron-ui:** adjust the layout of the qr scanner dialog ([5d91d90](https://github.com/nervosnetwork/neuron/commit/5d91d90))
+* Improve localization translations ([44b3642](https://github.com/nervosnetwork/neuron/commit/44b3642))
+* **neuron-ui:** refine transaction list and address list ([e78dd9f](https://github.com/nervosnetwork/neuron/commit/e78dd9f))
+* **neuron-ui:** remove hover effect on table header ([a21bc7e](https://github.com/nervosnetwork/neuron/commit/a21bc7e))
+* Remove hover background effect on property list and overview details lists ([91a1c6e](https://github.com/nervosnetwork/neuron/commit/91a1c6e))
+
+
+
 # [0.20.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.19.0-beta.1...v0.20.0-beta.0) (2019-09-09)
 
 
