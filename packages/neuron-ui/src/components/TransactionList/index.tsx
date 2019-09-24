@@ -177,11 +177,13 @@ const TransactionList = ({
             return item ? (
               <>
                 <TextField
+                  data-description-key={item.hash}
+                  data-description-value={item.description}
                   title={item.description}
                   value={isSelected ? localDescription.description : item.description || ''}
-                  onBlur={isSelected ? onDescriptionFieldBlur(item.hash, item.description) : undefined}
-                  onKeyPress={isSelected ? onDescriptionPress(item.hash, item.description) : undefined}
-                  onChange={isSelected ? onDescriptionChange(item.hash) : undefined}
+                  onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                  onKeyPress={isSelected ? onDescriptionPress : undefined}
+                  onChange={isSelected ? onDescriptionChange : undefined}
                   borderless
                   readOnly={!isSelected}
                   styles={{

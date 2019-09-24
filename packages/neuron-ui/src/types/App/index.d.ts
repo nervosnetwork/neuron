@@ -10,6 +10,19 @@ declare namespace State {
     blockNumber: string
     status: 'pending' | 'success' | 'failed'
   }
+
+  interface DetailedOutput {
+    capacity: string
+    lock: {
+      args: string[]
+      codeHash: string
+    }
+    lockHash: string
+    outPoint: {
+      index: string
+      txHash: string
+    }
+  }
   interface DetailedTransaction extends Transaction {
     blockHash: string
     blockNumber: string
@@ -25,18 +38,7 @@ declare namespace State {
         } | null
       }
     }[]
-    outputs: {
-      capacity: string
-      lock: {
-        args: string[]
-        codeHash: string
-      }
-      lockHash: string
-      outPoint: {
-        index: string
-        txHash: string
-      }
-    }[]
+    outputs: DetailedOutput[]
     witnesses: string[]
   }
   interface Output {
@@ -94,6 +96,7 @@ declare namespace State {
   interface NetworkProperty {
     name: string
     remote: string
+    type?: 'mainnet' | 'testnet'
   }
 
   interface Network extends NetworkProperty {

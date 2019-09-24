@@ -4,6 +4,9 @@
   align-items: flex-end;
   position: absolute;
   right: 0;
+  height: calc(100vh - 81px);
+  overflow: hidden;
+  pointer-events: none;
 
   &>div {
     max-width: auto;

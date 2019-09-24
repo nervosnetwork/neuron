@@ -8,8 +8,8 @@ export default class Blake2b {
   }
 
   public update = (message: string): void => {
-    const msg = hexToBytes(message.replace(/0x/, ''))
-    this.blake2b.update(msg)
+    const msg = message.startsWith('0x') ? message : `0x${message}`
+    this.blake2b.update(hexToBytes(msg))
   }
 
   public digest = (): string => {

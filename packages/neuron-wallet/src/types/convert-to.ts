@@ -1,9 +1,11 @@
 import { Transaction, Input, Cell, Script, TransactionWithoutHash, CellDep, OutPoint } from './cell-types'
+import HexUtils from 'utils/hex'
 
 export default class ConvertTo {
   public static toSdkTransaction = (tx: Transaction): CKBComponents.Transaction => {
     const transaction: CKBComponents.Transaction = {
-      ...tx,
+      hash: tx.hash,
+      version: HexUtils.toHex(tx.version),
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
       cellDeps: tx.cellDeps ? tx.cellDeps.map(cellDep => ConvertTo.toSdkCellDep(cellDep)) : [],
@@ -23,7 +25,7 @@ export default class ConvertTo {
 
   public static toSdkTxWithoutHash = (tx: TransactionWithoutHash): CKBComponents.RawTransaction => {
     const transaction = {
-      ...tx,
+      version: HexUtils.toHex(tx.version),
       inputs: tx.inputs!.map(input => ConvertTo.toSdkInput(input)),
       outputs: tx.outputs!.map(output => ConvertTo.toSdkOutput(output)),
       cellDeps: tx.cellDeps ? tx.cellDeps.map(cellDep => ConvertTo.toSdkCellDep(cellDep)) : [],
@@ -36,8 +38,8 @@ export default class ConvertTo {
 
   public static toSdkInput = (input: Input): CKBComponents.CellInput => {
     return {
-      since: input.since!,
-      previousOutput: input.previousOutput!,
+      since: HexUtils.toHex(input.since!),
+      previousOutput: ConvertTo.toSdkOutPoint(input.previousOutput!),
     }
   }
 
@@ -45,7 +47,7 @@ export default class ConvertTo {
     const type = output.type ? ConvertTo.toSdkScript(output.type) : undefined
 
     return {
-      ...output,
+      capacity: HexUtils.toHex(output.capacity),
       lock: ConvertTo.toSdkScript(output.lock!),
       type,
     }
@@ -56,6 +58,13 @@ export default class ConvertTo {
       args: script.args!,
       codeHash: script.codeHash!,
       hashType: script.hashType,
+    }
+  }
+
+  public static toSdkOutPoint = (outPoint: OutPoint): CKBComponents.OutPoint => {
+    return {
+      txHash: outPoint.txHash,
+      index: HexUtils.toHex(outPoint.index),
     }
   }
 }

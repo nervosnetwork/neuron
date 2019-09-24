@@ -5,6 +5,7 @@ import { Block, BlockHeader } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import CheckAndSave from './check-and-save'
 import Utils from './utils'
+import HexUtils from 'utils/hex'
 
 export default class GetBlocks {
   private retryTime: number
@@ -59,13 +60,13 @@ export default class GetBlocks {
   }
 
   public getBlockByNumber = async (num: string): Promise<Block> => {
-    const block = await this.core.rpc.getBlockByNumber(num)
+    const block = await this.core.rpc.getBlockByNumber(HexUtils.toHex(num))
     return TypeConvert.toBlock(block)
   }
 
   public genesisBlockHash = async (): Promise<string> => {
     const hash: string = await Utils.retry(3, 100, async () => {
-      const h: string = await this.core.rpc.getBlockHash('0')
+      const h: string = await this.core.rpc.getBlockHash('0x0')
       return h
     })
 

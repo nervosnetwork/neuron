@@ -87,9 +87,11 @@ const Send = ({
                     </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
                       <TextField
+                        data-field="address"
+                        data-idx={idx}
                         disabled={sending}
                         value={item.address || ''}
-                        onChange={onItemChange('address', idx)}
+                        onChange={onItemChange}
                         required
                         validateOnLoad={false}
                         onGetErrorMessage={onGetAddressErrorMessage}
@@ -99,7 +101,10 @@ const Send = ({
                       <QRScanner
                         title={t('send.scan-to-get-address')}
                         label={t('send.address')}
-                        onConfirm={(data: string) => onItemChange('address', idx)(undefined as any, data)}
+                        onConfirm={(data: string) => {
+                          const e = { target: { dataset: { field: 'address', idx } } }
+                          onItemChange(e, data)
+                        }}
                       />
                     </Stack>
                   </Stack>
@@ -127,9 +132,11 @@ const Send = ({
                     </Stack.Item>
                     <Stack.Item styles={{ root: { flex: 1 } }}>
                       <TextField
+                        data-field="amount"
+                        data-idx={idx}
                         value={item.amount}
                         placeholder={PlaceHolders.send.Amount}
-                        onChange={onItemChange('amount', idx)}
+                        onChange={onItemChange}
                         disabled={sending}
                         required
                         validateOnLoad={false}

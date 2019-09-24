@@ -157,9 +157,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
                 <IconButton iconProps={{ iconName: 'Dismiss' }} onClick={onNotificationDismiss(n.timestamp)} />
               </Stack>
               <Text as="p">
-                {notification.code
-                  ? t(`messages.codes.${notification.code}`, notification.meta)
-                  : notification.content || t('messages.unknown-error')}
+                {n.code ? t(`messages.codes.${n.code}`, n.meta) : n.content || t('messages.unknown-error')}
               </Text>
             </Stack>
           )

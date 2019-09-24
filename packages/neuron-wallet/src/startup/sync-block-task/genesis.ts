@@ -5,7 +5,7 @@ const { core } = NodeService.getInstance()
 
 export const genesisBlockHash = async () => {
   const hash: string = await Utils.retry(3, 100, async () => {
-    const h: string = await core.rpc.getBlockHash('0')
+    const h: string = await core.rpc.getBlockHash('0x0')
     return h
   })
 
