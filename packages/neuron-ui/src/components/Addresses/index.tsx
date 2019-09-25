@@ -189,7 +189,9 @@ const Addresses = ({
       <ShimmeredDetailsList
         enableShimmer={isLoading}
         checkboxVisibility={CheckboxVisibility.hidden}
-        columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
+        columns={addressColumns
+          .filter(col => !showMainnetAddress || col.key === 'address')
+          .map(col => ({ ...col, name: t(col.name) }))}
         items={addresses.map(addr => ({
           ...addr,
           address: showMainnetAddress
