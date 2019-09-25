@@ -6,8 +6,8 @@ import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
-import { Controller as ControllerDecorator, CatchControllerError } from 'decorators'
-import { ResponseCode, Channel } from 'utils/const'
+import { CatchControllerError } from 'decorators'
+import { ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
   IsRequired,
@@ -27,7 +27,6 @@ import logger from 'utils/logger'
  * @class WalletsController
  * @description handle messages from wallets channel
  */
-@ControllerDecorator(Channel.Wallets)
 export default class WalletsController {
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
