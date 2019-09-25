@@ -1,7 +1,7 @@
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
-import { CatchControllerError, Controller as ControllerDecorator } from 'decorators'
-import { Channel, ResponseCode } from 'utils/const'
+import { CatchControllerError } from 'decorators'
+import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 
 const networksService = NetworksService.getInstance()
@@ -10,7 +10,6 @@ const networksService = NetworksService.getInstance()
  * @class NetworksController
  * @description handle messages from networks channel
  */
-@ControllerDecorator(Channel.Networks)
 export default class NetworksController {
   @CatchControllerError
   public static async getAll() {
