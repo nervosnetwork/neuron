@@ -26,14 +26,29 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
 }
 
 export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispatch: StateDispatch, history: any) => {
-  updateRemoteNetwork(params).then(res => {
-    if (res.status === 1) {
-      addPopup('update-network-successfully')(dispatch)
-      history.push(Routes.SettingsNetworks)
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
-    }
+  dispatch({
+    type: AppActions.UpdateLoadings,
+    payload: {
+      network: true,
+    },
   })
+  updateRemoteNetwork(params)
+    .then(res => {
+      if (res.status === 1) {
+        addPopup('update-network-successfully')(dispatch)
+        history.push(Routes.SettingsNetworks)
+      } else {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
+    })
+    .finally(() => {
+      dispatch({
+        type: AppActions.UpdateLoadings,
+        payload: {
+          network: false,
+        },
+      })
+    })
 }
 
 export default {

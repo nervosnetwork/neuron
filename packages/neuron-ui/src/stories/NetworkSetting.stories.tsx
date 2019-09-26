@@ -9,14 +9,22 @@ const states: { [title: string]: State.Network[] } = {
   'Empty List': [],
   'Content List': [
     {
+      id: 'Mainnet',
+      name: 'Mainnet',
+      remote: 'http://localhost:8114',
+      chain: 'ckb',
+    },
+    {
       id: 'Testnet',
       name: 'Testnet',
       remote: 'http://localhost:8114',
+      chain: 'ckb_testnet',
     },
     {
       id: 'Local',
       name: 'Local',
       remote: 'http://localhost:8114',
+      chain: 'ckb_devnet',
     },
   ],
 }

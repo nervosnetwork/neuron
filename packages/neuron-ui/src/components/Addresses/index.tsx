@@ -32,7 +32,8 @@ const Addresses = ({
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
-  const isMainnet = (networks.find(n => n.id === networkID) || {}).type === 'mainnet'
+  const isMainnet =
+    (networks.find(n => n.id === networkID) || {}).chain === (process.env.REACT_APP_MAINNET_TAG || 'ckb')
   const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
   useEffect(() => {
