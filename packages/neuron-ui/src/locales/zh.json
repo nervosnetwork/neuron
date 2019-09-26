@@ -109,7 +109,7 @@
     },
     "history": {
       "meta": "元信息",
-      "type": "类型",
+      "type": "交易类型",
       "date": "时间",
       "timestamp": "时间",
       "amount": "金额",
@@ -143,7 +143,7 @@
     },
     "addresses": {
       "addresses": "地址",
-      "type": "交易类型",
+      "type": "类型",
       "address": "地址",
       "identifier": "标志",
       "description": "标签",
