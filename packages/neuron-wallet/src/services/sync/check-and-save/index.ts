@@ -12,11 +12,12 @@ export default class CheckAndSave {
 
   public process = async (): Promise<boolean[]> => {
     const txs = this.block.transactions
-    return Promise.all(
-      txs.map(async tx => {
-        const checkTx = new CheckTx(tx)
-        return checkTx.checkAndSave(this.lockHashes)
-      })
-    )
+    let result: boolean[] = []
+    for (const tx of txs) {
+      const checkTx = new CheckTx(tx)
+      const checkResult = await checkTx.checkAndSave(this.lockHashes)
+      result.push(checkResult)
+    }
+    return result
   }
 }

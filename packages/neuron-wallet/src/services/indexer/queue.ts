@@ -177,6 +177,8 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < 1000)
         ) {
+          logger.debug('indexer fetched tx:', type, txPoint.txHash)
+
           const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
           const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
           const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)
