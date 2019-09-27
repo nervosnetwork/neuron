@@ -1,3 +1,24 @@
+# [0.21.0-beta.1](https://github.com/nervosnetwork/neuron/compare/v0.21.0-beta.0...v0.21.0-beta.1) (2019-09-27)
+
+
+### Bug Fixes
+
+* sync stopped in indexer and normal mode ([dfa2f1e](https://github.com/nervosnetwork/neuron/commit/dfa2f1e))
+* Translation for type column on history and address book view ([4d4b7e1](https://github.com/nervosnetwork/neuron/commit/4d4b7e1))
+* **neuron-ui:** hide unrelated columns when the mainnet address is displayed ([700c059](https://github.com/nervosnetwork/neuron/commit/700c059))
+
+
+### Features
+
+* discriminate chain type by the result of rpc.getBlockchainInfo method ([9654662](https://github.com/nervosnetwork/neuron/commit/9654662))
+
+
+### Performance Improvements
+
+* skip `createdBy` if already created in indexer ([b1d694b](https://github.com/nervosnetwork/neuron/commit/b1d694b))
+
+
+
 # [0.21.0-beta.0](https://github.com/nervosnetwork/neuron/compare/v0.20.0-beta.0...v0.21.0-beta.0) (2019-09-24)
 
 
