@@ -179,6 +179,8 @@ export class TransactionPersistor {
     } finally {
       await queryRunner.release()
     }
+    tx.inputs = inputs
+    tx.outputs = outputs
     return tx
   }
 

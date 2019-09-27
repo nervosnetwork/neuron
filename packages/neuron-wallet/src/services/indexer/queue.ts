@@ -12,6 +12,7 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 
 import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
+import { TxUniqueFlagCache } from './tx-unique-flag'
 
 export interface LockHashInfo {
   lockHash: string
@@ -40,6 +41,8 @@ export default class IndexerQueue {
   private inProcess = false
 
   private resetFlag = false
+
+  private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
 
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
     // this.lockHashes = lockHashes
@@ -180,6 +183,16 @@ export default class IndexerQueue {
           const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
           const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
           const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)
+          const txUniqueFlag = {
+            txHash: transaction.hash,
+            blockHash: transactionWithStatus.txStatus.blockHash!
+          }
+          if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
+            return
+          }
+
+          logger.debug('indexer fetched tx:', type, txPoint.txHash)
+
           // tx timestamp / blockNumber / blockHash
           const { blockHash } = transactionWithStatus.txStatus
           if (blockHash) {
@@ -194,6 +207,7 @@ export default class IndexerQueue {
           let address: string | undefined
           if (type === TxPointType.CreatedBy) {
             address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
+            this.latestCreatedBy.push(txUniqueFlag)
           } else if (type === TxPointType.ConsumedBy) {
             const input = txEntity.inputs[parseInt(txPoint.index, 16)]
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
