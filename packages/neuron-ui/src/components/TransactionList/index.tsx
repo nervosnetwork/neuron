@@ -28,8 +28,6 @@ import { CONFIRMATION_THRESHOLD } from 'utils/const'
 const theme = getTheme()
 const { semanticColors } = theme
 
-const MIN_CELL_WIDTH = 50
-
 interface FormatTransaction extends State.Transaction {
   date: string
 }
@@ -82,8 +80,8 @@ const TransactionList = ({
           name: t('history.type'),
           key: 'type',
           fieldName: 'type',
-          minWidth: MIN_CELL_WIDTH,
-          maxWidth: 50,
+          minWidth: 70,
+          maxWidth: 70,
           onRender: (item?: FormatTransaction) => {
             if (!item) {
               return null
