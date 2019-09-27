@@ -158,6 +158,7 @@ export default class AppController {
     }
     const { id, type } = params
     switch (type) {
+      case 'copyMainnetAddress':
       case 'networkList':
       case 'walletList':
       case 'addressList':

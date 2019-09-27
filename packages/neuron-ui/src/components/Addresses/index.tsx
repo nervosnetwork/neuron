@@ -204,7 +204,9 @@ const Addresses = ({
             : addr.address,
         }))}
         onItemContextMenu={item => {
-          if (!showMainnetAddress) {
+          if (showMainnetAddress) {
+            contextMenu({ type: 'copyMainnetAddress', id: item.identifier })
+          } else {
             contextMenu({ type: 'addressList', id: item.identifier })
           }
         }}
