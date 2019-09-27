@@ -1,5 +1,5 @@
 import { MenuItemConstructorOptions, clipboard, dialog, MessageBoxReturnValue } from 'electron'
-import { bech32Address } from '@nervosnetwork/ckb-sdk-utils'
+import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 
 import WalletsService from 'services/wallets'
 import NetworksService from 'services/networks'
@@ -19,6 +19,21 @@ const networksService = NetworksService.getInstance()
 export const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
 } = {
+  copyMainnetAddress: async (identifier: string) => {
+    const address = bech32Address(identifier, {
+      prefix: AddressPrefix.Mainnet,
+      type: AddressType.HashIdx,
+      codeHashIndex: '0x00',
+    })
+    return [
+      {
+        label: i18n.t('contextMenu.copy-address'),
+        click: () => {
+          clipboard.writeText(address)
+        },
+      },
+    ]
+  },
   networkList: async (id: string) => {
     const [network, currentNetworkID] = await Promise.all([
       networksService.get(id).catch(() => null),
