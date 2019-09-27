@@ -189,7 +189,10 @@
           "title": "添加或编辑网络",
           "rpc-url": "RPC地址",
           "name": "名称"
-        }
+        },
+        "mainnet": "主网",
+        "testnet": "测试网",
+        "devnet": "开发网"
       }
     },
     "password-request": {

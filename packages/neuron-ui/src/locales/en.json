@@ -189,7 +189,10 @@
           "title": "Add or Edit Network",
           "rpc-url": "RPC URL",
           "name": "Name"
-        }
+        },
+        "mainnet": "Mainnet",
+        "testnet": "Testnet",
+        "devnet": "Devnet"
       }
     },
     "password-request": {

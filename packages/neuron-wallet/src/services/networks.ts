@@ -1,3 +1,4 @@
+import Core from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
 import { BehaviorSubject } from 'rxjs'
 import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from 'exceptions/network'
@@ -92,18 +93,28 @@ export default class NetworksService extends Store {
   public async create(
     @Required name: NetworkName,
     @Required remote: NetworkRemote,
-    type: NetworkType = NetworkType.Normal
+    type: NetworkType = NetworkType.Normal,
   ) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {
       throw new UsedName('Network')
     }
+
+    const core = new Core(remote)
+
+    const chain = await core.rpc
+      .getBlockchainInfo()
+      .then(info => info.chain)
+      .catch(() => '')
+
     const newOne = {
       id: uuid(),
       name,
       remote,
       type,
+      chain,
     }
+
     await this.updateAll([...list, newOne])
     return newOne
   }
@@ -115,7 +126,17 @@ export default class NetworksService extends Store {
     if (!network) {
       throw new NetworkNotFound(id)
     }
+
     Object.assign(network, options)
+    if (!options.chain) {
+      const core = new Core(network.remote)
+      const chain = await core.rpc
+        .getBlockchainInfo()
+        .then(info => info.chain)
+        .catch(() => '')
+      network.chain = chain
+    }
+
     this.updateAll(list)
     const currentID = await this.getCurrentID()
     if (currentID === id) {
@@ -145,6 +166,17 @@ export default class NetworksService extends Store {
       throw new NetworkNotFound(id)
     }
     this.writeSync(NetworksKey.Current, id)
+
+    const core = new Core(network.remote)
+
+    const chain = await core.rpc
+      .getBlockchainInfo()
+      .then(info => info.chain)
+      .catch(() => '')
+
+    if (chain && chain !== network.chain) {
+      this.update(id, { chain })
+    }
   }
 
   public getCurrentID = async () => {

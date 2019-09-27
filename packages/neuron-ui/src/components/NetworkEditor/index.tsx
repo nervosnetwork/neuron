@@ -1,13 +1,16 @@
 import React, { useMemo, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, DefaultButton, TextField } from 'office-ui-fabric-react'
+import { Stack, PrimaryButton, DefaultButton, TextField, Spinner } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
 import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
 
 const NetworkEditor = ({
+  app: {
+    loadings: { network: isUpdating = false },
+  },
   settings: { networks = [] },
   match: {
     params: { id = '' },
@@ -42,7 +45,13 @@ const NetworkEditor = ({
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        <PrimaryButton disabled={hasError || notModified} onClick={handleSubmit} text={t('common.save')} />
+        {isUpdating ? (
+          <PrimaryButton disabled>
+            <Spinner />
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton disabled={hasError || notModified} onClick={handleSubmit} text={t('common.save')} />
+        )}
       </Stack>
     </Stack>
   )
