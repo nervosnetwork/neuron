@@ -32,7 +32,8 @@ const Addresses = ({
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
-  const isMainnet = (networks.find(n => n.id === networkID) || {}).type === 'mainnet'
+  const isMainnet =
+    (networks.find(n => n.id === networkID) || {}).chain === (process.env.REACT_APP_MAINNET_TAG || 'ckb')
   const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
   useEffect(() => {
@@ -189,7 +190,9 @@ const Addresses = ({
       <ShimmeredDetailsList
         enableShimmer={isLoading}
         checkboxVisibility={CheckboxVisibility.hidden}
-        columns={addressColumns.map(col => ({ ...col, name: t(col.name) }))}
+        columns={addressColumns
+          .filter(col => !showMainnetAddress || col.key === 'address')
+          .map(col => ({ ...col, name: t(col.name) }))}
         items={addresses.map(addr => ({
           ...addr,
           address: showMainnetAddress

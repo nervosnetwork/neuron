@@ -13,6 +13,20 @@ const onContextMenu = (id: string = '') => () => {
   contextMenu({ type: 'networkList', id })
 }
 
+const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
+  switch (type) {
+    case 'ckb': {
+      return <span className="label primary">{t('settings.network.mainnet')}</span>
+    }
+    case 'ckb_testnet': {
+      return <span className="label secondary">{t('settings.network.testnet')}</span>
+    }
+    default: {
+      return <span className="label third">{t('settings.network.devnet')}</span>
+    }
+  }
+}
+
 const NetworkSetting = ({
   chain = chainState,
   settings: { networks = [] },
@@ -53,6 +67,7 @@ const NetworkSetting = ({
                     <Text as="span" style={{ color: '#999' }}>
                       {`(${network.remote})`}
                     </Text>
+                    <Label type={network.chain} t={t} />
                   </Stack>
                 )
               },

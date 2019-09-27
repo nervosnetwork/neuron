@@ -4,8 +4,8 @@ import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } 
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
 
-import { Controller as ControllerDecorator, CatchControllerError } from 'decorators'
-import { Channel, ResponseCode } from 'utils/const'
+import { CatchControllerError } from 'decorators'
+import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
 
@@ -13,7 +13,6 @@ import LockUtils from 'models/lock-utils'
  * @class TransactionsController
  * @description handle messages from transactions channel
  */
-@ControllerDecorator(Channel.Transactions)
 export default class TransactionsController {
   @CatchControllerError
   public static async getAll(

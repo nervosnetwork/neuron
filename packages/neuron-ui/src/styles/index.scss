@@ -42,6 +42,29 @@ navbar {
   background-color: white;
 }
 
+.label {
+  padding: 3px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  border-radius: 2px;
+  box-shadow: inset 0 -1px 0 rgba(27, 31, 35, .12);
+  text-transform: capitalize;
+
+  &.primary {
+    background-color: #6f42c1;
+  }
+
+  &.secondary {
+    background-color: #009688;
+  }
+
+  &.third {
+    background-color: #78909C;
+  }
+}
+
 .form-control,
 .btn {
   &:focus {

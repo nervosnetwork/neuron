@@ -34,10 +34,13 @@ export default class GetBlocks {
   }
 
   public checkAndSave = async (blocks: Block[], lockHashes: string[]) => {
-    return Utils.mapSeries(blocks, async (block: Block) => {
+    let checkResult: boolean[][] = []
+    for (const block of blocks) {
       const checkAndSave = new CheckAndSave(block, lockHashes)
-      return checkAndSave.process()
-    })
+      const result = await checkAndSave.process()
+      checkResult.push(result)
+    }
+    return checkResult
   }
 
   public retryGetBlock = async (num: string): Promise<Block> => {

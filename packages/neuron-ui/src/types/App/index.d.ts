@@ -87,6 +87,7 @@ declare namespace State {
       sending: boolean
       addressList: boolean
       transactionList: boolean
+      network: boolean
     }
     showTopAlert: boolean
     showAllNotifications: boolean
@@ -96,7 +97,7 @@ declare namespace State {
   interface NetworkProperty {
     name: string
     remote: string
-    type?: 'mainnet' | 'testnet'
+    chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
   }
 
   interface Network extends NetworkProperty {

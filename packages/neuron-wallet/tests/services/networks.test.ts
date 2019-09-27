@@ -20,6 +20,7 @@ describe(`Unit tests of networks service`, () => {
     remote: `http://new-network.localhost.com`,
     type: 0,
     id: '',
+    chain: '',
   }
 
   const newNetworkWithDefaultTypeOf1 = {
@@ -166,14 +167,14 @@ describe(`Unit tests of networks service`, () => {
 
       it(`service.create requires name, and remote`, async () => {
         expect(service.create(undefined as any, undefined as any)).rejects.toThrowError(
-          i18n.t(ERROR_MESSAGE.MISSING_ARG)
+          i18n.t(ERROR_MESSAGE.MISSING_ARG),
         )
         expect(service.create('network name', undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
       })
 
       it(`service.update requires id, options`, () => {
         expect(service.update(undefined as any, undefined as any)).rejects.toThrowError(
-          i18n.t(ERROR_MESSAGE.MISSING_ARG)
+          i18n.t(ERROR_MESSAGE.MISSING_ARG),
         )
         expect(service.update('', undefined as any)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.MISSING_ARG))
       })

@@ -20,8 +20,7 @@ import WalletsController from 'controllers/wallets'
 import SyncInfoController from 'controllers/sync-info'
 import UpdateController from 'controllers/update'
 
-import { Controller as ControllerDecorator } from 'decorators'
-import { Channel, ResponseCode } from 'utils/const'
+import { ResponseCode } from 'utils/const'
 import WindowManager from 'models/window-manager'
 import i18n from 'utils/i18n'
 import env from 'env'
@@ -31,7 +30,6 @@ import { SystemScriptSubject } from 'models/subjects/system-script'
 
 import { URL, contextMenuTemplate } from './options'
 
-@ControllerDecorator(Channel.App)
 export default class AppController {
   public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
