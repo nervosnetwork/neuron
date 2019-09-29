@@ -164,6 +164,7 @@
       },
       "general": {
         "display-address-book-in-the-navbar": "显示地址簿",
+        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cell",
         "show": "显示",
         "hide": "隐藏"
       },

@@ -42,7 +42,10 @@ const Navbar = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const neuronWallet = useState()
   const {
-    settings: { wallets = [], showAddressBook = false },
+    settings: {
+      wallets = [],
+      general: { showAddressBook = false },
+    },
   } = neuronWallet
   const [t] = useTranslation()
 

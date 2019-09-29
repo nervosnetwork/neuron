@@ -139,7 +139,10 @@ declare namespace State {
     }
   }
   interface Settings {
-    showAddressBook: boolean
+    general: {
+      skipDataAndType: boolean
+      showAddressBook: boolean
+    }
     networks: Network[]
     wallets: WalletIdentity[]
   }
