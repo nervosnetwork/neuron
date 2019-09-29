@@ -9,6 +9,7 @@ import {
   Close as DismissIcon,
   Close as FailIcon,
   Copy as CopyIcon,
+  Domain as ExplorerIcon,
   Down as ArrowDownIcon,
   FormEdit as EditIcon,
   FormClose as ClearIcon,
@@ -89,6 +90,7 @@ registerIcons({
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
     Edit: <EditIcon color="#000" size="20px" />,
     Settings: <SettingsIcon size="20px" />,
+    Explorer: <ExplorerIcon size="16px" color="#FFF" />,
   },
 })
 

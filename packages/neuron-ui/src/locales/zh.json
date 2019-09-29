@@ -139,7 +139,18 @@
       "confirming-with-count": " 已确认 {{confirmations}} 次"
     },
     "transaction": {
-      "goBack": "返回"
+      "date": "时间",
+      "transaction-hash": "交易哈希",
+      "block-number": "区块高度",
+      "goBack": "返回",
+      "index": "序号",
+      "address": "地址",
+      "income": "收入",
+      "amount": "数量",
+      "inputs": "输入",
+      "outputs": "输出",
+      "view-in-explorer": "浏览器",
+      "view-in-explorer-button-title": "浏览器中查看详情"
     },
     "addresses": {
       "addresses": "地址",

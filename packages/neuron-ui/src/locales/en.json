@@ -139,7 +139,18 @@
       "confirming-with-count": "{{confirmations}} confirmations"
     },
     "transaction": {
-      "goBack": "Go back"
+      "date": "Date",
+      "transaction-hash": "Transaction Hash",
+      "block-number": "Block Number",
+      "goBack": "Go back",
+      "index": "Index",
+      "address": "Address",
+      "income": "Income",
+      "amount": "Amount",
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "view-in-explorer": "Explorer",
+      "view-in-explorer-button-title": "View in the explorer"
     },
     "addresses": {
       "addresses": "Addresses",
