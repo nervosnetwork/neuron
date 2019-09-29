@@ -28,7 +28,10 @@ const Addresses = ({
   },
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
-  settings: { showAddressBook = false, networks = [] },
+  settings: {
+    general: { showAddressBook = false },
+    networks = [],
+  },
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {

@@ -18,6 +18,8 @@ export enum NeuronWalletActions {
   // Connection
   UpdateConnectionStatus = 'updateConnectionStatus',
   UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
+  // settings
+  UpdateSkipDataAndType = 'updateSkipDataAndType',
 }
 export enum AppActions {
   ToggleAddressBookVisibility = 'toggleAddressBookVisibility',
@@ -77,6 +79,7 @@ export const reducer = (
         syncedBlockNumber,
         connectionStatus,
         codeHash,
+        skipDataAndType,
       } = payload
       return {
         ...state,
@@ -90,7 +93,10 @@ export const reducer = (
           tipBlockNumber: syncedBlockNumber,
         },
         settings: {
-          ...state.settings,
+          general: {
+            ...state.settings.general,
+            skipDataAndType,
+          },
           networks,
           wallets,
         },
@@ -101,7 +107,22 @@ export const reducer = (
         ...state,
         settings: {
           ...settings,
-          showAddressBook: !settings.showAddressBook,
+          general: {
+            ...settings.general,
+            showAddressBook: !settings.general.showAddressBook,
+          },
+        },
+      }
+    }
+    case NeuronWalletActions.UpdateSkipDataAndType: {
+      return {
+        ...state,
+        settings: {
+          ...settings,
+          general: {
+            ...settings.general,
+            skipDataAndType: payload,
+          },
         },
       }
     }

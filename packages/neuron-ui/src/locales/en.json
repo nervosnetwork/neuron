@@ -164,6 +164,7 @@
       },
       "general": {
         "display-address-book-in-the-navbar": "Show the address book",
+        "skip-data-and-type": "Skip the cells which contain data or type script",
         "show": "Show",
         "hide": "Hide"
       },
