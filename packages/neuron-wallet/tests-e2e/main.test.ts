@@ -45,3 +45,10 @@ describe('Test address book', () => {
   afterAll(() => app.stop())
   tests.AddressBook(app)
 })
+
+describe('Test general settings', () => {
+  let app = new Application()
+  beforeAll(() => app.start())
+  afterAll(() => app.stop())
+  tests.GeneralSettings(app)
+})
