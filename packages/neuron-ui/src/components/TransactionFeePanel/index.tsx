@@ -38,7 +38,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
   const selectedSpeed = calculateSpeed(+price)
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
+    <Stack tokens={{ childrenGap: 15 }} aria-label="transaction fee">
       <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
         <Stack horizontal tokens={{ childrenGap: 20 }} styles={{ root: { width: leftStackWidth } }}>
           <Stack.Item styles={{ root: { width: labelWidth } }}>
@@ -76,7 +76,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
             <Label>{t('send.price')}</Label>
           </Stack.Item>
           <Stack.Item grow>
-            <TextField value={price} onChange={onPriceChange} />
+            <TextField value={price} onChange={onPriceChange} aria-label="price" />
           </Stack.Item>
           {actionSpacer}
         </Stack>
@@ -90,10 +90,10 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
               dropdownWidth={140}
               selectedKey={selectedSpeed}
               options={[
-                { key: '0', text: 'immediately' },
-                { key: '30', text: '~ 30s' },
-                { key: '60', text: '~ 1min' },
-                { key: '180', text: '~ 3min' },
+                { key: '180', text: 'immediately' },
+                { key: '60', text: '~ 30s' },
+                { key: '30', text: '~ 1min' },
+                { key: '0', text: '~ 3min' },
               ]}
               onRenderCaretDown={() => {
                 return <Icon iconName="ArrowDown" />
@@ -103,6 +103,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
                   onPriceChange(e, item.key)
                 }
               }}
+              aria-label="expected speed"
             />
           </Stack.Item>
         </Stack>
