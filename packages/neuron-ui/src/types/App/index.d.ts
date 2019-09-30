@@ -38,7 +38,9 @@ declare namespace State {
         } | null
       }
     }[]
+    inputsCount: string
     outputs: DetailedOutput[]
+    outputsCount: string
     witnesses: string[]
   }
   interface Output {

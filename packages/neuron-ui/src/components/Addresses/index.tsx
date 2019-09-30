@@ -83,7 +83,7 @@ const Addresses = ({
         maxWidth: 500,
         onRender: (item?: State.Address, _index?: number, column?: IColumn) => {
           if (item) {
-            if (column && (column.calculatedWidth || 0) < 400) {
+            if (column && (column.calculatedWidth || 0) < 420) {
               return (
                 <div
                   title={item.address}

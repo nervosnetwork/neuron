@@ -69,6 +69,14 @@ export const showOpenDialog = (opt: { title: string; message?: string; onUpload:
   )
 }
 
+export const openExternal = (url: string) => {
+  if (!window.remote) {
+    window.open(url)
+  } else {
+    window.remote.require('electron').shell.openExternal(url)
+  }
+}
+
 export default {
   getLocale,
   validateMnemonic,
@@ -77,4 +85,5 @@ export default {
   showErrorMessage,
   showOpenDialog,
   getWinID,
+  openExternal,
 }

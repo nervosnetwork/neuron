@@ -9,6 +9,8 @@ import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
 
+const CELL_COUNT_THRESHOLD = 10
+
 /**
  * @class TransactionsController
  * @description handle messages from transactions channel
@@ -16,7 +18,7 @@ import LockUtils from 'models/lock-utils'
 export default class TransactionsController {
   @CatchControllerError
   public static async getAll(
-    params: TransactionsByLockHashesParam
+    params: TransactionsByLockHashesParam,
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
 
@@ -32,7 +34,7 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async getAllByKeywords(
-    params: Controller.Params.TransactionsByKeywords
+    params: Controller.Params.TransactionsByKeywords,
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
@@ -56,7 +58,7 @@ export default class TransactionsController {
 
   @CatchControllerError
   public static async getAllByAddresses(
-    params: Controller.Params.TransactionsByAddresses
+    params: Controller.Params.TransactionsByAddresses,
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
     const { pageNo, pageSize, addresses = '' } = params
 
@@ -85,7 +87,10 @@ export default class TransactionsController {
   }
 
   @CatchControllerError
-  public static async get(walletID: string, hash: string): Promise<Controller.Response<Transaction>> {
+  public static async get(
+    walletID: string,
+    hash: string,
+  ): Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
     const transaction = await TransactionsService.get(hash)
 
     if (!transaction) {
@@ -114,15 +119,20 @@ export default class TransactionsController {
       .reduce((result, c) => result + c, BigInt(0))
     const value: bigint = outputCapacities - inputCapacities
     transaction.value = value.toString()
+    const inputsCount = transaction.inputs ? transaction.inputs.length.toString() : '0'
+    if (transaction.inputs) {
+      transaction.inputs = transaction.inputs.slice(0, CELL_COUNT_THRESHOLD)
+    }
+    const outputsCount = transaction.outputs ? transaction.outputs.length.toString() : '0'
     if (transaction.outputs) {
-      transaction.outputs = transaction
-        .outputs.sort((o1, o2) => +o1.outPoint!.index - +o2.outPoint!.index)
-        .slice(0, 200)
+      transaction.outputs = transaction.outputs
+        .sort((o1, o2) => +o1.outPoint!.index - +o2.outPoint!.index)
+        .slice(0, CELL_COUNT_THRESHOLD)
     }
 
     return {
       status: ResponseCode.Success,
-      result: transaction,
+      result: { ...transaction, outputsCount, inputsCount },
     }
   }
 
