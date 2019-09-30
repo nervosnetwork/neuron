@@ -133,7 +133,7 @@ const TransactionList = ({
             const confirmationCount = 1 + +tipBlockNumber - +item.blockNumber
             if (confirmationCount < CONFIRMATION_THRESHOLD) {
               return t(`history.confirming-with-count`, {
-                confirmations: `${confirmationCount} / ${CONFIRMATION_THRESHOLD}`,
+                confirmations: `${Math.max(0, confirmationCount)} / ${CONFIRMATION_THRESHOLD}`,
               })
             }
             const confirmations = localNumberFormatter(confirmationCount)
