@@ -85,7 +85,7 @@ export default class LockUtils {
 
     const lock: Script = {
       codeHash: systemScript.codeHash,
-      args: [LockUtils.addressToBlake160(address)],
+      args: LockUtils.addressToBlake160(address),
       hashType,
     }
     return lock
@@ -113,7 +113,7 @@ export default class LockUtils {
   }
 
   static lockScriptToAddress(lock: Script): string {
-    const blake160: string = lock.args![0]
+    const blake160: string = lock.args!
     return this.blake160ToAddress(blake160)
   }
 
@@ -127,8 +127,7 @@ export default class LockUtils {
   }
 
   static addressToBlake160(address: string): string {
-    const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
-    const result: string = core.utils.parseAddress(address, prefix, 'hex') as string
+    const result: string = core.utils.parseAddress(address, 'hex') as string
     const hrp: string = `0100`
     let blake160: string = result.slice(hrp.length + 2, result.length)
     if (!blake160.startsWith('0x')) {

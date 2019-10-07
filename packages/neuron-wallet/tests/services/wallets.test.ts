@@ -1,5 +1,4 @@
 import WalletService, { WalletProperties } from '../../src/services/wallets'
-import { Witness } from '../../src/types/cell-types'
 import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
@@ -175,17 +174,15 @@ describe('wallet service', () => {
 })
 
 describe('sign witness', () => {
-  const witness: Witness = { data: [] }
+  const witness: string = ''
   const privateKey: string = '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
   const txHash = '0x00f5f31941964004d665a8762df8eb4fab53b5ef8437b7d34a38e018b1409054'
-  const expectedData = [
-    '0x99b79ff84dc39de16ec7ed2e9a2836a2560b95a71041ad3a6c00b2d31844db4c26b760918bbe08747ead167cccb35b1b9ba4db42896c19e412b885cd6589d41a00',
-  ]
+  const expectedData = '0x99b79ff84dc39de16ec7ed2e9a2836a2560b95a71041ad3a6c00b2d31844db4c26b760918bbe08747ead167cccb35b1b9ba4db42896c19e412b885cd6589d41a00'
 
   it('success', () => {
     const wallet = new WalletService()
     const newWitness = wallet.signWitness(witness, privateKey, txHash)
-    expect(newWitness.data).toEqual(expectedData)
+    expect(newWitness).toEqual(expectedData)
   })
 })
 
