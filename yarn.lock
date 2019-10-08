@@ -2079,45 +2079,36 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@nervosnetwork/ckb-sdk-address@0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-address/-/ckb-sdk-address-0.21.0.tgz#bf78b3bcb84f80566d9167c5b38d9dac8b5eb81f"
-  integrity sha512-2sYFh38/DYHbb2OCvyTB3UGbrdbGU2qj47dQY82lsznDphblC6h/VLwISlaE/xQ04de/idb0Uc0fHVAqA4lkEg==
+"@nervosnetwork/ckb-sdk-core@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.22.0.tgz#dc4e93d425154e0dfeb40c08932095c0b99b8947"
+  integrity sha512-HKFFD4L3tK5yWsVSPn0t5qc+NZ35wmoEpd2q5wJtTt8rpLb0n1lJKKk8MQCRhWLR9a8UPskISrLDLyI2uQ7Q8Q==
   dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
-    "@nervosnetwork/ckb-types" "0.21.0"
+    "@nervosnetwork/ckb-sdk-rpc" "0.22.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.22.0"
+    "@nervosnetwork/ckb-types" "0.22.0"
 
-"@nervosnetwork/ckb-sdk-core@0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-core/-/ckb-sdk-core-0.21.0.tgz#60d5bb5bb2c80b31a77c221ab06fded4d34b72c0"
-  integrity sha512-zS8vp01t5iYqXDsAjlhcdZafIXaYkJoYXSC1cnCh3dr23iaYuYjDz9/mbe2j/fZ4p46c1NSqQRpo4TGubhSm1g==
+"@nervosnetwork/ckb-sdk-rpc@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.22.0.tgz#f5a4b8459941fed110505b92fa94014d8853073b"
+  integrity sha512-auc2RqktbvQqyn8LcTnLVjgAMXIm1C0zLIHEEltngXQbZA5YeLXfJnC0RSSvpwloThgFpuKPvTy19b2/N9YzNg==
   dependencies:
-    "@nervosnetwork/ckb-sdk-address" "0.21.0"
-    "@nervosnetwork/ckb-sdk-rpc" "0.21.0"
-    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
-    "@nervosnetwork/ckb-types" "0.21.0"
-
-"@nervosnetwork/ckb-sdk-rpc@0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-rpc/-/ckb-sdk-rpc-0.21.0.tgz#4ff7d8e16b716c49ad5e9cc32868324921ba6b3b"
-  integrity sha512-0Dz871S9slwFPASs3Dz/07kkRK99T3uFo60zgyt1GSEmGoSREqXOwzaXbEU2lqPLvmFz1GP+T/mHt4TtIf7nWg==
-  dependencies:
-    "@nervosnetwork/ckb-sdk-utils" "0.21.0"
+    "@nervosnetwork/ckb-sdk-utils" "0.22.0"
     axios "0.19.0"
 
-"@nervosnetwork/ckb-sdk-utils@0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.21.0.tgz#461c9864d511bd4b9fb4469f4f0a35b4e631e589"
-  integrity sha512-MNMG1cx8w+qLrF1iKJLT8NgpZ+gaFrbvgtYF9SCqQiChqZI2iQyBdT7QyBQ/XPIRi5EKyEjyFH5+ofPwukWDFA==
+"@nervosnetwork/ckb-sdk-utils@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-sdk-utils/-/ckb-sdk-utils-0.22.0.tgz#94a0e03cec53ff6bfe4664e9afc4d84a0e01ee77"
+  integrity sha512-Rz6s9drKhBlZM1NVMpz5wP1WPMDOD6VIpwUpATF7zcpeyzMHJtFgZjGAOeDGuP1OMNZIQzUMW5v7RB3MpzXAQQ==
   dependencies:
-    "@nervosnetwork/ckb-types" "0.21.0"
+    "@nervosnetwork/ckb-types" "0.22.0"
     blake2b-wasm "1.1.7"
     elliptic "6.5.1"
 
-"@nervosnetwork/ckb-types@0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.21.0.tgz#20cfc81f2eef8c7baa36f0ada4f7642aee0eaf39"
-  integrity sha512-1VhtubsnTkY+rP+CiQ25nXoK+5SLWlf+aUsGJ7HhWhjP1gzlBJKXB3EAoa92FZzmfARJ7U3QKJoAEV4Bo6KXkQ==
+"@nervosnetwork/ckb-types@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@nervosnetwork/ckb-types/-/ckb-types-0.22.0.tgz#9191c3f1c8da4bc6c5f6a23910eee0c9ec8f267d"
+  integrity sha512-fA9QD851/PBhBEIWnh9N1S9p+ntEoMNw/GwpsLsL/LfXebzpWxrc10UJgTkOrJEz+Si1MSLz2SKGYGJKRrccTw==
 
 "@nodelib/fs.scandir@2.1.2":
   version "2.1.2"

@@ -50,7 +50,7 @@ const env: ENV = {
         name: 'Local',
         remote: 'http://localhost:8114',
         type: 1,
-        chain: 'ckb_devnet',
+        chain: 'ckb_dev',
       },
     ],
   },
