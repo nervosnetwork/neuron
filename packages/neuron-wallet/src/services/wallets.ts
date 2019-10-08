@@ -6,7 +6,6 @@ import Store from 'models/store'
 import LockUtils from 'models/lock-utils'
 import { TransactionWithoutHash, Input } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
-import Blake2b from 'utils/blake2b'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
 import { Address as AddressInterface } from 'database/address/dao'
 import Keychain from 'models/keys/keychain'
@@ -444,15 +443,10 @@ export default class WalletService {
   }
 
   public signWitness = (witness: string, privateKey: string, txHash: string): string => {
-    const addrObj = core.generateAddress(privateKey)
-    const oldData = witness
-    const blake2b = new Blake2b()
-    blake2b.update(txHash)
-    blake2b.update(oldData)
-    const message = blake2b.digest()
-    const signature = addrObj.signRecoverable(message)
-    const newWitness = signature
-    return newWitness
+    return core.signWitnesses(privateKey)({
+      transactionHash: txHash,
+      witnesses: [witness]
+    })[0]
   }
 
   // Derivate all child private keys for specified BIP44 paths.
