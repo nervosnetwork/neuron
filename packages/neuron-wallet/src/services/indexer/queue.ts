@@ -13,6 +13,7 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
+import TransactionEntity from 'database/chain/entities/transaction'
 
 export interface LockHashInfo {
   lockHash: string
@@ -196,15 +197,25 @@ export default class IndexerQueue {
           logger.debug('indexer fetched tx:', type, txPoint.txHash)
 
           // tx timestamp / blockNumber / blockHash
-          const { blockHash } = transactionWithStatus.txStatus
-          if (blockHash) {
-            const blockHeader = await this.getBlocksService.getHeader(blockHash)
-            transaction.blockHash = blockHash
-            transaction.blockNumber = blockHeader.number
-            transaction.timestamp = blockHeader.timestamp
+          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
+          if (!txEntity || !txEntity.blockHash) {
+            for (const input of transaction.inputs!) {
+              const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
+              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              input.lock = previousOutput.lock
+              input.lockHash = LockUtils.lockScriptToHash(input.lock)
+              input.capacity = previousOutput.capacity
+            }
+            const { blockHash } = transactionWithStatus.txStatus
+            if (blockHash) {
+              const blockHeader = await this.getBlocksService.getHeader(blockHash)
+              transaction.blockHash = blockHash
+              transaction.blockNumber = blockHeader.number
+              transaction.timestamp = blockHeader.timestamp
+            }
+            txEntity = await TransactionPersistor.saveFetchTx(transaction)
           }
-          // broadcast address used
-          const txEntity = await TransactionPersistor.saveFetchTx(transaction)
 
           let address: string | undefined
           if (type === TxPointType.CreatedBy) {

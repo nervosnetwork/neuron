@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface } from 'types/cell-types'
+import { OutPoint, Input as InputInterface, Script } from 'types/cell-types'
 import Transaction from './transaction'
 
 /* eslint @typescript-eslint/no-unused-vars: "warn" */
@@ -32,6 +32,13 @@ export default class Input extends BaseEntity {
     nullable: true,
   })
   lockHash: string | null = null
+
+  // cellbase input has no previous output lock script
+  @Column({
+    type: 'simple-json',
+    nullable: true,
+  })
+  lock: Script | null = null
 
   @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
   transaction!: Transaction
