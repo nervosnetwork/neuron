@@ -9,8 +9,13 @@ export const initDatabase = async () => {
   try {
     const hash = await genesisBlockHash()
     await initConnection(hash)
-    const systemScriptInfo = await LockUtils.systemScript()
-    updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo })
+
+    try {
+      const systemScriptInfo = await LockUtils.systemScript()
+      updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo })
+    } catch (err) {
+      logger.error('update systemScriptInfo failed:', err)
+    }
   } catch (err) {
     logger.debug('initDatabase error:', err)
     try {
