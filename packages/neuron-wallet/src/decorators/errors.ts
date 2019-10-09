@@ -11,7 +11,7 @@ export const CatchControllerError = (_target: any, _name: string, descriptor: Pr
       } catch (err) {
         logger.error(`CatchControllerError:`, err)
         return {
-          status: ResponseCode.Fail,
+          status: err.code || ResponseCode.Fail,
           message: typeof err.message === 'string' ? { content: err.message } : err.message,
         }
       }
