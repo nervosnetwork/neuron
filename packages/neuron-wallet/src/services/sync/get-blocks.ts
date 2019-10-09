@@ -3,9 +3,12 @@ import { generateCore } from 'services/sdk-core'
 
 import { Block, BlockHeader } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
-import CheckAndSave from './check-and-save'
 import Utils from './utils'
 import HexUtils from 'utils/hex'
+import CheckTx from 'services/sync/check-and-save/tx'
+import { TransactionPersistor } from 'services/tx'
+import LockUtils from 'models/lock-utils'
+import { addressesUsedSubject } from './renderer-params'
 
 export default class GetBlocks {
   private retryTime: number
@@ -33,14 +36,25 @@ export default class GetBlocks {
     return tip
   }
 
-  public checkAndSave = async (blocks: Block[], lockHashes: string[]) => {
-    let checkResult: boolean[][] = []
+  public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
     for (const block of blocks) {
-      const checkAndSave = new CheckAndSave(block, lockHashes)
-      const result = await checkAndSave.process()
-      checkResult.push(result)
+      for (const tx of block.transactions) {
+        const checkTx = new CheckTx(tx)
+        const addresses = await checkTx.check(lockHashes)
+        if (addresses.length > 0) {
+          for (const input of tx.inputs!) {
+            const previousTxWithStatus = await this.getTransaction(input.previousOutput!.txHash)
+            const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+            const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+            input.lock = previousOutput.lock
+            input.lockHash = LockUtils.lockScriptToHash(input.lock)
+            input.capacity = previousOutput.capacity
+          }
+          await TransactionPersistor.saveFetchTx(tx)
+          addressesUsedSubject.next(addresses)
+        }
+      }
     }
-    return checkResult
   }
 
   public retryGetBlock = async (num: string): Promise<Block> => {
