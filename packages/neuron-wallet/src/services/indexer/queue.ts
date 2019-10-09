@@ -13,7 +13,7 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
-import TransactionEntity from 'database/chain/entities/transaction';
+import TransactionEntity from 'database/chain/entities/transaction'
 
 export interface LockHashInfo {
   lockHash: string
