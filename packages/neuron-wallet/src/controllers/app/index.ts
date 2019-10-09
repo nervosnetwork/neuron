@@ -19,6 +19,7 @@ import WalletsService from 'services/wallets'
 import WalletsController from 'controllers/wallets'
 import SyncInfoController from 'controllers/sync-info'
 import UpdateController from 'controllers/update'
+import SkipDataAndType from 'services/settings/skip-data-and-type'
 
 import { ResponseCode } from 'utils/const'
 import WindowManager from 'models/window-manager'
@@ -63,7 +64,7 @@ export default class AppController {
           },
           () => {
             resolve(false)
-          }
+          },
         )
       }),
       new Promise(resolve => {
@@ -84,8 +85,8 @@ export default class AppController {
             }
           }
           return undefined
-        })
-      )
+        }),
+      ),
     )
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
@@ -99,6 +100,9 @@ export default class AppController {
           walletID: currentWallet.id,
         }).then(res => res.result)
       : []
+
+    const skipDataAndType = SkipDataAndType.getInstance().get()
+
     const initState = {
       currentWallet,
       wallets: [...wallets.map(({ name, id }, idx: number) => ({ id, name, minerAddress: minerAddresses[idx] }))],
@@ -109,6 +113,7 @@ export default class AppController {
       syncedBlockNumber,
       connectionStatus,
       codeHash,
+      skipDataAndType,
     }
 
     return { status: ResponseCode.Success, result: initState }
@@ -158,6 +163,7 @@ export default class AppController {
     }
     const { id, type } = params
     switch (type) {
+      case 'copyMainnetAddress':
       case 'networkList':
       case 'walletList':
       case 'addressList':

@@ -28,8 +28,6 @@ import { CONFIRMATION_THRESHOLD } from 'utils/const'
 const theme = getTheme()
 const { semanticColors } = theme
 
-const MIN_CELL_WIDTH = 50
-
 interface FormatTransaction extends State.Transaction {
   date: string
 }
@@ -82,8 +80,8 @@ const TransactionList = ({
           name: t('history.type'),
           key: 'type',
           fieldName: 'type',
-          minWidth: MIN_CELL_WIDTH,
-          maxWidth: 50,
+          minWidth: 70,
+          maxWidth: 70,
           onRender: (item?: FormatTransaction) => {
             if (!item) {
               return null
@@ -135,7 +133,7 @@ const TransactionList = ({
             const confirmationCount = 1 + +tipBlockNumber - +item.blockNumber
             if (confirmationCount < CONFIRMATION_THRESHOLD) {
               return t(`history.confirming-with-count`, {
-                confirmations: `${confirmationCount} / ${CONFIRMATION_THRESHOLD}`,
+                confirmations: `${Math.max(0, confirmationCount)} / ${CONFIRMATION_THRESHOLD}`,
               })
             }
             const confirmations = localNumberFormatter(confirmationCount)

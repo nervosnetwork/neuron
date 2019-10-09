@@ -32,7 +32,7 @@ describe('CellsService', () => {
   const bob = {
     lockScript: {
       codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: ['0x36c329ed630d6ce750712a477543672adab57f4c'],
+      args: '0x36c329ed630d6ce750712a477543672adab57f4c',
       hashType: ScriptHashType.Type,
     },
     lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
@@ -43,7 +43,7 @@ describe('CellsService', () => {
   const alice = {
     lockScript: {
       codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: ['0xe2193df51d78411601796b35b17b4f8f2cd85bd0'],
+      args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
       hashType: ScriptHashType.Type,
     },
     lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
@@ -85,7 +85,7 @@ describe('CellsService', () => {
 
   const typeScript: Script = {
     codeHash: randomHex(),
-    args: [],
+    args: '',
     hashType: ScriptHashType.Data,
   }
 

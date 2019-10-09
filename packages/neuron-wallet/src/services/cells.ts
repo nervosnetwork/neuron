@@ -159,7 +159,7 @@ export default class CellsService {
         if (!args) {
           return undefined
         }
-        return args[0]
+        return args
       })
       .filter(blake160 => !!blake160) as string[]
 

@@ -2,6 +2,7 @@ export * from './app'
 export * from './wallets'
 export * from './networks'
 export * from './transactions'
+export * from './skipDataAndType'
 
 export const getLocale = () => {
   if (!window.remote) {
@@ -68,6 +69,14 @@ export const showOpenDialog = (opt: { title: string; message?: string; onUpload:
   )
 }
 
+export const openExternal = (url: string) => {
+  if (!window.remote) {
+    window.open(url)
+  } else {
+    window.remote.require('electron').shell.openExternal(url)
+  }
+}
+
 export default {
   getLocale,
   validateMnemonic,
@@ -76,4 +85,5 @@ export default {
   showErrorMessage,
   showOpenDialog,
   getWinID,
+  openExternal,
 }

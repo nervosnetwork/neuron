@@ -1,3 +1,25 @@
+# [0.22.0](https://github.com/nervosnetwork/neuron/compare/v0.21.0-beta.1...v0.22.0) (2019-10-09)
+
+
+### Bug Fixes
+
+* address balance error in indexer mode ([0a35d61](https://github.com/nervosnetwork/neuron/commit/0a35d61))
+* **neuron-ui:** add an auto match on speed of price from 20 to 40 ([160c844](https://github.com/nervosnetwork/neuron/commit/160c844))
+* **neuron-ui:** fix the relationship between transaction price and speed ([541ab94](https://github.com/nervosnetwork/neuron/commit/541ab94))
+* **neuron-ui:** show 0 confirmations if the real data is negative ([e974a21](https://github.com/nervosnetwork/neuron/commit/e974a21))
+* change `hasData` to 0 in `output` ([04b1176](https://github.com/nervosnetwork/neuron/commit/04b1176))
+
+
+### Features
+
+* bump sdk to v0.22.0 ([b6e3035](https://github.com/nervosnetwork/neuron/commit/b6e3035))
+* **neuron-ui:** add a toggle of skip-data-and-type ([9cb7c62](https://github.com/nervosnetwork/neuron/commit/9cb7c62))
+* **neuron-ui:** extend the width of tx type field to 70 px ([513c7d9](https://github.com/nervosnetwork/neuron/commit/513c7d9))
+* **neuron-ui:** update the view of transaction detail ([#965](https://github.com/nervosnetwork/neuron/issues/965)) ([ca38b40](https://github.com/nervosnetwork/neuron/commit/ca38b40))
+* enable copy the mainnet addresses when it's not connected to the mainnet ([6b3952f](https://github.com/nervosnetwork/neuron/commit/6b3952f))
+
+
+
 # [0.21.0-beta.1](https://github.com/nervosnetwork/neuron/compare/v0.21.0-beta.0...v0.21.0-beta.1) (2019-09-27)
 
 

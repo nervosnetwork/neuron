@@ -4,9 +4,8 @@ import { AccountExtendedPublicKey, PathAndPrivateKey } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
 import LockUtils from 'models/lock-utils'
-import { Witness, TransactionWithoutHash, Input } from 'types/cell-types'
+import { TransactionWithoutHash, Input } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
-import Blake2b from 'utils/blake2b'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
 import { Address as AddressInterface } from 'database/address/dao'
 import Keychain from 'models/keys/keychain'
@@ -380,8 +379,8 @@ export default class WalletService {
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
-    const witnesses: Witness[] = inputs!.map((input: Input) => {
-      const blake160: string = input.lock!.args![0]
+    const witnesses: string[] = inputs!.map((input: Input) => {
+      const blake160: string = input.lock!.args!
       const info = addressInfos.find(i => i.blake160 === blake160)
       const { path } = info!
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
@@ -389,7 +388,7 @@ export default class WalletService {
         throw new Error('no private key found')
       }
       const { privateKey } = pathAndPrivateKey
-      const witness = this.signWitness({ data: [] }, privateKey, txHash)
+      const witness = this.signWitness('', privateKey, txHash)
       return witness
     })
 
@@ -443,20 +442,11 @@ export default class WalletService {
     return addr!.address
   }
 
-  public signWitness = (witness: Witness, privateKey: string, txHash: string): Witness => {
-    const addrObj = core.generateAddress(privateKey)
-    const oldData = witness.data
-    const blake2b = new Blake2b()
-    blake2b.update(txHash)
-    oldData.forEach(data => {
-      blake2b.update(data)
-    })
-    const message = blake2b.digest()
-    const signature = addrObj.signRecoverable(message)
-    const newWitness: Witness = {
-      data: [signature],
-    }
-    return newWitness
+  public signWitness = (witness: string, privateKey: string, txHash: string): string => {
+    return core.signWitnesses(privateKey)({
+      transactionHash: txHash,
+      witnesses: [witness]
+    })[0]
   }
 
   // Derivate all child private keys for specified BIP44 paths.

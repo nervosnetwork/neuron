@@ -188,6 +188,8 @@ export default class IndexerQueue {
             blockHash: transactionWithStatus.txStatus.blockHash!
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
+            const address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
+            AddressesUsedSubject.getSubject().next([address])
             return
           }
 

@@ -25,7 +25,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
   })
 
-  afterEach(async() => {
+  afterEach(async () => {
     const { client } = app.spectron
     client.click('button[type=reset]')
     await client.waitUntilWindowLoaded()
@@ -33,7 +33,7 @@ export default (app: Application) => {
 
   describe('Test address field boundary validation', () => {
     app.test('Invalid address should show alert', async () => {
-    const { client } = app.spectron
+      const { client } = app.spectron
       const invalidAddress = 'invalid-address'
       const inputs = await app.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, invalidAddress)
@@ -52,7 +52,6 @@ export default (app: Application) => {
       const errorMessage = await app.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe('Address cannot be empty')
-
     })
 
     app.test('Valid address should not show alert', async () => {
@@ -65,8 +64,6 @@ export default (app: Application) => {
       expect(errorMessage.state).toBe('failure')
     })
   })
-
-
 
   describe('Test amount field boundary validation', () => {
     const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
@@ -110,5 +107,44 @@ export default (app: Application) => {
       expect(msg.value).toBe('Amount is not enough')
     })
   })
-}
 
+  describe('Test the transaction fee operations', () => {
+    beforeAll(async () => {
+      const { client } = app.spectron
+      client.click('button[role=switch]')
+      await app.waitUntilLoaded()
+    })
+
+    app.test('default price should be 0 and default speed should be 3min', async () => {
+      const { client } = app.spectron
+      const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
+      const [, priceField] = await transactionFeePanel.$$('input')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('0')
+      const speedDropdown = await client.$('div[role=listbox]')
+      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 3min')
+    })
+
+    app.test('Change speed to immediately and the price should be 180', async () => {
+      const { client } = app.spectron
+      client.click('div[role=listbox]')
+      await app.waitUntilLoaded()
+      client.click('button[title=immediately]')
+      await app.waitUntilLoaded()
+      const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
+      const [, priceField] = await transactionFeePanel.$$('input')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('180')
+    })
+
+    app.test('Change the price to 150 and the speed should switch to ~ 30s', async () => {
+      const { client } = app.spectron
+      const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
+      const [, priceField] = await transactionFeePanel.$$('input')
+      client.elementIdClear(priceField.value.ELEMENT)
+      await app.waitUntilLoaded()
+      client.elementIdValue(priceField.value.ELEMENT, '150')
+      const speedDropdown = await client.$('div[role=listbox]')
+
+      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 30s')
+    })
+  })
+}

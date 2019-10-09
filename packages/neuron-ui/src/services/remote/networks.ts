@@ -18,8 +18,18 @@ export const updateNetwork = controllerMethodWrapper(CONTROLLER_NAME)(
   }
 )
 
+export const getAllNetworks = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => {
+  return controller.getAll()
+})
+
+export const getCurrentNetworkID = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => {
+  return controller.currentID()
+})
+
 export default {
   createNetwork,
   updateNetwork,
   setCurrentNetowrk,
+  getAllNetworks,
+  getCurrentNetworkID,
 }

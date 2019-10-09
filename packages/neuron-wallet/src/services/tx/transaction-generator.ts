@@ -34,7 +34,7 @@ export class TransactionGenerator {
         data: '0x',
         lock: {
           codeHash,
-          args: [blake160],
+          args: blake160,
           hashType,
         },
       }
@@ -53,7 +53,7 @@ export class TransactionGenerator {
         data: '0x',
         lock: {
           codeHash,
-          args: [changeBlake160],
+          args: changeBlake160,
           hashType,
         },
       }

@@ -38,7 +38,9 @@ declare namespace State {
         } | null
       }
     }[]
+    inputsCount: string
     outputs: DetailedOutput[]
+    outputsCount: string
     witnesses: string[]
   }
   interface Output {
@@ -139,7 +141,10 @@ declare namespace State {
     }
   }
   interface Settings {
-    showAddressBook: boolean
+    general: {
+      skipDataAndType: boolean
+      showAddressBook: boolean
+    }
     networks: Network[]
     wallets: WalletIdentity[]
   }

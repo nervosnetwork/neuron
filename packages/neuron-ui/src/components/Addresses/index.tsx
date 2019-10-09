@@ -28,7 +28,10 @@ const Addresses = ({
   },
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
-  settings: { showAddressBook = false, networks = [] },
+  settings: {
+    general: { showAddressBook = false },
+    networks = [],
+  },
   history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -80,7 +83,7 @@ const Addresses = ({
         maxWidth: 500,
         onRender: (item?: State.Address, _index?: number, column?: IColumn) => {
           if (item) {
-            if (column && (column.calculatedWidth || 0) < 400) {
+            if (column && (column.calculatedWidth || 0) < 420) {
               return (
                 <div
                   title={item.address}
@@ -204,7 +207,9 @@ const Addresses = ({
             : addr.address,
         }))}
         onItemContextMenu={item => {
-          if (!showMainnetAddress) {
+          if (showMainnetAddress) {
+            contextMenu({ type: 'copyMainnetAddress', id: item.identifier })
+          } else {
             contextMenu({ type: 'addressList', id: item.identifier })
           }
         }}

@@ -70,4 +70,5 @@ declare namespace Controller {
     hash: string
     description: string
   }
+  type SetSkipAndTypeParam = boolean
 }

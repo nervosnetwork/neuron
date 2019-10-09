@@ -11,7 +11,7 @@ import {
   AfterRemove,
 } from 'typeorm'
 import { remote } from 'electron'
-import { Witness, Transaction as TransactionInterface, TransactionStatus, CellDep } from 'types/cell-types'
+import { Transaction as TransactionInterface, TransactionStatus, CellDep } from 'types/cell-types'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
@@ -47,7 +47,7 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  witnesses!: Witness[]
+  witnesses!: string[]
 
   @Column({
     type: 'varchar',

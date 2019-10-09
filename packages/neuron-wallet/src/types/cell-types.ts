@@ -45,7 +45,7 @@ export interface TransactionWithoutHash {
   value?: string
   blockNumber?: string
   blockHash?: string
-  witnesses?: Witness[]
+  witnesses?: string[]
   type?: string
   description?: string
   status?: TransactionStatus
@@ -65,10 +65,6 @@ export interface Input {
   lock?: Script
 }
 
-export interface Witness {
-  data: string[]
-}
-
 export interface Cell {
   capacity: string
   data?: string
@@ -85,7 +81,7 @@ export interface OutPoint {
 }
 
 export interface Script {
-  args?: string[]
+  args?: string
   codeHash?: string | null
   hashType: ScriptHashType
 }

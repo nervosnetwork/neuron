@@ -269,11 +269,11 @@ export class TransactionsService {
     let outputBlake160s: string[] = []
     if (tx.inputs) {
       inputBlake160s = tx.inputs
-        .map(input => input.lock && input.lock.args && input.lock.args[0])
+        .map(input => input.lock && input.lock.args)
         .filter(blake160 => blake160) as string[]
     }
     if (tx.outputs) {
-      outputBlake160s = tx.outputs.map(output => output.lock.args![0])
+      outputBlake160s = tx.outputs.map(output => output.lock.args!)
     }
     return [...new Set(inputBlake160s.concat(outputBlake160s))]
   }

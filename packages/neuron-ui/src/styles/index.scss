@@ -109,11 +109,12 @@ navbar {
     }
   }
 
-  .textOverflow {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 
+}
+
+.textOverflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // hack fabric ui experimental pagination style
