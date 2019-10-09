@@ -11,6 +11,7 @@ import { sleep } from '../application/utils'
  * 6. check the notification, it should have two messages
  *   1. incorrect PasswordRequest
  *   2. disconnected to the network
+ * 6. password-incorrect alerts should be dismissed once a correct one is inputted
  */
 export default (app: Application) => {
   beforeAll(async () => {
@@ -32,7 +33,7 @@ export default (app: Application) => {
 
   describe('Test alert message and notification', () => {
     const messages = {
-      disconnected: 'connect ECONNREFUSED 127.0.0.1:8114',
+      disconnected: 'Connection to the node is failed',
       incorrectPassword: 'Password is incorrect',
     }
 
@@ -68,5 +69,19 @@ export default (app: Application) => {
     })
 
     // TODO: dismiss a message
+
+    app.test('Password-incorrect alerts should be dismissed once a correct one is inputted', async () => {
+      const { client } = app.spectron
+      await app.clickMenu(['Wallet', 'Delete Current Wallet'])
+      await app.waitUntilLoaded()
+      const inputElement = await client.$('input')
+      await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
+      client.click('button[type=submit]')
+      await app.waitUntilLoaded()
+      sleep(4000)
+      const alertComponent = await client.$('.ms-MessageBar-text')
+      const msg = await client.elementIdText(alertComponent.value.ELEMENT)
+      expect(msg.value).toBe(messages.disconnected)
+    })
   })
 }

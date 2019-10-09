@@ -275,6 +275,7 @@
         "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 61 CKB 的值",
         "102": "$t(messages.fields.{{fieldName}})无效",
         "103": "$t(messages.fields.keystore-password) 不正确",
+        "104": "未连接到节点",
         "201": "缺少$t(messages.fields.{{fieldName}})",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}",

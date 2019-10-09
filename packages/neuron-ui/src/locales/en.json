@@ -275,6 +275,7 @@
         "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB",
         "102": "$t(messages.fields.{{fieldName}}) is invalid",
         "103": "$t(messages.fields.keystore-password) is incorrect",
+        "104": "Connection to the node is failed",
         "201": "$t(messages.fields.{{fieldName}}) is required",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}",
