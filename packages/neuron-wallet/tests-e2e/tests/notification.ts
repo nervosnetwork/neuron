@@ -11,7 +11,7 @@ import { sleep } from '../application/utils'
  * 6. check the notification, it should have two messages
  *   1. incorrect PasswordRequest
  *   2. disconnected to the network
- * 6. password-incorrect alerts should be dismissed once a correct one is inputted
+ * 7. password-incorrect alerts should be dismissed once a correct one is inputted
  */
 export default (app: Application) => {
   beforeAll(async () => {
