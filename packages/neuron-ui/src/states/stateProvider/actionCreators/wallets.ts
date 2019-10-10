@@ -152,6 +152,10 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
     sendCapacity(params)
       .then(res => {
         if (res.status === 1) {
+          dispatch({
+            type: AppActions.ClearNotificationsOfCode,
+            payload: ErrorCode.PasswordIncorrect,
+          })
           history.push(Routes.History)
         } else {
           addNotification({
