@@ -60,7 +60,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
     }
   }
 
-  if (res.status) {
+  if (res.status === 1) {
     return {
       status: 1,
       result: res.result || null,
@@ -68,7 +68,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
   }
 
   return {
-    status: 0,
+    status: res.status || 0,
     message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
   }
 }

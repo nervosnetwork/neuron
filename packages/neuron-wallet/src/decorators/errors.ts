@@ -1,6 +1,8 @@
 import { ResponseCode } from 'utils/const'
 import logger from 'utils/logger'
 
+const NODE_DISCONNECTED_CODE = 104
+
 export const CatchControllerError = (_target: any, _name: string, descriptor: PropertyDescriptor) => {
   const originalMethod = descriptor.value
   return {
@@ -10,8 +12,11 @@ export const CatchControllerError = (_target: any, _name: string, descriptor: Pr
         return await originalMethod(...args)
       } catch (err) {
         logger.error(`CatchControllerError:`, err)
+        if (err.code === 'ECONNREFUSED') {
+          err.code = NODE_DISCONNECTED_CODE
+        }
         return {
-          status: ResponseCode.Fail,
+          status: err.code || ResponseCode.Fail,
           message: typeof err.message === 'string' ? { content: err.message } : err.message,
         }
       }

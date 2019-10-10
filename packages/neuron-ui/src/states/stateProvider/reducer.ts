@@ -34,6 +34,7 @@ export enum AppActions {
   UpdateMessage = 'updateMessage',
   AddNotification = 'addNotification',
   DismissNotification = 'dismissNotification',
+  ClearNotificationsOfCode = 'clearNotificationsOfCode',
   ClearNotifications = 'clearNotifications',
   CleanTransaction = 'cleanTransaction',
   CleanTransactions = 'cleanTransactions',
@@ -471,6 +472,18 @@ export const reducer = (
             app.notifications.findIndex(message => message.timestamp === payload) === app.notifications.length - 1
               ? false
               : app.showTopAlert,
+        },
+      }
+    }
+    case AppActions.ClearNotificationsOfCode: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          messages: {
+            ...app.messages,
+          },
+          notifications: app.notifications.filter(({ code }) => code !== payload),
         },
       }
     }

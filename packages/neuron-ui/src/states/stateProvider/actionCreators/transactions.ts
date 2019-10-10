@@ -9,7 +9,7 @@ import { addNotification } from './app'
 
 export const updateTransactionList = (params: GetTransactionListParams) => (dispatch: StateDispatch) => {
   getTransactionList(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       dispatch({
         type: NeuronWalletActions.UpdateTransactionList,
         payload: res.result,
@@ -32,7 +32,7 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
     payload: descriptionParams,
   }) // update local description before remote description to avoid the flicker on the field
   updateRemoteTransactionDescription(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       dispatch({
         type: NeuronWalletActions.UpdateTransactionDescription,
         payload: descriptionParams,
