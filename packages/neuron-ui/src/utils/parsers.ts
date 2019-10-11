@@ -23,4 +23,12 @@ export const prompt = (search: string) => {
 }
 export const queryParsers = { history, prompt }
 
-export default { queryParsers }
+/* eslint-disable no-bitwise */
+export const epochParser = (epoch: string) => {
+  return {
+    index: +epoch & 0xffff,
+  }
+}
+/* eslint-enable no-bitwise */
+
+export default { queryParsers, epochParser }
