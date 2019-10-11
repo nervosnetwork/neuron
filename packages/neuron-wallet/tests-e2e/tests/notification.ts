@@ -79,9 +79,8 @@ export default (app: Application) => {
       client.click('button[type=submit]')
       await app.waitUntilLoaded()
       sleep(4000)
-      const alertComponent = await client.$('.ms-MessageBar-text')
-      const msg = await client.elementIdText(alertComponent.value.ELEMENT)
-      expect(msg.value).toBe(messages.disconnected)
+      const alertComponent = await client.$('.ms-MessageBar--error')
+      expect(alertComponent.state).toBe('failure')
     })
   })
 }

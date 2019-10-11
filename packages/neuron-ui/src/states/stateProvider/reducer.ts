@@ -483,6 +483,10 @@ export const reducer = (
           messages: {
             ...app.messages,
           },
+          showTopAlert: !(
+            app.notifications[app.notifications.length - 1] &&
+            app.notifications[app.notifications.length - 1].code === payload
+          ),
           notifications: app.notifications.filter(({ code }) => code !== payload),
         },
       }
