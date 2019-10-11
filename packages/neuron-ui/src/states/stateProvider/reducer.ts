@@ -476,6 +476,7 @@ export const reducer = (
       }
     }
     case AppActions.ClearNotificationsOfCode: {
+      const notifications = app.notifications.filter(({ code }) => code !== payload)
       return {
         ...state,
         app: {
@@ -483,11 +484,11 @@ export const reducer = (
           messages: {
             ...app.messages,
           },
-          showTopAlert: !(
-            app.notifications[app.notifications.length - 1] &&
-            app.notifications[app.notifications.length - 1].code === payload
-          ),
-          notifications: app.notifications.filter(({ code }) => code !== payload),
+          showTopAlert:
+            app.showTopAlert &&
+            notifications.length > 0 &&
+            !(app.notifications.length > 0 && app.notifications[app.notifications.length - 1].code === payload),
+          notifications,
         },
       }
     }
