@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
-import { queryParsers } from 'utils/parser'
+import { queryParsers } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
 
 export const useSearch = (search: string = '', walletID: string = '', dispatch: React.Dispatch<any>) => {

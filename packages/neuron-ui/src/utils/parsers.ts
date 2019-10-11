@@ -23,4 +23,10 @@ export const prompt = (search: string) => {
 }
 export const queryParsers = { history, prompt }
 
-export default { queryParsers }
+export const epochParser = (epoch: string) => {
+  return {
+    index: +epoch & 0xffff,
+  }
+}
+
+export default { queryParsers, epochParser }
