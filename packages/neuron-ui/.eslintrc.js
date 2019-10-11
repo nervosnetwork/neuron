@@ -72,7 +72,8 @@ module.exports = {
     "no-alert": [0],
     "no-console": [2, {
       "allow": ["info", "warn", "error", "group", "groupEnd"]
-    }]
+    }],
+    "no-bitwise": [0]
   },
   "env": {
     "jest": true,
