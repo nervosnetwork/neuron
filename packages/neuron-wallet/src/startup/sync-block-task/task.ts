@@ -1,7 +1,6 @@
 import { remote } from 'electron'
 import { initConnection as initAddressConnection } from 'database/address/ormconfig'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
-import { NetworkWithID } from 'types/network'
 import { register as registerTxStatusListener } from 'listeners/tx-status'
 import { register as registerAddressListener } from 'listeners/address'
 import IndexerRPC from 'services/indexer/indexer-rpc'
@@ -9,6 +8,7 @@ import Utils from 'services/sync/utils'
 
 import { switchNetwork as syncSwitchNetwork } from './sync'
 import { switchNetwork as indexerSwitchNetwork } from './indexer'
+import { DatabaseInitParams } from './create'
 
 // register to listen address updates
 registerAddressListener()
@@ -32,13 +32,14 @@ export const testIndexer = async (url: string): Promise<boolean> => {
 
 export const run = async () => {
   await initAddressConnection()
-  databaseInitSubject.subscribe(async (network: NetworkWithID | undefined) => {
-    if (network) {
+  databaseInitSubject.subscribe(async (params: DatabaseInitParams) => {
+    const { network, genesisBlockHash } = params
+    if (network && genesisBlockHash.startsWith('0x')) {
       const indexerEnabled = await testIndexer(network.remote)
       if (indexerEnabled) {
-        await indexerSwitchNetwork(network.remote)
+        await indexerSwitchNetwork(network.remote, genesisBlockHash)
       } else {
-        await syncSwitchNetwork(network.remote)
+        await syncSwitchNetwork(network.remote, genesisBlockHash)
       }
     }
   })

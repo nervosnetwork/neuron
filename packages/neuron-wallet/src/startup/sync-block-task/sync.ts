@@ -4,7 +4,7 @@ import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
 import { Address } from 'database/address/dao'
 
-import { initDatabase } from './init-database'
+import initConnection from 'database/chain/ormconfig'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -18,24 +18,24 @@ export interface LockHashInfo {
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
-export const loadAddressesAndConvert = async (): Promise<string[]> => {
+export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
   return lockHashes
 }
 
 // call this after network switched
 let blockListener: BlockListener | undefined
-export const switchNetwork = async (url: string) => {
+export const switchNetwork = async (url: string, genesisBlockHash: string) => {
   // stop all blocks service
   if (blockListener) {
     await blockListener.stopAndWait()
   }
 
   // disconnect old connection and connect to new database
-  await initDatabase()
+  await initConnection(genesisBlockHash)
   // load lockHashes
-  const lockHashes: string[] = await loadAddressesAndConvert()
+  const lockHashes: string[] = await loadAddressesAndConvert(url)
   // start sync blocks service
   blockListener = new BlockListener(url, lockHashes, nodeService.tipNumberSubject)
 
@@ -69,7 +69,7 @@ export const switchNetwork = async (url: string) => {
       await blockListener.stopAndWait()
     }
     // wait former queue to be drained
-    const hashes: string[] = await loadAddressesAndConvert()
+    const hashes: string[] = await loadAddressesAndConvert(url)
     blockListener = new BlockListener(url, hashes, nodeService.tipNumberSubject)
     await blockListener.start(true)
   }

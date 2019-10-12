@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 import { ReplaySubject } from 'rxjs'
 import { bufferTime } from 'rxjs/operators'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
+import AddressesUsedSubject, { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 import AddressService from 'services/addresses'
 import WalletService from 'services/wallets'
 import { AccountExtendedPublicKey } from 'models/keys/key'
@@ -12,17 +12,21 @@ const addressesUsedSubject = isRenderer
   : AddressesUsedSubject.getSubject()
 
 // pipe not working directly
-const bridge = new ReplaySubject<string[]>(1000)
-addressesUsedSubject.subscribe((addresses: string[]) => {
-  bridge.next(addresses)
+const bridge = new ReplaySubject<AddressesWithURL>(1000)
+addressesUsedSubject.subscribe((params: AddressesWithURL) => {
+  bridge.next(params)
 })
 
 // update txCount when addresses used
 export const register = () => {
-  bridge.pipe(bufferTime(1000)).subscribe(async (addressesList: string[][]) => {
-    const addresses = addressesList.reduce((acc, val) => acc.concat(val), [])
+  bridge.pipe(bufferTime(1000)).subscribe(async (addressesList: AddressesWithURL[]) => {
+    if (addressesList.length === 0) {
+      return
+    }
+    const addresses = addressesList.map(list => list.addresses).reduce((acc, val) => acc.concat(val), [])
+    const url: string = addressesList[addressesList.length - 1].url
     const uniqueAddresses = [...new Set(addresses)]
-    const addrs = await AddressService.updateTxCountAndBalances(uniqueAddresses)
+    const addrs = await AddressService.updateTxCountAndBalances(uniqueAddresses, url)
     const walletIds: string[] = addrs.map(addr => addr.walletId).filter((value, idx, a) => a.indexOf(value) === idx)
     await Promise.all(
       walletIds.map(async id => {

@@ -4,30 +4,30 @@ import LockUtils from 'models/lock-utils'
 import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
 import { Address } from 'database/address/dao'
 
-import { initDatabase } from './init-database'
+import initConnection from 'database/chain/ormconfig'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
-export const loadAddressesAndConvert = async (): Promise<string[]> => {
+export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
   return lockHashes
 }
 
 // call this after network switched
 let indexerQueue: IndexerQueue | undefined
-export const switchNetwork = async (nodeURL: string) => {
+export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) => {
   // stop all blocks service
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
 
   // disconnect old connection and connect to new database
-  await initDatabase()
+  await initConnection(genesisBlockHash)
   // load lockHashes
-  const lockHashes: string[] = await loadAddressesAndConvert()
+  const lockHashes: string[] = await loadAddressesAndConvert(nodeURL)
   const lockHashInfos: LockHashInfo[] = lockHashes.map(lockHash => {
     return {
       lockHash,
@@ -42,7 +42,7 @@ export const switchNetwork = async (nodeURL: string) => {
     if (indexerQueue) {
       const infos: LockHashInfo[] = (await Promise.all(
         addresses.map(async addr => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
+          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address, nodeURL)
           // undefined means true
           const isImporting: boolean = addr.isImporting !== false
           return hashes.map(h => {
