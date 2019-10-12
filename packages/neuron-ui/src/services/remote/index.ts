@@ -4,9 +4,12 @@ export * from './networks'
 export * from './transactions'
 export * from './skipDataAndType'
 
+const REMOTE_MODULE_NOT_FOUND =
+  'The remote module is not found, please make sure the UI is running inside the Electron App'
+
 export const getLocale = () => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     return window.navigator.language
   }
   return window.remote.require('electron').app.getLocale()
@@ -14,7 +17,7 @@ export const getLocale = () => {
 
 export const getWinID = () => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     return -1
   }
   return window.remote.getCurrentWindow().id
@@ -22,7 +25,7 @@ export const getWinID = () => {
 
 export const validateMnemonic = (mnemonic: string): boolean => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     return true
   }
   const { validateMnemonic: remoteValidateMnemonic } = window.remote.require('./models/keys/mnemonic')
@@ -31,7 +34,7 @@ export const validateMnemonic = (mnemonic: string): boolean => {
 
 export const generateMnemonic = (): string => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     return ''
   }
   const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
@@ -40,7 +43,7 @@ export const generateMnemonic = (): string => {
 
 export const showMessage = (options: any, callback: Function) => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     window.alert(options.message)
   } else {
     window.remote.require('electron').dialog.showMessageBox(options, callback)
@@ -49,7 +52,7 @@ export const showMessage = (options: any, callback: Function) => {
 
 export const showErrorMessage = (title: string, content: string) => {
   if (!window.remote) {
-    console.warn('remote is not supported')
+    console.warn(REMOTE_MODULE_NOT_FOUND)
     window.alert(`${title}: ${content}`)
   } else {
     window.remote.require('electron').dialog.showErrorBox(title, content)
@@ -58,7 +61,7 @@ export const showErrorMessage = (title: string, content: string) => {
 
 export const showOpenDialog = (opt: { title: string; message?: string; onUpload: Function }) => {
   if (!window.remote) {
-    window.alert('remote is not supported')
+    window.alert(REMOTE_MODULE_NOT_FOUND)
   }
   const { onUpload, ...options } = opt
   return window.remote.require('electron').dialog.showOpenDialog(
