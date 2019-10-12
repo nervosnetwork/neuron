@@ -6,6 +6,7 @@ import AddressDao, { Address as AddressInterface } from 'database/address/dao'
 import env from 'env'
 import AddressEntity, { AddressVersion } from 'database/address/entities/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
+import NodeService from './node'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -96,10 +97,13 @@ export default class AddressService {
 
   /* eslint no-await-in-loop: "off" */
   /* eslint no-restricted-syntax: "off" */
-  public static updateTxCountAndBalances = async (addresses: string[]) => {
+  public static updateTxCountAndBalances = async (
+    addresses: string[],
+    url: string = NodeService.getInstance().core.rpc.node.url
+  ) => {
     let addrs: AddressEntity[] = []
     for (const address of addresses) {
-      const ads = await AddressDao.updateTxCountAndBalance(address)
+      const ads = await AddressDao.updateTxCountAndBalance(address, url)
       addrs = addrs.concat(ads)
     }
     return addrs

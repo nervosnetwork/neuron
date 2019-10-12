@@ -45,9 +45,12 @@ export default class IndexerQueue {
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
 
+  private url: string
+
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
     // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
+    this.url = url
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks(url)
     this.blockNumberService = new BlockNumber()
@@ -190,7 +193,10 @@ export default class IndexerQueue {
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
             const address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
-            AddressesUsedSubject.getSubject().next([address])
+            AddressesUsedSubject.getSubject().next({
+              addresses: [address],
+              url: this.url,
+            })
             return
           }
 
@@ -229,7 +235,10 @@ export default class IndexerQueue {
             }
           }
           if (address) {
-            AddressesUsedSubject.getSubject().next([address])
+            AddressesUsedSubject.getSubject().next({
+              addresses: [address],
+              url: this.url,
+            })
           }
         }
       }

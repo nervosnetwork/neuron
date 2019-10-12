@@ -7,6 +7,7 @@ import { TransactionStatus } from 'types/cell-types'
 import { OutputStatus } from 'services/tx/params'
 import AddressEntity, { AddressVersion } from './entities/address'
 import { getConnection } from './ormconfig'
+import NodeService from 'services/node'
 
 export interface Address {
   walletId: string
@@ -54,7 +55,10 @@ export default class AddressDao {
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
   // totalBalance means balance of all cells, including those who hold data and type script
-  public static updateTxCountAndBalance = async (address: string): Promise<AddressEntity[]> => {
+  public static updateTxCountAndBalance = async (
+    address: string,
+    url: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<AddressEntity[]> => {
     const addressEntities = await getConnection()
       .getRepository(AddressEntity)
       .find({
@@ -64,12 +68,12 @@ export default class AddressDao {
     const txCount: number = await TransactionsService.getCountByAddressAndStatus(address, [
       TransactionStatus.Pending,
       TransactionStatus.Success,
-    ])
+    ], url)
     const entities = await Promise.all(
       addressEntities.map(async entity => {
         const addressEntity = entity
         addressEntity.txCount = txCount
-        const lockHashes: string[] = await LockUtils.addressToAllLockHashes(addressEntity.address)
+        const lockHashes: string[] = await LockUtils.addressToAllLockHashes(addressEntity.address, url)
         addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, true)
         addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, true)
         addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending, true)

@@ -1,11 +1,16 @@
-import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import {
+  scriptToHash,
+  AddressPrefix,
+  bech32Address,
+  AddressType,
+  parseAddress
+} from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
 import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import env from 'env'
 import ConvertTo from 'types/convert-to'
 import { SystemScriptSubject } from 'models/subjects/system-script'
-
-const { core } = NodeService.getInstance()
+import Core from '@nervosnetwork/ckb-sdk-core'
 
 export interface SystemScript {
   codeHash: string
@@ -28,10 +33,14 @@ export default class LockUtils {
   @subscribed
   static systemScriptInfo: SystemScript | undefined
 
-  static async systemScript(): Promise<SystemScript> {
-    if (this.systemScriptInfo) {
+  static previousURL: string | undefined
+
+  static async systemScript(nodeURL: string = NodeService.getInstance().core.rpc.node.url): Promise<SystemScript> {
+    if (this.systemScriptInfo && nodeURL === LockUtils.previousURL) {
       return this.systemScriptInfo
     }
+
+    const core = new Core(nodeURL)
 
     const systemCell = await core.loadSecp256k1Dep()
     let { codeHash } = systemCell
@@ -57,6 +66,7 @@ export default class LockUtils {
     }
 
     this.systemScriptInfo = systemScriptInfo
+    LockUtils.previousURL = nodeURL
 
     return systemScriptInfo
   }
@@ -80,8 +90,12 @@ export default class LockUtils {
     return LockUtils.computeScriptHash(lock)
   }
 
-  static async addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Promise<Script> {
-    const systemScript = await this.systemScript()
+  static async addressToLockScript(
+    address: string,
+    hashType: ScriptHashType = ScriptHashType.Type,
+    nodeURL: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<Script> {
+    const systemScript = await this.systemScript(nodeURL)
 
     const lock: Script = {
       codeHash: systemScript.codeHash,
@@ -91,22 +105,32 @@ export default class LockUtils {
     return lock
   }
 
-  static async addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): Promise<string> {
-    const lock: Script = await this.addressToLockScript(address, hashType)
+  static async addressToLockHash(
+    address: string,
+    hashType: ScriptHashType = ScriptHashType.Type,
+    nodeURL: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<string> {
+    const lock: Script = await this.addressToLockScript(address, hashType, nodeURL)
     const lockHash: string = this.lockScriptToHash(lock)
 
     return lockHash
   }
 
-  static async addressToAllLockHashes(address: string): Promise<string[]> {
-    const dataLockHash = await LockUtils.addressToLockHash(address)
+  static async addressToAllLockHashes(
+    address: string,
+    nodeURL: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<string[]> {
+    const dataLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Type, nodeURL)
     return [dataLockHash]
   }
 
-  static async addressesToAllLockHashes(addresses: string[]): Promise<string[]> {
+  static async addressesToAllLockHashes(
+    addresses: string[],
+    nodeURL: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<string[]> {
     const lockHashes: string[] = (await Promise.all(
       addresses.map(async addr => {
-        return LockUtils.addressToAllLockHashes(addr)
+        return LockUtils.addressToAllLockHashes(addr, nodeURL)
       })
     )).reduce((acc, val) => acc.concat(val), [])
     return lockHashes
@@ -118,16 +142,16 @@ export default class LockUtils {
   }
 
   static blake160ToAddress(blake160: string): string {
-    const prefix = env.testnet ? core.utils.AddressPrefix.Testnet : core.utils.AddressPrefix.Mainnet
-    return core.utils.bech32Address(blake160, {
+    const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
+    return bech32Address(blake160, {
       prefix,
-      type: core.utils.AddressType.HashIdx,
+      type: AddressType.HashIdx,
       codeHashIndex: '0x00',
     })
   }
 
   static addressToBlake160(address: string): string {
-    const result: string = core.utils.parseAddress(address, 'hex') as string
+    const result: string = parseAddress(address, 'hex') as string
     const hrp: string = `0100`
     let blake160: string = result.slice(hrp.length + 2, result.length)
     if (!blake160.startsWith('0x')) {

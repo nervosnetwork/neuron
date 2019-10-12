@@ -6,14 +6,22 @@ import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
+import { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 
 export default class CheckTx {
   private tx: Transaction
-  private addressesUsedSubject: Subject<string[]>
+  private addressesUsedSubject: Subject<AddressesWithURL>
+  private url: string
 
-  constructor(tx: Transaction, addressesUsedSubject: Subject<string[]> = addressesUsedSubjectParam) {
+  constructor(
+    tx: Transaction,
+    url: string,
+    addressesUsedSubject: Subject<AddressesWithURL> = addressesUsedSubjectParam,
+  ) {
     this.tx = tx
     this.addressesUsedSubject = addressesUsedSubject
+
+    this.url = url
   }
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
@@ -33,7 +41,10 @@ export default class CheckTx {
     const addresses = await this.check(lockHashes)
     if (addresses.length > 0) {
       await TransactionPersistor.saveFetchTx(this.tx)
-      this.addressesUsedSubject.next(addresses)
+      this.addressesUsedSubject.next({
+        addresses,
+        url: this.url,
+      })
       return true
     }
     return false

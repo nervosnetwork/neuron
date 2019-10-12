@@ -14,10 +14,12 @@ export default class GetBlocks {
   private retryTime: number
   private retryInterval: number
   private core: Core
+  private url: string
 
   constructor(url: string, retryTime: number = 3, retryInterval: number = 100) {
     this.retryTime = retryTime
     this.retryInterval = retryInterval
+    this.url = url
     this.core = generateCore(url)
   }
 
@@ -39,7 +41,7 @@ export default class GetBlocks {
   public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
     for (const block of blocks) {
       for (const tx of block.transactions) {
-        const checkTx = new CheckTx(tx)
+        const checkTx = new CheckTx(tx, this.url)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           for (const input of tx.inputs!) {
@@ -51,7 +53,10 @@ export default class GetBlocks {
             input.capacity = previousOutput.capacity
           }
           await TransactionPersistor.saveFetchTx(tx)
-          addressesUsedSubject.next(addresses)
+          addressesUsedSubject.next({
+            addresses,
+            url: this.url,
+          })
         }
       }
     }

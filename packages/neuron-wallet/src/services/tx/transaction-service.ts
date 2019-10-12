@@ -4,6 +4,7 @@ import { Transaction, TransactionWithoutHash, TransactionStatus } from 'types/ce
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
+import NodeService from 'services/node'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -300,8 +301,12 @@ export class TransactionsService {
     return count
   }
 
-  public static getCountByAddressAndStatus = async (address: string, status: TransactionStatus[]): Promise<number> => {
-    const lockHashes: string[] = await LockUtils.addressToAllLockHashes(address)
+  public static getCountByAddressAndStatus = async (
+    address: string,
+    status: TransactionStatus[],
+    url: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<number> => {
+    const lockHashes: string[] = await LockUtils.addressToAllLockHashes(address, url)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 
