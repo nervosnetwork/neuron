@@ -29,6 +29,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
     settings: { wallets },
   } = props
   const [fields, setFields] = useState(defaultFields)
+  const [loading, setLoading] = useState(false)
   const goBack = useGoBack(history)
 
   useEffect(() => {
@@ -66,12 +67,18 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   }, [fields])
 
   const onSubmit = useCallback(() => {
-    importWalletWithKeystore({
-      name: fields.name || '',
-      keystorePath: fields.path,
-      password: fields.password,
-    })(dispatch, history)
-  }, [fields.name, fields.password, fields.path, history, dispatch])
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    setTimeout(() => {
+      importWalletWithKeystore({
+        name: fields.name || '',
+        keystorePath: fields.path,
+        password: fields.password,
+      })(dispatch, history).finally(() => setLoading(false))
+    }, 200)
+  }, [fields.name, fields.password, fields.path, history, dispatch, loading])
 
   return (
     <Stack verticalFill verticalAlign="center" tokens={{ childrenGap: 15 }}>
@@ -117,7 +124,10 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <DefaultButton onClick={goBack}>{t('import-keystore.button.back')}</DefaultButton>
-        <PrimaryButton disabled={!(fields.name && fields.path && fields.password && !isNameUsed)} onClick={onSubmit}>
+        <PrimaryButton
+          disabled={loading || !(fields.name && fields.path && fields.password && !isNameUsed)}
+          onClick={onSubmit}
+        >
           {t('import-keystore.button.submit')}
         </PrimaryButton>
       </Stack>
