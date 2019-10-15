@@ -150,7 +150,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "view-in-explorer": "浏览器",
-      "view-in-explorer-button-title": "浏览器中查看详情"
+      "view-in-explorer-button-title": "浏览器中查看详情",
+      "cell-from-coinbase": "来自 Coinbase"
     },
     "addresses": {
       "addresses": "地址",

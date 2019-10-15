@@ -13,6 +13,20 @@ import { explorerNavButton } from './style.module.scss'
 
 const MIN_CELL_WIDTH = 70
 
+const CompactAddress = ({ address }: { address: string }) => (
+  <div
+    title={address}
+    style={{
+      overflow: 'hidden',
+      display: 'flex',
+    }}
+    className="monospacedFont"
+  >
+    <span className="textOverflow">{address.slice(0, -6)}</span>
+    <span>{address.slice(-6)}</span>
+  </div>
+)
+
 const Transaction = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
@@ -27,7 +41,7 @@ const Transaction = () => {
           name: t('transaction.index'),
           minWidth: 60,
           maxWidth: 60,
-          onRender: (_item?: any, index?: number) => {
+          onRender: (_input?: State.DetailedInput, index?: number) => {
             if (undefined !== index) {
               return index
             }
@@ -35,17 +49,34 @@ const Transaction = () => {
           },
         },
         {
-          key: 'outPointCell',
-          name: 'OutPoint Cell',
-          minWidth: 150,
-          maxWidth: 600,
-          onRender: (item: any) => {
-            const text = item.previousOutput ? `${item.previousOutput.txHash}[${item.previousOutput.index}]` : 'none'
-            return (
-              <span title={text} className="textOverflow">
-                {text}
-              </span>
-            )
+          key: 'address',
+          name: t('transaction.address'),
+          minWidth: 200,
+          maxWidth: 500,
+          onRender: (input?: State.DetailedInput, _index?: number, column?: IColumn) => {
+            if (!input) {
+              return null
+            }
+            if (!input.lock) {
+              return t('transaction.cell-from-coinbase')
+            }
+            try {
+              const address = ckbCore.utils.bech32Address(input.lock.args, {
+                prefix: addressPrefix,
+                type: ckbCore.utils.AddressType.HashIdx,
+                codeHashIndex: '0x00',
+              })
+              if (column && (column.calculatedWidth || 0) < 450) {
+                return <CompactAddress address={address} />
+              }
+              return (
+                <span title={address} className="monospacedFont">
+                  {address}
+                </span>
+              )
+            } catch {
+              return null
+            }
           },
         },
         {
@@ -67,7 +98,7 @@ const Transaction = () => {
           ...col,
         })
       ),
-    [t]
+    [addressPrefix, t]
   )
 
   const outputColumns: IColumn[] = useMemo(
@@ -101,19 +132,7 @@ const Transaction = () => {
                 codeHashIndex: '0x00',
               })
               if (column && (column.calculatedWidth || 0) < 450) {
-                return (
-                  <div
-                    title={address}
-                    style={{
-                      overflow: 'hidden',
-                      display: 'flex',
-                    }}
-                    className="monospacedFont"
-                  >
-                    <span className="textOverflow">{address.slice(0, -6)}</span>
-                    <span>{address.slice(-6)}</span>
-                  </div>
-                )
+                return <CompactAddress address={address} />
               }
               return (
                 <span title={address} className="monospacedFont">
