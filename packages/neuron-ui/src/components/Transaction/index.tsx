@@ -95,7 +95,7 @@ const Transaction = () => {
               return null
             }
             try {
-              const address = ckbCore.utils.bech32Address(output.lock.args[0], {
+              const address = ckbCore.utils.bech32Address(output.lock.args, {
                 prefix: addressPrefix,
                 type: ckbCore.utils.AddressType.HashIdx,
                 codeHashIndex: '0x00',

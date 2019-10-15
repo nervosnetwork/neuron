@@ -13,6 +13,7 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
+import TransactionEntity from 'database/chain/entities/transaction'
 
 export interface LockHashInfo {
   lockHash: string
@@ -44,9 +45,12 @@ export default class IndexerQueue {
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
 
+  private url: string
+
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
     // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
+    this.url = url
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks(url)
     this.blockNumberService = new BlockNumber()
@@ -189,22 +193,35 @@ export default class IndexerQueue {
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
             const address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
-            AddressesUsedSubject.getSubject().next([address])
+            AddressesUsedSubject.getSubject().next({
+              addresses: [address],
+              url: this.url,
+            })
             return
           }
 
           logger.debug('indexer fetched tx:', type, txPoint.txHash)
 
           // tx timestamp / blockNumber / blockHash
-          const { blockHash } = transactionWithStatus.txStatus
-          if (blockHash) {
-            const blockHeader = await this.getBlocksService.getHeader(blockHash)
-            transaction.blockHash = blockHash
-            transaction.blockNumber = blockHeader.number
-            transaction.timestamp = blockHeader.timestamp
+          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
+          if (!txEntity || !txEntity.blockHash) {
+            for (const input of transaction.inputs!) {
+              const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
+              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              input.lock = previousOutput.lock
+              input.lockHash = LockUtils.lockScriptToHash(input.lock)
+              input.capacity = previousOutput.capacity
+            }
+            const { blockHash } = transactionWithStatus.txStatus
+            if (blockHash) {
+              const blockHeader = await this.getBlocksService.getHeader(blockHash)
+              transaction.blockHash = blockHash
+              transaction.blockNumber = blockHeader.number
+              transaction.timestamp = blockHeader.timestamp
+            }
+            txEntity = await TransactionPersistor.saveFetchTx(transaction)
           }
-          // broadcast address used
-          const txEntity = await TransactionPersistor.saveFetchTx(transaction)
 
           let address: string | undefined
           if (type === TxPointType.CreatedBy) {
@@ -218,7 +235,10 @@ export default class IndexerQueue {
             }
           }
           if (address) {
-            AddressesUsedSubject.getSubject().next([address])
+            AddressesUsedSubject.getSubject().next({
+              addresses: [address],
+              url: this.url,
+            })
           }
         }
       }

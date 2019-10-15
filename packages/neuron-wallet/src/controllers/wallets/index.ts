@@ -387,7 +387,7 @@ export default class WalletsController {
     } catch (err) {
       logger.error(`sendCapacity:`, err)
       return {
-        status: ResponseCode.Fail,
+        status: err.code || ResponseCode.Fail,
         message: `Error: "${err.message}"`,
       }
     }

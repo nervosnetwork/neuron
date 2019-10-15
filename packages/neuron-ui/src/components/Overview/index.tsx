@@ -26,6 +26,7 @@ import { updateTransactionList } from 'states/stateProvider/actionCreators'
 import { showTransactionDetails } from 'services/remote'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
+import { epochParser } from 'utils/parsers'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 
@@ -250,7 +251,7 @@ const Overview = ({
       },
       {
         label: t('overview.epoch'),
-        value: epoch,
+        value: epochParser(epoch).index,
       },
       {
         label: t('overview.difficulty'),

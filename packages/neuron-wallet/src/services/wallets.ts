@@ -403,7 +403,10 @@ export default class WalletService {
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
-    AddressesUsedSubject.getSubject().next(usedAddresses)
+    AddressesUsedSubject.getSubject().next({
+      addresses: usedAddresses,
+      url: core.rpc.node.url,
+    })
 
     return txHash
   }

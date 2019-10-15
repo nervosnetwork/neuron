@@ -6,23 +6,38 @@ import { NetworkWithID } from 'types/network'
 import env from 'env'
 import AddressService from 'services/addresses'
 import genesisBlockHash from './genesis'
-import initDatabase from './init-database'
+import InitDatabase from './init-database'
 
 export { genesisBlockHash }
 
-const updateAllAddressesTxCount = async () => {
+const updateAllAddressesTxCount = async (url: string) => {
   const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
-  await AddressService.updateTxCountAndBalances(addresses)
+  await AddressService.updateTxCountAndBalances(addresses, url)
 }
 
-export const databaseInitSubject = new ReplaySubject(1)
+export interface DatabaseInitParams {
+  network: NetworkWithID
+  genesisBlockHash: string
+}
+
+export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
+
 networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
     // TODO: only switch if genesisHash is different
-    await initDatabase()
-    databaseInitSubject.next(network)
-    // re init txCount in addresses if switch network
-    await updateAllAddressesTxCount()
+
+    await InitDatabase.getInstance().stopAndWait()
+    const genesisBlockHash = await InitDatabase.getInstance().init(network.remote)
+
+    if (genesisBlockHash !== 'killed') {
+      const databaseInitParams: DatabaseInitParams = {
+        network,
+        genesisBlockHash,
+      }
+      databaseInitSubject.next(databaseInitParams)
+      // re init txCount in addresses if switch network
+      await updateAllAddressesTxCount(network.remote)
+    }
   }
 })
 

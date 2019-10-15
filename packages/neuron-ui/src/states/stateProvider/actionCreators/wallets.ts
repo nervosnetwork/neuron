@@ -18,7 +18,7 @@ import initStates from 'states/initStates'
 import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
-import { Routes } from 'utils/const'
+import { Routes, ErrorCode } from 'utils/const'
 import { addressesToBalance, failureResToNotification } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
@@ -45,7 +45,7 @@ export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   _dispatch: StateDispatch,
   history: any
 ) => {
-  createWallet(params).then(res => {
+  return createWallet(params).then(res => {
     if (res.status === 1) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
@@ -63,7 +63,7 @@ export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams
   _dispatch: StateDispatch,
   history: any
 ) => {
-  importMnemonic(params).then(res => {
+  return importMnemonic(params).then(res => {
     if (res.status === 1) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
@@ -81,7 +81,7 @@ export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams
   _dispatch: StateDispatch,
   history: any
 ) => {
-  importKeystore(params).then(res => {
+  return importKeystore(params).then(res => {
     if (res.status === 1) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
@@ -118,7 +118,7 @@ export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
   history?: any
 ) => {
   updateWallet(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       addPopup('update-wallet-successfully')(dispatch)
       if (history) {
         history.push(Routes.SettingsWallets)
@@ -130,7 +130,7 @@ export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
 }
 export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   setRemoteCurrentWallet(id).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       dispatch({
         type: AppActions.Ignore,
         payload: null,
@@ -152,6 +152,10 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
     sendCapacity(params)
       .then(res => {
         if (res.status === 1) {
+          dispatch({
+            type: AppActions.ClearNotificationsOfCode,
+            payload: ErrorCode.PasswordIncorrect,
+          })
           history.push(Routes.History)
         } else {
           addNotification({
@@ -188,7 +192,7 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
   dispatch: StateDispatch
 ) => {
   getAddressesByWalletID(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       const addresses = res.result || []
       const balance = addressesToBalance(addresses)
       dispatch({
@@ -213,7 +217,7 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
     payload: descriptionParams,
   })
   updateRemoteAddressDescription(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       dispatch({
         type: NeuronWalletActions.UpdateAddressDescription,
         payload: descriptionParams,
@@ -230,8 +234,12 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
     payload: null,
   })
   deleteRemoteWallet(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       addPopup('delete-wallet-successfully')(dispatch)
+      dispatch({
+        type: AppActions.ClearNotificationsOfCode,
+        payload: ErrorCode.PasswordIncorrect,
+      })
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
@@ -244,10 +252,10 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
     payload: null,
   })
   backupRemoteWallet(params).then(res => {
-    if (res.status) {
+    if (res.status === 1) {
       dispatch({
-        type: AppActions.Ignore,
-        payload: null,
+        type: AppActions.ClearNotificationsOfCode,
+        payload: ErrorCode.PasswordIncorrect,
       })
     } else {
       addNotification(failureResToNotification(res))(dispatch)

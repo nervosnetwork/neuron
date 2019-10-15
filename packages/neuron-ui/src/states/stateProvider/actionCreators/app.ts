@@ -15,7 +15,7 @@ import {
 export const initAppState = () => (dispatch: StateDispatch, history: any) => {
   getNeuronWalletState()
     .then(res => {
-      if (res.status) {
+      if (res.status === 1) {
         const {
           wallets = [],
           currentWallet: wallet = initStates.wallet,

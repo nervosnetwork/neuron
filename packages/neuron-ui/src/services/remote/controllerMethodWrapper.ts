@@ -17,7 +17,7 @@ export type ControllerResponse = SuccessFromController | FailureFromController
 export const RemoteNotLoadError = {
   status: 0 as 0,
   message: {
-    content: 'remote is not supported',
+    content: 'The remote module is not found, please make sure the UI is running inside the Electron App',
   },
 }
 
@@ -60,7 +60,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
     }
   }
 
-  if (res.status) {
+  if (res.status === 1) {
     return {
       status: 1,
       result: res.result || null,
@@ -68,7 +68,7 @@ export const controllerMethodWrapper = (controllerName: string) => (
   }
 
   return {
-    status: 0,
+    status: res.status || 0,
     message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
   }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Stack,
@@ -10,6 +10,7 @@ import {
   DefaultButton,
   TextField,
   FontSizes,
+  Spinner,
 } from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -224,9 +225,13 @@ const Submission = ({
 }: WizardElementProps<{ type: string }>) => {
   const { name, password, confirmPassword, imported } = state
   const [t] = useTranslation()
+  const [loading, setLoading] = useState(false)
   const message = 'wizard.set-wallet-name-and-password'
 
   useEffect(() => {
+    if (loading) {
+      return
+    }
     dispatch({
       type: 'name',
       payload: generateWalletName(wallets, wallets.length + 1, t),
@@ -239,7 +244,7 @@ const Submission = ({
       type: 'confirmPassword',
       payload: '',
     })
-  }, [dispatch, wallets, t])
+  }, [loading, dispatch, wallets, t])
 
   const onChange = useCallback(
     (e: any, value?: string) => {
@@ -258,17 +263,23 @@ const Submission = ({
   )
 
   const onNext = useCallback(() => {
+    if (loading) {
+      return
+    }
     const p = {
       name,
       password,
       mnemonic: imported,
     }
-    if (type === MnemonicAction.Create) {
-      createWalletWithMnemonic(p)(dispatch, history)
-    } else {
-      importWalletWithMnemonic(p)(dispatch, history)
-    }
-  }, [type, name, password, imported, history, dispatch])
+    setLoading(true)
+    setTimeout(() => {
+      if (type === MnemonicAction.Create) {
+        createWalletWithMnemonic(p)(dispatch, history).finally(() => setLoading(false))
+      } else {
+        importWalletWithMnemonic(p)(dispatch, history).finally(() => setLoading(false))
+      }
+    }, 0)
+  }, [type, name, password, imported, history, dispatch, loading])
 
   const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
   const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
@@ -310,7 +321,13 @@ const Submission = ({
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        {loading ? (
+          <PrimaryButton disabled>
+            <Spinner />
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        )}
       </Stack>
     </Stack>
   )

@@ -12,6 +12,7 @@ export class WalletNotFound extends Error {
 }
 
 export class IncorrectPassword extends Error {
+  public code = 103
   constructor() {
     super(i18n.t('messages.incorrect-password'))
   }

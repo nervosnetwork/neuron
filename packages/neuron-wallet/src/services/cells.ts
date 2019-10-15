@@ -118,6 +118,8 @@ export default class CellsService {
         previousOutput: cell.outPoint(),
         since: '0',
         lock: cell.lock,
+        lockHash: cell.lockHash,
+        capacity: cell.capacity,
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)

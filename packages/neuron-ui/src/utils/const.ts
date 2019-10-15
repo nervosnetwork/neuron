@@ -71,6 +71,7 @@ export enum ErrorCode {
   // Errors from neuron-wallet
   AmountNotEnough = 100,
   AmountTooSmall = 101,
+  PasswordIncorrect = 103,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,

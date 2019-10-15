@@ -117,6 +117,7 @@ export class TransactionPersistor {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
+      input.lock = i.lock || null
       input.since = i.since!
       inputs.push(input)
 
@@ -260,6 +261,14 @@ export class TransactionPersistor {
       transaction,
       TxSaveType.Fetch
     )
+    return txEntity
+  }
+
+  public static get = async (txHash: string) => {
+    const txEntity: TransactionEntity | undefined = await getConnection()
+      .getRepository(TransactionEntity)
+      .findOne(txHash, { relations: ['inputs', 'outputs'] })
+
     return txEntity
   }
 

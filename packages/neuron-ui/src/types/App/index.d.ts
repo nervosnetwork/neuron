@@ -14,7 +14,7 @@ declare namespace State {
   interface DetailedOutput {
     capacity: string
     lock: {
-      args: string[]
+      args: string
       codeHash: string
     }
     lockHash: string

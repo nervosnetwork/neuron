@@ -61,7 +61,11 @@ const trackingStatus = async () => {
   if (failedTxs.length) {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
-    AddressesUsedSubject.getSubject().next(usedAddresses)
+    const { core } = nodeService
+    AddressesUsedSubject.getSubject().next({
+      addresses: usedAddresses,
+      url: core.rpc.node.url,
+    })
   }
 
   if (successTxs.length > 0) {

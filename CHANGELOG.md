@@ -1,3 +1,25 @@
+## [0.22.1](https://github.com/nervosnetwork/neuron/compare/v0.22.0...v0.22.1) (2019-10-15)
+
+
+### Bug Fixes
+
+* not sync after switch network ([be5a014](https://github.com/nervosnetwork/neuron/commit/be5a014))
+* **neuron-ui:** fix the type of script.args from string[] to string ([aa34515](https://github.com/nervosnetwork/neuron/commit/aa34515))
+
+
+### Features
+
+* **neuron-ui:** add loading effects on creating/import wallets ([8508965](https://github.com/nervosnetwork/neuron/commit/8508965))
+* **neuron-ui:** add loading on creating networks ([8b89b1e](https://github.com/nervosnetwork/neuron/commit/8b89b1e))
+* **neuron-ui:** dismiss pinned top alert if it's related to auto-dismissed notifications ([b1ea6d5](https://github.com/nervosnetwork/neuron/commit/b1ea6d5))
+* **neuron-ui:** make the alert of lacking remote module more clear ([a36abba](https://github.com/nervosnetwork/neuron/commit/a36abba))
+* **neuron-ui:** remove eslint rule of no-bitwise ([c5c5101](https://github.com/nervosnetwork/neuron/commit/c5c5101))
+* **neuron-ui:** update loading style of submit button for importing/creating wallets ([7469911](https://github.com/nervosnetwork/neuron/commit/7469911))
+* **neuron-ui:** update the epoch index ([7599cb7](https://github.com/nervosnetwork/neuron/commit/7599cb7))
+* add lock to input ([436b388](https://github.com/nervosnetwork/neuron/commit/436b388))
+
+
+
 # [0.22.0](https://github.com/nervosnetwork/neuron/compare/v0.21.0-beta.1...v0.22.0) (2019-10-09)
 
 
