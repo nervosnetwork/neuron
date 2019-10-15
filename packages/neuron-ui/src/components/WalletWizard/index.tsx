@@ -10,6 +10,7 @@ import {
   DefaultButton,
   TextField,
   FontSizes,
+  Spinner,
 } from 'office-ui-fabric-react'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
@@ -283,7 +284,7 @@ const Submission = ({
   const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
   const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
   const isPwdSame = useMemo(() => password && password === confirmPassword, [password, confirmPassword])
-  const disableNext = loading || !(isNameUnused && isPwdComplex && isPwdSame)
+  const disableNext = !(isNameUnused && isPwdComplex && isPwdSame)
 
   return (
     <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
@@ -320,7 +321,13 @@ const Submission = ({
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        {loading ? (
+          <PrimaryButton disabled>
+            <Spinner />
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        )}
       </Stack>
     </Stack>
   )

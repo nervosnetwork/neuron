@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, DefaultButton, PrimaryButton, TextField } from 'office-ui-fabric-react'
+import { Stack, DefaultButton, PrimaryButton, TextField, Spinner } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { showOpenDialog } from 'services/remote'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
@@ -124,12 +124,15 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
         <DefaultButton onClick={goBack}>{t('import-keystore.button.back')}</DefaultButton>
-        <PrimaryButton
-          disabled={loading || !(fields.name && fields.path && fields.password && !isNameUsed)}
-          onClick={onSubmit}
-        >
-          {t('import-keystore.button.submit')}
-        </PrimaryButton>
+        {loading ? (
+          <PrimaryButton disabled>
+            <Spinner />
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton disabled={!(fields.name && fields.path && fields.password && !isNameUsed)} onClick={onSubmit}>
+            {t('import-keystore.button.submit')}
+          </PrimaryButton>
+        )}
       </Stack>
     </Stack>
   )
