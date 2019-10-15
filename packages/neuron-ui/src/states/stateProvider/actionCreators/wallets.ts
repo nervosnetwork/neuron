@@ -14,7 +14,7 @@ import {
   backupWallet as backupRemoteWallet,
   showErrorMessage,
 } from 'services/remote'
-import initStates from 'states/initStates'
+import { emptyWallet } from 'states/initStates/wallet'
 import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
@@ -26,7 +26,7 @@ import { addNotification, addPopup } from './app'
 export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any) => {
   getCurrentWallet().then(res => {
     if (res.status === 1) {
-      const payload = res.result || initStates.wallet
+      const payload = res.result || emptyWallet
       if (!payload || !payload.id) {
         history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
       }
