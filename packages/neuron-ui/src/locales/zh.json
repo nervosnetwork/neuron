@@ -150,7 +150,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "view-in-explorer": "浏览器",
-      "view-in-explorer-button-title": "浏览器中查看详情"
+      "view-in-explorer-button-title": "浏览器中查看详情",
+      "cell-from-cellbase": "来自 Cellbase"
     },
     "addresses": {
       "addresses": "地址",
@@ -175,7 +176,7 @@
       },
       "general": {
         "display-address-book-in-the-navbar": "显示地址簿",
-        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cell",
+        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cells",
         "show": "显示",
         "hide": "隐藏"
       },

@@ -1,3 +1,19 @@
+## [0.22.2](https://github.com/nervosnetwork/neuron/compare/v0.22.1...v0.22.2) (2019-10-16)
+
+
+### Bug Fixes
+
+* **neuron-ui:** fix the label of skip-data toggle ([dafcb3e](https://github.com/nervosnetwork/neuron/commit/dafcb3e))
+* **neuron-ui:** set current wallet to empty when all wallets are deleted ([f146e34](https://github.com/nervosnetwork/neuron/commit/f146e34))
+
+
+### Features
+
+* Load icon for BrowserWindow to show it on linux launcher ([7ce28b6](https://github.com/nervosnetwork/neuron/commit/7ce28b6))
+* **neuron-ui:** display address field of input on the transaction de… ([#987](https://github.com/nervosnetwork/neuron/issues/987)) ([0cb9a1d](https://github.com/nervosnetwork/neuron/commit/0cb9a1d))
+
+
+
 ## [0.22.1](https://github.com/nervosnetwork/neuron/compare/v0.22.0...v0.22.1) (2019-10-15)
 
 

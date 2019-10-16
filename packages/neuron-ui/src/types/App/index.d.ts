@@ -11,6 +11,19 @@ declare namespace State {
     status: 'pending' | 'success' | 'failed'
   }
 
+  interface DetailedInput {
+    capacity: string | null
+    lockHash: string | null
+    previousOutput: {
+      blockHash: string | null
+      cell: {
+        txHash: string
+        index: string
+      } | null
+    }
+    lock: CKBComponents.Script | null
+  }
+
   interface DetailedOutput {
     capacity: string
     lock: {
@@ -27,17 +40,7 @@ declare namespace State {
     blockHash: string
     blockNumber: string
     deps: any[]
-    inputs: {
-      capacity: string | null
-      lockHash: string | null
-      previousOutput: {
-        blockHash: string | null
-        cell: {
-          txHash: string
-          index: string
-        } | null
-      }
-    }[]
+    inputs: DetailedInput[]
     inputsCount: string
     outputs: DetailedOutput[]
     outputsCount: string

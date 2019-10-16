@@ -62,7 +62,7 @@ export interface Input {
   since?: string
   capacity?: string | null
   lockHash?: string | null
-  lock?: Script
+  lock?: Script | null
 }
 
 export interface Cell {

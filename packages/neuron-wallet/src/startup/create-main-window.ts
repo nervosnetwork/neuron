@@ -20,6 +20,7 @@ function createWindow() {
     minHeight: 600,
     show: false,
     backgroundColor: '#e9ecef',
+    icon: path.join(__dirname, '../neuron-ui/icon.png'),
     webPreferences: {
       devTools: env.isDevMode,
       nodeIntegration: env.isDevMode || env.isTestMode,
