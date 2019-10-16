@@ -151,7 +151,7 @@
       "outputs": "Outputs",
       "view-in-explorer": "Explorer",
       "view-in-explorer-button-title": "View on explorer",
-      "cell-from-coinbase": "From coinbase"
+      "cell-from-cellbase": "From cellbase"
     },
     "addresses": {
       "addresses": "Addresses",

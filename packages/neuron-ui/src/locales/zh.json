@@ -151,7 +151,7 @@
       "outputs": "输出",
       "view-in-explorer": "浏览器",
       "view-in-explorer-button-title": "浏览器中查看详情",
-      "cell-from-coinbase": "来自 Coinbase"
+      "cell-from-cellbase": "来自 Cellbase"
     },
     "addresses": {
       "addresses": "地址",

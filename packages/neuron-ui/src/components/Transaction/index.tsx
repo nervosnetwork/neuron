@@ -58,7 +58,7 @@ const Transaction = () => {
               return null
             }
             if (!input.lock) {
-              return t('transaction.cell-from-coinbase')
+              return t('transaction.cell-from-cellbase')
             }
             try {
               const address = ckbCore.utils.bech32Address(input.lock.args, {
