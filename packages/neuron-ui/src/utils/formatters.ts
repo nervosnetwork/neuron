@@ -102,6 +102,9 @@ export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: 
     console.warn(`Shannon is not a valid number`)
     return shannon
   }
+  if (shannon === null) {
+    return '0'
+  }
   let sign = ''
   if (shannon.startsWith('-')) {
     sign = '-'

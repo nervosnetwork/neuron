@@ -150,7 +150,8 @@
       "inputs": "输入",
       "outputs": "输出",
       "view-in-explorer": "浏览器",
-      "view-in-explorer-button-title": "浏览器中查看详情"
+      "view-in-explorer-button-title": "浏览器中查看详情",
+      "cell-from-cellbase": "来自 Cellbase"
     },
     "addresses": {
       "addresses": "地址",

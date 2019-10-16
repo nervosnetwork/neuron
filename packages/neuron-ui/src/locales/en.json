@@ -150,7 +150,8 @@
       "inputs": "Inputs",
       "outputs": "Outputs",
       "view-in-explorer": "Explorer",
-      "view-in-explorer-button-title": "View on explorer"
+      "view-in-explorer-button-title": "View on explorer",
+      "cell-from-cellbase": "From cellbase"
     },
     "addresses": {
       "addresses": "Addresses",
