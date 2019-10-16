@@ -3,7 +3,6 @@
 Nervos CKB Desktop Wallet
 
 [![Azure Pipelines Build Status](https://dev.azure.com/nervosnetwork/neuron/_apis/build/status/nervosnetwork.neuron?branchName=develop)](https://dev.azure.com/nervosnetwork/neuron/_build/latest?definitionId=8&branchName=develop)
-[![TravisCI](https://travis-ci.com/nervosnetwork/neuron.svg?branch=develop)](https://travis-ci.com/nervosnetwork/neuron)
 [![Telegram Group](https://cdn.rawgit.com/Patrolavia/telegram-badge/8fe3382b/chat.svg)](https://t.me/nervos_ckb_dev)
 
 ---
