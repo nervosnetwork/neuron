@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import React, { useEffect, useRef, useCallback } from 'react'
 import canvg from 'canvg'
 import { Stack, DefaultButton } from 'office-ui-fabric-react'
