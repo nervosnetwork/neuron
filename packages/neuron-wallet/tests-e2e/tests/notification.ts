@@ -3,7 +3,7 @@ import { createWallet } from '../operations'
 import { sleep } from '../application/utils'
 
 /**
- * 1. check the alert, it should be disconnected to the network
+ * 1. check the alert, it should be empty
  * 2. navigate to wallet settingsState
  * 3. delete a wallet
  * 4. input a wrong password
@@ -33,15 +33,14 @@ export default (app: Application) => {
 
   describe('Test alert message and notification', () => {
     const messages = {
-      disconnected: 'Connection to the node is failed',
       incorrectPassword: 'Password is incorrect',
     }
 
-    app.test('It should have an alert message of disconnection', async () => {
+    app.test('There is no alerts after the app launched', async () => {
       const { client } = app.spectron
       const alertComponent = await client.$('.ms-MessageBar-text')
       const msg = await client.elementIdText(alertComponent.value.ELEMENT)
-      expect(msg.value).toBe(messages.disconnected)
+      expect(msg.value).toBe('')
     })
 
     app.test('It should have an alert message of incorrect password', async () => {
@@ -58,14 +57,12 @@ export default (app: Application) => {
       expect(msg.value).toBe(messages.incorrectPassword)
     })
 
-    app.test('It should have two messages in the notification', async () => {
+    app.test('It should have a message in the notification', async () => {
       const { client } = app.spectron
       const messageComponents = await client.$$('.ms-Panel-content p')
       expect(messageComponents.length).toBe(Object.keys(messages).length)
       const incorrectPasswordMsg = await client.element(`//P[text()="${messages.incorrectPassword}"]`)
-      const disconnectMsg = await client.element(`//P[text()="${messages.disconnected}"]`)
       expect(incorrectPasswordMsg.state).not.toBe('failure')
-      expect(disconnectMsg.state).not.toBe('failed')
     })
 
     // TODO: dismiss a message
