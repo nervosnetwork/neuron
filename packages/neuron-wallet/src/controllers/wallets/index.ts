@@ -289,7 +289,7 @@ export default class WalletsController {
       AppController.showSaveDialog(
         {
           title: i18n.t('messages.save-keystore'),
-          defaultPath: wallet.name,
+          defaultPath: wallet.name + '.json',
         },
         (returnValue: SaveDialogReturnValue) => {
           if (returnValue.filePath) {
