@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import { debounceTime } from 'rxjs/operators'
 
-import { updateApplicationMenu } from 'utils/application-menu'
 import WindowManager from 'models/window-manager'
 import createMainWindow from 'startup/create-main-window'
 import createSyncBlockTask from 'startup/sync-block-task/create'
@@ -11,6 +10,7 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import dataUpdateSubject from 'models/subjects/data-update'
 import app from 'app'
 import { changeLanguage } from 'utils/i18n'
+import AppController from 'controllers/app'
 
 const walletsService = WalletsService.getInstance()
 
@@ -36,11 +36,11 @@ app.on('ready', async () => {
     const walletList = currentWalletList.map(({ id, name }) => ({ id, name }))
     const currentWalletId = currentWallet ? currentWallet.id : null
     dataUpdateSubject.next({ dataType: 'wallets', actionType: 'update' })
-    updateApplicationMenu(walletList, currentWalletId)
+    AppController.updateApplicationMenu(walletList, currentWalletId)
   })
 
   CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async ({ currentWallet = null, walletList = [] }) => {
-    updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
+    AppController.updateApplicationMenu(walletList, currentWallet ? currentWallet.id : null)
     if (currentWallet) {
       dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
@@ -49,7 +49,7 @@ app.on('ready', async () => {
   const wallets = walletsService.getAll()
   const currentWallet = walletsService.getCurrent()
 
-  updateApplicationMenu(wallets, currentWallet ? currentWallet.id : null)
+  AppController.updateApplicationMenu(wallets, currentWallet ? currentWallet.id : null)
   await initConnection()
   createSyncBlockTask()
   openWindow()
