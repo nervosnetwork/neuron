@@ -76,6 +76,9 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
 }
 
 export const addNotification = (message: State.Message<ErrorCode>) => (dispatch: StateDispatch) => {
+  if (message && message.code === ErrorCode.NodeDisconnected) {
+    return
+  }
   dispatch({
     type: AppActions.AddNotification,
     payload: message,
