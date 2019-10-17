@@ -121,7 +121,7 @@ const QRCode = ({
     }
     const dataURL = canvasRef.current.toDataURL('image/png')
     const downloadLink = document.createElement('a')
-    downloadLink.download = 'Receive'
+    downloadLink.download = 'ckb-address'
     downloadLink.href = dataURL
     window.document.body.appendChild(downloadLink)
     downloadLink.click()
