@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron = require("electron");
-const controllers_app = require("../../dist/controllers/app/index");
+const controllers_app = require("../../dist/controllers/app");
 const services_networks = __importDefault(require("../../dist/services/networks"));
 
 electron.ipcMain.on('E2E_EDIT_WALLET', function (event, arg) {
