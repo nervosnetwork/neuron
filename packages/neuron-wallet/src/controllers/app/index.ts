@@ -56,16 +56,7 @@ export default class AppController {
       return
     }
 
-    AppController.mainWindow = AppController.createWindow()
-    AppController.mainWindow.on('closed', () => {
-      if (process.platform !== 'darwin') {
-        app.quit()
-      }
-      if (AppController.mainWindow) {
-        AppController.mainWindow.removeAllListeners()
-        AppController.mainWindow = null
-      }
-    })
+    AppController.createWindow()
   }
 
   static createWindow = () => {
@@ -93,8 +84,6 @@ export default class AppController {
 
     windowState.manage(AppController.mainWindow)
 
-    AppController.mainWindow.loadURL(env.mainURL)
-
     AppController.mainWindow.on('ready-to-show', () => {
       if (AppController.mainWindow) {
         AppController.mainWindow.show()
@@ -105,7 +94,17 @@ export default class AppController {
       }
     })
 
-    return AppController.mainWindow
+    AppController.mainWindow.on('closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+      if (AppController.mainWindow) {
+        AppController.mainWindow.removeAllListeners()
+        AppController.mainWindow = null
+      }
+    })
+
+    AppController.mainWindow.loadURL(env.mainURL)
   }
 
   public static getInitState = async () => {
