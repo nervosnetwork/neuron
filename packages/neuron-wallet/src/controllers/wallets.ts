@@ -21,7 +21,7 @@ import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import logger from 'utils/logger'
-import MainWindowController from './main-window'
+import AppController from './app'
 
 /**
  * @class WalletsController
@@ -286,7 +286,7 @@ export default class WalletsController {
 
     const keystore = wallet.loadKeystore()
     return new Promise(resolve => {
-      dialog.showSaveDialog(MainWindowController.mainWindow!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
+      dialog.showSaveDialog(AppController.mainWindow!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
         (returnValue: SaveDialogReturnValue) => {
           if (returnValue.filePath) {
             fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))

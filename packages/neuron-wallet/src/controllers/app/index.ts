@@ -10,6 +10,7 @@ import {
   MessageBoxReturnValue,
   BrowserWindow,
 } from 'electron'
+import windowStateKeeper from 'electron-window-state'
 import { take } from 'rxjs/operators'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 
@@ -20,12 +21,14 @@ import WalletsService from 'services/wallets'
 import SkipDataAndType from 'services/settings/skip-data-and-type'
 
 import { ResponseCode } from 'utils/const'
-import MainWindowController from 'controllers/main-window'
+import logger from 'utils/logger'
 import i18n from 'utils/i18n'
 import env from 'env'
 import CommandSubject from 'models/subjects/command'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
+
+import { subscribe } from './subscribe'
 
 const isMac = process.platform === 'darwin'
 const networksService = NetworksService.getInstance()
@@ -492,7 +495,80 @@ const contextMenuTemplate: {
   },
 }
 
+// Acts as a middle man so that subscribe doesn't have to know AppController
+const messageDispatcher = {
+  sendMessage: (channel: string, obj: any) => {
+    AppController.sendMessage(channel, obj)
+  }
+}
+subscribe(messageDispatcher)
+
 export default class AppController {
+  public static mainWindow: BrowserWindow | null
+
+  public static sendMessage = (channel: string, obj: any) => {
+    if (AppController.mainWindow) {
+      AppController.mainWindow.webContents.send(channel, obj)
+    }
+  }
+
+  public static openWindow = () => {
+    if (AppController.mainWindow) {
+      return
+    }
+
+    AppController.mainWindow = AppController.createWindow()
+    AppController.mainWindow.on('closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+      if (AppController.mainWindow) {
+        AppController.mainWindow.removeAllListeners()
+        AppController.mainWindow = null
+      }
+    })
+  }
+
+  static createWindow = () => {
+    const windowState = windowStateKeeper({
+      defaultWidth: 1366,
+      defaultHeight: 768,
+    })
+
+    AppController.mainWindow = new BrowserWindow({
+      x: windowState.x,
+      y: windowState.y,
+      width: windowState.width,
+      height: windowState.height,
+      minWidth: 800,
+      minHeight: 600,
+      show: false,
+      backgroundColor: '#e9ecef',
+      icon: path.join(__dirname, '../../neuron-ui/icon.png'),
+      webPreferences: {
+        devTools: env.isDevMode,
+        nodeIntegration: env.isDevMode || env.isTestMode,
+        preload: path.join(__dirname, './preload.js'),
+      },
+    })
+
+    windowState.manage(AppController.mainWindow)
+
+    AppController.mainWindow.loadURL(env.mainURL)
+
+    AppController.mainWindow.on('ready-to-show', () => {
+      if (AppController.mainWindow) {
+        AppController.mainWindow.show()
+        AppController.mainWindow.focus()
+        logger.info('The main window is ready to show')
+      } else {
+        logger.error('The main window is not initialized on ready to show')
+      }
+    })
+
+    return AppController.mainWindow
+  }
+
   public static getInitState = async () => {
     const walletsService = WalletsService.getInstance()
     const networksService = NetworksService.getInstance()
@@ -587,7 +663,7 @@ export default class AppController {
   }
 
   public static isMainWindow = (winID: number) => {
-    return MainWindowController.mainWindow && winID === MainWindowController.mainWindow.id
+    return AppController.mainWindow && winID === AppController.mainWindow.id
   }
 
   public static showMessageBox(options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) {
@@ -617,9 +693,9 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    if (MainWindowController.mainWindow) {
+    if (AppController.mainWindow) {
       CommandSubject.next({
-        winID: MainWindowController.mainWindow.id,
+        winID: AppController.mainWindow.id,
         type: 'toggle-address-book',
         payload: null,
       })
@@ -627,8 +703,8 @@ export default class AppController {
   }
 
   public static navTo(url: string) {
-    if (MainWindowController.mainWindow) {
-      CommandSubject.next({ winID: MainWindowController.mainWindow.id, type: 'nav', payload: url })
+    if (AppController.mainWindow) {
+      CommandSubject.next({ winID: AppController.mainWindow.id, type: 'nav', payload: url })
     }
   }
 
