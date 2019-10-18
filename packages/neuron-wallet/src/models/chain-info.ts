@@ -20,10 +20,6 @@ export default class ChainInfo {
   }
 
   public isMainnet = (): boolean => {
-    if (this.chain === 'ckb') {
-      return true
-    }
-
-    return false
+    return this.chain === 'ckb'
   }
 }
