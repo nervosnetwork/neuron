@@ -5,7 +5,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   let walletIndex: number | null = null
 
   // Go to setting page
-  await app.clickMenu(['Electron', 'Preferences...'])
+  await app.gotoSettingPageFromMenu()
   await app.waitUntilLoaded()
 
   // Switch to wallet setting

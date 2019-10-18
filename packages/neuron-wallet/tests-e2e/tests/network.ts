@@ -9,7 +9,7 @@ export default (app: Application) => {
     const newNodeRpcUrl = 'http://localhost:8114'
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     // Switch to network setting
@@ -119,7 +119,7 @@ export default (app: Application) => {
     const { client } = app.spectron
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     // Switch to network setting
