@@ -7,7 +7,7 @@ export const DataUpdateSubject = new Subject<{
 }>()
 
 DataUpdateSubject.subscribe(data => {
-  MainWindowController.dataUpdated(data)
+  MainWindowController.sendMessage('data-updated', data)
 })
 
 export default DataUpdateSubject

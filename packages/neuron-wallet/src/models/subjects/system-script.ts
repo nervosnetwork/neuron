@@ -8,7 +8,7 @@ export const SystemScriptSubject = new BehaviorSubject<{ codeHash: string }>({ c
 export const DebouncedSystemScriptSubject = SystemScriptSubject.pipe(debounceTime(DEBOUNCE_TIME))
 
 DebouncedSystemScriptSubject.subscribe(params => {
-  MainWindowController.systemScriptUpdated(params)
+  MainWindowController.sendMessage('system-script-updated', params)
 })
 
 export default { SystemScriptSubject, DebouncedSystemScriptSubject }

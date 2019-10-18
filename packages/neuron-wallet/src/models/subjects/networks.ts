@@ -15,10 +15,10 @@ export const DebouncedNetworkListSubject = NetworkListSubject.pipe(debounceTime(
 export const DebouncedCurrentNetworkIDSubject = CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME))
 
 DebouncedNetworkListSubject.subscribe(({ currentNetworkList = [] }) => {
-  MainWindowController.networkListUpdated(currentNetworkList)
+  MainWindowController.sendMessage('network-list-updated', currentNetworkList)
 })
 DebouncedCurrentNetworkIDSubject.subscribe(({ currentNetworkID = '' }) => {
-  MainWindowController.currentNetworkIDUpdated(currentNetworkID)
+  MainWindowController.sendMessage('current-network-id-updated', currentNetworkID)
 })
 
 export default {

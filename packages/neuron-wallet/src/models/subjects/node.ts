@@ -12,11 +12,11 @@ export const DebouncedConnectionStatusSubject = ConnectionStatusSubject.pipe(deb
 export const SampledSyncedBlockNumberSubject = SyncedBlockNumberSubject.pipe(sampleTime(SAMPLE_TIME))
 
 DebouncedConnectionStatusSubject.subscribe(params => {
-  MainWindowController.connectionStatusUpdated(params)
+  MainWindowController.sendMessage('connection-status-updated', params)
 })
 
 SampledSyncedBlockNumberSubject.subscribe(params => {
-  MainWindowController.syncedBlockNumberUpdated(params)
+  MainWindowController.sendMessage('synced-block-number-updated', params)
 })
 
 export default {

@@ -8,7 +8,7 @@ const CommandSubject = new Subject<{
 }>()
 
 CommandSubject.subscribe(params => {
-  MainWindowController.sendCommand(params)
+  MainWindowController.sendMessage('command', params)
 })
 
 export default CommandSubject
