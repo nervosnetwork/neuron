@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { debounceTime } from 'rxjs/operators'
 
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 import createMainWindow from 'startup/create-main-window'
 import createSyncBlockTask from 'startup/sync-block-task/create'
 import initConnection from 'database/address/ormconfig'
@@ -15,15 +15,15 @@ import AppController from 'controllers/app'
 const walletsService = WalletsService.getInstance()
 
 const openWindow = () => {
-  if (!WindowManager.mainWindow) {
-    WindowManager.mainWindow = createMainWindow()
-    WindowManager.mainWindow.on('closed', () => {
+  if (!MainWindowController.mainWindow) {
+    MainWindowController.mainWindow = createMainWindow()
+    MainWindowController.mainWindow.on('closed', () => {
       if (process.platform !== 'darwin') {
         app.quit()
       }
-      if (WindowManager.mainWindow) {
-        WindowManager.mainWindow.removeAllListeners()
-        WindowManager.mainWindow = null
+      if (MainWindowController.mainWindow) {
+        MainWindowController.mainWindow.removeAllListeners()
+        MainWindowController.mainWindow = null
       }
     })
   }

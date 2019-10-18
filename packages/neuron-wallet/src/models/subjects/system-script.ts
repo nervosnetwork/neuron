@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 
 const DEBOUNCE_TIME = 50
 
@@ -8,7 +8,7 @@ export const SystemScriptSubject = new BehaviorSubject<{ codeHash: string }>({ c
 export const DebouncedSystemScriptSubject = SystemScriptSubject.pipe(debounceTime(DEBOUNCE_TIME))
 
 DebouncedSystemScriptSubject.subscribe(params => {
-  WindowManager.systemScriptUpdated(params)
+  MainWindowController.systemScriptUpdated(params)
 })
 
 export default { SystemScriptSubject, DebouncedSystemScriptSubject }

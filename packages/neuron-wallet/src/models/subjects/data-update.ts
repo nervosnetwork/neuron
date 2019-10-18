@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 
 export const DataUpdateSubject = new Subject<{
   dataType: 'address' | 'transaction' | 'wallets' | 'current-wallet' | 'network'
@@ -7,7 +7,7 @@ export const DataUpdateSubject = new Subject<{
 }>()
 
 DataUpdateSubject.subscribe(data => {
-  WindowManager.dataUpdated(data)
+  MainWindowController.dataUpdated(data)
 })
 
 export default DataUpdateSubject

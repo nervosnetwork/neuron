@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 
 const CommandSubject = new Subject<{
   winID: number
@@ -8,7 +8,7 @@ const CommandSubject = new Subject<{
 }>()
 
 CommandSubject.subscribe(params => {
-  WindowManager.sendCommand(params)
+  MainWindowController.sendCommand(params)
 })
 
 export default CommandSubject

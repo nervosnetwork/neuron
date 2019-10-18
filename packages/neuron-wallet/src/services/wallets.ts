@@ -14,7 +14,7 @@ import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import CommandSubject from 'models/subjects/command'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 import CellsService from 'services/cells'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import env from 'env'
@@ -468,9 +468,9 @@ export default class WalletService {
   }
 
   public requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
-    if (WindowManager.mainWindow) {
+    if (MainWindowController.mainWindow) {
       CommandSubject.next({
-        winID: WindowManager.mainWindow.id,
+        winID: MainWindowController.mainWindow.id,
         type: actionType,
         payload: walletID,
       })

@@ -8,8 +8,6 @@ import {
   clipboard,
   MessageBoxOptions,
   MessageBoxReturnValue,
-  SaveDialogOptions,
-  SaveDialogReturnValue,
   BrowserWindow,
 } from 'electron'
 import { take } from 'rxjs/operators'
@@ -22,7 +20,7 @@ import WalletsService from 'services/wallets'
 import SkipDataAndType from 'services/settings/skip-data-and-type'
 
 import { ResponseCode } from 'utils/const'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 import i18n from 'utils/i18n'
 import env from 'env'
 import CommandSubject from 'models/subjects/command'
@@ -589,15 +587,11 @@ export default class AppController {
   }
 
   public static isMainWindow = (winID: number) => {
-    return WindowManager.mainWindow && winID === WindowManager.mainWindow.id
+    return MainWindowController.mainWindow && winID === MainWindowController.mainWindow.id
   }
 
   public static showMessageBox(options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) {
     dialog.showMessageBox(options).then(callback)
-  }
-
-  public static showSaveDialog(options: SaveDialogOptions, callback?: (returnValue: SaveDialogReturnValue) => void) {
-    dialog.showSaveDialog(options).then(callback)
   }
 
   public static updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
@@ -623,9 +617,9 @@ export default class AppController {
   }
 
   public static toggleAddressBook() {
-    if (WindowManager.mainWindow) {
+    if (MainWindowController.mainWindow) {
       CommandSubject.next({
-        winID: WindowManager.mainWindow.id,
+        winID: MainWindowController.mainWindow.id,
         type: 'toggle-address-book',
         payload: null,
       })
@@ -633,8 +627,8 @@ export default class AppController {
   }
 
   public static navTo(url: string) {
-    if (WindowManager.mainWindow) {
-      CommandSubject.next({ winID: WindowManager.mainWindow.id, type: 'nav', payload: url })
+    if (MainWindowController.mainWindow) {
+      CommandSubject.next({ winID: MainWindowController.mainWindow.id, type: 'nav', payload: url })
     }
   }
 

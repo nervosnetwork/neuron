@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime, sampleTime } from 'rxjs/operators'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 
 const DEBOUNCE_TIME = 50
 const SAMPLE_TIME = 500
@@ -12,11 +12,11 @@ export const DebouncedConnectionStatusSubject = ConnectionStatusSubject.pipe(deb
 export const SampledSyncedBlockNumberSubject = SyncedBlockNumberSubject.pipe(sampleTime(SAMPLE_TIME))
 
 DebouncedConnectionStatusSubject.subscribe(params => {
-  WindowManager.connectionStatusUpdated(params)
+  MainWindowController.connectionStatusUpdated(params)
 })
 
 SampledSyncedBlockNumberSubject.subscribe(params => {
-  WindowManager.syncedBlockNumberUpdated(params)
+  MainWindowController.syncedBlockNumberUpdated(params)
 })
 
 export default {

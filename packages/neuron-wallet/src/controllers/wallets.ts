@@ -1,6 +1,5 @@
 import fs from 'fs'
-import { SaveDialogReturnValue } from 'electron'
-import AppController from 'controllers/app'
+import { dialog, SaveDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
@@ -22,6 +21,7 @@ import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import logger from 'utils/logger'
+import MainWindowController from './main-window'
 
 /**
  * @class WalletsController
@@ -286,11 +286,7 @@ export default class WalletsController {
 
     const keystore = wallet.loadKeystore()
     return new Promise(resolve => {
-      AppController.showSaveDialog(
-        {
-          title: i18n.t('messages.save-keystore'),
-          defaultPath: wallet.name + '.json',
-        },
+      dialog.showSaveDialog(MainWindowController.mainWindow!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
         (returnValue: SaveDialogReturnValue) => {
           if (returnValue.filePath) {
             fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))

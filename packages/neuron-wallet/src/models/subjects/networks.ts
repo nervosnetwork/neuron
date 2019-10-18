@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
-import WindowManager from 'models/window-manager'
+import MainWindowController from 'controllers/main-window'
 
 const DEBOUNCE_TIME = 50
 
@@ -15,10 +15,10 @@ export const DebouncedNetworkListSubject = NetworkListSubject.pipe(debounceTime(
 export const DebouncedCurrentNetworkIDSubject = CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME))
 
 DebouncedNetworkListSubject.subscribe(({ currentNetworkList = [] }) => {
-  WindowManager.networkListUpdated(currentNetworkList)
+  MainWindowController.networkListUpdated(currentNetworkList)
 })
 DebouncedCurrentNetworkIDSubject.subscribe(({ currentNetworkID = '' }) => {
-  WindowManager.currentNetworkIDUpdated(currentNetworkID)
+  MainWindowController.currentNetworkIDUpdated(currentNetworkID)
 })
 
 export default {
