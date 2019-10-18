@@ -1,7 +1,6 @@
-import { dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
+import { app, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
-import app from 'app'
 import env from 'env'
 import AppController from 'controllers/app'
 import NetworksService from 'services/networks'

@@ -1,9 +1,8 @@
 import path from 'path'
-import { shell, MenuItem, dialog, BrowserWindow } from 'electron'
+import { app as electronApp, remote, shell, MenuItem, dialog, BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import { take } from 'rxjs/operators'
 
-import app from 'app'
 import env from 'env'
 import { updateApplicationMenu, popContextMenu } from './menu'
 import { TransactionsController, WalletsController, SyncInfoController, UpdateController } from 'controllers'
@@ -36,6 +35,8 @@ const eventResponder = {
   }
 }
 subscribe(eventResponder)
+
+const app = electronApp || (remote && remote.app)
 
 export default class AppController {
   public static mainWindow: BrowserWindow | null
