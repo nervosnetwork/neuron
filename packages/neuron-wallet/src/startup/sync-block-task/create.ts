@@ -18,6 +18,7 @@ const updateAllAddressesTxCount = async (url: string) => {
 export interface DatabaseInitParams {
   network: NetworkWithID
   genesisBlockHash: string
+  chain: string
 }
 
 export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
@@ -27,12 +28,13 @@ networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     // TODO: only switch if genesisHash is different
 
     await InitDatabase.getInstance().stopAndWait()
-    const genesisBlockHash = await InitDatabase.getInstance().init(network.remote)
+    const info = await InitDatabase.getInstance().init(network.remote)
 
-    if (genesisBlockHash !== 'killed') {
+    if (info !== 'killed') {
       const databaseInitParams: DatabaseInitParams = {
         network,
-        genesisBlockHash,
+        genesisBlockHash: info.hash,
+        chain: info.chain
       }
       databaseInitSubject.next(databaseInitParams)
       // re init txCount in addresses if switch network
