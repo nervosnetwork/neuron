@@ -73,6 +73,7 @@ export default class LockUtils {
 
   static setSystemScript(info: SystemScript) {
     LockUtils.systemScriptInfo = info
+    LockUtils.previousURL = NodeService.getInstance().core.rpc.node.url
     SystemScriptSubject.next({ codeHash: info.codeHash })
   }
 
