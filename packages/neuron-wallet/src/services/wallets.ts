@@ -17,13 +17,13 @@ import CommandSubject from 'models/subjects/command'
 import WindowManager from 'models/window-manager'
 import CellsService from 'services/cells'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import env from 'env'
 
 import NodeService from './node'
 import FileService from './file'
 import { TransactionsService, TransactionPersistor, TransactionGenerator } from './tx'
 import AddressService from './addresses'
 import { deindexLockHashes } from './indexer/deindex'
+import ChainInfo from 'models/chain-info'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -270,7 +270,7 @@ export default class WalletService {
   }
 
   private deindexAddresses = async (addresses: string[]) => {
-    const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
+    const prefix = ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const addressesWithEnvPrefix: string[] = addresses.filter(addr => addr.startsWith(prefix))
 
     if (addressesWithEnvPrefix.length === 0) {

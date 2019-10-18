@@ -33,13 +33,13 @@ export const testIndexer = async (url: string): Promise<boolean> => {
 export const run = async () => {
   await initAddressConnection()
   databaseInitSubject.subscribe(async (params: DatabaseInitParams) => {
-    const { network, genesisBlockHash } = params
+    const { network, genesisBlockHash, chain } = params
     if (network && genesisBlockHash.startsWith('0x')) {
       const indexerEnabled = await testIndexer(network.remote)
       if (indexerEnabled) {
-        await indexerSwitchNetwork(network.remote, genesisBlockHash)
+        await indexerSwitchNetwork(network.remote, genesisBlockHash, chain)
       } else {
-        await syncSwitchNetwork(network.remote, genesisBlockHash)
+        await syncSwitchNetwork(network.remote, genesisBlockHash, chain)
       }
     }
   })

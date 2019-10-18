@@ -5,6 +5,7 @@ import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
 import { Address } from 'database/address/dao'
 
 import initConnection from 'database/chain/ormconfig'
+import ChainInfo from 'models/chain-info'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -18,7 +19,7 @@ export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]
 
 // call this after network switched
 let indexerQueue: IndexerQueue | undefined
-export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) => {
+export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, chain: string) => {
   // stop all blocks service
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
@@ -26,6 +27,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) =
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
+  ChainInfo.getInstance().setChain(chain)
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(nodeURL)
   const lockHashInfos: LockHashInfo[] = lockHashes.map(lockHash => {
