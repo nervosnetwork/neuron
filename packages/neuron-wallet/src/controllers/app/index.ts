@@ -1,10 +1,8 @@
 import path from 'path'
 import {
-  dialog,
   shell,
   MenuItem,
-  MessageBoxOptions,
-  MessageBoxReturnValue,
+  dialog,
   BrowserWindow,
 } from 'electron'
 import windowStateKeeper from 'electron-window-state'
@@ -204,10 +202,6 @@ export default class AppController {
     return AppController.mainWindow && winID === AppController.mainWindow.id
   }
 
-  public static showMessageBox(options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) {
-    dialog.showMessageBox(options).then(callback)
-  }
-
   public static updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
     updateApplicationMenu(wallets, id)
   }
@@ -245,7 +239,7 @@ export default class AppController {
       buttons: ['OK'],
       cancelId: 0,
     }
-    AppController.showMessageBox(options)
+    dialog.showMessageBox(options)
   }
 
   public static checkUpdates(menuItem: MenuItem) {

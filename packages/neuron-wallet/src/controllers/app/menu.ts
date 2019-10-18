@@ -1,4 +1,4 @@
-import { dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxReturnValue } from 'electron'
+import { dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
 import app from 'app'
@@ -23,6 +23,10 @@ const separator: MenuItemConstructorOptions = {
 }
 
 const networksService = NetworksService.getInstance()
+
+const showMessageBox = (options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) => {
+  dialog.showMessageBox(options).then(callback)
+}
 
 const generateTemplate = () => {
   const appMenuItem: MenuItemConstructorOptions = {
@@ -261,7 +265,7 @@ const contextMenuTemplate: {
     ])
 
     if (!network) {
-      AppController.showMessageBox({
+      showMessageBox({
         type: 'error',
         message: i18n.t('messages.network-not-found', { id }),
       })
@@ -277,7 +281,7 @@ const contextMenuTemplate: {
         enabled: !isCurrent,
         click: () => {
           networksService.activate(id).catch((err: Error) => {
-            AppController.showMessageBox({
+            showMessageBox({
               type: 'error',
               message: err.message,
             })
@@ -294,7 +298,7 @@ const contextMenuTemplate: {
         enabled: !isDefault,
         cancelId: 1,
         click: async () => {
-          AppController.showMessageBox(
+          showMessageBox(
             {
               type: 'warning',
               title: i18n.t(`messageBox.remove-network.title`),
@@ -326,7 +330,7 @@ const contextMenuTemplate: {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
     if (!wallet) {
-      AppController.showMessageBox({
+      showMessageBox({
         type: 'error',
         message: i18n.t('messages.wallet-not-found', { id }),
       })
@@ -338,7 +342,7 @@ const contextMenuTemplate: {
           try {
             walletsService.setCurrent(id)
           } catch (err) {
-            AppController.showMessageBox({ type: 'error', message: err.message })
+            showMessageBox({ type: 'error', message: err.message })
           }
         },
       },
