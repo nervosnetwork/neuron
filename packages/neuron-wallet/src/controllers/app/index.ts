@@ -273,7 +273,7 @@ export default class AppController {
       width: 1200,
       show: false,
       webPreferences: {
-        preload: path.join(__dirname, '../../startup/preload.js'),
+        preload: path.join(__dirname, './preload.js'),
       },
     })
     win.loadURL(`${env.mainURL}#/transaction/${hash}`)
