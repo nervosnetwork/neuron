@@ -1,6 +1,5 @@
 import Application from '../application'
 import { createWallet } from '../operations'
-import { sleep } from '../application/utils'
 
 /**
  * 1. check the alert, it should be empty
@@ -24,7 +23,7 @@ export default (app: Application) => {
     await createWallet(app)
     await app.waitUntilLoaded()
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     client.click('button[name=Wallets]')
@@ -51,7 +50,7 @@ export default (app: Application) => {
       await client.elementIdValue(inputElement.value.ELEMENT, 'Invalid Password')
       client.click('button[type=submit]')
       await app.waitUntilLoaded()
-      sleep(4000)
+      app.wait(4000)
       const alertComponent = await client.$('.ms-MessageBar-text')
       const msg = await client.elementIdText(alertComponent.value.ELEMENT)
       expect(msg.value).toBe(messages.incorrectPassword)
@@ -75,7 +74,7 @@ export default (app: Application) => {
       await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
       client.click('button[type=submit]')
       await app.waitUntilLoaded()
-      sleep(4000)
+      app.wait(4000)
       const alertComponent = await client.$('.ms-MessageBar--error')
       expect(alertComponent.state).toBe('failure')
     })

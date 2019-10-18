@@ -52,7 +52,7 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
@@ -110,7 +110,7 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
