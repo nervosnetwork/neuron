@@ -2,7 +2,7 @@ import { Subject } from 'rxjs'
 
 export const WalletListSubject = new Subject<{
   currentWallet?: Controller.Wallet | null
-  prevWalletList: Controller.Wallet[]
+  previousWalletList: Controller.Wallet[]
   currentWalletList: Controller.Wallet[]
 }>()
 

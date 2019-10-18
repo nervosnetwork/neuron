@@ -399,9 +399,13 @@ const contextMenuTemplate: {
   },
 }
 
-const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
+const updateApplicationMenu = () => {
   const menu = Menu.buildFromTemplate(generateTemplate())
   const selectMenu = menu.getMenuItemById('select')
+
+  const walletsService = WalletsService.getInstance()
+  const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
+  const currentWallet = walletsService.getCurrent()
 
   wallets.forEach(wallet => {
     selectMenu.submenu.append(
@@ -409,7 +413,7 @@ const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) 
         id: wallet.id,
         label: wallet.name,
         type: 'radio',
-        checked: wallet.id === id,
+        checked: currentWallet && wallet.id === currentWallet.id,
         click: () => {
           const walletsService = WalletsService.getInstance()
           walletsService.setCurrent(wallet.id)
