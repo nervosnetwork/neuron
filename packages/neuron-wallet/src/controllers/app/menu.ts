@@ -1,7 +1,6 @@
-import { dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
+import { app, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
-import app from 'app'
 import env from 'env'
 import AppController from 'controllers/app'
 import NetworksService from 'services/networks'
@@ -399,9 +398,13 @@ const contextMenuTemplate: {
   },
 }
 
-const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
+const updateApplicationMenu = () => {
   const menu = Menu.buildFromTemplate(generateTemplate())
   const selectMenu = menu.getMenuItemById('select')
+
+  const walletsService = WalletsService.getInstance()
+  const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
+  const currentWallet = walletsService.getCurrent()
 
   wallets.forEach(wallet => {
     selectMenu.submenu.append(
@@ -409,7 +412,7 @@ const updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) 
         id: wallet.id,
         label: wallet.name,
         type: 'radio',
-        checked: wallet.id === id,
+        checked: currentWallet && wallet.id === currentWallet.id,
         click: () => {
           const walletsService = WalletsService.getInstance()
           walletsService.setCurrent(wallet.id)

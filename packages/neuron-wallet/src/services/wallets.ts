@@ -125,9 +125,9 @@ export default class WalletService {
 
     this.listStore.on(
       this.walletsKey,
-      (prevWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
+      (previousWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
         const currentWallet = this.getCurrent()
-        WalletListSubject.next({ currentWallet, prevWalletList, currentWalletList })
+        WalletListSubject.next({ currentWallet, previousWalletList, currentWalletList })
       }
     )
     this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentID: string | undefined) => {

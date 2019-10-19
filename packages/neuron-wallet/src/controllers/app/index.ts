@@ -1,29 +1,21 @@
 import path from 'path'
-import {
-  shell,
-  MenuItem,
-  dialog,
-  BrowserWindow,
-} from 'electron'
+import { app as electronApp, remote, shell, MenuItem, dialog, BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 import { take } from 'rxjs/operators'
 
-import app from 'app'
+import env from 'env'
+import { updateApplicationMenu, popContextMenu } from './menu'
 import { TransactionsController, WalletsController, SyncInfoController, UpdateController } from 'controllers'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import SkipDataAndType from 'services/settings/skip-data-and-type'
-
 import { ResponseCode } from 'utils/const'
 import logger from 'utils/logger'
 import i18n from 'utils/i18n'
-import env from 'env'
 import CommandSubject from 'models/subjects/command'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
-
 import { subscribe } from './subscribe'
-import { updateApplicationMenu, popContextMenu } from './menu'
 
 enum URL {
   Preference = '/settings/general',
@@ -33,12 +25,18 @@ enum URL {
 }
 
 // Acts as a middle man so that subscribe doesn't have to know AppController
-const messageDispatcher = {
-  sendMessage: (channel: string, obj: any) => {
-    AppController.sendMessage(channel, obj)
+const eventResponder = {
+  sendMessage: (channel: string, arg: any) => {
+    AppController.sendMessage(channel, arg)
+  },
+
+  updateMenu: () => {
+    AppController.updateApplicationMenu()
   }
 }
-subscribe(messageDispatcher)
+subscribe(eventResponder)
+
+const app = electronApp || (remote && remote.app)
 
 export default class AppController {
   public static mainWindow: BrowserWindow | null
@@ -63,7 +61,7 @@ export default class AppController {
       defaultHeight: 768,
     })
 
-    AppController.mainWindow = new BrowserWindow({
+    const mainWindow = new BrowserWindow({
       x: windowState.x,
       y: windowState.y,
       width: windowState.width,
@@ -80,9 +78,9 @@ export default class AppController {
       },
     })
 
-    windowState.manage(AppController.mainWindow)
+    windowState.manage(mainWindow)
 
-    AppController.mainWindow.on('ready-to-show', () => {
+    mainWindow.on('ready-to-show', () => {
       if (AppController.mainWindow) {
         AppController.mainWindow.show()
         AppController.mainWindow.focus()
@@ -92,7 +90,7 @@ export default class AppController {
       }
     })
 
-    AppController.mainWindow.on('closed', () => {
+    mainWindow.on('closed', () => {
       if (process.platform !== 'darwin') {
         app.quit()
       }
@@ -102,7 +100,9 @@ export default class AppController {
       }
     })
 
-    AppController.mainWindow.loadURL(env.mainURL)
+    mainWindow.loadURL(env.mainURL)
+    AppController.mainWindow = mainWindow
+    AppController.updateApplicationMenu()
   }
 
   public static getInitState = async () => {
@@ -202,8 +202,8 @@ export default class AppController {
     return AppController.mainWindow && winID === AppController.mainWindow.id
   }
 
-  public static updateApplicationMenu = (wallets: Controller.Wallet[], id: string | null) => {
-    updateApplicationMenu(wallets, id)
+  public static updateApplicationMenu = () => {
+    updateApplicationMenu()
   }
 
   public static async contextMenu(params: { type: string; id: string }) {
