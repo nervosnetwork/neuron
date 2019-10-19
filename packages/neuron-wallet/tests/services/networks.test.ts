@@ -128,7 +128,9 @@ describe(`Unit tests of networks service`, () => {
       await service.delete(inactiveNetwork.id)
       const currentID = await service.getCurrentID()
       const currentNetworks = await service.getAll()
-      expect(currentNetworks).toEqual(prevNetworks.filter(n => n.id !== inactiveNetwork.id))
+      expect(currentNetworks.map(n => n.id)).toEqual(
+        prevNetworks.filter(n => n.id !== inactiveNetwork.id).map(n => n.id),
+      )
       expect(currentID).toBe(prevCurrentID)
     })
 
@@ -137,10 +139,10 @@ describe(`Unit tests of networks service`, () => {
       const prevCurrentID = await service.getCurrentID()
       const prevNetworks = await service.getAll()
       expect(prevCurrentID).toBe(localNetwork.id)
-      expect(prevNetworks).toEqual(list)
+      expect(prevNetworks.map(n => n.id)).toEqual(list.map(n => n.id))
       await service.delete(prevCurrentID || '')
       const currentNetworks = await service.getAll()
-      expect(currentNetworks).toEqual(prevNetworks.filter(n => n.id !== prevCurrentID))
+      expect(currentNetworks.map(n => n.id)).toEqual(prevNetworks.filter(n => n.id !== prevCurrentID).map(n => n.id))
       const currentID = await new Promise(resolve => {
         setTimeout(() => {
           service.getCurrentID().then(cID => resolve(cID))
