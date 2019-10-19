@@ -165,6 +165,7 @@ const generateTemplate = () => {
   const windowMenuItem: MenuItemConstructorOptions = {
     id: 'window',
     label: i18n.t('application-menu.window.label'),
+    role: 'window',
     submenu: [
       {
         label: i18n.t('application-menu.window.minimize'),
