@@ -1,4 +1,4 @@
-import { app, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
+import { app, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
 import env from 'env'
@@ -31,6 +31,7 @@ const generateTemplate = () => {
   const walletsService = WalletsService.getInstance()
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
+  const isMainWindow = AppController && BrowserWindow.getFocusedWindow() === AppController.mainWindow
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
@@ -45,12 +46,14 @@ const generateTemplate = () => {
         click: () => { AppController.showAbout() },
       },
       {
+        enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.check-updates'),
         click: (menuItem: MenuItem) => { AppController.checkUpdates(menuItem) }
       },
       separator,
       {
         id: 'preference',
+        enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
         click: () => { AppController.showPreference() }
@@ -68,6 +71,7 @@ const generateTemplate = () => {
   const walletMenuItem: MenuItemConstructorOptions = {
     id: 'wallet',
     label: i18n.t('application-menu.wallet.label'),
+    enabled: isMainWindow,
     submenu: [
       { id: 'select', label: i18n.t('application-menu.wallet.select'), submenu: [] },
       {
@@ -151,7 +155,7 @@ const generateTemplate = () => {
       },
       {
         label: i18n.t('application-menu.view.address-book'),
-        enabled: hasCurrentWallet,
+        enabled: isMainWindow && hasCurrentWallet,
         click: () => { AppController.toggleAddressBook() },
         accelerator: 'CmdOrCtrl+B',
       },
@@ -408,6 +412,7 @@ const updateApplicationMenu = () => {
   const walletsService = WalletsService.getInstance()
   const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
+  const isMainWindow = AppController && BrowserWindow.getFocusedWindow() === AppController.mainWindow
 
   wallets.forEach(wallet => {
     selectMenu.submenu.append(
@@ -420,7 +425,7 @@ const updateApplicationMenu = () => {
       })
     )
   })
-  selectMenu.enabled = wallets.length > 0
+  selectMenu.enabled = isMainWindow && wallets.length > 0
 
   Menu.setApplicationMenu(menu)
 }

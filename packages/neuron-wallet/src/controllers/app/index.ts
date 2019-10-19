@@ -100,6 +100,14 @@ export default class AppController {
       }
     })
 
+    mainWindow.on('focus', () => {
+      AppController.updateApplicationMenu()
+    })
+
+    mainWindow.on('blur', () => {
+      AppController.updateApplicationMenu()
+    })
+
     mainWindow.loadURL(env.mainURL)
     AppController.mainWindow = mainWindow
     AppController.updateApplicationMenu()
