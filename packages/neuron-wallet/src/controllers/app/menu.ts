@@ -28,6 +28,10 @@ const showMessageBox = (options: MessageBoxOptions, callback?: (returnValue: Mes
 }
 
 const generateTemplate = () => {
+  const walletsService = WalletsService.getInstance()
+  const currentWallet = walletsService.getCurrent()
+  const hasCurrentWallet = currentWallet !== undefined
+
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
     label: app.getName(),
@@ -91,9 +95,8 @@ const generateTemplate = () => {
       {
         id: 'backup',
         label: i18n.t('application-menu.wallet.backup'),
+        enabled: hasCurrentWallet,
         click: () => {
-          const walletsService = WalletsService.getInstance()
-          const currentWallet = walletsService.getCurrent()
           if (!currentWallet) {
             return
           }
@@ -103,9 +106,8 @@ const generateTemplate = () => {
       {
         id: 'delete',
         label: i18n.t('application-menu.wallet.delete'),
+        enabled: hasCurrentWallet,
         click: () => {
-          const walletsService = WalletsService.getInstance()
-          const currentWallet = walletsService.getCurrent()
           if (!currentWallet) {
             return
           }
@@ -149,6 +151,7 @@ const generateTemplate = () => {
       },
       {
         label: i18n.t('application-menu.view.address-book'),
+        enabled: hasCurrentWallet,
         click: () => { AppController.toggleAddressBook() },
         accelerator: 'CmdOrCtrl+B',
       },
@@ -413,13 +416,11 @@ const updateApplicationMenu = () => {
         label: wallet.name,
         type: 'radio',
         checked: currentWallet && wallet.id === currentWallet.id,
-        click: () => {
-          const walletsService = WalletsService.getInstance()
-          walletsService.setCurrent(wallet.id)
-        },
+        click: () => { WalletsService.getInstance().setCurrent(wallet.id) }
       })
     )
   })
+  selectMenu.enabled = wallets.length > 0
 
   Menu.setApplicationMenu(menu)
 }
