@@ -11,10 +11,6 @@ import LockUtils from 'models/lock-utils'
 
 const CELL_COUNT_THRESHOLD = 10
 
-/**
- * @class TransactionsController
- * @description handle messages from transactions channel
- */
 export default class TransactionsController {
   @CatchControllerError
   public static async getAll(

@@ -28,6 +28,7 @@ export const validateMnemonic = (mnemonic: string): boolean => {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return true
   }
+  // TODO: use api controller, do NOT require models
   const { validateMnemonic: remoteValidateMnemonic } = window.remote.require('./models/keys/mnemonic')
   return remoteValidateMnemonic(mnemonic)
 }
@@ -37,6 +38,7 @@ export const generateMnemonic = (): string => {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return ''
   }
+  // TODO: use api controller, do NOT require models
   const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
   return remoteGenerateMnemonic()
 }

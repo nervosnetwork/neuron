@@ -1,29 +1,23 @@
-import { controllerMethodWrapper } from './controllerMethodWrapper'
+import { apiMethodWrapper } from './apiMethodWrapper'
 
-const CONTROLLER_NAME = 'networks'
-
-export const setCurrentNetowrk = controllerMethodWrapper(CONTROLLER_NAME)((controller: any) => (networkID: string) => {
-  return controller.activate(networkID)
+export const setCurrentNetowrk = apiMethodWrapper((api: any) => (networkID: string) => {
+  return api.setCurrentNetowrk(networkID)
 })
 
-export const createNetwork = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.CreateNetworkParams) => {
-    return controller.create(params)
-  }
-)
-
-export const updateNetwork = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => ({ networkID, options }: Controller.UpdateNetworkParams) => {
-    return controller.update(networkID, options)
-  }
-)
-
-export const getAllNetworks = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => {
-  return controller.getAll()
+export const createNetwork = apiMethodWrapper(api => (params: Controller.CreateNetworkParams) => {
+  return api.createNetwork(params)
 })
 
-export const getCurrentNetworkID = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => {
-  return controller.currentID()
+export const updateNetwork = apiMethodWrapper(api => ({ networkID, options }: Controller.UpdateNetworkParams) => {
+  return api.updateNetwork(networkID, options)
+})
+
+export const getAllNetworks = apiMethodWrapper(api => () => {
+  return api.getAllNetworks()
+})
+
+export const getCurrentNetworkID = apiMethodWrapper(api => () => {
+  return api.getCurrentNetworkID()
 })
 
 export default {
