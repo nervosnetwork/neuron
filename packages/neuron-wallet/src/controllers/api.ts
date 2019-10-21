@@ -106,11 +106,6 @@ export default class ApiController {
     }
   }
 
-  public static isMainWindow = (winID: number) => {
-    // TODO: Fix this
-    return winID === 0 // AppController.mainWindow && winID === AppController.mainWindow.id
-  }
-
   public static async contextMenu(params: { type: string; id: string }) {
     return popContextMenu(params)
   }
