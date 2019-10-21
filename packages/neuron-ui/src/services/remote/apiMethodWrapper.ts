@@ -21,7 +21,7 @@ export const RemoteNotLoadError = {
   },
 }
 
-export const apiMethodWrapper = () => (
+export const apiMethodWrapper = (
   callControllerMethod: (
     controller: any
   ) => (
