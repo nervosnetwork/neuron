@@ -1,8 +1,8 @@
 import { controllerMethodWrapper } from './controllerMethodWrapper'
 
-const CONTROLLER_NAME = 'app'
+const CONTROLLER_NAME = 'api'
 export const getNeuronWalletState = controllerMethodWrapper(CONTROLLER_NAME)(controller => () =>
-  controller.getInitState()
+  controller.loadInitData()
 )
 
 export const handleViewError = controllerMethodWrapper(CONTROLLER_NAME)(controller => (errorMessage: string) =>
@@ -16,14 +16,9 @@ export const showTransactionDetails = controllerMethodWrapper(CONTROLLER_NAME)(c
   controller.showTransactionDetails(hash)
 )
 
-export const isMainWindow = controllerMethodWrapper(CONTROLLER_NAME)(controller => (winID: number) =>
-  controller.isMainWindow(winID)
-)
-
 export default {
   getNeuronWalletState,
   handleViewError,
   contextMenu,
   showTransactionDetails,
-  isMainWindow,
 }

@@ -5,9 +5,7 @@ import initConnection from 'database/address/ormconfig'
 import createSyncBlockTask from 'startup/sync-block-task/create'
 import { changeLanguage } from 'utils/i18n'
 
-const openWindow = () => {
-  AppController.openWindow()
-}
+const appController = new AppController()
 
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
@@ -15,7 +13,7 @@ app.on('ready', async () => {
   await initConnection()
   createSyncBlockTask()
 
-  openWindow()
+  appController.openWindow()
 })
 
-app.on('activate', openWindow)
+app.on('activate', appController.openWindow)

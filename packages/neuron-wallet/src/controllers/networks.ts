@@ -106,11 +106,3 @@ export default class NetworksController {
     }
   }
 }
-
-/* eslint-disable */
-declare global {
-  module Controller {
-    type NetworksMethod = Exclude<keyof typeof NetworksController, keyof typeof Object | 'service'>
-  }
-}
-/* eslint-enable */

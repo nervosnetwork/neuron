@@ -6,6 +6,8 @@ import SyncInfoController from './sync-info'
 import SkipDataAndTypeController from './skip-data-and-type'
 import UpdateController from './update'
 
+import ApiController from './api'
+
 export {
   AppController,
   NetworksController,
@@ -13,5 +15,6 @@ export {
   TransactionsController,
   SyncInfoController,
   SkipDataAndTypeController,
-  UpdateController
+  UpdateController,
+  ApiController
 }

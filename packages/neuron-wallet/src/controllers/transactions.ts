@@ -149,11 +149,3 @@ export default class TransactionsController {
     }
   }
 }
-
-/* eslint-disable*/
-declare global {
-  module Controller {
-    type TransactionsMethod = Exclude<keyof typeof TransactionsController, keyof typeof Object>
-  }
-}
-/* eslint-enable */
