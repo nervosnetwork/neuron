@@ -73,5 +73,5 @@ export const apiMethodWrapper = () => (
 
 export default {
   RemoteNotLoadError,
-  controllerMethodWrapper: apiMethodWrapper,
+  apiMethodWrapper,
 }
