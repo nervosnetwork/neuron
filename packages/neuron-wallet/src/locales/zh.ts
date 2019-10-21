@@ -42,6 +42,7 @@ export default {
       },
       help: {
         label: '帮助',
+        'nervos-website': 'Nervos 网站',
         'source-code': '源代码',
         'report-issue': '报告问题',
         settings: '设置',

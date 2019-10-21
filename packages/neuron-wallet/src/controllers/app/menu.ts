@@ -229,7 +229,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
 
   const helpSubmenu: MenuItemConstructorOptions[] = [
     {
-      label: 'Nervos',
+      label: i18n.t('application-menu.help.nervos-website'),
       click: () => { shell.openExternal(ExternalURL.Website) }
     },
     {

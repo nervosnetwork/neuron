@@ -42,6 +42,7 @@ export default {
       },
       help: {
         label: 'Help',
+        'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
         settings: 'Settings',
