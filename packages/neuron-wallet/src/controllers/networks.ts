@@ -6,10 +6,6 @@ import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from '
 
 const networksService = NetworksService.getInstance()
 
-/**
- * @class NetworksController
- * @description handle messages from networks channel
- */
 export default class NetworksController {
   @CatchControllerError
   public static async getAll() {

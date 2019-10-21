@@ -22,10 +22,6 @@ import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import logger from 'utils/logger'
 
-/**
- * @class WalletsController
- * @description handle messages from wallets channel
- */
 export default class WalletsController {
   @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {

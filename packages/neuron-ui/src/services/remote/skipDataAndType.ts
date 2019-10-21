@@ -1,11 +1,7 @@
-import { controllerMethodWrapper } from './controllerMethodWrapper'
+import { apiMethodWrapper } from './apiMethodWrapper'
 
-const CONTROLLER_NAME = 'skip-data-and-type'
-
-export const setSkipDataAndType = controllerMethodWrapper(CONTROLLER_NAME)(
-  (controller: any) => (params: Controller.SetSkipAndTypeParam) => {
-    return controller.update(params)
-  }
-)
+export const setSkipDataAndType = apiMethodWrapper()((api: any) => (params: Controller.SetSkipAndTypeParam) => {
+  return api.updateSkipDataAndType(params)
+})
 
 export default { setSkipDataAndType }

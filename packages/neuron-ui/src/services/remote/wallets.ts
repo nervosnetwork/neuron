@@ -1,52 +1,49 @@
-import { controllerMethodWrapper } from './controllerMethodWrapper'
+import { apiMethodWrapper } from './apiMethodWrapper'
 
-const CONTROLLER_NAME = 'wallets'
-
-export const updateWallet = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.UpdateWalletParams) => controller.update(params)
+export const updateWallet = apiMethodWrapper()(api => (params: Controller.UpdateWalletParams) =>
+  api.updateWallet(params)
 )
 
-export const getCurrentWallet = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => controller.getCurrent())
+export const getCurrentWallet = apiMethodWrapper()(api => () => api.getCurrentWallet())
 
-export const getWalletList = controllerMethodWrapper(CONTROLLER_NAME)(controller => () => controller.getAll())
+export const getWalletList = apiMethodWrapper()(api => () => api.getAllWallets())
 
-export const createWallet = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.CreateWalletParams) => controller.create(params)
+export const createWallet = apiMethodWrapper()(api => (params: Controller.CreateWalletParams) =>
+  api.createWallet(params)
 )
 
-export const importMnemonic = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.ImportMnemonicParams) => controller.importMnemonic(params)
+export const importMnemonic = apiMethodWrapper()(api => (params: Controller.ImportMnemonicParams) =>
+  api.importMnemonic(params)
 )
 
-export const importKeystore = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.ImportKeystoreParams) => controller.importKeystore(params)
+export const importKeystore = apiMethodWrapper()(api => (params: Controller.ImportKeystoreParams) =>
+  api.importKeystore(params)
 )
 
-export const deleteWallet = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.DeleteWalletParams) => controller.delete(params)
+export const deleteWallet = apiMethodWrapper()(api => (params: Controller.DeleteWalletParams) =>
+  api.deleteWallet(params)
 )
 
-export const backupWallet = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.DeleteWalletParams) => controller.backup(params)
+export const backupWallet = apiMethodWrapper()(api => (params: Controller.DeleteWalletParams) =>
+  api.backupWallet(params)
 )
 
-export const setCurrentWallet = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (id: Controller.SetCurrentWalletParams) => controller.activate(id)
-)
-export const sendCapacity = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.SendTransaction) => controller.sendCapacity(params)
+export const setCurrentWallet = apiMethodWrapper()(api => (id: Controller.SetCurrentWalletParams) =>
+  api.setCurrentWallet(id)
 )
 
-export const getAddressesByWalletID = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (walletID: Controller.GetAddressesByWalletIDParams) => controller.getAllAddresses(walletID)
+export const sendCapacity = apiMethodWrapper()(api => (params: Controller.SendTransaction) => api.sendCapacity(params))
+
+export const getAddressesByWalletID = apiMethodWrapper()(api => (walletID: Controller.GetAddressesByWalletIDParams) =>
+  api.getAddressesByWalletID(walletID)
 )
 
-export const updateAddressDescription = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.UpdateAddressDescriptionParams) => controller.updateAddressDescription(params)
+export const updateAddressDescription = apiMethodWrapper()(api => (params: Controller.UpdateAddressDescriptionParams) =>
+  api.updateAddressDescription(params)
 )
 
-export const calculateCycles = controllerMethodWrapper(CONTROLLER_NAME)(
-  controller => (params: Controller.ComputeCycles) => controller.computeCycles(params)
+export const calculateCycles = apiMethodWrapper()(api => (params: Controller.ComputeCycles) =>
+  api.computeCycles(params)
 )
 
 export default {

@@ -21,14 +21,7 @@ export const RemoteNotLoadError = {
   },
 }
 
-export const controllerNotLoaded = (controllerName: string) => ({
-  status: 0 as 0,
-  message: {
-    content: `${controllerName} controller not loaded`,
-  },
-})
-
-export const controllerMethodWrapper = (controllerName: string) => (
+export const apiMethodWrapper = () => (
   callControllerMethod: (
     controller: any
   ) => (
@@ -42,13 +35,18 @@ export const controllerMethodWrapper = (controllerName: string) => (
   if (!window.remote) {
     return RemoteNotLoadError
   }
-  const controller = window.remote.require(`./controllers/${controllerName}`).default
+  const controller = window.remote.require('./controllers/api').default
   if (!controller) {
-    return controllerNotLoaded(controllerName)
+    return {
+      status: 0,
+      message: {
+        content: 'api controller not loaded',
+      },
+    }
   }
   const res = await callControllerMethod(controller)(realParams)
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
-    console.group(`${controllerName} controller`)
+    console.group('api controller')
     console.info(JSON.stringify(res, null, 2))
     console.groupEnd()
   }
@@ -75,6 +73,5 @@ export const controllerMethodWrapper = (controllerName: string) => (
 
 export default {
   RemoteNotLoadError,
-  controllerNotLoaded,
-  controllerMethodWrapper,
+  controllerMethodWrapper: apiMethodWrapper,
 }
