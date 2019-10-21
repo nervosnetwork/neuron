@@ -1,8 +1,8 @@
 import { controllerMethodWrapper } from './controllerMethodWrapper'
 
-const CONTROLLER_NAME = 'app'
+const CONTROLLER_NAME = 'api'
 export const getNeuronWalletState = controllerMethodWrapper(CONTROLLER_NAME)(controller => () =>
-  controller.getInitState()
+  controller.loadInitData()
 )
 
 export const handleViewError = controllerMethodWrapper(CONTROLLER_NAME)(controller => (errorMessage: string) =>

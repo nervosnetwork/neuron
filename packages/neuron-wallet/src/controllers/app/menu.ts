@@ -1,13 +1,19 @@
-import { app, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
+import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
 import env from 'env'
-import AppController from 'controllers/app'
+import { UpdateController } from 'controllers'
+import { showWindow } from './show-window'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
+import CommandSubject from 'models/subjects/command'
 
-// TODO: Refactor this to remove circular reference between menu and app controller.
-// Perhaps menu should only do dispatching.
+enum URL {
+  Preference = '/settings/general',
+  CreateWallet = '/wizard/mnemonic/create',
+  ImportMnemonic = '/wizard/mnemonic/import',
+  ImportKeystore = '/keystore/import',
+}
 
 enum ExternalURL {
   Website = 'https://www.nervos.org/',
@@ -15,23 +21,48 @@ enum ExternalURL {
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
 }
 
-const isMac = process.platform === 'darwin'
-
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
 }
-
-const networksService = NetworksService.getInstance()
 
 const showMessageBox = (options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) => {
   dialog.showMessageBox(options).then(callback)
 }
 
-const generateTemplate = () => {
+const showAbout = () => {
+  const options = {
+    type: 'info',
+    title: app.getName(),
+    message: app.getName(),
+    detail: app.getVersion(),
+    buttons: ['OK'],
+    cancelId: 0,
+  }
+  dialog.showMessageBox(options)
+}
+
+const navTo = (url: string) => {
+  const window = BrowserWindow.getFocusedWindow()
+  if (window) {
+    CommandSubject.next({ winID: window.id, type: 'nav', payload: url })
+  }
+}
+
+const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
+  const window = BrowserWindow.getFocusedWindow()
+  if (window) {
+    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID })
+  }
+}
+
+const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
+  const isMac = process.platform === 'darwin'
+  let isMainWindow = mainWindow == BrowserWindow.getFocusedWindow()
+
   const walletsService = WalletsService.getInstance()
+  const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
   const currentWallet = walletsService.getCurrent()
   const hasCurrentWallet = currentWallet !== undefined
-  const isMainWindow = AppController && BrowserWindow.getFocusedWindow() === AppController.mainWindow
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
@@ -43,12 +74,12 @@ const generateTemplate = () => {
           app: app.getName(),
         }),
         role: 'about',
-        click: () => { AppController.showAbout() },
+        click: () => { showAbout() },
       },
       {
         enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.check-updates'),
-        click: (menuItem: MenuItem) => { AppController.checkUpdates(menuItem) }
+        click: (menuItem: MenuItem) => { new UpdateController().checkUpdates(menuItem) }
       },
       separator,
       {
@@ -56,7 +87,7 @@ const generateTemplate = () => {
         enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
-        click: () => { AppController.showPreference() }
+        click: () => { navTo(URL.Preference) }
       },
       separator,
       {
@@ -68,16 +99,26 @@ const generateTemplate = () => {
     ],
   }
 
+  const selectWalletMenu: MenuItemConstructorOptions[] = wallets.map(wallet => {
+    return {
+      id: wallet.id,
+      label: wallet.name,
+      type: 'radio',
+      checked: currentWallet && wallet.id === currentWallet.id,
+      click: () => { WalletsService.getInstance().setCurrent(wallet.id) }
+    }
+  })
+
   const walletMenuItem: MenuItemConstructorOptions = {
     id: 'wallet',
     label: i18n.t('application-menu.wallet.label'),
     enabled: isMainWindow,
     submenu: [
-      { id: 'select', label: i18n.t('application-menu.wallet.select'), submenu: [] },
+      { id: 'select', label: i18n.t('application-menu.wallet.select'), submenu: selectWalletMenu },
       {
         id: 'create',
         label: i18n.t('application-menu.wallet.create-new'),
-        click: () => { AppController.createWallet() }
+        click: () => { navTo(URL.CreateWallet) }
       },
       {
         id: 'import',
@@ -86,12 +127,12 @@ const generateTemplate = () => {
           {
             id: 'import-with-mnemonic',
             label: i18n.t('application-menu.wallet.import-mnemonic'),
-            click: () => { AppController.importWallet('mnemonic') }
+            click: () => { navTo(URL.ImportMnemonic) }
           },
           {
             id: 'import-with-keystore',
             label: i18n.t('application-menu.wallet.import-keystore'),
-            click: () => { AppController.importWallet('keystore') },
+            click: () => { navTo(URL.ImportKeystore )},
           },
         ],
       },
@@ -104,7 +145,7 @@ const generateTemplate = () => {
           if (!currentWallet) {
             return
           }
-          walletsService.requestPassword(currentWallet.id, 'backup-wallet')
+          requestPassword(currentWallet.id, 'backup-wallet')
         },
       },
       {
@@ -115,7 +156,7 @@ const generateTemplate = () => {
           if (!currentWallet) {
             return
           }
-          walletsService.requestPassword(currentWallet.id, 'delete-wallet')
+          requestPassword(currentWallet.id, 'delete-wallet')
         },
       },
     ],
@@ -156,7 +197,15 @@ const generateTemplate = () => {
       {
         label: i18n.t('application-menu.view.address-book'),
         enabled: isMainWindow && hasCurrentWallet,
-        click: () => { AppController.toggleAddressBook() },
+        click: () => {
+          if (mainWindow) {
+            CommandSubject.next({
+              winID: mainWindow.id,
+              type: 'toggle-address-book',
+              payload: null,
+            })
+          }
+        },
         accelerator: 'CmdOrCtrl+B',
       },
     ],
@@ -181,15 +230,15 @@ const generateTemplate = () => {
   const helpSubmenu: MenuItemConstructorOptions[] = [
     {
       label: 'Nervos',
-      click: () => { AppController.openExternal(ExternalURL.Website) }
+      click: () => { shell.openExternal(ExternalURL.Website) }
     },
     {
       label: i18n.t('application-menu.help.source-code'),
-      click: () => { AppController.openExternal(ExternalURL.Repository) }
+      click: () => { shell.openExternal(ExternalURL.Repository) }
     },
     {
       label: i18n.t('application-menu.help.report-issue'),
-      click: () => { AppController.openExternal(ExternalURL.Issues) }
+      click: () => { shell.openExternal(ExternalURL.Issues) }
     },
   ]
   if (!isMac) {
@@ -197,11 +246,11 @@ const generateTemplate = () => {
     helpSubmenu.push({
       id: 'preference',
       label: i18n.t('application-menu.help.settings'),
-      click: () => { AppController.showPreference() }
+      click: () => { navTo(URL.Preference) }
     })
     helpSubmenu.push({
       label: i18n.t('application-menu.neuron.check-updates'),
-      click: (menuItem: MenuItem) => { AppController.checkUpdates(menuItem) }
+      click: (menuItem: MenuItem) => { new UpdateController().checkUpdates(menuItem) }
     })
     helpSubmenu.push({
       id: 'about',
@@ -209,7 +258,7 @@ const generateTemplate = () => {
         app: app.getName(),
       }),
       role: 'about',
-      click: () => { AppController.showAbout() }
+      click: () => { showAbout() }
     })
   }
 
@@ -246,14 +295,17 @@ const generateTemplate = () => {
   if (isMac) {
     applicationMenuTemplate.unshift(appMenuItem)
   }
-  return applicationMenuTemplate
+
+  const menu = Menu.buildFromTemplate(applicationMenuTemplate)
+
+  Menu.setApplicationMenu(menu)
 }
 
 const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
 } = {
-  copyMainnetAddress: async (identifier: string) => {
-    const address = bech32Address(identifier, {
+  copyMainnetAddress: async (publicKeyHash: string) => {
+    const address = bech32Address(publicKeyHash, {
       prefix: AddressPrefix.Mainnet,
       type: AddressType.HashIdx,
       codeHashIndex: '0x00',
@@ -266,6 +318,7 @@ const contextMenuTemplate: {
     ]
   },
   networkList: async (id: string) => {
+    const networksService = NetworksService.getInstance()
     const [network, currentNetworkID] = await Promise.all([
       networksService.get(id).catch(() => null),
       networksService.getCurrentID().catch(() => null),
@@ -298,7 +351,7 @@ const contextMenuTemplate: {
       {
         label: i18n.t('contextMenu.edit'),
         enabled: !isDefault,
-        click: () => { AppController.navTo(`/network/${id}`) }
+        click: () => { navTo(`/network/${id}`) }
       },
       {
         label: i18n.t('contextMenu.delete'),
@@ -355,15 +408,15 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.backup'),
-        click: async () => { walletsService.requestPassword(id, 'backup-wallet') }
+        click: async () => { requestPassword(id, 'backup-wallet') }
       },
       {
         label: i18n.t('contextMenu.edit'),
-        click: () => { AppController.navTo(`/editwallet/${id}`) }
+        click: () => { navTo(`/editwallet/${id}`) }
       },
       {
         label: i18n.t('contextMenu.delete'),
-        click: async () => { walletsService.requestPassword(id, 'delete-wallet') }
+        click: async () => { requestPassword(id, 'delete-wallet') }
       },
     ]
   },
@@ -380,11 +433,11 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.request-payment'),
-        click: () => { AppController.navTo(`/receive/${address}`) }
+        click: () => { navTo(`/receive/${address}`) }
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { AppController.openExternal(`${env.explorer}/address/${address}`) }
+        click: () => { shell.openExternal(`${env.explorer}/address/${address}`) }
       },
     ]
   },
@@ -392,7 +445,9 @@ const contextMenuTemplate: {
     return [
       {
         label: i18n.t('contextMenu.detail'),
-        click: () => AppController.showTransactionDetails(hash),
+        click: () => {
+          showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+        }
       },
       {
         label: i18n.t('contextMenu.copy-transaction-hash'),
@@ -400,35 +455,10 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { AppController.openExternal(`${env.explorer}/transaction/${hash}`) }
+        click: () => { shell.openExternal(`${env.explorer}/transaction/${hash}`) }
       },
     ]
   },
-}
-
-const updateApplicationMenu = () => {
-  const menu = Menu.buildFromTemplate(generateTemplate())
-  const selectMenu = menu.getMenuItemById('select')
-
-  const walletsService = WalletsService.getInstance()
-  const wallets = walletsService.getAll().map(({ id, name }) => ({ id, name }))
-  const currentWallet = walletsService.getCurrent()
-  const isMainWindow = AppController && BrowserWindow.getFocusedWindow() === AppController.mainWindow
-
-  wallets.forEach(wallet => {
-    selectMenu.submenu.append(
-      new MenuItem({
-        id: wallet.id,
-        label: wallet.name,
-        type: 'radio',
-        checked: currentWallet && wallet.id === currentWallet.id,
-        click: () => { WalletsService.getInstance().setCurrent(wallet.id) }
-      })
-    )
-  })
-  selectMenu.enabled = isMainWindow && wallets.length > 0
-
-  Menu.setApplicationMenu(menu)
 }
 
 const popContextMenu = async (params: { type: string; id: string }) => {

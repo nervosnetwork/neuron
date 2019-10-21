@@ -13,8 +13,6 @@ import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
-import CommandSubject from 'models/subjects/command'
-import AppController from 'controllers/app'
 import CellsService from 'services/cells'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 
@@ -465,15 +463,5 @@ export default class WalletService {
       path,
       privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
     }))
-  }
-
-  public requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
-    if (AppController.mainWindow) {
-      CommandSubject.next({
-        winID: AppController.mainWindow.id,
-        type: actionType,
-        payload: walletID,
-      })
-    }
   }
 }

@@ -6,11 +6,13 @@ const services_networks = __importDefault(require("../../dist/services/networks"
 
 electron.ipcMain.on('E2E_EDIT_WALLET', function (event, arg) {
     const walletId = arg[0];
+    // TODO: fix navTo
     controllers_app.default.navTo(`/editwallet/${walletId}`);
 });
 
 electron.ipcMain.on('E2E_EDIT_NETWORK', function (event, arg) {
     const networkId = arg[0];
+    // TODO: fix navTo
     controllers_app.default.navTo(`/network/${networkId}`);
 });
 
