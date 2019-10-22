@@ -307,7 +307,7 @@ export class TransactionsService {
     status: TransactionStatus[],
     url: string = NodeService.getInstance().core.rpc.node.url
   ): Promise<number> => {
-    const lockHashes: string[] = new LockUtils(await LockUtils.loadSystemScript(url)).addressToAllLockHashes(address)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 

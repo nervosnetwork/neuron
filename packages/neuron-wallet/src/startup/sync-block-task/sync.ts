@@ -20,7 +20,7 @@ export interface LockHashInfo {
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
-  const lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+  const lockUtils = new LockUtils(await LockUtils.systemScript(nodeURL))
   const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
   return lockUtils.addressesToAllLockHashes(addresses)
 }
@@ -44,7 +44,7 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, chain
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (blockListener) {
-      const lockUtils = new LockUtils(await LockUtils.loadSystemScript(url))
+      const lockUtils = new LockUtils(await LockUtils.systemScript(url))
       const infos: LockHashInfo[] = addresses.map(addr => {
         const hashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
         // undefined means false
