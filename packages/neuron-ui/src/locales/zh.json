@@ -36,7 +36,12 @@
       "sending": "正在发送",
       "received": "已收款",
       "receiving": "正在收款",
-      "more": "查看更多记录"
+      "more": "查看更多记录",
+      "statusLabel": {
+        "success": "成功",
+        "failed": "失败",
+        "pending": "已提交"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
