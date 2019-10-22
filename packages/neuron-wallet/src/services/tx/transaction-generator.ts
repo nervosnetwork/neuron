@@ -6,6 +6,13 @@ import { TargetOutput } from './params'
 
 export class TransactionGenerator {
   private static txSerializedSizeInBlockWithoutInputs = (outputLength: number) : number => {
+    /*
+    * add a transaction to block need 4 Bytes for offset
+    * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
+    * every cellDep need 37 Bytes, transaction in Neuron only one cellDep
+    * every output without typeScript & with lock in secp need 97 Bytes and 4 Bytes for offset (add to transaction)
+    * every outputsData in "0x" need 4 Bytes and 4 Bytes for offset
+    */
     return 4 + 68 + 37 * 1 + (4 + 97 + 4 + 4) * outputLength
   }
 
