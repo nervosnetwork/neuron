@@ -20,9 +20,9 @@ export interface LockHashInfo {
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
-  const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
-  return lockHashes
+  const lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+  const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
+  return lockUtils.addressesToAllLockHashes(addresses)
 }
 
 // call this after network switched
@@ -44,19 +44,18 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, chain
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (blockListener) {
-      const infos: LockHashInfo[] = (await Promise.all(
-        addresses.map(async addr => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
-          // undefined means false
-          const isImporting: boolean = addr.isImporting === true
-          return hashes.map(h => {
-            return {
-              lockHash: h,
-              isImporting,
-            }
-          })
+      const lockUtils = new LockUtils(await LockUtils.loadSystemScript(url))
+      const infos: LockHashInfo[] = addresses.map(addr => {
+        const hashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+        // undefined means false
+        const isImporting: boolean = addr.isImporting === true
+        return hashes.map(h => {
+          return {
+            lockHash: h,
+            isImporting,
+          }
         })
-      )).reduce((acc, val) => acc.concat(val), [])
+      }).reduce((acc, val) => acc.concat(val), [])
       const oldLockHashes: string[] = blockListener.getLockHashes()
       const anyIsImporting: boolean = infos.some(info => info.isImporting === true)
       if (oldLockHashes.length === 0 && !anyIsImporting) {

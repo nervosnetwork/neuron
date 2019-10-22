@@ -98,7 +98,7 @@ export default class TransactionsController {
       throw new CurrentWalletNotSet()
     }
     const addresses: string[] = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const outputCapacities: bigint = transaction
       .outputs!.filter(o => lockHashes.includes(o.lockHash!))
