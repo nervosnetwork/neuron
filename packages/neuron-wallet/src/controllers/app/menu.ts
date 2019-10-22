@@ -308,7 +308,7 @@ const contextMenuTemplate: {
     const address = bech32Address(publicKeyHash, {
       prefix: AddressPrefix.Mainnet,
       type: AddressType.HashIdx,
-      codeHashIndex: '0x00',
+      codeHashOrCodeHashIndex: '0x00',
     })
     return [
       {

@@ -14,7 +14,7 @@ export const publicKeyToAddress = (publicKey: string, prefix = AddressPrefix.Tes
   return pubkeyToAddress(pubkey, {
     prefix,
     type: Type.HashIdx,
-    codeHashIndex: '0x00',
+    codeHashOrCodeHashIndex: '0x00',
   })
 }
 

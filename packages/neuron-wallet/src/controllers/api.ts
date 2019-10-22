@@ -185,6 +185,7 @@ export default class ApiController {
     }[]
     password: string
     fee: string
+    feeRate: string
     description?: string
   }) {
     return WalletsController.sendCapacity(params)

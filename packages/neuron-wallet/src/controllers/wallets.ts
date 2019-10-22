@@ -357,6 +357,7 @@ export default class WalletsController {
     }[]
     password: string
     fee: string
+    feeRate: string
     description?: string
   }) {
     if (!params) {
@@ -369,6 +370,7 @@ export default class WalletsController {
         params.items,
         params.password,
         params.fee,
+        params.feeRate,
         params.description
       )
       return {
@@ -377,6 +379,39 @@ export default class WalletsController {
       }
     } catch (err) {
       logger.error(`sendCapacity:`, err)
+      return {
+        status: err.code || ResponseCode.Fail,
+        message: `Error: "${err.message}"`,
+      }
+    }
+  }
+
+  @CatchControllerError
+  public static async calculateFee(params: {
+    id: string
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    feeRate: string
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    try {
+      const walletsService = WalletsService.getInstance()
+      const fee = await walletsService.calculateFee(
+        params.walletID,
+        params.items,
+        params.feeRate,
+      )
+      return {
+        status: ResponseCode.Success,
+        result: fee,
+      }
+    } catch (err) {
+      logger.error(`calculateFee:`, err)
       return {
         status: err.code || ResponseCode.Fail,
         message: `Error: "${err.message}"`,

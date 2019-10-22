@@ -336,6 +336,7 @@ export default class WalletService {
     }[] = [],
     password: string = '',
     fee: string = '0',
+    feeRate: string = '0',
     description: string = ''
   ) => {
     const wallet = await this.get(walletID)
@@ -364,7 +365,8 @@ export default class WalletService {
       lockHashes,
       targetOutputs,
       changeAddress,
-      fee
+      fee,
+      feeRate
     )
 
     let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
@@ -407,6 +409,50 @@ export default class WalletService {
     })
 
     return txHash
+  }
+
+  public calculateFee = async (
+    walletID: string = '',
+    items: {
+      address: string
+      capacity: string
+    }[] = [],
+    feeRate: string = '0',
+  ) => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString(),
+    }))
+
+    const changeAddress: string = await this.getChangeAddress()
+
+    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+      lockHashes,
+      targetOutputs,
+      changeAddress,
+      '0',
+      feeRate
+    )
+
+    const inputCapacities = tx.inputs!
+      .map(input => BigInt(input.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+    const outputCapacities = tx.outputs!
+      .map(output => BigInt(output.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    return (inputCapacities - outputCapacities).toString()
   }
 
   public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
