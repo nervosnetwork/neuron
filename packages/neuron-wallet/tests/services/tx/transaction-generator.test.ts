@@ -1,12 +1,12 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import { ScriptHashType, Script, TransactionWithoutHash } from '../../../src/types/cell-types';
+import { ScriptHashType, Script, TransactionWithoutHash } from '../../../src/types/cell-types'
 import { OutputStatus } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
-import SkipDataAndType from '../../../src/services/settings/skip-data-and-type';
-import TransactionGenerator from '../../../src/services/tx/transaction-generator';
+import SkipDataAndType from '../../../src/services/settings/skip-data-and-type'
+import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
-import CellsService from '../../../src/services/cells';
+import CellsService from '../../../src/services/cells'
 
 const systemScript = {
   outPoint: {

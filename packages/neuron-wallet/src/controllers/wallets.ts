@@ -21,6 +21,7 @@ import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import logger from 'utils/logger'
+import { TransactionWithoutHash } from 'types/cell-types';
 
 export default class WalletsController {
   @CatchControllerError
@@ -348,29 +349,23 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async sendCapacity(params: {
+  public static async sendTx(params: {
     id: string
     walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
+    tx: string,
     password: string
-    fee: string
-    feeRate: string
     description?: string
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
+    const transaction: TransactionWithoutHash = JSON.parse(params.tx)
     try {
       const walletsService = WalletsService.getInstance()
-      const hash = await walletsService.sendCapacity(
+      const hash = await walletsService.sendTx(
         params.walletID,
-        params.items,
+        transaction,
         params.password,
-        params.fee,
-        params.feeRate,
         params.description
       )
       return {
@@ -387,13 +382,14 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async calculateFee(params: {
+  public static async generateTx(params: {
     id: string
     walletID: string
     items: {
       address: string
       capacity: string
     }[]
+    fee: string
     feeRate: string
   }) {
     if (!params) {
@@ -401,11 +397,37 @@ export default class WalletsController {
     }
     try {
       const walletsService = WalletsService.getInstance()
-      const fee = await walletsService.calculateFee(
+      const tx = await walletsService.generateTx(
         params.walletID,
         params.items,
+        params.fee,
         params.feeRate,
       )
+      return {
+        status: ResponseCode.Success,
+        result: JSON.stringify(tx),
+      }
+    } catch (err) {
+      logger.error(`generateTx:`, err)
+      return {
+        status: err.code || ResponseCode.Fail,
+        message: `Error: "${err.message}"`,
+      }
+    }
+  }
+
+  @CatchControllerError
+  public static async calculateFee(params: {
+    id: string
+    tx: string
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const transaction: TransactionWithoutHash = JSON.parse(params.tx)
+    try {
+      const walletsService = WalletsService.getInstance()
+      const fee = await walletsService.calculateFee(transaction)
       return {
         status: ResponseCode.Success,
         result: fee,
