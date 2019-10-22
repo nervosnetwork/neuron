@@ -36,7 +36,12 @@
       "sending": "Sending",
       "received": "Received",
       "receiving": "Receiving",
-      "more": "More activities"
+      "more": "More activities",
+      "statusLabel": {
+        "success": "Success",
+        "failed": "Failed",
+        "pending": "Pending"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
