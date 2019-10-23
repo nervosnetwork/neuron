@@ -395,19 +395,18 @@ export default class WalletsController {
   public static async sendTx(params: {
     id: string
     walletID: string
-    tx: string,
+    tx: TransactionWithoutHash
     password: string
     description?: string
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transaction: TransactionWithoutHash = JSON.parse(params.tx)
     try {
       const walletsService = WalletsService.getInstance()
       const hash = await walletsService.sendTx(
         params.walletID,
-        transaction,
+        params.tx,
         params.password,
         params.description
       )
@@ -416,7 +415,7 @@ export default class WalletsController {
         result: hash,
       }
     } catch (err) {
-      logger.error(`sendCapacity:`, err)
+      logger.error(`sendTx:`, err)
       return {
         status: err.code || ResponseCode.Fail,
         message: `Error: "${err.message}"`,
@@ -448,7 +447,7 @@ export default class WalletsController {
       )
       return {
         status: ResponseCode.Success,
-        result: JSON.stringify(tx),
+        result: tx,
       }
     } catch (err) {
       logger.error(`generateTx:`, err)
@@ -462,15 +461,14 @@ export default class WalletsController {
   @CatchControllerError
   public static async calculateFee(params: {
     id: string
-    tx: string
+    tx: TransactionWithoutHash
   }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transaction: TransactionWithoutHash = JSON.parse(params.tx)
     try {
       const walletsService = WalletsService.getInstance()
-      const fee = await walletsService.calculateFee(transaction)
+      const fee = await walletsService.calculateFee(params.tx)
       return {
         status: ResponseCode.Success,
         result: fee,
