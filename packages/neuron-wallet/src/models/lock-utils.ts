@@ -129,7 +129,7 @@ export default class LockUtils {
     return bech32Address(blake160, {
       prefix,
       type: AddressType.HashIdx,
-      codeHashIndex: '0x00',
+      codeHashOrCodeHashIndex: '0x00',
     })
   }
 

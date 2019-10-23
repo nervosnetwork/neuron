@@ -336,6 +336,18 @@ export default class WalletService {
     }[] = [],
     password: string = '',
     fee: string = '0',
+    feeRate: string = '0',
+    description: string = ''
+  ): Promise<string> => {
+    const tx = await this.generateTx(walletID, items, fee, feeRate)
+
+    return this.sendTx(walletID, tx, password, description)
+  }
+
+  public sendTx = async (
+    walletID: string = '',
+    tx: TransactionWithoutHash,
+    password: string = '',
     description: string = ''
   ) => {
     const wallet = await this.get(walletID)
@@ -348,24 +360,6 @@ export default class WalletService {
     }
 
     const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
-
-    const targetOutputs = items.map(item => ({
-      ...item,
-      capacity: BigInt(item.capacity).toString(),
-    }))
-
-    const changeAddress: string = await this.getChangeAddress()
-
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
-      lockHashes,
-      targetOutputs,
-      changeAddress,
-      fee
-    )
 
     let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
     if (!txHash.startsWith('0x')) {
@@ -407,6 +401,57 @@ export default class WalletService {
     })
 
     return txHash
+  }
+
+  public calculateFee = async (
+    tx: TransactionWithoutHash
+  ) => {
+    const inputCapacities = tx.inputs!
+      .map(input => BigInt(input.capacity!))
+      .reduce((result, c) => result + c, BigInt(0))
+    const outputCapacities = tx.outputs!
+      .map(output => BigInt(output.capacity!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    return (inputCapacities - outputCapacities).toString()
+  }
+
+  public generateTx = async (
+    walletID: string = '',
+    items: {
+      address: string
+      capacity: string
+    }[] = [],
+    fee: string = '0',
+    feeRate: string = '0',
+  ): Promise<TransactionWithoutHash> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString(),
+    }))
+
+    const changeAddress: string = await this.getChangeAddress()
+
+    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+      lockHashes,
+      targetOutputs,
+      changeAddress,
+      fee,
+      feeRate
+    )
+
+    return tx
   }
 
   public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
