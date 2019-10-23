@@ -457,27 +457,6 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async calculateFee(params: { tx: TransactionWithoutHash }) {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const fee = await walletsService.calculateFee(params.tx)
-      return {
-        status: ResponseCode.Success,
-        result: fee,
-      }
-    } catch (err) {
-      logger.error(`calculateFee:`, err)
-      return {
-        status: err.code || ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
-    }
-  }
-
-  @CatchControllerError
   public static async computeCycles(params: { walletID: string; capacities: string }) {
     if (!params) {
       throw new IsRequired('Parameters')

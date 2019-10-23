@@ -215,13 +215,6 @@ export default class ApiController {
   }
 
   @CatchControllerError
-  public static async calculateFee(params: {
-    tx: TransactionWithoutHash
-  }) {
-    return WalletsController.calculateFee(params)
-  }
-
-  @CatchControllerError
   public static async computeCycles(params: { walletID: string; capacities: string }) {
     return WalletsController.computeCycles(params)
   }
