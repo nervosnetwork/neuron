@@ -12,8 +12,8 @@ $pending-color: #999999;
   margin: 15px 0;
   grid-template: 'action status'auto'time meta'auto / 1fr auto;
   border-left-color: currentColor;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16),
-    0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  box-shadow: 0 1px 5px 1px rgba(0, 0, 0, 0.14);
   transition: color 0.3s;
 
 
