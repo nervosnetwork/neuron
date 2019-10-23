@@ -39,13 +39,12 @@ describe('LockUtils Test', () => {
     expect(lockHash).toEqual(bob.lockHash)
   })
 
-  // FIXME: test failed, should fix addressToLockScript
   it('addressToLockScript', async () => {
     const mockContractInfo = jest.fn()
     mockContractInfo.mockReturnValue(systemScript)
     LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockScript: Script = await LockUtils.addressToLockScript(bob.address)
+    const lockScript: Script = new LockUtils(await LockUtils.systemScript()).addressToLockScript(bob.address)
 
     expect(lockScript).toEqual(bob.lockScript)
   })
@@ -55,7 +54,7 @@ describe('LockUtils Test', () => {
     mockContractInfo.mockReturnValue(systemScript)
     LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockHash: string = await LockUtils.addressToLockHash(bob.address)
+    const lockHash: string = new LockUtils(await LockUtils.systemScript()).addressToLockHash(bob.address)
 
     expect(lockHash).toEqual(bob.lockHash)
   })
@@ -65,7 +64,7 @@ describe('LockUtils Test', () => {
     mockContractInfo.mockReturnValue(systemScript)
     LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockHashes: string[] = await LockUtils.addressToAllLockHashes(bob.address)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(bob.address)
 
     expect(lockHashes).toEqual([bob.lockHash])
   })
@@ -75,7 +74,8 @@ describe('LockUtils Test', () => {
     mockContractInfo.mockReturnValue(systemScript)
     LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes([bob.address, alice.address])
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
+      .addressesToAllLockHashes([bob.address, alice.address])
 
     const expectedResult = [bob.lockHash, alice.lockHash]
 

@@ -280,7 +280,7 @@ export default class WalletService {
     if (deindexAddresses.length !== 0) {
       const lockHashes: string[] = await Promise.all(
         deindexAddresses.map(async address => {
-          return LockUtils.addressToLockHash(address)
+          return new LockUtils(await LockUtils.systemScript()).addressToLockHash(address)
         })
       )
       // don't await
@@ -351,7 +351,7 @@ export default class WalletService {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -419,7 +419,7 @@ export default class WalletService {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
     const cycles = SECP_CYCLES * BigInt(inputs.length)
