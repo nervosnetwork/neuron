@@ -176,6 +176,21 @@ export default class ApiController {
   }
 
   @CatchControllerError
+  public static async sendCapacity(params: {
+    id: string
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    password: string
+    fee: string
+    description?: string
+  }) {
+    return WalletsController.sendCapacity(params)
+  }
+
+  @CatchControllerError
   public static async sendTx(params: {
     id: string
     walletID: string

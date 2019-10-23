@@ -328,6 +328,22 @@ export default class WalletService {
     this.listStore.clear()
   }
 
+  public sendCapacity = async (
+    walletID: string = '',
+    items: {
+      address: string
+      capacity: string
+    }[] = [],
+    password: string = '',
+    fee: string = '0',
+    feeRate: string = '0',
+    description: string = ''
+  ): Promise<string> => {
+    const tx = await this.generateTx(walletID, items, fee, feeRate)
+
+    return this.sendTx(walletID, tx, password, description)
+  }
+
   public sendTx = async (
     walletID: string = '',
     tx: TransactionWithoutHash,

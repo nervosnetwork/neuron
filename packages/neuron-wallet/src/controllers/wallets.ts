@@ -349,6 +349,49 @@ export default class WalletsController {
   }
 
   @CatchControllerError
+  public static async sendCapacity(params: {
+    id: string
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    password: string
+    fee: string
+    description?: string
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    // set default feeRate
+    let feeRate = '0'
+    if (!params.fee || params.fee === '0') {
+      feeRate = '1000'
+    }
+    try {
+      const walletsService = WalletsService.getInstance()
+      const hash = await walletsService.sendCapacity(
+        params.walletID,
+        params.items,
+        params.password,
+        params.fee,
+        feeRate,
+        params.description
+      )
+      return {
+        status: ResponseCode.Success,
+        result: hash,
+      }
+    } catch (err) {
+      logger.error(`sendCapacity:`, err)
+      return {
+        status: err.code || ResponseCode.Fail,
+        message: `Error: "${err.message}"`,
+      }
+    }
+  }
+
+  @CatchControllerError
   public static async sendTx(params: {
     id: string
     walletID: string
