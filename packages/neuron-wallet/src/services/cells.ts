@@ -167,8 +167,8 @@ export default class CellsService {
 
   public static everyInputFee = (feeRate: bigint): bigint => {
     /*
-    * every input need 44 Bytes and extra 4 Bytes for offset
-    * every input need 1 witness signed by secp256k1, with 65 Bytes data, and serialized in 69 Bytes
+    * every input need 44 Bytes
+    * every input need 1 witness signed by secp256k1, with 65 Bytes data, serialized in 69 Bytes, add extra 4 Bytes when add to transaction.
     */
     const ratio = BigInt(1000)
     const base = BigInt(4 + 44 + 69) * feeRate
