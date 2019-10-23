@@ -66,14 +66,23 @@ export default class CellsService {
   public static gatherInputs = async (
     capacity: string,
     lockHashes: string[],
-    fee: string = '0'
+    fee: string = '0',
+    feeRate: string = '0'
   ): Promise<{
     inputs: Input[]
     capacities: string
+    needFee: string
   }> => {
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
-    const totalCapacities: bigint = capacityInt + feeInt
+    // const totalCapacities: bigint = capacityInt + feeInt
+    const feeRateInt = BigInt(feeRate)
+    let needFee = BigInt(0)
+
+    let mode: 'fee' | 'feeRate' = 'fee'
+    if (feeRateInt > 0) {
+      mode = 'feeRate'
+    }
 
     // use min secp size (without data)
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
@@ -124,12 +133,21 @@ export default class CellsService {
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
 
-      const diff = inputCapacities - totalCapacities
+      let diff = inputCapacities - capacityInt - feeInt
+      if (mode === 'feeRate') {
+        needFee += CellsService.everyInputFee(feeRateInt)
+        diff = inputCapacities - capacityInt - needFee
+      }
       if (diff >= minChangeCapacity || diff === BigInt(0)) {
         return false
       }
       return true
     })
+
+    let totalCapacities = capacityInt + feeInt
+    if (mode === 'feeRate') {
+      totalCapacities = capacityInt + needFee
+    }
 
     if (inputCapacities < totalCapacities) {
       throw new CapacityNotEnough()
@@ -143,7 +161,22 @@ export default class CellsService {
     return {
       inputs,
       capacities: inputCapacities.toString(),
+      needFee: needFee.toString(),
     }
+  }
+
+  public static everyInputFee = (feeRate: bigint): bigint => {
+    /*
+    * every input needs 44 Bytes
+    * every input needs 1 witness signed by secp256k1, with 65 Bytes data, serialized in 69 Bytes, add extra 4 Bytes when add to transaction.
+    */
+    const ratio = BigInt(1000)
+    const base = BigInt(4 + 44 + 69) * feeRate
+    const fee = base / ratio
+    if (fee * ratio < base) {
+      return fee + BigInt(1)
+    }
+    return fee
   }
 
   public static allBlake160s = async (): Promise<string[]> => {

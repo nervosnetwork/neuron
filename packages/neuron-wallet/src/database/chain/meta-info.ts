@@ -7,6 +7,7 @@ const fileName = 'meta-info.json'
 export interface MetaInfo {
   genesisBlockHash: string
   systemScriptInfo: SystemScript
+  chain: string // ckb | ckb_testnet | ckb_dev
 }
 
 export const updateMetaInfo = (metaInfo: MetaInfo) => {

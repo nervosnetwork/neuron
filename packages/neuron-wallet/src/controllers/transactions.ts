@@ -11,10 +11,6 @@ import LockUtils from 'models/lock-utils'
 
 const CELL_COUNT_THRESHOLD = 10
 
-/**
- * @class TransactionsController
- * @description handle messages from transactions channel
- */
 export default class TransactionsController {
   @CatchControllerError
   public static async getAll(
@@ -102,7 +98,7 @@ export default class TransactionsController {
       throw new CurrentWalletNotSet()
     }
     const addresses: string[] = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const outputCapacities: bigint = transaction
       .outputs!.filter(o => lockHashes.includes(o.lockHash!))
@@ -149,11 +145,3 @@ export default class TransactionsController {
     }
   }
 }
-
-/* eslint-disable*/
-declare global {
-  module Controller {
-    type TransactionsMethod = Exclude<keyof typeof TransactionsController, keyof typeof Object>
-  }
-}
-/* eslint-enable */

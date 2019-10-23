@@ -1,6 +1,19 @@
+import { app as electronApp, remote } from 'electron'
+import os from 'os'
 import * as path from 'path'
-import app from 'app'
 import { NetworkWithID } from 'types/network'
+
+const app = electronApp || (remote && remote.app) || {
+  getPath(aPath: string): string {
+    return path.join(os.tmpdir(), aPath)
+  },
+  getName(): string {
+    return 'Fake App'
+  },
+  getLocale(): string {
+    return 'en'
+  }
+}
 
 const { NODE_ENV } = process.env
 
@@ -27,7 +40,6 @@ interface ENV {
     list: NetworkWithID[]
   }
   explorer: string
-  testnet: boolean
   isTestMode: boolean
 }
 const env: ENV = {
@@ -55,7 +67,6 @@ const env: ENV = {
     ],
   },
   explorer: 'https://explorer.nervos.org',
-  testnet: true,
   isTestMode,
 }
 

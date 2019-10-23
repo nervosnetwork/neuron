@@ -1,0 +1,99 @@
+$success-color: #3cc68a;
+$failed-color: #f47983;
+$pending-color: #999999;
+
+.activityRow {
+  display: grid;
+  box-sizing: border-box;
+  border-right: 1px solid #eee;
+  border-left: 5px solid #eee;
+  padding: 5px 10px;
+
+  margin: 15px 0;
+  grid-template: 'action status'auto'time meta'auto / 1fr auto;
+  border-left-color: currentColor;
+  border-radius: 2px;
+  box-shadow: 0 1px 5px 1px rgba(0, 0, 0, 0.14);
+  transition: color 0.3s;
+
+
+  &.pending {
+    color: $pending-color;
+
+    .status::before {
+      filter: drop-shadow(0 0 1px $pending-color);
+      animation: blink 5s infinite;
+    }
+  }
+
+  &.success {
+    color: $success-color;
+
+    .status::before {
+      filter: drop-shadow(0 0 1px $success-color);
+    }
+  }
+
+  &.failed {
+    color: $failed-color;
+
+    .status::before {
+      filter: drop-shadow(0 0 1px $failed-color);
+    }
+
+  }
+
+  .time {
+    grid-area: time;
+    color: grey;
+    font-size: 14px;
+  }
+
+  .action {
+    grid-area: action;
+    color: #000;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .meta {
+    text-align: end;
+    grid-area: meta;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .status {
+    font-size: 85%;
+    grid-area: status;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    text-transform: uppercase;
+
+    &::before {
+      display: inline-block;
+      border-radius: 50%;
+      background-color: currentColor;
+      width: 8px;
+      height: 8px;
+      margin-top: 2px;
+      content: '';
+      margin-right: 5px;
+    }
+  }
+
+  @keyframes blink {
+
+    from,
+    to {
+      opacity: 0.5;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+}

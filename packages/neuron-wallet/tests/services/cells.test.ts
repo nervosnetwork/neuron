@@ -271,5 +271,51 @@ describe('CellsService', () => {
 
       expect(error).toBeInstanceOf(CapacityNotEnoughForChange)
     })
+
+    describe('skip, by feeRate 1000', () => {
+      beforeEach(async done => {
+        SkipDataAndType.getInstance().update(true)
+        const cells: OutputEntity[] = [
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+          generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+        ]
+        await getConnection().manager.save(cells)
+        done()
+      })
+
+      it('capacity 500', async () => {
+        const feeRate = '1000'
+        const result = await CellsService.gatherInputs(toShannon('500'), [bob.lockHash], '0', feeRate)
+        expect(result.capacities).toEqual(toShannon('1000'))
+        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(1))
+      })
+
+      it('capacity 1000', async () => {
+        const feeRate = '1000'
+        const result = await CellsService.gatherInputs(toShannon('1000'), [bob.lockHash], '0', feeRate)
+        expect(result.capacities).toEqual(toShannon('3000'))
+        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(2))
+      })
+
+      it('capacity 1000 - everyInputFee', async () => {
+        const feeRate = '1000'
+        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+
+        const capacity = BigInt(1000 * 10**8) - everyInputFee
+        const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
+        expect(result.capacities).toEqual(toShannon('1000'))
+        expect(BigInt(result.needFee)).toEqual(everyInputFee)
+      })
+
+      it('capacity 1000 - everyInputFee + 1 shannon', async () => {
+        const feeRate = '1000'
+        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+
+        const capacity = BigInt(1000 * 10**8) - everyInputFee + BigInt(1)
+        const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
+        expect(result.capacities).toEqual(toShannon('3000'))
+        expect(BigInt(result.needFee)).toEqual(everyInputFee * BigInt(2))
+      })
+    })
   })
 })

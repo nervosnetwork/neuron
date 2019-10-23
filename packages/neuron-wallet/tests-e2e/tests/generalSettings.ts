@@ -8,7 +8,7 @@ import Application from '../application'
  */
 export default (app: Application) => {
   beforeAll(async () => {
-    app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
   })
 

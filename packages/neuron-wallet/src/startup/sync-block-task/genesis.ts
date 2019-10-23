@@ -11,4 +11,13 @@ export const genesisBlockHash = async (url: string) => {
   return hash
 }
 
+export const getChain = async (url: string): Promise<string> => {
+  const core = new Core(url)
+  const chain: string = await Utils.retry(3, 100, async () => {
+    const i = await core.rpc.getBlockchainInfo()
+    return i.chain
+  })
+  return chain
+}
+
 export default genesisBlockHash

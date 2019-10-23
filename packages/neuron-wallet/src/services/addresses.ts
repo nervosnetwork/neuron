@@ -3,10 +3,10 @@ import { AccountExtendedPublicKey } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface } from 'database/address/dao'
-import env from 'env'
 import AddressEntity, { AddressVersion } from 'database/address/entities/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
+import ChainInfo from 'models/chain-info'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -169,7 +169,7 @@ export default class AddressService {
       AddressPrefix.Mainnet
     ).address
 
-    const addressToParse = env.testnet ? testnetAddress : mainnetAddress
+    const addressToParse = ChainInfo.getInstance().isMainnet() ? mainnetAddress : testnetAddress
     const blake160: string = LockUtils.addressToBlake160(addressToParse)
 
     const testnetAddressInfo: AddressInterface = {
@@ -253,6 +253,6 @@ export default class AddressService {
   }
 
   private static getAddressVersion = (): AddressVersion => {
-    return env.testnet ? AddressVersion.Testnet : AddressVersion.Mainnet
+    return ChainInfo.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
   }
 }

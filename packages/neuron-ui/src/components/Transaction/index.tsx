@@ -64,7 +64,7 @@ const Transaction = () => {
               const address = ckbCore.utils.bech32Address(input.lock.args, {
                 prefix: addressPrefix,
                 type: ckbCore.utils.AddressType.HashIdx,
-                codeHashIndex: '0x00',
+                codeHashOrCodeHashIndex: '0x00',
               })
               if (column && (column.calculatedWidth || 0) < 450) {
                 return <CompactAddress address={address} />
@@ -129,7 +129,7 @@ const Transaction = () => {
               const address = ckbCore.utils.bech32Address(output.lock.args, {
                 prefix: addressPrefix,
                 type: ckbCore.utils.AddressType.HashIdx,
-                codeHashIndex: '0x00',
+                codeHashOrCodeHashIndex: '0x00',
               })
               if (column && (column.calculatedWidth || 0) < 450) {
                 return <CompactAddress address={address} />

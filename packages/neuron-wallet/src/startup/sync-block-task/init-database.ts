@@ -3,7 +3,8 @@ import Utils from 'services/sync/utils'
 import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
-import genesisBlockHash from './genesis'
+import genesisBlockHash, { getChain } from './genesis'
+import ChainInfo from 'models/chain-info'
 
 // only used by main process
 export class InitDatabase {
@@ -28,7 +29,7 @@ export class InitDatabase {
 
   private killed: boolean = false
 
-  public init = async (url: string): Promise<string> => {
+  public init = async (url: string) => {
     if (InitDatabase.previous) {
       await InitDatabase.previous.stopAndWait()
     }
@@ -36,14 +37,17 @@ export class InitDatabase {
     this.inProcess = true
 
     let hash: string | undefined
+    let chain: string | undefined
     while (!this.stopped && !this.success) {
       try {
         hash = await genesisBlockHash(url)
         await initConnection(hash)
+        chain = await getChain(url)
+        ChainInfo.getInstance().setChain(chain)
 
         try {
           const systemScriptInfo = await LockUtils.systemScript(url)
-          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo })
+          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain })
         } catch (err) {
           logger.error('update systemScriptInfo failed:', err)
         }
@@ -54,6 +58,8 @@ export class InitDatabase {
         try {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
+          chain = metaInfo.chain
+          ChainInfo.getInstance().setChain(chain)
           LockUtils.setSystemScript(metaInfo.systemScriptInfo)
           hash = metaInfo.genesisBlockHash
           this.success = true
@@ -69,7 +75,10 @@ export class InitDatabase {
       return 'killed'
     }
 
-    return hash!
+    return {
+      hash: hash!,
+      chain: chain!,
+    }
   }
 
   public stopAndWait = async (timeout: number = 10000) => {

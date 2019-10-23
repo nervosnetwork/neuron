@@ -5,6 +5,7 @@ import BlockListener from 'services/sync/block-listener'
 import { Address } from 'database/address/dao'
 
 import initConnection from 'database/chain/ormconfig'
+import ChainInfo from 'models/chain-info'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -19,14 +20,14 @@ export interface LockHashInfo {
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
-  const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
-  return lockHashes
+  const lockUtils = new LockUtils(await LockUtils.systemScript(nodeURL))
+  const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
+  return lockUtils.addressesToAllLockHashes(addresses)
 }
 
 // call this after network switched
 let blockListener: BlockListener | undefined
-export const switchNetwork = async (url: string, genesisBlockHash: string) => {
+export const switchNetwork = async (url: string, genesisBlockHash: string, chain: string) => {
   // stop all blocks service
   if (blockListener) {
     await blockListener.stopAndWait()
@@ -34,6 +35,7 @@ export const switchNetwork = async (url: string, genesisBlockHash: string) => {
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
+  ChainInfo.getInstance().setChain(chain)
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(url)
   // start sync blocks service
@@ -42,19 +44,18 @@ export const switchNetwork = async (url: string, genesisBlockHash: string) => {
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (blockListener) {
-      const infos: LockHashInfo[] = (await Promise.all(
-        addresses.map(async addr => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address)
-          // undefined means false
-          const isImporting: boolean = addr.isImporting === true
-          return hashes.map(h => {
-            return {
-              lockHash: h,
-              isImporting,
-            }
-          })
+      const lockUtils = new LockUtils(await LockUtils.systemScript(url))
+      const infos: LockHashInfo[] = addresses.map(addr => {
+        const hashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+        // undefined means false
+        const isImporting: boolean = addr.isImporting === true
+        return hashes.map(h => {
+          return {
+            lockHash: h,
+            isImporting,
+          }
         })
-      )).reduce((acc, val) => acc.concat(val), [])
+      }).reduce((acc, val) => acc.concat(val), [])
       const oldLockHashes: string[] = blockListener.getLockHashes()
       const anyIsImporting: boolean = infos.some(info => info.isImporting === true)
       if (oldLockHashes.length === 0 && !anyIsImporting) {

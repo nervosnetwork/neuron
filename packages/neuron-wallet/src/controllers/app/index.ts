@@ -1,236 +1,94 @@
 import path from 'path'
-import {
-  dialog,
-  shell,
-  Menu,
-  MenuItem,
-  MessageBoxOptions,
-  MessageBoxReturnValue,
-  SaveDialogOptions,
-  SaveDialogReturnValue,
-  BrowserWindow,
-} from 'electron'
-import { take } from 'rxjs/operators'
-import app from 'app'
+import { app as electronApp, remote, BrowserWindow } from 'electron'
+import windowStateKeeper from 'electron-window-state'
 
-import TransactionsController from 'controllers/transactions'
-import NetworksService from 'services/networks'
-import WalletsService from 'services/wallets'
-import WalletsController from 'controllers/wallets'
-import SyncInfoController from 'controllers/sync-info'
-import UpdateController from 'controllers/update'
-import SkipDataAndType from 'services/settings/skip-data-and-type'
-
-import { ResponseCode } from 'utils/const'
-import WindowManager from 'models/window-manager'
-import i18n from 'utils/i18n'
 import env from 'env'
-import CommandSubject from 'models/subjects/command'
-import { ConnectionStatusSubject } from 'models/subjects/node'
-import { SystemScriptSubject } from 'models/subjects/system-script'
+import { updateApplicationMenu } from './menu'
+import logger from 'utils/logger'
+import { subscribe } from './subscribe'
 
-import { URL, contextMenuTemplate } from './options'
+const app = electronApp || (remote && remote.app)
 
 export default class AppController {
-  public static getInitState = async () => {
-    const walletsService = WalletsService.getInstance()
-    const networksService = NetworksService.getInstance()
-    const [
-      currentWallet = null,
-      wallets = [],
-      currentNetworkID = '',
-      networks = [],
-      syncedBlockNumber = '0',
-      connectionStatus = false,
-      codeHash = '',
-    ] = await Promise.all([
-      walletsService.getCurrent(),
-      walletsService.getAll(),
-      networksService.getCurrentID(),
-      networksService.getAll(),
+  public mainWindow: BrowserWindow | null
 
-      SyncInfoController.currentBlockNumber()
-        .then(res => {
-          if (res.status) {
-            return res.result.currentBlockNumber
-          }
-          return '0'
-        })
-        .catch(() => '0'),
-      new Promise(resolve => {
-        ConnectionStatusSubject.pipe(take(1)).subscribe(
-          status => {
-            resolve(status)
-          },
-          () => {
-            resolve(false)
-          },
-        )
-      }),
-      new Promise(resolve => {
-        SystemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
-      }),
-    ])
-
-    const minerAddresses = await Promise.all(
-      wallets.map(({ id }) =>
-        WalletsController.getAllAddresses(id).then(addrRes => {
-          if (addrRes.result) {
-            const minerAddr = addrRes.result.find(addr => addr.type === 0 && addr.index === 0)
-            if (minerAddr) {
-              return {
-                address: minerAddr.address,
-                identifier: minerAddr.identifier,
-              }
-            }
-          }
-          return undefined
-        }),
-      ),
-    )
-    const addresses: Controller.Address[] = await (currentWallet
-      ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
-      : [])
-
-    const transactions = currentWallet
-      ? await TransactionsController.getAllByKeywords({
-          pageNo: 1,
-          pageSize: 15,
-          keywords: '',
-          walletID: currentWallet.id,
-        }).then(res => res.result)
-      : []
-
-    const skipDataAndType = SkipDataAndType.getInstance().get()
-
-    const initState = {
-      currentWallet,
-      wallets: [...wallets.map(({ name, id }, idx: number) => ({ id, name, minerAddress: minerAddresses[idx] }))],
-      currentNetworkID,
-      networks,
-      addresses,
-      transactions,
-      syncedBlockNumber,
-      connectionStatus,
-      codeHash,
-      skipDataAndType,
-    }
-
-    return { status: ResponseCode.Success, result: initState }
+  constructor() {
+    this.mainWindow = null
+    subscribe(this)
   }
 
-  public static handleViewError = (error: string) => {
-    if (env.isDevMode) {
-      console.error(error)
+  public sendMessage = (channel: string, obj: any) => {
+    if (this.mainWindow) {
+      this.mainWindow.webContents.send(channel, obj)
     }
   }
 
-  public static isMainWindow = (winID: number) => {
-    return WindowManager.mainWindow && winID === WindowManager.mainWindow.id
+  public updateMenu = () => {
+    updateApplicationMenu(this.mainWindow)
   }
 
-  public static showMessageBox(options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) {
-    dialog.showMessageBox(options).then(callback)
-  }
-
-  public static showSaveDialog(options: SaveDialogOptions, callback?: (returnValue: SaveDialogReturnValue) => void) {
-    dialog.showSaveDialog(options).then(callback)
-  }
-
-  public static toggleAddressBook() {
-    if (WindowManager.mainWindow) {
-      CommandSubject.next({
-        winID: WindowManager.mainWindow.id,
-        type: 'toggle-address-book',
-        payload: null,
-      })
-    }
-  }
-
-  public static navTo(url: string) {
-    if (WindowManager.mainWindow) {
-      CommandSubject.next({ winID: WindowManager.mainWindow.id, type: 'nav', payload: url })
-    }
-  }
-
-  public static openExternal(url: string) {
-    shell.openExternal(url)
-  }
-
-  public static async contextMenu(params: { type: string; id: string }) {
-    if (!params || params.id === undefined) {
+  public openWindow = () => {
+    if (this.mainWindow) {
       return
     }
-    const { id, type } = params
-    switch (type) {
-      case 'copyMainnetAddress':
-      case 'networkList':
-      case 'walletList':
-      case 'addressList':
-      case 'transactionList': {
-        const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
-        menu.popup()
-        break
-      }
-      default: {
-        break
-      }
-    }
+
+    this.createWindow()
   }
 
-  public static showAbout() {
-    const options = {
-      type: 'info',
-      title: app.getName(),
-      message: app.getName(),
-      detail: app.getVersion(),
-      buttons: ['OK'],
-      cancelId: 0,
-    }
-    AppController.showMessageBox(options)
-  }
+  createWindow = () => {
+    const windowState = windowStateKeeper({
+      defaultWidth: 1366,
+      defaultHeight: 768,
+    })
 
-  public static checkUpdates(menuItem: MenuItem) {
-    new UpdateController().checkUpdates(menuItem)
-  }
-
-  public static showPreference() {
-    AppController.navTo(URL.Preference)
-  }
-
-  public static createWallet() {
-    AppController.navTo(URL.CreateWallet)
-  }
-
-  public static importWallet(type: 'mnemonic' | 'keystore') {
-    if (type === 'mnemonic') {
-      AppController.navTo(URL.ImportMnemonic)
-    } else if (type === 'keystore') {
-      AppController.navTo(URL.ImportKeystore)
-    }
-  }
-
-  public static async showTransactionDetails(hash: string) {
-    const win = new BrowserWindow({
-      width: 1200,
+    this.mainWindow = new BrowserWindow({
+      x: windowState.x,
+      y: windowState.y,
+      width: windowState.width,
+      height: windowState.height,
+      minWidth: 800,
+      minHeight: 600,
       show: false,
+      backgroundColor: '#e9ecef',
+      icon: path.join(__dirname, '../../neuron-ui/icon.png'),
       webPreferences: {
-        preload: path.join(__dirname, '../../startup/preload.js'),
+        devTools: env.isDevMode,
+        nodeIntegration: env.isDevMode || env.isTestMode,
+        preload: path.join(__dirname, './preload.js'),
       },
     })
-    win.loadURL(`${env.mainURL}#/transaction/${hash}`)
-    win.on('ready-to-show', () => {
-      win.setTitle(i18n.t(`messageBox.transaction.title`, { hash }))
-      win.show()
-      win.focus()
-    })
-  }
-}
 
-/* eslint-disable */
-declare global {
-  module Controller {
-    type AppMethod = Exclude<keyof typeof AppController, keyof typeof Object>
+    windowState.manage(this.mainWindow)
+
+    this.mainWindow.on('ready-to-show', () => {
+      if (this.mainWindow) {
+        this.mainWindow.show()
+        this.mainWindow.focus()
+        logger.info('The main window is ready to show')
+      } else {
+        logger.error('The main window is not initialized on ready to show')
+      }
+    })
+
+    this.mainWindow.on('closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+      if (this.mainWindow) {
+        this.mainWindow.removeAllListeners()
+        this.mainWindow = null
+      }
+    })
+
+    this.mainWindow.on('focus', () => {
+      this.updateMenu()
+    })
+
+    this.mainWindow.on('blur', () => {
+      this.updateMenu()
+    })
+
+    this.mainWindow.loadURL(env.mainURL)
+    this.updateMenu()
   }
 }
-/* eslint-enable */

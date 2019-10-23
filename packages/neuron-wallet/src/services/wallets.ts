@@ -13,17 +13,15 @@ import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
-import CommandSubject from 'models/subjects/command'
-import WindowManager from 'models/window-manager'
 import CellsService from 'services/cells'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import env from 'env'
 
 import NodeService from './node'
 import FileService from './file'
 import { TransactionsService, TransactionPersistor, TransactionGenerator } from './tx'
 import AddressService from './addresses'
 import { deindexLockHashes } from './indexer/deindex'
+import ChainInfo from 'models/chain-info'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -125,9 +123,9 @@ export default class WalletService {
 
     this.listStore.on(
       this.walletsKey,
-      (prevWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
+      (previousWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
         const currentWallet = this.getCurrent()
-        WalletListSubject.next({ currentWallet, prevWalletList, currentWalletList })
+        WalletListSubject.next({ currentWallet, previousWalletList, currentWalletList })
       }
     )
     this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentID: string | undefined) => {
@@ -270,7 +268,7 @@ export default class WalletService {
   }
 
   private deindexAddresses = async (addresses: string[]) => {
-    const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
+    const prefix = ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const addressesWithEnvPrefix: string[] = addresses.filter(addr => addr.startsWith(prefix))
 
     if (addressesWithEnvPrefix.length === 0) {
@@ -282,7 +280,7 @@ export default class WalletService {
     if (deindexAddresses.length !== 0) {
       const lockHashes: string[] = await Promise.all(
         deindexAddresses.map(async address => {
-          return LockUtils.addressToLockHash(address)
+          return new LockUtils(await LockUtils.systemScript()).addressToLockHash(address)
         })
       )
       // don't await
@@ -338,6 +336,18 @@ export default class WalletService {
     }[] = [],
     password: string = '',
     fee: string = '0',
+    feeRate: string = '0',
+    description: string = ''
+  ): Promise<string> => {
+    const tx = await this.generateTx(walletID, items, fee, feeRate)
+
+    return this.sendTx(walletID, tx, password, description)
+  }
+
+  public sendTx = async (
+    walletID: string = '',
+    tx: TransactionWithoutHash,
+    password: string = '',
     description: string = ''
   ) => {
     const wallet = await this.get(walletID)
@@ -350,24 +360,6 @@ export default class WalletService {
     }
 
     const addressInfos = await this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
-
-    const targetOutputs = items.map(item => ({
-      ...item,
-      capacity: BigInt(item.capacity).toString(),
-    }))
-
-    const changeAddress: string = await this.getChangeAddress()
-
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
-      lockHashes,
-      targetOutputs,
-      changeAddress,
-      fee
-    )
 
     let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
     if (!txHash.startsWith('0x')) {
@@ -411,6 +403,57 @@ export default class WalletService {
     return txHash
   }
 
+  public calculateFee = async (
+    tx: TransactionWithoutHash
+  ) => {
+    const inputCapacities = tx.inputs!
+      .map(input => BigInt(input.capacity!))
+      .reduce((result, c) => result + c, BigInt(0))
+    const outputCapacities = tx.outputs!
+      .map(output => BigInt(output.capacity!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    return (inputCapacities - outputCapacities).toString()
+  }
+
+  public generateTx = async (
+    walletID: string = '',
+    items: {
+      address: string
+      capacity: string
+    }[] = [],
+    fee: string = '0',
+    feeRate: string = '0',
+  ): Promise<TransactionWithoutHash> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString(),
+    }))
+
+    const changeAddress: string = await this.getChangeAddress()
+
+    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+      lockHashes,
+      targetOutputs,
+      changeAddress,
+      fee,
+      feeRate
+    )
+
+    return tx
+  }
+
   public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
     const wallet = await this.get(walletID)
     if (!wallet) {
@@ -421,7 +464,7 @@ export default class WalletService {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
     const cycles = SECP_CYCLES * BigInt(inputs.length)
@@ -465,15 +508,5 @@ export default class WalletService {
       path,
       privateKey: `0x${masterKeychain.derivePath(path).privateKey.toString('hex')}`,
     }))
-  }
-
-  public requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
-    if (WindowManager.mainWindow) {
-      CommandSubject.next({
-        winID: WindowManager.mainWindow.id,
-        type: actionType,
-        payload: walletID,
-      })
-    }
   }
 }

@@ -6,10 +6,6 @@ import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from '
 
 const networksService = NetworksService.getInstance()
 
-/**
- * @class NetworksController
- * @description handle messages from networks channel
- */
 export default class NetworksController {
   @CatchControllerError
   public static async getAll() {
@@ -106,11 +102,3 @@ export default class NetworksController {
     }
   }
 }
-
-/* eslint-disable */
-declare global {
-  module Controller {
-    type NetworksMethod = Exclude<keyof typeof NetworksController, keyof typeof Object | 'service'>
-  }
-}
-/* eslint-enable */

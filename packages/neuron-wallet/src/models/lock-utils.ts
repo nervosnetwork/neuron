@@ -7,10 +7,10 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
 import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
-import env from 'env'
 import ConvertTo from 'types/convert-to'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import Core from '@nervosnetwork/ckb-sdk-core'
+import ChainInfo from './chain-info'
 
 export interface SystemScript {
   codeHash: string
@@ -30,16 +30,18 @@ const subscribed = (target: any, propertyName: string) => {
 }
 
 export default class LockUtils {
+  systemScript: SystemScript
+
+  constructor(systemScript: SystemScript) {
+    this.systemScript = systemScript
+  }
+
   @subscribed
   static systemScriptInfo: SystemScript | undefined
 
   static previousURL: string | undefined
 
-  static async systemScript(nodeURL: string = NodeService.getInstance().core.rpc.node.url): Promise<SystemScript> {
-    if (this.systemScriptInfo && nodeURL === LockUtils.previousURL) {
-      return this.systemScriptInfo
-    }
-
+  static async loadSystemScript(nodeURL: string): Promise<SystemScript> {
     const core = new Core(nodeURL)
 
     const systemCell = await core.loadSecp256k1Dep()
@@ -56,24 +58,51 @@ export default class LockUtils {
       txHash = `0x${txHash}`
     }
 
-    const systemScriptInfo = {
+    return {
       codeHash,
-      outPoint: {
-        txHash,
-        index,
-      },
-      hashType: hashType as ScriptHashType,
+      outPoint: { txHash, index },
+      hashType: hashType as ScriptHashType
+    }
+  }
+
+  static async systemScript(nodeURL: string = NodeService.getInstance().core.rpc.node.url): Promise<SystemScript> {
+    if (LockUtils.systemScriptInfo && nodeURL === LockUtils.previousURL) {
+      return LockUtils.systemScriptInfo
     }
 
-    this.systemScriptInfo = systemScriptInfo
+    LockUtils.systemScriptInfo = await LockUtils.loadSystemScript(nodeURL)
     LockUtils.previousURL = nodeURL
 
-    return systemScriptInfo
+    return LockUtils.systemScriptInfo
   }
 
   static setSystemScript(info: SystemScript) {
     LockUtils.systemScriptInfo = info
+    LockUtils.previousURL = NodeService.getInstance().core.rpc.node.url
     SystemScriptSubject.next({ codeHash: info.codeHash })
+  }
+
+  addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
+    return {
+      codeHash: this.systemScript.codeHash,
+      args: LockUtils.addressToBlake160(address),
+      hashType,
+    }
+  }
+
+  addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {
+    const lock = this.addressToLockScript(address, hashType)
+    return LockUtils.lockScriptToHash(lock)
+  }
+
+  addressToAllLockHashes(address: string): string[] {
+    return [this.addressToLockHash(address, ScriptHashType.Type)]
+  }
+
+  addressesToAllLockHashes(addresses: string[]): string[] {
+    return addresses.map(addr => {
+      return this.addressToAllLockHashes(addr)
+    }).reduce((acc, val) => acc.concat(val), [])
   }
 
   static computeScriptHash = (script: Script): string => {
@@ -90,63 +119,17 @@ export default class LockUtils {
     return LockUtils.computeScriptHash(lock)
   }
 
-  static async addressToLockScript(
-    address: string,
-    hashType: ScriptHashType = ScriptHashType.Type,
-    nodeURL: string = NodeService.getInstance().core.rpc.node.url
-  ): Promise<Script> {
-    const systemScript = await this.systemScript(nodeURL)
-
-    const lock: Script = {
-      codeHash: systemScript.codeHash,
-      args: LockUtils.addressToBlake160(address),
-      hashType,
-    }
-    return lock
-  }
-
-  static async addressToLockHash(
-    address: string,
-    hashType: ScriptHashType = ScriptHashType.Type,
-    nodeURL: string = NodeService.getInstance().core.rpc.node.url
-  ): Promise<string> {
-    const lock: Script = await this.addressToLockScript(address, hashType, nodeURL)
-    const lockHash: string = this.lockScriptToHash(lock)
-
-    return lockHash
-  }
-
-  static async addressToAllLockHashes(
-    address: string,
-    nodeURL: string = NodeService.getInstance().core.rpc.node.url
-  ): Promise<string[]> {
-    const dataLockHash = await LockUtils.addressToLockHash(address, ScriptHashType.Type, nodeURL)
-    return [dataLockHash]
-  }
-
-  static async addressesToAllLockHashes(
-    addresses: string[],
-    nodeURL: string = NodeService.getInstance().core.rpc.node.url
-  ): Promise<string[]> {
-    const lockHashes: string[] = (await Promise.all(
-      addresses.map(async addr => {
-        return LockUtils.addressToAllLockHashes(addr, nodeURL)
-      })
-    )).reduce((acc, val) => acc.concat(val), [])
-    return lockHashes
-  }
-
   static lockScriptToAddress(lock: Script): string {
     const blake160: string = lock.args!
-    return this.blake160ToAddress(blake160)
+    return LockUtils.blake160ToAddress(blake160)
   }
 
   static blake160ToAddress(blake160: string): string {
-    const prefix = env.testnet ? AddressPrefix.Testnet : AddressPrefix.Mainnet
+    const prefix = ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     return bech32Address(blake160, {
       prefix,
       type: AddressType.HashIdx,
-      codeHashIndex: '0x00',
+      codeHashOrCodeHashIndex: '0x00',
     })
   }
 

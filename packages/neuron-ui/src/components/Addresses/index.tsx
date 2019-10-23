@@ -202,7 +202,7 @@ const Addresses = ({
             ? ckbCore.utils.bech32Address(addr.identifier, {
                 prefix: ckbCore.utils.AddressPrefix.Mainnet,
                 type: ckbCore.utils.AddressType.HashIdx,
-                codeHashIndex: '0x00',
+                codeHashOrCodeHashIndex: '0x00',
               }) || ''
             : addr.address,
         }))}

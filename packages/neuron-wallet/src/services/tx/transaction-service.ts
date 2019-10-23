@@ -72,7 +72,7 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHashes: string[] = await LockUtils.addressToAllLockHashes(value)
+      const lockHashes: string[] = await new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
       return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
     }
     if (type === SearchType.TxHash) {
@@ -207,7 +207,8 @@ export class TransactionsService {
     params: TransactionsByAddressesParam,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(params.addresses)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
+      .addressesToAllLockHashes(params.addresses)
 
     return TransactionsService.getAll(
       {
@@ -228,7 +229,7 @@ export class TransactionsService {
       return addr
     })
 
-    const lockHashes = await LockUtils.addressesToAllLockHashes(addresses)
+    const lockHashes = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     return TransactionsService.getAll(
       {
@@ -306,7 +307,7 @@ export class TransactionsService {
     status: TransactionStatus[],
     url: string = NodeService.getInstance().core.rpc.node.url
   ): Promise<number> => {
-    const lockHashes: string[] = await LockUtils.addressToAllLockHashes(address, url)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 

@@ -1,22 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron = require("electron");
-const controllers_app = require("../../dist/controllers/app/index");
-const services_networks = __importDefault(require("../../dist/services/networks"));
+const CommandSubject = require("../../dist/models/subjects/command").default;
+const servicesNetworks = require("../../dist/services/networks").default;
 
 electron.ipcMain.on('E2E_EDIT_WALLET', function (event, arg) {
     const walletId = arg[0];
-    controllers_app.default.navTo(`/editwallet/${walletId}`);
+    const window = electron.BrowserWindow.getFocusedWindow()
+    CommandSubject.next({ winID: window.id, type: 'nav', payload: `/editwallet/${walletId}` })
 });
 
 electron.ipcMain.on('E2E_EDIT_NETWORK', function (event, arg) {
     const networkId = arg[0];
-    controllers_app.default.navTo(`/network/${networkId}`);
+    const window = electron.BrowserWindow.getFocusedWindow()
+    CommandSubject.next({ winID: window.id, type: 'nav', payload: `/network/${networkId}` })
 });
 
 electron.ipcMain.on('E2E_DELETE_NETWORK', function (event, arg) {
     const networkId = arg[0];
-    const networksService = services_networks.default.getInstance();
+    const networksService = servicesNetworks.getInstance();
     networksService.delete(networkId);
 })
 
@@ -29,6 +31,7 @@ function findItem(menuItems, labels) {
     }
     return findItem(foundItem.submenu.items, rest);
 }
+
 electron.ipcMain.on('E2E_GET_MENU_ITEM', function (e, labels) {
     var menuItem = findItem(electron.Menu.getApplicationMenu().items, labels);
     if (menuItem) {
@@ -45,6 +48,7 @@ electron.ipcMain.on('E2E_GET_MENU_ITEM', function (e, labels) {
         });
     }
 });
+
 electron.ipcMain.on('E2E_CLICK_MENU_ITEM', function (e, labels) {
     var item = findItem(electron.Menu.getApplicationMenu().items, labels);
     item.click();

@@ -5,6 +5,7 @@ import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
 import { Address } from 'database/address/dao'
 
 import initConnection from 'database/chain/ormconfig'
+import ChainInfo from 'models/chain-info'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -12,13 +13,13 @@ const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.requ
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
-  return lockHashes
+  const lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+  return lockUtils.addressesToAllLockHashes(addresses)
 }
 
 // call this after network switched
 let indexerQueue: IndexerQueue | undefined
-export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) => {
+export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, chain: string) => {
   // stop all blocks service
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
@@ -26,6 +27,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) =
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
+  ChainInfo.getInstance().setChain(chain)
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(nodeURL)
   const lockHashInfos: LockHashInfo[] = lockHashes.map(lockHash => {
@@ -40,19 +42,18 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) =
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (indexerQueue) {
-      const infos: LockHashInfo[] = (await Promise.all(
-        addresses.map(async addr => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address, nodeURL)
-          // undefined means true
-          const isImporting: boolean = addr.isImporting !== false
-          return hashes.map(h => {
-            return {
-              lockHash: h,
-              isImporting,
-            }
-          })
+      let lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+      const infos: LockHashInfo[] = addresses.map(addr => {
+        const hashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+        // undefined means true
+        const isImporting: boolean = addr.isImporting !== false
+        return hashes.map(h => {
+          return {
+            lockHash: h,
+            isImporting,
+          }
         })
-      )).reduce((acc, val) => acc.concat(val), [])
+      }).reduce((acc, val) => acc.concat(val), [])
       indexerQueue.appendLockHashInfos(infos)
     }
   })

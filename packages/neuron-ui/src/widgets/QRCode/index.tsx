@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import React, { useEffect, useRef, useCallback } from 'react'
 import canvg from 'canvg'
 import { Stack, DefaultButton } from 'office-ui-fabric-react'
@@ -121,7 +120,7 @@ const QRCode = ({
     }
     const dataURL = canvasRef.current.toDataURL('image/png')
     const downloadLink = document.createElement('a')
-    downloadLink.download = 'Receive'
+    downloadLink.download = 'ckb-address'
     downloadLink.href = dataURL
     window.document.body.appendChild(downloadLink)
     downloadLink.click()

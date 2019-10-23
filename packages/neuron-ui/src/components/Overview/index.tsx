@@ -1,37 +1,20 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Stack,
-  Text,
-  ActionButton,
-  DefaultButton,
-  DetailsList,
-  DetailsRow,
-  Icon,
-  IColumn,
-  CheckboxVisibility,
-  DetailsListLayoutMode,
-  IRenderFunction,
-  IDetailsRowProps,
-  IDetailsRowStyles,
-  FontSizes,
-  Callout,
-} from 'office-ui-fabric-react'
+import { Stack, Text, ActionButton, DefaultButton, DetailsList, Callout } from 'office-ui-fabric-react'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { showTransactionDetails } from 'services/remote'
-
-import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter as timeFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 
+import ActivityRow, { ActivityItem } from 'components/CustomRows/ActivityRow'
+
 const TITLE_FONT_SIZE = 'xxLarge'
-export type ActivityItem = State.Transaction & { confirmations: string; typeLabel: string }
 
 const genTypeLabel = (
   type: 'send' | 'receive',
@@ -62,97 +45,6 @@ const genTypeLabel = (
     }
   }
 }
-
-const onTransactionActivityRender = (item?: ActivityItem) => {
-  if (!item) {
-    return null
-  }
-  return (
-    <>
-      <Text variant="mediumPlus" as="span" title={`${item.value} shannon`}>
-        {`${item.typeLabel} ${shannonToCKBFormatter(item.value)} CKB`}
-      </Text>
-      <Text variant="mediumPlus" as="span" title={item.confirmations} styles={{ root: [{ paddingLeft: '5px' }] }}>
-        {item.confirmations}
-      </Text>
-    </>
-  )
-}
-
-const onTransactionRowRender = (props?: IDetailsRowProps) => {
-  if (!props) {
-    return null
-  }
-  const customStyles: Partial<IDetailsRowStyles> = {
-    root: {
-      animationDuration: '0!important',
-    },
-  }
-  return <DetailsRow {...props} styles={customStyles} />
-}
-
-const onTimestampRender = (item?: any) => {
-  if (!item) {
-    return null
-  }
-  return (
-    <Text variant="mediumPlus" as="span">
-      {timeFormatter(item.timestamp || item.createdAt)}
-    </Text>
-  )
-}
-
-const ActivityList = ({
-  columns,
-  items,
-  onGoToHistory,
-  t,
-  ...props
-}: React.PropsWithoutRef<{
-  columns: IColumn[]
-  items: any
-  onGoToHistory: any
-  t: any
-  isHeaderVisible?: boolean
-  onRenderRow?: IRenderFunction<IDetailsRowProps>
-  [index: string]: any
-}>) => (
-  <Stack verticalFill>
-    <DetailsList
-      isHeaderVisible={false}
-      layoutMode={DetailsListLayoutMode.justified}
-      checkboxVisibility={CheckboxVisibility.hidden}
-      compact
-      items={items.slice(0, 10)}
-      columns={columns}
-      onItemInvoked={item => {
-        showTransactionDetails(item.hash)
-      }}
-      className="listNoHover"
-      styles={{
-        root: {
-          backgroundColor: 'transparent',
-        },
-        contentWrapper: {
-          selectors: {
-            '.ms-DetailsRow': {
-              backgroundColor: 'transparent',
-            },
-            '.ms-DetailsRow-cell': {
-              fontSize: FontSizes.mediumPlus,
-            },
-          },
-        },
-      }}
-      {...props}
-    />
-    {items.length > 10 ? (
-      <ActionButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
-        {t('overview.more')}
-      </ActionButton>
-    ) : null}
-  </Stack>
-)
 
 const Overview = ({
   dispatch,
@@ -186,49 +78,6 @@ const Overview = ({
   const onGoToHistory = useCallback(() => {
     history.push(Routes.History)
   }, [history])
-
-  const activityColumns: IColumn[] = useMemo(() => {
-    return [
-      {
-        key: 'status',
-        name: t('overview.status'),
-        minWidth: 20,
-        maxWidth: 20,
-        onRender: (item?: State.Transaction) => {
-          if (!item) {
-            return null
-          }
-          let iconName = 'TransactionPending'
-          if (item.status === 'success') {
-            iconName = 'TransactionSuccess'
-          } else if (item.status === 'failed') {
-            iconName = 'TransactionFailure'
-          }
-          return <Icon iconName={iconName} title={item.status} />
-        },
-      },
-      {
-        key: 'timestamp',
-        name: t('overview.datetime'),
-        minWidth: 180,
-        maxWidth: 180,
-        onRender: onTimestampRender,
-      },
-      {
-        key: 'activity',
-        name: t('overview.activity'),
-        minWidth: 100,
-        maxWidth: 600,
-        onRender: onTransactionActivityRender,
-      },
-    ].map(
-      (col): IColumn => ({
-        fieldName: col.key,
-        ariaLabel: col.name,
-        ...col,
-      })
-    )
-  }, [t])
 
   const balanceProperties: Property[] = useMemo(
     () => [
@@ -266,7 +115,7 @@ const Overview = ({
     [setDisplayBlockchainInfo]
   )
 
-  const activityItems = useMemo(
+  const activityItems: ActivityItem[] = useMemo(
     () =>
       items.map(item => {
         let confirmations = '(-)'
@@ -283,19 +132,20 @@ const Overview = ({
           typeLabel = genTypeLabel(item.type, confirmationCount, status)
 
           if (confirmationCount === 1) {
-            confirmations = `(${t('overview.confirmation', {
+            confirmations = t('overview.confirmation', {
               confirmationCount: localNumberFormatter(confirmationCount),
-            })})`
+            })
           } else if (confirmationCount > 1) {
-            confirmations = `(${t('overview.confirmations', {
+            confirmations = `${t('overview.confirmations', {
               confirmationCount: localNumberFormatter(confirmationCount),
-            })})`
+            })}`
           }
         }
 
         return {
           ...item,
           status,
+          statusLabel: t(`overview.statusLabel.${status}`),
           value: item.value.replace(/^-/, ''),
           confirmations: item.status === 'success' ? confirmations : '',
           typeLabel: t(`overview.${typeLabel}`),
@@ -323,14 +173,14 @@ const Overview = ({
         {t('overview.recent-activities')}
       </Text>
       {items.length ? (
-        <ActivityList
-          columns={activityColumns}
-          items={activityItems}
-          onRenderRow={onTransactionRowRender}
-          onGoToHistory={onGoToHistory}
-          className="listNoHover"
-          t={t}
-        />
+        <Stack verticalFill>
+          <DetailsList isHeaderVisible={false} items={activityItems.slice(0, 10)} onRenderRow={ActivityRow} />
+          {items.length > 10 ? (
+            <ActionButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
+              {t('overview.more')}
+            </ActionButton>
+          ) : null}
+        </Stack>
       ) : (
         <div>{t('overview.no-recent-activities')}</div>
       )}

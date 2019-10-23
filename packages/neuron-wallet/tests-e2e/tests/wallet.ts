@@ -52,7 +52,9 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    const networkElement = await app.element('//FOOTER/DIV[1]/DIV[2]')
+    expect(networkElement.value).not.toBeNull()
+    await client.elementIdClick(networkElement.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
@@ -110,7 +112,7 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     // Go to setting page
-    await app.clickMenu(['Electron', 'Preferences...'])
+    await app.gotoSettingPageFromMenu()
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
