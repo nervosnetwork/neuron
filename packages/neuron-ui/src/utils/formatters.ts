@@ -145,14 +145,6 @@ export const uniformTimeFormatter = (time: string | number | Date) => {
   return timeFormatter.format(+time).replace(/\//g, '-')
 }
 
-export const priceToFee = (price: string, cycles: string) => {
-  if (Number.isNaN(+price)) {
-    console.warn(`Price is not a valid number`)
-    return `0`
-  }
-  return (BigInt(price) * BigInt(cycles)).toString()
-}
-
 export const addressesToBalance = (addresses: State.Address[] = []) => {
   return addresses
     .reduce((total, addr) => {
@@ -191,7 +183,6 @@ export default {
   shannonToCKBFormatter,
   localNumberFormatter,
   uniformTimeFormatter,
-  priceToFee,
   addressesToBalance,
   outputsToTotalAmount,
   failureResToNotification,

@@ -28,8 +28,8 @@ export enum AppActions {
   RemoveSendOutput = 'removeSendOutput',
   UpdateSendOutput = 'updateSendOutput',
   UpdateSendPrice = 'updateSendPrice',
-  UpdateSendCycles = 'updateSendCycles',
   UpdateSendDescription = 'updateSendDescription',
+  UpdateGeneratedTx = 'updateGeneratedTx',
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
   AddNotification = 'addNotification',
@@ -357,21 +357,6 @@ export const reducer = (
         },
       }
     }
-    case AppActions.UpdateSendCycles: {
-      /**
-       * payload: new cycles
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            cycles: payload,
-          },
-        },
-      }
-    }
     case AppActions.UpdateSendDescription: {
       /**
        * payload: new description
@@ -383,6 +368,18 @@ export const reducer = (
           send: {
             ...app.send,
             description: payload,
+          },
+        },
+      }
+    }
+    case AppActions.UpdateGeneratedTx: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          send: {
+            ...app.send,
+            generatedTx: payload || null,
           },
         },
       }

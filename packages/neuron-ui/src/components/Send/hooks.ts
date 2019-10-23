@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { calculateCycles } from 'services/remote/wallets'
+import { generateTx } from 'services/remote/wallets'
 
-import { outputsToTotalAmount, priceToFee } from 'utils/formatters'
+import { outputsToTotalAmount, CKBToShannonFormatter } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
-import { ErrorCode } from 'utils/const'
-import { MAX_DECIMAL_DIGITS } from '../../utils/const'
+import { ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
+import calculateFee from 'utils/calculateFee'
+
 import { TransactionOutput } from '.'
 
-let cyclesTimer: ReturnType<typeof setTimeout>
+let generateTxTimer: ReturnType<typeof setTimeout>
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
@@ -49,49 +50,47 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
 const useOnTransactionChange = (
   walletID: string,
   items: TransactionOutput[],
+  price: string,
   dispatch: StateDispatch,
   setIsTransactionValid: Function,
   setTotalAmount: Function
 ) => {
   useEffect(() => {
-    clearTimeout(cyclesTimer)
-    cyclesTimer = setTimeout(() => {
+    clearTimeout(generateTxTimer)
+    generateTxTimer = setTimeout(() => {
+      dispatch({
+        type: AppActions.UpdateGeneratedTx,
+        payload: null,
+      })
       if (verifyTransactionOutputs(items)) {
         setIsTransactionValid(true)
         const totalAmount = outputsToTotalAmount(items)
         setTotalAmount(totalAmount)
-        calculateCycles({
+        const realParams = {
           walletID,
-          capacities: totalAmount,
-        })
-          .then(response => {
-            if (response.status) {
-              if (Number.isNaN(+response.result)) {
-                throw new Error('Invalid Cycles')
-              }
+          items: items.map(item => ({
+            address: item.address,
+            capacity: CKBToShannonFormatter(item.amount, item.unit),
+          })),
+          feeRate: price,
+        }
+        generateTx(realParams)
+          .then((res: any) => {
+            if (res.status === 1) {
               dispatch({
-                type: AppActions.UpdateSendCycles,
-                payload: response.result,
+                type: AppActions.UpdateGeneratedTx,
+                payload: res.result,
               })
-            } else {
-              throw new Error('Cycles Not Calculated')
             }
           })
-          .catch(() => {
-            dispatch({
-              type: AppActions.UpdateSendCycles,
-              payload: '0',
-            })
+          .catch((err: Error) => {
+            console.error(err)
           })
       } else {
         setIsTransactionValid(false)
-        dispatch({
-          type: AppActions.UpdateSendCycles,
-          payload: '0',
-        })
       }
     }, 300)
-  }, [walletID, items, dispatch, setIsTransactionValid, setTotalAmount])
+  }, [walletID, items, price, dispatch, setIsTransactionValid, setTotalAmount])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
@@ -170,12 +169,12 @@ const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch),
 
 export const useInitialize = (
   items: TransactionOutput[],
-  price: string,
-  cycles: string,
+  generatedTx: any | null,
   dispatch: React.Dispatch<any>,
   t: any
 ) => {
-  const fee = useMemo(() => priceToFee(price, cycles), [price, cycles]) // in shannon
+  const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
+
   const [isTransactionValid, setIsTransactionValid] = useState(false)
   const [totalAmount, setTotalAmount] = useState('0')
 

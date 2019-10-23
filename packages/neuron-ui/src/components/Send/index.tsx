@@ -57,8 +57,8 @@ const Send = ({
     onGetAddressErrorMessage,
     onGetAmountErrorMessage,
     onClear,
-  } = useInitialize(send.outputs, send.price, send.cycles, dispatch, t)
-  useOnTransactionChange(walletID, send.outputs, dispatch, setIsTransactionValid, setTotalAmount)
+  } = useInitialize(send.outputs, send.generatedTx, dispatch, t)
+  useOnTransactionChange(walletID, send.outputs, send.price, dispatch, setIsTransactionValid, setTotalAmount)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
 
@@ -211,12 +211,7 @@ const Send = ({
         </Stack>
       </Stack>
 
-      <TransactionFeePanel
-        fee={shannonToCKBFormatter(fee)}
-        cycles={send.cycles}
-        price={send.price}
-        onPriceChange={updateTransactionPrice}
-      />
+      <TransactionFeePanel fee={shannonToCKBFormatter(fee)} price={send.price} onPriceChange={updateTransactionPrice} />
 
       <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 20 }}>
         <Stack.Item styles={{ root: { width: labelWidth } }}>

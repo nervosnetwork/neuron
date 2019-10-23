@@ -10,7 +10,7 @@ import {
   SyncInfoController,
   SkipDataAndTypeController,
   NetworksController
- } from 'controllers'
+} from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
@@ -193,7 +193,6 @@ export default class ApiController {
 
   @CatchControllerError
   public static async sendTx(params: {
-    id: string
     walletID: string
     tx: TransactionWithoutHash,
     password: string
@@ -204,7 +203,6 @@ export default class ApiController {
 
   @CatchControllerError
   public static async generateTx(params: {
-    id: string
     walletID: string
     items: {
       address: string
@@ -214,14 +212,6 @@ export default class ApiController {
     feeRate: string
   }) {
     return WalletsController.generateTx(params)
-  }
-
-  @CatchControllerError
-  public static async calculateFee(params: {
-    id: string
-    tx: TransactionWithoutHash
-  }) {
-    return WalletsController.calculateFee(params)
   }
 
   @CatchControllerError

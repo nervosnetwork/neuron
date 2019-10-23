@@ -4,11 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Stack, Text, Label, Modal, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
 import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
 import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
-import { priceToFee, CKBToShannonFormatter } from 'utils/formatters'
 
 const PasswordRequest = ({
   app: {
-    send: { txID, outputs, description, price, cycles },
+    send: { description, generatedTx },
     loadings: { sending: isSending = false },
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
@@ -32,15 +31,10 @@ const PasswordRequest = ({
           break
         }
         sendTransaction({
-          id: txID,
           walletID,
-          items: outputs.map(output => ({
-            address: output.address,
-            capacity: CKBToShannonFormatter(output.amount, output.unit),
-          })),
+          tx: generatedTx,
           description,
           password,
-          fee: priceToFee(price, cycles),
         })(dispatch, history)
         break
       }
@@ -62,7 +56,7 @@ const PasswordRequest = ({
         break
       }
     }
-  }, [dispatch, walletID, password, actionType, txID, description, outputs, cycles, price, history, isSending])
+  }, [dispatch, walletID, password, actionType, description, history, isSending, generatedTx])
 
   const onChange = useCallback(
     (_e, value?: string) => {

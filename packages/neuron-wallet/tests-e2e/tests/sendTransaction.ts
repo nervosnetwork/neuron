@@ -115,36 +115,36 @@ export default (app: Application) => {
       await app.waitUntilLoaded()
     })
 
-    app.test('default price should be 0 and default speed should be 3min', async () => {
+    app.test('default price should be 1000 and default speed should be 500 blocks', async () => {
       const { client } = app.spectron
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
-      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('0')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('1000')
       const speedDropdown = await client.$('div[role=listbox]')
-      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 3min')
+      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 500 blocks')
     })
 
-    app.test('Change speed to immediately and the price should be 180', async () => {
+    app.test('Change speed to ~ 100 blocks and the price should be 3000', async () => {
       const { client } = app.spectron
       client.click('div[role=listbox]')
       await app.waitUntilLoaded()
-      client.click('button[title=immediately]')
+      client.click('button[title="~ 100 blocks"]')
       await app.waitUntilLoaded()
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
-      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('180')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('3000')
     })
 
-    app.test('Change the price to 150 and the speed should switch to ~ 30s', async () => {
+    app.test('Change the price to 100000 and the speed should switch to immediately', async () => {
       const { client } = app.spectron
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
       client.elementIdClear(priceField.value.ELEMENT)
       await app.waitUntilLoaded()
-      client.elementIdValue(priceField.value.ELEMENT, '150')
+      client.elementIdValue(priceField.value.ELEMENT, '00')
       const speedDropdown = await client.$('div[role=listbox]')
 
-      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 30s')
+      expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('immediately')
     })
   })
 }
