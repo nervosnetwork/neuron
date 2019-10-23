@@ -1,3 +1,27 @@
+# [0.23.0](https://github.com/nervosnetwork/neuron/compare/v0.22.2...v0.23.0) (2019-10-23)
+
+
+### Bug Fixes
+
+* api controller params ([c345d06](https://github.com/nervosnetwork/neuron/commit/c345d0658285cda84f60b6af12cc3d5f08c64cf9))
+* fix codeHashOrCodeHashIndex in UI ([bf396e5](https://github.com/nervosnetwork/neuron/commit/bf396e538c71b358b1d94d58474e2b55a173a74c))
+* Integration tests ([14008f6](https://github.com/nervosnetwork/neuron/commit/14008f6afa2f71ccfb3426b04787bf5ce9fa443b))
+* set previous url when set system script ([7753c4f](https://github.com/nervosnetwork/neuron/commit/7753c4fc2bb479e885d48357c4a7e88f4cfe83b5))
+
+
+### Features
+
+* Add ApiController ([7a00d33](https://github.com/nervosnetwork/neuron/commit/7a00d33c5e269d8f974176c3c4f6b9c26710c816))
+* Disable certain menu items when main windows is not current focus window ([eecfa41](https://github.com/nervosnetwork/neuron/commit/eecfa412c7119661741e4a2a8f318cde5a617b44))
+* Expose a flat API controller from neuron wallet to UI layer ([500c37c](https://github.com/nervosnetwork/neuron/commit/500c37cd37fa9563e6db818a58e357be21a28d96))
+* Localize nervos website menu item ([02be3af](https://github.com/nervosnetwork/neuron/commit/02be3af7f48fa16a490aba9cace062d0fbe3d66d))
+* Set window menu role ([51e6a38](https://github.com/nervosnetwork/neuron/commit/51e6a38c87825677c89cc2f6bdfa919eac6ea579))
+* slipt sendCapacity to generateTx and sendTx ([f956088](https://github.com/nervosnetwork/neuron/commit/f95608819fe7f2f9a72469c04cc097a072a6de64))
+* Softer activity row shadow ([13445e7](https://github.com/nervosnetwork/neuron/commit/13445e7d926fc4128aaa47a0f453f60c752a8994))
+* **neuron-ui:** ignore the NodeDisconnected Errors from controller, … ([#996](https://github.com/nervosnetwork/neuron/issues/996)) ([248c8ed](https://github.com/nervosnetwork/neuron/commit/248c8ed60956ea7f9edfb4d18566eec0be79f344))
+
+
+
 ## [0.22.2](https://github.com/nervosnetwork/neuron/compare/v0.22.1...v0.22.2) (2019-10-16)
 
 
