@@ -69,11 +69,12 @@ export default class AddressDao {
       TransactionStatus.Pending,
       TransactionStatus.Success,
     ], url)
+    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
     const entities = await Promise.all(
       addressEntities.map(async entity => {
         const addressEntity = entity
         addressEntity.txCount = txCount
-        const lockHashes: string[] = await LockUtils.addressToAllLockHashes(addressEntity.address, url)
+        const lockHashes: string[] = lockUtils.addressToAllLockHashes(addressEntity.address)
         addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, true)
         addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, true)
         addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending, true)

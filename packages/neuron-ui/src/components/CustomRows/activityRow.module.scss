@@ -12,8 +12,8 @@ $pending-color: #999999;
   margin: 15px 0;
   grid-template: 'action status'auto'time meta'auto / 1fr auto;
   border-left-color: currentColor;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16),
-    0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  box-shadow: 0 1px 5px 1px rgba(0, 0, 0, 0.14);
   transition: color 0.3s;
 
 
@@ -21,7 +21,7 @@ $pending-color: #999999;
     color: $pending-color;
 
     .status::before {
-      filter: drop-shadow(0 0 2px $pending-color);
+      filter: drop-shadow(0 0 1px $pending-color);
       animation: blink 5s infinite;
     }
   }
@@ -30,7 +30,7 @@ $pending-color: #999999;
     color: $success-color;
 
     .status::before {
-      filter: drop-shadow(0 0 2px $success-color);
+      filter: drop-shadow(0 0 1px $success-color);
     }
   }
 
@@ -38,7 +38,7 @@ $pending-color: #999999;
     color: $failed-color;
 
     .status::before {
-      filter: drop-shadow(0 0 2px $failed-color);
+      filter: drop-shadow(0 0 1px $failed-color);
     }
 
   }
@@ -66,6 +66,7 @@ $pending-color: #999999;
   }
 
   .status {
+    font-size: 85%;
     grid-area: status;
     display: flex;
     justify-content: flex-end;
@@ -76,8 +77,8 @@ $pending-color: #999999;
       display: inline-block;
       border-radius: 50%;
       background-color: currentColor;
-      width: 13px;
-      height: 13px;
+      width: 8px;
+      height: 8px;
       margin-top: 2px;
       content: '';
       margin-right: 5px;

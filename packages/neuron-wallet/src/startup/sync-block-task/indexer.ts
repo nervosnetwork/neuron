@@ -13,8 +13,8 @@ const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.requ
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
   const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
-  const lockHashes: string[] = await LockUtils.addressesToAllLockHashes(addresses, nodeURL)
-  return lockHashes
+  const lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+  return lockUtils.addressesToAllLockHashes(addresses)
 }
 
 // call this after network switched
@@ -42,19 +42,18 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, c
   // listen to address created
   addressCreatedSubject.subscribe(async (addresses: Address[]) => {
     if (indexerQueue) {
-      const infos: LockHashInfo[] = (await Promise.all(
-        addresses.map(async addr => {
-          const hashes: string[] = await LockUtils.addressToAllLockHashes(addr.address, nodeURL)
-          // undefined means true
-          const isImporting: boolean = addr.isImporting !== false
-          return hashes.map(h => {
-            return {
-              lockHash: h,
-              isImporting,
-            }
-          })
+      let lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
+      const infos: LockHashInfo[] = addresses.map(addr => {
+        const hashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+        // undefined means true
+        const isImporting: boolean = addr.isImporting !== false
+        return hashes.map(h => {
+          return {
+            lockHash: h,
+            isImporting,
+          }
         })
-      )).reduce((acc, val) => acc.concat(val), [])
+      }).reduce((acc, val) => acc.concat(val), [])
       indexerQueue.appendLockHashInfos(infos)
     }
   })
