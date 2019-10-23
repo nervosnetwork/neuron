@@ -393,7 +393,6 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async sendTx(params: {
-    id: string
     walletID: string
     tx: TransactionWithoutHash
     password: string
@@ -425,7 +424,6 @@ export default class WalletsController {
 
   @CatchControllerError
   public static async generateTx(params: {
-    id: string
     walletID: string
     items: {
       address: string
@@ -459,10 +457,7 @@ export default class WalletsController {
   }
 
   @CatchControllerError
-  public static async calculateFee(params: {
-    id: string
-    tx: TransactionWithoutHash
-  }) {
+  public static async calculateFee(params: { tx: TransactionWithoutHash }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }

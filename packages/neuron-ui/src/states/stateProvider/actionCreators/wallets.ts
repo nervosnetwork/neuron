@@ -7,7 +7,7 @@ import {
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
-  sendCapacity,
+  sendTx,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
   deleteWallet as deleteRemoteWallet,
@@ -141,7 +141,10 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   })
 }
 
-export const sendTransaction = (params: Controller.SendTransaction) => (dispatch: StateDispatch, history: any) => {
+export const sendTransaction = (params: Controller.SendTransactionParams) => (
+  dispatch: StateDispatch,
+  history: any
+) => {
   dispatch({
     type: AppActions.UpdateLoadings,
     payload: {
@@ -149,7 +152,7 @@ export const sendTransaction = (params: Controller.SendTransaction) => (dispatch
     },
   })
   setTimeout(() => {
-    sendCapacity(params)
+    sendTx(params)
       .then(res => {
         if (res.status === 1) {
           dispatch({

@@ -1,11 +1,11 @@
 import { apiMethodWrapper } from './apiMethodWrapper'
 
-export const getNeuronWalletState = apiMethodWrapper(controller => () => controller.loadInitData())
+export const getNeuronWalletState = apiMethodWrapper<void>(controller => () => controller.loadInitData())
 
-export const handleViewError = apiMethodWrapper(controller => (errorMessage: string) =>
+export const handleViewError = apiMethodWrapper<string>(controller => errorMessage =>
   controller.handleViewError(errorMessage)
 )
-export const contextMenu = apiMethodWrapper(controller => (params: { type: string; id: string }) =>
+export const contextMenu = apiMethodWrapper<{ type: string; id: string }>(controller => params =>
   controller.contextMenu(params)
 )
 

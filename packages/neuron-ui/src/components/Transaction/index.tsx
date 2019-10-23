@@ -210,8 +210,15 @@ const Transaction = () => {
     const currentWallet = currentWalletCache.load()
     if (currentWallet) {
       const hash = window.location.href.split('/').pop()
+      if (!hash) {
+        showErrorMessage(
+          t(`messages.error`),
+          t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction hash' })
+        )
+        return
+      }
       getTransaction({ hash, walletID: currentWallet.id })
-        .then(res => {
+        .then((res: any) => {
           if (res.status) {
             setTransaction(res.result)
           } else {

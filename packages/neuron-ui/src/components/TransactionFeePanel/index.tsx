@@ -4,30 +4,24 @@ import { useTranslation } from 'react-i18next'
 
 interface TransactionFee {
   fee: string
-  cycles: string
   price: string
   onPriceChange: any
 }
 
 const calculateSpeed = (price: number) => {
-  if (price >= 160) {
-    return '180'
+  if (price >= 16000) {
+    return '18000'
   }
-  if (price >= 40) {
-    return '60'
+  if (price >= 4000) {
+    return '6000'
   }
-  if (price >= 20) {
-    return '30'
+  if (price >= 2000) {
+    return '3000'
   }
   return '0'
 }
 
-const TransactionFee: React.FunctionComponent<TransactionFee> = ({
-  cycles,
-  price,
-  fee,
-  onPriceChange,
-}: TransactionFee) => {
+const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, onPriceChange }: TransactionFee) => {
   const [t] = useTranslation()
   const [showDetail, setShowDetail] = useState(false)
   const leftStackWidth = '70%'
@@ -48,7 +42,18 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
             <Label>{t('send.fee')}</Label>
           </Stack.Item>
           <Stack.Item grow>
-            <TextField value={`${fee} CKB`} readOnly />
+            <TextField
+              value={`${fee} CKB`}
+              readOnly
+              styles={{
+                field: {
+                  color: '#888',
+                },
+                fieldGroup: {
+                  borderColor: '#eee!important',
+                },
+              }}
+            />
           </Stack.Item>
           {actionSpacer}
         </Stack>
@@ -79,7 +84,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
             <Label>{t('send.price')}</Label>
           </Stack.Item>
           <Stack.Item grow>
-            <TextField value={price} onChange={onPriceChange} aria-label="price" />
+            <TextField value={price} onChange={onPriceChange} aria-label="price" suffix="shannons/kB" />
           </Stack.Item>
           {actionSpacer}
         </Stack>
@@ -93,10 +98,10 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
               dropdownWidth={140}
               selectedKey={selectedSpeed}
               options={[
-                { key: '180', text: 'immediately' },
-                { key: '60', text: '~ 30s' },
-                { key: '30', text: '~ 1min' },
-                { key: '0', text: '~ 3min' },
+                { key: '18000', text: 'immediately' },
+                { key: '6000', text: '~ 10 blocks' },
+                { key: '3000', text: '~ 100 blocks' },
+                { key: '0', text: '~ 500 blocks' },
               ]}
               onRenderCaretDown={() => {
                 return <Icon iconName="ArrowDown" />
@@ -109,15 +114,6 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({
               aria-label="expected speed"
             />
           </Stack.Item>
-        </Stack>
-
-        <Stack>
-          <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 20 }}>
-            <Stack.Item styles={{ root: { width: labelWidth } }}>
-              <Label>{t('send.total-cycles')}</Label>
-            </Stack.Item>
-            <Stack.Item>{cycles}</Stack.Item>
-          </Stack>
         </Stack>
       </Stack>
     </Stack>

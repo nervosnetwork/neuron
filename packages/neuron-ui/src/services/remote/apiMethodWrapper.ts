@@ -21,17 +21,17 @@ export const RemoteNotLoadError = {
   },
 }
 
-export const apiMethodWrapper = (
+export const apiMethodWrapper = <T = any>(
   callControllerMethod: (
     controller: any
   ) => (
-    params: any
+    params: T
   ) => Promise<{
     status: any
     result: any
     message: { code?: number; content?: string; meta?: { [key: string]: string } }
   }>
-) => async (realParams?: any): Promise<ControllerResponse> => {
+) => async (realParams: T): Promise<ControllerResponse> => {
   if (!window.remote) {
     return RemoteNotLoadError
   }
