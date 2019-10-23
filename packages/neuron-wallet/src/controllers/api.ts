@@ -19,6 +19,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import { CatchControllerError } from 'decorators/errors'
 import { ResponseCode } from 'utils/const'
+import { TransactionWithoutHash } from 'types/cell-types'
 
 /**
  * @class ApiController
@@ -194,7 +195,7 @@ export default class ApiController {
   public static async sendTx(params: {
     id: string
     walletID: string
-    tx: string,
+    tx: TransactionWithoutHash,
     password: string
     description?: string
   }) {
@@ -218,7 +219,7 @@ export default class ApiController {
   @CatchControllerError
   public static async calculateFee(params: {
     id: string
-    tx: string
+    tx: TransactionWithoutHash
   }) {
     return WalletsController.calculateFee(params)
   }
