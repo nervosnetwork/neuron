@@ -1,16 +1,18 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Stack,
-  Text,
   ShimmeredDetailsList,
   TextField,
   IconButton,
   IColumn,
   IGroup,
   CheckboxVisibility,
+  CollapseAllVisibility,
   getTheme,
 } from 'office-ui-fabric-react'
+
+import GroupHeader from 'components/CustomRows/GroupHeader'
+import HistoryRow from 'components/CustomRows/HistoryRow'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { contextMenu, showTransactionDetails } from 'services/remote'
@@ -22,7 +24,6 @@ import {
   uniformTimeFormatter,
   localNumberFormatter,
 } from 'utils/formatters'
-import { onRenderRow } from 'utils/fabricUIRender'
 import { CONFIRMATION_THRESHOLD } from 'utils/const'
 
 const theme = getTheme()
@@ -30,24 +31,6 @@ const { semanticColors } = theme
 
 interface FormatTransaction extends State.Transaction {
   date: string
-}
-
-const onRenderHeader = ({ group }: any) => {
-  const { name } = group
-  return (
-    <Stack
-      tokens={{ padding: 15 }}
-      styles={{
-        root: {
-          background: theme.palette.neutralLighterAlt,
-          borderTop: `1px solid ${theme.palette.neutralSecondary}`,
-          borderBottom: `1px solid ${theme.palette.neutralLighter}`,
-        },
-      }}
-    >
-      <Text variant="large">{name}</Text>
-    </Stack>
-  )
 }
 
 const TransactionList = ({
@@ -185,6 +168,10 @@ const TransactionList = ({
                   borderless
                   readOnly={!isSelected}
                   styles={{
+                    root: {
+                      flex: '1',
+                      paddingRight: '15px',
+                    },
                     fieldGroup: {
                       backgroundColor: isSelected ? '#fff' : 'transparent',
                       borderColor: 'transparent',
@@ -268,9 +255,10 @@ const TransactionList = ({
       enableShimmer={isLoading}
       columns={transactionColumns}
       items={txs}
-      groups={groups.filter(group => group.count !== 0)}
+      groups={groups}
       groupProps={{
-        onRenderHeader,
+        collapseAllVisibility: CollapseAllVisibility.hidden,
+        onRenderHeader: GroupHeader,
       }}
       checkboxVisibility={CheckboxVisibility.hidden}
       onItemInvoked={item => {
@@ -282,7 +270,7 @@ const TransactionList = ({
         }
       }}
       className="listWithDesc"
-      onRenderRow={onRenderRow}
+      onRenderRow={HistoryRow}
     />
   )
 }
