@@ -34,7 +34,7 @@ export const SyncStatus = ({
   const percentage = +syncedBlockNumber / +tipBlockNumber
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }} title={`${syncedBlockNumber} / ${tipBlockNumber}`}>
       {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
         <>
           {t('sync.syncing')}
