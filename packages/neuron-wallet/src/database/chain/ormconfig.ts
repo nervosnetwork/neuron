@@ -13,6 +13,7 @@ import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigra
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 import { ChangeHasDataDefault1568621556467 } from './migrations/1568621556467-ChangeHasDataDefault'
 import { AddLockToInput1570522869590 } from './migrations/1570522869590-AddLockToInput'
+import { AddIndices1572006450765 } from './migrations/1572006450765-AddIndices'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -38,6 +39,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddTypeAndHasData1567144517514,
       ChangeHasDataDefault1568621556467,
       AddLockToInput1570522869590,
+      AddIndices1572006450765
     ],
     logging,
     maxQueryExecutionTime: 100
