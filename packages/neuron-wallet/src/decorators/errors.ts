@@ -3,7 +3,7 @@ import logger from 'utils/logger'
 
 const NODE_DISCONNECTED_CODE = 104
 
-export const CatchControllerError = (_target: any, _name: string, descriptor: PropertyDescriptor) => {
+export const CatchControllerError = (target: any, name: string, descriptor: PropertyDescriptor) => {
   const originalMethod = descriptor.value
   return {
     ...descriptor,
@@ -11,7 +11,7 @@ export const CatchControllerError = (_target: any, _name: string, descriptor: Pr
       try {
         return await originalMethod(...args)
       } catch (err) {
-        logger.error(`CatchControllerError:`, err)
+        logger.error(`${target.name}.${name}:`, err)
         if (err.code === 'ECONNREFUSED') {
           err.code = NODE_DISCONNECTED_CODE
         }
