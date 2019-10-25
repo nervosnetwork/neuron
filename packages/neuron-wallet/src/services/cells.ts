@@ -7,9 +7,6 @@ import SkipDataAndType from './settings/skip-data-and-type'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
-/* eslint no-await-in-loop: "warn" */
-/* eslint no-restricted-syntax: "warn" */
 export default class CellsService {
   // exclude hasData = true and typeScript != null
   public static getBalance = async (

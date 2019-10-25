@@ -2,7 +2,6 @@ import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import { Script, OutPoint, Cell } from 'types/cell-types'
 import TransactionEntity from './transaction'
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()
 export default class Output extends BaseEntity {
   @PrimaryColumn({

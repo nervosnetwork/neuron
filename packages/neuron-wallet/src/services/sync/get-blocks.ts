@@ -64,16 +64,14 @@ export default class GetBlocks {
 
   public retryGetBlock = async (num: string): Promise<Block> => {
     const block: Block = await Utils.retry(this.retryTime, this.retryInterval, async () => {
-      const b: Block = await this.getBlockByNumber(num)
-      return b
+      return await this.getBlockByNumber(num)
     })
 
     return block
   }
 
   public getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
-    const tx = await this.core.rpc.getTransaction(hash)
-    return tx
+    return await this.core.rpc.getTransaction(hash)
   }
 
   public getHeader = async (hash: string): Promise<BlockHeader> => {
@@ -88,8 +86,7 @@ export default class GetBlocks {
 
   public genesisBlockHash = async (): Promise<string> => {
     const hash: string = await Utils.retry(3, 100, async () => {
-      const h: string = await this.core.rpc.getBlockHash('0x0')
-      return h
+      return await this.core.rpc.getBlockHash('0x0')
     })
 
     return hash

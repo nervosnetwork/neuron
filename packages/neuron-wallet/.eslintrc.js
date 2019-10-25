@@ -14,13 +14,14 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": ["error", {
       "vars": "local",
       "args": "after-used",
-      "ignoreRestSiblings": false
+      "ignoreRestSiblings": false,
+      "argsIgnorePattern": "^_"
     }],
     "curly": [2, "all"],
     "implicit-arrow-linebreak": "off",
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
-      "code": 120,
+      "code": 140,
       "ignoreComments": true,
       "ignoreTrailingComments": true,
       "ignoreUrls": true,

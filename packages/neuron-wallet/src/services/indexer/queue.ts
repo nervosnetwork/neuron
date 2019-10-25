@@ -26,7 +26,6 @@ enum TxPointType {
 }
 
 export default class IndexerQueue {
-  // private lockHashes: string[]
   private lockHashInfos: LockHashInfo[]
   private indexerRPC: IndexerRPC
   private getBlocksService: GetBlocks
@@ -48,7 +47,6 @@ export default class IndexerQueue {
   private url: string
 
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
-    // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.indexerRPC = new IndexerRPC(url)
@@ -62,7 +60,6 @@ export default class IndexerQueue {
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
-    // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
     this.indexed = false
   }
@@ -76,8 +73,6 @@ export default class IndexerQueue {
     this.resetFlag = true
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "off" */
   public start = async () => {
     while (!this.stopped) {
       try {
@@ -148,8 +143,7 @@ export default class IndexerQueue {
       .map(state => HexUtils.toDecimal(state.blockNumber))
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
     const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
-    const minBlockNumber = Utils.min(blockNumbersBigInt)
-    return minBlockNumber
+    return Utils.min(blockNumbersBigInt)
   }
 
   public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
@@ -168,7 +162,7 @@ export default class IndexerQueue {
     let page = 0
     let stopped = false
     while (!stopped) {
-      const txs = await this.indexerRPC.getTransactionByLockHash(lockHash, `0x${page.toString(16)}`, `0x${this.per.toString(16)}`)
+      const txs = await this.indexerRPC.getTransactionsByLockHash(lockHash, `0x${page.toString(16)}`, `0x${this.per.toString(16)}`)
       if (txs.length < this.per) {
         stopped = true
       }
