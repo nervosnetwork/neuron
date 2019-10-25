@@ -21,7 +21,7 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
-import { ConnectionStatus } from 'utils/const'
+import { ConnectionStatus, ErrorCode } from 'utils/const'
 import {
   networks as networksCache,
   currentNetworkID as currentNetworkIDCache,
@@ -39,6 +39,10 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
           dispatch({
             type: AppActions.UpdateTipBlockNumber,
             payload: BigInt(tipBlockNumber).toString(),
+          })
+          dispatch({
+            type: AppActions.ClearNotificationsOfCode,
+            payload: ErrorCode.NodeDisconnected,
           })
         })
         .catch((err: Error) => {
