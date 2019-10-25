@@ -186,7 +186,7 @@ export default class WalletsController {
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
       accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      accountKeychain.chainCode.toString('hex'),
     )
 
     const walletsService = WalletsService.getInstance()
@@ -273,7 +273,7 @@ export default class WalletsController {
 
     const keystore = wallet.loadKeystore()
     return new Promise(resolve => {
-      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json', }).then(
+      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
         (returnValue: SaveDialogReturnValue) => {
           if (returnValue.filePath) {
             fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
@@ -408,7 +408,7 @@ export default class WalletsController {
       params.walletID,
       params.items,
       params.fee,
-      params.feeRate
+      params.feeRate,
     )
     return {
       status: ResponseCode.Success,
