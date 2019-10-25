@@ -26,7 +26,6 @@ enum TxPointType {
 }
 
 export default class IndexerQueue {
-  // private lockHashes: string[]
   private lockHashInfos: LockHashInfo[]
   private indexerRPC: IndexerRPC
   private getBlocksService: GetBlocks
@@ -48,7 +47,6 @@ export default class IndexerQueue {
   private url: string
 
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
-    // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.indexerRPC = new IndexerRPC(url)
@@ -62,7 +60,6 @@ export default class IndexerQueue {
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
-    // this.lockHashes = lockHashes
     this.lockHashInfos = lockHashInfos
     this.indexed = false
   }
@@ -76,8 +73,6 @@ export default class IndexerQueue {
     this.resetFlag = true
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "off" */
   public start = async () => {
     while (!this.stopped) {
       try {

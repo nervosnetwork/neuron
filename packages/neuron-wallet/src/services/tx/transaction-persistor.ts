@@ -7,9 +7,6 @@ import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
 import Utils from 'services/sync/utils'
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
-/* eslint no-await-in-loop: "off" */
-/* eslint no-restricted-syntax: "off" */
 export class TransactionPersistor {
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending

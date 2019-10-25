@@ -21,7 +21,6 @@ const txDbChangedSubject = isRenderer
   ? remote.require('./models/subjects/tx-db-changed-subject').default.getSubject()
   : TxDbChangedSubject.getSubject()
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
 @Entity()
 export default class Transaction extends BaseEntity {
   @PrimaryColumn({

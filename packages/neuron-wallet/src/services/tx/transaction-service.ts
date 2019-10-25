@@ -38,9 +38,6 @@ export enum SearchType {
   Unknown = 'unknown',
 }
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
-/* eslint no-await-in-loop: "off" */
-/* eslint no-restricted-syntax: "off" */
 export class TransactionsService {
   public static filterSearchType = (value: string) => {
     if (value === '') {
