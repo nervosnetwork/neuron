@@ -1,13 +1,11 @@
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
-import { CatchControllerError } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 
 const networksService = NetworksService.getInstance()
 
 export default class NetworksController {
-  @CatchControllerError
   public static async getAll() {
     const networks = await networksService.getAll()
     return {
@@ -16,7 +14,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async get(id: NetworkID) {
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
@@ -33,7 +30,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async create({ name, remote, type = NetworkType.Normal }: Network) {
     if (!name || !remote) {
       throw new IsRequired('Name and address')
@@ -49,7 +45,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async update(id: NetworkID, options: Partial<Network>) {
     if (options.name && options.name === 'error') {
       throw new InvalidName('Network')
@@ -62,7 +57,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async delete(id: NetworkID) {
     await networksService.delete(id)
 
@@ -72,7 +66,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async currentID() {
     const currentID = await networksService.getCurrentID()
     if (currentID) {
@@ -84,7 +77,6 @@ export default class NetworksController {
     throw new CurrentNetworkNotSet()
   }
 
-  @CatchControllerError
   public static async activate(id: NetworkID) {
     await networksService.activate(id)
     return {
@@ -93,7 +85,6 @@ export default class NetworksController {
     }
   }
 
-  @CatchControllerError
   public static async clear() {
     await networksService.clear()
     return {

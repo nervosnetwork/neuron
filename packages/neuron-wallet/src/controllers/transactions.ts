@@ -4,7 +4,6 @@ import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } 
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
 
-import { CatchControllerError } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
@@ -12,7 +11,6 @@ import LockUtils from 'models/lock-utils'
 const CELL_COUNT_THRESHOLD = 10
 
 export default class TransactionsController {
-  @CatchControllerError
   public static async getAll(
     params: TransactionsByLockHashesParam,
   ): Promise<Controller.Response<PaginationResult<Transaction>>> {
@@ -28,7 +26,6 @@ export default class TransactionsController {
     }
   }
 
-  @CatchControllerError
   public static async getAllByKeywords(
     params: Controller.Params.TransactionsByKeywords,
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
@@ -52,7 +49,6 @@ export default class TransactionsController {
     }
   }
 
-  @CatchControllerError
   public static async getAllByAddresses(
     params: Controller.Params.TransactionsByAddresses,
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
@@ -82,7 +78,6 @@ export default class TransactionsController {
     }
   }
 
-  @CatchControllerError
   public static async get(
     walletID: string,
     hash: string,
@@ -132,7 +127,6 @@ export default class TransactionsController {
     }
   }
 
-  @CatchControllerError
   public static async updateDescription({ hash, description }: { hash: string; description: string }) {
     await TransactionsService.updateDescription(hash, description)
 

@@ -5,7 +5,6 @@ import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
-import { CatchControllerError } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
@@ -20,10 +19,9 @@ import {
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-import { TransactionWithoutHash } from 'types/cell-types';
+import { TransactionWithoutHash } from 'types/cell-types'
 
 export default class WalletsController {
-  @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
     const walletsService = WalletsService.getInstance()
     const wallets = walletsService.getAll()
@@ -52,7 +50,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async get(id: string): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     if (typeof id === 'undefined') {
@@ -69,7 +66,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async importMnemonic({
     name,
     password,
@@ -91,7 +87,6 @@ export default class WalletsController {
     return result
   }
 
-  @CatchControllerError
   public static async create({
     name,
     password,
@@ -164,7 +159,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async importKeystore({
     name,
     password,
@@ -213,7 +207,7 @@ export default class WalletsController {
   }
 
   // TODO: update addresses?
-  @CatchControllerError
+
   public static async update({
     id,
     name,
@@ -248,7 +242,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async delete({
     id = '',
     password = '',
@@ -267,7 +260,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async backup({
     id = '',
     password = '',
@@ -281,7 +273,7 @@ export default class WalletsController {
 
     const keystore = wallet.loadKeystore()
     return new Promise(resolve => {
-      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
+      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json', }).then(
         (returnValue: SaveDialogReturnValue) => {
           if (returnValue.filePath) {
             fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
@@ -290,12 +282,10 @@ export default class WalletsController {
               result: true,
             })
           }
-        }
-      )
+        })
     })
   }
 
-  @CatchControllerError
   public static async getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {
@@ -304,7 +294,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async activate(id: string) {
     const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)
@@ -318,7 +307,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async getAllAddresses(id: string) {
     const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
       addrs.map(
@@ -347,7 +335,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async sendCapacity(params: {
     id: string
     walletID: string
@@ -382,7 +369,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async sendTx(params: {
     walletID: string
     tx: TransactionWithoutHash
@@ -405,7 +391,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async generateTx(params: {
     walletID: string
     items: {
@@ -423,7 +408,7 @@ export default class WalletsController {
       params.walletID,
       params.items,
       params.fee,
-      params.feeRate,
+      params.feeRate
     )
     return {
       status: ResponseCode.Success,
@@ -431,7 +416,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async computeCycles(params: { walletID: string; capacities: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
@@ -444,7 +428,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async updateAddressDescription({
     walletID,
     address,
