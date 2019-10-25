@@ -42,7 +42,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddIndices1572006450765
     ],
     logging,
-    maxQueryExecutionTime: 100
+    maxQueryExecutionTime: 70
   }
 }
 
