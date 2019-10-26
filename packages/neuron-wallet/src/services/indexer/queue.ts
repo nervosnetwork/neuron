@@ -191,7 +191,7 @@ export default class IndexerQueue {
               addresses: [address],
               url: this.url,
             })
-            return
+            break
           }
 
           logger.debug('indexer fetched tx:', type, txPoint.txHash)
