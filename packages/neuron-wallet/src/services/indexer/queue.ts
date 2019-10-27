@@ -166,7 +166,7 @@ export default class IndexerQueue {
       if (txs.length < this.per) {
         stopped = true
       }
-      logger.debug('indexer txs for : ', type, lockHash, 'page: ', page, ', tx count: ', txs.length)
+      logger.debug(`indexer txs for: ${type} ${lockHash}, page: ${page}, tx count: ${txs.length}`)
 
       for (const tx of txs) {
         let txPoint: CKBComponents.TransactionPoint | null = null
@@ -180,8 +180,6 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < 1000)
         ) {
-          logger.debug('\tprocess tx: ', txPoint.txHash)
-
           const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
           const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
           const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)

@@ -124,6 +124,9 @@ export default class Transaction extends BaseEntity {
   updateCreatedAt() {
     this.createdAt = Date.now().toString()
     this.updatedAt = this.createdAt
+    if (!this.timestamp) {
+      this.timestamp = this.createdAt
+    }
   }
 
   @BeforeUpdate()

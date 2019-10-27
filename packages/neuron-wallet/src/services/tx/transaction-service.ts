@@ -81,7 +81,7 @@ export class TransactionsService {
       return [
         `${
           base[0]
-        } AND (CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST(ifnull("tx"."timestamp", "tx"."createdAt") AS UNSIGNED BIG INT) < :endTimestamp)`,
+        } AND (CAST("tx"."timestamp") AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp") AS UNSIGNED BIG INT) < :endTimestamp)`,
         {
           lockHashes: params.lockHashes,
           beginTimestamp,
@@ -152,15 +152,14 @@ export class TransactionsService {
     const query = getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
-      .addSelect(`ifnull('tx'.timestamp, 'tx'.createdAt)`, 'tt')
       .leftJoinAndSelect('tx.inputs', 'input')
       .leftJoinAndSelect('tx.outputs', 'output')
       .where(searchParams[0], searchParams[1] as ObjectLiteral)
-      .orderBy(`tt`, 'DESC')
 
     const totalCount: number = await query.getCount()
 
     const transactions: TransactionEntity[] = await query
+      .orderBy(`tx.timestamp`, 'DESC')
       .skip(skip)
       .take(params.pageSize)
       .getMany()
@@ -285,10 +284,8 @@ export class TransactionsService {
     const count: number = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
-      .leftJoinAndSelect('tx.inputs', 'input')
-      .leftJoinAndSelect('tx.outputs', 'output')
       .where(
-        `(input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)) AND tx.status IN (:...status)`,
+        `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND tx.status IN (:...status)`,
         {
           lockHashes,
           status,
