@@ -29,4 +29,8 @@ export class TransactionCache {
   public delete(key: string): boolean {
     return this.store.delete(key)
   }
+
+  public size(): number {
+    return this.store.size
+  }
 }
