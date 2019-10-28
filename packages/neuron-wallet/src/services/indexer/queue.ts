@@ -2,7 +2,7 @@ import { Subject, Subscription } from 'rxjs'
 import Utils from 'services/sync/utils'
 import logger from 'utils/logger'
 import GetBlocks from 'services/sync/get-blocks'
-import { Transaction } from 'types/cell-types'
+import { Transaction, TransactionWithStatus } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import BlockNumber from 'services/sync/block-number'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
@@ -13,6 +13,7 @@ import IndexerTransaction from 'services/tx/indexer-transaction'
 import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
+import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
 
 export interface LockHashInfo {
@@ -43,6 +44,7 @@ export default class IndexerQueue {
   private resetFlag = false
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
+  private txCache: TransactionCache = new TransactionCache(100)
 
   private url: string
 
@@ -123,6 +125,7 @@ export default class IndexerQueue {
           const result = await this.getBlocksService.getTransaction(tx.hash)
           if (!result) {
             await IndexerTransaction.deleteTxWhenFork(tx.hash)
+            this.txCache.delete(tx.hash)
           } else if (tip - BigInt(tx.blockNumber) >= 1000) {
             await IndexerTransaction.confirm(tx.hash)
           }
@@ -157,6 +160,16 @@ export default class IndexerQueue {
     })
   }
 
+  public getTransaction = async (txHash: string): Promise<TransactionWithStatus> => {
+    let txWithStatus = this.txCache.get(txHash)
+    if (!txWithStatus) {
+      const transactionWithStatus = await this.getBlocksService.getTransaction(txHash)
+      txWithStatus = TypeConvert.toTransactionWithStatus(transactionWithStatus)
+      this.txCache.push(txWithStatus)
+    }
+    return txWithStatus
+  }
+
   // type: 'createdBy' | 'consumedBy'
   public pipeline = async (lockHash: string, type: TxPointType, startBlockNumber: bigint) => {
     let page = 0
@@ -180,9 +193,8 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < 1000)
         ) {
-          const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
-          const ckbTransaction: CKBComponents.Transaction = transactionWithStatus.transaction
-          const transaction: Transaction = TypeConvert.toTransaction(ckbTransaction)
+          const transactionWithStatus = await this.getTransaction(txPoint.txHash)
+          const transaction: Transaction = transactionWithStatus.transaction
           const txUniqueFlag = {
             txHash: transaction.hash,
             blockHash: transactionWithStatus.txStatus.blockHash!
@@ -210,9 +222,11 @@ export default class IndexerQueue {
             const { blockHash } = transactionWithStatus.txStatus
             if (blockHash) {
               const blockHeader = await this.getBlocksService.getHeader(blockHash)
-              transaction.blockHash = blockHash
-              transaction.blockNumber = blockHeader.number
-              transaction.timestamp = blockHeader.timestamp
+              if (blockHeader) {
+                transaction.blockHash = blockHash
+                transaction.blockNumber = blockHeader.number
+                transaction.timestamp = blockHeader.timestamp
+              }
             }
             txEntity = await TransactionPersistor.saveFetchTx(transaction)
           }
