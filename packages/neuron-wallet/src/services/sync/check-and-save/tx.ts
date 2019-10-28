@@ -64,8 +64,6 @@ export default class CheckTx {
     return cells
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "warn" */
   public filterInputs = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 

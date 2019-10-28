@@ -36,8 +36,6 @@ const getTransactionStatus = async (hash: string) => {
   }
 }
 
-/* eslint no-await-in-loop: "off" */
-/* eslint no-restricted-syntax: "off" */
 const trackingStatus = async () => {
   const pendingTransactions = await FailedTransaction.pendings()
   if (!pendingTransactions.length) {
