@@ -46,7 +46,6 @@ export default class Queue {
     this.lockHashes = lockHashes
   }
 
-  /* eslint no-await-in-loop: "off" */
   public start = async () => {
     while (!this.stopped) {
       try {

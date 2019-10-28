@@ -21,7 +21,6 @@ export default class Utils {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  /* eslint no-await-in-loop: "off" */
   public static retry = async (times: number, interval: number, callback: any): Promise<any> => {
     let retryTime = 0
 
@@ -39,7 +38,6 @@ export default class Utils {
     return undefined
   }
 
-  /* eslint no-restricted-syntax: "off" */
   public static mapSeries = async (array: any[], callback: any): Promise<any[]> => {
     const result = []
     for (const item of array) {

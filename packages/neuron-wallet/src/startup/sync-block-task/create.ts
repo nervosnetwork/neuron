@@ -47,7 +47,6 @@ const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
 export { networkSwitchSubject }
 
-/* eslint global-require: "off" */
 // create a background task to sync transactions
 // this task is a renderer process
 const createSyncBlockTask = () => {
