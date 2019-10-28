@@ -63,8 +63,8 @@ declare namespace State {
     txID: string
     outputs: Output[]
     price: string
-    cycles: string
     description: string
+    generatedTx: any | null
   }
 
   interface Popup {

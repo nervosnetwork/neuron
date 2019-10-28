@@ -5,7 +5,6 @@ import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
-import { CatchControllerError } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
@@ -20,11 +19,9 @@ import {
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-import logger from 'utils/logger'
-import { TransactionWithoutHash } from 'types/cell-types';
+import { TransactionWithoutHash } from 'types/cell-types'
 
 export default class WalletsController {
-  @CatchControllerError
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
     const walletsService = WalletsService.getInstance()
     const wallets = walletsService.getAll()
@@ -53,7 +50,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async get(id: string): Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     if (typeof id === 'undefined') {
@@ -70,7 +66,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async importMnemonic({
     name,
     password,
@@ -92,7 +87,6 @@ export default class WalletsController {
     return result
   }
 
-  @CatchControllerError
   public static async create({
     name,
     password,
@@ -165,7 +159,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async importKeystore({
     name,
     password,
@@ -193,7 +186,7 @@ export default class WalletsController {
     const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
     const accountExtendedPublicKey = new AccountExtendedPublicKey(
       accountKeychain.publicKey.toString('hex'),
-      accountKeychain.chainCode.toString('hex')
+      accountKeychain.chainCode.toString('hex'),
     )
 
     const walletsService = WalletsService.getInstance()
@@ -214,7 +207,7 @@ export default class WalletsController {
   }
 
   // TODO: update addresses?
-  @CatchControllerError
+
   public static async update({
     id,
     name,
@@ -249,7 +242,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async delete({
     id = '',
     password = '',
@@ -268,7 +260,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async backup({
     id = '',
     password = '',
@@ -291,12 +282,10 @@ export default class WalletsController {
               result: true,
             })
           }
-        }
-      )
+        })
     })
   }
 
-  @CatchControllerError
   public static async getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {
@@ -305,7 +294,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async activate(id: string) {
     const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)
@@ -319,7 +307,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async getAllAddresses(id: string) {
     const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
       addrs.map(
@@ -348,7 +335,6 @@ export default class WalletsController {
     }
   }
 
-  @CatchControllerError
   public static async sendCapacity(params: {
     id: string
     walletID: string
@@ -368,32 +354,22 @@ export default class WalletsController {
     if (!params.fee || params.fee === '0') {
       feeRate = '1000'
     }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const hash = await walletsService.sendCapacity(
-        params.walletID,
-        params.items,
-        params.password,
-        params.fee,
-        feeRate,
-        params.description
-      )
-      return {
-        status: ResponseCode.Success,
-        result: hash,
-      }
-    } catch (err) {
-      logger.error(`sendCapacity:`, err)
-      return {
-        status: err.code || ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
+    const walletsService = WalletsService.getInstance()
+    const hash = await walletsService.sendCapacity(
+      params.walletID,
+      params.items,
+      params.password,
+      params.fee,
+      feeRate,
+      params.description
+    )
+    return {
+      status: ResponseCode.Success,
+      result: hash,
     }
   }
 
-  @CatchControllerError
   public static async sendTx(params: {
-    id: string
     walletID: string
     tx: TransactionWithoutHash
     password: string
@@ -402,30 +378,20 @@ export default class WalletsController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const hash = await walletsService.sendTx(
-        params.walletID,
-        params.tx,
-        params.password,
-        params.description
-      )
-      return {
-        status: ResponseCode.Success,
-        result: hash,
-      }
-    } catch (err) {
-      logger.error(`sendTx:`, err)
-      return {
-        status: err.code || ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
+    const walletsService = WalletsService.getInstance()
+    const hash = await walletsService.sendTx(
+      params.walletID,
+      params.tx,
+      params.password,
+      params.description
+    )
+    return {
+      status: ResponseCode.Success,
+      result: hash,
     }
   }
 
-  @CatchControllerError
   public static async generateTx(params: {
-    id: string
     walletID: string
     items: {
       address: string
@@ -437,72 +403,31 @@ export default class WalletsController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const tx = await walletsService.generateTx(
-        params.walletID,
-        params.items,
-        params.fee,
-        params.feeRate,
-      )
-      return {
-        status: ResponseCode.Success,
-        result: tx,
-      }
-    } catch (err) {
-      logger.error(`generateTx:`, err)
-      return {
-        status: err.code || ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.generateTx(
+      params.walletID,
+      params.items,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
     }
   }
 
-  @CatchControllerError
-  public static async calculateFee(params: {
-    id: string
-    tx: TransactionWithoutHash
-  }) {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const fee = await walletsService.calculateFee(params.tx)
-      return {
-        status: ResponseCode.Success,
-        result: fee,
-      }
-    } catch (err) {
-      logger.error(`calculateFee:`, err)
-      return {
-        status: err.code || ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
-    }
-  }
-
-  @CatchControllerError
   public static async computeCycles(params: { walletID: string; capacities: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    try {
-      const walletsService = WalletsService.getInstance()
-      const cycles = await walletsService.computeCycles(params.walletID, params.capacities)
-      return {
-        status: ResponseCode.Success,
-        result: cycles,
-      }
-    } catch (err) {
-      return {
-        status: ResponseCode.Fail,
-        message: `Error: "${err.message}"`,
-      }
+    const walletsService = WalletsService.getInstance()
+    const cycles = await walletsService.computeCycles(params.walletID, params.capacities)
+    return {
+      status: ResponseCode.Success,
+      result: cycles,
     }
   }
 
-  @CatchControllerError
   public static async updateAddressDescription({
     walletID,
     address,

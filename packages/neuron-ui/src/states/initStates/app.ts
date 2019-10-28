@@ -14,9 +14,9 @@ const appState: State.App = {
         unit: CapacityUnit.CKB,
       },
     ],
-    price: '0',
-    cycles: '0',
+    price: '1000',
     description: '',
+    generatedTx: '',
   },
   passwordRequest: {
     actionType: null,

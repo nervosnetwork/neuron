@@ -46,7 +46,6 @@ export default class Queue {
     this.lockHashes = lockHashes
   }
 
-  /* eslint no-await-in-loop: "off" */
   public start = async () => {
     while (!this.stopped) {
       try {
@@ -136,7 +135,7 @@ export default class Queue {
         const range = await this.rangeForCheck.getRange()
         const rangeFirstBlockHeader: BlockHeader = range[0]
         await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
-        await this.rangeForCheck.clearRange()
+        this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
         throw new Error(`chain forked: ${checkResult.type}`)
       } else if (checkResult.type === CheckResultType.BlockHeadersNotMatch) {

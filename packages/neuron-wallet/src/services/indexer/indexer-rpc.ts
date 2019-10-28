@@ -16,27 +16,15 @@ export default class IndexerRPC {
     return this.core.rpc.indexLockHash(lockHash, indexFrom)
   }
 
-  public getTransactionByLockHash = async (
-    lockHash: string,
-    page: string,
-    per: string,
-    reverseOrder: boolean = false
-  ) => {
-    const result = await this.core.rpc.getTransactionsByLockHash(lockHash, page, per, reverseOrder)
-    return result
+  public getTransactionsByLockHash = async (lockHash: string, page: string, per: string, reverseOrder: boolean = false) => {
+    return await this.core.rpc.getTransactionsByLockHash(lockHash, page, per, reverseOrder)
   }
 
   public getLockHashIndexStates = async () => {
     return this.core.rpc.getLockHashIndexStates()
   }
 
-  public getLiveCellsByLockHash = async (
-    lockHash: string,
-    page: string,
-    per: string,
-    reverseOrder: boolean = false
-  ) => {
-    const result = await this.core.rpc.getLiveCellsByLockHash(lockHash, page, per, reverseOrder)
-    return result
+  public getLiveCellsByLockHash = async (lockHash: string, page: string, per: string, reverseOrder: boolean = false) => {
+    return await this.core.rpc.getLiveCellsByLockHash(lockHash, page, per, reverseOrder)
   }
 }

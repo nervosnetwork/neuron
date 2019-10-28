@@ -1,4 +1,3 @@
-// TODO: use error code
 interface SuccessFromController {
   status: 1
   result: any
@@ -12,6 +11,7 @@ interface FailureFromController {
         meta?: { [key: string]: string }
       }
 }
+
 export type ControllerResponse = SuccessFromController | FailureFromController
 
 export const RemoteNotLoadError = {
@@ -21,17 +21,9 @@ export const RemoteNotLoadError = {
   },
 }
 
-export const apiMethodWrapper = (
-  callControllerMethod: (
-    controller: any
-  ) => (
-    params: any
-  ) => Promise<{
-    status: any
-    result: any
-    message: { code?: number; content?: string; meta?: { [key: string]: string } }
-  }>
-) => async (realParams?: any): Promise<ControllerResponse> => {
+export const apiMethodWrapper = <T = any>(
+  callControllerMethod: (controller: any) => (params: T) => Promise<string>
+) => async (realParams: T): Promise<ControllerResponse> => {
   if (!window.remote) {
     return RemoteNotLoadError
   }
@@ -44,7 +36,16 @@ export const apiMethodWrapper = (
       },
     }
   }
-  const res = await callControllerMethod(controller)(realParams)
+
+  const res: SuccessFromController | FailureFromController = await callControllerMethod(controller)(realParams)
+    .then(stringifiedRes => (stringifiedRes ? JSON.parse(stringifiedRes) : stringifiedRes))
+    .catch(() => ({
+      status: 0,
+      message: {
+        content: 'Invalid response format',
+      },
+    }))
+
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
     console.group('api controller')
     console.info(JSON.stringify(res, null, 2))

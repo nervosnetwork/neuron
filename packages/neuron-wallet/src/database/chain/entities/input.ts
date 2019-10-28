@@ -2,7 +2,6 @@ import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 't
 import { OutPoint, Input as InputInterface, Script } from 'types/cell-types'
 import Transaction from './transaction'
 
-/* eslint @typescript-eslint/no-unused-vars: "warn" */
 // cellbase input may have same OutPoint
 @Entity()
 export default class Input extends BaseEntity {

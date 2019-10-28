@@ -33,16 +33,21 @@ declare namespace Controller {
   }
 
   type SetCurrentWalletParams = string
-  interface SendTransaction {
-    id: string
+
+  interface SendTransactionParams {
+    walletID: string
+    tx: string
+    password: string
+    description?: string
+  }
+
+  interface GenerateTransactionParams {
     walletID: string
     items: {
       address: string
       capacity: string
     }[]
-    password: string
-    fee: string
-    description: string
+    feeRate: string
   }
 
   interface ComputeCycles {

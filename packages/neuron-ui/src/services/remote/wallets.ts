@@ -2,9 +2,9 @@ import { apiMethodWrapper } from './apiMethodWrapper'
 
 export const updateWallet = apiMethodWrapper(api => (params: Controller.UpdateWalletParams) => api.updateWallet(params))
 
-export const getCurrentWallet = apiMethodWrapper(api => () => api.getCurrentWallet())
+export const getCurrentWallet = apiMethodWrapper<void>(api => () => api.getCurrentWallet())
 
-export const getWalletList = apiMethodWrapper(api => () => api.getAllWallets())
+export const getWalletList = apiMethodWrapper<void>(api => () => api.getAllWallets())
 
 export const createWallet = apiMethodWrapper(api => (params: Controller.CreateWalletParams) => api.createWallet(params))
 
@@ -24,7 +24,11 @@ export const setCurrentWallet = apiMethodWrapper(api => (id: Controller.SetCurre
   api.setCurrentWallet(id)
 )
 
-export const sendCapacity = apiMethodWrapper(api => (params: Controller.SendTransaction) => api.sendCapacity(params))
+export const generateTx = apiMethodWrapper(api => (params: Controller.GenerateTransactionParams) =>
+  api.generateTx(params)
+)
+
+export const sendTx = apiMethodWrapper(api => (params: Controller.SendTransactionParams) => api.sendTx(params))
 
 export const getAddressesByWalletID = apiMethodWrapper(api => (walletID: Controller.GetAddressesByWalletIDParams) =>
   api.getAddressesByWalletID(walletID)
@@ -33,8 +37,6 @@ export const getAddressesByWalletID = apiMethodWrapper(api => (walletID: Control
 export const updateAddressDescription = apiMethodWrapper(api => (params: Controller.UpdateAddressDescriptionParams) =>
   api.updateAddressDescription(params)
 )
-
-export const calculateCycles = apiMethodWrapper(api => (params: Controller.ComputeCycles) => api.computeCycles(params))
 
 export default {
   updateWallet,
@@ -45,8 +47,8 @@ export default {
   deleteWallet,
   backupWallet,
   getCurrentWallet,
-  sendCapacity,
-  calculateCycles,
+  generateTx,
+  sendTx,
   getAddressesByWalletID,
   updateAddressDescription,
 }

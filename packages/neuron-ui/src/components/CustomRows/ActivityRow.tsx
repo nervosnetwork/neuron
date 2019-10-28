@@ -34,13 +34,13 @@ const ActivityRow = (props?: ActivityRowProps) => {
   return (
     <div
       className={`${styles.activityRow} ${styles[status]}`}
-      title={`${hash}: ${description}`}
+      title={`${hash}: ${description || ''}`}
       onDoubleClick={onDoubleClick}
     >
       <div className={styles.action}>{`${typeLabel} ${shannonToCKBFormatter(value)} CKB`}</div>
       <div className={styles.status}>{statusLabel}</div>
       <div className={styles.time}>{time}</div>
-      <div className={styles.meta}>{status === 'success' ? confirmations : ''}</div>
+      <div className={styles.meta}>{confirmations}</div>
     </div>
   )
 }

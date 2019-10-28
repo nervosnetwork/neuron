@@ -77,8 +77,6 @@ export default class BlockListener {
     })
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "off" */
   public setToTip = async () => {
     const timeout = 5000
     let number: bigint = BigInt(0)

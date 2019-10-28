@@ -9,6 +9,7 @@ import CheckTx from 'services/sync/check-and-save/tx'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import { addressesUsedSubject } from './renderer-params'
+import logger from 'utils/logger'
 
 export default class GetBlocks {
   private retryTime: number
@@ -34,18 +35,24 @@ export default class GetBlocks {
   }
 
   public getTipBlockNumber = async (): Promise<string> => {
-    const tip: string = await this.core.rpc.getTipBlockNumber()
-    return tip
+    return this.core.rpc.getTipBlockNumber()
   }
 
   public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
+    const cachedPreviousTxs = new Map()
     for (const block of blocks) {
+      logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
       for (const tx of block.transactions) {
         const checkTx = new CheckTx(tx, this.url)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           for (const input of tx.inputs!) {
-            const previousTxWithStatus = await this.getTransaction(input.previousOutput!.txHash)
+            const previousTxHash = input.previousOutput!.txHash
+            let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+            if (!previousTxWithStatus) {
+              previousTxWithStatus = await this.getTransaction(previousTxHash)
+              cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+            }
             const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
             const previousOutput = previousTx.outputs![+input.previousOutput!.index]
             input.lock = previousOutput.lock
@@ -60,20 +67,19 @@ export default class GetBlocks {
         }
       }
     }
+    cachedPreviousTxs.clear()
   }
 
   public retryGetBlock = async (num: string): Promise<Block> => {
     const block: Block = await Utils.retry(this.retryTime, this.retryInterval, async () => {
-      const b: Block = await this.getBlockByNumber(num)
-      return b
+      return await this.getBlockByNumber(num)
     })
 
     return block
   }
 
   public getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
-    const tx = await this.core.rpc.getTransaction(hash)
-    return tx
+    return await this.core.rpc.getTransaction(hash)
   }
 
   public getHeader = async (hash: string): Promise<BlockHeader> => {
@@ -88,8 +94,7 @@ export default class GetBlocks {
 
   public genesisBlockHash = async (): Promise<string> => {
     const hash: string = await Utils.retry(3, 100, async () => {
-      const h: string = await this.core.rpc.getBlockHash('0x0')
-      return h
+      return await this.core.rpc.getBlockHash('0x0')
     })
 
     return hash

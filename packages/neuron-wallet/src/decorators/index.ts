@@ -1,10 +1,10 @@
-import errorDecorators from './errors'
+import mappers from './mappers'
 import validatorDecorators from './validators'
 
-export const { CatchControllerError } = errorDecorators
+export const { MapApiResponse } = mappers
 export const { Validate, Password, Required } = validatorDecorators
 
 export default {
-  ...errorDecorators,
+  ...mappers,
   ...validatorDecorators,
 }

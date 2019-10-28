@@ -13,6 +13,9 @@ import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigra
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 import { ChangeHasDataDefault1568621556467 } from './migrations/1568621556467-ChangeHasDataDefault'
 import { AddLockToInput1570522869590 } from './migrations/1570522869590-AddLockToInput'
+import { AddIndices1572006450765 } from './migrations/1572006450765-AddIndices'
+import { AddIndexToTxTimestamp1572137226866 } from './migrations/1572137226866-AddIndexToTxTimestamp'
+import { AddOutputIndex1572226722928 } from './migrations/1572226722928-AddOutputIndex'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -26,7 +29,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] =
-    process.env.SHOW_CHAIN_DB_LOG && (env.isDevMode || env.isTestMode) ? true : ['warn', 'error']
+    (env.isDevMode || env.isTestMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
     ...connectionOptions,
@@ -38,13 +41,13 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddTypeAndHasData1567144517514,
       ChangeHasDataDefault1568621556467,
       AddLockToInput1570522869590,
+      AddIndices1572006450765,
+      AddIndexToTxTimestamp1572137226866,
+      AddOutputIndex1572226722928
     ],
     logging,
+    maxQueryExecutionTime: 30
   }
-}
-
-const setBusyTimeout = async () => {
-  await getConnection().manager.query(`PRAGMA busy_timeout = 3000;`)
 }
 
 export const initConnection = async (genesisBlockHash: string) => {
@@ -58,7 +61,8 @@ export const initConnection = async (genesisBlockHash: string) => {
 
   try {
     await createConnection(connectionOptions)
-    await setBusyTimeout()
+    await getConnection().manager.query(`PRAGMA busy_timeout = 3000;`)
+    await getConnection().manager.query(`PRAGMA temp_store = MEMORY;`)
   } catch (err) {
     logger.error(err.message)
   }

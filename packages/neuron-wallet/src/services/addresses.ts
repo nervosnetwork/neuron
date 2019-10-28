@@ -95,8 +95,6 @@ export default class AddressService {
     )
   }
 
-  /* eslint no-await-in-loop: "off" */
-  /* eslint no-restricted-syntax: "off" */
   public static updateTxCountAndBalances = async (
     addresses: string[],
     url: string = NodeService.getInstance().core.rpc.node.url

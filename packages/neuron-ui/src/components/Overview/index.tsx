@@ -118,7 +118,7 @@ const Overview = ({
   const activityItems: ActivityItem[] = useMemo(
     () =>
       items.map(item => {
-        let confirmations = '(-)'
+        let confirmations = ''
         let typeLabel: string = item.type
         let { status } = item
         if (item.blockNumber !== undefined) {
@@ -147,7 +147,7 @@ const Overview = ({
           status,
           statusLabel: t(`overview.statusLabel.${status}`),
           value: item.value.replace(/^-/, ''),
-          confirmations: item.status === 'success' ? confirmations : '',
+          confirmations: ['success', 'pending'].includes(item.status) ? confirmations : '',
           typeLabel: t(`overview.${typeLabel}`),
         }
       }),

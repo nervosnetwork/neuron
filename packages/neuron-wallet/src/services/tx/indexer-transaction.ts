@@ -64,7 +64,7 @@ export default class IndexerTransaction {
       })
       .getOne()
 
-    if (output) {
+    if (output && output.status !== OutputStatus.Dead) {
       await getConnection().manager.update(
         InputEntity,
         {
@@ -83,7 +83,7 @@ export default class IndexerTransaction {
         .getRepository(TransactionEntity)
         .createQueryBuilder('tx')
         .where({
-          hash: output.outPointTxHash,
+          hash: txHash,
         })
         .getOne()
       if (tx) {
