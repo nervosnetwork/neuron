@@ -28,9 +28,16 @@ export default class CellsService {
 
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
-      .find({
-        where: queryParams,
-      })
+      .createQueryBuilder('output')
+      .select([
+        "output.lockHash",
+        "output.status",
+        "output.hasData",
+        "output.typeScript",
+        "output.capacity"
+      ])
+      .where(queryParams)
+      .getMany()
 
     const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
 

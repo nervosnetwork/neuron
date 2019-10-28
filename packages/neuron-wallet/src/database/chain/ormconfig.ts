@@ -15,6 +15,7 @@ import { ChangeHasDataDefault1568621556467 } from './migrations/1568621556467-Ch
 import { AddLockToInput1570522869590 } from './migrations/1570522869590-AddLockToInput'
 import { AddIndices1572006450765 } from './migrations/1572006450765-AddIndices'
 import { AddIndexToTxTimestamp1572137226866 } from './migrations/1572137226866-AddIndexToTxTimestamp'
+import { AddOutputIndex1572226722928 } from './migrations/1572226722928-AddOutputIndex'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -41,7 +42,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       ChangeHasDataDefault1568621556467,
       AddLockToInput1570522869590,
       AddIndices1572006450765,
-      AddIndexToTxTimestamp1572137226866
+      AddIndexToTxTimestamp1572137226866,
+      AddOutputIndex1572226722928
     ],
     logging,
     maxQueryExecutionTime: 30
