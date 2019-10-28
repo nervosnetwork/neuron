@@ -199,13 +199,15 @@ export default class IndexerQueue {
           // tx timestamp / blockNumber / blockHash
           let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
           if (!txEntity || !txEntity.blockHash) {
-            for (const input of transaction.inputs!) {
-              const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
-              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
-              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-              input.lock = previousOutput.lock
-              input.lockHash = LockUtils.lockScriptToHash(input.lock)
-              input.capacity = previousOutput.capacity
+            if (!txEntity) {
+              for (const input of transaction.inputs!) {
+                const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
+                const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+                const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+                input.lock = previousOutput.lock
+                input.lockHash = LockUtils.lockScriptToHash(input.lock)
+                input.capacity = previousOutput.capacity
+              }
             }
             const { blockHash } = transactionWithStatus.txStatus
             if (blockHash) {

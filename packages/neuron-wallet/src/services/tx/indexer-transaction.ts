@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm'
+import { getConnection, Not } from 'typeorm'
 import TransactionEntity from 'database/chain/entities/transaction'
 import Utils from 'services/sync/utils'
 import InputEntity from 'database/chain/entities/input'
@@ -61,10 +61,11 @@ export default class IndexerTransaction {
       .where({
         outPointTxHash: txHash,
         outPointIndex: index,
+        status: Not(OutputStatus.Dead)
       })
       .getOne()
 
-    if (output && output.status !== OutputStatus.Dead) {
+    if (output) {
       await getConnection().manager.update(
         InputEntity,
         {

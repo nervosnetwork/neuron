@@ -1,5 +1,5 @@
-import { getConnection, QueryRunner } from 'typeorm';
-import { OutPoint, Transaction, TransactionWithoutHash, Input, TransactionStatus } from 'types/cell-types'
+import { getConnection, QueryRunner, Not} from 'typeorm'
+import { OutPoint, Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
@@ -30,7 +30,7 @@ export class TransactionPersistor {
     const connection = getConnection()
     const txEntity: TransactionEntity | undefined = await connection
       .getRepository(TransactionEntity)
-      .findOne(transaction.hash, { relations: ['inputs', 'outputs'] })
+      .findOne(transaction.hash)
 
     // return if success
     if (txEntity && txEntity.status === TransactionStatus.Success) {
@@ -38,10 +38,27 @@ export class TransactionPersistor {
     }
 
     if (txEntity) {
+      // lazy load inputs / outputs
+      const inputEntities = await connection
+        .getRepository(InputEntity)
+        .createQueryBuilder('input')
+        .where({
+          transaction: txEntity,
+        })
+        .getMany()
+
+      const outputEntities = await connection
+        .getRepository(OutputEntity)
+        .createQueryBuilder('output')
+        .where({
+          transaction: txEntity,
+        })
+        .getMany()
+
       // input -> previousOutput => dead
       // output => live
       const outputs: OutputEntity[] = await Promise.all(
-        txEntity.outputs.map(async o => {
+        outputEntities.map(async o => {
           const output = o
           output.status = OutputStatus.Live
           return output
@@ -49,18 +66,20 @@ export class TransactionPersistor {
       )
 
       const previousOutputsWithUndefined: Array<OutputEntity | undefined> = await Promise.all(
-        txEntity.inputs.map(async input => {
+        inputEntities.map(async input => {
           const outPoint: OutPoint | null = input.previousOutput()
 
           if (outPoint) {
             const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
               outPointTxHash: outPoint.txHash,
               outPointIndex: outPoint.index,
+              status: Not(OutputStatus.Dead),
             })
             if (outputEntity) {
               outputEntity.status = OutputStatus.Dead
+              // only need to update when outputEntity status changed
+              return outputEntity
             }
-            return outputEntity
           }
           return undefined
         })
@@ -122,6 +141,7 @@ export class TransactionPersistor {
         const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
           outPointTxHash: outPoint.txHash,
           outPointIndex: outPoint.index,
+          status: Not(inputStatus),
         })
 
         if (previousOutput) {
@@ -133,28 +153,26 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
-    const outputs: OutputEntity[] = await Promise.all(
-      transaction.outputs!.map(async (o, index) => {
-        const output = new OutputEntity()
-        output.outPointTxHash = transaction.hash
-        output.outPointIndex = index.toString()
-        output.capacity = o.capacity
-        output.lock = o.lock
-        output.lockHash = o.lockHash!
-        output.transaction = tx
-        output.status = outputStatus
-        if (o.type) {
-          output.typeScript = o.type
-        }
-        const data = outputsData[index]
-        if (data && data !== '0x') {
-          output.hasData = true
-        } else {
-          output.hasData = false
-        }
-        return output
-      })
-    )
+    const outputs: OutputEntity[] = transaction.outputs!.map((o, index) => {
+      const output = new OutputEntity()
+      output.outPointTxHash = transaction.hash
+      output.outPointIndex = index.toString()
+      output.capacity = o.capacity
+      output.lock = o.lock
+      output.lockHash = o.lockHash!
+      output.transaction = tx
+      output.status = outputStatus
+      if (o.type) {
+        output.typeScript = o.type
+      }
+      const data = outputsData[index]
+      if (data && data !== '0x') {
+        output.hasData = true
+      } else {
+        output.hasData = false
+      }
+      return output
+    })
 
     const sliceSize = 100
     const queryRunner = connection.createQueryRunner()
@@ -218,30 +236,12 @@ export class TransactionPersistor {
     const tx: Transaction = transaction
     tx.outputs = tx.outputs!.map(o => {
       const output = o
-      output.lockHash = LockUtils.lockScriptToHash(output.lock!)
+      if (!output.lockHash) {
+        output.lockHash = LockUtils.lockScriptToHash(output.lock!)
+      }
       return output
     })
 
-    tx.inputs = await Promise.all(
-      tx.inputs!.map(async i => {
-        const input: Input = i
-        const outPoint = i.previousOutput
-
-        if (outPoint) {
-          const outputEntity: OutputEntity | undefined = await getConnection()
-            .getRepository(OutputEntity)
-            .findOne({
-              outPointTxHash: outPoint.txHash,
-              outPointIndex: outPoint.index,
-            })
-          if (outputEntity) {
-            input.capacity = outputEntity.capacity
-            input.lockHash = outputEntity.lockHash
-          }
-        }
-        return input
-      })
-    )
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
       txEntity = await TransactionPersistor.saveWithSent(tx)
