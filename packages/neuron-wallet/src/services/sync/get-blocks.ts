@@ -9,6 +9,7 @@ import CheckTx from 'services/sync/check-and-save/tx'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import { addressesUsedSubject } from './renderer-params'
+import logger from 'utils/logger'
 
 export default class GetBlocks {
   private retryTime: number
@@ -34,18 +35,24 @@ export default class GetBlocks {
   }
 
   public getTipBlockNumber = async (): Promise<string> => {
-    const tip: string = await this.core.rpc.getTipBlockNumber()
-    return tip
+    return this.core.rpc.getTipBlockNumber()
   }
 
   public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
+    const cachedPreviousTxs = new Map()
     for (const block of blocks) {
+      logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
       for (const tx of block.transactions) {
         const checkTx = new CheckTx(tx, this.url)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           for (const input of tx.inputs!) {
-            const previousTxWithStatus = await this.getTransaction(input.previousOutput!.txHash)
+            const previousTxHash = input.previousOutput!.txHash
+            let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+            if (!previousTxWithStatus) {
+              previousTxWithStatus = await this.getTransaction(previousTxHash)
+              cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+            }
             const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
             const previousOutput = previousTx.outputs![+input.previousOutput!.index]
             input.lock = previousOutput.lock
@@ -60,6 +67,7 @@ export default class GetBlocks {
         }
       }
     }
+    cachedPreviousTxs.clear()
   }
 
   public retryGetBlock = async (num: string): Promise<Block> => {
