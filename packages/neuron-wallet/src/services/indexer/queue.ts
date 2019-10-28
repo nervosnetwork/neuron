@@ -166,6 +166,8 @@ export default class IndexerQueue {
       if (txs.length < this.per) {
         stopped = true
       }
+      logger.debug(`indexer txs for: ${type} ${lockHash}, page: ${page}, tx count: ${txs.length}`)
+
       for (const tx of txs) {
         let txPoint: CKBComponents.TransactionPoint | null = null
         if (type === TxPointType.CreatedBy) {
@@ -193,8 +195,6 @@ export default class IndexerQueue {
             })
             continue
           }
-
-          logger.debug('indexer fetched tx:', type, txPoint.txHash)
 
           // tx timestamp / blockNumber / blockHash
           let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)

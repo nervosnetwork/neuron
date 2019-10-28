@@ -262,11 +262,8 @@ export class TransactionPersistor {
   }
 
   public static get = async (txHash: string) => {
-    const txEntity: TransactionEntity | undefined = await getConnection()
-      .getRepository(TransactionEntity)
-      .findOne(txHash, { relations: ['inputs', 'outputs'] })
-
-    return txEntity
+    return await getConnection().getRepository(TransactionEntity)
+      .findOne(txHash, { relations: ['inputs'] })
   }
 
   public static saveSentTx = async (
