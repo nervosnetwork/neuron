@@ -1,3 +1,25 @@
+## [0.23.1](https://github.com/nervosnetwork/neuron/compare/v0.23.0...v0.23.1) (2019-10-28)
+
+
+### Bug Fixes
+
+* break => continue ([05ae69e](https://github.com/nervosnetwork/neuron/commit/05ae69e))
+* return => break ([97b8ea4](https://github.com/nervosnetwork/neuron/commit/97b8ea4))
+
+
+### Features
+
+* Add a few db indices ([83dffb5](https://github.com/nervosnetwork/neuron/commit/83dffb5))
+* display disconnection errors and dismiss them on getting connec… ([#1019](https://github.com/nervosnetwork/neuron/issues/1019)) ([e866c66](https://github.com/nervosnetwork/neuron/commit/e866c66))
+* Optimize output db query ([6e36550](https://github.com/nervosnetwork/neuron/commit/6e36550))
+* stringify the result from api controller ([1f4d4ea](https://github.com/nervosnetwork/neuron/commit/1f4d4ea))
+* **neuron-ui:** add a tooltip to display synchronized block number and the tip block number ([9e52fef](https://github.com/nervosnetwork/neuron/commit/9e52fef))
+* **neuron-ui:** display confirmations of pending transactions in the recent activity list ([9aebede](https://github.com/nervosnetwork/neuron/commit/9aebede))
+* **neuron-ui:** update history list to make it more compact ([35d8b87](https://github.com/nervosnetwork/neuron/commit/35d8b87))
+* **neuron-ui:** update the Send View according to the new transaction fee model. ([dc415f3](https://github.com/nervosnetwork/neuron/commit/dc415f3))
+
+
+
 # [0.23.0](https://github.com/nervosnetwork/neuron/compare/v0.22.2...v0.23.0) (2019-10-23)
 
 
