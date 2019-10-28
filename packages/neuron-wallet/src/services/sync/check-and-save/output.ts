@@ -18,7 +18,7 @@ export default class CheckOutput {
     return this.output
   }
 
-  public checkLockHash = async (lockHashList: string[]): Promise<boolean | undefined> => {
+  public checkLockHash = (lockHashList: string[]): boolean => {
     return lockHashList.includes(this.output.lockHash!)
   }
 }
