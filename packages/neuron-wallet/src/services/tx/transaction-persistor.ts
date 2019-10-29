@@ -1,4 +1,4 @@
-import { getConnection, QueryRunner, Not} from 'typeorm'
+import { getConnection, QueryRunner } from 'typeorm'
 import { OutPoint, Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
@@ -73,9 +73,8 @@ export class TransactionPersistor {
             const outputEntity: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
               outPointTxHash: outPoint.txHash,
               outPointIndex: outPoint.index,
-              status: Not(OutputStatus.Dead),
             })
-            if (outputEntity) {
+            if (outputEntity && outputEntity.status !== OutputStatus.Dead) {
               outputEntity.status = OutputStatus.Dead
               // only need to update when outputEntity status changed
               return outputEntity
@@ -141,10 +140,9 @@ export class TransactionPersistor {
         const previousOutput: OutputEntity | undefined = await connection.getRepository(OutputEntity).findOne({
           outPointTxHash: outPoint.txHash,
           outPointIndex: outPoint.index,
-          status: Not(inputStatus),
         })
 
-        if (previousOutput) {
+        if (previousOutput && previousOutput.status !== inputStatus) {
           // update previousOutput status here
           previousOutput.status = inputStatus
           previousOutputs.push(previousOutput)
