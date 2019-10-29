@@ -1,4 +1,5 @@
 import HexUtils from 'utils/hex';
+import { TransactionWithStatus } from './cell-types';
 import {
   Block,
   BlockHeader,
@@ -49,6 +50,16 @@ export default class TypeConvert {
       tx.blockHash = blockHeader.hash
     }
     return tx
+  }
+
+  static toTransactionWithStatus(transactionWithStatus: CKBComponents.TransactionWithStatus): TransactionWithStatus {
+    return {
+      transaction: TypeConvert.toTransaction(transactionWithStatus.transaction),
+      txStatus: {
+        blockHash: transactionWithStatus.txStatus.blockHash,
+        status: transactionWithStatus.txStatus.status,
+      }
+    }
   }
 
   static toCellDep(cellDep: CKBComponents.CellDep): CellDep {
