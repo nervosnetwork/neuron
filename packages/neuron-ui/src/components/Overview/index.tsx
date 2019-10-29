@@ -123,7 +123,9 @@ const Overview = ({
         let { status } = item
         if (item.blockNumber !== undefined) {
           const confirmationCount =
-            item.blockNumber === undefined ? 0 : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+            item.blockNumber === null || item.status === 'failed'
+              ? 0
+              : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
           if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
             status = 'pending'
@@ -147,7 +149,7 @@ const Overview = ({
           status,
           statusLabel: t(`overview.statusLabel.${status}`),
           value: item.value.replace(/^-/, ''),
-          confirmations: ['success', 'pending'].includes(item.status) ? confirmations : '',
+          confirmations,
           typeLabel: t(`overview.${typeLabel}`),
         }
       }),
