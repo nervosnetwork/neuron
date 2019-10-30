@@ -255,7 +255,7 @@ const TransactionList = ({
       enableShimmer={isLoading}
       columns={transactionColumns}
       items={txs}
-      groups={groups}
+      groups={groups.filter(group => group.count !== 0)}
       groupProps={{
         collapseAllVisibility: CollapseAllVisibility.hidden,
         onRenderHeader: GroupHeader,
