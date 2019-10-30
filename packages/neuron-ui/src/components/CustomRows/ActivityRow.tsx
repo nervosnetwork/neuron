@@ -34,7 +34,7 @@ const ActivityRow = (props?: ActivityRowProps) => {
   return (
     <div
       className={`${styles.activityRow} ${styles[status]}`}
-      title={`${hash}: ${description || ''}`}
+      title={`${hash}${description ? `: ${description}` : ''}`}
       onDoubleClick={onDoubleClick}
     >
       <div className={styles.action}>{`${typeLabel} ${shannonToCKBFormatter(value)} CKB`}</div>
