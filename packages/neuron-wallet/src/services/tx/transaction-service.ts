@@ -81,7 +81,7 @@ export class TransactionsService {
       return [
         `${
           base[0]
-        } AND (CAST("tx"."timestamp") AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp") AS UNSIGNED BIG INT) < :endTimestamp)`,
+        } AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
         {
           lockHashes: params.lockHashes,
           beginTimestamp,
