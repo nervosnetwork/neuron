@@ -232,7 +232,7 @@ const Send = ({
           <PrimaryButton
             type="submit"
             onClick={onSubmit(walletID)}
-            disabled={sending || !isTransactionValid || !isAffordable}
+            disabled={sending || !isTransactionValid || !isAffordable || !send.generatedTx}
             text={t('send.send')}
           />
         )}
