@@ -168,6 +168,7 @@ const clear = (dispatch: StateDispatch) => {
 const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch), [dispatch])
 
 export const useInitialize = (
+  walletID: string,
   items: TransactionOutput[],
   generatedTx: any | null,
   dispatch: React.Dispatch<any>,
@@ -186,6 +187,10 @@ export const useInitialize = (
   const onDescriptionChange = useSendDescriptionChange(dispatch)
   const onSubmit = useOnSubmit(items, dispatch)
   const onClear = useClear(dispatch)
+
+  useEffect(() => {
+    clear(dispatch)
+  }, [walletID, dispatch])
 
   const onGetAddressErrorMessage = useCallback(
     (addr: string) => {

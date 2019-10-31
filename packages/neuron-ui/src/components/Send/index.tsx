@@ -57,7 +57,7 @@ const Send = ({
     onGetAddressErrorMessage,
     onGetAmountErrorMessage,
     onClear,
-  } = useInitialize(send.outputs, send.generatedTx, dispatch, t)
+  } = useInitialize(walletID, send.outputs, send.generatedTx, dispatch, t)
   useOnTransactionChange(walletID, send.outputs, send.price, dispatch, setIsTransactionValid, setTotalAmount)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
