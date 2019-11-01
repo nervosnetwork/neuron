@@ -15,6 +15,7 @@ import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
 import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
+import IndexerProgress from 'services/indexer/progress'
 
 export interface LockHashInfo {
   lockHash: string
@@ -92,11 +93,17 @@ export default class IndexerQueue {
           }
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
-          for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber)
+          // for (const lockHash of lockHashes) {
+          //   await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber)
+          // }
+          for (let i = 0; i < lockHashes.length; ++i) {
+            await this.pipeline(lockHashes[i], TxPointType.CreatedBy, currentBlockNumber, i)
           }
-          for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.ConsumedBy, currentBlockNumber)
+          // for (const lockHash of lockHashes) {
+          //   await this.pipeline(lockHash, TxPointType.ConsumedBy, currentBlockNumber)
+          // }
+          for (let i = 0; i < lockHashes.length; ++i) {
+            await this.pipeline(lockHashes[i], TxPointType.ConsumedBy, currentBlockNumber, i)
           }
           if (minBlockNumber) {
             await this.blockNumberService.updateCurrent(minBlockNumber)
@@ -171,7 +178,7 @@ export default class IndexerQueue {
   }
 
   // type: 'createdBy' | 'consumedBy'
-  public pipeline = async (lockHash: string, type: TxPointType, startBlockNumber: bigint) => {
+  public pipeline = async (lockHash: string, type: TxPointType, startBlockNumber: bigint, index: number) => {
     let page = 0
     let stopped = false
     while (!stopped) {
@@ -252,6 +259,20 @@ export default class IndexerQueue {
           }
         }
       }
+      let lastBlockNumber: bigint
+      const totalCount = this.lockHashInfos.length
+      let base = 0
+      if (type === TxPointType.ConsumedBy) {
+        base = 0.5
+        lastBlockNumber = BigInt(txs[txs.length - 1].consumedBy!.blockNumber)
+      } else {
+        lastBlockNumber = BigInt(txs[txs.length - 1].createdBy.blockNumber)
+      }
+      const result = ((index * parseInt(this.tipBlockNumber.toString()) + parseInt(lastBlockNumber.toString())) /
+                       (totalCount * 2 * parseInt(this.tipBlockNumber.toString()))) + base
+      // TODO: the second time will restart from 0 to 1, how to avoid this ?
+      const r = result.toFixed(4)
+      await (new IndexerProgress()).update(r)
       page += 1
     }
   }

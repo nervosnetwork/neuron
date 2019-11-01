@@ -21,6 +21,13 @@ export default class IndexerProgress {
     return indexerProgressEntity.value
   }
 
+  public update = async (current: string): Promise<void> => {
+    const oldCurrent = await this.getCurrent()
+    if (current !== oldCurrent) {
+      await this.updateCurrent(current)
+    }
+  }
+
   public updateCurrent = async (current: string): Promise<void> => {
     let indexerProgressEntity = await this.indexerProgress()
 
