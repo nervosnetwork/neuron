@@ -22,4 +22,11 @@ export default class ChainInfo {
   public isMainnet = (): boolean => {
     return this.chain === 'ckb'
   }
+
+  public explorerUrl = (): string => {
+    if (this.isMainnet()) {
+      return "https://explorer.nervos.org"
+    }
+    return "https://explorer.nervos.org" // TODO: change this to proper testnet explorer URL
+  }
 }
