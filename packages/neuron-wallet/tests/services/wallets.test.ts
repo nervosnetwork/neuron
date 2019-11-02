@@ -177,7 +177,7 @@ describe('sign witness', () => {
   const witness: string = ''
   const privateKey: string = '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
   const txHash = '0x00f5f31941964004d665a8762df8eb4fab53b5ef8437b7d34a38e018b1409054'
-  const expectedData = '0x99b79ff84dc39de16ec7ed2e9a2836a2560b95a71041ad3a6c00b2d31844db4c26b760918bbe08747ead167cccb35b1b9ba4db42896c19e412b885cd6589d41a00'
+  const expectedData = '0x5500000010000000550000005500000041000000aa6de884b0dd0378383cedddc39790b5cad66e42d5dc7655de728ee7eb3a53be071605d76641ad26766c6ed4864e67dbc2cd1526e006c9be7ccfa9b8cbf9e7c701'
 
   it('success', () => {
     const wallet = new WalletService()
