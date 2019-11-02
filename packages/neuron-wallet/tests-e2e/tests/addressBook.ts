@@ -2,12 +2,11 @@ import Application from '../application'
 import { createWallet } from '../operations'
 
 /**
- * 1. toggle address book on
- * 2. navigate to the address book
- * 3. verify the count of receiving/changing addresses
- * 4. verify default data of the first address
- * 5. update description of the first address
- * 6. refresh the view and verify the description
+ * 1. navigate to the address book
+ * 2. verify the count of receiving/changing addresses
+ * 3. verify default data of the first address
+ * 4. update description of the first address
+ * 5. refresh the view and verify the description
  */
 export default (app: Application) => {
   beforeAll(async () => {
@@ -19,19 +18,6 @@ export default (app: Application) => {
     await client.elementIdClick(createWalletButton!.ELEMENT)
     await createWallet(app)
     await app.waitUntilLoaded()
-  })
-
-  app.test('Toggle address book on', async () => {
-    const { client } = app.spectron
-    let addressTab = await client.$('button[name=Addresses]')
-    expect(addressTab.state).toBe('failure')
-    app.clickMenu(['View', 'Address Book'])
-    await app.waitUntilLoaded()
-    addressTab = await client.$('button[name=Addresses]')
-    expect(addressTab.state).not.toBe('failure')
-    client.click('button[name=Addresses]')
-    await app.waitUntilLoaded()
-    await app.wait(1000)
   })
 
   app.test('Address book should have 20 receiving addresses and 10 change addresses', async () => {

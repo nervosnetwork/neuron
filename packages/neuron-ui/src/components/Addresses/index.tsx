@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -18,7 +18,6 @@ import { ckbCore } from 'services/chain'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
-import { Routes } from 'utils/const'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { onRenderRow } from 'utils/fabricUIRender'
 
@@ -28,22 +27,13 @@ const Addresses = ({
   },
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
-  settings: {
-    general: { showAddressBook = false },
-    networks = [],
-  },
-  history,
+  settings: { networks = [] },
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const isMainnet =
     (networks.find(n => n.id === networkID) || {}).chain === (process.env.REACT_APP_MAINNET_TAG || 'ckb')
   const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
-  useEffect(() => {
-    if (!showAddressBook) {
-      history.push(Routes.Overview)
-    }
-  }, [showAddressBook, history])
 
   const {
     localDescription,

@@ -7,7 +7,7 @@ interface NeuronWalletSubject<T = any> {
 }
 
 declare namespace Command {
-  type Type = 'nav' | 'toggle-address-book' | 'delete-wallet' | 'backup-wallet'
+  type Type = 'nav' | 'delete-wallet' | 'backup-wallet'
   type Payload = string | null
 }
 

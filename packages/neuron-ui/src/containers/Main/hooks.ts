@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
-  toggleAddressBook,
   updateTransactionList,
   updateCurrentWallet,
   updateWalletList,
@@ -212,10 +211,6 @@ export const useSubscription = ({
         switch (type) {
           case 'nav': {
             history.push(payload)
-            break
-          }
-          case 'toggle-address-book': {
-            dispatch(toggleAddressBook())
             break
           }
           case 'delete-wallet': {

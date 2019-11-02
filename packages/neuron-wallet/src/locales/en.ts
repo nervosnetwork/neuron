@@ -30,11 +30,6 @@ export default {
         paste: 'Paste',
         selectall: 'Select All',
       },
-      view: {
-        label: 'View',
-        fullscreen: 'Enter Full Screen',
-        'address-book': 'Address Book',
-      },
       window: {
         label: 'Window',
         minimize: 'Minimize',
