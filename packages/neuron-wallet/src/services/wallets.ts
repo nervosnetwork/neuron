@@ -489,10 +489,15 @@ export default class WalletService {
   }
 
   public signWitness = (witness: string, privateKey: string, txHash: string): string => {
+    const witnessArg: CKBComponents.WitnessArgs = {
+      lock: witness,
+      inputType: undefined,
+      outputType: undefined,
+    }
     return core.signWitnesses(privateKey)({
       transactionHash: txHash,
-      witnesses: [witness]
-    })[0]
+      witnesses: [witnessArg]
+    })[0] as string
   }
 
   // Derivate all child private keys for specified BIP44 paths.
