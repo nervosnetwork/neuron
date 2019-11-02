@@ -30,11 +30,6 @@ export default {
         paste: '粘贴',
         selectall: '全部选中',
       },
-      view: {
-        label: '视图',
-        fullscreen: '进入全屏模式',
-        'address-book': '地址簿',
-      },
       window: {
         label: '窗口',
         minimize: '最小化',

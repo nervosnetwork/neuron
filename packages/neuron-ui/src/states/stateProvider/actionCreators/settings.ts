@@ -1,18 +1,9 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
-import { addressBook } from 'services/localCache'
 import { Routes } from 'utils/const'
 import { failureResToNotification } from 'utils/formatters'
 import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
-
-export const toggleAddressBook = () => {
-  addressBook.toggleVisibility()
-  return {
-    type: AppActions.ToggleAddressBookVisibility,
-    payload: null,
-  }
-}
 
 export const createNetwork = (params: Controller.CreateNetworkParams) => (dispatch: StateDispatch, history: any) => {
   dispatch({
@@ -67,7 +58,6 @@ export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispat
 }
 
 export default {
-  toggleAddressBook,
   createNetwork,
   updateNetwork,
 }

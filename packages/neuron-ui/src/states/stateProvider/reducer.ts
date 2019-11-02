@@ -22,7 +22,6 @@ export enum NeuronWalletActions {
   UpdateSkipDataAndType = 'updateSkipDataAndType',
 }
 export enum AppActions {
-  ToggleAddressBookVisibility = 'toggleAddressBookVisibility',
   UpdateTransactionID = 'updateTransactionID',
   AddSendOutput = 'addSendOutput',
   RemoveSendOutput = 'removeSendOutput',
@@ -100,18 +99,6 @@ export const reducer = (
           },
           networks,
           wallets,
-        },
-      }
-    }
-    case AppActions.ToggleAddressBookVisibility: {
-      return {
-        ...state,
-        settings: {
-          ...settings,
-          general: {
-            ...settings.general,
-            showAddressBook: !settings.general.showAddressBook,
-          },
         },
       }
     }
