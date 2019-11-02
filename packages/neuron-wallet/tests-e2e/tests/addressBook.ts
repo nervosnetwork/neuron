@@ -20,6 +20,13 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
   })
 
+  app.test('Go to addresses tab', async () => {
+    const { client } = app.spectron
+    client.click('button[name=Addresses]')
+    await app.waitUntilLoaded()
+    await app.wait(1000)
+  })
+
   app.test('Address book should have 20 receiving addresses and 10 change addresses', async () => {
     const { client } = app.spectron
     const countOfReceivingAddresses = await client

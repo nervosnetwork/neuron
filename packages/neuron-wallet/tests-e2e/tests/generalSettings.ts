@@ -15,22 +15,21 @@ export default (app: Application) => {
   describe('Test general settings', () => {
     app.test('Check the initialized statuses', async () => {
       const { client } = app.spectron
-      const toggles = client.$$('button[role=switch]')
-      expect(toggles).toHaveLength(1)
-      expect((await client.elementIdAttribute(toggles[1].value.ELEMENT, 'aria-checked')).value).toBe('true')
+      const toggles = await client.$$('button[role=switch]')
+      expect((await client.elementIdAttribute(toggles[0].value.ELEMENT, 'aria-checked')).value).toBe('true')
     })
 
     app.test('toggle SkipDataAndType to false', async () => {
       const { client } = app.spectron
       await app.waitUntilLoaded()
-      const toggles = client.$$('button[role=switch]')
+      const toggles = await client.$$('button[role=switch]')
 
       toggles.forEach((_, idx) => {
         client.elementIdClick(toggles[idx].value.ELEMENT)
       })
 
       await app.waitUntilLoaded()
-      expect((await client.elementIdAttribute(toggles[1].value.ELEMENT, 'aria-checked')).value).toBe('false')
+      expect((await client.elementIdAttribute(toggles[0].value.ELEMENT, 'aria-checked')).value).toBe('false')
     })
 
     test.skip('Toggle statuses should be preserved', async () => {})
