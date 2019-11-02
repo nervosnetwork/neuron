@@ -69,22 +69,6 @@ export default class ApiController {
       }),
     ])
 
-    const minerAddresses = await Promise.all(
-      wallets.map(({ id }) =>
-        WalletsController.getAllAddresses(id).then(addrRes => {
-          if (addrRes.result) {
-            const minerAddr = addrRes.result.find(addr => addr.type === 0 && addr.index === 0)
-            if (minerAddr) {
-              return {
-                address: minerAddr.address,
-                identifier: minerAddr.identifier,
-              }
-            }
-          }
-          return undefined
-        }),
-      ),
-    )
     const addresses: Controller.Address[] = await (currentWallet
       ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
       : [])
@@ -102,7 +86,7 @@ export default class ApiController {
 
     const initState = {
       currentWallet,
-      wallets: [...wallets.map(({ name, id }, idx: number) => ({ id, name, minerAddress: minerAddresses[idx] }))],
+      wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
       currentNetworkID,
       networks,
       addresses,
