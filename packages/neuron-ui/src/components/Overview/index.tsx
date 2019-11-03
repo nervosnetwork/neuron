@@ -129,19 +129,21 @@ const Overview = ({
 
           if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
             status = 'pending'
+
+            if (confirmationCount === 1) {
+              confirmations = t('overview.confirmation', {
+                confirmationCount: localNumberFormatter(confirmationCount),
+                threshold: CONFIRMATION_THRESHOLD,
+              })
+            } else if (confirmationCount > 1) {
+              confirmations = `${t('overview.confirmations', {
+                confirmationCount: localNumberFormatter(confirmationCount),
+                threshold: CONFIRMATION_THRESHOLD,
+              })}`
+            }
           }
 
           typeLabel = genTypeLabel(item.type, confirmationCount, status)
-
-          if (confirmationCount === 1) {
-            confirmations = t('overview.confirmation', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })
-          } else if (confirmationCount > 1) {
-            confirmations = `${t('overview.confirmations', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })}`
-          }
         }
 
         return {
