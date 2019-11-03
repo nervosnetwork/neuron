@@ -26,8 +26,8 @@
       "epoch": "Epoch",
       "difficulty": "Difficulty",
       "address": "Address",
-      "confirmation": "{{confirmationCount}} Confirmation",
-      "confirmations": "{{confirmationCount}} Confirmations",
+      "confirmation": "{{confirmationCount}}/{{threshold}} Confirmation",
+      "confirmations": "{{confirmationCount}}/{{threshold}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
@@ -137,7 +137,7 @@
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
       "confirmations": "Confirmations",
-      "confirming-with-count": "{{confirmations}} confirmations"
+      "confirming-with-count": "{{confirmations}} Confirmations"
     },
     "transaction": {
       "date": "Date",
