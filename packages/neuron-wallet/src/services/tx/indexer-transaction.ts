@@ -89,8 +89,10 @@ export default class IndexerTransaction {
       if (tx) {
         tx.emitUpdate()
       }
+
+      return output
     }
 
-    return output
+    return undefined
   }
 }

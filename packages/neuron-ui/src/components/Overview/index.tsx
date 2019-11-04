@@ -123,23 +123,27 @@ const Overview = ({
         let { status } = item
         if (item.blockNumber !== undefined) {
           const confirmationCount =
-            item.blockNumber === undefined ? 0 : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+            item.blockNumber === null || item.status === 'failed'
+              ? 0
+              : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
           if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
             status = 'pending'
+
+            if (confirmationCount === 1) {
+              confirmations = t('overview.confirmation', {
+                confirmationCount: localNumberFormatter(confirmationCount),
+                threshold: CONFIRMATION_THRESHOLD,
+              })
+            } else if (confirmationCount > 1) {
+              confirmations = `${t('overview.confirmations', {
+                confirmationCount: localNumberFormatter(confirmationCount),
+                threshold: CONFIRMATION_THRESHOLD,
+              })}`
+            }
           }
 
           typeLabel = genTypeLabel(item.type, confirmationCount, status)
-
-          if (confirmationCount === 1) {
-            confirmations = t('overview.confirmation', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })
-          } else if (confirmationCount > 1) {
-            confirmations = `${t('overview.confirmations', {
-              confirmationCount: localNumberFormatter(confirmationCount),
-            })}`
-          }
         }
 
         return {
@@ -147,7 +151,7 @@ const Overview = ({
           status,
           statusLabel: t(`overview.statusLabel.${status}`),
           value: item.value.replace(/^-/, ''),
-          confirmations: ['success', 'pending'].includes(item.status) ? confirmations : '',
+          confirmations,
           typeLabel: t(`overview.${typeLabel}`),
         }
       }),

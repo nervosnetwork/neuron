@@ -57,6 +57,16 @@ export interface Transaction extends TransactionWithoutHash {
   hash: string
 }
 
+export interface TxStatus {
+  blockHash: string | null
+  status: 'pending' | 'proposed' | 'committed'
+}
+
+export interface TransactionWithStatus {
+  transaction: Transaction
+  txStatus: TxStatus
+}
+
 export interface Input {
   previousOutput: OutPoint | null
   since?: string

@@ -25,13 +25,9 @@
       "tip-block-number": "区块高度",
       "epoch": "Epoch",
       "difficulty": "难度",
-      "miner-info": "挖矿信息",
-      "lock-arg": "Lock Arg",
       "address": "地址",
-      "code-hash": "Code Hash",
-      "copy-pubkey-hash": "复制 Lock Arg (Pubkey Hash)",
-      "confirmation": "{{confirmationCount}} 个确认",
-      "confirmations": "{{confirmationCount}} 个确认",
+      "confirmation": "{{confirmationCount}}/{{threshold}} 个确认",
+      "confirmations": "{{confirmationCount}}{{threshold}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
@@ -180,7 +176,6 @@
         "network": "网络"
       },
       "general": {
-        "display-address-book-in-the-navbar": "显示地址簿",
         "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cells",
         "show": "显示",
         "hide": "隐藏"
@@ -260,7 +255,6 @@
       "update-network-successfully": "已更新节点信息",
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
-      "lock-arg-copied": "已复制 Lock Arg 到剪贴板",
       "fields": {
         "wallet": "钱包",
         "name": "名称",

@@ -2,7 +2,7 @@ import React, { useCallback, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, getTheme, Text, ProgressIndicator, Icon } from 'office-ui-fabric-react'
+import { Stack, getTheme, Text, ProgressIndicator, Icon, TooltipHost } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { ConnectionStatus, FULL_SCREENS, Routes } from 'utils/const'
@@ -33,20 +33,19 @@ export const SyncStatus = ({
 
   const percentage = +syncedBlockNumber / +tipBlockNumber
 
-  return (
-    <div style={{ display: 'flex', alignItems: 'center' }} title={`${syncedBlockNumber} / ${tipBlockNumber}`}>
-      {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
-        <>
-          {t('sync.syncing')}
-          <ProgressIndicator
-            percentComplete={percentage}
-            styles={{ root: { width: '120px', marginLeft: '5px', marginRight: '5px' } }}
-          />
-        </>
-      ) : (
-        <>{t('sync.synced')}</>
-      )}
-    </div>
+  return +syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
+    <TooltipHost
+      content={`${syncedBlockNumber} / ${tipBlockNumber}`}
+      styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center' } }}
+    >
+      {t('sync.syncing')}
+      <ProgressIndicator
+        percentComplete={percentage}
+        styles={{ root: { width: '120px', marginLeft: '5px', marginRight: '5px' } }}
+      />
+    </TooltipHost>
+  ) : (
+    <>{t('sync.synced')}</>
   )
 }
 

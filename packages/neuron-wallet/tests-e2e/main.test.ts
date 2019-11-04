@@ -32,7 +32,7 @@ describe('Test transaction in neuron', () => {
   tests.SendTransaction(app)
 })
 
-describe('Test notification', () => {
+describe.skip('Test notification', () => {
   let app = new Application()
   beforeAll(() => app.start())
   afterAll(() => app.stop())

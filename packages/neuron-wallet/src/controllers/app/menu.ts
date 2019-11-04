@@ -6,6 +6,7 @@ import { UpdateController } from 'controllers'
 import { showWindow } from './show-window'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
+import ChainInfo from 'models/chain-info'
 import CommandSubject from 'models/subjects/command'
 
 enum URL {
@@ -186,31 +187,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     ],
   }
 
-  const viewMenuItem: MenuItemConstructorOptions = {
-    id: 'view',
-    label: i18n.t('application-menu.view.label'),
-    submenu: [
-      {
-        label: i18n.t('application-menu.view.fullscreen'),
-        role: 'togglefullscreen',
-      },
-      {
-        label: i18n.t('application-menu.view.address-book'),
-        enabled: isMainWindow && hasCurrentWallet,
-        click: () => {
-          if (mainWindow) {
-            CommandSubject.next({
-              winID: mainWindow.id,
-              type: 'toggle-address-book',
-              payload: null,
-            })
-          }
-        },
-        accelerator: 'CmdOrCtrl+B',
-      },
-    ],
-  }
-
   const windowMenuItem: MenuItemConstructorOptions = {
     id: 'window',
     label: i18n.t('application-menu.window.label'),
@@ -289,8 +265,8 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   }
 
   const applicationMenuTemplate = env.isDevMode
-    ? [walletMenuItem, editMenuItem, viewMenuItem, developMenuItem, windowMenuItem, helpMenuItem]
-    : [walletMenuItem, editMenuItem, viewMenuItem, windowMenuItem, helpMenuItem]
+    ? [walletMenuItem, editMenuItem, developMenuItem, windowMenuItem, helpMenuItem]
+    : [walletMenuItem, editMenuItem, windowMenuItem, helpMenuItem]
 
   if (isMac) {
     applicationMenuTemplate.unshift(appMenuItem)
@@ -437,7 +413,7 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${env.explorer}/address/${address}`) }
+        click: () => { shell.openExternal(`${ChainInfo.getInstance().explorerUrl()}/address/${address}`) }
       },
     ]
   },
@@ -455,7 +431,7 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${env.explorer}/transaction/${hash}`) }
+        click: () => { shell.openExternal(`${ChainInfo.getInstance().explorerUrl()}/transaction/${hash}`) }
       },
     ]
   },

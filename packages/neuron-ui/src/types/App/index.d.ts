@@ -112,7 +112,6 @@ declare namespace State {
   interface WalletIdentity {
     id: string
     name: string
-    minerAddress?: { address: string; identifier: string }
   }
 
   interface Address {
@@ -146,7 +145,6 @@ declare namespace State {
   interface Settings {
     general: {
       skipDataAndType: boolean
-      showAddressBook: boolean
     }
     networks: Network[]
     wallets: WalletIdentity[]

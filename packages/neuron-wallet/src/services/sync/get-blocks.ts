@@ -82,9 +82,12 @@ export default class GetBlocks {
     return await this.core.rpc.getTransaction(hash)
   }
 
-  public getHeader = async (hash: string): Promise<BlockHeader> => {
+  public getHeader = async (hash: string): Promise<BlockHeader | undefined> => {
     const result = await this.core.rpc.getHeader(hash)
-    return TypeConvert.toBlockHeader(result)
+    if (result) {
+      return TypeConvert.toBlockHeader(result)
+    }
+    return undefined
   }
 
   public getBlockByNumber = async (num: string): Promise<Block> => {

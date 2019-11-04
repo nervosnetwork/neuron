@@ -25,13 +25,9 @@
       "tip-block-number": "Block Number",
       "epoch": "Epoch",
       "difficulty": "Difficulty",
-      "miner-info": "Miner Info",
-      "lock-arg": "Lock Arg",
       "address": "Address",
-      "code-hash": "Code Hash",
-      "copy-pubkey-hash": "Copy Lock Arg (Pubkey Hash)",
-      "confirmation": "{{confirmationCount}} Confirmation",
-      "confirmations": "{{confirmationCount}} Confirmations",
+      "confirmation": "{{confirmationCount}}/{{threshold}} Confirmation",
+      "confirmations": "{{confirmationCount}}/{{threshold}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
@@ -141,7 +137,7 @@
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
       "confirmations": "Confirmations",
-      "confirming-with-count": "{{confirmations}} confirmations"
+      "confirming-with-count": "{{confirmations}} Confirmations"
     },
     "transaction": {
       "date": "Date",
@@ -180,7 +176,6 @@
         "network": "Network"
       },
       "general": {
-        "display-address-book-in-the-navbar": "Show the address book",
         "skip-data-and-type": "Skip the Cells which contain Data or Type Script",
         "show": "Show",
         "hide": "Hide"
@@ -260,7 +255,6 @@
       "update-network-successfully": "The network was updated",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
-      "lock-arg-copied": "Lock Arg has been copied to the clipboard",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

@@ -42,16 +42,11 @@ const Navbar = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const neuronWallet = useState()
   const {
-    settings: {
-      wallets = [],
-      general: { showAddressBook = false },
-    },
+    settings: { wallets = [] },
   } = neuronWallet
   const [t] = useTranslation()
 
-  const pivotItems = useMemo(() => (showAddressBook ? menuItems : menuItems.slice(0, menuItems.length - 1)), [
-    showAddressBook,
-  ])
+  const pivotItems = menuItems
 
   const selectedKey = useMemo(() => {
     const selectedTab = pivotItems.find(item => item.key === pathname.split('/')[1])

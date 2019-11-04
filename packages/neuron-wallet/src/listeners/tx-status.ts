@@ -73,10 +73,12 @@ const trackingStatus = async () => {
       const transaction = successTx.tx
       const { blockHash } = successTx
       const blockHeader = await getBlockService.getHeader(blockHash!)
-      transaction.blockHash = blockHash!
-      transaction.blockNumber = blockHeader.number
-      transaction.timestamp = blockHeader.timestamp
-      await TransactionPersistor.saveFetchTx(transaction)
+      if (blockHeader) {
+        transaction.blockHash = blockHash!
+        transaction.blockNumber = blockHeader.number
+        transaction.timestamp = blockHeader.timestamp
+        await TransactionPersistor.saveFetchTx(transaction)
+      }
     }
   }
 }

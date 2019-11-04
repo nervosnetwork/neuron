@@ -17,7 +17,7 @@ import withWizard, { WizardElementProps, WithWizardState } from 'components/with
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
@@ -51,14 +51,12 @@ const submissionInputs = [
     type: 'password',
     hint: 'wizard.set-a-strong-password-to-protect-your-wallet',
     autoFocus: true,
-    maxLength: MAX_PASSWORD_LENGTH,
   },
   {
     label: 'confirm-password',
     key: 'confirmPassword',
     type: 'password',
     autoFocus: false,
-    maxLength: MAX_PASSWORD_LENGTH,
   },
 ]
 
