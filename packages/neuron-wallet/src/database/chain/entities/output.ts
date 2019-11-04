@@ -41,6 +41,18 @@ export default class Output extends BaseEntity {
   typeScript: Script | null = null
 
   @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  daoData: string | null = null
+
+  @Column({
     type: 'boolean',
   })
   hasData!: boolean
