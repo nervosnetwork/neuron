@@ -38,12 +38,12 @@ export default class GetBlocks {
     return this.core.rpc.getTipBlockNumber()
   }
 
-  public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
+  public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
       logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
       for (const tx of block.transactions) {
-        const checkTx = new CheckTx(tx, this.url)
+        const checkTx = new CheckTx(tx, this.url, daoScriptHash)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           for (const input of tx.inputs!) {

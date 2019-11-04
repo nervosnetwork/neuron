@@ -83,6 +83,8 @@ export interface Cell {
   outPoint?: OutPoint
   status?: string
   lockHash?: string
+  typeHash?: string | null
+  daoData?: string | null
 }
 
 export interface OutPoint {
