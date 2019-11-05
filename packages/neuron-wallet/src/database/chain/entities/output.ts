@@ -74,6 +74,9 @@ export default class Output extends BaseEntity {
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
       status: this.status,
+      type: this.typeScript,
+      typeHash: this.typeHash,
+      daoData: this.daoData
     }
   }
 }

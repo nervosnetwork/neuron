@@ -44,6 +44,17 @@ export default class CellsService {
     return capacity.toString()
   }
 
+  public static getDaoCells = async (): Promise<OutputEntity[]> => {
+    return getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where(`output.daoData IS NOT NULL`)
+      .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
+      .addOrderBy('tx.timestamp', 'ASC')
+      .getMany()
+  }
+
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
     const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
 
