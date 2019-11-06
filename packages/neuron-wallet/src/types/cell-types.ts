@@ -34,6 +34,12 @@ export interface CellDep {
   depType: DepType
 }
 
+export interface WitnessArgs {
+  lock: string
+  inputType: string | undefined
+  outputType: string | undefined
+}
+
 export interface TransactionWithoutHash {
   version: string
   cellDeps?: CellDep[]
@@ -51,6 +57,7 @@ export interface TransactionWithoutHash {
   status?: TransactionStatus
   createdAt?: string
   updatedAt?: string
+  witnessArgs?: WitnessArgs[]
 }
 
 export interface Transaction extends TransactionWithoutHash {

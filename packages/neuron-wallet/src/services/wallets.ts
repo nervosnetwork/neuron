@@ -26,6 +26,7 @@ import AddressesService from 'services/addresses'
 import { Cell, DepType } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import DaoUtils from 'models/dao-utils'
+import { WitnessArgs } from 'types/cell-types'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -370,12 +371,12 @@ export default class WalletService {
       txHash = `0x${txHash}`
     }
 
-    const { inputs } = tx
+    const { inputs, witnessArgs } = tx
 
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
-    const witnesses: string[] = inputs!.map((input: Input) => {
+    const witnesses: string[] = inputs!.map((input: Input, index: number) => {
       const blake160: string = input.lock!.args!
       const info = addressInfos.find(i => i.blake160 === blake160)
       const { path } = info!
@@ -384,7 +385,12 @@ export default class WalletService {
         throw new Error('no private key found')
       }
       const { privateKey } = pathAndPrivateKey
-      const witness = this.signWitness('', privateKey, txHash)
+      const args: WitnessArgs = (witnessArgs && witnessArgs[index]) || {
+        lock: '',
+        inputType: undefined,
+        outputType: undefined,
+      }
+      const witness = this.signWitness(args.lock, privateKey, txHash, args.inputType, args.outputType)
       return witness
     })
 
@@ -685,6 +691,11 @@ export default class WalletService {
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],
+      witnessArgs: [{
+        lock: '',
+        inputType: '0x0000000000000000',
+        outputType: undefined,
+      }]
     }
   }
 
