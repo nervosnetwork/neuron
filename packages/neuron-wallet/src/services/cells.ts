@@ -5,6 +5,7 @@ import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import SkipDataAndType from './settings/skip-data-and-type'
 import FeeMode from 'models/fee-mode'
+import { PaginationResult } from './tx'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -45,15 +46,33 @@ export default class CellsService {
     return capacity.toString()
   }
 
-  public static getDaoCells = async (): Promise<OutputEntity[]> => {
-    return getConnection()
+  public static getDaoCells = async (
+    lockHashes: string[],
+    page: number,
+    perPage: number
+  ): Promise<PaginationResult<Cell>> => {
+    const skip = (page - 1) * perPage
+
+    const query = getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.daoData IS NOT NULL`)
+      .where(`output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
+        lockHashes,
+      })
+
+    const totalCount: number = await query.getCount()
+    const outputs: OutputEntity[] = await query
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
+      .skip(skip)
+      .take(perPage)
       .getMany()
+
+    return {
+      totalCount,
+      items: outputs.map(o => o.toInterface()),
+    }
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
