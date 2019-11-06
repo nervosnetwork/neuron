@@ -11,7 +11,7 @@ macos_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Ne
 linux_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-linux-x86_64.AppImage"
 
 def get_sha256_checksum(url)
-  %x(curl -L -s #{url} | sha256sum).split(" ").first
+  %x(curl -L #{url} | sha256sum).split(" ").first
 end
 
 windows_exe_sha256 = get_sha256_checksum(windows_exe)
