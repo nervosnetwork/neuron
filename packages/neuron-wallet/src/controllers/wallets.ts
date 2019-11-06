@@ -19,7 +19,7 @@ import {
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-import { TransactionWithoutHash } from 'types/cell-types'
+import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
 export default class WalletsController {
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -391,6 +391,74 @@ export default class WalletsController {
     const tx = await walletsService.generateTx(
       params.walletID,
       params.items,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
+  public static async generateDepositTx(params: {
+    walletID: string,
+    capacity: string,
+    fee: string,
+    feeRate: string,
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.generateDepositTx(
+      params.walletID,
+      params.capacity,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
+  public static async startWithdrawFromDao(params: {
+    walletID: string,
+    outPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.startWithdrawFromDao(
+      params.walletID,
+      params.outPoint,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
+  public static async withdrawFormDao(params: {
+    walletID: string,
+    depositOutPoint: OutPoint,
+    withdrawingOutPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.withdrawFormDao(
+      params.walletID,
+      params.depositOutPoint,
+      params.withdrawingOutPoint,
       params.fee,
       params.feeRate,
     )

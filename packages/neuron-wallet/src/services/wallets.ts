@@ -498,13 +498,17 @@ export default class WalletService {
     return tx
   }
 
-  public startWithdrawFormDao = async (
+  public startWithdrawFromDao = async (
     walletID: string,
-    lockHashes: string[],
     outPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<TransactionWithoutHash> => {
+    const wallet = await this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
     const cellStatus = await core.rpc.getLiveCell(outPoint, false)
     if (cellStatus.status !== 'live') {
       throw new Error('Cell is not yet live!')
@@ -513,6 +517,12 @@ export default class WalletService {
     if (tx.txStatus.status !== 'committed') {
       throw new Error('Transaction is not committed yet!')
     }
+
+    const addressInfos = await this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
