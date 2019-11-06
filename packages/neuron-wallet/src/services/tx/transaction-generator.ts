@@ -4,6 +4,7 @@ import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
 import { TargetOutput } from './params'
 import DaoUtils from 'models/dao-utils'
+import FeeMode from 'models/fee-mode'
 
 export class TransactionGenerator {
   private static txSerializedSizeInBlockWithoutInputs = (outputLength: number) : number => {
@@ -66,10 +67,7 @@ export class TransactionGenerator {
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
-    let mode: 'fee' | 'feeRate' = 'fee'
-    if (feeRateInt > 0) {
-      mode = 'feeRate'
-    }
+    const mode = new FeeMode(feeRateInt)
 
     const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputs(
       targetOutputs.length + 1
@@ -105,7 +103,7 @@ export class TransactionGenerator {
     })
 
     let gatherCapacities = needCapacities
-    if (mode === 'feeRate') {
+    if (mode.isFeeRateMode()) {
       gatherCapacities = needCapacities + feeWithoutInputs
     }
     const {
@@ -122,11 +120,14 @@ export class TransactionGenerator {
     const totalFee = feeWithoutInputs + needFeeInt
 
     // change
-    if (mode === 'fee' && BigInt(capacities) > needCapacities + feeInt || mode === 'feeRate' && BigInt(capacities) > needCapacities + feeWithoutInputs + needFeeInt) {
+    if (
+      mode.isFeeMode() && BigInt(capacities) > needCapacities + feeInt ||
+      mode.isFeeRateMode() && BigInt(capacities) > needCapacities + feeWithoutInputs + needFeeInt
+    ) {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
 
       let changeCapacity = BigInt(capacities) - needCapacities - feeInt
-      if (mode === 'feeRate') {
+      if (mode.isFeeRateMode()) {
         changeCapacity = BigInt(capacities) - needCapacities - totalFee
       }
 
@@ -173,10 +174,7 @@ export class TransactionGenerator {
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
-    let mode: 'fee' | 'feeRate' = 'fee'
-    if (feeRateInt > 0) {
-      mode = 'feeRate'
-    }
+    const mode = new FeeMode(feeRateInt)
 
     const capacityInt: bigint = BigInt(capacity)
 
@@ -201,7 +199,7 @@ export class TransactionGenerator {
     const outputs: Cell[] = [output]
 
     let gatherCapacities = capacityInt
-    if(mode === 'feeRate') {
+    if(mode.isFeeRateMode()) {
       gatherCapacities = capacityInt + feeWithoutInputs
     }
 
@@ -219,10 +217,13 @@ export class TransactionGenerator {
     const totalFee = feeWithoutInputs + needFeeInt
 
     // change
-    if (mode === 'fee' && BigInt(capacities) > capacityInt + feeInt || mode === 'feeRate' && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt) {
+    if (
+      mode.isFeeMode() && BigInt(capacities) > capacityInt + feeInt ||
+      mode.isFeeRateMode() && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt
+    ) {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
       let changeCapacity = BigInt(capacities) - capacityInt - feeInt
-      if (mode === 'feeRate') {
+      if (mode.isFeeRateMode()) {
         changeCapacity = BigInt(capacities) - capacityInt - totalFee
       }
 

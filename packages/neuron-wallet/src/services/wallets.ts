@@ -27,6 +27,7 @@ import { Cell, DepType } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import DaoUtils from 'models/dao-utils'
 import { WitnessArgs } from 'types/cell-types'
+import FeeMode from 'models/fee-mode'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -515,10 +516,7 @@ export default class WalletService {
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
-    let mode: 'fee' | 'feeRate' = 'fee'
-    if (feeRateInt > 0) {
-      mode = 'feeRate'
-    }
+    const mode = new FeeMode(feeRateInt)
 
     const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit() + (4+44+89)
     const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
@@ -551,11 +549,14 @@ export default class WalletService {
     const daoScriptInfo = await DaoUtils.daoScript()
 
     // change
-    if (mode === 'fee' && BigInt(capacities) > capacityInt + feeInt || mode === 'feeRate' && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt) {
+    if (
+      mode.isFeeMode() && BigInt(capacities) > capacityInt + feeInt ||
+      mode.isFeeRateMode() && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt
+    ) {
       const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress!.address)
       let changeCapacity = BigInt(capacities) - capacityInt - feeInt
-      if (mode === 'feeRate') {
+      if (mode.isFeeRateMode()) {
         changeCapacity = BigInt(capacities) - capacityInt - totalFee
       }
 
@@ -604,13 +605,10 @@ export default class WalletService {
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
-    let mode: 'fee' | 'feeRate' = 'fee'
-    if (feeRateInt > BigInt(0)) {
-      mode = 'feeRate'
-    }
+    const mode = new FeeMode(feeRateInt)
 
     let finalFee: bigint = feeInt
-    if (mode === 'feeRate') {
+    if (mode.isFeeRateMode()) {
       const txSize = TransactionGenerator.txSerializedSizeInBlockForWithdraw()
       finalFee = TransactionGenerator.txFee(txSize, feeRateInt)
     }
