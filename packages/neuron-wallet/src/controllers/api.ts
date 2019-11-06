@@ -269,7 +269,7 @@ export default class ApiController {
 
   @MapApiResponse
   public static async getTransactionList(
-    params: Controller.Params.TransactionsByKeywords,
+    params: Controller.Params.TransactionsByKeywords
   ) {
     return TransactionsController.getAllByKeywords(params)
   }
@@ -284,15 +284,15 @@ export default class ApiController {
     return TransactionsController.updateDescription(params)
   }
 
+  @MapApiResponse
   public static async showTransactionDetails(hash: string) {
     showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
   }
 
   // Dao
-
   @MapApiResponse
   public static async getDaoCells(
-    params: Controller.Params.GetDaoCellsParams,
+    params: Controller.Params.GetDaoCellsParams
   ) {
     return DaoController.getDaoCells(params)
   }

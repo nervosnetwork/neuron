@@ -7,6 +7,7 @@ import {
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
+  getNervosDaoData,
   sendTx,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
@@ -15,6 +16,7 @@ import {
   showErrorMessage,
 } from 'services/remote'
 import { emptyWallet } from 'states/initStates/wallet'
+import { emptyNervosDaoData } from 'states/initStates/nervosDAO'
 import { WalletWizardPath } from 'components/WalletWizard'
 import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
@@ -265,6 +267,27 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
     }
   })
 }
+
+export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
+  getNervosDaoData(walletID).then(res => {
+    if (res.status === 1) {
+      dispatch({
+        type: NeuronWalletActions.UpdateNervosDaoData,
+        payload: { records: res.result },
+      })
+    } else {
+      addNotification(failureResToNotification(res))(dispatch)
+    }
+  })
+}
+
+export const clearNervosDaoData = () => (dispatch: StateDispatch) => {
+  dispatch({
+    type: NeuronWalletActions.UpdateNervosDaoData,
+    payload: emptyNervosDaoData,
+  })
+}
+
 export default {
   createWalletWithMnemonic,
   importWalletWithMnemonic,
@@ -277,4 +300,5 @@ export default {
   updateAddressDescription,
   deleteWallet,
   backupWallet,
+  updateNervosDaoData,
 }

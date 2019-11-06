@@ -11,6 +11,13 @@ export const CONFIRMATION_THRESHOLD = 30
 
 export const MAX_DECIMAL_DIGITS = 8
 
+export const MIN_DEPOSIT_AMOUNT = 102
+
+export const SHANNON_CKB_RATIO = 1e8
+
+export const MEDIUM_FEE_RATE = 6000
+export const WITHDRAW_EPOCHS = 180
+
 export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',
@@ -36,6 +43,7 @@ export enum Routes {
   NetworkEditor = '/network',
   WalletEditor = '/editwallet',
   Prompt = '/prompt',
+  NervosDAO = '/nervos-dao',
 }
 
 export enum CapacityUnit {

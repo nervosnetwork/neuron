@@ -38,6 +38,20 @@ export const updateAddressDescription = apiMethodWrapper(api => (params: Control
   api.updateAddressDescription(params)
 )
 
+export const getNervosDaoData = apiMethodWrapper(api => (params: Controller.GetNervosDaoDataParams) =>
+  api.getDaoCells(params)
+)
+
+export const generateDepositTx = apiMethodWrapper(api => (params: Controller.DepositParams) =>
+  api.generateDepositTx(params)
+)
+
+export const generateWithdrawTx = apiMethodWrapper(api => (params: Controller.WithdrawParams) =>
+  api.startWithdrawFromDao(params)
+)
+
+export const generateClaimTx = apiMethodWrapper(api => (params: Controller.ClaimParams) => api.withdrawFromDao(params))
+
 export default {
   updateWallet,
   getWalletList,
@@ -51,4 +65,8 @@ export default {
   sendTx,
   getAddressesByWalletID,
   updateAddressDescription,
+  getNervosDaoData,
+  generateDepositTx,
+  generateWithdrawTx,
+  generateClaimTx,
 }

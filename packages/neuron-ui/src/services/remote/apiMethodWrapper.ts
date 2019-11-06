@@ -47,8 +47,9 @@ export const apiMethodWrapper = <T = any>(
     }))
 
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
-    console.group('api controller')
-    console.info(JSON.stringify(res, null, 2))
+    console.group(callControllerMethod)
+    console.info(`params: ${JSON.stringify(realParams, null, 2)}`)
+    console.info(`res: ${JSON.stringify(res, null, 2)}`)
     console.groupEnd()
   }
 
