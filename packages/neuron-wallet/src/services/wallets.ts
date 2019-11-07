@@ -28,6 +28,7 @@ import TypeConvert from 'types/type-convert'
 import DaoUtils from 'models/dao-utils'
 import { WitnessArgs } from 'types/cell-types'
 import FeeMode from 'models/fee-mode'
+import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -511,11 +512,11 @@ export default class WalletService {
 
     const cellStatus = await core.rpc.getLiveCell(outPoint, false)
     if (cellStatus.status !== 'live') {
-      throw new Error('Cell is not yet live!')
+      throw new CellIsNotYetLive()
     }
     const tx = await core.rpc.getTransaction(outPoint.txHash)
     if (tx.txStatus.status !== 'committed') {
-      throw new Error('Transaction is not committed yet!')
+      throw new TransactionIsNotCommittedYet()
     }
 
     const addressInfos = await this.getAddressInfos(walletID)
@@ -625,11 +626,11 @@ export default class WalletService {
 
     const cellStatus = await core.rpc.getLiveCell(withdrawingOutPoint, true)
     if (cellStatus.status !== 'live') {
-      throw new Error('Cell is not yet live!')
+      throw new CellIsNotYetLive()
     }
     const tx = await core.rpc.getTransaction(withdrawingOutPoint.txHash)
     if (tx.txStatus.status !== 'committed') {
-      throw new Error('Transaction is not committed yet!')
+      throw new TransactionIsNotCommittedYet()
     }
     const content = cellStatus.cell.data!.content
     const buf = Buffer.from(content.slice(2), 'hex')
