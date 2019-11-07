@@ -638,7 +638,8 @@ export default class WalletService {
       finalFee = TransactionGenerator.txFee(txSize, feeRateInt)
     }
 
-    const cellStatus = await core.rpc.getLiveCell(withdrawingOutPoint, true)
+    const sdkWithdrawingOutPoint = ConvertTo.toSdkOutPoint(withdrawingOutPoint)
+    const cellStatus = await core.rpc.getLiveCell(sdkWithdrawingOutPoint, true)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
@@ -689,9 +690,12 @@ export default class WalletService {
 
     const outputs: Cell[] = [output]
 
+    const previousOutput = TypeConvert.toOutput(cellStatus.cell.output)
     const input: Input = {
       previousOutput: withdrawingOutPoint,
       since: minimalSince.toString(),
+      lock: previousOutput.lock,
+      lockHash: LockUtils.computeScriptHash(previousOutput.lock)
     }
 
     return {
@@ -715,7 +719,7 @@ export default class WalletService {
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],
       witnessArgs: [{
-        lock: '',
+        lock: undefined,
         inputType: '0x0000000000000000',
         outputType: undefined,
       }]
@@ -786,7 +790,7 @@ export default class WalletService {
   }
 
   public signWitness = (
-    lock: string,
+    lock: string | undefined,
     privateKey: string,
     txHash: string,
     inputType: string | undefined = undefined,
@@ -797,10 +801,12 @@ export default class WalletService {
       inputType,
       outputType,
     }
-    return core.signWitnesses(privateKey)({
+    const result = core.signWitnesses(privateKey)({
       transactionHash: txHash,
       witnesses: [witnessArg]
-    })[0] as string
+    })
+
+    return result[0] as string
   }
 
   // Derivate all child private keys for specified BIP44 paths.

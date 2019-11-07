@@ -35,7 +35,7 @@ export interface CellDep {
 }
 
 export interface WitnessArgs {
-  lock: string
+  lock: string | undefined
   inputType: string | undefined
   outputType: string | undefined
 }
