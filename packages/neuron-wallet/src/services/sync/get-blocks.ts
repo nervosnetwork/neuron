@@ -46,7 +46,12 @@ export default class GetBlocks {
         const checkTx = new CheckTx(tx, this.url)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
-          for (const input of tx.inputs!) {
+          const inputs = tx.inputs!
+          for (let i = 0; i < inputs.length; ++i) {
+            if (i === 0) {
+              continue
+            }
+            const input = inputs[i]
             const previousTxHash = input.previousOutput!.txHash
             let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
             if (!previousTxWithStatus) {
