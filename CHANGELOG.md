@@ -1,3 +1,13 @@
+## [0.24.1](https://github.com/nervosnetwork/neuron/compare/v0.24.0...v0.24.1) (2019-11-07)
+
+
+### Features
+
+* Create a ruby script to download a release binaries ([acfa6e9](https://github.com/nervosnetwork/neuron/commit/acfa6e9))
+* Use system curl and sha256sum commands to digest binaries ([0fa0dd8](https://github.com/nervosnetwork/neuron/commit/0fa0dd8))
+
+
+
 # [0.24.0](https://github.com/nervosnetwork/neuron/compare/v0.23.1...v0.24.0) (2019-11-04)
 
 
