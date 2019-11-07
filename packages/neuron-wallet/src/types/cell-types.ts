@@ -57,6 +57,12 @@ export interface Transaction extends TransactionWithoutHash {
   hash: string
 }
 
+export interface WitnessArgs {
+  lock: string | undefined
+  inputType: string | undefined
+  outputType: string | undefined
+}
+
 export interface TxStatus {
   blockHash: string | null
   status: 'pending' | 'proposed' | 'committed'
