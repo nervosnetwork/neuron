@@ -4,7 +4,7 @@ import { AccountExtendedPublicKey, PathAndPrivateKey } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
 import LockUtils from 'models/lock-utils'
-import { TransactionWithoutHash, Input } from 'types/cell-types'
+import { TransactionWithoutHash, Input, WitnessArgs } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
 import { Address as AddressInterface } from 'database/address/dao'
@@ -371,8 +371,33 @@ export default class WalletService {
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
-    const witnesses: string[] = inputs!.map((input: Input) => {
+    const witnessesWithLockHashes = inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args!
+      const witnessArgs: WitnessArgs = {
+        lock: undefined,
+        inputType: undefined,
+        outputType: undefined
+      }
+      return {
+        // TODO: fill in required DAO's type witness here
+        witnessArgs,
+        lockHash: input.lockHash!,
+        witness: '',
+        blake160,
+      }
+    })
+
+    const lockHashes = new Set(witnessesWithLockHashes.map(w => w.lockHash));
+
+    for (const lockHash of lockHashes) {
+      const firstIndex = witnessesWithLockHashes.findIndex(w => w.lockHash === lockHash)
+      const witnessesArgsWithBlake160 = witnessesWithLockHashes
+        .filter(w => w.lockHash === lockHash)
+        .map(w => ({args: w.witnessArgs, blake160: w.blake160}))
+      // A 65-byte empty signature used as placeholder
+      witnessesArgsWithBlake160[0].args.lock = '0x' + '0'.repeat(130)
+
+      const blake160: string = witnessesArgsWithBlake160[0].blake160
       const info = addressInfos.find(i => i.blake160 === blake160)
       const { path } = info!
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
@@ -380,9 +405,21 @@ export default class WalletService {
         throw new Error('no private key found')
       }
       const { privateKey } = pathAndPrivateKey
-      const witness = this.signWitness('', privateKey, txHash)
-      return witness
-    })
+
+      const signedWitness = core.signWitnesses(privateKey)({
+        transactionHash: txHash,
+        witnesses: witnessesArgsWithBlake160.map(w => w.args)
+      })[0] as string
+
+      for (const w of witnessesWithLockHashes) {
+        if (w.lockHash === lockHash) {
+          w.witness = '0x'
+        }
+      }
+      witnessesWithLockHashes[firstIndex].witness = signedWitness
+    }
+
+    const witnesses: string[] = witnessesWithLockHashes.map(w => w.witness)
 
     tx.witnesses = witnesses
 
