@@ -116,9 +116,9 @@ export default class CellsService {
     // use min secp size (without data)
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
-    if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
-      throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
-    }
+    // if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
+    //   throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
+    // }
 
     const queryParams = {
       lockHash: In(lockHashes),

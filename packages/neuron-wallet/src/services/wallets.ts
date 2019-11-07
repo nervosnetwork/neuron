@@ -510,7 +510,9 @@ export default class WalletService {
       throw new WalletNotFound(walletID)
     }
 
-    const cellStatus = await core.rpc.getLiveCell(outPoint, false)
+    const sdkOutPoint = ConvertTo.toSdkOutPoint(outPoint)
+
+    const cellStatus = await core.rpc.getLiveCell(sdkOutPoint, false)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
@@ -529,6 +531,7 @@ export default class WalletService {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
+    // 4 + 44 + 89 is input of deposited dao and witness size
     const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit() + (4+44+89)
     const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
@@ -539,6 +542,7 @@ export default class WalletService {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(BigInt(depositBlockNumber))
     output.data = `0x${buf.toString('hex')}`
+    output.daoData = output.data
 
     const capacityInt = BigInt(output.capacity)
     const outputs: Cell[] = [output]
@@ -559,6 +563,14 @@ export default class WalletService {
     const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
     const daoScriptInfo = await DaoUtils.daoScript()
 
+    const input: Input = {
+      previousOutput: outPoint,
+      since: '0',
+      lock: output.lock,
+      lockHash: LockUtils.lockScriptToHash(output.lock),
+      capacity: output.capacity,
+    }
+
     // change
     if (
       mode.isFeeMode() && BigInt(capacities) > capacityInt + feeInt ||
@@ -566,9 +578,9 @@ export default class WalletService {
     ) {
       const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress!.address)
-      let changeCapacity = BigInt(capacities) - capacityInt - feeInt
+      let changeCapacity = BigInt(capacities) - feeInt
       if (mode.isFeeRateMode()) {
-        changeCapacity = BigInt(capacities) - capacityInt - totalFee
+        changeCapacity = BigInt(capacities) - totalFee
       }
 
       const changeOutput: Cell = {
@@ -596,8 +608,10 @@ export default class WalletService {
           depType: DepType.Code,
         },
       ],
-      headerDeps: [],
-      inputs,
+      headerDeps: [
+        depositBlock.hash,
+      ],
+      inputs: [input].concat(inputs),
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],

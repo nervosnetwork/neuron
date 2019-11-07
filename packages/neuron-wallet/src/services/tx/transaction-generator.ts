@@ -193,7 +193,8 @@ export class TransactionGenerator {
         hashType: daoScriptInfo.hashType,
         args: '0x',
       },
-      data: '0x0000000000000000'
+      data: '0x0000000000000000',
+      daoData: '0x0000000000000000',
     }
 
     const outputs: Cell[] = [output]

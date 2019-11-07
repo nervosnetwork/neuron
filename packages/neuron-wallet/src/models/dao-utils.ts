@@ -22,7 +22,7 @@ export default class DaoUtils {
     const systemCellTransaction = genesisBlock.transactions[0]
     const daoOutPoint = {
       txHash: systemCellTransaction.hash,
-      index: '2'
+      index: '0x2'
     }
 
     const daoTypeHash = scriptToHash(systemCellTransaction.outputs[2].type!)
