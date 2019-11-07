@@ -605,7 +605,7 @@ export default class WalletService {
 
   public withdrawFormDao = async (
     walletID: string,
-    _depositOutPoint: OutPoint,
+    depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
@@ -654,7 +654,7 @@ export default class WalletService {
     const minimalSince = this.epochSince(minimalSinceEpochLength, minimalSinceEpochIndex, minimalSinceEpochNumber)
 
     // TODO: calculate_dao_maximum_withdraw rpc
-    const outputCapacity = '1000'
+    const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlock.hash)
 
     const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
     const daoScriptInfo = await DaoUtils.daoScript()
@@ -705,6 +705,23 @@ export default class WalletService {
         outputType: undefined,
       }]
     }
+  }
+
+  public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): bigint => {
+    const calculateDaoMaximumWithdrawMethod = {
+      name: 'calculateDaoMaximumWithdraw',
+      method: 'calculate_dao_maximum_withdraw',
+      paramsFormatters: [core.rpc.paramsFormatter.toOutPoint, core.rpc.paramsFormatter.toHash],
+    }
+
+    core.rpc.addMethod(calculateDaoMaximumWithdrawMethod)
+
+    const result = await (core.rpc as any).calculateDaoMaximumWithdraw(
+      ConvertTo.toSdkOutPoint(depositOutPoint),
+      withdrawBlockHash,
+    )
+
+    return BigInt(result)
   }
 
   public parseEpoch = (epoch: bigint) => {
