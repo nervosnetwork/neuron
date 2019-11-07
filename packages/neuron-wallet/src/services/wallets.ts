@@ -371,18 +371,39 @@ export default class WalletService {
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
 
-    const witnesses: string[] = inputs!.map((input: Input) => {
-      const blake160: string = input.lock!.args!
-      const info = addressInfos.find(i => i.blake160 === blake160)
-      const { path } = info!
-      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
-      if (!pathAndPrivateKey) {
-        throw new Error('no private key found')
+    const witnessesWithLockHashes = inputs!.map((input: Input) => {
+      return {
+        // TODO: fill in required DAO's type witness here
+        witness: {
+          lock: undefined,
+          inputType: undefined,
+          outputType: undefined
+        },
+        lockHash: input.lockHash!
+      };
+    });
+
+    const lockHashes = new Set(witnessesWithLockHashes.map(w => w.lockHash));
+
+    for (let lockHash of lockHashes) {
+      const firstIndex = witnessesWithLockHashes.findIndex(w => w.lockHash == lockHash);
+      const witnesses = witnessesWithLockHashes.filter(w => w.lockHash == lockHash).map(w => w.witness);
+      // A 65-byte empty signature used as placeholder
+      witnesses[0].lock = "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+      const signedWitness = core.signWitness(privateKey)({
+        transactionHash: txHash,
+        witnesses: witnesses
+      })[0] as string;
+
+      for (let w of witnessesWithLockHashes) {
+        if (w.lockHash == lockHash) {
+          w.witness = "0x"
+        }
       }
-      const { privateKey } = pathAndPrivateKey
-      const witness = this.signWitness('', privateKey, txHash)
-      return witness
-    })
+      witnessesWithLockHashes[firstIndex].witness = signedWitness;
+    }
+
+    const witnesses: string[] = witnessesWithLockHashes.map(w => w.witness);
 
     tx.witnesses = witnesses
 
