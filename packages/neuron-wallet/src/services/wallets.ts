@@ -707,7 +707,7 @@ export default class WalletService {
     }
   }
 
-  public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): bigint => {
+  public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
     const calculateDaoMaximumWithdrawMethod = {
       name: 'calculateDaoMaximumWithdraw',
       method: 'calculate_dao_maximum_withdraw',
