@@ -53,25 +53,22 @@ export default class CellsService {
   ): Promise<PaginationResult<Cell>> => {
     const skip = (page - 1) * perPage
 
-    const query = getConnection()
+    const outputsAndCount: [OutputEntity[], number] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(`output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
         lockHashes,
       })
-
-    const totalCount: number = await query.getCount()
-    const outputs: OutputEntity[] = await query
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
       .skip(skip)
-      .take(perPage)
-      .getMany()
+      .limit(perPage)
+      .getManyAndCount()
 
     return {
-      totalCount,
-      items: outputs.map(o => o.toInterface()),
+      totalCount: outputsAndCount[1],
+      items: outputsAndCount[0].map(o => o.toInterface()),
     }
   }
 
