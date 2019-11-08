@@ -24,11 +24,17 @@ export class TransactionGenerator {
     * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
     * every cellDep need 37 Bytes, transaction for deposit needs 2 cellDeps(lock / type)
     * every output without typeScript & with lock in secp need 97 Bytes and 4 Bytes for offset (add to transaction)
-    * every output for deposit with typeScript in dao & with lock in secp need 130 Bytes and 4 Bytes for offset (add to transaction)
+    * every output for deposit with typeScript in dao & with lock in secp need 150 Bytes and 4 Bytes for offset (add to transaction)
     * every outputsData in "0x" need 4 Bytes and 4 Bytes for offset
     * every outputsData in "0x0000000000000000" need 12 Bytes and 4 Bytes for offset
     */
-   return 4 + 68 + 37 * 2 + (4 + 97 + 4 + 4) + (130 + 4 + 12 + 4)
+   return 4 + 68 + 37 * 2 + (4 + 97 + 4 + 4) + (150 + 4 + 12 + 4)
+  }
+
+  public static txSerializedSizeInBlockWithoputInputsForWitdrawStep1 = (): number => {
+    // a fixed input for (4+44+89) Bytes
+    // a fixed headerDep for 32 Bytes
+    return TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit() + (4 + 44 + 89) + 32
   }
 
   public static txSerializedSizeInBlockForWithdraw = (): number => {
@@ -42,7 +48,7 @@ export class TransactionGenerator {
     * only one input, for 44 Bytes
     * one witness with extra inputType "0x0000000000000000", 101 Bytes, extra 4 Bytes for add to transaction
     */
-   return 4 + 68 + 37 * 2 + 32 * 2 + (4 + 97 + 4 + 4) + (101 + 4)
+    return 4 + 68 + 37 * 2 + 32 * 2 + (4 + 97 + 4 + 4) + 44 + (101 + 4)
   }
 
   public static txFee = (size: number, feeRate: bigint) => {

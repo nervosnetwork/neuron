@@ -554,7 +554,7 @@ export default class WalletService {
     const mode = new FeeMode(feeRateInt)
 
     // 4 + 44 + 89 is input of deposited dao and witness size
-    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit() + (4+44+89)
+    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoputInputsForWitdrawStep1()
     const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
     const depositBlock = await core.rpc.getHeader(tx.txStatus.blockHash!)
@@ -691,7 +691,6 @@ export default class WalletService {
 
     const minimalSince = this.epochSince(minimalSinceEpochLength, minimalSinceEpochIndex, minimalSinceEpochNumber)
 
-    // TODO: calculate_dao_maximum_withdraw rpc
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlock.hash)
 
     const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
