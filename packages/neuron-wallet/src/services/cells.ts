@@ -52,8 +52,9 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
+      .where(`output.status = :status AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
         lockHashes,
+        status: OutputStatus.Live,
       })
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
