@@ -259,7 +259,14 @@ export class TransactionsService {
 
     const tx = await getConnection()
       .getRepository(TransactionEntity)
-      .findOne(hash, { relations: ['inputs', 'outputs'] })
+      .createQueryBuilder('transaction')
+      .where('transaction.hash is :hash', {hash})
+      .leftJoinAndSelect('transaction.inputs', 'input')
+      .leftJoinAndSelect('transaction.outputs', 'output')
+      .orderBy({
+        'input.id': "ASC"
+      })
+      .getOne()
 
     if (!tx) {
       return undefined
