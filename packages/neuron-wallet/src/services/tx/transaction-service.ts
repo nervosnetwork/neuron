@@ -69,7 +69,7 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHashes: string[] = await new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
+      const lockHashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
       return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
     }
     if (type === SearchType.TxHash) {
@@ -92,7 +92,15 @@ export class TransactionsService {
     return base
   }
 
-  public static searchByAmount = async (params: TransactionsByLockHashesParam, amount: string) => {
+  /// TODO: Decide if this should be supported.
+  /// For now just return empty results.
+  /// The second query (one after `if (result.totalCount > 100) {` will mostly cuase `SQLITE_ERROR: too many SQL variables` error.
+  public static searchByAmount = async (_params: TransactionsByLockHashesParam, _amount: string) => {
+    return {
+      totalCount: 0,
+      items: []
+    }
+    /*
     // 1. get all transactions
     const result = await TransactionsService.getAll({
       pageNo: 1,
@@ -114,7 +122,7 @@ export class TransactionsService {
     return {
       totalCount: txs.length || 0,
       items: txs.slice(skip, skip + params.pageSize),
-    }
+    }*/
   }
 
   public static getAll = async (

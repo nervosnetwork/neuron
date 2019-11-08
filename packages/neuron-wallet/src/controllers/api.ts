@@ -4,17 +4,10 @@ import env from 'env'
 import i18n from 'utils/i18n'
 import { popContextMenu } from './app/menu'
 import { showWindow } from './app/show-window'
-import {
-  TransactionsController,
-  WalletsController,
-  SyncInfoController,
-  SkipDataAndTypeController,
-  NetworksController
-} from 'controllers'
+import { TransactionsController, WalletsController, SyncInfoController, NetworksController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import SkipDataAndType from 'services/settings/skip-data-and-type'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import { MapApiResponse } from 'decorators'
@@ -83,8 +76,6 @@ export default class ApiController {
         }).then(res => res.result)
       : []
 
-    const skipDataAndType = SkipDataAndType.getInstance().get()
-
     const initState = {
       currentWallet,
       wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
@@ -95,7 +86,6 @@ export default class ApiController {
       syncedBlockNumber,
       connectionStatus,
       codeHash,
-      skipDataAndType,
     }
 
     return { status: ResponseCode.Success, result: initState }
@@ -305,12 +295,5 @@ export default class ApiController {
     params: Controller.Params.GetDaoCellsParams,
   ) {
     return DaoController.getDaoCells(params)
-  }
-
-  // Misc
-
-  @MapApiResponse
-  public static async updateSkipDataAndType(skip: boolean) {
-    return SkipDataAndTypeController.update(skip)
   }
 }

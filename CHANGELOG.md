@@ -1,3 +1,44 @@
+## [0.24.1](https://github.com/nervosnetwork/neuron/compare/v0.24.0...v0.24.1) (2019-11-07)
+
+
+### Features
+
+* Create a ruby script to download a release binaries ([acfa6e9](https://github.com/nervosnetwork/neuron/commit/acfa6e9))
+* Use system curl and sha256sum commands to digest binaries ([0fa0dd8](https://github.com/nervosnetwork/neuron/commit/0fa0dd8))
+
+
+
+# [0.24.0](https://github.com/nervosnetwork/neuron/compare/v0.23.1...v0.24.0) (2019-11-04)
+
+
+### Bug Fixes
+
+* sign witness result in test ([92dbaa2](https://github.com/nervosnetwork/neuron/commit/92dbaa2))
+* **neuron-ui:** remove length limitation of password, but should the alert instead ([f25c8fd](https://github.com/nervosnetwork/neuron/commit/f25c8fd))
+* Search history by date ([6df490a](https://github.com/nervosnetwork/neuron/commit/6df490a))
+* **neuron-ui:** hide the colon if description is empty ([3af1ec4](https://github.com/nervosnetwork/neuron/commit/3af1ec4))
+* **neuron-ui:** hide the confirmations of pending txs ([456210d](https://github.com/nervosnetwork/neuron/commit/456210d))
+* **neuron-ui:** hide the pending list if it has no items. ([19d857e](https://github.com/nervosnetwork/neuron/commit/19d857e))
+
+
+### Features
+
+* Always show address book ([940e23a](https://github.com/nervosnetwork/neuron/commit/940e23a))
+* Change confirmation threshold to 30 ([1dabb3c](https://github.com/nervosnetwork/neuron/commit/1dabb3c))
+* Change the way pending confirmations display on overview ([f5cad48](https://github.com/nervosnetwork/neuron/commit/f5cad48))
+* Move explorer URL determination to ChainInfo ([83c69c7](https://github.com/nervosnetwork/neuron/commit/83c69c7))
+* Remove miner info feature ([4dcdad4](https://github.com/nervosnetwork/neuron/commit/4dcdad4))
+* **neuron-ui:** clear send view on wallet switching ([47af746](https://github.com/nervosnetwork/neuron/commit/47af746))
+* **neuron-ui:** disable the submit button if the generated tx is null ([be45889](https://github.com/nervosnetwork/neuron/commit/be45889))
+* **neuron-ui:** use tooltip component instead of element title to display the sync progress. ([6780d45](https://github.com/nervosnetwork/neuron/commit/6780d45))
+
+
+### Performance Improvements
+
+* cache getTransaction result when sync in indexer mode ([756bd30](https://github.com/nervosnetwork/neuron/commit/756bd30))
+
+
+
 ## [0.23.1](https://github.com/nervosnetwork/neuron/compare/v0.23.0...v0.23.1) (2019-10-28)
 
 
