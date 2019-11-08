@@ -106,7 +106,8 @@
       "click-to-copy": "Click to copy the address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
-      "address-qrcode": "Address QR Code"
+      "address-qrcode": "Address QR Code",
+      "address": "{{network}} Address"
     },
     "history": {
       "meta": "Meta",

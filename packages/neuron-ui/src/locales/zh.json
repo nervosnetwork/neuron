@@ -106,7 +106,8 @@
       "click-to-copy": "点击复制地址",
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
-      "address-qrcode": "地址二维码"
+      "address-qrcode": "地址二维码",
+      "address": "{{network}} 地址"
     },
     "history": {
       "meta": "元信息",

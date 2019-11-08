@@ -82,6 +82,7 @@ const QRCode = ({
   includeMargin = false,
   exportable = false,
   dispatch,
+  remark,
 }: {
   value: string
   size: number
@@ -93,6 +94,7 @@ const QRCode = ({
   includeMargin?: boolean
   exportable?: boolean
   dispatch: StateDispatch
+  remark?: JSX.Element
 }) => {
   const [t] = useTranslation()
   const qrcode = new QRCodeImpl(-1, level)
@@ -156,8 +158,9 @@ const QRCode = ({
       <Stack.Item>
         <canvas ref={canvasRef} width={size} height={size} onClick={onQRCodeClick} />
       </Stack.Item>
+      {remark || null}
       {exportable ? (
-        <Stack horizontal horizontalAlign="space-between">
+        <Stack horizontal horizontalAlign="space-between" styles={{ root: { minWidth: 500 } }}>
           <DefaultButton onClick={onCopy}>{t('qrcode.copy')}</DefaultButton>
           <DefaultButton onClick={onDownload}>{t('qrcode.save')}</DefaultButton>
         </Stack>
