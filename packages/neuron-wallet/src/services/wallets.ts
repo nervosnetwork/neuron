@@ -493,7 +493,7 @@ export default class WalletService {
     capacity: string,
     fee: string = '0',
     feeRate: string = '0',
-  ) => {
+  ): Promise<TransactionWithoutHash> => {
     const wallet = await this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
@@ -509,7 +509,7 @@ export default class WalletService {
 
     const changeAddress: string = await this.getChangeAddress()
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+    const tx = await TransactionGenerator.generateDepositTx(
       lockHashes,
       capacity,
       address!.address,
@@ -553,7 +553,6 @@ export default class WalletService {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    // 4 + 44 + 89 is input of deposited dao and witness size
     const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoputInputsForWitdrawStep1()
     const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
@@ -566,7 +565,7 @@ export default class WalletService {
     output.data = `0x${buf.toString('hex')}`
     output.daoData = output.data
 
-    const capacityInt = BigInt(output.capacity)
+    // const capacityInt = BigInt(output.capacity)
     const outputs: Cell[] = [output]
 
     const {
@@ -594,16 +593,14 @@ export default class WalletService {
     }
 
     // change
-    if (
-      mode.isFeeMode() && BigInt(capacities) > capacityInt + feeInt ||
-      mode.isFeeRateMode() && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt
-    ) {
+    let finalFee: bigint = feeInt
+    if (mode.isFeeRateMode()) {
+      finalFee = totalFee
+    }
+    if (BigInt(capacities) > finalFee) {
       const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress!.address)
-      let changeCapacity = BigInt(capacities) - feeInt
-      if (mode.isFeeRateMode()) {
-        changeCapacity = BigInt(capacities) - totalFee
-      }
+      const changeCapacity = BigInt(capacities) - finalFee
 
       const changeOutput: Cell = {
         capacity: changeCapacity.toString(),
@@ -637,6 +634,7 @@ export default class WalletService {
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],
+      fee: finalFee.toString(),
     }
   }
 
@@ -674,6 +672,7 @@ export default class WalletService {
     const depositBlockNumber: bigint = buf.readBigUInt64LE()
     const depositBlock = await core.rpc.getHeaderByNumber(depositBlockNumber)
     const depositEpoch = this.parseEpoch(BigInt(depositBlock.epoch))
+    const depositCapacity: bigint = BigInt(cellStatus.cell.output.capacity)
 
     const withdrawBlock = await core.rpc.getHeader(tx.txStatus.blockHash!)
     const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlock.epoch))
@@ -743,7 +742,9 @@ export default class WalletService {
         lock: undefined,
         inputType: '0x0000000000000000',
         outputType: undefined,
-      }]
+      }],
+      fee: finalFee.toString(),
+      interest: (BigInt(output.capacity) - depositCapacity).toString(),
     }
   }
 

@@ -405,7 +405,7 @@ export default class WalletsController {
     capacity: string,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -427,7 +427,7 @@ export default class WalletsController {
     outPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -450,7 +450,7 @@ export default class WalletsController {
     withdrawingOutPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
