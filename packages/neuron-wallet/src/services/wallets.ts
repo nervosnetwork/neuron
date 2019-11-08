@@ -393,15 +393,15 @@ export default class WalletService {
       witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
 
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
-      const signedWitness = core.signWitnesses(privateKey)({
+      const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
-        witnesses: witnessesArgs.map(w => w.witnessArgs)
-      })[0] as string
+        witnesses: [witnessesArgs[0].witnessArgs, ...Array.from({length: witnessesArgs.length - 1}).map(() => '0x')]
+      })
+      const signedWitness = signed[0] as string
 
-      for (const w of witnessSigningEntries) {
-        if (w.lockHash === lockHash) {
-          w.witness = '0x'
-        }
+      const entires = witnessSigningEntries.filter(e => e.lockHash === lockHash)
+      for (let i = 0; i < entires.length; ++i) {
+        entires[i].witness = signed[i] as string
       }
       witnessSigningEntries[firstIndex].witness = signedWitness
     }
