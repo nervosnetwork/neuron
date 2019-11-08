@@ -354,10 +354,7 @@ export default class WalletService {
       throw new IsRequired('Password')
     }
 
-    let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
-    if (!txHash.startsWith('0x')) {
-      txHash = `0x${txHash}`
-    }
+    const txHash = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
 
     const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
