@@ -387,7 +387,6 @@ export default class WalletService {
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     for (const lockHash of lockHashes) {
-      const firstIndex = witnessSigningEntries.findIndex(w => w.lockHash === lockHash)
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
@@ -409,13 +408,10 @@ export default class WalletService {
         transactionHash: txHash,
         witnesses: serializedWitnesses
       })
-      const signedWitness = signed[0] as string
 
-      const entires = witnessSigningEntries.filter(e => e.lockHash === lockHash)
-      for (let i = 0; i < entires.length; ++i) {
-        entires[i].witness = signed[i] as string
+      for (let i = 0; i < witnessesArgs.length; ++i) {
+        witnessesArgs[i].witness = signed[i] as string
       }
-      witnessSigningEntries[firstIndex].witness = signedWitness
     }
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
