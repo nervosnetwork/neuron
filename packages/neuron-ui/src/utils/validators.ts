@@ -4,8 +4,7 @@ import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGIT
 
 export const verifyAddress = (address: string): boolean => {
   try {
-    ckbCore.utils.parseAddress(address)
-    return true
+    return ckbCore.utils.parseAddress(address, 'hex').startsWith('0x0100')
   } catch (err) {
     return false
   }
