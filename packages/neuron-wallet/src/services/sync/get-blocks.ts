@@ -42,27 +42,25 @@ export default class GetBlocks {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
       logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
-      for (const tx of block.transactions) {
+      for (let i = 0; i < block.transactions.length; ++i) {
+        const tx = block.transactions[i]
         const checkTx = new CheckTx(tx, this.url)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
-          const inputs = tx.inputs!
-          for (let i = 0; i < inputs.length; ++i) {
-            if (i === 0) {
-              continue
+          if (i > 0) {
+            for (const input of tx.inputs!) {
+              const previousTxHash = input.previousOutput!.txHash
+              let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+              if (!previousTxWithStatus) {
+                previousTxWithStatus = await this.getTransaction(previousTxHash)
+                cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+              }
+              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              input.lock = previousOutput.lock
+              input.lockHash = LockUtils.lockScriptToHash(input.lock)
+              input.capacity = previousOutput.capacity
             }
-            const input = inputs[i]
-            const previousTxHash = input.previousOutput!.txHash
-            let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
-            if (!previousTxWithStatus) {
-              previousTxWithStatus = await this.getTransaction(previousTxHash)
-              cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
-            }
-            const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
-            const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-            input.lock = previousOutput.lock
-            input.lockHash = LockUtils.lockScriptToHash(input.lock)
-            input.capacity = previousOutput.capacity
           }
           await TransactionPersistor.saveFetchTx(tx)
           addressesUsedSubject.next({
