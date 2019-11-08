@@ -14,7 +14,7 @@ import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import CellsService from 'services/cells'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressPrefix, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 
 import NodeService from './node'
 import FileService from './file'
@@ -387,23 +387,31 @@ export default class WalletService {
     const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     for (const lockHash of lockHashes) {
-      const firstIndex = witnessSigningEntries.findIndex(w => w.lockHash === lockHash)
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
 
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
-      const signedWitness = core.signWitnesses(privateKey)({
-        transactionHash: txHash,
-        witnesses: witnessesArgs.map(w => w.witnessArgs)
-      })[0] as string
 
-      for (const w of witnessSigningEntries) {
-        if (w.lockHash === lockHash) {
-          w.witness = '0x'
-        }
+      const serializedWitnesses = witnessesArgs
+        .map((value: any, index: number) => {
+          const args = value.witnessArgs
+          if (index === 0) {
+            return args
+          }
+          if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
+            return '0x'
+          }
+          return serializeWitnessArgs(args)
+        })
+      const signed = core.signWitnesses(privateKey)({
+        transactionHash: txHash,
+        witnesses: serializedWitnesses
+      })
+
+      for (let i = 0; i < witnessesArgs.length; ++i) {
+        witnessesArgs[i].witness = signed[i] as string
       }
-      witnessSigningEntries[firstIndex].witness = signedWitness
     }
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
