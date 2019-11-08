@@ -638,7 +638,7 @@ export default class WalletService {
     }
   }
 
-  public withdrawFormDao = async (
+  public withdrawFromDao = async (
     walletID: string,
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,

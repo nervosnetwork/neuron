@@ -444,7 +444,7 @@ export default class WalletsController {
     }
   }
 
-  public static async withdrawFormDao(params: {
+  public static async withdrawFromDao(params: {
     walletID: string,
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
@@ -455,7 +455,7 @@ export default class WalletsController {
       throw new IsRequired('Parameters')
     }
     const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.withdrawFormDao(
+    const tx = await walletsService.withdrawFromDao(
       params.walletID,
       params.depositOutPoint,
       params.withdrawingOutPoint,

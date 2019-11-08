@@ -214,14 +214,14 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async withdrawFormDao(params: {
+  public static async withdrawFromDao(params: {
     walletID: string,
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
     fee: string,
     feeRate: string,
   }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return WalletsController.withdrawFormDao(params)
+    return WalletsController.withdrawFromDao(params)
   }
 
   @MapApiResponse
