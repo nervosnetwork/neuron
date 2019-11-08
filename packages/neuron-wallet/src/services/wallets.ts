@@ -374,9 +374,9 @@ export default class WalletService {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries = tx.inputs!.map((input: Input) => {
+    const witnessSigningEntries = tx.inputs!.map((input: Input, index: number) => {
       const blake160: string = input.lock!.args!
-      const witnessArgs: WitnessArgs = {
+      const witnessArgs: WitnessArgs = (tx.witnessArgs && tx.witnessArgs[index]) || {
         lock: undefined,
         inputType: undefined,
         outputType: undefined
