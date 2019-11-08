@@ -14,7 +14,7 @@ import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import CellsService from 'services/cells'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import { AddressPrefix, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 
 import NodeService from './node'
 import FileService from './file'
@@ -393,9 +393,21 @@ export default class WalletService {
       witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
 
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
+
+      const serializedWitnesses = witnessesArgs
+        .map(value => value.witnessArgs)
+        .map((value: WitnessArgs, index: number) => {
+          if (index === 0) {
+            return value
+          }
+          if (value.lock === undefined && value.inputType === undefined && value.outputType === undefined) {
+            return '0x'
+          }
+          return serializeWitnessArgs(value)
+        })
       const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
-        witnesses: [witnessesArgs[0].witnessArgs, ...Array.from({length: witnessesArgs.length - 1}).map(() => '0x')]
+        witnesses: serializedWitnesses
       })
       const signedWitness = signed[0] as string
 
