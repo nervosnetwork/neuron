@@ -184,7 +184,7 @@ export class TransactionsService {
           }
           return false
         })
-        .map(i => BigInt(i.capacity))
+        .map(i => BigInt(i.capacity || 0))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
       return {
