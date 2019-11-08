@@ -344,13 +344,8 @@ export default class WalletService {
     return this.sendTx(walletID, tx, password, description)
   }
 
-  public sendTx = async (
-    walletID: string = '',
-    tx: TransactionWithoutHash,
-    password: string = '',
-    description: string = ''
-  ) => {
-    const wallet = await this.get(walletID)
+  public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
@@ -359,19 +354,24 @@ export default class WalletService {
       throw new IsRequired('Password')
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
-
     let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
     if (!txHash.startsWith('0x')) {
       txHash = `0x${txHash}`
     }
 
-    const { inputs } = tx
-
+    const addressInfos = await this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
+    const findPrivateKey = (blake160: string) => {
+      const { path } = addressInfos.find(i => i.blake160 === blake160)!
+      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
+      if (!pathAndPrivateKey) {
+        throw new Error('no private key found')
+      }
+      return pathAndPrivateKey.privateKey
+    }
 
-    const witnessesWithLockHashes = inputs!.map((input: Input) => {
+    const witnessesWithLockHashes = tx.inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args!
       const witnessArgs: WitnessArgs = {
         lock: undefined,
@@ -397,15 +397,7 @@ export default class WalletService {
       // A 65-byte empty signature used as placeholder
       witnessesArgsWithBlake160[0].args.lock = '0x' + '0'.repeat(130)
 
-      const blake160: string = witnessesArgsWithBlake160[0].blake160
-      const info = addressInfos.find(i => i.blake160 === blake160)
-      const { path } = info!
-      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
-      if (!pathAndPrivateKey) {
-        throw new Error('no private key found')
-      }
-      const { privateKey } = pathAndPrivateKey
-
+      const privateKey = findPrivateKey(witnessesArgsWithBlake160[0].blake160)
       const signedWitness = core.signWitnesses(privateKey)({
         transactionHash: txHash,
         witnesses: witnessesArgsWithBlake160.map(w => w.args)
@@ -419,9 +411,7 @@ export default class WalletService {
       witnessesWithLockHashes[firstIndex].witness = signedWitness
     }
 
-    const witnesses: string[] = witnessesWithLockHashes.map(w => w.witness)
-
-    tx.witnesses = witnesses
+    tx.witnesses = witnessesWithLockHashes.map(w => w.witness)
 
     const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
     await core.rpc.sendTransaction(txToSend)
@@ -440,9 +430,7 @@ export default class WalletService {
     return txHash
   }
 
-  public calculateFee = async (
-    tx: TransactionWithoutHash
-  ) => {
+  public calculateFee = async (tx: TransactionWithoutHash) => {
     const inputCapacities = tx.inputs!
       .map(input => BigInt(input.capacity!))
       .reduce((result, c) => result + c, BigInt(0))
@@ -511,12 +499,11 @@ export default class WalletService {
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
   public getAddressInfos = async (walletID: string): Promise<AddressInterface[]> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
-    const addrs = await AddressService.allAddressesByWalletId(walletID)
-    return addrs
+    return AddressService.allAddressesByWalletId(walletID)
   }
 
   public getChangeAddress = async (): Promise<string> => {
@@ -537,7 +524,7 @@ export default class WalletService {
     })[0] as string
   }
 
-  // Derivate all child private keys for specified BIP44 paths.
+  // Derive all child private keys for specified BIP44 paths.
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
