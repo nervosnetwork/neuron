@@ -394,15 +394,15 @@ export default class WalletService {
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
 
       const serializedWitnesses = witnessesArgs
-        .map(value => value.witnessArgs)
-        .map((value: WitnessArgs, index: number) => {
+        .map((value: any, index: number) => {
+          const args = value.witnessArgs
           if (index === 0) {
-            return value
+            return args
           }
-          if (value.lock === undefined && value.inputType === undefined && value.outputType === undefined) {
+          if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
             return '0x'
           }
-          return serializeWitnessArgs(value)
+          return serializeWitnessArgs(args)
         })
       const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
