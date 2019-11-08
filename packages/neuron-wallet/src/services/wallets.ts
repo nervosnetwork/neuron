@@ -4,7 +4,7 @@ import { AccountExtendedPublicKey, PathAndPrivateKey } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
 import LockUtils from 'models/lock-utils'
-import { TransactionWithoutHash, Input } from 'types/cell-types'
+import { TransactionWithoutHash, Input, WitnessArgs } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
 import { Address as AddressInterface } from 'database/address/dao'
@@ -344,13 +344,8 @@ export default class WalletService {
     return this.sendTx(walletID, tx, password, description)
   }
 
-  public sendTx = async (
-    walletID: string = '',
-    tx: TransactionWithoutHash,
-    password: string = '',
-    description: string = ''
-  ) => {
-    const wallet = await this.get(walletID)
+  public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
@@ -359,32 +354,59 @@ export default class WalletService {
       throw new IsRequired('Password')
     }
 
+    const txHash = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
+
     const addressInfos = await this.getAddressInfos(walletID)
-
-    let txHash: string = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
-    if (!txHash.startsWith('0x')) {
-      txHash = `0x${txHash}`
-    }
-
-    const { inputs } = tx
-
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
-
-    const witnesses: string[] = inputs!.map((input: Input) => {
-      const blake160: string = input.lock!.args!
-      const info = addressInfos.find(i => i.blake160 === blake160)
-      const { path } = info!
+    const findPrivateKey = (blake160: string) => {
+      const { path } = addressInfos.find(i => i.blake160 === blake160)!
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
       }
-      const { privateKey } = pathAndPrivateKey
-      const witness = this.signWitness('', privateKey, txHash)
-      return witness
+      return pathAndPrivateKey.privateKey
+    }
+
+    const witnessSigningEntries = tx.inputs!.map((input: Input) => {
+      const blake160: string = input.lock!.args!
+      const witnessArgs: WitnessArgs = {
+        lock: undefined,
+        inputType: undefined,
+        outputType: undefined
+      }
+      return {
+        // TODO: fill in required DAO's type witness here
+        witnessArgs,
+        lockHash: input.lockHash!,
+        witness: '',
+        blake160,
+      }
     })
 
-    tx.witnesses = witnesses
+    const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
+
+    for (const lockHash of lockHashes) {
+      const firstIndex = witnessSigningEntries.findIndex(w => w.lockHash === lockHash)
+      const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
+      // A 65-byte empty signature used as placeholder
+      witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
+
+      const privateKey = findPrivateKey(witnessesArgs[0].blake160)
+      const signedWitness = core.signWitnesses(privateKey)({
+        transactionHash: txHash,
+        witnesses: witnessesArgs.map(w => w.witnessArgs)
+      })[0] as string
+
+      for (const w of witnessSigningEntries) {
+        if (w.lockHash === lockHash) {
+          w.witness = '0x'
+        }
+      }
+      witnessSigningEntries[firstIndex].witness = signedWitness
+    }
+
+    tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
     const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
     await core.rpc.sendTransaction(txToSend)
@@ -403,9 +425,7 @@ export default class WalletService {
     return txHash
   }
 
-  public calculateFee = async (
-    tx: TransactionWithoutHash
-  ) => {
+  public calculateFee = async (tx: TransactionWithoutHash) => {
     const inputCapacities = tx.inputs!
       .map(input => BigInt(input.capacity!))
       .reduce((result, c) => result + c, BigInt(0))
@@ -474,12 +494,11 @@ export default class WalletService {
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
   public getAddressInfos = async (walletID: string): Promise<AddressInterface[]> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
-    const addrs = await AddressService.allAddressesByWalletId(walletID)
-    return addrs
+    return AddressService.allAddressesByWalletId(walletID)
   }
 
   public getChangeAddress = async (): Promise<string> => {
@@ -500,7 +519,7 @@ export default class WalletService {
     })[0] as string
   }
 
-  // Derivate all child private keys for specified BIP44 paths.
+  // Derive all child private keys for specified BIP44 paths.
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     const masterKeychain = new Keychain(
