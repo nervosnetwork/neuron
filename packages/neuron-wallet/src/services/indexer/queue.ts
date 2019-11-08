@@ -48,6 +48,8 @@ export default class IndexerQueue {
 
   private url: string
 
+  private emptyTxHash = '0x' + '0'.repeat(64)
+
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
     this.lockHashInfos = lockHashInfos
     this.url = url
@@ -213,6 +215,9 @@ export default class IndexerQueue {
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
               for (const input of transaction.inputs!) {
+                if (input.previousOutput!.txHash === this.emptyTxHash) {
+                  continue
+                }
                 const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
                 const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
                 const previousOutput = previousTx.outputs![+input.previousOutput!.index]

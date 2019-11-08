@@ -18,8 +18,6 @@ export enum NeuronWalletActions {
   // Connection
   UpdateConnectionStatus = 'updateConnectionStatus',
   UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
-  // settings
-  UpdateSkipDataAndType = 'updateSkipDataAndType',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -79,7 +77,6 @@ export const reducer = (
         syncedBlockNumber,
         connectionStatus,
         codeHash,
-        skipDataAndType,
       } = payload
       return {
         ...state,
@@ -95,22 +92,9 @@ export const reducer = (
         settings: {
           general: {
             ...state.settings.general,
-            skipDataAndType,
           },
           networks,
           wallets,
-        },
-      }
-    }
-    case NeuronWalletActions.UpdateSkipDataAndType: {
-      return {
-        ...state,
-        settings: {
-          ...settings,
-          general: {
-            ...settings.general,
-            skipDataAndType: payload,
-          },
         },
       }
     }
