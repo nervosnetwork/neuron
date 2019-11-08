@@ -368,7 +368,7 @@ export default class WalletService {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessesWithLockHashes = tx.inputs!.map((input: Input) => {
+    const witnessSigningEntries = tx.inputs!.map((input: Input) => {
       const blake160: string = input.lock!.args!
       const witnessArgs: WitnessArgs = {
         lock: undefined,
@@ -384,31 +384,29 @@ export default class WalletService {
       }
     })
 
-    const lockHashes = new Set(witnessesWithLockHashes.map(w => w.lockHash))
+    const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
 
     for (const lockHash of lockHashes) {
-      const firstIndex = witnessesWithLockHashes.findIndex(w => w.lockHash === lockHash)
-      const witnessesArgsWithBlake160 = witnessesWithLockHashes
-        .filter(w => w.lockHash === lockHash)
-        .map(w => ({args: w.witnessArgs, blake160: w.blake160}))
+      const firstIndex = witnessSigningEntries.findIndex(w => w.lockHash === lockHash)
+      const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
-      witnessesArgsWithBlake160[0].args.lock = '0x' + '0'.repeat(130)
+      witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
 
-      const privateKey = findPrivateKey(witnessesArgsWithBlake160[0].blake160)
+      const privateKey = findPrivateKey(witnessesArgs[0].blake160)
       const signedWitness = core.signWitnesses(privateKey)({
         transactionHash: txHash,
-        witnesses: witnessesArgsWithBlake160.map(w => w.args)
+        witnesses: witnessesArgs.map(w => w.witnessArgs)
       })[0] as string
 
-      for (const w of witnessesWithLockHashes) {
+      for (const w of witnessSigningEntries) {
         if (w.lockHash === lockHash) {
           w.witness = '0x'
         }
       }
-      witnessesWithLockHashes[firstIndex].witness = signedWitness
+      witnessSigningEntries[firstIndex].witness = signedWitness
     }
 
-    tx.witnesses = witnessesWithLockHashes.map(w => w.witness)
+    tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
     const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
     await core.rpc.sendTransaction(txToSend)
