@@ -162,12 +162,16 @@ export class TransactionPersistor {
       output.status = outputStatus
       if (o.type) {
         output.typeScript = o.type
+        output.typeHash = o.typeHash ? o.typeHash : null
       }
       const data = outputsData[index]
       if (data && data !== '0x') {
         output.hasData = true
       } else {
         output.hasData = false
+      }
+      if (o.daoData) {
+        output.daoData = o.daoData
       }
       return output
     })

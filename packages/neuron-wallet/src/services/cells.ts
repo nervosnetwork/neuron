@@ -4,6 +4,8 @@ import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import SkipDataAndType from './settings/skip-data-and-type'
+import FeeMode from 'models/fee-mode'
+import { PaginationResult } from './tx'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -42,6 +44,32 @@ export default class CellsService {
     const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
 
     return capacity.toString()
+  }
+
+  public static getDaoCells = async (
+    lockHashes: string[],
+    page: number,
+    perPage: number
+  ): Promise<PaginationResult<Cell>> => {
+    const skip = (page - 1) * perPage
+
+    const outputsAndCount: [OutputEntity[], number] = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where(`output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
+        lockHashes,
+      })
+      .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
+      .addOrderBy('tx.timestamp', 'ASC')
+      .skip(skip)
+      .limit(perPage)
+      .getManyAndCount()
+
+    return {
+      totalCount: outputsAndCount[1],
+      items: outputsAndCount[0].map(o => o.toInterface()),
+    }
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
@@ -83,17 +111,14 @@ export default class CellsService {
     const feeRateInt = BigInt(feeRate)
     let needFee = BigInt(0)
 
-    let mode: 'fee' | 'feeRate' = 'fee'
-    if (feeRateInt > 0) {
-      mode = 'feeRate'
-    }
+    const mode = new FeeMode(feeRateInt)
 
     // use min secp size (without data)
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
-    if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
-      throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
-    }
+    // if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
+    //   throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
+    // }
 
     const queryParams = {
       lockHash: In(lockHashes),
@@ -138,7 +163,7 @@ export default class CellsService {
       inputCapacities += BigInt(cell.capacity)
 
       let diff = inputCapacities - capacityInt - feeInt
-      if (mode === 'feeRate') {
+      if (mode.isFeeRateMode()) {
         needFee += CellsService.everyInputFee(feeRateInt)
         diff = inputCapacities - capacityInt - needFee
       }
@@ -149,7 +174,7 @@ export default class CellsService {
     })
 
     let totalCapacities = capacityInt + feeInt
-    if (mode === 'feeRate') {
+    if (mode.isFeeRateMode()) {
       totalCapacities = capacityInt + needFee
     }
 
