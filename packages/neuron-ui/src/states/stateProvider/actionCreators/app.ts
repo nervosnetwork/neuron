@@ -26,7 +26,6 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           syncedBlockNumber = '',
           connectionStatus = false,
           codeHash = '',
-          skipDataAndType = false,
         } = res.result
         dispatch({
           type: NeuronWalletActions.InitAppState,
@@ -39,7 +38,6 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
             syncedBlockNumber,
             connectionStatus,
             codeHash,
-            skipDataAndType,
           },
         })
         if (!wallet) {

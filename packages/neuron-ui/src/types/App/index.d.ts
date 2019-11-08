@@ -143,9 +143,7 @@ declare namespace State {
     }
   }
   interface Settings {
-    general: {
-      skipDataAndType: boolean
-    }
+    general: {}
     networks: Network[]
     wallets: WalletIdentity[]
   }
