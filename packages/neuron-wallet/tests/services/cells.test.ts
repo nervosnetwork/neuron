@@ -354,8 +354,6 @@ describe('CellsService', () => {
       it('get all in correct order', async () => {
         const cells = await CellsService.getDaoCells(
           [bob.lockHash],
-          1,
-          10
         )
         const expectedCapacitySort = [
           '2000',
@@ -363,7 +361,7 @@ describe('CellsService', () => {
           '1000',
           '3000',
         ].map(capacity => toShannon(capacity))
-        expect(cells.items.map(c => c.capacity)).toEqual(expectedCapacitySort)
+        expect(cells.map(c => c.capacity)).toEqual(expectedCapacitySort)
       })
     })
   })

@@ -25,8 +25,6 @@ declare module Controller {
 
     interface GetDaoCellsParams {
       walletID: string
-      pageNo: number
-      pageSize: number
     }
 
     interface BackupWallet {
