@@ -2,7 +2,6 @@ export * from './app'
 export * from './wallets'
 export * from './networks'
 export * from './transactions'
-export * from './skipDataAndType'
 
 const REMOTE_MODULE_NOT_FOUND =
   'The remote module is not found, please make sure the UI is running inside the Electron App'
