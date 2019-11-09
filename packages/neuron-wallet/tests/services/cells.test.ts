@@ -335,6 +335,8 @@ describe('CellsService', () => {
         tx.timestamp = timestamp
         tx.status = TransactionStatus.Success
         tx.witnesses = []
+        tx.blockNumber = '1'
+        tx.blockHash = '0x10'
         return tx
       }
       beforeEach(async done => {
@@ -362,6 +364,16 @@ describe('CellsService', () => {
           '3000',
         ].map(capacity => toShannon(capacity))
         expect(cells.map(c => c.capacity)).toEqual(expectedCapacitySort)
+      })
+
+      it('make sure timestamp/blockNumber/blockHash', async () => {
+        const cells = await CellsService.getDaoCells(
+          [bob.lockHash],
+        )
+        const firstCell = cells[0]!
+        expect(firstCell.timestamp).toBeDefined()
+        expect(firstCell.blockNumber).toBeDefined()
+        expect(firstCell.blockHash).toBeDefined()
       })
     })
   })

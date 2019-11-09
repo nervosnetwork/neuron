@@ -52,13 +52,29 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status = :status AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
+      .where(`output.status = :status AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
         lockHashes,
         status: OutputStatus.Live,
       })
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
+
+    const cells = outputs.map(o => o.toInterface())
+    for (const o of cells) {
+      const output = await getConnection()
+        .getRepository(OutputEntity)
+        .createQueryBuilder('output')
+        .leftJoinAndSelect('output.transaction', 'tx')
+        .where(`(output.outPointTxHash, output.outPointIndex) IN (select outPointTxHash, outPointIndex from input where input.transactionHash = :transactionHash)`, {
+          transactionHash: o.outPoint!.txHash,
+        })
+        .getOne()
+
+      if (output) {
+        o.depositOutPoint = output.outPoint()
+      }
+    }
 
     return outputs.map(o => o.toInterface())
   }
