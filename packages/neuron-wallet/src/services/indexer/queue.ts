@@ -231,6 +231,17 @@ export default class IndexerQueue {
                 input.lock = previousOutput.lock
                 input.lockHash = LockUtils.lockScriptToHash(input.lock)
                 input.capacity = previousOutput.capacity
+                if (
+                  type === TxPointType.CreatedBy &&
+                  previousOutput.type &&
+                  LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                  previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+                ) {
+                  transaction.outputs![+txPoint.index].depositOutPoint = {
+                    txHash: input.previousOutput!.txHash,
+                    index: input.previousOutput!.index,
+                  }
+                }
               }
 
               const outputs = transaction.outputs!

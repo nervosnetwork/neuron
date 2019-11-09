@@ -60,6 +60,20 @@ export default class GetBlocks {
               input.lock = previousOutput.lock
               input.lockHash = LockUtils.lockScriptToHash(input.lock)
               input.capacity = previousOutput.capacity
+
+              if (
+                previousOutput.type &&
+                LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+              ) {
+                const output = tx.outputs!.filter(o => o.daoData && o.daoData !== '0x0000000000000000')[0]
+                if (output) {
+                  output.depositOutPoint = {
+                    txHash: input.previousOutput!.txHash,
+                    index: input.previousOutput!.index,
+                  }
+                }
+              }
             }
           }
           await TransactionPersistor.saveFetchTx(tx)

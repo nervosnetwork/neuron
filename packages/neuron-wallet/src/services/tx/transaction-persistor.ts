@@ -173,6 +173,10 @@ export class TransactionPersistor {
       if (o.daoData) {
         output.daoData = o.daoData
       }
+      if (o.depositOutPoint) {
+        output.depositTxHash = o.depositOutPoint.txHash
+        output.depositIndex = o.depositOutPoint.index
+      }
       return output
     })
 

@@ -57,11 +57,33 @@ export default class Output extends BaseEntity {
   })
   hasData!: boolean
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  depositTxHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  depositIndex: string | null = null
+
   public outPoint(): OutPoint {
     return {
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
     }
+  }
+
+  public depositOutPoint(): OutPoint | undefined {
+    if (this.depositTxHash && this.depositIndex) {
+      return {
+        txHash: this.depositTxHash,
+        index: this.depositIndex
+      }
+    }
+    return undefined
   }
 
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
@@ -83,6 +105,7 @@ export default class Output extends BaseEntity {
       timestamp,
       blockNumber,
       blockHash,
+      depositOutPoint: this.depositOutPoint(),
     }
   }
 }
