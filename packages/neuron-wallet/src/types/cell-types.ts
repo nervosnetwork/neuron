@@ -103,6 +103,7 @@ export interface Cell {
   timestamp?: string | null
   blockNumber?: string | null
   blockHash?: string | null
+  depositOutPoint?: OutPoint
 }
 
 export interface OutPoint {

@@ -60,6 +60,22 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
+    const cells = outputs.map(o => o.toInterface())
+    for (const o of cells) {
+      const output = await getConnection()
+        .getRepository(OutputEntity)
+        .createQueryBuilder('output')
+        .leftJoinAndSelect('output.transaction', 'tx')
+        .where(`(output.outPointTxHash, output.outPointIndex) IN (select outPointTxHash, outPointIndex from input where input.transactionHash = :transactionHash)`, {
+          transactionHash: o.outPoint!.txHash,
+        })
+        .getOne()
+
+      if (output) {
+        o.depositOutPoint = output.outPoint()
+      }
+    }
+
     return outputs.map(o => o.toInterface())
   }
 
