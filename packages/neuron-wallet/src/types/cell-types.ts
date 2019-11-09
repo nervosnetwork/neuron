@@ -100,6 +100,9 @@ export interface Cell {
   lockHash?: string
   typeHash?: string | null
   daoData?: string | null
+  timestamp?: string | null
+  blockNumber?: string | null
+  blockHash?: string | null
 }
 
 export interface OutPoint {

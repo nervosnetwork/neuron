@@ -68,6 +68,9 @@ export default class Output extends BaseEntity {
   transaction!: TransactionEntity
 
   public toInterface(): Cell {
+    const timestamp = this.transaction && (this.transaction.timestamp || this.transaction.createdAt)
+    const blockNumber = this.transaction && this.transaction.blockNumber
+    const blockHash = this.transaction && this.transaction.blockHash
     return {
       capacity: this.capacity,
       lock: this.lock,
@@ -76,7 +79,10 @@ export default class Output extends BaseEntity {
       status: this.status,
       type: this.typeScript,
       typeHash: this.typeHash,
-      daoData: this.daoData
+      daoData: this.daoData,
+      timestamp,
+      blockNumber,
+      blockHash,
     }
   }
 }
