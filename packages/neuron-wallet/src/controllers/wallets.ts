@@ -405,7 +405,7 @@ export default class WalletsController {
     capacity: string,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -427,7 +427,7 @@ export default class WalletsController {
     outPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -444,18 +444,18 @@ export default class WalletsController {
     }
   }
 
-  public static async withdrawFormDao(params: {
+  public static async withdrawFromDao(params: {
     walletID: string,
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
     const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.withdrawFormDao(
+    const tx = await walletsService.withdrawFromDao(
       params.walletID,
       params.depositOutPoint,
       params.withdrawingOutPoint,

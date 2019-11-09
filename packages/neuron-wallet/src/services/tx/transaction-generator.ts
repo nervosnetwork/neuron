@@ -173,7 +173,7 @@ export class TransactionGenerator {
     changeAddress: string,
     fee: string = '0',
     feeRate: string = '0'
-  ) => {
+  ): Promise<TransactionWithoutHash> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
     const blake160: string = LockUtils.addressToBlake160(receiveAddress)
     const daoScriptInfo = await DaoUtils.daoScript()
@@ -224,15 +224,14 @@ export class TransactionGenerator {
     const totalFee = feeWithoutInputs + needFeeInt
 
     // change
-    if (
-      mode.isFeeMode() && BigInt(capacities) > capacityInt + feeInt ||
-      mode.isFeeRateMode() && BigInt(capacities) > capacityInt + feeWithoutInputs + needFeeInt
-    ) {
+    let finalFee: bigint = feeInt
+    if (mode.isFeeRateMode()) {
+      finalFee = totalFee
+    }
+    if (BigInt(capacities) > capacityInt + finalFee) {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
-      let changeCapacity = BigInt(capacities) - capacityInt - feeInt
-      if (mode.isFeeRateMode()) {
-        changeCapacity = BigInt(capacities) - capacityInt - totalFee
-      }
+
+      const changeCapacity = BigInt(capacities) - capacityInt - finalFee
 
       const changeOutput: Cell = {
         capacity: changeCapacity.toString(),
@@ -264,6 +263,7 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
+      fee: finalFee.toString(),
     }
   }
 }

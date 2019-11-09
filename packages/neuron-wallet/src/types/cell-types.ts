@@ -58,6 +58,8 @@ export interface TransactionWithoutHash {
   createdAt?: string
   updatedAt?: string
   witnessArgs?: WitnessArgs[]
+  fee?: string
+  interest?: string
 }
 
 export interface Transaction extends TransactionWithoutHash {

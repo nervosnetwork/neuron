@@ -199,7 +199,7 @@ export default class ApiController {
     capacity: string,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     return WalletsController.generateDepositTx(params)
   }
 
@@ -209,19 +209,19 @@ export default class ApiController {
     outPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
     return WalletsController.startWithdrawFromDao(params)
   }
 
   @MapApiResponse
-  public static async withdrawFormDao(params: {
+  public static async withdrawFromDao(params: {
     walletID: string,
     depositOutPoint: OutPoint,
     withdrawingOutPoint: OutPoint,
     fee: string,
     feeRate: string,
-  }) {
-    return WalletsController.withdrawFormDao(params)
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.withdrawFromDao(params)
   }
 
   @MapApiResponse
