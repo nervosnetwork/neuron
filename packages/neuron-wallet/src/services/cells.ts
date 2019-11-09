@@ -62,21 +62,23 @@ export default class CellsService {
 
     const cells = outputs.map(o => o.toInterface())
     for (const o of cells) {
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .createQueryBuilder('output')
-        .leftJoinAndSelect('output.transaction', 'tx')
-        .where(`(output.outPointTxHash, output.outPointIndex) IN (select outPointTxHash, outPointIndex from input where input.transactionHash = :transactionHash)`, {
-          transactionHash: o.outPoint!.txHash,
-        })
-        .getOne()
+      if (o.daoData !== '0x0000000000000000') {
+        const output = await getConnection()
+          .getRepository(OutputEntity)
+          .createQueryBuilder('output')
+          .leftJoinAndSelect('output.transaction', 'tx')
+          .where(`(output.outPointTxHash, output.outPointIndex) IN (select outPointTxHash, outPointIndex from input where input.transactionHash = :transactionHash)`, {
+            transactionHash: o.outPoint!.txHash,
+          })
+          .getOne()
 
-      if (output) {
-        o.depositOutPoint = output.outPoint()
+        if (output) {
+          o.depositOutPoint = output.outPoint()
+        }
       }
     }
 
-    return outputs.map(o => o.toInterface())
+    return cells
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
