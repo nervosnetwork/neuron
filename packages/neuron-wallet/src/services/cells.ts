@@ -52,7 +52,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status = :status AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes)`, {
+      .where(`output.status = :status AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
         lockHashes,
         status: OutputStatus.Live,
       })
