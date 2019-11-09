@@ -246,9 +246,10 @@ const Transaction = () => {
     })
   }, [])
 
-  // TODO: add conditional branch on mainnet and testnet
   const onExplorerBtnClick = useCallback(() => {
-    openExternal(`https://explorer.nervos.org/transaction/${transaction.hash}`)
+    const isMainnet = false // TODO: add conditional branch on mainnet and testnet
+    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
+    openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
   }, [transaction.hash])
 
   const basicInfoItems = useMemo(
