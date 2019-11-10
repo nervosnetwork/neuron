@@ -325,13 +325,13 @@
       "deposit-value": "存款",
       "interest": "利息",
       "yield": "Yield",
-      "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块完成最终取款。",
+      "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(~{{days}}天)完成最终取款。",
       "deposit-terms": "Nervos DAO is a system layer decentralized infrastructure. Your saving here is secure.\nAccording to the Nervos DAO protocol, you need at least 180 epochs to withdraw your deposit",
       "deposited-action-label": "Withdraw",
       "withdrawing-action-label": "Claim",
       "minimal-fee-required": "存入金额应不少于 {{minimal}} CKB",
       "interest-accumulated": "已累计 {{blockNumber}} 个块的利息",
-      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块"
+      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(~{{days}} 天)"
     }
   }
 }

@@ -77,7 +77,7 @@ const NervosDAO = ({
       }, 500)
       setDepositValue(value)
     },
-    [clearGeneratedTx, dispatch, wallet.id]
+    [clearGeneratedTx, dispatch, wallet.id, t]
   )
 
   useEffect(() => {
@@ -282,6 +282,7 @@ const NervosDAO = ({
           onDismiss={onWithdrawDialogDismiss}
           onSubmit={onWithdrawDialogSubmit}
           tipBlockHash={tipBlockHash}
+          currentEpoch={epoch}
         />
       ) : null}
     </>

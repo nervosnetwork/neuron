@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { ckbCore, getBlockByNumber } from 'services/chain'
 import calculateAPY from 'utils/calculateAPY'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
+import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
-import { WITHDRAW_EPOCHS } from 'utils/const'
+// import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import * as styles from './daoRecordRow.module.scss'
 
@@ -74,24 +75,16 @@ const DAORecord = ({
   } else {
     const depositEpochInfo = epochParser(depositEpoch)
     const currentEpochInfo = epochParser(epoch)
-
-    let depositedEpochs = currentEpochInfo.number - depositEpochInfo.number
-    const depositEpochFraction = depositEpochInfo.index * currentEpochInfo.length
-    const currentEpochFraction = currentEpochInfo.index * depositEpochInfo.length
-    if (currentEpochFraction > depositEpochFraction) {
-      depositedEpochs += BigInt(1)
-    }
-    const minLockEpochs =
-      ((depositedEpochs + BigInt(WITHDRAW_EPOCHS - 1)) / BigInt(WITHDRAW_EPOCHS)) * BigInt(WITHDRAW_EPOCHS)
-    const targetEpochNumber = depositEpochInfo.number + minLockEpochs
-
+    const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, currentEpochInfo)
     if (targetEpochNumber < currentEpochInfo.number + BigInt(1) && targetEpochNumber >= currentEpochInfo.number) {
       metaInfo = 'Ready'
       ready = true
     } else {
+      const epochs = targetEpochNumber - currentEpochInfo.number - BigInt(1)
       metaInfo = t('nervos-dao.blocks-left', {
-        epochs: localNumberFormatter(targetEpochNumber - currentEpochInfo.number - BigInt(1)),
-        blocks: currentEpochInfo.length - currentEpochInfo.index,
+        epochs: localNumberFormatter(epochs),
+        blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
+        days: localNumberFormatter(epochs / BigInt(6)),
       })
     }
   }
