@@ -6,7 +6,6 @@ import calculateAPY from 'utils/calculateAPY'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
-// import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import * as styles from './daoRecordRow.module.scss'
 
@@ -39,8 +38,17 @@ const DAORecord = ({
     if (!withdrawBlockHash) {
       return
     }
+    const formattedDepositOutPoint = depositOutPoint
+      ? {
+          txHash: depositOutPoint.txHash,
+          index: BigInt(depositOutPoint.index),
+        }
+      : {
+          txHash,
+          index: BigInt(index),
+        }
     ;(ckbCore.rpc as any)
-      .calculateDaoMaximumWithdraw({ txHash, index: `0x${BigInt(index).toString(16)}` }, withdrawBlockHash)
+      .calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
       .then((res: string) => {
         setWithdrawValue(BigInt(res).toString())
       })
