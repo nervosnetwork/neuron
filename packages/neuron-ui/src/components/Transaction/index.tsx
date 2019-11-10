@@ -8,7 +8,7 @@ import { ckbCore } from 'services/chain'
 import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { ErrorCode } from 'utils/const'
+import { ErrorCode, MAINNET_TAG } from 'utils/const'
 import { explorerNavButton } from './style.module.scss'
 
 const MIN_CELL_WIDTH = 70
@@ -199,9 +199,7 @@ const Transaction = () => {
           }
 
           setAddressPrefix(
-            network.chain === process.env.REACT_APP_MAINNET_TAG
-              ? ckbCore.utils.AddressPrefix.Mainnet
-              : ckbCore.utils.AddressPrefix.Testnet
+            network.chain === MAINNET_TAG ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
           )
         }
       })
