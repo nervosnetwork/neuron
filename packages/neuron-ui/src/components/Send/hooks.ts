@@ -52,18 +52,18 @@ const useOnTransactionChange = (
   items: TransactionOutput[],
   price: string,
   dispatch: StateDispatch,
-  setIsTransactionValid: Function,
-  setTotalAmount: Function
+  setTotalAmount: Function,
+  setErrorMessage: Function
 ) => {
   useEffect(() => {
     clearTimeout(generateTxTimer)
+    setErrorMessage('')
     generateTxTimer = setTimeout(() => {
       dispatch({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
       if (verifyTransactionOutputs(items)) {
-        setIsTransactionValid(true)
         const totalAmount = outputsToTotalAmount(items)
         setTotalAmount(totalAmount)
         const realParams = {
@@ -81,16 +81,25 @@ const useOnTransactionChange = (
                 type: AppActions.UpdateGeneratedTx,
                 payload: res.result,
               })
+            } else {
+              throw new Error(res.message.content)
             }
           })
           .catch((err: Error) => {
-            console.error(err)
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: '',
+            })
+            setErrorMessage(err.message)
           })
       } else {
-        setIsTransactionValid(false)
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: '',
+        })
       }
     }, 300)
-  }, [walletID, items, price, dispatch, setIsTransactionValid, setTotalAmount])
+  }, [walletID, items, price, dispatch, setTotalAmount])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
@@ -176,8 +185,8 @@ export const useInitialize = (
 ) => {
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
 
-  const [isTransactionValid, setIsTransactionValid] = useState(false)
   const [totalAmount, setTotalAmount] = useState('0')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -235,8 +244,6 @@ export const useInitialize = (
     fee,
     totalAmount,
     setTotalAmount,
-    isTransactionValid,
-    setIsTransactionValid,
     useOnTransactionChange,
     onItemChange,
     addTransactionOutput,
@@ -247,6 +254,8 @@ export const useInitialize = (
     onGetAmountErrorMessage,
     onSubmit,
     onClear,
+    errorMessage,
+    setErrorMessage,
   }
 }
 
