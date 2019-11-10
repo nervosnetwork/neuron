@@ -98,7 +98,6 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
               placeholder={t(`import-keystore.placeholder.${key}`)}
               type={key === 'password' ? 'password' : 'text'}
               readOnly={key === 'path'}
-              maxLength={maxLength}
               value={value}
               validateOnLoad={false}
               onGetErrorMessage={(text?: string) => {
@@ -107,6 +106,13 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
                 }
                 if (key === 'name' && isNameUsed) {
                   return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `name`, fieldValue: text })
+                }
+                if (text && maxLength && text.length > maxLength) {
+                  return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
+                    fieldName: key,
+                    fieldValue: text,
+                    length: maxLength,
+                  })
                 }
                 return ''
               }}
