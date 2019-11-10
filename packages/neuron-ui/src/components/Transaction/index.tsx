@@ -30,8 +30,10 @@ const CompactAddress = ({ address }: { address: string }) => (
 const Transaction = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
-  const [addressPrefix, setAddressPrefix] = useState(ckbCore.utils.AddressPrefix.Mainnet)
+  const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
+
+  const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
   const inputColumns: IColumn[] = useMemo(
     () =>
@@ -198,9 +200,7 @@ const Transaction = () => {
             throw new Error('Cannot find current network in the network list')
           }
 
-          setAddressPrefix(
-            network.chain === MAINNET_TAG ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
-          )
+          setIsMainnet(network.chain === MAINNET_TAG)
         }
       })
       .catch(err => console.warn(err))
@@ -245,10 +245,9 @@ const Transaction = () => {
   }, [])
 
   const onExplorerBtnClick = useCallback(() => {
-    const isMainnet = false // TODO: add conditional branch on mainnet and testnet
     const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
     openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
-  }, [transaction.hash])
+  }, [transaction.hash, isMainnet])
 
   const basicInfoItems = useMemo(
     () => [
