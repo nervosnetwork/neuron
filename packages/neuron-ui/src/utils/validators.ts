@@ -3,6 +3,9 @@ import { ckbCore } from 'services/chain'
 import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 
 export const verifyAddress = (address: string): boolean => {
+  if (typeof address !== 'string' || address.length !== 46) {
+    return false
+  }
   try {
     return ckbCore.utils.parseAddress(address, 'hex').startsWith('0x0100')
   } catch (err) {
