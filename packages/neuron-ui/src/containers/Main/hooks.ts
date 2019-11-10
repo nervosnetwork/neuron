@@ -19,7 +19,7 @@ import {
   SyncedBlockNumber as SyncedBlockNumberSubject,
   Command as CommandSubject,
 } from 'services/subjects'
-import { ckbCore, getTipBlockNumber, getBlockchainInfo } from 'services/chain'
+import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
 import { ConnectionStatus, ErrorCode } from 'utils/const'
 import {
   networks as networksCache,
@@ -32,46 +32,24 @@ const SYNC_INTERVAL_TIME = 10000
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
-    const syncTipNumber = () =>
-      getTipBlockNumber()
-        .then(tipBlockNumber => {
+    const syncBlockchainInfo = () => {
+      Promise.all([getTipHeader(), getBlockchainInfo()])
+        .then(([header, chainInfo]) => {
           dispatch({
-            type: AppActions.UpdateTipBlockNumber,
-            payload: BigInt(tipBlockNumber).toString(),
+            type: AppActions.UpdateChainInfo,
+            payload: {
+              tipBlockNumber: `${BigInt(header.number)}`,
+              tipBlockHash: header.hash,
+              chain: chainInfo.chain,
+              difficulty: `${BigInt(chainInfo.difficulty)}`,
+              epoch: chainInfo.epoch,
+            },
           })
+
           dispatch({
             type: AppActions.ClearNotificationsOfCode,
             payload: ErrorCode.NodeDisconnected,
           })
-        })
-        .catch((err: Error) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.error(err)
-          }
-        })
-
-    const syncBlockchainInfo = () => {
-      getBlockchainInfo()
-        .then(info => {
-          if (info) {
-            const { chain = '', difficulty: difficultyHex = '', epoch: epochHex = '', alerts = [] } = info
-            const difficulty = BigInt(difficultyHex).toString()
-            const epoch = BigInt(epochHex).toString()
-            if (alerts.length) {
-              alerts.forEach(a => {
-                // TODO: display alerts in Notification
-                console.info(a)
-              })
-            }
-            dispatch({
-              type: AppActions.UpdateChainInfo,
-              payload: {
-                chain,
-                difficulty,
-                epoch,
-              },
-            })
-          }
         })
         .catch((err: Error) => {
           if (process.env.NODE_ENV === 'development') {
@@ -82,10 +60,8 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
     clearInterval(timer)
     if (chainURL) {
       ckbCore.setNode(chainURL)
-      syncTipNumber()
       syncBlockchainInfo()
       timer = setInterval(() => {
-        syncTipNumber()
         syncBlockchainInfo()
       }, SYNC_INTERVAL_TIME)
     } else {

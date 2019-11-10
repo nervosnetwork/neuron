@@ -38,7 +38,7 @@ export default class AppController {
   createWindow = () => {
     const windowState = windowStateKeeper({
       defaultWidth: 1366,
-      defaultHeight: 768,
+      defaultHeight: 900,
     })
 
     this.mainWindow = new BrowserWindow({
@@ -46,7 +46,7 @@ export default class AppController {
       y: windowState.y,
       width: windowState.width,
       height: windowState.height,
-      minWidth: 800,
+      minWidth: 900,
       minHeight: 600,
       show: false,
       backgroundColor: '#e9ecef',
