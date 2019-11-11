@@ -84,7 +84,7 @@ const DAORecord = ({
     const depositEpochInfo = epochParser(depositEpoch)
     const currentEpochInfo = epochParser(epoch)
     const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, currentEpochInfo)
-    if (targetEpochNumber < currentEpochInfo.number + BigInt(1) && targetEpochNumber >= currentEpochInfo.number) {
+    if (targetEpochNumber <= currentEpochInfo.number) {
       metaInfo = 'Ready'
       ready = true
     } else {
