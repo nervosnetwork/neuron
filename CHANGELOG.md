@@ -1,3 +1,21 @@
+## [0.24.2](https://github.com/nervosnetwork/neuron/compare/v0.24.1...v0.24.2) (2019-11-08)
+
+
+### Bug Fixes
+
+* replace with empty string in input group rename witness ([5d59f3d](https://github.com/nervosnetwork/neuron/commit/5d59f3d))
+* skip get previous tx when cellbase ([41600ea](https://github.com/nervosnetwork/neuron/commit/41600ea))
+* skip get previous tx when cellbase in indexer ([7e8a578](https://github.com/nervosnetwork/neuron/commit/7e8a578))
+* skip the cellbase tx, not the first input ([aeeb464](https://github.com/nervosnetwork/neuron/commit/aeeb464))
+
+
+### Features
+
+* Disable search history by amount ([9bdece6](https://github.com/nervosnetwork/neuron/commit/9bdece6))
+* remove skip data and type toggle ([879d227](https://github.com/nervosnetwork/neuron/commit/879d227))
+
+
+
 ## [0.24.1](https://github.com/nervosnetwork/neuron/compare/v0.24.0...v0.24.1) (2019-11-07)
 
 
