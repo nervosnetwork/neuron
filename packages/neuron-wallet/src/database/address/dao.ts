@@ -20,7 +20,6 @@ export interface Address {
   sentBalance: string
   pendingBalance: string
   balance: string
-  totalBalance: string
   blake160: string
   version: AddressVersion
   description?: string
@@ -54,7 +53,6 @@ export default class AddressDao {
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
-  // totalBalance means balance of all cells, including those who hold data and type script
   public static updateTxCountAndBalance = async (
     address: string,
     url: string = NodeService.getInstance().core.rpc.node.url
@@ -78,7 +76,6 @@ export default class AddressDao {
         addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
         addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
         addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
-        addressEntity.totalBalance = '0'
         return addressEntity
       })
     )

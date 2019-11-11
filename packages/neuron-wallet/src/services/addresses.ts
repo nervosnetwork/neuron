@@ -181,7 +181,6 @@ export default class AddressService {
       sentBalance: '0',
       pendingBalance: '0',
       balance: '0',
-      totalBalance: '0',
       blake160,
       version: AddressVersion.Testnet,
     }
