@@ -27,7 +27,7 @@
       "difficulty": "难度",
       "address": "地址",
       "confirmation": "{{confirmationCount}}/{{threshold}} 个确认",
-      "confirmations": "{{confirmationCount}}{{threshold}} 个确认",
+      "confirmations": "{{confirmationCount}}/{{threshold}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
@@ -106,7 +106,8 @@
       "click-to-copy": "点击复制地址",
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
-      "address-qrcode": "地址二维码"
+      "address-qrcode": "地址二维码",
+      "address": "{{network}} 地址"
     },
     "history": {
       "meta": "元信息",
@@ -258,6 +259,7 @@
       "fields": {
         "wallet": "钱包",
         "name": "名称",
+        "password": "密码",
         "remote": "RPC URL",
         "network": "网络",
         "address": "地址",

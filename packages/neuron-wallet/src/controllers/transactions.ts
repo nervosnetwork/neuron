@@ -33,7 +33,7 @@ export default class TransactionsController {
 
     const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
 
-    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords)
+    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
 
     if (!transactions) {
       throw new ServiceHasNoResponse('Transactions')
