@@ -5,7 +5,6 @@ import { OutputStatus } from '../../src/services/tx/params'
 import { ScriptHashType, Script } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from '../../src/exceptions/wallet'
-import SkipDataAndType from '../../src/services/settings/skip-data-and-type'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -136,36 +135,22 @@ describe('CellsService', () => {
     it('getBalance, Live, skip', async () => {
       await createCells()
 
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Live, true)
+      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Live)
       expect(balance).toEqual('100')
     })
 
     it('getBalance, Sent, skip', async () => {
       await createCells()
 
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Sent, true)
+      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
       expect(balance).toEqual('200')
-    })
-
-    it('getBalance, Live, not skip', async () => {
-      await createCells()
-
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Live, false)
-      expect(balance).toEqual('11100')
-    })
-
-    it('getBalance, Pending, not skip', async () => {
-      await createCells()
-
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Pending, false)
-      expect(balance).toEqual('33300')
     })
 
     it('getBalance with alice', async () => {
       await createCells()
       await createCell('2222', OutputStatus.Live, false, null, alice)
 
-      const balance: string = await CellsService.getBalance([alice.lockHash, bob.lockHash], OutputStatus.Live, true)
+      const balance: string = await CellsService.getBalance([alice.lockHash, bob.lockHash], OutputStatus.Live)
       expect(balance).toEqual((100 + 2222).toString())
     })
 
@@ -173,7 +158,7 @@ describe('CellsService', () => {
       await createCells()
       await createCell('2222', OutputStatus.Live, false, null, alice)
 
-      const balance: string = await CellsService.getBalance([alice.lockHash], OutputStatus.Live, true)
+      const balance: string = await CellsService.getBalance([alice.lockHash], OutputStatus.Live)
       expect(balance).toEqual('2222')
     })
   })
@@ -191,7 +176,6 @@ describe('CellsService', () => {
     }
 
     it('1000, skip', async () => {
-      SkipDataAndType.getInstance().update(true)
       await createCells()
 
       const result = await CellsService.gatherInputs(toShannon('1000'), lockHashes)
@@ -200,7 +184,6 @@ describe('CellsService', () => {
     })
 
     it('1001, skip', async () => {
-      SkipDataAndType.getInstance().update(true)
       await createCells()
 
       let error
@@ -212,31 +195,7 @@ describe('CellsService', () => {
       expect(error).toBeInstanceOf(CapacityNotEnough)
     })
 
-    it('6000, not skip', async () => {
-      SkipDataAndType.getInstance().update(false)
-      await createCells()
-
-      const ckb = toShannon('6000')
-      const result = await CellsService.gatherInputs(ckb, lockHashes)
-
-      expect(result.capacities).toEqual(ckb)
-    })
-
-    it('6001, not skip', async () => {
-      SkipDataAndType.getInstance().update(false)
-      await createCells()
-
-      let error
-      try {
-        await CellsService.gatherInputs(toShannon('6001'), lockHashes)
-      } catch (e) {
-        error = e
-      }
-      expect(error).toBeInstanceOf(CapacityNotEnough)
-    })
-
     it(`bob's and alice's cells`, async () => {
-      SkipDataAndType.getInstance().update(true)
       await createCells()
       await createCell(toShannon('5000'), OutputStatus.Live, false, null, alice)
 
@@ -246,7 +205,6 @@ describe('CellsService', () => {
     })
 
     it(`only bob's cells`, async () => {
-      SkipDataAndType.getInstance().update(true)
       await createCells()
       await createCell(toShannon('5000'), OutputStatus.Live, false, null, alice)
 
@@ -274,7 +232,6 @@ describe('CellsService', () => {
 
     describe('skip, by feeRate 1000', () => {
       beforeEach(async done => {
-        SkipDataAndType.getInstance().update(true)
         const cells: OutputEntity[] = [
           generateCell(toShannon('1000'), OutputStatus.Live, false, null),
           generateCell(toShannon('2000'), OutputStatus.Live, false, null),

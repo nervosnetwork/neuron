@@ -35,7 +35,6 @@ describe('balance', () => {
       sentBalance: sentBalance.toString(),
       pendingBalance: pendingBalance.toString(),
       balance: '0',
-      totalBalance: '0',
       blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
       version: AddressVersion.Testnet,
     }

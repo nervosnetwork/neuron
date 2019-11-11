@@ -3,7 +3,6 @@ import OutputEntity from 'database/chain/entities/output'
 import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
-import SkipDataAndType from './settings/skip-data-and-type'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -11,21 +10,8 @@ export default class CellsService {
   // exclude hasData = true and typeScript != null
   public static getBalance = async (
     lockHashes: string[],
-    status: OutputStatus,
-    skipDataAndType: boolean
+    status: OutputStatus
   ): Promise<string> => {
-    const queryParams = {
-      lockHash: In(lockHashes),
-      status,
-    }
-
-    if (skipDataAndType) {
-      Object.assign(queryParams, {
-        hasData: false,
-        typeScript: null,
-      })
-    }
-
     const cells: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
@@ -36,7 +22,12 @@ export default class CellsService {
         "output.typeScript",
         "output.capacity"
       ])
-      .where(queryParams)
+      .where({
+        lockHash: In(lockHashes),
+        status,
+        hasData: false,
+        typeScript: null,
+      })
       .getMany()
 
     const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
@@ -95,23 +86,16 @@ export default class CellsService {
       throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
     }
 
-    const queryParams = {
-      lockHash: In(lockHashes),
-      status: OutputStatus.Live,
-    }
-    const skipDataAndType = SkipDataAndType.getInstance().get()
-    if (skipDataAndType) {
-      Object.assign(queryParams, {
-        hasData: false,
-        typeScript: null,
-      })
-    }
-
     // only live cells, skip which has data or type
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
-        where: queryParams,
+        where: {
+          lockHash: In(lockHashes),
+          status: OutputStatus.Live,
+          hasData: false,
+          typeScript: null,
+        },
       })
     cellEntities.sort((a, b) => {
       const result = BigInt(a.capacity) - BigInt(b.capacity)
