@@ -4,6 +4,7 @@ import { dialog, SaveDialogReturnValue, BrowserWindow } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
+import ChainInfo from 'models/chain-info'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
 import { ResponseCode } from 'utils/const'
@@ -22,6 +23,7 @@ import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
+import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 
 export default class WalletsController {
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -339,7 +341,16 @@ export default class WalletsController {
       feeRate = '1000'
     }
 
+    const isMainnet = ChainInfo.getInstance().isMainnet()
     params.items.forEach(item => {
+      if (isMainnet && !item.address.startsWith('ckb')) {
+        throw new MainnetAddressRequired(item.address)
+      }
+
+      if (!isMainnet && !item.address.startsWith('ckt')) {
+        throw new TestnetAddressRequired(item.address)
+      }
+
       if (!this.verifyAddress(item.address)) {
         throw new InvalidAddress(item.address)
       }

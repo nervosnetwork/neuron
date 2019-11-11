@@ -92,7 +92,9 @@ export default {
       'invalid-keystore': 'Keystore 格式不正确',
       'invalid-json': 'JSON 文件格式不正确',
       'cell-is-not-yet-live': 'Cell 尚未激活',
-      'transaction-is-not-committed-yet': '交易未提交'
+      'transaction-is-not-committed-yet': '交易未提交',
+      'mainnet-address-required': '{{address}} 不是主网地址',
+      'testnet-address-required': '{{address}} 不是测试网地址'
     },
     contextMenu: {
       select: '选择',

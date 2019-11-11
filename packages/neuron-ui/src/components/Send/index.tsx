@@ -38,7 +38,8 @@ const Send = ({
     loadings: { sending = false },
   },
   wallet: { id: walletID = '', balance = '' },
-  chain: { connectionStatus },
+  chain: { networkID, connectionStatus },
+  settings: { networks = [] },
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
@@ -66,6 +67,8 @@ const Send = ({
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
+  const network = networks.find(n => n.id === networkID)
+  const isMainnet = (network && network.chain === 'ckb') || false // TODO: shoudl be replaced after the mainnet tag is introduced
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
@@ -97,7 +100,7 @@ const Send = ({
                         onChange={onItemChange}
                         required
                         validateOnLoad={false}
-                        onGetErrorMessage={onGetAddressErrorMessage}
+                        onGetErrorMessage={onGetAddressErrorMessage(isMainnet)}
                       />
                     </Stack.Item>
                     <Stack styles={{ root: { width: '48px' } }} verticalAlign="start">

@@ -10,8 +10,14 @@ import {
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 
-export const verifyAddress = (address: string): boolean => {
+export const verifyAddress = (address: string, isMainnet?: boolean): boolean => {
   if (typeof address !== 'string' || address.length !== 46) {
+    return false
+  }
+  if (isMainnet === true && !address.startsWith('ckb')) {
+    return false
+  }
+  if (isMainnet === false && !address.startsWith('ckt')) {
     return false
   }
   try {

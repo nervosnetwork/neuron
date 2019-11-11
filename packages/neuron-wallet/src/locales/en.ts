@@ -93,7 +93,9 @@ export default {
       'invalid-keystore': 'Keystore is invalid',
       'invalid-json': 'Invalid JSON file',
       'cell-is-not-yet-live': 'Cell is not yet live!',
-      'transaction-is-not-committed-yet': 'Transaction is not committed yet!'
+      'transaction-is-not-committed-yet': 'Transaction is not committed yet!',
+      'mainnet-address-required': '{{address}} is not a mainnet address',
+      'testnet-address-required': '{{address}} is not a testnet address'
     },
     contextMenu: {
       select: 'Select',
