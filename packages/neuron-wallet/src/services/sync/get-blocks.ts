@@ -48,7 +48,7 @@ export default class GetBlocks {
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
-            for (const input of tx.inputs!) {
+            for (const [inputIndex, input] of tx.inputs!.entries()) {
               const previousTxHash = input.previousOutput!.txHash
               let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {
@@ -60,6 +60,7 @@ export default class GetBlocks {
               input.lock = previousOutput.lock
               input.lockHash = LockUtils.lockScriptToHash(input.lock)
               input.capacity = previousOutput.capacity
+              input.inputIndex = inputIndex.toString()
             }
           }
           await TransactionPersistor.saveFetchTx(tx)

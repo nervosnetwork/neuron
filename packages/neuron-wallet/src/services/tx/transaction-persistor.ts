@@ -134,6 +134,9 @@ export class TransactionPersistor {
       input.lockHash = i.lockHash || null
       input.lock = i.lock || null
       input.since = i.since!
+      if (i.inputIndex) {
+        input.inputIndex = i.inputIndex
+      }
       inputs.push(input)
 
       if (outPoint) {

@@ -48,6 +48,12 @@ export default class Input extends BaseEntity {
   })
   capacity: string | null = null
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  inputIndex: string | null = null
+
   public previousOutput(): OutPoint | null {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
