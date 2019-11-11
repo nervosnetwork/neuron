@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import Keystore from 'models/keys/keystore'
@@ -15,6 +16,7 @@ import {
   EmptyPassword,
   IncorrectPassword,
   InvalidJSON,
+  InvalidAddress,
 } from 'exceptions'
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
@@ -338,6 +340,13 @@ export default class WalletsController {
     if (!params.fee || params.fee === '0') {
       feeRate = '1000'
     }
+
+    params.items.forEach(item => {
+      if (!this.verifyAddress(item.address)) {
+        throw new InvalidAddress(item.address)
+      }
+    })
+
     const walletsService = WalletsService.getInstance()
     const hash = await walletsService.sendCapacity(
       params.walletID,
@@ -433,6 +442,17 @@ export default class WalletsController {
         address,
         description,
       },
+    }
+  }
+
+  private static verifyAddress = (address: string): boolean => {
+    if (typeof address !== 'string' || address.length !== 46) {
+      return false
+    }
+    try {
+      return parseAddress(address, 'hex').startsWith('0x0100')
+    } catch (err) {
+      return false
     }
   }
 }
