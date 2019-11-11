@@ -27,6 +27,6 @@ export default class ChainInfo {
     if (this.isMainnet()) {
       return "https://explorer.nervos.org"
     }
-    return "https://explorer.nervos.org" // TODO: change this to proper testnet explorer URL
+    return "https://explorer.nervos.org/testnet"
   }
 }
