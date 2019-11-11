@@ -259,6 +259,7 @@
       "fields": {
         "wallet": "钱包",
         "name": "名称",
+        "password": "密码",
         "remote": "RPC URL",
         "network": "网络",
         "address": "地址",
