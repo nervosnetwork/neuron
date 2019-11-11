@@ -40,10 +40,11 @@ nsis:
 
 dmg:
   sign: false
+  artifactName: "${productName}-v${version}.${ext}"
 
 win:
   verifyUpdateCodeSignature: false
-  artifactName: "${productName}-v${version}-${os}-${arch}-installer.${ext}"
+  artifactName: "${productName}-v${version}-setup.${ext}"
   icon: assets/icons/icon.ico
   target:
     - target: nsis
@@ -64,7 +65,7 @@ mac:
     - zip
 
 linux:
-  artifactName: "${productName}-v${version}-${os}-${arch}.${ext}"
+  artifactName: "${productName}-v${version}-${arch}.${ext}"
   category: Finance
   icon: assets/icons/
   target:
