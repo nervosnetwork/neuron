@@ -75,12 +75,10 @@ export default class AddressDao {
         const addressEntity = entity
         addressEntity.txCount = txCount
         const lockHashes: string[] = lockUtils.addressToAllLockHashes(addressEntity.address)
-        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, true)
-        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, true)
-        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending, true)
-        const totalLiveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live, false)
-        const totalSentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent, false)
-        addressEntity.totalBalance = (BigInt(totalLiveBalance) - BigInt(totalSentBalance)).toString()
+        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
+        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
+        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
+        addressEntity.totalBalance = '0'
         return addressEntity
       })
     )

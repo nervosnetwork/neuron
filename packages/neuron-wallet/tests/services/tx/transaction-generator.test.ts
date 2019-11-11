@@ -3,7 +3,6 @@ import { initConnection } from '../../../src/database/chain/ormconfig'
 import { ScriptHashType, Script, TransactionWithoutHash } from '../../../src/types/cell-types'
 import { OutputStatus } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
-import SkipDataAndType from '../../../src/services/settings/skip-data-and-type'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
 import CellsService from '../../../src/services/cells'
@@ -110,7 +109,6 @@ describe('TransactionGenerator', () => {
 
   describe('generateTx', () => {
     beforeEach(async done => {
-      SkipDataAndType.getInstance().update(true)
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
         generateCell(toShannon('2000'), OutputStatus.Live, false, null),
