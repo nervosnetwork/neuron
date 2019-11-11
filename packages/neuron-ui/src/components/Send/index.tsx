@@ -62,10 +62,9 @@ const Send = ({
   const leftStackWidth = '70%'
   const labelWidth = '140px'
 
-  let errorMessageUnderTotal = errorMessage
-  if (!errorMessageUnderTotal && !verifyTotalAmount(totalAmount, fee, balance)) {
-    errorMessageUnderTotal = t(`messages.codes.${ErrorCode.AmountNotEnough}`)
-  }
+  const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
+    ? errorMessage
+    : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>

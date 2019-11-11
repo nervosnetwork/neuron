@@ -99,7 +99,7 @@ const useOnTransactionChange = (
         })
       }
     }, 300)
-  }, [walletID, items, price, dispatch, setTotalAmount])
+  }, [walletID, items, price, dispatch, setTotalAmount, setErrorMessage])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
