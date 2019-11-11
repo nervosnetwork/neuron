@@ -48,7 +48,7 @@ export default class GetBlocks {
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
-            for (const input of tx.inputs!) {
+            for (const [inputIndex, input] of tx.inputs!.entries()) {
               const previousTxHash = input.previousOutput!.txHash
               let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {
@@ -66,7 +66,7 @@ export default class GetBlocks {
                 LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
-                const output = tx.outputs!.filter(o => o.daoData && o.daoData !== '0x0000000000000000')[0]
+                const output = tx.outputs![inputIndex]
                 if (output) {
                   output.depositOutPoint = {
                     txHash: input.previousOutput!.txHash,
