@@ -31,6 +31,7 @@ const DAORecord = ({
 }) => {
   const [t] = useTranslation()
   const [withdrawValue, setWithdrawValue] = useState('')
+  const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
 
   useEffect(() => {
@@ -69,7 +70,15 @@ const DAORecord = ({
       .catch((err: Error) => {
         console.error(err)
       })
-  }, [daoData, depositOutPoint])
+
+    getBlockByNumber(BigInt(blockNumber))
+      .then(b => {
+        setWithdrawingEpoch(b.header.epoch)
+      })
+      .catch((err: Error) => {
+        console.error(err)
+      })
+  }, [daoData, depositOutPoint, blockNumber])
 
   const interest = BigInt(withdrawValue) - BigInt(capacity)
 
@@ -83,7 +92,8 @@ const DAORecord = ({
   } else {
     const depositEpochInfo = epochParser(depositEpoch)
     const currentEpochInfo = epochParser(epoch)
-    const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, currentEpochInfo)
+    const withdrawingEpochInfo = epochParser(withdrawingEpoch)
+    const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, withdrawingEpochInfo)
     if (targetEpochNumber <= currentEpochInfo.number) {
       metaInfo = 'Ready'
       ready = true

@@ -6,10 +6,10 @@ interface EpochInfo {
   length: bigint
 }
 
-export default (depositEpochInfo: EpochInfo, currentEpochInfo: EpochInfo) => {
-  let depositedEpochs = currentEpochInfo.number - depositEpochInfo.number
-  const depositEpochFraction = depositEpochInfo.index * currentEpochInfo.length
-  const currentEpochFraction = currentEpochInfo.index * depositEpochInfo.length
+export default (depositEpochInfo: EpochInfo, withdrawingEpochInfo: EpochInfo) => {
+  let depositedEpochs = withdrawingEpochInfo.number - depositEpochInfo.number
+  const depositEpochFraction = depositEpochInfo.index * withdrawingEpochInfo.length
+  const currentEpochFraction = withdrawingEpochInfo.index * depositEpochInfo.length
   if (currentEpochFraction > depositEpochFraction) {
     depositedEpochs += BigInt(1)
   }
