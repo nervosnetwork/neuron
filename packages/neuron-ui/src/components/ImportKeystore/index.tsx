@@ -110,7 +110,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
                 if (text && maxLength && text.length > maxLength) {
                   return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
                     fieldName: key,
-                    fieldValue: text,
+                    fieldValue: key === 'password' ? '' : text,
                     length: maxLength,
                   })
                 }
