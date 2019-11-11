@@ -68,7 +68,7 @@ const Send = ({
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
   const network = networks.find(n => n.id === networkID)
-  const isMainnet = (network && network.chain === 'ckb') || false // TODO: shoudl be replaced after the mainnet tag is introduced
+  const isMainnet = (network && network.chain === 'ckb') || false // TODO: should be replaced after the mainnet tag is introduced
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
