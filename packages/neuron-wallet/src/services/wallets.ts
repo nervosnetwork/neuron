@@ -745,7 +745,7 @@ export default class WalletService {
         outputType: undefined,
       }],
       fee: finalFee.toString(),
-      interest: (BigInt(output.capacity) - depositCapacity).toString(),
+      interest: (BigInt(outputCapacity) - depositCapacity).toString(),
     }
   }
 
