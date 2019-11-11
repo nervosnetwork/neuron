@@ -45,8 +45,6 @@ const Send = ({
     fee,
     totalAmount,
     setTotalAmount,
-    isTransactionValid,
-    setIsTransactionValid,
     useOnTransactionChange,
     onItemChange,
     onSubmit,
@@ -57,12 +55,16 @@ const Send = ({
     onGetAddressErrorMessage,
     onGetAmountErrorMessage,
     onClear,
+    errorMessage,
+    setErrorMessage,
   } = useInitialize(walletID, send.outputs, send.generatedTx, dispatch, t)
-  useOnTransactionChange(walletID, send.outputs, send.price, dispatch, setIsTransactionValid, setTotalAmount)
+  useOnTransactionChange(walletID, send.outputs, send.price, dispatch, setTotalAmount, setErrorMessage)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
 
-  const isAffordable = verifyTotalAmount(totalAmount, fee, balance)
+  const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
+    ? errorMessage
+    : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
@@ -178,7 +180,7 @@ const Send = ({
           styles={{
             root: {
               width: leftStackWidth,
-              display: send.outputs.length > 1 || !isAffordable ? 'flex' : 'none',
+              display: send.outputs.length > 1 || errorMessageUnderTotal ? 'flex' : 'none',
             },
           }}
           tokens={{ childrenGap: 20 }}
@@ -192,7 +194,7 @@ const Send = ({
               alt={t('send.total-amount')}
               value={`${shannonToCKBFormatter(totalAmount)} CKB`}
               readOnly
-              errorMessage={isAffordable ? '' : t(`messages.codes.${ErrorCode.AmountNotEnough}`)}
+              errorMessage={errorMessageUnderTotal}
             />
           </Stack.Item>
         </Stack>
@@ -232,7 +234,7 @@ const Send = ({
           <PrimaryButton
             type="submit"
             onClick={onSubmit(walletID)}
-            disabled={sending || !isTransactionValid || !isAffordable || !send.generatedTx}
+            disabled={sending || !!errorMessageUnderTotal || !send.generatedTx}
             text={t('send.send')}
           />
         )}
