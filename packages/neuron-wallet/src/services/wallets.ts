@@ -564,6 +564,7 @@ export default class WalletService {
     buf.writeBigUInt64LE(BigInt(depositBlockNumber))
     output.data = `0x${buf.toString('hex')}`
     output.daoData = output.data
+    output.depositOutPoint = outPoint
 
     // const capacityInt = BigInt(output.capacity)
     const outputs: Cell[] = [output]
