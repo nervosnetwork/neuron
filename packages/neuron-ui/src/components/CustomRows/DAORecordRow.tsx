@@ -132,13 +132,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>
-          {`APY: ~${calculateAPY(
-            interest >= BigInt(0) ? interest.toString() : '0',
-            capacity,
-            `${Date.now() - +timestamp}`
-          )}%`}
-        </span>
+        <span>{`APY: ~${calculateAPY(interest.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>
