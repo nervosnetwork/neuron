@@ -33,6 +33,7 @@ const NervosDAO = ({
   wallet,
   dispatch,
   nervosDAO: { records },
+  chain: { connectionStatus },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
@@ -226,13 +227,14 @@ const NervosDAO = ({
                 onClick={onActionClick}
                 tipBlockNumber={tipBlockNumber}
                 epoch={epoch}
+                connectionStatus={connectionStatus}
               />
             )
           })}
         </Stack>
       </>
     )
-  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch])
+  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -271,7 +273,7 @@ const NervosDAO = ({
           <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
             <DefaultButton
               text={t('nervos-dao.deposit')}
-              disabled={sending}
+              disabled={connectionStatus === 'offline' || sending}
               onClick={() => setShowDepositDialog(true)}
             />
             <TooltipHost
