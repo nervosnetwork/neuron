@@ -750,16 +750,6 @@ export default class WalletService {
   }
 
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
-    if (!(core.rpc as any).calculateDaoMaximumWithdraw) {
-      const calculateDaoMaximumWithdrawMethod = {
-        name: 'calculateDaoMaximumWithdraw',
-        method: 'calculate_dao_maximum_withdraw',
-        paramsFormatters: [core.rpc.paramsFormatter.toOutPoint, core.rpc.paramsFormatter.toHash],
-      }
-
-      core.rpc.addMethod(calculateDaoMaximumWithdrawMethod)
-    }
-
 
     const result = await (core.rpc as any).calculateDaoMaximumWithdraw(
       ConvertTo.toSdkOutPoint(depositOutPoint),
