@@ -34,6 +34,16 @@ export default class GetBlocks {
     return blocks
   }
 
+  public getRangeBlockHeaders = async (blockNumbers: string[]): Promise<BlockHeader[]> => {
+    const headers: BlockHeader[] = await Promise.all(
+      blockNumbers.map(async num => {
+        return this.retryGetBlockHeader(num)
+      })
+    )
+
+    return headers
+  }
+
   public getTipBlockNumber = async (): Promise<string> => {
     return this.core.rpc.getTipBlockNumber()
   }
@@ -96,6 +106,14 @@ export default class GetBlocks {
     return block
   }
 
+  public retryGetBlockHeader = async (num: string): Promise<BlockHeader> => {
+    const header: BlockHeader = await Utils.retry(this.retryTime, this.retryInterval, async () => {
+      return await this.getBlockHeaderByNumber(num)
+    })
+
+    return header
+  }
+
   public getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
     return await this.core.rpc.getTransaction(hash)
   }
@@ -111,6 +129,11 @@ export default class GetBlocks {
   public getBlockByNumber = async (num: string): Promise<Block> => {
     const block = await this.core.rpc.getBlockByNumber(HexUtils.toHex(num))
     return TypeConvert.toBlock(block)
+  }
+
+  public getBlockHeaderByNumber = async (num: string): Promise<BlockHeader> => {
+    const header = await this.core.rpc.getHeaderByNumber(HexUtils.toHex(num))
+    return TypeConvert.toBlockHeader(header)
   }
 
   public genesisBlockHash = async (): Promise<string> => {

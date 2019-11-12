@@ -1,4 +1,4 @@
-import { BlockHeader, Block } from 'types/cell-types'
+import { BlockHeader } from 'types/cell-types'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
 import Utils from './utils'
@@ -10,7 +10,7 @@ export enum CheckResultType {
 
 export default class RangeForCheck {
   private range: BlockHeader[] = []
-  private checkSize = 12
+  private checkSize = 32
   private url: string
 
   constructor(url: string) {
@@ -18,7 +18,7 @@ export default class RangeForCheck {
   }
 
   public getRange = async (): Promise<BlockHeader[]> => {
-    if (this.range.length <= 0) {
+    if (this.range.length < this.checkSize) {
       this.range = await this.generateRange()
     }
     return this.range
@@ -32,12 +32,9 @@ export default class RangeForCheck {
     const blockNumbers = Utils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
 
     const getBlocksService = new GetBlocks(this.url)
-    const blocks: Block[] = await getBlocksService.getRangeBlocks(blockNumbers)
-    const blockHeaders: BlockHeader[] = blocks.map((block: Block) => {
-      return block.header
-    })
+    const headers: BlockHeader[] = await getBlocksService.getRangeBlockHeaders(blockNumbers)
 
-    return blockHeaders
+    return headers
   }
 
   public setRange = (range: BlockHeader[]) => {
