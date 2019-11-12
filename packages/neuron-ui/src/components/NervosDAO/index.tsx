@@ -8,8 +8,8 @@ import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
 import calculateFee from 'utils/calculateFee'
-import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO } from 'utils/const'
+import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
+import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, CapacityUnit } from 'utils/const'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
 import { epochParser } from 'utils/parsers'
@@ -60,7 +60,7 @@ const NervosDAO = ({
           setErrorMessage('')
           generateDepositTx({
             feeRate: `${MEDIUM_FEE_RATE}`,
-            capacity: (BigInt(value) * BigInt(SHANNON_CKB_RATIO)).toString(),
+            capacity: CKBToShannonFormatter(value, CapacityUnit.CKB),
             walletID: wallet.id,
           }).then(res => {
             if (res.status === 1) {
