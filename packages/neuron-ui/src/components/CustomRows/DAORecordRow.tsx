@@ -12,51 +12,49 @@ import * as styles from './daoRecordRow.module.scss'
 const DAORecord = ({
   daoData,
   blockNumber,
-  blockHash,
   outPoint: { txHash, index },
   tipBlockNumber,
-  tipBlockHash,
   capacity,
   actionLabel,
   onClick,
   timestamp,
   depositOutPoint,
   epoch,
+  withdraw,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: any
   tipBlockNumber: string
-  tipBlockHash: string
   epoch: string
+  withdraw: string | null
 }) => {
   const [t] = useTranslation()
-  const [withdrawValue, setWithdrawValue] = useState('')
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
 
-  useEffect(() => {
-    const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
-    if (!withdrawBlockHash) {
-      return
-    }
-    const formattedDepositOutPoint = depositOutPoint
-      ? {
-          txHash: depositOutPoint.txHash,
-          index: BigInt(depositOutPoint.index),
-        }
-      : {
-          txHash,
-          index: BigInt(index),
-        }
-    ;(ckbCore.rpc as any)
-      .calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
-      .then((res: string) => {
-        setWithdrawValue(BigInt(res).toString())
-      })
-      .catch((err: Error) => {
-        console.error(err)
-      })
-  }, [txHash, index, tipBlockHash, depositOutPoint, blockHash])
+  // useEffect(() => {
+  //   const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
+  //   if (!withdrawBlockHash) {
+  //     return
+  //   }
+  //   const formattedDepositOutPoint = depositOutPoint
+  //     ? {
+  //         txHash: depositOutPoint.txHash,
+  //         index: BigInt(depositOutPoint.index),
+  //       }
+  //     : {
+  //         txHash,
+  //         index: BigInt(index),
+  //       }
+  //   ;(ckbCore.rpc as any)
+  //     .calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
+  //     .then((res: string) => {
+  //       setWithdrawValue(BigInt(res).toString())
+  //     })
+  //     .catch((err: Error) => {
+  //       console.error(err)
+  //     })
+  // }, [txHash, index, tipBlockHash, depositOutPoint, blockHash])
 
   useEffect(() => {
     if (!depositOutPoint) {
@@ -80,7 +78,7 @@ const DAORecord = ({
       })
   }, [daoData, depositOutPoint, blockNumber])
 
-  const interest = BigInt(withdrawValue) - BigInt(capacity)
+  const interest = BigInt(withdraw || capacity) - BigInt(capacity)
 
   let ready = false
   let metaInfo = 'Ready'
