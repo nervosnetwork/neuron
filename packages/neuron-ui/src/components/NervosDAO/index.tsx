@@ -234,15 +234,8 @@ const NervosDAO = ({
     )
   }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch])
 
-  let free = BigInt(0)
-  let locked = BigInt(0)
-  records.forEach(r => {
-    if (!r.depositOutPoint) {
-      locked += BigInt(r.capacity)
-    } else {
-      free += BigInt(r.capacity)
-    }
-  })
+  const free = BigInt(wallet.balance)
+  const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
 
   const EpochInfo = useMemo(() => {
     if (!epoch) {
