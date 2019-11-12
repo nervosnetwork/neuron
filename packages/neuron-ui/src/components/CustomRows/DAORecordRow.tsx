@@ -82,7 +82,7 @@ const DAORecord = ({
   }
 
   return (
-    <div className={styles.daoRecord}>
+    <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
       <div className={styles.primaryInfo}>
         <div>{interest >= BigInt(0) ? `${shannonToCKBFormatter(interest.toString()).toString()} CKB` : ''}</div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
