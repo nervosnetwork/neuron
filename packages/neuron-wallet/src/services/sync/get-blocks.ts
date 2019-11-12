@@ -60,6 +60,7 @@ export default class GetBlocks {
               input.lock = previousOutput.lock
               input.lockHash = LockUtils.lockScriptToHash(input.lock)
               input.capacity = previousOutput.capacity
+              input.inputIndex = inputIndex.toString()
 
               if (
                 previousOutput.type &&

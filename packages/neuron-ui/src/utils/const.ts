@@ -10,6 +10,7 @@ export const UNREMOVABLE_NETWORK_ID = '0'
 export const CONFIRMATION_THRESHOLD = 30
 
 export const MAX_DECIMAL_DIGITS = 8
+export const MAINNET_TAG = 'ckb'
 
 export const MIN_DEPOSIT_AMOUNT = 102
 

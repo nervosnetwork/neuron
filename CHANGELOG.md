@@ -1,3 +1,28 @@
+## [0.24.3](https://github.com/nervosnetwork/neuron/compare/v0.24.2...v0.24.3) (2019-11-11)
+
+
+### Bug Fixes
+
+* **neuron-ui:** fix the address prefix on tx view according to the chain type. ([ffedca7](https://github.com/nervosnetwork/neuron/commit/ffedca7))
+* **neuron-wallet:** order inputs in a tx ([b0e3855](https://github.com/nervosnetwork/neuron/commit/b0e3855))
+* I18n for pending confirmations count ([2990891](https://github.com/nervosnetwork/neuron/commit/2990891))
+* input capacity can be null ([2d80fa8](https://github.com/nervosnetwork/neuron/commit/2d80fa8))
+
+
+### Features
+
+* **neuron-ui:** remove input truncation on importing keystore. ([#1068](https://github.com/nervosnetwork/neuron/issues/1068)) ([2d6283d](https://github.com/nervosnetwork/neuron/commit/2d6283d))
+* **neuron-ui:** show local error message ahead of remote error message ([21fd5b1](https://github.com/nervosnetwork/neuron/commit/21fd5b1))
+* **neuron-ui:** show the error message from api controller on send view. ([7bf6dbc](https://github.com/nervosnetwork/neuron/commit/7bf6dbc))
+* **neuron-wallet:** trim the keywords on searching txs ([8ed5501](https://github.com/nervosnetwork/neuron/commit/8ed5501))
+* strengthen address validation ([1bc213a](https://github.com/nervosnetwork/neuron/commit/1bc213a))
+* **neuron-ui:** update the explorer url according to chain type. ([67aceb8](https://github.com/nervosnetwork/neuron/commit/67aceb8))
+* Finalize testnet explorer URL ([848fe7b](https://github.com/nervosnetwork/neuron/commit/848fe7b))
+* **neuron-ui:** adjust the layout of receive view to vertical aglinment. ([8d58abc](https://github.com/nervosnetwork/neuron/commit/8d58abc))
+* **neuron-ui:** only addresses start with 0x0100 are valid ([67be688](https://github.com/nervosnetwork/neuron/commit/67be688))
+
+
+
 ## [0.24.2](https://github.com/nervosnetwork/neuron/compare/v0.24.1...v0.24.2) (2019-11-08)
 
 

@@ -8,7 +8,7 @@ import { ckbCore } from 'services/chain'
 import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { ErrorCode } from 'utils/const'
+import { ErrorCode, MAINNET_TAG } from 'utils/const'
 import { explorerNavButton } from './style.module.scss'
 
 const MIN_CELL_WIDTH = 70
@@ -30,8 +30,10 @@ const CompactAddress = ({ address }: { address: string }) => (
 const Transaction = () => {
   const [t] = useTranslation()
   const [transaction, setTransaction] = useState(transactionState)
-  const [addressPrefix, setAddressPrefix] = useState(ckbCore.utils.AddressPrefix.Mainnet)
+  const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
+
+  const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
   const inputColumns: IColumn[] = useMemo(
     () =>
@@ -198,11 +200,7 @@ const Transaction = () => {
             throw new Error('Cannot find current network in the network list')
           }
 
-          setAddressPrefix(
-            network.chain === process.env.REACT_APP_MAINNET_TAG
-              ? ckbCore.utils.AddressPrefix.Mainnet
-              : ckbCore.utils.AddressPrefix.Testnet
-          )
+          setIsMainnet(network.chain === MAINNET_TAG)
         }
       })
       .catch(err => console.warn(err))
@@ -246,10 +244,10 @@ const Transaction = () => {
     })
   }, [])
 
-  // TODO: add conditional branch on mainnet and testnet
   const onExplorerBtnClick = useCallback(() => {
-    openExternal(`https://explorer.nervos.org/transaction/${transaction.hash}`)
-  }, [transaction.hash])
+    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
+    openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
+  }, [transaction.hash, isMainnet])
 
   const basicInfoItems = useMemo(
     () => [

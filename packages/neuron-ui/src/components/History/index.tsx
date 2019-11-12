@@ -76,7 +76,7 @@ const History = ({
           lastPageIconProps={{ iconName: 'LastPage' }}
           format="buttons"
           onPageChange={(idx: number) => {
-            history.push(`${Routes.History}?pageNo=${idx + 1}`)
+            history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
           }}
         />
       </Stack>

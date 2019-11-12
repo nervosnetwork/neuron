@@ -20,6 +20,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { onRenderRow } from 'utils/fabricUIRender'
+import { MAINNET_TAG } from 'utils/const'
 
 const Addresses = ({
   app: {
@@ -30,8 +31,7 @@ const Addresses = ({
   settings: { networks = [] },
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
-  const isMainnet =
-    (networks.find(n => n.id === networkID) || {}).chain === (process.env.REACT_APP_MAINNET_TAG || 'ckb')
+  const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
   const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
 

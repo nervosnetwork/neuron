@@ -221,7 +221,7 @@ export default class IndexerQueue {
           let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
-              for (const input of transaction.inputs!) {
+              for (const [inputIndex, input] of transaction.inputs!.entries()) {
                 if (input.previousOutput!.txHash === this.emptyTxHash) {
                   continue
                 }
@@ -231,6 +231,7 @@ export default class IndexerQueue {
                 input.lock = previousOutput.lock
                 input.lockHash = LockUtils.lockScriptToHash(input.lock)
                 input.capacity = previousOutput.capacity
+                input.inputIndex = inputIndex.toString()
                 if (
                   type === TxPointType.CreatedBy &&
                   previousOutput.type &&
