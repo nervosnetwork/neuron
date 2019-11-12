@@ -18,6 +18,8 @@ export enum NeuronWalletActions {
   // Connection
   UpdateConnectionStatus = 'updateConnectionStatus',
   UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
+  // dao
+  UpdateNervosDaoData = 'updateNervosDaoData',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -38,7 +40,6 @@ export enum AppActions {
   RequestPassword = 'requestPassword',
   DismissPasswordRequest = 'dismissPasswordRequest',
   UpdatePassword = 'updatePassword',
-  UpdateTipBlockNumber = 'updateTipBlockNumber',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
 
@@ -223,19 +224,13 @@ export const reducer = (
         },
       }
     }
-    // Actions of App
-    case AppActions.UpdateTipBlockNumber: {
-      /**
-       * paylaod: tipBlockNumber
-       */
+    case NeuronWalletActions.UpdateNervosDaoData: {
       return {
         ...state,
-        app: {
-          ...state.app,
-          tipBlockNumber: payload,
-        },
+        nervosDAO: payload,
       }
     }
+    // Actions of App
     case AppActions.UpdateChainInfo: {
       return {
         ...state,

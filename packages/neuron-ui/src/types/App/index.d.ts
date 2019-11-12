@@ -74,6 +74,7 @@ declare namespace State {
 
   interface App {
     tipBlockNumber: string
+    tipBlockHash: string
     chain: string
     difficulty: string
     epoch: string
@@ -148,11 +149,45 @@ declare namespace State {
     wallets: WalletIdentity[]
   }
 
+  interface NervosDAORecord {
+    blockNumber: string
+    blockHash: string
+    capacity: string
+    lock: {
+      codeHash: string
+      hashType: string
+      args: string
+    }
+    lockHash: string
+    outPoint: {
+      txHash: string
+      index: string
+    }
+    depositOutPoint?: {
+      txHash: string
+      index: string
+    }
+    status: 'live' | 'dead'
+    type: {
+      codeHash: string
+      hashType: string
+      args: string
+    }
+    typeHash: string | null
+    daoData: string
+    timestamp: string
+  }
+
+  interface NervosDAO {
+    records: NervosDAORecord[]
+  }
+
   interface AppWithNeuronWallet {
     app: App
     chain: Chain
     settings: Settings
     wallet: Wallet
+    nervosDAO: NervosDAO
   }
 }
 

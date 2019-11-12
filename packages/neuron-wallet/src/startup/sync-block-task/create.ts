@@ -7,6 +7,7 @@ import env from 'env'
 import AddressService from 'services/addresses'
 import genesisBlockHash from './genesis'
 import InitDatabase from './init-database'
+import DataUpdateSubject from 'models/subjects/data-update'
 
 export { genesisBlockHash }
 
@@ -29,6 +30,11 @@ networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
 
     await InitDatabase.getInstance().stopAndWait()
     const info = await InitDatabase.getInstance().init(network.remote)
+
+    DataUpdateSubject.next({
+      dataType: 'transaction',
+      actionType: 'update',
+    })
 
     if (info !== 'killed') {
       const databaseInitParams: DatabaseInitParams = {

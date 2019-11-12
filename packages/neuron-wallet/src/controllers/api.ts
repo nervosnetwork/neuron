@@ -12,7 +12,8 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import { MapApiResponse } from 'decorators'
 import { ResponseCode } from 'utils/const'
-import { TransactionWithoutHash } from 'types/cell-types'
+import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
+import DaoController from './dao'
 
 /**
  * @class ApiController
@@ -193,6 +194,37 @@ export default class ApiController {
   }
 
   @MapApiResponse
+  public static async generateDepositTx(params: {
+    walletID: string,
+    capacity: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.generateDepositTx(params)
+  }
+
+  @MapApiResponse
+  public static async startWithdrawFromDao(params: {
+    walletID: string,
+    outPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.startWithdrawFromDao(params)
+  }
+
+  @MapApiResponse
+  public static async withdrawFromDao(params: {
+    walletID: string,
+    depositOutPoint: OutPoint,
+    withdrawingOutPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.withdrawFromDao(params)
+  }
+
+  @MapApiResponse
   public static async computeCycles(params: { walletID: string; capacities: string }) {
     return WalletsController.computeCycles(params)
   }
@@ -237,7 +269,7 @@ export default class ApiController {
 
   @MapApiResponse
   public static async getTransactionList(
-    params: Controller.Params.TransactionsByKeywords,
+    params: Controller.Params.TransactionsByKeywords
   ) {
     return TransactionsController.getAllByKeywords(params)
   }
@@ -252,7 +284,16 @@ export default class ApiController {
     return TransactionsController.updateDescription(params)
   }
 
+  @MapApiResponse
   public static async showTransactionDetails(hash: string) {
     showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+  }
+
+  // Dao
+  @MapApiResponse
+  public static async getDaoCells(
+    params: Controller.Params.GetDaoCellsParams
+  ) {
+    return DaoController.getDaoCells(params)
   }
 }

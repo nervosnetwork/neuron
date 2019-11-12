@@ -76,4 +76,39 @@ declare namespace Controller {
     description: string
   }
   type SetSkipAndTypeParam = boolean
+
+  type GetNervosDaoDataParams = {
+    walletID: string
+  }
+
+  // the generate deposit tx method in neuron wallet
+  interface DepositParams {
+    walletID: string
+    capacity: string
+    feeRate: string
+  }
+
+  // the start withdraw from dao method in neuron wallet
+  interface WithdrawParams {
+    walletID: string
+    outPoint: {
+      txHash: string
+      index: string
+    }
+    feeRate: string
+  }
+
+  // the withdraw from dao method in neuron wallet
+  interface ClaimParams {
+    walletID: string
+    depositOutPoint: {
+      txHash: string
+      index: string
+    }
+    withdrawingOutPoint: {
+      txHash: string
+      index: string
+    }
+    feeRate: string
+  }
 }

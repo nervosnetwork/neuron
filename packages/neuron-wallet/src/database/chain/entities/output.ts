@@ -41,9 +41,33 @@ export default class Output extends BaseEntity {
   typeScript: Script | null = null
 
   @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  daoData: string | null = null
+
+  @Column({
     type: 'boolean',
   })
   hasData!: boolean
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  depositTxHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  depositIndex: string | null = null
 
   public outPoint(): OutPoint {
     return {
@@ -52,16 +76,36 @@ export default class Output extends BaseEntity {
     }
   }
 
+  public depositOutPoint(): OutPoint | undefined {
+    if (this.depositTxHash && this.depositIndex) {
+      return {
+        txHash: this.depositTxHash,
+        index: this.depositIndex
+      }
+    }
+    return undefined
+  }
+
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
   public toInterface(): Cell {
+    const timestamp = this.transaction && (this.transaction.timestamp || this.transaction.createdAt)
+    const blockNumber = this.transaction && this.transaction.blockNumber
+    const blockHash = this.transaction && this.transaction.blockHash
     return {
       capacity: this.capacity,
       lock: this.lock,
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
       status: this.status,
+      type: this.typeScript,
+      typeHash: this.typeHash,
+      daoData: this.daoData,
+      timestamp,
+      blockNumber,
+      blockHash,
+      depositOutPoint: this.depositOutPoint(),
     }
   }
 }

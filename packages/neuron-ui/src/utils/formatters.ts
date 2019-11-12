@@ -133,12 +133,13 @@ export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: 
   return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
 }
 
-export const localNumberFormatter = (num: string | number = 0) => {
-  if (Number.isNaN(+num)) {
+export const localNumberFormatter = (num: string | number | bigint = 0) => {
+  if (typeof num !== 'bigint' && Number.isNaN(+num)) {
     console.warn(`Nuumber is not a valid number`)
     return num
   }
-  return numberFormatter.format(+num)
+  const n: any = BigInt(num)
+  return numberFormatter.format(n)
 }
 
 export const uniformTimeFormatter = (time: string | number | Date) => {

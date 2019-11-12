@@ -24,8 +24,11 @@ export const prompt = (search: string) => {
 export const queryParsers = { history, prompt }
 
 export const epochParser = (epoch: string) => {
+  const e = BigInt(epoch)
   return {
-    index: +epoch & 0xffff,
+    length: (e >> BigInt(40)) & BigInt(0xffff),
+    index: (e >> BigInt(24)) & BigInt(0xffff),
+    number: e & BigInt(0xffffff),
   }
 }
 

@@ -234,4 +234,27 @@ describe('get keys with paths', () => {
       privateKey: changePriateKey,
     })
   })
+
+  describe('epoch', () => {
+    const epochInfo = {
+      epoch: BigInt('1979121332649985'),
+      length: BigInt(1800),
+      index: BigInt(24),
+      number: BigInt(1),
+    }
+
+    it('parse epoch', () => {
+      const result = WalletService.getInstance().parseEpoch(epochInfo.epoch)
+
+      expect(result.length).toEqual(epochInfo.length)
+      expect(result.index).toEqual(epochInfo.index)
+      expect(result.number).toEqual(epochInfo.number)
+    })
+
+    it('epoch since', () => {
+      const epoch = WalletService.getInstance().epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
+
+      expect(epoch).toEqual(epochInfo.epoch + (BigInt(0x20) << BigInt(56)))
+    })
+  })
 })
