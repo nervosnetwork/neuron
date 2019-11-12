@@ -32,30 +32,6 @@ const DAORecord = ({
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
 
-  // useEffect(() => {
-  //   const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
-  //   if (!withdrawBlockHash) {
-  //     return
-  //   }
-  //   const formattedDepositOutPoint = depositOutPoint
-  //     ? {
-  //         txHash: depositOutPoint.txHash,
-  //         index: BigInt(depositOutPoint.index),
-  //       }
-  //     : {
-  //         txHash,
-  //         index: BigInt(index),
-  //       }
-  //   ;(ckbCore.rpc as any)
-  //     .calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
-  //     .then((res: string) => {
-  //       setWithdrawValue(BigInt(res).toString())
-  //     })
-  //     .catch((err: Error) => {
-  //       console.error(err)
-  //     })
-  // }, [txHash, index, tipBlockHash, depositOutPoint, blockHash])
-
   useEffect(() => {
     if (!depositOutPoint) {
       return
