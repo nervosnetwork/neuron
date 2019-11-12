@@ -51,6 +51,8 @@ export default class IndexerQueue {
 
   private emptyTxHash = '0x' + '0'.repeat(64)
 
+  private static CHECK_SIZE = 50
+
   constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
     this.lockHashInfos = lockHashInfos
     this.url = url
@@ -135,7 +137,7 @@ export default class IndexerQueue {
           if (!result) {
             await IndexerTransaction.deleteTxWhenFork(tx.hash)
             this.txCache.delete(tx.hash)
-          } else if (tip - BigInt(tx.blockNumber) >= 1000) {
+          } else if (tip - BigInt(tx.blockNumber) >= IndexerQueue.CHECK_SIZE) {
             await IndexerTransaction.confirm(tx.hash)
           }
         }
@@ -200,7 +202,7 @@ export default class IndexerQueue {
 
         if (
           txPoint &&
-          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < 1000)
+          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
           const transactionWithStatus = await this.getTransaction(txPoint.txHash)
           const transaction: Transaction = transactionWithStatus.transaction
