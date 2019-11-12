@@ -38,6 +38,7 @@ const Send = ({
     loadings: { sending = false },
   },
   wallet: { id: walletID = '', balance = '' },
+  chain: { connectionStatus },
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
@@ -234,7 +235,7 @@ const Send = ({
           <PrimaryButton
             type="submit"
             onClick={onSubmit(walletID)}
-            disabled={sending || !!errorMessageUnderTotal || !send.generatedTx}
+            disabled={connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx}
             text={t('send.send')}
           />
         )}

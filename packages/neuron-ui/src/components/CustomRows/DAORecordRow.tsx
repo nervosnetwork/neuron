@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getBlockByNumber } from 'services/chain'
+import { showMessage } from 'services/remote'
 import calculateAPY from 'utils/calculateAPY'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
@@ -21,12 +22,14 @@ const DAORecord = ({
   depositOutPoint,
   epoch,
   withdraw,
+  connectionStatus,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: any
   tipBlockNumber: string
   epoch: string
   withdraw: string | null
+  connectionStatus: 'online' | 'offline'
 }) => {
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
@@ -34,6 +37,13 @@ const DAORecord = ({
 
   useEffect(() => {
     if (!depositOutPoint) {
+      getBlockByNumber(BigInt(blockNumber))
+        .then(b => {
+          setDepositEpoch(b.header.epoch)
+        })
+        .catch((err: Error) => {
+          console.error(err)
+        })
       return
     }
     const depositBlockNumber = ckbCore.utils.bytesToHex(ckbCore.utils.hexToBytes(daoData).reverse())
@@ -81,18 +91,42 @@ const DAORecord = ({
     }
   }
 
+  const onActionClick = useMemo(() => {
+    const currentEpochInfo = epochParser(epoch)
+    const thresholdEpoch = withdrawingEpoch || depositEpoch
+    if (thresholdEpoch) {
+      const thresholdEpochInfo = epochParser(thresholdEpoch)
+      if (thresholdEpochInfo.number + BigInt(4) >= currentEpochInfo.number) {
+        return () =>
+          showMessage(
+            {
+              title: t('nervos-dao.insufficient-period-alert-title'),
+              message: t('nervos-dao.insufficient-period-alert-title'),
+              detail: t('nervos-dao.insufficient-period-alert-message'),
+            },
+            () => {}
+          )
+      }
+    }
+    return onClick
+  }, [onClick, epoch, depositEpoch, withdrawingEpoch, t])
+
   return (
-    <div className={styles.daoRecord}>
+    <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
       <div className={styles.primaryInfo}>
-        <div>{interest >= BigInt(0) ? `${shannonToCKBFormatter(interest.toString()).toString()} CKB` : ''}</div>
+        <div>
+          {interest >= BigInt(0)
+            ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(interest.toString()).toString()} CKB`
+            : ''}
+        </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div>
           <DefaultButton
             text={actionLabel}
             data-tx-hash={txHash}
             data-index={index}
-            onClick={onClick}
-            disabled={depositOutPoint && !ready}
+            onClick={onActionClick}
+            disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
             styles={{
               flexContainer: {
                 pointerEvents: 'none',

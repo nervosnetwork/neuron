@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogFooter, DefaultButton, PrimaryButton, DialogType } from 'office-ui-fabric-react'
+import { Dialog, DialogFooter, DefaultButton, PrimaryButton, DialogType, Text } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
@@ -65,6 +65,16 @@ const WithdrawDialog = ({
     blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
     days: localNumberFormatter(epochs / BigInt(6)),
   })
+
+  const alert =
+    epochs <= BigInt(5)
+      ? t('nervos-dao.withdraw-alert', {
+          epochs,
+          nextLeftEpochs: epochs + BigInt(180),
+          days: (epochs + BigInt(180)) / BigInt(6),
+        })
+      : ''
+
   return (
     <Dialog
       hidden={!record}
@@ -77,20 +87,25 @@ const WithdrawDialog = ({
     >
       {record ? (
         <>
-          <div>
+          <Text as="p" variant="large" block>
             <span>{`${t('nervos-dao.deposit')}: `}</span>
             <span>{`${shannonToCKBFormatter(record.capacity)} CKB`}</span>
-          </div>
-          <div>
+          </Text>
+          <Text as="p" variant="large" block>
             <span>{`${t('nervos-dao.interest')}: `}</span>
             <span>
               {withdrawValue
                 ? `${shannonToCKBFormatter((BigInt(withdrawValue) - BigInt(record.capacity)).toString())} CKB`
                 : ''}
             </span>
-          </div>
+          </Text>
           <div>
-            <span>{message}</span>
+            <Text as="p" variant="medium" block>
+              {message}
+            </Text>
+            <Text as="p" variant="xSmall" block styles={{ root: { color: 'red' } }}>
+              {alert}
+            </Text>
           </div>
         </>
       ) : null}

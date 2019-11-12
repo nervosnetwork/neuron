@@ -33,6 +33,7 @@ const NervosDAO = ({
   wallet,
   dispatch,
   nervosDAO: { records },
+  chain: { connectionStatus },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
@@ -116,19 +117,11 @@ const NervosDAO = ({
   const onWithdrawDialogSubmit = () => {
     setErrorMessage('')
     if (activeRecord) {
-      ;(activeRecord.depositOutPoint
-        ? generateClaimTx({
-            walletID: wallet.id,
-            withdrawingOutPoint: activeRecord.outPoint,
-            depositOutPoint: activeRecord.depositOutPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
-          })
-        : generateWithdrawTx({
-            walletID: wallet.id,
-            outPoint: activeRecord.outPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
-          })
-      )
+      generateWithdrawTx({
+        walletID: wallet.id,
+        outPoint: activeRecord.outPoint,
+        feeRate: `${MEDIUM_FEE_RATE}`,
+      })
         .then((res: any) => {
           if (res.status === 1) {
             dispatch({
@@ -170,10 +163,47 @@ const NervosDAO = ({
       }
       const record = records.find(r => r.outPoint.txHash === outPoint.txHash && r.outPoint.index === outPoint.index)
       if (record) {
-        setActiveRecord(record)
+        if (record.depositOutPoint) {
+          generateClaimTx({
+            walletID: wallet.id,
+            withdrawingOutPoint: record.outPoint,
+            depositOutPoint: record.depositOutPoint,
+            feeRate: `${MEDIUM_FEE_RATE}`,
+          })
+            .then((res: any) => {
+              if (res.status === 1) {
+                dispatch({
+                  type: AppActions.UpdateGeneratedTx,
+                  payload: res.result,
+                })
+                dispatch({
+                  type: AppActions.RequestPassword,
+                  payload: {
+                    walletID: wallet.id,
+                    actionType: 'send',
+                  },
+                })
+              } else {
+                clearGeneratedTx()
+                setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+              }
+            })
+            .catch((err: Error) => {
+              dispatch({
+                type: AppActions.AddNotification,
+                payload: {
+                  type: 'alert',
+                  timestamp: +new Date(),
+                  content: err.message,
+                },
+              })
+            })
+        } else {
+          setActiveRecord(record)
+        }
       }
     },
-    [records]
+    [records, clearGeneratedTx, dispatch, wallet.id]
   )
 
   const fee = `${shannonToCKBFormatter(
@@ -226,13 +256,14 @@ const NervosDAO = ({
                 onClick={onActionClick}
                 tipBlockNumber={tipBlockNumber}
                 epoch={epoch}
+                connectionStatus={connectionStatus}
               />
             )
           })}
         </Stack>
       </>
     )
-  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch])
+  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -271,7 +302,7 @@ const NervosDAO = ({
           <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
             <DefaultButton
               text={t('nervos-dao.deposit')}
-              disabled={sending}
+              disabled={connectionStatus === 'offline' || sending}
               onClick={() => setShowDepositDialog(true)}
             />
             <TooltipHost
