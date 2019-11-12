@@ -12,6 +12,7 @@ import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
 import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, CapacityUnit } from 'utils/const'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
+import { ckbCore } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
 import DAORecord from 'components/CustomRows/DAORecordRow'
@@ -38,6 +39,7 @@ const NervosDAO = ({
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -178,6 +180,31 @@ const NervosDAO = ({
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
   )} CKB`
 
+  useEffect(() => {
+    Promise.all(
+      records.map(async ({ outPoint, depositOutPoint, blockHash }) => {
+        if (!tipBlockHash) {
+          return null
+        }
+        const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
+        const formattedDepositOutPoint = depositOutPoint
+          ? {
+              txHash: depositOutPoint.txHash,
+              index: BigInt(depositOutPoint.index),
+            }
+          : {
+              txHash: outPoint.txHash,
+              index: BigInt(outPoint.index),
+            }
+        return (ckbCore.rpc as any).calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash) as string
+      })
+    )
+      .then(res => {
+        setWithdrawList(res)
+      })
+      .catch(console.error)
+  }, [records, tipBlockHash])
+
   const Records = useMemo(() => {
     return (
       <>
@@ -185,7 +212,7 @@ const NervosDAO = ({
           {t('nervos-dao.deposit-records')}
         </Text>
         <Stack>
-          {records.map(record => {
+          {records.map((record, i) => {
             let stage = 'deposited'
             if (record.depositOutPoint) {
               stage = 'withdrawing'
@@ -193,10 +220,10 @@ const NervosDAO = ({
             return (
               <DAORecord
                 {...record}
+                withdraw={withdrawList[i]}
                 actionLabel={t(`nervos-dao.${stage}-action-label`)}
                 key={JSON.stringify(record.outPoint)}
                 onClick={onActionClick}
-                tipBlockHash={tipBlockHash}
                 tipBlockNumber={tipBlockNumber}
                 epoch={epoch}
               />
@@ -205,17 +232,10 @@ const NervosDAO = ({
         </Stack>
       </>
     )
-  }, [records, t, tipBlockHash, onActionClick, tipBlockNumber, epoch])
+  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch])
 
-  let free = BigInt(0)
-  let locked = BigInt(0)
-  records.forEach(r => {
-    if (!r.depositOutPoint) {
-      locked += BigInt(r.capacity)
-    } else {
-      free += BigInt(r.capacity)
-    }
-  })
+  const free = BigInt(wallet.balance)
+  const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
 
   const EpochInfo = useMemo(() => {
     if (!epoch) {
