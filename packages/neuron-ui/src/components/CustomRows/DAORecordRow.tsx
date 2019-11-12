@@ -109,7 +109,7 @@ const DAORecord = ({
       }
     }
     return onClick
-  }, [onClick, epoch, depositEpoch, withdrawingEpoch])
+  }, [onClick, epoch, depositEpoch, withdrawingEpoch, t])
 
   return (
     <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>

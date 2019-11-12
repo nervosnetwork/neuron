@@ -65,6 +65,7 @@ const WithdrawDialog = ({
     blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
     days: localNumberFormatter(epochs / BigInt(6)),
   })
+
   const alert =
     epochs <= BigInt(5)
       ? t('nervos-dao.withdraw-alert', {
@@ -73,6 +74,7 @@ const WithdrawDialog = ({
           days: (epochs + BigInt(180)) / BigInt(6),
         })
       : ''
+
   return (
     <Dialog
       hidden={!record}

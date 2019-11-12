@@ -254,7 +254,7 @@ const Transaction = () => {
       { label: t('transaction.transaction-hash'), value: transaction.hash || 'none' },
       {
         label: t('transaction.block-number'),
-        value: localNumberFormatter(transaction.blockNumber) || 'none',
+        value: transaction.blockNumber ? localNumberFormatter(transaction.blockNumber) : 'none',
       },
       {
         label: t('transaction.date'),
