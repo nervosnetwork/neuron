@@ -1,4 +1,4 @@
-const YEAR = 365 * 30 * 24 * 60 * 60 * 1000
+const YEAR = 365 * 24 * 60 * 60 * 1000
 
 export default (interest: string, amount: string, duration: string) => {
   const BASE = 10000
