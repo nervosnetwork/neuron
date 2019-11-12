@@ -1,3 +1,40 @@
+## [0.24.4](https://github.com/nervosnetwork/neuron/compare/v0.24.3...v0.24.4) (2019-11-12)
+
+
+### Bug Fixes
+
+* **neuron-ui:** fix the apy calculation ([03c88d2](https://github.com/nervosnetwork/neuron/commit/03c88d2))
+* **neuron-ui:** fix the free and locked value of nervos dao ([16b2233](https://github.com/nervosnetwork/neuron/commit/16b2233))
+* **neuron-ui:** fix the minimal withdraw epoch number ([1c19582](https://github.com/nervosnetwork/neuron/commit/1c19582))
+* **neuron-ui:** fix the yield of nervos dao records ([544becd](https://github.com/nervosnetwork/neuron/commit/544becd))
+* **neuron-ui:** including keywords on tx list paging ([935950d](https://github.com/nervosnetwork/neuron/commit/935950d))
+* calculate tx serialized size for dao ([2088d5c](https://github.com/nervosnetwork/neuron/commit/2088d5c))
+* calculateDaoMaximumWithdraw return type ([22ee960](https://github.com/nervosnetwork/neuron/commit/22ee960))
+* deposit dao and withdraw step1 error ([77a505d](https://github.com/nervosnetwork/neuron/commit/77a505d))
+* fix getDaoCells return ([c914dff](https://github.com/nervosnetwork/neuron/commit/c914dff))
+* fix withdraw dao bug ([9b1c0ed](https://github.com/nervosnetwork/neuron/commit/9b1c0ed))
+* getDaoCells and its tests ([2460b0b](https://github.com/nervosnetwork/neuron/commit/2460b0b))
+* getDaoCells load dao cells except dead ([d5ba396](https://github.com/nervosnetwork/neuron/commit/d5ba396))
+* load init txs in windows ([8880d34](https://github.com/nervosnetwork/neuron/commit/8880d34))
+* mark depositOutPoint when create step1 ([85a851b](https://github.com/nervosnetwork/neuron/commit/85a851b))
+
+
+### Features
+
+* add dao methods to controller ([41953bf](https://github.com/nervosnetwork/neuron/commit/41953bf))
+* add inputIndex to inputs ([c760db5](https://github.com/nervosnetwork/neuron/commit/c760db5))
+* add typeHash and daoData to Output ([5efe225](https://github.com/nervosnetwork/neuron/commit/5efe225))
+* add typeHash and daoData when sync ([1b6b062](https://github.com/nervosnetwork/neuron/commit/1b6b062))
+* generate dao transactions ([36ba523](https://github.com/nervosnetwork/neuron/commit/36ba523))
+* remove SkipDataAndType module ([1bc25eb](https://github.com/nervosnetwork/neuron/commit/1bc25eb))
+* remove totalBalance ([5b0df6f](https://github.com/nervosnetwork/neuron/commit/5b0df6f))
+* Shorter binary file names ([337790d](https://github.com/nervosnetwork/neuron/commit/337790d))
+* **neuron-ui:** add nervos dao view ([ca46665](https://github.com/nervosnetwork/neuron/commit/ca46665))
+* **neuron-ui:** allow user to claim since unlock epoch. ([f1ad76b](https://github.com/nervosnetwork/neuron/commit/f1ad76b))
+* **neuron-ui:** update i18n of nervos dao ([3b72042](https://github.com/nervosnetwork/neuron/commit/3b72042))
+
+
+
 ## [0.24.3](https://github.com/nervosnetwork/neuron/compare/v0.24.2...v0.24.3) (2019-11-11)
 
 
