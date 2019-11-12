@@ -2,10 +2,17 @@ import CKBCore from '@nervosnetwork/ckb-sdk-core'
 
 export const ckbCore = new CKBCore('')
 
-export const { getTipBlockNumber, getBlockchainInfo } = ckbCore.rpc
+ckbCore.rpc.addMethod({
+  name: 'calculateDaoMaximumWithdraw',
+  method: 'calculate_dao_maximum_withdraw',
+  paramsFormatters: [ckbCore.rpc.paramsFormatter.toOutPoint, ckbCore.rpc.paramsFormatter.toHash],
+})
+
+export const { getBlockchainInfo, getTipHeader, getBlockByNumber } = ckbCore.rpc
 
 export default {
   ckbCore,
-  getTipBlockNumber,
   getBlockchainInfo,
+  getTipHeader,
+  getBlockByNumber,
 }

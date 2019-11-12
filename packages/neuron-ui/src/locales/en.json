@@ -10,7 +10,8 @@
       "receive": "Receive",
       "history": "History",
       "addresses": "Addresses",
-      "settings": "Settings"
+      "settings": "Settings",
+      "nervos-dao": "Nervos DAO"
     },
     "overview": {
       "balance": "Balance",
@@ -306,6 +307,32 @@
       "last-page": "Last page",
       "page": "Page",
       "selected": "Current page"
+    },
+    "nervos-dao": {
+      "free": "Free",
+      "locked": "Locked",
+      "deposit": "Deposit",
+      "deposit-records": "Deposit Records",
+      "apy": "APY",
+      "deposit-at": "Deposit at {{time}}",
+      "claim": "Claim",
+      "withdraw": "Withdraw",
+      "fee": "Transaction fee",
+      "deposit-to-nervos-dao": "Deposit to Nervos DAO",
+      "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",
+      "notice": "Notice",
+      "cancel": "Cancel",
+      "proceed": "Proceed",
+      "deposit-value": "Deposit",
+      "interest": "Interest",
+      "yield": "Yield",
+      "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to claim the saving.",
+      "deposit-terms": "Nervos DAO is a system layer decentralized infrastructure. Your saving here is secure.\nAccording to the Nervos DAO protocol, you need at least 180 epochs to withdraw your deposit",
+      "deposited-action-label": "Withdraw",
+      "withdrawing-action-label": "Claim",
+      "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKB",
+      "interest-accumulated": "{{blockNumber}} blocks interest accumulated",
+      "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)"
     }
   }
 }

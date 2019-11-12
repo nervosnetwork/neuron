@@ -12,16 +12,19 @@ export default class CheckTx {
   private tx: Transaction
   private addressesUsedSubject: Subject<AddressesWithURL>
   private url: string
+  private daoTypeHash: string
 
   constructor(
     tx: Transaction,
     url: string,
+    daoTypeHash: string,
     addressesUsedSubject: Subject<AddressesWithURL> = addressesUsedSubjectParam,
   ) {
     this.tx = tx
     this.addressesUsedSubject = addressesUsedSubject
 
     this.url = url
+    this.daoTypeHash = daoTypeHash
   }
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
@@ -51,10 +54,16 @@ export default class CheckTx {
   }
 
   public filterOutputs = (lockHashes: string[]) => {
-    const cells: Cell[] = this.tx.outputs!.map(output => {
+    const cells: Cell[] = this.tx.outputs!.map((output, index) => {
       const checkOutput = new CheckOutput(output)
       const result = checkOutput.checkLockHash(lockHashes)
       if (result) {
+        if (output.type) {
+          this.tx.outputs![index].typeHash = LockUtils.computeScriptHash(output.type)
+          if (output.typeHash === this.daoTypeHash) {
+            this.tx.outputs![index].daoData = this.tx.outputsData![index]
+          }
+        }
         return output
       }
       return false

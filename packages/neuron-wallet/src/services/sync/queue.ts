@@ -1,6 +1,8 @@
 import { Block, BlockHeader } from 'types/cell-types'
 import { TransactionPersistor } from 'services/tx'
 import logger from 'utils/logger'
+import LockUtils from 'models/lock-utils'
+import DaoUtils from 'models/dao-utils'
 
 import GetBlocks from './get-blocks'
 import RangeForCheck, { CheckResultType } from './range-for-check'
@@ -22,6 +24,8 @@ export default class Queue {
 
   private yieldTime = 1
 
+  private url: string
+
   constructor(
     url: string,
     lockHashes: string[],
@@ -32,6 +36,7 @@ export default class Queue {
     start: boolean = true
   ) {
     this.lockHashes = lockHashes
+    this.url = url
     this.getBlocksService = new GetBlocks(url)
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
@@ -117,8 +122,15 @@ export default class Queue {
       return
     }
 
+    const daoScriptInfo = await DaoUtils.daoScript(this.url)
+    const daoScriptHash = LockUtils.computeScriptHash({
+      codeHash: daoScriptInfo.codeHash,
+      args: "0x",
+      hashType: daoScriptInfo.hashType,
+    })
+
     // 3. check and save
-    await this.getBlocksService.checkAndSave(blocks, this.lockHashes)
+    await this.getBlocksService.checkAndSave(blocks, this.lockHashes, daoScriptHash)
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]

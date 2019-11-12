@@ -16,6 +16,8 @@ import { AddLockToInput1570522869590 } from './migrations/1570522869590-AddLockT
 import { AddIndices1572006450765 } from './migrations/1572006450765-AddIndices'
 import { AddIndexToTxTimestamp1572137226866 } from './migrations/1572137226866-AddIndexToTxTimestamp'
 import { AddOutputIndex1572226722928 } from './migrations/1572226722928-AddOutputIndex'
+import { AddTypeHashToOutput1572852964749 } from './migrations/1572852964749-AddTypeHashToOutput'
+import { AddDepositOutPointToOutput1573305225465 } from './migrations/1573305225465-AddDepositOutPointToOutput'
 import { AddInputIndexToInput1573461100330 } from './migrations/1573461100330-AddInputIndexToInput'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
@@ -45,6 +47,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddIndices1572006450765,
       AddIndexToTxTimestamp1572137226866,
       AddOutputIndex1572226722928,
+      AddTypeHashToOutput1572852964749,
+      AddDepositOutPointToOutput1573305225465,
       AddInputIndexToInput1573461100330,
     ],
     logging,

@@ -91,6 +91,8 @@ export default {
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型',
       'invalid-keystore': 'Keystore 格式不正确',
       'invalid-json': 'JSON 文件格式不正确',
+      'cell-is-not-yet-live': 'Cell 尚未激活',
+      'transaction-is-not-committed-yet': '交易未提交'
     },
     contextMenu: {
       select: '选择',

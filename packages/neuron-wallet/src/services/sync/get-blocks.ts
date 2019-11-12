@@ -38,13 +38,13 @@ export default class GetBlocks {
     return this.core.rpc.getTipBlockNumber()
   }
 
-  public checkAndSave = async (blocks: Block[], lockHashes: string[]): Promise<void> => {
+  public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
       logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
       for (let i = 0; i < block.transactions.length; ++i) {
         const tx = block.transactions[i]
-        const checkTx = new CheckTx(tx, this.url)
+        const checkTx = new CheckTx(tx, this.url, daoScriptHash)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
@@ -61,6 +61,20 @@ export default class GetBlocks {
               input.lockHash = LockUtils.lockScriptToHash(input.lock)
               input.capacity = previousOutput.capacity
               input.inputIndex = inputIndex.toString()
+
+              if (
+                previousOutput.type &&
+                LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+              ) {
+                const output = tx.outputs![inputIndex]
+                if (output) {
+                  output.depositOutPoint = {
+                    txHash: input.previousOutput!.txHash,
+                    index: input.previousOutput!.index,
+                  }
+                }
+              }
             }
           }
           await TransactionPersistor.saveFetchTx(tx)

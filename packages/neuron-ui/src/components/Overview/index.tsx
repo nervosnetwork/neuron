@@ -100,7 +100,7 @@ const Overview = ({
       },
       {
         label: t('overview.epoch'),
-        value: epochParser(epoch).index,
+        value: epochParser(epoch).number.toString(),
       },
       {
         label: t('overview.difficulty'),

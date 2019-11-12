@@ -18,6 +18,7 @@ import NetworkEditor from 'components/NetworkEditor'
 import WalletEditor from 'components/WalletEditor'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
+import NervosDAO from 'components/NervosDAO'
 
 import { Routes } from 'utils/const'
 
@@ -106,6 +107,12 @@ export const mainContents: CustomRouter.Route[] = [
     path: '/',
     exact: false,
     comp: PasswordRequest,
+  },
+  {
+    name: `NervosDAO`,
+    path: Routes.NervosDAO,
+    exact: true,
+    comp: NervosDAO,
   },
 ]
 

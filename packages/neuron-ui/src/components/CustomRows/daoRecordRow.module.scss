@@ -1,0 +1,35 @@
+.daoRecord {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #000;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding: 5px 15px;
+
+  .primaryInfo,
+  .secondaryInfo {
+    display: flex;
+    justify-content: space-between;
+
+    &>div,
+    &>span {
+      flex: 1;
+      text-align: center;
+
+      &:first-child {
+        text-align: left;
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+    }
+
+  }
+
+  .secondaryInfo {
+    font-size: 12px;
+    color: #666;
+  }
+
+}

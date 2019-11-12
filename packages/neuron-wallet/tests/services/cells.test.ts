@@ -2,9 +2,10 @@ import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/services/tx/params'
-import { ScriptHashType, Script } from '../../src/types/cell-types'
+import { ScriptHashType, Script, TransactionStatus } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from '../../src/exceptions/wallet'
+import TransactionEntity from 'database/chain/entities/transaction'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -55,7 +56,9 @@ describe('CellsService', () => {
     status: OutputStatus,
     hasData: boolean,
     typeScript: Script | null,
-    who: any = bob
+    who: any = bob,
+    daoData: string | null = null,
+    transaction: TransactionEntity | null = null
   ) => {
     const output = new OutputEntity()
     output.outPointTxHash = randomHex()
@@ -66,6 +69,10 @@ describe('CellsService', () => {
     output.status = status
     output.hasData = hasData
     output.typeScript = typeScript
+    output.daoData = daoData
+    if (transaction) {
+      output.transaction = transaction
+    }
 
     return output
   }
@@ -272,6 +279,57 @@ describe('CellsService', () => {
         const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
         expect(result.capacities).toEqual(toShannon('3000'))
         expect(BigInt(result.needFee)).toEqual(everyInputFee * BigInt(2))
+      })
+    })
+
+    describe('getDaoCells', () => {
+      const depositData = '0x0000000000000000'
+      const step1Data = '0x000000000000000a'
+      const generateTx = (hash: string, timestamp: string) => {
+        const tx = new TransactionEntity()
+        tx.hash = hash
+        tx.version = '0x0'
+        tx.timestamp = timestamp
+        tx.status = TransactionStatus.Success
+        tx.witnesses = []
+        tx.blockNumber = '1'
+        tx.blockHash = '0x10'
+        return tx
+      }
+      beforeEach(async done => {
+        const tx1 = generateTx('0x1234', '1572862777481')
+        const tx2 = generateTx('0x5678', '1572862829087')
+        const cells: OutputEntity[] = [
+          generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1),
+          generateCell(toShannon('2000'), OutputStatus.Live, false, null, bob, step1Data, tx1),
+          generateCell(toShannon('3000'), OutputStatus.Live, false, null, bob, depositData, tx2),
+          generateCell(toShannon('4000'), OutputStatus.Live, false, null, bob, step1Data, tx2),
+        ]
+        await getConnection().manager.save([tx1, tx2, ...cells])
+        done()
+      })
+
+      it('get all in correct order', async () => {
+        const cells = await CellsService.getDaoCells(
+          [bob.lockHash],
+        )
+        const expectedCapacitySort = [
+          '2000',
+          '4000',
+          '1000',
+          '3000',
+        ].map(capacity => toShannon(capacity))
+        expect(cells.map(c => c.capacity)).toEqual(expectedCapacitySort)
+      })
+
+      it('make sure timestamp/blockNumber/blockHash', async () => {
+        const cells = await CellsService.getDaoCells(
+          [bob.lockHash],
+        )
+        const firstCell = cells[0]!
+        expect(firstCell.timestamp).toBeDefined()
+        expect(firstCell.blockNumber).toBeDefined()
+        expect(firstCell.blockHash).toBeDefined()
       })
     })
   })

@@ -5,6 +5,7 @@ import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import genesisBlockHash, { getChain } from './genesis'
 import ChainInfo from 'models/chain-info'
+import DaoUtils from '../../models/dao-utils';
 
 // only used by main process
 export class InitDatabase {
@@ -47,7 +48,8 @@ export class InitDatabase {
 
         try {
           const systemScriptInfo = await LockUtils.systemScript(url)
-          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain })
+          const daoScriptInfo = await DaoUtils.daoScript(url)
+          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
         } catch (err) {
           logger.error('update systemScriptInfo failed:', err)
         }
@@ -61,6 +63,7 @@ export class InitDatabase {
           chain = metaInfo.chain
           ChainInfo.getInstance().setChain(chain)
           LockUtils.setSystemScript(metaInfo.systemScriptInfo)
+          DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
           hash = metaInfo.genesisBlockHash
           this.success = true
         } catch (error) {

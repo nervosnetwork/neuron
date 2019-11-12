@@ -34,6 +34,12 @@ export interface CellDep {
   depType: DepType
 }
 
+export interface WitnessArgs {
+  lock: string | undefined
+  inputType: string | undefined
+  outputType: string | undefined
+}
+
 export interface TransactionWithoutHash {
   version: string
   cellDeps?: CellDep[]
@@ -51,6 +57,9 @@ export interface TransactionWithoutHash {
   status?: TransactionStatus
   createdAt?: string
   updatedAt?: string
+  witnessArgs?: WitnessArgs[]
+  fee?: string
+  interest?: string
 }
 
 export interface Transaction extends TransactionWithoutHash {
@@ -90,6 +99,12 @@ export interface Cell {
   outPoint?: OutPoint
   status?: string
   lockHash?: string
+  typeHash?: string | null
+  daoData?: string | null
+  timestamp?: string | null
+  blockNumber?: string | null
+  blockHash?: string | null
+  depositOutPoint?: OutPoint
 }
 
 export interface OutPoint {
