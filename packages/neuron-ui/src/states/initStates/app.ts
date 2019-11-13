@@ -3,6 +3,7 @@ import { CapacityUnit } from 'utils/const'
 const appState: State.App = {
   tipBlockNumber: '',
   tipBlockHash: '',
+  tipBlockTimestamp: 0,
   chain: '',
   difficulty: '',
   epoch: '',

@@ -7,6 +7,7 @@ import appState from 'states/initStates/app'
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
+import calculateGlobalAPY from 'utils/calculateGlobalAPY'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
 import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, CapacityUnit } from 'utils/const'
@@ -28,6 +29,7 @@ const NervosDAO = ({
     loadings: { sending = false },
     tipBlockNumber,
     tipBlockHash,
+    tipBlockTimestamp,
     epoch,
   },
   wallet,
@@ -41,6 +43,7 @@ const NervosDAO = ({
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
+  const [globalAPY, setGlobalAPY] = useState(0)
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -91,6 +94,14 @@ const NervosDAO = ({
       clearGeneratedTx()
     }
   }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id])
+
+  useEffect(() => {
+    if (tipBlockTimestamp) {
+      calculateGlobalAPY(tipBlockTimestamp).then(apy => {
+        setGlobalAPY(apy)
+      })
+    }
+  }, [tipBlockTimestamp])
 
   const onDepositDialogDismiss = () => {
     setShowDepositDialog(false)
@@ -278,9 +289,10 @@ const NervosDAO = ({
         <Text as="span" variant="small" block>{`Epoch number: ${epochInfo.number}`}</Text>
         <Text as="span" variant="small" block>{`Epoch index: ${epochInfo.index}`}</Text>
         <Text as="span" variant="small" block>{`Epoch length: ${epochInfo.length}`}</Text>
+        <Text as="span" variant="small" block>{`APY: ~${globalAPY}%`}</Text>
       </Stack>
     )
-  }, [epoch])
+  }, [epoch, globalAPY])
 
   return (
     <>
