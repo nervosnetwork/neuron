@@ -312,7 +312,7 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
-      "deposit-records": "存款记录",
+      "deposit-receipts": "存款凭证",
       "apy": "预期年化利率",
       "deposit-at": "存入于{{time}}",
       "claim": "取款",

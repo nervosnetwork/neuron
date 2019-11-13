@@ -250,7 +250,7 @@ const NervosDAO = ({
     return (
       <>
         <Text as="h2" variant="xxLarge">
-          {t('nervos-dao.deposit-records')}
+          {t('nervos-dao.deposit-receipts')}
         </Text>
         <Stack>
           {records.map((record, i) => {
