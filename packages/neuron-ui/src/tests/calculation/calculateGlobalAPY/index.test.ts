@@ -9,8 +9,8 @@ describe('calculate the global apy', () => {
     expectAPY,
   ])
 
-  test.each(fixtureTable)(`%s`, (_title, currentTime, genesisTime, expectAPY) => {
-    const apy = calculateGlobalAPY(currentTime, genesisTime)
-    expect(apy).toBe(expectAPY === 0 ? 0 : expectAPY.toFixed(2))
+  test.each(fixtureTable)(`%s`, async (_title, currentTime, genesisTime, expectAPY) => {
+    const apy = await calculateGlobalAPY(currentTime, genesisTime)
+    expect(apy).toBe(expectAPY === 0 ? 0 : +expectAPY.toFixed(2))
   })
 })
