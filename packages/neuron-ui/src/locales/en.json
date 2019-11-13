@@ -313,7 +313,7 @@
       "free": "Free",
       "locked": "Locked",
       "deposit": "Deposit",
-      "deposit-records": "Deposit Records",
+      "deposit-receipts": "Deposit Receipts",
       "apy": "APY",
       "deposit-at": "Deposit at {{time}}",
       "claim": "Claim",
