@@ -294,26 +294,24 @@ export default class WalletsController {
   }
 
   public static async getAllAddresses(id: string) {
-    const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
-      addrs.map(
-        ({
-          address,
-          blake160: identifier,
-          addressType: type,
-          txCount,
-          balance,
-          description = '',
-          addressIndex: index = '',
-        }) => ({
-          address,
-          identifier,
-          type,
-          txCount,
-          description,
-          balance,
-          index,
-        })
-      )
+    const addresses = AddressService.allAddressesByWalletId(id).map(
+      ({
+        address,
+        blake160: identifier,
+        addressType: type,
+        txCount,
+        balance,
+        description = '',
+        addressIndex: index = '',
+      }) => ({
+        address,
+        identifier,
+        type,
+        txCount,
+        description,
+        balance,
+        index,
+      })
     )
     return {
       status: ResponseCode.Success,

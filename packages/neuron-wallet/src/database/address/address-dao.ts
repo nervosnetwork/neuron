@@ -120,10 +120,11 @@ export default class AddressDao {
   }
 
   public static allAddressesByWalletId(walletId: string, version: AddressVersion): Address[] {
-    const all = AddressStore.getAll()
-    return all.filter(value => {
-      return value.walletId === walletId && value.version === version
-    })
+    return AddressStore.getAll()
+      .filter(value => value.walletId === walletId && value.version === version)
+      .sort((lhs, rhs) => {
+        return lhs.addressType - rhs.addressType || lhs.addressIndex - rhs.addressIndex
+      })
   }
 
   public static usedAddressesByWalletId(walletId: string, version: AddressVersion):Address[] {

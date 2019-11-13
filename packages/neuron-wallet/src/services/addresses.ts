@@ -22,7 +22,7 @@ export default class AddressService {
     return !!addressEntity
   }
 
-  public static generateAndSave = async (
+  public static generateAndSave = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
@@ -63,7 +63,7 @@ export default class AddressService {
     AddressCreatedSubject.getSubject().next(addrs)
   }
 
-  public static checkAndGenerateSave = async (
+  public static checkAndGenerateSave = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
@@ -216,7 +216,7 @@ export default class AddressService {
     return AddressDao.allAddresses(version)
   }
 
-  public static allAddressesByWalletId = async (walletId: string): Promise<AddressInterface[]> => {
+  public static allAddressesByWalletId = (walletId: string): AddressInterface[] => {
     const version = AddressService.getAddressVersion()
     return AddressDao.allAddressesByWalletId(walletId, version)
   }

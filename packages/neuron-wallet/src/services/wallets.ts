@@ -173,7 +173,15 @@ export default class WalletService {
     return FileKeystoreWallet.fromJSON(wallet)
   }
 
-  public generateAddressesById = async (
+  public generateAddressesIfNecessary = () => {
+    for (const wallet of this.getAll()) {
+      if (AddressService.allAddressesByWalletId(wallet.id).length === 0) {
+        this.generateAddressesById(wallet.id, false)
+      }
+    }
+  }
+
+  public generateAddressesById = (
     id: string,
     isImporting: boolean,
     receivingAddressCount: number = 20,
@@ -181,7 +189,7 @@ export default class WalletService {
   ) => {
     const wallet: Wallet = this.get(id)
     const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-    await AddressService.checkAndGenerateSave(
+    AddressService.checkAndGenerateSave(
       id,
       accountExtendedPublicKey,
       isImporting,
