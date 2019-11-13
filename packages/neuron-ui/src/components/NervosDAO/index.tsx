@@ -9,7 +9,7 @@ import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/ac
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, CapacityUnit } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, CapacityUnit } from 'utils/const'
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
@@ -66,7 +66,7 @@ const NervosDAO = ({
           return
         }
 
-        if (+value < MIN_DEPOSIT_AMOUNT) {
+        if (BigInt(CKBToShannonFormatter(value)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
           setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
           return
         }
