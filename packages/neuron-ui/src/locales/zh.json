@@ -326,7 +326,7 @@
       "deposit-value": "存款",
       "interest": "利息",
       "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(~{{days}}天)完成最终取款。",
-      "deposit-terms": "Nervos DAO 是一个系统层面的去中心化底层设施。您在其中存款是十分安全的。\n根据 Nervos DAO 的协议, 您需要等待至少 180 个 epochs 才能取回您的存款。",
+      "deposit-terms": "存入 NervosDAO 的资产中需要 102 CKB 作为存款凭证的存储，这部分 CKB 是无法产生利息的。\nNervos DAO 是一个系统层面的去中心化底层设施。您在其中存款是十分安全的。\n根据 Nervos DAO 的协议, 您需要等待至少 180 个 epochs 才能取回您的存款。",
       "deposited-action-label": "结算",
       "withdrawing-action-label": "取款",
       "minimal-fee-required": "存入金额应不少于 {{minimal}} CKB",
