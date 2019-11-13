@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, DefaultButton, Icon, TooltipHost, Spinner } from 'office-ui-fabric-react'
+import PropertyList from 'widgets/PropertyList'
 
 import appState from 'states/initStates/app'
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
@@ -302,6 +303,17 @@ const NervosDAO = ({
     )
   }, [epoch, globalAPY])
 
+  const lockAndFreeProperties = [
+    {
+      label: t('nervos-dao.free'),
+      value: `${shannonToCKBFormatter(`${free}`)} CKB`,
+    },
+    {
+      label: t('nervos-dao.locked'),
+      value: `${shannonToCKBFormatter(`${locked}`)} CKB`,
+    },
+  ]
+
   return (
     <>
       <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
@@ -310,14 +322,7 @@ const NervosDAO = ({
         </Text>
         <Stack horizontal tokens={{ childrenGap: 15 }}>
           <Stack style={{ minWidth: '250px' }} tokens={{ childrenGap: 10 }}>
-            <Stack horizontalAlign="space-between" horizontal>
-              <Text>{`${t('nervos-dao.free')}: `}</Text>
-              <Text>{`${shannonToCKBFormatter(`${free}`)} CKB`}</Text>
-            </Stack>
-            <Stack horizontalAlign="space-between" horizontal>
-              <Text>{`${t('nervos-dao.locked')}: `}</Text>
-              <Text>{`${shannonToCKBFormatter(`${locked}`)} CKB`}</Text>
-            </Stack>
+            <PropertyList properties={lockAndFreeProperties} />
           </Stack>
           <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
             <DefaultButton
