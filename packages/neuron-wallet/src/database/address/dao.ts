@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
@@ -7,6 +8,7 @@ import { OutputStatus } from 'services/tx/params'
 import { AddressVersion } from './entities/address'
 import NodeService from 'services/node'
 import Store from 'models/store'
+import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 
 export interface Address {
   walletId: string
@@ -183,6 +185,11 @@ export default class AddressDao {
   }
 }
 
+const isRenderer = process && process.type === 'renderer'
+const addressDbChangedSubject = isRenderer
+  ? remote.require('./models/subjects/address-db-changed-subject').default.getSubject()
+  : AddressDbChangedSubject.getSubject()
+
 /// Persist all addresses as array in `addresses/index.json`.
 class AddressStore {
   static MODULE_NAME = 'addresses'
@@ -196,6 +203,7 @@ class AddressStore {
 
   static updateAll(addresses: Address[]) {
     AddressStore.store.writeSync(AddressStore.ROOT_KEY, addresses)
+    AddressStore.changed()
   }
 
   static add(addresses: Address[]): Address[] {
@@ -223,5 +231,9 @@ class AddressStore {
     AddressStore.updateAll(all)
 
     return address
+  }
+
+  static changed() {
+    addressDbChangedSubject.next("Updated")
   }
 }
