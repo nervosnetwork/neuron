@@ -5,10 +5,14 @@ import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { TransactionStatus } from 'types/cell-types'
 import { OutputStatus } from 'services/tx/params'
-import { AddressVersion } from './entities/address'
 import NodeService from 'services/node'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
+
+export enum AddressVersion {
+  Testnet = 'testnet',
+  Mainnet = 'mainnet',
+}
 
 export interface Address {
   walletId: string

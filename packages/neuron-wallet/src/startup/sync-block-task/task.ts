@@ -1,5 +1,4 @@
 import { remote } from 'electron'
-import { initConnection as initAddressConnection } from 'database/address/ormconfig'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { register as registerTxStatusListener } from 'listeners/tx-status'
 import { register as registerAddressListener } from 'listeners/address'
@@ -31,7 +30,6 @@ export const testIndexer = async (url: string): Promise<boolean> => {
 }
 
 export const run = async () => {
-  await initAddressConnection()
   databaseInitSubject.subscribe(async (params: DatabaseInitParams) => {
     const { network, genesisBlockHash, chain } = params
     if (network && genesisBlockHash.startsWith('0x')) {

@@ -2,7 +2,7 @@ import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
-import { Address } from 'database/address/dao'
+import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
 import ChainInfo from 'models/chain-info'

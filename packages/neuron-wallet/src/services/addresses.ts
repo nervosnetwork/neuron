@@ -2,8 +2,7 @@ import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
-import AddressDao, { Address as AddressInterface } from 'database/address/dao'
-import { AddressVersion } from 'database/address/entities/address'
+import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
 import ChainInfo from 'models/chain-info'
@@ -95,16 +94,13 @@ export default class AddressService {
     )
   }
 
-  public static updateTxCountAndBalances = async (
-    addresses: string[],
-    url: string = NodeService.getInstance().core.rpc.node.url
-  ) => {
-    let addrs: Address[] = []
+  public static updateTxCountAndBalances = async (addresses: string[], url: string = NodeService.getInstance().core.rpc.node.url) => {
+    let result: Address[] = []
     for (const address of addresses) {
-      const ads = await AddressDao.updateTxCountAndBalance(address, url)
-      addrs = addrs.concat(ads)
+      const updatedAddress = await AddressDao.updateTxCountAndBalance(address, url)
+      result = result.concat(updatedAddress)
     }
-    return addrs
+    return result
   }
 
   // Generate both receiving and change addresses.

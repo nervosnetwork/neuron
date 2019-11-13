@@ -1,6 +1,5 @@
-import { AddressVersion } from '../../../src/database/address/entities/address'
 import { AddressType } from '../../../src/models/keys/address'
-import AddressDao, { Address } from '../../../src/database/address/dao'
+import AddressDao, { Address, AddressVersion } from '../../../src/database/address/address-dao'
 
 describe('balance', () => {
   beforeEach(async () => {

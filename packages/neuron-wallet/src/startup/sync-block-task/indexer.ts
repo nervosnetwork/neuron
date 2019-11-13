@@ -2,7 +2,7 @@ import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
-import { Address } from 'database/address/dao'
+import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
 import ChainInfo from 'models/chain-info'
