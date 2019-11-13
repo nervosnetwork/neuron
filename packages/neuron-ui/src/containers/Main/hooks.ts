@@ -40,6 +40,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
             payload: {
               tipBlockNumber: `${BigInt(header.number)}`,
               tipBlockHash: header.hash,
+              tipBlockTimestamp: +header.timestamp,
               chain: chainInfo.chain,
               difficulty: `${BigInt(chainInfo.difficulty)}`,
               epoch: chainInfo.epoch,
