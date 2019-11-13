@@ -61,7 +61,7 @@ const DepositDialog = ({
           </Text>
           <Stack>
             <Text as="h2" variant="large">
-              {t('nervos-dao.notice')}
+              {`${t('nervos-dao.notice')}:`}
             </Text>
             {t('nervos-dao.deposit-terms')
               .split('\n')
