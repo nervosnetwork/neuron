@@ -4,6 +4,7 @@ import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
+import { TransactionStatus } from 'types/cell-types'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -43,9 +44,10 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status <> :deadStatus AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
+      .where(`(output.status = :liveStatus OR tx.status = :failedStatus) AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
         lockHashes,
-        deadStatus: OutputStatus.Dead,
+        liveStatus: OutputStatus.Live,
+        failedStatus: TransactionStatus.Failed,
       })
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
