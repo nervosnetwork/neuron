@@ -100,7 +100,7 @@ const WithdrawDialog = ({
             </span>
           </Text>
           <div>
-            <Text as="p" variant="medium" block>
+            <Text as="p" variant="small" block>
               {message}
             </Text>
             <Text as="p" variant="xSmall" block styles={{ root: { color: 'red' } }}>
