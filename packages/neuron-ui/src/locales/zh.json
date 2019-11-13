@@ -270,7 +270,8 @@
         "mnemonic": "助记词",
         "keystore-path": "Keystore 文件",
         "keystore-name": "钱包名称",
-        "keystore-password": "密码"
+        "keystore-password": "密码",
+        "deposit": "存入金额"
       },
       "codes": {
         "-3": "",
