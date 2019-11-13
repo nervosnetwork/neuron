@@ -270,7 +270,8 @@
         "mnemonic": "Mnemonic",
         "keystore-path": "Keystore File",
         "keystore-name": "Wallet name",
-        "keystore-password": "Password"
+        "keystore-password": "Password",
+        "deposit": "Deposit"
       },
       "codes": {
         "-3": "",

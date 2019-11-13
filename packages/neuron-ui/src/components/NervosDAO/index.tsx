@@ -10,7 +10,8 @@ import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/ac
 import calculateGlobalAPY from 'utils/calculateGlobalAPY'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, CapacityUnit } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, CapacityUnit } from 'utils/const'
+import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
 import { ckbCore } from 'services/chain'
@@ -59,27 +60,34 @@ const NervosDAO = ({
       }
       clearTimeout(timer)
       timer = setTimeout(() => {
-        if (+value < MIN_DEPOSIT_AMOUNT) {
-          setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
-          clearGeneratedTx()
-        } else {
-          setErrorMessage('')
-          generateDepositTx({
-            feeRate: `${MEDIUM_FEE_RATE}`,
-            capacity: CKBToShannonFormatter(value, CapacityUnit.CKB),
-            walletID: wallet.id,
-          }).then(res => {
-            if (res.status === 1) {
-              dispatch({
-                type: AppActions.UpdateGeneratedTx,
-                payload: res.result,
-              })
-            } else {
-              clearGeneratedTx()
-              setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-            }
-          })
+        setErrorMessage('')
+        clearGeneratedTx()
+
+        const verifyRes = verifyAmount(value)
+        if (verifyRes !== true) {
+          setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit' }))
+          return
         }
+
+        if (BigInt(CKBToShannonFormatter(value)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
+          setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
+          return
+        }
+
+        generateDepositTx({
+          feeRate: `${MEDIUM_FEE_RATE}`,
+          capacity: CKBToShannonFormatter(value, CapacityUnit.CKB),
+          walletID: wallet.id,
+        }).then(res => {
+          if (res.status === 1) {
+            dispatch({
+              type: AppActions.UpdateGeneratedTx,
+              payload: res.result,
+            })
+          } else {
+            setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+          }
+        })
       }, 500)
       setDepositValue(value)
     },

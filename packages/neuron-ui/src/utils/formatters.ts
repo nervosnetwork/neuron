@@ -72,7 +72,7 @@ export const currencyFormatter = (
   return `${integer.replace(/\B(?=(\d{3})+(?!\d))/g, delimiter)}${dot}${decimal} ${unit}`
 }
 
-export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit) => {
+export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit = CapacityUnit.CKB) => {
   if (Number.isNaN(+amount)) {
     console.warn(`Amount is not a valid number`)
     return `${amount} ${unit}`
