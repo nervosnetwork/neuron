@@ -105,12 +105,12 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
                   return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: `keystore-${key}` })
                 }
                 if (key === 'name' && isNameUsed) {
-                  return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `name`, fieldValue: text })
+                  return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `keystore-name`, fieldValue: '' })
                 }
                 if (text && maxLength && text.length > maxLength) {
                   return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
-                    fieldName: key,
-                    fieldValue: key === 'password' ? '' : text,
+                    fieldName: `keystore-${key}`,
+                    fieldValue: '',
                     length: maxLength,
                   })
                 }
