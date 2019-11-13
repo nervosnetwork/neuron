@@ -6,10 +6,10 @@ require "digest"
 tag = ARGV[0]
 puts "Generating release checksums for #{tag}, this could take a while..."
 
-windows_exe = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-win-installer.exe"
+windows_exe = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-setup.exe"
 macos_zip = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-mac.zip"
-macos_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-mac.dmg"
-linux_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-linux-x86_64.AppImage"
+macos_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}.dmg"
+linux_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-x86_64.AppImage"
 
 def get_sha256_checksum(url)
   content = open(url).read
