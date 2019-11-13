@@ -1,21 +1,10 @@
-import AddressEntity, { AddressVersion } from '../../../src/database/address/entities/address'
+import { AddressVersion } from '../../../src/database/address/entities/address'
 import { AddressType } from '../../../src/models/keys/address'
-import initConnection, { getConnection } from '../../../src/database/address/ormconfig'
 import AddressDao, { Address } from '../../../src/database/address/dao'
 
 describe('balance', () => {
-  beforeAll(async () => {
-    await initConnection()
-  })
-
-  afterAll(async () => {
-    await getConnection().close()
-  })
-
   beforeEach(async () => {
-    const connection = getConnection()
-    await connection.dropDatabase()
-    await connection.synchronize()
+    AddressDao.deleteAll()
   })
 
   const generateAddress = (
@@ -43,24 +32,24 @@ describe('balance', () => {
 
   it('balance = live + sent - pending', async () => {
     const address = generateAddress('1000', '100', '300')
-    const addrs: AddressEntity[] = await AddressDao.create([address])
+    const addrs: Address[] = await AddressDao.create([address])
     const addr = addrs[0]
-    expect(addr.balance()).toEqual((1000 + 100).toString())
+    expect(addr.balance).toEqual((1000 + 100).toString())
   })
 
   it('the balance returned by the toInterface() is correct', async () => {
     const address = generateAddress('1000', '100', '300')
-    const addrs: AddressEntity[] = await AddressDao.create([address])
+    const addrs: Address[] = AddressDao.create([address])
     const addr = addrs[0]
-    expect(addr.toInterface().balance).toEqual((1000 + 100).toString())
+    expect(addr.balance).toEqual((1000 + 100).toString())
   })
 
   it('sent to others', async () => {
     // have 1000, sent to others 200, and refund 800
     const addresses = [generateAddress('0', '0', '1000'), generateAddress('0', '800', '0')]
 
-    const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
+    const addrs: Address[] = await AddressDao.create(addresses)
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance)).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(800))
   })
@@ -72,8 +61,8 @@ describe('balance', () => {
       generateAddress('0', '200', '0'),
       generateAddress('0', '800', '0'),
     ]
-    const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
+    const addrs: Address[] = await AddressDao.create(addresses)
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance)).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(1000))
   })
@@ -82,8 +71,8 @@ describe('balance', () => {
     // have 1000, sent to others 200, and refund 790, with 10 shannon fee
     const addresses = [generateAddress('0', '0', '1000'), generateAddress('0', '790', '0')]
 
-    const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
+    const addrs: Address[] = await AddressDao.create(addresses)
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance)).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(790))
   })
@@ -96,8 +85,8 @@ describe('balance', () => {
       generateAddress('0', '790', '0'),
     ]
 
-    const addrs: AddressEntity[] = await AddressDao.create(addresses)
-    const balance: bigint = addrs.map(addr => BigInt(addr.balance())).reduce((result, c) => result + c, BigInt(0))
+    const addrs: Address[] = await AddressDao.create(addresses)
+    const balance: bigint = addrs.map(addr => BigInt(addr.balance)).reduce((result, c) => result + c, BigInt(0))
 
     expect(balance).toEqual(BigInt(990))
   })

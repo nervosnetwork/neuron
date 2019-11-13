@@ -1,13 +1,12 @@
-import { Not, In } from 'typeorm'
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { TransactionStatus } from 'types/cell-types'
 import { OutputStatus } from 'services/tx/params'
-import AddressEntity, { AddressVersion } from './entities/address'
-import { getConnection } from './ormconfig'
+import { AddressVersion } from './entities/address'
 import NodeService from 'services/node'
+import Store from 'models/store'
 
 export interface Address {
   walletId: string
@@ -27,24 +26,20 @@ export interface Address {
 }
 
 export default class AddressDao {
-  public static create = async (addresses: Address[]): Promise<AddressEntity[]> => {
-    const addressEntities: AddressEntity[] = addresses.map(address => {
-      const addressEntity = new AddressEntity()
-      addressEntity.walletId = address.walletId
-      addressEntity.address = address.address
-      addressEntity.path = address.path
-      addressEntity.addressType = address.addressType
-      addressEntity.addressIndex = address.addressIndex
-      addressEntity.txCount = address.txCount || 0
-      addressEntity.blake160 = address.blake160
-      addressEntity.version = address.version
-      addressEntity.liveBalance = address.liveBalance || '0'
-      addressEntity.sentBalance = address.sentBalance || '0'
-      addressEntity.pendingBalance = address.pendingBalance || '0'
-      return addressEntity
+  public static create = (addresses: Address[]): Address[] => {
+    const result = addresses.map(address => {
+      address.txCount = address.txCount || 0
+      address.liveBalance = address.liveBalance || '0'
+      address.sentBalance = address.sentBalance || '0'
+      address.pendingBalance = address.pendingBalance || '0'
+      address.balance = (BigInt(address.liveBalance) + BigInt(address.sentBalance)).toString()
+      return address
     })
+    return AddressStore.add(result)
+  }
 
-    return getConnection().manager.save(addressEntities)
+  public static getAll(): Address[] {
+    return AddressStore.getAll()
   }
 
   // txCount include all txs in db
@@ -56,190 +51,177 @@ export default class AddressDao {
   public static updateTxCountAndBalance = async (
     address: string,
     url: string = NodeService.getInstance().core.rpc.node.url
-  ): Promise<AddressEntity[]> => {
-    const addressEntities = await getConnection()
-      .getRepository(AddressEntity)
-      .find({
-        address,
-      })
+  ): Promise<Address[]> => {
+    const all = AddressStore.getAll()
+    const toUpdate = all.filter(value => {
+      return value.address === address
+    })
+    const others = all.filter(value => {
+      return value.address !== address
+    })
 
     const txCount: number = await TransactionsService.getCountByAddressAndStatus(address, [
       TransactionStatus.Pending,
       TransactionStatus.Success,
     ], url)
     const lockUtils = new LockUtils(await LockUtils.systemScript(url))
-    const entities = await Promise.all(
-      addressEntities.map(async entity => {
-        const addressEntity = entity
-        addressEntity.txCount = txCount
-        const lockHashes: string[] = lockUtils.addressToAllLockHashes(addressEntity.address)
-        addressEntity.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
-        addressEntity.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
-        addressEntity.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
-        return addressEntity
+    const result = await Promise.all(
+      toUpdate.map(async entity => {
+        const item = entity
+        item.txCount = txCount
+        const lockHashes: string[] = lockUtils.addressToAllLockHashes(item.address)
+        item.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
+        item.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
+        item.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
+        item.balance = (BigInt(item.liveBalance) + BigInt(item.sentBalance)).toString()
+        return item
       })
     )
 
-    return getConnection().manager.save(entities)
-  }
-
-  public static nextUnusedAddress = async (
-    walletId: string,
-    version: AddressVersion
-  ): Promise<AddressEntity | undefined> => {
-    const addressEntity = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        version,
-        addressType: AddressType.Receiving,
-        txCount: 0,
-      })
-      .orderBy('address.addressIndex', 'ASC')
-      .getOne()
-
-    return addressEntity
-  }
-
-  public static nextUnusedChangeAddress = async (
-    walletId: string,
-    version: AddressVersion
-  ): Promise<AddressEntity | undefined> => {
-    const addressEntity = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        version,
-        addressType: AddressType.Change,
-        txCount: 0,
-      })
-      .orderBy('address.addressIndex', 'ASC')
-      .getOne()
-
-    return addressEntity
-  }
-
-  public static allAddresses = async (version: AddressVersion): Promise<AddressEntity[]> => {
-    const addressEntities = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        version,
-      })
-      .getMany()
-
-    return addressEntities
-  }
-
-  public static allAddressesByWalletId = async (
-    walletId: string,
-    version: AddressVersion
-  ): Promise<AddressEntity[]> => {
-    const addressEntities = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        version,
-      })
-      .getMany()
-
-    return addressEntities
-  }
-
-  public static usedAddressesByWalletId = async (
-    walletId: string,
-    version: AddressVersion
-  ): Promise<AddressEntity[]> => {
-    const addressEntities = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        version,
-        txCount: Not(0),
-      })
-      .getMany()
-
-    return addressEntities
-  }
-
-  public static findByAddress = async (address: string, walletId: string): Promise<AddressEntity | undefined> => {
-    const addressEntity = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        address,
-        walletId,
-      })
-      .getOne()
-
-    return addressEntity
-  }
-
-  public static findByAddresses = async (addresses: string[]) => {
-    const addressEntities = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        address: In(addresses),
-      })
-      .getMany()
-    return addressEntities
-  }
-
-  public static maxAddressIndex = async (
-    walletId: string,
-    addressType: AddressType,
-    version: AddressVersion
-  ): Promise<AddressEntity | undefined> => {
-    const addressEntity = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        addressType,
-        version,
-      })
-      .orderBy('address.addressIndex', 'DESC')
-      .getOne()
-
-    if (!addressEntity) {
-      return undefined
-    }
-
-    return addressEntity
-  }
-
-  public static updateDescription = async (walletId: string, address: string, description: string) => {
-    const addressEntity = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-        address,
-      })
-      .getOne()
-
-    if (!addressEntity) {
-      return undefined
-    }
-    addressEntity.description = description
-    return getConnection().manager.save(addressEntity)
-  }
-
-  public static deleteByWalletId = async (walletId: string) => {
-    const addresses = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .where({
-        walletId,
-      })
-      .getMany()
-    const result = addresses.map(addr => addr.toInterface())
-    await getConnection().manager.remove(addresses)
+    AddressStore.updateAll(toUpdate.concat(others))
     return result
+  }
+
+  public static nextUnusedAddress(walletId: string, version: AddressVersion): Address | undefined {
+    const addresses = AddressStore.getAll().filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Receiving
+        && value.txCount === 0
+    })
+    return addresses.sort((lhs, rhs) => {
+      return lhs.addressIndex < rhs.addressIndex ? 1 : -1
+    })[0]
+  }
+
+  public static nextUnusedChangeAddress(walletId: string, version: AddressVersion): Address | undefined {
+    const addresses = AddressStore.getAll().filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Change
+        && value.txCount === 0
+    })
+    return addresses.sort((lhs, rhs) => {
+      return lhs.addressIndex < rhs.addressIndex ? 1 : -1
+    })[0]
+  }
+
+  public static allAddresses(version: AddressVersion): Address[] {
+    const all = AddressStore.getAll()
+    return all.filter(value => {
+      return value.version === version
+    })
+  }
+
+  public static allAddressesByWalletId(walletId: string, version: AddressVersion): Address[] {
+    const all = AddressStore.getAll()
+    return all.filter(value => {
+      return value.walletId === walletId && value.version === version
+    })
+  }
+
+  public static usedAddressesByWalletId(walletId: string, version: AddressVersion):Address[] {
+    const all = AddressStore.getAll()
+    return all.filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.txCount !== 0
+    })
+  }
+
+  public static findByAddress(address: string, walletId: string): Address | undefined {
+    return AddressStore.getAll().find(value => {
+      return value.address === address && value.walletId == walletId
+    })
+  }
+
+  public static findByAddresses(addresses: string[]): Address[] {
+    return AddressStore.getAll().filter(value => {
+      return addresses.includes(value.address)
+    })
+  }
+
+  public static maxAddressIndex(walletId: string, addressType: AddressType, version: AddressVersion): Address | undefined {
+    const addresses = AddressStore.getAll().filter(value => {
+      return value.walletId === walletId
+        && value.addressType === addressType
+        && value.version === version
+    })
+    return addresses.sort((lhs, rhs) => {
+      return lhs.addressIndex > rhs.addressIndex ? -1 : 1
+    })[0]
+  }
+
+  public static updateDescription(walletId: string, address: string, description: string): Address | undefined {
+    const item = AddressDao.findByAddress(address, walletId)
+    if (!item) {
+      return undefined
+    }
+    item.description = description
+    return AddressStore.update(item)
+  }
+
+  public static deleteByWalletId(walletId: string): Address[] {
+    const all = AddressStore.getAll()
+    const toKeep = all.filter(value => {
+      return value.walletId !== walletId
+    })
+    const deleted = all.filter(value => {
+      return value.walletId === walletId
+    })
+    AddressStore.updateAll(toKeep)
+
+    return deleted
+  }
+
+  public static updateAll(addresses: Address[]) {
+    AddressStore.updateAll(addresses)
+  }
+
+  public static deleteAll() {
+    AddressStore.updateAll([])
+  }
+}
+
+/// Persist all addresses as array in `addresses/index.json`.
+class AddressStore {
+  static MODULE_NAME = 'addresses'
+  static ROOT_KEY = 'addresses'
+  static store = new Store(AddressStore.MODULE_NAME, 'index.json', '{}')
+
+  static getAll(): Address[] {
+    const root = AddressStore.store.readSync<Address[]>(AddressStore.ROOT_KEY)
+    return root || []
+  }
+
+  static updateAll(addresses: Address[]) {
+    AddressStore.store.writeSync(AddressStore.ROOT_KEY, addresses)
+  }
+
+  static add(addresses: Address[]): Address[] {
+    const all = AddressStore.getAll()
+    for (let address of addresses) {
+      all.push(address)
+    }
+
+    AddressStore.updateAll(all)
+
+    return addresses
+  }
+
+  static update(address: Address): Address {
+    const all = AddressStore.getAll()
+    const exist = all.findIndex(value => {
+      return value.walletId === address.walletId && value.address === address.address
+    })
+    if (exist !== -1) {
+      all[exist] = address
+    } else {
+      all.push(address)
+    }
+
+    AddressStore.updateAll(all)
+
+    return address
   }
 }

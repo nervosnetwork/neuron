@@ -1,6 +1,5 @@
 import AddressService from '../../src/services/addresses'
-import initConnection, { getConnection } from '../../src/database/address/ormconfig'
-import AddressEntity, { AddressVersion } from '../../src/database/address/entities/address'
+import { AddressVersion } from '../../src/database/address/entities/address'
 import AddressDao, { Address } from '../../src/database/address/dao'
 import { AddressType } from '../../src/models/keys/address'
 import { AccountExtendedPublicKey } from '../../src/models/keys/key'
@@ -88,18 +87,8 @@ describe('Key tests with db', () => {
     version: AddressVersion.Testnet,
   }
 
-  beforeAll(async () => {
-    await initConnection()
-  })
-
-  afterAll(async () => {
-    await getConnection().close()
-  })
-
   beforeEach(async () => {
-    const connection = getConnection()
-    await connection.dropDatabase()
-    await connection.synchronize()
+    AddressDao.deleteAll()
   })
 
   const generate = async (id: string = walletId) => {
@@ -113,10 +102,7 @@ describe('Key tests with db', () => {
   it('generateAndSave', async () => {
     await generate()
 
-    const all = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .getMany()
+    const all = AddressDao.getAll()
 
     expect(all.length).toEqual((2 + 1) * 2)
   })
@@ -124,26 +110,23 @@ describe('Key tests with db', () => {
   it('checkAndGenerateSave', async () => {
     await generate()
 
-    const all = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .getMany()
+    const all = AddressDao.getAll()
 
     const usedAll = all
-      .filter(one => one.addressType === AddressType.Receiving)
       .map(one => {
-        const entity = one
-        entity.txCount = 1
-        return entity
+        if (one.addressType === AddressType.Receiving) {
+          const entity = one
+          entity.txCount = 1
+          return entity
+        } else {
+          return one
+        }
       })
-    await getConnection().manager.save(usedAll)
+    AddressDao.updateAll(usedAll)
 
     await checkAndGenerate()
 
-    const final = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .getMany()
+    const final = AddressDao.getAll()
 
     expect(final.length).toEqual((2 + 1) * 2 * 2)
   })
@@ -151,32 +134,29 @@ describe('Key tests with db', () => {
   it('generateAndSave with two wallet', async () => {
     await generate()
     await generate('2')
-    const all = await getConnection()
-      .getRepository(AddressEntity)
-      .createQueryBuilder('address')
-      .getMany()
+    const all = AddressDao.getAll()
 
     expect(all.length).toEqual((2 + 1) * 2 * 2)
   })
 
   it('isAddressUsed', async () => {
-    await AddressDao.create([address, usedAddress])
+    AddressDao.create([address, usedAddress])
     const used = await AddressService.isAddressUsed(address.address, walletId)
     expect(used).toBe(true)
   })
 
   it('nextUnusedAddress', async () => {
-    await AddressDao.create([address, usedAddress, changeAddress])
+    AddressDao.create([address, usedAddress, changeAddress])
     const addr = await AddressService.nextUnusedAddress(walletId)
-    const addrDao = await AddressDao.nextUnusedAddress(walletId, AddressVersion.Testnet)
-    expect(addr).toEqual(addrDao && addrDao.toInterface())
+    const addrDao = AddressDao.nextUnusedAddress(walletId, AddressVersion.Testnet)
+    expect(addr).toEqual(addrDao)
   })
 
   it('nextUnusedChangeAddress', async () => {
-    await AddressDao.create([address, usedAddress, changeAddress])
+    AddressDao.create([address, usedAddress, changeAddress])
     const addr = await AddressService.nextUnusedChangeAddress(walletId)
-    const addrDao = await AddressDao.nextUnusedChangeAddress(walletId, AddressVersion.Testnet)
-    expect(addr).toEqual(addrDao && addrDao.toInterface())
+    const addrDao = AddressDao.nextUnusedChangeAddress(walletId, AddressVersion.Testnet)
+    expect(addr).toEqual(addrDao)
   })
 
   it('allAddresses', async () => {
@@ -194,7 +174,7 @@ describe('Key tests with db', () => {
   })
 
   it('usedAddress', async () => {
-    await AddressDao.create([address, usedAddress])
+    AddressDao.create([address, usedAddress])
 
     const addr = await AddressService.usedAddresses(walletId)
     expect(addr).toEqual([])

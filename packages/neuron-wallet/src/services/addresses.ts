@@ -3,7 +3,7 @@ import { AccountExtendedPublicKey } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface } from 'database/address/dao'
-import AddressEntity, { AddressVersion } from 'database/address/entities/address'
+import { AddressVersion } from 'database/address/entities/address'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
 import ChainInfo from 'models/chain-info'
@@ -19,7 +19,7 @@ export interface AddressMetaInfo {
 
 export default class AddressService {
   public static isAddressUsed = async (address: string, walletId: string): Promise<boolean> => {
-    const addressEntity = await AddressDao.findByAddress(address, walletId)
+    const addressEntity = AddressDao.findByAddress(address, walletId)
     return !!addressEntity
   }
 
@@ -46,7 +46,7 @@ export default class AddressService {
       ...addresses.testnetChange,
       ...addresses.mainnetChange,
     ]
-    await AddressDao.create(allAddresses)
+    AddressDao.create(allAddresses)
 
     // TODO: notify address created and pass addressWay
     AddressService.notifyAddressCreated(allAddresses, isImporting)
@@ -72,8 +72,8 @@ export default class AddressService {
     changeAddressCount: number = 10
   ) => {
     const addressVersion = AddressService.getAddressVersion()
-    const maxIndexReceivingAddress = await AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
-    const maxIndexChangeAddress = await AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
+    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
+    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
     if (
       maxIndexReceivingAddress !== undefined &&
       maxIndexReceivingAddress.txCount === 0 &&
@@ -99,7 +99,7 @@ export default class AddressService {
     addresses: string[],
     url: string = NodeService.getInstance().core.rpc.node.url
   ) => {
-    let addrs: AddressEntity[] = []
+    let addrs: Address[] = []
     for (const address of addresses) {
       const ads = await AddressDao.updateTxCountAndBalance(address, url)
       addrs = addrs.concat(ads)
@@ -197,43 +197,37 @@ export default class AddressService {
   public static nextUnusedAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
     const version = AddressService.getAddressVersion()
 
-    const addressEntity = await AddressDao.nextUnusedAddress(walletId, version)
+    const addressEntity = AddressDao.nextUnusedAddress(walletId, version)
     if (!addressEntity) {
       return undefined
     }
-    return addressEntity.toInterface()
+    return addressEntity
   }
 
   public static nextUnusedChangeAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
     const version = AddressService.getAddressVersion()
 
-    const addressEntity = await AddressDao.nextUnusedChangeAddress(walletId, version)
+    const addressEntity = AddressDao.nextUnusedChangeAddress(walletId, version)
     if (!addressEntity) {
       return undefined
     }
-    return addressEntity.toInterface()
+    return addressEntity
   }
 
   public static allAddresses = async (): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
 
-    const addressEntities = await AddressDao.allAddresses(version)
-
-    return addressEntities.map(addr => addr.toInterface())
+    return AddressDao.allAddresses(version)
   }
 
   public static allAddressesByWalletId = async (walletId: string): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
-    const addressEntities = await AddressDao.allAddressesByWalletId(walletId, version)
-
-    return addressEntities.map(addr => addr.toInterface())
+    return AddressDao.allAddressesByWalletId(walletId, version)
   }
 
   public static usedAddresses = async (walletId: string): Promise<AddressInterface[]> => {
     const version = AddressService.getAddressVersion()
-    const addressEntities = await AddressDao.usedAddressesByWalletId(walletId, version)
-
-    return addressEntities.map(addr => addr.toInterface())
+    return AddressDao.usedAddressesByWalletId(walletId, version)
   }
 
   public static updateDescription = async (walletId: string, address: string, description: string) => {
@@ -245,8 +239,7 @@ export default class AddressService {
   }
 
   public static findByAddresses = async (addresses: string[]) => {
-    const entities = await AddressDao.findByAddresses(addresses)
-    return entities.map(entity => entity.toInterface())
+    return AddressDao.findByAddresses(addresses)
   }
 
   private static getAddressVersion = (): AddressVersion => {
