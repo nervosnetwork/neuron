@@ -2,7 +2,7 @@ import { AddressType } from '../../../src/models/keys/address'
 import AddressDao, { Address, AddressVersion } from '../../../src/database/address/address-dao'
 
 describe('balance', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     AddressDao.deleteAll()
   })
 

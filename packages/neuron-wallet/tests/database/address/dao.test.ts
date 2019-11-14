@@ -47,7 +47,7 @@ describe('Address Dao tests', () => {
     version: AddressVersion.Testnet,
   }
 
-  beforeEach(async () => {
+  beforeEach(() => {
     AddressDao.deleteAll()
   })
 

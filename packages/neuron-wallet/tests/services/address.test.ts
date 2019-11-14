@@ -86,7 +86,7 @@ describe('Key tests with db', () => {
     version: AddressVersion.Testnet,
   }
 
-  beforeEach(async () => {
+  beforeEach(() => {
     AddressDao.deleteAll()
   })
 
@@ -107,7 +107,7 @@ describe('Key tests with db', () => {
   })
 
   it('checkAndGenerateSave', async () => {
-    await generate()
+    generate()
 
     const all = AddressDao.getAll()
 
