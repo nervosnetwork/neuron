@@ -92,7 +92,7 @@ const WithdrawDialog = ({
             <span>{`${shannonToCKBFormatter(record.capacity)} CKB`}</span>
           </Text>
           <Text as="p" variant="large" block>
-            <span>{`${t('nervos-dao.interest')}: `}</span>
+            <span>{`${t('nervos-dao.compensation')}: `}</span>
             <span>
               {withdrawValue
                 ? `${shannonToCKBFormatter((BigInt(withdrawValue) - BigInt(record.capacity)).toString())} CKB`
