@@ -1,3 +1,35 @@
+## [0.24.5](https://github.com/nervosnetwork/neuron/compare/v0.24.4...v0.24.5) (2019-11-14)
+
+
+### Bug Fixes
+
+* **neuron-ui:** add decimal validation on deposit value ([#1093](https://github.com/nervosnetwork/neuron/issues/1093)) ([61eab4f](https://github.com/nervosnetwork/neuron/commit/61eab4f))
+* current block number should be -1 if not start ([543cdd0](https://github.com/nervosnetwork/neuron/commit/543cdd0))
+* dao i18n ([4f41d9d](https://github.com/nervosnetwork/neuron/commit/4f41d9d))
+
+
+### Features
+
+* **neuron-ui:** add an alert when past epochs are less than 5 ([15d0cc8](https://github.com/nervosnetwork/neuron/commit/15d0cc8))
+* **neuron-ui:** add border color on dao records ([96b4ef6](https://github.com/nervosnetwork/neuron/commit/96b4ef6))
+* **neuron-ui:** rename APY to APC ([c337a21](https://github.com/nervosnetwork/neuron/commit/c337a21))
+* **neuron-ui:** rename interest to compensation ([e6d6060](https://github.com/nervosnetwork/neuron/commit/e6d6060))
+* Regenerate addresses if necessary on launch ([9988a13](https://github.com/nervosnetwork/neuron/commit/9988a13))
+* **neuron-ui:** add content in deposit notice ([dd0c7dc](https://github.com/nervosnetwork/neuron/commit/dd0c7dc))
+* **neuron-ui:** add global apy estimation ([#1092](https://github.com/nervosnetwork/neuron/issues/1092)) ([dc82cbb](https://github.com/nervosnetwork/neuron/commit/dc82cbb))
+* **neuron-ui:** add more translation of nervos dao ([3c62598](https://github.com/nervosnetwork/neuron/commit/3c62598))
+* **neuron-ui:** adjust the order of dao records ([e8398b6](https://github.com/nervosnetwork/neuron/commit/e8398b6))
+* **neuron-ui:** remove the user-confirmation from phase2 of nervos dao ([7e9e9e3](https://github.com/nervosnetwork/neuron/commit/7e9e9e3))
+* **neuron-ui:** rename deposit record to deposit receipt ([4c587a8](https://github.com/nervosnetwork/neuron/commit/4c587a8))
+* **neuron-ui:** use the same style of activity record on deposit record. ([99f77aa](https://github.com/nervosnetwork/neuron/commit/99f77aa))
+* Remove address sqlite db ([6f95340](https://github.com/nervosnetwork/neuron/commit/6f95340))
+* Send address db changed event when address store ([617a9a3](https://github.com/nervosnetwork/neuron/commit/617a9a3))
+* **neuron-ui:** remove redundant error messages ([c67aa36](https://github.com/nervosnetwork/neuron/commit/c67aa36))
+* **neuron-ui:** update the info and message of nervos dao ([cd44e43](https://github.com/nervosnetwork/neuron/commit/cd44e43))
+* **neuron-ui:** use the same style of overview on nervos dao overview ([20bbf33](https://github.com/nervosnetwork/neuron/commit/20bbf33))
+
+
+
 ## [0.24.4](https://github.com/nervosnetwork/neuron/compare/v0.24.3...v0.24.4) (2019-11-12)
 
 
