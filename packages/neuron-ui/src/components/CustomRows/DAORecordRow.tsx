@@ -35,6 +35,13 @@ const DAORecord = ({
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
+  const [apc, setApc] = useState(0)
+
+  useEffect(() => {
+    calculateGlobalAPC(+(depositTimestamp || timestamp)).then(res => {
+      setApc(res)
+    })
+  })
 
   useEffect(() => {
     if (!depositOutPoint) {
@@ -143,7 +150,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APC: ~${calculateGlobalAPC(+(depositTimestamp || timestamp))}%`}</span>
+        <span>{`APC: ~${apc}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>
