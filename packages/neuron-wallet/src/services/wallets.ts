@@ -357,7 +357,7 @@ export default class WalletService {
 
     const txHash = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
 
-    const addressInfos = await this.getAddressInfos(walletID)
+    const addressInfos = this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
     const findPrivateKey = (blake160: string) => {
@@ -454,7 +454,7 @@ export default class WalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
@@ -522,7 +522,7 @@ export default class WalletService {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<TransactionWithoutHash> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
@@ -538,7 +538,7 @@ export default class WalletService {
       throw new TransactionIsNotCommittedYet()
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
+    const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
@@ -767,12 +767,12 @@ export default class WalletService {
   }
 
   public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
+    const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 

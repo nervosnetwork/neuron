@@ -134,7 +134,7 @@ export default class WalletsController {
       keystore,
     })
 
-    await walletsService.generateAddressesById(wallet.id, isImporting)
+    walletsService.generateAddressesById(wallet.id, isImporting)
 
     return {
       status: ResponseCode.Success,
