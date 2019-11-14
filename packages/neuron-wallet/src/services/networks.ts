@@ -10,6 +10,7 @@ import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
 import { NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import logger from 'utils/logger'
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
 
@@ -30,6 +31,21 @@ export default class NetworksService extends Store {
       if (currentNetworkList) {
         NetworkListSubject.next({
           currentNetworkList,
+        })
+        Promise.all(currentNetworkList.map(n => {
+          const core = new Core(n.remote)
+          return core.rpc
+            .getBlockchainInfo()
+            .then(info => info.chain)
+            .catch(() => '')
+            .then(chain => ({
+              ...n,
+              chain,
+            }))
+        })).then(networkList => {
+          this.updateAll(networkList)
+        }).catch((err: Error) => {
+          logger.error(err)
         })
       }
     })
