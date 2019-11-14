@@ -29,14 +29,12 @@ export const register = () => {
     const uniqueAddresses = [...new Set(addresses)]
     const addrs = await AddressService.updateTxCountAndBalances(uniqueAddresses, url)
     const walletIds: string[] = addrs.map(addr => (addr as Address).walletId).filter((value, idx, a) => a.indexOf(value) === idx)
-    await Promise.all(
-      walletIds.map(async id => {
-        const wallet = WalletService.getInstance().get(id)
-        const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-        // set isImporting to undefined means unknown
-        await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
-      })
-    )
+    for (const id of walletIds) {
+      const wallet = WalletService.getInstance().get(id)
+      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+      // set isImporting to undefined means unknown
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
+    }
   })
 }
 

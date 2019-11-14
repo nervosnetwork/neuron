@@ -17,7 +17,7 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
-  public static isAddressUsed = async (address: string, walletId: string): Promise<boolean> => {
+  public static isAddressUsed = (address: string, walletId: string): boolean => {
     const addressEntity = AddressDao.findByAddress(address, walletId)
     return !!addressEntity
   }
@@ -190,7 +190,7 @@ export default class AddressService {
     return [testnetAddressInfo, mainnetAddressInfo]
   }
 
-  public static nextUnusedAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
+  public static nextUnusedAddress = (walletId: string): AddressInterface | undefined => {
     const version = AddressService.getAddressVersion()
 
     const addressEntity = AddressDao.nextUnusedAddress(walletId, version)
@@ -200,7 +200,7 @@ export default class AddressService {
     return addressEntity
   }
 
-  public static nextUnusedChangeAddress = async (walletId: string): Promise<AddressInterface | undefined> => {
+  public static nextUnusedChangeAddress = (walletId: string): AddressInterface | undefined => {
     const version = AddressService.getAddressVersion()
 
     const addressEntity = AddressDao.nextUnusedChangeAddress(walletId, version)
@@ -210,7 +210,7 @@ export default class AddressService {
     return addressEntity
   }
 
-  public static allAddresses = async (): Promise<AddressInterface[]> => {
+  public static allAddresses = (): AddressInterface[] => {
     const version = AddressService.getAddressVersion()
 
     return AddressDao.allAddresses(version)
@@ -221,20 +221,20 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId, version)
   }
 
-  public static usedAddresses = async (walletId: string): Promise<AddressInterface[]> => {
+  public static usedAddresses = (walletId: string): AddressInterface[] => {
     const version = AddressService.getAddressVersion()
     return AddressDao.usedAddressesByWalletId(walletId, version)
   }
 
-  public static updateDescription = async (walletId: string, address: string, description: string) => {
+  public static updateDescription = (walletId: string, address: string, description: string): AddressInterface | undefined => {
     return AddressDao.updateDescription(walletId, address, description)
   }
 
-  public static deleteByWalletId = async (walletId: string) => {
+  public static deleteByWalletId = (walletId: string): AddressInterface[] => {
     return AddressDao.deleteByWalletId(walletId)
   }
 
-  public static findByAddresses = async (addresses: string[]) => {
+  public static findByAddresses = (addresses: string[]): AddressInterface[] => {
     return AddressDao.findByAddresses(addresses)
   }
 

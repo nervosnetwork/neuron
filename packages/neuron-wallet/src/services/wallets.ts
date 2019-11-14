@@ -187,8 +187,7 @@ export default class WalletService {
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
-    const wallet: Wallet = this.get(id)
-    const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+    const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
     AddressService.checkAndGenerateSave(
       id,
       accountExtendedPublicKey,
@@ -196,18 +195,6 @@ export default class WalletService {
       receivingAddressCount,
       changeAddressCount
     )
-  }
-
-  public generateCurrentWalletAddresses = async (
-    isImporting: boolean,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
-  ) => {
-    const wallet: Wallet | undefined = this.getCurrent()
-    if (!wallet) {
-      return undefined
-    }
-    return this.generateAddressesById(wallet.id, isImporting, receivingAddressCount, changeAddressCount)
   }
 
   public create = (props: WalletProperties) => {
@@ -277,7 +264,7 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
-    const addressInterfaces = await AddressService.deleteByWalletId(id)
+    const addressInterfaces = AddressService.deleteByWalletId(id)
     this.deindexAddresses(addressInterfaces.map(addr => addr.address))
   }
 
@@ -288,7 +275,7 @@ export default class WalletService {
     if (addressesWithEnvPrefix.length === 0) {
       return
     }
-    const addrs: string[] = (await AddressService.findByAddresses(addressesWithEnvPrefix)).map(addr => addr.address)
+    const addrs: string[] = AddressService.findByAddresses(addressesWithEnvPrefix).map(addr => addr.address)
     const deindexAddresses: string[] = addresses.filter(item => addrs.indexOf(item) < 0);
     // only deindex if no same wallet
     if (deindexAddresses.length !== 0) {
@@ -472,7 +459,7 @@ export default class WalletService {
       throw new WalletNotFound(walletID)
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
+    const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
@@ -483,7 +470,7 @@ export default class WalletService {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const changeAddress: string = await this.getChangeAddress()
+    const changeAddress: string = this.getChangeAddress()
 
     const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
       lockHashes,
@@ -502,20 +489,20 @@ export default class WalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = await this.get(walletID)
+    const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
     }
 
-    const addressInfos = await this.getAddressInfos(walletID)
+    const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
-    const address = await AddressesService.nextUnusedAddress(walletID)
+    const address = AddressesService.nextUnusedAddress(walletID)
 
-    const changeAddress: string = await this.getChangeAddress()
+    const changeAddress: string = this.getChangeAddress()
 
     const tx = await TransactionGenerator.generateDepositTx(
       lockHashes,
@@ -798,7 +785,7 @@ export default class WalletService {
   }
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
-  public getAddressInfos = async (walletID: string): Promise<AddressInterface[]> => {
+  public getAddressInfos = (walletID: string): AddressInterface[] => {
     const wallet = this.get(walletID)
     if (!wallet) {
       throw new WalletNotFound(walletID)
@@ -806,10 +793,9 @@ export default class WalletService {
     return AddressService.allAddressesByWalletId(walletID)
   }
 
-  public getChangeAddress = async (): Promise<string> => {
+  public getChangeAddress = (): string => {
     const walletId = this.getCurrent()!.id
-    const addr = await AddressService.nextUnusedChangeAddress(walletId)
-    return addr!.address
+    return AddressService.nextUnusedChangeAddress(walletId)!.address
   }
 
   public signWitness = (

@@ -90,16 +90,16 @@ describe('Key tests with db', () => {
     AddressDao.deleteAll()
   })
 
-  const generate = async (id: string = walletId) => {
-    await AddressService.generateAndSave(id, extendedKey, undefined, 0, 0, 2, 1)
+  const generate = (id: string = walletId) => {
+    AddressService.generateAndSave(id, extendedKey, undefined, 0, 0, 2, 1)
   }
 
-  const checkAndGenerate = async (id: string = walletId) => {
-    await AddressService.checkAndGenerateSave(id, extendedKey, undefined, 2, 1)
+  const checkAndGenerate = (id: string = walletId) => {
+    AddressService.checkAndGenerateSave(id, extendedKey, undefined, 2, 1)
   }
 
   it('generateAndSave', async () => {
-    await generate()
+    generate()
 
     const all = AddressDao.getAll()
 
@@ -130,54 +130,54 @@ describe('Key tests with db', () => {
     expect(final.length).toEqual((2 + 1) * 2 * 2)
   })
 
-  it('generateAndSave with two wallet', async () => {
-    await generate()
-    await generate('2')
+  it('generateAndSave with two wallet', () => {
+    generate()
+    generate('2')
     const all = AddressDao.getAll()
 
     expect(all.length).toEqual((2 + 1) * 2 * 2)
   })
 
-  it('isAddressUsed', async () => {
+  it('isAddressUsed', () => {
     AddressDao.create([address, usedAddress])
-    const used = await AddressService.isAddressUsed(address.address, walletId)
+    const used = AddressService.isAddressUsed(address.address, walletId)
     expect(used).toBe(true)
   })
 
-  it('nextUnusedAddress', async () => {
+  it('nextUnusedAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
-    const addr = await AddressService.nextUnusedAddress(walletId)
+    const addr = AddressService.nextUnusedAddress(walletId)
     const addrDao = AddressDao.nextUnusedAddress(walletId, AddressVersion.Testnet)
     expect(addr).toEqual(addrDao)
   })
 
-  it('nextUnusedChangeAddress', async () => {
+  it('nextUnusedChangeAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
-    const addr = await AddressService.nextUnusedChangeAddress(walletId)
+    const addr = AddressService.nextUnusedChangeAddress(walletId)
     const addrDao = AddressDao.nextUnusedChangeAddress(walletId, AddressVersion.Testnet)
     expect(addr).toEqual(addrDao)
   })
 
-  it('allAddresses', async () => {
-    await generate()
-    await generate('2')
-    const all = await AddressService.allAddresses()
+  it('allAddresses', () => {
+    generate()
+    generate('2')
+    const all = AddressService.allAddresses()
     expect(all.length).toEqual(6)
   })
 
-  it('allAddressesByWalletId', async () => {
-    await generate()
-    await generate('2')
-    const all = await AddressService.allAddressesByWalletId(walletId)
+  it('allAddressesByWalletId', () => {
+    generate()
+    generate('2')
+    const all = AddressService.allAddressesByWalletId(walletId)
     expect(all.length).toEqual(3)
   })
 
-  it('usedAddress', async () => {
+  it('usedAddress', () => {
     AddressDao.create([address, usedAddress])
 
-    const addr = await AddressService.usedAddresses(walletId)
+    const addr = AddressService.usedAddresses(walletId)
     expect(addr).toEqual([])
-    const addr2 = await AddressService.usedAddresses('2')
+    const addr2 = AddressService.usedAddresses('2')
     expect(addr2).not.toEqual([])
   })
 })

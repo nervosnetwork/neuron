@@ -127,7 +127,7 @@ export default class AddressDao {
       })
   }
 
-  public static usedAddressesByWalletId(walletId: string, version: AddressVersion):Address[] {
+  public static usedAddressesByWalletId(walletId: string, version: AddressVersion): Address[] {
     const all = AddressStore.getAll()
     return all.filter(value => {
       return value.walletId === walletId

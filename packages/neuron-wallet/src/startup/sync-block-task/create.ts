@@ -12,7 +12,7 @@ import DataUpdateSubject from 'models/subjects/data-update'
 export { genesisBlockHash }
 
 const updateAllAddressesTxCount = async (url: string) => {
-  const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
+  const addresses = AddressService.allAddresses().map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses, url)
 }
 

@@ -499,7 +499,7 @@ export default class WalletsController {
     const walletService = WalletsService.getInstance()
     const wallet = walletService.get(walletID)
 
-    await AddressService.updateDescription(wallet.id, address, description)
+    AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,
