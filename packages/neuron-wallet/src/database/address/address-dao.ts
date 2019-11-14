@@ -96,7 +96,7 @@ export default class AddressDao {
         && value.txCount === 0
     })
     return addresses.sort((lhs, rhs) => {
-      return lhs.addressIndex < rhs.addressIndex ? 1 : -1
+      return lhs.addressIndex - rhs.addressIndex
     })[0]
   }
 
@@ -126,7 +126,7 @@ export default class AddressDao {
         && value.txCount === 0
     })
     return addresses.sort((lhs, rhs) => {
-      return lhs.addressIndex < rhs.addressIndex ? 1 : -1
+      return lhs.addressIndex - rhs.addressIndex
     })[0]
   }
 

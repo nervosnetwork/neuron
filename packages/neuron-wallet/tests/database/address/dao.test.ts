@@ -17,6 +17,21 @@ describe('Address Dao tests', () => {
     version: AddressVersion.Testnet,
   }
 
+  const address2: Address = {
+    walletId: '1',
+    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+    path: "m/44'/309'/0'/0/1",
+    addressType: AddressType.Receiving,
+    addressIndex: 1,
+    txCount: 0,
+    liveBalance: '0',
+    sentBalance: '0',
+    pendingBalance: '0',
+    balance: '0',
+    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    version: AddressVersion.Testnet,
+  }
+
   const usedAddress: Address = {
     walletId: '2',
     address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
@@ -141,5 +156,13 @@ describe('Address Dao tests', () => {
 
     const counts = AddressDao.unusedAddressesCount(address.walletId, AddressVersion.Testnet)
     expect(counts).toEqual([1, 1])
+  })
+
+  it('nextUnusedAddress', () => {
+    AddressDao.create([address, address2])
+
+    const next = AddressDao.nextUnusedAddress('1', AddressVersion.Testnet)
+
+    expect(next!.address).toEqual(address.address)
   })
 })
