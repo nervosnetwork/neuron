@@ -1,8 +1,8 @@
 [
-  { "difficulty": 0, "expected": "0 H" },
-  { "difficulty": 123, "expected": "123 H" },
-  { "difficulty": 12345, "expected": "12,345 H" },
-  { "difficulty": 123454669, "expected": "123,454.67 KH" },
-  { "difficulty": 1234546698945, "expected": "1,234.55 GH" },
-  { "difficulty": 100003439, "expected": "100,003.44 KH" }
+  { "difficulty": 0, "expected": "0 H/s" },
+  { "difficulty": 123, "expected": "123 H/s" },
+  { "difficulty": 12345, "expected": "12,345 H/s" },
+  { "difficulty": 123454669, "expected": "123,454.67 KH/s" },
+  { "difficulty": 1234546698945, "expected": "1,234.55 GH/s" },
+  { "difficulty": 100003439, "expected": "100,003.44 KH/s" }
 ]
