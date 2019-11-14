@@ -5,6 +5,7 @@ import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
 import { TransactionStatus } from 'types/cell-types'
+import TransactionEntity from 'database/chain/entities/transaction'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -54,6 +55,25 @@ export default class CellsService {
       .getMany()
 
     const cells = outputs.map(o => o.toInterface())
+
+    const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
+
+    const txs = await getConnection()
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where({
+        hash: In(txHashes)
+      })
+      .getMany()
+
+    for (const output of cells) {
+      if (output.depositOutPoint) {
+        const tx = txs.filter(t => t.hash === output.depositOutPoint!.txHash)[0]
+        if (tx) {
+          output.depositTimestamp = tx.timestamp
+        }
+      }
+    }
 
     return cells
   }
