@@ -20,7 +20,7 @@ import QRScanner from 'widgets/QRScanner'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, CapacityUnit, ErrorCode } from 'utils/const'
+import { PlaceHolders, CapacityUnit, ErrorCode, MAINNET_TAG } from 'utils/const'
 import { shannonToCKBFormatter } from 'utils/formatters'
 
 import { verifyTotalAmount } from 'utils/validators'
@@ -68,7 +68,7 @@ const Send = ({
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
   const network = networks.find(n => n.id === networkID)
-  const isMainnet = (network && network.chain === 'ckb') || false // TODO: should be replaced after the mainnet tag is introduced
+  const isMainnet = (network && network.chain === MAINNET_TAG) || false
 
   return (
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
