@@ -19,6 +19,7 @@ const DAORecord = ({
   actionLabel,
   onClick,
   timestamp,
+  depositTimestamp,
   depositOutPoint,
   epoch,
   withdraw,
@@ -142,7 +143,13 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APC: ~${calculateAPC(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
+        <span>
+          {`APC: ~${calculateAPC(
+            compensation.toString(),
+            capacity,
+            `${Date.now() - +(depositTimestamp || timestamp)}`
+          )}%`}
+        </span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>

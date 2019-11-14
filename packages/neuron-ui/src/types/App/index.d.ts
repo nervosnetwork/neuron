@@ -177,6 +177,7 @@ declare namespace State {
     typeHash: string | null
     daoData: string
     timestamp: string
+    depositTimestamp?: string
   }
 
   interface NervosDAO {
