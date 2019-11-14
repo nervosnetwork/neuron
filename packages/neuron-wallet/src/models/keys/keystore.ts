@@ -6,6 +6,7 @@ import { UnsupportedCipher, IncorrectPassword, InvalidKeystore } from 'exception
 import { ExtendedPrivateKey } from './key'
 
 const CIPHER = 'aes-128-ctr'
+const CKB_CLI_ORIGIN = 'ckb-cli'
 
 interface CipherParams {
   iv: string
@@ -42,6 +43,9 @@ export default class Keystore {
   static fromJson = (json: string) => {
     try {
       const object = JSON.parse(json)
+      if (object.origin === CKB_CLI_ORIGIN) {
+        throw 'Keystore from CKB CLI is not supported'
+      }
       return new Keystore(object.crypto, object.id)
     } catch {
       throw new InvalidKeystore()
