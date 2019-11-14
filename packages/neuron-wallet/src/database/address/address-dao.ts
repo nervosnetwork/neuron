@@ -100,6 +100,24 @@ export default class AddressDao {
     })[0]
   }
 
+  public static unusedAddressesCount(walletId: string, version: AddressVersion): [number, number] {
+    const addresses = AddressStore.getAll()
+    const receivingCount = addresses.filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Receiving
+        && value.txCount === 0
+    }).length
+    const changeCount = addresses.filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Change
+        && value.txCount === 0
+    }).length
+
+    return [receivingCount, changeCount]
+  }
+
   public static nextUnusedChangeAddress(walletId: string, version: AddressVersion): Address | undefined {
     const addresses = AddressStore.getAll().filter(value => {
       return value.walletId === walletId

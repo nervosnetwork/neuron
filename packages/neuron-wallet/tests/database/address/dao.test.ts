@@ -135,4 +135,11 @@ describe('Address Dao tests', () => {
 
     expect(one!.address).toEqual(address.address)
   })
+
+  it('unusedAddressesCount', () => {
+    AddressDao.create([address, changeAddress])
+
+    const counts = AddressDao.unusedAddressesCount(address.walletId, AddressVersion.Testnet)
+    expect(counts).toEqual([1, 1])
+  })
 })

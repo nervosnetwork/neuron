@@ -71,16 +71,15 @@ export default class AddressService {
     changeAddressCount: number = 10
   ) => {
     const addressVersion = AddressService.getAddressVersion()
-    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
-    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
+    const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
     if (
-      maxIndexReceivingAddress !== undefined &&
-      maxIndexReceivingAddress.txCount === 0 &&
-      maxIndexChangeAddress !== undefined &&
-      maxIndexChangeAddress.txCount === 0
+      unusedReceivingCount > 3 &&
+      unusedChangeCount > 3
     ) {
       return undefined
     }
+    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
+    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
     const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
     const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
     return AddressService.generateAndSave(
