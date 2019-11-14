@@ -3,7 +3,7 @@ import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getBlockByNumber } from 'services/chain'
 import { showMessage } from 'services/remote'
-import calculateAPY from 'utils/calculateAPY'
+import calculateAPC from 'utils/calculateAPC'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
@@ -64,13 +64,13 @@ const DAORecord = ({
       })
   }, [daoData, depositOutPoint, blockNumber])
 
-  const interest = BigInt(withdraw || capacity) - BigInt(capacity)
+  const compensation = BigInt(withdraw || capacity) - BigInt(capacity)
 
   let ready = false
   let metaInfo = 'Ready'
   if (!depositOutPoint) {
     const duration = BigInt(tipBlockNumber) - BigInt(blockNumber)
-    metaInfo = t('nervos-dao.interest-accumulated', {
+    metaInfo = t('nervos-dao.compensation-accumulated', {
       blockNumber: localNumberFormatter(duration >= BigInt(0) ? duration : 0),
     })
   } else {
@@ -115,8 +115,8 @@ const DAORecord = ({
     <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
       <div className={styles.primaryInfo}>
         <div>
-          {interest >= BigInt(0)
-            ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(interest.toString()).toString()} CKB`
+          {compensation >= BigInt(0)
+            ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
             : ''}
         </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
@@ -142,7 +142,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APY: ~${calculateAPY(interest.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
+        <span>{`APC: ~${calculateAPC(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>

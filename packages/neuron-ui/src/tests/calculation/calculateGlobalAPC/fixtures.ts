@@ -2,11 +2,11 @@ export default {
   'return 0 if the genesis block is not loaded': {
     currentTime: Date.now(),
     genesisTime: undefined,
-    expectAPY: 0,
+    expectAPC: 0,
   },
   'one period and one handrand days': {
     currentTime: new Date('2023-04-10').getTime(),
     genesisTime: new Date('2019-01-01').getTime(),
-    expectAPY: 2.369552868619654,
+    expectAPC: 2.369552868619654,
   },
 }
