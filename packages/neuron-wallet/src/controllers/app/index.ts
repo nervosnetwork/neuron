@@ -6,7 +6,6 @@ import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
 import { subscribe } from './subscribe'
-import WalletService from 'services/wallets'
 
 const app = electronApp || (remote && remote.app)
 
@@ -66,8 +65,6 @@ export default class AppController {
         this.mainWindow.show()
         this.mainWindow.focus()
         logger.info('The main window is ready to show')
-
-        WalletService.getInstance().generateAddressesIfNecessary()
       } else {
         logger.error('The main window is not initialized on ready to show')
       }
