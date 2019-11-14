@@ -177,6 +177,31 @@ export const failureResToNotification = (res: any): State.Message => {
   }
 }
 
+export const difficultyFormatter = (value: bigint) => {
+  const units = new Map([
+    ['YH/s', 1e24],
+    ['ZH/s', 1e21],
+    ['EH/s', 1e18],
+    ['PH/s', 1e15],
+    ['TH/s', 1e12],
+    ['GH/s', 1e9],
+    ['MH/s', 1e6],
+    ['KH/s', 1e3],
+  ])
+
+  /* eslint-disable no-restricted-syntax */
+  for (const [unit, range] of units) {
+    if (value >= range * 1e3) {
+      const integer = value / BigInt(range)
+      const decimal = (Number(value) / range).toFixed(2).split('.')[1]
+      return `${localNumberFormatter(integer)}.${decimal} ${unit}`
+    }
+  }
+  /* eslint-enable no-restricted-syntax */
+
+  return `${localNumberFormatter(value)} H/s`
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
@@ -184,6 +209,7 @@ export default {
   shannonToCKBFormatter,
   localNumberFormatter,
   uniformTimeFormatter,
+  difficultyFormatter,
   addressesToBalance,
   outputsToTotalAmount,
   failureResToNotification,
