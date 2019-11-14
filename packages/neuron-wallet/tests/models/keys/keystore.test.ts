@@ -59,3 +59,14 @@ describe('load ckb cli standard keystore', () => {
     expect(extendedPrivateKey.chainCode).toEqual('615302e2c93151a55c29121dd02ad554e47908a6df6d7374f357092cec11675b')
   })
 })
+
+describe('load ckb cli origin keystore', () => {
+  const keystoreString =
+    '{"origin":"ckb-cli", "address":"ea22142fa5be326e834681144ca30326f99a6d5a","crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"29304e5bcbb1885ef5cdcb40b5312b58"},"ciphertext":"93054530a8fbe5b11995acda856585d7362ac7d2b1e4f268c633d997be2d6532c4962501d0835bf52a4693ae7a091ac9bac9297793f4116ef7c123edb00dbc85","kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"724327e67ca321ccf15035bb78a0a05c816bebbe218a0840abdc26da8453c1f4"},"mac":"1d0e5660ffbfc1f9ff4da97aefcfc2153c0ec1b411e35ffee26ee92815cc06f9"},"id":"43c1116e-efd5-4c9e-a86a-3ec0ab163122","version":3}'
+
+  it('does not load', () => {
+    expect(
+      () => Keystore.fromJson(keystoreString)
+    ).toThrowError()
+  })
+})
