@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
+import { Route, RouteComponentProps, Switch, Redirect } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState } from 'states/stateProvider'
@@ -102,12 +102,12 @@ export const mainContents: CustomRouter.Route[] = [
     exact: false,
     comp: ImportKeystore,
   },
-  {
-    name: `PasswordRequest`,
-    path: '/',
-    exact: false,
-    comp: PasswordRequest,
-  },
+  // {
+  //   name: `PasswordRequest`,
+  //   path: '/',
+  //   exact: false,
+  //   comp: PasswordRequest,
+  // },
   {
     name: `NervosDAO`,
     path: Routes.NervosDAO,
@@ -158,16 +158,26 @@ const MainContent = ({
 
   return (
     <>
-      {mainContents.map(container => (
-        <Route
-          exact={container.exact}
-          path={`${container.path}${container.params || ''}`}
-          key={container.name}
-          render={routerProps => {
-            return <container.comp {...routerProps} {...neuronWalletState} dispatch={dispatch} />
-          }}
-        />
-      ))}
+      <Route
+        path="/"
+        key="PasswordRequest"
+        render={routerProps => {
+          return <PasswordRequest {...routerProps} {...neuronWalletState} dispatch={dispatch} />
+        }}
+      />
+      <Switch>
+        <Redirect from={Routes.SettingsGeneral} to={Routes.SettingsWallets} />
+        {mainContents.map(container => (
+          <Route
+            exact={container.exact}
+            path={`${container.path}${container.params || ''}`}
+            key={container.name}
+            render={routerProps => {
+              return <container.comp {...routerProps} {...neuronWalletState} dispatch={dispatch} />
+            }}
+          />
+        ))}
+      </Switch>
     </>
   )
 }
