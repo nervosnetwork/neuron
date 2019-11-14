@@ -46,15 +46,19 @@ export default class NetworksService extends Store {
           currentNetworkList,
         })
         Promise.all(currentNetworkList.map(n => {
-          const core = new Core(n.remote)
-          return core.rpc
-            .getBlockchainInfo()
-            .then(info => info.chain)
-            .catch(() => '')
-            .then(chain => ({
+          if (n.type == NetworkType.Default) {
+            return n
+          } else {
+            const core = new Core(n.remote)
+            return Promise.all([
+              core.rpc.getBlockchainInfo(),
+              core.rpc.getBlockHash('0x0')
+            ]).then(([info, genesisHash]) => ({
               ...n,
-              chain,
+              chain: info.chain,
+              genesisHash
             }))
+          }
         })).then(networkList => {
           this.updateAll(networkList)
         }).catch((err: Error) => {
