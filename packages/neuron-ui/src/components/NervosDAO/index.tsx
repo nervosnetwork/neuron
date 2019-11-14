@@ -11,7 +11,7 @@ import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/ac
 import calculateGlobalAPC from 'utils/calculateGlobalAPC'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, CapacityUnit } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIGITS, CapacityUnit } from 'utils/const'
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
@@ -66,7 +66,7 @@ const NervosDAO = ({
 
         const verifyRes = verifyAmount(value)
         if (verifyRes !== true) {
-          setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit' }))
+          setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
           return
         }
 
