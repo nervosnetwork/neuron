@@ -75,6 +75,7 @@ declare namespace State {
   interface App {
     tipBlockNumber: string
     tipBlockHash: string
+    tipBlockTimestamp: number
     chain: string
     difficulty: string
     epoch: string

@@ -108,7 +108,7 @@ export const useInputs = (editor: EditorType, usedNetworkNames: string[], t: any
           if (typeof res === 'object') {
             return t(`messages.codes.${res.code}`, {
               fieldName: 'name',
-              fieldValue: name,
+              fieldValue: '',
               length: MAX_NETWORK_NAME_LENGTH,
             })
           }

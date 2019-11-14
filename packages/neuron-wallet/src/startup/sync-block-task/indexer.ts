@@ -2,7 +2,7 @@ import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
-import { Address } from 'database/address/dao'
+import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
 import ChainInfo from 'models/chain-info'
@@ -12,7 +12,7 @@ const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.requ
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
-  const addresses: string[] = (await AddressService.allAddresses()).map(addr => addr.address)
+  const addresses: string[] = AddressService.allAddresses().map(addr => addr.address)
   const lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
   return lockUtils.addressesToAllLockHashes(addresses)
 }

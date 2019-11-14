@@ -19,7 +19,7 @@ export default class BlockNumber {
     const blockNumberEntity: SyncInfoEntity | undefined = await this.blockNumber()
 
     if (!blockNumberEntity) {
-      return BigInt(0)
+      return BigInt(-1)
     }
 
     return BigInt(blockNumberEntity.value)

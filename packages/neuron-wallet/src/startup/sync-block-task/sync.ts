@@ -2,7 +2,7 @@ import { remote } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
-import { Address } from 'database/address/dao'
+import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
 import ChainInfo from 'models/chain-info'
@@ -21,7 +21,7 @@ export interface LockHashInfo {
 // load all addresses and convert to lockHashes
 export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]> => {
   const lockUtils = new LockUtils(await LockUtils.systemScript(nodeURL))
-  const addresses = (await AddressService.allAddresses()).map(addr => addr.address)
+  const addresses = AddressService.allAddresses().map(addr => addr.address)
   return lockUtils.addressesToAllLockHashes(addresses)
 }
 

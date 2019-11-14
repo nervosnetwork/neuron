@@ -3,6 +3,7 @@ import { ReplaySubject } from 'rxjs'
 import { bufferTime } from 'rxjs/operators'
 import AddressesUsedSubject, { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 import AddressService from 'services/addresses'
+import { Address } from 'database/address/address-dao'
 import WalletService from 'services/wallets'
 import { AccountExtendedPublicKey } from 'models/keys/key'
 
@@ -27,15 +28,13 @@ export const register = () => {
     const url: string = addressesList[addressesList.length - 1].url
     const uniqueAddresses = [...new Set(addresses)]
     const addrs = await AddressService.updateTxCountAndBalances(uniqueAddresses, url)
-    const walletIds: string[] = addrs.map(addr => addr.walletId).filter((value, idx, a) => a.indexOf(value) === idx)
-    await Promise.all(
-      walletIds.map(async id => {
-        const wallet = WalletService.getInstance().get(id)
-        const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-        // set isImporting to undefined means unknown
-        await AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
-      })
-    )
+    const walletIds: string[] = addrs.map(addr => (addr as Address).walletId).filter((value, idx, a) => a.indexOf(value) === idx)
+    for (const id of walletIds) {
+      const wallet = WalletService.getInstance().get(id)
+      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+      // set isImporting to undefined means unknown
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
+    }
   })
 }
 

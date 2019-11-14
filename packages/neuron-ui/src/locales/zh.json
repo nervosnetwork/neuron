@@ -270,7 +270,8 @@
         "mnemonic": "助记词",
         "keystore-path": "Keystore 文件",
         "keystore-name": "钱包名称",
-        "keystore-password": "密码"
+        "keystore-password": "密码",
+        "deposit": "存入金额"
       },
       "codes": {
         "-3": "",
@@ -312,11 +313,11 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
-      "deposit-records": "存款记录",
-      "apy": "预期年化利率",
+      "deposit-receipts": "存款凭证",
+      "apc": "年化锁定补贴率",
       "deposit-at": "存入于{{time}}",
-      "claim": "Claim",
-      "withdraw": "Withdraw",
+      "claim": "取款",
+      "withdraw": "结算",
       "fee": "手续费",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
@@ -324,15 +325,17 @@
       "cancel": "取消",
       "proceed": "继续",
       "deposit-value": "存款",
-      "interest": "利息",
-      "yield": "Yield",
+      "compensation": "锁定补贴",
       "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(~{{days}}天)完成最终取款。",
-      "deposit-terms": "Nervos DAO is a system layer decentralized infrastructure. Your saving here is secure.\nAccording to the Nervos DAO protocol, you need at least 180 epochs to withdraw your deposit",
-      "deposited-action-label": "Withdraw",
-      "withdrawing-action-label": "Claim",
+      "deposit-terms": "存入 NervosDAO 的资产中需要 102 CKB 作为存款凭证的存储，这部分 CKB 是无法产生锁定补贴的。\nNervos DAO 是一个系统层面的去中心化底层设施。您在其中存款是十分安全的。\n根据 Nervos DAO 的协议, 您需要等待至少 180 个 epochs 才能取回您的存款。",
+      "deposited-action-label": "结算",
+      "withdrawing-action-label": "取款",
       "minimal-fee-required": "存入金额应不少于 {{minimal}} CKB",
-      "interest-accumulated": "已累计 {{blockNumber}} 个块的利息",
-      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(~{{days}} 天)"
+      "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
+      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(~{{days}} 天)",
+      "withdraw-alert": "风险提示：距离 NervosDAO 规定的最近一个允许提现 epoch 仅剩下 {{epochs}} 个 epoch，存在提现交易拥堵无法上链从而导致只能在下一个提现周期(约 {{days}} 天)的风险",
+      "insufficient-period-alert-title": "未达到要求周期",
+      "insufficient-period-alert-message": "Nervos DAO 要求您在至少 4 个 epochs 后执行此操作"
     }
   }
 }

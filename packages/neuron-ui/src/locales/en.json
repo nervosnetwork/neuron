@@ -270,7 +270,8 @@
         "mnemonic": "Mnemonic",
         "keystore-path": "Keystore File",
         "keystore-name": "Wallet name",
-        "keystore-password": "Password"
+        "keystore-password": "Password",
+        "deposit": "Deposit"
       },
       "codes": {
         "-3": "",
@@ -312,8 +313,8 @@
       "free": "Free",
       "locked": "Locked",
       "deposit": "Deposit",
-      "deposit-records": "Deposit Records",
-      "apy": "APY",
+      "deposit-receipts": "Deposit Receipts",
+      "apc": "APC",
       "deposit-at": "Deposit at {{time}}",
       "claim": "Claim",
       "withdraw": "Withdraw",
@@ -324,15 +325,17 @@
       "cancel": "Cancel",
       "proceed": "Proceed",
       "deposit-value": "Deposit",
-      "interest": "Interest",
-      "yield": "Yield",
+      "compensation": "Compensation",
       "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to claim the saving.",
-      "deposit-terms": "Nervos DAO is a system layer decentralized infrastructure. Your saving here is secure.\nAccording to the Nervos DAO protocol, you need at least 180 epochs to withdraw your deposit",
+      "deposit-terms": "Nervos DAO needs 102 CKB for receipt storage, which is not compensation-bearing.\nNervos DAO is a system layer decentralized infrastructure. Your saving here is secure.\nAccording to the Nervos DAO protocol, you need at least 180 epochs to withdraw your deposit.",
       "deposited-action-label": "Withdraw",
       "withdrawing-action-label": "Claim",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKB",
-      "interest-accumulated": "{{blockNumber}} blocks interest accumulated",
-      "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)"
+      "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
+      "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
+      "withdraw-alert": "Alert: these are only {{epochs}} epochs left before the next start withdrawing epoch number conforming to Nervos DAO, and it is possible that you have to do the withdraw after the next period(~{{days}}) due to the jam on CKB.",
+      "insufficient-period-alert-title": "Insufficient Period",
+      "insufficient-period-alert-message": "Nervos DAO needs at least 4 epochs to handle your request."
     }
   }
 }

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getBlockByNumber } from 'services/chain'
-import calculateAPY from 'utils/calculateAPY'
+import { showMessage } from 'services/remote'
+import calculateAPC from 'utils/calculateAPC'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
@@ -21,12 +22,14 @@ const DAORecord = ({
   depositOutPoint,
   epoch,
   withdraw,
+  connectionStatus,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: any
   tipBlockNumber: string
   epoch: string
   withdraw: string | null
+  connectionStatus: 'online' | 'offline'
 }) => {
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
@@ -34,6 +37,13 @@ const DAORecord = ({
 
   useEffect(() => {
     if (!depositOutPoint) {
+      getBlockByNumber(BigInt(blockNumber))
+        .then(b => {
+          setDepositEpoch(b.header.epoch)
+        })
+        .catch((err: Error) => {
+          console.error(err)
+        })
       return
     }
     const depositBlockNumber = ckbCore.utils.bytesToHex(ckbCore.utils.hexToBytes(daoData).reverse())
@@ -54,13 +64,13 @@ const DAORecord = ({
       })
   }, [daoData, depositOutPoint, blockNumber])
 
-  const interest = BigInt(withdraw || capacity) - BigInt(capacity)
+  const compensation = BigInt(withdraw || capacity) - BigInt(capacity)
 
   let ready = false
   let metaInfo = 'Ready'
   if (!depositOutPoint) {
     const duration = BigInt(tipBlockNumber) - BigInt(blockNumber)
-    metaInfo = t('nervos-dao.interest-accumulated', {
+    metaInfo = t('nervos-dao.compensation-accumulated', {
       blockNumber: localNumberFormatter(duration >= BigInt(0) ? duration : 0),
     })
   } else {
@@ -81,18 +91,42 @@ const DAORecord = ({
     }
   }
 
+  const onActionClick = useMemo(() => {
+    const currentEpochInfo = epochParser(epoch)
+    const thresholdEpoch = withdrawingEpoch || depositEpoch
+    if (thresholdEpoch) {
+      const thresholdEpochInfo = epochParser(thresholdEpoch)
+      if (thresholdEpochInfo.number + BigInt(4) >= currentEpochInfo.number) {
+        return () =>
+          showMessage(
+            {
+              title: t('nervos-dao.insufficient-period-alert-title'),
+              message: t('nervos-dao.insufficient-period-alert-title'),
+              detail: t('nervos-dao.insufficient-period-alert-message'),
+            },
+            () => {}
+          )
+      }
+    }
+    return onClick
+  }, [onClick, epoch, depositEpoch, withdrawingEpoch, t])
+
   return (
-    <div className={styles.daoRecord}>
+    <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
       <div className={styles.primaryInfo}>
-        <div>{interest >= BigInt(0) ? `${shannonToCKBFormatter(interest.toString()).toString()} CKB` : ''}</div>
+        <div>
+          {compensation >= BigInt(0)
+            ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
+            : ''}
+        </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div>
           <DefaultButton
             text={actionLabel}
             data-tx-hash={txHash}
             data-index={index}
-            onClick={onClick}
-            disabled={depositOutPoint && !ready}
+            onClick={onActionClick}
+            disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
             styles={{
               flexContainer: {
                 pointerEvents: 'none',
@@ -108,7 +142,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APY: ~${calculateAPY(interest.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
+        <span>{`APC: ~${calculateAPC(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>

@@ -1,6 +1,14 @@
-import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
+import {
+  MAX_NETWORK_NAME_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  MAX_PASSWORD_LENGTH,
+  MIN_AMOUNT,
+  MAX_DECIMAL_DIGITS,
+  SHANNON_CKB_RATIO,
+  ErrorCode,
+} from 'utils/const'
+import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_AMOUNT, MAX_DECIMAL_DIGITS, ErrorCode } from './const'
 
 export const verifyAddress = (address: string): boolean => {
   if (typeof address !== 'string' || address.length !== 46) {
@@ -14,15 +22,12 @@ export const verifyAddress = (address: string): boolean => {
 }
 
 export const verifyAmountRange = (amount: string = '') => {
-  return +amount >= MIN_AMOUNT
+  return BigInt(CKBToShannonFormatter(amount)) >= BigInt(MIN_AMOUNT * SHANNON_CKB_RATIO)
 }
 
 export const verifyAmount = (amount: string = '0') => {
   if (Number.isNaN(+amount)) {
     return { code: ErrorCode.FieldInvalid }
-  }
-  if (+amount < 0) {
-    return { code: ErrorCode.NotNegative }
   }
   const [, decimal = ''] = amount.split('.')
   if (decimal.length > MAX_DECIMAL_DIGITS) {
@@ -30,11 +35,14 @@ export const verifyAmount = (amount: string = '0') => {
       code: ErrorCode.DecimalExceed,
     }
   }
+  if (BigInt(CKBToShannonFormatter(amount)) < BigInt(0)) {
+    return { code: ErrorCode.NotNegative }
+  }
   return true
 }
 
 export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
-  if (+balance < 0) {
+  if (BigInt(balance) < BigInt(0)) {
     return false
   }
   return BigInt(totalAmount) + BigInt(fee) <= BigInt(balance)
