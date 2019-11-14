@@ -314,7 +314,7 @@
       "locked": "Locked",
       "deposit": "Deposit",
       "deposit-receipts": "Deposit Receipts",
-      "apy": "APY",
+      "apc": "APC",
       "deposit-at": "Deposit at {{time}}",
       "claim": "Claim",
       "withdraw": "Withdraw",

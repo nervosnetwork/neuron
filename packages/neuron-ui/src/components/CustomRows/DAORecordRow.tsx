@@ -3,7 +3,7 @@ import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getBlockByNumber } from 'services/chain'
 import { showMessage } from 'services/remote'
-import calculateAPY from 'utils/calculateAPY'
+import calculateAPC from 'utils/calculateAPC'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
@@ -142,7 +142,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APY: ~${calculateAPY(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
+        <span>{`APC: ~${calculateAPC(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>
