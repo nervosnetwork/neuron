@@ -2,7 +2,7 @@
   "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
