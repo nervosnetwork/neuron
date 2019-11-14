@@ -8,7 +8,7 @@ const PERIOD_LENGTH = DAYS_PER_PERIOD * MILLI_SECONDS_PER_DAY
 
 let cachedGenesisTimestamp: number | undefined
 
-export default async (now: number, initialTimestamp: number | undefined = cachedGenesisTimestamp) => {
+export default async (checkPointTimestamp: number, initialTimestamp: number | undefined = cachedGenesisTimestamp) => {
   let genesisTimestamp = initialTimestamp
   if (genesisTimestamp === undefined) {
     genesisTimestamp = await getBlockByNumber('0x0')
@@ -18,12 +18,12 @@ export default async (now: number, initialTimestamp: number | undefined = cached
       })
       .catch(() => undefined)
   }
-  if (genesisTimestamp === undefined || now <= genesisTimestamp) {
+  if (genesisTimestamp === undefined || checkPointTimestamp <= genesisTimestamp) {
     return 0
   }
 
-  const pastPeriods = BigInt(now - genesisTimestamp) / BigInt(PERIOD_LENGTH)
-  const pastDays = Math.ceil(((now - genesisTimestamp) % PERIOD_LENGTH) / MILLI_SECONDS_PER_DAY)
+  const pastPeriods = BigInt(checkPointTimestamp - genesisTimestamp) / BigInt(PERIOD_LENGTH)
+  const pastDays = Math.ceil(((checkPointTimestamp - genesisTimestamp) % PERIOD_LENGTH) / MILLI_SECONDS_PER_DAY)
 
   const realSecondaryOffer =
     BigInt(4) * SECONDARY_OFFER * pastPeriods +
