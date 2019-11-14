@@ -16,7 +16,7 @@ const stateTemplate = {
   app: {
     ...initStates.app,
     epoch: '1',
-    difficulty: '0x111111',
+    difficulty: BigInt('0x111111'),
     chain: 'chain_dev',
   },
   wallet: {
@@ -77,7 +77,7 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     app: {
       ...initStates.app,
       epoch: text('Epoch', '1'),
-      difficulty: text('Difficulty', '0x111'),
+      difficulty: BigInt(100000),
       chain: text('Chain', 'chain_dev'),
     },
     wallet: {

@@ -77,7 +77,7 @@ declare namespace State {
     tipBlockHash: string
     tipBlockTimestamp: number
     chain: string
-    difficulty: string
+    difficulty: bigint
     epoch: string
     send: Send
     passwordRequest: {

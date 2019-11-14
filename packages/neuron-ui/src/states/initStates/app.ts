@@ -5,7 +5,7 @@ const appState: State.App = {
   tipBlockHash: '',
   tipBlockTimestamp: 0,
   chain: '',
-  difficulty: '',
+  difficulty: BigInt(0),
   epoch: '',
   send: {
     txID: '',

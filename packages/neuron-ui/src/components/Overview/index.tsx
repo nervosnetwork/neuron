@@ -7,7 +7,7 @@ import PropertyList, { Property } from 'widgets/PropertyList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter, difficultyFormatter } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
@@ -104,7 +104,7 @@ const Overview = ({
       },
       {
         label: t('overview.difficulty'),
-        value: localNumberFormatter(+difficulty),
+        value: difficultyFormatter(difficulty),
       },
     ],
     [t, chain, epoch, difficulty, tipBlockNumber]
