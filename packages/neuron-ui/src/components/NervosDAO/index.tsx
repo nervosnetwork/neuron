@@ -97,12 +97,14 @@ const NervosDAO = ({
 
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+    updateDepositValue(
+      BigInt(wallet.balance) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO) ? wallet.balance : `${MIN_DEPOSIT_AMOUNT}`
+    )
     return () => {
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
     }
-  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id])
+  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance])
 
   useEffect(() => {
     if (tipBlockTimestamp) {
