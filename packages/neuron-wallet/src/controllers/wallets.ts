@@ -134,7 +134,7 @@ export default class WalletsController {
       keystore,
     })
 
-    await walletsService.generateAddressesById(wallet.id, isImporting)
+    walletsService.generateAddressesById(wallet.id, isImporting)
 
     return {
       status: ResponseCode.Success,
@@ -294,26 +294,24 @@ export default class WalletsController {
   }
 
   public static async getAllAddresses(id: string) {
-    const addresses = await AddressService.allAddressesByWalletId(id).then(addrs =>
-      addrs.map(
-        ({
-          address,
-          blake160: identifier,
-          addressType: type,
-          txCount,
-          balance,
-          description = '',
-          addressIndex: index = '',
-        }) => ({
-          address,
-          identifier,
-          type,
-          txCount,
-          description,
-          balance,
-          index,
-        })
-      )
+    const addresses = AddressService.allAddressesByWalletId(id).map(
+      ({
+        address,
+        blake160: identifier,
+        addressType: type,
+        txCount,
+        balance,
+        description = '',
+        addressIndex: index = '',
+      }) => ({
+        address,
+        identifier,
+        type,
+        txCount,
+        description,
+        balance,
+        index,
+      })
     )
     return {
       status: ResponseCode.Success,
@@ -501,7 +499,7 @@ export default class WalletsController {
     const walletService = WalletsService.getInstance()
     const wallet = walletService.get(walletID)
 
-    await AddressService.updateDescription(wallet.id, address, description)
+    AddressService.updateDescription(wallet.id, address, description)
 
     return {
       status: ResponseCode.Success,

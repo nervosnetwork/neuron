@@ -32,7 +32,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] =
-    (env.isDevMode || env.isTestMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
+    (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
     ...connectionOptions,
