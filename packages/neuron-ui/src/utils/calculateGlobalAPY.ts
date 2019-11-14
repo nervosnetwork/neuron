@@ -44,5 +44,5 @@ export default async (now: number, initialTimestamp: number | undefined = cached
   realPrimaryOffer += primaryOfferFraction
 
   const totalOffer = INITIAL_OFFER + realPrimaryOffer + realSecondaryOffer
-  return +(Number(SECONDARY_OFFER) / Number(totalOffer)).toFixed(2)
+  return +(Number(SECONDARY_OFFER) / (Number(totalOffer) / 100)).toFixed(2)
 }
