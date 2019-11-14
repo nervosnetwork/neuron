@@ -246,8 +246,8 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async createNetwork({ name, remote, type = NetworkType.Normal, chain = 'ckb' }: Network) {
-    return NetworksController.create({ name, remote, type, chain })
+  public static async createNetwork({ name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) {
+    return NetworksController.create({ name, remote, type, genesisHash, chain })
   }
 
   @MapApiResponse
