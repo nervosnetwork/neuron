@@ -273,6 +273,8 @@
         "keystore-password": "密码",
         "deposit": "存入金额"
       },
+      "mainnet-address-required": "请输入主网地址",
+      "testnet-address-required": "请输出测试网地址",
       "codes": {
         "-3": "",
         "100": "余额不足",
