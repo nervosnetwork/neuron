@@ -51,7 +51,7 @@ describe('Address Dao tests', () => {
     AddressDao.deleteAll()
   })
 
-  it('create', async () => {
+  it('create', () => {
     AddressDao.create([address])
 
     const all = AddressDao.getAll()
@@ -74,7 +74,7 @@ describe('Address Dao tests', () => {
   //   expect(dao.txCount).toEqual(getCountByAddress)
   // })
 
-  it('nextUnusedAddress', async () => {
+  it('nextUnusedAddress', () => {
     AddressDao.create([address, usedAddress])
 
     const addr = AddressDao.nextUnusedAddress('1', AddressVersion.Testnet)
@@ -87,7 +87,7 @@ describe('Address Dao tests', () => {
     expect(mainnetAddr).toBe(undefined)
   })
 
-  it('nextUnusedChangeAddress', async () => {
+  it('nextUnusedChangeAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
 
     const addr = AddressDao.nextUnusedChangeAddress('1', AddressVersion.Testnet)
@@ -100,7 +100,7 @@ describe('Address Dao tests', () => {
     expect(mainnetAddr).toBe(undefined)
   })
 
-  it('allAddresses', async () => {
+  it('allAddresses', () => {
     AddressDao.create([address, usedAddress])
 
     const all = AddressDao.allAddresses(AddressVersion.Testnet)
@@ -111,14 +111,14 @@ describe('Address Dao tests', () => {
     expect(allMainnet.length).toEqual(0)
   })
 
-  it('allAddressesByWalletId', async () => {
+  it('allAddressesByWalletId', () => {
     AddressDao.create([address, usedAddress])
 
     const all = AddressDao.allAddressesByWalletId('1', AddressVersion.Testnet)
     expect(all.length).toEqual(1)
   })
 
-  it('usedAddressByWalletId', async () => {
+  it('usedAddressByWalletId', () => {
     AddressDao.create([address, usedAddress])
 
     const walletOne = AddressDao.usedAddressesByWalletId('1', AddressVersion.Testnet)
@@ -128,7 +128,7 @@ describe('Address Dao tests', () => {
     expect(walletTwo.length).toEqual(1)
   })
 
-  it('findByAddress', async () => {
+  it('findByAddress', () => {
     AddressDao.create([address, usedAddress])
 
     const one = AddressDao.findByAddress(address.address, address.walletId)
