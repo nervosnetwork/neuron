@@ -98,7 +98,7 @@ describe('Key tests with db', () => {
     AddressService.checkAndGenerateSave(id, extendedKey, undefined, 2, 1)
   }
 
-  it('generateAndSave', async () => {
+  it('generateAndSave', () => {
     generate()
 
     const all = AddressDao.getAll()
@@ -106,7 +106,7 @@ describe('Key tests with db', () => {
     expect(all.length).toEqual((2 + 1) * 2)
   })
 
-  it('checkAndGenerateSave', async () => {
+  it('checkAndGenerateSave', () => {
     generate()
 
     const all = AddressDao.getAll()
@@ -123,7 +123,7 @@ describe('Key tests with db', () => {
       })
     AddressDao.updateAll(usedAll)
 
-    await checkAndGenerate()
+    checkAndGenerate()
 
     const final = AddressDao.getAll()
 
