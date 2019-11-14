@@ -21,7 +21,7 @@
     "start:dev": "yarn run build && electron .",
     "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
-    "test": "jest --color",
+    "test": "jest --color --runInBand",
     "test:e2e": "jest --config jest.e2e.config.js --color",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
