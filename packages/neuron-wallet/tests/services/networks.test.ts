@@ -13,7 +13,7 @@ describe(`Unit tests of networks service`, () => {
     name: `new network`,
     remote: `http://localhost:8114`,
     type: 0,
-    genesisHash: '',
+    genesisHash: '0x',
     id: '',
     chain: '',
   }
@@ -121,7 +121,7 @@ describe(`Unit tests of networks service`, () => {
       const prevCurrentID = await service.getCurrentID()
       const prevNetworks = await service.getAll()
       expect(prevCurrentID).toBe(network.id)
-      expect(prevNetworks.map(n => n.id)).toEqual(['Mainnet', network.id])
+      expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', network.id])
       await service.delete(prevCurrentID || '')
       const currentNetworks = await service.getAll()
       expect(currentNetworks.map(n => n.id)).toEqual(prevNetworks.filter(n => n.id !== prevCurrentID).map(n => n.id))
