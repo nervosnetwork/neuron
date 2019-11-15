@@ -6,7 +6,7 @@ import { UpdateController } from 'controllers'
 import { showWindow } from './show-window'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import ChainInfo from 'models/chain-info'
+import ChainInfo from 'services/chain-info'
 import CommandSubject from 'models/subjects/command'
 
 enum URL {
@@ -295,10 +295,8 @@ const contextMenuTemplate: {
   },
   networkList: async (id: string) => {
     const networksService = NetworksService.getInstance()
-    const [network, currentNetworkID] = await Promise.all([
-      networksService.get(id).catch(() => null),
-      networksService.getCurrentID().catch(() => null),
-    ])
+    const network = networksService.get(id)
+    const currentNetworkID = networksService.getCurrentID()
 
     if (!network) {
       showMessageBox({
@@ -401,7 +399,11 @@ const contextMenuTemplate: {
       return []
     }
 
-    const address = bech32Address(identifier)
+    const address = bech32Address(identifier, {
+      prefix: ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+      type: AddressType.HashIdx,
+      codeHashOrCodeHashIndex: '0x00',
+    })
     return [
       {
         label: i18n.t('contextMenu.copy-address'),

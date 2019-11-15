@@ -5,7 +5,7 @@ import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
-import ChainInfo from 'models/chain-info'
+import ChainInfo from 'services/chain-info'
 
 const MAX_ADDRESS_COUNT = 30
 

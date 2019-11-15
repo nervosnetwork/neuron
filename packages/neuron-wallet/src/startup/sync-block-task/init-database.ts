@@ -4,7 +4,7 @@ import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import genesisBlockHash, { getChain } from './genesis'
-import ChainInfo from 'models/chain-info'
+import ChainInfo from 'services/chain-info'
 import DaoUtils from '../../models/dao-utils'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 

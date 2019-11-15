@@ -1,3 +1,5 @@
+import NetworksService from './networks'
+
 export default class ChainInfo {
   private static instance: ChainInfo
 
@@ -9,18 +11,15 @@ export default class ChainInfo {
     return ChainInfo.instance
   }
 
-  private chain: string = ''
-
-  public setChain = (chain: string) => {
-    this.chain = chain
+  public setChain = (_chain: string) => {
   }
 
   public getChain = (): string => {
-    return this.chain
+    return NetworksService.getInstance().getCurrent().chain
   }
 
   public isMainnet = (): boolean => {
-    return this.chain === 'ckb'
+    return this.getChain() === 'ckb'
   }
 
   public explorerUrl = (): string => {

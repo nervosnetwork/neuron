@@ -10,7 +10,7 @@ import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import ChainInfo from './chain-info'
+import ChainInfo from '../services/chain-info'
 
 export interface SystemScript {
   codeHash: string

@@ -5,7 +5,7 @@ import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
 import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
-import ChainInfo from 'models/chain-info'
+import ChainInfo from 'services/chain-info'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
