@@ -336,7 +336,7 @@
       "minimal-fee-required": "存入金额应不少于 {{minimal}} CKB",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
       "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(~{{days}} 天)",
-      "withdraw-alert": "风险提示：距离 NervosDAO 规定的最近一个允许提现 epoch 仅剩下 {{epochs}} 个 epoch，存在提现交易拥堵无法上链从而导致只能在下一个提现周期(约 {{days}} 天)的风险",
+      "withdraw-alert": "风险提示：本补贴申请距离 Nervos DAO 规则允许的最近一个撤出周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)，存在交易拥堵无法上链从而导致只能在下一个撤出周期(约 {{days}} 天)撤出，且无法获得新增撤出周期期间补偿的风险。",
       "insufficient-period-alert-title": "未达到要求周期",
       "insufficient-period-alert-message": "Nervos DAO 要求您在至少 4 个 epochs 后执行此操作"
     }
