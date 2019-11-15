@@ -228,7 +228,8 @@
       "save": "Save image"
     },
     "footer": {
-      "fail-to-fetch-tip-block-number": "Cannot fetch tip block number"
+      "fail-to-fetch-tip-block-number": "Cannot fetch tip block number",
+      "sync-not-start": "Synchronization not started yet"
     },
     "common": {
       "or": "or",
