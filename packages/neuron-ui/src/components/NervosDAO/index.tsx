@@ -15,7 +15,7 @@ import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIG
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
-import { ckbCore } from 'services/chain'
+import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
 import DAORecord from 'components/CustomRows/DAORecordRow'
@@ -46,6 +46,7 @@ const NervosDAO = ({
   const [errorMessage, setErrorMessage] = useState('')
   const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
   const [globalAPC, setGlobalAPC] = useState(0)
+  const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -98,6 +99,9 @@ const NervosDAO = ({
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
     updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+    getHeaderByNumber('0x0')
+      .then(header => setGenesisBlockTimestamp(+header.timestamp))
+      .catch(err => console.error(err))
     return () => {
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
@@ -106,11 +110,13 @@ const NervosDAO = ({
 
   useEffect(() => {
     if (tipBlockTimestamp) {
-      calculateGlobalAPC(tipBlockTimestamp).then(apc => {
-        setGlobalAPC(apc)
-      })
+      calculateGlobalAPC(tipBlockTimestamp, genesisBlockTimestamp)
+        .then(apc => {
+          setGlobalAPC(apc)
+        })
+        .catch(err => console.error(err))
     }
-  }, [tipBlockTimestamp])
+  }, [tipBlockTimestamp, genesisBlockTimestamp])
 
   const onDepositDialogDismiss = () => {
     setShowDepositDialog(false)
@@ -276,6 +282,7 @@ const NervosDAO = ({
                 onClick={onActionClick}
                 tipBlockNumber={tipBlockNumber}
                 epoch={epoch}
+                genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
               />
             )
@@ -283,7 +290,7 @@ const NervosDAO = ({
         </Stack>
       </>
     )
-  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus])
+  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus, genesisBlockTimestamp])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
