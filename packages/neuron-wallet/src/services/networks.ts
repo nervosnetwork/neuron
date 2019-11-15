@@ -4,15 +4,28 @@ import { BehaviorSubject } from 'rxjs'
 import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from 'exceptions/network'
 
 import Store from 'models/store'
-import env from 'env'
 
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
-import { NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
 import logger from 'utils/logger'
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
+
+const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
+  selected: 'mainnet',
+  networks: [
+    {
+      id: 'mainnet',
+      name: 'Mainnet',
+      remote: 'http://localhost:8114',
+      genesisHash: MAINNET_GENESIS_HASH,
+      type: NetworkType.Default,
+      chain: 'ckb',
+    }
+  ]
+}
 
 export default class NetworksService extends Store {
   private static instance: NetworksService
@@ -25,7 +38,7 @@ export default class NetworksService extends Store {
   }
 
   constructor() {
-    super('networks', 'index.json', JSON.stringify(env.presetNetworks))
+    super('networks', 'index.json', JSON.stringify(presetNetworks))
 
     this.getAll().then(currentNetworkList => {
       if (currentNetworkList) {
@@ -33,15 +46,19 @@ export default class NetworksService extends Store {
           currentNetworkList,
         })
         Promise.all(currentNetworkList.map(n => {
-          const core = new Core(n.remote)
-          return core.rpc
-            .getBlockchainInfo()
-            .then(info => info.chain)
-            .catch(() => '')
-            .then(chain => ({
+          if (n.type == NetworkType.Default) {
+            return n
+          } else {
+            const core = new Core(n.remote)
+            return Promise.all([
+              core.rpc.getBlockchainInfo(),
+              core.rpc.getBlockHash('0x0')
+            ]).then(([info, genesisHash]) => ({
               ...n,
-              chain,
+              chain: info.chain,
+              genesisHash
             }))
+          }
         })).then(networkList => {
           this.updateAll(networkList)
         }).catch((err: Error) => {
@@ -88,7 +105,7 @@ export default class NetworksService extends Store {
 
   public getAll = async () => {
     const list = await this.read<NetworkWithID[]>(NetworksKey.List)
-    return list || []
+    return list || presetNetworks.networks
   }
 
   @Validate
@@ -102,15 +119,11 @@ export default class NetworksService extends Store {
     if (!Array.isArray(networks)) {
       throw new InvalidFormat('Networks')
     }
-    await this.writeSync(NetworksKey.List, networks)
+    this.writeSync(NetworksKey.List, networks)
   }
 
   @Validate
-  public async create(
-    @Required name: NetworkName,
-    @Required remote: NetworkRemote,
-    type: NetworkType = NetworkType.Normal,
-  ) {
+  public async create(@Required name: NetworkName, @Required remote: NetworkRemote, type: NetworkType = NetworkType.Normal) {
     const list = await this.getAll()
     if (list.some(item => item.name === name)) {
       throw new UsedName('Network')
@@ -121,12 +134,16 @@ export default class NetworksService extends Store {
     const chain = await core.rpc
       .getBlockchainInfo()
       .then(info => info.chain)
-      .catch(() => '')
+      .catch(() => 'ckb_dev')
+    const genesisHash = await core.rpc
+      .getBlockHash('0x0')
+      .catch(() => EMPTY_GENESIS_HASH)
 
     const newOne = {
       id: uuid(),
       name,
       remote,
+      genesisHash,
       type,
       chain,
     }
@@ -146,11 +163,17 @@ export default class NetworksService extends Store {
     Object.assign(network, options)
     if (!options.chain) {
       const core = new Core(network.remote)
+
       const chain = await core.rpc
         .getBlockchainInfo()
         .then(info => info.chain)
-        .catch(() => '')
+        .catch(() => 'ckb_dev')
       network.chain = chain
+
+      const genesisHash = await core.rpc
+        .getBlockHash('0x0')
+        .catch(() => EMPTY_GENESIS_HASH)
+      network.genesisHash = genesisHash
     }
 
     this.updateAll(list)
@@ -183,6 +206,11 @@ export default class NetworksService extends Store {
     }
     this.writeSync(NetworksKey.Current, id)
 
+    // No need to update the default mainnet
+    if (network.type === NetworkType.Default) {
+      return
+    }
+
     const core = new Core(network.remote)
 
     const chain = await core.rpc
@@ -190,8 +218,12 @@ export default class NetworksService extends Store {
       .then(info => info.chain)
       .catch(() => '')
 
-    if (chain && chain !== network.chain) {
-      this.update(id, { chain })
+      const genesisHash = await core.rpc
+        .getBlockHash('0x0')
+        .catch(() => EMPTY_GENESIS_HASH)
+
+    if (chain && chain !== network.chain && genesisHash && genesisHash !== network.genesisHash) {
+      this.update(id, { chain, genesisHash })
     }
   }
 

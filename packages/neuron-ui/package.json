@@ -17,7 +17,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
-    "test": "react-app-rewired test --env=jsdom --color --watchAll=false",
+    "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "build": "react-app-rewired build",
     "clean": "rimraf build/*",
     "precommit": "lint-staged",

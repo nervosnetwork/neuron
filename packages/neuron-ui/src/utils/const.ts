@@ -19,6 +19,8 @@ export const SHANNON_CKB_RATIO = 1e8
 export const MEDIUM_FEE_RATE = 6000
 export const WITHDRAW_EPOCHS = 180
 
+export const RUN_NODE_GUIDE_URL = 'https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node'
+
 export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',

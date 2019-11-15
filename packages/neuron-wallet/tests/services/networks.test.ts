@@ -1,6 +1,5 @@
 import NetworksService from '../../src/services/networks'
 import { NetworkWithID } from '../../src/types/network'
-import env from '../../src/env'
 import i18n from '../../src/utils/i18n'
 
 const ERROR_MESSAGE = {
@@ -9,23 +8,19 @@ const ERROR_MESSAGE = {
   NETWORK_ID_NOT_FOUND: `messages.network-not-found`,
 }
 
-const {
-  presetNetworks: { current, list },
-} = env
-const [testnetNetwork, localNetwork] = list
-
 describe(`Unit tests of networks service`, () => {
   const newNetwork: NetworkWithID = {
     name: `new network`,
-    remote: `http://new-network.localhost.com`,
+    remote: `http://localhost:8114`,
     type: 0,
+    genesisHash: '0x',
     id: '',
-    chain: '',
+    chain: 'ckb_dev',
   }
 
   const newNetworkWithDefaultTypeOf1 = {
     name: `new network with the default type of 1`,
-    remote: `http://test.localhost.com`,
+    remote: `http://localhost:8114`,
     id: '',
   }
 
@@ -52,7 +47,8 @@ describe(`Unit tests of networks service`, () => {
 
     it(`has preset networks`, async () => {
       const networks = await service.getAll()
-      expect(networks).toEqual(list)
+      expect(networks.length).toBe(1)
+      expect(networks[0].id).toEqual('mainnet')
     })
 
     it(`get the default network`, async () => {
@@ -60,20 +56,9 @@ describe(`Unit tests of networks service`, () => {
       expect(network && network.type).toBe(0)
     })
 
-    it(`testnet should be type of default network`, async () => {
-      const defaultNetwork = await service.defaultOne()
-      expect(defaultNetwork).toEqual(testnetNetwork)
-    })
-
-    it(`testnet should be the current one by default`, async () => {
+    it(`mainnet should be the current one by default`, async () => {
       const currentNetworkID = await service.getCurrentID()
-      expect(currentNetworkID).toBe(current)
-      expect(currentNetworkID).toBe(testnetNetwork.id)
-    })
-
-    it(`get network by id ${current}`, async () => {
-      const currentNetwork = await service.get(current)
-      expect(currentNetwork).toEqual(list.find(network => network.id === current))
+      expect(currentNetworkID).toBe('mainnet')
     })
 
     it(`getting a non-exsiting network should return null`, async () => {
@@ -94,35 +79,31 @@ describe(`Unit tests of networks service`, () => {
       expect(res.type).toBe(1)
     })
 
-    it(`update the local networks's name`, async () => {
-      const name = `new local network name`
-      await service.update(localNetwork.id, { name })
-      const network = await service.get(localNetwork.id)
-      expect(network && network.name).toBe(name)
+    it(`update the networks's name`, async () => {
+      const network = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
+      const name = `new network name`
+      await service.update(network.id, { name })
+      const updated = await service.get(network.id)
+      expect(updated && updated.name).toBe(name)
     })
 
-    it(`update the local network address`, async () => {
-      const addr = `http://updated-address.com`
-      await service.update(localNetwork.id, { remote: addr })
-      const network = await service.get(localNetwork.id)
-      expect(network && network.remote).toBe(addr)
+    it(`update the network' address`, async () => {
+      const network = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
+      const address = `http://localhost:8115`
+      await service.update(network.id, { remote: address })
+      const updated = await service.get(network.id)
+      expect(updated && updated.remote).toBe(address)
     })
 
-    it(`update the local network type to 1`, async () => {
-      const type = 1
-      await service.update(localNetwork.id, { type })
-      const network = await service.get(localNetwork.id)
-      expect(network && network.type).toBe(type)
-    })
-
-    it(`set the local network to be the current one`, async () => {
-      await service.activate(localNetwork.id)
+    it(`set the network to be the current one`, async () => {
+      const network = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
+      await service.activate(network.id)
       const currentNetworkID = await service.getCurrentID()
-      expect(currentNetworkID).toBe(localNetwork.id)
+      expect(currentNetworkID).toBe(network.id)
     })
 
     it(`delete an inactive network`, async () => {
-      const inactiveNetwork = localNetwork
+      const inactiveNetwork = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
       const prevCurrentID = (await service.getCurrentID()) || ''
       const prevNetworks = await service.getAll()
       await service.delete(inactiveNetwork.id)
@@ -134,12 +115,13 @@ describe(`Unit tests of networks service`, () => {
       expect(currentID).toBe(prevCurrentID)
     })
 
-    it(`activate the local network and delete it, the current networks should switch to the testnet network`, async () => {
-      await service.activate(localNetwork.id)
+    it(`activate a network and delete it, the current networks should switch to the default network`, async () => {
+      const network = await service.create(newNetworkWithDefaultTypeOf1.name, newNetworkWithDefaultTypeOf1.remote)
+      await service.activate(network.id)
       const prevCurrentID = await service.getCurrentID()
       const prevNetworks = await service.getAll()
-      expect(prevCurrentID).toBe(localNetwork.id)
-      expect(prevNetworks.map(n => n.id)).toEqual(list.map(n => n.id))
+      expect(prevCurrentID).toBe(network.id)
+      expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', network.id])
       await service.delete(prevCurrentID || '')
       const currentNetworks = await service.getAll()
       expect(currentNetworks.map(n => n.id)).toEqual(prevNetworks.filter(n => n.id !== prevCurrentID).map(n => n.id))
@@ -148,16 +130,16 @@ describe(`Unit tests of networks service`, () => {
           service.getCurrentID().then(cID => resolve(cID))
         }, 500)
       })
-      expect(currentID).toBe(testnetNetwork.id)
+      expect(currentID).toBe('mainnet')
     })
 
     it(`reset the netowrks`, async () => {
       await service.create(newNetwork.name, newNetwork.remote)
       const newNetworkList = await service.getAll()
-      expect(newNetworkList.length).toBe(list.length + 1)
+      expect(newNetworkList.length).toBe(2)
       service.clear()
       const networks = await service.getAll()
-      expect(networks.length).toBe(list.length)
+      expect(networks.length).toBe(1)
     })
   })
 
@@ -192,8 +174,8 @@ describe(`Unit tests of networks service`, () => {
   })
 
   describe(`validation on network existence`, () => {
-    it(`create network with existing name of ${list[0].name}`, () => {
-      expect(service.create(list[0].name, list[0].remote)).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NAME_USED))
+    it(`create network with existing name of Mainnet`, () => {
+      expect(service.create('Mainnet', 'http://localhost:8114')).rejects.toThrowError(i18n.t(ERROR_MESSAGE.NAME_USED))
     })
 
     it(`update network which is not existing`, () => {

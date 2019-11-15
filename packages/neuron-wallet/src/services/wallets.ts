@@ -558,6 +558,7 @@ export default class WalletService {
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(BigInt(depositBlockNumber))
     output.data = `0x${buf.toString('hex')}`
+    output.typeHash = LockUtils.computeScriptHash(output.type!)
     output.daoData = output.data
     output.depositOutPoint = outPoint
 
