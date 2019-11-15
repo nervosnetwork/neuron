@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.24.5",
+  "version": "0.25.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -17,7 +17,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "lint": "eslint --fix --ext .tsx,.ts,.js src",
-    "test": "react-app-rewired test --env=jsdom --color --watchAll=false",
+    "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "build": "react-app-rewired build",
     "clean": "rimraf build/*",
     "precommit": "lint-staged",

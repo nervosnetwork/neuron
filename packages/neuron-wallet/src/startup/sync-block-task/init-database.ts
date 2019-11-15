@@ -4,8 +4,8 @@ import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import genesisBlockHash, { getChain } from './genesis'
-import ChainInfo from 'models/chain-info'
-import DaoUtils from '../../models/dao-utils';
+import DaoUtils from '../../models/dao-utils'
+import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 
 // only used by main process
 export class InitDatabase {
@@ -19,9 +19,7 @@ export class InitDatabase {
   }
 
   private stopped: boolean = false
-  // private nodeURL: string
   private inProcess: boolean = false
-
   private success: boolean = false
 
   public id: number = +new Date()
@@ -30,43 +28,48 @@ export class InitDatabase {
 
   private killed: boolean = false
 
-  public init = async (url: string) => {
+  public init = async (network: NetworkWithID) => {
     if (InitDatabase.previous) {
       await InitDatabase.previous.stopAndWait()
     }
 
     this.inProcess = true
 
-    let hash: string | undefined
-    let chain: string | undefined
+    let hash: string = EMPTY_GENESIS_HASH
+    let chain: string = ''
     while (!this.stopped && !this.success) {
       try {
-        hash = await genesisBlockHash(url)
+        hash = await genesisBlockHash(network.remote)
         await initConnection(hash)
-        chain = await getChain(url)
-        ChainInfo.getInstance().setChain(chain)
+        chain = await getChain(network.remote)
 
-        try {
-          const systemScriptInfo = await LockUtils.systemScript(url)
-          const daoScriptInfo = await DaoUtils.daoScript(url)
-          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
-        } catch (err) {
-          logger.error('update systemScriptInfo failed:', err)
+        if (hash === network.genesisHash && chain === network.chain) {
+          try {
+            const systemScriptInfo = await LockUtils.systemScript(network.remote)
+            const daoScriptInfo = await DaoUtils.daoScript(network.remote)
+            updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
+          } catch (err) {
+            logger.error('update systemScriptInfo failed:', err)
+          }
+
+          this.success = true
+        } else {
+          logger.error('network genesis hash and chain do not match data fetched')
+          this.stopped = true
+          this.killed = true // Do not process as successful to let sync start with wrong genesis hash or chain
         }
-
-        this.success = true
       } catch (err) {
-        logger.debug('initDatabase error:', err)
+        logger.error('initDatabase error:', err)
         try {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
           chain = metaInfo.chain
-          ChainInfo.getInstance().setChain(chain)
           LockUtils.setSystemScript(metaInfo.systemScriptInfo)
           DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
           hash = metaInfo.genesisBlockHash
           this.success = true
         } catch (error) {
+          logger.error('get cached meta info error:', err)
           Utils.sleep(5000)
         }
       }

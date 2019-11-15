@@ -197,7 +197,7 @@ export const reducer = (
           ...app,
           tipBlockNumber: '0',
           chain: '',
-          difficulty: '',
+          difficulty: BigInt(0),
           epoch: '',
         },
         chain: {

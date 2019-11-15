@@ -1,7 +1,6 @@
 import { app as electronApp, remote } from 'electron'
 import os from 'os'
 import * as path from 'path'
-import { NetworkWithID } from 'types/network'
 
 const app = electronApp || (remote && remote.app) || {
   getPath(aPath: string): string {
@@ -35,10 +34,6 @@ interface ENV {
   fileBasePath: string
   mainURL: string
   remote: string
-  presetNetworks: {
-    current: 'testnet'
-    list: NetworkWithID[]
-  }
   isTestMode: boolean
 }
 const env: ENV = {
@@ -46,25 +41,6 @@ const env: ENV = {
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),
   mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
   remote: 'http://localhost:8114',
-  presetNetworks: {
-    current: 'testnet',
-    list: [
-      {
-        id: 'testnet',
-        name: 'Testnet',
-        remote: 'http://localhost:8114',
-        type: 0,
-        chain: 'ckb_testnet',
-      },
-      {
-        id: 'local',
-        name: 'Local',
-        remote: 'http://localhost:8114',
-        type: 1,
-        chain: 'ckb_dev',
-      },
-    ],
-  },
   isTestMode,
 }
 

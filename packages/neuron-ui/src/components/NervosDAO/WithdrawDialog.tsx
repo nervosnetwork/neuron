@@ -60,17 +60,20 @@ const WithdrawDialog = ({
   const currentEpochInfo = epochParser(currentEpoch)
   const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
   const epochs = targetEpochNumber - currentEpochInfo.number - BigInt(1)
-  const message = t('nervos-dao.notice-wait-time', {
-    epochs: localNumberFormatter(epochs),
-    blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
-    days: localNumberFormatter(epochs / BigInt(6)),
-  })
+  const message =
+    epochs >= BigInt(0)
+      ? t('nervos-dao.notice-wait-time', {
+          epochs: localNumberFormatter(epochs),
+          blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
+          days: localNumberFormatter(epochs / BigInt(6)),
+        })
+      : ''
 
   const alert =
-    epochs <= BigInt(5)
+    epochs <= BigInt(5) && epochs >= BigInt(0)
       ? t('nervos-dao.withdraw-alert', {
           epochs,
-          nextLeftEpochs: epochs + BigInt(180),
+          hours: epochs * BigInt(4),
           days: (epochs + BigInt(180)) / BigInt(6),
         })
       : ''

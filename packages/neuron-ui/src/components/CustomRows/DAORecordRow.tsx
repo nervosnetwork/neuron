@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
-import { ckbCore, getBlockByNumber } from 'services/chain'
+import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { showMessage } from 'services/remote'
-import calculateAPC from 'utils/calculateAPC'
+import calculateGlobalAPC from 'utils/calculateGlobalAPC'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
@@ -19,6 +19,8 @@ const DAORecord = ({
   actionLabel,
   onClick,
   timestamp,
+  genesisBlockTimestamp,
+  depositTimestamp,
   depositOutPoint,
   epoch,
   withdraw,
@@ -29,17 +31,25 @@ const DAORecord = ({
   tipBlockNumber: string
   epoch: string
   withdraw: string | null
+  genesisBlockTimestamp: number | undefined
   connectionStatus: 'online' | 'offline'
 }) => {
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
+  const [apc, setApc] = useState(0)
+
+  useEffect(() => {
+    calculateGlobalAPC(+(depositTimestamp || timestamp), genesisBlockTimestamp).then(res => {
+      setApc(res)
+    })
+  }, [depositTimestamp, timestamp, genesisBlockTimestamp])
 
   useEffect(() => {
     if (!depositOutPoint) {
-      getBlockByNumber(BigInt(blockNumber))
-        .then(b => {
-          setDepositEpoch(b.header.epoch)
+      getHeaderByNumber(BigInt(blockNumber))
+        .then(header => {
+          setDepositEpoch(header.epoch)
         })
         .catch((err: Error) => {
           console.error(err)
@@ -47,17 +57,17 @@ const DAORecord = ({
       return
     }
     const depositBlockNumber = ckbCore.utils.bytesToHex(ckbCore.utils.hexToBytes(daoData).reverse())
-    getBlockByNumber(BigInt(depositBlockNumber))
-      .then(b => {
-        setDepositEpoch(b.header.epoch)
+    getHeaderByNumber(BigInt(depositBlockNumber))
+      .then(header => {
+        setDepositEpoch(header.epoch)
       })
       .catch((err: Error) => {
         console.error(err)
       })
 
-    getBlockByNumber(BigInt(blockNumber))
-      .then(b => {
-        setWithdrawingEpoch(b.header.epoch)
+    getHeaderByNumber(BigInt(blockNumber))
+      .then(header => {
+        setWithdrawingEpoch(header.epoch)
       })
       .catch((err: Error) => {
         console.error(err)
@@ -142,7 +152,7 @@ const DAORecord = ({
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APC: ~${calculateAPC(compensation.toString(), capacity, `${Date.now() - +timestamp}`)}%`}</span>
+        <span>{`APC: ~${apc}%`}</span>
         <span>{uniformTimeFormatter(+timestamp)}</span>
         <span>{metaInfo}</span>
       </div>

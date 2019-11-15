@@ -5,4 +5,17 @@ export class InvalidAddress extends Error {
     super(i18n.t('invalid-address', { address }))
   }
 }
-export default { InvalidAddress }
+
+export class MainnetAddressRequired extends Error {
+  constructor(address: string) {
+    super(i18n.t('mainnet-address-required', { address }))
+  }
+}
+
+export class TestnetAddressRequired extends Error {
+  constructor(address: string) {
+    super(i18n.t('testnet-address-required', { address }))
+  }
+}
+
+export default { InvalidAddress, MainnetAddressRequired, TestnetAddressRequired }

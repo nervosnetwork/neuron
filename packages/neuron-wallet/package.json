@@ -3,7 +3,7 @@
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
   "homepage": "https://www.nervos.org/",
-  "version": "0.24.5",
+  "version": "0.25.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -21,8 +21,8 @@
     "start:dev": "yarn run build && electron .",
     "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
-    "test": "jest --color --runInBand",
-    "test:e2e": "jest --config jest.e2e.config.js --color",
+    "test": "jest --runInBand",
+    "test:e2e": "jest --config jest.e2e.config.js",
     "lint": "eslint --fix --ext .ts,.js src",
     "precommit": "lint-staged",
     "rebuild:nativemodules": "electron-builder install-app-deps"
@@ -64,7 +64,7 @@
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.1.1",
     "lint-staged": "9.2.5",
-    "neuron-ui": "0.24.5",
+    "neuron-ui": "0.25.0",
     "rimraf": "3.0.0",
     "spectron": "8.0.0",
     "ts-transformer-imports": "0.4.3",

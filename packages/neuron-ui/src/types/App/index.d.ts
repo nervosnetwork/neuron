@@ -77,7 +77,7 @@ declare namespace State {
     tipBlockHash: string
     tipBlockTimestamp: number
     chain: string
-    difficulty: string
+    difficulty: bigint
     epoch: string
     send: Send
     passwordRequest: {
@@ -177,6 +177,7 @@ declare namespace State {
     typeHash: string | null
     daoData: string
     timestamp: string
+    depositTimestamp?: string
   }
 
   interface NervosDAO {

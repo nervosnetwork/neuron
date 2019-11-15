@@ -4,14 +4,28 @@ import { BehaviorSubject } from 'rxjs'
 import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from 'exceptions/network'
 
 import Store from 'models/store'
-import env from 'env'
 
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
-import { NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import logger from 'utils/logger'
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
+
+const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
+  selected: 'mainnet',
+  networks: [
+    {
+      id: 'mainnet',
+      name: 'Mainnet',
+      remote: 'http://localhost:8114',
+      genesisHash: MAINNET_GENESIS_HASH,
+      type: NetworkType.Default,
+      chain: 'ckb',
+    }
+  ]
+}
 
 export default class NetworksService extends Store {
   private static instance: NetworksService
@@ -24,36 +38,46 @@ export default class NetworksService extends Store {
   }
 
   constructor() {
-    super('networks', 'index.json', JSON.stringify(env.presetNetworks))
+    super('networks', 'index.json', JSON.stringify(presetNetworks))
 
-    this.getAll().then(currentNetworkList => {
-      if (currentNetworkList) {
-        NetworkListSubject.next({
-          currentNetworkList,
-        })
+    const currentNetworkList = this.getAll()
+    NetworkListSubject.next({ currentNetworkList })
+
+    Promise.all(currentNetworkList.map(n => {
+      if (n.type == NetworkType.Default) {
+        return n
+      } else {
+        const core = new Core(n.remote)
+        return Promise.all([
+          core.rpc.getBlockchainInfo(),
+          core.rpc.getBlockHash('0x0')
+        ]).then(([info, genesisHash]) => ({
+          ...n,
+          chain: info.chain,
+          genesisHash
+        }))
       }
+    })).then(networkList => {
+      this.updateAll(networkList)
+    }).catch((err: Error) => {
+      logger.error(err)
     })
 
-    this.getCurrentID().then(currentNetworkID => {
-      if (currentNetworkID) {
-        CurrentNetworkIDSubject.next({ currentNetworkID })
-        this.get(currentNetworkID).then(network => {
-          if (network) {
-            networkSwitchSubject.next(network)
-          }
-        })
-      }
-    })
+    const currentNetwork = this.getCurrent()
+    if (currentNetwork) {
+      CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
+      networkSwitchSubject.next(currentNetwork)
+    }
 
     this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
       NetworkListSubject.next({ currentNetworkList })
 
-      const currentID = await this.getCurrentID()
+      const currentID = this.getCurrentID()
       if (currentNetworkList.find(network => network.id === currentID)) {
         return
       }
 
-      const defaultNetwork = await this.defaultOne()
+      const defaultNetwork = this.defaultOne()
       if (!defaultNetwork) {
         throw new LackOfDefaultNetwork()
       }
@@ -61,7 +85,7 @@ export default class NetworksService extends Store {
     })
 
     this.on(NetworksKey.Current, async (_, currentNetworkID: NetworkID) => {
-      const currentNetwork = await this.get(currentNetworkID)
+      const currentNetwork = this.get(currentNetworkID)
       if (!currentNetwork) {
         throw new NetworkNotFound(currentNetworkID)
       }
@@ -70,32 +94,31 @@ export default class NetworksService extends Store {
     })
   }
 
-  public getAll = async () => {
-    const list = await this.read<NetworkWithID[]>(NetworksKey.List)
-    return list || []
+  public getAll = () => {
+    const list = this.readSync<NetworkWithID[]>(NetworksKey.List)
+    return list || presetNetworks.networks
   }
 
-  @Validate
-  public async get(@Required id: NetworkID) {
-    const list = await this.getAll()
+  public getCurrent(): NetworkWithID {
+    const currentID = this.getCurrentID()
+    return this.get(currentID) || this.defaultOne()! // Should always have at least one network
+  }
+
+  public get(@Required id: NetworkID) {
+    const list = this.getAll()
     return list.find(item => item.id === id) || null
   }
 
-  @Validate
-  public async updateAll(@Required networks: NetworkWithID[]) {
+  public updateAll(@Required networks: NetworkWithID[]) {
     if (!Array.isArray(networks)) {
       throw new InvalidFormat('Networks')
     }
-    await this.writeSync(NetworksKey.List, networks)
+    this.writeSync(NetworksKey.List, networks)
   }
 
   @Validate
-  public async create(
-    @Required name: NetworkName,
-    @Required remote: NetworkRemote,
-    type: NetworkType = NetworkType.Normal,
-  ) {
-    const list = await this.getAll()
+  public async create(@Required name: NetworkName, @Required remote: NetworkRemote, type: NetworkType = NetworkType.Normal) {
+    const list = this.getAll()
     if (list.some(item => item.name === name)) {
       throw new UsedName('Network')
     }
@@ -105,23 +128,27 @@ export default class NetworksService extends Store {
     const chain = await core.rpc
       .getBlockchainInfo()
       .then(info => info.chain)
-      .catch(() => '')
+      .catch(() => 'ckb_dev')
+    const genesisHash = await core.rpc
+      .getBlockHash('0x0')
+      .catch(() => EMPTY_GENESIS_HASH)
 
     const newOne = {
       id: uuid(),
       name,
       remote,
+      genesisHash,
       type,
       chain,
     }
 
-    await this.updateAll([...list, newOne])
+    this.updateAll([...list, newOne])
     return newOne
   }
 
   @Validate
   public async update(@Required id: NetworkID, @Required options: Partial<Network>) {
-    const list = await this.getAll()
+    const list = this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
       throw new NetworkNotFound(id)
@@ -130,15 +157,21 @@ export default class NetworksService extends Store {
     Object.assign(network, options)
     if (!options.chain) {
       const core = new Core(network.remote)
+
       const chain = await core.rpc
         .getBlockchainInfo()
         .then(info => info.chain)
-        .catch(() => '')
+        .catch(() => 'ckb_dev')
       network.chain = chain
+
+      const genesisHash = await core.rpc
+        .getBlockHash('0x0')
+        .catch(() => EMPTY_GENESIS_HASH)
+      network.genesisHash = genesisHash
     }
 
     this.updateAll(list)
-    const currentID = await this.getCurrentID()
+    const currentID = this.getCurrentID()
     if (currentID === id) {
       await this.activate(id)
     }
@@ -146,7 +179,7 @@ export default class NetworksService extends Store {
 
   @Validate
   public async delete(@Required id: NetworkID) {
-    const networkToDelete = await this.get(id)
+    const networkToDelete = this.get(id)
     if (!networkToDelete) {
       throw new NetworkNotFound(id)
     }
@@ -154,18 +187,23 @@ export default class NetworksService extends Store {
       throw new DefaultNetworkUnremovable()
     }
 
-    const prevNetworkList = await this.getAll()
+    const prevNetworkList = this.getAll()
     const currentNetworkList = prevNetworkList.filter(item => item.id !== id)
     this.updateAll(currentNetworkList)
   }
 
   @Validate
   public async activate(@Required id: NetworkID) {
-    const network = await this.get(id)
+    const network = this.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
     this.writeSync(NetworksKey.Current, id)
+
+    // No need to update the default mainnet
+    if (network.type === NetworkType.Default) {
+      return
+    }
 
     const core = new Core(network.remote)
 
@@ -174,17 +212,32 @@ export default class NetworksService extends Store {
       .then(info => info.chain)
       .catch(() => '')
 
-    if (chain && chain !== network.chain) {
-      this.update(id, { chain })
+      const genesisHash = await core.rpc
+        .getBlockHash('0x0')
+        .catch(() => EMPTY_GENESIS_HASH)
+
+    if (chain && chain !== network.chain && genesisHash && genesisHash !== network.genesisHash) {
+      this.update(id, { chain, genesisHash })
     }
   }
 
-  public getCurrentID = async () => {
-    return (await this.read<string>(NetworksKey.Current)) || null
+  public getCurrentID = () => {
+    return this.readSync<string>(NetworksKey.Current) || 'mainnet'
   }
 
-  public defaultOne = async () => {
-    const list = await this.getAll()
-    return list.find(item => item.type === NetworkType.Default) || null
+  public defaultOne = () => {
+    const list = this.getAll()
+    return list.find(item => item.type === NetworkType.Default) || presetNetworks.networks[0]
+  }
+
+  public isMainnet = (): boolean => {
+    return this.getCurrent().chain === 'ckb'
+  }
+
+  public explorerUrl = (): string => {
+    if (this.isMainnet()) {
+      return "https://explorer.nervos.org"
+    }
+    return "https://explorer.nervos.org/testnet"
   }
 }

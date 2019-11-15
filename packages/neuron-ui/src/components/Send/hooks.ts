@@ -201,10 +201,16 @@ export const useInitialize = (
     clear(dispatch)
   }, [walletID, dispatch])
 
-  const onGetAddressErrorMessage = useCallback(
-    (addr: string) => {
+  const onGetAddressErrorMessage: (isMainnet: boolean) => (addr: string) => string = useCallback(
+    (isMainnet: boolean) => (addr: string) => {
       if (addr === '') {
         return t(`messages.codes.${ErrorCode.AddressIsEmpty}`)
+      }
+      if (isMainnet && !addr.startsWith('ckb')) {
+        return t(`messages.mainnet-address-required`)
+      }
+      if (!isMainnet && !addr.startsWith('ckt')) {
+        return t(`messages.testnet-address-required`)
       }
       if (!verifyAddress(addr)) {
         return t(`messages.codes.${ErrorCode.FieldInvalid}`, {

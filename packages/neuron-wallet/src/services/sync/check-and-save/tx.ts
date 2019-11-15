@@ -7,6 +7,8 @@ import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
 import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
 import { AddressesWithURL } from 'models/subjects/addresses-used-subject'
+import NetworksService from 'services/networks'
+import { AddressPrefix } from 'models/keys/address'
 
 export default class CheckTx {
   private tx: Transaction
@@ -32,7 +34,10 @@ export default class CheckTx {
     const inputAddresses = await this.filterInputs(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
-      return LockUtils.lockScriptToAddress(output.lock)
+      return LockUtils.lockScriptToAddress(
+        output.lock,
+        NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+      )
     })
 
     const addresses: string[] = inputAddresses.concat(outputAddresses)
@@ -85,7 +90,12 @@ export default class CheckTx {
             outPointIndex: outPoint.index,
           })
         if (output && lockHashes.includes(output.lockHash)) {
-          addresses.push(LockUtils.lockScriptToAddress(output.lock))
+          addresses.push(
+            LockUtils.lockScriptToAddress(
+              output.lock,
+              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+            )
+          )
         }
       }
     }

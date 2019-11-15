@@ -271,17 +271,9 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
 export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
   getNervosDaoData(walletID).then(res => {
     if (res.status === 1) {
-      const withdrawList = res.result
-        .filter((r: State.NervosDAORecord) => !r.depositOutPoint)
-        .sort((r1: State.NervosDAORecord, r2: State.NervosDAORecord) => +r2.timestamp - +r1.timestamp)
-
-      const claimList = res.result
-        .filter((r: State.NervosDAORecord) => r.depositOutPoint)
-        .sort((r1: State.NervosDAORecord, r2: State.NervosDAORecord) => +r2.timestamp - +r1.timestamp)
-
       dispatch({
         type: NeuronWalletActions.UpdateNervosDaoData,
-        payload: { records: [...claimList, ...withdrawList] },
+        payload: { records: res.result },
       })
     } else {
       addNotification(failureResToNotification(res))(dispatch)

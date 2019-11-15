@@ -5,7 +5,7 @@ import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
-import ChainInfo from 'models/chain-info'
+import NetworksService from 'services/networks'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -71,16 +71,15 @@ export default class AddressService {
     changeAddressCount: number = 10
   ) => {
     const addressVersion = AddressService.getAddressVersion()
-    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
-    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
+    const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
     if (
-      maxIndexReceivingAddress !== undefined &&
-      maxIndexReceivingAddress.txCount === 0 &&
-      maxIndexChangeAddress !== undefined &&
-      maxIndexChangeAddress.txCount === 0
+      unusedReceivingCount > 3 &&
+      unusedChangeCount > 3
     ) {
       return undefined
     }
+    const maxIndexReceivingAddress = AddressDao.maxAddressIndex(walletId, AddressType.Receiving, addressVersion)
+    const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
     const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
     const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
     return AddressService.generateAndSave(
@@ -163,7 +162,7 @@ export default class AddressService {
       AddressPrefix.Mainnet
     ).address
 
-    const addressToParse = ChainInfo.getInstance().isMainnet() ? mainnetAddress : testnetAddress
+    const addressToParse = NetworksService.getInstance().isMainnet() ? mainnetAddress : testnetAddress
     const blake160: string = LockUtils.addressToBlake160(addressToParse)
 
     const testnetAddressInfo: AddressInterface = {
@@ -239,6 +238,6 @@ export default class AddressService {
   }
 
   private static getAddressVersion = (): AddressVersion => {
-    return ChainInfo.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+    return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
   }
 }

@@ -18,6 +18,15 @@
   }
 }
 
+.guide {
+  margin-left: 20px;
+  color: rgb(0, 90, 158);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 @keyframes autoDismiss {
   from {
     transform: translateX(110%)
@@ -33,4 +42,5 @@
   100% {
     transform: translateX(110%)
   }
+
 }

@@ -31,13 +31,15 @@ export default class TransactionsController {
   ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
-    const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
+    const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
 
-    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+    const transactions = await TransactionsService
+      .getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+      .catch(() => ({
+        totalCount: 0,
+        items: []
+      }))
 
-    if (!transactions) {
-      throw new ServiceHasNoResponse('Transactions')
-    }
     return {
       status: ResponseCode.Success,
       result: {
@@ -64,7 +66,7 @@ export default class TransactionsController {
       if (!wallet) {
         throw new CurrentWalletNotSet()
       }
-      searchAddresses = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
+      searchAddresses = AddressesService.allAddressesByWalletId(wallet.id).map(addr => addr.address)
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
@@ -106,7 +108,7 @@ export default class TransactionsController {
         }
         return false
       })
-      .map(i => BigInt(i.capacity))
+      .map(i => BigInt(i.capacity || 0))
       .reduce((result, c) => result + c, BigInt(0))
     const value: bigint = outputCapacities - inputCapacities
     transaction.value = value.toString()
