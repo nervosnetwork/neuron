@@ -56,6 +56,7 @@ export class InitDatabase {
         } else {
           logger.error('network genesis hash and chain do not match data fetched')
           this.stopped = true
+          this.killed = true // Do not process as successful to let sync start with wrong genesis hash or chain
         }
       } catch (err) {
         logger.error('initDatabase error:', err)
