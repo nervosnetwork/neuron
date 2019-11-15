@@ -234,6 +234,7 @@
     "common": {
       "or": "or",
       "confirm": "Confirm",
+      "open": "Open",
       "cancel": "Cancel",
       "save": "Save",
       "toggle": {
@@ -258,6 +259,7 @@
       "update-network-successfully": "The network was updated",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
+      "view-the-run-node-doc": "View the guide in browser",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

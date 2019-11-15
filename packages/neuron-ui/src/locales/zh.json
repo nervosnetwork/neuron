@@ -234,6 +234,7 @@
     "common": {
       "or": "或",
       "confirm": "确认",
+      "open": "打开",
       "cancel": "取消",
       "save": "保存",
       "toggle": {
@@ -258,6 +259,7 @@
       "update-network-successfully": "已更新节点信息",
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
+      "view-the-run-node-doc": "打开浏览器查看文档",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
