@@ -31,6 +31,10 @@ export const SyncStatus = ({
     return <Text variant="xSmall">{t('footer.fail-to-fetch-tip-block-number')}</Text>
   }
 
+  if (+syncedBlockNumber < 0) {
+    return <Text variant="xSmall">{t('footer.sync-not-start')}</Text>
+  }
+
   const percentage = +syncedBlockNumber / +tipBlockNumber
 
   return +syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
