@@ -275,7 +275,7 @@
       },
       "mainnet-address-required": "请输入主网地址",
       "testnet-address-required": "请输出测试网地址",
-      "run-ckb-guide": "如何运行一个 CKB 主网节点?",
+      "run-ckb-guide": "如何运行一个 CKB 节点?",
       "codes": {
         "-3": "",
         "100": "余额不足",
