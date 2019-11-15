@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Stack, getTheme, Text, ProgressIndicator, Icon, TooltipHost, TeachingBubble } from 'office-ui-fabric-react'
 
 import { openExternal } from 'services/remote'
+import { guideBubbleTimes } from 'services/localCache'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { NeuronWalletContext } from 'states/stateProvider'
 import { ConnectionStatus, FULL_SCREENS, RUN_NODE_GUIDE_URL, Routes } from 'utils/const'
@@ -79,8 +80,9 @@ const Footer = ({
   const [showGuide, setShowGuide] = useState(false)
 
   useEffect(() => {
-    if (connectionStatus !== ConnectionStatus.Online) {
+    if (connectionStatus !== ConnectionStatus.Online && guideBubbleTimes.getRemaining()) {
       setShowGuide(true)
+      guideBubbleTimes.reduce()
     } else {
       setShowGuide(false)
     }

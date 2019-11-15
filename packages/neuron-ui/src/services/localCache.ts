@@ -5,6 +5,7 @@ export enum LocalCacheKey {
   CurrentWallet = 'currentWallet',
   CurrentNetworkID = 'currentNetworkID',
   SystemScript = 'systemScript',
+  GuideBubbleTimes = 'guideBubbleTimes',
 }
 
 export const addresses = {
@@ -122,6 +123,18 @@ export const systemScript = {
   },
 }
 
+export const guideBubbleTimes = {
+  getRemaining: () => {
+    const t = window.localStorage.getItem(LocalCacheKey.GuideBubbleTimes)
+    const remaining = t === null ? 3 : +t
+    return remaining
+  },
+  reduce: () => {
+    const remaining = guideBubbleTimes.getRemaining()
+    window.localStorage.setItem(LocalCacheKey.GuideBubbleTimes, `${Math.max(remaining - 1, 0)}`)
+  },
+}
+
 export default {
   LocalCacheKey,
   addresses,
@@ -130,4 +143,5 @@ export default {
   currentWallet,
   currentNetworkID,
   systemScript,
+  guideBubbleTimes,
 }
