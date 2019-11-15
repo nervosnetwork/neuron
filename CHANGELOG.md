@@ -1,4 +1,4 @@
-# [0.25.0](https://github.com/nervosnetwork/neuron/compare/v0.24.5...v0.25.0) (2019-11-15)
+# [0.25.0](https://github.com/nervosnetwork/neuron/compare/v0.24.5...v0.25.0) (2019-11-16)
 
 
 ### Bug Fixes
