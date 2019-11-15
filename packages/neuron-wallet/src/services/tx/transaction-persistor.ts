@@ -91,7 +91,25 @@ export class TransactionPersistor {
       txEntity.blockHash = transaction.blockHash
       txEntity.blockNumber = transaction.blockNumber
       txEntity.status = TransactionStatus.Success
-      await connection.manager.save([txEntity, ...outputs.concat(previousOutputs)])
+
+      const sliceSize = 100
+      const queryRunner = connection.createQueryRunner()
+      await TransactionPersistor.waitUntilTransactionFinished(queryRunner)
+      await queryRunner.startTransaction()
+      try {
+        await queryRunner.manager.save(txEntity)
+        for (const slice of Utils.eachSlice(previousOutputs, sliceSize)) {
+          await queryRunner.manager.save(slice)
+        }
+        for (const slice of Utils.eachSlice(outputs, sliceSize)) {
+          await queryRunner.manager.save(slice)
+        }
+        await queryRunner.commitTransaction()
+      } catch (err) {
+        await queryRunner.rollbackTransaction()
+      } finally {
+        await queryRunner.release()
+      }
 
       return txEntity
     }
