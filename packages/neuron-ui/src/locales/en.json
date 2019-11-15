@@ -275,7 +275,7 @@
       },
       "mainnet-address-required": "Please enter a mainnet address",
       "testnet-address-required": "Please enter a testnet address",
-      "run-ckb-guide": "How to run a CKB Mainnet Node?",
+      "run-ckb-guide": "How to run a CKB node?",
       "codes": {
         "-3": "",
         "100": "Amount is not enough",
