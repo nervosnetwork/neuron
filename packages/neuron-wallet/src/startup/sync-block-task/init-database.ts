@@ -35,29 +35,30 @@ export class InitDatabase {
 
     this.inProcess = true
 
-    let hash: string = network.genesisHash
-    let chain: string = network.chain
+    let hash: string = EMPTY_GENESIS_HASH
+    let chain: string = ''
     while (!this.stopped && !this.success) {
       try {
-        if (hash === EMPTY_GENESIS_HASH) {
-          hash = await genesisBlockHash(network.remote)
-        }
+        hash = await genesisBlockHash(network.remote)
         await initConnection(hash)
-        if (chain === '') {
-          chain = await getChain(network.remote)
-        }
+        chain = await getChain(network.remote)
 
-        try {
-          const systemScriptInfo = await LockUtils.systemScript(network.remote)
-          const daoScriptInfo = await DaoUtils.daoScript(network.remote)
-          updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
-        } catch (err) {
-          logger.error('update systemScriptInfo failed:', err)
-        }
+        if (hash === network.genesisHash && chain === network.chain) {
+          try {
+            const systemScriptInfo = await LockUtils.systemScript(network.remote)
+            const daoScriptInfo = await DaoUtils.daoScript(network.remote)
+            updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
+          } catch (err) {
+            logger.error('update systemScriptInfo failed:', err)
+          }
 
-        this.success = true
+          this.success = true
+        } else {
+          logger.error('network genesis hash and chain do not match data fetched')
+          this.stopped = true
+        }
       } catch (err) {
-        logger.debug('initDatabase error:', err)
+        logger.error('initDatabase error:', err)
         try {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
@@ -67,6 +68,7 @@ export class InitDatabase {
           hash = metaInfo.genesisBlockHash
           this.success = true
         } catch (error) {
+          logger.error('get cached meta info error:', err)
           Utils.sleep(5000)
         }
       }
