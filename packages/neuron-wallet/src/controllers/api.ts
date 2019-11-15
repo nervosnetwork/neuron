@@ -26,17 +26,17 @@ export default class ApiController {
   public static async loadInitData() {
     const walletsService = WalletsService.getInstance()
     const networksService = NetworksService.getInstance()
+
+    const currentWallet = walletsService.getCurrent()
+    const wallets = walletsService.getAll()
+
     const [
-      currentWallet = null,
-      wallets = [],
       currentNetworkID = '',
       networks = [],
       syncedBlockNumber = '0',
       connectionStatus = false,
       codeHash = '',
     ] = await Promise.all([
-      walletsService.getCurrent(),
-      walletsService.getAll(),
       networksService.getCurrentID(),
       networksService.getAll(),
 
@@ -48,18 +48,21 @@ export default class ApiController {
           return '0'
         })
         .catch(() => '0'),
+
       new Promise(resolve => {
         ConnectionStatusSubject.pipe(take(1)).subscribe(
-          status => {
-            resolve(status)
-          },
-          () => {
-            resolve(false)
-          },
+          status => { resolve(status) },
+          () => { resolve(false) },
+          () => { resolve(false) }
         )
       }),
+
       new Promise(resolve => {
-        SystemScriptSubject.pipe(take(1)).subscribe(({ codeHash: currentCodeHash }) => resolve(currentCodeHash))
+        SystemScriptSubject.pipe(take(1)).subscribe(
+          ({ codeHash: currentCodeHash }) => resolve(currentCodeHash),
+          () => { resolve('') },
+          () => { resolve('') }
+        )
       }),
     ])
 
@@ -77,8 +80,8 @@ export default class ApiController {
       : []
 
     const initState = {
-      currentWallet,
-      wallets: [...wallets.map(({ name, id }) => ({ id, name }))],
+      currentWallet: currentWallet || null,
+      wallets: wallets,
       currentNetworkID,
       networks,
       addresses,
@@ -246,8 +249,8 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async createNetwork({ name, remote, type = NetworkType.Normal, chain = 'ckb' }: Network) {
-    return NetworksController.create({ name, remote, type, chain })
+  public static async createNetwork({ name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) {
+    return NetworksController.create({ name, remote, type, genesisHash, chain })
   }
 
   @MapApiResponse
@@ -268,9 +271,7 @@ export default class ApiController {
   // Transactions
 
   @MapApiResponse
-  public static async getTransactionList(
-    params: Controller.Params.TransactionsByKeywords
-  ) {
+  public static async getTransactionList(params: Controller.Params.TransactionsByKeywords) {
     return TransactionsController.getAllByKeywords(params)
   }
 

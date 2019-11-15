@@ -67,7 +67,7 @@ export default (app: Application) => {
   })
 
   describe('Test amount field boundary validation', () => {
-    const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
+    const validAddress = 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd'
     app.test('Amount 60.99999999 is too small, 61 CKB is required', async () => {
       const smallAmount = '60.99999999'
       const { client } = app.spectron
@@ -95,7 +95,7 @@ export default (app: Application) => {
   })
 
   describe('Amount is not enough', () => {
-    const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
+    const validAddress = 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd'
     const validAmount = '61'
     app.test('Amount is not enough', async () => {
       const { client } = app.spectron
