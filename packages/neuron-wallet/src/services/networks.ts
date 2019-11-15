@@ -8,7 +8,7 @@ import Store from 'models/store'
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
-import { MAINNET_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
 import logger from 'utils/logger'
 
 export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
@@ -137,7 +137,7 @@ export default class NetworksService extends Store {
       .catch(() => 'ckb_dev')
     const genesisHash = await core.rpc
       .getBlockHash('0x0')
-      .catch(() => '0x')
+      .catch(() => EMPTY_GENESIS_HASH)
 
     const newOne = {
       id: uuid(),
@@ -172,7 +172,7 @@ export default class NetworksService extends Store {
 
       const genesisHash = await core.rpc
         .getBlockHash('0x0')
-        .catch(() => '0x')
+        .catch(() => EMPTY_GENESIS_HASH)
       network.genesisHash = genesisHash
     }
 
@@ -220,7 +220,7 @@ export default class NetworksService extends Store {
 
       const genesisHash = await core.rpc
         .getBlockHash('0x0')
-        .catch(() => '0x')
+        .catch(() => EMPTY_GENESIS_HASH)
 
     if (chain && chain !== network.chain && genesisHash && genesisHash !== network.genesisHash) {
       this.update(id, { chain, genesisHash })

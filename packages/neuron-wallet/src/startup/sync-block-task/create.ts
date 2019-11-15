@@ -29,7 +29,7 @@ networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
     // TODO: only switch if genesisHash is different
 
     await InitDatabase.getInstance().stopAndWait()
-    const info = await InitDatabase.getInstance().init(network.remote)
+    const info = await InitDatabase.getInstance().init(network)
 
     DataUpdateSubject.next({
       dataType: 'transaction',

@@ -13,7 +13,8 @@ export enum NetworkType {
   Normal,
 }
 
-export const MAINNET_GENESIS_HASH = "0x" // TODO: set this when mainnet launches!
+export const MAINNET_GENESIS_HASH = "0xeeee" // TODO: set this when mainnet launches!
+export const EMPTY_GENESIS_HASH = "0x"
 
 export interface Network {
   name: NetworkName
