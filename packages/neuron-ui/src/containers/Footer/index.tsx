@@ -31,7 +31,7 @@ export const SyncStatus = ({
     return <Text variant="xSmall">{t('footer.fail-to-fetch-tip-block-number')}</Text>
   }
 
-  if (+syncedBlockNumber < 0) {
+  if (BigInt(syncedBlockNumber) < BigInt(0)) {
     return <Text variant="xSmall">{t('footer.sync-not-start')}</Text>
   }
 
