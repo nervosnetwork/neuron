@@ -70,7 +70,7 @@ const WithdrawDialog = ({
     epochs <= BigInt(5)
       ? t('nervos-dao.withdraw-alert', {
           epochs,
-          nextLeftEpochs: epochs + BigInt(180),
+          hours: epochs * BigInt(4),
           days: (epochs + BigInt(180)) / BigInt(6),
         })
       : ''

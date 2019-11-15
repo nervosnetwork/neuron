@@ -335,7 +335,7 @@
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKB",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
-      "withdraw-alert": "Alert: these are only {{epochs}} epochs left before the next start withdrawing epoch number conforming to Nervos DAO, and it is possible that you have to do the withdraw after the next period(~{{days}}) due to the jam on CKB.",
+      "withdraw-alert": "Warning: these are only {{epochs}} epochs (~ {{hours}} hours) left to the next deposit claim period. If your start withdrawing transaction is not confirmed before that, your deposit will be locked until the next period (~{{days}}). And you won’t get more compensation for the prolonged lock period.",
       "insufficient-period-alert-title": "Insufficient Period",
       "insufficient-period-alert-message": "Nervos DAO needs at least 4 epochs to handle your request."
     }
