@@ -6,7 +6,6 @@ import { UpdateController } from 'controllers'
 import { showWindow } from './show-window'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import ChainInfo from 'services/chain-info'
 import CommandSubject from 'models/subjects/command'
 
 enum URL {
@@ -400,7 +399,7 @@ const contextMenuTemplate: {
     }
 
     const address = bech32Address(identifier, {
-      prefix: ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+      prefix: NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
       type: AddressType.HashIdx,
       codeHashOrCodeHashIndex: '0x00',
     })
@@ -415,7 +414,7 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${ChainInfo.getInstance().explorerUrl()}/address/${address}`) }
+        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/address/${address}`) }
       },
     ]
   },
@@ -433,7 +432,7 @@ const contextMenuTemplate: {
       },
       {
         label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${ChainInfo.getInstance().explorerUrl()}/transaction/${hash}`) }
+        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/transaction/${hash}`) }
       },
     ]
   },

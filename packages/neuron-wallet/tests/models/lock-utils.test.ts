@@ -1,5 +1,6 @@
 import { Script, ScriptHashType } from '../../src/types/cell-types'
 import LockUtils from '../../src/models/lock-utils'
+import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 
 const systemScript = {
   outPoint: {
@@ -83,13 +84,13 @@ describe('LockUtils Test', () => {
   })
 
   it('lockScriptToAddress', async () => {
-    const address: string = LockUtils.lockScriptToAddress(bob.lockScript)
+    const address: string = LockUtils.lockScriptToAddress(bob.lockScript, AddressPrefix.Testnet)
 
     expect(address).toEqual(bob.address)
   })
 
   it('blake160ToAddress', async () => {
-    const address: string = LockUtils.blake160ToAddress(bob.blake160)
+    const address: string = LockUtils.blake160ToAddress(bob.blake160, AddressPrefix.Testnet)
 
     expect(address).toEqual(bob.address)
   })

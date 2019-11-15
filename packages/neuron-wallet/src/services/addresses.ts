@@ -5,7 +5,7 @@ import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
-import ChainInfo from 'services/chain-info'
+import NetworksService from 'services/networks'
 
 const MAX_ADDRESS_COUNT = 30
 
@@ -162,7 +162,7 @@ export default class AddressService {
       AddressPrefix.Mainnet
     ).address
 
-    const addressToParse = ChainInfo.getInstance().isMainnet() ? mainnetAddress : testnetAddress
+    const addressToParse = NetworksService.getInstance().isMainnet() ? mainnetAddress : testnetAddress
     const blake160: string = LockUtils.addressToBlake160(addressToParse)
 
     const testnetAddressInfo: AddressInterface = {
@@ -238,6 +238,6 @@ export default class AddressService {
   }
 
   private static getAddressVersion = (): AddressVersion => {
-    return ChainInfo.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+    return NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
   }
 }

@@ -101,7 +101,7 @@ export default class NetworksService extends Store {
 
   public getCurrent(): NetworkWithID {
     const currentID = this.getCurrentID()
-    return this.get(currentID!)! // Should always have at least one network
+    return this.get(currentID) || this.defaultOne()! // Should always have at least one network
   }
 
   public get(@Required id: NetworkID) {
@@ -222,11 +222,22 @@ export default class NetworksService extends Store {
   }
 
   public getCurrentID = () => {
-    return this.readSync<string>(NetworksKey.Current) || null
+    return this.readSync<string>(NetworksKey.Current) || 'mainnet'
   }
 
   public defaultOne = () => {
     const list = this.getAll()
-    return list.find(item => item.type === NetworkType.Default) || null
+    return list.find(item => item.type === NetworkType.Default) || presetNetworks.networks[0]
+  }
+
+  public isMainnet = (): boolean => {
+    return this.getCurrent().chain === 'ckb'
+  }
+
+  public explorerUrl = (): string => {
+    if (this.isMainnet()) {
+      return "https://explorer.nervos.org"
+    }
+    return "https://explorer.nervos.org/testnet"
   }
 }
