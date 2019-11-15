@@ -15,7 +15,7 @@ describe(`Unit tests of networks service`, () => {
     type: 0,
     genesisHash: '0x',
     id: '',
-    chain: '',
+    chain: 'ckb_dev',
   }
 
   const newNetworkWithDefaultTypeOf1 = {
