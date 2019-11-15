@@ -15,7 +15,7 @@ import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIG
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
-import { ckbCore, getBlockByNumber } from 'services/chain'
+import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
 import DAORecord from 'components/CustomRows/DAORecordRow'
@@ -99,8 +99,8 @@ const NervosDAO = ({
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
     updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
-    getBlockByNumber('0x0')
-      .then(b => setGenesisBlockTimestamp(+b.header.timestamp))
+    getHeaderByNumber('0x0')
+      .then(header => setGenesisBlockTimestamp(+header.timestamp))
       .catch(err => console.error(err))
     return () => {
       clearNervosDaoData()(dispatch)

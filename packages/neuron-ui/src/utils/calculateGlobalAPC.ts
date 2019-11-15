@@ -1,4 +1,4 @@
-import { getBlockByNumber } from '../services/chain'
+import { getHeaderByNumber } from '../services/chain'
 
 const INITIAL_OFFER = BigInt(33600000000)
 const SECONDARY_OFFER = BigInt(1344000000)
@@ -9,8 +9,8 @@ const PERIOD_LENGTH = DAYS_PER_PERIOD * MILLI_SECONDS_PER_DAY
 export default async (checkPointTimestamp: number, initialTimestamp?: number | undefined) => {
   let genesisTimestamp = initialTimestamp
   if (genesisTimestamp === undefined) {
-    genesisTimestamp = await getBlockByNumber('0x0')
-      .then(b => +b.header.timestamp)
+    genesisTimestamp = await getHeaderByNumber('0x0')
+      .then(h => +h.timestamp)
       .catch(() => undefined)
   }
   if (genesisTimestamp === undefined || checkPointTimestamp <= genesisTimestamp) {
