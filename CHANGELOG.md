@@ -4,6 +4,7 @@
 ### Bug Fixes
 
 * capacity null when calculate bytes ([97ee2a1](https://github.com/nervosnetwork/neuron/commit/97ee2a1))
+* update tx and its outputs in different sqls ([b8fe366](https://github.com/nervosnetwork/neuron/commit/b8fe366))
 * **neuron:** use deposit timestamp to calculate phase2 dao cell apc ([abdab3f](https://github.com/nervosnetwork/neuron/commit/abdab3f))
 * **neuron-ui:** cache the genesis block timestamp in the nervos dao component instead of in global ([5274edd](https://github.com/nervosnetwork/neuron/commit/5274edd))
 * **neuron-ui:** fix the missing field in error message. ([a7dc73b](https://github.com/nervosnetwork/neuron/commit/a7dc73b))
@@ -17,13 +18,17 @@
 
 ### Features
 
+* Always load genesis hash and chain info when ([761a4a8](https://github.com/nervosnetwork/neuron/commit/761a4a8))
 * ChainInfo delegates Networks Service to get current chain ([0673343](https://github.com/nervosnetwork/neuron/commit/0673343))
+* If genesis hash doesn't match do not proceed to sync ([bd8e4e4](https://github.com/nervosnetwork/neuron/commit/bd8e4e4))
 * Remove ChainInfo moving its feature into NetworksService ([81f1eff](https://github.com/nervosnetwork/neuron/commit/81f1eff))
 * **neuron-ui:** add a guide bubble in connection status ([59f2dd5](https://github.com/nervosnetwork/neuron/commit/59f2dd5))
 * **neuron-ui:** add a guide link to run a ckb mainnet node. ([89aa04c](https://github.com/nervosnetwork/neuron/commit/89aa04c))
+* **neuron-ui:** add difficulty formatter ([#1105](https://github.com/nervosnetwork/neuron/issues/1105)) ([98ba68d](https://github.com/nervosnetwork/neuron/commit/98ba68d))
 * **neuron-ui:** add hint for synchronization not started. ([7d0cc67](https://github.com/nervosnetwork/neuron/commit/7d0cc67))
 * **neuron-ui:** hide the general settings and redirect to wallets setting ([b3e3d0e](https://github.com/nervosnetwork/neuron/commit/b3e3d0e))
 * **neuron-ui:** limit the times of guide bubble to 3 ([9b85589](https://github.com/nervosnetwork/neuron/commit/9b85589))
+* **neuron-ui:** update chain types on launch ([2cb5047](https://github.com/nervosnetwork/neuron/commit/2cb5047))
 * **neuron-ui:** update the hint of withdraw dialog ([0bec01e](https://github.com/nervosnetwork/neuron/commit/0bec01e))
 * **neuron-ui:** update the warning in withdraw dialog. ([e819439](https://github.com/nervosnetwork/neuron/commit/e819439))
 * add depositTimestamp ([108d5b1](https://github.com/nervosnetwork/neuron/commit/108d5b1))
@@ -34,8 +39,6 @@
 * Preset mainnet network configuration ([1979e8a](https://github.com/nervosnetwork/neuron/commit/1979e8a))
 * Set current wallet to null if it's undefined ([6c7117f](https://github.com/nervosnetwork/neuron/commit/6c7117f))
 * Update all networks' chain and genesis hash when NetworkService ([a3ccf2d](https://github.com/nervosnetwork/neuron/commit/a3ccf2d))
-* **neuron-ui:** add difficulty formatter ([#1105](https://github.com/nervosnetwork/neuron/issues/1105)) ([98ba68d](https://github.com/nervosnetwork/neuron/commit/98ba68d))
-* **neuron-ui:** update chain types on launch ([2cb5047](https://github.com/nervosnetwork/neuron/commit/2cb5047))
 * **neuron-ui:** use calculateGlobalAPC to update Nervos DAO APC ([e96ca61](https://github.com/nervosnetwork/neuron/commit/e96ca61))
 * verify address according to chain type ([2026921](https://github.com/nervosnetwork/neuron/commit/2026921))
 
