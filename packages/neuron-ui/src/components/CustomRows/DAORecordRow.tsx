@@ -19,6 +19,7 @@ const DAORecord = ({
   actionLabel,
   onClick,
   timestamp,
+  genesisBlockTimestamp,
   depositTimestamp,
   depositOutPoint,
   epoch,
@@ -30,6 +31,7 @@ const DAORecord = ({
   tipBlockNumber: string
   epoch: string
   withdraw: string | null
+  genesisBlockTimestamp: number | undefined
   connectionStatus: 'online' | 'offline'
 }) => {
   const [t] = useTranslation()
@@ -38,10 +40,10 @@ const DAORecord = ({
   const [apc, setApc] = useState(0)
 
   useEffect(() => {
-    calculateGlobalAPC(+(depositTimestamp || timestamp)).then(res => {
+    calculateGlobalAPC(+(depositTimestamp || timestamp), genesisBlockTimestamp).then(res => {
       setApc(res)
     })
-  })
+  }, [depositTimestamp, timestamp, genesisBlockTimestamp])
 
   useEffect(() => {
     if (!depositOutPoint) {

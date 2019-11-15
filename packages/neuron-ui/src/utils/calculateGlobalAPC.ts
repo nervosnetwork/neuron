@@ -6,16 +6,11 @@ const DAYS_PER_PERIOD = 365 * 4 * 1
 const MILLI_SECONDS_PER_DAY = 24 * 3600 * 1000
 const PERIOD_LENGTH = DAYS_PER_PERIOD * MILLI_SECONDS_PER_DAY
 
-let cachedGenesisTimestamp: number | undefined
-
-export default async (checkPointTimestamp: number, initialTimestamp: number | undefined = cachedGenesisTimestamp) => {
+export default async (checkPointTimestamp: number, initialTimestamp?: number | undefined) => {
   let genesisTimestamp = initialTimestamp
   if (genesisTimestamp === undefined) {
     genesisTimestamp = await getBlockByNumber('0x0')
-      .then(b => {
-        cachedGenesisTimestamp = +b.header.timestamp
-        return cachedGenesisTimestamp
-      })
+      .then(b => +b.header.timestamp)
       .catch(() => undefined)
   }
   if (genesisTimestamp === undefined || checkPointTimestamp <= genesisTimestamp) {
