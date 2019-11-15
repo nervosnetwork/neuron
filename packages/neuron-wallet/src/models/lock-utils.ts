@@ -10,7 +10,6 @@ import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { SystemScriptSubject } from 'models/subjects/system-script'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import ChainInfo from './chain-info'
 
 export interface SystemScript {
   codeHash: string
@@ -119,13 +118,12 @@ export default class LockUtils {
     return LockUtils.computeScriptHash(lock)
   }
 
-  static lockScriptToAddress(lock: Script): string {
+  static lockScriptToAddress(lock: Script, prefix: AddressPrefix = AddressPrefix.Mainnet): string {
     const blake160: string = lock.args!
-    return LockUtils.blake160ToAddress(blake160)
+    return LockUtils.blake160ToAddress(blake160, prefix)
   }
 
-  static blake160ToAddress(blake160: string): string {
-    const prefix = ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+  static blake160ToAddress(blake160: string, prefix: AddressPrefix = AddressPrefix.Mainnet): string {
     return bech32Address(blake160, {
       prefix,
       type: AddressType.HashIdx,

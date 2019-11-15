@@ -21,7 +21,7 @@ import FileService from './file'
 import { TransactionsService, TransactionPersistor, TransactionGenerator } from './tx'
 import AddressService from './addresses'
 import { deindexLockHashes } from './indexer/deindex'
-import ChainInfo from 'models/chain-info'
+import NetworksService from 'services/networks'
 import AddressesService from 'services/addresses'
 import { Cell, DepType } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
@@ -269,7 +269,7 @@ export default class WalletService {
   }
 
   private deindexAddresses = async (addresses: string[]) => {
-    const prefix = ChainInfo.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const addressesWithEnvPrefix: string[] = addresses.filter(addr => addr.startsWith(prefix))
 
     if (addressesWithEnvPrefix.length === 0) {

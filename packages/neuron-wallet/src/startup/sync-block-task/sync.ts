@@ -3,9 +3,7 @@ import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
 import { Address } from 'database/address/address-dao'
-
 import initConnection from 'database/chain/ormconfig'
-import ChainInfo from 'models/chain-info'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -27,7 +25,7 @@ export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]
 
 // call this after network switched
 let blockListener: BlockListener | undefined
-export const switchNetwork = async (url: string, genesisBlockHash: string, chain: string) => {
+export const switchNetwork = async (url: string, genesisBlockHash: string, _chain: string) => {
   // stop all blocks service
   if (blockListener) {
     await blockListener.stopAndWait()
@@ -35,7 +33,6 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, chain
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
-  ChainInfo.getInstance().setChain(chain)
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(url)
   // start sync blocks service

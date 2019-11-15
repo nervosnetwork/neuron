@@ -1,7 +1,9 @@
 import { Subject, Subscription } from 'rxjs'
+import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Utils from 'services/sync/utils'
 import logger from 'utils/logger'
 import GetBlocks from 'services/sync/get-blocks'
+import NetworksService from 'services/networks'
 import { Transaction, TransactionWithStatus } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import BlockNumber from 'services/sync/block-number'
@@ -211,7 +213,10 @@ export default class IndexerQueue {
             blockHash: transactionWithStatus.txStatus.blockHash!
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
-            const address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
+            const address = LockUtils.lockScriptToAddress(
+              transaction.outputs![parseInt(txPoint.index, 16)].lock,
+              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+            )
             AddressesUsedSubject.getSubject().next({
               addresses: [address],
               url: this.url,
@@ -273,13 +278,19 @@ export default class IndexerQueue {
 
           let address: string | undefined
           if (type === TxPointType.CreatedBy) {
-            address = LockUtils.lockScriptToAddress(transaction.outputs![parseInt(txPoint.index, 16)].lock)
+            address = LockUtils.lockScriptToAddress(
+              transaction.outputs![parseInt(txPoint.index, 16)].lock,
+              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+            )
             this.latestCreatedBy.push(txUniqueFlag)
           } else if (type === TxPointType.ConsumedBy) {
             const input = txEntity.inputs[parseInt(txPoint.index, 16)]
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
             if (output) {
-              address = LockUtils.lockScriptToAddress(output.lock)
+              address = LockUtils.lockScriptToAddress(
+                output.lock,
+                NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+              )
             }
           }
           if (address) {

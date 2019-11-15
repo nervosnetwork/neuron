@@ -4,7 +4,6 @@ import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import genesisBlockHash, { getChain } from './genesis'
-import ChainInfo from 'models/chain-info'
 import DaoUtils from '../../models/dao-utils'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 
@@ -47,7 +46,6 @@ export class InitDatabase {
         if (chain === '') {
           chain = await getChain(network.remote)
         }
-        ChainInfo.getInstance().setChain(chain)
 
         try {
           const systemScriptInfo = await LockUtils.systemScript(network.remote)
@@ -64,7 +62,6 @@ export class InitDatabase {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
           chain = metaInfo.chain
-          ChainInfo.getInstance().setChain(chain)
           LockUtils.setSystemScript(metaInfo.systemScriptInfo)
           DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
           hash = metaInfo.genesisBlockHash

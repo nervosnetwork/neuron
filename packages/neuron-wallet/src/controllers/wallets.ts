@@ -2,9 +2,9 @@ import fs from 'fs'
 import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
 import { dialog, SaveDialogReturnValue, BrowserWindow } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
+import NetworksService from 'services/networks'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
-import ChainInfo from 'models/chain-info'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
 import { ResponseCode } from 'utils/const'
@@ -341,7 +341,7 @@ export default class WalletsController {
       feeRate = '1000'
     }
 
-    const isMainnet = ChainInfo.getInstance().isMainnet()
+    const isMainnet = NetworksService.getInstance().isMainnet()
     params.items.forEach(item => {
       if (isMainnet && !item.address.startsWith('ckb')) {
         throw new MainnetAddressRequired(item.address)
