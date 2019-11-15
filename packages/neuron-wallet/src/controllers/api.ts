@@ -80,7 +80,7 @@ export default class ApiController {
       : []
 
     const initState = {
-      currentWallet,
+      currentWallet: currentWallet || null,
       wallets: wallets,
       currentNetworkID,
       networks,
