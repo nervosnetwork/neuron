@@ -202,6 +202,7 @@ export class TransactionGenerator {
       data: '0x0000000000000000',
       daoData: '0x0000000000000000',
     }
+    output.typeHash = LockUtils.computeScriptHash(output.type!)
 
     const outputs: Cell[] = [output]
 
