@@ -96,7 +96,7 @@ const DAORecord = ({
       metaInfo = t('nervos-dao.blocks-left', {
         epochs: localNumberFormatter(epochs),
         blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
-        days: localNumberFormatter(epochs / BigInt(6)),
+        days: localNumberFormatter(Math.round(Number(epochs) / 6)),
       })
     }
   }
@@ -153,7 +153,7 @@ const DAORecord = ({
       </div>
       <div className={styles.secondaryInfo}>
         <span>{`APC: ~${apc}%`}</span>
-        <span>{uniformTimeFormatter(+timestamp)}</span>
+        <span>{t('nervos-dao.deposit-at', { time: uniformTimeFormatter(+timestamp) })}</span>
         <span>{metaInfo}</span>
       </div>
     </div>
