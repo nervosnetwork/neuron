@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Route, RouteComponentProps, Switch, Redirect } from 'react-router-dom'
+import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState } from 'states/stateProvider'
@@ -157,8 +157,7 @@ const MainContent = ({
   })
 
   return (
-    <Switch>
-      <Redirect from={Routes.SettingsGeneral} to={Routes.SettingsWallets} />
+    <>
       {mainContents.map(container => (
         <Route
           exact={container.exact}
@@ -169,7 +168,7 @@ const MainContent = ({
           }}
         />
       ))}
-    </Switch>
+    </>
   )
 }
 
