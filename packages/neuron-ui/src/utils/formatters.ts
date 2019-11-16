@@ -179,14 +179,14 @@ export const failureResToNotification = (res: any): State.Message => {
 
 export const difficultyFormatter = (value: bigint) => {
   const units = new Map([
-    ['YH/s', 1e24],
-    ['ZH/s', 1e21],
-    ['EH/s', 1e18],
-    ['PH/s', 1e15],
-    ['TH/s', 1e12],
-    ['GH/s', 1e9],
-    ['MH/s', 1e6],
-    ['KH/s', 1e3],
+    ['YH', 1e24],
+    ['ZH', 1e21],
+    ['EH', 1e18],
+    ['PH', 1e15],
+    ['TH', 1e12],
+    ['GH', 1e9],
+    ['MH', 1e6],
+    ['KH', 1e3],
   ])
 
   /* eslint-disable no-restricted-syntax */
@@ -199,7 +199,7 @@ export const difficultyFormatter = (value: bigint) => {
   }
   /* eslint-enable no-restricted-syntax */
 
-  return `${localNumberFormatter(value)} H/s`
+  return `${localNumberFormatter(value)} H`
 }
 
 export default {
