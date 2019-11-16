@@ -142,13 +142,17 @@ export default class NetworksService extends Store {
       const chain = await core.rpc
         .getBlockchainInfo()
         .then(info => info.chain)
-        .catch(() => 'ckb_dev')
-      network.chain = chain
+        .catch(() => '')
+      if (chain !== '') {
+        network.chain = chain
+      }
 
       const genesisHash = await core.rpc
         .getBlockHash('0x0')
         .catch(() => EMPTY_GENESIS_HASH)
-      network.genesisHash = genesisHash
+      if (genesisHash !== EMPTY_GENESIS_HASH) {
+        network.genesisHash = genesisHash
+      }
     }
 
     this.updateAll(list)
