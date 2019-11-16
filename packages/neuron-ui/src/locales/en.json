@@ -178,7 +178,7 @@
         "network": "Network"
       },
       "general": {
-        "skip-data-and-type": "Skip the Cells which contain Data or Type Script",
+        "clear-cache": "Clear cache",
         "show": "Show",
         "hide": "Hide"
       },

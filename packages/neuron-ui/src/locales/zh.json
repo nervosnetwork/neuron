@@ -178,7 +178,7 @@
         "network": "网络"
       },
       "general": {
-        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cells",
+        "clear-cache": "清空缓存",
         "show": "显示",
         "hide": "隐藏"
       },
