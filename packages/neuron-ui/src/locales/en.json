@@ -257,6 +257,7 @@
       "delete-wallet-successfully": "The wallet was deleted",
       "create-network-successfully": "The network was created",
       "update-network-successfully": "The network was updated",
+      "clear-cache-successfully": "The cache was cleared",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",

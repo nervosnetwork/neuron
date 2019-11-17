@@ -257,6 +257,7 @@
       "delete-wallet-successfully": "已删除钱包",
       "create-network-successfully": "已添加新节点",
       "update-network-successfully": "已更新节点信息",
+      "clear-cache-successfully": "已清空数据缓存",
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",

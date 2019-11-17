@@ -60,6 +60,7 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
     })
 }
 
+// text: an i18n key under `messages`
 export const addPopup = (text: string) => (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.PopIn,

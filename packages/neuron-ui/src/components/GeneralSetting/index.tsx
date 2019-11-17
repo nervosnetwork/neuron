@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, Spinner } from 'office-ui-fabric-react'
-import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { addPopup } from 'states/stateProvider/actionCreators'
 import { clearCellCache } from 'services/remote'
 
 const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
@@ -9,24 +10,13 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
   const [clearing, setClearing] = useState(false)
 
   const clearCache = useCallback(() => {
-    // TODO: real clear action
     setClearing(true)
     setTimeout(() => {
-      clearCellCache()
-        .catch(err => {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: err.message,
-            },
-          })
-        })
-        .finally(() => {
-          setClearing(false)
-        })
-    }, 1000)
+      clearCellCache().finally(() => {
+        addPopup('clear-cache-successfully')(dispatch)
+        setClearing(false)
+      })
+    }, 100)
   }, [dispatch])
 
   return (
