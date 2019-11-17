@@ -745,6 +745,34 @@ export default class WalletService {
     }
   }
 
+  public generateDepositAllTx = async (
+    walletID: string = '',
+    fee: string = '0',
+    feeRate: string = '0',
+  ): Promise<TransactionWithoutHash> => {
+    const wallet = this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+
+    const address = AddressesService.nextUnusedAddress(walletID)
+
+    const tx = await TransactionGenerator.generateDepositAllTx(
+      lockHashes,
+      address!.address,
+      fee,
+      feeRate,
+    )
+
+    return tx
+  }
+
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
 
     const result = await (core.rpc as any).calculateDaoMaximumWithdraw(
