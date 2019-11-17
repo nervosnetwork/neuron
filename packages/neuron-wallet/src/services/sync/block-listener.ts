@@ -50,7 +50,7 @@ export default class BlockListener {
   // start listening
   public start = async (restart: boolean = false) => {
     if (restart) {
-      await this.currentBlockNumber.updateCurrent(BigInt(0))
+      await this.currentBlockNumber.updateCurrent(BigInt(-1))
     }
 
     try {
