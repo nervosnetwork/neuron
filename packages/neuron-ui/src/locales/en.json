@@ -178,7 +178,8 @@
         "network": "Network"
       },
       "general": {
-        "skip-data-and-type": "Skip the Cells which contain Data or Type Script",
+        "clear-cache": "Clear cache",
+        "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide"
       },
@@ -257,6 +258,7 @@
       "delete-wallet-successfully": "The wallet was deleted",
       "create-network-successfully": "The network was created",
       "update-network-successfully": "The network was updated",
+      "clear-cache-successfully": "The cache was cleared",
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",

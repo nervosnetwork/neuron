@@ -74,10 +74,17 @@ const loadURL = `file://${path.join(__dirname, 'index.html')}`
 
 export { networkSwitchSubject }
 
+let syncBlockBackgroundWindow: BrowserWindow | null
+
 // create a background task to sync transactions
 // this task is a renderer process
-const createSyncBlockTask = () => {
-  let syncBlockBackgroundWindow: BrowserWindow | null = new BrowserWindow({
+export const createSyncBlockTask = () => {
+  if (syncBlockBackgroundWindow) {
+    return
+  }
+
+  console.info('Start sync block background process')
+  syncBlockBackgroundWindow = new BrowserWindow({
     width: 1366,
     height: 768,
     show: false,
@@ -85,8 +92,6 @@ const createSyncBlockTask = () => {
       nodeIntegration: true,
     },
   })
-
-  syncBlockBackgroundWindow.loadURL(loadURL)
 
   syncBlockBackgroundWindow.on('ready-to-show', async () => {
     if (env.isDevMode && process.env.DEV_SYNC_TASK) {
@@ -100,7 +105,15 @@ const createSyncBlockTask = () => {
     syncBlockBackgroundWindow = null
   })
 
+  syncBlockBackgroundWindow.loadURL(loadURL)
+
   return syncBlockBackgroundWindow
 }
 
-export default createSyncBlockTask
+export const killSyncBlockTask = async () => {
+  if (syncBlockBackgroundWindow) {
+    console.info('Kill sync block background process')
+    // TODO: kill block number listener
+    syncBlockBackgroundWindow.close()
+  }
+}

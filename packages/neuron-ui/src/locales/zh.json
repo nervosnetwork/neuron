@@ -178,7 +178,8 @@
         "network": "网络"
       },
       "general": {
-        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cells",
+        "clear-cache": "清空缓存",
+        "clear-cache-description": "当数据同步或显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "show": "显示",
         "hide": "隐藏"
       },
@@ -257,6 +258,7 @@
       "delete-wallet-successfully": "已删除钱包",
       "create-network-successfully": "已添加新节点",
       "update-network-successfully": "已更新节点信息",
+      "clear-cache-successfully": "已清空数据缓存",
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
