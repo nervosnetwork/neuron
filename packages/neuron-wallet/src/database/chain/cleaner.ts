@@ -13,7 +13,7 @@ export default class ChainCleaner {
         return
       }
 
-      for (const file of files.filter(f => { return f.endsWith('sqlite') })) {
+      for (const file of files.filter(f => { return path.extname(f) === '.sqlite' })) {
         fs.unlink(path.join(folder, file), () => {})
       }
     })
