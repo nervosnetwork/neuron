@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, Spinner } from 'office-ui-fabric-react'
+import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
+import { clearCellCache } from 'services/remote'
 
-const GeneralSetting = () => {
+const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
   const [clearing, setClearing] = useState(false)
 
@@ -10,19 +12,37 @@ const GeneralSetting = () => {
     // TODO: real clear action
     setClearing(true)
     setTimeout(() => {
-      setClearing(false)
-    }, 2000)
-  }, [])
+      clearCellCache()
+        .catch(err => {
+          dispatch({
+            type: AppActions.AddNotification,
+            payload: {
+              type: 'alert',
+              timestamp: +new Date(),
+              content: err.message,
+            },
+          })
+        })
+        .finally(() => {
+          setClearing(false)
+        })
+    }, 1000)
+  }, [dispatch])
 
   return (
     <Stack tokens={{ childrenGap: 15 }} horizontal horizontalAlign="start">
       <PrimaryButton
-        text={t('settings.general.clear-cache')}
         onClick={clearCache}
         disabled={clearing}
         ariaDescription="Create new network configuration"
-      />
-      {clearing ? <Spinner /> : null}
+        styles={{
+          root: {
+            minWidth: 150,
+          },
+        }}
+      >
+        {clearing ? <Spinner /> : t('settings.general.clear-cache')}
+      </PrimaryButton>
     </Stack>
   )
 }

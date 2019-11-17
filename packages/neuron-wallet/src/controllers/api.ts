@@ -297,4 +297,10 @@ export default class ApiController {
   ) {
     return DaoController.getDaoCells(params)
   }
+  
+  // settings
+  @MapApiResponse
+  public static async clearCellCache () {
+    return Promise.resolve()
+  }
 }
