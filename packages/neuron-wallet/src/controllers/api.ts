@@ -4,7 +4,7 @@ import env from 'env'
 import i18n from 'utils/i18n'
 import { popContextMenu } from './app/menu'
 import { showWindow } from './app/show-window'
-import { TransactionsController, WalletsController, SyncInfoController, NetworksController } from 'controllers'
+import { TransactionsController, WalletsController, SyncController, NetworksController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
@@ -40,7 +40,7 @@ export default class ApiController {
       networksService.getCurrentID(),
       networksService.getAll(),
 
-      SyncInfoController.currentBlockNumber()
+      SyncController.currentBlockNumber()
         .then(res => {
           if (res.status) {
             return res.result.currentBlockNumber
@@ -297,10 +297,12 @@ export default class ApiController {
   ) {
     return DaoController.getDaoCells(params)
   }
-  
+
   // settings
   @MapApiResponse
-  public static async clearCellCache () {
-    return Promise.resolve()
+  public static async clearCellCache() {
+    await SyncController.stopSyncing()
+    // TODO: remove cache
+    return SyncController.startSyncing()
   }
 }

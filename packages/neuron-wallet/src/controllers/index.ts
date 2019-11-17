@@ -2,7 +2,7 @@ import AppController from './app'
 import NetworksController from './networks'
 import WalletsController from './wallets'
 import TransactionsController from './transactions'
-import SyncInfoController from './sync-info'
+import SyncController from './sync'
 import UpdateController from './update'
 
 import ApiController from './api'
@@ -12,7 +12,7 @@ export {
   NetworksController,
   WalletsController,
   TransactionsController,
-  SyncInfoController,
+  SyncController,
   UpdateController,
   ApiController,
 }

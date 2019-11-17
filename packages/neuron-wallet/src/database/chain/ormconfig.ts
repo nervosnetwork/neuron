@@ -22,9 +22,9 @@ import { AddInputIndexToInput1573461100330 } from './migrations/1573461100330-Ad
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
-const dbPath = (networkName: string): string => {
-  const name = `cell-${networkName}.sqlite`
-  return path.join(env.fileBasePath, 'cells', name)
+const dbPath = (name: string): string => {
+  const filename = `cell-${name}.sqlite`
+  return path.join(env.fileBasePath, 'cells', filename)
 }
 
 const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
