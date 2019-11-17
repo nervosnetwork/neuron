@@ -113,6 +113,7 @@ export const createSyncBlockTask = () => {
 export const killSyncBlockTask = async () => {
   if (syncBlockBackgroundWindow) {
     console.info('Kill sync block background process')
+    // TODO: kill block number listener
     syncBlockBackgroundWindow.close()
   }
 }

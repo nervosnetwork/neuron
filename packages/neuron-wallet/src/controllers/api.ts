@@ -302,7 +302,7 @@ export default class ApiController {
   @MapApiResponse
   public static async clearCellCache() {
     await SyncController.stopSyncing()
-    // TODO: remove cache
+    await SyncController.deleteData()
     return SyncController.startSyncing()
   }
 }
