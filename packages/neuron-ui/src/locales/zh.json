@@ -179,6 +179,7 @@
       },
       "general": {
         "clear-cache": "清空缓存",
+        "clear-cache-description": "当数据同步或显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "show": "显示",
         "hide": "隐藏"
       },

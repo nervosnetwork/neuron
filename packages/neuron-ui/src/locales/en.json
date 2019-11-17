@@ -179,6 +179,7 @@
       },
       "general": {
         "clear-cache": "Clear cache",
+        "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide"
       },
