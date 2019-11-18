@@ -177,8 +177,12 @@ export default class AddressDao {
     })[0]
   }
 
-  public static updateDescription(walletId: string, address: string, description: string): Address | undefined {
-    const item = AddressDao.findByAddress(address, walletId)
+  public static updateDescription(walletId: string, address: string, version: AddressVersion, description: string): Address | undefined {
+    const item = AddressStore.getAll().find(value => {
+      return value.walletId === walletId
+        && value.address === address
+        && value.version === version
+    })
     if (!item) {
       return undefined
     }
@@ -243,7 +247,9 @@ class AddressStore {
   static update(address: Address): Address {
     const all = AddressStore.getAll()
     const exist = all.findIndex(value => {
-      return value.walletId === address.walletId && value.address === address.address
+      return value.walletId === address.walletId
+        && value.address === address.address
+        && value.version === address.version
     })
     if (exist !== -1) {
       all[exist] = address

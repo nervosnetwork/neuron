@@ -139,12 +139,6 @@ describe('Key tests with db', () => {
     expect(all.length).toEqual((2 + 1) * 2 * 2)
   })
 
-  it('isAddressUsed', () => {
-    AddressDao.create([address, usedAddress])
-    const used = AddressService.isAddressUsed(address.address, walletId)
-    expect(used).toBe(true)
-  })
-
   it('nextUnusedAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
     const addr = AddressService.nextUnusedAddress(walletId)
