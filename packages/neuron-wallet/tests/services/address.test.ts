@@ -54,7 +54,7 @@ describe('Key tests with db', () => {
     pendingBalance: '0',
     balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    version: NetworksService.getInstance().isMainnet ? AddressVersion.Mainnet : AddressVersion.Testnet,
+    version: NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet,
   }
 
   const usedAddress: Address = {
@@ -69,7 +69,7 @@ describe('Key tests with db', () => {
     pendingBalance: '0',
     balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    version: NetworksService.getInstance().isMainnet ? AddressVersion.Mainnet : AddressVersion.Testnet,
+    version: NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet,
   }
 
   const changeAddress: Address = {
@@ -84,7 +84,7 @@ describe('Key tests with db', () => {
     pendingBalance: '0',
     balance: '0',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    version: NetworksService.getInstance().isMainnet ? AddressVersion.Mainnet : AddressVersion.Testnet,
+    version: NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet,
   }
 
   beforeEach(() => {
@@ -142,14 +142,14 @@ describe('Key tests with db', () => {
   it('nextUnusedAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
     const addr = AddressService.nextUnusedAddress(walletId)
-    const addrDao = AddressDao.nextUnusedAddress(walletId, NetworksService.getInstance().isMainnet ? AddressVersion.Mainnet : AddressVersion.Testnet)
+    const addrDao = AddressDao.nextUnusedAddress(walletId, NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet)
     expect(addr).toEqual(addrDao)
   })
 
   it('nextUnusedChangeAddress', () => {
     AddressDao.create([address, usedAddress, changeAddress])
     const addr = AddressService.nextUnusedChangeAddress(walletId)
-    const addrDao = AddressDao.nextUnusedChangeAddress(walletId, NetworksService.getInstance().isMainnet ? AddressVersion.Mainnet : AddressVersion.Testnet)
+    const addrDao = AddressDao.nextUnusedChangeAddress(walletId, NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet)
     expect(addr).toEqual(addrDao)
   })
 

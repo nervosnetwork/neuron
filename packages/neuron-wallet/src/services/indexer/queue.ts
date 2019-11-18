@@ -215,7 +215,7 @@ export default class IndexerQueue {
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
             const address = LockUtils.lockScriptToAddress(
               transaction.outputs![parseInt(txPoint.index, 16)].lock,
-              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+              NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
             AddressesUsedSubject.getSubject().next({
               addresses: [address],
@@ -280,7 +280,7 @@ export default class IndexerQueue {
           if (type === TxPointType.CreatedBy) {
             address = LockUtils.lockScriptToAddress(
               transaction.outputs![parseInt(txPoint.index, 16)].lock,
-              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+              NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
             this.latestCreatedBy.push(txUniqueFlag)
           } else if (type === TxPointType.ConsumedBy) {
@@ -289,7 +289,7 @@ export default class IndexerQueue {
             if (output) {
               address = LockUtils.lockScriptToAddress(
                 output.lock,
-                NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+                NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
               )
             }
           }
