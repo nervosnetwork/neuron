@@ -87,7 +87,7 @@ export default class IndexerQueue {
       try {
         this.inProcess = true
         if (this.resetFlag) {
-          await this.blockNumberService.updateCurrent(BigInt(0))
+          await this.blockNumberService.updateCurrent(BigInt(-1))
           this.resetFlag = false
         }
         const { lockHashInfos } = this
