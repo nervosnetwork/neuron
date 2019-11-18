@@ -241,7 +241,9 @@
       "toggle": {
         "on": "On",
         "off": "Off"
-      }
+      },
+      "copy-tx-hash": "Copy transaction hash",
+      "copy-address": "Copy address"
     },
     "notification-panel": {
       "title": "Notifications"

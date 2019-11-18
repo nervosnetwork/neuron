@@ -2,7 +2,14 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, DetailsList, Text, CheckboxVisibility, IColumn, Icon } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'services/localCache'
-import { getTransaction, showErrorMessage, getAllNetworks, getCurrentNetworkID, openExternal } from 'services/remote'
+import {
+  getTransaction,
+  showErrorMessage,
+  getAllNetworks,
+  getCurrentNetworkID,
+  openExternal,
+  openContextMenu,
+} from 'services/remote'
 import { ckbCore } from 'services/chain'
 
 import { transactionState } from 'states/initStates/chain'
@@ -111,7 +118,7 @@ const Transaction = () => {
           name: t('transaction.index'),
           minWidth: 60,
           maxWidth: 60,
-          onRender: (item?: any | State.DetailedOutput) => {
+          onRender: (item?: State.DetailedOutput) => {
             if (item) {
               return item.outPoint.index
             }
@@ -216,7 +223,7 @@ const Transaction = () => {
         return
       }
       getTransaction({ hash, walletID: currentWallet.id })
-        .then((res: any) => {
+        .then(res => {
           if (res.status) {
             setTransaction(res.result)
           } else {
@@ -270,6 +277,75 @@ const Transaction = () => {
     [t, transaction]
   )
 
+  const onBasicInfoContextMenu = useCallback(
+    (property: { label: string; value: string }, index?: number) => {
+      if (index === 0 && property && property.value) {
+        const menuTemplate = [
+          {
+            label: t('common.copy-tx-hash'),
+            click: () => {
+              window.clipboard.writeText(property.value)
+            },
+          },
+        ]
+        openContextMenu(menuTemplate)
+      }
+    },
+    [t]
+  )
+
+  const onInputContextMenu = useCallback(
+    (input?: State.DetailedInput) => {
+      if (input && input.lock && input.lock.args) {
+        try {
+          const address = ckbCore.utils.bech32Address(input.lock.args, {
+            prefix: addressPrefix,
+            type: ckbCore.utils.AddressType.HashIdx,
+            codeHashOrCodeHashIndex: '0x00',
+          })
+          const menuTemplate = [
+            {
+              label: t('common.copy-address'),
+              click: () => {
+                window.clipboard.writeText(address)
+              },
+            },
+          ]
+          openContextMenu(menuTemplate)
+        } catch (err) {
+          console.error(err)
+        }
+      }
+    },
+    [addressPrefix, t]
+  )
+
+  const onOutputContextMenu = useCallback(
+    (output?: State.DetailedOutput) => {
+      if (output && output.lock && output.lock.args) {
+        try {
+          const address = ckbCore.utils.bech32Address(output.lock.args, {
+            prefix: addressPrefix,
+            type: ckbCore.utils.AddressType.HashIdx,
+            codeHashOrCodeHashIndex: '0x00',
+          })
+          const menuTemplate = [
+            {
+              label: t('common.copy-address'),
+              click: () => {
+                window.clipboard.writeText(address)
+              },
+            },
+          ]
+          openContextMenu(menuTemplate)
+        } catch (err) {
+          console.error(err)
+        }
+      }
+    },
+    [addressPrefix, t]
+  )
+
   if (error.code) {
     return (
       <Stack verticalFill verticalAlign="center" horizontalAlign="center">
@@ -290,6 +366,7 @@ const Transaction = () => {
           checkboxVisibility={CheckboxVisibility.hidden}
           compact
           isHeaderVisible={false}
+          onItemContextMenu={onBasicInfoContextMenu}
         />
       </Stack>
       <Stack tokens={{ childrenGap: 15 }} verticalFill>
@@ -303,6 +380,7 @@ const Transaction = () => {
             items={transaction.inputs}
             columns={inputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
+            onItemContextMenu={onInputContextMenu}
             compact
             isHeaderVisible
           />
@@ -317,6 +395,7 @@ const Transaction = () => {
             items={transaction.outputs}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
+            onItemContextMenu={onOutputContextMenu}
             compact
             isHeaderVisible
           />

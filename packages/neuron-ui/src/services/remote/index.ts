@@ -81,6 +81,16 @@ export const openExternal = (url: string) => {
   }
 }
 
+export const openContextMenu = (template: { label: string; click: Function }[]): void => {
+  if (!window.remote) {
+    window.alert(REMOTE_MODULE_NOT_FOUND)
+  } else {
+    const { Menu } = window.remote.require('electron')
+    const menu = Menu.buildFromTemplate(template)
+    menu.popup()
+  }
+}
+
 export default {
   getLocale,
   validateMnemonic,
@@ -90,4 +100,5 @@ export default {
   showOpenDialog,
   getWinID,
   openExternal,
+  openContextMenu,
 }
