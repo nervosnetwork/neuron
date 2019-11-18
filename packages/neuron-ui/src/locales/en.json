@@ -243,7 +243,7 @@
         "off": "Off"
       },
       "copy-tx-hash": "Copy Transaction Hash",
-      "copy-address": "Copy address"
+      "copy-address": "Copy Address"
     },
     "notification-panel": {
       "title": "Notifications"
