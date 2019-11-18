@@ -1,3 +1,29 @@
+## [0.25.1](https://github.com/nervosnetwork/neuron/compare/v0.25.0...v0.25.1) (2019-11-18)
+
+
+### Bug Fixes
+
+* Genesis block should be scanned when next scan range ([6947864](https://github.com/nervosnetwork/neuron/commit/6947864)), closes [#1](https://github.com/nervosnetwork/neuron/issues/1)
+* set restart start number to -1 ([06b030e](https://github.com/nervosnetwork/neuron/commit/06b030e))
+* sync when start node ([219d99c](https://github.com/nervosnetwork/neuron/commit/219d99c))
+* **neuron-ui:** remove /s from difficulty units ([2a45e63](https://github.com/nervosnetwork/neuron/commit/2a45e63))
+
+
+### Features
+
+* Add a clear cache button on general settings view ([429be9c](https://github.com/nervosnetwork/neuron/commit/429be9c))
+* Add description for clear cache feature ([38aa4c4](https://github.com/nervosnetwork/neuron/commit/38aa4c4))
+* Delete cell db files when clearing cache ([83ff29d](https://github.com/nervosnetwork/neuron/commit/83ff29d))
+* Do not update network info too often ([819793a](https://github.com/nervosnetwork/neuron/commit/819793a))
+* Only update network's genesis hash and chain when they're actually fetched from RPC and valid ([507131b](https://github.com/nervosnetwork/neuron/commit/507131b))
+* Show popup message when clearing cache finishes ([7dfe670](https://github.com/nervosnetwork/neuron/commit/7dfe670))
+* start/stop syncing with sync controller ([afde49d](https://github.com/nervosnetwork/neuron/commit/afde49d))
+* **neuron-ui:** add clear cache button on the general settings ([7419d37](https://github.com/nervosnetwork/neuron/commit/7419d37))
+* **neuron-ui:** update the i18n texts of nervos dao. ([b445a0c](https://github.com/nervosnetwork/neuron/commit/b445a0c))
+* **neuron-ui:** update the pagination style ([646cf8f](https://github.com/nervosnetwork/neuron/commit/646cf8f))
+
+
+
 # [0.25.0](https://github.com/nervosnetwork/neuron/compare/v0.24.5...v0.25.0) (2019-11-16)
 
 
