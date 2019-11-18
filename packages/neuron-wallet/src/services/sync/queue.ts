@@ -57,7 +57,12 @@ export default class Queue {
         this.inProcess = true
 
         if (this.lockHashes.length !== 0) {
-          const current: bigint = await this.currentBlockNumber.getCurrent()
+          let current: bigint = await this.currentBlockNumber.getCurrent()
+          if (current === BigInt(0)) {
+            // If it scans from genesis block but current block number was already set to 0,
+            // set it to -1 to make sure `startNumber` would be set to 0.
+            current = BigInt(-1)
+          }
           const startNumber: bigint = current + BigInt(1)
           const endNumber: bigint = current + BigInt(this.fetchSize)
           const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
