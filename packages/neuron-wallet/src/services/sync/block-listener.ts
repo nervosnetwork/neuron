@@ -50,7 +50,7 @@ export default class BlockListener {
   // start listening
   public start = async (restart: boolean = false) => {
     if (restart) {
-      await this.currentBlockNumber.updateCurrent(BigInt(0))
+      await this.currentBlockNumber.updateCurrent(BigInt(-1))
     }
 
     try {
@@ -123,7 +123,9 @@ export default class BlockListener {
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
     if (this.queue) {
-      this.queue.resetEndBlockNumber(endBlockNumber)
+      if (this.tipBlockNumber > BigInt(0)) {
+        this.queue.resetEndBlockNumber(endBlockNumber)
+      }
     } else {
       const startBlockNumber: string = await this.getStartBlockNumber()
       this.queue = new Queue(

@@ -28,6 +28,12 @@ export class InitDatabase {
 
   private killed: boolean = false
 
+  private usingPrevious: boolean = false
+
+  public isUsingPrevious = (): boolean => {
+    return this.usingPrevious
+  }
+
   public init = async (network: NetworkWithID) => {
     if (InitDatabase.previous) {
       await InitDatabase.previous.stopAndWait()
@@ -39,6 +45,7 @@ export class InitDatabase {
     let chain: string = ''
     while (!this.stopped && !this.success) {
       try {
+        this.usingPrevious = false
         hash = await genesisBlockHash(network.remote)
         await initConnection(hash)
         chain = await getChain(network.remote)
@@ -68,6 +75,7 @@ export class InitDatabase {
           DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
           hash = metaInfo.genesisBlockHash
           this.success = true
+          this.usingPrevious = true
         } catch (error) {
           logger.error('get cached meta info error:', err)
           Utils.sleep(5000)

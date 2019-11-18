@@ -26,17 +26,11 @@ describe(`Unit tests of networks service`, () => {
 
   let service: NetworksService = new NetworksService()
 
-  beforeEach(done => {
+  beforeEach(() => {
     service = new NetworksService()
-    setTimeout(() => {
-      done()
-    }, 1000)
   })
-  afterEach(done => {
+  afterEach(() => {
     service.clear()
-    setTimeout(() => {
-      done()
-    }, 1000)
   })
 
   describe(`success cases`, () => {
@@ -132,7 +126,7 @@ describe(`Unit tests of networks service`, () => {
       expect(currentID).toBe('mainnet')
     })
 
-    it(`reset the netowrks`, async () => {
+    it(`reset the networks`, async () => {
       await service.create(newNetwork.name, newNetwork.remote)
       const newNetworkList = service.getAll()
       expect(newNetworkList.length).toBe(2)

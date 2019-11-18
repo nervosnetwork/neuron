@@ -36,7 +36,7 @@ export default class CheckTx {
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(
         output.lock,
-        NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+        NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
       )
     })
 
@@ -93,7 +93,7 @@ export default class CheckTx {
           addresses.push(
             LockUtils.lockScriptToAddress(
               output.lock,
-              NetworksService.getInstance().isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+              NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
           )
         }

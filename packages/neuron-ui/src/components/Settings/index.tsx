@@ -13,7 +13,7 @@ import { WalletWizardPath } from 'components/WalletWizard'
 import { Routes } from 'utils/const'
 
 const pivotItems = [
-  // { label: 'settings.setting-tabs.general', url: Routes.SettingsGeneral },
+  { label: 'settings.setting-tabs.general', url: Routes.SettingsGeneral },
   { label: 'settings.setting-tabs.wallets', url: Routes.SettingsWallets },
   { label: 'settings.setting-tabs.network', url: Routes.SettingsNetworks },
 ]

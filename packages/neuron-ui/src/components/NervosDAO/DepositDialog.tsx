@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   Stack,
   Dialog,
@@ -7,13 +7,15 @@ import {
   Text,
   DefaultButton,
   PrimaryButton,
+  ActionButton,
   DialogType,
   DialogFooter,
   Spinner,
   SpinnerSize,
 } from 'office-ui-fabric-react'
-import { useTranslation } from 'react-i18next'
-import { SHANNON_CKB_RATIO } from 'utils/const'
+import { useTranslation, Trans } from 'react-i18next'
+import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
+import { openExternal } from 'services/remote'
 
 const DepositDialog = ({
   show,
@@ -28,6 +30,28 @@ const DepositDialog = ({
   errorMessage,
 }: any) => {
   const [t] = useTranslation()
+  const rfcLink = useMemo(
+    () => (
+      <ActionButton
+        styles={{
+          root: {
+            height: 20,
+            margin: 0,
+            padding: 0,
+            textDecoration: 'underline',
+            fontSize: 14,
+            color: 'rgb(0, 120, 212)',
+          },
+          label: {
+            margin: 0,
+          },
+        }}
+        onClick={() => openExternal(NERVOS_DAO_RFC_URL)}
+        ariaLabel="Nervos DAO RFC"
+      />
+    ),
+    []
+  )
   const maxValue = +(BigInt(balance) / BigInt(SHANNON_CKB_RATIO)).toString()
 
   if (!show) {
@@ -63,13 +87,9 @@ const DepositDialog = ({
             <Text as="h2" variant="large">
               {`${t('nervos-dao.notice')}:`}
             </Text>
-            {t('nervos-dao.deposit-terms')
-              .split('\n')
-              .map(term => (
-                <Text as="p" key={term}>
-                  {term}
-                </Text>
-              ))}
+            <Text as="p">
+              <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
+            </Text>
           </Stack>
           <DialogFooter>
             <DefaultButton onClick={onDismiss} text={t('nervos-dao.cancel')} />

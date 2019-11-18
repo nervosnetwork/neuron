@@ -178,7 +178,8 @@
         "network": "网络"
       },
       "general": {
-        "skip-data-and-type": "忽略包含 Data 或 Type Script 的 Cells",
+        "clear-cache": "清空缓存",
+        "clear-cache-description": "当数据同步或显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "show": "显示",
         "hide": "隐藏"
       },
@@ -257,6 +258,7 @@
       "delete-wallet-successfully": "已删除钱包",
       "create-network-successfully": "已添加新节点",
       "update-network-successfully": "已更新节点信息",
+      "clear-cache-successfully": "已清空数据缓存",
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
@@ -319,29 +321,26 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
-      "deposit-receipts": "存款凭证",
+      "deposit-records": "锁定记录",
       "apc": "年化锁定补贴率",
-      "deposit-at": "存入于{{time}}",
-      "claim": "取款",
-      "withdraw": "结算",
+      "deposit-at": "存入于 {{time}}",
       "fee": "手续费",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
       "notice": "注意",
       "cancel": "取消",
       "proceed": "继续",
-      "deposit-value": "存款",
       "compensation": "锁定补贴",
-      "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(~{{days}}天)完成最终取款。",
-      "deposit-terms": "存入 NervosDAO 的资产中需要 102 CKB 作为存款凭证的存储，这部分 CKB 是无法产生锁定补贴的。\nNervos DAO 是一个系统层面的去中心化底层设施。您在其中存款是十分安全的。\n根据 Nervos DAO 的协议, 您需要等待至少 180 个 epochs 才能取回您的存款。",
-      "deposited-action-label": "结算",
-      "withdrawing-action-label": "取款",
-      "minimal-fee-required": "存入金额应不少于 {{minimal}} CKB",
+      "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)完成最终取出操作。",
+      "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
+      "deposited-action-label": "申请取出",
+      "withdrawing-action-label": "取出",
+      "minimal-fee-required": "存入数量应不少于 {{minimal}} CKBytes",
       "compensation-accumulated": "已累计 {{blockNumber}} 个块的锁定补贴",
-      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(~{{days}} 天)",
-      "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个撤出周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)，存在交易拥堵无法上链从而导致只能在下一个撤出周期(约 {{days}} 天)撤出，且无法获得新增撤出周期期间补偿的可能。",
-      "insufficient-period-alert-title": "未达到要求周期",
-      "insufficient-period-alert-message": "Nervos DAO 要求您在至少 4 个 epochs 后执行此操作"
+      "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(约 {{days}} 天)",
+      "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
+      "insufficient-period-alert-title": "Header 引用无效",
+      "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期为 4 个 epochs)"
     }
   }
 }
