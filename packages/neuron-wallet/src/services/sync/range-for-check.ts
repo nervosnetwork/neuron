@@ -73,6 +73,11 @@ export default class RangeForCheck {
     }
     const lastBlockHeader = this.range[this.range.length - 1]
     const firstBlockHeader = blockHeaders[0]
+    if (firstBlockHeader.number === '0') {
+      return {
+        success: true,
+      }
+    }
     if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
       return {
         success: false,
