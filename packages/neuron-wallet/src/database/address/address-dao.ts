@@ -154,12 +154,6 @@ export default class AddressDao {
     })
   }
 
-  public static findByAddress(address: string, walletId: string): Address | undefined {
-    return AddressStore.getAll().find(value => {
-      return value.address === address && value.walletId == walletId
-    })
-  }
-
   public static findByAddresses(addresses: string[]): Address[] {
     return AddressStore.getAll().filter(value => {
       return addresses.includes(value.address)

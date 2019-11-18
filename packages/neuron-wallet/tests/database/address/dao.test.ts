@@ -143,14 +143,6 @@ describe('Address Dao tests', () => {
     expect(walletTwo.length).toEqual(1)
   })
 
-  it('findByAddress', () => {
-    AddressDao.create([address, usedAddress])
-
-    const one = AddressDao.findByAddress(address.address, address.walletId)
-
-    expect(one!.address).toEqual(address.address)
-  })
-
   it('unusedAddressesCount', () => {
     AddressDao.create([address, changeAddress])
 
