@@ -212,7 +212,7 @@ export default class AddressService {
   }
 
   public static updateDescription = (walletId: string, address: string, description: string): AddressInterface | undefined => {
-    return AddressDao.updateDescription(walletId, address, AddressService.getAddressVersion(), description)
+    return AddressDao.updateDescription(walletId, address, description)
   }
 
   public static deleteByWalletId = (walletId: string): AddressInterface[] => {
