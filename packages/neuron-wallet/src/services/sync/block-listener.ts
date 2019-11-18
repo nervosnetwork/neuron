@@ -123,7 +123,9 @@ export default class BlockListener {
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
     if (this.queue) {
-      this.queue.resetEndBlockNumber(endBlockNumber)
+      if (this.tipBlockNumber > BigInt(0)) {
+        this.queue.resetEndBlockNumber(endBlockNumber)
+      }
     } else {
       const startBlockNumber: string = await this.getStartBlockNumber()
       this.queue = new Queue(
