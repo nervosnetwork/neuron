@@ -154,12 +154,6 @@ export default class AddressDao {
     })
   }
 
-  public static findByAddress(address: string, walletId: string): Address | undefined {
-    return AddressStore.getAll().find(value => {
-      return value.address === address && value.walletId == walletId
-    })
-  }
-
   public static findByAddresses(addresses: string[]): Address[] {
     return AddressStore.getAll().filter(value => {
       return addresses.includes(value.address)
@@ -178,7 +172,10 @@ export default class AddressDao {
   }
 
   public static updateDescription(walletId: string, address: string, description: string): Address | undefined {
-    const item = AddressDao.findByAddress(address, walletId)
+    const item = AddressStore.getAll().find(value => {
+      return value.walletId === walletId
+        && value.address === address
+    })
     if (!item) {
       return undefined
     }

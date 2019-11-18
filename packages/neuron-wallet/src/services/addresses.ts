@@ -17,11 +17,6 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
-  public static isAddressUsed = (address: string, walletId: string): boolean => {
-    const addressEntity = AddressDao.findByAddress(address, walletId)
-    return !!addressEntity
-  }
-
   public static generateAndSave = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
@@ -52,9 +47,8 @@ export default class AddressService {
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
-    const version = AddressService.getAddressVersion()
     const addrs = addresses
-      .filter(addr => addr.version === version)
+      .filter(addr => addr.version ===  AddressService.getAddressVersion())
       .map(addr => {
         const address = addr
         address.isImporting = isImporting
@@ -190,9 +184,7 @@ export default class AddressService {
   }
 
   public static nextUnusedAddress = (walletId: string): AddressInterface | undefined => {
-    const version = AddressService.getAddressVersion()
-
-    const addressEntity = AddressDao.nextUnusedAddress(walletId, version)
+    const addressEntity = AddressDao.nextUnusedAddress(walletId,  AddressService.getAddressVersion())
     if (!addressEntity) {
       return undefined
     }
@@ -200,9 +192,7 @@ export default class AddressService {
   }
 
   public static nextUnusedChangeAddress = (walletId: string): AddressInterface | undefined => {
-    const version = AddressService.getAddressVersion()
-
-    const addressEntity = AddressDao.nextUnusedChangeAddress(walletId, version)
+    const addressEntity = AddressDao.nextUnusedChangeAddress(walletId,  AddressService.getAddressVersion())
     if (!addressEntity) {
       return undefined
     }
@@ -210,19 +200,15 @@ export default class AddressService {
   }
 
   public static allAddresses = (): AddressInterface[] => {
-    const version = AddressService.getAddressVersion()
-
-    return AddressDao.allAddresses(version)
+    return AddressDao.allAddresses( AddressService.getAddressVersion())
   }
 
   public static allAddressesByWalletId = (walletId: string): AddressInterface[] => {
-    const version = AddressService.getAddressVersion()
-    return AddressDao.allAddressesByWalletId(walletId, version)
+    return AddressDao.allAddressesByWalletId(walletId,  AddressService.getAddressVersion())
   }
 
   public static usedAddresses = (walletId: string): AddressInterface[] => {
-    const version = AddressService.getAddressVersion()
-    return AddressDao.usedAddressesByWalletId(walletId, version)
+    return AddressDao.usedAddressesByWalletId(walletId,  AddressService.getAddressVersion())
   }
 
   public static updateDescription = (walletId: string, address: string, description: string): AddressInterface | undefined => {
