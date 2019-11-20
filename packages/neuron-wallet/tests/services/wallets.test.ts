@@ -3,6 +3,7 @@ import Keystore from '../../src/models/keys/keystore'
 import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
+import Core from '@nervosnetwork/ckb-sdk-core'
 
 describe('wallet service', () => {
   let walletService: WalletService
@@ -164,14 +165,21 @@ describe('wallet service', () => {
 })
 
 describe('sign witness', () => {
-  const witness: string = ''
+  const witness = {
+    lock: undefined,
+    inputType: undefined,
+    outputType: undefined,
+  }
   const privateKey: string = '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3'
   const txHash = '0x00f5f31941964004d665a8762df8eb4fab53b5ef8437b7d34a38e018b1409054'
-  const expectedData = '0x5500000010000000550000005500000041000000aa6de884b0dd0378383cedddc39790b5cad66e42d5dc7655de728ee7eb3a53be071605d76641ad26766c6ed4864e67dbc2cd1526e006c9be7ccfa9b8cbf9e7c701'
+  const expectedData = ['0x5500000010000000550000005500000041000000aa6de884b0dd0378383cedddc39790b5cad66e42d5dc7655de728ee7eb3a53be071605d76641ad26766c6ed4864e67dbc2cd1526e006c9be7ccfa9b8cbf9e7c701']
 
   it('success', () => {
-    const wallet = new WalletService()
-    const newWitness = wallet.signWitness(witness, privateKey, txHash)
+    const core = new Core('')
+    const newWitness = core.signWitnesses(privateKey)({
+      witnesses: [witness],
+      transactionHash: txHash
+    })
     expect(newWitness).toEqual(expectedData)
   })
 })
