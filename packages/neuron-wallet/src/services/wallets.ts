@@ -764,26 +764,6 @@ export default class WalletService {
     return AddressService.nextUnusedChangeAddress(walletId)!.address
   }
 
-  public signWitness = (
-    lock: string | undefined,
-    privateKey: string,
-    txHash: string,
-    inputType: string | undefined = undefined,
-    outputType: string | undefined = undefined
-  ): string => {
-    const witnessArg: CKBComponents.WitnessArgs = {
-      lock,
-      inputType,
-      outputType,
-    }
-    const result = core.signWitnesses(privateKey)({
-      transactionHash: txHash,
-      witnesses: [witnessArg]
-    })
-
-    return result[0] as string
-  }
-
   // Derive all child private keys for specified BIP44 paths.
   public getPrivateKeys = (wallet: Wallet, paths: string[], password: string): PathAndPrivateKey[] => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
