@@ -321,56 +321,6 @@ export default class WalletsController {
     }
   }
 
-  public static async sendCapacity(params: {
-    id: string
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    password: string
-    fee: string
-    description?: string
-  }) {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    // set default feeRate
-    let feeRate = '0'
-    if (!params.fee || params.fee === '0') {
-      feeRate = '1000'
-    }
-
-    const isMainnet = NetworksService.getInstance().isMainnet()
-    params.items.forEach(item => {
-      if (isMainnet && !item.address.startsWith('ckb')) {
-        throw new MainnetAddressRequired(item.address)
-      }
-
-      if (!isMainnet && !item.address.startsWith('ckt')) {
-        throw new TestnetAddressRequired(item.address)
-      }
-
-      if (!this.verifyAddress(item.address)) {
-        throw new InvalidAddress(item.address)
-      }
-    })
-
-    const walletsService = WalletsService.getInstance()
-    const hash = await walletsService.sendCapacity(
-      params.walletID,
-      params.items,
-      params.password,
-      params.fee,
-      feeRate,
-      params.description
-    )
-    return {
-      status: ResponseCode.Success,
-      result: hash,
-    }
-  }
-
   public static async sendTx(params: {
     walletID: string
     tx: TransactionWithoutHash
@@ -380,6 +330,7 @@ export default class WalletsController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
+
     const walletsService = WalletsService.getInstance()
     const hash = await walletsService.sendTx(
       params.walletID,
@@ -405,6 +356,9 @@ export default class WalletsController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
+    const addresses: string[] = params.items.map(i => i.address)
+    WalletsController.checkAddresses(addresses)
+
     const walletsService = WalletsService.getInstance()
     const tx = await walletsService.generateTx(
       params.walletID,
@@ -520,6 +474,23 @@ export default class WalletsController {
         description,
       },
     }
+  }
+
+  private static checkAddresses = (addresses: string[]) => {
+    const isMainnet = NetworksService.getInstance().isMainnet()
+    addresses.forEach(address => {
+      if (isMainnet && !address.startsWith('ckb')) {
+        throw new MainnetAddressRequired(address)
+      }
+
+      if (!isMainnet && !address.startsWith('ckt')) {
+        throw new TestnetAddressRequired(address)
+      }
+
+      if (!WalletsController.verifyAddress(address)) {
+        throw new InvalidAddress(address)
+      }
+    })
   }
 
   private static verifyAddress = (address: string): boolean => {

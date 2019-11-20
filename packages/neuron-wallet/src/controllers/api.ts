@@ -159,21 +159,6 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async sendCapacity(params: {
-    id: string
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    password: string
-    fee: string
-    description?: string
-  }) {
-    return WalletsController.sendCapacity(params)
-  }
-
-  @MapApiResponse
   public static async sendTx(params: {
     walletID: string
     tx: TransactionWithoutHash
