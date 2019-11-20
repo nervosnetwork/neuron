@@ -34,7 +34,6 @@ const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
 const DEBOUNCE_TIME = 200
-const SECP_CYCLES = BigInt('1440000')
 
 export interface Wallet {
   id: string
@@ -749,24 +748,6 @@ export default class WalletService {
 
   public epochSince = (length: bigint, index: bigint, number: bigint) => {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
-  }
-
-  public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
-    const wallet = this.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
-    const addressInfos = this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
-
-    const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
-    const cycles = SECP_CYCLES * BigInt(inputs.length)
-
-    return cycles.toString()
   }
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"

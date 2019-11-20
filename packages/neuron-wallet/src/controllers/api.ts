@@ -213,11 +213,6 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async computeCycles(params: { walletID: string; capacities: string }) {
-    return WalletsController.computeCycles(params)
-  }
-
-  @MapApiResponse
   public static async updateAddressDescription(params: {
     walletID: string
     address: string

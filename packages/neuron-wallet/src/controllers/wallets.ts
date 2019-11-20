@@ -440,18 +440,6 @@ export default class WalletsController {
     }
   }
 
-  public static async computeCycles(params: { walletID: string; capacities: string }) {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    const walletsService = WalletsService.getInstance()
-    const cycles = await walletsService.computeCycles(params.walletID, params.capacities)
-    return {
-      status: ResponseCode.Success,
-      result: cycles,
-    }
-  }
-
   public static async updateAddressDescription({
     walletID,
     address,
