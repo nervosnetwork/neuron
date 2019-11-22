@@ -32,8 +32,8 @@ export interface DatabaseInitParams {
 const networkChange = async (network: NetworkWithID) => {
   await InitDatabase.getInstance().stopAndWait()
   // clean LockUtils info and DaoUtils info
-  LockUtils.cleanInfoWhenSwitchNetwork()
-  DaoUtils.cleanInfoWhenSwitchNetwork()
+  LockUtils.cleanInfo()
+  DaoUtils.cleanInfo()
   const info = await InitDatabase.getInstance().init(network)
 
   DataUpdateSubject.next({

@@ -45,7 +45,7 @@ export default class DaoUtils {
     return DaoUtils.daoScriptInfo
   }
 
-  static cleanInfoWhenSwitchNetwork(): void {
+  static cleanInfo(): void {
     DaoUtils.daoScriptInfo = undefined
   }
 

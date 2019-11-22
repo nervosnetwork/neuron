@@ -63,7 +63,7 @@ export default class LockUtils {
     return LockUtils.systemScriptInfo
   }
 
-  static cleanInfoWhenSwitchNetwork(): void {
+  static cleanInfo(): void {
     LockUtils.systemScriptInfo = undefined
   }
 

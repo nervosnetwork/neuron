@@ -26,8 +26,8 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
   }
 
   // clean LockUtils info and DaoUtils info
-  LockUtils.cleanInfoWhenSwitchNetwork()
-  DaoUtils.cleanInfoWhenSwitchNetwork()
+  LockUtils.cleanInfo()
+  DaoUtils.cleanInfo()
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
