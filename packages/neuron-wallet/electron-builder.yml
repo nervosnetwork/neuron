@@ -3,6 +3,7 @@ copyright: Copyright (C) 2019 Nervos Foundation.
 productName: Neuron
 
 asar: true
+asarUnpack: ["Resources/bin"]
 
 directories:
   buildResources: .
@@ -13,7 +14,7 @@ afterSign: scripts/notarize.js
 files:
   - from: "../.."
     to: "."
-    filter: ["!**/*", "ormconfig.json", "ormconfig-address.json"]
+    filter: ["!**/*", "ormconfig.json"]
   - package.json
   - dist
   - "!**/*.map"
@@ -46,6 +47,9 @@ win:
   verifyUpdateCodeSignature: false
   artifactName: "${productName}-v${version}-setup.${ext}"
   icon: assets/icons/icon.ico
+  files:
+    - from: "bin/win/ckb.exe"
+      to: "Resources/bin/ckb.exe"
   target:
     - target: nsis
       arch:
@@ -55,6 +59,9 @@ mac:
   artifactName: "${productName}-v${version}-${os}.${ext}"
   category: public.app-category.finance
   icon: assets/icons/icon.icns
+  files:
+    - from: "bin/mac/ckb"
+      to: "Resources/bin/ckb"
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
@@ -68,5 +75,8 @@ linux:
   artifactName: "${productName}-v${version}-${arch}.${ext}"
   category: Finance
   icon: assets/icons/
+  files:
+    - from: "bin/linux/ckb"
+      to: "Resources/bin/ckb"
   target:
     - AppImage

@@ -15,6 +15,9 @@ build
 dist
 pages
 release
+/packages/neuron-wallet/bin/mac/ckb
+/packages/neuron-wallet/bin/linux/ckb
+/packages/neuron-wallet/bin/win/ckb.exe
 
 # misc
 .DS_Store
