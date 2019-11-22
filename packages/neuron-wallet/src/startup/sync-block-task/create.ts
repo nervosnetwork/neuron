@@ -12,6 +12,8 @@ import logger from 'utils/logger'
 import NodeService from 'services/node'
 import NetworksService from 'services/networks'
 import { distinctUntilChanged } from 'rxjs/operators'
+import LockUtils from 'models/lock-utils'
+import DaoUtils from 'models/dao-utils'
 
 export { genesisBlockHash }
 
@@ -29,6 +31,9 @@ export interface DatabaseInitParams {
 // network switch or network connect
 const networkChange = async (network: NetworkWithID) => {
   await InitDatabase.getInstance().stopAndWait()
+  // clean LockUtils info and DaoUtils info
+  LockUtils.cleanInfoWhenSwitchNetwork()
+  DaoUtils.cleanInfoWhenSwitchNetwork()
   const info = await InitDatabase.getInstance().init(network)
 
   DataUpdateSubject.next({

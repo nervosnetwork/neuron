@@ -45,6 +45,10 @@ export default class DaoUtils {
     return DaoUtils.daoScriptInfo
   }
 
+  static cleanInfoWhenSwitchNetwork(): void {
+    DaoUtils.daoScriptInfo = undefined
+  }
+
   static setDaoScript(info: SystemScript) {
     DaoUtils.daoScriptInfo = info
     DaoUtils.previousURL = NodeService.getInstance().core.rpc.node.url

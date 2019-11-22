@@ -21,9 +21,11 @@ const subscribed = (target: any, propertyName: string) => {
   let value: any
   Object.defineProperty(target, propertyName, {
     get: () => value,
-    set: (info: { codeHash: string }) => {
-      SystemScriptSubject.next({ codeHash: info.codeHash })
+    set: (info: SystemScript | undefined) => {
       value = info
+      if (info) {
+        SystemScriptSubject.next({ codeHash: info.codeHash })
+      }
     },
   })
 }
@@ -73,6 +75,10 @@ export default class LockUtils {
     LockUtils.previousURL = nodeURL
 
     return LockUtils.systemScriptInfo
+  }
+
+  static cleanInfoWhenSwitchNetwork(): void {
+    LockUtils.systemScriptInfo = undefined
   }
 
   static setSystemScript(info: SystemScript) {
