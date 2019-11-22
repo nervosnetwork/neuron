@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Dialog, DialogFooter, DefaultButton, PrimaryButton, DialogType, Text } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import { ckbCore } from 'services/chain'
+import { calculateDaoMaximumWithdraw, getBlock } from 'services/chain'
 import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
 
@@ -26,8 +26,7 @@ const WithdrawDialog = ({
     if (!record) {
       return
     }
-    ckbCore.rpc
-      .getBlock(record.blockHash)
+    getBlock(record.blockHash)
       .then(b => {
         setDepositEpoch(b.header.epoch)
       })
@@ -40,14 +39,13 @@ const WithdrawDialog = ({
       return
     }
 
-    ;(ckbCore.rpc as any)
-      .calculateDaoMaximumWithdraw(
-        {
-          txHash: record.outPoint.txHash,
-          index: `0x${BigInt(record.outPoint.index).toString(16)}`,
-        },
-        tipBlockHash
-      )
+    calculateDaoMaximumWithdraw(
+      {
+        txHash: record.outPoint.txHash,
+        index: `0x${BigInt(record.outPoint.index).toString(16)}`,
+      },
+      tipBlockHash
+    )
       .then((res: string) => {
         setWithdrawValue(res)
       })

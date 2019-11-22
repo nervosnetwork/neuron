@@ -15,7 +15,7 @@ import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIG
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
-import { ckbCore, getHeaderByNumber } from 'services/chain'
+import { getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
 import DAORecord from 'components/CustomRows/DAORecordRow'
@@ -246,13 +246,13 @@ const NervosDAO = ({
         const formattedDepositOutPoint = depositOutPoint
           ? {
               txHash: depositOutPoint.txHash,
-              index: BigInt(depositOutPoint.index),
+              index: `0x${BigInt(depositOutPoint.index).toString(16)}`,
             }
           : {
               txHash: outPoint.txHash,
-              index: BigInt(outPoint.index),
+              index: `0x${BigInt(outPoint.index).toString(16)}`,
             }
-        return (ckbCore.rpc as any).calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash) as string
+        return calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
       })
     )
       .then(res => {
