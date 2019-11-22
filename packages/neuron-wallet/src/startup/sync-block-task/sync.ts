@@ -4,6 +4,7 @@ import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
 import { Address } from 'database/address/address-dao'
 import initConnection from 'database/chain/ormconfig'
+import DaoUtils from 'models/dao-utils'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -30,6 +31,10 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
   if (blockListener) {
     await blockListener.stopAndWait()
   }
+
+  // clean LockUtils info and DaoUtils info
+  LockUtils.cleanInfoWhenSwitchNetwork()
+  DaoUtils.cleanInfoWhenSwitchNetwork()
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
