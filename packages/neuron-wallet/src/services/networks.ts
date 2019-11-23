@@ -1,7 +1,6 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
-import { BehaviorSubject } from 'rxjs'
-import { LackOfDefaultNetwork, DefaultNetworkUnremovable } from 'exceptions/network'
+import { DefaultNetworkUnremovable, LackOfDefaultNetwork } from 'exceptions/network'
 
 import Store from 'models/store'
 
@@ -9,8 +8,21 @@ import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import { remote } from 'electron'
+import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 
-export const networkSwitchSubject = new BehaviorSubject<undefined | NetworkWithID>(undefined)
+const isRenderer = process && process.type === 'renderer'
+const networkSwitchSubject = isRenderer
+  ? remote.require('./models/subjects/network-switch-subject').default.getSubject()
+  : NetworkSwitchSubject.getSubject()
+
+const currentNetworkIDSubject = isRenderer
+  ? remote.require('./models/subjects/networks').default.CurrentNetworkIDSubject
+  : CurrentNetworkIDSubject
+
+const networkListSubject = isRenderer
+  ? remote.require('./models/subjects/networks').default.NetworkListSubject
+  : NetworkListSubject
 
 const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
   selected: 'mainnet',
@@ -40,7 +52,7 @@ export default class NetworksService extends Store {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
     const currentNetworkList = this.getAll()
-    NetworkListSubject.next({ currentNetworkList })
+    networkListSubject.next({ currentNetworkList })
 
     const currentNetwork = this.getCurrent()
     if (currentNetwork) {
@@ -48,12 +60,12 @@ export default class NetworksService extends Store {
         this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
       }
 
-      CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
+      currentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
       networkSwitchSubject.next(currentNetwork)
     }
 
     this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
-      NetworkListSubject.next({ currentNetworkList })
+      networkListSubject.next({ currentNetworkList })
 
       const currentID = this.getCurrentID()
       if (currentNetworkList.find(network => network.id === currentID)) {
@@ -72,7 +84,7 @@ export default class NetworksService extends Store {
       if (!currentNetwork) {
         throw new NetworkNotFound(currentNetworkID)
       }
-      CurrentNetworkIDSubject.next({ currentNetworkID })
+      currentNetworkIDSubject.next({ currentNetworkID })
       networkSwitchSubject.next(currentNetwork)
     })
   }
@@ -158,7 +170,7 @@ export default class NetworksService extends Store {
     this.updateAll(list)
 
     if (this.getCurrentID() === id) {
-      CurrentNetworkIDSubject.next({ currentNetworkID: id })
+      currentNetworkIDSubject.next({ currentNetworkID: id })
       networkSwitchSubject.next(network)
     }
   }
