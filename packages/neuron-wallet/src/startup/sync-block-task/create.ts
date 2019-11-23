@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { ReplaySubject } from 'rxjs'
 import path from 'path'
-import { networkSwitchSubject } from 'services/networks'
 import { NetworkWithID } from 'types/network'
 import env from 'env'
 import AddressService from 'services/addresses'
@@ -14,6 +13,7 @@ import NetworksService from 'services/networks'
 import { distinctUntilChanged } from 'rxjs/operators'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
+import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 
 export { genesisBlockHash }
 
@@ -55,7 +55,7 @@ const networkChange = async (network: NetworkWithID) => {
 
 export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
 
-networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
+NetworkSwitchSubject.getSubject().subscribe(async (network: NetworkWithID | undefined) => {
   if (network) {
     await networkChange(network)
   }
@@ -76,8 +76,6 @@ NodeService
   })
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
-
-export { networkSwitchSubject }
 
 let syncBlockBackgroundWindow: BrowserWindow | null
 
