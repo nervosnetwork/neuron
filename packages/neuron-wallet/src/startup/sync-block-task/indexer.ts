@@ -5,6 +5,7 @@ import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
 import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
+import DaoUtils from 'models/dao-utils'
 
 const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
 
@@ -23,6 +24,10 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
+
+  // clean LockUtils info and DaoUtils info
+  LockUtils.cleanInfo()
+  DaoUtils.cleanInfo()
 
   // disconnect old connection and connect to new database
   await initConnection(genesisBlockHash)
