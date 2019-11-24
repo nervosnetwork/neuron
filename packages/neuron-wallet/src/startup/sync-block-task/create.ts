@@ -96,7 +96,7 @@ export const createSyncBlockTask = () => {
     return
   }
 
-  console.info('Start sync block background process')
+  logger.info('Start sync block background process')
   syncBlockBackgroundWindow = new BrowserWindow({
     width: 1366,
     height: 768,
@@ -125,7 +125,7 @@ export const createSyncBlockTask = () => {
 
 export const killSyncBlockTask = async () => {
   if (syncBlockBackgroundWindow) {
-    console.info('Kill sync block background process')
+    logger.info('Kill sync block background process')
     // TODO: kill block number listener
     syncBlockBackgroundWindow.close()
   }
