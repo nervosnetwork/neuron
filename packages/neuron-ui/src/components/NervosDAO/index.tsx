@@ -252,7 +252,7 @@ const NervosDAO = ({
               txHash: outPoint.txHash,
               index: `0x${BigInt(outPoint.index).toString(16)}`,
             }
-        return calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash)
+        return calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash).catch(() => null)
       })
     )
       .then(res => {
