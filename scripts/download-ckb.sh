@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CKB_VERSION=$1
-ROOT_DIR=$(pwd)
+CKB_VERSION=$(cat .ckb-version)
+ROOT_DIR=$(pwd) # Be sure to run this from root directory!
 
 # macOS
 CKB_FILENAME="ckb_${CKB_VERSION}_x86_64-apple-darwin"
