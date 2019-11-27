@@ -14,6 +14,8 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
+import { SyncedBlockNumberSubject } from 'models/subjects/node'
+import BlockNumber from 'services/sync/block-number'
 
 export { genesisBlockHash }
 
@@ -36,6 +38,8 @@ const networkChange = async (network: NetworkWithID) => {
   DaoUtils.cleanInfo()
   const info = await InitDatabase.getInstance().init(network)
 
+  const blockNumber = await (new BlockNumber()).getCurrent()
+  SyncedBlockNumberSubject.next(blockNumber.toString())
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',
