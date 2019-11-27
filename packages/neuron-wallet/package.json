@@ -19,7 +19,7 @@
   "scripts": {
     "start": "electron .",
     "start:dev": "yarn run build && electron .",
-    "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html && ncp ./src/startup/ckb-runner/index.html ./dist/startup/ckb-runner/index.html",
+    "build": "ttsc && ncp ./src/startup/sync-block-task/index.html ./dist/startup/sync-block-task/index.html",
     "clean": "rimraf dist/*",
     "test": "jest --runInBand",
     "test:e2e": "jest --config jest.e2e.config.js",

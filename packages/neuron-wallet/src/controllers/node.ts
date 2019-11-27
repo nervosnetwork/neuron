@@ -1,9 +1,9 @@
-import { createCkbRunnerTask, killCkbRunnerTask } from 'startup/ckb-runner'
+import { startCkbNode, stopCkbNode } from 'startup/ckb-runner'
 import { ResponseCode } from 'utils/const'
 
 export default class NodeController {
   public static async startNode() {
-    createCkbRunnerTask()
+    startCkbNode()
 
     return {
       status: ResponseCode.Success,
@@ -12,7 +12,7 @@ export default class NodeController {
   }
 
   public static async stopNode() {
-    killCkbRunnerTask()
+    stopCkbNode()
 
     return {
       status: ResponseCode.Success,
