@@ -17,6 +17,19 @@ import { useTranslation, Trans } from 'react-i18next'
 import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
 import { openExternal } from 'services/remote'
 
+interface DepositDialogProps {
+  show: boolean
+  value: any
+  fee: string
+  onDismiss: any
+  onChange: any
+  onSubmit: any
+  onSlide: any
+  balance: string
+  isDepositing: boolean
+  errorMessage: string
+}
+
 const DepositDialog = ({
   show,
   value,
@@ -28,7 +41,7 @@ const DepositDialog = ({
   onDismiss,
   isDepositing,
   errorMessage,
-}: any) => {
+}: DepositDialogProps) => {
   const [t] = useTranslation()
   const rfcLink = useMemo(
     () => (
@@ -93,7 +106,7 @@ const DepositDialog = ({
           </Stack>
           <DialogFooter>
             <DefaultButton onClick={onDismiss} text={t('nervos-dao.cancel')} />
-            <PrimaryButton onClick={onSubmit} text={t('nervos-dao.proceed')} disabled={errorMessage} />
+            <PrimaryButton onClick={onSubmit} text={t('nervos-dao.proceed')} disabled={!!errorMessage} />
           </DialogFooter>
         </>
       )}

@@ -11,7 +11,14 @@ import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/ac
 import calculateGlobalAPC from 'utils/calculateGlobalAPC'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIGITS, CapacityUnit } from 'utils/const'
+import {
+  MIN_AMOUNT,
+  MIN_DEPOSIT_AMOUNT,
+  MEDIUM_FEE_RATE,
+  SHANNON_CKB_RATIO,
+  MAX_DECIMAL_DIGITS,
+  CapacityUnit,
+} from 'utils/const'
 import { verifyAmount } from 'utils/validators'
 
 import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
@@ -232,6 +239,17 @@ const NervosDAO = ({
     [records, clearGeneratedTx, dispatch, wallet.id]
   )
 
+  const onSlide = useCallback(
+    (value: number) => {
+      const amount =
+        BigInt(wallet.balance) - BigInt(CKBToShannonFormatter(`${value}`)) < BigInt(SHANNON_CKB_RATIO * MIN_AMOUNT)
+          ? shannonToCKBFormatter(wallet.balance, false, '')
+          : `${value}`
+      updateDepositValue(amount)
+    },
+    [updateDepositValue, wallet.balance]
+  )
+
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
   )} CKB`
@@ -354,7 +372,7 @@ const NervosDAO = ({
         onChange={(_e: any, value: string) => updateDepositValue(value)}
         onDismiss={onDepositDialogDismiss}
         onSubmit={onDepositDialogSubmit}
-        onSlide={(value: number) => updateDepositValue(`${value}`)}
+        onSlide={onSlide}
         balance={wallet.balance}
         isDepositing={sending}
         errorMessage={errorMessage}
