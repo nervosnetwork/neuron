@@ -408,7 +408,8 @@ export default class WalletService {
 
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
     AddressesUsedSubject.getSubject().next({
       addresses: usedAddresses,
       url: core.rpc.node.url,

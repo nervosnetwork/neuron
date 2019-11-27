@@ -54,38 +54,35 @@ export default class AddressDao {
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
-  public static updateTxCountAndBalance = async (
-    address: string,
+  public static updateTxCountAndBalances = async (
+    addresses: string[],
     url: string = NodeService.getInstance().core.rpc.node.url
   ): Promise<Address[]> => {
     const all = AddressStore.getAll()
     const toUpdate = all.filter(value => {
-      return value.address === address
+      return addresses.includes(value.address)
     })
     const others = all.filter(value => {
-      return value.address !== address
+      return !addresses.includes(value.address)
     })
 
-    const txCount: number = await TransactionsService.getCountByAddressAndStatus(address, [
-      TransactionStatus.Pending,
-      TransactionStatus.Success,
-    ], url)
     const lockUtils = new LockUtils(await LockUtils.systemScript(url))
-    const result = await Promise.all(
-      toUpdate.map(async entity => {
-        const item = entity
-        item.txCount = txCount
-        const lockHashes: string[] = lockUtils.addressToAllLockHashes(item.address)
-        item.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
-        item.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
-        item.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
-        item.balance = (BigInt(item.liveBalance) + BigInt(item.sentBalance)).toString()
-        return item
-      })
-    )
+    for (const addr of toUpdate) {
+      const txCount: number = await TransactionsService.getCountByAddressAndStatus(addr.address, [
+        TransactionStatus.Pending,
+        TransactionStatus.Success,
+      ], url)
+      addr.txCount = txCount
+
+      const lockHashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+      addr.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
+      addr.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
+      addr.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
+      addr.balance = (BigInt(addr.liveBalance) + BigInt(addr.sentBalance)).toString()
+    }
 
     AddressStore.updateAll(toUpdate.concat(others))
-    return result
+    return toUpdate
   }
 
   public static nextUnusedAddress(walletId: string, version: AddressVersion): Address | undefined {
