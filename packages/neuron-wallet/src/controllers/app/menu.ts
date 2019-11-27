@@ -79,7 +79,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.check-updates'),
-        click: (menuItem: MenuItem) => { new UpdateController().checkUpdates(menuItem) }
+        click: (menuItem: MenuItem) => {
+           new UpdateController().checkUpdates(menuItem)
+           navTo(URL.Preference)
+         }
       },
       separator,
       {
@@ -225,7 +228,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     })
     helpSubmenu.push({
       label: i18n.t('application-menu.neuron.check-updates'),
-      click: (menuItem: MenuItem) => { new UpdateController().checkUpdates(menuItem) }
+      click: (menuItem: MenuItem) => {
+        new UpdateController().checkUpdates(menuItem)
+        navTo(URL.Preference)
+      }
     })
     helpSubmenu.push({
       id: 'about',

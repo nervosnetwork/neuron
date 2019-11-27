@@ -12,9 +12,12 @@ export default class UpdateController {
     this.bindEvents()
   }
 
-  public checkUpdates(sender: { enabled: boolean }) {
+  // TODO: refactor: do not require sender
+  public checkUpdates(sender: { enabled: boolean } | null = null) {
     this.sender = sender
-    this.sender.enabled = false
+    if (this.sender) {
+      this.sender.enabled = false
+    }
 
     autoUpdater.checkForUpdates()
   }
