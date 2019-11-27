@@ -1,21 +1,79 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, Spinner, Text } from 'office-ui-fabric-react'
+import { Stack, PrimaryButton, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, clearCellCache } from 'services/remote'
+
+const UpdateDownloadStatus = ({
+  progress = 0,
+  newVersion = '',
+}: React.PropsWithoutRef<{ progress: number; newVersion: string }>) => {
+  const [t] = useTranslation()
+  const available = newVersion !== '' && progress <= 0
+  const downloaded = progress >= 1
+
+  if (available) {
+    return (
+      <Stack>
+        <Text as="p" variant="medium">
+          {t('updates.updates-found-do-you-want-to-update', { version: newVersion })}
+        </Text>
+        <Stack horizontal horizontalAlign="start">
+          <PrimaryButton
+            styles={{
+              root: {
+                minWidth: 180,
+              },
+            }}
+          >
+            {t('updates.download-update')}
+          </PrimaryButton>
+        </Stack>
+      </Stack>
+    )
+  }
+
+  if (downloaded) {
+    return (
+      <Stack>
+        <Text as="p" variant="medium">
+          {t('updates.updates-downloaded-about-to-quit-and-install')}
+        </Text>
+        <Stack horizontal horizontalAlign="start">
+          <PrimaryButton
+            styles={{
+              root: {
+                minWidth: 180,
+              },
+            }}
+          >
+            {t('updates.quit-and-install')}
+          </PrimaryButton>
+        </Stack>
+      </Stack>
+    )
+  }
+
+  return (
+    <ProgressIndicator
+      percentComplete={progress}
+      label={t('updates.downloading-update')}
+      styles={{ root: { width: '250px' } }}
+    />
+  )
+}
 
 const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
   const [clearing, setClearing] = useState(false)
   const [checkingUpdates, setCheckingUpdates] = useState(false) // TODO: checkingUpdates should be fetched from backend
+  const [downloadingUpdate] = useState(false)
 
   const checkUpdates = useCallback(() => {
     setCheckingUpdates(true)
     setTimeout(() => {
-      checkForUpdates().finally(() => {
-        setCheckingUpdates(false)
-      })
+      checkForUpdates()
     }, 100)
   }, [dispatch])
 
@@ -33,18 +91,22 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack>
         <Stack horizontal horizontalAlign="start">
-          <PrimaryButton
-            onClick={checkUpdates}
-            disabled={checkingUpdates}
-            ariaDescription="Check updates"
-            styles={{
-              root: {
-                minWidth: 150,
-              },
-            }}
-          >
-            {checkingUpdates ? <Spinner /> : t('updates.check-updates')}
-          </PrimaryButton>
+          {downloadingUpdate ? (
+            <UpdateDownloadStatus progress={1} newVersion="v0.25.2" />
+          ) : (
+            <PrimaryButton
+              onClick={checkUpdates}
+              disabled={checkingUpdates}
+              ariaDescription="Check updates"
+              styles={{
+                root: {
+                  minWidth: 180,
+                },
+              }}
+            >
+              {checkingUpdates ? <Spinner /> : t('updates.check-updates')}
+            </PrimaryButton>
+          )}
         </Stack>
       </Stack>
 
@@ -59,7 +121,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
             ariaDescription="Clear cache"
             styles={{
               root: {
-                minWidth: 150,
+                minWidth: 180,
               },
             }}
           >

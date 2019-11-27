@@ -178,7 +178,7 @@
         "network": "Network"
       },
       "general": {
-        "clear-cache": "Clear cache",
+        "clear-cache": "Clear Cache",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide"
@@ -346,7 +346,12 @@
     },
     "updates": {
       "check-updates": "Check for Updates",
-      "download-update": "Download Update"
+      "downloading-update": "Downloading update...",
+      "update-not-available": "There are currently no updates available.",
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and update now?",
+      "download-update": "Download Update",
+      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Neuron will quit and install the update...",
+      "quit-and-install": "Quit and Install"
     }
   }
 }
