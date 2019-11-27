@@ -20,6 +20,8 @@ export enum NeuronWalletActions {
   UpdateSyncedBlockNumber = 'updateSyncedBlockNumber',
   // dao
   UpdateNervosDaoData = 'updateNervosDaoData',
+  // updater
+  UpdateAppUpdaterStatus = 'updateAppUpdaterStatus',
 }
 export enum AppActions {
   UpdateTransactionID = 'updateTransactionID',
@@ -96,6 +98,12 @@ export const reducer = (
           },
           networks,
           wallets,
+        },
+        updater: {
+          checking: false,
+          downloadProgress: -1,
+          version: '',
+          releaseNotes: '',
         },
       }
     }
@@ -222,6 +230,12 @@ export const reducer = (
           ...chain,
           tipBlockNumber: payload,
         },
+      }
+    }
+    case NeuronWalletActions.UpdateAppUpdaterStatus: {
+      return {
+        ...state,
+        updater: payload,
       }
     }
     case NeuronWalletActions.UpdateNervosDaoData: {

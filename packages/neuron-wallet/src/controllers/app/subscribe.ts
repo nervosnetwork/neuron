@@ -7,6 +7,7 @@ import { DebouncedCurrentNetworkIDSubject, DebouncedNetworkListSubject } from 'm
 import { SampledSyncedBlockNumberSubject, DebouncedConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
+import AppUpdaterSubject from 'models/subjects/app-updater'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
@@ -51,5 +52,9 @@ export const subscribe = (dispatcher: AppResponder) => {
     if (params.currentWallet) {
       dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
+  })
+
+  AppUpdaterSubject.subscribe(params => {
+    dispatcher.sendMessage('app-updater-updated', params)
   })
 }

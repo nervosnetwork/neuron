@@ -17,6 +17,7 @@ import {
   CurrentNetworkID as CurrentNetworkIDSubject,
   ConnectionStatus as ConnectionStatusSubject,
   SyncedBlockNumber as SyncedBlockNumberSubject,
+  AppUpdater as AppUpdaterSubject,
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
@@ -183,6 +184,13 @@ export const useSubscription = ({
       })
     })
 
+    const appUpdaterSubscription = AppUpdaterSubject.subscribe(appUpdaterInfo => {
+      dispatch({
+        type: NeuronWalletActions.UpdateAppUpdaterStatus,
+        payload: appUpdaterInfo,
+      })
+    })
+
     const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
       if (winID && getWinID() === winID) {
         switch (type) {
@@ -223,6 +231,7 @@ export const useSubscription = ({
       currentNetworkIDSubscription.unsubscribe()
       connectionStatusSubscription.unsubscribe()
       syncedBlockNumberSubscription.unsubscribe()
+      appUpdaterSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch])
