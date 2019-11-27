@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MenuItem, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
+import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
 import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
 import i18n from 'utils/i18n'
 import env from 'env'
@@ -77,10 +77,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         click: () => { showAbout() },
       },
       {
-        enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.check-updates'),
-        click: (menuItem: MenuItem) => {
-           new UpdateController().checkUpdates(menuItem)
+        enabled: isMainWindow && !UpdateController.isChecking,
+        click: () => {
+           new UpdateController().checkUpdates()
            navTo(URL.Preference)
          }
       },
@@ -228,8 +228,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     })
     helpSubmenu.push({
       label: i18n.t('application-menu.neuron.check-updates'),
-      click: (menuItem: MenuItem) => {
-        new UpdateController().checkUpdates(menuItem)
+      enabled: isMainWindow && !UpdateController.isChecking,
+      click: () => {
+        new UpdateController().checkUpdates()
         navTo(URL.Preference)
       }
     })

@@ -1,25 +1,29 @@
 import { dialog } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
 import i18n from 'utils/i18n'
+import AppUpdaterSubject from 'models/subjects/app-updater'
 
 export default class UpdateController {
-  sender: { enabled: boolean } | null
+  static isChecking = false // One instance is already running and checking
 
   constructor() {
     autoUpdater.autoDownload = false
-    this.sender = null
 
-    this.bindEvents()
+    if (!UpdateController.isChecking) {
+      this.bindEvents()
+    }
   }
 
-  // TODO: refactor: do not require sender
-  public checkUpdates(sender: { enabled: boolean } | null = null) {
-    this.sender = sender
-    if (this.sender) {
-      this.sender.enabled = false
-    }
-
+  public checkUpdates() {
+    UpdateController.isChecking = true
     autoUpdater.checkForUpdates()
+
+    AppUpdaterSubject.next({
+      checking: true,
+      downloadProgress: -1,
+      version: '',
+      releaseNotes: ''
+    })
   }
 
   bindEvents() {
@@ -27,25 +31,14 @@ export default class UpdateController {
 
     autoUpdater.on('error', error => {
       dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
-      this.enableSender()
+
+      UpdateController.isChecking = false
+      this.notify()
     })
 
     autoUpdater.on('update-available', (info: UpdateInfo) => {
-      const { version } = info
-      dialog
-        .showMessageBox({
-          type: 'info',
-          title: version,
-          message: i18n.t('updater.updates-found-do-you-want-to-update', { version }),
-          buttons: [i18n.t('updater.update-now'), i18n.t('common.no')],
-        })
-        .then(returnValue => {
-          if (returnValue.response === 0) {
-            autoUpdater.downloadUpdate()
-          } else {
-            this.enableSender()
-          }
-        })
+      UpdateController.isChecking = false
+      this.notify(-1, info.version, 'todo')
     })
 
     autoUpdater.on('update-not-available', () => {
@@ -54,7 +47,9 @@ export default class UpdateController {
         message: i18n.t('updater.update-not-available'),
         buttons: [i18n.t('common.ok')],
       })
-      this.enableSender()
+
+      UpdateController.isChecking = false
+      this.notify()
     })
 
     autoUpdater.on('update-downloaded', () => {
@@ -67,13 +62,18 @@ export default class UpdateController {
         .then(() => {
           setImmediate(() => autoUpdater.quitAndInstall())
         })
+
+      UpdateController.isChecking = false
+      this.notify(1, 'toto', '')
     })
   }
 
-  enableSender() {
-    if (this.sender) {
-      this.sender.enabled = true
-    }
-    this.sender = null
+  private notify(downloadProgress: number = -1, version = '', releaseNotes = '') {
+    AppUpdaterSubject.next({
+      checking: UpdateController.isChecking,
+      downloadProgress,
+      version,
+      releaseNotes
+    })
   }
 }

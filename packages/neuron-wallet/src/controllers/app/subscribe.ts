@@ -55,6 +55,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   AppUpdaterSubject.subscribe(params => {
+    dispatcher.updateMenu()
     dispatcher.sendMessage('app-updater-updated', params)
   })
 }
