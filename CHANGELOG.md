@@ -1,3 +1,37 @@
+## [0.25.2](https://github.com/nervosnetwork/neuron/compare/v0.25.1...v0.25.2) (2019-11-29)
+
+
+### Bug Fixes
+
+* remove bufferTime for address created event ([9b0a077](https://github.com/nervosnetwork/neuron/commit/9b0a077))
+* the missing txs ([ed557b6](https://github.com/nervosnetwork/neuron/commit/ed557b6))
+* **neuron-ui:** remove www from docs.nervos.org ([3fc8154](https://github.com/nervosnetwork/neuron/commit/3fc8154))
+* balance not update after sent tx ([65e51dd](https://github.com/nervosnetwork/neuron/commit/65e51dd))
+* **neuron-ui:** show 0 if withdraw rpc returns errors ([b714376](https://github.com/nervosnetwork/neuron/commit/b714376))
+* also clean lock/dao info in renderer process ([a0b2470](https://github.com/nervosnetwork/neuron/commit/a0b2470))
+* clean lock utils info and dao utils info when switch network ([60ec486](https://github.com/nervosnetwork/neuron/commit/60ec486))
+* initialize NetworksService in renderer process ([73f1bf0](https://github.com/nervosnetwork/neuron/commit/73f1bf0))
+* network switch event broadcast twice ([f1b0f72](https://github.com/nervosnetwork/neuron/commit/f1b0f72))
+* pending in windows when network off ([67dcb79](https://github.com/nervosnetwork/neuron/commit/67dcb79))
+* sign witnesses test ([5000edd](https://github.com/nervosnetwork/neuron/commit/5000edd))
+
+
+### Features
+
+* **neuron-ui:** update the url to nervos dao rfc ([6b68ab6](https://github.com/nervosnetwork/neuron/commit/6b68ab6))
+* Add API for downloading and installing updates ([b8d24ca](https://github.com/nervosnetwork/neuron/commit/b8d24ca))
+* Add app updater subject and state ([423109d](https://github.com/nervosnetwork/neuron/commit/423109d))
+* Adding check update to settings view ([98fe06c](https://github.com/nervosnetwork/neuron/commit/98fe06c))
+* Connect updater events to UI ([b267321](https://github.com/nervosnetwork/neuron/commit/b267321))
+* Delete unused updater translations ([bcafce8](https://github.com/nervosnetwork/neuron/commit/bcafce8))
+* Different stage status of checking updates ([cd82ca4](https://github.com/nervosnetwork/neuron/commit/cd82ca4))
+* Polish updater i18n translations and UI ([af45f0c](https://github.com/nervosnetwork/neuron/commit/af45f0c))
+* Show release notes when there's update available ([8cf9581](https://github.com/nervosnetwork/neuron/commit/8cf9581))
+* Trigger check updates menu item enabling/disabling ([cd8e5d5](https://github.com/nervosnetwork/neuron/commit/cd8e5d5))
+* **neuron-ui:** add copy address and copy tx hash context menus on the tx detail view. ([7d86454](https://github.com/nervosnetwork/neuron/commit/7d86454))
+
+
+
 ## [0.25.1](https://github.com/nervosnetwork/neuron/compare/v0.25.0...v0.25.1) (2019-11-18)
 
 
