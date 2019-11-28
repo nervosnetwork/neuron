@@ -6,10 +6,10 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 export default class UpdateController {
   static isChecking = false // One instance is already running and checking
 
-  constructor() {
+  constructor(check: boolean = true) {
     autoUpdater.autoDownload = false
 
-    if (!UpdateController.isChecking) {
+    if (check && !UpdateController.isChecking) {
       this.bindEvents()
     }
   }
@@ -26,7 +26,15 @@ export default class UpdateController {
     })
   }
 
-  bindEvents() {
+  public quitAndInstall() {
+    autoUpdater.quitAndInstall()
+  }
+
+  public downloadUpdate() {
+    autoUpdater.downloadUpdate()
+  }
+
+  private bindEvents() {
     autoUpdater.removeAllListeners()
 
     autoUpdater.on('error', error => {
@@ -53,16 +61,6 @@ export default class UpdateController {
     })
 
     autoUpdater.on('update-downloaded', () => {
-      dialog
-        .showMessageBox({
-          type: 'info',
-          message: i18n.t('updater.updates-downloaded-about-to-quit-and-install'),
-          buttons: [i18n.t('common.ok')],
-        })
-        .then(() => {
-          setImmediate(() => autoUpdater.quitAndInstall())
-        })
-
       UpdateController.isChecking = false
       this.notify(1, 'toto', '')
     })

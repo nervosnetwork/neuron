@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
-import { checkForUpdates, clearCellCache } from 'services/remote'
+import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
 
 const UpdateDownloadStatus = ({
   progress = 0,
@@ -14,6 +14,10 @@ const UpdateDownloadStatus = ({
   const downloaded = progress >= 1
 
   if (available) {
+    const download = () => {
+      downloadUpdate()
+    }
+
     return (
       <Stack>
         <Text as="p" variant="medium">
@@ -21,6 +25,8 @@ const UpdateDownloadStatus = ({
         </Text>
         <Stack horizontal horizontalAlign="start">
           <PrimaryButton
+            onClick={download}
+            disabled={available}
             styles={{
               root: {
                 minWidth: 180,
@@ -35,6 +41,10 @@ const UpdateDownloadStatus = ({
   }
 
   if (downloaded) {
+    const quitAndInstall = () => {
+      installUpdate()
+    }
+
     return (
       <Stack>
         <Text as="p" variant="medium">
@@ -42,6 +52,8 @@ const UpdateDownloadStatus = ({
         </Text>
         <Stack horizontal horizontalAlign="start">
           <PrimaryButton
+            onClick={quitAndInstall}
+            disabled={!downloaded}
             styles={{
               root: {
                 minWidth: 180,

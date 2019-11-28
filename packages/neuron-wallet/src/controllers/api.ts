@@ -279,11 +279,21 @@ export default class ApiController {
     return DaoController.getDaoCells(params)
   }
 
-  // settings
+  // Settings
 
   @MapApiResponse
   public static async checkForUpdates() {
     return new UpdateController().checkUpdates()
+  }
+
+  @MapApiResponse
+  public static async downloadUpdate() {
+    return new UpdateController(false).downloadUpdate()
+  }
+
+  @MapApiResponse
+  public static async quitAndInstall() {
+    return new UpdateController(false).quitAndInstall()
   }
 
   @MapApiResponse
