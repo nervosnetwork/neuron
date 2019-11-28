@@ -10,7 +10,7 @@ import DataUpdateSubject from 'models/subjects/data-update'
 import logger from 'utils/logger'
 import NodeService from 'services/node'
 import NetworksService from 'services/networks'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, pairwise, startWith } from 'rxjs/operators'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
@@ -59,11 +59,17 @@ const networkChange = async (network: NetworkWithID) => {
 
 export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
 
-NetworkSwitchSubject.getSubject().subscribe(async (network: NetworkWithID | undefined) => {
-  if (network) {
-    await networkChange(network)
-  }
-})
+NetworkSwitchSubject
+  .getSubject()
+  .pipe(
+    startWith(undefined),
+    pairwise()
+  )
+  .subscribe(async ([previousNetwork, network]: (NetworkWithID | undefined)[]) => {
+    if ((!previousNetwork && network) || (previousNetwork && network && network.id !== previousNetwork.id)) {
+      await networkChange(network)
+    }
+  })
 
 NodeService
   .getInstance()
