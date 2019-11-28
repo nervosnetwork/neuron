@@ -348,6 +348,7 @@
       "check-updates": "检查更新",
       "downloading-update": "正在下载更新...",
       "update-not-available": "没有可供升级的新版本。",
+      "release-notes": "Release Notes:",
       "updates-found-do-you-want-to-update": "有可供升级的新版本({{version}})。现在进行下载和升级吗？",
       "download-update": "下载更新以升级",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请退出并安装新版本。",

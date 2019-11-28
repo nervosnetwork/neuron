@@ -1,0 +1,21 @@
+.releaseNotesStyle {
+  overflow: scroll;
+  height: 200px;
+  margin-bottom: 20px;
+  padding: 10px 15px 15px 15px;
+  border: solid 1px #ccc;
+
+  ul {
+    list-style-type: disc;
+    padding-left: 30px;
+
+    li {
+      margin: 5px 0;
+    }
+  }
+
+  a {
+    text-decoration: none;
+    pointer-events: none;
+  }
+}

@@ -5,13 +5,15 @@ import { NeuronWalletContext } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
+import { releaseNotesStyle } from './style.module.scss'
 
 const UpdateDownloadStatus = ({
   progress = 0,
   newVersion = '',
-}: React.PropsWithoutRef<{ progress: number; newVersion: string }>) => {
+  releaseNotes = '',
+}: React.PropsWithoutRef<{ progress: number; newVersion: string; releaseNotes: string }>) => {
   const [t] = useTranslation()
-  const available = newVersion !== '' && progress <= 0
+  const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
 
   if (available) {
@@ -19,11 +21,21 @@ const UpdateDownloadStatus = ({
       downloadUpdate()
     }
 
+    const releaseNotesHtml = () => {
+      return { __html: releaseNotes }
+    }
+
+    /* eslint-disable react/no-danger */
+
     return (
       <Stack>
         <Text as="p" variant="medium">
           {t('updates.updates-found-do-you-want-to-update', { version: newVersion })}
         </Text>
+        <h3>{t('updates.release-notes')}</h3>
+        <div className={releaseNotesStyle}>
+          <div dangerouslySetInnerHTML={releaseNotesHtml()} />
+        </div>
         <Stack horizontal horizontalAlign="start">
           <PrimaryButton
             onClick={download}
@@ -101,7 +113,11 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
       <Stack>
         <Stack horizontal horizontalAlign="start">
           {updater.version !== '' || updater.downloadProgress >= 0 ? (
-            <UpdateDownloadStatus progress={updater.downloadProgress} newVersion={updater.version} />
+            <UpdateDownloadStatus
+              progress={updater.downloadProgress}
+              newVersion={updater.version}
+              releaseNotes={updater.releaseNotes}
+            />
           ) : (
             <PrimaryButton
               onClick={checkUpdates}

@@ -31,6 +31,7 @@ export default class UpdateController {
   }
 
   public downloadUpdate() {
+    this.notify(0)
     autoUpdater.downloadUpdate()
   }
 
@@ -46,7 +47,7 @@ export default class UpdateController {
 
     autoUpdater.on('update-available', (info: UpdateInfo) => {
       UpdateController.isChecking = false
-      this.notify(-1, info.version, 'todo')
+      this.notify(-1, info.version, info.releaseNotes as string)
     })
 
     autoUpdater.on('update-not-available', () => {

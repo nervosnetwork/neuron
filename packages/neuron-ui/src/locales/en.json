@@ -348,6 +348,7 @@
       "check-updates": "Check for Updates",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
+      "release-notes": "Release Notes:",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and update now?",
       "download-update": "Download Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Please quit to install the update.",
