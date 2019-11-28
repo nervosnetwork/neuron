@@ -4,7 +4,7 @@ import env from 'env'
 import i18n from 'utils/i18n'
 import { popContextMenu } from './app/menu'
 import { showWindow } from './app/show-window'
-import { TransactionsController, WalletsController, SyncController, NetworksController } from 'controllers'
+import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
@@ -271,6 +271,7 @@ export default class ApiController {
   }
 
   // Dao
+
   @MapApiResponse
   public static async getDaoCells(
     params: Controller.Params.GetDaoCellsParams
@@ -278,7 +279,23 @@ export default class ApiController {
     return DaoController.getDaoCells(params)
   }
 
-  // settings
+  // Settings
+
+  @MapApiResponse
+  public static async checkForUpdates() {
+    return new UpdateController().checkUpdates()
+  }
+
+  @MapApiResponse
+  public static async downloadUpdate() {
+    return new UpdateController(false).downloadUpdate()
+  }
+
+  @MapApiResponse
+  public static async quitAndInstall() {
+    return new UpdateController(false).quitAndInstall()
+  }
+
   @MapApiResponse
   public static async clearCellCache() {
     await SyncController.stopSyncing()

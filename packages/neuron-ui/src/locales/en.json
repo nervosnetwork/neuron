@@ -178,7 +178,7 @@
         "network": "Network"
       },
       "general": {
-        "clear-cache": "Clear cache",
+        "clear-cache": "Clear Cache",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide"
@@ -343,6 +343,16 @@
       "withdraw-alert": "Hint: these are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "insufficient-period-alert-title": "Referenced Header is Invalid",
       "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs)"
+    },
+    "updates": {
+      "check-updates": "Check for Updates",
+      "downloading-update": "Downloading update...",
+      "update-not-available": "There are currently no updates available.",
+      "release-notes": "Release Notes:",
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and install now?",
+      "download-update": "Install Update",
+      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
+      "quit-and-install": "Install and relaunch"
     }
   }
 }

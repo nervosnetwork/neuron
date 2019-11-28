@@ -343,6 +343,16 @@
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
       "insufficient-period-alert-title": "Header 引用无效",
       "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期为 4 个 epochs)"
+    },
+    "updates": {
+      "check-updates": "检查更新",
+      "downloading-update": "正在下载更新...",
+      "update-not-available": "已经在使用最新版本",
+      "release-notes": "Release Notes:",
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载。要下载和安装吗？",
+      "download-update": "下载安装",
+      "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
+      "quit-and-install": "安装并重启应用"
     }
   }
 }
