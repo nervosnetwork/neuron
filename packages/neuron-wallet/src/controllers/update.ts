@@ -38,10 +38,10 @@ export default class UpdateController {
     autoUpdater.removeAllListeners()
 
     autoUpdater.on('error', error => {
-      dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
-
       UpdateController.isChecking = false
       this.notify()
+
+      dialog.showErrorBox('Error', error == null ? 'unknown' : (error.stack || error).toString())
     })
 
     autoUpdater.on('update-available', (info: UpdateInfo) => {
@@ -50,19 +50,23 @@ export default class UpdateController {
     })
 
     autoUpdater.on('update-not-available', () => {
+      UpdateController.isChecking = false
+      this.notify()
+
       dialog.showMessageBox({
         type: 'info',
         message: i18n.t('updater.update-not-available'),
         buttons: [i18n.t('common.ok')],
       })
+    })
 
-      UpdateController.isChecking = false
-      this.notify()
+    autoUpdater.on('download-progress', progress => {
+      this.notify(progress.percent / 100)
     })
 
     autoUpdater.on('update-downloaded', () => {
       UpdateController.isChecking = false
-      this.notify(1, 'toto', '')
+      this.notify(1)
     })
   }
 

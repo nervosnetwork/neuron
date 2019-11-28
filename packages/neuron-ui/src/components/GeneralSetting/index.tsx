@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, PrimaryButton, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
+import { NeuronWalletContext } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
@@ -26,7 +27,7 @@ const UpdateDownloadStatus = ({
         <Stack horizontal horizontalAlign="start">
           <PrimaryButton
             onClick={download}
-            disabled={available}
+            disabled={!available}
             styles={{
               root: {
                 minWidth: 180,
@@ -78,23 +79,19 @@ const UpdateDownloadStatus = ({
 
 const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
-  const [clearing, setClearing] = useState(false)
-  const [checkingUpdates, setCheckingUpdates] = useState(false) // TODO: checkingUpdates should be fetched from backend
-  const [downloadingUpdate] = useState(false)
+  const { updater } = useContext(NeuronWalletContext)
+  const [clearingCache, setClearingCache] = useState(false)
 
   const checkUpdates = useCallback(() => {
-    setCheckingUpdates(true)
-    setTimeout(() => {
-      checkForUpdates()
-    }, 100)
-  }, [dispatch])
+    checkForUpdates()
+  }, [])
 
   const clearCache = useCallback(() => {
-    setClearing(true)
+    setClearingCache(true)
     setTimeout(() => {
       clearCellCache().finally(() => {
         addPopup('clear-cache-successfully')(dispatch)
-        setClearing(false)
+        setClearingCache(false)
       })
     }, 100)
   }, [dispatch])
@@ -103,12 +100,12 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack>
         <Stack horizontal horizontalAlign="start">
-          {downloadingUpdate ? (
-            <UpdateDownloadStatus progress={1} newVersion="v0.25.2" />
+          {updater.version !== '' || updater.downloadProgress >= 0 ? (
+            <UpdateDownloadStatus progress={updater.downloadProgress} newVersion={updater.version} />
           ) : (
             <PrimaryButton
               onClick={checkUpdates}
-              disabled={checkingUpdates}
+              disabled={updater.checking}
               ariaDescription="Check updates"
               styles={{
                 root: {
@@ -116,7 +113,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
                 },
               }}
             >
-              {checkingUpdates ? <Spinner /> : t('updates.check-updates')}
+              {updater.checking ? <Spinner /> : t('updates.check-updates')}
             </PrimaryButton>
           )}
         </Stack>
@@ -129,7 +126,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
         <Stack horizontal horizontalAlign="start">
           <PrimaryButton
             onClick={clearCache}
-            disabled={clearing}
+            disabled={clearingCache}
             ariaDescription="Clear cache"
             styles={{
               root: {
@@ -137,7 +134,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
               },
             }}
           >
-            {clearing ? <Spinner /> : t('settings.general.clear-cache')}
+            {clearingCache ? <Spinner /> : t('settings.general.clear-cache')}
           </PrimaryButton>
         </Stack>
       </Stack>

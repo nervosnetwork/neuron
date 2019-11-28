@@ -350,7 +350,7 @@
       "update-not-available": "There are currently no updates available.",
       "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and update now?",
       "download-update": "Download Update",
-      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Neuron will quit and install the update...",
+      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Please quit to install the update.",
       "quit-and-install": "Quit and Install"
     }
   }
