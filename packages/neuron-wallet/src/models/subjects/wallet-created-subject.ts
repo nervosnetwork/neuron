@@ -1,13 +1,13 @@
-import { ReplaySubject } from 'rxjs'
+import { Subject } from 'rxjs'
 
 export class WalletCreatedSubject {
-  static subject = new ReplaySubject<string>(1)
+  static subject = new Subject<string>()
 
   static getSubject() {
     return this.subject
   }
 
-  static setSubject(subject: ReplaySubject<string>) {
+  static setSubject(subject: Subject<string>) {
     this.subject = subject
   }
 }
