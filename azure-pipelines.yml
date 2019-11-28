@@ -99,7 +99,8 @@ jobs:
     - script: yarn test:e2e
       name: Test
 
-  - job: Release
+  - job: release_mac
+    displayName: Release macOS
     condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     pool:
       vmImage: 'macos-10.14'
@@ -117,19 +118,59 @@ jobs:
       displayName: 'Download macOS Signing Certificate'
       inputs:
         secureFile: Neuron_mac.p12
-    - task: DownloadSecureFile@1
-      name: winSiginingCertificate
-      displayName: 'Download Windows Signing Certificate'
-      inputs:
-        secureFile: Neuron_win.p12
-    - script: yarn release
+    - script: yarn release mac
       name: Release
       displayName: 'Sign and Release'
       env:
         CSC_LINK: $(macSiginingCertificate.secureFilePath)
         CSC_KEY_PASSWORD: $(macSiginingCertificatePassword)
-        WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
-        WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
         APPLE_ID: $(appleId)
         APPLE_ID_PASSWORD: $(appleIdPassword)
+        GH_TOKEN: $(ghToken)
+
+  - job: release_linux
+    displayName: Release Linux
+    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 12.x
+      displayName: 'Install Node.js'
+    - script: |
+        yarn global add lerna
+        yarn bootstrap
+      name: Bootstrap
+    - script: yarn release linux
+      name: Release
+      displayName: 'Sign and Release'
+      env:
+        GH_TOKEN: $(ghToken)
+
+  - job: release_win
+    displayName: Release Windows
+    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+    pool:
+      vmImage: 'macos-10.14'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: 12.x
+      displayName: 'Install Node.js'
+    - script: |
+        yarn global add lerna
+        yarn bootstrap
+      name: Bootstrap
+    - task: DownloadSecureFile@1
+      name: winSiginingCertificate
+      displayName: 'Download Windows Signing Certificate'
+      inputs:
+        secureFile: Neuron_win.p12
+    - script: yarn release win
+      name: Release
+      displayName: 'Sign and Release'
+      env:
+        WIN_CSC_LINK: $(winSiginingCertificate.secureFilePath)
+        WIN_CSC_KEY_PASSWORD: $(winSiginingCertificatePassword)
         GH_TOKEN: $(ghToken)
