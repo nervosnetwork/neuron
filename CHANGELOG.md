@@ -3,12 +3,13 @@
 
 ### Bug Fixes
 
+* also clean lock/dao info in renderer process ([a0b2470](https://github.com/nervosnetwork/neuron/commit/a0b2470))
+* Fix the problem that balance not right if switch network from default network ([0f763a5](https://github.com/nervosnetwork/neuron/commit/0f763a5))
 * remove bufferTime for address created event ([9b0a077](https://github.com/nervosnetwork/neuron/commit/9b0a077))
 * the missing txs ([ed557b6](https://github.com/nervosnetwork/neuron/commit/ed557b6))
 * **neuron-ui:** remove www from docs.nervos.org ([3fc8154](https://github.com/nervosnetwork/neuron/commit/3fc8154))
 * balance not update after sent tx ([65e51dd](https://github.com/nervosnetwork/neuron/commit/65e51dd))
 * **neuron-ui:** show 0 if withdraw rpc returns errors ([b714376](https://github.com/nervosnetwork/neuron/commit/b714376))
-* also clean lock/dao info in renderer process ([a0b2470](https://github.com/nervosnetwork/neuron/commit/a0b2470))
 * clean lock utils info and dao utils info when switch network ([60ec486](https://github.com/nervosnetwork/neuron/commit/60ec486))
 * initialize NetworksService in renderer process ([73f1bf0](https://github.com/nervosnetwork/neuron/commit/73f1bf0))
 * network switch event broadcast twice ([f1b0f72](https://github.com/nervosnetwork/neuron/commit/f1b0f72))
