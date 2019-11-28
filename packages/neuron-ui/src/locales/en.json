@@ -349,10 +349,10 @@
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and update now?",
-      "download-update": "Download Update",
-      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Please quit to install the update.",
-      "quit-and-install": "Quit and Install"
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and install now?",
+      "download-update": "Install Update",
+      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
+      "quit-and-install": "Install and relaunch"
     }
   }
 }

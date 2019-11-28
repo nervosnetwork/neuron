@@ -109,7 +109,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
   }, [dispatch])
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
+    <Stack tokens={{ childrenGap: 25 }}>
       <Stack>
         <Stack horizontal horizontalAlign="start">
           {updater.version !== '' || updater.downloadProgress >= 0 ? (

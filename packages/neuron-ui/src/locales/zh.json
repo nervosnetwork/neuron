@@ -347,12 +347,12 @@
     "updates": {
       "check-updates": "检查更新",
       "downloading-update": "正在下载更新...",
-      "update-not-available": "没有可供升级的新版本。",
+      "update-not-available": "已经在使用最新版本",
       "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "有可供升级的新版本({{version}})。现在进行下载和升级吗？",
-      "download-update": "下载更新以升级",
-      "updates-downloaded-about-to-quit-and-install": "下载完成。请退出并安装新版本。",
-      "quit-and-install": "退出并安装"
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载。要下载和安装吗？",
+      "download-update": "下载安装",
+      "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
+      "quit-and-install": "安装并重启应用"
     }
   }
 }
