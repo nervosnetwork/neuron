@@ -20,7 +20,8 @@ stages:
 - stage: unit_tests
   displayName: Unit Tests
   jobs:
-  - job: macOS
+  - job: mac
+    displayName: macOS
     pool:
       vmImage: 'macos-10.14'
     strategy:
@@ -40,7 +41,8 @@ stages:
     - script: CI=true yarn test
       name: Test
 
-  - job: Linux
+  - job: linux
+    displayName: Linux
     pool:
       vmImage: 'ubuntu-18.04'
     strategy:
@@ -63,7 +65,8 @@ stages:
         CI=true yarn test
       name: Test
 
-  - job: Windows
+  - job: win
+    displayName: Windows
     pool:
       vmImage: 'windows-2019'
     strategy:
@@ -92,6 +95,7 @@ stages:
   dependsOn: []
   jobs:
   - job: Integration
+    displayName: Integration Tests
     pool:
       vmImage: 'macos-10.14'
     steps:
@@ -108,10 +112,10 @@ stages:
 
 - stage: release
   displayName: Release Binaries
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: release_mac
     displayName: Release macOS
-    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     pool:
       vmImage: 'macos-10.14'
     steps:
@@ -140,7 +144,6 @@ stages:
 
   - job: release_linux
     displayName: Release Linux
-    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     pool:
       vmImage: 'ubuntu-18.04'
     steps:
@@ -160,7 +163,6 @@ stages:
 
   - job: release_win
     displayName: Release Windows
-    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     pool:
       vmImage: 'macos-10.14'
     steps:
