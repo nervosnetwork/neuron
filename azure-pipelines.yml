@@ -16,7 +16,10 @@ pr:
     include:
       - '*'
 
-jobs:
+stages:
+- stage: unit_tests
+  displayName: Unit Tests
+  jobs:
   - job: macOS
     pool:
       vmImage: 'macos-10.14'
@@ -84,6 +87,9 @@ jobs:
         yarn test
       name: Test
 
+- stage: e2e_tests
+  displayName: Integration Tests
+  dependsOn: []
   - job: Integration
     pool:
       vmImage: 'macos-10.14'
@@ -99,6 +105,9 @@ jobs:
     - script: yarn test:e2e
       name: Test
 
+- stage: release
+  displayName: Release Binaries
+  jobs:
   - job: release_mac
     displayName: Release macOS
     condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
