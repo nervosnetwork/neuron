@@ -53,20 +53,6 @@ export default class FileService {
     return fs.readFileSync(path.join(this.basePath, moduleName, filename), this.config)
   }
 
-  public readFile = (moduleName: string, filename: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      if (!this.hasFile(moduleName, filename)) {
-        reject(new FileNotFound(filename))
-      }
-      fs.readFile(path.join(this.basePath, moduleName, filename), this.config, (err, file) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(file)
-      })
-    })
-  }
-
   public writeFileSync = (moduleName: string, filename: string, data: string) => {
     if (!this.hasModule(moduleName)) {
       throw new ModuleNotFound(moduleName)
