@@ -29,4 +29,10 @@ declare namespace Subject {
   }
   type ConnectionStatus = boolean
   type BlockNumber = string
+  interface AppUpdater {
+    checking: boolean
+    downloadProgress: number
+    version: string
+    releaseNotes: string
+  }
 }

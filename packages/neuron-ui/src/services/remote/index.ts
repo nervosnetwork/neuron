@@ -2,6 +2,7 @@ export * from './app'
 export * from './wallets'
 export * from './networks'
 export * from './transactions'
+export * from './updater'
 
 const REMOTE_MODULE_NOT_FOUND =
   'The remote module is not found, please make sure the UI is running inside the Electron App'
@@ -81,6 +82,16 @@ export const openExternal = (url: string) => {
   }
 }
 
+export const openContextMenu = (template: { label: string; click: Function }[]): void => {
+  if (!window.remote) {
+    window.alert(REMOTE_MODULE_NOT_FOUND)
+  } else {
+    const { Menu } = window.remote.require('electron')
+    const menu = Menu.buildFromTemplate(template)
+    menu.popup()
+  }
+}
+
 export default {
   getLocale,
   validateMnemonic,
@@ -90,4 +101,5 @@ export default {
   showOpenDialog,
   getWinID,
   openExternal,
+  openContextMenu,
 }

@@ -87,13 +87,11 @@ export default class AddressService {
     )
   }
 
-  public static updateTxCountAndBalances = async (addresses: string[], url: string = NodeService.getInstance().core.rpc.node.url) => {
-    let result: Address[] = []
-    for (const address of addresses) {
-      const updatedAddress = await AddressDao.updateTxCountAndBalance(address, url)
-      result = result.concat(updatedAddress)
-    }
-    return result
+  public static updateTxCountAndBalances = async (
+    addresses: string[],
+    url: string = NodeService.getInstance().core.rpc.node.url
+  ): Promise<Address[]> => {
+    return AddressDao.updateTxCountAndBalances(addresses, url)
   }
 
   // Generate both receiving and change addresses.

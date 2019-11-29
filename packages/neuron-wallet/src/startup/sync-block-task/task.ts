@@ -8,11 +8,14 @@ import Utils from 'services/sync/utils'
 import { switchNetwork as syncSwitchNetwork } from './sync'
 import { switchNetwork as indexerSwitchNetwork } from './indexer'
 import { DatabaseInitParams } from './create'
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
 
 // register to listen address updates
 registerAddressListener()
 
-const { addressesUsedSubject, databaseInitSubject } = remote.require('./startup/sync-block-task/params')
+const { addressesUsedSubject, databaseInitSubject, addressCreatedSubject } = remote.require('./startup/sync-block-task/params')
+
+AddressCreatedSubject.setSubject(addressCreatedSubject)
 
 // pass to task a main process subject
 AddressesUsedSubject.setSubject(addressesUsedSubject)

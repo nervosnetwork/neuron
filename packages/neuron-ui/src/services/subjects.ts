@@ -21,6 +21,7 @@ const SubjectConstructor = <T>(
     | 'connection-status-updated'
     | 'synced-block-number-updated'
     | 'command'
+    | 'app-updater-updated'
 ) => {
   return window.ipcRenderer
     ? {
@@ -45,6 +46,7 @@ export const NetworkList = SubjectConstructor<Subject.NetworkList>('network-list
 export const CurrentNetworkID = SubjectConstructor<Subject.CurrentNetworkID>('current-network-id-updated')
 export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('connection-status-updated')
 export const SyncedBlockNumber = SubjectConstructor<Subject.BlockNumber>('synced-block-number-updated')
+export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 
 export default {
@@ -56,5 +58,6 @@ export default {
   CurrentNetworkID,
   ConnectionStatus,
   SyncedBlockNumber,
+  AppUpdater,
   Command,
 }

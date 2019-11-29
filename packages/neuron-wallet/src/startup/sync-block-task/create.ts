@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { ReplaySubject } from 'rxjs'
 import path from 'path'
-import { networkSwitchSubject } from 'services/networks'
 import { NetworkWithID } from 'types/network'
 import env from 'env'
 import AddressService from 'services/addresses'
@@ -11,7 +10,12 @@ import DataUpdateSubject from 'models/subjects/data-update'
 import logger from 'utils/logger'
 import NodeService from 'services/node'
 import NetworksService from 'services/networks'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, pairwise, startWith } from 'rxjs/operators'
+import LockUtils from 'models/lock-utils'
+import DaoUtils from 'models/dao-utils'
+import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
+import { SyncedBlockNumberSubject } from 'models/subjects/node'
+import BlockNumber from 'services/sync/block-number'
 
 export { genesisBlockHash }
 
@@ -29,8 +33,13 @@ export interface DatabaseInitParams {
 // network switch or network connect
 const networkChange = async (network: NetworkWithID) => {
   await InitDatabase.getInstance().stopAndWait()
+  // clean LockUtils info and DaoUtils info
+  LockUtils.cleanInfo()
+  DaoUtils.cleanInfo()
   const info = await InitDatabase.getInstance().init(network)
 
+  const blockNumber = await (new BlockNumber()).getCurrent()
+  SyncedBlockNumberSubject.next(blockNumber.toString())
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',
@@ -50,11 +59,17 @@ const networkChange = async (network: NetworkWithID) => {
 
 export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
 
-networkSwitchSubject.subscribe(async (network: NetworkWithID | undefined) => {
-  if (network) {
-    await networkChange(network)
-  }
-})
+NetworkSwitchSubject
+  .getSubject()
+  .pipe(
+    startWith(undefined),
+    pairwise()
+  )
+  .subscribe(async ([previousNetwork, network]: (NetworkWithID | undefined)[]) => {
+    if ((!previousNetwork && network) || (previousNetwork && network && network.id !== previousNetwork.id)) {
+      await networkChange(network)
+    }
+  })
 
 NodeService
   .getInstance()
@@ -71,8 +86,6 @@ NodeService
   })
 
 const loadURL = `file://${path.join(__dirname, 'index.html')}`
-
-export { networkSwitchSubject }
 
 let syncBlockBackgroundWindow: BrowserWindow | null
 

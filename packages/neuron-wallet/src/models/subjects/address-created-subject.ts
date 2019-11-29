@@ -7,4 +7,8 @@ export default class AddressCreatedSubject {
   static getSubject() {
     return this.subject
   }
+
+  static setSubject(subject: ReplaySubject<Address[]>) {
+    this.subject = subject
+  }
 }

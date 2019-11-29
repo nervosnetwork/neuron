@@ -31,11 +31,12 @@ export default class BlockListener {
   }
 
   public setLockHashes = (lockHashes: string[]) => {
-    this.lockHashes = lockHashes
+    const hashes = [...new Set(lockHashes)]
+    this.lockHashes = hashes
     if (!this.queue) {
       return
     }
-    this.queue.setLockHashes(lockHashes)
+    this.queue.setLockHashes(hashes)
   }
 
   public appendLockHashes = (lockHashes: string[]) => {

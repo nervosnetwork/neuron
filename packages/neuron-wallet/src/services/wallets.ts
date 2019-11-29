@@ -34,7 +34,6 @@ const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
 const DEBOUNCE_TIME = 200
-const SECP_CYCLES = BigInt('1440000')
 
 export interface Wallet {
   id: string
@@ -329,22 +328,6 @@ export default class WalletService {
     this.listStore.clear()
   }
 
-  public sendCapacity = async (
-    walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
-    password: string = '',
-    fee: string = '0',
-    feeRate: string = '0',
-    description: string = ''
-  ): Promise<string> => {
-    const tx = await this.generateTx(walletID, items, fee, feeRate)
-
-    return this.sendTx(walletID, tx, password, description)
-  }
-
   public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
     const wallet = this.get(walletID)
     if (!wallet) {
@@ -425,7 +408,8 @@ export default class WalletService {
 
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
     AddressesUsedSubject.getSubject().next({
       addresses: usedAddresses,
       url: core.rpc.node.url,
@@ -767,24 +751,6 @@ export default class WalletService {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
   }
 
-  public computeCycles = async (walletID: string = '', capacities: string): Promise<string> => {
-    const wallet = this.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
-    const addressInfos = this.getAddressInfos(walletID)
-
-    const addresses: string[] = addressInfos.map(info => info.address)
-
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
-
-    const { inputs } = await CellsService.gatherInputs(capacities, lockHashes, '0')
-    const cycles = SECP_CYCLES * BigInt(inputs.length)
-
-    return cycles.toString()
-  }
-
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
   public getAddressInfos = (walletID: string): AddressInterface[] => {
     const wallet = this.get(walletID)
@@ -797,26 +763,6 @@ export default class WalletService {
   public getChangeAddress = (): string => {
     const walletId = this.getCurrent()!.id
     return AddressService.nextUnusedChangeAddress(walletId)!.address
-  }
-
-  public signWitness = (
-    lock: string | undefined,
-    privateKey: string,
-    txHash: string,
-    inputType: string | undefined = undefined,
-    outputType: string | undefined = undefined
-  ): string => {
-    const witnessArg: CKBComponents.WitnessArgs = {
-      lock,
-      inputType,
-      outputType,
-    }
-    const result = core.signWitnesses(privateKey)({
-      transactionHash: txHash,
-      witnesses: [witnessArg]
-    })
-
-    return result[0] as string
   }
 
   // Derive all child private keys for specified BIP44 paths.

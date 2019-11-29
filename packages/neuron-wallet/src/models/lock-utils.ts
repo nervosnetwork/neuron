@@ -17,17 +17,6 @@ export interface SystemScript {
   hashType: ScriptHashType
 }
 
-const subscribed = (target: any, propertyName: string) => {
-  let value: any
-  Object.defineProperty(target, propertyName, {
-    get: () => value,
-    set: (info: { codeHash: string }) => {
-      SystemScriptSubject.next({ codeHash: info.codeHash })
-      value = info
-    },
-  })
-}
-
 export default class LockUtils {
   systemScript: SystemScript
 
@@ -35,10 +24,9 @@ export default class LockUtils {
     this.systemScript = systemScript
   }
 
-  @subscribed
-  static systemScriptInfo: SystemScript | undefined
+  private static systemScriptInfo: SystemScript | undefined
 
-  static previousURL: string | undefined
+  private static previousURL: string | undefined
 
   static async loadSystemScript(nodeURL: string): Promise<SystemScript> {
     const core = new Core(nodeURL)
@@ -73,6 +61,10 @@ export default class LockUtils {
     LockUtils.previousURL = nodeURL
 
     return LockUtils.systemScriptInfo
+  }
+
+  static cleanInfo(): void {
+    LockUtils.systemScriptInfo = undefined
   }
 
   static setSystemScript(info: SystemScript) {

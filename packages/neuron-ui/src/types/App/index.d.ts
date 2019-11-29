@@ -184,12 +184,20 @@ declare namespace State {
     records: NervosDAORecord[]
   }
 
+  interface AppUpdater {
+    checking: boolean
+    downloadProgress: number
+    version: string
+    releaseNotes: string
+  }
+
   interface AppWithNeuronWallet {
     app: App
     chain: Chain
     settings: Settings
     wallet: Wallet
     nervosDAO: NervosDAO
+    updater: AppUpdater
   }
 }
 
