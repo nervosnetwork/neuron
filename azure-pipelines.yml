@@ -90,6 +90,7 @@ stages:
 - stage: e2e_tests
   displayName: Integration Tests
   dependsOn: []
+  jobs:
   - job: Integration
     pool:
       vmImage: 'macos-10.14'
