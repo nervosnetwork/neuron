@@ -1,6 +1,6 @@
 import { app as electronApp, remote } from 'electron'
 import path from 'path'
-import { spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 import logger from 'utils/logger'
 
 const platform = (): string => {
@@ -17,6 +17,7 @@ const platform = (): string => {
 }
 
 const app = electronApp || remote.app
+let ckb: ChildProcess | null = null
 
 const ckbPath = (): string => {
   return app.isPackaged ?
@@ -36,7 +37,7 @@ const ckbDataPath = (): string => {
 }
 
 const initCkb = () => {
-  logger.info('Trying initializing CKB')
+  logger.info('Initializing CKB')
   const init = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
   init.stderr.on('data', data => {
     logger.error('CKB init fail:', data.toString())
@@ -51,17 +52,21 @@ const initCkb = () => {
 export const startCkbNode = async () => {
   const init = initCkb()
   init.on('close', () => {
-    logger.info('Trying starting CKB')
-    const ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
-    ckb.stderr.on('data', data => {
+    logger.info('Starting CKB')
+    ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
+    ckb.stderr && ckb.stderr.on('data', data => {
       logger.error('CKB run fail:', data.toString())
     })
-    ckb.stdout.on('data', _data => {
+    ckb.stdout && ckb.stdout.on('data', _data => {
       // Do not log here. CKB has its own run.log in data/logs.
     })
   })
 }
 
 export const stopCkbNode = async () => {
-  // TODO
+  if (ckb) {
+    logger.info('Killing CKB')
+    ckb.kill()
+    ckb = null
+  }
 }
