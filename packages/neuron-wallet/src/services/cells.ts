@@ -163,7 +163,7 @@ export default class CellsService {
 
       let diff = inputCapacities - capacityInt - feeInt
       if (mode.isFeeRateMode()) {
-        needFee += CellsService.everyInputFee(feeRateInt)
+        needFee += CellsService.inputFee(feeRateInt)
         diff = inputCapacities - capacityInt - needFee
       }
       if (diff >= minChangeCapacity || diff === BigInt(0)) {
@@ -218,9 +218,9 @@ export default class CellsService {
     return inputs
   }
 
-  public static everyInputFee = (feeRate: bigint): bigint => {
+  public static inputFee = (feeRate: bigint): bigint => {
     const ratio = BigInt(1000)
-    const base = BigInt(CellsService.everyInputSize()) * feeRate
+    const base = BigInt(CellsService.inputSize()) * feeRate
     const fee = base / ratio
     if (fee * ratio < base) {
       return fee + BigInt(1)
@@ -228,7 +228,7 @@ export default class CellsService {
     return fee
   }
 
-  public static everyInputSize = (): number => {
+  public static inputSize = (): number => {
     /*
     * every input needs 44 Bytes
     * every input needs 1 witness signed by secp256k1, with 85 Bytes data, serialized in 89 Bytes, add extra 4 Bytes when add to transaction.

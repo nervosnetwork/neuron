@@ -97,7 +97,7 @@ describe('TransactionGenerator', () => {
         outputLength
       ),
       feeRate
-    ) + CellsService.everyInputFee(feeRate) * BigInt(inputLength)
+    ) + CellsService.inputFee(feeRate) * BigInt(inputLength)
   }
 
   it('txSerializedSizeInBlockWithoutInputs', () => {

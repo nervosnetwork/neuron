@@ -340,7 +340,7 @@ export class TransactionGenerator {
     let finalFee: bigint = feeInt
     if (mode.isFeeRateMode()) {
       const size: number =
-        TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDepositAll() + allInputs.length * CellsService.everyInputSize()
+        TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDepositAll() + allInputs.length * CellsService.inputSize()
       finalFee = TransactionGenerator.txFee(size, feeRateInt)
     }
 
