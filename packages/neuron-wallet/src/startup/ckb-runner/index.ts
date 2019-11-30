@@ -36,29 +36,38 @@ const ckbDataPath = (): string => {
   return path.resolve(app.getPath('userData',), 'chains/mainnet')
 }
 
-const initCkb = () => {
-  logger.info('Initializing CKB')
-  const init = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
-  init.stderr.on('data', data => {
-    logger.error('CKB init fail:', data.toString())
-  })
-  init.stdout.on('data', data => {
-    logger.log('CKB init result:', data.toString())
-  })
+const initCkb = async () => {
+  logger.info('Initializing CKB...')
+  return new Promise(resolve => {
+    const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
+    initCmd.stderr.on('data', data => {
+      logger.error('CKB init fail:', data.toString())
+    })
+    initCmd.stdout.on('data', data => {
+      logger.log('CKB init result:', data.toString())
+    })
 
-  return init
+    initCmd.on('close', () => {
+      // `ckb init` always quits no matter it fails (usually due to config file already existing) or not.
+      resolve()
+    })
+  })
 }
 
 export const startCkbNode = async () => {
-  const init = initCkb()
-  init.on('close', () => {
-    logger.info('Starting CKB')
+  initCkb().finally(() => {
+    logger.info('Starting CKB...')
     ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
     ckb.stderr && ckb.stderr.on('data', data => {
       logger.error('CKB run fail:', data.toString())
     })
     ckb.stdout && ckb.stdout.on('data', _data => {
       // Do not log here. CKB has its own run.log in data/logs.
+      // Note `Address already in use` log when port 8114 is used (CKB is already running) outputs also goes here.
+    })
+    ckb.on('close', () => {
+      logger.info('CKB process closed.')
+      ckb = null
     })
   })
 }
