@@ -18,7 +18,7 @@ export default class ConvertTo {
 
   static toSdkCellDep(cellDep: CellDep): CKBComponents.CellDep {
     return {
-      outPoint: cellDep.outPoint as OutPoint,
+      outPoint: ConvertTo.toSdkOutPoint(cellDep.outPoint!),
       depType: cellDep.depType as CKBComponents.DepType,
     }
   }

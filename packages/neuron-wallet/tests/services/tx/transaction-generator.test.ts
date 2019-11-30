@@ -6,6 +6,7 @@ import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
 import CellsService from '../../../src/services/cells'
+import DaoUtils from 'models/dao-utils'
 
 const systemScript = {
   outPoint: {
@@ -13,6 +14,15 @@ const systemScript = {
     index: '0',
   },
   codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
+  hashType: ScriptHashType.Type,
+}
+
+const daoScript = {
+  outPoint: {
+    txHash: '0xa563884b3686078ec7e7677a5f86449b15cf2693f3c1241766c6996f206cc541',
+    index: '2',
+  },
+  codeHash: '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e',
   hashType: ScriptHashType.Type,
 }
 
@@ -32,6 +42,10 @@ describe('TransactionGenerator', () => {
     const mockContractInfo = jest.fn()
     mockContractInfo.mockReturnValue(systemScript)
     LockUtils.systemScript = mockContractInfo.bind(LockUtils)
+
+    const mockDaoScriptInfo = jest.fn()
+    mockDaoScriptInfo.mockReturnValue(daoScript)
+    DaoUtils.daoScript = mockDaoScriptInfo.bind(DaoUtils)
   })
 
   afterAll(async () => {
@@ -83,7 +97,7 @@ describe('TransactionGenerator', () => {
         outputLength
       ),
       feeRate
-    ) + CellsService.everyInputFee(feeRate) * BigInt(inputLength)
+    ) + CellsService.inputFee(feeRate) * BigInt(inputLength)
   }
 
   it('txSerializedSizeInBlockWithoutInputs', () => {
@@ -324,6 +338,73 @@ describe('TransactionGenerator', () => {
         // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
+    })
+  })
+
+  describe('generateDepositAllTx', () => {
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    it('in fee mode, fee = 0', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash],
+        bob.address,
+        '0'
+      )
+
+      const expectCapacity = '300000000000'
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectCapacity)
+    })
+
+    it('in fee mode, fee = 999', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash],
+        bob.address,
+        '999'
+      )
+
+      const expectCapacity = BigInt('300000000000') - BigInt('999')
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectCapacity.toString())
+    })
+
+    it('in feeRate mode, feeRate = 0', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash],
+        bob.address,
+        '0',
+        '0'
+      )
+
+      const expectCapacity = BigInt('300000000000')
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectCapacity.toString())
+    })
+
+    it('in feeRate mode, feeRate = 1000', async () => {
+      const tx = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash],
+        bob.address,
+        '0',
+        '1000'
+      )
+
+      const expectedFee = BigInt('590')
+      const expectedCapacity = BigInt('300000000000') - expectedFee
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
+      expect(tx.fee!).toEqual(expectedFee.toString())
     })
   })
 })
