@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ShimmeredDetailsList,
@@ -15,7 +15,7 @@ import GroupHeader from 'components/CustomRows/GroupHeader'
 import HistoryRow from 'components/CustomRows/HistoryRow'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { contextMenu, showTransactionDetails } from 'services/remote'
+import { showTransactionDetails, openContextMenu, openExternal, openInWindow } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import {
@@ -38,12 +38,14 @@ const TransactionList = ({
   items = [],
   walletID,
   tipBlockNumber,
+  isMainnet,
   dispatch,
 }: {
   isLoading?: boolean
   walletID: string
   items: State.Transaction[]
   tipBlockNumber: string
+  isMainnet: boolean
   dispatch: StateDispatch
 }) => {
   const [t] = useTranslation()
@@ -250,6 +252,40 @@ const TransactionList = ({
     return { groups: groupItems, txs: txItems }
   }, [items])
 
+  const onContextMenu = useCallback(
+    item => {
+      if (item && item.hash) {
+        const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
+        const menuTemplate = [
+          {
+            label: t('history.detail'),
+            click: () => {
+              openInWindow({
+                url: `#/transaction/${item.hash}`,
+                title: t(`messageBox.transaction.title`, { hash: item.hash }),
+              })
+            },
+          },
+          {
+            label: t('history.copy-transaction-hash'),
+            click: () => {
+              window.clipboard.writeText(item.hash)
+            },
+          },
+          {
+            label: t('history.view-on-explorer'),
+            click: () => {
+              openExternal(`${explorerUrl}/transaction/${item.hash}`)
+            },
+          },
+        ]
+
+        openContextMenu(menuTemplate)
+      }
+    },
+    [isMainnet, t]
+  )
+
   return (
     <ShimmeredDetailsList
       enableShimmer={isLoading}
@@ -264,11 +300,7 @@ const TransactionList = ({
       onItemInvoked={item => {
         showTransactionDetails(item.hash)
       }}
-      onItemContextMenu={item => {
-        if (item) {
-          contextMenu({ type: 'transactionList', id: item.hash })
-        }
-      }}
+      onItemContextMenu={onContextMenu}
       className="listWithDesc"
       onRenderRow={HistoryRow}
     />

@@ -1,4 +1,8 @@
 declare namespace Controller {
+  interface OpenInWindowParams {
+    url: string
+    title: string
+  }
   interface CreateWalletParams {
     name: string
     mnemonic: string

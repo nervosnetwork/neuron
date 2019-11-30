@@ -21,6 +21,10 @@ import DaoController from './dao'
  */
 export default class ApiController {
   // App
+  @MapApiResponse
+  public static async openInWindow({ url, title }: { url: string, title: string }) {
+    showWindow(url, title)
+  }
 
   @MapApiResponse
   public static async loadInitData() {

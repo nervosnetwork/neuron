@@ -139,7 +139,9 @@
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
       "confirmations": "确认次数",
-      "confirming-with-count": " 已确认 {{confirmations}} 次"
+      "confirming-with-count": " 已确认 {{confirmations}} 次",
+      "view-on-explorer": "在浏览器中查看",
+      "copy-transaction-hash": "复制交易哈希"
     },
     "transaction": {
       "date": "时间",

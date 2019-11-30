@@ -3,7 +3,6 @@ import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sd
 import i18n from 'utils/i18n'
 import env from 'env'
 import { UpdateController } from 'controllers'
-import { showWindow } from './show-window'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
@@ -425,24 +424,6 @@ const contextMenuTemplate: {
       },
     ]
   },
-  transactionList: async (hash: string) => {
-    return [
-      {
-        label: i18n.t('contextMenu.detail'),
-        click: () => {
-          showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
-        }
-      },
-      {
-        label: i18n.t('contextMenu.copy-transaction-hash'),
-        click: () => { clipboard.writeText(hash) }
-      },
-      {
-        label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/transaction/${hash}`) }
-      },
-    ]
-  },
 }
 
 const popContextMenu = async (params: { type: string; id: string }) => {
@@ -454,8 +435,7 @@ const popContextMenu = async (params: { type: string; id: string }) => {
     case 'copyMainnetAddress':
     case 'networkList':
     case 'walletList':
-    case 'addressList':
-    case 'transactionList': {
+    case 'addressList': {
       const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
       menu.popup()
       break

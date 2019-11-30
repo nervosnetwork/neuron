@@ -139,7 +139,9 @@
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
       "confirmations": "Confirmations",
-      "confirming-with-count": "{{confirmations}} Confirmations"
+      "confirming-with-count": "{{confirmations}} Confirmations",
+      "view-on-explorer": "View on Explorer",
+      "copy-transaction-hash": "Copy Transaction Hash"
     },
     "transaction": {
       "date": "Date",
