@@ -170,7 +170,10 @@
       "change-address": "Change Address",
       "display-testnet-addresses": "Display Testnet Addresses",
       "display-mainnet-addresses": "Display Mainnet Addresses",
-      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses"
+      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses",
+      "copy-address": "Copy Address",
+      "request-payment": "Request Payment",
+      "view-on-explorer": "View on Explorer"
     },
     "settings": {
       "go-to-overview": "Go to Overview",

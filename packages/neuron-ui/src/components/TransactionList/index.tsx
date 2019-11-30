@@ -24,6 +24,7 @@ import {
   uniformTimeFormatter,
   localNumberFormatter,
 } from 'utils/formatters'
+import getExplorerUrl from 'utils/getExplorerUrl'
 import { CONFIRMATION_THRESHOLD } from 'utils/const'
 
 const theme = getTheme()
@@ -255,7 +256,6 @@ const TransactionList = ({
   const onContextMenu = useCallback(
     item => {
       if (item && item.hash) {
-        const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
         const menuTemplate = [
           {
             label: t('history.detail'),
@@ -275,6 +275,7 @@ const TransactionList = ({
           {
             label: t('history.view-on-explorer'),
             click: () => {
+              const explorerUrl = getExplorerUrl(isMainnet)
               openExternal(`${explorerUrl}/transaction/${item.hash}`)
             },
           },

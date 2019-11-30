@@ -1,5 +1,13 @@
-import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
-import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
+import { 
+  app, 
+  shell,
+  BrowserWindow,
+  dialog,
+  MenuItemConstructorOptions,
+  Menu,
+  MessageBoxOptions,
+  MessageBoxReturnValue
+} from 'electron'
 import i18n from 'utils/i18n'
 import env from 'env'
 import { UpdateController } from 'controllers'
@@ -285,19 +293,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
 const contextMenuTemplate: {
   [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
 } = {
-  copyMainnetAddress: async (publicKeyHash: string) => {
-    const address = bech32Address(publicKeyHash, {
-      prefix: AddressPrefix.Mainnet,
-      type: AddressType.HashIdx,
-      codeHashOrCodeHashIndex: '0x00',
-    })
-    return [
-      {
-        label: i18n.t('contextMenu.copy-address'),
-        click: () => { clipboard.writeText(address) }
-      },
-    ]
-  },
   networkList: async (id: string) => {
     const networksService = NetworksService.getInstance()
     const network = networksService.get(id)
@@ -399,31 +394,6 @@ const contextMenuTemplate: {
       },
     ]
   },
-  addressList: async (identifier: string) => {
-    if (identifier === undefined) {
-      return []
-    }
-
-    const address = bech32Address(identifier, {
-      prefix: NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-      type: AddressType.HashIdx,
-      codeHashOrCodeHashIndex: '0x00',
-    })
-    return [
-      {
-        label: i18n.t('contextMenu.copy-address'),
-        click: () => { clipboard.writeText(address) }
-      },
-      {
-        label: i18n.t('contextMenu.request-payment'),
-        click: () => { navTo(`/receive/${address}`) }
-      },
-      {
-        label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/address/${address}`) }
-      },
-    ]
-  },
 }
 
 const popContextMenu = async (params: { type: string; id: string }) => {
@@ -432,10 +402,8 @@ const popContextMenu = async (params: { type: string; id: string }) => {
   }
   const { id, type } = params
   switch (type) {
-    case 'copyMainnetAddress':
     case 'networkList':
-    case 'walletList':
-    case 'addressList': {
+    case 'walletList': {
       const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
       menu.popup()
       break

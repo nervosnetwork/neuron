@@ -102,12 +102,8 @@ export default {
       backup: 'Backup',
       edit: 'Edit',
       delete: 'Delete',
-      'copy-address': 'Copy Address',
       'request-payment': 'Request Payment',
-      'spend-from': 'Spend from',
-      'view-on-explorer': 'View on Explorer',
-      detail: 'Detail',
-      'copy-transaction-hash': 'Copy Transaction Hash',
+      'spend-from': 'Spend from'
     },
     messageBox: {
       button: {
