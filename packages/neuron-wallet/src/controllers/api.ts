@@ -213,6 +213,15 @@ export default class ApiController {
   }
 
   @MapApiResponse
+  public static async generateDepositAllTx(params: {
+    walletID: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.generateDepositAllTx(params)
+  }
+
+  @MapApiResponse
   public static async updateAddressDescription(params: {
     walletID: string
     address: string

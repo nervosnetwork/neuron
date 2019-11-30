@@ -440,6 +440,26 @@ export default class WalletsController {
     }
   }
 
+  public static async generateDepositAllTx(params: {
+    walletID: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.generateDepositAllTx(
+      params.walletID,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public static async updateAddressDescription({
     walletID,
     address,

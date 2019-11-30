@@ -193,18 +193,47 @@ export default class CellsService {
     }
   }
 
+  public static gatherAllInputs = async (lockHashes: string[]): Promise<Input[]> => {
+    const cellEntities: OutputEntity[] = await getConnection()
+      .getRepository(OutputEntity)
+      .find({
+        where: {
+          lockHash: In(lockHashes),
+          status: OutputStatus.Live,
+          hasData: false,
+          typeScript: null,
+        },
+      })
+
+    const inputs: Input[] = cellEntities.map(cell => {
+      return {
+        previousOutput: cell.outPoint(),
+        since: '0',
+        lock: cell.lock,
+        lockHash: cell.lockHash,
+        capacity: cell.capacity,
+      }
+    })
+
+    return inputs
+  }
+
   public static everyInputFee = (feeRate: bigint): bigint => {
-    /*
-    * every input needs 44 Bytes
-    * every input needs 1 witness signed by secp256k1, with 85 Bytes data, serialized in 89 Bytes, add extra 4 Bytes when add to transaction.
-    */
     const ratio = BigInt(1000)
-    const base = BigInt(4 + 44 + 89) * feeRate
+    const base = BigInt(CellsService.everyInputSize()) * feeRate
     const fee = base / ratio
     if (fee * ratio < base) {
       return fee + BigInt(1)
     }
     return fee
+  }
+
+  public static everyInputSize = (): number => {
+    /*
+    * every input needs 44 Bytes
+    * every input needs 1 witness signed by secp256k1, with 85 Bytes data, serialized in 89 Bytes, add extra 4 Bytes when add to transaction.
+    */
+    return 4 + 44 + 89
   }
 
   public static allBlake160s = async (): Promise<string[]> => {
