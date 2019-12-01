@@ -248,7 +248,11 @@
         "off": "Off"
       },
       "copy-tx-hash": "Copy Transaction Hash",
-      "copy-address": "Copy Address"
+      "copy-address": "Copy Address",
+      "select": "Select",
+      "backup": "Backup",
+      "edit": "Edit",
+      "delete": "Delete"
     },
     "notification-panel": {
       "title": "Notifications"

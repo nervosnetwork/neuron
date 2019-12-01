@@ -5,13 +5,9 @@ import { Stack, Text, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'off
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
-import { setCurrentNetowrk, contextMenu } from 'services/remote'
+import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
 import { Routes } from 'utils/const'
-
-const onContextMenu = (id: string = '') => () => {
-  contextMenu({ type: 'networkList', id })
-}
 
 const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
   switch (type) {
@@ -44,6 +40,40 @@ const NetworkSetting = ({
     history.push(`${Routes.NetworkEditor}/new`)
   }, [history])
 
+  const onContextMenu = useCallback(
+    item => () => {
+      if (item) {
+        const isCurrent = item.id === chain.networkID
+        const isDefault = item.type === 0
+        const menuTemplate = [
+          {
+            label: t('common.select'),
+            enabled: !isCurrent,
+            click: () => {
+              setCurrentNetowrk(item.id)
+            },
+          },
+          {
+            label: t('common.edit'),
+            enabled: !isDefault,
+            click: () => {
+              history.push(`${Routes.NetworkEditor}/${item.id}`)
+            },
+          },
+          {
+            label: t('common.delete'),
+            enabled: !isDefault,
+            click: () => {
+              deleteNetwork(item.id)
+            },
+          },
+        ]
+        openContextMenu(menuTemplate)
+      }
+    },
+    [chain.networkID, history, t]
+  )
+
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack.Item>
@@ -58,7 +88,7 @@ const NetworkSetting = ({
                   <Stack
                     horizontal
                     tokens={{ childrenGap: 5 }}
-                    onContextMenu={onContextMenu(network.id)}
+                    onContextMenu={onContextMenu(network)}
                     title={`${text}: ${network.remote}`}
                   >
                     <Text as="span" className="ms-ChoiceFieldLabel">

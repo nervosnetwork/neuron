@@ -20,10 +20,15 @@ export const getCurrentNetworkID = apiMethodWrapper<void>(api => () => {
   return api.getCurrentNetworkID()
 })
 
+export const deleteNetwork = apiMethodWrapper<Controller.DeleteNetworkParams>(api => params =>
+  api.deleteNetwork(params)
+)
+
 export default {
   createNetwork,
   updateNetwork,
   setCurrentNetowrk,
   getAllNetworks,
   getCurrentNetworkID,
+  deleteNetwork,
 }

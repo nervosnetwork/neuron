@@ -248,7 +248,11 @@
         "off": "关"
       },
       "copy-tx-hash": "复制交易 Hash",
-      "copy-address": "复制地址"
+      "copy-address": "复制地址",
+      "select": "选择",
+      "backup": "备份",
+      "edit": "编辑",
+      "delete": "删除"
     },
     "notification-panel": {
       "title": "通知中心"

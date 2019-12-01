@@ -261,6 +261,11 @@ export default class ApiController {
     return NetworksController.activate(id)
   }
 
+  @MapApiResponse
+  public static async deleteNetwork(id: NetworkID) {
+    return NetworksController.delete(id)
+  }
+
   // Transactions
 
   @MapApiResponse

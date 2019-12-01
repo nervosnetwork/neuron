@@ -96,13 +96,6 @@ export default {
       'mainnet-address-required': '{{address}} 不是主网地址',
       'testnet-address-required': '{{address}} 不是测试网地址'
     },
-    contextMenu: {
-      select: '选择',
-      backup: '备份',
-      edit: '编辑',
-      delete: '删除',
-      'spend-from': '支付来源'
-    },
     messageBox: {
       button: {
         confirm: '确定',

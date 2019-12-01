@@ -97,14 +97,6 @@ export default {
       'mainnet-address-required': '{{address}} is not a mainnet address',
       'testnet-address-required': '{{address}} is not a testnet address'
     },
-    contextMenu: {
-      select: 'Select',
-      backup: 'Backup',
-      edit: 'Edit',
-      delete: 'Delete',
-      'request-payment': 'Request Payment',
-      'spend-from': 'Spend from'
-    },
     messageBox: {
       button: {
         confirm: 'OK',
