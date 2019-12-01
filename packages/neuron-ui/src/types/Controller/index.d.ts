@@ -26,6 +26,11 @@ declare namespace Controller {
     name?: string
   }
 
+  interface RequestPasswordParams {
+    walletID: string
+    action: 'delete-wallet' | 'backup-wallet'
+  }
+
   interface DeleteWalletParams {
     id: string
     password: string

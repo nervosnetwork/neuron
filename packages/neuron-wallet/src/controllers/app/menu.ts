@@ -5,8 +5,6 @@ import {
   dialog,
   MenuItemConstructorOptions,
   Menu,
-  MessageBoxOptions,
-  MessageBoxReturnValue
 } from 'electron'
 import i18n from 'utils/i18n'
 import env from 'env'
@@ -29,10 +27,6 @@ enum ExternalURL {
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
-}
-
-const showMessageBox = (options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) => {
-  dialog.showMessageBox(options).then(callback)
 }
 
 const showAbout = () => {
@@ -289,60 +283,4 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   Menu.setApplicationMenu(menu)
 }
 
-const contextMenuTemplate: {
-  [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
-} = {
-  walletList: async (id: string) => {
-    const walletsService = WalletsService.getInstance()
-    const wallet = walletsService.get(id)
-    if (!wallet) {
-      showMessageBox({
-        type: 'error',
-        message: i18n.t('messages.wallet-not-found', { id }),
-      })
-    }
-    return [
-      {
-        label: i18n.t('contextMenu.select'),
-        click: () => {
-          try {
-            walletsService.setCurrent(id)
-          } catch (err) {
-            showMessageBox({ type: 'error', message: err.message })
-          }
-        },
-      },
-      {
-        label: i18n.t('contextMenu.backup'),
-        click: async () => { requestPassword(id, 'backup-wallet') }
-      },
-      {
-        label: i18n.t('contextMenu.edit'),
-        click: () => { navTo(`/editwallet/${id}`) }
-      },
-      {
-        label: i18n.t('contextMenu.delete'),
-        click: async () => { requestPassword(id, 'delete-wallet') }
-      },
-    ]
-  },
-}
-
-const popContextMenu = async (params: { type: string; id: string }) => {
-  if (!params || params.id === undefined) {
-    return
-  }
-  const { id, type } = params
-  switch (type) {
-    case 'walletList': {
-      const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
-      menu.popup()
-      break
-    }
-    default: {
-      break
-    }
-  }
-}
-
-export { updateApplicationMenu, popContextMenu }
+export { updateApplicationMenu }

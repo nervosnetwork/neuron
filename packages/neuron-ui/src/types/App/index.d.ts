@@ -105,6 +105,7 @@ declare namespace State {
     name: string
     remote: string
     chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string
+    type: 0 | 1
   }
 
   interface Network extends NetworkProperty {

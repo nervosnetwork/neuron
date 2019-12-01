@@ -2,7 +2,6 @@ import { take } from 'rxjs/operators'
 
 import env from 'env'
 import i18n from 'utils/i18n'
-import { popContextMenu } from './app/menu'
 import { showWindow } from './app/show-window'
 import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
@@ -105,11 +104,6 @@ export default class ApiController {
     }
   }
 
-  @MapApiResponse
-  public static async contextMenu(params: { type: string; id: string }) {
-    return popContextMenu(params)
-  }
-
   // Wallets
 
   @MapApiResponse
@@ -160,6 +154,11 @@ export default class ApiController {
   @MapApiResponse
   public static async getAddressesByWalletID(id: string) {
     return WalletsController.getAllAddresses(id)
+  }
+
+  @MapApiResponse
+  public static async requestPassword({ walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) {
+    WalletsController.requestPassword(walletID, action)
   }
 
   @MapApiResponse

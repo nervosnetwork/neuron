@@ -41,7 +41,9 @@ const NetworkSetting = ({
   }, [history])
 
   const onContextMenu = useCallback(
-    item => () => {
+    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      const { networkId } = (e.target as HTMLElement).dataset
+      const item = networks.find(n => n.id === networkId)
       if (item) {
         const isCurrent = item.id === chain.networkID
         const isDefault = item.type === 0
@@ -71,7 +73,7 @@ const NetworkSetting = ({
         openContextMenu(menuTemplate)
       }
     },
-    [chain.networkID, history, t]
+    [chain.networkID, networks, history, t]
   )
 
   return (
@@ -88,13 +90,14 @@ const NetworkSetting = ({
                   <Stack
                     horizontal
                     tokens={{ childrenGap: 5 }}
-                    onContextMenu={onContextMenu(network)}
+                    data-network-id={network.id}
+                    onContextMenu={onContextMenu}
                     title={`${text}: ${network.remote}`}
                   >
-                    <Text as="span" className="ms-ChoiceFieldLabel">
+                    <Text as="span" className="ms-ChoiceFieldLabel" style={{ pointerEvents: 'none' }}>
                       {text}
                     </Text>
-                    <Text as="span" style={{ color: '#999' }}>
+                    <Text as="span" style={{ color: '#999', pointerEvents: 'none' }}>
                       {`(${network.remote})`}
                     </Text>
                     <Label type={network.chain} t={t} />
