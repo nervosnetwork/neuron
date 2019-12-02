@@ -1,4 +1,4 @@
-import { Cell, WitnessArgs } from 'types/cell-types'
+import { Cell, WitnessArgs, TransactionWithoutHash } from 'types/cell-types';
 import ConvertTo from 'types/convert-to'
 import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
 import HexUtils from 'utils/hex'
@@ -15,7 +15,7 @@ export default class TransactionSize {
     return 37
   }
 
-  public static header(): number {
+  public static headerDep(): number {
     return 32
   }
 
@@ -29,11 +29,28 @@ export default class TransactionSize {
     return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
+  public static outputData(data: string): number {
+    const bytes = serializeFixVec(data)
+    return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+  }
+
   public static witness(witness: WitnessArgs | string): number {
     const wit: string = typeof(witness) === 'string'
       ? witness
       : serializeWitnessArgs(ConvertTo.toSdkWitnessArgs(witness))
     const bytes = serializeFixVec(wit)
     return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+  }
+
+  public static tx(tx: TransactionWithoutHash): number {
+    return [
+      this.base(),
+      this.cellDep() * tx.cellDeps!.length,
+      this.headerDep() * tx.headerDeps!.length,
+      this.input() * tx.inputs!.length,
+      ...tx.outputs!.map(o => this.output(o)),
+      ...tx.outputsData!.map(data => this.outputData(data)),
+      ...tx.witnesses!.map(wit => this.witness(wit)),
+    ].reduce((result, c) => result + c, 0)
   }
 }
