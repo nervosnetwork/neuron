@@ -6,6 +6,9 @@ import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
 import { TransactionStatus } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
+import { WitnessArgs } from '../types/cell-types';
+import TransactionSize from '../models/transaction-size';
+import TransactionFee from 'models/transaction-fee'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -105,17 +108,23 @@ export default class CellsService {
     capacity: string,
     lockHashes: string[],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    baseSize: number = 0,
+    changeOutputSize: number = 0,
+    append?: {
+      input: Input,
+      witness: WitnessArgs,
+    }
   ): Promise<{
     inputs: Input[]
     capacities: string
-    needFee: string
+    finalFee: string
   }> => {
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
-    // const totalCapacities: bigint = capacityInt + feeInt
     const feeRateInt = BigInt(feeRate)
     let needFee = BigInt(0)
+    const changeOutputFee: bigint = TransactionFee.fee(changeOutputSize, feeRateInt)
 
     const mode = new FeeMode(feeRateInt)
 
@@ -150,6 +159,11 @@ export default class CellsService {
 
     const inputs: Input[] = []
     let inputCapacities: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    if (append) {
+      inputs.push(append.input)
+      totalSize += TransactionSize.witness(append.witness)
+    }
     cellEntities.every(cell => {
       const input: Input = {
         previousOutput: cell.outPoint(),
@@ -158,24 +172,43 @@ export default class CellsService {
         lockHash: cell.lockHash,
         capacity: cell.capacity,
       }
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.witness('0x')
+      } else {
+        const wit = {
+          lock: '0x' + '0'.repeat(130),
+          inputType: undefined,
+          outputType: undefined,
+        }
+        totalSize += TransactionSize.witness(wit)
+      }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
+      totalSize += TransactionSize.input()
 
-      let diff = inputCapacities - capacityInt - feeInt
       if (mode.isFeeRateMode()) {
-        needFee += CellsService.inputFee(feeRateInt)
-        diff = inputCapacities - capacityInt - needFee
+        needFee = TransactionFee.fee(totalSize, feeRateInt)
+        const diff = inputCapacities - capacityInt - needFee
+        if (diff === BigInt(0)) {
+          return false
+        } else if (diff - changeOutputFee >= minChangeCapacity) {
+          needFee += changeOutputFee
+          return false
+        }
+        return true
+      } else {
+        const diff = inputCapacities - capacityInt - feeInt
+        if (diff >= minChangeCapacity || diff === BigInt(0)) {
+          return false
+        }
+        return true
       }
-      if (diff >= minChangeCapacity || diff === BigInt(0)) {
-        return false
-      }
-      return true
     })
 
-    let totalCapacities = capacityInt + feeInt
-    if (mode.isFeeRateMode()) {
-      totalCapacities = capacityInt + needFee
-    }
+    // The final fee need in this tx (shannon)
+    const finalFee: bigint = mode.isFeeRateMode() ? needFee : feeInt
+
+    const totalCapacities = capacityInt + finalFee
 
     if (inputCapacities < totalCapacities) {
       throw new CapacityNotEnough()
@@ -189,7 +222,7 @@ export default class CellsService {
     return {
       inputs,
       capacities: inputCapacities.toString(),
-      needFee: needFee.toString(),
+      finalFee: finalFee.toString(),
     }
   }
 
@@ -216,24 +249,6 @@ export default class CellsService {
     })
 
     return inputs
-  }
-
-  public static inputFee = (feeRate: bigint): bigint => {
-    const ratio = BigInt(1000)
-    const base = BigInt(CellsService.inputSize()) * feeRate
-    const fee = base / ratio
-    if (fee * ratio < base) {
-      return fee + BigInt(1)
-    }
-    return fee
-  }
-
-  public static inputSize = (): number => {
-    /*
-    * every input needs 44 Bytes
-    * every input needs 1 witness signed by secp256k1, with 85 Bytes data, serialized in 89 Bytes, add extra 4 Bytes when add to transaction.
-    */
-    return 4 + 44 + 89
   }
 
   public static allBlake160s = async (): Promise<string[]> => {
