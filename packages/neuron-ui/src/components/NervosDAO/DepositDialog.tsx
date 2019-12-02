@@ -25,7 +25,7 @@ interface DepositDialogProps {
   onChange: any
   onSubmit: any
   onSlide: any
-  balance: string
+  maxDepositAmount: bigint
   isDepositing: boolean
   errorMessage: string
 }
@@ -34,7 +34,7 @@ const DepositDialog = ({
   show,
   value,
   fee,
-  balance,
+  maxDepositAmount,
   onChange,
   onSlide,
   onSubmit,
@@ -65,7 +65,7 @@ const DepositDialog = ({
     ),
     []
   )
-  const maxValue = +(BigInt(balance) / BigInt(SHANNON_CKB_RATIO)).toString()
+  const maxValue = +(maxDepositAmount / BigInt(SHANNON_CKB_RATIO)).toString()
 
   if (!show) {
     return null
