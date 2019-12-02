@@ -111,6 +111,7 @@ export default class CellsService {
     feeRate: string = '0',
     baseSize: number = 0,
     changeOutputSize: number = 0,
+    changeOutputDataSize: number = 0,
     append?: {
       input: Input,
       witness: WitnessArgs,
@@ -119,12 +120,13 @@ export default class CellsService {
     inputs: Input[]
     capacities: string
     finalFee: string
+    hasChangeOutput: boolean
   }> => {
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     let needFee = BigInt(0)
-    const changeOutputFee: bigint = TransactionFee.fee(changeOutputSize, feeRateInt)
+    const changeOutputFee: bigint = TransactionFee.fee(changeOutputSize + changeOutputDataSize, feeRateInt)
 
     const mode = new FeeMode(feeRateInt)
 
@@ -164,6 +166,7 @@ export default class CellsService {
       inputs.push(append.input)
       totalSize += TransactionSize.witness(append.witness)
     }
+    let hasChangeOutput: boolean = false
     cellEntities.every(cell => {
       const input: Input = {
         previousOutput: cell.outPoint(),
@@ -190,15 +193,21 @@ export default class CellsService {
         needFee = TransactionFee.fee(totalSize, feeRateInt)
         const diff = inputCapacities - capacityInt - needFee
         if (diff === BigInt(0)) {
+          hasChangeOutput = false
           return false
         } else if (diff - changeOutputFee >= minChangeCapacity) {
           needFee += changeOutputFee
+          hasChangeOutput = true
           return false
         }
         return true
       } else {
         const diff = inputCapacities - capacityInt - feeInt
-        if (diff >= minChangeCapacity || diff === BigInt(0)) {
+        if (diff === BigInt(0)) {
+          hasChangeOutput = false
+          return false
+        } else if (diff >= minChangeCapacity) {
+          hasChangeOutput = true
           return false
         }
         return true
@@ -223,6 +232,7 @@ export default class CellsService {
       inputs,
       capacities: inputCapacities.toString(),
       finalFee: finalFee.toString(),
+      hasChangeOutput,
     }
   }
 

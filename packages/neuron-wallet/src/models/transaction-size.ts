@@ -42,6 +42,19 @@ export default class TransactionSize {
     return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
+  public static secpLockWitness(): number {
+    const wit = {
+      lock: '0x' + '0'.repeat(130),
+      inputType: undefined,
+      outputType: undefined,
+    }
+    return TransactionSize.witness(wit)
+  }
+
+  public static emptyWitness(): number {
+    return TransactionSize.witness('0x')
+  }
+
   public static tx(tx: TransactionWithoutHash): number {
     return [
       this.base(),

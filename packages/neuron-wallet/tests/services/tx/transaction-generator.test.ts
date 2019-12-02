@@ -5,8 +5,9 @@ import { OutputStatus } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
-import CellsService from '../../../src/services/cells'
-import DaoUtils from 'models/dao-utils'
+import DaoUtils from '../../../src/models/dao-utils'
+import TransactionSize from '../../../src/models/transaction-size'
+import TransactionFee from '../../../src/models/transaction-fee'
 
 const systemScript = {
   outPoint: {
@@ -89,38 +90,6 @@ describe('TransactionGenerator', () => {
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
   }
 
-  const calculateFee = (outputLength: number, inputLength: number, feeRate: bigint): bigint => {
-    // @ts-ignore: Private method
-    return TransactionGenerator.txFee(
-      // @ts-ignore: Private methods
-      TransactionGenerator.txSerializedSizeInBlockWithoutInputs(
-        outputLength
-      ),
-      feeRate
-    ) + CellsService.inputFee(feeRate) * BigInt(inputLength)
-  }
-
-  it('txSerializedSizeInBlockWithoutInputs', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txSerializedSizeInBlockWithoutInputs(2)
-    ).toEqual(327)
-  })
-
-  it('txFee without carry', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txFee(1035, BigInt(1000))
-    ).toEqual(BigInt(1035))
-  })
-
-  it('txFee with carry', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txFee(1035, BigInt(900))
-    ).toEqual(BigInt(932))
-  })
-
   describe('generateTx', () => {
     beforeEach(async done => {
       const cells: OutputEntity[] = [
@@ -154,9 +123,12 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 1, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+        expect(expectedFee).toEqual(BigInt(464))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
       it('capacity 1000', async () => {
@@ -181,19 +153,20 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 2, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
-      it('capacity 1000 - fee', async () => {
+      it('capacity 1000 - fee, no change output', async () => {
         const feeRate = '1000'
         const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - calculateFee(2, 1, BigInt(feeRate))).toString(),
+              capacity: BigInt(1000 * 10**8 - 355).toString(),
             }
           ],
           bob.address,
@@ -208,9 +181,11 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 1, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+        expect(expectedFee).toEqual(BigInt(355))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
       it('capacity 1000 - fee + 1 shannon', async () => {
@@ -220,7 +195,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - calculateFee(2, 1, BigInt(feeRate)) + BigInt(1)).toString(),
+              capacity: (BigInt(1000 * 10**8) - BigInt(464) + BigInt(1)).toString(),
             }
           ],
           bob.address,
@@ -235,8 +210,8 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 2, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
       })
     })
@@ -263,7 +238,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -287,7 +261,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -311,7 +284,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -335,7 +307,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
     })
