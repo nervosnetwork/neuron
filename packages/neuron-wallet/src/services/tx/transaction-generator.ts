@@ -183,14 +183,7 @@ export class TransactionGenerator {
     const blake160: string = LockUtils.addressToBlake160(receiveAddress)
     const daoScriptInfo = await DaoUtils.daoScript()
 
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
-
     const capacityInt: bigint = BigInt(capacity)
-
-    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit()
-    const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
     const output: Cell = {
       capacity: capacity,
@@ -211,48 +204,7 @@ export class TransactionGenerator {
 
     const outputs: Cell[] = [output]
 
-    let gatherCapacities = capacityInt
-    if(mode.isFeeRateMode()) {
-      gatherCapacities = capacityInt + feeWithoutInputs
-    }
-
-    const {
-      inputs,
-      capacities,
-      finalFee: needFee,
-    } = await CellsService.gatherInputs(
-      gatherCapacities.toString(),
-      lockHashes,
-      fee,
-      feeRate,
-    )
-    const needFeeInt = BigInt(needFee)
-    const totalFee = feeWithoutInputs + needFeeInt
-
-    // change
-    let finalFee: bigint = feeInt
-    if (mode.isFeeRateMode()) {
-      finalFee = totalFee
-    }
-    if (BigInt(capacities) > capacityInt + finalFee) {
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
-
-      const changeCapacity = BigInt(capacities) - capacityInt - finalFee
-
-      const changeOutput: Cell = {
-        capacity: changeCapacity.toString(),
-        data: '0x',
-        lock: {
-          codeHash,
-          args: changeBlake160,
-          hashType
-        },
-      }
-
-      outputs.push(changeOutput)
-    }
-
-    return {
+    const tx: TransactionWithoutHash = {
       version: '0',
       cellDeps: [
         {
@@ -265,12 +217,54 @@ export class TransactionGenerator {
         },
       ],
       headerDeps: [],
-      inputs,
+      inputs: [],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
-      fee: finalFee.toString(),
+      witnesses: []
     }
+
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput,
+    } = await CellsService.gatherInputs(
+      capacityInt.toString(),
+      lockHashes,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+
+    // change
+    if (hasChangeOutput) {
+      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+
+      const changeCapacity = BigInt(capacities) - capacityInt - finalFeeInt
+
+      const changeOutput: Cell = {
+        capacity: changeCapacity.toString(),
+        data: '0x',
+        lock: {
+          codeHash,
+          args: changeBlake160,
+          hashType
+        },
+      }
+
+      outputs.push(changeOutput)
+      tx.outputsData!.push(changeOutput.data!)
+    }
+
+    tx.fee = finalFee
+
+    return tx
   }
 
   public static generateDepositAllTx = async (

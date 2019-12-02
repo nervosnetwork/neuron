@@ -351,6 +351,85 @@ describe('TransactionGenerator', () => {
     })
   })
 
+  describe('generateDepositTx', () => {
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    const feeRate = '1000'
+    const feeRateInt = BigInt(feeRate)
+
+    it('capacity 500', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        toShannon('500'),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it('capacity 1000', async () => {
+      const feeRate = '1000'
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        toShannon('1000'),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it('capacity 1000 - fee, no change output', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        (BigInt(100 * 10**8 - 453)).toString(),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it(`2 bob's outputs, 1 alice output`, async () => {
+      const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+      await getConnection().manager.save(aliceCell)
+
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash, alice.lockHash],
+        BigInt(3000 * 10**8).toString(),
+        alice.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+  })
+
   describe('generateDepositAllTx', () => {
     beforeEach(async done => {
       const cells: OutputEntity[] = [
