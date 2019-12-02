@@ -2,6 +2,8 @@ import path from 'path'
 import { app as electronApp, remote, BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
+import NodeController from 'controllers/node'
+import SyncController from 'controllers/sync'
 import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
@@ -27,12 +29,17 @@ export default class AppController {
     updateApplicationMenu(this.mainWindow)
   }
 
-  public openWindow = () => {
+  public openWindow = async () => {
     if (this.mainWindow) {
       return
     }
 
     this.createWindow()
+
+    if (!env.isTestMode) {
+      await NodeController.startNode()
+      SyncController.startSyncing()
+    }
   }
 
   createWindow = () => {
@@ -71,9 +78,15 @@ export default class AppController {
     })
 
     this.mainWindow.on('closed', () => {
+      if (!env.isTestMode) {
+        SyncController.stopSyncing()
+        NodeController.stopNode()
+      }
+
       if (process.platform !== 'darwin') {
         app.quit()
       }
+
       if (this.mainWindow) {
         this.mainWindow.removeAllListeners()
         this.mainWindow = null
