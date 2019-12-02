@@ -179,6 +179,7 @@
       },
       "general": {
         "clear-cache": "Clear Cache",
+        "clearing-cache": "Clearing...",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
         "hide": "Hide"
@@ -346,6 +347,7 @@
     },
     "updates": {
       "check-updates": "Check for Updates",
+      "checking-updates": "Checking...",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
       "release-notes": "Release Notes:",

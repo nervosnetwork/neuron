@@ -1,6 +1,6 @@
 import React, { useContext, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
+import { Stack, PrimaryButton, Button, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import { NeuronWalletContext } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
@@ -119,7 +119,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
               releaseNotes={updater.releaseNotes}
             />
           ) : (
-            <PrimaryButton
+            <Button
               onClick={checkUpdates}
               disabled={updater.checking}
               ariaDescription="Check updates"
@@ -129,8 +129,16 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
                 },
               }}
             >
-              {updater.checking ? <Spinner /> : t('updates.check-updates')}
-            </PrimaryButton>
+              {updater.checking ? (
+                <Spinner
+                  styles={{ root: { marginRight: 5 } }}
+                  label={t('updates.checking-updates')}
+                  labelPosition="right"
+                />
+              ) : (
+                t('updates.check-updates')
+              )}
+            </Button>
           )}
         </Stack>
       </Stack>
@@ -140,7 +148,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
           {t('settings.general.clear-cache-description')}
         </Text>
         <Stack horizontal horizontalAlign="start">
-          <PrimaryButton
+          <Button
             onClick={clearCache}
             disabled={clearingCache}
             ariaDescription="Clear cache"
@@ -150,8 +158,16 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
               },
             }}
           >
-            {clearingCache ? <Spinner /> : t('settings.general.clear-cache')}
-          </PrimaryButton>
+            {clearingCache ? (
+              <Spinner
+                styles={{ root: { marginRight: 5 } }}
+                label={t('settings.general.clearing-cache')}
+                labelPosition="right"
+              />
+            ) : (
+              t('settings.general.clear-cache')
+            )}
+          </Button>
         </Stack>
       </Stack>
     </Stack>
