@@ -97,18 +97,6 @@ export default {
       'mainnet-address-required': '{{address}} is not a mainnet address',
       'testnet-address-required': '{{address}} is not a testnet address'
     },
-    contextMenu: {
-      select: 'Select',
-      backup: 'Backup',
-      edit: 'Edit',
-      delete: 'Delete',
-      'copy-address': 'Copy Address',
-      'request-payment': 'Request Payment',
-      'spend-from': 'Spend from',
-      'view-on-explorer': 'View on Explorer',
-      detail: 'Detail',
-      'copy-transaction-hash': 'Copy Transaction Hash',
-    },
     messageBox: {
       button: {
         confirm: 'OK',

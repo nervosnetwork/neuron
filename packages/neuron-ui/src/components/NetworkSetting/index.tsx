@@ -1,17 +1,13 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { Stack, Text, Button, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
-import { setCurrentNetowrk, contextMenu } from 'services/remote'
+import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
 import { Routes } from 'utils/const'
-
-const onContextMenu = (id: string = '') => () => {
-  contextMenu({ type: 'networkList', id })
-}
 
 const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
   switch (type) {
@@ -44,6 +40,42 @@ const NetworkSetting = ({
     history.push(`${Routes.NetworkEditor}/new`)
   }, [history])
 
+  const onContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      const { networkId } = (e.target as HTMLElement).dataset
+      const item = networks.find(n => n.id === networkId)
+      if (item) {
+        const isCurrent = item.id === chain.networkID
+        const isDefault = item.type === 0
+        const menuTemplate = [
+          {
+            label: t('common.select'),
+            enabled: !isCurrent,
+            click: () => {
+              setCurrentNetowrk(item.id)
+            },
+          },
+          {
+            label: t('common.edit'),
+            enabled: !isDefault,
+            click: () => {
+              history.push(`${Routes.NetworkEditor}/${item.id}`)
+            },
+          },
+          {
+            label: t('common.delete'),
+            enabled: !isDefault,
+            click: () => {
+              deleteNetwork(item.id)
+            },
+          },
+        ]
+        openContextMenu(menuTemplate)
+      }
+    },
+    [chain.networkID, networks, history, t]
+  )
+
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <Stack.Item>
@@ -58,13 +90,14 @@ const NetworkSetting = ({
                   <Stack
                     horizontal
                     tokens={{ childrenGap: 5 }}
-                    onContextMenu={onContextMenu(network.id)}
+                    data-network-id={network.id}
+                    onContextMenu={onContextMenu}
                     title={`${text}: ${network.remote}`}
                   >
-                    <Text as="span" className="ms-ChoiceFieldLabel">
+                    <Text as="span" className="ms-ChoiceFieldLabel" style={{ pointerEvents: 'none' }}>
                       {text}
                     </Text>
-                    <Text as="span" style={{ color: '#999' }}>
+                    <Text as="span" style={{ color: '#999', pointerEvents: 'none' }}>
                       {`(${network.remote})`}
                     </Text>
                     <Label type={network.chain} t={t} />
@@ -77,7 +110,7 @@ const NetworkSetting = ({
         />
       </Stack.Item>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
-        <PrimaryButton
+        <Button
           text={t('settings.network.add-network')}
           onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"

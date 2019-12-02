@@ -44,11 +44,6 @@ describe(`Store`, () => {
     expect(value).toBe(1)
   })
 
-  it('read a: 1', async () => {
-    const value = await store.read('a')
-    expect(value).toBe(1)
-  })
-
   it('update to a: 2', () => {
     const newValue = 2
     store.writeSync('a', newValue)

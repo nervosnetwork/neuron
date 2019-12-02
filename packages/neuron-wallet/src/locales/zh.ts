@@ -96,18 +96,6 @@ export default {
       'mainnet-address-required': '{{address}} 不是主网地址',
       'testnet-address-required': '{{address}} 不是测试网地址'
     },
-    contextMenu: {
-      select: '选择',
-      backup: '备份',
-      edit: '编辑',
-      delete: '删除',
-      'copy-address': '复制地址',
-      'request-payment': '请求支付',
-      'spend-from': '支付来源',
-      'view-on-explorer': '在浏览器中查看',
-      detail: '详情',
-      'copy-transaction-hash': '复制交易哈希',
-    },
     messageBox: {
       button: {
         confirm: '确定',

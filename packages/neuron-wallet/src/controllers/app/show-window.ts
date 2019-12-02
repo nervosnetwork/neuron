@@ -1,5 +1,6 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
+import env from 'env'
 
 const showWindow = (url: string, title: string): BrowserWindow => {
 	const win = new BrowserWindow({
@@ -9,7 +10,8 @@ const showWindow = (url: string, title: string): BrowserWindow => {
 			preload: path.join(__dirname, './preload.js'),
 		},
 	})
-	win.loadURL(url)
+	const fmtUrl = url.startsWith('http') ? url : env.mainURL + url
+	win.loadURL(fmtUrl)
 	win.on('ready-to-show', () => {
 		win.setTitle(title)
 		win.show()

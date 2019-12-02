@@ -251,34 +251,34 @@ describe('CellsService', () => {
         const feeRate = '1000'
         const result = await CellsService.gatherInputs(toShannon('500'), [bob.lockHash], '0', feeRate)
         expect(result.capacities).toEqual(toShannon('1000'))
-        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(1))
+        expect(BigInt(result.needFee)).toEqual(CellsService.inputFee(BigInt(feeRate)) * BigInt(1))
       })
 
       it('capacity 1000', async () => {
         const feeRate = '1000'
         const result = await CellsService.gatherInputs(toShannon('1000'), [bob.lockHash], '0', feeRate)
         expect(result.capacities).toEqual(toShannon('3000'))
-        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(2))
+        expect(BigInt(result.needFee)).toEqual(CellsService.inputFee(BigInt(feeRate)) * BigInt(2))
       })
 
-      it('capacity 1000 - everyInputFee', async () => {
+      it('capacity 1000 - inputFee', async () => {
         const feeRate = '1000'
-        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+        const inputFee = CellsService.inputFee(BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - everyInputFee
+        const capacity = BigInt(1000 * 10**8) - inputFee
         const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
         expect(result.capacities).toEqual(toShannon('1000'))
-        expect(BigInt(result.needFee)).toEqual(everyInputFee)
+        expect(BigInt(result.needFee)).toEqual(inputFee)
       })
 
-      it('capacity 1000 - everyInputFee + 1 shannon', async () => {
+      it('capacity 1000 - inputFee + 1 shannon', async () => {
         const feeRate = '1000'
-        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+        const inputFee = CellsService.inputFee(BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - everyInputFee + BigInt(1)
+        const capacity = BigInt(1000 * 10**8) - inputFee + BigInt(1)
         const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
         expect(result.capacities).toEqual(toShannon('3000'))
-        expect(BigInt(result.needFee)).toEqual(everyInputFee * BigInt(2))
+        expect(BigInt(result.needFee)).toEqual(inputFee * BigInt(2))
       })
     })
 
