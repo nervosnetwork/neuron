@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { Stack, Button, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { setCurrentWallet } from 'states/stateProvider/actionCreators'
@@ -79,7 +79,7 @@ const WalletSetting = ({
       </Stack.Item>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         {buttons.map(({ label, url }) => (
-          <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
+          <Button key={label} onClick={navTo(url)} text={t(label)} />
         ))}
       </Stack>
     </Stack>

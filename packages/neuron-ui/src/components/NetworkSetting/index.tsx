@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { Stack, Text, Button, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
@@ -77,7 +77,7 @@ const NetworkSetting = ({
         />
       </Stack.Item>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
-        <PrimaryButton
+        <Button
           text={t('settings.network.add-network')}
           onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"
