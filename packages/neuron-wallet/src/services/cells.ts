@@ -176,14 +176,9 @@ export default class CellsService {
         capacity: cell.capacity,
       }
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
-        totalSize += TransactionSize.witness('0x')
+        totalSize += TransactionSize.emptyWitness()
       } else {
-        const wit = {
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        }
-        totalSize += TransactionSize.witness(wit)
+        totalSize += TransactionSize.secpLockWitness()
       }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)

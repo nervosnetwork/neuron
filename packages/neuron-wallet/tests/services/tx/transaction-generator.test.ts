@@ -37,6 +37,28 @@ const randomHex = (length: number = 64): string => {
 
 const toShannon = (ckb: string) => `${ckb}00000000`
 
+const bob = {
+  lockScript: {
+    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+    args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    hashType: ScriptHashType.Type,
+  },
+  lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
+  address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+  blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+}
+
+const alice = {
+  lockScript: {
+    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+    args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+    hashType: ScriptHashType.Type,
+  },
+  lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
+  address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
+  blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+}
+
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
@@ -78,17 +100,6 @@ describe('TransactionGenerator', () => {
     await connection.synchronize(true)
     done()
   })
-
-  const bob = {
-    lockScript: {
-      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      hashType: ScriptHashType.Type,
-    },
-    lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-  }
 
   describe('generateTx', () => {
     beforeEach(async done => {
@@ -213,6 +224,34 @@ describe('TransactionGenerator', () => {
         const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
         const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+      })
+
+      it(`2 bob's outputs, 1 alice output`, async () => {
+        const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+        await getConnection().manager.save(aliceCell)
+
+        const feeRate = '1000'
+        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+          [bob.lockHash, alice.lockHash],
+          [
+            {
+              address: bob.address,
+              capacity: BigInt(1000 * 10**8).toString(),
+            },
+            {
+              address: alice.address,
+              capacity: BigInt(2500 * 10**8).toString(),
+            }
+          ],
+          bob.address,
+          '0',
+          feeRate
+        )
+
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
     })
 
