@@ -7,6 +7,7 @@ import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
 import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
+import CommandSubject from 'models/subjects/command'
 import { ResponseCode } from 'utils/const'
 import {
   CurrentWalletNotSet,
@@ -481,6 +482,17 @@ export default class WalletsController {
         address,
         description,
       },
+    }
+  }
+
+  public static async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
+    const window = BrowserWindow.getFocusedWindow()
+    if (window) {
+      CommandSubject.next({
+        winID: window.id,
+        type: action,
+        payload: walletID,
+      })
     }
   }
 

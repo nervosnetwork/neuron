@@ -8,7 +8,7 @@ import { setCurrentWallet } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 
-import { contextMenu } from 'services/remote'
+import { openContextMenu, requestPassword } from 'services/remote'
 import { Routes, MnemonicAction } from 'utils/const'
 
 const buttons = [
@@ -43,10 +43,42 @@ const WalletSetting = ({
     [dispatch]
   )
   const onContextMenu = useCallback(
-    (id: string = '') => () => {
-      contextMenu({ type: 'walletList', id })
+    (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+      const { id } = (e.target as HTMLSpanElement).dataset
+      if (id) {
+        const menuTemplate = [
+          {
+            label: t('common.select'),
+            click: () => {
+              setCurrentWallet(id)(dispatch)
+            },
+          },
+          {
+            label: t('common.backup'),
+            click: () => {
+              requestPassword({
+                walletID: id,
+                action: 'backup-wallet',
+              })
+            },
+          },
+          {
+            label: t('common.edit'),
+            click: () => {
+              history.push(`${Routes.WalletEditor}/${id}`)
+            },
+          },
+          {
+            label: t('common.delete'),
+            click: () => {
+              requestPassword({ walletID: id, action: 'delete-wallet' })
+            },
+          },
+        ]
+        openContextMenu(menuTemplate)
+      }
     },
-    []
+    [t, history, dispatch]
   )
 
   const navTo = useCallback(
@@ -67,7 +99,7 @@ const WalletSetting = ({
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
                 <Stack>
-                  <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
+                  <span className="ms-ChoiceFieldLabel" data-id={wallet.id} onContextMenu={onContextMenu}>
                     {text}
                   </span>
                 </Stack>

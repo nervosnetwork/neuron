@@ -1,7 +1,9 @@
+import { dialog } from 'electron'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
+import i18n from 'utils/i18n'
 
 const networksService = NetworksService.getInstance()
 
@@ -58,16 +60,44 @@ export default class NetworksController {
   }
 
   public static async delete(id: NetworkID) {
-    await networksService.delete(id)
+    const networkService = NetworksService.getInstance()
+    const network = networkService.get(id)
+    if (!network) {
+      throw new NetworkNotFound(id)
+    }
+    const currentID = networkService.getCurrentID()
 
-    return {
-      status: ResponseCode.Success,
-      result: true,
+    const messageValue = await dialog.showMessageBox(
+      {
+        type: 'warning',
+        title: i18n.t(`messageBox.remove-network.title`),
+        message: i18n.t(`messageBox.remove-network.message`, {
+          name: network.name,
+          address: network.remote,
+        }),
+        detail: currentID === id ? i18n.t('messageBox.remove-network.alert') : '',
+        buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
+      }
+    )
+
+    if (messageValue.response === 0) {
+      try {
+        networksService.delete(id)
+        return {
+          status: ResponseCode.Success,
+          result: true,
+        }
+      } catch (err) {
+        dialog.showMessageBox({
+          type: 'error',
+          message: err.message,
+        })
+      }
     }
   }
 
-  public static async currentID() {
-    const currentID = await networksService.getCurrentID()
+  public static currentID() {
+    const currentID = networksService.getCurrentID()
     if (currentID) {
       return {
         status: ResponseCode.Success,

@@ -139,7 +139,9 @@
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
       "confirmations": "Confirmations",
-      "confirming-with-count": "{{confirmations}} Confirmations"
+      "confirming-with-count": "{{confirmations}} Confirmations",
+      "view-on-explorer": "View on Explorer",
+      "copy-transaction-hash": "Copy Transaction Hash"
     },
     "transaction": {
       "date": "Date",
@@ -168,7 +170,10 @@
       "change-address": "Change Address",
       "display-testnet-addresses": "Display Testnet Addresses",
       "display-mainnet-addresses": "Display Mainnet Addresses",
-      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses"
+      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses",
+      "copy-address": "Copy Address",
+      "request-payment": "Request Payment",
+      "view-on-explorer": "View on Explorer"
     },
     "settings": {
       "go-to-overview": "Go to Overview",
@@ -243,7 +248,11 @@
         "off": "Off"
       },
       "copy-tx-hash": "Copy Transaction Hash",
-      "copy-address": "Copy Address"
+      "copy-address": "Copy Address",
+      "select": "Select",
+      "backup": "Backup",
+      "edit": "Edit",
+      "delete": "Delete"
     },
     "notification-panel": {
       "title": "Notifications"

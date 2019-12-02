@@ -7,7 +7,7 @@ import { Pagination } from '@uifabric/experiments'
 import TransactionList from 'components/TransactionList'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import { Routes } from 'utils/const'
+import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
 
@@ -18,14 +18,20 @@ const History = ({
   },
   wallet: { id },
   chain: {
+    networkID,
     tipBlockNumber: syncedBlockNumber,
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
   },
+  settings: { networks },
   history,
   location: { search },
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const isMainnet = useMemo(() => {
+    const network = networks.find(n => n.id === networkID)
+    return !!(network && network.chain === MAINNET_TAG)
+  }, [networks, networkID])
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   useEffect(() => {
@@ -57,6 +63,7 @@ const History = ({
           walletID={id}
           items={items}
           tipBlockNumber={tipBlockNumber}
+          isMainnet={isMainnet}
           dispatch={dispatch}
         />
         <Pagination
@@ -94,6 +101,7 @@ const History = ({
     totalCount,
     pageSize,
     history,
+    isMainnet,
     t,
   ])
 
