@@ -4,7 +4,7 @@ import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
 
 export default class SyncController {
-  public static async startSyncing() {
+  public static startSyncing() {
     createSyncBlockTask()
 
     return {
@@ -13,7 +13,7 @@ export default class SyncController {
     }
   }
 
-  public static async stopSyncing() {
+  public static stopSyncing() {
     killSyncBlockTask()
 
     return {
@@ -23,7 +23,7 @@ export default class SyncController {
   }
 
   public static async deleteData() {
-    ChainCleaner.clean()
+    await ChainCleaner.clean()
 
     return {
       status: ResponseCode.Success,

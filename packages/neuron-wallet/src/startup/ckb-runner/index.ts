@@ -72,7 +72,7 @@ export const startCkbNode = async () => {
   })
 }
 
-export const stopCkbNode = async () => {
+export const stopCkbNode = () => {
   if (ckb) {
     logger.info('Killing CKB')
     ckb.kill()

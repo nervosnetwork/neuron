@@ -3,7 +3,7 @@ import { ResponseCode } from 'utils/const'
 
 export default class NodeController {
   public static async startNode() {
-    startCkbNode()
+    await startCkbNode()
 
     return {
       status: ResponseCode.Success,
@@ -11,7 +11,7 @@ export default class NodeController {
     }
   }
 
-  public static async stopNode() {
+  public static stopNode() {
     stopCkbNode()
 
     return {

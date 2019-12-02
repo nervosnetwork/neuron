@@ -14,14 +14,14 @@ app.on('ready', async () => {
 
   WalletService.getInstance().generateAddressesIfNecessary()
   if (!env.isTestMode) {
-    NodeController.startNode()
+    await NodeController.startNode()
     SyncController.startSyncing()
   }
 
   appController.openWindow()
 })
 
-app.on('will-quit', async () => {
+app.on('will-quit', () => {
   if (!env.isTestMode) {
     SyncController.stopSyncing()
     NodeController.stopNode()
