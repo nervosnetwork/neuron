@@ -1,5 +1,4 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
-import NodeService from 'services/node'
 import logger from 'utils/logger'
 
 import Queue from './queue'
@@ -21,7 +20,7 @@ export default class BlockListener {
   constructor(
     url: string,
     lockHashes: string[],
-    tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject
+    tipNumberSubject: BehaviorSubject<string | undefined>
   ) {
     this.url = url
     this.lockHashes = lockHashes
