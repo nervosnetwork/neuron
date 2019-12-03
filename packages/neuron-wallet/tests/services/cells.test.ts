@@ -273,11 +273,7 @@ describe('CellsService', () => {
           feeRate
         )
         expect(result.capacities).toEqual(toShannon('1000'))
-        const expectedSize = TransactionSize.input() + TransactionSize.witness({
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        })
+        const expectedSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
 
@@ -289,22 +285,14 @@ describe('CellsService', () => {
           '0',
           feeRate
         )
-        const expectedSize = 2 * TransactionSize.input() + TransactionSize.witness({
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        }) + TransactionSize.witness('0x')
+        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness()+ TransactionSize.emptyWitness()
         expect(result.capacities).toEqual(toShannon('3000'))
         expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
 
       it('capacity 1000 - inputFee', async () => {
         const feeRate = '1000'
-        const inputSize = TransactionSize.input() + TransactionSize.witness({
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        })
+        const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const expectedFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
         const capacity = BigInt(1000 * 10**8) - expectedFee
@@ -320,11 +308,7 @@ describe('CellsService', () => {
 
       it('capacity 1000 - inputFee + 1 shannon', async () => {
         const feeRate = '1000'
-        const inputSize = TransactionSize.input() + TransactionSize.witness({
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        })
+        const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
         const inputFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
         const capacity = BigInt(1000 * 10**8) - inputFee + BigInt(1)
@@ -335,11 +319,7 @@ describe('CellsService', () => {
           feeRate
         )
         expect(result.capacities).toEqual(toShannon('3000'))
-        const expectedSize = TransactionSize.input() * 2 + TransactionSize.witness({
-          lock: '0x' + '0'.repeat(130),
-          inputType: undefined,
-          outputType: undefined,
-        }) + TransactionSize.witness('0x')
+        const expectedSize = TransactionSize.input() * 2 + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
         const expectedFee = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(BigInt(result.finalFee)).toEqual(expectedFee)
       })
