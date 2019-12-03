@@ -67,10 +67,6 @@ export const startCkbNode = async () => {
     ckb.stderr && ckb.stderr.on('data', data => {
       logger.error('CKB run fail:', data.toString())
     })
-    ckb.stdout && ckb.stdout.on('data', _data => {
-      // Do not log here. CKB has its own run.log in data/logs.
-      // Note `Address already in use` log when port 8114 is used (CKB is already running) outputs also goes here.
-    })
 
     ckb.on('error', error => {
       logger.error('CKB run fail:', error)
