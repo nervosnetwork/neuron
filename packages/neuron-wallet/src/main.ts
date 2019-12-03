@@ -21,10 +21,10 @@ app.on('ready', async () => {
   appController.openWindow()
 })
 
-app.on('will-quit', async () => {
+app.on('before-quit', async () => {
   if (!env.isTestMode) {
+    // No need to stop syncing as background process will be killed
     NodeController.stopNode()
-    await SyncController.stopSyncing()
   }
 })
 
