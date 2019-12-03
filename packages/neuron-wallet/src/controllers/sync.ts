@@ -1,5 +1,5 @@
 import BlockNumber from 'services/sync/block-number'
-import { createSyncBlockTask, killSyncBlockTask } from 'startup/sync-block-task/create'
+import { createSyncBlockTask, killSyncBlockTask } from 'startup/sync-block-task'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
 
@@ -13,8 +13,8 @@ export default class SyncController {
     }
   }
 
-  public static stopSyncing() {
-    killSyncBlockTask()
+  public static async stopSyncing() {
+    await killSyncBlockTask()
 
     return {
       status: ResponseCode.Success,
@@ -22,13 +22,14 @@ export default class SyncController {
     }
   }
 
-  public static async deleteData() {
-    await ChainCleaner.clean()
-
-    return {
-      status: ResponseCode.Success,
-      result: true
-    }
+  public static async clearCache() {
+    return new Promise(resolve => {
+      SyncController.stopSyncing().finally(() => {
+        ChainCleaner.clean().finally(() => {
+          return resolve(this.startSyncing())
+        })
+      })
+    })
   }
 
   public static async currentBlockNumber() {

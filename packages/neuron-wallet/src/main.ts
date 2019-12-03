@@ -21,9 +21,9 @@ app.on('ready', async () => {
   appController.openWindow()
 })
 
-app.on('will-quit', () => {
+app.on('will-quit', async () => {
   if (!env.isTestMode) {
-    SyncController.stopSyncing()
+    await SyncController.stopSyncing()
     NodeController.stopNode()
   }
 })
