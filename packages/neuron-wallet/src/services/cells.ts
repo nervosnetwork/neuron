@@ -4,9 +4,8 @@ import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
-import { TransactionStatus } from 'types/cell-types'
+import { TransactionStatus, WitnessArgs } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
-import { WitnessArgs } from '../types/cell-types';
 import TransactionSize from '../models/transaction-size';
 import TransactionFee from 'models/transaction-fee'
 
