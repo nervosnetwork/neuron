@@ -45,9 +45,21 @@ describe('TransactionSize', () => {
     expect(result).toEqual(85 + 4 + 4)
   })
 
-  it('empty witness', () => {
+  it('witness 0x', () => {
     const result = TransactionSize.witness('0x')
     expect(result).toEqual(4 + 4)
+  })
+
+  it('secpLockWitness', () => {
+    expect(
+      TransactionSize.secpLockWitness()
+    ).toEqual(85 + 4 + 4)
+  })
+
+  it('emptyWitness', () => {
+    expect(
+      TransactionSize.emptyWitness()
+    ).toEqual(4 + 4)
   })
 
   it('empty outputData', () => {
