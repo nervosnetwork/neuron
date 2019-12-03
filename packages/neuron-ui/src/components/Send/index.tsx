@@ -23,7 +23,7 @@ import appState from 'states/initStates/app'
 import { PlaceHolders, CapacityUnit, ErrorCode, MAINNET_TAG } from 'utils/const'
 import { shannonToCKBFormatter } from 'utils/formatters'
 
-import { verifyTotalAmount } from 'utils/validators'
+import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
 
 export interface TransactionOutput {
@@ -44,6 +44,7 @@ const Send = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const { t } = useTranslation()
   const {
+    outputs,
     fee,
     totalAmount,
     setTotalAmount,
@@ -59,8 +60,10 @@ const Send = ({
     onClear,
     errorMessage,
     setErrorMessage,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, dispatch, t)
-  useOnTransactionChange(walletID, send.outputs, send.price, dispatch, setTotalAmount, setErrorMessage)
+    isSendMax,
+    onSendMaxClick,
+  } = useInitialize(walletID, send.outputs, send.generatedTx, sending, dispatch, t)
+  useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
 
@@ -74,7 +77,7 @@ const Send = ({
     <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
       <Stack.Item>
         <List
-          items={send.outputs || []}
+          items={outputs}
           onRenderCell={(item, idx) => {
             if (undefined === item || undefined === idx) {
               return null
@@ -95,7 +98,7 @@ const Send = ({
                       <TextField
                         data-field="address"
                         data-idx={idx}
-                        disabled={sending}
+                        disabled={item.disabled}
                         value={item.address || ''}
                         onChange={onItemChange}
                         required
@@ -116,9 +119,10 @@ const Send = ({
                   </Stack>
 
                   <Stack.Item>
-                    {send.outputs.length > 1 ? (
+                    {outputs.length > 1 ? (
                       <IconButton
-                        iconProps={{ iconName: 'Remove' }}
+                        disabled={isSendMax}
+                        iconProps={{ iconName: isSendMax ? 'DisabledRemove' : 'Remove' }}
                         text={t('send.remove-this')}
                         onClick={() => removeTransactionOutput(idx)}
                       />
@@ -141,9 +145,9 @@ const Send = ({
                         data-field="amount"
                         data-idx={idx}
                         value={item.amount}
-                        placeholder={PlaceHolders.send.Amount}
+                        placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
                         onChange={onItemChange}
-                        disabled={sending}
+                        disabled={item.disabled}
                         required
                         validateOnLoad={false}
                         onGetErrorMessage={onGetAmountErrorMessage}
@@ -155,16 +159,29 @@ const Send = ({
                   </Stack>
 
                   <Stack.Item>
-                    {idx === send.outputs.length - 1 ? (
-                      <IconButton
-                        iconProps={{ iconName: 'Add' }}
-                        onClick={() => addTransactionOutput()}
-                        ariaLabel={t('send.add-one')}
-                      />
+                    {idx === outputs.length - 1 ? (
+                      <Stack horizontal>
+                        <DefaultButton
+                          onClick={onSendMaxClick}
+                          style={{
+                            boxShadow: isSendMax ? 'inset 0 0 5px #000' : 'none',
+                          }}
+                          disabled={!verifyTransactionOutputs(outputs, true)}
+                        >
+                          Max
+                        </DefaultButton>
+                        <IconButton
+                          disabled={!verifyTransactionOutputs(outputs, false) || isSendMax}
+                          iconProps={{
+                            iconName: !verifyTransactionOutputs(outputs, false) || isSendMax ? 'DisabledAdd' : 'Add',
+                          }}
+                          onClick={() => addTransactionOutput()}
+                          ariaLabel={t('send.add-one')}
+                        />
+                      </Stack>
                     ) : null}
                   </Stack.Item>
                 </Stack>
-
                 <Separator />
               </Stack>
             )
@@ -184,7 +201,7 @@ const Send = ({
           styles={{
             root: {
               width: leftStackWidth,
-              display: send.outputs.length > 1 || errorMessageUnderTotal ? 'flex' : 'none',
+              display: outputs.length > 1 || errorMessageUnderTotal ? 'flex' : 'none',
             },
           }}
           tokens={{ childrenGap: 20 }}

@@ -59,6 +59,8 @@ declare namespace Controller {
     feeRate: string
   }
 
+  type GenerateSendingAllTransactionParams = GenerateTransactionParams
+
   interface GenerateDepositAllTransactionParams {
     walletID: string
     feeRate: string
