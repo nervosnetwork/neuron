@@ -18,6 +18,7 @@ export const SHANNON_CKB_RATIO = 1e8
 
 export const MEDIUM_FEE_RATE = 6000
 export const WITHDRAW_EPOCHS = 180
+export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
 
 export const RUN_NODE_GUIDE_URL = 'https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node'
 export const NERVOS_DAO_RFC_URL =
