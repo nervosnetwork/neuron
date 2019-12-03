@@ -29,6 +29,7 @@ import FeeMode from 'models/fee-mode'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
+import logger from 'utils/logger'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -654,6 +655,8 @@ export default class WalletService {
       tx.fee = fee
       output.capacity = (outputCapacity - feeInt).toString()
     }
+
+    logger.debug('withdrawFromDao fee:', tx.fee)
 
     return tx
   }
