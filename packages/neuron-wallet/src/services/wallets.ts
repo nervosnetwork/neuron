@@ -13,7 +13,6 @@ import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
-import CellsService from 'services/cells'
 import { AddressPrefix, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 
 import NodeService from './node'
@@ -512,111 +511,35 @@ export default class WalletService {
     }
 
     const sdkOutPoint = ConvertTo.toSdkOutPoint(outPoint)
-
     const cellStatus = await core.rpc.getLiveCell(sdkOutPoint, false)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
-    const tx = await core.rpc.getTransaction(outPoint.txHash)
-    if (tx.txStatus.status !== 'committed') {
+    const prevTx = await core.rpc.getTransaction(outPoint.txHash)
+    if (prevTx.txStatus.status !== 'committed') {
       throw new TransactionIsNotCommittedYet()
     }
 
     const addressInfos = this.getAddressInfos(walletID)
-
     const addresses: string[] = addressInfos.map(info => info.address)
-
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
+    const depositBlockHeader = await core.rpc.getHeader(prevTx.txStatus.blockHash!)
 
-    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoputInputsForWitdrawStep1()
-    const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
-
-    const depositBlock = await core.rpc.getHeader(tx.txStatus.blockHash!)
-    const depositBlockNumber = depositBlock.number
-
-    const output = TypeConvert.toOutput(cellStatus.cell.output)
-    const buf = Buffer.alloc(8)
-    buf.writeBigUInt64LE(BigInt(depositBlockNumber))
-    output.data = `0x${buf.toString('hex')}`
-    output.typeHash = LockUtils.computeScriptHash(output.type!)
-    output.daoData = output.data
-    output.depositOutPoint = outPoint
-
-    // const capacityInt = BigInt(output.capacity)
-    const outputs: Cell[] = [output]
-
-    const {
-      inputs,
-      capacities,
-      needFee
-    } = await CellsService.gatherInputs(
-      '0',
+    const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
+    const prevOutput = TypeConvert.toOutput(cellStatus.cell.output)
+    const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
       lockHashes,
+      outPoint,
+      prevOutput,
+      depositBlockHeader.number,
+      depositBlockHeader.hash,
+      changeAddress!.address,
       fee,
-      feeRate
+      feeRate,
     )
-    const needFeeInt = BigInt(needFee)
-    const totalFee = feeWithoutInputs + needFeeInt
 
-    const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
-    const daoScriptInfo = await DaoUtils.daoScript()
-
-    const input: Input = {
-      previousOutput: outPoint,
-      since: '0',
-      lock: output.lock,
-      lockHash: LockUtils.lockScriptToHash(output.lock),
-      capacity: output.capacity,
-    }
-
-    // change
-    let finalFee: bigint = feeInt
-    if (mode.isFeeRateMode()) {
-      finalFee = totalFee
-    }
-    if (BigInt(capacities) > finalFee) {
-      const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress!.address)
-      const changeCapacity = BigInt(capacities) - finalFee
-
-      const changeOutput: Cell = {
-        capacity: changeCapacity.toString(),
-        data: '0x',
-        lock: {
-          codeHash,
-          args: changeBlake160,
-          hashType
-        },
-      }
-
-      outputs.push(changeOutput)
-    }
-
-    return {
-      version: '0',
-      cellDeps: [
-        {
-          outPoint: secpOutPoint,
-          depType: DepType.DepGroup,
-        },
-        {
-          outPoint: daoScriptInfo.outPoint,
-          depType: DepType.Code,
-        },
-      ],
-      headerDeps: [
-        depositBlock.hash,
-      ],
-      inputs: [input].concat(inputs),
-      outputs,
-      outputsData: outputs.map(o => o.data || '0x'),
-      witnesses: [],
-      fee: finalFee.toString(),
-    }
+    return tx
   }
 
   public withdrawFromDao = async (
