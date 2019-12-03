@@ -127,8 +127,6 @@ export const killSyncBlockTask = () => {
   if (syncBlockBackgroundWindow) {
     logger.info('Kill sync block background process')
     // TODO: kill block number listener
-    // FIXME: this cuases crash when closing the window but not quit the app
     syncBlockBackgroundWindow.close()
-    syncBlockBackgroundWindow = null
   }
 }

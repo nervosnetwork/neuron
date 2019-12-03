@@ -315,7 +315,7 @@ export default class ApiController {
 
   @MapApiResponse
   public static async clearCellCache() {
-    SyncController.stopSyncing()
+    await SyncController.stopSyncing()
     await SyncController.deleteData()
     return SyncController.startSyncing()
   }
