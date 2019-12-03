@@ -23,8 +23,8 @@ app.on('ready', async () => {
 
 app.on('will-quit', async () => {
   if (!env.isTestMode) {
-    await SyncController.stopSyncing()
     NodeController.stopNode()
+    await SyncController.stopSyncing()
   }
 })
 
