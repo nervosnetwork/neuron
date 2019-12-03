@@ -488,8 +488,29 @@ describe('TransactionGenerator', () => {
         '1000'
       )
 
-      const expectedFee = BigInt('590')
+      // calculated by SDK
+      const expectedFee = BigInt('505')
       const expectedCapacity = BigInt('300000000000') - expectedFee
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
+      expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+
+    it(`2 bob's outputs, 1 alice output`, async () => {
+      const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+      await getConnection().manager.save(aliceCell)
+
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash, alice.lockHash],
+        bob.address,
+        '0',
+        '1000'
+      )
+
+      // calculated by SDK
+      const expectedFee = BigInt('642')
+      const expectedCapacity = BigInt('450000000000') - expectedFee
 
       expect(tx.outputs!.length).toEqual(1)
       expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())

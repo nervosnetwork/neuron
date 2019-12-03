@@ -327,14 +327,12 @@ export class TransactionGenerator {
     // change
     let finalFee: bigint = feeInt
     if (mode.isFeeRateMode()) {
-      const size: number =
-        TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDepositAll() +
-          allInputs.length * (TransactionSize.input() + TransactionSize.witness({
-            lock: '0x' + '0'.repeat(130),
-            inputType: undefined,
-            outputType: undefined,
-          }))
-      finalFee = TransactionGenerator.txFee(size, feeRateInt)
+      const lockHashes = new Set(allInputs.map(i => i.lockHash!))
+      const keyCount: number = lockHashes.size
+      const txSize: number = TransactionSize.tx(tx) +
+        TransactionSize.secpLockWitness() * keyCount +
+        TransactionSize.emptyWitness() * (allInputs.length - keyCount)
+      finalFee = TransactionGenerator.txFee(txSize, feeRateInt)
     }
 
     output.capacity = (BigInt(output.capacity) - finalFee).toString()
