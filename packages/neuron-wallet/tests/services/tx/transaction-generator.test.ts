@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import { ScriptHashType, Script, TransactionWithoutHash } from '../../../src/types/cell-types'
+import { ScriptHashType, Script, TransactionWithoutHash, OutPoint } from '../../../src/types/cell-types';
 import { OutputStatus } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
@@ -25,6 +25,12 @@ const daoScript = {
   },
   codeHash: '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e',
   hashType: ScriptHashType.Type,
+}
+
+const daoTypeScript: Script = {
+  "codeHash": "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+  "hashType": ScriptHashType.Type,
+  "args": "0x"
 }
 
 const randomHex = (length: number = 64): string => {
@@ -80,7 +86,8 @@ describe('TransactionGenerator', () => {
     status: OutputStatus,
     hasData: boolean,
     typeScript: Script | null,
-    who: any = bob
+    who: any = bob,
+    daoData?: string | undefined
   ) => {
     const output = new OutputEntity()
     output.outPointTxHash = randomHex()
@@ -91,6 +98,9 @@ describe('TransactionGenerator', () => {
     output.status = status
     output.hasData = hasData
     output.typeScript = typeScript
+    if (daoData) {
+      output.daoData = daoData
+    }
 
     return output
   }
@@ -398,7 +408,7 @@ describe('TransactionGenerator', () => {
     it('capacity 1000 - fee, no change output', async () => {
       const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
         [bob.lockHash],
-        (BigInt(100 * 10**8 - 453)).toString(),
+        (BigInt(1000 * 10**8 - 453)).toString(),
         bob.address,
         bob.address,
         '0',
@@ -407,6 +417,7 @@ describe('TransactionGenerator', () => {
 
       const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
       const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.outputs!.length).toEqual(1)
       expect(tx.fee).toEqual(expectedFee.toString())
     })
 
@@ -515,6 +526,48 @@ describe('TransactionGenerator', () => {
       expect(tx.outputs!.length).toEqual(1)
       expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
       expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+  })
+
+  describe('startWithdrawFromDao', () => {
+    const daoData = "0x0000000000000000"
+    const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, daoTypeScript, alice, daoData)
+    const depositDaoCell = depositDaoOutput.toInterface()
+    const depositOutPoint: OutPoint = {
+      txHash: '0x' + '2'.repeat(64),
+      index: '0'
+    }
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+        depositDaoOutput,
+      ]
+
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    const feeRate = '1000'
+    const feeRateInt = BigInt(feeRate)
+
+    it('deposit first', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
+        [bob.lockHash, alice.lockHash],
+        depositOutPoint,
+        depositDaoCell,
+        '12',
+        '0x' + '3'.repeat(64),
+        bob.address,
+        '0',
+        feeRate
+      )
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(expectedFee).toEqual(BigInt(731))
+      expect(tx.fee).toEqual(expectedFee.toString())
+      expect(tx.inputs!.length).toEqual(2)
+      expect(tx.outputs!.length).toEqual(2)
     })
   })
 })

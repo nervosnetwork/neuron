@@ -164,6 +164,7 @@ export default class CellsService {
     let totalSize: number = baseSize
     if (append) {
       inputs.push(append.input)
+      totalSize += TransactionSize.input()
       totalSize += TransactionSize.witness(append.witness)
     }
     let hasChangeOutput: boolean = false
