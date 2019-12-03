@@ -27,6 +27,8 @@ import TypeConvert from 'types/type-convert'
 import DaoUtils from 'models/dao-utils'
 import FeeMode from 'models/fee-mode'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
+import TransactionSize from 'models/transaction-size'
+import TransactionFee from 'models/transaction-fee'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
@@ -550,36 +552,29 @@ export default class WalletService {
     feeRate: string = '0'
   ): Promise<TransactionWithoutHash> => {
     const DAO_LOCK_PERIOD_EPOCHS = BigInt(180)
-    // const DAO_MATURITY_BLOCKS = 5
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
-
-    let finalFee: bigint = feeInt
-    if (mode.isFeeRateMode()) {
-      const txSize = TransactionGenerator.txSerializedSizeInBlockForWithdraw()
-      finalFee = TransactionGenerator.txFee(txSize, feeRateInt)
-    }
 
     const sdkWithdrawingOutPoint = ConvertTo.toSdkOutPoint(withdrawingOutPoint)
     const cellStatus = await core.rpc.getLiveCell(sdkWithdrawingOutPoint, true)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
-    const tx = await core.rpc.getTransaction(withdrawingOutPoint.txHash)
-    if (tx.txStatus.status !== 'committed') {
+    const prevTx = await core.rpc.getTransaction(withdrawingOutPoint.txHash)
+    if (prevTx.txStatus.status !== 'committed') {
       throw new TransactionIsNotCommittedYet()
     }
     const content = cellStatus.cell.data!.content
     const buf = Buffer.from(content.slice(2), 'hex')
     const depositBlockNumber: bigint = buf.readBigUInt64LE()
-    const depositBlock = await core.rpc.getHeaderByNumber(depositBlockNumber)
-    const depositEpoch = this.parseEpoch(BigInt(depositBlock.epoch))
+    const depositBlockHeader = await core.rpc.getHeaderByNumber(depositBlockNumber)
+    const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
     const depositCapacity: bigint = BigInt(cellStatus.cell.output.capacity)
 
-    const withdrawBlock = await core.rpc.getHeader(tx.txStatus.blockHash!)
-    const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlock.epoch))
+    const withdrawBlockHeader = await core.rpc.getHeader(prevTx.txStatus.blockHash!)
+    const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
 
     const withdrawFraction = withdrawEpoch.index * depositEpoch.length
     const depositFraction = depositEpoch.index * withdrawEpoch.length
@@ -594,7 +589,7 @@ export default class WalletService {
 
     const minimalSince = this.epochSince(minimalSinceEpochLength, minimalSinceEpochIndex, minimalSinceEpochNumber)
 
-    const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlock.hash)
+    const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
     const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
     const daoScriptInfo = await DaoUtils.daoScript()
@@ -603,7 +598,7 @@ export default class WalletService {
     const blake160 = LockUtils.addressToBlake160(address!.address)
 
     const output: Cell = {
-      capacity: (BigInt(outputCapacity) - finalFee).toString(),
+      capacity: outputCapacity.toString(),
       lock: {
         codeHash,
         hashType,
@@ -622,7 +617,12 @@ export default class WalletService {
       lockHash: LockUtils.computeScriptHash(previousOutput.lock)
     }
 
-    return {
+    const withdrawWitnessArgs: WitnessArgs = {
+      lock: '0x' + '0'.repeat(130),
+      inputType: '0x0000000000000000',
+      outputType: undefined,
+    }
+    const tx: TransactionWithoutHash = {
       version: '0',
       cellDeps: [
         {
@@ -635,21 +635,27 @@ export default class WalletService {
         },
       ],
       headerDeps: [
-        depositBlock.hash,
-        withdrawBlock.hash
+        depositBlockHeader.hash,
+        withdrawBlockHeader.hash
       ],
       inputs: [input],
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],
-      witnessArgs: [{
-        lock: undefined,
-        inputType: '0x0000000000000000',
-        outputType: undefined,
-      }],
-      fee: finalFee.toString(),
+      witnessArgs: [withdrawWitnessArgs],
       interest: (BigInt(outputCapacity) - depositCapacity).toString(),
     }
+    if (mode.isFeeRateMode()) {
+      const txSize: number = TransactionSize.tx(tx) + TransactionSize.witness(withdrawWitnessArgs)
+      const txFee: bigint = TransactionFee.fee(txSize, BigInt(feeRate))
+      tx.fee = txFee.toString()
+      output.capacity = (outputCapacity - txFee).toString()
+    } else {
+      tx.fee = fee
+      output.capacity = (outputCapacity - feeInt).toString()
+    }
+
+    return tx
   }
 
   public generateDepositAllTx = async (
