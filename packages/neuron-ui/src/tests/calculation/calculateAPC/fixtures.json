@@ -1,0 +1,18 @@
+{
+  "less than 1 year": {
+    "startYearNumber": 0,
+    "endYearNumber": 0.19,
+    "expected": 3.7
+  },
+
+  "1 year cross periods": {
+    "startYearNumber": 3.5,
+    "endYearNumber": 4.5,
+    "expected": 2.44
+  },
+  "more than 4 year": {
+    "startYearNumber": 0,
+    "endYearNumber": 5.5,
+    "expected": 2.94
+  }
+}

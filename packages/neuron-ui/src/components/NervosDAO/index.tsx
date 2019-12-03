@@ -8,7 +8,7 @@ import appState from 'states/initStates/app'
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
-import calculateGlobalAPC from 'utils/calculateGlobalAPC'
+import calculateAPC from 'utils/calculateAPC'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
 import {
@@ -17,6 +17,7 @@ import {
   MEDIUM_FEE_RATE,
   SHANNON_CKB_RATIO,
   MAX_DECIMAL_DIGITS,
+  MILLISECONDS_IN_YEAR,
   CapacityUnit,
 } from 'utils/const'
 import { verifyAmount } from 'utils/validators'
@@ -151,11 +152,16 @@ const NervosDAO = ({
 
   useEffect(() => {
     if (tipBlockTimestamp) {
-      calculateGlobalAPC(tipBlockTimestamp, genesisBlockTimestamp)
-        .then(apc => {
-          setGlobalAPC(apc)
+      const endYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      try {
+        const apc = calculateAPC({
+          startYearNumber: 0,
+          endYearNumber,
         })
-        .catch(err => console.error(err))
+        setGlobalAPC(apc)
+      } catch (err) {
+        console.error(err)
+      }
     }
   }, [tipBlockTimestamp, genesisBlockTimestamp])
 
@@ -333,6 +339,7 @@ const NervosDAO = ({
                 key={JSON.stringify(record.outPoint)}
                 onClick={onActionClick}
                 tipBlockNumber={tipBlockNumber}
+                tipBlockTimestamp={tipBlockTimestamp}
                 epoch={epoch}
                 genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
@@ -342,7 +349,17 @@ const NervosDAO = ({
         </Stack>
       </>
     )
-  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus, genesisBlockTimestamp])
+  }, [
+    records,
+    withdrawList,
+    t,
+    onActionClick,
+    tipBlockNumber,
+    epoch,
+    connectionStatus,
+    genesisBlockTimestamp,
+    tipBlockTimestamp,
+  ])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
