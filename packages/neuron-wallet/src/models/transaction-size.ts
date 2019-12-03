@@ -1,4 +1,4 @@
-import { Cell, WitnessArgs, TransactionWithoutHash } from 'types/cell-types';
+import { Cell, WitnessArgs, TransactionWithoutHash } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils/lib/serialization/transaction'
 import HexUtils from 'utils/hex'
@@ -26,12 +26,12 @@ export default class TransactionSize {
   public static output(output: Cell): number {
     const sdkOutput = ConvertTo.toSdkOutput(output)
     const bytes = serializeOutput(sdkOutput)
-    return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   public static outputData(data: string): number {
     const bytes = serializeFixVec(data)
-    return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   public static witness(witness: WitnessArgs | string): number {
@@ -39,7 +39,7 @@ export default class TransactionSize {
       ? witness
       : serializeWitnessArgs(ConvertTo.toSdkWitnessArgs(witness))
     const bytes = serializeFixVec(wit)
-    return Buffer.byteLength(HexUtils.removePrefix(bytes), 'hex') + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+    return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
   public static secpLockWitness(): number {
