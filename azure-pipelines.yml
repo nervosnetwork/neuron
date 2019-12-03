@@ -132,7 +132,9 @@ stages:
       displayName: 'Download macOS Signing Certificate'
       inputs:
         secureFile: Neuron_mac.p12
-    - script: yarn release mac
+    - script:
+        ./scripts/download-ckb.sh mac
+        yarn release mac
       name: Release
       displayName: 'Sign and Release'
       env:
@@ -155,7 +157,9 @@ stages:
         yarn global add lerna
         yarn bootstrap
       name: Bootstrap
-    - script: yarn release linux
+    - script: |
+        ./scripts/download-ckb.sh
+        yarn release linux
       name: Release
       displayName: 'Sign and Release'
       env:
@@ -179,7 +183,9 @@ stages:
       displayName: 'Download Windows Signing Certificate'
       inputs:
         secureFile: Neuron_win.p12
-    - script: yarn release win
+    - script:
+        ./scripts/download-ckb.sh win
+        yarn release win
       name: Release
       displayName: 'Sign and Release'
       env:
