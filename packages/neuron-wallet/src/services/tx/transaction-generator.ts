@@ -106,6 +106,89 @@ export class TransactionGenerator {
     return tx
   }
 
+  // rest of capacity all send to last target output.
+  public static generateAllTx = async (
+    lockHashes: string[],
+    targetOutputs: TargetOutput[],
+    fee: string = '0',
+    feeRate: string = '0'
+  ): Promise<TransactionWithoutHash> => {
+    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
+
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+    const totalCapacity: bigint = allInputs
+      .map(input => BigInt(input.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
+    const outputs: Cell[] = targetOutputs.map((o, index) => {
+      const { capacity, address } = o
+
+      // skip last output
+      if (BigInt(capacity) < minCellCapacity && index !== targetOutputs.length - 1) {
+        throw new CapacityTooSmall()
+      }
+
+      const blake160: string = LockUtils.addressToBlake160(address)
+
+      const output: Cell = {
+        capacity,
+        data: '0x',
+        lock: {
+          codeHash,
+          args: blake160,
+          hashType,
+        },
+      }
+
+      return output
+    })
+
+    const tx: TransactionWithoutHash = {
+      version: '0',
+      cellDeps: [
+        {
+          outPoint,
+          depType: DepType.DepGroup,
+        }
+      ],
+      headerDeps: [],
+      inputs: allInputs,
+      outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
+      witnesses: [],
+    }
+
+    // change
+    let finalFee: bigint = feeInt
+    if (mode.isFeeRateMode()) {
+      const lockHashes = new Set(allInputs.map(i => i.lockHash!))
+      const keyCount: number = lockHashes.size
+      const txSize: number = TransactionSize.tx(tx) +
+        TransactionSize.secpLockWitness() * keyCount +
+        TransactionSize.emptyWitness() * (allInputs.length - keyCount)
+      finalFee = TransactionFee.fee(txSize, feeRateInt)
+    }
+
+    const capacitiesExceptLast: bigint = outputs
+      .slice(0, -1)
+      .map(o => BigInt(o.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+    outputs[outputs.length - 1].capacity = (totalCapacity - capacitiesExceptLast - finalFee).toString()
+    tx.fee = finalFee.toString()
+
+    // check
+    if (outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !== totalCapacity) {
+      throw new Error('generateAllTx Error')
+    }
+
+    return tx
+  }
+
   public static generateDepositTx = async (
     lockHashes: string[],
     capacity: string,
