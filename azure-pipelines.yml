@@ -112,7 +112,7 @@ stages:
 
 - stage: release
   displayName: Release Binaries
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  # condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: release_mac
     displayName: Release macOS
