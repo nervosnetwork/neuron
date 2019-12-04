@@ -132,7 +132,7 @@ stages:
       displayName: 'Download macOS Signing Certificate'
       inputs:
         secureFile: Neuron_mac.p12
-    - script:
+    - script: |
         ./scripts/download-ckb.sh mac
         yarn release mac
       name: Release
@@ -183,7 +183,7 @@ stages:
       displayName: 'Download Windows Signing Certificate'
       inputs:
         secureFile: Neuron_win.p12
-    - script:
+    - script: |
         ./scripts/download-ckb.sh win
         yarn release win
       name: Release
