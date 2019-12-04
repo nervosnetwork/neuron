@@ -8,13 +8,21 @@ import appState from 'states/initStates/app'
 import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
-import calculateGlobalAPC from 'utils/calculateGlobalAPC'
+import calculateAPC from 'utils/calculateAPC'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, MEDIUM_FEE_RATE, SHANNON_CKB_RATIO, MAX_DECIMAL_DIGITS, CapacityUnit } from 'utils/const'
+import {
+  MIN_AMOUNT,
+  MIN_DEPOSIT_AMOUNT,
+  MEDIUM_FEE_RATE,
+  SHANNON_CKB_RATIO,
+  MAX_DECIMAL_DIGITS,
+  MILLISECONDS_IN_YEAR,
+  CapacityUnit,
+} from 'utils/const'
 import { verifyAmount } from 'utils/validators'
 
-import { generateDepositTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
+import { generateDepositTx, generateDepositAllTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
 import { getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
@@ -47,6 +55,8 @@ const NervosDAO = ({
   const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
+  const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
+  const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -76,29 +86,43 @@ const NervosDAO = ({
           return
         }
 
-        generateDepositTx({
-          feeRate: `${MEDIUM_FEE_RATE}`,
-          capacity: CKBToShannonFormatter(value, CapacityUnit.CKB),
-          walletID: wallet.id,
-        }).then(res => {
-          if (res.status === 1) {
-            dispatch({
-              type: AppActions.UpdateGeneratedTx,
-              payload: res.result,
-            })
-          } else {
-            setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-          }
-        })
+        const capacity = CKBToShannonFormatter(value, CapacityUnit.CKB)
+        if (BigInt(capacity) < maxDepositAmount) {
+          generateDepositTx({
+            feeRate: `${MEDIUM_FEE_RATE}`,
+            capacity,
+            walletID: wallet.id,
+          }).then(res => {
+            if (res.status === 1) {
+              dispatch({
+                type: AppActions.UpdateGeneratedTx,
+                payload: res.result,
+              })
+            } else {
+              setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+            }
+          })
+        } else {
+          dispatch({
+            type: AppActions.UpdateGeneratedTx,
+            payload: maxDepositTx,
+          })
+        }
       }, 500)
       setDepositValue(value)
     },
-    [clearGeneratedTx, dispatch, wallet.id, t]
+    [clearGeneratedTx, maxDepositAmount, maxDepositTx, dispatch, wallet.id, t]
   )
 
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    updateDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
+    updateDepositValue(
+      `${
+        BigInt(wallet.balance) > BigInt(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`))
+          ? BigInt(MIN_DEPOSIT_AMOUNT)
+          : BigInt(0)
+      }`
+    )
     getHeaderByNumber('0x0')
       .then(header => setGenesisBlockTimestamp(+header.timestamp))
       .catch(err => console.error(err))
@@ -106,15 +130,38 @@ const NervosDAO = ({
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
     }
-  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id])
+  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance])
+
+  useEffect(() => {
+    generateDepositAllTx({
+      walletID: wallet.id,
+      feeRate: `${MEDIUM_FEE_RATE}`,
+    })
+      .then(res => {
+        if (res.status === 1) {
+          const fee = BigInt(res.result.fee)
+          const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
+          setMaxDepositAmount(maxValue)
+          setMaxDepositTx(res.result)
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }, [wallet.id, wallet.balance])
 
   useEffect(() => {
     if (tipBlockTimestamp) {
-      calculateGlobalAPC(tipBlockTimestamp, genesisBlockTimestamp)
-        .then(apc => {
-          setGlobalAPC(apc)
+      const endYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      try {
+        const apc = calculateAPC({
+          startYearNumber: 0,
+          endYearNumber,
         })
-        .catch(err => console.error(err))
+        setGlobalAPC(apc)
+      } catch (err) {
+        console.error(err)
+      }
     }
   }, [tipBlockTimestamp, genesisBlockTimestamp])
 
@@ -232,6 +279,17 @@ const NervosDAO = ({
     [records, clearGeneratedTx, dispatch, wallet.id]
   )
 
+  const onSlide = useCallback(
+    (value: number) => {
+      const amount =
+        maxDepositAmount - BigInt(CKBToShannonFormatter(`${value}`)) < BigInt(SHANNON_CKB_RATIO * MIN_AMOUNT)
+          ? shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
+          : `${value}`
+      updateDepositValue(amount)
+    },
+    [updateDepositValue, maxDepositAmount]
+  )
+
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
   )} CKB`
@@ -281,6 +339,7 @@ const NervosDAO = ({
                 key={JSON.stringify(record.outPoint)}
                 onClick={onActionClick}
                 tipBlockNumber={tipBlockNumber}
+                tipBlockTimestamp={tipBlockTimestamp}
                 epoch={epoch}
                 genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
@@ -290,7 +349,17 @@ const NervosDAO = ({
         </Stack>
       </>
     )
-  }, [records, withdrawList, t, onActionClick, tipBlockNumber, epoch, connectionStatus, genesisBlockTimestamp])
+  }, [
+    records,
+    withdrawList,
+    t,
+    onActionClick,
+    tipBlockNumber,
+    epoch,
+    connectionStatus,
+    genesisBlockTimestamp,
+    tipBlockTimestamp,
+  ])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -354,8 +423,8 @@ const NervosDAO = ({
         onChange={(_e: any, value: string) => updateDepositValue(value)}
         onDismiss={onDepositDialogDismiss}
         onSubmit={onDepositDialogSubmit}
-        onSlide={(value: number) => updateDepositValue(`${value}`)}
-        balance={wallet.balance}
+        onSlide={onSlide}
+        maxDepositAmount={maxDepositAmount}
         isDepositing={sending}
         errorMessage={errorMessage}
       />

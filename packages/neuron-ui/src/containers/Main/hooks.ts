@@ -29,7 +29,7 @@ import {
 } from 'services/localCache'
 
 let timer: NodeJS.Timeout
-const SYNC_INTERVAL_TIME = 10000
+const SYNC_INTERVAL_TIME = 4000
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {

@@ -5,8 +5,8 @@ import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 
-export { genesisBlockHash } from './create'
-export { databaseInitSubject } from './create'
+export { genesisBlockHash } from '.'
+export { databaseInitSubject } from '.'
 
 export const nodeService = NodeService.getInstance()
 export const addressesUsedSubject = AddressesUsedSubject.getSubject()

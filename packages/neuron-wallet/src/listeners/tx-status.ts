@@ -97,4 +97,8 @@ export const register = () => {
   })
 }
 
+export const unregister = () => {
+  // Nothing to do. This interval subscription will be killed with the renderer process.
+}
+
 export default register

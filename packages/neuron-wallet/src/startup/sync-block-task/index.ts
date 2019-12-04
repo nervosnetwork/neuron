@@ -16,6 +16,7 @@ import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
+import Utils from 'services/sync/utils'
 
 export { genesisBlockHash }
 
@@ -96,7 +97,7 @@ export const createSyncBlockTask = () => {
     return
   }
 
-  console.info('Start sync block background process')
+  logger.info('Start sync block background process')
   syncBlockBackgroundWindow = new BrowserWindow({
     width: 1366,
     height: 768,
@@ -124,9 +125,19 @@ export const createSyncBlockTask = () => {
 }
 
 export const killSyncBlockTask = async () => {
-  if (syncBlockBackgroundWindow) {
-    console.info('Kill sync block background process')
-    // TODO: kill block number listener
-    syncBlockBackgroundWindow.close()
-  }
+  return new Promise(resolve => {
+    if (syncBlockBackgroundWindow) {
+      logger.info('Kill sync block background process')
+      syncBlockBackgroundWindow.webContents.send("sync-window-will-close")
+      // Give ipcRenderer enough time to receive and handle sync-window-will-close channel
+      Utils.sleep(2000).then(() => {
+        if (syncBlockBackgroundWindow) {
+          syncBlockBackgroundWindow.close()
+        }
+        resolve()
+      })
+    } else {
+      resolve()
+    }
+  })
 }

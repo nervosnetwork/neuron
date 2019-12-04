@@ -1,4 +1,4 @@
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
@@ -85,3 +85,10 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
 
   blockListener.start()
 }
+
+ipcRenderer.on('sync-window-will-close', () => {
+  if (blockListener) {
+    blockListener.stop()
+    blockListener = undefined
+  }
+})

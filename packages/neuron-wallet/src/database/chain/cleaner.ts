@@ -7,8 +7,10 @@ import SyncInfoEntity from './entities/sync-info'
 // Clean local sqlite storage
 export default class ChainCleaner {
   public static async clean() {
-    for (const entity of [InputEntity, OutputEntity, TransactionEntity, SyncInfoEntity]) {
-      await getConnection().getRepository(entity).clear()
-    }
+    return Promise.all(
+      [InputEntity, OutputEntity, TransactionEntity, SyncInfoEntity].map(entity => {
+        return getConnection().getRepository(entity).clear()
+      })
+    )
   }
 }
