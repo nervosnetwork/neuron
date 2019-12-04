@@ -188,7 +188,6 @@ const NervosDAO = ({
   }
 
   const onWithdrawDialogSubmit = () => {
-    setErrorMessage('')
     if (activeRecord) {
       generateWithdrawTx({
         walletID: wallet.id,
@@ -210,7 +209,7 @@ const NervosDAO = ({
             })
           } else {
             clearGeneratedTx()
-            setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+            throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
           }
         })
         .catch((err: Error) => {
@@ -258,7 +257,7 @@ const NervosDAO = ({
                 })
               } else {
                 clearGeneratedTx()
-                setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+                throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
               }
             })
             .catch((err: Error) => {
