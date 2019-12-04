@@ -185,6 +185,19 @@ export default class ApiController {
   }
 
   @MapApiResponse
+  public static async generateAllTx(params: {
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    fee: string
+    feeRate: string
+  }) {
+    return WalletsController.generateAllTx(params)
+  }
+
+  @MapApiResponse
   public static async generateDepositTx(params: {
     walletID: string,
     capacity: string,

@@ -469,6 +469,41 @@ export default class WalletService {
     return tx
   }
 
+  public generateAllTx = async (
+    walletID: string = '',
+    items: {
+      address: string
+      capacity: string
+    }[] = [],
+    fee: string = '0',
+    feeRate: string = '0',
+  ): Promise<TransactionWithoutHash> => {
+    const wallet = this.get(walletID)
+    if (!wallet) {
+      throw new WalletNotFound(walletID)
+    }
+
+    const addressInfos = this.getAddressInfos(walletID)
+
+    const addresses: string[] = addressInfos.map(info => info.address)
+
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+
+    const targetOutputs = items.map(item => ({
+      ...item,
+      capacity: BigInt(item.capacity).toString(),
+    }))
+
+    const tx: TransactionWithoutHash = await TransactionGenerator.generateAllTx(
+      lockHashes,
+      targetOutputs,
+      fee,
+      feeRate
+    )
+
+    return tx
+  }
+
   public generateDepositTx = async (
     walletID: string = '',
     capacity: string,
