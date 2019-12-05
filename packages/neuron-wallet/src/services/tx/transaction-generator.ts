@@ -7,6 +7,7 @@ import DaoUtils from 'models/dao-utils'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
+import { CapacityNotEnough } from 'exceptions/wallet'
 
 export class TransactionGenerator {
   public static CHANGE_OUTPUT_SIZE = 101
@@ -120,6 +121,11 @@ export class TransactionGenerator {
     const mode = new FeeMode(feeRateInt)
 
     const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+
+    if (allInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
     const totalCapacity: bigint = allInputs
       .map(input => BigInt(input.capacity))
       .reduce((result, c) => result + c, BigInt(0))
@@ -300,6 +306,9 @@ export class TransactionGenerator {
     const mode = new FeeMode(feeRateInt)
 
     const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+    if (allInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
     const totalCapacity: bigint = allInputs
       .map(input => BigInt(input.capacity))
       .reduce((result, c) => result + c, BigInt(0))
