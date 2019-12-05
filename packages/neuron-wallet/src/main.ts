@@ -1,6 +1,7 @@
 import { app } from 'electron'
 
 import WalletService from 'services/wallets'
+import NetworksService from 'services/networks'
 import NodeController from 'controllers/node'
 import SyncController from 'controllers/sync'
 import AppController from 'controllers/app'
@@ -12,6 +13,7 @@ const appController = new AppController()
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
 
+  NetworksService.getInstance().notifyAll()
   WalletService.getInstance().generateAddressesIfNecessary()
   if (!env.isTestMode) {
     await NodeController.startNode()

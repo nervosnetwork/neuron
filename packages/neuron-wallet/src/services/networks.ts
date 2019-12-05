@@ -39,23 +39,6 @@ export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
-    const currentNetworkList = this.getAll()
-    if (isMainProcess) {
-      NetworkListSubject.next({ currentNetworkList })
-    }
-
-    const currentNetwork = this.getCurrent()
-    if (currentNetwork) {
-      if (currentNetwork.type !== NetworkType.Default) {
-        this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
-      }
-
-      if (isMainProcess) {
-        CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
-      }
-    }
-
     this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
       if (isMainProcess) {
         NetworkListSubject.next({ currentNetworkList })
@@ -83,6 +66,25 @@ export default class NetworksService extends Store {
         NetworkSwitchSubject.getSubject().next(currentNetwork)
       }
     })
+  }
+
+  public notifyAll = () => {
+    const currentNetworkList = this.getAll()
+    if (isMainProcess) {
+      NetworkListSubject.next({ currentNetworkList })
+    }
+
+    const currentNetwork = this.getCurrent()
+    if (currentNetwork) {
+      if (currentNetwork.type !== NetworkType.Default) {
+        this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
+      }
+
+      if (isMainProcess) {
+        CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
+        NetworkSwitchSubject.getSubject().next(currentNetwork)
+      }
+    }
   }
 
   public getAll = () => {
