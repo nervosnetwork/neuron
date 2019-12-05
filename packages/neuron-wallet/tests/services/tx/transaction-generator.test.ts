@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
 import { ScriptHashType, Script, TransactionWithoutHash, OutPoint } from '../../../src/types/cell-types';
-import { OutputStatus } from '../../../src/services/tx/params'
+import { OutputStatus, TargetOutput } from '../../../src/services/tx/params';
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
@@ -358,6 +358,92 @@ describe('TransactionGenerator', () => {
 
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
+    })
+  })
+
+  describe('generateSendingAllTx', () => {
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('3000'), OutputStatus.Live, false, null, alice),
+      ]
+      await getConnection().manager.save(cells)
+      done()
+    })
+    const totalCapacities: bigint = BigInt(toShannon('6000'))
+
+    const lockHashes: string[] = [bob.lockHash, alice.lockHash]
+    const targetOutputs: TargetOutput[] = [
+      {
+        address: bob.address,
+        capacity: toShannon('500'),
+      },
+      {
+        address: alice.address,
+        capacity: toShannon('1000'),
+      },
+      {
+        address: bob.address,
+        capacity: toShannon('0')
+      }
+    ]
+
+    it('with fee 800', async () => {
+      const fee = '800'
+      const feeInt = BigInt(fee)
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+        lockHashes,
+        targetOutputs,
+        fee,
+      )
+
+      const inputCapacities = tx.inputs!
+        .map(input => BigInt(input.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs!
+        .map(output => BigInt(output.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+
+      expect(inputCapacities - outputCapacities).toEqual(feeInt)
+      expect(tx.fee).toEqual(fee)
+      targetOutputs.map((o, index) => {
+        if (index !== targetOutputs.length - 1) {
+          expect(o.capacity).toEqual(tx.outputs![index].capacity)
+        }
+      })
+      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+    })
+
+    it('with feeRate 1000', async () => {
+      const feeRate = '1000'
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+        lockHashes,
+        targetOutputs,
+        '0',
+        feeRate
+      )
+
+      const inputCapacities = tx.inputs!
+        .map(input => BigInt(input.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs!
+        .map(output => BigInt(output.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+      // 762 is calculated by SDK
+      expect(expectedFee).toEqual(BigInt(762))
+      expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+      expect(tx.fee).toEqual(expectedFee.toString())
+      targetOutputs.map((o, index) => {
+        if (index !== targetOutputs.length - 1) {
+          expect(o.capacity).toEqual(tx.outputs![index].capacity)
+        }
+      })
+      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
     })
   })
 

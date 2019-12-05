@@ -373,6 +373,34 @@ export default class WalletsController {
     }
   }
 
+  public static async generateSendingAllTx(params: {
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    fee: string
+    feeRate: string
+  }) {
+    if (!params) {
+      throw new IsRequired('Parameters')
+    }
+    const addresses: string[] = params.items.map(i => i.address)
+    WalletsController.checkAddresses(addresses)
+
+    const walletsService = WalletsService.getInstance()
+    const tx = await walletsService.generateSendingAllTx(
+      params.walletID,
+      params.items,
+      params.fee,
+      params.feeRate,
+    )
+    return {
+      status: ResponseCode.Success,
+      result: tx,
+    }
+  }
+
   public static async generateDepositTx(params: {
     walletID: string,
     capacity: string,
