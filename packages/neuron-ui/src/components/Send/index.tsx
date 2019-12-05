@@ -246,7 +246,7 @@ const Send = ({
       </Stack>
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton type="reset" onClick={onClear}>
+        <DefaultButton type="reset" onClick={onClear} disabled={isSendMax}>
           {t('send.clear')}
         </DefaultButton>
         {sending ? (
