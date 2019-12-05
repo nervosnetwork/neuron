@@ -1,78 +1,17 @@
-import { TransactionWithoutHash, Cell, DepType, Input } from 'types/cell-types'
+import { TransactionWithoutHash, Cell, DepType, Input, OutPoint } from 'types/cell-types'
 import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
 import { TargetOutput } from './params'
 import DaoUtils from 'models/dao-utils'
 import FeeMode from 'models/fee-mode'
+import TransactionSize from 'models/transaction-size'
+import TransactionFee from 'models/transaction-fee'
 
 export class TransactionGenerator {
-  private static txSerializedSizeInBlockWithoutInputs = (outputLength: number) : number => {
-    /*
-    * add a transaction to block need 4 Bytes for offset
-    * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
-    * every cellDep need 37 Bytes, transaction in Neuron only one cellDep
-    * every output without typeScript & with lock in secp need 97 Bytes and 4 Bytes for offset (add to transaction)
-    * every outputsData in "0x" need 4 Bytes and 4 Bytes for offset
-    */
-    return 4 + 68 + 37 * 1 + (4 + 97 + 4 + 4) * outputLength
-  }
+  public static CHANGE_OUTPUT_SIZE = 101
+  public static CHANGE_OUTPUT_DATA_SIZE = 8
 
-  public static txSerializedSizeInBlockWithoutInputsForDeposit = (): number => {
-    /*
-    * add a transaction to block need 4 Bytes for offset
-    * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
-    * every cellDep need 37 Bytes, transaction for deposit needs 2 cellDeps(lock / type)
-    * every output without typeScript & with lock in secp need 97 Bytes and 4 Bytes for offset (add to transaction)
-    * every output for deposit with typeScript in dao & with lock in secp need 150 Bytes and 4 Bytes for offset (add to transaction)
-    * every outputsData in "0x" need 4 Bytes and 4 Bytes for offset
-    * every outputsData in "0x0000000000000000" need 12 Bytes and 4 Bytes for offset
-    */
-   return 4 + 68 + 37 * 2 + (4 + 97 + 4 + 4) + (150 + 4 + 12 + 4)
-  }
-
-  public static txSerializedSizeInBlockWithoutInputsForDepositAll = (): number => {
-    /*
-    * add a transaction to block need 4 Bytes for offset
-    * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
-    * every cellDep need 37 Bytes, transaction for deposit needs 2 cellDeps(lock / type)
-    * every output for deposit with typeScript in dao & with lock in secp need 150 Bytes and 4 Bytes for offset (add to transaction)
-    * every outputsData in "0x0000000000000000" need 12 Bytes and 4 Bytes for offset
-    */
-   return 4 + 68 + 37 * 2 + (150 + 4 + 12 + 4)
-  }
-
-  public static txSerializedSizeInBlockWithoputInputsForWitdrawStep1 = (): number => {
-    // a fixed input for (4+44+89) Bytes
-    // a fixed headerDep for 32 Bytes
-    return TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit() + (4 + 44 + 89) + 32
-  }
-
-  public static txSerializedSizeInBlockForWithdraw = (): number => {
-    /*
-    * add a transaction to block need 4 Bytes for offset
-    * a transaction with empty inputs/outputs/cellDeps/header/outputs_data/witnesses need 68 Bytes
-    * every cellDep need 37 Bytes, transaction for withdraw step2 needs 2 cellDeps(lock / type)
-    * every headerDep need 32 Bytes, transaction for withdraw step2 need 2 headerDeps
-    * every output without typeScript & with lock in secp need 97 Bytes and 4 Bytes for offset (add to transaction)
-    * every outputsData in "0x" need 4 Bytes and 4 Bytes for offset
-    * only one input, for 44 Bytes
-    * one witness with extra inputType "0x0000000000000000", 101 Bytes, extra 4 Bytes for add to transaction
-    */
-    return 4 + 68 + 37 * 2 + 32 * 2 + (4 + 97 + 4 + 4) + 44 + (101 + 4)
-  }
-
-  public static txFee = (size: number, feeRate: bigint) => {
-    const ratio = BigInt(1000)
-    const base = BigInt(size) * feeRate
-    const fee = base / ratio
-    if (fee * ratio < base) {
-      return fee + BigInt(1)
-    }
-    return fee
-  }
-
-  // lockHashes for each inputs
   public static generateTx = async (
     lockHashes: string[],
     targetOutputs: TargetOutput[],
@@ -81,15 +20,6 @@ export class TransactionGenerator {
     feeRate: string = '0'
   ): Promise<TransactionWithoutHash> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
-
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
-
-    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputs(
-      targetOutputs.length + 1
-    )
-    const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
@@ -119,34 +49,45 @@ export class TransactionGenerator {
       return output
     })
 
-    let gatherCapacities = needCapacities
-    if (mode.isFeeRateMode()) {
-      gatherCapacities = needCapacities + feeWithoutInputs
+    const tx: TransactionWithoutHash = {
+      version: '0',
+      cellDeps: [
+        {
+          outPoint,
+          depType: DepType.DepGroup,
+        },
+      ],
+      headerDeps: [],
+      inputs: [],
+      outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
+      witnesses: [],
     }
+
+    const baseSize: number = TransactionSize.tx(tx)
     const {
       inputs,
       capacities,
-      needFee
+      finalFee,
+      hasChangeOutput,
     } = await CellsService.gatherInputs(
-      gatherCapacities.toString(),
+      needCapacities.toString(),
       lockHashes,
       fee,
-      feeRate
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
     )
-    const needFeeInt = BigInt(needFee)
-    const totalFee = feeWithoutInputs + needFeeInt
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+    tx.fee = finalFee
 
     // change
-    if (
-      mode.isFeeMode() && BigInt(capacities) > needCapacities + feeInt ||
-      mode.isFeeRateMode() && BigInt(capacities) > needCapacities + feeWithoutInputs + needFeeInt
-    ) {
+    if (hasChangeOutput) {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
 
-      let changeCapacity = BigInt(capacities) - needCapacities - feeInt
-      if (mode.isFeeRateMode()) {
-        changeCapacity = BigInt(capacities) - needCapacities - totalFee
-      }
+      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
       const output: Cell = {
         capacity: changeCapacity.toString(),
@@ -159,22 +100,10 @@ export class TransactionGenerator {
       }
 
       outputs.push(output)
+      tx.outputsData!.push('0x')
     }
 
-    return {
-      version: '0',
-      cellDeps: [
-        {
-          outPoint,
-          depType: DepType.DepGroup,
-        },
-      ],
-      headerDeps: [],
-      inputs,
-      outputs,
-      outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
-    }
+    return tx
   }
 
   public static generateDepositTx = async (
@@ -189,14 +118,7 @@ export class TransactionGenerator {
     const blake160: string = LockUtils.addressToBlake160(receiveAddress)
     const daoScriptInfo = await DaoUtils.daoScript()
 
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
-
     const capacityInt: bigint = BigInt(capacity)
-
-    const sizeWithoutInputs: number = TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDeposit()
-    const feeWithoutInputs: bigint = TransactionGenerator.txFee(sizeWithoutInputs, feeRateInt)
 
     const output: Cell = {
       capacity: capacity,
@@ -217,48 +139,7 @@ export class TransactionGenerator {
 
     const outputs: Cell[] = [output]
 
-    let gatherCapacities = capacityInt
-    if(mode.isFeeRateMode()) {
-      gatherCapacities = capacityInt + feeWithoutInputs
-    }
-
-    const {
-      inputs,
-      capacities,
-      needFee
-    } = await CellsService.gatherInputs(
-      gatherCapacities.toString(),
-      lockHashes,
-      fee,
-      feeRate,
-    )
-    const needFeeInt = BigInt(needFee)
-    const totalFee = feeWithoutInputs + needFeeInt
-
-    // change
-    let finalFee: bigint = feeInt
-    if (mode.isFeeRateMode()) {
-      finalFee = totalFee
-    }
-    if (BigInt(capacities) > capacityInt + finalFee) {
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
-
-      const changeCapacity = BigInt(capacities) - capacityInt - finalFee
-
-      const changeOutput: Cell = {
-        capacity: changeCapacity.toString(),
-        data: '0x',
-        lock: {
-          codeHash,
-          args: changeBlake160,
-          hashType
-        },
-      }
-
-      outputs.push(changeOutput)
-    }
-
-    return {
+    const tx: TransactionWithoutHash = {
       version: '0',
       cellDeps: [
         {
@@ -271,12 +152,54 @@ export class TransactionGenerator {
         },
       ],
       headerDeps: [],
-      inputs,
+      inputs: [],
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
-      fee: finalFee.toString(),
+      witnesses: []
     }
+
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput,
+    } = await CellsService.gatherInputs(
+      capacityInt.toString(),
+      lockHashes,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+
+    // change
+    if (hasChangeOutput) {
+      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+
+      const changeCapacity = BigInt(capacities) - capacityInt - finalFeeInt
+
+      const changeOutput: Cell = {
+        capacity: changeCapacity.toString(),
+        data: '0x',
+        lock: {
+          codeHash,
+          args: changeBlake160,
+          hashType
+        },
+      }
+
+      outputs.push(changeOutput)
+      tx.outputsData!.push(changeOutput.data!)
+    }
+
+    tx.fee = finalFee
+
+    return tx
   }
 
   public static generateDepositAllTx = async (
@@ -339,13 +262,121 @@ export class TransactionGenerator {
     // change
     let finalFee: bigint = feeInt
     if (mode.isFeeRateMode()) {
-      const size: number =
-        TransactionGenerator.txSerializedSizeInBlockWithoutInputsForDepositAll() + allInputs.length * CellsService.inputSize()
-      finalFee = TransactionGenerator.txFee(size, feeRateInt)
+      const lockHashes = new Set(allInputs.map(i => i.lockHash!))
+      const keyCount: number = lockHashes.size
+      const txSize: number = TransactionSize.tx(tx) +
+        TransactionSize.secpLockWitness() * keyCount +
+        TransactionSize.emptyWitness() * (allInputs.length - keyCount)
+      finalFee = TransactionFee.fee(txSize, feeRateInt)
     }
 
     output.capacity = (BigInt(output.capacity) - finalFee).toString()
     tx.fee = finalFee.toString()
+
+    return tx
+  }
+
+  public static startWithdrawFromDao = async (
+    lockHashes: string[],
+    outPoint: OutPoint,
+    prevOutput: Cell,
+    depositBlockNumber: string,
+    depositBlockHash: string,
+    changeAddress: string,
+    fee: string = '0',
+    feeRate: string = '0'
+  ): Promise<TransactionWithoutHash> => {
+    const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
+    const daoScriptInfo = await DaoUtils.daoScript()
+
+    const output = prevOutput
+    const buf = Buffer.alloc(8)
+    buf.writeBigUInt64LE(BigInt(depositBlockNumber))
+    output.data = `0x${buf.toString('hex')}`
+    output.typeHash = LockUtils.computeScriptHash(output.type!)
+    output.daoData = output.data
+    output.depositOutPoint = outPoint
+
+    const outputs: Cell[] = [output]
+
+    const tx: TransactionWithoutHash = {
+      version: '0',
+      cellDeps: [
+        {
+          outPoint: secpOutPoint,
+          depType: DepType.DepGroup,
+        },
+        {
+          outPoint: daoScriptInfo.outPoint,
+          depType: DepType.Code,
+        },
+      ],
+      headerDeps: [
+        depositBlockHash,
+      ],
+      inputs: [],
+      outputs,
+      outputsData: outputs.map(o => o.data || '0x'),
+      witnesses: [],
+    }
+
+    const baseSize: number = TransactionSize.tx(tx)
+
+    const input: Input = {
+      previousOutput: outPoint,
+      since: '0',
+      lock: output.lock,
+      lockHash: LockUtils.lockScriptToHash(output.lock),
+      capacity: output.capacity,
+    }
+
+    const append = {
+      input,
+      witness: {
+        lock: '0x' + '0'.repeat(130),
+        inputType: undefined,
+        outputType: undefined,
+      }
+    }
+
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput,
+    } = await CellsService.gatherInputs(
+      '0',
+      lockHashes,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      append
+    )
+    const finalFeeInt = BigInt(finalFee)
+
+    tx.inputs = inputs
+    tx.fee = finalFee
+
+    // change
+    if (hasChangeOutput) {
+      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+      const changeCapacity = BigInt(capacities) - finalFeeInt
+
+      const changeOutput: Cell = {
+        capacity: changeCapacity.toString(),
+        data: '0x',
+        lock: {
+          codeHash,
+          args: changeBlake160,
+          hashType
+        },
+      }
+
+      outputs.push(changeOutput)
+      tx.outputsData!.push(changeOutput.data!)
+    }
 
     return tx
   }

@@ -4,8 +4,10 @@ import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
-import { TransactionStatus } from 'types/cell-types'
+import { TransactionStatus, WitnessArgs } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
+import TransactionSize from '../models/transaction-size';
+import TransactionFee from 'models/transaction-fee'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -105,17 +107,25 @@ export default class CellsService {
     capacity: string,
     lockHashes: string[],
     fee: string = '0',
-    feeRate: string = '0'
+    feeRate: string = '0',
+    baseSize: number = 0,
+    changeOutputSize: number = 0,
+    changeOutputDataSize: number = 0,
+    append?: {
+      input: Input,
+      witness: WitnessArgs,
+    }
   ): Promise<{
     inputs: Input[]
     capacities: string
-    needFee: string
+    finalFee: string
+    hasChangeOutput: boolean
   }> => {
     const capacityInt = BigInt(capacity)
     const feeInt = BigInt(fee)
-    // const totalCapacities: bigint = capacityInt + feeInt
     const feeRateInt = BigInt(feeRate)
     let needFee = BigInt(0)
+    const changeOutputFee: bigint = TransactionFee.fee(changeOutputSize + changeOutputDataSize, feeRateInt)
 
     const mode = new FeeMode(feeRateInt)
 
@@ -137,6 +147,15 @@ export default class CellsService {
           typeScript: null,
         },
       })
+    if (
+      cellEntities.length === 0 &&
+      (
+        (mode.isFeeRateMode() && feeRateInt !== 0n) ||
+        (mode.isFeeMode() && feeInt !== 0n)
+      )
+    ) {
+      throw new CapacityNotEnough()
+    }
     cellEntities.sort((a, b) => {
       const result = BigInt(a.capacity) - BigInt(b.capacity)
       if (result > BigInt(0)) {
@@ -150,6 +169,13 @@ export default class CellsService {
 
     const inputs: Input[] = []
     let inputCapacities: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    if (append) {
+      inputs.push(append.input)
+      totalSize += TransactionSize.input()
+      totalSize += TransactionSize.witness(append.witness)
+    }
+    let hasChangeOutput: boolean = false
     cellEntities.every(cell => {
       const input: Input = {
         previousOutput: cell.outPoint(),
@@ -158,24 +184,44 @@ export default class CellsService {
         lockHash: cell.lockHash,
         capacity: cell.capacity,
       }
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.emptyWitness()
+      } else {
+        totalSize += TransactionSize.secpLockWitness()
+      }
       inputs.push(input)
       inputCapacities += BigInt(cell.capacity)
+      totalSize += TransactionSize.input()
 
-      let diff = inputCapacities - capacityInt - feeInt
       if (mode.isFeeRateMode()) {
-        needFee += CellsService.inputFee(feeRateInt)
-        diff = inputCapacities - capacityInt - needFee
+        needFee = TransactionFee.fee(totalSize, feeRateInt)
+        const diff = inputCapacities - capacityInt - needFee
+        if (diff === BigInt(0)) {
+          hasChangeOutput = false
+          return false
+        } else if (diff - changeOutputFee >= minChangeCapacity) {
+          needFee += changeOutputFee
+          hasChangeOutput = true
+          return false
+        }
+        return true
+      } else {
+        const diff = inputCapacities - capacityInt - feeInt
+        if (diff === BigInt(0)) {
+          hasChangeOutput = false
+          return false
+        } else if (diff >= minChangeCapacity) {
+          hasChangeOutput = true
+          return false
+        }
+        return true
       }
-      if (diff >= minChangeCapacity || diff === BigInt(0)) {
-        return false
-      }
-      return true
     })
 
-    let totalCapacities = capacityInt + feeInt
-    if (mode.isFeeRateMode()) {
-      totalCapacities = capacityInt + needFee
-    }
+    // The final fee need in this tx (shannon)
+    const finalFee: bigint = mode.isFeeRateMode() ? needFee : feeInt
+
+    const totalCapacities = capacityInt + finalFee
 
     if (inputCapacities < totalCapacities) {
       throw new CapacityNotEnough()
@@ -189,7 +235,8 @@ export default class CellsService {
     return {
       inputs,
       capacities: inputCapacities.toString(),
-      needFee: needFee.toString(),
+      finalFee: finalFee.toString(),
+      hasChangeOutput,
     }
   }
 
@@ -216,24 +263,6 @@ export default class CellsService {
     })
 
     return inputs
-  }
-
-  public static inputFee = (feeRate: bigint): bigint => {
-    const ratio = BigInt(1000)
-    const base = BigInt(CellsService.inputSize()) * feeRate
-    const fee = base / ratio
-    if (fee * ratio < base) {
-      return fee + BigInt(1)
-    }
-    return fee
-  }
-
-  public static inputSize = (): number => {
-    /*
-    * every input needs 44 Bytes
-    * every input needs 1 witness signed by secp256k1, with 85 Bytes data, serialized in 89 Bytes, add extra 4 Bytes when add to transaction.
-    */
-    return 4 + 44 + 89
   }
 
   public static allBlake160s = async (): Promise<string[]> => {

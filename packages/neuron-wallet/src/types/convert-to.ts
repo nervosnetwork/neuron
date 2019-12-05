@@ -1,5 +1,6 @@
 import { Transaction, Input, Cell, Script, TransactionWithoutHash, CellDep, OutPoint } from './cell-types'
 import HexUtils from 'utils/hex'
+import { WitnessArgs } from 'types/cell-types'
 
 export default class ConvertTo {
   public static toSdkTransaction = (tx: Transaction): CKBComponents.Transaction => {
@@ -65,6 +66,14 @@ export default class ConvertTo {
     return {
       txHash: outPoint.txHash,
       index: HexUtils.toHex(outPoint.index),
+    }
+  }
+
+  public static toSdkWitnessArgs = (witnessArgs: WitnessArgs): CKBComponents.WitnessArgs => {
+    return {
+      lock: witnessArgs.lock,
+      inputType: witnessArgs.inputType,
+      outputType: witnessArgs.outputType,
     }
   }
 }

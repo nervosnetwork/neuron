@@ -1,12 +1,13 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import { ScriptHashType, Script, TransactionWithoutHash } from '../../../src/types/cell-types'
+import { ScriptHashType, Script, TransactionWithoutHash, OutPoint } from '../../../src/types/cell-types';
 import { OutputStatus } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
-import CellsService from '../../../src/services/cells'
-import DaoUtils from 'models/dao-utils'
+import DaoUtils from '../../../src/models/dao-utils'
+import TransactionSize from '../../../src/models/transaction-size'
+import TransactionFee from '../../../src/models/transaction-fee'
 
 const systemScript = {
   outPoint: {
@@ -26,6 +27,12 @@ const daoScript = {
   hashType: ScriptHashType.Type,
 }
 
+const daoTypeScript: Script = {
+  "codeHash": "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+  "hashType": ScriptHashType.Type,
+  "args": "0x"
+}
+
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
     .map(() => Math.floor(Math.random() * 16).toString(16))
@@ -35,6 +42,28 @@ const randomHex = (length: number = 64): string => {
 }
 
 const toShannon = (ckb: string) => `${ckb}00000000`
+
+const bob = {
+  lockScript: {
+    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+    args: '0x36c329ed630d6ce750712a477543672adab57f4c',
+    hashType: ScriptHashType.Type,
+  },
+  lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
+  address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+  blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+}
+
+const alice = {
+  lockScript: {
+    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+    args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+    hashType: ScriptHashType.Type,
+  },
+  lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
+  address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
+  blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+}
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
@@ -57,7 +86,8 @@ describe('TransactionGenerator', () => {
     status: OutputStatus,
     hasData: boolean,
     typeScript: Script | null,
-    who: any = bob
+    who: any = bob,
+    daoData?: string | undefined
   ) => {
     const output = new OutputEntity()
     output.outPointTxHash = randomHex()
@@ -68,6 +98,9 @@ describe('TransactionGenerator', () => {
     output.status = status
     output.hasData = hasData
     output.typeScript = typeScript
+    if (daoData) {
+      output.daoData = daoData
+    }
 
     return output
   }
@@ -76,49 +109,6 @@ describe('TransactionGenerator', () => {
     const connection = getConnection()
     await connection.synchronize(true)
     done()
-  })
-
-  const bob = {
-    lockScript: {
-      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      hashType: ScriptHashType.Type,
-    },
-    lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
-    blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
-  }
-
-  const calculateFee = (outputLength: number, inputLength: number, feeRate: bigint): bigint => {
-    // @ts-ignore: Private method
-    return TransactionGenerator.txFee(
-      // @ts-ignore: Private methods
-      TransactionGenerator.txSerializedSizeInBlockWithoutInputs(
-        outputLength
-      ),
-      feeRate
-    ) + CellsService.inputFee(feeRate) * BigInt(inputLength)
-  }
-
-  it('txSerializedSizeInBlockWithoutInputs', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txSerializedSizeInBlockWithoutInputs(2)
-    ).toEqual(327)
-  })
-
-  it('txFee without carry', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txFee(1035, BigInt(1000))
-    ).toEqual(BigInt(1035))
-  })
-
-  it('txFee with carry', () => {
-    expect(
-      // @ts-ignore: Private method
-      TransactionGenerator.txFee(1035, BigInt(900))
-    ).toEqual(BigInt(932))
   })
 
   describe('generateTx', () => {
@@ -154,9 +144,12 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 1, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+        expect(expectedFee).toEqual(BigInt(464))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
       it('capacity 1000', async () => {
@@ -181,19 +174,20 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 2, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
-      it('capacity 1000 - fee', async () => {
+      it('capacity 1000 - fee, no change output', async () => {
         const feeRate = '1000'
         const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - calculateFee(2, 1, BigInt(feeRate))).toString(),
+              capacity: BigInt(1000 * 10**8 - 355).toString(),
             }
           ],
           bob.address,
@@ -208,9 +202,11 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 1, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+        expect(expectedFee).toEqual(BigInt(355))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
 
       it('capacity 1000 - fee + 1 shannon', async () => {
@@ -220,7 +216,7 @@ describe('TransactionGenerator', () => {
           [
             {
               address: bob.address,
-              capacity: (BigInt(1000 * 10**8) - calculateFee(2, 1, BigInt(feeRate)) + BigInt(1)).toString(),
+              capacity: (BigInt(1000 * 10**8) - BigInt(464) + BigInt(1)).toString(),
             }
           ],
           bob.address,
@@ -235,9 +231,37 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
-        const expectedFee: bigint = calculateFee(2, 2, BigInt(feeRate))
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+      })
+
+      it(`2 bob's outputs, 1 alice output`, async () => {
+        const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+        await getConnection().manager.save(aliceCell)
+
+        const feeRate = '1000'
+        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+          [bob.lockHash, alice.lockHash],
+          [
+            {
+              address: bob.address,
+              capacity: BigInt(1000 * 10**8).toString(),
+            },
+            {
+              address: alice.address,
+              capacity: BigInt(2500 * 10**8).toString(),
+            }
+          ],
+          bob.address,
+          '0',
+          feeRate
+        )
+
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+
+        expect(tx.fee).toEqual(expectedFee.toString())
       })
     })
 
@@ -263,7 +287,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -287,7 +310,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -311,7 +333,6 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
 
@@ -335,9 +356,88 @@ describe('TransactionGenerator', () => {
           .map(output => BigInt(output.capacity))
           .reduce((result, c) => result + c, BigInt(0))
 
-        // @ts-ignore: Private method
         expect(inputCapacities - outputCapacities).toEqual(BigInt(fee))
       })
+    })
+  })
+
+  describe('generateDepositTx', () => {
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    const feeRate = '1000'
+    const feeRateInt = BigInt(feeRate)
+
+    it('capacity 500', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        toShannon('500'),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it('capacity 1000', async () => {
+      const feeRate = '1000'
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        toShannon('1000'),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it('capacity 1000 - fee, no change output', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash],
+        (BigInt(1000 * 10**8 - 453)).toString(),
+        bob.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.fee).toEqual(expectedFee.toString())
+    })
+
+    it(`2 bob's outputs, 1 alice output`, async () => {
+      const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+      await getConnection().manager.save(aliceCell)
+
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+        [bob.lockHash, alice.lockHash],
+        BigInt(3000 * 10**8).toString(),
+        alice.address,
+        bob.address,
+        '0',
+        feeRate
+      )
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+
+      expect(tx.fee).toEqual(expectedFee.toString())
     })
   })
 
@@ -399,12 +499,75 @@ describe('TransactionGenerator', () => {
         '1000'
       )
 
-      const expectedFee = BigInt('590')
+      // calculated by SDK
+      const expectedFee = BigInt('505')
       const expectedCapacity = BigInt('300000000000') - expectedFee
 
       expect(tx.outputs!.length).toEqual(1)
       expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
       expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+
+    it(`2 bob's outputs, 1 alice output`, async () => {
+      const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
+      await getConnection().manager.save(aliceCell)
+
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositAllTx(
+        [bob.lockHash, alice.lockHash],
+        bob.address,
+        '0',
+        '1000'
+      )
+
+      // calculated by SDK
+      const expectedFee = BigInt('642')
+      const expectedCapacity = BigInt('450000000000') - expectedFee
+
+      expect(tx.outputs!.length).toEqual(1)
+      expect(tx.outputs![0].capacity).toEqual(expectedCapacity.toString())
+      expect(tx.fee!).toEqual(expectedFee.toString())
+    })
+  })
+
+  describe('startWithdrawFromDao', () => {
+    const daoData = "0x0000000000000000"
+    const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, daoTypeScript, alice, daoData)
+    const depositDaoCell = depositDaoOutput.toInterface()
+    const depositOutPoint: OutPoint = {
+      txHash: '0x' + '2'.repeat(64),
+      index: '0'
+    }
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+        depositDaoOutput,
+      ]
+
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    const feeRate = '1000'
+    const feeRateInt = BigInt(feeRate)
+
+    it('deposit first', async () => {
+      const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
+        [bob.lockHash, alice.lockHash],
+        depositOutPoint,
+        depositDaoCell,
+        '12',
+        '0x' + '3'.repeat(64),
+        bob.address,
+        '0',
+        feeRate
+      )
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, feeRateInt)
+      expect(expectedFee).toEqual(BigInt(731))
+      expect(tx.fee).toEqual(expectedFee.toString())
+      expect(tx.inputs!.length).toEqual(2)
+      expect(tx.outputs!.length).toEqual(2)
     })
   })
 })
