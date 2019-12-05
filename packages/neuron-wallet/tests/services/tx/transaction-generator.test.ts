@@ -361,7 +361,7 @@ describe('TransactionGenerator', () => {
     })
   })
 
-  describe('generateAllTx', () => {
+  describe('generateSendingAllTx', () => {
     beforeEach(async done => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
@@ -392,7 +392,7 @@ describe('TransactionGenerator', () => {
     it('with fee 800', async () => {
       const fee = '800'
       const feeInt = BigInt(fee)
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateAllTx(
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
         lockHashes,
         targetOutputs,
         fee,
@@ -417,7 +417,7 @@ describe('TransactionGenerator', () => {
 
     it('with feeRate 1000', async () => {
       const feeRate = '1000'
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateAllTx(
+      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
         lockHashes,
         targetOutputs,
         '0',

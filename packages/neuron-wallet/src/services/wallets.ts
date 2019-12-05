@@ -469,7 +469,7 @@ export default class WalletService {
     return tx
   }
 
-  public generateAllTx = async (
+  public generateSendingAllTx = async (
     walletID: string = '',
     items: {
       address: string
@@ -494,7 +494,7 @@ export default class WalletService {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateAllTx(
+    const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
       lockHashes,
       targetOutputs,
       fee,

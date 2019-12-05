@@ -107,7 +107,7 @@ export class TransactionGenerator {
   }
 
   // rest of capacity all send to last target output.
-  public static generateAllTx = async (
+  public static generateSendingAllTx = async (
     lockHashes: string[],
     targetOutputs: TargetOutput[],
     fee: string = '0',
@@ -183,7 +183,7 @@ export class TransactionGenerator {
 
     // check
     if (outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !== totalCapacity) {
-      throw new Error('generateAllTx Error')
+      throw new Error('generateSendingAllTx Error')
     }
 
     return tx

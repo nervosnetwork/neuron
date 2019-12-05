@@ -373,7 +373,7 @@ export default class WalletsController {
     }
   }
 
-  public static async generateAllTx(params: {
+  public static async generateSendingAllTx(params: {
     walletID: string
     items: {
       address: string
@@ -389,7 +389,7 @@ export default class WalletsController {
     WalletsController.checkAddresses(addresses)
 
     const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateAllTx(
+    const tx = await walletsService.generateSendingAllTx(
       params.walletID,
       params.items,
       params.fee,

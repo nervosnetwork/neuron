@@ -185,7 +185,7 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async generateAllTx(params: {
+  public static async generateSendingAllTx(params: {
     walletID: string
     items: {
       address: string
@@ -194,7 +194,7 @@ export default class ApiController {
     fee: string
     feeRate: string
   }) {
-    return WalletsController.generateAllTx(params)
+    return WalletsController.generateSendingAllTx(params)
   }
 
   @MapApiResponse
