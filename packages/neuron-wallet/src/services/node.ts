@@ -30,7 +30,7 @@ class NodeService {
     this.start()
     this.syncConnectionStatus()
     CurrentNetworkIDSubject.subscribe(async ({ currentNetworkID }) => {
-      const currentNetwork = await NetworksService.getInstance().get(currentNetworkID)
+      const currentNetwork = NetworksService.getInstance().get(currentNetworkID)
       if (currentNetwork) {
         this.setNetwork(currentNetwork.remote)
       }
