@@ -1,4 +1,4 @@
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import IndexerQueue, { LockHashInfo } from 'services/indexer/queue'
@@ -72,3 +72,10 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
   indexerQueue.start()
   indexerQueue.processFork()
 }
+
+ipcRenderer.on('sync-window-will-close', () => {
+  if (indexerQueue) {
+    indexerQueue.stop()
+    indexerQueue = undefined
+  }
+})
