@@ -5,7 +5,7 @@ import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
 import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
-import { ErrorCode, Price, MAX_DECIMAL_DIGITS } from 'utils/const'
+import { ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
 import calculateFee from 'utils/calculateFee'
 
 import { TransactionOutput } from '.'
@@ -233,6 +233,7 @@ export const useInitialize = (
   walletID: string,
   items: TransactionOutput[],
   generatedTx: any | null,
+  price: string,
   sending: boolean,
   dispatch: React.Dispatch<any>,
   t: any
@@ -257,40 +258,40 @@ export const useInitialize = (
   const onDescriptionChange = useSendDescriptionChange(dispatch)
   const onSubmit = useOnSubmit(items, dispatch)
   const onClear = useClear(dispatch)
+
+  const updateSendingAllTransaction = useCallback(() => {
+    updateTransactionWith(generateSendingAllTx)({
+      walletID,
+      items,
+      price,
+      setTotalAmount,
+      setErrorMessage,
+      updateTransactionOutput,
+      dispatch,
+    }).then(tx => {
+      if (!tx) {
+        setIsSendMax(false)
+      }
+    })
+  }, [walletID, updateTransactionOutput, price, items, dispatch])
+
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {
       setIsSendMax(true)
-      updateTransactionWith(generateSendingAllTx)({
-        walletID,
-        items,
-        price: Price.Immediately,
-        setTotalAmount,
-        setErrorMessage,
-        updateTransactionOutput,
-        dispatch,
-      }).then(tx => {
-        if (!tx) {
-          setIsSendMax(false)
-        }
-      })
-
-      updateTransactionPrice(undefined as any, Price.Immediately)
+      updateSendingAllTransaction()
     } else {
       setIsSendMax(false)
       updateTransactionOutput('amount')(outputs.length - 1)('')
       const total = outputsToTotalAmount(items.filter(item => item.amount))
       setTotalAmount(total)
     }
-  }, [
-    setIsSendMax,
-    isSendMax,
-    outputs.length,
-    updateTransactionOutput,
-    updateTransactionPrice,
-    dispatch,
-    items,
-    walletID,
-  ])
+  }, [updateSendingAllTransaction, setIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
+
+  useEffect(() => {
+    if (isSendMax) {
+      updateSendingAllTransaction()
+    }
+  }, [isSendMax, price])
 
   useEffect(() => {
     clear(dispatch)

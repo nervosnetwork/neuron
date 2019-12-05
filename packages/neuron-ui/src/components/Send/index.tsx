@@ -62,7 +62,7 @@ const Send = ({
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, sending, dispatch, t)
+  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
@@ -246,7 +246,7 @@ const Send = ({
       </Stack>
 
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton type="reset" onClick={onClear}>
+        <DefaultButton type="reset" onClick={onClear} disabled={isSendMax}>
           {t('send.clear')}
         </DefaultButton>
         {sending ? (
