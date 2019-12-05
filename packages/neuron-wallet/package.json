@@ -68,6 +68,6 @@
     "rimraf": "3.0.0",
     "spectron": "8.0.0",
     "ts-transformer-imports": "0.4.3",
-    "ttypescript": "1.5.7"
+    "ttypescript": "1.5.8"
   }
 }
