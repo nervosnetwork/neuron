@@ -51,7 +51,9 @@ export default class GetBlocks {
   public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
-      logger.debug(`checking block #${block.header.number}, ${block.transactions.length} txs`)
+      if (BigInt(block.header.number) % 1000n === 0n) {
+        logger.debug(`Scanning from block #${block.header.number}`)
+      }
       for (let i = 0; i < block.transactions.length; ++i) {
         const tx = block.transactions[i]
         const checkTx = new CheckTx(tx, this.url, daoScriptHash)

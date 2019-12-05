@@ -15,53 +15,48 @@ You will need `node >= 12` and `yarn >= 1.14` to build and run Neuron.
 
 #### Lerna
 
-This project uses [lerna](https://github.com/lerna/lerna/) for package management. It can be installed either globally or locally within the project:
+This project uses [lerna](https://github.com/lerna/lerna/) for package management.
 
-```sh
+```shell
 $ yarn global add lerna # install lerna globally
-# or
-$ yarn add lerna --exact --ignore-workspace-root-check # install lerna locally within the project
 ```
 
 #### Install Dependencies
 
 After lerna has been installed, run this to install and link dependencies:
 
-```sh
+```shell
 $ yarn bootstrap
 ```
 
 ### Start Neuron
 
-A local CKB node is required for Neuron wallet to talk to it via RPC APIs and get data. Please follow the [Nervos CKB doc](https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node) to get CKB node up and running first.
+As of `v0.26.0`, Neuron bundles a CKB binary and starts it for Mainnet automatically. If you prefer to run a local CKB node yourself instead, please follow the [Nervos CKB doc](https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node) to get it up and running before launching Neuron.
 
 ### Start Neuron in Development Mode
 
-```sh
+```shell
+$ ./scripts/download-ckb.sh # Download CKB binary for your platform. Neuron will starts it automatically.
 $ yarn start
 ```
 
-This command will start two tasks:
-
-1. start `neuron-ui`, which is the React UI layer.
-2. start `neuron-wallet`, which is the core wallet layer.
+This command starts `neuron-ui`, the React UI layer and `neuron-wallet`, the core wallet layer.
 
 You can also start them independently:
 
-```sh
+```shell
 # start neuron-ui at `http://localhost:3000`
 $ yarn start:ui
 ```
 
-```sh
+```shell
 # start neuron-wallet
 $ yarn start:wallet
 ```
 
 ### Test
 
-```sh
-# launch the test runner.
+```shell
 $ yarn test
 ```
 

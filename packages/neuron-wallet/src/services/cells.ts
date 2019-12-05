@@ -147,6 +147,15 @@ export default class CellsService {
           typeScript: null,
         },
       })
+    if (
+      cellEntities.length === 0 &&
+      (
+        (mode.isFeeRateMode() && feeRateInt !== 0n) ||
+        (mode.isFeeMode() && feeInt !== 0n)
+      )
+    ) {
+      throw new CapacityNotEnough()
+    }
     cellEntities.sort((a, b) => {
       const result = BigInt(a.capacity) - BigInt(b.capacity)
       if (result > BigInt(0)) {

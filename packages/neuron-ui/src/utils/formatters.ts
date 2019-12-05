@@ -97,7 +97,7 @@ export const CKBToShannonFormatter = (amount: string = '0', unit: CapacityUnit =
   }
 }
 
-export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: boolean) => {
+export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: boolean, delimiter: string = ',') => {
   if (Number.isNaN(+shannon)) {
     console.warn(`Shannon is not a valid number`)
     return shannon
@@ -125,7 +125,7 @@ export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: 
         .join('')
         .match(/\d{1,3}/g) || ['0']
     )
-      .join(',')
+      .join(delimiter)
       .split('')
       .reverse()
       .join('')}${decimal}`

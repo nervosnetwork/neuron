@@ -59,6 +59,11 @@ declare namespace Controller {
     feeRate: string
   }
 
+  interface GenerateDepositAllTransactionParams {
+    walletID: string
+    feeRate: string
+  }
+
   interface ComputeCycles {
     walletID: string
     capacities: string

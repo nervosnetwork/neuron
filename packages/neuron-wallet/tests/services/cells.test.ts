@@ -254,6 +254,37 @@ describe('CellsService', () => {
       expect(error).toBeInstanceOf(CapacityNotEnoughForChange)
     })
 
+    it('capacity 0, feeRate 1000, no cells', async () => {
+      let error
+      try {
+        await CellsService.gatherInputs(
+          '0',
+          [alice.lockHash, bob.lockHash],
+          '0',
+          '1000'
+        )
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(CapacityNotEnough)
+    })
+
+    it('capacity 0, fee 1000, no cells', async () => {
+      let error
+      try {
+        await CellsService.gatherInputs(
+          '0',
+          [alice.lockHash, bob.lockHash],
+          '1000'
+        )
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(CapacityNotEnough)
+    })
+
     describe('skip, by feeRate 1000', () => {
       beforeEach(async done => {
         const cells: OutputEntity[] = [
