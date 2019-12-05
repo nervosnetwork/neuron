@@ -57,6 +57,7 @@ const NervosDAO = ({
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
+  const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -107,11 +108,12 @@ const NervosDAO = ({
             type: AppActions.UpdateGeneratedTx,
             payload: maxDepositTx,
           })
+          setErrorMessage(maxDepositErrorMessage)
         }
       }, 500)
       setDepositValue(value)
     },
-    [clearGeneratedTx, maxDepositAmount, maxDepositTx, dispatch, wallet.id, t]
+    [clearGeneratedTx, maxDepositAmount, maxDepositTx, dispatch, wallet.id, maxDepositErrorMessage, t]
   )
 
   useEffect(() => {
@@ -143,10 +145,15 @@ const NervosDAO = ({
           const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
           setMaxDepositAmount(maxValue)
           setMaxDepositTx(res.result)
+          setMaxDepositErrorMessage('')
+        } else {
+          throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
         }
       })
       .catch(err => {
-        console.error(err)
+        setMaxDepositAmount(BigInt(0))
+        setMaxDepositTx(undefined)
+        setMaxDepositErrorMessage(err.message)
       })
   }, [wallet.id, wallet.balance])
 
@@ -402,7 +409,7 @@ const NervosDAO = ({
           <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
             <DefaultButton
               text={t('nervos-dao.deposit')}
-              disabled={connectionStatus === 'offline' || sending}
+              disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
               onClick={() => setShowDepositDialog(true)}
             />
             <TooltipHost
