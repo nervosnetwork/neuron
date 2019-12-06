@@ -16,7 +16,15 @@ export class TransactionPersistor {
       .getRepository(TransactionEntity)
       .findOne(transaction.hash)
 
-    if (txEntity) {
+    if (txEntity && txEntity.status === TransactionStatus.Failed) {
+      // delete and create a new one (OR just update all status)
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(TransactionEntity)
+        .where('hash = :hash', { hash: transaction.hash })
+        .execute()
+    } else if (txEntity) {
       // nothing to do if exists already
       return txEntity
     }
