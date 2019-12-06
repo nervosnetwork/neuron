@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
-import { generateTx } from 'services/remote/wallets'
+import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
-import { outputsToTotalAmount, CKBToShannonFormatter } from 'utils/formatters'
+import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
 import { ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
 import calculateFee from 'utils/calculateFee'
@@ -11,6 +11,82 @@ import calculateFee from 'utils/calculateFee'
 import { TransactionOutput } from '.'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
+
+Object.defineProperty(generateTx, 'type', {
+  value: 'common',
+})
+Object.defineProperty(generateSendingAllTx, 'type', {
+  value: 'all',
+})
+
+const updateTransactionWith = (generator: typeof generateTx | typeof generateSendingAllTx) => ({
+  walletID,
+  price,
+  items,
+  setTotalAmount,
+  setErrorMessage,
+  updateTransactionOutput,
+  dispatch,
+}: {
+  walletID: string
+  price: string
+  items: TransactionOutput[]
+  setTotalAmount: Function
+  setErrorMessage: Function
+  updateTransactionOutput?: Function
+  dispatch: StateDispatch
+}) => {
+  const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
+  if (verifyTransactionOutputs(items, type === 'all')) {
+    if (type === 'common') {
+      const totalAmount = outputsToTotalAmount(items)
+      setTotalAmount(totalAmount)
+    }
+    const realParams = {
+      walletID,
+      items: items.map(item => ({
+        address: item.address,
+        capacity: CKBToShannonFormatter(item.amount, item.unit),
+      })),
+      feeRate: price,
+    }
+    return generator(realParams)
+      .then((res: any) => {
+        if (res.status === 1) {
+          dispatch({
+            type: AppActions.UpdateGeneratedTx,
+            payload: res.result,
+          })
+          if (type === 'all') {
+            const fmtItems = items.map((item, i) => ({
+              ...item,
+              amount: shannonToCKBFormatter(res.result.outputs[i].capacity, false, ''),
+            }))
+            const totalAmount = outputsToTotalAmount(fmtItems)
+            setTotalAmount(totalAmount)
+            if (updateTransactionOutput) {
+              updateTransactionOutput('amount')(items.length - 1)(fmtItems[fmtItems.length - 1].amount)
+            }
+          }
+          return res.result
+        }
+        throw new Error(res.message.content)
+      })
+      .catch((err: Error) => {
+        dispatch({
+          type: AppActions.UpdateGeneratedTx,
+          payload: '',
+        })
+        setErrorMessage(err.message)
+        return undefined
+      })
+  }
+  dispatch({
+    type: AppActions.UpdateGeneratedTx,
+    payload: '',
+  })
+  return Promise.resolve(undefined)
+}
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
@@ -52,54 +128,31 @@ const useOnTransactionChange = (
   items: TransactionOutput[],
   price: string,
   dispatch: StateDispatch,
+  isSendMax: boolean,
   setTotalAmount: Function,
   setErrorMessage: Function
 ) => {
   useEffect(() => {
     clearTimeout(generateTxTimer)
     setErrorMessage('')
+    if (isSendMax) {
+      return
+    }
     generateTxTimer = setTimeout(() => {
       dispatch({
         type: AppActions.UpdateGeneratedTx,
         payload: null,
       })
-      if (verifyTransactionOutputs(items)) {
-        const totalAmount = outputsToTotalAmount(items)
-        setTotalAmount(totalAmount)
-        const realParams = {
-          walletID,
-          items: items.map(item => ({
-            address: item.address,
-            capacity: CKBToShannonFormatter(item.amount, item.unit),
-          })),
-          feeRate: price,
-        }
-        generateTx(realParams)
-          .then((res: any) => {
-            if (res.status === 1) {
-              dispatch({
-                type: AppActions.UpdateGeneratedTx,
-                payload: res.result,
-              })
-            } else {
-              throw new Error(res.message.content)
-            }
-          })
-          .catch((err: Error) => {
-            dispatch({
-              type: AppActions.UpdateGeneratedTx,
-              payload: '',
-            })
-            setErrorMessage(err.message)
-          })
-      } else {
-        dispatch({
-          type: AppActions.UpdateGeneratedTx,
-          payload: '',
-        })
-      }
+      updateTransactionWith(generateTx)({
+        walletID,
+        items,
+        price,
+        setTotalAmount,
+        setErrorMessage,
+        dispatch,
+      })
     }, 300)
-  }, [walletID, items, price, dispatch, setTotalAmount, setErrorMessage])
+  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage])
 }
 
 const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
@@ -180,6 +233,8 @@ export const useInitialize = (
   walletID: string,
   items: TransactionOutput[],
   generatedTx: any | null,
+  price: string,
+  sending: boolean,
   dispatch: React.Dispatch<any>,
   t: any
 ) => {
@@ -187,6 +242,13 @@ export const useInitialize = (
 
   const [totalAmount, setTotalAmount] = useState('0')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isSendMax, setIsSendMax] = useState(false)
+
+  const outputs = useMemo(() => items.map(item => ({ ...item, disabled: isSendMax || sending })), [
+    items,
+    isSendMax,
+    sending,
+  ])
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
   const onItemChange = useOnItemChange(updateTransactionOutput)
@@ -196,6 +258,40 @@ export const useInitialize = (
   const onDescriptionChange = useSendDescriptionChange(dispatch)
   const onSubmit = useOnSubmit(items, dispatch)
   const onClear = useClear(dispatch)
+
+  const updateSendingAllTransaction = useCallback(() => {
+    updateTransactionWith(generateSendingAllTx)({
+      walletID,
+      items,
+      price,
+      setTotalAmount,
+      setErrorMessage,
+      updateTransactionOutput,
+      dispatch,
+    }).then(tx => {
+      if (!tx) {
+        setIsSendMax(false)
+      }
+    })
+  }, [walletID, updateTransactionOutput, price, items, dispatch])
+
+  const onSendMaxClick = useCallback(() => {
+    if (!isSendMax) {
+      setIsSendMax(true)
+      updateSendingAllTransaction()
+    } else {
+      setIsSendMax(false)
+      updateTransactionOutput('amount')(outputs.length - 1)('')
+      const total = outputsToTotalAmount(items.filter(item => item.amount))
+      setTotalAmount(total)
+    }
+  }, [updateSendingAllTransaction, setIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
+
+  useEffect(() => {
+    if (isSendMax) {
+      updateSendingAllTransaction()
+    }
+  }, [isSendMax, price])
 
   useEffect(() => {
     clear(dispatch)
@@ -247,6 +343,7 @@ export const useInitialize = (
   )
 
   return {
+    outputs,
     fee,
     totalAmount,
     setTotalAmount,
@@ -262,6 +359,8 @@ export const useInitialize = (
     onClear,
     errorMessage,
     setErrorMessage,
+    isSendMax,
+    onSendMaxClick,
   }
 }
 

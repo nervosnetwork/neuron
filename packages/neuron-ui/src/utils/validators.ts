@@ -87,10 +87,16 @@ export const verifyPasswordComplexity = (password: string) => {
   return true
 }
 
-export const verifyTransactionOutputs = (items: { address: string; amount: string }[] = []) => {
-  return !items.some(item => {
+export const verifyTransactionOutputs = (
+  items: { address: string; amount: string }[] = [],
+  ignoreLastAmount: boolean = false
+) => {
+  return !items.some((item, i) => {
     if (item.address === '' || verifyAddress(item.address) !== true) {
       return true
+    }
+    if (ignoreLastAmount && i === items.length - 1) {
+      return false
     }
     if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
       return true

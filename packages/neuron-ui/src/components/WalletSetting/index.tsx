@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { Stack, Button, ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { setCurrentWallet } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
 
-import { contextMenu } from 'services/remote'
+import { openContextMenu, requestPassword } from 'services/remote'
 import { Routes, MnemonicAction } from 'utils/const'
 
 const buttons = [
@@ -43,10 +43,42 @@ const WalletSetting = ({
     [dispatch]
   )
   const onContextMenu = useCallback(
-    (id: string = '') => () => {
-      contextMenu({ type: 'walletList', id })
+    (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+      const { id } = (e.target as HTMLSpanElement).dataset
+      if (id) {
+        const menuTemplate = [
+          {
+            label: t('common.select'),
+            click: () => {
+              setCurrentWallet(id)(dispatch)
+            },
+          },
+          {
+            label: t('common.backup'),
+            click: () => {
+              requestPassword({
+                walletID: id,
+                action: 'backup-wallet',
+              })
+            },
+          },
+          {
+            label: t('common.edit'),
+            click: () => {
+              history.push(`${Routes.WalletEditor}/${id}`)
+            },
+          },
+          {
+            label: t('common.delete'),
+            click: () => {
+              requestPassword({ walletID: id, action: 'delete-wallet' })
+            },
+          },
+        ]
+        openContextMenu(menuTemplate)
+      }
     },
-    []
+    [t, history, dispatch]
   )
 
   const navTo = useCallback(
@@ -67,7 +99,7 @@ const WalletSetting = ({
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
               return (
                 <Stack>
-                  <span className="ms-ChoiceFieldLabel" onContextMenu={onContextMenu(wallet.id)}>
+                  <span className="ms-ChoiceFieldLabel" data-id={wallet.id} onContextMenu={onContextMenu}>
                     {text}
                   </span>
                 </Stack>
@@ -79,7 +111,7 @@ const WalletSetting = ({
       </Stack.Item>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         {buttons.map(({ label, url }) => (
-          <PrimaryButton key={label} onClick={navTo(url)} text={t(label)} />
+          <Button key={label} onClick={navTo(url)} text={t(label)} />
         ))}
       </Stack>
     </Stack>

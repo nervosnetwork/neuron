@@ -5,7 +5,9 @@ import { OutputStatus } from '../../src/services/tx/params'
 import { ScriptHashType, Script, TransactionStatus } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
 import { CapacityNotEnough, CapacityNotEnoughForChange } from '../../src/exceptions/wallet'
-import TransactionEntity from 'database/chain/entities/transaction'
+import TransactionEntity from '../../src/database/chain/entities/transaction'
+import TransactionSize from '../../src/models/transaction-size'
+import TransactionFee from '../../src/models/transaction-fee'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -185,7 +187,10 @@ describe('CellsService', () => {
     it('1000, skip', async () => {
       await createCells()
 
-      const result = await CellsService.gatherInputs(toShannon('1000'), lockHashes)
+      const result = await CellsService.gatherInputs(
+        toShannon('1000'),
+        lockHashes
+      )
 
       expect(result.capacities).toEqual('100000000000')
     })
@@ -195,7 +200,10 @@ describe('CellsService', () => {
 
       let error
       try {
-        await CellsService.gatherInputs(toShannon('1001'), lockHashes)
+        await CellsService.gatherInputs(
+          toShannon('1001'),
+          lockHashes
+        )
       } catch (e) {
         error = e
       }
@@ -206,7 +214,10 @@ describe('CellsService', () => {
       await createCells()
       await createCell(toShannon('5000'), OutputStatus.Live, false, null, alice)
 
-      const result = await CellsService.gatherInputs(toShannon('6000'), [alice.lockHash, bob.lockHash])
+      const result = await CellsService.gatherInputs(
+        toShannon('6000'),
+        [alice.lockHash, bob.lockHash]
+      )
 
       expect(result.capacities).toEqual('600000000000')
     })
@@ -217,7 +228,10 @@ describe('CellsService', () => {
 
       let error
       try {
-        await CellsService.gatherInputs(toShannon('1001'), [bob.lockHash])
+        await CellsService.gatherInputs(
+          toShannon('1001'),
+          [bob.lockHash]
+        )
       } catch (e) {
         error = e
       }
@@ -229,12 +243,46 @@ describe('CellsService', () => {
       await createCell(toShannon('100'), OutputStatus.Live, false, null)
       let error
       try {
-        await CellsService.gatherInputs(toShannon('77'), [bob.lockHash])
+        await CellsService.gatherInputs(
+          toShannon('77'),
+          [bob.lockHash]
+        )
       } catch (e) {
         error = e
       }
 
       expect(error).toBeInstanceOf(CapacityNotEnoughForChange)
+    })
+
+    it('capacity 0, feeRate 1000, no cells', async () => {
+      let error
+      try {
+        await CellsService.gatherInputs(
+          '0',
+          [alice.lockHash, bob.lockHash],
+          '0',
+          '1000'
+        )
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(CapacityNotEnough)
+    })
+
+    it('capacity 0, fee 1000, no cells', async () => {
+      let error
+      try {
+        await CellsService.gatherInputs(
+          '0',
+          [alice.lockHash, bob.lockHash],
+          '1000'
+        )
+      } catch (e) {
+        error = e
+      }
+
+      expect(error).toBeInstanceOf(CapacityNotEnough)
     })
 
     describe('skip, by feeRate 1000', () => {
@@ -249,36 +297,62 @@ describe('CellsService', () => {
 
       it('capacity 500', async () => {
         const feeRate = '1000'
-        const result = await CellsService.gatherInputs(toShannon('500'), [bob.lockHash], '0', feeRate)
+        const result = await CellsService.gatherInputs(
+          toShannon('500'),
+          [bob.lockHash],
+          '0',
+          feeRate
+        )
         expect(result.capacities).toEqual(toShannon('1000'))
-        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(1))
+        const expectedSize = TransactionSize.input() + TransactionSize.secpLockWitness()
+        expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
 
       it('capacity 1000', async () => {
         const feeRate = '1000'
-        const result = await CellsService.gatherInputs(toShannon('1000'), [bob.lockHash], '0', feeRate)
+        const result = await CellsService.gatherInputs(
+          toShannon('1000'),
+          [bob.lockHash],
+          '0',
+          feeRate
+        )
+        const expectedSize = 2 * TransactionSize.input() + TransactionSize.secpLockWitness()+ TransactionSize.emptyWitness()
         expect(result.capacities).toEqual(toShannon('3000'))
-        expect(BigInt(result.needFee)).toEqual(CellsService.everyInputFee(BigInt(feeRate)) * BigInt(2))
+        expect(BigInt(result.finalFee)).toEqual(TransactionFee.fee(expectedSize, BigInt(feeRate)))
       })
 
-      it('capacity 1000 - everyInputFee', async () => {
+      it('capacity 1000 - inputFee', async () => {
         const feeRate = '1000'
-        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+        const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
+        const expectedFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - everyInputFee
-        const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
+        const capacity = BigInt(1000 * 10**8) - expectedFee
+        const result = await CellsService.gatherInputs(
+          capacity.toString(),
+          [bob.lockHash],
+          '0',
+          feeRate
+        )
         expect(result.capacities).toEqual(toShannon('1000'))
-        expect(BigInt(result.needFee)).toEqual(everyInputFee)
+        expect(BigInt(result.finalFee)).toEqual(expectedFee)
       })
 
-      it('capacity 1000 - everyInputFee + 1 shannon', async () => {
+      it('capacity 1000 - inputFee + 1 shannon', async () => {
         const feeRate = '1000'
-        const everyInputFee = CellsService.everyInputFee(BigInt(feeRate))
+        const inputSize = TransactionSize.input() + TransactionSize.secpLockWitness()
+        const inputFee = TransactionFee.fee(inputSize, BigInt(feeRate))
 
-        const capacity = BigInt(1000 * 10**8) - everyInputFee + BigInt(1)
-        const result = await CellsService.gatherInputs(capacity.toString(), [bob.lockHash], '0', feeRate)
+        const capacity = BigInt(1000 * 10**8) - inputFee + BigInt(1)
+        const result = await CellsService.gatherInputs(
+          capacity.toString(),
+          [bob.lockHash],
+          '0',
+          feeRate
+        )
         expect(result.capacities).toEqual(toShannon('3000'))
-        expect(BigInt(result.needFee)).toEqual(everyInputFee * BigInt(2))
+        const expectedSize = TransactionSize.input() * 2 + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+        const expectedFee = TransactionFee.fee(expectedSize, BigInt(feeRate))
+        expect(BigInt(result.finalFee)).toEqual(expectedFee)
       })
     })
 

@@ -13,18 +13,21 @@ const states: { [title: string]: State.Network[] } = {
       name: 'Mainnet',
       remote: 'http://localhost:8114',
       chain: 'ckb',
+      type: 0,
     },
     {
       id: 'Testnet',
       name: 'Testnet',
       remote: 'http://localhost:8114',
       chain: 'ckb_testnet',
+      type: 1,
     },
     {
       id: 'Local',
       name: 'Local',
       remote: 'http://localhost:8114',
       chain: 'ckb_devnet',
+      type: 1,
     },
   ],
 }

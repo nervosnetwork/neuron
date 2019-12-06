@@ -3,7 +3,8 @@ import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { showMessage } from 'services/remote'
-import calculateGlobalAPC from 'utils/calculateGlobalAPC'
+import calculateAPC from 'utils/calculateAPC'
+import { MILLISECONDS_IN_YEAR } from 'utils/const'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
@@ -15,6 +16,7 @@ const DAORecord = ({
   blockNumber,
   outPoint: { txHash, index },
   tipBlockNumber,
+  tipBlockTimestamp,
   capacity,
   actionLabel,
   onClick,
@@ -29,6 +31,7 @@ const DAORecord = ({
   actionLabel: string
   onClick: any
   tipBlockNumber: string
+  tipBlockTimestamp: number
   epoch: string
   withdraw: string | null
   genesisBlockTimestamp: number | undefined
@@ -40,10 +43,32 @@ const DAORecord = ({
   const [apc, setApc] = useState(0)
 
   useEffect(() => {
-    calculateGlobalAPC(+(depositTimestamp || timestamp), genesisBlockTimestamp).then(res => {
-      setApc(res)
-    })
-  }, [depositTimestamp, timestamp, genesisBlockTimestamp])
+    if (depositTimestamp) {
+      const startYearNumber = (+depositTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      const endYearNumber = (+timestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      try {
+        const calculatedAPC = calculateAPC({
+          startYearNumber,
+          endYearNumber,
+        })
+        setApc(calculatedAPC)
+      } catch (err) {
+        console.error(err)
+      }
+    } else {
+      const startYearNumber = (+timestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      const endYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      try {
+        const calculatedAPC = calculateAPC({
+          startYearNumber,
+          endYearNumber,
+        })
+        setApc(calculatedAPC)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }, [depositTimestamp, tipBlockTimestamp, timestamp, genesisBlockTimestamp])
 
   useEffect(() => {
     if (!depositOutPoint) {

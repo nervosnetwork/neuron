@@ -1,4 +1,5 @@
 import { remote } from 'electron'
+import { Subscription } from 'rxjs'
 import AddressesUsedSubject, { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 import AddressService from 'services/addresses'
 import { Address } from 'database/address/address-dao'
@@ -10,9 +11,11 @@ const addressesUsedSubject = isRenderer
   ? remote.require('./models/subjects/addresses-used-subject').default.getSubject()
   : AddressesUsedSubject.getSubject()
 
+let addressesUsedSubscription: Subscription | null
+
 // update txCount when addresses used
 export const register = () => {
-  addressesUsedSubject.subscribe(async (address: AddressesWithURL) => {
+  addressesUsedSubscription = addressesUsedSubject.subscribe(async (address: AddressesWithURL) => {
     const addrs = await AddressService.updateTxCountAndBalances(address.addresses, address.url)
     const walletIds: string[] = addrs
       .map(addr => (addr as Address).walletId)
@@ -24,6 +27,13 @@ export const register = () => {
       AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
     }
   })
+}
+
+export const unregister = () => {
+  if (addressesUsedSubscription) {
+    addressesUsedSubscription.unsubscribe()
+    addressesUsedSubscription = null
+  }
 }
 
 export default register

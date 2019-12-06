@@ -1,14 +1,12 @@
-import React, { useCallback, useContext, useState, useEffect } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, getTheme, Text, ProgressIndicator, Icon, TooltipHost, TeachingBubble } from 'office-ui-fabric-react'
+import { Stack, getTheme, Text, ProgressIndicator, Icon, TooltipHost } from 'office-ui-fabric-react'
 
-import { openExternal } from 'services/remote'
-import { guideBubbleTimes } from 'services/localCache'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { NeuronWalletContext } from 'states/stateProvider'
-import { ConnectionStatus, FULL_SCREENS, RUN_NODE_GUIDE_URL, Routes } from 'utils/const'
+import { ConnectionStatus, FULL_SCREENS, Routes } from 'utils/const'
 
 const theme = getTheme()
 const stackStyles = {
@@ -77,24 +75,6 @@ const Footer = ({
     settings: { networks = [] },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
-  const [showGuide, setShowGuide] = useState(false)
-
-  useEffect(() => {
-    if (connectionStatus !== ConnectionStatus.Online && guideBubbleTimes.getRemaining()) {
-      setShowGuide(true)
-      guideBubbleTimes.reduce()
-    } else {
-      setShowGuide(false)
-    }
-  }, [connectionStatus, setShowGuide])
-
-  const onDismissGuide = useCallback(() => {
-    setShowGuide(false)
-  }, [setShowGuide])
-
-  const onGuideLinkClick = useCallback(() => {
-    openExternal(RUN_NODE_GUIDE_URL)
-  }, [])
 
   const goToNetworksSetting = useCallback(() => {
     history.push(Routes.SettingsNetworks)
@@ -126,27 +106,6 @@ const Footer = ({
         ) : (
           <Text>{t('settings.setting-tabs.network')}</Text>
         )}
-        {showGuide ? (
-          <TeachingBubble
-            target="#network-status"
-            headline={t('messages.run-ckb-guide')}
-            hasSmallHeadline
-            primaryButtonProps={{
-              children: t('common.open'),
-              onClick: onGuideLinkClick,
-            }}
-            onDismiss={onDismissGuide}
-            styles={{
-              subText: {
-                fontSize: '14px',
-              },
-            }}
-          >
-            <Text as="span" variant="xSmall">
-              {t('messages.view-the-run-node-doc')}
-            </Text>
-          </TeachingBubble>
-        ) : null}
       </Stack>
     </Stack>
   )

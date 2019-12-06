@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,14 +13,15 @@ import {
   getTheme,
 } from 'office-ui-fabric-react'
 
-import { contextMenu } from 'services/remote'
+import { openExternal, openContextMenu } from 'services/remote'
 import { ckbCore } from 'services/chain'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { onRenderRow } from 'utils/fabricUIRender'
-import { MAINNET_TAG } from 'utils/const'
+import { Routes, MAINNET_TAG } from 'utils/const'
+import getExplorerUrl from 'utils/getExplorerUrl'
 
 const Addresses = ({
   app: {
@@ -29,6 +30,7 @@ const Addresses = ({
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
   settings: { networks = [] },
+  history,
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
@@ -178,6 +180,48 @@ const Addresses = ({
       semanticColors,
     ]
   )
+
+  const onContextMenu = useCallback(
+    item => {
+      if (item && item.address) {
+        if (showMainnetAddress) {
+          const menuTemplate = [
+            {
+              label: t('addresses.copy-address'),
+              click: () => {
+                window.clipboard.writeText(item.address)
+              },
+            },
+          ]
+          openContextMenu(menuTemplate)
+        } else {
+          const menuTemplate = [
+            {
+              label: t('addresses.copy-address'),
+              click: () => {
+                window.clipboard.writeText(item.address)
+              },
+            },
+            {
+              label: t('addresses.request-payment'),
+              click: () => {
+                history.push(`${Routes.Receive}/${item.address}`)
+              },
+            },
+            {
+              label: t('addresses.view-on-explorer'),
+              click: () => {
+                const explorerUrl = getExplorerUrl(isMainnet)
+                openExternal(`${explorerUrl}/address/${item.address}`)
+              },
+            },
+          ]
+          openContextMenu(menuTemplate)
+        }
+      }
+    },
+    [t, showMainnetAddress, isMainnet, history]
+  )
   const List = useMemo(
     () => (
       <ShimmeredDetailsList
@@ -196,18 +240,12 @@ const Addresses = ({
               }) || ''
             : addr.address,
         }))}
-        onItemContextMenu={item => {
-          if (showMainnetAddress) {
-            contextMenu({ type: 'copyMainnetAddress', id: item.identifier })
-          } else {
-            contextMenu({ type: 'addressList', id: item.identifier })
-          }
-        }}
+        onItemContextMenu={onContextMenu}
         className="listWithDesc"
         onRenderRow={onRenderRow}
       />
     ),
-    [isLoading, addressColumns, addresses, showMainnetAddress, t]
+    [isLoading, addressColumns, addresses, showMainnetAddress, onContextMenu, t]
   )
 
   return (

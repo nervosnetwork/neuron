@@ -1,3 +1,32 @@
+# [0.26.0](https://github.com/nervosnetwork/neuron/compare/v0.25.2...v0.26.0) (2019-12-06)
+
+
+### Bundled CKB node
+
+It's painful to download, configure and run a CKB node when setting up the Neuron wallet. We understand that. Version 0.26.0 comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
+
+If you prefer to run your own node you can still do that. Start your node before launching the Neuron wallet, then Neuron will connect to your node instead of the bundled one.
+
+Note that your operating system or firewall might ask you for permission to run the bundle node. Please allow that when prompted.
+
+### Improved Nervos DAO UI and flow
+
+We added a feature to allow you to deposit all of your unused balance into the Nervos DAO. Simply drag the deposit amount slider to the right and Neuron will calculate the amount and fee for you.
+
+With the updated formula of DAO compensation rate, the Nervos DAO view now displays more precise information.
+
+### UI for checking updates
+
+We've introduced UI for checking and downloading updates. You can find this on `Settings(Preferences) - General` view. It's now more convenient to see when there's a new version available to install.
+
+### Bug fixes
+
+We fixed several bugs related to block syncing and balance calculations. Now, balance of Overall and locked/free Nervos DAO should display correctly.
+
+We also addressed several other bugs to make the Neuron wallet more stable.
+
+
+
 ## [0.25.2](https://github.com/nervosnetwork/neuron/compare/v0.25.1...v0.25.2) (2019-11-29)
 
 
@@ -825,5 +854,4 @@
 * **package:** Rename package task to release, publish to GitHub ([e3d473e](https://github.com/nervosnetwork/neuron/commit/e3d473e))
 * call methods of app controller with remote module ([cdc93a0](https://github.com/nervosnetwork/neuron/commit/cdc93a0))
 * subscribe network list from neuron-wallet in neuron-ui ([b56ae1c](https://github.com/nervosnetwork/neuron/commit/b56ae1c))
-
 

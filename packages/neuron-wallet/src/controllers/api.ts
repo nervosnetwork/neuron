@@ -2,7 +2,6 @@ import { take } from 'rxjs/operators'
 
 import env from 'env'
 import i18n from 'utils/i18n'
-import { popContextMenu } from './app/menu'
 import { showWindow } from './app/show-window'
 import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
@@ -21,6 +20,10 @@ import DaoController from './dao'
  */
 export default class ApiController {
   // App
+  @MapApiResponse
+  public static async openInWindow({ url, title }: { url: string, title: string }) {
+    showWindow(url, title)
+  }
 
   @MapApiResponse
   public static async loadInitData() {
@@ -101,11 +104,6 @@ export default class ApiController {
     }
   }
 
-  @MapApiResponse
-  public static async contextMenu(params: { type: string; id: string }) {
-    return popContextMenu(params)
-  }
-
   // Wallets
 
   @MapApiResponse
@@ -159,6 +157,11 @@ export default class ApiController {
   }
 
   @MapApiResponse
+  public static async requestPassword({ walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) {
+    WalletsController.requestPassword(walletID, action)
+  }
+
+  @MapApiResponse
   public static async sendTx(params: {
     walletID: string
     tx: TransactionWithoutHash
@@ -179,6 +182,19 @@ export default class ApiController {
     feeRate: string
   }) {
     return WalletsController.generateTx(params)
+  }
+
+  @MapApiResponse
+  public static async generateSendingAllTx(params: {
+    walletID: string
+    items: {
+      address: string
+      capacity: string
+    }[]
+    fee: string
+    feeRate: string
+  }) {
+    return WalletsController.generateSendingAllTx(params)
   }
 
   @MapApiResponse
@@ -210,6 +226,15 @@ export default class ApiController {
     feeRate: string,
   }): Promise<Controller.Response<TransactionWithoutHash>> {
     return WalletsController.withdrawFromDao(params)
+  }
+
+  @MapApiResponse
+  public static async generateDepositAllTx(params: {
+    walletID: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return WalletsController.generateDepositAllTx(params)
   }
 
   @MapApiResponse
@@ -246,6 +271,11 @@ export default class ApiController {
   @MapApiResponse
   public static async setCurrentNetowrk(id: NetworkID) {
     return NetworksController.activate(id)
+  }
+
+  @MapApiResponse
+  public static async deleteNetwork(id: NetworkID) {
+    return NetworksController.delete(id)
   }
 
   // Transactions
@@ -298,8 +328,6 @@ export default class ApiController {
 
   @MapApiResponse
   public static async clearCellCache() {
-    await SyncController.stopSyncing()
-    await SyncController.deleteData()
-    return SyncController.startSyncing()
+    return SyncController.clearCache()
   }
 }

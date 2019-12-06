@@ -6,12 +6,13 @@ import transactions from './data/transactions'
 const stories = storiesOf('TransactionList', module)
 Object.entries(transactions).forEach(([title, list]) => {
   stories.add(title, () => (
-    <TransactionList isLoading={false} tipBlockNumber="123" walletID="1" items={list} dispatch={() => {}} />
+    <TransactionList isMainnet isLoading={false} tipBlockNumber="123" walletID="1" items={list} dispatch={() => {}} />
   ))
 })
 
 stories.add('Wtih empty pending list', () => (
   <TransactionList
+    isMainnet
     isLoading={false}
     tipBlockNumber="123"
     walletID="1"
@@ -21,5 +22,7 @@ stories.add('Wtih empty pending list', () => (
 ))
 
 stories.add('Shimmered List', () => {
-  return <TransactionList isLoading={false} tipBlockNumber="123" walletID="1" items={[]} dispatch={() => {}} />
+  return (
+    <TransactionList isMainnet isLoading={false} tipBlockNumber="123" walletID="1" items={[]} dispatch={() => {}} />
+  )
 })

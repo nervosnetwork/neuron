@@ -28,6 +28,17 @@ export const generateTx = apiMethodWrapper(api => (params: Controller.GenerateTr
   api.generateTx(params)
 )
 
+export const generateSendingAllTx = apiMethodWrapper(api => (params: Controller.GenerateSendingAllTransactionParams) =>
+  api.generateSendingAllTx(params)
+)
+
+export const generateDepositAllTx = apiMethodWrapper<Controller.GenerateDepositAllTransactionParams>(api => params =>
+  api.generateDepositAllTx(params)
+)
+export const requestPassword = apiMethodWrapper<Controller.RequestPasswordParams>(api => params =>
+  api.requestPassword(params)
+)
+
 export const sendTx = apiMethodWrapper(api => (params: Controller.SendTransactionParams) => api.sendTx(params))
 
 export const getAddressesByWalletID = apiMethodWrapper(api => (walletID: Controller.GetAddressesByWalletIDParams) =>
@@ -62,6 +73,9 @@ export default {
   backupWallet,
   getCurrentWallet,
   generateTx,
+  generateSendingAllTx,
+  generateDepositAllTx,
+  requestPassword,
   sendTx,
   getAddressesByWalletID,
   updateAddressDescription,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Stack, Label, TextField, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { Price } from 'utils/const'
 
 interface TransactionFee {
   fee: string
@@ -10,15 +11,15 @@ interface TransactionFee {
 
 const calculateSpeed = (price: number) => {
   if (price >= 16000) {
-    return '18000'
+    return Price.Immediately
   }
   if (price >= 4000) {
-    return '6000'
+    return Price.TenBlocks
   }
   if (price >= 2000) {
-    return '3000'
+    return Price.HundredBlocks
   }
-  return '0'
+  return Price.FiveHundredsBlocks
 }
 
 const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, onPriceChange }: TransactionFee) => {
@@ -98,10 +99,10 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
               dropdownWidth={140}
               selectedKey={selectedSpeed}
               options={[
-                { key: '18000', text: 'immediately' },
-                { key: '6000', text: '~ 10 blocks' },
-                { key: '3000', text: '~ 100 blocks' },
-                { key: '0', text: '~ 500 blocks' },
+                { key: Price.Immediately, text: 'immediately' },
+                { key: Price.TenBlocks, text: '~ 10 blocks' },
+                { key: Price.HundredBlocks, text: '~ 100 blocks' },
+                { key: Price.FiveHundredsBlocks, text: '~ 500 blocks' },
               ]}
               onRenderCaretDown={() => {
                 return <Icon iconName="ArrowDown" />

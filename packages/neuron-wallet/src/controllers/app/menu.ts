@@ -1,10 +1,14 @@
-import { app, shell, BrowserWindow, dialog, MenuItemConstructorOptions, clipboard, Menu, MessageBoxOptions, MessageBoxReturnValue } from 'electron'
-import { bech32Address, AddressPrefix, AddressType } from '@nervosnetwork/ckb-sdk-utils'
+import { 
+  app, 
+  shell,
+  BrowserWindow,
+  dialog,
+  MenuItemConstructorOptions,
+  Menu,
+} from 'electron'
 import i18n from 'utils/i18n'
 import env from 'env'
 import { UpdateController } from 'controllers'
-import { showWindow } from './show-window'
-import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
 
@@ -23,10 +27,6 @@ enum ExternalURL {
 
 const separator: MenuItemConstructorOptions = {
   type: 'separator',
-}
-
-const showMessageBox = (options: MessageBoxOptions, callback?: (returnValue: MessageBoxReturnValue) => void) => {
-  dialog.showMessageBox(options).then(callback)
 }
 
 const showAbout = () => {
@@ -283,187 +283,4 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   Menu.setApplicationMenu(menu)
 }
 
-const contextMenuTemplate: {
-  [key: string]: (id: string) => Promise<MenuItemConstructorOptions[]>
-} = {
-  copyMainnetAddress: async (publicKeyHash: string) => {
-    const address = bech32Address(publicKeyHash, {
-      prefix: AddressPrefix.Mainnet,
-      type: AddressType.HashIdx,
-      codeHashOrCodeHashIndex: '0x00',
-    })
-    return [
-      {
-        label: i18n.t('contextMenu.copy-address'),
-        click: () => { clipboard.writeText(address) }
-      },
-    ]
-  },
-  networkList: async (id: string) => {
-    const networksService = NetworksService.getInstance()
-    const network = networksService.get(id)
-    const currentNetworkID = networksService.getCurrentID()
-
-    if (!network) {
-      showMessageBox({
-        type: 'error',
-        message: i18n.t('messages.network-not-found', { id }),
-      })
-      return []
-    }
-
-    const isCurrent = currentNetworkID === id
-    const isDefault = network.type === 0
-
-    return [
-      {
-        label: i18n.t('contextMenu.select'),
-        enabled: !isCurrent,
-        click: () => {
-          networksService.activate(id).catch((err: Error) => {
-            showMessageBox({
-              type: 'error',
-              message: err.message,
-            })
-          })
-        },
-      },
-      {
-        label: i18n.t('contextMenu.edit'),
-        enabled: !isDefault,
-        click: () => { navTo(`/network/${id}`) }
-      },
-      {
-        label: i18n.t('contextMenu.delete'),
-        enabled: !isDefault,
-        cancelId: 1,
-        click: async () => {
-          showMessageBox(
-            {
-              type: 'warning',
-              title: i18n.t(`messageBox.remove-network.title`),
-              message: i18n.t(`messageBox.remove-network.message`, {
-                name: network.name,
-                address: network.remote,
-              }),
-              detail: isCurrent ? i18n.t('messageBox.remove-network.alert') : '',
-              buttons: [i18n.t('messageBox.button.confirm'), i18n.t('messageBox.button.discard')],
-            },
-            (returnValue: MessageBoxReturnValue) => {
-              if (returnValue.response === 0) {
-                try {
-                  networksService.delete(id)
-                } catch (err) {
-                  dialog.showMessageBox({
-                    type: 'error',
-                    message: err.message,
-                  })
-                }
-              }
-            }
-          )
-        },
-      },
-    ]
-  },
-  walletList: async (id: string) => {
-    const walletsService = WalletsService.getInstance()
-    const wallet = walletsService.get(id)
-    if (!wallet) {
-      showMessageBox({
-        type: 'error',
-        message: i18n.t('messages.wallet-not-found', { id }),
-      })
-    }
-    return [
-      {
-        label: i18n.t('contextMenu.select'),
-        click: () => {
-          try {
-            walletsService.setCurrent(id)
-          } catch (err) {
-            showMessageBox({ type: 'error', message: err.message })
-          }
-        },
-      },
-      {
-        label: i18n.t('contextMenu.backup'),
-        click: async () => { requestPassword(id, 'backup-wallet') }
-      },
-      {
-        label: i18n.t('contextMenu.edit'),
-        click: () => { navTo(`/editwallet/${id}`) }
-      },
-      {
-        label: i18n.t('contextMenu.delete'),
-        click: async () => { requestPassword(id, 'delete-wallet') }
-      },
-    ]
-  },
-  addressList: async (identifier: string) => {
-    if (identifier === undefined) {
-      return []
-    }
-
-    const address = bech32Address(identifier, {
-      prefix: NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-      type: AddressType.HashIdx,
-      codeHashOrCodeHashIndex: '0x00',
-    })
-    return [
-      {
-        label: i18n.t('contextMenu.copy-address'),
-        click: () => { clipboard.writeText(address) }
-      },
-      {
-        label: i18n.t('contextMenu.request-payment'),
-        click: () => { navTo(`/receive/${address}`) }
-      },
-      {
-        label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/address/${address}`) }
-      },
-    ]
-  },
-  transactionList: async (hash: string) => {
-    return [
-      {
-        label: i18n.t('contextMenu.detail'),
-        click: () => {
-          showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
-        }
-      },
-      {
-        label: i18n.t('contextMenu.copy-transaction-hash'),
-        click: () => { clipboard.writeText(hash) }
-      },
-      {
-        label: i18n.t('contextMenu.view-on-explorer'),
-        click: () => { shell.openExternal(`${NetworksService.getInstance().explorerUrl()}/transaction/${hash}`) }
-      },
-    ]
-  },
-}
-
-const popContextMenu = async (params: { type: string; id: string }) => {
-  if (!params || params.id === undefined) {
-    return
-  }
-  const { id, type } = params
-  switch (type) {
-    case 'copyMainnetAddress':
-    case 'networkList':
-    case 'walletList':
-    case 'addressList':
-    case 'transactionList': {
-      const menu = Menu.buildFromTemplate(await contextMenuTemplate[type](id))
-      menu.popup()
-      break
-    }
-    default: {
-      break
-    }
-  }
-}
-
-export { updateApplicationMenu, popContextMenu }
+export { updateApplicationMenu }

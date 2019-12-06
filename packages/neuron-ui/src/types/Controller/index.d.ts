@@ -1,4 +1,8 @@
 declare namespace Controller {
+  interface OpenInWindowParams {
+    url: string
+    title: string
+  }
   interface CreateWalletParams {
     name: string
     mnemonic: string
@@ -20,6 +24,11 @@ declare namespace Controller {
     password?: string
     newPassword?: string
     name?: string
+  }
+
+  interface RequestPasswordParams {
+    walletID: string
+    action: 'delete-wallet' | 'backup-wallet'
   }
 
   interface DeleteWalletParams {
@@ -50,6 +59,13 @@ declare namespace Controller {
     feeRate: string
   }
 
+  type GenerateSendingAllTransactionParams = GenerateTransactionParams
+
+  interface GenerateDepositAllTransactionParams {
+    walletID: string
+    feeRate: string
+  }
+
   interface ComputeCycles {
     walletID: string
     capacities: string
@@ -71,6 +87,8 @@ declare namespace Controller {
     networkID: string
     options: Partial<{ name: string; remote: string }>
   }
+
+  type DeleteNetworkParams = string
   interface UpdateTransactionDescriptionParams {
     hash: string
     description: string

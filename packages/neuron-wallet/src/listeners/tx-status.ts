@@ -9,6 +9,8 @@ import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import TypeConvert from 'types/type-convert'
 import GetBlocks from 'services/sync/get-blocks'
+import NetworksService from 'services/networks'
+import { AddressPrefix } from 'models/keys/address'
 
 const { nodeService } = remote.require('./startup/sync-block-task/params')
 
@@ -58,7 +60,8 @@ const trackingStatus = async () => {
 
   if (failedTxs.length) {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160))
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
     const { core } = nodeService
     AddressesUsedSubject.getSubject().next({
       addresses: usedAddresses,
@@ -95,6 +98,10 @@ export const register = () => {
       }
     }
   })
+}
+
+export const unregister = () => {
+  // Nothing to do. This interval subscription will be killed with the renderer process.
 }
 
 export default register
