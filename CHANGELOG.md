@@ -3,7 +3,7 @@
 
 ### Bundled CKB node
 
-It's painful to download, configure and run a CKB node when setting up the Neuron wallet. We understand that. Verion 0.26.0 comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
+It's painful to download, configure and run a CKB node when setting up the Neuron wallet. We understand that. Version 0.26.0 comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
 
 If you prefer to run your own node you can still do that. Start your node before launching the Neuron wallet, then Neuron will connect to your node instead of the bundled one.
 
@@ -854,5 +854,4 @@ We also addressed several other bugs to make the Neuron wallet more stable.
 * **package:** Rename package task to release, publish to GitHub ([e3d473e](https://github.com/nervosnetwork/neuron/commit/e3d473e))
 * call methods of app controller with remote module ([cdc93a0](https://github.com/nervosnetwork/neuron/commit/cdc93a0))
 * subscribe network list from neuron-wallet in neuron-ui ([b56ae1c](https://github.com/nervosnetwork/neuron/commit/b56ae1c))
-
 
