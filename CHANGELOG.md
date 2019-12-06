@@ -1,3 +1,32 @@
+# [0.26.0](https://github.com/nervosnetwork/neuron/compare/v0.25.2...v0.26.0) (2019-12-06)
+
+
+### Bundled CKB node
+
+It's painful to download, configure and run a CKB node, before one can use the wallet! We understand that. This version comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
+
+If you prefer to run your own node you can still do that. Start your node before launching Neuron, then Neuron would happily connect to your node instead of starting the bundled one.
+
+Note that your operating system or firewall might ask you for permission to run the bundle node. Please allow that when prompted.
+
+### Improved Nervos DAO UI and flow
+
+We added a feature to allow you to deposit all of your free balance to Nervos DAO. Simply drag the deposit amount slider to the right end and Neuron will calculate the amount and fee for you.
+
+With the updated formula of DAO compensation rate, Nervos DAO view now shows more precise information.
+
+### UI for checking updates
+
+We've introduced UI for checking and downloading updates. Find that on `Settings(Preferences) - General` view. It's more convenient than ever to see if there's a new version to install.
+
+### Bug fixes
+
+We fixed several bugs related to block syncing and balance calculations. Now, balance of Overall and locked/free Nervos DAO should display correctly.
+
+We also addressed many other bugs to make Neuron more stable.
+
+
+
 ## [0.25.2](https://github.com/nervosnetwork/neuron/compare/v0.25.1...v0.25.2) (2019-11-29)
 
 
