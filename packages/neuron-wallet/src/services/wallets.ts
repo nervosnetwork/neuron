@@ -650,7 +650,8 @@ export default class WalletService {
       previousOutput: withdrawingOutPoint,
       since: minimalSince.toString(),
       lock: previousOutput.lock,
-      lockHash: LockUtils.computeScriptHash(previousOutput.lock)
+      lockHash: LockUtils.computeScriptHash(previousOutput.lock),
+      capacity: previousOutput.capacity,
     }
 
     const withdrawWitnessArgs: WitnessArgs = {
