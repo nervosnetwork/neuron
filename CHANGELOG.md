@@ -3,27 +3,27 @@
 
 ### Bundled CKB node
 
-It's painful to download, configure and run a CKB node, before one can use the wallet! We understand that. This version comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
+It's painful to download, configure and run a CKB node when setting up the Neuron wallet. We understand that. Verion 0.26.0 comes with a bundled CKB node, preconfigured to connect to Nervos CKB Mainnet Lina. Just open Neuron and it will start the bundled node and sync with that.
 
-If you prefer to run your own node you can still do that. Start your node before launching Neuron, then Neuron would happily connect to your node instead of starting the bundled one.
+If you prefer to run your own node you can still do that. Start your node before launching the Neuron wallet, then Neuron will connect to your node instead of the bundled one.
 
 Note that your operating system or firewall might ask you for permission to run the bundle node. Please allow that when prompted.
 
 ### Improved Nervos DAO UI and flow
 
-We added a feature to allow you to deposit all of your free balance to Nervos DAO. Simply drag the deposit amount slider to the right end and Neuron will calculate the amount and fee for you.
+We added a feature to allow you to deposit all of your unused balance into the Nervos DAO. Simply drag the deposit amount slider to the right and Neuron will calculate the amount and fee for you.
 
-With the updated formula of DAO compensation rate, Nervos DAO view now shows more precise information.
+With the updated formula of DAO compensation rate, the Nervos DAO view now displays more precise information.
 
 ### UI for checking updates
 
-We've introduced UI for checking and downloading updates. Find that on `Settings(Preferences) - General` view. It's more convenient than ever to see if there's a new version to install.
+We've introduced UI for checking and downloading updates. You can find this on `Settings(Preferences) - General` view. It's now more convenient to see when there's a new version available to install.
 
 ### Bug fixes
 
 We fixed several bugs related to block syncing and balance calculations. Now, balance of Overall and locked/free Nervos DAO should display correctly.
 
-We also addressed many other bugs to make Neuron more stable.
+We also addressed several other bugs to make the Neuron wallet more stable.
 
 
 
