@@ -6,9 +6,7 @@ const app = electronApp || (remote && remote.app) || {
   getPath(aPath: string): string {
     return path.join(os.tmpdir(), aPath)
   },
-  getName(): string {
-    return 'Fake App'
-  },
+  name: 'Fake App',
   getLocale(): string {
     return 'en'
   }
