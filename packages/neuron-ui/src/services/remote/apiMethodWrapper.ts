@@ -74,13 +74,18 @@ export const apiMethodWrapper = <T = any>(
 }
 
 // New API wrapper using Electron 7 invoke/handle
-export const apiWrapper = <T = any>(channel: string) => async (realParams: T): Promise<ControllerResponse> => {
-  if (!window.remote) {
-    return RemoteNotLoadError
-  }
+// Action: Electron channel
+type Action =
+  | 'get-transaction-list'
+  | 'get-dao-cells'
+  | 'check-for-updates'
+  | 'download-update'
+  | 'quit-and-install'
+  | 'clear-cache'
 
+export const apiWrapper = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
   const res: SuccessFromController | FailureFromController = await window.ipcRenderer
-    .invoke(channel, realParams)
+    .invoke(action, params)
     .then(stringifiedRes => (stringifiedRes ? JSON.parse(stringifiedRes) : stringifiedRes))
     .catch(() => ({
       status: 0,
@@ -90,8 +95,8 @@ export const apiWrapper = <T = any>(channel: string) => async (realParams: T): P
     }))
 
   if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
-    console.group(channel)
-    console.info(`params: ${JSON.stringify(realParams, null, 2)}`)
+    console.group(action)
+    console.info(`params: ${JSON.stringify(params, null, 2)}`)
     console.info(`res: ${JSON.stringify(res, null, 2)}`)
     console.groupEnd()
   }
@@ -117,7 +122,6 @@ export const apiWrapper = <T = any>(channel: string) => async (realParams: T): P
 }
 
 export default {
-  RemoteNotLoadError,
   apiMethodWrapper,
   apiWrapper,
 }
