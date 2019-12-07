@@ -1,6 +1,6 @@
-import { apiMethodWrapper } from './apiMethodWrapper'
+import { apiMethodWrapper, apiWrapper } from './apiMethodWrapper'
 
-export const checkForUpdates = apiMethodWrapper<void>(api => () => api.checkForUpdates())
+export const checkForUpdates = apiWrapper<void>('check-for-updates')
 export const downloadUpdate = apiMethodWrapper<void>(api => () => api.downloadUpdate())
 export const installUpdate = apiMethodWrapper<void>(api => () => api.quitAndInstall())
 

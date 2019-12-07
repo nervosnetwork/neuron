@@ -1,4 +1,4 @@
-import { apiMethodWrapper } from './apiMethodWrapper'
+import { apiMethodWrapper, apiWrapper } from './apiMethodWrapper'
 
 export const getNeuronWalletState = apiMethodWrapper<void>(api => () => api.loadInitData())
 
@@ -6,7 +6,7 @@ export const openInWindow = apiMethodWrapper<Controller.OpenInWindowParams>(api 
 
 export const handleViewError = apiMethodWrapper<string>(api => errorMessage => api.handleViewError(errorMessage))
 
-export const clearCellCache = apiMethodWrapper<void>(api => () => api.clearCellCache())
+export const clearCellCache = apiWrapper<void>('clear-cache')
 
 export default {
   getNeuronWalletState,

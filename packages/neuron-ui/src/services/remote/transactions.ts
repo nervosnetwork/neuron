@@ -1,4 +1,4 @@
-import { apiMethodWrapper } from './apiMethodWrapper'
+import { apiMethodWrapper, apiWrapper } from './apiMethodWrapper'
 
 export interface GetTransactionListParams {
   pageNo: number
@@ -7,9 +7,7 @@ export interface GetTransactionListParams {
   walletID: string
 }
 
-export const getTransactionList = apiMethodWrapper(api => (params: GetTransactionListParams) => {
-  return api.getTransactionList(params)
-})
+export const getTransactionList = apiWrapper<GetTransactionListParams>('get-transaction-list')
 
 export const getTransaction = apiMethodWrapper(api => ({ walletID, hash }: { walletID: string; hash: string }) => {
   return api.getTransaction(walletID, hash)

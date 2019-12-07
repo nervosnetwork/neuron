@@ -73,7 +73,51 @@ export const apiMethodWrapper = <T = any>(
   }
 }
 
+// New API wrapper using Electron 7 invoke/handle
+export const apiWrapper = <T = any>(channel: string) => async (realParams: T): Promise<ControllerResponse> => {
+  if (!window.remote) {
+    return RemoteNotLoadError
+  }
+
+  const res: SuccessFromController | FailureFromController = await window.ipcRenderer
+    .invoke(channel, realParams)
+    .then(stringifiedRes => (stringifiedRes ? JSON.parse(stringifiedRes) : stringifiedRes))
+    .catch(() => ({
+      status: 0,
+      message: {
+        content: 'Invalid response format',
+      },
+    }))
+
+  if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
+    console.group(channel)
+    console.info(`params: ${JSON.stringify(realParams, null, 2)}`)
+    console.info(`res: ${JSON.stringify(res, null, 2)}`)
+    console.groupEnd()
+  }
+
+  if (!res) {
+    return {
+      status: 1,
+      result: null,
+    }
+  }
+
+  if (res.status === 1) {
+    return {
+      status: 1,
+      result: res.result || null,
+    }
+  }
+
+  return {
+    status: res.status || 0,
+    message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
+  }
+}
+
 export default {
   RemoteNotLoadError,
   apiMethodWrapper,
+  apiWrapper,
 }

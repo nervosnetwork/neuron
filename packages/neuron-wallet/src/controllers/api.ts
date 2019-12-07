@@ -1,4 +1,5 @@
 import { take } from 'rxjs/operators'
+import { ipcMain } from 'electron'
 
 import env from 'env'
 import i18n from 'utils/i18n'
@@ -281,11 +282,6 @@ export default class ApiController {
   // Transactions
 
   @MapApiResponse
-  public static async getTransactionList(params: Controller.Params.TransactionsByKeywords) {
-    return TransactionsController.getAllByKeywords(params)
-  }
-
-  @MapApiResponse
   public static async getTransaction(walletID: string, hash: string) {
     return TransactionsController.get(walletID, hash)
   }
@@ -312,11 +308,6 @@ export default class ApiController {
   // Settings
 
   @MapApiResponse
-  public static async checkForUpdates() {
-    return new UpdateController().checkUpdates()
-  }
-
-  @MapApiResponse
   public static async downloadUpdate() {
     return new UpdateController(false).downloadUpdate()
   }
@@ -326,8 +317,26 @@ export default class ApiController {
     return new UpdateController(false).quitAndInstall()
   }
 
-  @MapApiResponse
-  public static async clearCellCache() {
-    return SyncController.clearCache()
+  /// Experiment Electron 7 revoke/handle
+  public static mount() {
+    // Transactions
+
+    ipcMain.handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
+      return mapResponse(await TransactionsController.getAllByKeywords(params))
+    })
+
+    // Settings
+
+    ipcMain.handle('check-for-updates', async () => {
+      return new UpdateController().checkUpdates()
+    })
+
+    ipcMain.handle('clear-cache', async () => {
+      return SyncController.clearCache()
+    })
   }
+}
+
+const mapResponse = (res: any): string => {
+  return JSON.stringify(res)
 }
