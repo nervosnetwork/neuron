@@ -20,7 +20,6 @@ import DaoController from './dao'
  * @description Handle messages from neuron UI channels
  */
 export default class ApiController {
-
   // Wallets
 
   @MapApiResponse
@@ -115,46 +114,6 @@ export default class ApiController {
   }
 
   @MapApiResponse
-  public static async generateDepositTx(params: {
-    walletID: string,
-    capacity: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return WalletsController.generateDepositTx(params)
-  }
-
-  @MapApiResponse
-  public static async startWithdrawFromDao(params: {
-    walletID: string,
-    outPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return WalletsController.startWithdrawFromDao(params)
-  }
-
-  @MapApiResponse
-  public static async withdrawFromDao(params: {
-    walletID: string,
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return WalletsController.withdrawFromDao(params)
-  }
-
-  @MapApiResponse
-  public static async generateDepositAllTx(params: {
-    walletID: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return WalletsController.generateDepositAllTx(params)
-  }
-
-  @MapApiResponse
   public static async updateAddressDescription(params: {
     walletID: string
     address: string
@@ -202,6 +161,46 @@ export default class ApiController {
     params: Controller.Params.GetDaoCellsParams
   ) {
     return DaoController.getDaoCells(params)
+  }
+
+  @MapApiResponse
+  public static async generateDepositTx(params: {
+    walletID: string,
+    capacity: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return DaoController.generateDepositTx(params)
+  }
+
+  @MapApiResponse
+  public static async generateDepositAllTx(params: {
+    walletID: string,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return DaoController.generateDepositAllTx(params)
+  }
+
+  @MapApiResponse
+  public static async startWithdrawFromDao(params: {
+    walletID: string,
+    outPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return DaoController.startWithdrawFromDao(params)
+  }
+
+  @MapApiResponse
+  public static async withdrawFromDao(params: {
+    walletID: string,
+    depositOutPoint: OutPoint,
+    withdrawingOutPoint: OutPoint,
+    fee: string,
+    feeRate: string,
+  }): Promise<Controller.Response<TransactionWithoutHash>> {
+    return DaoController.withdrawFromDao(params)
   }
 
   /// Experiment Electron 7 revoke/handle
