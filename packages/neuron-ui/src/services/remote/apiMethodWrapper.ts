@@ -76,6 +76,9 @@ export const apiMethodWrapper = <T = any>(
 // New API wrapper using Electron 7 invoke/handle
 // Action: Electron channel
 type Action =
+  | 'load-init-data'
+  | 'open-in-window'
+  | 'handle-view-error'
   | 'get-transaction-list'
   | 'get-transaction'
   | 'show-transaction-details'
@@ -83,7 +86,7 @@ type Action =
   | 'get-dao-cells'
   | 'check-for-updates'
   | 'download-update'
-  | 'quit-and-install'
+  | 'quit-and-install-update'
   | 'clear-cache'
 
 export const apiWrapper = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {

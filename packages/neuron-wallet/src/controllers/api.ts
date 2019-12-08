@@ -20,90 +20,6 @@ import DaoController from './dao'
  * @description Handle messages from neuron UI channels
  */
 export default class ApiController {
-  // App
-  @MapApiResponse
-  public static async openInWindow({ url, title }: { url: string, title: string }) {
-    showWindow(url, title)
-  }
-
-  @MapApiResponse
-  public static async loadInitData() {
-    const walletsService = WalletsService.getInstance()
-    const networksService = NetworksService.getInstance()
-
-    const currentWallet = walletsService.getCurrent()
-    const wallets = walletsService.getAll()
-
-    const [
-      currentNetworkID = '',
-      networks = [],
-      syncedBlockNumber = '0',
-      connectionStatus = false,
-      codeHash = '',
-    ] = await Promise.all([
-      networksService.getCurrentID(),
-      networksService.getAll(),
-
-      SyncController.currentBlockNumber()
-        .then(res => {
-          if (res.status) {
-            return res.result.currentBlockNumber
-          }
-          return '0'
-        })
-        .catch(() => '0'),
-
-      new Promise(resolve => {
-        ConnectionStatusSubject.pipe(take(1)).subscribe(
-          status => { resolve(status) },
-          () => { resolve(false) },
-          () => { resolve(false) }
-        )
-      }),
-
-      new Promise(resolve => {
-        SystemScriptSubject.pipe(take(1)).subscribe(
-          ({ codeHash: currentCodeHash }) => resolve(currentCodeHash),
-          () => { resolve('') },
-          () => { resolve('') }
-        )
-      }),
-    ])
-
-    const addresses: Controller.Address[] = await (currentWallet
-      ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
-      : [])
-
-    const transactions = currentWallet
-      ? await TransactionsController.getAllByKeywords({
-          pageNo: 1,
-          pageSize: 15,
-          keywords: '',
-          walletID: currentWallet.id,
-        }).then(res => res.result)
-      : []
-
-    const initState = {
-      currentWallet: currentWallet || null,
-      wallets: wallets,
-      currentNetworkID,
-      networks,
-      addresses,
-      transactions,
-      syncedBlockNumber,
-      connectionStatus,
-      codeHash,
-    }
-
-    return { status: ResponseCode.Success, result: initState }
-  }
-
-  @MapApiResponse
-  public static handleViewError(error: string) {
-    if (env.isDevMode) {
-      console.error(error)
-    }
-  }
 
   // Wallets
 
@@ -288,20 +204,91 @@ export default class ApiController {
     return DaoController.getDaoCells(params)
   }
 
-  // Settings
-
-  @MapApiResponse
-  public static async downloadUpdate() {
-    return new UpdateController(false).downloadUpdate()
-  }
-
-  @MapApiResponse
-  public static async quitAndInstall() {
-    return new UpdateController(false).quitAndInstall()
-  }
-
   /// Experiment Electron 7 revoke/handle
   public static mount() {
+    // App
+
+    ipcMain.handle('load-init-data', async () => {
+      const walletsService = WalletsService.getInstance()
+      const networksService = NetworksService.getInstance()
+
+      const currentWallet = walletsService.getCurrent()
+      const wallets = walletsService.getAll()
+
+      const [
+        currentNetworkID = '',
+        networks = [],
+        syncedBlockNumber = '0',
+        connectionStatus = false,
+        codeHash = '',
+      ] = await Promise.all([
+        networksService.getCurrentID(),
+        networksService.getAll(),
+
+        SyncController.currentBlockNumber()
+          .then(res => {
+            if (res.status) {
+              return res.result.currentBlockNumber
+            }
+            return '0'
+          })
+          .catch(() => '0'),
+
+        new Promise(resolve => {
+          ConnectionStatusSubject.pipe(take(1)).subscribe(
+            status => { resolve(status) },
+            () => { resolve(false) },
+            () => { resolve(false) }
+          )
+        }),
+
+        new Promise(resolve => {
+          SystemScriptSubject.pipe(take(1)).subscribe(
+            ({ codeHash: currentCodeHash }) => resolve(currentCodeHash),
+            () => { resolve('') },
+            () => { resolve('') }
+          )
+        }),
+      ])
+
+      const addresses: Controller.Address[] = await (currentWallet
+        ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+        : [])
+
+      const transactions = currentWallet
+        ? await TransactionsController.getAllByKeywords({
+            pageNo: 1,
+            pageSize: 15,
+            keywords: '',
+            walletID: currentWallet.id,
+          }).then(res => res.result)
+        : []
+
+      const initState = {
+        currentWallet: currentWallet || null,
+        wallets: wallets,
+        currentNetworkID,
+        networks,
+        addresses,
+        transactions,
+        syncedBlockNumber,
+        connectionStatus,
+        codeHash,
+      }
+
+      return mapResponse({ status: ResponseCode.Success, result: initState })
+    })
+
+    ipcMain.handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
+      showWindow(url, title)
+    })
+
+    ipcMain.handle('handle-view-error', async (_, error: string) => {
+      if (env.isDevMode) {
+        console.error(error)
+      }
+    })
+
     // Transactions
 
     ipcMain.handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
@@ -323,7 +310,15 @@ export default class ApiController {
     // Settings
 
     ipcMain.handle('check-for-updates', async () => {
-      return new UpdateController().checkUpdates()
+      new UpdateController().checkUpdates()
+    })
+
+    ipcMain.handle('download-update', async () => {
+      new UpdateController(false).downloadUpdate()
+    })
+
+    ipcMain.handle('quit-and-install-update', async () => {
+      new UpdateController(false).quitAndInstall()
     })
 
     ipcMain.handle('clear-cache', async () => {

@@ -17,10 +17,3 @@ export const updateTransactionDescription = apiWrapper<Controller.UpdateTransact
 
 // param: txhash
 export const showTransactionDetails = apiWrapper<string>('show-transaction-details')
-
-export default {
-  getTransactionList,
-  getTransaction,
-  updateTransactionDescription,
-  showTransactionDetails,
-}
