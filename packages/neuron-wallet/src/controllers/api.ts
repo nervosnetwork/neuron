@@ -279,23 +279,6 @@ export default class ApiController {
     return NetworksController.delete(id)
   }
 
-  // Transactions
-
-  @MapApiResponse
-  public static async getTransaction(walletID: string, hash: string) {
-    return TransactionsController.get(walletID, hash)
-  }
-
-  @MapApiResponse
-  public static async updateTransactionDescription(params: { hash: string; description: string }) {
-    return TransactionsController.updateDescription(params)
-  }
-
-  @MapApiResponse
-  public static async showTransactionDetails(hash: string) {
-    showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
-  }
-
   // Dao
 
   @MapApiResponse
@@ -323,6 +306,18 @@ export default class ApiController {
 
     ipcMain.handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
       return mapResponse(await TransactionsController.getAllByKeywords(params))
+    })
+
+    ipcMain.handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
+      return mapResponse(await TransactionsController.get(walletID, hash))
+    })
+
+    ipcMain.handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
+      return mapResponse(await TransactionsController.updateDescription(params))
+    })
+
+    ipcMain.handle('show-transaction-details', async (_, hash: string) => {
+      showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
     })
 
     // Settings

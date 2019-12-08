@@ -77,6 +77,9 @@ export const apiMethodWrapper = <T = any>(
 // Action: Electron channel
 type Action =
   | 'get-transaction-list'
+  | 'get-transaction'
+  | 'show-transaction-details'
+  | 'update-transaction-description'
   | 'get-dao-cells'
   | 'check-for-updates'
   | 'download-update'
