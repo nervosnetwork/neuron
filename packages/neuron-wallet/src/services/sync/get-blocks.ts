@@ -139,10 +139,22 @@ export default class GetBlocks {
   }
 
   public genesisBlockHash = async (): Promise<string> => {
-    const hash: string = await Utils.retry(3, 100, async () => {
+    const hash: string = await this.retry(async () => {
       return await this.core.rpc.getBlockHash('0x0')
     })
 
     return hash
+  }
+
+  public getChain = async (): Promise<string> => {
+    const chain: string = await this.retry(async () => {
+      const i = await this.core.rpc.getBlockchainInfo()
+      return i.chain
+    })
+    return chain
+  }
+
+  private async retry<T>(func: () => T): Promise<T> {
+    return Utils.retry(this.retryTime, this.retryInterval, func)
   }
 }

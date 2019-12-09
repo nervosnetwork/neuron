@@ -21,21 +21,17 @@ export default class Utils {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  public static retry = async (times: number, interval: number, callback: any): Promise<any> => {
+  public static async retry<T>(times: number, interval: number, callback: (...args: any[]) => T): Promise<T> {
     let retryTime = 0
 
-    while (++retryTime <= times) {
+    while (++retryTime < times) {
       try {
-        const result = await callback()
-        return result
+        return callback()
       } catch (err) {
-        if (retryTime === times) {
-          throw err
-        }
         await Utils.sleep(interval)
       }
     }
-    return undefined
+    return callback()
   }
 
   public static mapSeries = async (array: any[], callback: any): Promise<any[]> => {

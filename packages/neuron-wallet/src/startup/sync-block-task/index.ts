@@ -3,7 +3,6 @@ import path from 'path'
 import { NetworkWithID } from 'types/network'
 import env from 'env'
 import AddressService from 'services/addresses'
-import genesisBlockHash from './genesis'
 import InitDatabase from './init-database'
 import DataUpdateSubject from 'models/subjects/data-update'
 import logger from 'utils/logger'
@@ -17,8 +16,6 @@ import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
 import Utils from 'services/sync/utils'
 import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
-
-export { genesisBlockHash }
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
