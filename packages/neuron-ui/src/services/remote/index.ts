@@ -41,17 +41,12 @@ export const showErrorMessage = (title: string, content: string) => {
   }
 }
 
-export const showOpenDialog = (opt: { title: string; message?: string; onUpload: Function }) => {
+export const showOpenDialog = (options: { title: string; message?: string }) => {
   if (!window.remote) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
+    return Promise.reject()
   }
-  const { onUpload, ...options } = opt
-  return window.remote.require('electron').dialog.showOpenDialog(
-    {
-      ...options,
-    },
-    onUpload
-  )
+  return window.remote.require('electron').dialog.showOpenDialog(options)
 }
 
 export const openExternal = (url: string) => {

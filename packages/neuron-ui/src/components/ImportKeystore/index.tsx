@@ -53,17 +53,17 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   const onFileClick = useCallback(() => {
     showOpenDialog({
       title: 'import keystore',
-      onUpload: (filePaths: string[]) => {
-        if (!filePaths || filePaths.length === 0) {
-          return
-        }
-        const filePath = filePaths[0]
-        setFields({
-          ...fields,
-          path: filePath,
-        })
-      },
     })
+      .then(({ filePaths }: { filePaths: string[] }) => {
+        const filePath = filePaths[0]
+        if (filePath) {
+          setFields({
+            ...fields,
+            path: filePath,
+          })
+        }
+      })
+      .catch((err: Error) => console.error(err))
   }, [fields])
 
   const onSubmit = useCallback(() => {
