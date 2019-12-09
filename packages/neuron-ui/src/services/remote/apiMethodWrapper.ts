@@ -76,21 +76,33 @@ export const apiMethodWrapper = <T = any>(
 // New API wrapper using Electron 7 invoke/handle
 // Action: Electron channel
 type Action =
+  // App
   | 'load-init-data'
   | 'open-in-window'
   | 'handle-view-error'
+  // Transactions
   | 'get-transaction-list'
   | 'get-transaction'
   | 'show-transaction-details'
   | 'update-transaction-description'
+  // Dao
   | 'get-dao-data'
   | 'generate-dao-deposit-tx'
   | 'generate-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
   | 'withdraw-from-dao'
+  // Networks
+  | 'get-all-networks'
+  | 'create-network'
+  | 'update-network'
+  | 'get-current-network-id'
+  | 'set-current-network-id'
+  | 'delete-network'
+  // Updater
   | 'check-for-updates'
   | 'download-update'
   | 'quit-and-install-update'
+  // Settings
   | 'clear-cache'
 
 export const apiWrapper = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {

@@ -1,10 +1,10 @@
 import { take } from 'rxjs/operators'
-import { ipcMain } from 'electron'
+import { ipcMain, IpcMainInvokeEvent } from 'electron'
 
 import env from 'env'
 import i18n from 'utils/i18n'
 import { showWindow } from './app/show-window'
-import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController } from 'controllers'
+import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController, DaoController } from 'controllers'
 import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
@@ -13,7 +13,8 @@ import { SystemScriptSubject } from 'models/subjects/system-script'
 import { MapApiResponse } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
-import DaoController from './dao'
+
+const NODE_DISCONNECTED_CODE = 104
 
 /**
  * @class ApiController
@@ -122,44 +123,11 @@ export default class ApiController {
     return WalletsController.updateAddressDescription(params)
   }
 
-  // Networks
-
-  @MapApiResponse
-  public static async getAllNetworks() {
-    return NetworksController.getAll()
-  }
-
-  @MapApiResponse
-  public static async createNetwork({ name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) {
-    return NetworksController.create({ name, remote, type, genesisHash, chain })
-  }
-
-  @MapApiResponse
-  public static async updateNetwork(id: NetworkID, options: Partial<Network>) {
-    return NetworksController.update(id, options)
-  }
-
-  @MapApiResponse
-  public static async getCurrentNetworkID() {
-    return NetworksController.currentID()
-  }
-
-  @MapApiResponse
-  public static async setCurrentNetowrk(id: NetworkID) {
-    return NetworksController.activate(id)
-  }
-
-  @MapApiResponse
-  public static async deleteNetwork(id: NetworkID) {
-    return NetworksController.delete(id)
-  }
-
 
   /// Experiment Electron 7 revoke/handle
   public static mount() {
     // App
-
-    ipcMain.handle('load-init-data', async () => {
+    handle('load-init-data', async () => {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
 
@@ -227,14 +195,14 @@ export default class ApiController {
         codeHash,
       }
 
-      return mapResponse({ status: ResponseCode.Success, result: initState })
+      return { status: ResponseCode.Success, result: initState }
     })
 
-    ipcMain.handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
+    handle('open-in-window', async (_, { url, title }: { url: string, title: string }) => {
       showWindow(url, title)
     })
 
-    ipcMain.handle('handle-view-error', async (_, error: string) => {
+    handle('handle-view-error', async (_, error: string) => {
       if (env.isDevMode) {
         console.error(error)
       }
@@ -242,64 +210,107 @@ export default class ApiController {
 
     // Transactions
 
-    ipcMain.handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return mapResponse(await TransactionsController.getAllByKeywords(params))
+    handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
+      return TransactionsController.getAllByKeywords(params)
     })
 
-    ipcMain.handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
-      return mapResponse(await TransactionsController.get(walletID, hash))
+    handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
+      return TransactionsController.get(walletID, hash)
     })
 
-    ipcMain.handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
-      return mapResponse(await TransactionsController.updateDescription(params))
+    handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
+      return TransactionsController.updateDescription(params)
     })
 
-    ipcMain.handle('show-transaction-details', async (_, hash: string) => {
+    handle('show-transaction-details', async (_, hash: string) => {
       showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
     })
 
     // Dao
 
-    ipcMain.handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
-      return mapResponse(await DaoController.getDaoCells(params))
+    handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
+      return DaoController.getDaoCells(params)
     })
 
-    ipcMain.handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
-      return mapResponse(await DaoController.generateDepositTx(params))
+    handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
+      return DaoController.generateDepositTx(params)
     })
 
-    ipcMain.handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
-      return mapResponse(await DaoController.generateDepositAllTx(params))
+    handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
+      return DaoController.generateDepositAllTx(params)
     })
 
-    ipcMain.handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
-      return mapResponse(await DaoController.startWithdrawFromDao(params))
+    handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
+      return DaoController.startWithdrawFromDao(params)
     })
 
-    ipcMain.handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
-      return mapResponse(await DaoController.withdrawFromDao(params))
+    handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
+      return DaoController.withdrawFromDao(params)
+    })
+
+    // Networks
+
+    handle('get-all-networks', async () => {
+      return NetworksController.getAll()
+    })
+
+    handle('create-network', async (_, { name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) => {
+      return NetworksController.create({ name, remote, type, genesisHash, chain })
+    })
+
+    handle('update-network', async (_, { networkID, options }: { networkID: NetworkID, options: Partial<Network> }) => {
+      return NetworksController.update(networkID, options)
+    })
+
+    handle('get-current-network-id', async () => {
+      return NetworksController.currentID()
+    })
+
+    handle('set-current-network-id', async (_, id: NetworkID) => {
+      return NetworksController.activate(id)
+    })
+
+    handle('delete-network', async (_, id: NetworkID) => {
+      return NetworksController.delete(id)
+    })
+
+    // Updater
+
+    handle('check-for-updates', async () => {
+      new UpdateController().checkUpdates()
+    })
+
+    handle('download-update', async () => {
+      new UpdateController(false).downloadUpdate()
+    })
+
+    handle('quit-and-install-update', async () => {
+      new UpdateController(false).quitAndInstall()
     })
 
     // Settings
 
-    ipcMain.handle('check-for-updates', async () => {
-      new UpdateController().checkUpdates()
-    })
-
-    ipcMain.handle('download-update', async () => {
-      new UpdateController(false).downloadUpdate()
-    })
-
-    ipcMain.handle('quit-and-install-update', async () => {
-      new UpdateController(false).quitAndInstall()
-    })
-
-    ipcMain.handle('clear-cache', async () => {
+    handle('clear-cache', async () => {
       return SyncController.clearCache()
     })
   }
 }
 
-const mapResponse = (res: any): string => {
-  return JSON.stringify(res)
+// Register handler, warp and serialize API response
+const handle = (channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) => {
+  ipcMain.handle(channel, async (event, args) => {
+    try {
+      const res = await listener(event, args)
+      return JSON.stringify(res)
+    } catch (err) {
+      if (err.code === 'ECONNREFUSED') {
+        err.code = NODE_DISCONNECTED_CODE
+      }
+      const res = {
+        status: err.code || ResponseCode.Fail,
+        message: typeof err.message === 'string' ? { content: err.message } : err.message,
+      }
+      return JSON.stringify(res)
+    }
+  })
 }
