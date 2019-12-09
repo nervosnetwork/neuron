@@ -154,54 +154,6 @@ export default class ApiController {
     return NetworksController.delete(id)
   }
 
-  // Dao
-
-  @MapApiResponse
-  public static async getDaoCells(
-    params: Controller.Params.GetDaoCellsParams
-  ) {
-    return DaoController.getDaoCells(params)
-  }
-
-  @MapApiResponse
-  public static async generateDepositTx(params: {
-    walletID: string,
-    capacity: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return DaoController.generateDepositTx(params)
-  }
-
-  @MapApiResponse
-  public static async generateDepositAllTx(params: {
-    walletID: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return DaoController.generateDepositAllTx(params)
-  }
-
-  @MapApiResponse
-  public static async startWithdrawFromDao(params: {
-    walletID: string,
-    outPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return DaoController.startWithdrawFromDao(params)
-  }
-
-  @MapApiResponse
-  public static async withdrawFromDao(params: {
-    walletID: string,
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    return DaoController.withdrawFromDao(params)
-  }
 
   /// Experiment Electron 7 revoke/handle
   public static mount() {
@@ -304,6 +256,28 @@ export default class ApiController {
 
     ipcMain.handle('show-transaction-details', async (_, hash: string) => {
       showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+    })
+
+    // Dao
+
+    ipcMain.handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
+      return mapResponse(await DaoController.getDaoCells(params))
+    })
+
+    ipcMain.handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
+      return mapResponse(await DaoController.generateDepositTx(params))
+    })
+
+    ipcMain.handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
+      return mapResponse(await DaoController.generateDepositAllTx(params))
+    })
+
+    ipcMain.handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
+      return mapResponse(await DaoController.startWithdrawFromDao(params))
+    })
+
+    ipcMain.handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
+      return mapResponse(await DaoController.withdrawFromDao(params))
     })
 
     // Settings

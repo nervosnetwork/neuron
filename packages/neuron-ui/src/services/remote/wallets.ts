@@ -1,4 +1,4 @@
-import { apiMethodWrapper } from './apiMethodWrapper'
+import { apiMethodWrapper, apiWrapper } from './apiMethodWrapper'
 
 export const updateWallet = apiMethodWrapper(api => (params: Controller.UpdateWalletParams) => api.updateWallet(params))
 
@@ -32,9 +32,6 @@ export const generateSendingAllTx = apiMethodWrapper(api => (params: Controller.
   api.generateSendingAllTx(params)
 )
 
-export const generateDepositAllTx = apiMethodWrapper<Controller.GenerateDepositAllTransactionParams>(api => params =>
-  api.generateDepositAllTx(params)
-)
 export const requestPassword = apiMethodWrapper<Controller.RequestPasswordParams>(api => params =>
   api.requestPassword(params)
 )
@@ -49,38 +46,10 @@ export const updateAddressDescription = apiMethodWrapper(api => (params: Control
   api.updateAddressDescription(params)
 )
 
-export const getNervosDaoData = apiMethodWrapper(api => (params: Controller.GetNervosDaoDataParams) =>
-  api.getDaoCells(params)
+export const getDaoData = apiWrapper<Controller.GetNervosDaoDataParams>('get-dao-data')
+export const generateDaoDepositTx = apiWrapper<Controller.DepositParams>('generate-dao-deposit-tx')
+export const generateDaoDepositAllTx = apiWrapper<Controller.GenerateDepositAllTransactionParams>(
+  'generate-dao-deposit-all-tx'
 )
-
-export const generateDepositTx = apiMethodWrapper(api => (params: Controller.DepositParams) =>
-  api.generateDepositTx(params)
-)
-
-export const generateWithdrawTx = apiMethodWrapper(api => (params: Controller.WithdrawParams) =>
-  api.startWithdrawFromDao(params)
-)
-
-export const generateClaimTx = apiMethodWrapper(api => (params: Controller.ClaimParams) => api.withdrawFromDao(params))
-
-export default {
-  updateWallet,
-  getWalletList,
-  createWallet,
-  importMnemonic,
-  importKeystore,
-  deleteWallet,
-  backupWallet,
-  getCurrentWallet,
-  generateTx,
-  generateSendingAllTx,
-  generateDepositAllTx,
-  requestPassword,
-  sendTx,
-  getAddressesByWalletID,
-  updateAddressDescription,
-  getNervosDaoData,
-  generateDepositTx,
-  generateWithdrawTx,
-  generateClaimTx,
-}
+export const generateDaoWithdrawTx = apiWrapper<Controller.WithdrawParams>('start-withdraw-from-dao')
+export const generateDaoClaimTx = apiWrapper<Controller.ClaimParams>('withdraw-from-dao')

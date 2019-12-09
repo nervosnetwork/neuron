@@ -22,7 +22,12 @@ import {
 } from 'utils/const'
 import { verifyAmount } from 'utils/validators'
 
-import { generateDepositTx, generateDepositAllTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
+import {
+  generateDaoDepositTx,
+  generateDaoDepositAllTx,
+  generateDaoWithdrawTx,
+  generateDaoClaimTx,
+} from 'services/remote'
 import { getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 import { epochParser } from 'utils/parsers'
 
@@ -89,7 +94,7 @@ const NervosDAO = ({
 
         const capacity = CKBToShannonFormatter(value, CapacityUnit.CKB)
         if (BigInt(capacity) < maxDepositAmount) {
-          generateDepositTx({
+          generateDaoDepositTx({
             feeRate: `${MEDIUM_FEE_RATE}`,
             capacity,
             walletID: wallet.id,
@@ -135,7 +140,7 @@ const NervosDAO = ({
   }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance])
 
   useEffect(() => {
-    generateDepositAllTx({
+    generateDaoDepositAllTx({
       walletID: wallet.id,
       feeRate: `${MEDIUM_FEE_RATE}`,
     })
@@ -196,7 +201,7 @@ const NervosDAO = ({
 
   const onWithdrawDialogSubmit = () => {
     if (activeRecord) {
-      generateWithdrawTx({
+      generateDaoWithdrawTx({
         walletID: wallet.id,
         outPoint: activeRecord.outPoint,
         feeRate: `${MEDIUM_FEE_RATE}`,
@@ -243,7 +248,7 @@ const NervosDAO = ({
       const record = records.find(r => r.outPoint.txHash === outPoint.txHash && r.outPoint.index === outPoint.index)
       if (record) {
         if (record.depositOutPoint) {
-          generateClaimTx({
+          generateDaoClaimTx({
             walletID: wallet.id,
             withdrawingOutPoint: record.outPoint,
             depositOutPoint: record.depositOutPoint,
