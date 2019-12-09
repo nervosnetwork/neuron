@@ -1,7 +1,7 @@
-import { apiWrapper } from './apiMethodWrapper'
+import { remoteApi } from './remoteApiWrapper'
 
-export const getNeuronWalletState = apiWrapper<void>('load-init-data')
-export const openInWindow = apiWrapper<Controller.OpenInWindowParams>('open-in-window')
-export const handleViewError = apiWrapper<string>('handle-view-error')
+export const getNeuronWalletState = remoteApi<void>('load-init-data')
+export const openInWindow = remoteApi<Controller.OpenInWindowParams>('open-in-window')
+export const handleViewError = remoteApi<string>('handle-view-error')
 
-export const clearCellCache = apiWrapper<void>('clear-cache')
+export const clearCellCache = remoteApi<void>('clear-cache')

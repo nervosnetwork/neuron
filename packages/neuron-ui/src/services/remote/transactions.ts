@@ -1,4 +1,4 @@
-import { apiWrapper } from './apiMethodWrapper'
+import { remoteApi } from './remoteApiWrapper'
 
 export interface GetTransactionListParams {
   pageNo: number
@@ -7,13 +7,9 @@ export interface GetTransactionListParams {
   walletID: string
 }
 
-export const getTransactionList = apiWrapper<GetTransactionListParams>('get-transaction-list')
-
-export const getTransaction = apiWrapper<{ walletID: string; hash: string }>('get-transaction')
-
-export const updateTransactionDescription = apiWrapper<Controller.UpdateTransactionDescriptionParams>(
+export const getTransactionList = remoteApi<GetTransactionListParams>('get-transaction-list')
+export const getTransaction = remoteApi<{ walletID: string; hash: string }>('get-transaction')
+export const updateTransactionDescription = remoteApi<Controller.UpdateTransactionDescriptionParams>(
   'update-transaction-description'
 )
-
-// param: txhash
-export const showTransactionDetails = apiWrapper<string>('show-transaction-details')
+export const showTransactionDetails = remoteApi<string>('show-transaction-details')

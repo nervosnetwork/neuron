@@ -1,5 +1,5 @@
-import { apiWrapper } from './apiMethodWrapper'
+import { remoteApi } from './remoteApiWrapper'
 
-export const checkForUpdates = apiWrapper<void>('check-for-updates')
-export const downloadUpdate = apiWrapper<void>('download-update')
-export const installUpdate = apiWrapper<void>('quit-and-install-update')
+export const checkForUpdates = remoteApi<void>('check-for-updates')
+export const downloadUpdate = remoteApi<void>('download-update')
+export const installUpdate = remoteApi<void>('quit-and-install-update')

@@ -69,7 +69,7 @@ type Action =
   // Settings
   | 'clear-cache'
 
-export const apiWrapper = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
+export const remoteApi = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
   const res: SuccessFromController | FailureFromController = await window.ipcRenderer
     .invoke(action, params)
     .then(stringifiedRes => (stringifiedRes ? JSON.parse(stringifiedRes) : stringifiedRes))
@@ -107,4 +107,4 @@ export const apiWrapper = <T = any>(action: Action) => async (params: T): Promis
   }
 }
 
-export default { apiWrapper }
+export default { remoteApi }
