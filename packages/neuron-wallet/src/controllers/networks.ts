@@ -8,20 +8,20 @@ import i18n from 'utils/i18n'
 const networksService = NetworksService.getInstance()
 
 export default class NetworksController {
-  public static async getAll() {
-    const networks = await networksService.getAll()
+  public static getAll() {
+    const networks = networksService.getAll()
     return {
       status: ResponseCode.Success,
       result: networks,
     }
   }
 
-  public static async get(id: NetworkID) {
+  public static get(id: NetworkID) {
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
     }
 
-    const network = await networksService.get(id)
+    const network = networksService.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
@@ -109,14 +109,6 @@ export default class NetworksController {
 
   public static async activate(id: NetworkID) {
     await networksService.activate(id)
-    return {
-      status: ResponseCode.Success,
-      result: true,
-    }
-  }
-
-  public static async clear() {
-    await networksService.clear()
     return {
       status: ResponseCode.Success,
       result: true,

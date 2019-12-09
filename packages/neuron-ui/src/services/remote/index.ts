@@ -23,26 +23,6 @@ export const getWinID = () => {
   return window.remote.getCurrentWindow().id
 }
 
-export const validateMnemonic = (mnemonic: string): boolean => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return true
-  }
-  // TODO: use api controller, do NOT require models
-  const { validateMnemonic: remoteValidateMnemonic } = window.remote.require('./models/keys/mnemonic')
-  return remoteValidateMnemonic(mnemonic)
-}
-
-export const generateMnemonic = (): string => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return ''
-  }
-  // TODO: use api controller, do NOT require models
-  const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
-  return remoteGenerateMnemonic()
-}
-
 export const showMessage = (options: any, callback: Function) => {
   if (!window.remote) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
@@ -94,8 +74,6 @@ export const openContextMenu = (template: { label: string; click: Function }[]):
 
 export default {
   getLocale,
-  validateMnemonic,
-  generateMnemonic,
   showMessage,
   showErrorMessage,
   showOpenDialog,

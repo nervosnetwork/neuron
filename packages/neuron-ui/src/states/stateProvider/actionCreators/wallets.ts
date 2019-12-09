@@ -7,7 +7,7 @@ import {
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
-  getNervosDaoData,
+  getDaoData,
   sendTx,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
@@ -269,7 +269,7 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
 }
 
 export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
-  getNervosDaoData(walletID).then(res => {
+  getDaoData(walletID).then(res => {
     if (res.status === 1) {
       dispatch({
         type: NeuronWalletActions.UpdateNervosDaoData,

@@ -132,10 +132,14 @@ const Mnemonic = ({
 
   useEffect(() => {
     if (type === MnemonicAction.Create) {
-      const mnemonic = generateMnemonic()
-      dispatch({
-        type: 'generated',
-        payload: mnemonic,
+      generateMnemonic().then(res => {
+        // Should always succeed
+        if (res.status === 1) {
+          dispatch({
+            type: 'generated',
+            payload: res.result,
+          })
+        }
       })
     } else {
       dispatch({
@@ -165,16 +169,24 @@ const Mnemonic = ({
         type: 'imported',
         payload: trimmedMnemonic,
       })
-      const isMnemonicValid = validateMnemonic(trimmedMnemonic)
-      if (isMnemonicValid) {
-        history.push(
-          `${rootPath}${WalletWizardPath.Submission}/${
-            type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
-          }`
-        )
-      } else {
-        showErrorMessage(t(`messages.error`), t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic' }))
-      }
+      validateMnemonic(trimmedMnemonic).then(res => {
+        let isMnemonicValid = false
+        if (res.status === 1) {
+          isMnemonicValid = res.result
+        }
+        if (isMnemonicValid) {
+          history.push(
+            `${rootPath}${WalletWizardPath.Submission}/${
+              type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
+            }`
+          )
+        } else {
+          showErrorMessage(
+            t(`messages.error`),
+            t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic' })
+          )
+        }
+      })
     }
   }, [isCreate, history, rootPath, type, imported, t, dispatch])
 

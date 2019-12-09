@@ -10,6 +10,7 @@ declare interface Window {
   require: any
   nativeImage: any
   ipcRenderer: {
+    invoke(channel: string, ...args: any[]): Promise<any>
     on(channel: string, listener: Function)
     removeListener(channel: string, listener: Function)
     removeAllListeners(channel: string)
