@@ -17,7 +17,7 @@ export default class AppController {
   constructor() {
     this.mainWindow = null
 
-    this.apiController = new ApiController
+    this.apiController = new ApiController()
     this.apiController.mount()
 
     subscribe(this)
