@@ -74,7 +74,6 @@ type Action =
 export const remoteApi = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
   const res: SuccessFromController | FailureFromController = await window.ipcRenderer
     .invoke(action, params)
-    .then(stringifiedRes => (stringifiedRes ? JSON.parse(stringifiedRes) : stringifiedRes))
     .catch(() => ({
       status: 0,
       message: {
