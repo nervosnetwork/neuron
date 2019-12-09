@@ -5,7 +5,6 @@ import NetworksService from 'services/networks'
 import NodeController from 'controllers/node'
 import SyncController from 'controllers/sync'
 import AppController from 'controllers/app'
-import ApiController from 'controllers/api'
 import { changeLanguage } from 'utils/i18n'
 import env from 'env'
 
@@ -13,8 +12,6 @@ const appController = new AppController()
 
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
-
-  ApiController.mount()
 
   NetworksService.getInstance().notifyAll()
   WalletService.getInstance().generateAddressesIfNecessary()

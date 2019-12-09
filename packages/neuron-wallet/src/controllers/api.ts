@@ -13,14 +13,14 @@ import { SystemScriptSubject } from 'models/subjects/system-script'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
-const NODE_DISCONNECTED_CODE = 104
-
 /**
  * @class ApiController
- * @description Handle messages from neuron UI channels
+ * @description Handle channel messages from neuron UI renderer process
  */
 export default class ApiController {
-  public static mount() {
+  public mount() {
+    const handle = this.handleChannel
+
     // App
     handle('load-init-data', async () => {
       const walletsService = WalletsService.getInstance()
@@ -259,23 +259,24 @@ export default class ApiController {
       return SyncController.clearCache()
     })
   }
-}
 
-// Register handler, warp and serialize API response
-const handle = (channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) => {
-  ipcMain.handle(channel, async (event, args) => {
-    try {
-      const res = await listener(event, args)
-      return JSON.stringify(res)
-    } catch (err) {
-      if (err.code === 'ECONNREFUSED') {
-        err.code = NODE_DISCONNECTED_CODE
+  // Register handler, warp and serialize API response
+  static NODE_DISCONNECTED_CODE = 104
+  private handleChannel(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)) {
+    ipcMain.handle(channel, async (event, args) => {
+      try {
+        const res = await listener(event, args)
+        return JSON.stringify(res)
+      } catch (err) {
+        if (err.code === 'ECONNREFUSED') {
+          err.code = ApiController.NODE_DISCONNECTED_CODE
+        }
+        const res = {
+          status: err.code || ResponseCode.Fail,
+          message: typeof err.message === 'string' ? { content: err.message } : err.message,
+        }
+        return JSON.stringify(res)
       }
-      const res = {
-        status: err.code || ResponseCode.Fail,
-        message: typeof err.message === 'string' ? { content: err.message } : err.message,
-      }
-      return JSON.stringify(res)
-    }
-  })
+    })
+  }
 }
