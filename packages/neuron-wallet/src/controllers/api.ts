@@ -165,6 +165,14 @@ export default class ApiController {
       return WalletsController.generateSendingAllTx(params)
     })
 
+    handle('generate-mnemonic', async () => {
+      return WalletsController.generateMnemonic()
+    })
+
+    handle('validate-mnemonic', async (_, mnemonic: string) => {
+      return WalletsController.validateMnemonic(mnemonic)
+    })
+
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {

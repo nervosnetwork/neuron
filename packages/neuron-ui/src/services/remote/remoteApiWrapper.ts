@@ -44,6 +44,8 @@ type Action =
   | 'send-tx'
   | 'generate-tx'
   | 'generate-send-all-tx'
+  | 'generate-mnemonic'
+  | 'validate-mnemonic'
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'

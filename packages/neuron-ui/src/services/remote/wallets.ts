@@ -17,6 +17,8 @@ export const requestPassword = remoteApi<Controller.RequestPasswordParams>('requ
 export const sendTx = remoteApi<Controller.SendTransactionParams>('send-tx')
 export const generateTx = remoteApi<Controller.GenerateTransactionParams>('generate-tx')
 export const generateSendingAllTx = remoteApi<Controller.GenerateSendingAllTransactionParams>('generate-send-all-tx')
+export const generateMnemonic = remoteApi<void>('generate-mnemonic')
+export const validateMnemonic = remoteApi<string>('validate-mnemonic')
 
 // Dao
 export const getDaoData = remoteApi<Controller.GetNervosDaoDataParams>('get-dao-data')

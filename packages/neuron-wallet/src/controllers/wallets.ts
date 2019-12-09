@@ -6,7 +6,7 @@ import NetworksService from 'services/networks'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from 'models/keys/key'
 import CommandSubject from 'models/subjects/command'
 import { ResponseCode } from 'utils/const'
 import {
@@ -433,6 +433,20 @@ export default class WalletsController {
         type: action,
         payload: walletID,
       })
+    }
+  }
+
+  public static validateMnemonic(mnemonic: string) {
+    return {
+      status: ResponseCode.Success,
+      result: validateMnemonic(mnemonic)
+    }
+  }
+
+  public static generateMnemonic() {
+    return {
+      status: ResponseCode.Success,
+      result: generateMnemonic()
     }
   }
 
