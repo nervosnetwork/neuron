@@ -5,10 +5,10 @@ import OutputEntity from 'database/chain/entities/output'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
-import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
 import { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 
 export default class CheckTx {
   private tx: Transaction
@@ -20,7 +20,7 @@ export default class CheckTx {
     tx: Transaction,
     url: string,
     daoTypeHash: string,
-    addressesUsedSubject: Subject<AddressesWithURL> = addressesUsedSubjectParam,
+    addressesUsedSubject: Subject<AddressesWithURL> = AddressesUsedSubject.getSubject()
   ) {
     this.tx = tx
     this.addressesUsedSubject = addressesUsedSubject

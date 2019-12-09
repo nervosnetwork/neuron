@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 
 export const {
-  networkSwitchSubject, nodeService, addressChangeSubject, addressesUsedSubject
+  nodeService
 } = remote.require(
   './startup/sync-block-task/params'
 )

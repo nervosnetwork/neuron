@@ -1,5 +1,4 @@
 import { BrowserWindow } from 'electron'
-import { ReplaySubject } from 'rxjs'
 import path from 'path'
 import { NetworkWithID } from 'types/network'
 import env from 'env'
@@ -17,18 +16,13 @@ import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
 import Utils from 'services/sync/utils'
+import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
 
 export { genesisBlockHash }
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses, url)
-}
-
-export interface DatabaseInitParams {
-  network: NetworkWithID
-  genesisBlockHash: string
-  chain: string
 }
 
 // network switch or network connect
@@ -52,13 +46,11 @@ const networkChange = async (network: NetworkWithID) => {
       genesisBlockHash: info.hash,
       chain: info.chain
     }
-    databaseInitSubject.next(databaseInitParams)
+    DatabaseInitSubject.getSubject().next(databaseInitParams)
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
   }
 }
-
-export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
 
 NetworkSwitchSubject
   .getSubject()

@@ -8,8 +8,8 @@ import HexUtils from 'utils/hex'
 import CheckTx from 'services/sync/check-and-save/tx'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
-import { addressesUsedSubject } from './renderer-params'
 import logger from 'utils/logger'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 
 export default class GetBlocks {
   private retryTime: number
@@ -90,7 +90,7 @@ export default class GetBlocks {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          addressesUsedSubject.next({
+          AddressesUsedSubject.getSubject().next({
             addresses,
             url: this.url,
           })

@@ -6,8 +6,10 @@ import { Address } from 'database/address/address-dao'
 
 import initConnection from 'database/chain/ormconfig'
 import DaoUtils from 'models/dao-utils'
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
+import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 
-const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
+const { nodeService } = remote.require('./startup/sync-block-task/params')
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -43,7 +45,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
   indexerQueue = new IndexerQueue(nodeURL, lockHashInfos, nodeService.tipNumberSubject)
 
   // listen to address created
-  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
+  AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
     if (indexerQueue) {
       let lockUtils = new LockUtils(await LockUtils.loadSystemScript(nodeURL))
       const infos: LockHashInfo[] = addresses.map(addr => {
@@ -61,7 +63,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
     }
   })
 
-  walletCreatedSubject.subscribe(async (type: string) => {
+  WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
     if (type === 'import') {
       if (indexerQueue) {
         indexerQueue.reset()

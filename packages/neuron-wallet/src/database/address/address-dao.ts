@@ -1,4 +1,3 @@
-import { remote } from 'electron'
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
@@ -202,11 +201,6 @@ export default class AddressDao {
   }
 }
 
-const isRenderer = process && process.type === 'renderer'
-const addressDbChangedSubject = isRenderer
-  ? remote.require('./models/subjects/address-db-changed-subject').default.getSubject()
-  : AddressDbChangedSubject.getSubject()
-
 /// Persist all addresses as array in `addresses/index.json`.
 class AddressStore {
   static MODULE_NAME = 'addresses'
@@ -251,6 +245,6 @@ class AddressStore {
   }
 
   static changed() {
-    addressDbChangedSubject.next("Updated")
+    AddressDbChangedSubject.getSubject().next("Updated")
   }
 }
