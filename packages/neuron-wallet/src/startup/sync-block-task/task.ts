@@ -32,7 +32,7 @@ const testIndexer = async (url: string): Promise<boolean> => {
   }
 }
 
-export const run = async () => {
+const run = async () => {
   databaseInitSubject.subscribe(async (params: DatabaseInitParams) => {
     const { network, genesisBlockHash, chain } = params
     if (network && genesisBlockHash.startsWith('0x')) {
