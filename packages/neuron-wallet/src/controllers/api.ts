@@ -10,7 +10,6 @@ import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { SystemScriptSubject } from 'models/subjects/system-script'
-import { MapApiResponse } from 'decorators'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
@@ -21,110 +20,6 @@ const NODE_DISCONNECTED_CODE = 104
  * @description Handle messages from neuron UI channels
  */
 export default class ApiController {
-  // Wallets
-
-  @MapApiResponse
-  public static async getAllWallets() {
-    return WalletsController.getAll()
-  }
-
-  @MapApiResponse
-  public static async getCurrentWallet() {
-    return WalletsController.getCurrent()
-  }
-
-  @MapApiResponse
-  public static async importMnemonic(params: { name: string; password: string; mnemonic: string }) {
-    return WalletsController.importMnemonic(params)
-  }
-
-  @MapApiResponse
-  public static async importKeystore(params: { name: string; password: string; keystorePath: string }) {
-    return WalletsController.importKeystore(params)
-  }
-
-  @MapApiResponse
-  public static async createWallet(params: { name: string; password: string; mnemonic: string }) {
-    return WalletsController.create(params)
-  }
-
-  @MapApiResponse
-  public static async updateWallet(params: { id: string; password: string; name: string; newPassword?: string }) {
-    return WalletsController.update(params)
-  }
-
-  @MapApiResponse
-  public static async deleteWallet({ id = '', password = '' }) {
-    return WalletsController.delete({ id, password })
-  }
-
-  @MapApiResponse
-  public static async backupWallet({ id = '', password = '' }) {
-    return WalletsController.backup({ id, password })
-  }
-
-  @MapApiResponse
-  public static async setCurrentWallet(id: string) {
-    return WalletsController.activate(id)
-  }
-
-  @MapApiResponse
-  public static async getAddressesByWalletID(id: string) {
-    return WalletsController.getAllAddresses(id)
-  }
-
-  @MapApiResponse
-  public static async requestPassword({ walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) {
-    WalletsController.requestPassword(walletID, action)
-  }
-
-  @MapApiResponse
-  public static async sendTx(params: {
-    walletID: string
-    tx: TransactionWithoutHash
-    password: string
-    description?: string
-  }) {
-    return WalletsController.sendTx(params)
-  }
-
-  @MapApiResponse
-  public static async generateTx(params: {
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    fee: string
-    feeRate: string
-  }) {
-    return WalletsController.generateTx(params)
-  }
-
-  @MapApiResponse
-  public static async generateSendingAllTx(params: {
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    fee: string
-    feeRate: string
-  }) {
-    return WalletsController.generateSendingAllTx(params)
-  }
-
-  @MapApiResponse
-  public static async updateAddressDescription(params: {
-    walletID: string
-    address: string
-    description: string
-  }) {
-    return WalletsController.updateAddressDescription(params)
-  }
-
-
-  /// Experiment Electron 7 revoke/handle
   public static mount() {
     // App
     handle('load-init-data', async () => {
@@ -206,6 +101,68 @@ export default class ApiController {
       if (env.isDevMode) {
         console.error(error)
       }
+    })
+
+    // Wallets
+
+    handle('get-all-wallets', async () => {
+      return WalletsController.getAll()
+    })
+
+    handle('get-current-wallet', async () => {
+      return WalletsController.getCurrent()
+    })
+
+    handle('set-current-wallet', async (_, id: string) => {
+      return WalletsController.activate(id)
+    })
+
+    handle('import-mnemonic', async (_, params: { name: string; password: string; mnemonic: string }) => {
+      return WalletsController.importMnemonic(params)
+    })
+
+    handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
+      return WalletsController.importKeystore(params)
+    })
+
+    handle('create-wallet', async (_, params: { name: string; password: string; mnemonic: string }) => {
+      return WalletsController.create(params)
+    })
+
+    handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
+      return WalletsController.update(params)
+    })
+
+    handle('delete-wallet', async (_, { id = '', password = '' }) => {
+      return WalletsController.delete({ id, password })
+    })
+
+    handle('backup-wallet', async (_, { id = '', password = '' }) => {
+      return WalletsController.backup({ id, password })
+    })
+
+    handle('get-all-addresses', async (_, id: string) => {
+      return WalletsController.getAllAddresses(id)
+    })
+
+    handle('update-address-description', async (_, params: { walletID: string, address: string, description: string }) => {
+      return WalletsController.updateAddressDescription(params)
+    })
+
+    handle('request-password', async (_, { walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) => {
+      WalletsController.requestPassword(walletID, action)
+    })
+
+    handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) => {
+      return WalletsController.sendTx(params)
+    })
+
+    handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
+      return WalletsController.generateTx(params)
+    })
+
+    handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
+      return WalletsController.generateSendingAllTx(params)
     })
 
     // Transactions
