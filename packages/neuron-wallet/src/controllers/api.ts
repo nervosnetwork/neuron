@@ -266,7 +266,7 @@ export default class ApiController {
     ipcMain.handle(channel, async (event, args) => {
       try {
         const res = await listener(event, args)
-        return JSON.stringify(res)
+        return res
       } catch (err) {
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
@@ -275,7 +275,7 @@ export default class ApiController {
           status: err.code || ResponseCode.Fail,
           message: typeof err.message === 'string' ? { content: err.message } : err.message,
         }
-        return JSON.stringify(res)
+        return res
       }
     })
   }
