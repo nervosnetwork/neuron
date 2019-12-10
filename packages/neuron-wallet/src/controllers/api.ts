@@ -188,7 +188,7 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`${env.mainURL}#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
     })
 
     // Dao

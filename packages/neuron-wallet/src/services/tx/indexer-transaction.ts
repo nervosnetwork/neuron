@@ -54,8 +54,8 @@ export default class IndexerTransaction {
     })
   }
 
-  public static updateInputLockHash = async (txHash: string, index: string) => {
-    const output = await getConnection()
+  public static updateInputLockHash = async (txHash: string, index: string): Promise<OutputEntity | undefined> => {
+    const output: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
@@ -93,6 +93,6 @@ export default class IndexerTransaction {
       return output
     }
 
-    return undefined
+    return output
   }
 }

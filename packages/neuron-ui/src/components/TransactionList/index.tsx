@@ -15,7 +15,7 @@ import GroupHeader from 'components/CustomRows/GroupHeader'
 import HistoryRow from 'components/CustomRows/HistoryRow'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { showTransactionDetails, openContextMenu, openExternal, openInWindow } from 'services/remote'
+import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import {
@@ -260,10 +260,7 @@ const TransactionList = ({
           {
             label: t('history.detail'),
             click: () => {
-              openInWindow({
-                url: `#/transaction/${item.hash}`,
-                title: t(`messageBox.transaction.title`, { hash: item.hash }),
-              })
+              showTransactionDetails(item.hash)
             },
           },
           {

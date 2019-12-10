@@ -7,7 +7,6 @@ import NetworksService from 'services/networks'
 import { Transaction, TransactionWithStatus } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
 import BlockNumber from 'services/sync/block-number'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
@@ -19,6 +18,10 @@ import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
 import CommonUtils from 'utils/common'
+import AddressService from 'services/addresses'
+import WalletService from 'services/wallets'
+import { AccountExtendedPublicKey } from 'models/keys/key'
+import { Address } from 'database/address/address-dao'
 
 export interface LockHashInfo {
   lockHash: string
@@ -70,7 +73,8 @@ export default class IndexerQueue {
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
-    this.lockHashInfos = lockHashInfos
+    const infos = [...new Set(lockHashInfos)]
+    this.lockHashInfos = infos
     this.indexed = false
   }
 
@@ -218,10 +222,7 @@ export default class IndexerQueue {
               transaction.outputs![parseInt(txPoint.index, 16)].lock,
               NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
-            AddressesUsedSubject.getSubject().next({
-              addresses: [address],
-              url: this.url,
-            })
+            await this.updateTxCountAndBalance(address)
             continue
           }
 
@@ -295,14 +296,24 @@ export default class IndexerQueue {
             }
           }
           if (address) {
-            AddressesUsedSubject.getSubject().next({
-              addresses: [address],
-              url: this.url,
-            })
+            await this.updateTxCountAndBalance(address)
           }
         }
       }
       page += 1
+    }
+  }
+
+  private updateTxCountAndBalance = async (address: string) => {
+    const addrs = await AddressService.updateTxCountAndBalances([address], this.url)
+    const walletIds: string[] = addrs
+      .map(addr => (addr as Address).walletId)
+      .filter((value, idx, a) => a.indexOf(value) === idx)
+    for (const id of walletIds) {
+      const wallet = WalletService.getInstance().get(id)
+      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+      // set isImporting to undefined means unknown
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
     }
   }
 
