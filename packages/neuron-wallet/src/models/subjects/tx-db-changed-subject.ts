@@ -14,7 +14,7 @@ export class TxDbChangedSubject {
 
   public static getSubject() {
     if (ProcessUtils.isRenderer()) {
-      return remote.require('./models/subjects/tx-db-changed-subjects').default.getSubject()
+      return remote.require('./models/subjects/tx-db-changed-subject').default.getSubject()
     } else {
       return this.subject
     }
