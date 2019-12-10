@@ -7,6 +7,7 @@ import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
+import logger from 'utils/logger'
 
 export class TransactionPersistor {
   // After the tx is sent:
@@ -115,6 +116,7 @@ export class TransactionPersistor {
         }
         await queryRunner.commitTransaction()
       } catch (err) {
+        logger.error('saveWithFetch update error:', err)
         await queryRunner.rollbackTransaction()
       } finally {
         await queryRunner.release()
@@ -227,6 +229,7 @@ export class TransactionPersistor {
       }
       await queryRunner.commitTransaction();
     } catch (err) {
+      logger.error('create transaction error:', err)
       await queryRunner.rollbackTransaction()
     } finally {
       await queryRunner.release()
