@@ -42,7 +42,7 @@ export default class GetBlocks {
   }
 
   public retryGetBlock = async (num: string): Promise<Block> => {
-    const block: Block = await Utils.retry(this.retryTime, this.retryInterval, async () => {
+    const block: Block = await this.retry(async () => {
       return await this.getBlockByNumber(num)
     })
 
@@ -50,7 +50,7 @@ export default class GetBlocks {
   }
 
   public retryGetBlockHeader = async (num: string): Promise<BlockHeader> => {
-    const header: BlockHeader = await Utils.retry(this.retryTime, this.retryInterval, async () => {
+    const header: BlockHeader = await this.retry(async () => {
       return await this.getBlockHeaderByNumber(num)
     })
 
