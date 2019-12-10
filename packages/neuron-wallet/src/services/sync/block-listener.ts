@@ -5,7 +5,7 @@ import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
-import Utils from './utils'
+import CommonUtils from 'utils/common'
 
 export default class BlockListener {
   private lockHashes: string[]
@@ -91,7 +91,7 @@ export default class BlockListener {
       if (now - startAt > timeout) {
         return
       }
-      await Utils.sleep(100)
+      await CommonUtils.sleep(100)
     }
     await this.currentBlockNumber.updateCurrent(this.tipBlockNumber)
     tipNumberListener.unsubscribe()

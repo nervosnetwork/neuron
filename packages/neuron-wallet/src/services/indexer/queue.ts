@@ -1,6 +1,6 @@
 import { Subject, Subscription } from 'rxjs'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import Utils from 'services/sync/utils'
+import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
 import GetBlocks from 'services/sync/get-blocks'
 import NetworksService from 'services/networks'
@@ -18,6 +18,7 @@ import { TxUniqueFlagCache } from './tx-unique-flag'
 import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
+import CommonUtils from 'utils/common'
 
 export interface LockHashInfo {
   lockHash: string
@@ -159,7 +160,7 @@ export default class IndexerQueue {
       .map(state => HexUtils.toDecimal(state.blockNumber))
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
     const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
-    return Utils.min(blockNumbersBigInt)
+    return ArrayUtils.min(blockNumbersBigInt)
   }
 
   public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
@@ -167,7 +168,7 @@ export default class IndexerQueue {
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
-    await Utils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
+    await ArrayUtils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
       const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
       await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
     })
@@ -327,6 +328,6 @@ export default class IndexerQueue {
   }
 
   private yield = async (millisecond: number = 1) => {
-    await Utils.sleep(millisecond)
+    await CommonUtils.sleep(millisecond)
   }
 }

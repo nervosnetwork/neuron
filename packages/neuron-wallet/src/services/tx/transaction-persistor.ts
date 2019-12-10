@@ -5,7 +5,8 @@ import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
-import Utils from 'services/sync/utils'
+import ArrayUtils from 'utils/array'
+import CommonUtils from 'utils/common'
 
 export class TransactionPersistor {
   // After the tx is sent:
@@ -106,10 +107,10 @@ export class TransactionPersistor {
       await queryRunner.startTransaction()
       try {
         await queryRunner.manager.save(txEntity)
-        for (const slice of Utils.eachSlice(previousOutputs, sliceSize)) {
+        for (const slice of ArrayUtils.eachSlice(previousOutputs, sliceSize)) {
           await queryRunner.manager.save(slice)
         }
-        for (const slice of Utils.eachSlice(outputs, sliceSize)) {
+        for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
           await queryRunner.manager.save(slice)
         }
         await queryRunner.commitTransaction()
@@ -215,13 +216,13 @@ export class TransactionPersistor {
     await queryRunner.startTransaction()
     try {
       await queryRunner.manager.save(tx)
-      for (const slice of Utils.eachSlice(inputs, sliceSize)) {
+      for (const slice of ArrayUtils.eachSlice(inputs, sliceSize)) {
         await queryRunner.manager.save(slice)
       }
-      for (const slice of Utils.eachSlice(previousOutputs, sliceSize)) {
+      for (const slice of ArrayUtils.eachSlice(previousOutputs, sliceSize)) {
         await queryRunner.manager.save(slice)
       }
-      for (const slice of Utils.eachSlice(outputs, sliceSize)) {
+      for (const slice of ArrayUtils.eachSlice(outputs, sliceSize)) {
         await queryRunner.manager.save(slice)
       }
       await queryRunner.commitTransaction();
@@ -240,7 +241,7 @@ export class TransactionPersistor {
     while (queryRunner.isTransactionActive) {
       const now: number = +new Date()
       if (now - startAt < timeout) {
-        await Utils.sleep(50)
+        await CommonUtils.sleep(50)
       }
     }
   }

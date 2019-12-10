@@ -14,8 +14,8 @@ import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
-import Utils from 'services/sync/utils'
 import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
+import CommonUtils from 'utils/common'
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
@@ -119,7 +119,7 @@ export const killSyncBlockTask = async () => {
       logger.info('Kill sync block background process')
       syncBlockBackgroundWindow.webContents.send("sync-window-will-close")
       // Give ipcRenderer enough time to receive and handle sync-window-will-close channel
-      Utils.sleep(2000).then(() => {
+      CommonUtils.sleep(2000).then(() => {
         if (syncBlockBackgroundWindow) {
           syncBlockBackgroundWindow.close()
         }

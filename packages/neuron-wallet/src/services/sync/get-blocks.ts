@@ -3,8 +3,8 @@ import { generateCore } from 'services/sdk-core'
 
 import { Block, BlockHeader } from 'types/cell-types'
 import TypeConvert from 'types/type-convert'
-import Utils from './utils'
 import HexUtils from 'utils/hex'
+import CommonUtils from 'utils/common'
 
 export default class GetBlocks {
   private retryTime: number
@@ -96,6 +96,6 @@ export default class GetBlocks {
   }
 
   private async retry<T>(func: () => T): Promise<T> {
-    return Utils.retry(this.retryTime, this.retryInterval, func)
+    return CommonUtils.retry(this.retryTime, this.retryInterval, func)
   }
 }

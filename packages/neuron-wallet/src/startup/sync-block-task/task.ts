@@ -2,11 +2,11 @@ import { ipcRenderer } from 'electron'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from 'listeners/tx-status'
 import { register as registerAddressListener, unregister as unregisterAddressListener } from 'listeners/address'
 import IndexerRPC from 'services/indexer/indexer-rpc'
-import Utils from 'services/sync/utils'
 
 import { switchNetwork as syncSwitchNetwork } from './sync'
 import { switchNetwork as indexerSwitchNetwork } from './indexer'
 import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
+import CommonUtils from 'utils/common'
 
 // register to listen address updates
 registerAddressListener()
@@ -14,7 +14,7 @@ registerAddressListener()
 const testIndexer = async (url: string): Promise<boolean> => {
   const indexerRPC = new IndexerRPC(url)
   try {
-    await Utils.retry(3, 100, () => {
+    await CommonUtils.retry(3, 100, () => {
       return indexerRPC.getLockHashIndexStates()
     })
     return true

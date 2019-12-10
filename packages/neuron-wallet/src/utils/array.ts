@@ -1,6 +1,6 @@
-export default class Utils {
-  public static eachSlice = (array: any[], size: number) => {
-    const arr = []
+export default class ArrayUtils {
+  public static eachSlice<T>(array: T[], size: number): T[][] {
+    const arr: T[][] = []
     for (let i = 0, l = array.length; i < l; i += size) {
       arr.push(array.slice(i, i + size))
     }
@@ -8,7 +8,7 @@ export default class Utils {
   }
 
   public static range = (startNumber: string, endNumber: string): string[] => {
-    const result = Utils.rangeForBigInt(BigInt(startNumber), BigInt(endNumber))
+    const result = ArrayUtils.rangeForBigInt(BigInt(startNumber), BigInt(endNumber))
     return result.map(num => num.toString())
   }
 
@@ -17,25 +17,8 @@ export default class Utils {
     return [...Array(size).keys()].map(i => BigInt(i) + startNumber)
   }
 
-  public static sleep = (ms: number) => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
-  public static async retry<T>(times: number, interval: number, callback: (...args: any[]) => T): Promise<T> {
-    let retryTime = 0
-
-    while (++retryTime < times) {
-      try {
-        return callback()
-      } catch (err) {
-        await Utils.sleep(interval)
-      }
-    }
-    return callback()
-  }
-
-  public static mapSeries = async (array: any[], callback: any): Promise<any[]> => {
-    const result = []
+  public static async mapSeries<T, K>(array: T[], callback: (arg: T) => K): Promise<K[]> {
+    const result: K[] = []
     for (const item of array) {
       const r = await callback(item)
       result.push(r)

@@ -7,10 +7,11 @@ import DaoUtils from 'models/dao-utils'
 import GetBlocks from './get-blocks'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
-import Utils from './utils'
+import ArrayUtils from 'utils/array'
 import CheckTx from './check-and-save/tx'
 import TypeConvert from 'types/type-convert'
 import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
+import CommonUtils from 'utils/common'
 
 export default class Queue {
   private lockHashes: string[]
@@ -77,7 +78,7 @@ export default class Queue {
           }
 
           if (realEndNumber >= startNumber) {
-            const rangeArr = Utils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
+            const rangeArr = ArrayUtils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
             await this.pipeline(rangeArr)
           }
         }
@@ -95,7 +96,7 @@ export default class Queue {
   }
 
   private yield = async (millisecond: number = 1) => {
-    await Utils.sleep(millisecond)
+    await CommonUtils.sleep(millisecond)
   }
 
   public stop = () => {
