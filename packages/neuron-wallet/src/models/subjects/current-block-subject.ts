@@ -1,5 +1,4 @@
 import { ReplaySubject } from 'rxjs'
-import { SyncedBlockNumberSubject } from './node'
 import ProcessUtils from 'utils/process'
 import { remote } from 'electron'
 
@@ -11,21 +10,13 @@ export interface CurrentBlockInfo {
 export class CurrentBlockSubject {
   private static subject = new ReplaySubject<CurrentBlockInfo>(1)
 
-  public static getSubject() {
+  public static getSubject(): ReplaySubject<CurrentBlockInfo> {
     if (ProcessUtils.isRenderer()) {
       return remote.require('./models/subjects/current-block-subject').default.getSubject()
     } else {
       return this.subject
     }
   }
-
-  static subscribe() {
-    CurrentBlockSubject.subject.subscribe(({ blockNumber }) => {
-      SyncedBlockNumberSubject.next(blockNumber)
-    })
-  }
 }
-
-CurrentBlockSubject.subscribe()
 
 export default CurrentBlockSubject

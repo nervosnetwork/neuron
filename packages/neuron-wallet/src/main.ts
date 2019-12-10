@@ -7,6 +7,7 @@ import SyncController from 'controllers/sync'
 import AppController from 'controllers/app'
 import { changeLanguage } from 'utils/i18n'
 import env from 'env'
+import { register } from 'listeners/main'
 
 const appController = new AppController()
 
@@ -15,6 +16,7 @@ app.on('ready', async () => {
 
   NetworksService.getInstance().notifyAll()
   WalletService.getInstance().generateAddressesIfNecessary()
+  register()
   if (!env.isTestMode) {
     await NodeController.startNode()
     SyncController.startSyncing()

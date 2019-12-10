@@ -1,7 +1,5 @@
 import { ReplaySubject } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
 import { Transaction } from 'types/cell-types'
-import DataUpdateSubject from './data-update'
 import ProcessUtils from 'utils/process'
 import { remote } from 'electron'
 
@@ -21,23 +19,6 @@ export class TxDbChangedSubject {
       return this.subject
     }
   }
-
-  static subscribe = () => {
-    TxDbChangedSubject.subject.pipe(debounceTime(500)).subscribe(() => {
-      DataUpdateSubject.next({
-        dataType: 'transaction',
-        actionType: 'update',
-      })
-    })
-  }
-
-  static unsubscribe = () => {
-    if (TxDbChangedSubject.subject) {
-      TxDbChangedSubject.subject.unsubscribe()
-    }
-  }
 }
-
-TxDbChangedSubject.subscribe()
 
 export default TxDbChangedSubject
