@@ -181,10 +181,11 @@ const useOnItemChange = (updateTransactionOutput: Function) =>
       const { field = '', idx = -1 } = e.target.dataset
       if (undefined !== value) {
         if (field === 'amount') {
-          if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
+          const amount = value.replace(/,/g, '')
+          if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
             return
           }
-          updateTransactionOutput(field)(idx)(value)
+          updateTransactionOutput(field)(idx)(amount)
         } else {
           updateTransactionOutput(field)(idx)(value)
         }
@@ -321,7 +322,7 @@ export const useInitialize = (
 
   const onGetAmountErrorMessage = useCallback(
     (text: string) => {
-      const amount = text || '0'
+      const amount = text.replace(/,/g, '') || '0'
 
       const msg = verifyAmount(amount)
       if (typeof msg === 'object') {

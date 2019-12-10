@@ -16,6 +16,7 @@ import {
 import { useTranslation, Trans } from 'react-i18next'
 import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
 import { openExternal } from 'services/remote'
+import { localNumberFormatter } from 'utils/formatters'
 
 interface DepositDialogProps {
   show: boolean
@@ -88,7 +89,12 @@ const DepositDialog = ({
         <Spinner size={SpinnerSize.large} />
       ) : (
         <>
-          <TextField label={t('nervos-dao.deposit')} value={value} onChange={onChange} suffix="CKB" />
+          <TextField
+            label={t('nervos-dao.deposit')}
+            value={localNumberFormatter(value)}
+            onChange={onChange}
+            suffix="CKB"
+          />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
           <Text as="p" variant="small" block>
             {`${t('nervos-dao.fee')}: ${fee}`}
