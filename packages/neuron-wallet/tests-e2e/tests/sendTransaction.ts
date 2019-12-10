@@ -116,16 +116,16 @@ export default (app: Application) => {
       await app.waitUntilLoaded()
     })
 
-    app.test('default price should be 1000 and default speed should be 500 blocks', async () => {
+    app.test('default price should be 1,000 and default speed should be 500 blocks', async () => {
       const { client } = app.spectron
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
-      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('1000')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('1,000')
       const speedDropdown = await client.$('div[role=listbox]')
       expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('~ 500 blocks')
     })
 
-    app.test('Change speed to ~ 100 blocks and the price should be 3000', async () => {
+    app.test('Change speed to ~ 100 blocks and the price should be 3,000', async () => {
       const { client } = app.spectron
       client.click('div[role=listbox]')
       await app.waitUntilLoaded()
@@ -133,10 +133,10 @@ export default (app: Application) => {
       await app.waitUntilLoaded()
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
-      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('3000')
+      expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('3,000')
     })
 
-    app.test('Change the price to 100000 and the speed should switch to immediately', async () => {
+    app.test('Change the price to 100,000 and the speed should switch to immediately', async () => {
       const { client } = app.spectron
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')

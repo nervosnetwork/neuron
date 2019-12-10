@@ -201,7 +201,7 @@ const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
         const price = value.replace(/[^\d]/g, '')
         dispatch({
           type: AppActions.UpdateSendPrice,
-          payload: price,
+          payload: price.replace(/,/g, ''),
         })
       }
     },
