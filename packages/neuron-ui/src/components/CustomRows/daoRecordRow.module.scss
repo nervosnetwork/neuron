@@ -38,4 +38,17 @@
   &.isClaim {
     border-left-color: blue;
   }
+
+  .epochsDialogBtn {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    margin-right: 16px;
+    background-color: rgb(38, 135, 133);
+
+    &:hover {
+      background-color: rgb(0, 170, 144);
+    }
+  }
 }

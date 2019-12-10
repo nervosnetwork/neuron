@@ -12,6 +12,7 @@ import { epochParser } from 'utils/parsers'
 import * as styles from './daoRecordRow.module.scss'
 
 const DAORecord = ({
+  blockHash,
   daoData,
   blockNumber,
   outPoint: { txHash, index },
@@ -20,6 +21,7 @@ const DAORecord = ({
   capacity,
   actionLabel,
   onClick,
+  onEpochsExplanationClick,
   timestamp,
   genesisBlockTimestamp,
   depositTimestamp,
@@ -29,7 +31,8 @@ const DAORecord = ({
   connectionStatus,
 }: State.NervosDAORecord & {
   actionLabel: string
-  onClick: any
+  onClick: React.EventHandler<any>
+  onEpochsExplanationClick: React.EventHandler<any>
   tipBlockNumber: string
   tipBlockTimestamp: number
   epoch: string
@@ -156,6 +159,18 @@ const DAORecord = ({
         </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div>
+          {depositOutPoint ? null : (
+            <span
+              data-block-hash={blockHash}
+              role="button"
+              className={styles.epochsDialogBtn}
+              onClick={onEpochsExplanationClick}
+              onKeyPress={onEpochsExplanationClick}
+              tabIndex={0}
+              aria-label={t('nervos-dao.explanation-of-epochs-period')}
+              title={t('nervos-dao.explanation-of-epochs-period')}
+            />
+          )}
           <DefaultButton
             text={actionLabel}
             data-tx-hash={txHash}

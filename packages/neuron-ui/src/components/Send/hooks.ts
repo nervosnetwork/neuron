@@ -292,7 +292,7 @@ export const useInitialize = (
     if (isSendMax) {
       updateSendingAllTransaction()
     }
-  }, [isSendMax, price])
+  }, [isSendMax, price, updateSendingAllTransaction])
 
   useEffect(() => {
     clear(dispatch)

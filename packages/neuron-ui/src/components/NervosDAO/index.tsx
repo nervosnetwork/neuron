@@ -35,6 +35,7 @@ import DAORecord from 'components/CustomRows/DAORecordRow'
 
 import DepositDialog from './DepositDialog'
 import WithdrawDialog from './WithdrawDialog'
+import EpochsDialog from './EpochsDialog'
 
 let timer: NodeJS.Timeout
 
@@ -63,6 +64,7 @@ const NervosDAO = ({
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
+  const [blockHashInEpochsDialog, setBlockHashInEpochsDialog] = useState('')
 
   const clearGeneratedTx = useCallback(() => {
     dispatch({
@@ -195,11 +197,11 @@ const NervosDAO = ({
     })
   }
 
-  const onWithdrawDialogDismiss = () => {
+  const onWithdrawDialogDismiss = useCallback(() => {
     setActiveRecord(null)
-  }
+  }, [setActiveRecord])
 
-  const onWithdrawDialogSubmit = () => {
+  const onWithdrawDialogSubmit = useCallback(() => {
     if (activeRecord) {
       generateDaoWithdrawTx({
         walletID: wallet.id,
@@ -236,7 +238,21 @@ const NervosDAO = ({
         })
     }
     setActiveRecord(null)
-  }
+  }, [activeRecord, setActiveRecord, clearGeneratedTx, wallet.id, dispatch])
+
+  const onEpochsExplanationClick = useCallback(
+    (e: React.SyntheticEvent<HTMLSpanElement, MouseEvent>) => {
+      const { dataset } = e.target as HTMLSpanElement
+      if (dataset.blockHash) {
+        setBlockHashInEpochsDialog(dataset.blockHash)
+      }
+    },
+    [setBlockHashInEpochsDialog]
+  )
+
+  const onEpochsDialogDismiss = useCallback(() => {
+    setBlockHashInEpochsDialog('')
+  }, [setBlockHashInEpochsDialog])
 
   const onActionClick = useCallback(
     (e: any) => {
@@ -330,7 +346,7 @@ const NervosDAO = ({
       .catch(console.error)
   }, [records, tipBlockHash])
 
-  const Records = useMemo(() => {
+  const MemoizedRecords = useMemo(() => {
     return (
       <>
         <Text as="h2" variant="xxLarge">
@@ -349,6 +365,7 @@ const NervosDAO = ({
                 actionLabel={t(`nervos-dao.${stage}-action-label`)}
                 key={JSON.stringify(record.outPoint)}
                 onClick={onActionClick}
+                onEpochsExplanationClick={onEpochsExplanationClick}
                 tipBlockNumber={tipBlockNumber}
                 tipBlockTimestamp={tipBlockTimestamp}
                 epoch={epoch}
@@ -365,12 +382,56 @@ const NervosDAO = ({
     withdrawList,
     t,
     onActionClick,
+    onEpochsExplanationClick,
     tipBlockNumber,
     epoch,
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
   ])
+
+  const MemoizedDepositDialog = useMemo(() => {
+    return (
+      <DepositDialog
+        show={showDepositDialog}
+        value={depositValue}
+        fee={fee}
+        onChange={(_e: any, value: string) => updateDepositValue(value)}
+        onDismiss={onDepositDialogDismiss}
+        onSubmit={onDepositDialogSubmit}
+        onSlide={onSlide}
+        maxDepositAmount={maxDepositAmount}
+        isDepositing={sending}
+        errorMessage={errorMessage}
+      />
+    )
+  }, [
+    showDepositDialog,
+    depositValue,
+    fee,
+    onDepositDialogDismiss,
+    onDepositDialogSubmit,
+    onSlide,
+    maxDepositAmount,
+    sending,
+    errorMessage,
+  ])
+
+  const MemoizedWithdrawDialog = useMemo(() => {
+    return activeRecord ? (
+      <WithdrawDialog
+        record={activeRecord}
+        onDismiss={onWithdrawDialogDismiss}
+        onSubmit={onWithdrawDialogSubmit}
+        tipBlockHash={tipBlockHash}
+        currentEpoch={epoch}
+      />
+    ) : null
+  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
+
+  const MemoizedEpochsDialog = useMemo(() => {
+    return <EpochsDialog blockHash={blockHashInEpochsDialog} currentEpoch={epoch} onDismiss={onEpochsDialogDismiss} />
+  }, [blockHashInEpochsDialog, epoch, onEpochsDialogDismiss])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -425,29 +486,11 @@ const NervosDAO = ({
             </TooltipHost>
           </Stack>
         </Stack>
-        {Records}
+        {MemoizedRecords}
       </Stack>
-      <DepositDialog
-        show={showDepositDialog}
-        value={depositValue}
-        fee={fee}
-        onChange={(_e: any, value: string) => updateDepositValue(value.replace(/,/g, ''))}
-        onDismiss={onDepositDialogDismiss}
-        onSubmit={onDepositDialogSubmit}
-        onSlide={onSlide}
-        maxDepositAmount={maxDepositAmount}
-        isDepositing={sending}
-        errorMessage={errorMessage}
-      />
-      {activeRecord ? (
-        <WithdrawDialog
-          record={activeRecord}
-          onDismiss={onWithdrawDialogDismiss}
-          onSubmit={onWithdrawDialogSubmit}
-          tipBlockHash={tipBlockHash}
-          currentEpoch={epoch}
-        />
-      ) : null}
+      {MemoizedDepositDialog}
+      {MemoizedWithdrawDialog}
+      {MemoizedEpochsDialog}
     </>
   )
 }
