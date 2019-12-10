@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
-import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from 'listeners/tx-status'
-import { register as registerAddressListener, unregister as unregisterAddressListener } from 'listeners/address'
+import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from 'listeners/renderer/tx-status'
+import { register as registerAddressListener, unregister as unregisterAddressListener } from 'listeners/renderer/address'
 import IndexerRPC from 'services/indexer/indexer-rpc'
 
 import { switchNetwork as syncSwitchNetwork } from './sync'
