@@ -9,6 +9,9 @@ import { changeLanguage } from 'utils/i18n'
 import env from 'env'
 import { register as registerListeners } from 'listeners/main'
 
+import leveldb from 'database/leveldb'
+import logger from 'utils/logger'
+
 const appController = new AppController()
 
 app.on('ready', async () => {
@@ -22,6 +25,8 @@ app.on('ready', async () => {
     SyncController.startSyncing()
   }
 
+  testLeveldb()
+
   appController.openWindow()
 })
 
@@ -33,3 +38,18 @@ app.on('before-quit', async () => {
 })
 
 app.on('activate', appController.openWindow)
+
+// Remove this after testing out
+const testLeveldb = () => {
+  const db = leveldb('test-leveldb')
+  db.put('info', '{ version: 1 }')
+    .then(() => {
+      return db.get('info')
+    })
+    .then(val => {
+      logger.debug("Leveldb get key info: " + val)
+    })
+    .catch(error => {
+      logger.error(error)
+    })
+}
