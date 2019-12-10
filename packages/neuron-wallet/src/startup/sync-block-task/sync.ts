@@ -1,4 +1,4 @@
-import { remote, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
@@ -7,8 +7,7 @@ import initConnection from 'database/chain/ormconfig'
 import DaoUtils from 'models/dao-utils'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-
-const { nodeService } = remote.require('./startup/sync-block-task/params')
+import NodeService from 'services/node'
 
 export interface LockHashInfo {
   lockHash: string
@@ -40,7 +39,7 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(url)
   // start sync blocks service
-  blockListener = new BlockListener(url, lockHashes, nodeService.tipNumberSubject)
+  blockListener = new BlockListener(url, lockHashes, NodeService.getInstance().tipNumberSubject)
 
   // listen to address created
   AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
@@ -72,7 +71,7 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
     }
     // wait former queue to be drained
     const hashes: string[] = await loadAddressesAndConvert(url)
-    blockListener = new BlockListener(url, hashes, nodeService.tipNumberSubject)
+    blockListener = new BlockListener(url, hashes, NodeService.getInstance().tipNumberSubject)
     await blockListener.start(true)
   }
 

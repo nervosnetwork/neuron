@@ -8,13 +8,19 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import NetworksService from 'services/networks'
 import HexUtils from 'utils/hex'
+import ProcessUtils from 'utils/process'
+import { remote } from 'electron'
 
 class NodeService {
   private static instance: NodeService
 
   static getInstance(): NodeService {
     if (!NodeService.instance) {
-      NodeService.instance = new NodeService()
+      if (ProcessUtils.isRenderer()) {
+        NodeService.instance = remote.require('./services/node').default.getInstance()
+      } else {
+        NodeService.instance = new NodeService()
+      }
     }
     return NodeService.instance
   }
