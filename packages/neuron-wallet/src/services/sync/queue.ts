@@ -8,6 +8,9 @@ import GetBlocks from './get-blocks'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
 import Utils from './utils'
+import CheckTx from './check-and-save/tx'
+import TypeConvert from 'types/type-convert'
+import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 
 export default class Queue {
   private lockHashes: string[]
@@ -135,7 +138,7 @@ export default class Queue {
     })
 
     // 3. check and save
-    await this.getBlocksService.checkAndSave(blocks, this.lockHashes, daoScriptHash)
+    await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]
@@ -143,6 +146,58 @@ export default class Queue {
 
     // 5. update range
     this.rangeForCheck.pushRange(blockHeaders)
+  }
+
+  public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
+    const cachedPreviousTxs = new Map()
+    for (const block of blocks) {
+      if (BigInt(block.header.number) % 1000n === 0n) {
+        logger.debug(`Scanning from block #${block.header.number}`)
+      }
+      for (let i = 0; i < block.transactions.length; ++i) {
+        const tx = block.transactions[i]
+        const checkTx = new CheckTx(tx, this.url, daoScriptHash)
+        const addresses = await checkTx.check(lockHashes)
+        if (addresses.length > 0) {
+          if (i > 0) {
+            for (const [inputIndex, input] of tx.inputs!.entries()) {
+              const previousTxHash = input.previousOutput!.txHash
+              let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+              if (!previousTxWithStatus) {
+                previousTxWithStatus = await this.getBlocksService.getTransaction(previousTxHash)
+                cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
+              }
+              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              input.lock = previousOutput.lock
+              input.lockHash = LockUtils.lockScriptToHash(input.lock)
+              input.capacity = previousOutput.capacity
+              input.inputIndex = inputIndex.toString()
+
+              if (
+                previousOutput.type &&
+                LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+              ) {
+                const output = tx.outputs![inputIndex]
+                if (output) {
+                  output.depositOutPoint = {
+                    txHash: input.previousOutput!.txHash,
+                    index: input.previousOutput!.index,
+                  }
+                }
+              }
+            }
+          }
+          await TransactionPersistor.saveFetchTx(tx)
+          AddressesUsedSubject.getSubject().next({
+            addresses,
+            url: this.url,
+          })
+        }
+      }
+    }
+    cachedPreviousTxs.clear()
   }
 
   public checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
