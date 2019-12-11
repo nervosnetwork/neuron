@@ -21,7 +21,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, CapacityUnit, ErrorCode, MAINNET_TAG } from 'utils/const'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 
 import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
@@ -144,7 +144,7 @@ const Send = ({
                       <TextField
                         data-field="amount"
                         data-idx={idx}
-                        value={item.amount}
+                        value={localNumberFormatter(item.amount)}
                         placeholder={isSendMax ? PlaceHolders.send.Calculating : PlaceHolders.send.Amount}
                         onChange={onItemChange}
                         disabled={item.disabled}

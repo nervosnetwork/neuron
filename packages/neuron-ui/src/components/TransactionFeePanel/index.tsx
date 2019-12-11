@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Stack, Label, TextField, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { Price } from 'utils/const'
+import { localNumberFormatter } from 'utils/formatters'
 
 interface TransactionFee {
   fee: string
@@ -85,7 +86,12 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             <Label>{t('send.price')}</Label>
           </Stack.Item>
           <Stack.Item grow>
-            <TextField value={price} onChange={onPriceChange} aria-label="price" suffix="shannons/kB" />
+            <TextField
+              value={localNumberFormatter(price)}
+              onChange={onPriceChange}
+              aria-label="price"
+              suffix="shannons/kB"
+            />
           </Stack.Item>
           {actionSpacer}
         </Stack>

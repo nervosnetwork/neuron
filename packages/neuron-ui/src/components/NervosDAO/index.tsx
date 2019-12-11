@@ -431,7 +431,7 @@ const NervosDAO = ({
         show={showDepositDialog}
         value={depositValue}
         fee={fee}
-        onChange={(_e: any, value: string) => updateDepositValue(value)}
+        onChange={(_e: any, value: string) => updateDepositValue(value.replace(/,/g, ''))}
         onDismiss={onDepositDialogDismiss}
         onSubmit={onDepositDialogSubmit}
         onSlide={onSlide}
