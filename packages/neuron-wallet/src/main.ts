@@ -41,13 +41,13 @@ app.on('activate', appController.openWindow)
 
 // Remove this after testing out
 const testLeveldb = () => {
-  const db = leveldb('test-leveldb')
-  db.put('info', '{ version: 1 }')
+  const db = leveldb('cells/testdb', 'subdb')
+  db.put('info', { version: 1 })
     .then(() => {
       return db.get('info')
     })
     .then(val => {
-      logger.debug("Leveldb get key info: " + val)
+      logger.debug("Leveldb get key info:", val)
     })
     .catch(error => {
       logger.error(error)
