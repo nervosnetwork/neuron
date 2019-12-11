@@ -85,6 +85,18 @@ export default class AddressDao {
     return toUpdate
   }
 
+  public static resetAddresses = () => {
+    const all = AddressStore.getAll()
+    all.forEach(addr => {
+      addr.txCount = 0
+      addr.liveBalance = '0'
+      addr.sentBalance = '0'
+      addr.pendingBalance = '0'
+      addr.balance = '0'
+    })
+    AddressStore.updateAll(all)
+  }
+
   public static nextUnusedAddress(walletId: string, version: AddressVersion): Address | undefined {
     const addresses = AddressStore.getAll().filter(value => {
       return value.walletId === walletId
