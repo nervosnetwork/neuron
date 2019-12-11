@@ -10,6 +10,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
+import * as styles from './history.module.scss'
 
 const History = ({
   app: {
@@ -47,7 +48,7 @@ const History = ({
 
   const List = useMemo(() => {
     return (
-      <Stack>
+      <Stack className={styles.history}>
         <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
           <SearchBox
             value={keywords}
@@ -66,26 +67,28 @@ const History = ({
           isMainnet={isMainnet}
           dispatch={dispatch}
         />
-        <Pagination
-          selectedPageIndex={pageNo - 1}
-          pageCount={Math.ceil(totalCount / pageSize)}
-          itemsPerPage={pageSize}
-          totalItemCount={totalCount}
-          previousPageAriaLabel={t('pagination.previous-page')}
-          nextPageAriaLabel={t('pagination.next-page')}
-          firstPageAriaLabel={t('pagination.first-page')}
-          lastPageAriaLabel={t('pagination.last-page')}
-          pageAriaLabel={t('pagination.page')}
-          selectedAriaLabel={t('pagination.selected')}
-          firstPageIconProps={{ iconName: 'FirstPage' }}
-          previousPageIconProps={{ iconName: 'PrevPage' }}
-          nextPageIconProps={{ iconName: 'NextPage' }}
-          lastPageIconProps={{ iconName: 'LastPage' }}
-          format="buttons"
-          onPageChange={(idx: number) => {
-            history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
-          }}
-        />
+        <div className={styles.pagination}>
+          <Pagination
+            selectedPageIndex={pageNo - 1}
+            pageCount={Math.ceil(totalCount / pageSize)}
+            itemsPerPage={pageSize}
+            totalItemCount={totalCount}
+            previousPageAriaLabel={t('pagination.previous-page')}
+            nextPageAriaLabel={t('pagination.next-page')}
+            firstPageAriaLabel={t('pagination.first-page')}
+            lastPageAriaLabel={t('pagination.last-page')}
+            pageAriaLabel={t('pagination.page')}
+            selectedAriaLabel={t('pagination.selected')}
+            firstPageIconProps={{ iconName: 'FirstPage' }}
+            previousPageIconProps={{ iconName: 'PrevPage' }}
+            nextPageIconProps={{ iconName: 'NextPage' }}
+            lastPageIconProps={{ iconName: 'LastPage' }}
+            format="buttons"
+            onPageChange={(idx: number) => {
+              history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
+            }}
+          />
+        </div>
       </Stack>
     )
   }, [

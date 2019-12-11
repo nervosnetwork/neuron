@@ -1,0 +1,10 @@
+.history {
+  min-height: calc(100vh - 100px);
+
+  .pagination {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end
+  }
+}
