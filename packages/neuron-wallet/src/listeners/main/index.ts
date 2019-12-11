@@ -1,5 +1,6 @@
 import { register as registerCurrentBlockNumber } from './current-block-number'
 import { register as registerTxDbChanged } from './tx-db-changed'
+import { register as registerAddressDbChanged } from './address-db-changed'
 import ProcessUtils from 'utils/process'
 
 // register in app.ready
@@ -9,4 +10,5 @@ export const register = () => {
   }
   registerCurrentBlockNumber()
   registerTxDbChanged()
+  registerAddressDbChanged()
 }
