@@ -7,10 +7,9 @@ import LockUtils from 'models/lock-utils'
 import { TransactionWithoutHash, Input, OutPoint, WitnessArgs } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface, Address } from 'database/address/address-dao'
 import Keychain from 'models/keys/keychain'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import { AddressPrefix, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
@@ -412,12 +411,22 @@ export default class WalletService {
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    AddressesUsedSubject.getSubject().next({
-      addresses: usedAddresses,
-      url: core.rpc.node.url,
-    })
-
+    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
     return txHash
+  }
+
+  // TODO: move this method and generateTx/sendTx out of this file
+  public static async updateUsedAddresses(addresses: string[], url: string) {
+    const addrs = await AddressService.updateTxCountAndBalances(addresses, url)
+    const walletIds: string[] = addrs
+      .map(addr => (addr as Address).walletId)
+      .filter((value, idx, a) => a.indexOf(value) === idx)
+    for (const id of walletIds) {
+      const wallet = WalletService.getInstance().get(id)
+      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+      // set isImporting to undefined means unknown
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
+    }
   }
 
   public calculateFee = async (tx: TransactionWithoutHash) => {

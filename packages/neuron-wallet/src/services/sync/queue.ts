@@ -10,8 +10,8 @@ import BlockNumber from './block-number'
 import ArrayUtils from 'utils/array'
 import CheckTx from './check-and-save/tx'
 import TypeConvert from 'types/type-convert'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import CommonUtils from 'utils/common'
+import WalletService from 'services/wallets'
 
 export default class Queue {
   private lockHashes: string[]
@@ -191,10 +191,7 @@ export default class Queue {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          AddressesUsedSubject.getSubject().next({
-            addresses,
-            url: this.url,
-          })
+          await WalletService.updateUsedAddresses(addresses, this.url)
         }
       }
     }

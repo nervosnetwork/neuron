@@ -3,7 +3,6 @@ import { getConnection } from 'typeorm'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { TransactionStatus } from 'types/cell-types'
 import LockUtils from 'models/lock-utils'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import TypeConvert from 'types/type-convert'
@@ -11,6 +10,7 @@ import GetBlocks from 'services/sync/get-blocks'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import NodeService from 'services/node'
+import WalletService from 'services/wallets'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().core.rpc.node.url
@@ -62,10 +62,7 @@ const trackingStatus = async () => {
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
     const { core } = NodeService.getInstance()
-    AddressesUsedSubject.getSubject().next({
-      addresses: usedAddresses,
-      url: core.rpc.node.url,
-    })
+    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
   }
 
   if (successTxs.length > 0) {

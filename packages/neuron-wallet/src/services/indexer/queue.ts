@@ -18,10 +18,7 @@ import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
 import CommonUtils from 'utils/common'
-import AddressService from 'services/addresses'
 import WalletService from 'services/wallets'
-import { AccountExtendedPublicKey } from 'models/keys/key'
-import { Address } from 'database/address/address-dao'
 
 export interface LockHashInfo {
   lockHash: string
@@ -222,7 +219,7 @@ export default class IndexerQueue {
               transaction.outputs![parseInt(txPoint.index, 16)].lock,
               NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
-            await this.updateTxCountAndBalance(address)
+            await WalletService.updateUsedAddresses([address], this.url)
             continue
           }
 
@@ -296,24 +293,11 @@ export default class IndexerQueue {
             }
           }
           if (address) {
-            await this.updateTxCountAndBalance(address)
+            await WalletService.updateUsedAddresses([address], this.url)
           }
         }
       }
       page += 1
-    }
-  }
-
-  private updateTxCountAndBalance = async (address: string) => {
-    const addrs = await AddressService.updateTxCountAndBalances([address], this.url)
-    const walletIds: string[] = addrs
-      .map(addr => (addr as Address).walletId)
-      .filter((value, idx, a) => a.indexOf(value) === idx)
-    for (const id of walletIds) {
-      const wallet = WalletService.getInstance().get(id)
-      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-      // set isImporting to undefined means unknown
-      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
     }
   }
 
