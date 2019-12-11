@@ -8,7 +8,7 @@ export default class NetworkSwitchSubject {
 
   public static getSubject() {
     if (ProcessUtils.isRenderer()) {
-      return remote.require('./models/subjects/current-block-subject').default.getSubject()
+      return remote.require('./models/subjects/network-switch-subject').default.getSubject()
     } else {
       return this.subject
     }
