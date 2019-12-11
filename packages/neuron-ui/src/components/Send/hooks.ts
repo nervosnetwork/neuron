@@ -198,7 +198,7 @@ const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
     (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
       if (undefined !== value) {
-        const price = value.replace(/[^\d]/g, '')
+        const price = value.split('.')[0].replace(/[^\d]/g, '')
         dispatch({
           type: AppActions.UpdateSendPrice,
           payload: price.replace(/,/g, ''),
