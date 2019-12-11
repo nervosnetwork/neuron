@@ -8,7 +8,6 @@ import initConnection from 'database/chain/ormconfig'
 import DaoUtils from 'models/dao-utils'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-import NodeService from 'services/node'
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -41,7 +40,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
     }
   })
   // start sync blocks service
-  indexerQueue = new IndexerQueue(nodeURL, lockHashInfos, NodeService.getInstance().tipNumberSubject)
+  indexerQueue = new IndexerQueue(nodeURL, lockHashInfos)
 
   // listen to address created
   AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {

@@ -1,4 +1,3 @@
-import { BehaviorSubject, Subscription } from 'rxjs'
 import logger from 'utils/logger'
 
 import Queue from './queue'
@@ -6,27 +5,23 @@ import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
 import CommonUtils from 'utils/common'
+import NodeService from 'services/node'
 
 export default class BlockListener {
   private lockHashes: string[]
-  private tipBlockNumber: bigint = BigInt(-1)
   private queue: Queue | undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
-  private tipNumberSubject: BehaviorSubject<string | undefined>
-  private tipNumberListener: Subscription | undefined
   private url: string
 
   constructor(
     url: string,
     lockHashes: string[],
-    tipNumberSubject: BehaviorSubject<string | undefined>
   ) {
     this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck(url)
-    this.tipNumberSubject = tipNumberSubject
   }
 
   public setLockHashes = (lockHashes: string[]) => {
@@ -68,39 +63,26 @@ export default class BlockListener {
     } catch (err) {
       logger.error(`BlockListener start error:`, err)
     }
+  }
 
-    this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
-      if (num) {
-        this.tipBlockNumber = BigInt(num)
-        await this.regenerate()
-      }
-    })
+  private tipBlockNumber = (): bigint => {
+    return BigInt(NodeService.getInstance().tipBlockNumber)
   }
 
   public setToTip = async () => {
     const timeout = 5000
-    let number: bigint = BigInt(0)
-    const tipNumberListener = this.tipNumberSubject.subscribe(async num => {
-      if (num) {
-        number = BigInt(num)
-      }
-    })
     const startAt = +new Date()
-    while (number === BigInt(0)) {
+    while (this.tipBlockNumber() === BigInt(0)) {
       const now = +new Date()
       if (now - startAt > timeout) {
         return
       }
       await CommonUtils.sleep(100)
     }
-    await this.currentBlockNumber.updateCurrent(this.tipBlockNumber)
-    tipNumberListener.unsubscribe()
+    await this.currentBlockNumber.updateCurrent(this.tipBlockNumber())
   }
 
   public stop = () => {
-    if (this.tipNumberListener) {
-      this.tipNumberListener.unsubscribe()
-    }
     if (this.queue) {
       this.queue.stop()
     }
@@ -123,7 +105,7 @@ export default class BlockListener {
     const endBlockNumber: string = this.tipBlockNumber.toString()
 
     if (this.queue) {
-      if (this.tipBlockNumber > BigInt(0)) {
+      if (this.tipBlockNumber() > BigInt(0)) {
         this.queue.resetEndBlockNumber(endBlockNumber)
       }
     } else {

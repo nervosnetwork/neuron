@@ -1,4 +1,3 @@
-import { Subject, Subscription } from 'rxjs'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
@@ -19,6 +18,7 @@ import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
+import NodeService from 'services/node';
 
 export interface LockHashInfo {
   lockHash: string
@@ -37,8 +37,6 @@ export default class IndexerQueue {
   private per = 50
   private interval = 1000
   private blockNumberService: BlockNumber
-  private tipNumberListener: Subscription
-  private tipBlockNumber: bigint = BigInt(-1)
 
   private stopped = false
   private indexed = false
@@ -56,17 +54,12 @@ export default class IndexerQueue {
 
   private static CHECK_SIZE = 50
 
-  constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
+  constructor(url: string, lockHashInfos: LockHashInfo[]) {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks(url)
     this.blockNumberService = new BlockNumber()
-    this.tipNumberListener = tipNumberSubject.subscribe(async (num: string) => {
-      if (num) {
-        this.tipBlockNumber = BigInt(num)
-      }
-    })
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -84,6 +77,10 @@ export default class IndexerQueue {
     this.resetFlag = true
   }
 
+  private tipBlockNumber = (): bigint => {
+    return BigInt(NodeService.getInstance().tipBlockNumber)
+  }
+
   public start = async () => {
     while (!this.stopped) {
       try {
@@ -94,7 +91,7 @@ export default class IndexerQueue {
         }
         const { lockHashInfos } = this
         const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
-        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber) {
+        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
             this.indexed = true
@@ -134,7 +131,7 @@ export default class IndexerQueue {
   public processFork = async () => {
     while (!this.stopped) {
       try {
-        const tip = this.tipBlockNumber
+        const tip = this.tipBlockNumber()
         const txs = await IndexerTransaction.txHashes()
         for (const tx of txs) {
           const result = await this.getBlocksService.getTransaction(tx.hash)
@@ -206,7 +203,7 @@ export default class IndexerQueue {
 
         if (
           txPoint &&
-          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
+          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber() - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
           const transactionWithStatus = await this.getTransaction(txPoint.txHash)
           const transaction: Transaction = transactionWithStatus.transaction
@@ -302,7 +299,6 @@ export default class IndexerQueue {
   }
 
   public stop = () => {
-    this.tipNumberListener.unsubscribe()
     this.stopped = true
   }
 

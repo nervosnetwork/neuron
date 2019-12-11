@@ -30,6 +30,8 @@ class NodeService {
   public tipNumberSubject = new BehaviorSubject<string>('0')
   public connectionStatusSubject = new BehaviorSubject<boolean>(false)
 
+  private _tipBlockNumber: string = '0'
+
   public core: Core = new Core('')
 
   constructor() {
@@ -41,6 +43,10 @@ class NodeService {
         this.setNetwork(currentNetwork.remote)
       }
     })
+  }
+
+  public get tipBlockNumber(): string {
+    return this._tipBlockNumber
   }
 
   public syncConnectionStatus = () => {
@@ -103,7 +109,9 @@ class NodeService {
           if (!this.delayTime) {
             this.delayTime = 0
           }
-          this.tipNumberSubject.next(HexUtils.toDecimal(tipNumber))
+          const tip: string = HexUtils.toDecimal(tipNumber)
+          this._tipBlockNumber = tip
+          this.tipNumberSubject.next(tip)
         },
         () => {
           if (this.delayTime < 10 * this.intervalTime) {
