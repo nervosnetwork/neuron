@@ -1,16 +1,18 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import { withKnobs, text, boolean } from '@storybook/addon-knobs'
-import { NetworkStatus } from 'containers/Footer'
+import { withKnobs, text } from '@storybook/addon-knobs'
+import NetworkStatus from 'components/NetworkStatus'
 
 const states = {
   Online: {
-    name: 'network name',
-    online: true,
+    networkName: 'network name',
+    connectionStatus: 'online' as any,
+    onAction: () => {},
   },
   Offline: {
-    name: 'network',
-    online: false,
+    networkName: 'network',
+    connectionStatus: 'offline' as any,
+    onAction: () => {},
   },
 }
 
@@ -24,8 +26,9 @@ Object.entries(states).forEach(([title, props]) => {
 
 stories.add('With knobs', () => {
   const props = {
-    name: text('Network name', 'network name'),
-    online: boolean('online', false),
+    networkName: text('Network name', 'network name'),
+    connectionStatus: text('online', 'online') as any,
+    onAction: () => {},
   }
   return <NetworkStatus {...props} />
 })

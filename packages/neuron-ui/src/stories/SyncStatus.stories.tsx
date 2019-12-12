@@ -1,7 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
-import { SyncStatus } from 'containers/Footer'
+import SyncStatus from 'components/SyncStatus'
 
 const stories = storiesOf('SyncStatus', module)
 

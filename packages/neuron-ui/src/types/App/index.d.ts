@@ -131,10 +131,11 @@ declare namespace State {
     balance: string
     addresses: Address[]
   }
+  type ConnectionStatus = 'online' | 'offline'
 
   interface Chain {
     networkID: string
-    connectionStatus: 'online' | 'offline'
+    connectionStatus: ConnectionStatus
     tipBlockNumber: string
     codeHash: string
     transactions: {

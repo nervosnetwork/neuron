@@ -1,0 +1,94 @@
+$hover-bg-color: #3cc68a4d;
+$left-padding: 15px;
+
+.sidebar {
+  display: grid;
+  grid-template:
+    'navs'1fr 'network'22px 'sync'auto / var(--sidebar-width);
+  height: 100vh;
+  background: black;
+}
+
+.navs {
+  display: flex;
+  flex-direction: column;
+  grid-area: navs;
+
+  button {
+    appearance: none;
+    border: none;
+    color: white;
+    background: transparent;
+    font-size: 1rem;
+    line-height: 2;
+    font-weight: bold;
+    text-align: left;
+    padding-left: $left-padding;
+
+
+    &:hover {
+      background-color: $hover-bg-color;
+    }
+
+    &[data-active=true] {
+      background-color: var(--nervos-green);
+    }
+  }
+}
+
+.network {
+  display: flex;
+  align-items: center;
+  grid-area: network;
+  color: #fff;
+  padding-left: $left-padding;
+  font-size: 0.8rem;
+  font-weight: bold;
+
+  span {
+    display: flex;
+    align-items: center;
+    line-height: 1em;
+
+    &::after {
+      display: block;
+      content: '';
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 100%;
+      background: red;
+      margin-left: 0.5rem;
+    }
+
+    &[data-online=true]::after {
+      background: green !important;
+    }
+  }
+
+}
+
+.sync {
+  display: flex;
+  flex-direction: column;
+  grid-area: sync;
+  color: #fff;
+  font-size: 0.8rem;
+
+  span {
+    padding-left: $left-padding;
+  }
+
+  progress {
+    appearance: none;
+    height: 5px;
+
+    &::-webkit-progress-bar {
+      background: transparent
+    }
+
+
+    &::-webkit-progress-value {
+      background: var(--nervos-green);
+    }
+  }
+}

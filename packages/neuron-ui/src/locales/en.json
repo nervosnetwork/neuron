@@ -317,7 +317,6 @@
       }
     },
     "sync": {
-      "syncing": "Syncing",
       "synced": "Synced",
       "block-number": "block number"
     },
