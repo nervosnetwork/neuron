@@ -12,7 +12,6 @@ export default (app: Application) => {
     const createWalletButton = await app.getElementByTagName('button', 'Create a Wallet')
     expect(createWalletButton).not.toBeNull()
     await client.elementIdClick(createWalletButton!.ELEMENT)
-    console.info(`clicked create wallet button ${new Date().toTimeString()}`)
 
     await createWallet(app)
     await app.waitUntilLoaded()
@@ -27,20 +26,17 @@ export default (app: Application) => {
     expect(networkElement.value).not.toBeNull()
     await client.elementIdClick(networkElement.value.ELEMENT)
     await app.waitUntilLoaded()
-    console.info(`Go to setting page ${new Date().toLocaleTimeString()}`)
 
     // Switch to wallet setting
     const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
     expect(walletSettingButton).not.toBeNull()
     await client.elementIdClick(walletSettingButton!.ELEMENT)
     await app.waitUntilLoaded()
-    console.info(`Switch to wallet setting ${new Date().toLocaleTimeString()}`)
 
     // Go to import wallet page
     const importWalletButton = await app.getElementByTagName('button', 'Import Wallet Seed')
     expect(importWalletButton).not.toBeNull()
     await client.elementIdClick(importWalletButton!.ELEMENT)
-    console.info(`Go to import wallet page ${new Date().toLocaleTimeString()}`)
 
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     await importWallet(app, mnemonicText)
@@ -103,6 +99,7 @@ export default (app: Application) => {
     // Check wallet name
     const newWalletNameElement = await app.element('//MAIN/DIV/H1')
     expect(newWalletNameElement.value).not.toBeNull()
+    await app.waitUntilLoaded()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).not.toBe(walletName.value)
   })
@@ -138,7 +135,7 @@ export default (app: Application) => {
     await app.setElementValue('<input />', 'Azusa')
     await app.waitUntilLoaded()
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
-    console.info(`walletNameInputText - ${walletNameInputText.value}`)
+    await app.waitUntilLoaded()
     // Save
     const saveButton = await app.getElementByTagName('button', 'Save')
     expect(saveButton).not.toBeNull()
@@ -150,7 +147,6 @@ export default (app: Application) => {
     expect(newWalletNameElement).not.toBeNull()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).toBe(walletNameInputText.value)
-    console.info(`newWalletName - ${newWalletName.value}`)
   })
 
   describe('Test field boundary', () => {
