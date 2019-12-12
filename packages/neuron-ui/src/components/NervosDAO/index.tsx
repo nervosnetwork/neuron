@@ -164,11 +164,11 @@ const NervosDAO = ({
 
   useEffect(() => {
     if (tipBlockTimestamp) {
-      const endYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
+      const startYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
       try {
         const apc = calculateAPC({
-          startYearNumber: 0,
-          endYearNumber,
+          startYearNumber,
+          endYearNumber: startYearNumber + 1,
         })
         setGlobalAPC(apc)
       } catch (err) {
