@@ -14,9 +14,9 @@ const appController = new AppController()
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
 
+  registerListeners()
   NetworksService.getInstance().notifyAll()
   WalletService.getInstance().generateAddressesIfNecessary()
-  registerListeners()
   if (!env.isTestMode) {
     await NodeController.startNode()
     SyncController.startSyncing()
