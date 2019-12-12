@@ -3,7 +3,6 @@ import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
 import { debuglog } from 'util'
-import { ELEMENT_QUERY_DEFAULT_RETRY_COUNT, ELEMENT_QUERY_RETRY_WAITING_TIME } from './const';
 import { clickMenu, deleteNetwork, editNetwork, editWallet, sleep } from './utils';
 
 const log = debuglog(__filename)
@@ -95,9 +94,8 @@ export default class Application {
   }
 
   // wait
-  async waitUntilLoaded() {
-    sleep(400)
-    await this.spectron.client.waitUntilWindowLoaded()
+  async waitUntilLoaded(timeout?: number) {
+    await this.spectron.client.waitUntilWindowLoaded(timeout)
   }
 
   wait(delay: number) {
@@ -124,7 +122,8 @@ export default class Application {
 
   // Element
 
-  async element(selector: string, retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT): Promise<RawResult<Element>> {
+  async element(selector: string, timeout: number = 200): Promise<RawResult<Element>> {
+    this.wait(timeout)
     const { client } = this.spectron
     let result: RawResult<Element> | undefined
     let error: Error | undefined
@@ -134,25 +133,16 @@ export default class Application {
       error = _error
     }
 
-    if ((error || (result && !result.value)) && retryCount > 0) {
-      log(`${selector} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
-      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
-      return this.element(selector, retryCount - 1)
-    } else {
-      return new Promise((resolve, reject) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(result)
-        }
-      })
-    }
+    return new Promise((resolve, reject) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result)
+      }
+    })
   }
 
-  async elements(
-    selector: string,
-    retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT
-  ): Promise<RawResult<Element[]>> {
+  async elements(selector: string): Promise<RawResult<Element[]>> {
     const { client } = this.spectron
     let result: RawResult<Element[]> | undefined
     let error: Error | undefined
@@ -162,26 +152,16 @@ export default class Application {
       error = _error
     }
 
-    if ((error || (result && !result.value)) && retryCount > 0) {
-      log(`${selector} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
-      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
-      return this.elements(selector, retryCount - 1)
-    } else {
-      return new Promise((resolve, reject) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(result)
-        }
-      })
-    }
+    return new Promise((resolve, reject) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result)
+      }
+    })
   }
 
-  async getElementByTagName(
-    tagName: string,
-    textContent: string,
-    retryCount: number = ELEMENT_QUERY_DEFAULT_RETRY_COUNT
-  ): Promise<Element | null> {
+  async getElementByTagName(tagName: string, textContent: string): Promise<Element | null> {
     const { client } = this.spectron
     const elements = await this.elements(`<${tagName} />`)
     for (let index = 0; index < elements.value.length; index++) {
@@ -191,18 +171,12 @@ export default class Application {
         return element
       }
     }
-    if (retryCount > 0) {
-      log(`${tagName}-${textContent} - The query failed, wait 1 second and try again. ${new Date().toTimeString()}`);
-      sleep(ELEMENT_QUERY_RETRY_WAITING_TIME)
-      return this.getElementByTagName(tagName, textContent, retryCount - 1)
-    } else {
-      return null
-    }
+    return null
   }
 
   async setElementValue(selector: string, text: string) {
     const { client } = this.spectron
-    const result = await client.selectorExecute(selector, (elements: any, args) => {
+    await client.selectorExecute(selector, (elements: any, args) => {
       const element = elements[0]
       var event = new Event('input', { bubbles: true}) as any;
       event.simulated = true;
@@ -210,13 +184,11 @@ export default class Application {
       element.dispatchEvent(event);
       return `${element} ${args}`
     }, text)
-    log(`setValue - ${selector} = ${result}`);
   }
 
   getOSplatform():string {
     let os = require('os');
     let platform = os.platform();
-    console.log(`current os platform is ${platform}`)
     return platform;
   }
 

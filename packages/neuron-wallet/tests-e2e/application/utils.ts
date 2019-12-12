@@ -13,6 +13,7 @@ export const getElementByTagName = async (client: SpectronClient, tagName: strin
   return null
 }
 
+// TODO: Refactor this! Integration tests should reply on UI operation, not IPC communications!
 export const clickMenu = (electron: AllElectron, labels: string[]) => {
   return electron.ipcRenderer.send('E2E_CLICK_MENU_ITEM', labels)
 }
