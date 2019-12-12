@@ -72,8 +72,8 @@ export class InitDatabase {
           this.success = true
           this.usingPrevious = true
         } catch (error) {
-          logger.error('Get cached meta info error:', err.toString())
-          CommonUtils.sleep(5000)
+          logger.error('get cached meta info error:', error)
+          await CommonUtils.sleep(5000)
         }
       }
     }
