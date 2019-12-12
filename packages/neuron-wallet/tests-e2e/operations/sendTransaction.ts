@@ -22,7 +22,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     balance = parseInt(balanceText.value.slice(0, balanceText.value.length - 4))
     console.log(`balance = ${balance}`);
     if (balance === 0) {
-      app.wait(1000)
+      await app.wait(1000)
     }
   }
   // Check balance
@@ -97,7 +97,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     if (transactionStatus.value === 'success') {
       break
     }
-    app.wait(2000)
+    await app.wait(2000)
   }
 
   console.log(`transaction success hash: ${transactionHash.value}`);

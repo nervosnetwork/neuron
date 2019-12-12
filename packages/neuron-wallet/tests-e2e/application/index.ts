@@ -98,8 +98,8 @@ export default class Application {
     await this.spectron.client.waitUntilWindowLoaded(timeout)
   }
 
-  wait(delay: number) {
-    sleep(delay)
+  async wait(delay: number) {
+    await sleep(delay)
   }
 
   // ipc
@@ -122,8 +122,8 @@ export default class Application {
 
   // Element
 
-  async element(selector: string, timeout: number = 200): Promise<RawResult<Element>> {
-    this.wait(timeout)
+  async element(selector: string, timeout: number = 300): Promise<RawResult<Element>> {
+    await this.wait(timeout)
     const { client } = this.spectron
     let result: RawResult<Element> | undefined
     let error: Error | undefined
