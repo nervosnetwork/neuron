@@ -57,7 +57,7 @@ export class InitDatabase {
             const daoScriptInfo = await DaoUtils.daoScript(network.remote)
             updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
           } catch (err) {
-            logger.error('update systemScriptInfo failed:', err)
+            logger.error('update systemScriptInfo failed:', err.toString())
           }
 
           this.success = true
@@ -67,7 +67,7 @@ export class InitDatabase {
           this.killed = true // Do not process as successful to let sync start with wrong genesis hash or chain
         }
       } catch (err) {
-        logger.error('initDatabase error:', err)
+        logger.error('initDatabase error:', err.toString())
         try {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
@@ -78,7 +78,7 @@ export class InitDatabase {
           this.success = true
           this.usingPrevious = true
         } catch (error) {
-          logger.error('get cached meta info error:', err)
+          logger.error('get cached meta info error:', err.toString())
           CommonUtils.sleep(5000)
         }
       }
