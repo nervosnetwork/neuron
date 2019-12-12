@@ -24,8 +24,6 @@ export class InitDatabase {
 
   public id: number = +new Date()
 
-  private static previous: InitDatabase | undefined
-
   private killed: boolean = false
 
   private usingPrevious: boolean = false
@@ -35,10 +33,6 @@ export class InitDatabase {
   }
 
   public init = async (network: NetworkWithID) => {
-    if (InitDatabase.previous) {
-      await InitDatabase.previous.stopAndWait()
-    }
-
     this.inProcess = true
 
     let hash: string = EMPTY_GENESIS_HASH
