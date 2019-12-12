@@ -21,7 +21,12 @@ export default (app: Application) => {
     await client.elementIdClick(createWalletButton!.ELEMENT)
     await createWallet(app)
     await app.waitUntilLoaded()
-    client.click('button[name=Send]')
+  })
+
+  beforeEach(async () => {
+    app.spectron.client.click('button[name=Nervos Dao]')
+    await app.waitUntilLoaded()
+    app.spectron.client.click('button[name=Send]')
     await app.waitUntilLoaded()
   })
 
@@ -32,13 +37,11 @@ export default (app: Application) => {
   })
 
   describe('Test address field boundary validation', () => {
-    // Skip for now, these case related to the real chain type
-    test('Invalid address should show alert', async () => {
+    app.test('Invalid address should show alert', async () => {
       const { client } = app.spectron
       const invalidAddress = 'invalid'
       const inputs = await app.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, invalidAddress)
-      await app.waitUntilLoaded()
       const errorMessage = await app.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.state).not.toBe('failure')
@@ -55,12 +58,11 @@ export default (app: Application) => {
       expect(msg.value).toBe('Address cannot be empty')
     })
 
-    test.skip('Valid address should not show alert', async () => {
+    app.test('Valid address should not show alert', async () => {
       const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
       const { client } = app.spectron
       const inputs = await app.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
-      await app.waitUntilLoaded()
       const errorMessage = await app.element('.ms-TextField-errorMessage')
       expect(errorMessage.state).toBe('failure')
     })
@@ -68,21 +70,8 @@ export default (app: Application) => {
 
   describe('Test amount field boundary validation', () => {
     const validAddress = 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd'
-    app.test('Amount 60.99999999 is too small, 61 CKB is required', async () => {
-      const smallAmount = '60.99999999'
-      const { client } = app.spectron
-      const inputs = await app.elements('input')
-      client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
-      await app.waitUntilLoaded()
-      client.elementIdValue(inputs.value[1].ELEMENT, smallAmount)
-      await app.waitUntilLoaded()
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
-      const msg = await client.elementIdText(errorMessage.value.ELEMENT)
-      expect(msg.value).toBe(`The amount ${smallAmount} CKB is too small, please enter an amount no less than 61 CKB`)
-    })
-
+    const invalidAmount = '0.123456789'
     app.test('Amount 0.123456789 is invalid, decimal places cannot be more than 8', async () => {
-      const invalidAmount = '0.123456789'
       const { client } = app.spectron
       const inputs = await app.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
@@ -96,12 +85,12 @@ export default (app: Application) => {
 
   describe('Amount is not enough', () => {
     const validAddress = 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd'
-    const validAmount = '61'
+    const invalidAmount = '61'
     app.test('Amount is not enough', async () => {
       const { client } = app.spectron
       const inputs = await app.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
-      client.elementIdValue(inputs.value[1].ELEMENT, validAmount)
+      client.elementIdValue(inputs.value[1].ELEMENT, invalidAmount)
       await app.waitUntilLoaded()
       const errorMessage = await app.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
@@ -110,7 +99,7 @@ export default (app: Application) => {
   })
 
   describe('Test the transaction fee operations', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       const { client } = app.spectron
       client.click('button[role=switch]')
       await app.waitUntilLoaded()
