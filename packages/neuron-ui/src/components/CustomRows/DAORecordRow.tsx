@@ -158,7 +158,7 @@ const DAORecord = ({
             : ''}
         </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
-        <div>
+        <div className={styles.actions}>
           {depositOutPoint ? null : (
             <span
               data-block-hash={blockHash}

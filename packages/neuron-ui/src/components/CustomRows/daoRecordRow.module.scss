@@ -39,11 +39,17 @@
     border-left-color: blue;
   }
 
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
   .epochsDialogBtn {
     display: inline-block;
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
     margin-right: 16px;
     background-color: rgb(38, 135, 133);
 
