@@ -34,7 +34,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   await app.waitUntilLoaded()
 
   // Check wallet name
-  const walletNameElement = await app.element('//MAIN/DIV/H1')
+  const walletNameElement = await app.element('//MAIN/DIV/H1', 1000)
   expect(walletNameElement.value).not.toBeNull()
   const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
   expect(walletName.value).toBe(walletNameInputText.value)

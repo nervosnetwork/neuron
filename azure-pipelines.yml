@@ -93,6 +93,7 @@ stages:
 - stage: e2e_tests
   displayName: Integration Tests
   dependsOn: []
+  condition: false # eq(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: Integration
     displayName: Integration Tests
