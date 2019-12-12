@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Dialog, DialogFooter, DefaultButton, PrimaryButton, DialogType, Text } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import { calculateDaoMaximumWithdraw, getBlock } from 'services/chain'
-import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
-import { epochParser } from 'utils/parsers'
+import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
+import { useCalculateEpochs } from 'utils/hooks'
 
 const WithdrawDialog = ({
   onDismiss,
@@ -26,9 +25,9 @@ const WithdrawDialog = ({
     if (!record) {
       return
     }
-    getBlock(record.blockHash)
-      .then(b => {
-        setDepositEpoch(b.header.epoch)
+    getHeader(record.blockHash)
+      .then(header => {
+        setDepositEpoch(header.epoch)
       })
       .catch((err: Error) => {
         console.error(err)
@@ -54,9 +53,8 @@ const WithdrawDialog = ({
       })
   }, [record, tipBlockHash])
 
-  const depositEpochInfo = epochParser(depositEpoch)
-  const currentEpochInfo = epochParser(currentEpoch)
-  const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
+  const { currentEpochInfo, targetEpochNumber } = useCalculateEpochs({ depositEpoch, currentEpoch })
+
   const epochs = targetEpochNumber - currentEpochInfo.number - BigInt(1)
   const message =
     epochs >= BigInt(0)

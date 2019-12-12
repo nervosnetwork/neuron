@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
+import { epochParser } from 'utils/parsers'
+import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -91,4 +93,16 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
   }
 }
 
-export default { useGoBack, useLocalDescription }
+export const useCalculateEpochs = ({ depositEpoch, currentEpoch }: { depositEpoch: string; currentEpoch: string }) =>
+  useMemo(() => {
+    const depositEpochInfo = epochParser(depositEpoch)
+    const currentEpochInfo = epochParser(currentEpoch)
+    const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
+    return {
+      depositEpochInfo,
+      currentEpochInfo,
+      targetEpochNumber,
+    }
+  }, [depositEpoch, currentEpoch])
+
+export default { useGoBack, useLocalDescription, useCalculateEpochs }

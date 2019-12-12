@@ -352,7 +352,13 @@
       "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
       "withdraw-alert": "Hint: these are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "insufficient-period-alert-title": "Referenced Header is Invalid",
-      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs)"
+      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs)",
+      "explanation-of-epochs-period": "Compensation Period",
+      "current-epochs-period": "Current Compensation Period",
+      "stage-of-current-epoch": "Progress: {{pastEpochs}} / {{totalEpochs}} epochs",
+      "left-time": "Left time: about {{leftDays}} days {{leftHours}} hours",
+      "detailed-explanation-of-epochs-period": "A compensation period in Nervos DAO consists of 180 epochs (estimated 30 days). Users may apply unlock for their deposits any time during every compensation period, then withdraw their deposits and compensations when that compensation period ends. It is worth mentioning that the compensations will stop accumulating as soon as users apply unlock. So we suggest that users apply unlock for their deposits at a time that closes enough to the end of a compensation period.",
+      "terms-in-explanation-of-epochs-period": "If you did not apply unlock during this compensation period, the next compensation period will start automatically.\nIt is suggested that users apply unlock during YELLOW epochs."
     },
     "updates": {
       "check-updates": "Check for Updates",
