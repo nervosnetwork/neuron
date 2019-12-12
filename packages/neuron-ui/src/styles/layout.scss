@@ -7,8 +7,7 @@ body {
   grid-template:
     'navbar notification notification notification' auto
     'navbar content content content' 1fr
-    'navbar content content content' 1fr
-    'navbar footer  footer  footer' 22px /
+    'navbar content content content' 1fr /
     auto 1fr 1fr 1fr;
 
   height: 100vh;

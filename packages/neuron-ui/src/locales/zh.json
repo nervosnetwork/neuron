@@ -317,7 +317,6 @@
       }
     },
     "sync": {
-      "syncing": "同步中",
       "synced": "同步完成",
       "block-number": "区块高度"
     },

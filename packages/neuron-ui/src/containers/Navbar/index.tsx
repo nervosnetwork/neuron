@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
+import NetworkStatus from 'components/NetworkStatus'
+import SyncStatus from 'components/SyncStatus'
+
 import { Routes, FULL_SCREENS } from 'utils/const'
 import * as styles from './navbar.module.scss'
 
@@ -24,7 +27,9 @@ const Navbar = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const neuronWallet = useState()
   const {
-    settings: { wallets = [] },
+    app: { tipBlockNumber = '0' },
+    chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t] = useTranslation()
 
@@ -49,10 +54,19 @@ const Navbar = ({
       {t(item.name)}
     </button>
   ))
+  const currentNetwork = networks.find(n => n.id === networkID)
+
+  const networkName = currentNetwork ? currentNetwork.name : null
 
   return (
     <aside className={styles.sidebar}>
       <nav className={styles.navs}>{menus}</nav>
+      <NetworkStatus
+        networkName={networkName}
+        connectionStatus={connectionStatus}
+        onAction={() => history.push(Routes.SettingsNetworks)}
+      />
+      <SyncStatus tipBlockNumber={tipBlockNumber} syncedBlockNumber={syncedBlockNumber} />
     </aside>
   )
 }
