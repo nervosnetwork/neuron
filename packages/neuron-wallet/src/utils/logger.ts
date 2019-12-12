@@ -5,6 +5,6 @@ if (!env.isDevMode) {
   logger.transports.file.level = 'warn'
 }
 
-logger.catchErrors({ showDialog: false })
+// logger.catchErrors({ showDialog: false })
 
 export default logger
