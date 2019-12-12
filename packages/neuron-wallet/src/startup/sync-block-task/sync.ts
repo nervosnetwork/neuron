@@ -1,20 +1,17 @@
-import { remote, ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron'
 import AddressService from 'services/addresses'
 import LockUtils from 'models/lock-utils'
 import BlockListener from 'services/sync/block-listener'
 import { Address } from 'database/address/address-dao'
 import initConnection from 'database/chain/ormconfig'
 import DaoUtils from 'models/dao-utils'
-
-const { nodeService, addressCreatedSubject, walletCreatedSubject } = remote.require('./startup/sync-block-task/params')
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
+import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 
 export interface LockHashInfo {
   lockHash: string
   isImporting: boolean | undefined
 }
-
-// pass to task a main process subject
-// AddressesUsedSubject.setSubject(addressesUsedSubject)
 
 // maybe should call this every time when new address generated
 // load all addresses and convert to lockHashes
@@ -41,10 +38,10 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
   // load lockHashes
   const lockHashes: string[] = await loadAddressesAndConvert(url)
   // start sync blocks service
-  blockListener = new BlockListener(url, lockHashes, nodeService.tipNumberSubject)
+  blockListener = new BlockListener(url, lockHashes)
 
   // listen to address created
-  addressCreatedSubject.subscribe(async (addresses: Address[]) => {
+  AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
     if (blockListener) {
       const lockUtils = new LockUtils(await LockUtils.systemScript(url))
       const infos: LockHashInfo[] = addresses.map(addr => {
@@ -73,11 +70,11 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
     }
     // wait former queue to be drained
     const hashes: string[] = await loadAddressesAndConvert(url)
-    blockListener = new BlockListener(url, hashes, nodeService.tipNumberSubject)
+    blockListener = new BlockListener(url, hashes)
     await blockListener.start(true)
   }
 
-  walletCreatedSubject.subscribe(async (type: string) => {
+  WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
     if (type === 'import') {
       await regenerateListener()
     }

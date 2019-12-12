@@ -1,7 +1,7 @@
 import { BlockHeader } from 'types/cell-types'
 import BlockNumber from './block-number'
 import GetBlocks from './get-blocks'
-import Utils from './utils'
+import ArrayUtils from 'utils/array'
 
 export enum CheckResultType {
   FirstNotMatch = 'first-not-match',
@@ -29,7 +29,7 @@ export default class RangeForCheck {
     const currentBlockNumber: bigint = await blockNumberService.getCurrent()
     const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
     const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
-    const blockNumbers = Utils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
+    const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
 
     const getBlocksService = new GetBlocks(this.url)
     const headers: BlockHeader[] = await getBlocksService.getRangeBlockHeaders(blockNumbers)

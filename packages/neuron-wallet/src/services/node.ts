@@ -8,13 +8,19 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import NetworksService from 'services/networks'
 import HexUtils from 'utils/hex'
+import ProcessUtils from 'utils/process'
+import { remote } from 'electron'
 
 class NodeService {
   private static instance: NodeService
 
   static getInstance(): NodeService {
     if (!NodeService.instance) {
-      NodeService.instance = new NodeService()
+      if (ProcessUtils.isRenderer()) {
+        NodeService.instance = remote.require('./services/node').default.getInstance()
+      } else {
+        NodeService.instance = new NodeService()
+      }
     }
     return NodeService.instance
   }
@@ -23,6 +29,8 @@ class NodeService {
   public intervalTime = 1000
   public tipNumberSubject = new BehaviorSubject<string>('0')
   public connectionStatusSubject = new BehaviorSubject<boolean>(false)
+
+  private _tipBlockNumber: string = '0'
 
   public core: Core = new Core('')
 
@@ -35,6 +43,10 @@ class NodeService {
         this.setNetwork(currentNetwork.remote)
       }
     })
+  }
+
+  public get tipBlockNumber(): string {
+    return this._tipBlockNumber
   }
 
   public syncConnectionStatus = () => {
@@ -97,7 +109,9 @@ class NodeService {
           if (!this.delayTime) {
             this.delayTime = 0
           }
-          this.tipNumberSubject.next(HexUtils.toDecimal(tipNumber))
+          const tip: string = HexUtils.toDecimal(tipNumber)
+          this._tipBlockNumber = tip
+          this.tipNumberSubject.next(tip)
         },
         () => {
           if (this.delayTime < 10 * this.intervalTime) {

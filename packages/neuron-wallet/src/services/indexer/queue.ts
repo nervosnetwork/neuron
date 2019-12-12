@@ -1,6 +1,5 @@
-import { Subject, Subscription } from 'rxjs'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import Utils from 'services/sync/utils'
+import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
 import GetBlocks from 'services/sync/get-blocks'
 import NetworksService from 'services/networks'
@@ -17,10 +16,9 @@ import { TxUniqueFlagCache } from './tx-unique-flag'
 import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
-import AddressService from 'services/addresses'
+import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
-import { AccountExtendedPublicKey } from 'models/keys/key'
-import { Address } from 'database/address/address-dao'
+import NodeService from 'services/node';
 
 export interface LockHashInfo {
   lockHash: string
@@ -39,8 +37,6 @@ export default class IndexerQueue {
   private per = 50
   private interval = 1000
   private blockNumberService: BlockNumber
-  private tipNumberListener: Subscription
-  private tipBlockNumber: bigint = BigInt(-1)
 
   private stopped = false
   private indexed = false
@@ -58,17 +54,12 @@ export default class IndexerQueue {
 
   private static CHECK_SIZE = 50
 
-  constructor(url: string, lockHashInfos: LockHashInfo[], tipNumberSubject: Subject<string | undefined>) {
+  constructor(url: string, lockHashInfos: LockHashInfo[]) {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.indexerRPC = new IndexerRPC(url)
     this.getBlocksService = new GetBlocks(url)
     this.blockNumberService = new BlockNumber()
-    this.tipNumberListener = tipNumberSubject.subscribe(async (num: string) => {
-      if (num) {
-        this.tipBlockNumber = BigInt(num)
-      }
-    })
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -86,6 +77,10 @@ export default class IndexerQueue {
     this.resetFlag = true
   }
 
+  private tipBlockNumber = (): bigint => {
+    return BigInt(NodeService.getInstance().tipBlockNumber)
+  }
+
   public start = async () => {
     while (!this.stopped) {
       try {
@@ -96,7 +91,7 @@ export default class IndexerQueue {
         }
         const { lockHashInfos } = this
         const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
-        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber) {
+        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
             this.indexed = true
@@ -136,7 +131,7 @@ export default class IndexerQueue {
   public processFork = async () => {
     while (!this.stopped) {
       try {
-        const tip = this.tipBlockNumber
+        const tip = this.tipBlockNumber()
         const txs = await IndexerTransaction.txHashes()
         for (const tx of txs) {
           const result = await this.getBlocksService.getTransaction(tx.hash)
@@ -163,7 +158,7 @@ export default class IndexerQueue {
       .map(state => HexUtils.toDecimal(state.blockNumber))
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
     const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
-    return Utils.min(blockNumbersBigInt)
+    return ArrayUtils.min(blockNumbersBigInt)
   }
 
   public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
@@ -171,7 +166,7 @@ export default class IndexerQueue {
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
-    await Utils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
+    await ArrayUtils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
       const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
       await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
     })
@@ -208,7 +203,7 @@ export default class IndexerQueue {
 
         if (
           txPoint &&
-          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
+          (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber() - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
           const transactionWithStatus = await this.getTransaction(txPoint.txHash)
           const transaction: Transaction = transactionWithStatus.transaction
@@ -221,7 +216,7 @@ export default class IndexerQueue {
               transaction.outputs![parseInt(txPoint.index, 16)].lock,
               NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
-            await this.updateTxCountAndBalance(address)
+            await WalletService.updateUsedAddresses([address], this.url)
             continue
           }
 
@@ -295,7 +290,7 @@ export default class IndexerQueue {
             }
           }
           if (address) {
-            await this.updateTxCountAndBalance(address)
+            await WalletService.updateUsedAddresses([address], this.url)
           }
         }
       }
@@ -303,21 +298,7 @@ export default class IndexerQueue {
     }
   }
 
-  private updateTxCountAndBalance = async (address: string) => {
-    const addrs = await AddressService.updateTxCountAndBalances([address], this.url)
-    const walletIds: string[] = addrs
-      .map(addr => (addr as Address).walletId)
-      .filter((value, idx, a) => a.indexOf(value) === idx)
-    for (const id of walletIds) {
-      const wallet = WalletService.getInstance().get(id)
-      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
-      // set isImporting to undefined means unknown
-      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
-    }
-  }
-
   public stop = () => {
-    this.tipNumberListener.unsubscribe()
     this.stopped = true
   }
 
@@ -338,6 +319,6 @@ export default class IndexerQueue {
   }
 
   private yield = async (millisecond: number = 1) => {
-    await Utils.sleep(millisecond)
+    await CommonUtils.sleep(millisecond)
   }
 }

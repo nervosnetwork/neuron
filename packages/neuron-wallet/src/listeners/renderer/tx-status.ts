@@ -1,21 +1,20 @@
-import { remote } from 'electron'
 import { interval } from 'rxjs'
 import { getConnection } from 'typeorm'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { TransactionStatus } from 'types/cell-types'
 import LockUtils from 'models/lock-utils'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import TypeConvert from 'types/type-convert'
 import GetBlocks from 'services/sync/get-blocks'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
-
-const { nodeService } = remote.require('./startup/sync-block-task/params')
+import NodeService from 'services/node'
+import WalletService from 'services/wallets'
 
 const getTransactionStatus = async (hash: string) => {
-  const { core } = nodeService
+  const url: string = NodeService.getInstance().core.rpc.node.url
+  const core = new Core(url)
   const tx = (await core.rpc.getTransaction(hash)) as CKBComponents.TransactionWithStatus
   if (!tx) {
     return {
@@ -62,15 +61,13 @@ const trackingStatus = async () => {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    const { core } = nodeService
-    AddressesUsedSubject.getSubject().next({
-      addresses: usedAddresses,
-      url: core.rpc.node.url,
-    })
+    const { core } = NodeService.getInstance()
+    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
   }
 
   if (successTxs.length > 0) {
-    const { core }: { core: Core } = nodeService
+    const url: string = NodeService.getInstance().core.rpc.node.url
+    const core = new Core(url)
     const getBlockService = new GetBlocks(core.rpc.node.url)
     for (const successTx of successTxs) {
       const transaction = successTx.tx

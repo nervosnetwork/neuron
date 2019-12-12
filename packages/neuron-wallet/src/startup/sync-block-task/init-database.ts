@@ -1,11 +1,11 @@
 import initConnection from 'database/chain/ormconfig'
-import Utils from 'services/sync/utils'
 import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
-import genesisBlockHash, { getChain } from './genesis'
-import DaoUtils from '../../models/dao-utils'
+import DaoUtils from 'models/dao-utils'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
+import GetBlocks from 'services/sync/get-blocks'
+import CommonUtils from 'utils/common'
 
 // only used by main process
 export class InitDatabase {
@@ -43,12 +43,13 @@ export class InitDatabase {
 
     let hash: string = EMPTY_GENESIS_HASH
     let chain: string = ''
+    const getBlockService = new GetBlocks(network.remote)
     while (!this.stopped && !this.success) {
       try {
         this.usingPrevious = false
-        hash = await genesisBlockHash(network.remote)
+        hash = await getBlockService.genesisBlockHash()
         await initConnection(hash)
-        chain = await getChain(network.remote)
+        chain = await getBlockService.getChain()
 
         if (hash === network.genesisHash && chain === network.chain) {
           try {
@@ -78,7 +79,7 @@ export class InitDatabase {
           this.usingPrevious = true
         } catch (error) {
           logger.error('get cached meta info error:', err)
-          Utils.sleep(5000)
+          CommonUtils.sleep(5000)
         }
       }
     }
@@ -105,7 +106,7 @@ export class InitDatabase {
       if (now - startAt > timeout) {
         return
       }
-      await Utils.sleep(100)
+      await CommonUtils.sleep(100)
     }
 
     this.killed = false

@@ -1,10 +1,8 @@
 import { BrowserWindow } from 'electron'
-import { ReplaySubject } from 'rxjs'
 import path from 'path'
 import { NetworkWithID } from 'types/network'
 import env from 'env'
 import AddressService from 'services/addresses'
-import genesisBlockHash from './genesis'
 import InitDatabase from './init-database'
 import DataUpdateSubject from 'models/subjects/data-update'
 import logger from 'utils/logger'
@@ -16,19 +14,12 @@ import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
-import Utils from 'services/sync/utils'
-
-export { genesisBlockHash }
+import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
+import CommonUtils from 'utils/common'
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses, url)
-}
-
-export interface DatabaseInitParams {
-  network: NetworkWithID
-  genesisBlockHash: string
-  chain: string
 }
 
 // network switch or network connect
@@ -52,13 +43,11 @@ const networkChange = async (network: NetworkWithID) => {
       genesisBlockHash: info.hash,
       chain: info.chain
     }
-    databaseInitSubject.next(databaseInitParams)
+    DatabaseInitSubject.getSubject().next(databaseInitParams)
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
   }
 }
-
-export const databaseInitSubject = new ReplaySubject<DatabaseInitParams>(1)
 
 NetworkSwitchSubject
   .getSubject()
@@ -130,7 +119,7 @@ export const killSyncBlockTask = async () => {
       logger.info('Kill sync block background process')
       syncBlockBackgroundWindow.webContents.send("sync-window-will-close")
       // Give ipcRenderer enough time to receive and handle sync-window-will-close channel
-      Utils.sleep(2000).then(() => {
+      CommonUtils.sleep(2000).then(() => {
         if (syncBlockBackgroundWindow) {
           syncBlockBackgroundWindow.close()
         }

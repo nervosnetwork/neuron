@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid'
-import { debounceTime } from 'rxjs/operators'
 import { AccountExtendedPublicKey, PathAndPrivateKey } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
@@ -7,12 +6,9 @@ import LockUtils from 'models/lock-utils'
 import { TransactionWithoutHash, Input, OutPoint, WitnessArgs } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
-import { Address as AddressInterface } from 'database/address/address-dao'
+import { Address as AddressInterface, Address } from 'database/address/address-dao'
 import Keychain from 'models/keys/keychain'
-import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
-import AddressesUsedSubject from 'models/subjects/addresses-used-subject'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
-import dataUpdateSubject from 'models/subjects/data-update'
 import { AddressPrefix, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 
 import NodeService from './node'
@@ -30,12 +26,12 @@ import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import logger from 'utils/logger'
+import ProcessUtils from 'utils/process'
 
 const { core } = NodeService.getInstance()
 const fileService = FileService.getInstance()
 
 const MODULE_NAME = 'wallets'
-const DEBOUNCE_TIME = 200
 
 export interface Wallet {
   id: string
@@ -131,30 +127,25 @@ export default class WalletService {
     this.listStore.on(
       this.walletsKey,
       (previousWalletList: WalletProperties[] = [], currentWalletList: WalletProperties[] = []) => {
-        const currentWallet = this.getCurrent()
-        WalletListSubject.next({ currentWallet, previousWalletList, currentWalletList })
+        if (ProcessUtils.isMain()) {
+          const currentWallet = this.getCurrent()
+          WalletListSubject.next({ currentWallet, previousWalletList, currentWalletList })
+        }
       }
     )
     this.listStore.on(this.currentWalletKey, (_prevId: string | undefined, currentID: string | undefined) => {
       if (undefined === currentID) {
         return
       }
-      const currentWallet = this.getCurrent() || null
-      const walletList = this.getAll()
-      CurrentWalletSubject.next({
-        currentWallet,
-        walletList,
-      })
-    })
-
-    AddressDbChangedSubject.getSubject()
-      .pipe(debounceTime(DEBOUNCE_TIME))
-      .subscribe(() => {
-        dataUpdateSubject.next({
-          dataType: 'address',
-          actionType: 'update',
+      if (ProcessUtils.isMain()) {
+        const currentWallet = this.getCurrent() || null
+        const walletList = this.getAll()
+        CurrentWalletSubject.next({
+          currentWallet,
+          walletList,
         })
-      })
+      }
+    })
   }
 
   public getAll = (): WalletProperties[] => {
@@ -412,12 +403,22 @@ export default class WalletService {
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    AddressesUsedSubject.getSubject().next({
-      addresses: usedAddresses,
-      url: core.rpc.node.url,
-    })
-
+    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
     return txHash
+  }
+
+  // TODO: move this method and generateTx/sendTx out of this file
+  public static async updateUsedAddresses(addresses: string[], url: string) {
+    const addrs = await AddressService.updateTxCountAndBalances(addresses, url)
+    const walletIds: string[] = addrs
+      .map(addr => (addr as Address).walletId)
+      .filter((value, idx, a) => a.indexOf(value) === idx)
+    for (const id of walletIds) {
+      const wallet = WalletService.getInstance().get(id)
+      const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
+      // set isImporting to undefined means unknown
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
+    }
   }
 
   public calculateFee = async (tx: TransactionWithoutHash) => {

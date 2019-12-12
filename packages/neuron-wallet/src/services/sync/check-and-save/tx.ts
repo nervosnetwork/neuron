@@ -1,30 +1,24 @@
 import { getConnection } from 'typeorm'
-import { Subject } from 'rxjs'
 import { Transaction, Cell, OutPoint } from 'types/cell-types'
 import OutputEntity from 'database/chain/entities/output'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
-import { addressesUsedSubject as addressesUsedSubjectParam } from '../renderer-params'
-import { AddressesWithURL } from 'models/subjects/addresses-used-subject'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
+import WalletService from 'services/wallets'
 
 export default class CheckTx {
   private tx: Transaction
-  private addressesUsedSubject: Subject<AddressesWithURL>
   private url: string
   private daoTypeHash: string
 
   constructor(
     tx: Transaction,
     url: string,
-    daoTypeHash: string,
-    addressesUsedSubject: Subject<AddressesWithURL> = addressesUsedSubjectParam,
+    daoTypeHash: string
   ) {
     this.tx = tx
-    this.addressesUsedSubject = addressesUsedSubject
-
     this.url = url
     this.daoTypeHash = daoTypeHash
   }
@@ -49,10 +43,7 @@ export default class CheckTx {
     const addresses = await this.check(lockHashes)
     if (addresses.length > 0) {
       await TransactionPersistor.saveFetchTx(this.tx)
-      this.addressesUsedSubject.next({
-        addresses,
-        url: this.url,
-      })
+      await WalletService.updateUsedAddresses(addresses, this.url)
       return true
     }
     return false

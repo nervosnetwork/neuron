@@ -1,14 +1,16 @@
 import { Subject } from 'rxjs'
+import ProcessUtils from 'utils/process'
+import { remote } from 'electron'
 
 export class WalletCreatedSubject {
-  static subject = new Subject<string>()
+  private static subject = new Subject<string>()
 
-  static getSubject() {
-    return this.subject
-  }
-
-  static setSubject(subject: Subject<string>) {
-    this.subject = subject
+  public static getSubject() {
+    if (ProcessUtils.isRenderer()) {
+      return remote.require('./models/subjects/wallet-created-subject').default.getSubject()
+    } else {
+      return this.subject
+    }
   }
 }
 

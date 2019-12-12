@@ -1,12 +1,6 @@
-import { remote } from 'electron'
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import CurrentBlockSubject from 'models/subjects/current-block-subject'
-
-const isRenderer = process && process.type === 'renderer'
-const currentBlockSubject = isRenderer
-  ? remote.require('./models/subjects/current-block-subject').default.getSubject()
-  : CurrentBlockSubject.getSubject()
 
 export default class BlockNumber {
   private current: bigint | undefined = undefined
@@ -34,7 +28,7 @@ export default class BlockNumber {
     blockNumberEntity.value = current.toString()
     await getConnection().manager.save(blockNumberEntity)
     // broadcast current block number updated
-    currentBlockSubject.next({
+    CurrentBlockSubject.getSubject().next({
       blockNumber: blockNumberEntity.value,
     })
     this.current = current
