@@ -78,14 +78,7 @@ export enum MnemonicAction {
   Import = 'import',
 }
 
-export const FULL_SCREENS = [
-  `${Routes.Transaction}/`,
-  `/wizard/`,
-  `/keystore/`,
-  `${Routes.Settings}/`,
-  `${Routes.WalletEditor}/`,
-  `${Routes.NetworkEditor}/`,
-]
+export const FULL_SCREENS = [`${Routes.Transaction}/`, `/wizard/`, `/keystore/`]
 
 export enum ErrorCode {
   // Errors from RPC

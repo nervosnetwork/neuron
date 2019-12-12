@@ -1,0 +1,45 @@
+$hover-bg-color: #3cc68a4d;
+$left-padding: 15px;
+
+.sidebar {
+  display: grid;
+  grid-template:
+    'navs'1fr 'network'22px 'sync'22px / var(--sidebar-width);
+  height: 100vh;
+  background: black;
+}
+
+.navs {
+  display: flex;
+  flex-direction: column;
+  grid-area: navs;
+
+  button {
+    appearance: none;
+    border: none;
+    color: white;
+    background: transparent;
+    font-size: 1rem;
+    line-height: 2;
+    font-weight: bold;
+    text-align: left;
+    padding-left: $left-padding;
+
+
+    &:hover {
+      background-color: $hover-bg-color;
+    }
+
+    &[data-active=true] {
+      background-color: var(--nervos-green);
+    }
+  }
+}
+
+.network {
+  grid-area: network;
+}
+
+.sync {
+  grid-area: sync;
+}

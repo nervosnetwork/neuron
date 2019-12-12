@@ -1,14 +1,18 @@
+:root{
+  --sidebar-width: 150px;
+}
+
 body {
   display: grid;
   grid-template:
-    'navbar navbar navbar' auto
-    'notification notification notification' auto
-    'content content content' 1fr
-    'content content content' 1fr
-    'footer  footer  footer' 22px /
-    1fr 1fr 1fr;
+    'navbar notification notification notification' auto
+    'navbar content content content' 1fr
+    'navbar content content content' 1fr
+    'navbar footer  footer  footer' 22px /
+    auto 1fr 1fr 1fr;
 
   height: 100vh;
+  font-size: 16px;
 }
 
 footer {
