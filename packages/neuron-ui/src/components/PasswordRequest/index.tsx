@@ -100,10 +100,10 @@ const PasswordRequest = ({
         </Label>
         <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
         <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
-          <DefaultButton onClick={onDismiss} ariaLabel="cancel">
+          <DefaultButton onClick={onDismiss} ariaLabel="cancel" name="cancel">
             {t('common.cancel')}
           </DefaultButton>
-          <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled} ariaLabel="confirm">
+          <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled} ariaLabel="confirm" name="confirm">
             {t('common.confirm')}
           </PrimaryButton>
         </Stack>

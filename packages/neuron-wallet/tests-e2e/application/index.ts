@@ -3,6 +3,7 @@ import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
 import { clickMenu, deleteNetwork, editNetwork, editWallet, sleep } from './utils';
+import { createWallet } from '../operations/createWallet'
 
 export default class Application {
   spectron: SpectronApplication
@@ -40,6 +41,24 @@ export default class Application {
       return
     }
     await this.spectron.stop()
+  }
+
+  async createWalletFromWizard() {
+    this.spectron.client.click('button[name=create-a-wallet]')
+    await this.spectron.client.waitUntilWindowLoaded()
+    await createWallet(this)
+    await this.spectron.client.waitUntilWindowLoaded()
+  }
+
+  async createWalletFromSettings() {
+    await this.gotoSettingsView()
+    await this.spectron.client.waitUntilWindowLoaded()
+    this.spectron.client.click('button[name=Wallets]')
+    await this.spectron.client.waitUntilWindowLoaded()
+    this.spectron.client.click('button[name=create-a-wallet]')
+    await this.spectron.client.waitUntilWindowLoaded()
+    await createWallet(this)
+    await this.spectron.client.waitUntilWindowLoaded()
   }
 
   test(name: string, func: () => void, timeout: number = 2000 * 10 * 1) {
@@ -117,19 +136,6 @@ export default class Application {
         resolve(result)
       }
     })
-  }
-
-  async getElementByTagName(tagName: string, textContent: string): Promise<Element | null> {
-    const { client } = this.spectron
-    const elements = await this.elements(`<${tagName} />`)
-    for (let index = 0; index < elements.value.length; index++) {
-      const element = elements.value[index];
-      const text = await client.elementIdText(element.ELEMENT)
-      if (text.value === textContent) {
-        return element
-      }
-    }
-    return null
   }
 
   async setElementValue(selector: string, text: string) {

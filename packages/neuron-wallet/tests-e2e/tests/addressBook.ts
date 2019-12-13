@@ -13,7 +13,7 @@ export default (app: Application) => {
     // create a new wallet and navigate to the Send View
     const { client } = app.spectron
     await app.waitUntilLoaded()
-    client.click('button[aria-label=create a wallet]')
+    client.click('button[name=create-a-wallet]')
     await createWallet(app)
     await app.waitUntilLoaded()
   })

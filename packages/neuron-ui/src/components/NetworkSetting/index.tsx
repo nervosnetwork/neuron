@@ -112,6 +112,7 @@ const NetworkSetting = ({
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
         <Button
           text={t('settings.network.add-network')}
+          name="add-network"
           onClick={goToCreateNetwork}
           ariaDescription="Create new network configuration"
         />

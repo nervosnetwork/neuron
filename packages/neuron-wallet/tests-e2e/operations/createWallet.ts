@@ -10,7 +10,7 @@ export const createWallet = async (app: Application, name: string | undefined = 
   let mnemonicText = mnemonic.value
 
   // Next
-  client.click('button[aria-label=next]')
+  client.click('button[aria-label="next"]')
   await app.waitUntilLoaded()
 
   return await importWallet(app, mnemonicText, name, password)

@@ -1,21 +1,28 @@
 import Application from '../application';
+import { createWallet } from '../operations/createWallet';
 
 export default (app: Application) => {
+  beforeAll(async () => {
+    await app.waitUntilLoaded()
+    app.spectron.client.click('button[name=create-a-wallet]')
+    await app.waitUntilLoaded()
+    await createWallet(app)
+    await app.waitUntilLoaded()
+
+    await app.gotoSettingsView()
+    await app.waitUntilLoaded()
+
+    // Switch to network setting
+    app.spectron.client.click('button[name=Network]')
+    await app.waitUntilLoaded()
+  })
+
   app.test('add network', async () => {
     const { client } = app.spectron
     const newNodeName = 'Node-2233'
     const newNodeRpcUrl = 'http://localhost:8114'
 
-    await app.gotoSettingsView()
-
-    // Switch to network setting
-    client.click('button[name=Network]')
-    await app.waitUntilLoaded()
-
-    // Click Add-Network
-    const addNetworkButton = await client.element('//MAIN/DIV/DIV[3]/DIV[2]/BUTTON')
-    expect(addNetworkButton.value).not.toBeNull()
-    await client.elementIdClick(addNetworkButton.value.ELEMENT)
+    client.click('button[name=add-network]')
     await app.waitUntilLoaded()
 
     // Setup Network
@@ -46,7 +53,6 @@ export default (app: Application) => {
     const networkItemElementId = await client.elementIdAttribute(networkItemElement.ELEMENT, 'id')
     const networkItemElementName = await client.elementIdAttribute(networkItemElement.ELEMENT, 'name')
     const networkId = networkItemElementId.value.slice(networkItemElementName.value.length + 1)
-    console.log(`networkId = ${networkId}`);
 
     // Go to edit network page
     await app.editNetwork(networkId)
