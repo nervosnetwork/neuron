@@ -3,7 +3,6 @@ import Network from './network'
 import SendTransaction from './sendTransaction'
 import Notification from './notification'
 import AddressBook from './addressBook'
-import GeneralSettings from './generalSettings'
 
 export default {
   Wallet,
@@ -11,5 +10,4 @@ export default {
   SendTransaction,
   Notification,
   AddressBook,
-  GeneralSettings,
 }

@@ -1,31 +1,26 @@
 import Application from './application'
 import tests from './tests'
 
-describe('Test data storage in neuron', () => {
+describe('Test wallet', () => {
   let app = new Application()
-
-  beforeAll(() => {
-    return app.start()
-  })
-
-  afterAll(() => {
-    return app.stop()
-  })
+  beforeAll(() => app.start())
+  afterAll(() =>  app.stop())
 
   tests.Wallet(app)
+})
+
+describe('Test networks', () => {
+  let app = new Application()
+  beforeAll(() => app.start())
+  afterAll(() =>  app.stop())
+
   tests.Network(app)
 })
 
-describe('Test transaction in neuron', () => {
+describe('Test transaction', () => {
   let app = new Application()
-
-  beforeAll(() => {
-    return app.start()
-  })
-
-  afterAll(() => {
-    return app.stop()
-  })
+  beforeAll(() => app.start())
+  afterAll(() =>  app.stop())
 
   // tests.SendTransaction(app) // It fails too often, skip temporarily until we make tests more robust.
 })
@@ -42,11 +37,4 @@ describe('Test address book', () => {
   beforeAll(() => app.start())
   afterAll(() => app.stop())
   tests.AddressBook(app)
-})
-
-describe('Test general settings', () => {
-  let app = new Application()
-  beforeAll(() => app.start())
-  afterAll(() => app.stop())
-  tests.GeneralSettings(app)
 })

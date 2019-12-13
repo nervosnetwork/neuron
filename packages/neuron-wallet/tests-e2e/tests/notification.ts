@@ -22,9 +22,7 @@ export default (app: Application) => {
     await client.elementIdClick(createWalletButton!.ELEMENT)
     await createWallet(app)
     await app.waitUntilLoaded()
-    // Go to setting page
-    await app.gotoSettingPageFromMenu()
-    await app.waitUntilLoaded()
+    await app.gotoSettingsView()
 
     client.click('button[name=Wallets]')
     await app.waitUntilLoaded()

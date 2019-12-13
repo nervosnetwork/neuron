@@ -108,9 +108,7 @@ export default (app: Application) => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
-    // Go to setting page
-    await app.gotoSettingPageFromMenu()
-    await app.waitUntilLoaded()
+    await app.gotoSettingsView()
 
     // Switch to wallet setting
     const walletSettingButton = await app.getElementByTagName('button', 'Wallets')

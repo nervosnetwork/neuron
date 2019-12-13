@@ -1,16 +1,13 @@
+import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
-import { debuglog } from 'util'
 import { clickMenu, deleteNetwork, editNetwork, editWallet, sleep } from './utils';
-
-const log = debuglog(__filename)
 
 export default class Application {
   spectron: SpectronApplication
   errorOccurred: boolean = false
-  osPlatform = this.getOSplatform()
 
   constructor() {
     let electronPath = path.join(__dirname, '../..', 'node_modules', '.bin', 'electron')
@@ -37,56 +34,39 @@ export default class Application {
     }
     await this.spectron.start()
     await this.spectron.client.waitUntilWindowLoaded(10000)
-    log(`start ${new Date().toTimeString()}`);
   }
 
   async stop() {
     if (!this.spectron.isRunning()) {
       return
     }
-    log(`stop ${new Date().toTimeString()}`);
     await this.spectron.stop()
   }
 
-  test(name: string, func: () => void, timeout: number = 1000 * 60 * 1) {
+  test(name: string, func: () => void, timeout: number = 2000 * 10 * 1) {
     it(name, async () => {
       if (this.errorOccurred) {
-        log(`skip - [${name}] ${new Date().toTimeString()}`);
         return
       }
 
       try {
-        log(`will test [${name}] ${new Date().toTimeString()}`);
         this.waitUntilLoaded()
         await func()
-        log(`did test [${name}] ${new Date().toTimeString()}`);
       } catch (error) {
         this.errorOccurred = true
-        log(`error: ${name} ${new Date().toTimeString()}\n${error}`);
-
-        // print main text
-        const { client, browserWindow } = this.spectron
-        const mainElement = await client.element('//MAIN')
-        if (mainElement.value) {
-          const mainText = await client.elementIdText(mainElement.value.ELEMENT)
-          log(`mainText: [\n${mainText.value}\n]`);
-        }
-
-        // create dir
 
         const errorsPath = path.join(__dirname, '../errors')
-        if(!fs.existsSync(errorsPath)) {
-          await fs.mkdirSync(errorsPath)
+        if (!fs.existsSync(errorsPath)) {
+          fs.mkdirSync(errorsPath)
         }
         const errorFileName = `${name.replace(/ /g, '_')}-${new Date().getTime()}`
+
         // save error log
-        await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.txt`), error.stack)
+        fs.writeFileSync(path.join(errorsPath, `${errorFileName}.txt`), error.stack)
 
         // save screenshot
-        const imageBuffer = await browserWindow.capturePage()
-        await fs.writeFileSync(path.join(__dirname, '../errors', `${errorFileName}.png`), imageBuffer)
-
-        log(`did save error log ${new Date().toTimeString()}\n${error}\n${error.stack}`);
+        const imageBuffer = await this.spectron.browserWindow.capturePage()
+        fs.writeFileSync(path.join(errorsPath, `${errorFileName}.png`), imageBuffer)
 
         throw error
       }
@@ -186,18 +166,13 @@ export default class Application {
     }, text)
   }
 
-  getOSplatform():string {
-    let os = require('os');
-    let platform = os.platform();
-    return platform;
-  }
-
-  // goto Setting page from menu according to OS platform
-  async gotoSettingPageFromMenu() {
-    if (this.osPlatform.includes("darwin")) {
-      await this.clickMenu(['Electron', 'Preferences...'])
+  // goto Setting page from menu according to platform
+  async gotoSettingsView() {
+    if (os.platform() === "darwin") {
+      this.clickMenu(['Electron', 'Preferences...'])
     } else {
-      await this.clickMenu(['Help', 'Settings'])
+      this.clickMenu(['Help', 'Settings'])
     }
+      await this.waitUntilLoaded()
   }
 }

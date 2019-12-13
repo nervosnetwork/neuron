@@ -4,9 +4,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   const { client } = app.spectron
   let walletIndex: number | null = null
 
-  // Go to setting page
-  await app.gotoSettingPageFromMenu()
-  await app.waitUntilLoaded()
+  await app.gotoSettingsView()
 
   // Switch to wallet setting
   const walletSettingButton = await app.getElementByTagName('button', 'Wallets')

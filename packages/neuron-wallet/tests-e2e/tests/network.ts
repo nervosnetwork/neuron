@@ -6,9 +6,7 @@ export default (app: Application) => {
     const newNodeName = 'Node-2233'
     const newNodeRpcUrl = 'http://localhost:8114'
 
-    // Go to setting page
-    await app.gotoSettingPageFromMenu()
-    await app.waitUntilLoaded()
+    await app.gotoSettingsView()
 
     // Switch to network setting
     const networkSettingButton = await app.getElementByTagName('button', 'Network')
@@ -116,9 +114,7 @@ export default (app: Application) => {
   app.test('delete network', async () => {
     const { client } = app.spectron
 
-    // Go to setting page
-    await app.gotoSettingPageFromMenu()
-    await app.waitUntilLoaded()
+    await app.gotoSettingsView()
 
     // Switch to network setting
     const networkSettingButton = await app.getElementByTagName('button', 'Network')
