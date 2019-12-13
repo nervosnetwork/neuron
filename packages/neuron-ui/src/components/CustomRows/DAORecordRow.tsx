@@ -21,21 +21,28 @@ const DAORecord = ({
   capacity,
   actionLabel,
   onClick,
-  onEpochsExplanationClick,
+  onCompensationPeriodExplanationClick,
   timestamp,
   genesisBlockTimestamp,
   depositTimestamp,
   depositOutPoint,
   epoch,
+  compensationPeriod,
   withdraw,
   connectionStatus,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: React.EventHandler<any>
-  onEpochsExplanationClick: React.EventHandler<any>
+  onCompensationPeriodExplanationClick: React.EventHandler<any>
   tipBlockNumber: string
   tipBlockTimestamp: number
   epoch: string
+  compensationPeriod: {
+    currentEpochNumber: bigint
+    currentEpochIndex: bigint
+    currentEpochLength: bigint
+    targetEpochNumber: bigint
+  } | null
   withdraw: string | null
   genesisBlockTimestamp: number | undefined
   connectionStatus: 'online' | 'offline'
@@ -44,6 +51,23 @@ const DAORecord = ({
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
   const [depositEpoch, setDepositEpoch] = useState('')
   const [apc, setApc] = useState(0)
+
+  let pastEpochs = 0
+  if (compensationPeriod) {
+    pastEpochs =
+      Number(compensationPeriod.currentEpochNumber) -
+      Number(compensationPeriod.targetEpochNumber) +
+      180 +
+      (compensationPeriod.currentEpochLength === BigInt(0)
+        ? 0
+        : +(Number(compensationPeriod.currentEpochIndex) / Number(compensationPeriod.currentEpochLength)).toFixed(1))
+  }
+  let compensationStage = 'stage1'
+  if (pastEpochs > 0.967 * 180) {
+    compensationStage = 'stage3'
+  } else if (pastEpochs > 0.767 * 180) {
+    compensationStage = 'stage2'
+  }
 
   useEffect(() => {
     if (depositTimestamp) {
@@ -159,13 +183,14 @@ const DAORecord = ({
         </div>
         <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div className={styles.actions}>
-          {depositOutPoint ? null : (
+          {depositOutPoint || !compensationPeriod || connectionStatus === 'offline' ? null : (
             <span
+              data-stage={compensationStage}
               data-block-hash={blockHash}
               role="button"
               className={styles.epochsDialogBtn}
-              onClick={onEpochsExplanationClick}
-              onKeyPress={onEpochsExplanationClick}
+              onClick={onCompensationPeriodExplanationClick}
+              onKeyPress={onCompensationPeriodExplanationClick}
               tabIndex={0}
               aria-label={t('nervos-dao.explanation-of-epochs-period')}
               title={t('nervos-dao.explanation-of-epochs-period')}

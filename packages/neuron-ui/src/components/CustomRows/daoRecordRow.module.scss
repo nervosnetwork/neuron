@@ -1,3 +1,7 @@
+$progress-green: #64dd17;
+$progress-yellow: #ffd600;
+$progress-grey: #b0bec5;
+
 .daoRecord {
   display: flex;
   flex-direction: column;
@@ -51,10 +55,21 @@
     height: 16px;
     border-radius: 8px;
     margin-right: 16px;
-    background-color: rgb(38, 135, 133);
+
+    &[data-stage='stage1'] {
+      background-color: $progress-green;
+    }
+
+    &[data-stage='stage2'] {
+      background-color: $progress-yellow;
+    }
+
+    &[data-stage='stage3'] {
+      background-color: $progress-grey;
+    }
 
     &:hover {
-      background-color: rgb(0, 170, 144);
+      filter: brightness(1.1);
     }
   }
 }
