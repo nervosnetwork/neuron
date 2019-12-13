@@ -40,9 +40,9 @@ export default (app: Application) => {
     app.test('Invalid address should show alert', async () => {
       const { client } = app.spectron
       const invalidAddress = 'invalid'
-      const inputs = await app.elements('input')
+      const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, invalidAddress)
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
+      const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.state).not.toBe('failure')
     })
@@ -50,10 +50,10 @@ export default (app: Application) => {
     app.test('Empty address should show alert', async () => {
       const emptyAddress = ''
       const { client } = app.spectron
-      const inputs = await app.elements('input')
+      const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, emptyAddress)
       await app.waitUntilLoaded()
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
+      const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe('Address cannot be empty')
     })
@@ -61,9 +61,9 @@ export default (app: Application) => {
     app.test('Valid address should not show alert', async () => {
       const validAddress = 'ckt1qyq0cwanfaf2t2cwmuxd8ujv2ww6kjv7n53sfwv2l0'
       const { client } = app.spectron
-      const inputs = await app.elements('input')
+      const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
+      const errorMessage = await client.element('.ms-TextField-errorMessage')
       expect(errorMessage.state).toBe('failure')
     })
   })
@@ -73,11 +73,11 @@ export default (app: Application) => {
     const invalidAmount = '0.123456789'
     app.test('Amount 0.123456789 is invalid, decimal places cannot be more than 8', async () => {
       const { client } = app.spectron
-      const inputs = await app.elements('input')
+      const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
       client.elementIdValue(inputs.value[1].ELEMENT, invalidAmount)
       await app.waitUntilLoaded()
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
+      const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe(`Amount ${invalidAmount} is invalid, please enter the Amount with no more than 8 decimal places`)
     })
@@ -88,11 +88,11 @@ export default (app: Application) => {
     const invalidAmount = '61'
     app.test('Amount is not enough', async () => {
       const { client } = app.spectron
-      const inputs = await app.elements('input')
+      const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
       client.elementIdValue(inputs.value[1].ELEMENT, invalidAmount)
       await app.waitUntilLoaded()
-      const errorMessage = await app.element('.ms-TextField-errorMessage')
+      const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe('Amount is not enough')
     })

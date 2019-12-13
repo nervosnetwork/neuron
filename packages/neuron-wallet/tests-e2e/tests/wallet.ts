@@ -54,14 +54,14 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Switch to first wallet
-    const firstWallet = await app.element('label span')
+    const firstWallet = await client.element('label span')
     expect(firstWallet).not.toBeNull()
     const firstWalletName = await client.elementIdText(firstWallet.value.ELEMENT)
     await client.elementIdClick(firstWallet.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const walletNameElement = await app.element('//MAIN/DIV/H1', 1000)
+    const walletNameElement = await client.element('//MAIN/DIV/H1')
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
     expect(walletName.value).toBe(firstWalletName.value)
@@ -72,7 +72,7 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     // Get current wallet name
-    const walletNameElement = await app.element('//MAIN/DIV/H1', 1000)
+    const walletNameElement = await client.element('//MAIN/DIV/H1')
     expect(walletNameElement.value).not.toBeNull()
     const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
 
@@ -81,7 +81,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Input password
-    const inputElement = await app.element('//INPUT')
+    const inputElement = await client.element('//INPUT')
     expect(inputElement.value).not.toBeNull()
     await app.setElementValue('//INPUT', 'Azusa2233')
     // Confirm
@@ -91,7 +91,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const newWalletNameElement = await app.element('//MAIN/DIV/H1')
+    const newWalletNameElement = await client.element('//MAIN/DIV/H1')
     expect(newWalletNameElement.value).not.toBeNull()
     await app.waitUntilLoaded()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
@@ -111,7 +111,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Get wallet id
-    const walletItemElement = await app.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]/DIV/INPUT')
+    const walletItemElement = await client.element('//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV/DIV[1]/DIV/INPUT')
     expect(walletItemElement.value).not.toBeNull()
     const walletItemElementId = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'id')
     const walletItemElementName = await client.elementIdAttribute(walletItemElement.value.ELEMENT, 'name')
@@ -122,7 +122,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Update wallet name
-    const walletNameInputElement = await app.element('<input />')
+    const walletNameInputElement = await client.element('<input />')
     expect(walletNameInputElement.value).not.toBeNull()
     await app.setElementValue('<input />', 'Azusa')
     await app.waitUntilLoaded()
@@ -135,7 +135,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Check wallet name
-    const newWalletNameElement = await app.element('label span')
+    const newWalletNameElement = await client.element('label span')
     expect(newWalletNameElement).not.toBeNull()
     const newWalletName = await client.elementIdText(newWalletNameElement.value.ELEMENT)
     expect(newWalletName.value).toBe(walletNameInputText.value)

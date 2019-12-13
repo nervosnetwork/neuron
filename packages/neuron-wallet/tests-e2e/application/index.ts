@@ -99,27 +99,6 @@ export default class Application {
     return deleteNetwork(this.spectron.electron, networkId)
   }
 
-  // Element
-
-  async element(selector: string, timeout: number = 300): Promise<RawResult<Element>> {
-    await this.wait(timeout)
-    const { client } = this.spectron
-    let result: RawResult<Element> | undefined
-    let error: Error | undefined
-    try {
-      result = await client.element(selector)
-    } catch (_error) {
-      error = _error
-    }
-
-    return new Promise((resolve, reject) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(result)
-      }
-    })
-  }
 
   async elements(selector: string): Promise<RawResult<Element[]>> {
     const { client } = this.spectron

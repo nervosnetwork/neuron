@@ -9,7 +9,7 @@ export const currentWalletAddress = async (app: Application) => {
   await client.elementIdClick(receiveButton!.ELEMENT)
   await app.waitUntilLoaded()
 
-  const addressElement = await app.element('//INPUT')
+  const addressElement = await client.element('//INPUT')
   expect(addressElement.value).not.toBeNull()
   const address = await client.elementIdAttribute(addressElement.value.ELEMENT, 'placeholder')
   console.log(`address = ${address.value}`);

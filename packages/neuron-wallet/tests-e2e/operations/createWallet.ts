@@ -7,7 +7,7 @@ export const createWallet = async (app: Application, name: string | undefined = 
   const { client } = app.spectron
 
   // Copy mnemonic
-  const mnemonicTextarea = await app.element('<textarea />')
+  const mnemonicTextarea = await client.element('<textarea />')
   const mnemonic = await client.elementIdText(mnemonicTextarea.value.ELEMENT)
   let mnemonicText = mnemonic.value
   log(`mnemonicText = ${mnemonicText} ${new Date().toTimeString()}`);

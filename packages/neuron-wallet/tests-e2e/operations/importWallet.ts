@@ -6,7 +6,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   const { client } = app.spectron
 
   // Input mnemonic
-  const inputMnemonicTextarea = await app.element('<textarea />')
+  const inputMnemonicTextarea = await client.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   app.setElementValue('<textarea />', mnemonic)
   app.waitUntilLoaded()
@@ -16,7 +16,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   await client.elementIdClick(mnemonicNextButton!.ELEMENT)
 
   // Setup wallet
-  const inputElements = await app.elements('<input />')
+  const inputElements = await client.elements('<input />')
   expect(inputElements.value).not.toBeNull()
   expect(inputElements.value.length).toBe(3)
   if (name) {
@@ -34,7 +34,7 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   await app.waitUntilLoaded()
 
   // Check wallet name
-  const walletNameElement = await app.element('//MAIN/DIV/H1', 1000)
+  const walletNameElement = await client.element('//MAIN/DIV/H1')
   expect(walletNameElement.value).not.toBeNull()
   const walletName = await client.elementIdText(walletNameElement.value.ELEMENT)
   expect(walletName.value).toBe(walletNameInputText.value)

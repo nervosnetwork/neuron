@@ -16,7 +16,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   let retryCount = 5
   while (balance === 0 && retryCount > 0) {
     retryCount -= 1
-    const balanceElement = await app.element('//MAIN/DIV/DIV[4]/DIV[2]')
+    const balanceElement = await client.element('//MAIN/DIV/DIV[4]/DIV[2]')
     expect(balanceElement.value).not.toBeNull()
     const balanceText = await client.elementIdText(balanceElement.value.ELEMENT)
     balance = parseInt(balanceText.value.slice(0, balanceText.value.length - 4))
@@ -49,7 +49,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     console.log(`setup sent to ${sendTo.address} ${sendTo.amount}`);
     if (elementIndex < sendToArr.length) {
       // add
-      const addButton = await app.element(`${sendItemElementPath}/DIV/DIV[2]//BUTTON`)
+      const addButton = await client.element(`${sendItemElementPath}/DIV/DIV[2]//BUTTON`)
       expect(addButton.value).not.toBeNull()
       await client.elementIdClick(addButton.value.ELEMENT)
       app.waitUntilLoaded()
@@ -57,29 +57,29 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   }
 
   // Send
-  const sendButton = await app.element(`//MAIN/DIV/DIV[5]/BUTTON[2]`)
+  const sendButton = await client.element(`//MAIN/DIV/DIV[5]/BUTTON[2]`)
   expect(sendButton.value).not.toBeNull()
   await client.elementIdClick(sendButton.value.ELEMENT)
   app.waitUntilLoaded()
 
   // Input password
-  const passwordInputElement = await app.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT')
+  const passwordInputElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT')
   expect(passwordInputElement.value).not.toBeNull()
   await app.setElementValue('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT', password)
   // Confirm
-  const confirmElement = await app.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[2]/BUTTON[2]')
+  const confirmElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[2]/BUTTON[2]')
   expect(confirmElement.value).not.toBeNull()
   await client.elementIdClick(confirmElement.value.ELEMENT)
   app.waitUntilLoaded()
 
   // Transaction element
   const transactionElementPath = `//MAIN/DIV/DIV[2]/DIV/DIV/DIV[2]/DIV/DIV/DIV/DIV/DIV/DIV[1]/DIV/DIV/DIV[2]/DIV/DIV/DIV[1]`
-  const transactionElement = await app.element(transactionElementPath)
+  const transactionElement = await client.element(transactionElementPath)
   expect(transactionElement.value).not.toBeNull()
   const transactionText = await client.elementIdText(transactionElement.value.ELEMENT)
   console.log(`transaction = ${transactionText.value}`);
   // Transaction hash
-  const transactionHashElement = await app.element(`${transactionElementPath}/DIV/DIV/DIV[3]/SPAN`)
+  const transactionHashElement = await client.element(`${transactionElementPath}/DIV/DIV/DIV[3]/SPAN`)
   expect(transactionHashElement.value).not.toBeNull()
   const transactionHash = await client.elementIdText(transactionHashElement.value.ELEMENT)
   console.log(`transactionHash = ${transactionHash.value}`);
@@ -90,7 +90,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     if (!(await checkNetworkStatus(app))) {
       throw 'Network disconnected'
     }
-    const transactionStatusElement = await app.element(`${transactionElementPath}/DIV/DIV/DIV[4]`)
+    const transactionStatusElement = await client.element(`${transactionElementPath}/DIV/DIV/DIV[4]`)
     expect(transactionStatusElement.value).not.toBeNull()
     const transactionStatus = await client.elementIdText(transactionStatusElement.value.ELEMENT)
     console.log(`transactionStatus = ${transactionStatus.value}`);

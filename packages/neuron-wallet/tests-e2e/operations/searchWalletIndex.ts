@@ -20,7 +20,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   // Search wallet
   for (let index = 1; index <= walletCount; index++) {
     const elementPath = `${groupElementPath}/DIV[${index}]`
-    const element = await app.element(elementPath)
+    const element = await client.element(elementPath)
     expect(element.value).not.toBeNull()
     const text = await client.elementIdText(element.value.ELEMENT)
     if (text.value === walletName) {
@@ -30,7 +30,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   }
 
   // Back
-  const backButton = await app.element('//MAIN/DIV/DIV/DIV/BUTTON')
+  const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
   expect(backButton.value).not.toBeNull()
   await client.elementIdClick(backButton.value.ELEMENT)
   await app.waitUntilLoaded()

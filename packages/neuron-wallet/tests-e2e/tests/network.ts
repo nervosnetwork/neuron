@@ -15,13 +15,13 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Click Add-Network
-    const addNetworkButton = await app.element('//MAIN/DIV/DIV[3]/DIV[2]/BUTTON')
+    const addNetworkButton = await client.element('//MAIN/DIV/DIV[3]/DIV[2]/BUTTON')
     expect(addNetworkButton.value).not.toBeNull()
     await client.elementIdClick(addNetworkButton.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Setup Network
-    const inputElements = await app.elements('<input />')
+    const inputElements = await client.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
     await app.setElementValue('//MAIN/DIV/DIV/DIV[1]//INPUT', newNodeRpcUrl)
@@ -35,7 +35,7 @@ export default (app: Application) => {
 
     // Check network name
     const title = `${newNodeName}: ${newNodeRpcUrl}`
-    const newNetworkItemElement = await app.element("//MAIN//LABEL/DIV[@title='" + title + "']")
+    const newNetworkItemElement = await client.element("//MAIN//LABEL/DIV[@title='" + title + "']")
     expect(newNetworkItemElement.value).not.toBeNull()
     console.log(`netowrkItemTitle - ${title}`);
   })
@@ -44,7 +44,7 @@ export default (app: Application) => {
     const { client } = app.spectron
 
     // Get network id
-    const inputs = await app.elements("//MAIN//INPUT")
+    const inputs = await client.elements("//MAIN//INPUT")
     const networkItemElement = inputs.value[1]
     expect(networkItemElement).not.toBeNull()
     const networkItemElementId = await client.elementIdAttribute(networkItemElement.ELEMENT, 'id')
@@ -57,7 +57,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Setup Network
-    const inputElements = await app.elements('<input />')
+    const inputElements = await client.elements('<input />')
     expect(inputElements.value).not.toBeNull()
     expect(inputElements.value.length).toBe(2)
     const networkRpcUrlInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
@@ -76,7 +76,7 @@ export default (app: Application) => {
 
     // Check network name
     const title = `${newName}: ${newRpcUrl}`
-    const newNetworkItemElement = await app.element("//MAIN//LABEL/DIV[@title='" + title + "']")
+    const newNetworkItemElement = await client.element("//MAIN//LABEL/DIV[@title='" + title + "']")
     expect(newNetworkItemElement.value).not.toBeNull()
     console.log(`netowrkItemTitle - ${title}`);
   })
@@ -97,13 +97,13 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // back
-    const backButton = await app.element('//MAIN/DIV/DIV/DIV/BUTTON')
+    const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
     expect(backButton.value).not.toBeNull()
     await client.elementIdClick(backButton.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check network name
-    const networkElement = await app.element('//FOOTER/DIV/DIV[2]')
+    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
     expect(networkElement).not.toBeNull()
     const networkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(networkName.value).toBe(targetNetowrkName.value)
@@ -141,13 +141,13 @@ export default (app: Application) => {
     app.waitUntilLoaded()
 
     // Back
-    const backButton = await app.element('//MAIN/DIV/DIV/DIV/BUTTON')
+    const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
     expect(backButton.value).not.toBeNull()
     await client.elementIdClick(backButton.value.ELEMENT)
     await app.waitUntilLoaded()
 
     // Check network name
-    const networkElement = await app.element('//FOOTER/DIV/DIV[2]')
+    const networkElement = await client.element('//FOOTER/DIV/DIV[2]')
     expect(networkElement).not.toBeNull()
     const newNetworkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(newNetworkName.value).not.toBe(netowrkName.value)
