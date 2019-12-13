@@ -21,10 +21,7 @@ export default (app: Application) => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
-    // Go to setting page
-    const networkElement = await app.element('//FOOTER/DIV[1]/DIV[2]')
-    expect(networkElement.value).not.toBeNull()
-    await client.elementIdClick(networkElement.value.ELEMENT)
+    await app.gotoSettingsView()
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
@@ -47,10 +44,7 @@ export default (app: Application) => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
 
-    // Go to setting page
-    const networkElement = await app.element('//FOOTER/DIV[1]/DIV[2]')
-    expect(networkElement.value).not.toBeNull()
-    await client.elementIdClick(networkElement.value.ELEMENT)
+    await app.gotoSettingsView()
     await app.waitUntilLoaded()
 
     // Switch to wallet setting

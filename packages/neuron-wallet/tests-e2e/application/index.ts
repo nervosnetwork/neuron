@@ -1,4 +1,3 @@
-import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
@@ -166,13 +165,7 @@ export default class Application {
     }, text)
   }
 
-  // goto Setting page from menu according to platform
   async gotoSettingsView() {
-    if (os.platform() === "darwin") {
-      this.clickMenu(['Electron', 'Preferences...'])
-    } else {
-      this.clickMenu(['Help', 'Settings'])
-    }
-      await this.waitUntilLoaded()
+    this.spectron.client.click('button[name=Settings]')
   }
 }

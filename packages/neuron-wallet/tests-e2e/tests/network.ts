@@ -89,7 +89,6 @@ export default (app: Application) => {
     const targetNetworkNameElement = labels.value[3]
     expect(targetNetworkNameElement).not.toBeNull()
     const targetNetowrkName = await client.elementIdText(targetNetworkNameElement.ELEMENT)
-    console.log(`targetNetowrkName = ${targetNetowrkName.value}`);
 
     // switch network
     const inputs = await app.elements("//MAIN//INPUT")
@@ -108,13 +107,13 @@ export default (app: Application) => {
     expect(networkElement).not.toBeNull()
     const networkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(networkName.value).toBe(targetNetowrkName.value)
-    console.log(`networkName = ${networkName.value}`);
   })
 
   app.test('delete network', async () => {
     const { client } = app.spectron
 
     await app.gotoSettingsView()
+    await app.waitUntilLoaded()
 
     // Switch to network setting
     const networkSettingButton = await app.getElementByTagName('button', 'Network')
@@ -136,7 +135,6 @@ export default (app: Application) => {
     const networkItemElementId = await client.elementIdAttribute(networkItemElement, 'id')
     const networkItemElementName = await client.elementIdAttribute(networkItemElement, 'name')
     const networkId = networkItemElementId.value.slice(networkItemElementName.value.length + 1)
-    console.log(`networkId = ${networkId}`);
 
     // Delete network
     app.deleteNetwork(networkId)
