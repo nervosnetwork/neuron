@@ -1,3 +1,4 @@
+import { BehaviorSubject, Subscription } from 'rxjs'
 import logger from 'utils/logger'
 
 import Queue from './queue'
@@ -12,16 +13,20 @@ export default class BlockListener {
   private queue: Queue | undefined
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
+  private tipNumberSubject: BehaviorSubject<string | undefined>
+  private tipNumberListener: Subscription | undefined
   private url: string
 
   constructor(
     url: string,
     lockHashes: string[],
+    tipNumberSubject: BehaviorSubject<string | undefined> = NodeService.getInstance().tipNumberSubject
   ) {
     this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck(url)
+    this.tipNumberSubject = tipNumberSubject
   }
 
   public setLockHashes = (lockHashes: string[]) => {
@@ -63,6 +68,12 @@ export default class BlockListener {
     } catch (err) {
       logger.error(`BlockListener start error:`, err)
     }
+
+    this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
+      if (num) {
+        await this.regenerate(num)
+      }
+    })
   }
 
   private tipBlockNumber = (): bigint => {
@@ -83,6 +94,9 @@ export default class BlockListener {
   }
 
   public stop = () => {
+    if (this.tipNumberListener) {
+      this.tipNumberListener.unsubscribe()
+    }
     if (this.queue) {
       this.queue.stop()
     }
@@ -101,12 +115,10 @@ export default class BlockListener {
     return startBlockNumber
   }
 
-  public regenerate = async (): Promise<void> => {
-    const endBlockNumber: string = this.tipBlockNumber.toString()
-
+  public regenerate = async (tipNumber: string): Promise<void> => {
     if (this.queue) {
-      if (this.tipBlockNumber() > BigInt(0)) {
-        this.queue.resetEndBlockNumber(endBlockNumber)
+      if (BigInt(tipNumber) > BigInt(0)) {
+        this.queue.resetEndBlockNumber(tipNumber)
       }
     } else {
       const startBlockNumber: string = await this.getStartBlockNumber()
@@ -114,7 +126,7 @@ export default class BlockListener {
         this.url,
         this.lockHashes,
         startBlockNumber,
-        endBlockNumber,
+        tipNumber,
         this.currentBlockNumber,
         this.rangeForCheck
       )
