@@ -9,7 +9,9 @@ import env from 'env'
 // with its own keyspace.
 const leveldb = (dbname: string, prefix: string | null = null): LevelUp => {
   const dbpath = path.join(env.fileBasePath, dbname)
-  fs.mkdirSync(dbpath, { recursive: true })
+  if (!fs.existsSync(dbpath)) {
+    fs.mkdirSync(dbpath, { recursive: true })
+  }
 
   const db = levelup(leveldown(dbpath))
   if (prefix) {
