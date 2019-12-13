@@ -1,0 +1,28 @@
+.address {
+  display: flex;
+  width: 438px;
+  margin: 20px auto 0;
+
+  &>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+  }
+
+  input {
+    flex: 1;
+    padding: 6px 17px;
+    border: 1px solid #000;
+    color: #000;
+    font-size: 0.75rem;
+    letter-spacing: 0.6px;
+  }
+}
+
+.notation {
+  width: 450px;
+  font-size: 0.625rem;
+  letter-spacing: 0.5px;
+  margin: 20px auto 0;
+}

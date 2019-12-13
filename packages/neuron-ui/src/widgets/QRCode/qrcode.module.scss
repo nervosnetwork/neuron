@@ -1,0 +1,36 @@
+$qrcode-size: 250px;
+
+.qrcode {
+  display: block;
+  width: $qrcode-size;
+  margin: 0 auto;
+  margin-top: 79px;
+}
+
+.pic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  canvas {
+    width: $qrcode-size;
+    height: $qrcode-size;
+    box-shadow: 1px 2px 6px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+
+  button {
+    width: 115px;
+    height: 30px;
+    border: none;
+    background-color: var(--nervos-green);
+    color: #fff;
+    font-size: 0.75rem;
+  }
+}
