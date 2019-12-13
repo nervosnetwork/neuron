@@ -9,9 +9,7 @@ export default (app: Application) => {
     await app.gotoSettingsView()
 
     // Switch to network setting
-    const networkSettingButton = await app.getElementByTagName('button', 'Network')
-    expect(networkSettingButton).not.toBeNull()
-    await client.elementIdClick(networkSettingButton!.ELEMENT)
+    client.click('button[name=Network]')
     await app.waitUntilLoaded()
 
     // Click Add-Network
@@ -28,9 +26,7 @@ export default (app: Application) => {
     await app.setElementValue('//MAIN/DIV/DIV/DIV[2]//INPUT', newNodeName)
     await app.waitUntilLoaded()
     // Save
-    const saveButton = await app.getElementByTagName('button', 'Save')
-    expect(saveButton).not.toBeNull()
-    await client.elementIdClick(saveButton!.ELEMENT)
+    client.click('button[name=save-network]')
     await app.waitUntilLoaded()
 
     // Check network name
@@ -69,9 +65,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Save
-    const saveButton = await app.getElementByTagName('button', 'Save')
-    expect(saveButton).not.toBeNull()
-    await client.elementIdClick(saveButton!.ELEMENT)
+    client.click('button[name=save-network]')
     await app.waitUntilLoaded()
 
     // Check network name
@@ -116,9 +110,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Switch to network setting
-    const networkSettingButton = await app.getElementByTagName('button', 'Network')
-    expect(networkSettingButton).not.toBeNull()
-    await client.elementIdClick(networkSettingButton!.ELEMENT)
+    client.click('button[name=Network]')
     await app.waitUntilLoaded()
 
     // Get network name

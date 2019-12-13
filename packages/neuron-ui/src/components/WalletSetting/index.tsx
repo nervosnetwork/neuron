@@ -14,14 +14,17 @@ import { Routes, MnemonicAction } from 'utils/const'
 const buttons = [
   {
     label: 'wizard.create-new-wallet',
+    ariaLabel: 'create a wallet',
     url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
   },
   {
     label: 'wizard.import-mnemonic',
+    ariaLabel: 'import wallet seed',
     url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
   },
   {
     label: 'wizard.import-keystore',
+    ariaLabel: 'import from keystore',
     url: Routes.ImportKeystore,
   },
 ]
@@ -110,8 +113,8 @@ const WalletSetting = ({
         />
       </Stack.Item>
       <Stack horizontal horizontalAlign="start" tokens={{ childrenGap: 20 }}>
-        {buttons.map(({ label, url }) => (
-          <Button key={label} onClick={navTo(url)} text={t(label)} />
+        {buttons.map(({ label, ariaLabel, url }) => (
+          <Button key={label} onClick={navTo(url)} text={t(label)} ariaLabel={ariaLabel} />
         ))}
       </Stack>
     </Stack>

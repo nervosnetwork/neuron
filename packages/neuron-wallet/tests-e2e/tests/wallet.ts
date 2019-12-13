@@ -9,9 +9,8 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Click create wallet
-    const createWalletButton = await app.getElementByTagName('button', 'Create a Wallet')
-    expect(createWalletButton).not.toBeNull()
-    await client.elementIdClick(createWalletButton!.ELEMENT)
+    client.click('button[name=create-a-wallet]')
+    await app.waitUntilLoaded()
 
     await createWallet(app)
     await app.waitUntilLoaded()
@@ -25,15 +24,11 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
-    const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
-    expect(walletSettingButton).not.toBeNull()
-    await client.elementIdClick(walletSettingButton!.ELEMENT)
+    client.click('button[name=Wallets]')
     await app.waitUntilLoaded()
 
     // Go to import wallet page
-    const importWalletButton = await app.getElementByTagName('button', 'Import Wallet Seed')
-    expect(importWalletButton).not.toBeNull()
-    await client.elementIdClick(importWalletButton!.ELEMENT)
+    client.click('button[name=import-wallet-seed]')
 
     const mnemonicText = 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog'
     await importWallet(app, mnemonicText)
@@ -48,9 +43,7 @@ export default (app: Application) => {
     await app.waitUntilLoaded()
 
     // Switch to wallet setting
-    const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
-    expect(walletSettingButton).not.toBeNull()
-    await client.elementIdClick(walletSettingButton!.ELEMENT)
+    client.click('button[name=Wallets]')
     await app.waitUntilLoaded()
 
     // Switch to first wallet
@@ -85,9 +78,7 @@ export default (app: Application) => {
     expect(inputElement.value).not.toBeNull()
     await app.setElementValue('//INPUT', 'Azusa2233')
     // Confirm
-    const confirmButton = await app.getElementByTagName('button', 'Confirm')
-    expect(confirmButton).not.toBeNull()
-    await client.elementIdClick(confirmButton!.ELEMENT)
+    client.click('button[name=confirm]')
     await app.waitUntilLoaded()
 
     // Check wallet name
@@ -105,9 +96,7 @@ export default (app: Application) => {
     await app.gotoSettingsView()
 
     // Switch to wallet setting
-    const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
-    expect(walletSettingButton).not.toBeNull()
-    await client.elementIdClick(walletSettingButton!.ELEMENT)
+    client.click('button[name=Wallets]')
     await app.waitUntilLoaded()
 
     // Get wallet id
@@ -129,9 +118,7 @@ export default (app: Application) => {
     const walletNameInputText = await client.elementIdAttribute(walletNameInputElement.value.ELEMENT, 'value')
     await app.waitUntilLoaded()
     // Save
-    const saveButton = await app.getElementByTagName('button', 'Save')
-    expect(saveButton).not.toBeNull()
-    await client.elementIdClick(saveButton!.ELEMENT)
+    client.click('button[name=save-wallet]')
     await app.waitUntilLoaded()
 
     // Check wallet name

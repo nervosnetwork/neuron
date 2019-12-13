@@ -86,28 +86,28 @@ const PasswordRequest = ({
   }
   return (
     <Modal isOpen={!!actionType} onDismiss={onDismiss}>
-      {
-        <Stack
-          tokens={{ childrenGap: 15 }}
-          styles={{
-            root: {
-              padding: 30,
-            },
-          }}
-        >
-          <Text variant="xLarge">{t(`password-request.${actionType}.title`, { name: wallet ? wallet.name : '' })}</Text>
-          <Label required title="password">
-            {t('password-request.password')}
-          </Label>
-          <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
-          <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
-            <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled}>
-              {t('common.confirm')}
-            </PrimaryButton>
-          </Stack>
+      <Stack
+        tokens={{ childrenGap: 15 }}
+        styles={{
+          root: {
+            padding: 30,
+          },
+        }}
+      >
+        <Text variant="xLarge">{t(`password-request.${actionType}.title`, { name: wallet ? wallet.name : '' })}</Text>
+        <Label required title="password">
+          {t('password-request.password')}
+        </Label>
+        <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
+        <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
+          <DefaultButton onClick={onDismiss} ariaLabel="cancel">
+            {t('common.cancel')}
+          </DefaultButton>
+          <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled} ariaLabel="confirm">
+            {t('common.confirm')}
+          </PrimaryButton>
         </Stack>
-      }
+      </Stack>
     </Modal>
   )
 }

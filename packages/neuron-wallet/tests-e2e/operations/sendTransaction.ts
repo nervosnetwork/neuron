@@ -6,9 +6,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   const { client } = app.spectron
 
   // Switch to send page
-  const receiveButton = await app.getElementByTagName('button', 'Send')
-  expect(receiveButton).not.toBeNull()
-  await client.elementIdClick(receiveButton!.ELEMENT)
+  client.click('button[name=Send]')
   await app.waitUntilLoaded()
 
   // Get balance

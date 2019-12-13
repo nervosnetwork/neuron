@@ -62,11 +62,13 @@ const WalletEditor = ({
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={goBack} text={t('common.cancel')} />
+        <DefaultButton onClick={goBack} text={t('common.cancel')} ariaLabel="cancel" />
         <PrimaryButton
           onClick={onConfirm}
           disabled={hint !== null || editor.name.value === wallet.name}
           text={t('common.save')}
+          ariaLabel="save wallet"
+          name="save-wallet"
         />
       </Stack>
     </Stack>

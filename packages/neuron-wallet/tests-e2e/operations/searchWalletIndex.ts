@@ -7,10 +7,8 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   await app.gotoSettingsView()
 
   // Switch to wallet setting
-  const walletSettingButton = await app.getElementByTagName('button', 'Wallets')
-  expect(walletSettingButton).not.toBeNull()
-  await client.elementIdClick(walletSettingButton!.ELEMENT)
-  await app.waitUntilLoaded()
+  client.click('button[name=Wallets]')
+  await app.waitUntilLoaded(1000)
 
   // Get wallet count
   const groupElementPath = '//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV'
