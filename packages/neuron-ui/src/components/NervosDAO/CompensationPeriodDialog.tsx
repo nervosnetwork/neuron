@@ -1,40 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Dialog, DialogType, Text } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
-import { getHeader } from 'services/chain'
-import { useCalculateEpochs } from 'utils/hooks'
 
-import * as styles from './epochsDialog.module.scss'
+import * as styles from './compensationPeriodDialog.module.scss'
 
-interface EpochsDialogProps {
-  blockHash: string
+interface CompensationPeriodDialogProps {
   onDismiss: any
-  currentEpoch: string
+  compensationPeriod: {
+    currentEpochNumber: bigint
+    currentEpochIndex: bigint
+    currentEpochLength: bigint
+    targetEpochNumber: bigint
+  } | null
 }
 
-const EpochsDialog = ({ blockHash, onDismiss, currentEpoch }: EpochsDialogProps) => {
+const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: CompensationPeriodDialogProps) => {
   const [t] = useTranslation()
-  const [depositEpoch, setDepositEpoch] = useState('')
 
-  useEffect(() => {
-    if (blockHash) {
-      getHeader(blockHash).then(header => setDepositEpoch(header.epoch))
-    }
-  }, [blockHash])
-
-  const {
-    targetEpochNumber,
-    currentEpochInfo: { number: currentEpochNumber, length: currentEpochLength, index: currentEpochIndex },
-  } = useCalculateEpochs({
-    depositEpoch,
-    currentEpoch,
-  })
-
-  const pastEpochs =
-    Number(currentEpochNumber) -
-    Number(targetEpochNumber) +
-    180 +
-    (currentEpochLength === BigInt(0) ? 0 : +(Number(currentEpochIndex) / Number(currentEpochLength)).toFixed(1))
+  let pastEpochs = 0
+  if (compensationPeriod) {
+    pastEpochs =
+      Number(compensationPeriod.currentEpochNumber) -
+      Number(compensationPeriod.targetEpochNumber) +
+      180 +
+      (compensationPeriod.currentEpochLength === BigInt(0)
+        ? 0
+        : +(Number(compensationPeriod.currentEpochIndex) / Number(compensationPeriod.currentEpochLength)).toFixed(1))
+  }
 
   const totalHours = Math.ceil((180 - pastEpochs) * 4)
   const leftDays = Math.floor(totalHours / 24)
@@ -47,7 +39,7 @@ const EpochsDialog = ({ blockHash, onDismiss, currentEpoch }: EpochsDialogProps)
 
   return (
     <Dialog
-      hidden={!blockHash}
+      hidden={!compensationPeriod}
       onDismiss={onDismiss}
       dialogContentProps={{
         type: DialogType.normal,
@@ -77,5 +69,5 @@ const EpochsDialog = ({ blockHash, onDismiss, currentEpoch }: EpochsDialogProps)
   )
 }
 
-EpochsDialog.displayName = 'EpochsDialog'
-export default EpochsDialog
+CompensationPeriodDialog.displayName = 'CompensationPeriodDialog'
+export default CompensationPeriodDialog
