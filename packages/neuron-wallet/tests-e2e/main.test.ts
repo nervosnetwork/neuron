@@ -17,8 +17,7 @@ describe('Test networks', () => {
   tests.Network(app)
 })
 
-// It fails too often, skip temporarily until we make tests more robust.
-describe.skip('Test transaction', () => {
+describe('Test transaction', () => {
   let app = new Application()
   beforeEach(() => app.start())
   afterEach(() =>  app.stop())
