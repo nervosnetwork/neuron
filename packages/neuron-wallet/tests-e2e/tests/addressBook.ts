@@ -1,5 +1,4 @@
 import Application from '../application'
-import { createWallet } from '../operations'
 
 /**
  * 1. navigate to the address book
@@ -9,20 +8,12 @@ import { createWallet } from '../operations'
  * 5. refresh the view and verify the description
  */
 export default (app: Application) => {
-  beforeAll(async () => {
-    // create a new wallet and navigate to the Send View
-    const { client } = app.spectron
-    await app.waitUntilLoaded()
-    client.click('button[name=create-a-wallet]')
-    await createWallet(app)
-    await app.waitUntilLoaded()
-  })
+  beforeEach(async () => {
+    await app.spectron.client.waitUntilWindowLoaded()
+    await app.createWalletFromWizard()
 
-  app.test('Go to addresses tab', async () => {
-    const { client } = app.spectron
-    client.click('button[name=Addresses]')
-    await app.waitUntilLoaded()
-    await app.wait(1000)
+    app.spectron.client.click('button[name=Addresses]')
+    await app.spectron.client.waitUntilWindowLoaded()
   })
 
   app.test('Address book should have 20 receiving addresses and 10 change addresses', async () => {
@@ -50,17 +41,18 @@ export default (app: Application) => {
     expect(descriptionBeforeUpdate).toBe('')
 
     client.moveToObject(descriptionCellSelector)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
     client.click(editButtonSelector)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
 
     client.setValue(inputSelector, newDescription)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
+    await client.pause(1000)
 
     client.click('button[name=Overview]')
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
     client.click('button[name=Addresses]')
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
 
     const descriptionAfterUpdate = await client.$(inputSelector).getValue()
     expect(descriptionAfterUpdate).toBe(newDescription)
