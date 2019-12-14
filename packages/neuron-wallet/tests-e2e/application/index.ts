@@ -3,7 +3,7 @@ import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
 import { clickMenu, deleteNetwork, editNetwork, editWallet } from './utils';
-import { createWallet } from '../operations/createWallet'
+import { createWallet } from '../operations/create-wallet'
 
 export default class Application {
   spectron: SpectronApplication
