@@ -1,5 +1,4 @@
 import Application from '../application'
-import { createWallet } from '../operations'
 
 /**
  * 1. check the alert, it should be disconnected to the network
@@ -13,17 +12,16 @@ import { createWallet } from '../operations'
  * 7. password-incorrect alerts should be dismissed once a correct one is inputted
  */
 export default (app: Application) => {
-  beforeAll(async () => {
-    // create a new wallet and navigate to the wallet settings
-    const { client } = app.spectron
-    await app.waitUntilLoaded()
-    client.click('button[name=create-a-wallet]')
-    await createWallet(app)
-    await app.waitUntilLoaded()
+  beforeEach(async () => {
+    await app.spectron.client.waitUntilWindowLoaded()
+    await app.createWalletFromWizard()
+
+    app.spectron.client.click('button[name=Addresses]')
+    await app.spectron.client.waitUntilWindowLoaded()
     await app.gotoSettingsView()
 
-    client.click('button[name=Wallets]')
-    await app.waitUntilLoaded()
+    app.spectron.client.click('button[name=Wallets]')
+    await app.spectron.client.waitUntilWindowLoaded()
   })
 
   describe('Test alert message and notification', () => {
@@ -42,12 +40,12 @@ export default (app: Application) => {
     app.test('It should have an alert message of incorrect password', async () => {
       const { client } = app.spectron
       await app.clickMenu(['Wallet', 'Delete Current Wallet'])
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const inputElement = await client.$('input')
       await client.elementIdValue(inputElement.value.ELEMENT, 'Invalid Password')
       client.click('button[type=submit]')
-      await app.waitUntilLoaded()
-      await app.wait(4000)
+      await client.waitUntilWindowLoaded()
+      await client.pause(3000)
       const alertComponent = await client.$('.ms-MessageBar-text')
       const msg = await client.elementIdText(alertComponent.value.ELEMENT)
       expect(msg.value).toBe(messages.incorrectPassword)
@@ -63,17 +61,15 @@ export default (app: Application) => {
       expect(disconnectMsg.state).not.toBe('failed')
     })
 
-    // TODO: dismiss a message
-
     app.test('Password-incorrect alerts should be dismissed once a correct one is inputted', async () => {
       const { client } = app.spectron
       await app.clickMenu(['Wallet', 'Delete Current Wallet'])
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const inputElement = await client.$('input')
       await client.elementIdValue(inputElement.value.ELEMENT, 'Azusa2233')
       client.click('button[type=submit]')
-      await app.waitUntilLoaded()
-      await app.wait(4000)
+      await client.waitUntilWindowLoaded()
+      await client.pause(3000)
       const alertComponent = await client.$('.ms-MessageBar--error')
       const msg = await client.elementIdText(alertComponent.value.ELEMENT)
       expect(msg.value).toBe(messages.disconnected)

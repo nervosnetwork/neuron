@@ -8,7 +8,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
 
   // Switch to wallet setting
   client.click('button[name=Wallets]')
-  await app.waitUntilLoaded(1000)
+  await client.waitUntilWindowLoaded(1000)
 
   // Get wallet count
   const groupElementPath = '//MAIN/DIV/DIV[3]/DIV/DIV/DIV/DIV'
@@ -31,7 +31,7 @@ export const searchWalletIndex = async (app: Application, walletName: string) =>
   const backButton = await client.element('//MAIN/DIV/DIV/DIV/BUTTON')
   expect(backButton.value).not.toBeNull()
   await client.elementIdClick(backButton.value.ELEMENT)
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   console.log(`searchWalletIndex - ${walletName}: ${walletIndex}`);
   return walletIndex

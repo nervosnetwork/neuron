@@ -24,7 +24,3 @@ export const editNetwork = (electron: AllElectron, networkId: string) => {
 export const deleteNetwork = (electron: AllElectron, networkId: string) => {
   return electron.ipcRenderer.send('E2E_DELETE_NETWORK', [networkId])
 }
-
-export const sleep = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}

@@ -1,5 +1,4 @@
 import Application from '../application'
-import { createWallet } from '../operations'
 
 /**
  * 1. navigate to the send transaction view
@@ -12,20 +11,13 @@ import { createWallet } from '../operations'
  * 4. amount not enough
  */
 export default (app: Application) => {
-  beforeAll(async () => {
-    // create a new wallet and navigate to the Send View
-    const { client } = app.spectron
-    await app.waitUntilLoaded()
-    client.click('button[name=create-a-wallet]').click()
-    await createWallet(app)
-    await app.waitUntilLoaded()
-  })
-
   beforeEach(async () => {
+    await app.spectron.client.waitUntilWindowLoaded()
+    await app.createWalletFromWizard()
     app.spectron.client.click('button[name=Nervos Dao]')
-    await app.waitUntilLoaded()
+    await app.spectron.client.waitUntilWindowLoaded()
     app.spectron.client.click('button[name=Send]')
-    await app.waitUntilLoaded()
+    await app.spectron.client.waitUntilWindowLoaded()
   })
 
   afterEach(async () => {
@@ -50,7 +42,7 @@ export default (app: Application) => {
       const { client } = app.spectron
       const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, emptyAddress)
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe('Address cannot be empty')
@@ -74,7 +66,7 @@ export default (app: Application) => {
       const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
       client.elementIdValue(inputs.value[1].ELEMENT, invalidAmount)
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe(`Amount ${invalidAmount} is invalid, please enter the Amount with no more than 8 decimal places`)
@@ -89,7 +81,7 @@ export default (app: Application) => {
       const inputs = await client.elements('input')
       client.elementIdValue(inputs.value[0].ELEMENT, validAddress)
       client.elementIdValue(inputs.value[1].ELEMENT, invalidAmount)
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const errorMessage = await client.element('.ms-TextField-errorMessage')
       const msg = await client.elementIdText(errorMessage.value.ELEMENT)
       expect(msg.value).toBe('Amount is not enough')
@@ -100,7 +92,7 @@ export default (app: Application) => {
     beforeEach(async () => {
       const { client } = app.spectron
       client.click('button[role=switch]')
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
     })
 
     app.test('default price should be 1,000 and default speed should be 500 blocks', async () => {
@@ -115,9 +107,9 @@ export default (app: Application) => {
     app.test('Change speed to ~ 100 blocks and the price should be 3,000', async () => {
       const { client } = app.spectron
       client.click('div[role=listbox]')
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       client.click('button[title="~ 100 blocks"]')
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
       expect((await client.elementIdAttribute(priceField.value.ELEMENT, 'value')).value).toBe('3,000')
@@ -128,7 +120,7 @@ export default (app: Application) => {
       const transactionFeePanel = client.$('div[aria-label="transaction fee"]')
       const [, priceField] = await transactionFeePanel.$$('input')
       client.elementIdClear(priceField.value.ELEMENT)
-      await app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
       client.elementIdValue(priceField.value.ELEMENT, '00')
       const speedDropdown = await client.$('div[role=listbox]')
 

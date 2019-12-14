@@ -5,16 +5,16 @@ export const currentWalletAddress = async (app: Application) => {
 
   // Switch to receive page
   client.click('button[name=Receive]')
-  await app.waitUntilLoaded(2000)
+  await client.waitUntilWindowLoaded(1000)
 
   const addressElement = await client.element('//INPUT')
   expect(addressElement.value).not.toBeNull()
   const address = await client.elementIdAttribute(addressElement.value.ELEMENT, 'placeholder')
-  await app.waitUntilLoaded(2000)
+  await client.waitUntilWindowLoaded(1000)
 
   // Back
   client.click('button[name=Overview]')
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded(1000)
 
   return address.value
 }

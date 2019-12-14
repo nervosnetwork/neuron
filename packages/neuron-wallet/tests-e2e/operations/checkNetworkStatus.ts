@@ -12,7 +12,7 @@ export const checkNetworkStatus = async (app: Application) => {
     console.log(`network state ${state.value}`);
     if (state.value === 'Disconnected') {
       connected = false
-      await app.wait(1000)
+      await client.pause(1000)
     } else if (state.value === 'Connected') {
       connected = true
       break

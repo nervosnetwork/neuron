@@ -7,7 +7,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
 
   // Switch to send page
   client.click('button[name=Send]')
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Get balance
   let balance = 0
@@ -20,7 +20,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     balance = parseInt(balanceText.value.slice(0, balanceText.value.length - 4))
     console.log(`balance = ${balance}`);
     if (balance === 0) {
-      await app.wait(1000)
+      await client.pause(1000)
     }
   }
   // Check balance
@@ -50,7 +50,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
       const addButton = await client.element(`${sendItemElementPath}/DIV/DIV[2]//BUTTON`)
       expect(addButton.value).not.toBeNull()
       await client.elementIdClick(addButton.value.ELEMENT)
-      app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
     }
   }
 
@@ -58,7 +58,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   const sendButton = await client.element(`//MAIN/DIV/DIV[5]/BUTTON[2]`)
   expect(sendButton.value).not.toBeNull()
   await client.elementIdClick(sendButton.value.ELEMENT)
-  app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Input password
   const passwordInputElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT')
@@ -68,7 +68,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
   const confirmElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[2]/BUTTON[2]')
   expect(confirmElement.value).not.toBeNull()
   await client.elementIdClick(confirmElement.value.ELEMENT)
-  app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Transaction element
   const transactionElementPath = `//MAIN/DIV/DIV[2]/DIV/DIV/DIV[2]/DIV/DIV/DIV/DIV/DIV/DIV[1]/DIV/DIV/DIV[2]/DIV/DIV/DIV[1]`
@@ -95,7 +95,7 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     if (transactionStatus.value === 'success') {
       break
     }
-    await app.wait(2000)
+    await client.pause(2000)
   }
 
   console.log(`transaction success hash: ${transactionHash.value}`);

@@ -25,7 +25,7 @@ export default (app: Application) => {
     await client.waitUntilWindowLoaded()
 
     await importWallet(app, 'refuse ecology globe virus demand gentle couch scrub bulk project chronic dog')
-    app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
   })
 
   test.skip('switch to first wallet', async () => {

@@ -2,12 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { Application as SpectronApplication } from 'spectron';
 import { Element, RawResult } from 'webdriverio';
-import { clickMenu, deleteNetwork, editNetwork, editWallet, sleep } from './utils';
+import { clickMenu, deleteNetwork, editNetwork, editWallet } from './utils';
 import { createWallet } from '../operations/createWallet'
 
 export default class Application {
   spectron: SpectronApplication
-  errorOccurred: boolean = false
 
   constructor() {
     let electronPath = path.join(__dirname, '../..', 'node_modules', '.bin', 'electron')
@@ -63,16 +62,9 @@ export default class Application {
 
   test(name: string, func: () => void, timeout: number = 2000 * 10 * 1) {
     it(name, async () => {
-      if (this.errorOccurred) {
-        return
-      }
-
       try {
-        this.waitUntilLoaded()
         await func()
       } catch (error) {
-        this.errorOccurred = true
-
         const errorsPath = path.join(__dirname, '../errors')
         if (!fs.existsSync(errorsPath)) {
           fs.mkdirSync(errorsPath)
@@ -85,19 +77,8 @@ export default class Application {
         // save screenshot
         const imageBuffer = await this.spectron.browserWindow.capturePage()
         fs.writeFileSync(path.join(errorsPath, `${errorFileName}.png`), imageBuffer)
-
-        throw error
       }
     }, timeout)
-  }
-
-  // wait
-  async waitUntilLoaded(timeout?: number) {
-    await this.spectron.client.waitUntilWindowLoaded(timeout)
-  }
-
-  async wait(delay: number) {
-    await sleep(delay)
   }
 
   // ipc

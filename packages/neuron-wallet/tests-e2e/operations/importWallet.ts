@@ -7,10 +7,10 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   const inputMnemonicTextarea = await client.element('<textarea />')
   expect(inputMnemonicTextarea.value).not.toBeNull()
   app.setElementValue('<textarea />', mnemonic)
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
   // Next
   client.click('button[aria-label="next"]')
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Setup wallet
   const inputElements = await client.elements('<input />')
@@ -22,10 +22,10 @@ export const importWallet = async (app: Application, mnemonic: string, name: str
   await app.setElementValue('//MAIN/DIV/DIV[2]//INPUT', password)
   await app.setElementValue('//MAIN/DIV/DIV[3]//INPUT', password)
   const walletNameInputText = await client.elementIdAttribute(inputElements.value[0].ELEMENT, 'value')
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
   // Next
   client.click('button[aria-label="next"]')
-  await app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Check wallet name
   const walletNameElement = await client.element('//MAIN/DIV/H1')

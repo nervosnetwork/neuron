@@ -17,15 +17,16 @@ describe('Test networks', () => {
   tests.Network(app)
 })
 
-describe('Test transaction', () => {
+// It fails too often, skip temporarily until we make tests more robust.
+describe.skip('Test transaction', () => {
   let app = new Application()
   beforeEach(() => app.start())
   afterEach(() =>  app.stop())
 
-  // tests.SendTransaction(app) // It fails too often, skip temporarily until we make tests more robust.
+  tests.SendTransaction(app)
 })
 
-describe.skip('Test notification', () => {
+describe('Test notification', () => {
   let app = new Application()
   beforeEach(() => app.start())
   afterEach(() =>  app.stop())

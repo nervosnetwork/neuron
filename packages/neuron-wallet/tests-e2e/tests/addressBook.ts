@@ -18,12 +18,12 @@ export default (app: Application) => {
 
   app.test('Address book should have 20 receiving addresses and 10 change addresses', async () => {
     const { client } = app.spectron
-    await app.wait(1000)
+    await client.pause(1000)
     const countOfReceivingAddresses = await client
       .elements('//SPAN[text()="Receiving Address"]')
       .then(res => res.value.length)
     expect(countOfReceivingAddresses).toBe(20)
-    await app.wait(1000)
+    await client.pause(1000)
     const countOfChangeAddresses = await client
       .elements('//SPAN[text()="Change Address"]')
       .then(res => res.value.length)

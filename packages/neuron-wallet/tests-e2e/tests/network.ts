@@ -32,7 +32,7 @@ export default (app: Application) => {
     await app.createWalletFromWizard()
 
     await app.gotoSettingsView()
-    await app.waitUntilLoaded()
+    await app.spectron.client.waitUntilWindowLoaded()
 
     app.spectron.client.click('button[name=Network]')
     await app.spectron.client.waitUntilWindowLoaded()
