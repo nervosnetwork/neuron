@@ -1,6 +1,10 @@
-import Application from '../application';
+import Application from './application';
 
-export default (app: Application) => {
+describe('Wallet tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
+
   const addNetwork = async () => {
     const { client } = app.spectron
     const newNodeName = 'Node-2233'
@@ -138,4 +142,4 @@ export default (app: Application) => {
     const newNetworkName = await client.elementIdText(networkElement.value.ELEMENT)
     expect(newNetworkName.value).not.toBe(netowrkName.value)
   })
-}
+})

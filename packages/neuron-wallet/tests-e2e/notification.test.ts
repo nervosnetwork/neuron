@@ -1,4 +1,4 @@
-import Application from '../application'
+import Application from './application'
 
 /**
  * 1. check the alert, it should be disconnected to the network
@@ -11,7 +11,11 @@ import Application from '../application'
  *   2. disconnected to the network
  * 7. password-incorrect alerts should be dismissed once a correct one is inputted
  */
-export default (app: Application) => {
+describe('Notification tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
+
   beforeEach(async () => {
     await app.spectron.client.waitUntilWindowLoaded()
     await app.createWalletFromWizard()

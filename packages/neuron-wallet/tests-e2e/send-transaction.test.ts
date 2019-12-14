@@ -1,4 +1,4 @@
-import Application from '../application'
+import Application from './application'
 
 /**
  * 1. navigate to the send transaction view
@@ -10,7 +10,11 @@ import Application from '../application'
  *   3.2 the decimal places should be no more than 8
  * 4. amount not enough
  */
-export default (app: Application) => {
+describe('Send transaction tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
+
   beforeEach(async () => {
     await app.spectron.client.waitUntilWindowLoaded()
     await app.createWalletFromWizard()
@@ -127,4 +131,4 @@ export default (app: Application) => {
       expect((await client.elementIdAttribute(speedDropdown.value.ELEMENT, 'innerText')).value).toBe('immediately')
     })
   })
-}
+})

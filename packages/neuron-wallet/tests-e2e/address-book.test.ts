@@ -1,4 +1,4 @@
-import Application from '../application'
+import Application from './application'
 
 /**
  * 1. navigate to the address book
@@ -7,7 +7,11 @@ import Application from '../application'
  * 4. update description of the first address
  * 5. refresh the view and verify the description
  */
-export default (app: Application) => {
+describe('Address book tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
+
   beforeEach(async () => {
     await app.spectron.client.waitUntilWindowLoaded()
     await app.createWalletFromWizard()

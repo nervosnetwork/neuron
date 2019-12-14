@@ -1,6 +1,6 @@
 import Application from '../application'
+import { TransactionSendTo } from '../application/env'
 import { checkNetworkStatus } from '.'
-import { TransactionSendTo } from '../env'
 
 export const sendTransaction = async (app: Application, password: string, sendToArr: TransactionSendTo[]) => {
   const { client } = app.spectron

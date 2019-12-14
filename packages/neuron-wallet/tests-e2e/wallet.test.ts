@@ -1,7 +1,11 @@
-import Application from '../application'
-import { importWallet } from '../operations'
+import Application from './application'
+import { importWallet } from './operations'
 
-export default (app: Application) => {
+describe('Wallet tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
+
   app.test('create wallet', async () => {
     const { client } = app.spectron
     await client.waitUntilWindowLoaded()
@@ -167,4 +171,4 @@ export default (app: Application) => {
       await client.waitUntilWindowLoaded()
     })
   })
-}
+})
