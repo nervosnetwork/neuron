@@ -77,6 +77,8 @@ export default class Application {
         // save screenshot
         const imageBuffer = await this.spectron.browserWindow.capturePage()
         fs.writeFileSync(path.join(errorsPath, `${errorFileName}.png`), imageBuffer)
+
+        throw error
       }
     }, timeout)
   }
