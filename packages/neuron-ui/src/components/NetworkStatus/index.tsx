@@ -17,7 +17,14 @@ const NetworkStatus = ({
 }: NetworkStatusProps) => {
   const [t] = useTranslation()
   return (
-    <div role="link" className={styles.network} onClick={onAction} onKeyPress={onAction} tabIndex={0}>
+    <div
+      role="link"
+      id="connected-network-name"
+      className={styles.network}
+      onClick={onAction}
+      onKeyPress={onAction}
+      tabIndex={0}
+    >
       {networkName ? (
         <span data-online={connectionStatus === ConnectionStatus.Online}>{networkName}</span>
       ) : (
