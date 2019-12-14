@@ -1,5 +1,4 @@
-import Application from '../application'
-import { createWallet } from '../operations'
+import Application from './application'
 
 /**
  * 1. navigate to the address book
@@ -8,33 +7,27 @@ import { createWallet } from '../operations'
  * 4. update description of the first address
  * 5. refresh the view and verify the description
  */
-export default (app: Application) => {
-  beforeAll(async () => {
-    // create a new wallet and navigate to the Send View
-    const { client } = app.spectron
-    await app.waitUntilLoaded()
-    const createWalletButton = await app.getElementByTagName('button', 'Create a Wallet')
-    expect(createWalletButton).not.toBeNull()
-    await client.elementIdClick(createWalletButton!.ELEMENT)
-    await createWallet(app)
-    await app.waitUntilLoaded()
-  })
+describe('Address book tests', () => {
+  const app = new Application()
+  beforeEach(() => app.start())
+  afterEach(() =>  app.stop())
 
-  app.test('Go to addresses tab', async () => {
-    const { client } = app.spectron
-    client.click('button[name=Addresses]')
-    await app.waitUntilLoaded()
-    await app.wait(1000)
+  beforeEach(async () => {
+    await app.spectron.client.waitUntilWindowLoaded()
+    await app.createWalletFromWizard()
+
+    app.spectron.client.click('button[name=Addresses]')
+    await app.spectron.client.waitUntilWindowLoaded()
   })
 
   app.test('Address book should have 20 receiving addresses and 10 change addresses', async () => {
     const { client } = app.spectron
-    await app.wait(1000)
+    await client.pause(1000)
     const countOfReceivingAddresses = await client
       .elements('//SPAN[text()="Receiving Address"]')
       .then(res => res.value.length)
     expect(countOfReceivingAddresses).toBe(20)
-    await app.wait(1000)
+    await client.pause(1000)
     const countOfChangeAddresses = await client
       .elements('//SPAN[text()="Change Address"]')
       .then(res => res.value.length)
@@ -52,17 +45,18 @@ export default (app: Application) => {
     expect(descriptionBeforeUpdate).toBe('')
 
     client.moveToObject(descriptionCellSelector)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
     client.click(editButtonSelector)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
 
     client.setValue(inputSelector, newDescription)
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
+    await client.pause(1000)
 
     client.click('button[name=Overview]')
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
     client.click('button[name=Addresses]')
-    await app.waitUntilLoaded()
+    await client.waitUntilWindowLoaded()
 
     const descriptionAfterUpdate = await client.$(inputSelector).getValue()
     expect(descriptionAfterUpdate).toBe(newDescription)

@@ -1,28 +1,26 @@
 import Application from '../application'
-import { checkNetworkStatus } from './'
-import { TransactionSendTo } from '../env'
+import { TransactionSendTo } from '../application/env'
+import { checkNetworkStatus } from '.'
 
 export const sendTransaction = async (app: Application, password: string, sendToArr: TransactionSendTo[]) => {
   const { client } = app.spectron
 
   // Switch to send page
-  const receiveButton = await app.getElementByTagName('button', 'Send')
-  expect(receiveButton).not.toBeNull()
-  await client.elementIdClick(receiveButton!.ELEMENT)
-  await app.waitUntilLoaded()
+  client.click('button[name=Send]')
+  await client.waitUntilWindowLoaded()
 
   // Get balance
   let balance = 0
   let retryCount = 5
   while (balance === 0 && retryCount > 0) {
     retryCount -= 1
-    const balanceElement = await app.element('//MAIN/DIV/DIV[4]/DIV[2]')
+    const balanceElement = await client.element('//MAIN/DIV/DIV[4]/DIV[2]')
     expect(balanceElement.value).not.toBeNull()
     const balanceText = await client.elementIdText(balanceElement.value.ELEMENT)
     balance = parseInt(balanceText.value.slice(0, balanceText.value.length - 4))
     console.log(`balance = ${balance}`);
     if (balance === 0) {
-      await app.wait(1000)
+      await client.pause(1000)
     }
   }
   // Check balance
@@ -49,37 +47,37 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     console.log(`setup sent to ${sendTo.address} ${sendTo.amount}`);
     if (elementIndex < sendToArr.length) {
       // add
-      const addButton = await app.element(`${sendItemElementPath}/DIV/DIV[2]//BUTTON`)
+      const addButton = await client.element(`${sendItemElementPath}/DIV/DIV[2]//BUTTON`)
       expect(addButton.value).not.toBeNull()
       await client.elementIdClick(addButton.value.ELEMENT)
-      app.waitUntilLoaded()
+      await client.waitUntilWindowLoaded()
     }
   }
 
   // Send
-  const sendButton = await app.element(`//MAIN/DIV/DIV[5]/BUTTON[2]`)
+  const sendButton = await client.element(`//MAIN/DIV/DIV[5]/BUTTON[2]`)
   expect(sendButton.value).not.toBeNull()
   await client.elementIdClick(sendButton.value.ELEMENT)
-  app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Input password
-  const passwordInputElement = await app.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT')
+  const passwordInputElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT')
   expect(passwordInputElement.value).not.toBeNull()
   await app.setElementValue('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[1]//INPUT', password)
   // Confirm
-  const confirmElement = await app.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[2]/BUTTON[2]')
+  const confirmElement = await client.element('//BODY/DIV[4]/DIV/DIV/DIV/DIV[2]/DIV[2]/DIV/DIV[2]/BUTTON[2]')
   expect(confirmElement.value).not.toBeNull()
   await client.elementIdClick(confirmElement.value.ELEMENT)
-  app.waitUntilLoaded()
+  await client.waitUntilWindowLoaded()
 
   // Transaction element
   const transactionElementPath = `//MAIN/DIV/DIV[2]/DIV/DIV/DIV[2]/DIV/DIV/DIV/DIV/DIV/DIV[1]/DIV/DIV/DIV[2]/DIV/DIV/DIV[1]`
-  const transactionElement = await app.element(transactionElementPath)
+  const transactionElement = await client.element(transactionElementPath)
   expect(transactionElement.value).not.toBeNull()
   const transactionText = await client.elementIdText(transactionElement.value.ELEMENT)
   console.log(`transaction = ${transactionText.value}`);
   // Transaction hash
-  const transactionHashElement = await app.element(`${transactionElementPath}/DIV/DIV/DIV[3]/SPAN`)
+  const transactionHashElement = await client.element(`${transactionElementPath}/DIV/DIV/DIV[3]/SPAN`)
   expect(transactionHashElement.value).not.toBeNull()
   const transactionHash = await client.elementIdText(transactionHashElement.value.ELEMENT)
   console.log(`transactionHash = ${transactionHash.value}`);
@@ -90,14 +88,14 @@ export const sendTransaction = async (app: Application, password: string, sendTo
     if (!(await checkNetworkStatus(app))) {
       throw 'Network disconnected'
     }
-    const transactionStatusElement = await app.element(`${transactionElementPath}/DIV/DIV/DIV[4]`)
+    const transactionStatusElement = await client.element(`${transactionElementPath}/DIV/DIV/DIV[4]`)
     expect(transactionStatusElement.value).not.toBeNull()
     const transactionStatus = await client.elementIdText(transactionStatusElement.value.ELEMENT)
     console.log(`transactionStatus = ${transactionStatus.value}`);
     if (transactionStatus.value === 'success') {
       break
     }
-    await app.wait(2000)
+    await client.pause(2000)
   }
 
   console.log(`transaction success hash: ${transactionHash.value}`);

@@ -44,13 +44,19 @@ const NetworkEditor = ({
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={goBack} text={t('common.cancel')} />
+        <DefaultButton onClick={goBack} text={t('common.cancel')} ariaLabel="cancel" />
         {isUpdating ? (
           <PrimaryButton disabled>
             <Spinner />
           </PrimaryButton>
         ) : (
-          <PrimaryButton disabled={hasError || notModified} onClick={handleSubmit} text={t('common.save')} />
+          <PrimaryButton
+            disabled={hasError || notModified}
+            onClick={handleSubmit}
+            text={t('common.save')}
+            ariaLabel="save network"
+            name="save-network"
+          />
         )}
       </Stack>
     </Stack>

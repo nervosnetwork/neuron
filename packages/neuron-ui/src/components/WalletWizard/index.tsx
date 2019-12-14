@@ -91,6 +91,8 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
           text={t('wizard.import-mnemonic')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
           iconProps={{ iconName: 'Import', styles: buttonGrommetIconStyles }}
+          name="import-wallet-seed"
+          ariaLabel="import wallet seed"
         />
         <span>{t('common.or')}</span>
         <PrimaryButton
@@ -98,6 +100,8 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
           text={t('wizard.import-keystore')}
           onClick={next(Routes.ImportKeystore)}
           iconProps={{ iconName: 'Keystore', styles: buttonGrommetIconStyles }}
+          name="import-from-keystore"
+          ariaLabel="import from keystore"
         />
         <span>{t('common.or')}</span>
         <DefaultButton
@@ -105,6 +109,8 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
           text={t('wizard.create-new-wallet')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`)}
           iconProps={{ iconName: 'Create', styles: buttonGrommetIconStyles }}
+          name="create-a-wallet"
+          ariaLabel="create a wallet"
         />
       </Stack>
     </Stack>
@@ -216,7 +222,7 @@ const Mnemonic = ({
       />
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
         <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} ariaLabel="next" />
       </Stack>
     </Stack>
   )
@@ -336,7 +342,13 @@ const Submission = ({
             <Spinner />
           </PrimaryButton>
         ) : (
-          <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
+          <PrimaryButton
+            type="submit"
+            onClick={onNext}
+            disabled={disableNext}
+            text={t('wizard.next')}
+            ariaLabel="next"
+          />
         )}
       </Stack>
     </Stack>
