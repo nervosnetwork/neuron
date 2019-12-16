@@ -46,6 +46,13 @@ const networkChange = async (network: NetworkWithID) => {
     DatabaseInitSubject.getSubject().next(databaseInitParams)
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
+  } else {
+    // if killed, should stop previous one
+    DatabaseInitSubject.getSubject().next({
+      network,
+      genesisBlockHash: 'stop',
+      chain: '',
+    })
   }
 }
 

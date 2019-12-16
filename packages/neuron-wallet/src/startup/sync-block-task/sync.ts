@@ -29,6 +29,10 @@ export const switchNetwork = async (url: string, genesisBlockHash: string, _chai
     await blockListener.stopAndWait()
   }
 
+  if (genesisBlockHash === 'stop') {
+    return
+  }
+
   // clean LockUtils info and DaoUtils info
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()

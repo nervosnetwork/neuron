@@ -22,7 +22,7 @@ const testIndexer = async (url: string): Promise<boolean> => {
 const run = async () => {
   DatabaseInitSubject.getSubject().subscribe(async (params: DatabaseInitParams) => {
     const { network, genesisBlockHash, chain } = params
-    if (network && genesisBlockHash.startsWith('0x')) {
+    if (network && (genesisBlockHash.startsWith('0x') || genesisBlockHash === 'stop')) {
       const indexerEnabled = await testIndexer(network.remote)
       if (indexerEnabled) {
         await indexerSwitchNetwork(network.remote, genesisBlockHash, chain)
