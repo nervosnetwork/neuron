@@ -1,19 +1,22 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 import { NetworkWithID } from 'types/network'
-import AddressService from 'services/addresses'
 import InitDatabase from './init-database'
+import Address from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
-import logger from 'utils/logger'
-import NodeService from 'services/node'
-import NetworksService from 'services/networks'
-import { distinctUntilChanged, pairwise, startWith } from 'rxjs/operators'
+import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
+import AddressCreatedSubject from 'models/subjects/address-created-subject'
+import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
+import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
-import { SyncedBlockNumberSubject } from 'models/subjects/node'
+import { distinctUntilChanged, pairwise, startWith } from 'rxjs/operators'
+import NodeService from 'services/node'
+import NetworksService from 'services/networks'
+import AddressService from 'services/addresses'
 import BlockNumber from 'services/sync/block-number'
 import CommonUtils from 'utils/common'
+import logger from 'utils/logger'
 
 let backgroundWindow: BrowserWindow | null
 let network: NetworkWithID | null
@@ -22,6 +25,19 @@ const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses, url)
 }
+
+// listen to address created
+AddressCreatedSubject.getSubject().subscribe(async (_addresses: Address[]) => {
+  // TODO: rescan from #0
+  await restartBlockSyncTask()
+})
+
+WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
+  if (type === 'import') {
+    // TODO: no need to rescan from block #0
+  }
+  // TODO: rescan from #0
+})
 
 // Network switch or network connect
 const syncNetwork = async () => {
@@ -43,7 +59,8 @@ const syncNetwork = async () => {
 
   if (info !== 'killed') {
     if (backgroundWindow) {
-      backgroundWindow.webContents.send("block-sync:start", network.remote, info.hash)
+      const lockHashes = await AddressService.allLockHashes(network.remote)
+      backgroundWindow.webContents.send("block-sync:start", network.remote, info.hash, lockHashes)
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
