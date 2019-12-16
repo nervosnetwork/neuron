@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import { NetworkWithID } from 'types/network'
+import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 import InitDatabase from './init-database'
 import Address from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -20,6 +20,7 @@ import logger from 'utils/logger'
 
 let backgroundWindow: BrowserWindow | null
 let network: NetworkWithID | null
+let initDatabase: InitDatabase | null
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
@@ -45,10 +46,14 @@ const syncNetwork = async () => {
     return
   }
 
-  await InitDatabase.getInstance().stopAndWait()
+  if (!initDatabase) {
+    initDatabase = new InitDatabase()
+  }
+
+  await initDatabase.stop()
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
-  const info = await InitDatabase.getInstance().init(network)
+  const genesisHash = await initDatabase.init(network)
 
   const blockNumber = await (new BlockNumber()).getCurrent()
   SyncedBlockNumberSubject.next(blockNumber.toString())
@@ -57,10 +62,10 @@ const syncNetwork = async () => {
     actionType: 'update',
   })
 
-  if (info !== 'killed') {
+  if (genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
-      backgroundWindow.webContents.send("block-sync:start", network.remote, info.hash, lockHashes)
+      backgroundWindow.webContents.send("block-sync:start", network.remote, genesisHash, lockHashes)
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
@@ -86,7 +91,7 @@ NodeService
   .connectionStatusSubject
   .pipe(distinctUntilChanged())
   .subscribe(async (connected: boolean) => {
-    if (connected && InitDatabase.getInstance().isUsingPrevious()) {
+    if (connected) {// && initDatabase && initDatabase.isUsingPrevious()) {
       network = NetworksService.getInstance().getCurrent()
       logger.debug('Network connected:', network)
       await restartBlockSyncTask()
@@ -125,6 +130,11 @@ export const createBlockSyncTask = () => {
 }
 
 export const killBlockSyncTask = async () => {
+  if (initDatabase) {
+    initDatabase.stopAndWait()
+    initDatabase = null
+  }
+
   if (backgroundWindow) {
     logger.info('Kill block sync background process')
     backgroundWindow.webContents.send("block-sync:will-close")

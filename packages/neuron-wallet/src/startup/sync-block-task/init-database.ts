@@ -7,98 +7,70 @@ import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 import GetBlocks from 'services/sync/get-blocks'
 import CommonUtils from 'utils/common'
 
-// only used by main process
+// TODO: Move this out of sync task. It should be controlled by main app.
 export class InitDatabase {
-  private static instance: InitDatabase
-
-  public static getInstance = () => {
-    if (!InitDatabase.instance) {
-      InitDatabase.instance = new InitDatabase()
-    }
-    return InitDatabase.instance
-  }
-
-  private stopped: boolean = false
-  private inProcess: boolean = false
-  private success: boolean = false
-
-  public id: number = +new Date()
-
-  private killed: boolean = false
-
-  private usingPrevious: boolean = false
+  private initializing = false
+  // Cannot connect thus use the cached info of last connected chain.
+  private usingPrevious = false
 
   public isUsingPrevious = (): boolean => {
     return this.usingPrevious
   }
 
-  saveMetaInfo = async(url: string, genesisHash: string, chain: string) => {
+  saveMetaInfo = async(url: string, genesisHash: string) => {
     try {
       const systemScriptInfo = await LockUtils.systemScript(url)
       const daoScriptInfo = await DaoUtils.daoScript(url)
-      updateMetaInfo({ genesisBlockHash: genesisHash, systemScriptInfo, chain, daoScriptInfo })
+      updateMetaInfo({ genesisBlockHash: genesisHash, systemScriptInfo, daoScriptInfo })
     } catch (err) {
       logger.error('Update systemScriptInfo failed:', err.toString())
     }
   }
 
+  // Initialize database and return genesis hash of the network.
+  // Return empty string if there's no connection or pre-saved network info.
   public init = async (network: NetworkWithID) => {
-    this.inProcess = true
+    this.initializing = true
 
     let hash: string = EMPTY_GENESIS_HASH
-    let chain: string = ''
     const getBlockService = new GetBlocks(network.remote)
-    while (!this.stopped && !this.success) {
-      try {
-        this.usingPrevious = false
-        hash = await getBlockService.genesisBlockHash()
-        await initConnection(hash)
-        chain = await getBlockService.getChain()
 
-        if (hash === network.genesisHash && chain === network.chain) {
-          this.saveMetaInfo(network.remote, hash, chain)
-          this.success = true
-        } else {
-          logger.error('Network genesis hash and chain do not match data fetched')
-          this.stopped = true
-          this.killed = true // Do not process as successful to let sync start with wrong genesis hash or chain
-        }
-      } catch (err) {
-        logger.error('Init database failed. Is CKB node available? Use previous saved connection info.')
-        try {
-          const metaInfo = getMetaInfo()
-          await initConnection(metaInfo.genesisBlockHash)
-          LockUtils.setSystemScript(metaInfo.systemScriptInfo)
-          DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
-          hash = metaInfo.genesisBlockHash
-          chain = metaInfo.chain
-          this.success = true
-          this.usingPrevious = true
-        } catch (error) {
-          logger.error('get cached meta info error:', error)
-          await CommonUtils.sleep(5000)
-        }
+    try {
+      this.usingPrevious = false
+      hash = await getBlockService.genesisBlockHash()
+
+      if (hash === network.genesisHash) {
+        this.saveMetaInfo(network.remote, hash)
+      } else {
+        // Do not process as successful to let sync start with wrong genesis hash or chain
+        logger.error('Network genesis hash and chain do not match data fetched')
+        hash = EMPTY_GENESIS_HASH
+      }
+    } catch (err) {
+      logger.error('Init database failed. Is CKB node available? Use previous saved connection info.')
+      try {
+        const metaInfo = getMetaInfo()
+        LockUtils.setSystemScript(metaInfo.systemScriptInfo)
+        DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
+        hash = metaInfo.genesisBlockHash
+        this.usingPrevious = true
+      } catch (error) {
+        logger.error('Get cached meta info error:', error)
+        hash = EMPTY_GENESIS_HASH
       }
     }
 
-    this.inProcess = false
-
-    if (this.killed) {
-      return 'killed'
+    if (hash !== EMPTY_GENESIS_HASH) {
+      await initConnection(hash)
     }
+    this.initializing = false
 
-    return {
-      hash: hash!,
-      chain: chain!,
-    }
+    return hash
   }
 
-  public stopAndWait = async (timeout: number = 10000) => {
-    this.killed = true
-    this.stopped = true
-
+  public stop = async (timeout: number = 10000) => {
     const startAt: number = +new Date()
-    while (this.inProcess) {
+    while (this.initializing) {
       const now: number = +new Date()
       if (now - startAt > timeout) {
         return
@@ -106,10 +78,7 @@ export class InitDatabase {
       await CommonUtils.sleep(100)
     }
 
-    this.killed = false
-    this.stopped = false
-    this.success = false
-    this.inProcess = false
+    this.initializing = false
   }
 }
 
