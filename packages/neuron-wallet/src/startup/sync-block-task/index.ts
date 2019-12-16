@@ -131,7 +131,7 @@ export const createBlockSyncTask = () => {
 
 export const killBlockSyncTask = async () => {
   if (initDatabase) {
-    initDatabase.stopAndWait()
+    initDatabase.stop()
     initDatabase = null
   }
 
