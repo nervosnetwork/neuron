@@ -4,8 +4,8 @@ import IndexerRPC from 'services/indexer/indexer-rpc'
 
 import { switchNetwork as syncSwitchNetwork } from './sync'
 import { switchNetwork as indexerSwitchNetwork } from './indexer'
-import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
 import CommonUtils from 'utils/common'
+import logger from 'utils/logger'
 
 const testIndexer = async (url: string): Promise<boolean> => {
   const indexerRPC = new IndexerRPC(url)
@@ -19,23 +19,18 @@ const testIndexer = async (url: string): Promise<boolean> => {
   }
 }
 
-const run = async () => {
-  DatabaseInitSubject.getSubject().subscribe(async (params: DatabaseInitParams) => {
-    const { network, genesisBlockHash, chain } = params
-    if (network && genesisBlockHash.startsWith('0x')) {
-      const indexerEnabled = await testIndexer(network.remote)
-      if (indexerEnabled) {
-        await indexerSwitchNetwork(network.remote, genesisBlockHash, chain)
-      } else {
-        await syncSwitchNetwork(network.remote, genesisBlockHash, chain)
-      }
-    }
-  })
-  registerTxStatusListener()
-}
+ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string) => {
+  logger.debug("=== block-sync:start", url, genesisHash)
+
+  if (await testIndexer(url)) {
+    await indexerSwitchNetwork(url, genesisHash)
+  } else {
+    await syncSwitchNetwork(url, genesisHash)
+  }
+})
 
 ipcRenderer.on('sync-window-will-close', () => {
   unregisterTxStatusListener()
 })
 
-run()
+registerTxStatusListener()

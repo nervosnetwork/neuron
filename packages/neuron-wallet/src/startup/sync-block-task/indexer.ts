@@ -19,7 +19,7 @@ export const loadAddressesAndConvert = async (nodeURL: string): Promise<string[]
 
 // call this after network switched
 let indexerQueue: IndexerQueue | undefined
-export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _chain: string) => {
+export const switchNetwork = async (nodeURL: string, genesisBlockHash: string) => {
   // stop all blocks service
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
@@ -73,7 +73,7 @@ export const switchNetwork = async (nodeURL: string, genesisBlockHash: string, _
   indexerQueue.processFork()
 }
 
-ipcRenderer.on('sync-window-will-close', () => {
+ipcRenderer.on('block-sync:will-close', () => {
   if (indexerQueue) {
     indexerQueue.stop()
     indexerQueue = undefined

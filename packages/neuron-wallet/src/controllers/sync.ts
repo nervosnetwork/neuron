@@ -1,12 +1,12 @@
 import BlockNumber from 'services/sync/block-number'
-import { createSyncBlockTask, killSyncBlockTask } from 'startup/sync-block-task'
+import { createBlockSyncTask, killBlockSyncTask } from 'startup/sync-block-task'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
 import AddressDao from 'database/address/address-dao'
 
 export default class SyncController {
   public static startSyncing() {
-    createSyncBlockTask()
+    createBlockSyncTask()
 
     return {
       status: ResponseCode.Success,
@@ -15,7 +15,7 @@ export default class SyncController {
   }
 
   public static async stopSyncing() {
-    await killSyncBlockTask()
+    await killBlockSyncTask()
 
     return {
       status: ResponseCode.Success,
