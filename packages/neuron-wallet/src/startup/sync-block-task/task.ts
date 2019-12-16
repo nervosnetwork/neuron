@@ -7,7 +7,6 @@ import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from 'listeners/renderer/tx-status'
 import CommonUtils from 'utils/common'
-import logger from 'utils/logger'
 
 const isIndexerEnabled = async (url: string): Promise<boolean> => {
   const indexerRPC = new IndexerRPC(url)
@@ -65,8 +64,6 @@ export const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: str
 }
 
 ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[]) => {
-  logger.debug("=== block-sync:start", url, genesisHash)
-
   if (await isIndexerEnabled(url)) {
     await startIndexerSyncing(url, genesisHash, lockHashes)
   } else {
