@@ -1,20 +1,23 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
+import React, { useCallback, useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, ActionButton, DefaultButton, DetailsList, Callout } from 'office-ui-fabric-react'
+import { ActionButton } from 'office-ui-fabric-react'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
+import { showTransactionDetails } from 'services/remote'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter, difficultyFormatter } from 'utils/formatters'
+import {
+  localNumberFormatter,
+  shannonToCKBFormatter,
+  difficultyFormatter,
+  uniformTimeFormatter,
+} from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
-
-import ActivityRow, { ActivityItem } from 'components/CustomRows/ActivityRow'
-
-const TITLE_FONT_SIZE = 'xxLarge'
+import * as styles from './overview.module.scss'
 
 const genTypeLabel = (
   type: 'send' | 'receive',
@@ -57,9 +60,6 @@ const Overview = ({
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const [displayBlockchainInfo, setDisplayBlockchainInfo] = useState(false)
-
-  const blockchainInfoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (id) {
@@ -110,97 +110,124 @@ const Overview = ({
     [t, chain, epoch, difficulty, tipBlockNumber]
   )
 
-  const [showBlockchainStatus, hideBlockchainStatus] = useMemo(
-    () => [() => setDisplayBlockchainInfo(true), () => setDisplayBlockchainInfo(false)],
-    [setDisplayBlockchainInfo]
-  )
+  const onRecentActivityDoubleClick = useCallback((e: React.SyntheticEvent) => {
+    const cellElement = e.target as HTMLTableCellElement
+    if (cellElement?.parentElement?.dataset?.hash) {
+      showTransactionDetails(cellElement.parentElement.dataset.hash)
+    }
+  }, [])
 
-  const activityItems: ActivityItem[] = useMemo(
-    () =>
-      items.map(item => {
-        let confirmations = ''
-        let typeLabel: string = item.type
-        let { status } = item
-        if (item.blockNumber !== undefined) {
-          const confirmationCount =
-            item.blockNumber === null || item.status === 'failed'
-              ? 0
-              : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
+  const recentItems = useMemo(() => {
+    return items.slice(0, 10)
+  }, [items])
 
-          if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
-            status = 'pending'
+  const RecentActivites = useMemo(() => {
+    const activities = recentItems.map(item => {
+      let confirmations = ''
+      let typeLabel: string = item.type
+      let { status } = item
+      if (item.blockNumber !== undefined) {
+        const confirmationCount =
+          item.blockNumber === null || item.status === 'failed'
+            ? 0
+            : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
-            if (confirmationCount === 1) {
-              confirmations = t('overview.confirmation', {
-                confirmationCount: localNumberFormatter(confirmationCount),
-                threshold: CONFIRMATION_THRESHOLD,
-              })
-            } else if (confirmationCount > 1) {
-              confirmations = `${t('overview.confirmations', {
-                confirmationCount: localNumberFormatter(confirmationCount),
-                threshold: CONFIRMATION_THRESHOLD,
-              })}`
-            }
+        if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
+          status = 'pending'
+
+          if (confirmationCount === 1) {
+            confirmations = t('overview.confirmation', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+              threshold: CONFIRMATION_THRESHOLD,
+            })
+          } else if (confirmationCount > 1) {
+            confirmations = `${t('overview.confirmations', {
+              confirmationCount: localNumberFormatter(confirmationCount),
+              threshold: CONFIRMATION_THRESHOLD,
+            })}`
           }
-
-          typeLabel = genTypeLabel(item.type, confirmationCount, status)
         }
 
-        return {
-          ...item,
-          status,
-          statusLabel: t(`overview.statusLabel.${status}`),
-          value: item.value.replace(/^-/, ''),
-          confirmations,
-          typeLabel: t(`overview.${typeLabel}`),
-        }
-      }),
-    [items, t, syncedBlockNumber, tipBlockNumber]
-  )
+        typeLabel = genTypeLabel(item.type, confirmationCount, status)
+      }
+
+      return {
+        ...item,
+        status,
+        statusLabel: t(`overview.statusLabel.${status}`),
+        value: item.value.replace(/^-/, ''),
+        confirmations,
+        typeLabel: t(`overview.${typeLabel}`),
+      }
+    })
+    return (
+      <table className={styles.recentActivities}>
+        <thead>
+          <tr>
+            {['date', 'type', 'amount', 'status'].map(field => {
+              const title = t(`overview.${field}`)
+              return (
+                <th key={field} title={title} aria-label={title}>
+                  {title}
+                </th>
+              )
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {activities.map(item => {
+            const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, value } = item
+            const time = uniformTimeFormatter(timestamp || createdAt)
+
+            return (
+              <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
+                <td title={time}>{time.split(' ')[0]}</td>
+                <td>{typeLabel}</td>
+                <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
+                <td className={styles.txStatus} data-status={status}>
+                  <div>
+                    <span>{statusLabel}</span>
+                    {confirmations ? <span>{confirmations}</span> : null}
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    )
+  }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 
   return (
-    <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
-      <Text as="h1" variant={TITLE_FONT_SIZE}>
-        {name}
-      </Text>
-      <Stack horizontal horizontalAlign="space-between">
-        <PropertyList properties={balanceProperties} />
-        <Stack tokens={{ childrenGap: 15 }}>
-          <div ref={blockchainInfoRef}>
-            <DefaultButton onClick={showBlockchainStatus} styles={{ root: { width: '200px' } }}>
-              {t('overview.blockchain-status')}
-            </DefaultButton>
-          </div>
-        </Stack>
-      </Stack>
-      <Text as="h2" variant={TITLE_FONT_SIZE}>
-        {t('overview.recent-activities')}
-      </Text>
+    <div className={styles.overview}>
+      <h1 className={styles.walletName}>{name}</h1>
+      <PropertyList properties={balanceProperties} />
+      <button className={styles.blockchainStatus} type="button" title={t('overview.blockchain-status')}>
+        <div>{t('overview.blockchain-status')}</div>
+        <section>
+          {blockchainStatusProperties.map(({ label, value }) => (
+            <div key={label} title={label}>
+              <span>{label}</span>
+              <span>{value}</span>
+            </div>
+          ))}
+          {/* <PropertyList properties={blockchainStatusProperties} /> */}
+        </section>
+      </button>
+      <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
       {items.length ? (
-        <Stack verticalFill>
-          <DetailsList isHeaderVisible={false} items={activityItems.slice(0, 10)} onRenderRow={ActivityRow} />
+        <>
+          {RecentActivites}
           {items.length > 10 ? (
             <ActionButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
               {t('overview.more')}
             </ActionButton>
           ) : null}
-        </Stack>
+        </>
       ) : (
         <div>{t('overview.no-recent-activities')}</div>
       )}
-      {blockchainInfoRef.current ? (
-        <Callout
-          target={blockchainInfoRef.current}
-          hidden={!displayBlockchainInfo}
-          onDismiss={hideBlockchainStatus}
-          gapSpace={0}
-        >
-          <Stack tokens={{ padding: 15 }}>
-            <PropertyList properties={blockchainStatusProperties} />
-          </Stack>
-        </Callout>
-      ) : null}
-    </Stack>
+    </div>
   )
 }
 

@@ -14,6 +14,8 @@
       "nervos-dao": "Nervos DAO"
     },
     "overview": {
+      "date": "日期",
+      "type": "类型",
       "balance": "余额",
       "recent-activities": "最近收支",
       "no-recent-activities": "没有收支记录",
