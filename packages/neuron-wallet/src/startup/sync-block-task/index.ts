@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 import { NetworkWithID } from 'types/network'
-import env from 'env'
 import AddressService from 'services/addresses'
 import InitDatabase from './init-database'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -14,18 +13,23 @@ import DaoUtils from 'models/dao-utils'
 import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import BlockNumber from 'services/sync/block-number'
-import DatabaseInitSubject, { DatabaseInitParams } from 'models/subjects/database-init-subject'
 import CommonUtils from 'utils/common'
+
+let backgroundWindow: BrowserWindow | null
+let network: NetworkWithID | null
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
   await AddressService.updateTxCountAndBalances(addresses, url)
 }
 
-// network switch or network connect
-const networkChange = async (network: NetworkWithID) => {
+// Network switch or network connect
+const syncNetwork = async () => {
+  if (!network) {
+    return
+  }
+
   await InitDatabase.getInstance().stopAndWait()
-  // clean LockUtils info and DaoUtils info
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
   const info = await InitDatabase.getInstance().init(network)
@@ -38,12 +42,9 @@ const networkChange = async (network: NetworkWithID) => {
   })
 
   if (info !== 'killed') {
-    const databaseInitParams: DatabaseInitParams = {
-      network,
-      genesisBlockHash: info.hash,
-      chain: info.chain
+    if (backgroundWindow) {
+      backgroundWindow.webContents.send("block-sync:start", network.remote, info.hash)
     }
-    DatabaseInitSubject.getSubject().next(databaseInitParams)
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
   }
@@ -55,9 +56,11 @@ NetworkSwitchSubject
     startWith(undefined),
     pairwise()
   )
-  .subscribe(async ([previousNetwork, network]: (NetworkWithID | undefined)[]) => {
-    if ((!previousNetwork && network) || (previousNetwork && network && network.id !== previousNetwork.id)) {
-      await networkChange(network)
+  .subscribe(async ([previousNetwork, newNetwork]: (NetworkWithID | undefined)[]) => {
+    if ((!previousNetwork && newNetwork) || (previousNetwork && newNetwork && newNetwork.id !== previousNetwork.id)) {
+      network = newNetwork
+      logger.debug('Network switched:', network)
+      await restartBlockSyncTask()
     }
   })
 
@@ -65,68 +68,51 @@ NodeService
   .getInstance()
   .connectionStatusSubject
   .pipe(distinctUntilChanged())
-  .subscribe(async (status: boolean) => {
-    if (status && InitDatabase.getInstance().isUsingPrevious()) {
-      const network = NetworksService.getInstance().getCurrent()
-      logger.debug('networkConnect:', network)
-      if (network) {
-        await networkChange(network)
-      }
+  .subscribe(async (connected: boolean) => {
+    if (connected && InitDatabase.getInstance().isUsingPrevious()) {
+      network = NetworksService.getInstance().getCurrent()
+      logger.debug('Network connected:', network)
+      await restartBlockSyncTask()
     }
   })
 
-const loadURL = `file://${path.join(__dirname, 'index.html')}`
+const restartBlockSyncTask = async () => {
+  await killBlockSyncTask()
+  createBlockSyncTask()
+}
 
-let syncBlockBackgroundWindow: BrowserWindow | null
-
-// create a background task to sync transactions
-// this task is a renderer process
-export const createSyncBlockTask = () => {
-  if (syncBlockBackgroundWindow) {
+export const createBlockSyncTask = () => {
+  if (backgroundWindow) {
     return
   }
 
-  logger.info('Start sync block background process')
-  syncBlockBackgroundWindow = new BrowserWindow({
+  logger.info('Start block sync background process')
+  backgroundWindow = new BrowserWindow({
     width: 1366,
     height: 768,
     show: false,
     webPreferences: {
-      nodeIntegration: true,
-    },
-  })
-
-  syncBlockBackgroundWindow.on('ready-to-show', async () => {
-    if (env.isDevMode && process.env.DEV_SYNC_TASK) {
-      syncBlockBackgroundWindow!.show()
-    } else {
-      syncBlockBackgroundWindow!.hide()
+      nodeIntegration: true
     }
   })
 
-  syncBlockBackgroundWindow.on('closed', () => {
-    syncBlockBackgroundWindow = null
+  backgroundWindow.on('ready-to-show', async () => {
+    syncNetwork()
   })
 
-  syncBlockBackgroundWindow.loadURL(loadURL)
+  backgroundWindow.on('closed', () => {
+    backgroundWindow = null
+  })
 
-  return syncBlockBackgroundWindow
+  backgroundWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 }
 
-export const killSyncBlockTask = async () => {
-  return new Promise(resolve => {
-    if (syncBlockBackgroundWindow) {
-      logger.info('Kill sync block background process')
-      syncBlockBackgroundWindow.webContents.send("sync-window-will-close")
-      // Give ipcRenderer enough time to receive and handle sync-window-will-close channel
-      CommonUtils.sleep(2000).then(() => {
-        if (syncBlockBackgroundWindow) {
-          syncBlockBackgroundWindow.close()
-        }
-        resolve()
-      })
-    } else {
-      resolve()
-    }
-  })
+export const killBlockSyncTask = async () => {
+  if (backgroundWindow) {
+    logger.info('Kill block sync background process')
+    backgroundWindow.webContents.send("block-sync:will-close")
+    // Give ipcRenderer enough time to receive and handle block-sync:will-close channel
+    await CommonUtils.sleep(2000)
+    backgroundWindow.close()
+  }
 }
