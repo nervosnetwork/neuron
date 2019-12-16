@@ -32,6 +32,16 @@ export class InitDatabase {
     return this.usingPrevious
   }
 
+  saveMetaInfo = async(url: string, genesisHash: string, chain: string) => {
+    try {
+      const systemScriptInfo = await LockUtils.systemScript(url)
+      const daoScriptInfo = await DaoUtils.daoScript(url)
+      updateMetaInfo({ genesisBlockHash: genesisHash, systemScriptInfo, chain, daoScriptInfo })
+    } catch (err) {
+      logger.error('Update systemScriptInfo failed:', err.toString())
+    }
+  }
+
   public init = async (network: NetworkWithID) => {
     this.inProcess = true
 
@@ -46,14 +56,7 @@ export class InitDatabase {
         chain = await getBlockService.getChain()
 
         if (hash === network.genesisHash && chain === network.chain) {
-          try {
-            const systemScriptInfo = await LockUtils.systemScript(network.remote)
-            const daoScriptInfo = await DaoUtils.daoScript(network.remote)
-            updateMetaInfo({ genesisBlockHash: hash, systemScriptInfo, chain, daoScriptInfo })
-          } catch (err) {
-            logger.error('Update systemScriptInfo failed:', err.toString())
-          }
-
+          this.saveMetaInfo(network.remote, hash, chain)
           this.success = true
         } else {
           logger.error('Network genesis hash and chain do not match data fetched')
@@ -65,10 +68,10 @@ export class InitDatabase {
         try {
           const metaInfo = getMetaInfo()
           await initConnection(metaInfo.genesisBlockHash)
-          chain = metaInfo.chain
           LockUtils.setSystemScript(metaInfo.systemScriptInfo)
           DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
           hash = metaInfo.genesisBlockHash
+          chain = metaInfo.chain
           this.success = true
           this.usingPrevious = true
         } catch (error) {
