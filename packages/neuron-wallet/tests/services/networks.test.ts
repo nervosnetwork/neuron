@@ -26,12 +26,8 @@ describe(`Unit tests of networks service`, () => {
 
   let service: NetworksService = new NetworksService()
 
-  beforeEach(() => {
-    service = new NetworksService()
-  })
-  afterEach(() => {
-    service.clear()
-  })
+  beforeEach(() => service = new NetworksService())
+  afterEach(() => service.clear())
 
   describe(`success cases`, () => {
     it(`get all networks`, () => {
@@ -121,18 +117,9 @@ describe(`Unit tests of networks service`, () => {
       expect(prevNetworks.map(n => n.id)).toEqual(['mainnet', network.id])
       await service.delete(prevCurrentID || '')
       const currentNetworks = service.getAll()
-      expect(currentNetworks.map(n => n.id)).toEqual(prevNetworks.filter(n => n.id !== prevCurrentID).map(n => n.id))
+      expect(currentNetworks.map(n => n.id)).toEqual(['mainnet'])
       const currentID = service.getCurrentID()
       expect(currentID).toBe('mainnet')
-    })
-
-    it(`reset the networks`, async () => {
-      await service.create(newNetwork.name, newNetwork.remote)
-      const newNetworkList = service.getAll()
-      expect(newNetworkList.length).toBe(2)
-      service.clear()
-      const networks = service.getAll()
-      expect(networks.length).toBe(1)
     })
   })
 
