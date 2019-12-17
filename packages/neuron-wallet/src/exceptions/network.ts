@@ -12,12 +12,6 @@ export class DefaultNetworkUnremovable extends Error {
   }
 }
 
-export class LackOfDefaultNetwork extends Error {
-  constructor() {
-    super(i18n.t('messages.lack-of-default-network'))
-  }
-}
-
 export class CurrentNetworkNotSet extends Error {
   constructor() {
     super(i18n.t('messages.current-network-not-set'))
@@ -27,6 +21,5 @@ export class CurrentNetworkNotSet extends Error {
 export default {
   NetworkNotFound,
   DefaultNetworkUnremovable,
-  LackOfDefaultNetwork,
   CurrentNetworkNotSet,
 }
