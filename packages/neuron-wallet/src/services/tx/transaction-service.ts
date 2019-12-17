@@ -5,6 +5,7 @@ import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
+import OutputEntity from 'database/chain/entities/output'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -172,6 +173,22 @@ export class TransactionsService {
       .take(params.pageSize)
       .getMany()
 
+    const inputPreviousTxHashes: string[] = transactions
+      .map(tx => tx.inputs)
+      .reduce((acc, val) => acc.concat(val), [])
+      .map(i => i.outPointTxHash)
+      .filter(h => !!h) as string[]
+
+    const daoCellOutPoints: { txHash: string, index: string }[] = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select("output.outPointTxHash", "txHash")
+      .addSelect("output.outPointIndex", "index")
+      .where('output.daoData IS NOT NULL AND output.outPointTxHash IN (:...inputPreviousTxHashes)', {
+        inputPreviousTxHashes,
+      })
+      .getRawMany()
+
     const txs: Transaction[] = transactions!.map(tx => {
       const outputCapacities: bigint = tx.outputs
         .filter(o => params.lockHashes.includes(o.lockHash))
@@ -187,12 +204,23 @@ export class TransactionsService {
         .map(i => BigInt(i.capacity || 0))
         .reduce((result, c) => result + c, BigInt(0))
       const value: bigint = outputCapacities - inputCapacities
+
+      let nervosDao: boolean = false
+      if (
+        tx.outputs.some(o => !!o.daoData) ||
+        tx.inputs.some(i => daoCellOutPoints.some(dc => {
+          return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
+        }))
+      ) {
+        nervosDao = true
+      }
       return {
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
         version: tx.version,
         type: value > BigInt(0) ? 'receive' : 'send',
+        nervosDao,
         status: tx.status,
         description: tx.description,
         createdAt: tx.createdAt,
