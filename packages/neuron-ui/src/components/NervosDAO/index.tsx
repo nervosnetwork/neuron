@@ -202,7 +202,7 @@ const NervosDAO = ({
     return (
       <CompensationPeriodDialog compensationPeriod={compensationPeriod} onDismiss={onCompensationPeriodDialogDismiss} />
     )
-  }, [blockHashInCompensationDialog, epoch, onCompensationPeriodDialogDismiss, compensationPeriods])
+  }, [records, blockHashInCompensationDialog, epoch, onCompensationPeriodDialogDismiss, compensationPeriods])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
