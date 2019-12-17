@@ -150,8 +150,8 @@ export default class CellsService {
     if (
       cellEntities.length === 0 &&
       (
-        (mode.isFeeRateMode() && feeRateInt !== 0n) ||
-        (mode.isFeeMode() && feeInt !== 0n)
+        (mode.isFeeRateMode() && feeRateInt !== BigInt(0)) ||
+        (mode.isFeeMode() && feeInt !== BigInt(0))
       )
     ) {
       throw new CapacityNotEnough()

@@ -148,7 +148,7 @@ export default class Queue {
   public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
-      if (BigInt(block.header.number) % 1000n === 0n) {
+      if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (let i = 0; i < block.transactions.length; ++i) {
