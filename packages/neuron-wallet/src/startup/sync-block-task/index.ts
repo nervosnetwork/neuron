@@ -1,16 +1,15 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 import InitDatabase from './init-database'
 import Address from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
-import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import { distinctUntilChanged, pairwise, startWith } from 'rxjs/operators'
 import NodeService from 'services/node'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
@@ -72,35 +71,35 @@ const syncNetwork = async () => {
   }
 }
 
-NetworkSwitchSubject
-  .getSubject()
-  .pipe(
-    startWith(undefined),
-    pairwise()
-  )
-  .subscribe(async ([previousNetwork, newNetwork]: (NetworkWithID | undefined)[]) => {
-    if ((!previousNetwork && newNetwork) || (previousNetwork && newNetwork && newNetwork.id !== previousNetwork.id)) {
-      network = newNetwork
-      logger.debug('Network switched:', network)
-      await restartBlockSyncTask()
-    }
-  })
-
 NodeService
   .getInstance()
   .connectionStatusSubject
   .pipe(distinctUntilChanged())
   .subscribe(async (connected: boolean) => {
-    if (connected) {// && initDatabase && initDatabase.isUsingPrevious()) {
+    if (connected) {
       network = NetworksService.getInstance().getCurrent()
-      logger.debug('Network connected:', network)
-      await restartBlockSyncTask()
+      switchToNetwork(network)
     }
   })
 
 const restartBlockSyncTask = async () => {
   await killBlockSyncTask()
   createBlockSyncTask()
+}
+
+export const switchToNetwork = async (newNetwork: NetworkWithID) => {
+  const previousNetwork = network
+  network = newNetwork
+
+  if (previousNetwork) {
+    if (previousNetwork.id === newNetwork.id || previousNetwork.genesisHash === newNetwork.genesisHash) {
+      // Three's no actual change. No need to reconnect.
+      return
+    }
+  }
+
+  logger.debug('Network switched to:', network)
+  await restartBlockSyncTask()
 }
 
 export const createBlockSyncTask = () => {

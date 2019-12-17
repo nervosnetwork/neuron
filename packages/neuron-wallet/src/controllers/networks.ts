@@ -3,6 +3,7 @@ import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
+import { switchToNetwork } from 'startup/sync-block-task'
 import i18n from 'utils/i18n'
 
 const networksService = NetworksService.getInstance()
@@ -53,6 +54,11 @@ export default class NetworksController {
     }
 
     await networksService.update(id, options)
+
+    if (networksService.getCurrentID() === id) {
+      switchToNetwork(networksService.get(id)!)
+    }
+
     return {
       status: ResponseCode.Success,
       result: true,
@@ -83,6 +89,11 @@ export default class NetworksController {
     if (messageValue.response === 0) {
       try {
         networksService.delete(id)
+
+        if (id === currentID) {
+          switchToNetwork(networksService.getCurrent())
+        }
+
         return {
           status: ResponseCode.Success,
           result: true,
@@ -109,6 +120,9 @@ export default class NetworksController {
 
   public static async activate(id: NetworkID) {
     await networksService.activate(id)
+    const network = networksService.get(id)!
+    switchToNetwork(network)
+
     return {
       status: ResponseCode.Success,
       result: true,
