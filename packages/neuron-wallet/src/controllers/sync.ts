@@ -1,4 +1,4 @@
-import BlockNumber from 'services/sync/block-number'
+import BlockNumber from 'block-sync-renderer/sync/block-number'
 import { createBlockSyncTask, killBlockSyncTask } from 'block-sync-renderer'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'

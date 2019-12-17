@@ -13,7 +13,7 @@ import DaoUtils from 'models/dao-utils'
 import NodeService from 'services/node'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
-import BlockNumber from 'services/sync/block-number'
+import BlockNumber from 'block-sync-renderer/sync/block-number'
 import logger from 'utils/logger'
 
 let backgroundWindow: BrowserWindow | null

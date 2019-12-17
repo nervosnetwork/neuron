@@ -1,4 +1,4 @@
-import { TxUniqueFlag, TxUniqueFlagCache } from '../../../src/services/indexer/tx-unique-flag'
+import { TxUniqueFlag, TxUniqueFlagCache } from '../../../src/block-sync-renderer/indexer/tx-unique-flag'
 
 describe('TxUniqueFlagCache', () => {
   const txUniqueFlag: TxUniqueFlag = {

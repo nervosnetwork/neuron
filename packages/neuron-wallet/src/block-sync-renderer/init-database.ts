@@ -4,7 +4,7 @@ import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import DaoUtils from 'models/dao-utils'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
-import GetBlocks from 'services/sync/get-blocks'
+import GetBlocks from 'block-sync-renderer/sync/get-blocks'
 import CommonUtils from 'utils/common'
 
 // TODO: Move this out of sync task. It should be controlled by main app.

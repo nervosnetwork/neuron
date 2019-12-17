@@ -1,5 +1,5 @@
 import IndexerRPC from "./indexer-rpc"
-import NodeService from '../node'
+import NodeService from '../../services/node'
 
 export const deindexLockHashes = async (lockHashes: string[]) => {
   const { core } = NodeService.getInstance()
