@@ -132,9 +132,12 @@ export default class NetworksService extends Store {
       throw new DefaultNetworkUnremovable()
     }
 
-    const prevNetworkList = this.getAll()
-    const currentNetworkList = prevNetworkList.filter(item => item.id !== id)
-    this.updateAll(currentNetworkList)
+    if (this.getCurrentID() === id) {
+      this.writeSync(NetworksKey.Current, null)
+    }
+
+    const list = this.getAll().filter(item => item.id !== id)
+    this.updateAll(list)
   }
 
   @Validate
