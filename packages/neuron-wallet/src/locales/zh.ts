@@ -87,6 +87,7 @@ export default {
       'unsupported-cipher': '不支持的 Cipher。',
       'capacity-not-enough': '余额不足。',
       'capacity-not-enough-for-change': '余额不足以支付找零。',
+      'live-capacity-not-enough': '可用余额不足，请等待上一笔交易上链。',
       'capacity-too-small': '金额小于最低金额。',
       'should-be-type-of': '{{field}} 应该为 {{type}} 类型。',
       'invalid-keystore': 'Keystore 格式不正确。',
