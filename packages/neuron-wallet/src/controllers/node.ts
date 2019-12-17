@@ -1,4 +1,4 @@
-import { startCkbNode, stopCkbNode } from 'startup/ckb-runner'
+import { startCkbNode, stopCkbNode } from 'services/ckb-runner'
 import { ResponseCode } from 'utils/const'
 
 export default class NodeController {
