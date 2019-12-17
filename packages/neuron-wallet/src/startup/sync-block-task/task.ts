@@ -71,7 +71,7 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
   }
 })
 
-ipcRenderer.on('block-sync:will-close', () => {
+window.addEventListener('beforeunload', () => {
   unregisterTxStatusListener()
 
   if (blockListener) {
