@@ -21,6 +21,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   NetworkListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkList = [] }) => {
     dispatcher.sendMessage('network-list-updated', currentNetworkList)
   })
+
   CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkID = '' }) => {
     dispatcher.sendMessage('current-network-id-updated', currentNetworkID)
   })

@@ -4,11 +4,17 @@ import NetworksService from 'services/networks'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'startup/sync-block-task'
+import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import i18n from 'utils/i18n'
 
 const networksService = NetworksService.getInstance()
 
 export default class NetworksController {
+  public static startUp() {
+    NetworksController.notifyListChange()
+    CurrentNetworkIDSubject.next({ currentNetworkID: networksService.getCurrentID() })
+  }
+
   public static getAll() {
     const networks = networksService.getAll()
     return {
@@ -42,6 +48,8 @@ export default class NetworksController {
     }
 
     const created = await networksService.create(name, remote, type)
+    NetworksController.notifyListChange()
+
     return {
       status: ResponseCode.Success,
       result: created,
@@ -56,8 +64,10 @@ export default class NetworksController {
     await networksService.update(id, options)
 
     if (networksService.getCurrentID() === id) {
+      CurrentNetworkIDSubject.next({ currentNetworkID: id })
       switchToNetwork(networksService.get(id)!)
     }
+    NetworksController.notifyListChange()
 
     return {
       status: ResponseCode.Success,
@@ -66,12 +76,11 @@ export default class NetworksController {
   }
 
   public static async delete(id: NetworkID) {
-    const networkService = NetworksService.getInstance()
-    const network = networkService.get(id)
+    const network = networksService.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
-    const currentID = networkService.getCurrentID()
+    const currentID = networksService.getCurrentID()
 
     const messageValue = await dialog.showMessageBox(
       {
@@ -91,8 +100,12 @@ export default class NetworksController {
         networksService.delete(id)
 
         if (id === currentID) {
-          switchToNetwork(networksService.getCurrent())
+          const newCurrentNetwork = networksService.getCurrent()
+          CurrentNetworkIDSubject.next({ currentNetworkID: newCurrentNetwork.id })
+          switchToNetwork(newCurrentNetwork)
         }
+
+        NetworksController.notifyListChange()
 
         return {
           status: ResponseCode.Success,
@@ -121,11 +134,16 @@ export default class NetworksController {
   public static async activate(id: NetworkID) {
     await networksService.activate(id)
     const network = networksService.get(id)!
+    CurrentNetworkIDSubject.next({ currentNetworkID: id })
     switchToNetwork(network)
 
     return {
       status: ResponseCode.Success,
       result: true,
     }
+  }
+
+  private static notifyListChange() {
+    NetworkListSubject.next({ currentNetworkList: networksService.getAll() })
   }
 }
