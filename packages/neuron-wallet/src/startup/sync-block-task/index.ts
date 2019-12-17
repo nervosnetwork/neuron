@@ -42,7 +42,7 @@ WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
 // Network switch or network connect
 const syncNetwork = async () => {
   if (!network) {
-    return
+    network = NetworksService.getInstance().getCurrent()
   }
 
   if (!initDatabase) {
@@ -77,8 +77,11 @@ NodeService
   .pipe(distinctUntilChanged())
   .subscribe(async (connected: boolean) => {
     if (connected) {
+      logger.debug('Network reconnected')
       network = NetworksService.getInstance().getCurrent()
-      switchToNetwork(network)
+      switchToNetwork(network, true)
+    } else {
+      logger.debug('Network connection dropped')
     }
   })
 
@@ -87,18 +90,23 @@ const restartBlockSyncTask = async () => {
   createBlockSyncTask()
 }
 
-export const switchToNetwork = async (newNetwork: NetworkWithID) => {
+export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = false) => {
   const previousNetwork = network
   network = newNetwork
 
-  if (previousNetwork) {
+  if (previousNetwork && !reconnected) {
     if (previousNetwork.id === newNetwork.id || previousNetwork.genesisHash === newNetwork.genesisHash) {
       // Three's no actual change. No need to reconnect.
       return
     }
   }
 
-  logger.debug('Network switched to:', network)
+  if (reconnected) {
+    logger.debug('Network reconnected to:', network)
+  } else {
+    logger.debug('Network switched to:', network)
+  }
+
   await restartBlockSyncTask()
 }
 
