@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
@@ -59,6 +59,7 @@ const Overview = ({
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const [isStatusShow, setIsStatusShow] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -197,20 +198,41 @@ const Overview = ({
     )
   }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 
+  const onStatusClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      if ((e.target as HTMLDivElement).getAttribute('role') === 'button') {
+        setIsStatusShow(show => !show)
+      }
+    },
+    [setIsStatusShow]
+  )
+
+  const onStatusBlur = useCallback(() => {
+    setIsStatusShow(false)
+  }, [setIsStatusShow])
+
   return (
     <div className={styles.overview}>
       <h1 className={styles.walletName}>{name}</h1>
       <PropertyList properties={balanceProperties} />
-      <button className={styles.blockchainStatus} type="button" title={t('overview.blockchain-status')}>
-        <div>{t('overview.blockchain-status')}</div>
-        <section>
-          {blockchainStatusProperties.map(({ label, value }) => (
-            <div key={label} title={label}>
-              <span>{label}</span>
-              <span>{value}</span>
-            </div>
-          ))}
-        </section>
+      <button
+        className={styles.blockchainStatus}
+        type="button"
+        title={t('overview.blockchain-status')}
+        onClick={onStatusClick}
+        onBlur={onStatusBlur}
+      >
+        <div role="button">{t('overview.blockchain-status')}</div>
+        {isStatusShow ? (
+          <section>
+            {blockchainStatusProperties.map(({ label, value }) => (
+              <div key={label} title={label}>
+                <span>{label}</span>
+                <span>{value}</span>
+              </div>
+            ))}
+          </section>
+        ) : null}
       </button>
       <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
       {items.length ? (
