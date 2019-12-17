@@ -8,7 +8,6 @@ import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
-import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
 
 const isMainProcess = process && process.type === 'browser'
 
@@ -63,7 +62,6 @@ export default class NetworksService extends Store {
       }
       if (isMainProcess) {
         CurrentNetworkIDSubject.next({ currentNetworkID })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
       }
     })
   }
@@ -82,7 +80,6 @@ export default class NetworksService extends Store {
 
       if (isMainProcess) {
         CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
       }
     }
   }
@@ -169,7 +166,6 @@ export default class NetworksService extends Store {
 
     if (this.getCurrentID() === id && isMainProcess) {
       CurrentNetworkIDSubject.next({ currentNetworkID: id })
-      NetworkSwitchSubject.getSubject().next(network)
     }
   }
 
