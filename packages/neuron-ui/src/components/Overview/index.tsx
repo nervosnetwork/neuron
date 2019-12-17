@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ActionButton } from 'office-ui-fabric-react'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { showTransactionDetails } from 'services/remote'
@@ -211,7 +210,6 @@ const Overview = ({
               <span>{value}</span>
             </div>
           ))}
-          {/* <PropertyList properties={blockchainStatusProperties} /> */}
         </section>
       </button>
       <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
@@ -219,9 +217,11 @@ const Overview = ({
         <>
           {RecentActivites}
           {items.length > 10 ? (
-            <ActionButton onClick={onGoToHistory} styles={{ root: { border: 'none' } }}>
-              {t('overview.more')}
-            </ActionButton>
+            <div className={styles.linkToHistory}>
+              <span role="link" onClick={onGoToHistory} onKeyPress={() => {}} tabIndex={0}>
+                {t('overview.more')}
+              </span>
+            </div>
           ) : null}
         </>
       ) : (
