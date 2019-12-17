@@ -14,6 +14,8 @@
       "nervos-dao": "Nervos DAO"
     },
     "overview": {
+      "date": "Date",
+      "type": "Type",
       "balance": "Balance",
       "recent-activities": "Recent Activities",
       "no-recent-activities": "No Recent Activities",
