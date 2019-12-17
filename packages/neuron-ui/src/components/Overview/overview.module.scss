@@ -177,6 +177,17 @@ $pending-color: #b3b3b3;
   }
 }
 
+.linkToHistory {
+  font-size: 0.625rem;
+  letter-spacing: 0.5px;
+  color: #000;
+  margin-top: 13px;
+
+  &>span:hover {
+    color: var(--nervos-green);
+  }
+}
+
 @keyframes blink {
 
   from,
