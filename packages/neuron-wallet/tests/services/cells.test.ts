@@ -4,7 +4,7 @@ import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/services/tx/params'
 import { ScriptHashType, Script, TransactionStatus } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
-import { CapacityNotEnough, CapacityNotEnoughForChange } from '../../src/exceptions/wallet'
+import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet';
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
 import TransactionFee from '../../src/models/transaction-fee'
@@ -195,13 +195,58 @@ describe('CellsService', () => {
       expect(result.capacities).toEqual('100000000000')
     })
 
-    it('1001, skip', async () => {
+    it('1001, LiveCapacityNotEnough', async () => {
       await createCells()
 
       let error
       try {
         await CellsService.gatherInputs(
           toShannon('1001'),
+          lockHashes
+        )
+      } catch (e) {
+        error = e
+      }
+      expect(error).toBeInstanceOf(LiveCapacityNotEnough)
+    })
+
+    it('1140, LiveCapacityNotEnough', async () => {
+      await createCells()
+
+      let error
+      try {
+        await CellsService.gatherInputs(
+          toShannon('1140'),
+          lockHashes
+        )
+      } catch (e) {
+        error = e
+      }
+      expect(error).toBeInstanceOf(LiveCapacityNotEnough)
+    })
+
+    it('1200, LiveCapacityNotEnough', async () => {
+      await createCells()
+
+      let error
+      try {
+        await CellsService.gatherInputs(
+          toShannon('1200'),
+          lockHashes
+        )
+      } catch (e) {
+        error = e
+      }
+      expect(error).toBeInstanceOf(LiveCapacityNotEnough)
+    })
+
+    it('1201, skip', async () => {
+      await createCells()
+
+      let error
+      try {
+        await CellsService.gatherInputs(
+          toShannon('1201'),
           lockHashes
         )
       } catch (e) {
@@ -236,7 +281,7 @@ describe('CellsService', () => {
         error = e
       }
 
-      expect(error).toBeInstanceOf(CapacityNotEnough)
+      expect(error).toBeInstanceOf(LiveCapacityNotEnough)
     })
 
     it('capacity not enough for change', async () => {
