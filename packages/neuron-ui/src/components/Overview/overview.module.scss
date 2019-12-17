@@ -63,7 +63,6 @@ $pending-color: #b3b3b3;
     background-color: #f5f5f5;
     box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
     padding: 6px 0;
-    display: none;
     z-index: 1;
 
     &>div {
@@ -86,11 +85,6 @@ $pending-color: #b3b3b3;
     }
   }
 
-  &:focus {
-    section {
-      display: block;
-    }
-  }
 }
 
 .recentActivities {
