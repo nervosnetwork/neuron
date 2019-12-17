@@ -3,7 +3,7 @@ import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
-import { switchToNetwork } from 'startup/sync-block-task'
+import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import i18n from 'utils/i18n'
 
