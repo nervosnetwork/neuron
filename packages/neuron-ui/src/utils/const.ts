@@ -99,7 +99,6 @@ export enum ErrorCode {
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
   FieldIrremovable = 301,
-  FailToLaunch = 302,
   FieldNotFound = 303,
   CameraUnavailable = 304,
   AddressIsEmpty = 305,
