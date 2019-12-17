@@ -1,5 +1,5 @@
 import BlockNumber from 'services/sync/block-number'
-import { createBlockSyncTask, killBlockSyncTask } from 'startup/sync-block-task'
+import { createBlockSyncTask, killBlockSyncTask } from 'block-sync-renderer'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
 import AddressDao from 'database/address/address-dao'
