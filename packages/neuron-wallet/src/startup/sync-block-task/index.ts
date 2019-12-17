@@ -14,7 +14,6 @@ import NodeService from 'services/node'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import BlockNumber from 'services/sync/block-number'
-import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 
 let backgroundWindow: BrowserWindow | null
@@ -138,15 +137,12 @@ export const createBlockSyncTask = () => {
 
 export const killBlockSyncTask = async () => {
   if (initDatabase) {
-    initDatabase.stop()
+    await initDatabase.stop()
     initDatabase = null
   }
 
   if (backgroundWindow) {
     logger.info('Kill block sync background process')
-    backgroundWindow.webContents.send("block-sync:will-close")
-    // Give ipcRenderer enough time to receive and handle block-sync:will-close channel
-    await CommonUtils.sleep(2000)
     backgroundWindow.close()
   }
 }
