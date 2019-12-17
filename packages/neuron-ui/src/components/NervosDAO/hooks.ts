@@ -15,6 +15,7 @@ import {
   MEDIUM_FEE_RATE,
   SHANNON_CKB_RATIO,
   MAX_DECIMAL_DIGITS,
+  ErrorCode,
   CapacityUnit,
 } from 'utils/const'
 
@@ -125,7 +126,8 @@ export const useUpdateDepositValue = ({
 }) =>
   useCallback(
     (value: string) => {
-      if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
+      const amount = value.replace(/,/g, '')
+      if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
         return
       }
       clearTimeout(timer)
@@ -133,18 +135,18 @@ export const useUpdateDepositValue = ({
         setErrorMessage('')
         clearGeneratedTx()
 
-        const verifyRes = verifyAmount(value)
+        const verifyRes = verifyAmount(amount)
         if (verifyRes !== true) {
           setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
           return
         }
 
-        if (BigInt(CKBToShannonFormatter(value)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
+        if (BigInt(CKBToShannonFormatter(amount)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
           setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
           return
         }
 
-        const capacity = CKBToShannonFormatter(value, CapacityUnit.CKB)
+        const capacity = CKBToShannonFormatter(amount, CapacityUnit.CKB)
         if (BigInt(capacity) < maxDepositAmount) {
           generateDaoDepositTx({
             feeRate: `${MEDIUM_FEE_RATE}`,
@@ -160,15 +162,17 @@ export const useUpdateDepositValue = ({
               setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
             }
           })
-        } else {
+        } else if (BigInt(capacity) === maxDepositAmount) {
           dispatch({
             type: AppActions.UpdateGeneratedTx,
             payload: maxDepositTx,
           })
           setErrorMessage(maxDepositErrorMessage)
+        } else {
+          setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
         }
       }, 500)
-      setDepositValue(value)
+      setDepositValue(amount)
     },
     [
       clearGeneratedTx,
