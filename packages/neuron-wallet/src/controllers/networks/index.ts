@@ -1,18 +1,22 @@
 import { dialog } from 'electron'
-import { NetworkType, NetworkID, Network } from 'types/network'
+import { NetworkType, NetworkID, Network, NetworkWithID } from 'types/network'
 import NetworksService from 'services/networks'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import i18n from 'utils/i18n'
+import ChainInfo from './chain-info'
 
 const networksService = NetworksService.getInstance()
 
 export default class NetworksController {
-  public static startUp() {
+  public static async startUp() {
+    const network = networksService.getCurrent()
+    await NetworksController.connectToNetwork(network)
+
     NetworksController.notifyListChange()
-    CurrentNetworkIDSubject.next({ currentNetworkID: networksService.getCurrentID() })
+    CurrentNetworkIDSubject.next({ currentNetworkID: network.id })
   }
 
   public static getAll() {
@@ -65,7 +69,7 @@ export default class NetworksController {
 
     if (networksService.getCurrentID() === id) {
       CurrentNetworkIDSubject.next({ currentNetworkID: id })
-      switchToNetwork(networksService.get(id)!)
+      await NetworksController.connectToNetwork(networksService.get(id)!)
     }
     NetworksController.notifyListChange()
 
@@ -102,7 +106,7 @@ export default class NetworksController {
         if (id === currentID) {
           const newCurrentNetwork = networksService.getCurrent()
           CurrentNetworkIDSubject.next({ currentNetworkID: newCurrentNetwork.id })
-          switchToNetwork(newCurrentNetwork)
+          await NetworksController.connectToNetwork(network)
         }
 
         NetworksController.notifyListChange()
@@ -135,7 +139,7 @@ export default class NetworksController {
     await networksService.activate(id)
     const network = networksService.get(id)!
     CurrentNetworkIDSubject.next({ currentNetworkID: id })
-    switchToNetwork(network)
+    await NetworksController.connectToNetwork(network)
 
     return {
       status: ResponseCode.Success,
@@ -145,5 +149,10 @@ export default class NetworksController {
 
   private static notifyListChange() {
     NetworkListSubject.next({ currentNetworkList: networksService.getAll() })
+  }
+
+  private static async connectToNetwork(network: NetworkWithID) {
+    await new ChainInfo(network).load()
+    await switchToNetwork(network)
   }
 }

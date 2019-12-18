@@ -23,11 +23,12 @@ const isIndexerEnabled = async (url: string): Promise<boolean> => {
 // Normal block syncing with BlockListener.
 // This runs when CKB Indexer module is not enabled.
 let blockListener: BlockListener | null
-export const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
   if (blockListener) {
     await blockListener.stopAndWait()
   }
 
+  // TODO: Do not clean meta info here!!!
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
 
@@ -40,11 +41,12 @@ export const startBlockSyncing = async (url: string, genesisBlockHash: string, l
 // Indexer syncing with IndexerQueue.
 // This runs when CKB Indexer module is enabled.
 let indexerQueue: IndexerQueue | null
-export const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lockHashes: string[]) => {
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
 
+  // TODO: Do not clean meta info here!!!
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
 

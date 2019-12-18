@@ -2,7 +2,6 @@ import { BrowserWindow } from 'electron'
 import path from 'path'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
-import InitDatabase from './init-database'
 import Address from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
@@ -18,7 +17,6 @@ import logger from 'utils/logger'
 
 let backgroundWindow: BrowserWindow | null
 let network: NetworkWithID | null
-let initDatabase: InitDatabase | null
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
@@ -44,14 +42,9 @@ const syncNetwork = async () => {
     network = NetworksService.getInstance().getCurrent()
   }
 
-  if (!initDatabase) {
-    initDatabase = new InitDatabase()
-  }
-
-  await initDatabase.stop()
+  // TODO: Do not clean meta info here!!!
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
-  const genesisHash = await initDatabase.init(network)
 
   const blockNumber = await (new BlockNumber()).getCurrent()
   SyncedBlockNumberSubject.next(blockNumber.toString())
@@ -60,10 +53,10 @@ const syncNetwork = async () => {
     actionType: 'update',
   })
 
-  if (genesisHash !== EMPTY_GENESIS_HASH) {
+  if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
-      backgroundWindow.webContents.send("block-sync:start", network.remote, genesisHash, lockHashes)
+      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes)
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
@@ -136,11 +129,6 @@ export const createBlockSyncTask = () => {
 }
 
 export const killBlockSyncTask = async () => {
-  if (initDatabase) {
-    await initDatabase.stop()
-    initDatabase = null
-  }
-
   if (backgroundWindow) {
     logger.info('Kill block sync background process')
     backgroundWindow.close()

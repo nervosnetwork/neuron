@@ -24,6 +24,7 @@ export interface Network {
   chain: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string // returned by rpc.getBlockchainInfo
 }
 
+// TODO: refactor to combine to Network
 export interface NetworkWithID extends Network {
   id: NetworkID
 }
