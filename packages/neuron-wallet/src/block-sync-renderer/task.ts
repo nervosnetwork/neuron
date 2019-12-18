@@ -74,15 +74,11 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
 window.addEventListener('beforeunload', () => {
   unregisterTxStatusListener()
 
-  if (blockListener) {
-    blockListener.stop()
-    blockListener = null
-  }
+  blockListener?.stop()
+  blockListener = null
 
-  if (indexerQueue) {
-    indexerQueue.stop()
-    indexerQueue = null
-  }
+  indexerQueue?.stop()
+  indexerQueue = null
 })
 
 registerTxStatusListener()
