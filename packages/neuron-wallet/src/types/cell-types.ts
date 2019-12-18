@@ -60,6 +60,7 @@ export interface TransactionWithoutHash {
   witnessArgs?: WitnessArgs[]
   fee?: string
   interest?: string
+  nervosDao?: boolean
 }
 
 export interface Transaction extends TransactionWithoutHash {
