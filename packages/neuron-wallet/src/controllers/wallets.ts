@@ -25,6 +25,7 @@ import AddressService from 'services/addresses'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { TransactionWithoutHash } from 'types/cell-types'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
+import TxWalletService from 'services/tx-wallet'
 
 export default class WalletsController {
   public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -332,8 +333,8 @@ export default class WalletsController {
       throw new IsRequired('Parameters')
     }
 
-    const walletsService = WalletsService.getInstance()
-    const hash = await walletsService.sendTx(
+    const txWalletService = TxWalletService.getInstance()
+    const hash = await txWalletService.sendTx(
       params.walletID,
       params.tx,
       params.password,
@@ -360,8 +361,8 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     WalletsController.checkAddresses(addresses)
 
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateTx(
+    const txWalletService = TxWalletService.getInstance()
+    const tx = await txWalletService.generateTx(
       params.walletID,
       params.items,
       params.fee,
@@ -388,8 +389,8 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     WalletsController.checkAddresses(addresses)
 
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateSendingAllTx(
+    const txWalletService = TxWalletService.getInstance()
+    const tx = await txWalletService.generateSendingAllTx(
       params.walletID,
       params.items,
       params.fee,
