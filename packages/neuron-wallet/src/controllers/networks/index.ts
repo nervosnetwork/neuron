@@ -1,14 +1,30 @@
 import { dialog } from 'electron'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkType, NetworkID, Network, NetworkWithID } from 'types/network'
 import NetworksService from 'services/networks'
+import NodeService from 'services/node'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import i18n from 'utils/i18n'
 import ChainInfo from './chain-info'
+import logger from 'utils/logger'
 
 const networksService = NetworksService.getInstance()
+
+NodeService
+  .getInstance()
+  .connectionStatusSubject
+  .pipe(distinctUntilChanged())
+  .subscribe(async (connected: boolean) => {
+    if (connected) {
+      logger.debug('Network reconnected')
+      NetworksController.connectToNetwork(networksService.getCurrent(), true)
+    } else {
+      logger.debug('Network connection dropped')
+    }
+  })
 
 export default class NetworksController {
   public static async startUp() {
@@ -151,8 +167,8 @@ export default class NetworksController {
     NetworkListSubject.next({ currentNetworkList: networksService.getAll() })
   }
 
-  private static async connectToNetwork(network: NetworkWithID) {
+  static async connectToNetwork(network: NetworkWithID, reconnected: boolean = false) {
     await new ChainInfo(network).load()
-    await switchToNetwork(network)
+    await switchToNetwork(network, reconnected)
   }
 }

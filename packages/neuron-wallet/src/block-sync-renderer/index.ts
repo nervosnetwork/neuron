@@ -1,6 +1,5 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 import Address from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
@@ -9,7 +8,6 @@ import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import NodeService from 'services/node'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import BlockNumber from 'block-sync-renderer/sync/block-number'
@@ -63,20 +61,6 @@ const syncNetwork = async () => {
     await updateAllAddressesTxCount(network.remote)
   }
 }
-
-NodeService
-  .getInstance()
-  .connectionStatusSubject
-  .pipe(distinctUntilChanged())
-  .subscribe(async (connected: boolean) => {
-    if (connected) {
-      logger.debug('Network reconnected')
-      network = NetworksService.getInstance().getCurrent()
-      switchToNetwork(network, true)
-    } else {
-      logger.debug('Network connection dropped')
-    }
-  })
 
 const restartBlockSyncTask = async () => {
   killBlockSyncTask()
