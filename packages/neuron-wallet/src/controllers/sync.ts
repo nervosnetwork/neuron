@@ -5,8 +5,8 @@ import { ResponseCode } from 'utils/const'
 import AddressDao from 'database/address/address-dao'
 
 export default class SyncController {
-  public static startSyncing() {
-    createBlockSyncTask()
+  public static async startSyncing() {
+    await createBlockSyncTask()
 
     return {
       status: ResponseCode.Success,
@@ -14,8 +14,8 @@ export default class SyncController {
     }
   }
 
-  public static async stopSyncing() {
-    await killBlockSyncTask()
+  public static stopSyncing() {
+    killBlockSyncTask()
 
     return {
       status: ResponseCode.Success,
@@ -24,14 +24,10 @@ export default class SyncController {
   }
 
   public static async clearCache() {
-    return new Promise(resolve => {
-      SyncController.stopSyncing().finally(() => {
-        AddressDao.resetAddresses()
-        ChainCleaner.clean().finally(() => {
-          return resolve(this.startSyncing())
-        })
-      })
-    })
+    SyncController.stopSyncing()
+    AddressDao.resetAddresses()
+    await ChainCleaner.clean()
+    return this.startSyncing()
   }
 
   public static async currentBlockNumber() {

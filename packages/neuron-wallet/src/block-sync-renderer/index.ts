@@ -14,6 +14,7 @@ import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import BlockNumber from 'block-sync-renderer/sync/block-number'
 import logger from 'utils/logger'
+import CommonUtils from 'utils/common'
 
 let backgroundWindow: BrowserWindow | null
 let network: NetworkWithID | null
@@ -78,8 +79,8 @@ NodeService
   })
 
 const restartBlockSyncTask = async () => {
-  await killBlockSyncTask()
-  createBlockSyncTask()
+  killBlockSyncTask()
+  await createBlockSyncTask()
 }
 
 export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = false) => {
@@ -102,7 +103,9 @@ export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = f
   await restartBlockSyncTask()
 }
 
-export const createBlockSyncTask = () => {
+export const createBlockSyncTask = async () => {
+  await CommonUtils.sleep(2000) // Do not start too fast
+
   if (backgroundWindow) {
     return
   }
@@ -128,7 +131,7 @@ export const createBlockSyncTask = () => {
   backgroundWindow.loadURL(`file://${path.join(__dirname, 'index.html')}`)
 }
 
-export const killBlockSyncTask = async () => {
+export const killBlockSyncTask = () => {
   if (backgroundWindow) {
     logger.info('Kill block sync background process')
     backgroundWindow.close()
