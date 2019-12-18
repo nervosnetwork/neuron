@@ -170,9 +170,6 @@
       "transactions": "交易总数",
       "receiving-address": "收款地址",
       "change-address": "找零地址",
-      "display-testnet-addresses": "显示测试网地址",
-      "display-mainnet-addresses": "显示主网地址",
-      "mainnet-address-caution": "请注意, 当前显示的是主网地址",
       "copy-address": "复制地址",
       "request-payment": "请求支付",
       "view-on-explorer": "在浏览器中查看"
