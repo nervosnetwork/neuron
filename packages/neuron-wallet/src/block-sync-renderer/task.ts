@@ -5,7 +5,7 @@ import BlockListener from 'block-sync-renderer/sync/block-listener'
 import IndexerQueue from 'block-sync-renderer/indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from 'listeners/renderer/tx-status'
+import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import CommonUtils from 'utils/common'
 
 const isIndexerEnabled = async (url: string): Promise<boolean> => {
