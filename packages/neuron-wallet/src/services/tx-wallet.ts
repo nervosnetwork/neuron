@@ -1,7 +1,7 @@
 import { TransactionWithoutHash, WitnessArgs, OutPoint, Cell, Input, DepType } from 'types/cell-types'
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
-import { WalletNotFound, IsRequired } from 'exceptions'
+import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import ConvertTo from 'types/convert-to'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
@@ -40,9 +40,6 @@ export default class TxWalletService {
 
   public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
     const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
 
     if (password === '') {
       throw new IsRequired('Password')
@@ -145,11 +142,6 @@ export default class TxWalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -183,11 +175,6 @@ export default class TxWalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -215,11 +202,6 @@ export default class TxWalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -248,10 +230,8 @@ export default class TxWalletService {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<TransactionWithoutHash> => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
+    // only for check wallet exists
+    this.walletService.get(walletID)
 
     const { core } = NodeService.getInstance()
     const sdkOutPoint = ConvertTo.toSdkOutPoint(outPoint)
@@ -410,11 +390,6 @@ export default class TxWalletService {
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<TransactionWithoutHash> => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
-
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -436,7 +411,7 @@ export default class TxWalletService {
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
 
     const { core } = NodeService.getInstance()
-    const result = await (core.rpc as any).calculateDaoMaximumWithdraw(
+    const result = await core.rpc.calculateDaoMaximumWithdraw(
       ConvertTo.toSdkOutPoint(depositOutPoint),
       withdrawBlockHash,
     )
@@ -444,7 +419,7 @@ export default class TxWalletService {
     return BigInt(result)
   }
 
-  public parseEpoch = (epoch: bigint) => {
+  private parseEpoch = (epoch: bigint) => {
     return {
       length: (epoch >> BigInt(40)) & BigInt(0xFFFF),
       index: (epoch >> BigInt(24)) & BigInt(0xFFFF),
@@ -452,16 +427,14 @@ export default class TxWalletService {
     }
   }
 
-  public epochSince = (length: bigint, index: bigint, number: bigint) => {
+  private epochSince = (length: bigint, index: bigint, number: bigint) => {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
   }
 
   // path is a BIP44 full path such as "m/44'/309'/0'/0/0"
   public getAddressInfos = (walletID: string): Address[] => {
-    const wallet = this.walletService.get(walletID)
-    if (!wallet) {
-      throw new WalletNotFound(walletID)
-    }
+    // only for check wallet exists
+    this.walletService.get(walletID)
     return AddressService.allAddressesByWalletId(walletID)
   }
 
