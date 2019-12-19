@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
-import Address from 'database/address/address-dao'
+import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
@@ -22,22 +22,28 @@ const updateAllAddressesTxCount = async (url: string) => {
   await AddressService.updateTxCountAndBalances(addresses, url)
 }
 
-// listen to address created
-AddressCreatedSubject.getSubject().subscribe(async (_addresses: Address[]) => {
-  // TODO: rescan from #0
+AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
+  const hasUsedAddresses = addresses.some(address => address.isImporting === true)
   killBlockSyncTask()
-  await createBlockSyncTask()
+  await createBlockSyncTask(hasUsedAddresses)
 })
 
+// TODO: Refactor, merge AddressCreatedSubject and WalletCreatedSubject.
 WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
   if (type === 'import') {
-    // TODO: no need to rescan from block #0
+    // Rescan from #0 for used wallet.
+    killBlockSyncTask()
+    await createBlockSyncTask(true)
+  } else {
+    // New wallet doesn't have history. No need to rescan from block #0
+    killBlockSyncTask()
+    await createBlockSyncTask()
   }
-  // TODO: rescan from #0
 })
 
 // Network switch or network connect
-const syncNetwork = async () => {
+// Param rescan: rescan start from genesis block.
+const syncNetwork = async (rescan = false) => {
   if (!network) {
     network = NetworksService.getInstance().getCurrent()
   }
@@ -56,7 +62,7 @@ const syncNetwork = async () => {
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
-      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes)
+      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes, rescan)
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
@@ -86,7 +92,7 @@ export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = f
   }
 }
 
-export const createBlockSyncTask = async () => {
+export const createBlockSyncTask = async (rescan = false) => {
   await CommonUtils.sleep(2000) // Do not start too fast
 
   if (backgroundWindow) {
@@ -104,7 +110,7 @@ export const createBlockSyncTask = async () => {
   })
 
   backgroundWindow.on('ready-to-show', async () => {
-    syncNetwork()
+    syncNetwork(rescan)
   })
 
   backgroundWindow.on('closed', () => {
