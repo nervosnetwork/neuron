@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { storiesOf } from '@storybook/react'
-import { withKnobs, text, number } from '@storybook/addon-knobs'
+import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import StoryRouter from 'storybook-react-router'
 import History from 'components/History'
@@ -131,6 +131,7 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
           description: text(`${idx}-Description`, tx.description),
           blockNumber: text(`${idx}-BlockNumber`, tx.blockNumber),
           status: text(`${idx}-Status`, tx.status) as 'pending' | 'success' | 'failed',
+          nervosDao: boolean('nervos dao', true),
         })),
         keywords: '',
       },

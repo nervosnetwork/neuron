@@ -176,13 +176,13 @@ const Overview = ({
         </thead>
         <tbody>
           {activities.map(item => {
-            const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, value } = item
+            const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, value, nervosDao } = item
             const time = uniformTimeFormatter(timestamp || createdAt)
 
             return (
               <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
                 <td title={time}>{time.split(' ')[0]}</td>
-                <td>{typeLabel}</td>
+                <td>{nervosDao ? 'Nervos DAO' : typeLabel}</td>
                 <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
                 <td className={styles.txStatus} data-status={status}>
                   <div>
