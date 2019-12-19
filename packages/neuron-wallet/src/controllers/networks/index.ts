@@ -1,14 +1,41 @@
 import { dialog } from 'electron'
-import { NetworkType, NetworkID, Network } from 'types/network'
+import { distinctUntilChanged } from 'rxjs/operators'
+import { NetworkType, NetworkID, Network, NetworkWithID } from 'types/network'
 import NetworksService from 'services/networks'
+import NodeService from 'services/node'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
+import { switchToNetwork } from 'block-sync-renderer'
+import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import i18n from 'utils/i18n'
+import ChainInfo from './chain-info'
+import logger from 'utils/logger'
 
 const networksService = NetworksService.getInstance()
 
 export default class NetworksController {
-  public static getAll() {
+  public async startUp() {
+    const network = networksService.getCurrent()
+    await this.connectToNetwork(network)
+
+    this.notifyListChange()
+    CurrentNetworkIDSubject.next({ currentNetworkID: network.id })
+
+    NodeService
+      .getInstance()
+      .connectionStatusSubject
+      .pipe(distinctUntilChanged())
+      .subscribe(async (connected: boolean) => {
+        if (connected) {
+          logger.debug('Network reconnected')
+          this.connectToNetwork(networksService.getCurrent(), true)
+        } else {
+          logger.debug('Network connection dropped')
+        }
+      })
+  }
+
+  public getAll() {
     const networks = networksService.getAll()
     return {
       status: ResponseCode.Success,
@@ -16,7 +43,7 @@ export default class NetworksController {
     }
   }
 
-  public static get(id: NetworkID) {
+  public get(id: NetworkID) {
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
     }
@@ -32,7 +59,7 @@ export default class NetworksController {
     }
   }
 
-  public static async create({ name, remote, type = NetworkType.Normal }: Network) {
+  public async create({ name, remote, type = NetworkType.Normal }: Network) {
     if (!name || !remote) {
       throw new IsRequired('Name and address')
     }
@@ -41,31 +68,39 @@ export default class NetworksController {
     }
 
     const created = await networksService.create(name, remote, type)
+    this.notifyListChange()
+
     return {
       status: ResponseCode.Success,
       result: created,
     }
   }
 
-  public static async update(id: NetworkID, options: Partial<Network>) {
+  public async update(id: NetworkID, options: Partial<Network>) {
     if (options.name && options.name === 'error') {
       throw new InvalidName('Network')
     }
 
     await networksService.update(id, options)
+
+    if (networksService.getCurrentID() === id) {
+      CurrentNetworkIDSubject.next({ currentNetworkID: id })
+      await this.connectToNetwork(networksService.get(id)!)
+    }
+    this.notifyListChange()
+
     return {
       status: ResponseCode.Success,
       result: true,
     }
   }
 
-  public static async delete(id: NetworkID) {
-    const networkService = NetworksService.getInstance()
-    const network = networkService.get(id)
+  public async delete(id: NetworkID) {
+    const network = networksService.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
-    const currentID = networkService.getCurrentID()
+    const currentID = networksService.getCurrentID()
 
     const messageValue = await dialog.showMessageBox(
       {
@@ -83,6 +118,15 @@ export default class NetworksController {
     if (messageValue.response === 0) {
       try {
         networksService.delete(id)
+
+        if (id === currentID) {
+          const newCurrentNetwork = networksService.getCurrent()
+          CurrentNetworkIDSubject.next({ currentNetworkID: newCurrentNetwork.id })
+          await this.connectToNetwork(network)
+        }
+
+        this.notifyListChange()
+
         return {
           status: ResponseCode.Success,
           result: true,
@@ -96,7 +140,7 @@ export default class NetworksController {
     }
   }
 
-  public static currentID() {
+  public currentID() {
     const currentID = networksService.getCurrentID()
     if (currentID) {
       return {
@@ -107,11 +151,24 @@ export default class NetworksController {
     throw new CurrentNetworkNotSet()
   }
 
-  public static async activate(id: NetworkID) {
+  public async activate(id: NetworkID) {
     await networksService.activate(id)
+    const network = networksService.get(id)!
+    CurrentNetworkIDSubject.next({ currentNetworkID: id })
+    await this.connectToNetwork(network)
+
     return {
       status: ResponseCode.Success,
       result: true,
     }
+  }
+
+  private notifyListChange() {
+    NetworkListSubject.next({ currentNetworkList: networksService.getAll() })
+  }
+
+  private async connectToNetwork(network: NetworkWithID, reconnected: boolean = false) {
+    const genesisHashMatched = await new ChainInfo(network).load()
+    await switchToNetwork(network, reconnected, genesisHashMatched)
   }
 }

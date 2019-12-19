@@ -1,16 +1,12 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
-import { DefaultNetworkUnremovable, LackOfDefaultNetwork } from 'exceptions/network'
+import { DefaultNetworkUnremovable } from 'exceptions/network'
 
 import Store from 'models/store'
 
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
-import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
-
-const isMainProcess = process && process.type === 'browser'
 
 const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
   selected: 'mainnet',
@@ -39,51 +35,9 @@ export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
-    this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
-      if (isMainProcess) {
-        NetworkListSubject.next({ currentNetworkList })
-      }
-
-      const currentID = this.getCurrentID()
-      if (currentNetworkList.find(network => network.id === currentID)) {
-        return
-      }
-
-      const defaultNetwork = this.defaultOne()
-      if (!defaultNetwork) {
-        throw new LackOfDefaultNetwork()
-      }
-      this.activate(defaultNetwork.id)
-    })
-
-    this.on(NetworksKey.Current, async (_, currentNetworkID: NetworkID) => {
-      const currentNetwork = this.get(currentNetworkID)
-      if (!currentNetwork) {
-        throw new NetworkNotFound(currentNetworkID)
-      }
-      if (isMainProcess) {
-        CurrentNetworkIDSubject.next({ currentNetworkID })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
-      }
-    })
-  }
-
-  public notifyAll = () => {
-    const currentNetworkList = this.getAll()
-    if (isMainProcess) {
-      NetworkListSubject.next({ currentNetworkList })
-    }
-
     const currentNetwork = this.getCurrent()
-    if (currentNetwork) {
-      if (currentNetwork.type !== NetworkType.Default) {
-        this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
-      }
-
-      if (isMainProcess) {
-        CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
-      }
+    if (currentNetwork.type !== NetworkType.Default) {
+      this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
     }
   }
 
@@ -166,11 +120,6 @@ export default class NetworksService extends Store {
     }
 
     this.updateAll(list)
-
-    if (this.getCurrentID() === id && isMainProcess) {
-      CurrentNetworkIDSubject.next({ currentNetworkID: id })
-      NetworkSwitchSubject.getSubject().next(network)
-    }
   }
 
   @Validate
@@ -183,9 +132,12 @@ export default class NetworksService extends Store {
       throw new DefaultNetworkUnremovable()
     }
 
-    const prevNetworkList = this.getAll()
-    const currentNetworkList = prevNetworkList.filter(item => item.id !== id)
-    this.updateAll(currentNetworkList)
+    if (this.getCurrentID() === id) {
+      this.writeSync(NetworksKey.Current, null)
+    }
+
+    const list = this.getAll().filter(item => item.id !== id)
+    this.updateAll(list)
   }
 
   @Validate

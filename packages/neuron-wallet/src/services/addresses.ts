@@ -205,6 +205,12 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId,  AddressService.getAddressVersion())
   }
 
+  public static allLockHashes = async (url: string): Promise<string[]> => {
+    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
+    const addresses = AddressService.allAddresses().map(address => address.address)
+    return lockUtils.addressesToAllLockHashes(addresses)
+  }
+
   public static usedAddresses = (walletId: string): AddressInterface[] => {
     return AddressDao.usedAddressesByWalletId(walletId,  AddressService.getAddressVersion())
   }

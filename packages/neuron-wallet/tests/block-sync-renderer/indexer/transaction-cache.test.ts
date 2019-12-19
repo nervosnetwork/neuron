@@ -1,4 +1,4 @@
-import { TransactionCache } from '../../../src/services/indexer/transaction-cache'
+import { TransactionCache } from '../../../src/block-sync-renderer/indexer/transaction-cache'
 import { TransactionWithStatus } from '../../../src/types/cell-types';
 
 describe('TransactionCache', () => {

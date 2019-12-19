@@ -9,7 +9,7 @@ import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 
 import FileService from './file'
 import AddressService from './addresses'
-import { deindexLockHashes } from './indexer/deindex'
+import { deindexLockHashes } from '../block-sync-renderer/indexer/deindex'
 import NetworksService from 'services/networks'
 import ProcessUtils from 'utils/process'
 import { Address } from 'database/address/address-dao'

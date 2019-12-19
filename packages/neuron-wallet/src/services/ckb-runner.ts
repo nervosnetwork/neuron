@@ -22,7 +22,7 @@ let ckb: ChildProcess | null = null
 const ckbPath = (): string => {
   return app.isPackaged ?
     path.join(path.dirname(app.getAppPath()), '..', './bin') :
-    path.join(__dirname, '../../../bin',)
+    path.join(__dirname, '../../bin',)
 }
 
 const ckbBinary = (): string => {

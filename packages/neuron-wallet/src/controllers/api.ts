@@ -18,7 +18,12 @@ import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
  * @description Handle channel messages from neuron UI renderer process
  */
 export default class ApiController {
-  public mount() {
+  networksController: NetworksController | null = null
+
+  public async mount() {
+    this.networksController = new NetworksController()
+    this.networksController.startUp()
+
     const handle = this.handleChannel
 
     // App
@@ -216,27 +221,27 @@ export default class ApiController {
     // Networks
 
     handle('get-all-networks', async () => {
-      return NetworksController.getAll()
+      return this.networksController?.getAll()
     })
 
     handle('create-network', async (_, { name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) => {
-      return NetworksController.create({ name, remote, type, genesisHash, chain })
+      return this.networksController?.create({ name, remote, type, genesisHash, chain })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: NetworkID, options: Partial<Network> }) => {
-      return NetworksController.update(networkID, options)
+      return this.networksController?.update(networkID, options)
     })
 
     handle('get-current-network-id', async () => {
-      return NetworksController.currentID()
+      return this.networksController?.currentID()
     })
 
     handle('set-current-network-id', async (_, id: NetworkID) => {
-      return NetworksController.activate(id)
+      return this.networksController?.activate(id)
     })
 
     handle('delete-network', async (_, id: NetworkID) => {
-      return NetworksController.delete(id)
+      return this.networksController?.delete(id)
     })
 
     // Updater

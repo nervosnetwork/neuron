@@ -187,7 +187,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    await walletsService.generateAddressesById(wallet.id, true)
+    walletsService.generateAddressesById(wallet.id, true)
     WalletCreatedSubject.getSubject().next('import')
 
     return {
