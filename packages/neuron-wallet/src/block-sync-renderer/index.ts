@@ -75,7 +75,7 @@ export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = f
 
   if (previousNetwork && !reconnected) {
     if (previousNetwork.id === newNetwork.id || previousNetwork.genesisHash === newNetwork.genesisHash) {
-      // Three's no actual change. No need to reconnect.
+      // There's no actual change. No need to reconnect.
       return
     }
   }
