@@ -1,0 +1,21 @@
+@mixin dialogContainer {
+  border: none;
+  border-radius: 2px;
+  box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+  max-width: 545px;
+}
+
+@mixin dialogConfirmButton {
+  border: none;
+  width: 5.125rem;
+  height: 1.875rem;
+  background-color: var(--nervos-green);
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.6px;
+}
+
+@mixin overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+}

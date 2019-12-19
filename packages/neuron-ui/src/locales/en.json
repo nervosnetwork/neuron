@@ -237,6 +237,7 @@
     },
     "common": {
       "or": "or",
+      "ok": "Ok",
       "confirm": "Confirm",
       "open": "Open",
       "cancel": "Cancel",

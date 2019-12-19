@@ -16,7 +16,7 @@ const AlertDialog = ({
 
   useEffect(() => {
     if (dialogRef.current) {
-      if (content) {
+      if (content && !dialogRef.current.open) {
         dialogRef.current.showModal()
       } else {
         dialogRef.current.close()
@@ -32,8 +32,8 @@ const AlertDialog = ({
     <dialog ref={dialogRef} className={styles.alertDialog}>
       {content ? (
         <>
-          <div className={styles.title}>{content.title}</div>
-          <div className={styles.message}>{content.message}</div>
+          <h2 className={styles.title}>{content.title}</h2>
+          <p className={styles.message}>{content.message}</p>
         </>
       ) : null}
       <div className={styles.actions}>

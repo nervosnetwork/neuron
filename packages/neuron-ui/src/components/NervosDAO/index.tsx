@@ -14,10 +14,10 @@ import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 
 import DAORecord from 'components/CustomRows/DAORecordRow'
+import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 
 import DepositDialog from './DepositDialog'
 import WithdrawDialog from './WithdrawDialog'
-import CompensationPeriodDialog from './CompensationPeriodDialog'
 import hooks from './hooks'
 
 const NervosDAO = ({
@@ -156,6 +156,7 @@ const NervosDAO = ({
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
+    dispatch,
   ])
 
   const MemoizedDepositDialog = useMemo(() => {
