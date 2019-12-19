@@ -21,9 +21,13 @@ export default class ApiController {
   networksController: NetworksController | null = null
 
   public async mount() {
+    this.registerHandlers()
+
     this.networksController = new NetworksController()
     this.networksController.startUp()
+  }
 
+  private registerHandlers() {
     const handle = this.handleChannel
 
     // App
