@@ -9,6 +9,7 @@ declare namespace State {
     description: string
     blockNumber: string
     status: 'pending' | 'success' | 'failed'
+    nervosDao: boolean
   }
 
   interface DetailedInput {

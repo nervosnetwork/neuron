@@ -18,6 +18,7 @@ export const transactionState: State.DetailedTransaction = {
   blockNumber: '',
   blockHash: '',
   witnesses: [],
+  nervosDao: false,
 }
 
 const chainState: State.Chain = {
