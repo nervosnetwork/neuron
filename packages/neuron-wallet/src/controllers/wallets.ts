@@ -22,7 +22,6 @@ import {
 } from 'exceptions'
 import i18n from 'utils/i18n'
 import AddressService from 'services/addresses'
-import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { TransactionWithoutHash } from 'types/cell-types'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
@@ -72,8 +71,6 @@ export default class WalletsController {
       isImporting: true,
     })
 
-    WalletCreatedSubject.getSubject().next('import')
-
     return result
   }
 
@@ -92,8 +89,6 @@ export default class WalletsController {
       mnemonic,
       isImporting: false,
     })
-
-    WalletCreatedSubject.getSubject().next('create')
 
     return result
   }
@@ -188,7 +183,6 @@ export default class WalletsController {
     })
 
     walletsService.generateAddressesById(wallet.id, true)
-    WalletCreatedSubject.getSubject().next('import')
 
     return {
       status: ResponseCode.Success,

@@ -4,7 +4,6 @@ import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
 import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
 import { SyncedBlockNumberSubject } from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
@@ -26,19 +25,6 @@ AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
   const hasUsedAddresses = addresses.some(address => address.isImporting === true)
   killBlockSyncTask()
   await createBlockSyncTask(hasUsedAddresses)
-})
-
-// TODO: Refactor, merge AddressCreatedSubject and WalletCreatedSubject.
-WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
-  if (type === 'import') {
-    // Rescan from #0 for used wallet.
-    killBlockSyncTask()
-    await createBlockSyncTask(true)
-  } else {
-    // New wallet doesn't have history. No need to rescan from block #0
-    killBlockSyncTask()
-    await createBlockSyncTask()
-  }
 })
 
 // Network switch or network connect
