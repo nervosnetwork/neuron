@@ -1,0 +1,40 @@
+.alertDialog {
+  padding: 60px 72px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+  max-width: 545px;
+
+  .title {
+    font-size: 1.125rem;
+    font-weight: bold;
+    letter-spacing: 0.9px;
+    margin-bottom: 29px;
+  }
+
+  .message {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    margin-bottom: 32px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      border: none;
+      width: 5.125rem;
+      height: 1.875rem;
+      background-color: var(--nervos-green);
+      color: #fff;
+      font-size: 0.75rem;
+      letter-spacing: 0.6px;
+    }
+  }
+
+  &::backdrop {
+    backdrop-filter: blur(1px);
+  }
+}

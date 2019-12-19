@@ -137,6 +137,7 @@ const NervosDAO = ({
                 epoch={epoch}
                 genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
+                dispatch={dispatch}
               />
             )
           })}

@@ -44,6 +44,7 @@ export enum AppActions {
   UpdatePassword = 'updatePassword',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
+  UpdateAlertDialog = 'updateAlertDialog',
 
   PopIn = 'popIn',
   PopOut = 'popOut',
@@ -499,6 +500,15 @@ export const reducer = (
             ...app.loadings,
             ...payload,
           },
+        },
+      }
+    }
+    case AppActions.UpdateAlertDialog: {
+      return {
+        ...state,
+        app: {
+          ...app,
+          alertDialog: payload,
         },
       }
     }

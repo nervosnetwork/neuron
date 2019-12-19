@@ -23,15 +23,6 @@ export const getWinID = () => {
   return window.remote.getCurrentWindow().id
 }
 
-export const showMessage = (options: any, callback: Function) => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    window.alert(options.message)
-  } else {
-    window.remote.require('electron').dialog.showMessageBox(options, callback)
-  }
-}
-
 export const showErrorMessage = (title: string, content: string) => {
   if (!window.remote) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
@@ -69,7 +60,6 @@ export const openContextMenu = (template: { label: string; click: Function }[]):
 
 export default {
   getLocale,
-  showMessage,
   showErrorMessage,
   showOpenDialog,
   getWinID,

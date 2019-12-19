@@ -34,6 +34,7 @@ const appState: State.App = {
   },
   popups: [],
   notifications: [],
+  alertDialog: null,
   loadings: {
     sending: false,
     addressList: false,

@@ -2,7 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
-import { showMessage } from 'services/remote'
+import { showAlertDialog } from 'states/stateProvider/actionCreators'
+import { AppActions } from 'states/stateProvider/reducer'
 import calculateAPC from 'utils/calculateAPC'
 import { MILLISECONDS_IN_YEAR } from 'utils/const'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
@@ -30,6 +31,7 @@ const DAORecord = ({
   compensationPeriod,
   withdraw,
   connectionStatus,
+  dispatch,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: React.EventHandler<any>
@@ -46,6 +48,7 @@ const DAORecord = ({
   withdraw: string | null
   genesisBlockTimestamp: number | undefined
   connectionStatus: 'online' | 'offline'
+  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>
 }) => {
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
@@ -160,14 +163,10 @@ const DAORecord = ({
       const thresholdEpochInfo = epochParser(thresholdEpoch)
       if (thresholdEpochInfo.number + BigInt(4) >= currentEpochInfo.number) {
         return () =>
-          showMessage(
-            {
-              title: t('nervos-dao.insufficient-period-alert-title'),
-              message: t('nervos-dao.insufficient-period-alert-title'),
-              detail: t('nervos-dao.insufficient-period-alert-message'),
-            },
-            () => {}
-          )
+          showAlertDialog({
+            title: t('nervos-dao.insufficient-period-alert-title'),
+            message: t('nervos-dao.insufficient-period-alert-message'),
+          })(dispatch)
       }
     }
     return onClick
