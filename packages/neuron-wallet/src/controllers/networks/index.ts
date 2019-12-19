@@ -168,7 +168,7 @@ export default class NetworksController {
   }
 
   private async connectToNetwork(network: NetworkWithID, reconnected: boolean = false) {
-    await new ChainInfo(network).load()
-    await switchToNetwork(network, reconnected)
+    const genesisHashMatched = await new ChainInfo(network).load()
+    await switchToNetwork(network, reconnected, genesisHashMatched)
   }
 }

@@ -25,7 +25,8 @@ const updateAllAddressesTxCount = async (url: string) => {
 // listen to address created
 AddressCreatedSubject.getSubject().subscribe(async (_addresses: Address[]) => {
   // TODO: rescan from #0
-  await restartBlockSyncTask()
+  killBlockSyncTask()
+  await createBlockSyncTask()
 })
 
 WalletCreatedSubject.getSubject().subscribe(async (type: string) => {
@@ -62,12 +63,7 @@ const syncNetwork = async () => {
   }
 }
 
-const restartBlockSyncTask = async () => {
-  killBlockSyncTask()
-  await createBlockSyncTask()
-}
-
-export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = false) => {
+export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = false, shouldSync = true) => {
   const previousNetwork = network
   network = newNetwork
 
@@ -84,7 +80,10 @@ export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = f
     logger.debug('Network switched to:', network)
   }
 
-  await restartBlockSyncTask()
+  killBlockSyncTask()
+  if (shouldSync) {
+    await createBlockSyncTask()
+  }
 }
 
 export const createBlockSyncTask = async () => {

@@ -21,6 +21,8 @@ export default class ChainInfo {
 
     try {
       genesisHash = await new GetBlocks(this.network.remote).genesisBlockHash()
+      // If fetched genesis hash doesn't match that of the network, still initalize DB.
+      // This would mostly only happens when using default mainnet network but connected to a wrong node.
       await initConnection(genesisHash)
       this.saveMetaInfo(this.network.remote, genesisHash)
 
