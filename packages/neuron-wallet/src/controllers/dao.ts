@@ -35,7 +35,7 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.generateDepositTx(
       params.walletID,
       params.capacity,
@@ -56,7 +56,7 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.generateDepositAllTx(
       params.walletID,
       params.fee,
@@ -77,7 +77,7 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.startWithdrawFromDao(
       params.walletID,
       params.outPoint,
@@ -100,7 +100,7 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.withdrawFromDao(
       params.walletID,
       params.depositOutPoint,

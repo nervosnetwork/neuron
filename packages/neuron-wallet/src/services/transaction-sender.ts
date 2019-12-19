@@ -23,16 +23,7 @@ import logger from 'utils/logger'
 import Keychain from 'models/keys/keychain'
 
 export default class TransactionSender {
-  private static instance: TransactionSender
-
   private walletService: WalletService
-
-  public static getInstance = () => {
-    if (!TransactionSender.instance) {
-      TransactionSender.instance = new TransactionSender()
-    }
-    return TransactionSender.instance
-  }
 
   constructor() {
     this.walletService = WalletsService.getInstance()

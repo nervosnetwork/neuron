@@ -68,7 +68,7 @@ describe('get keys with paths', () => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
 
-    const pathsAndKeys = TransactionSender.getInstance().getPrivateKeys(wallet, [receivingPath, changePath], password)
+    const pathsAndKeys = (new TransactionSender()).getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({
       path: receivingPath,
       privateKey: receivingPrivateKey,
@@ -90,7 +90,7 @@ describe('epoch', () => {
 
   it('parse epoch', () => {
     // @ts-ignore: Private method
-    const result = TransactionSender.getInstance().parseEpoch(epochInfo.epoch)
+    const result = (new TransactionSender()).parseEpoch(epochInfo.epoch)
 
     expect(result.length).toEqual(epochInfo.length)
     expect(result.index).toEqual(epochInfo.index)
@@ -99,7 +99,7 @@ describe('epoch', () => {
 
   it('epoch since', () => {
     // @ts-ignore: Private method
-    const epoch = TransactionSender.getInstance().epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
+    const epoch = (new TransactionSender()).epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
 
     expect(epoch).toEqual(epochInfo.epoch + (BigInt(0x20) << BigInt(56)))
   })

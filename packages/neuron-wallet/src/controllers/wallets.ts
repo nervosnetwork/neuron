@@ -333,7 +333,7 @@ export default class WalletsController {
       throw new IsRequired('Parameters')
     }
 
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const hash = await transactionSender.sendTx(
       params.walletID,
       params.tx,
@@ -361,7 +361,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     WalletsController.checkAddresses(addresses)
 
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.generateTx(
       params.walletID,
       params.items,
@@ -389,7 +389,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     WalletsController.checkAddresses(addresses)
 
-    const transactionSender = TransactionSender.getInstance()
+    const transactionSender = new TransactionSender()
     const tx = await transactionSender.generateSendingAllTx(
       params.walletID,
       params.items,
