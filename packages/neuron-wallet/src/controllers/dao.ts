@@ -4,7 +4,7 @@ import { ResponseCode } from 'utils/const'
 import AddressesService from 'services/addresses'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
-import TxWalletService from 'services/tx-wallet'
+import TransactionSender from 'services/transaction-sender'
 
 export default class DaoController {
   public static async getDaoCells(
@@ -35,8 +35,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const txWalletService = TxWalletService.getInstance()
-    const tx = await txWalletService.generateDepositTx(
+    const transactionSender = TransactionSender.getInstance()
+    const tx = await transactionSender.generateDepositTx(
       params.walletID,
       params.capacity,
       params.fee,
@@ -56,8 +56,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const txWalletService = TxWalletService.getInstance()
-    const tx = await txWalletService.generateDepositAllTx(
+    const transactionSender = TransactionSender.getInstance()
+    const tx = await transactionSender.generateDepositAllTx(
       params.walletID,
       params.fee,
       params.feeRate,
@@ -77,8 +77,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const txWalletService = TxWalletService.getInstance()
-    const tx = await txWalletService.startWithdrawFromDao(
+    const transactionSender = TransactionSender.getInstance()
+    const tx = await transactionSender.startWithdrawFromDao(
       params.walletID,
       params.outPoint,
       params.fee,
@@ -100,8 +100,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const txWalletService = TxWalletService.getInstance()
-    const tx = await txWalletService.withdrawFromDao(
+    const transactionSender = TransactionSender.getInstance()
+    const tx = await transactionSender.withdrawFromDao(
       params.walletID,
       params.depositOutPoint,
       params.withdrawingOutPoint,

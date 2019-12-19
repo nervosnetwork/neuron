@@ -4,7 +4,7 @@ import Keychain from '../../src/models/keys/keychain'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import TxWalletService from '../../src/services/tx-wallet'
+import TransactionSender from '../../src/services/transaction-sender'
 
 describe('sign witness', () => {
   const witness = {
@@ -68,7 +68,7 @@ describe('get keys with paths', () => {
     const masterPrivateKey = wallet.loadKeystore().extendedPrivateKey(password)
     expect(masterKeychain.privateKey.toString('hex')).toEqual(masterPrivateKey.privateKey)
 
-    const pathsAndKeys = TxWalletService.getInstance().getPrivateKeys(wallet, [receivingPath, changePath], password)
+    const pathsAndKeys = TransactionSender.getInstance().getPrivateKeys(wallet, [receivingPath, changePath], password)
     expect(pathsAndKeys[0]).toEqual({
       path: receivingPath,
       privateKey: receivingPrivateKey,
@@ -90,7 +90,7 @@ describe('epoch', () => {
 
   it('parse epoch', () => {
     // @ts-ignore: Private method
-    const result = TxWalletService.getInstance().parseEpoch(epochInfo.epoch)
+    const result = TransactionSender.getInstance().parseEpoch(epochInfo.epoch)
 
     expect(result.length).toEqual(epochInfo.length)
     expect(result.index).toEqual(epochInfo.index)
@@ -99,7 +99,7 @@ describe('epoch', () => {
 
   it('epoch since', () => {
     // @ts-ignore: Private method
-    const epoch = TxWalletService.getInstance().epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
+    const epoch = TransactionSender.getInstance().epochSince(epochInfo.length, epochInfo.index, epochInfo.number)
 
     expect(epoch).toEqual(epochInfo.epoch + (BigInt(0x20) << BigInt(56)))
   })

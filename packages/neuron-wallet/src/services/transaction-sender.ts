@@ -22,16 +22,16 @@ import TransactionFee from 'models/transaction-fee'
 import logger from 'utils/logger'
 import Keychain from 'models/keys/keychain'
 
-export default class TxWalletService {
-  private static instance: TxWalletService
+export default class TransactionSender {
+  private static instance: TransactionSender
 
   private walletService: WalletService
 
   public static getInstance = () => {
-    if (!TxWalletService.instance) {
-      TxWalletService.instance = new TxWalletService()
+    if (!TransactionSender.instance) {
+      TransactionSender.instance = new TransactionSender()
     }
-    return TxWalletService.instance
+    return TransactionSender.instance
   }
 
   constructor() {
