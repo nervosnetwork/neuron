@@ -1,10 +1,10 @@
 import { Cell, OutPoint, TransactionWithoutHash } from 'types/cell-types'
 import { ServiceHasNoResponse, IsRequired } from 'exceptions'
 import { ResponseCode } from 'utils/const'
-import WalletsService from 'services/wallets'
 import AddressesService from 'services/addresses'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
+import TransactionSender from 'services/transaction-sender'
 
 export default class DaoController {
   public static async getDaoCells(
@@ -35,8 +35,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateDepositTx(
+    const transactionSender = new TransactionSender()
+    const tx = await transactionSender.generateDepositTx(
       params.walletID,
       params.capacity,
       params.fee,
@@ -56,8 +56,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateDepositAllTx(
+    const transactionSender = new TransactionSender()
+    const tx = await transactionSender.generateDepositAllTx(
       params.walletID,
       params.fee,
       params.feeRate,
@@ -77,8 +77,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.startWithdrawFromDao(
+    const transactionSender = new TransactionSender()
+    const tx = await transactionSender.startWithdrawFromDao(
       params.walletID,
       params.outPoint,
       params.fee,
@@ -100,8 +100,8 @@ export default class DaoController {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.withdrawFromDao(
+    const transactionSender = new TransactionSender()
+    const tx = await transactionSender.withdrawFromDao(
       params.walletID,
       params.depositOutPoint,
       params.withdrawingOutPoint,
