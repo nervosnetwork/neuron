@@ -11,7 +11,9 @@
       "history": "History",
       "addresses": "Addresses",
       "settings": "Settings",
-      "nervos-dao": "Nervos DAO"
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "Connection error",
+      "sync-not-start": "Synchronization not started yet"
     },
     "overview": {
       "date": "Date",
@@ -235,10 +237,6 @@
     "qrcode": {
       "copy": "Copy image",
       "save": "Save image"
-    },
-    "footer": {
-      "fail-to-fetch-tip-block-number": "Cannot fetch tip block number",
-      "sync-not-start": "Synchronization not started yet"
     },
     "common": {
       "or": "or",

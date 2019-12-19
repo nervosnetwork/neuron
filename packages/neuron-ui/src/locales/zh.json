@@ -11,7 +11,9 @@
       "history": "交易历史",
       "addresses": "地址管理",
       "settings": "设置",
-      "nervos-dao": "Nervos DAO"
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "未连接到节点",
+      "sync-not-start": "同步尚未开始"
     },
     "overview": {
       "date": "日期",
@@ -235,10 +237,6 @@
     "qrcode": {
       "copy": "复制图片",
       "save": "保存图片"
-    },
-    "footer": {
-      "fail-to-fetch-tip-block-number": "无法获取最新高度",
-      "sync-not-start": "同步尚未开始"
     },
     "common": {
       "or": "或",

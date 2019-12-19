@@ -12,7 +12,7 @@ const SyncStatus = ({
   if (tipBlockNumber === '') {
     return (
       <div className={styles.sync}>
-        <span>{t('footer.fail-to-fetch-tip-block-number')}</span>
+        <span>{t('navbar.fail-to-fetch-tip-block-number')}</span>
       </div>
     )
   }
@@ -20,7 +20,7 @@ const SyncStatus = ({
   if (BigInt(syncedBlockNumber) < BigInt(0)) {
     return (
       <div className={styles.sync}>
-        <span>{t('footer.sync-not-start')}</span>
+        <span>{t('navbar.sync-not-start')}</span>
       </div>
     )
   }
