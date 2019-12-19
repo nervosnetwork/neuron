@@ -6,18 +6,23 @@ import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
 import { subscribe } from './subscribe'
-import ApiController from 'controllers/api'
+import { NetworksController, ApiController } from 'controllers'
 
 const app = electronApp || (remote && remote.app)
 
 export default class AppController {
   public mainWindow: BrowserWindow | null
-  apiController: ApiController
+  private apiController: ApiController
+  private networksController: NetworksController
 
   constructor() {
     this.mainWindow = null
 
+    this.networksController = new NetworksController()
+    this.networksController.startUp()
+
     this.apiController = new ApiController()
+    this.apiController.networksController = this.networksController
     this.apiController.mount()
 
     subscribe(this)

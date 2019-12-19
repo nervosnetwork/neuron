@@ -1,7 +1,6 @@
 import { app } from 'electron'
 
 import WalletService from 'services/wallets'
-import NetworksController from 'controllers/networks'
 import NodeController from 'controllers/node'
 import AppController from 'controllers/app'
 import { changeLanguage } from 'utils/i18n'
@@ -20,7 +19,6 @@ app.on('ready', async () => {
   registerListeners()
 
   WalletService.getInstance().generateAddressesIfNecessary()
-  await NetworksController.startUp()
 
   appController.openWindow()
 })
