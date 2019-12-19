@@ -20,7 +20,10 @@ import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 export default class ApiController {
   networksController: NetworksController | null = null
 
-  public mount() {
+  public async mount() {
+    this.networksController = new NetworksController()
+    this.networksController.startUp()
+
     const handle = this.handleChannel
 
     // App
