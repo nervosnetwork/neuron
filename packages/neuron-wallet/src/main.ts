@@ -7,7 +7,7 @@ import { changeLanguage } from 'utils/i18n'
 import env from 'env'
 import { register as registerListeners } from 'listeners/main'
 
-const appController = new AppController()
+let appController = new AppController()
 
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
@@ -20,7 +20,7 @@ app.on('ready', async () => {
 
   WalletService.getInstance().generateAddressesIfNecessary()
 
-  appController.openWindow()
+  appController.start()
 })
 
 app.on('before-quit', async () => {

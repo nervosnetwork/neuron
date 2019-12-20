@@ -11,16 +11,16 @@ import { ApiController } from 'controllers'
 const app = electronApp || (remote && remote.app)
 
 export default class AppController {
-  public mainWindow: BrowserWindow | null
-  private apiController: ApiController
+  public mainWindow: BrowserWindow | null = null
+  private apiController = new ApiController()
 
   constructor() {
-    this.mainWindow = null
-
-    this.apiController = new ApiController()
-    this.apiController.mount()
-
     subscribe(this)
+  }
+
+  public start = async () => {
+    this.apiController.mount()
+    this.openWindow()
   }
 
   public sendMessage = (channel: string, obj: any) => {
