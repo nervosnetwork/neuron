@@ -91,6 +91,7 @@ declare namespace State {
     }
     popups: Popup[]
     notifications: Message[]
+    alertDialog: { title: string; message: string } | null
     loadings: {
       sending: boolean
       addressList: boolean

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { epochParser } from 'utils/parsers'
@@ -105,4 +105,24 @@ export const useCalculateEpochs = ({ depositEpoch, currentEpoch }: { depositEpoc
     }
   }, [depositEpoch, currentEpoch])
 
-export default { useGoBack, useLocalDescription, useCalculateEpochs }
+export const useDialog = ({
+  show,
+  dialogRef,
+}: {
+  show: any
+  dialogRef: React.MutableRefObject<HTMLDialogElement | null>
+}) => {
+  useEffect(() => {
+    if (dialogRef.current) {
+      if (show) {
+        if (!dialogRef.current.open) {
+          dialogRef.current.showModal()
+        }
+      } else {
+        dialogRef.current.close()
+      }
+    }
+  }, [show, dialogRef])
+}
+
+export default { useGoBack, useLocalDescription, useCalculateEpochs, useDialog }

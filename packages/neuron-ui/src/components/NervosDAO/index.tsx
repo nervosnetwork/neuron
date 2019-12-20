@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, DefaultButton, Icon, TooltipHost, Spinner } from 'office-ui-fabric-react'
-import PropertyList from 'widgets/PropertyList'
+import { Stack, Text, Icon, TooltipHost, Spinner } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -13,12 +12,13 @@ import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
 
 import { epochParser } from 'utils/parsers'
 
-import DAORecord from 'components/CustomRows/DAORecordRow'
+import DepositDialog from 'components/DepositDialog'
+import WithdrawDialog from 'components/WithdrawDialog'
+import DAORecord from 'components/NervosDAORecord'
+import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 
-import DepositDialog from './DepositDialog'
-import WithdrawDialog from './WithdrawDialog'
-import CompensationPeriodDialog from './CompensationPeriodDialog'
 import hooks from './hooks'
+import styles from './nervosDAO.module.scss'
 
 const NervosDAO = ({
   app: {
@@ -114,9 +114,7 @@ const NervosDAO = ({
   const MemoizedRecords = useMemo(() => {
     return (
       <>
-        <Text as="h2" variant="xxLarge">
-          {t('nervos-dao.deposit-records')}
-        </Text>
+        <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
         <Stack>
           {records.map((record, i) => {
             let stage = 'deposited'
@@ -137,6 +135,7 @@ const NervosDAO = ({
                 epoch={epoch}
                 genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
+                dispatch={dispatch}
               />
             )
           })}
@@ -155,6 +154,7 @@ const NervosDAO = ({
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
+    dispatch,
   ])
 
   const MemoizedDepositDialog = useMemo(() => {
@@ -202,7 +202,7 @@ const NervosDAO = ({
     return (
       <CompensationPeriodDialog compensationPeriod={compensationPeriod} onDismiss={onCompensationPeriodDialogDismiss} />
     )
-  }, [records, blockHashInCompensationDialog, epoch, onCompensationPeriodDialogDismiss, compensationPeriods])
+  }, [records, blockHashInCompensationDialog, onCompensationPeriodDialogDismiss, compensationPeriods])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -234,35 +234,38 @@ const NervosDAO = ({
   ]
 
   return (
-    <>
-      <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
-        <Text as="h1" variant="xxLarge">
-          {wallet.name}
-        </Text>
-        <Stack horizontal tokens={{ childrenGap: 15 }}>
-          <Stack style={{ minWidth: '250px' }} tokens={{ childrenGap: 10 }}>
-            <PropertyList properties={lockAndFreeProperties} />
-          </Stack>
-          <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
-            <DefaultButton
-              text={t('nervos-dao.deposit')}
-              disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-              onClick={() => setShowDepositDialog(true)}
-            />
-            <TooltipHost
-              content={EpochInfo}
-              styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center' } }}
-            >
-              <Icon iconName="info" />
-            </TooltipHost>
-          </Stack>
-        </Stack>
-        {MemoizedRecords}
-      </Stack>
+    <div className={styles.nervosDAOContainer}>
+      <div className={styles.amount}>
+        {lockAndFreeProperties.map(({ label, value }) => (
+          <div key={label} title={label} aria-label={label} className={styles.amountProperty}>
+            <span>{label}</span>
+            <span>{value}</span>
+          </div>
+        ))}
+      </div>
+      <div className={styles.deposit}>
+        <div>
+          <button
+            type="button"
+            aria-label={t('nervos-dao.deposit')}
+            disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
+            onClick={() => setShowDepositDialog(true)}
+          >
+            {t('nervos-dao.deposit')}
+          </button>
+          <TooltipHost
+            content={EpochInfo}
+            styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: 9 } }}
+          >
+            <Icon iconName="info" />
+          </TooltipHost>
+        </div>
+      </div>
+      <div className={styles.records}>{MemoizedRecords}</div>
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
       {MemoizedCompensationPeriodDialog}
-    </>
+    </div>
   )
 }
 

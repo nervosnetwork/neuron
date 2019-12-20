@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
-import { showMessage } from 'services/remote'
+import { showAlertDialog } from 'states/stateProvider/actionCreators'
+import { AppActions } from 'states/stateProvider/reducer'
 import calculateAPC from 'utils/calculateAPC'
 import { MILLISECONDS_IN_YEAR } from 'utils/const'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
 
-import * as styles from './daoRecordRow.module.scss'
+import styles from './daoRecordRow.module.scss'
 
 const DAORecord = ({
   blockHash,
@@ -30,6 +30,7 @@ const DAORecord = ({
   compensationPeriod,
   withdraw,
   connectionStatus,
+  dispatch,
 }: State.NervosDAORecord & {
   actionLabel: string
   onClick: React.EventHandler<any>
@@ -46,6 +47,7 @@ const DAORecord = ({
   withdraw: string | null
   genesisBlockTimestamp: number | undefined
   connectionStatus: 'online' | 'offline'
+  dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>
 }) => {
   const [t] = useTranslation()
   const [withdrawingEpoch, setWithdrawingEpoch] = useState('')
@@ -160,28 +162,24 @@ const DAORecord = ({
       const thresholdEpochInfo = epochParser(thresholdEpoch)
       if (thresholdEpochInfo.number + BigInt(4) >= currentEpochInfo.number) {
         return () =>
-          showMessage(
-            {
-              title: t('nervos-dao.insufficient-period-alert-title'),
-              message: t('nervos-dao.insufficient-period-alert-title'),
-              detail: t('nervos-dao.insufficient-period-alert-message'),
-            },
-            () => {}
-          )
+          showAlertDialog({
+            title: t('nervos-dao.insufficient-period-alert-title'),
+            message: t('nervos-dao.insufficient-period-alert-message'),
+          })(dispatch)
       }
     }
     return onClick
-  }, [onClick, epoch, depositEpoch, withdrawingEpoch, t])
+  }, [onClick, epoch, depositEpoch, withdrawingEpoch, t, dispatch])
 
   return (
-    <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
+    <div className={styles.daoRecord}>
       <div className={styles.primaryInfo}>
-        <div>
+        <div className={styles.compensation}>
           {compensation >= BigInt(0)
             ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
             : ''}
         </div>
-        <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
+        <div className={styles.depositAmount}>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div className={styles.actions}>
           {depositOutPoint || !compensationPeriod || connectionStatus === 'offline' ? null : (
             <span
@@ -196,29 +194,20 @@ const DAORecord = ({
               title={t('nervos-dao.explanation-of-epochs-period')}
             />
           )}
-          <DefaultButton
-            text={actionLabel}
+          <button
+            type="button"
             data-tx-hash={txHash}
             data-index={index}
             onClick={onActionClick}
             disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
-            styles={{
-              flexContainer: {
-                pointerEvents: 'none',
-              },
-              textContainer: {
-                pointerEvents: 'none',
-              },
-              label: {
-                pointerEvents: 'none',
-              },
-            }}
-          />
+          >
+            {actionLabel}
+          </button>
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APC: ~${apc}%`}</span>
         <span>{t('nervos-dao.deposit-at', { time: uniformTimeFormatter(+timestamp) })}</span>
+        <span>{`APC: ~${apc}%`}</span>
         <span>{metaInfo}</span>
       </div>
     </div>

@@ -16,7 +16,7 @@ import {
 import { epochParser } from 'utils/parsers'
 import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
-import * as styles from './overview.module.scss'
+import styles from './overview.module.scss'
 
 const genTypeLabel = (
   type: 'send' | 'receive',

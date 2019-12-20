@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConnectionStatus } from 'utils/const'
 
-import * as styles from 'containers/Navbar/navbar.module.scss'
+import styles from 'containers/Navbar/navbar.module.scss'
 
 interface NetworkStatusProps {
   networkName: string | null

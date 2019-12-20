@@ -3,7 +3,7 @@ import canvg from 'canvg'
 import { useTranslation } from 'react-i18next'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
-import * as styles from './qrcode.module.scss'
+import styles from './qrcode.module.scss'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
 
