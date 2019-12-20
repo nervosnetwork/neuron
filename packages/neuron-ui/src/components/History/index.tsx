@@ -10,7 +10,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
-import * as styles from './history.module.scss'
+import styles from './history.module.scss'
 
 const History = ({
   app: {

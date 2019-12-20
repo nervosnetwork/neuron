@@ -118,6 +118,27 @@ navbar {
   text-overflow: ellipsis;
 }
 
+// hack fabric slider
+.ms-Slider-active {
+  background: var(--nervos-green) !important;
+}
+
+.ms-Slider-inactive {
+  background: rgb(200, 198, 196) !important;
+}
+
+.ms-Slider-thumb {
+  background: var(--nervos-green) !important;
+  border: none !important;
+  top: -4px;
+  width: 12px;
+  height: 12px;
+
+  &:hover {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
 // hack fabric ui experimental pagination style
 .ms-Pagination-container {
   position: relative;

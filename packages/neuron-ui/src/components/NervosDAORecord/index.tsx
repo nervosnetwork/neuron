@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { showAlertDialog } from 'states/stateProvider/actionCreators'
@@ -10,7 +9,7 @@ import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } fro
 import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import { epochParser } from 'utils/parsers'
 
-import * as styles from './daoRecordRow.module.scss'
+import styles from './daoRecordRow.module.scss'
 
 const DAORecord = ({
   blockHash,
@@ -173,14 +172,14 @@ const DAORecord = ({
   }, [onClick, epoch, depositEpoch, withdrawingEpoch, t, dispatch])
 
   return (
-    <div className={`${styles.daoRecord} ${depositOutPoint ? styles.isClaim : ''}`}>
+    <div className={styles.daoRecord}>
       <div className={styles.primaryInfo}>
-        <div>
+        <div className={styles.compensation}>
           {compensation >= BigInt(0)
             ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
             : ''}
         </div>
-        <div>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
+        <div className={styles.depositAmount}>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
         <div className={styles.actions}>
           {depositOutPoint || !compensationPeriod || connectionStatus === 'offline' ? null : (
             <span
@@ -195,29 +194,20 @@ const DAORecord = ({
               title={t('nervos-dao.explanation-of-epochs-period')}
             />
           )}
-          <DefaultButton
-            text={actionLabel}
+          <button
+            type="button"
             data-tx-hash={txHash}
             data-index={index}
             onClick={onActionClick}
             disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
-            styles={{
-              flexContainer: {
-                pointerEvents: 'none',
-              },
-              textContainer: {
-                pointerEvents: 'none',
-              },
-              label: {
-                pointerEvents: 'none',
-              },
-            }}
-          />
+          >
+            {actionLabel}
+          </button>
         </div>
       </div>
       <div className={styles.secondaryInfo}>
-        <span>{`APC: ~${apc}%`}</span>
         <span>{t('nervos-dao.deposit-at', { time: uniformTimeFormatter(+timestamp) })}</span>
+        <span>{`APC: ~${apc}%`}</span>
         <span>{metaInfo}</span>
       </div>
     </div>

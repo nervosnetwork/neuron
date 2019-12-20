@@ -1,0 +1,108 @@
+$progress-green: #3cc68a;
+$progress-yellow: #f7ae4d;
+$progress-grey: #e3e3e3;
+
+.daoRecord {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+  border-bottom: 1px solid #b3b3b3;
+  box-sizing: border-box;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.primaryInfo,
+.secondaryInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &>div,
+  &>span {
+    flex: 1;
+    text-align: center;
+
+    &:first-child {
+      text-align: left;
+    }
+
+    &:last-child {
+      text-align: right;
+    }
+  }
+}
+
+.primaryInfo {
+  margin-bottom: 7px;
+}
+
+.compensation {
+  color: var(--nervos-green);
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+}
+
+.depositAmount {
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+}
+
+.secondaryInfo {
+  font-size: 12px;
+  color: #666;
+  line-height: 0.8125rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.5px;
+  color: #434343;
+
+  span {
+    width: 33%;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  button {
+    background-color: var(--nervos-green);
+    color: #fff;
+    width: 8.75rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.6px;
+    border: none;
+  }
+}
+
+.epochsDialogBtn {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  margin-right: 16px;
+
+  &[data-stage='stage1'] {
+    background-color: $progress-green;
+  }
+
+  &[data-stage='stage2'] {
+    background-color: $progress-yellow;
+  }
+
+  &[data-stage='stage3'] {
+    background-color: $progress-grey;
+  }
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import * as styles from './compensationPeriodDialog.module.scss'
+import styles from './compensationPeriodDialog.module.scss'
 
 interface CompensationPeriodDialogProps {
-  onDismiss: any
+  onDismiss: () => void
   compensationPeriod: {
     currentEpochNumber: bigint
     currentEpochIndex: bigint

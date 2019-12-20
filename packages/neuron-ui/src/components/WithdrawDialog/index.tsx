@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { Dialog, DialogFooter, DefaultButton, PrimaryButton, DialogType, Text } from 'office-ui-fabric-react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
 import { useCalculateEpochs } from 'utils/hooks'
+import styles from './withdrawDialog.module.scss'
 
 const WithdrawDialog = ({
   onDismiss,
@@ -12,8 +12,8 @@ const WithdrawDialog = ({
   tipBlockHash,
   currentEpoch,
 }: {
-  onDismiss: any
-  onSubmit: any
+  onDismiss: () => void
+  onSubmit: () => void
   record: State.NervosDAORecord
   tipBlockHash: string
   currentEpoch: string
@@ -21,18 +21,28 @@ const WithdrawDialog = ({
   const [t] = useTranslation()
   const [depositEpoch, setDepositEpoch] = useState('')
   const [withdrawValue, setWithdrawValue] = useState('')
+
+  const dialogRef = useRef<HTMLDialogElement | null>(null)
+
   useEffect(() => {
-    if (!record) {
-      return
+    if (dialogRef.current) {
+      if (record) {
+        getHeader(record.blockHash)
+          .then(header => {
+            setDepositEpoch(header.epoch)
+          })
+          .catch((err: Error) => {
+            console.error(err)
+          })
+        if (!dialogRef.current.open) {
+          dialogRef.current.showModal()
+        }
+      } else {
+        dialogRef.current.close()
+      }
     }
-    getHeader(record.blockHash)
-      .then(header => {
-        setDepositEpoch(header.epoch)
-      })
-      .catch((err: Error) => {
-        console.error(err)
-      })
   }, [record])
+
   useEffect(() => {
     if (!record || !tipBlockHash) {
       return
@@ -76,44 +86,43 @@ const WithdrawDialog = ({
       : ''
 
   return (
-    <Dialog
-      hidden={!record}
-      onDismiss={onDismiss}
-      dialogContentProps={{ type: DialogType.close, title: t('nervos-dao.withdraw-from-nervos-dao') }}
-      modalProps={{
-        isBlocking: false,
-        styles: { main: { maxWidth: '500px!important' } },
-      }}
-    >
+    <dialog ref={dialogRef} className={styles.dialog}>
+      <h2
+        className={styles.title}
+        title={t('nervos-dao.withdraw-from-nervos-dao')}
+        aria-label={t('nervos-dao.withdraw-from-nervos-dao')}
+      >
+        {t('nervos-dao.withdraw-from-nervos-dao')}
+      </h2>
       {record ? (
         <>
-          <Text as="p" variant="large" block>
+          <p className={styles.deposit}>
             <span>{`${t('nervos-dao.deposit')}: `}</span>
             <span>{`${shannonToCKBFormatter(record.capacity)} CKB`}</span>
-          </Text>
-          <Text as="p" variant="large" block>
+          </p>
+          <p className={styles.compensation}>
             <span>{`${t('nervos-dao.compensation')}: `}</span>
             <span>
               {withdrawValue
                 ? `${shannonToCKBFormatter((BigInt(withdrawValue) - BigInt(record.capacity)).toString())} CKB`
                 : ''}
             </span>
-          </Text>
+          </p>
           <div>
-            <Text as="p" variant="small" block>
-              {message}
-            </Text>
-            <Text as="p" variant="xSmall" block styles={{ root: { color: 'red' } }}>
-              {alert}
-            </Text>
+            <p className={styles.message}>{message}</p>
+            <p className={styles.errorMessage}>{alert}</p>
           </div>
         </>
       ) : null}
-      <DialogFooter>
-        <DefaultButton text={t('nervos-dao.cancel')} onClick={onDismiss} />
-        <PrimaryButton text={t('nervos-dao.proceed')} onClick={onSubmit} />
-      </DialogFooter>
-    </Dialog>
+      <div className={styles.footer}>
+        <button type="button" aria-label={t('nervos-dao.cancel')} onClick={onDismiss} className={styles.cancel}>
+          {t('nervos-dao.cancel')}
+        </button>
+        <button type="submit" aria-label={t('nervos-dao.proceed')} onClick={onSubmit} className={styles.submit}>
+          {t('nervos-dao.proceed')}
+        </button>
+      </div>
+    </dialog>
   )
 }
 

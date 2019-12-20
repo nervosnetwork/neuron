@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import * as styles from 'containers/Navbar/navbar.module.scss'
+import styles from 'containers/Navbar/navbar.module.scss'
 
 const SyncStatus = ({
   tipBlockNumber = '',

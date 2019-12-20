@@ -1,0 +1,79 @@
+@import "../../styles/mixin.scss";
+
+.nervosDAOContainer {
+  display: grid;
+  grid-template:
+    'amount deposit'107px 'records records'auto/ 450px 1fr;
+  padding: 54px 31px 41px 31px;
+}
+
+.amount {
+  grid-area: amount;
+  padding-right: 75px;
+
+  .amountProperty {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    letter-spacing: 0.7px;
+    font-weight: 500;
+
+    &:first-of-type {
+      margin-bottom: 11px;
+    }
+
+    span:first-of-type {
+      font-weight: 600;
+
+      &::after {
+        display: inline;
+        content: ':';
+      }
+    }
+  }
+
+}
+
+.deposit {
+  grid-area: deposit;
+
+  &>div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  button {
+    width: 5.125rem;
+    height: 1.875rem;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    background-color: var(--nervos-green);
+    border: none;
+
+    &[disabled] {
+      @include disabledBtn;
+    }
+  }
+}
+
+.records {
+  grid-area: records;
+
+  .recordsTitle {
+    line-height: 1.6875rem;
+    font-size: 1.375rem;
+    font-weight: bold;
+    letter-spacing: 1.1px;
+    color: #000;
+    margin: 0 0 19px 0;
+    padding: 0;
+  }
+
+  &>div {
+    padding: 0 15px;
+  }
+}

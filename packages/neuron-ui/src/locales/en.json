@@ -340,6 +340,7 @@
       "proceed": "Proceed",
       "compensation": "Compensation",
       "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "deposit-dialog-title": "Deposit Nervos DAO",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "deposited-action-label": "Request withdraw",
       "withdrawing-action-label": "Withdraw",

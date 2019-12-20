@@ -8,7 +8,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 
 import { Routes, FULL_SCREENS } from 'utils/const'
-import * as styles from './navbar.module.scss'
+import styles from './navbar.module.scss'
 
 const menuItems = [
   { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview },

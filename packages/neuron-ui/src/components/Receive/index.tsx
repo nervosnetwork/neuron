@@ -6,7 +6,7 @@ import { TooltipHost, IconButton } from 'office-ui-fabric-react'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
-import * as styles from './receive.module.scss'
+import styles from './receive.module.scss'
 
 const Receive = ({
   wallet: { addresses = [] },

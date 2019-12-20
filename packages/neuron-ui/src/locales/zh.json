@@ -340,6 +340,7 @@
       "proceed": "继续",
       "compensation": "锁定补贴",
       "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)完成最终取出操作。",
+      "deposit-dialog-title": "出入 Nervos DAO",
       "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
       "deposited-action-label": "申请取出",
       "withdrawing-action-label": "取出",

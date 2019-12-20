@@ -2,7 +2,7 @@ import React, { useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { dismissAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
-import * as styles from './alertDialog.module.scss'
+import styles from './alertDialog.module.scss'
 
 const AlertDialog = ({
   content,

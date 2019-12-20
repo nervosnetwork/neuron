@@ -10,7 +10,7 @@ import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { Routes, MAINNET_TAG } from 'utils/const'
 import getExplorerUrl from 'utils/getExplorerUrl'
-import * as styles from './addresses.module.scss'
+import styles from './addresses.module.scss'
 
 const Addresses = ({
   wallet: { addresses = [], id: walletID },
