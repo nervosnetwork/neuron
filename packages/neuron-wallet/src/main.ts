@@ -20,7 +20,7 @@ app.on('ready', async () => {
 
   WalletService.getInstance().generateAddressesIfNecessary()
 
-  appController.openWindow()
+  appController.start()
 })
 
 app.on('before-quit', async () => {

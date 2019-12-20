@@ -24,7 +24,7 @@ export default class ApiController {
     this.registerHandlers()
 
     this.networksController = new NetworksController()
-    this.networksController.startUp()
+    this.networksController.start()
   }
 
   private registerHandlers() {

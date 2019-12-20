@@ -1,4 +1,4 @@
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
 import { DefaultNetworkUnremovable } from 'exceptions/network'
 
@@ -68,27 +68,18 @@ export default class NetworksService extends Store {
       throw new UsedName('Network')
     }
 
-    const core = new Core(remote)
-
-    const chain = await core.rpc
-      .getBlockchainInfo()
-      .then(info => info.chain)
-      .catch(() => 'ckb_dev')
-    const genesisHash = await core.rpc
-      .getBlockHash('0x0')
-      .catch(() => EMPTY_GENESIS_HASH)
-
-    const newOne = {
+    const properties = {
       id: uuid(),
       name,
       remote,
-      genesisHash,
       type,
-      chain,
+      genesisHash: EMPTY_GENESIS_HASH,
+      chain: 'ckb_dev'
     }
+    const network = await this.refreshChainInfo(properties)
 
-    this.updateAll([...list, newOne])
-    return newOne
+    this.updateAll([...list, network])
+    return network
   }
 
   @Validate
@@ -100,24 +91,7 @@ export default class NetworksService extends Store {
     }
 
     Object.assign(network, options)
-    if (!options.chain) {
-      const core = new Core(network.remote)
-
-      const chain = await core.rpc
-        .getBlockchainInfo()
-        .then(info => info.chain)
-        .catch(() => '')
-      if (chain !== '') {
-        network.chain = chain
-      }
-
-      const genesisHash = await core.rpc
-        .getBlockHash('0x0')
-        .catch(() => EMPTY_GENESIS_HASH)
-      if (genesisHash !== EMPTY_GENESIS_HASH) {
-        network.genesisHash = genesisHash
-      }
-    }
+    Object.assign(network, await this.refreshChainInfo(network))
 
     this.updateAll(list)
   }
@@ -146,11 +120,7 @@ export default class NetworksService extends Store {
     if (!network) {
       throw new NetworkNotFound(id)
     }
-
-    // No need to update the default mainnet's genesis hash
-    if (network.type !== NetworkType.Default) {
-      this.update(id, {})
-    }
+    this.update(id, {}) // Trigger chain info refresh
 
     this.writeSync(NetworksKey.Current, id)
   }
@@ -172,5 +142,30 @@ export default class NetworksService extends Store {
       return "https://explorer.nervos.org"
     }
     return "https://explorer.nervos.org/testnet"
+  }
+
+  // Refresh a network's genesis and chain info
+  private async refreshChainInfo(network: NetworkWithID): Promise<NetworkWithID> {
+    if (network.type === NetworkType.Default) {
+      // Default mainnet network is not editable
+      return network
+    }
+
+    const ckb = new CKB(network.remote)
+
+    const genesisHash = await ckb.rpc
+      .getBlockHash('0x0')
+      .catch(() => EMPTY_GENESIS_HASH)
+    const chain = await ckb.rpc
+      .getBlockchainInfo()
+      .then(info => info.chain)
+      .catch(() => '')
+
+    if (genesisHash !== network.genesisHash && chain !== '') {
+      network.genesisHash = genesisHash
+      network.chain = chain
+    }
+
+    return network
   }
 }
