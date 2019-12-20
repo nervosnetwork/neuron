@@ -16,6 +16,7 @@ import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
 import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
+import Button from 'widgets/Button'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
@@ -245,14 +246,13 @@ const NervosDAO = ({
       </div>
       <div className={styles.deposit}>
         <div>
-          <button
-            type="button"
+          <Button
+            type="confirm"
             aria-label={t('nervos-dao.deposit')}
             disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
             onClick={() => setShowDepositDialog(true)}
-          >
-            {t('nervos-dao.deposit')}
-          </button>
+            label={t('nervos-dao.deposit')}
+          />
           <TooltipHost
             content={EpochInfo}
             styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: 9 } }}

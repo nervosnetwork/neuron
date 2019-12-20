@@ -76,8 +76,4 @@ $progress-indicator-offet: ($progress-bar-height - $progress-indicator-height) /
 .actions {
   display: flex;
   justify-content: flex-end;
-
-  button {
-    @include dialogConfirmButton;
-  }
 }

@@ -1,0 +1,33 @@
+.button {
+  appearance: none;
+  min-width: 5.125rem;
+  font-size: 0.75rem;
+  line-height: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  padding: 7px 0;
+  border: none;
+  margin: 0;
+
+  &[data-type='default'] {
+    background-color: #fff;
+    color: #000;
+  }
+
+  &[data-type="cancel"] {
+    background-color: #e3e3e3;
+    color: #000;
+  }
+
+  &[data-type='ok'],
+  &[data-type="submit"],
+  &[data-type="confirm"] {
+    background-color: var(--nervos-green);
+    color: #fff;
+  }
+
+  &[disabled] {
+    background-color: rgb(243, 242, 241) !important;
+    color: rgb(161, 159, 157) !important;
+  }
+}

@@ -65,4 +65,8 @@
 
 .footer {
   @include dialogFooter;
+
+  button:last-of-type {
+    margin-left: 9px;
+  }
 }
