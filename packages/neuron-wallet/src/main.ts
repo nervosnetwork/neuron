@@ -7,7 +7,7 @@ import { changeLanguage } from 'utils/i18n'
 import env from 'env'
 import { register as registerListeners } from 'listeners/main'
 
-let appController = new AppController()
+const appController = new AppController()
 
 app.on('ready', async () => {
   changeLanguage(app.getLocale())
