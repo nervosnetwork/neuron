@@ -88,11 +88,8 @@ export const useOnCurrentWalletChange = ({
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    if (walletID) {
-      initAppState()(dispatch, history)
-    } else {
-      initAppState()(dispatch, history)
-    }
+    console.info(`switching to ${walletID}`)
+    initAppState()(dispatch, history)
   }, [walletID, dispatch, history])
 }
 

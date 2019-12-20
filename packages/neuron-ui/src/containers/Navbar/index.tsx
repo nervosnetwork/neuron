@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
@@ -21,12 +20,10 @@ const menuItems = [
   { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
 ]
 
-const Navbar = ({
-  location: { pathname },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
   const neuronWallet = useState()
   const {
+    wallet: { name },
     app: { tipBlockNumber = '0' },
     chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
     settings: { wallets = [], networks = [] },
@@ -60,7 +57,12 @@ const Navbar = ({
 
   return (
     <aside className={styles.sidebar}>
-      <nav className={styles.navs}>{menus}</nav>
+      <h1 className={styles.name} title={name} aria-label={name}>
+        {name}
+      </h1>
+      <nav role="navigation" className={styles.navs}>
+        {menus}
+      </nav>
       <NetworkStatus
         networkName={networkName}
         connectionStatus={connectionStatus}
