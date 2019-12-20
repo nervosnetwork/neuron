@@ -1,9 +1,10 @@
-import React, { useMemo, useRef, useEffect } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { TextField, Slider, Spinner, SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation, Trans } from 'react-i18next'
 import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
 import { openExternal } from 'services/remote'
 import { localNumberFormatter } from 'utils/formatters'
+import { useDialog } from 'utils/hooks'
 import styles from './depositDialog.module.scss'
 
 interface DepositDialogProps {
@@ -33,16 +34,7 @@ const DepositDialog = ({
 }: DepositDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-
-  useEffect(() => {
-    if (dialogRef.current) {
-      if (show && !dialogRef.current.open) {
-        dialogRef.current.showModal()
-      } else {
-        dialogRef.current.close()
-      }
-    }
-  }, [show])
+  useDialog({ show, dialogRef })
 
   const rfcLink = useMemo(
     () => (

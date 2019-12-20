@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDialog } from 'utils/hooks'
 
 import styles from './compensationPeriodDialog.module.scss'
 
@@ -16,16 +17,7 @@ interface CompensationPeriodDialogProps {
 const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: CompensationPeriodDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-
-  useEffect(() => {
-    if (dialogRef.current) {
-      if (compensationPeriod && !dialogRef.current.open) {
-        dialogRef.current.showModal()
-      } else {
-        dialogRef.current.close()
-      }
-    }
-  })
+  useDialog({ show: compensationPeriod, dialogRef })
 
   let pastEpochs = 0
   if (compensationPeriod) {

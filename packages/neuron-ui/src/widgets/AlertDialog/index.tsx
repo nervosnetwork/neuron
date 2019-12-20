@@ -1,7 +1,8 @@
-import React, { useRef, useCallback, useEffect } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { dismissAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
+import { useDialog } from 'utils/hooks'
 import styles from './alertDialog.module.scss'
 
 const AlertDialog = ({
@@ -14,15 +15,7 @@ const AlertDialog = ({
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
-  useEffect(() => {
-    if (dialogRef.current) {
-      if (content && !dialogRef.current.open) {
-        dialogRef.current.showModal()
-      } else {
-        dialogRef.current.close()
-      }
-    }
-  }, [content, dialogRef])
+  useDialog({ show: content, dialogRef })
 
   const onDismiss = useCallback(() => {
     dismissAlertDialog()(dispatch)

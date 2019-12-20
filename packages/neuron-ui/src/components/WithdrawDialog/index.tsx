@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
-import { useCalculateEpochs } from 'utils/hooks'
+import { useCalculateEpochs, useDialog } from 'utils/hooks'
+
 import styles from './withdrawDialog.module.scss'
 
 const WithdrawDialog = ({
@@ -23,23 +24,17 @@ const WithdrawDialog = ({
   const [withdrawValue, setWithdrawValue] = useState('')
 
   const dialogRef = useRef<HTMLDialogElement | null>(null)
+  useDialog({ show: record, dialogRef })
 
   useEffect(() => {
-    if (dialogRef.current) {
-      if (record) {
-        getHeader(record.blockHash)
-          .then(header => {
-            setDepositEpoch(header.epoch)
-          })
-          .catch((err: Error) => {
-            console.error(err)
-          })
-        if (!dialogRef.current.open) {
-          dialogRef.current.showModal()
-        }
-      } else {
-        dialogRef.current.close()
-      }
+    if (record) {
+      getHeader(record.blockHash)
+        .then(header => {
+          setDepositEpoch(header.epoch)
+        })
+        .catch((err: Error) => {
+          console.error(err)
+        })
     }
   }, [record])
 
