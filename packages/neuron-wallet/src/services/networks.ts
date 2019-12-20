@@ -91,7 +91,7 @@ export default class NetworksService extends Store {
     }
 
     Object.assign(network, options)
-    Object.assign(await this.refreshChainInfo(network))
+    Object.assign(network, await this.refreshChainInfo(network))
 
     this.updateAll(list)
   }
