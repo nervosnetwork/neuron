@@ -4,7 +4,7 @@ $left-padding: 15px;
 .sidebar {
   display: grid;
   grid-template:
-    'name'auto 'navs'1fr 'network'22px 'sync'auto / var(--sidebar-width);
+    'name'75px 'navs'1fr 'network'22px 'sync'auto / var(--sidebar-width);
   height: 100vh;
   background: black;
 }
