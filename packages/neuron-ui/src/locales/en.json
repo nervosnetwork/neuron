@@ -13,7 +13,7 @@
       "settings": "Settings",
       "nervos-dao": "Nervos DAO",
       "fail-to-fetch-tip-block-number": "Connection error",
-      "sync-not-start": "Synchronization not started yet"
+      "sync-not-start": "Sync not started yet"
     },
     "overview": {
       "date": "Date",
