@@ -69,9 +69,17 @@ declare namespace State {
   }
 
   interface Popup {
-    timestamp: Date
+    timestamp: number
     text: string
   }
+
+  interface PasswordRequest {
+    actionType: 'send' | 'backup' | 'delete' | null
+    walletID: string
+    password: string
+  }
+
+  type AlertDialog = { title: string; message: string } | null
 
   interface App {
     tipBlockNumber: string
@@ -81,17 +89,13 @@ declare namespace State {
     difficulty: bigint
     epoch: string
     send: Send
-    passwordRequest: {
-      actionType: 'send' | 'backup' | 'delete' | null
-      walletID: string
-      password: string
-    }
+    passwordRequest: PasswordRequest
     messages: {
       [index: string]: Message | null
     }
     popups: Popup[]
     notifications: Message[]
-    alertDialog: { title: string; message: string } | null
+    alertDialog: AlertDialog
     loadings: {
       sending: boolean
       addressList: boolean

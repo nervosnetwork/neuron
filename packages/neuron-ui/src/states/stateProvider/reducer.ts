@@ -1,6 +1,6 @@
 import produce from 'immer'
 import initStates from 'states/initStates'
-import { ConnectionStatus } from '../../utils/const'
+import { ConnectionStatus, ErrorCode } from 'utils/const'
 
 export enum NeuronWalletActions {
   InitAppState = 'initAppState',
@@ -53,9 +53,49 @@ export enum AppActions {
   Ignore = 'ignore',
 }
 
-export type StateActions = NeuronWalletActions | AppActions
+export type StateAction =
+  | { type: AppActions.AddSendOutput }
+  | { type: AppActions.RemoveSendOutput; payload: number }
+  | { type: AppActions.UpdateSendOutput; payload: { idx: number; item: Partial<State.Output> } }
+  | { type: AppActions.UpdateSendPrice; payload: string }
+  | { type: AppActions.UpdateSendDescription; payload: string }
+  | { type: AppActions.UpdateGeneratedTx; payload: any }
+  | { type: AppActions.ClearSendState }
+  | { type: AppActions.UpdateMessage; payload: any }
+  | { type: AppActions.AddNotification; payload: State.Message }
+  | { type: AppActions.DismissNotification; payload: number } // payload: timestamp
+  | { type: AppActions.ClearNotificationsOfCode; payload: ErrorCode } // payload: code
+  | { type: AppActions.ClearNotifications }
+  | { type: AppActions.CleanTransaction }
+  | { type: AppActions.CleanTransactions }
+  | { type: AppActions.RequestPassword; payload: Omit<State.PasswordRequest, 'password'> }
+  | { type: AppActions.DismissPasswordRequest }
+  | { type: AppActions.UpdatePassword; payload: string }
+  | { type: AppActions.UpdateChainInfo; payload: Partial<State.App> }
+  | { type: AppActions.UpdateLoadings; payload: any }
+  | { type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }
+  | { type: AppActions.PopIn; payload: State.Popup }
+  | { type: AppActions.PopOut }
+  | { type: AppActions.ToggleTopAlertVisibility; payload?: boolean }
+  | { type: AppActions.ToggleAllNotificationVisibility; payload?: boolean }
+  | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
+  | { type: AppActions.Ignore; payload?: any }
+  | { type: NeuronWalletActions.InitAppState; payload: any }
+  | { type: NeuronWalletActions.UpdateCodeHash; payload: string }
+  | { type: NeuronWalletActions.UpdateCurrentWallet; payload: Partial<State.Wallet> }
+  | { type: NeuronWalletActions.UpdateWalletList; payload: State.WalletIdentity[] }
+  | { type: NeuronWalletActions.UpdateAddressListAndBalance; payload: Partial<State.Wallet> }
+  | { type: NeuronWalletActions.UpdateAddressDescription; payload: { address: string; description: string } }
+  | { type: NeuronWalletActions.UpdateTransactionList; payload: any }
+  | { type: NeuronWalletActions.UpdateTransactionDescription; payload: { hash: string; description: string } }
+  | { type: NeuronWalletActions.UpdateNetworkList; payload: State.Network[] }
+  | { type: NeuronWalletActions.UpdateCurrentNetworkID; payload: string }
+  | { type: NeuronWalletActions.UpdateConnectionStatus; payload: State.ConnectionStatus }
+  | { type: NeuronWalletActions.UpdateSyncedBlockNumber; payload: string }
+  | { type: NeuronWalletActions.UpdateNervosDaoData; payload: State.NervosDAO }
+  | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
 
-export type StateDispatch = React.Dispatch<{ type: StateActions; payload: any }> // TODO: add type of payload
+export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
 export type StateWithDispatch = State.AppWithNeuronWallet & { dispatch: StateDispatch }
 
 <<<<<<< HEAD
@@ -89,11 +129,9 @@ export const reducer = (
 =======
 /* eslint-disable no-param-reassign */
 export const reducer = produce(
-  (
-    state: State.AppWithNeuronWallet,
-    { type, payload }: { type: StateActions; payload: any }
-  ): State.AppWithNeuronWallet => {
-    const { app } = state
+  (state: State.AppWithNeuronWallet, action: StateAction): State.AppWithNeuronWallet => {
+    const { type } = action
+    const payload = 'payload' in action ? action.payload : undefined
     if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-action')) {
       console.group(`type: ${type}`)
       console.info(payload)
@@ -363,11 +401,14 @@ export const reducer = produce(
          * payload: timstamp
          */
         state.app.showTopAlert =
-          app.notifications.findIndex(message => message.timestamp === payload) === app.notifications.length - 1
+          state.app.notifications.findIndex(message => message.timestamp === payload) ===
+          state.app.notifications.length - 1
             ? false
-            : app.showTopAlert
+            : state.app.showTopAlert
         state.app.notifications = state.app.notifications.filter(({ timestamp }) => timestamp !== payload)
-        state.app.showAllNotifications = state.app.notifications.length > 1
+        state.app.showAllNotifications = state.app.showAllNotifications
+          ? state.app.notifications.length > 0
+          : state.app.showAllNotifications
         break
       }
       case AppActions.ClearNotificationsOfCode: {
@@ -415,11 +456,11 @@ export const reducer = produce(
         break
       }
       case AppActions.ToggleAllNotificationVisibility: {
-        state.app.showAllNotifications = payload === undefined ? !app.showAllNotifications : payload
+        state.app.showAllNotifications = payload === undefined ? !state.app.showAllNotifications : payload
         break
       }
       case AppActions.ToggleIsAllowedToFetchList: {
-        state.app.isAllowedToFetchList = payload === undefined ? !app.isAllowedToFetchList : payload
+        state.app.isAllowedToFetchList = payload === undefined ? !state.app.isAllowedToFetchList : payload
         break
       }
       default: {

@@ -20,7 +20,6 @@ const PasswordRequest = ({
   const onDismiss = useCallback(() => {
     dispatch({
       type: AppActions.DismissPasswordRequest,
-      payload: null,
     })
   }, [dispatch])
 

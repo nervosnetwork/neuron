@@ -67,7 +67,6 @@ export const addPopup = (text: string) => (dispatch: StateDispatch) => {
   setTimeout(() => {
     dispatch({
       type: AppActions.PopOut,
-      payload: null,
     })
   }, 8000)
 }

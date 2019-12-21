@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useCallback } from 'react'
 import { TFunction } from 'i18next'
-import { AppActions, StateActions } from 'states/stateProvider/reducer'
+import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { verifyAmount } from 'utils/validators'
 import { epochParser } from 'utils/parsers'
 import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
@@ -72,7 +72,7 @@ export const useInitData = ({
   setGenesisBlockTimestamp,
 }: {
   clearGeneratedTx: () => void
-  dispatch: React.Dispatch<{ type: StateActions; payload: any }>
+  dispatch: React.Dispatch<StateAction>
   updateDepositValue: (value: string) => void
   wallet: State.Wallet
   setGenesisBlockTimestamp: React.Dispatch<React.SetStateAction<number | undefined>>
@@ -95,11 +95,10 @@ export const useInitData = ({
     }
   }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance, setGenesisBlockTimestamp])
 
-export const useClearGeneratedTx = (dispatch: React.Dispatch<{ type: AppActions; payload: any }>) =>
+export const useClearGeneratedTx = (dispatch: React.Dispatch<StateAction>) =>
   useCallback(() => {
     dispatch({
       type: AppActions.ClearSendState,
-      payload: null,
     })
   }, [dispatch])
 
@@ -119,7 +118,7 @@ export const useUpdateDepositValue = ({
   clearGeneratedTx: () => void
   maxDepositAmount: bigint
   maxDepositTx: React.Dispatch<React.SetStateAction<any>>
-  dispatch: React.Dispatch<{ type: StateActions; payload: any }>
+  dispatch: React.Dispatch<StateAction>
   walletID: string
   maxDepositErrorMessage: string
   t: TFunction
@@ -262,7 +261,7 @@ export const useOnDepositDialogSubmit = ({
 }: {
   setShowDepositDialog: React.Dispatch<React.SetStateAction<boolean>>
   setDepositValue: React.Dispatch<React.SetStateAction<string>>
-  dispatch: React.Dispatch<{ type: StateActions; payload: any }>
+  dispatch: React.Dispatch<StateAction>
   walletID: string
 }) =>
   useCallback(() => {
@@ -293,7 +292,7 @@ export const useOnWithdrawDialogSubmit = ({
   setActiveRecord: React.Dispatch<null>
   clearGeneratedTx: () => void
   walletID: string
-  dispatch: React.Dispatch<{ type: StateActions; payload: any }>
+  dispatch: React.Dispatch<StateAction>
 }) =>
   useCallback(() => {
     if (activeRecord) {
@@ -359,7 +358,7 @@ export const useOnActionClick = ({
 }: {
   records: State.NervosDAORecord[]
   clearGeneratedTx: () => void
-  dispatch: React.Dispatch<{ type: StateActions; payload: any }>
+  dispatch: React.Dispatch<StateAction>
   walletID: string
   setActiveRecord: React.Dispatch<State.NervosDAORecord>
 }) =>

@@ -108,7 +108,6 @@ const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
       type: AppActions.AddSendOutput,
-      payload: null,
     })
   }, [dispatch])
 
@@ -220,7 +219,6 @@ const useSendDescriptionChange = (dispatch: StateDispatch) =>
 const clear = (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.ClearSendState,
-    payload: null,
   })
 }
 
