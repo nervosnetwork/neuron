@@ -1,3 +1,4 @@
+import produce from 'immer'
 import initStates from 'states/initStates'
 import { ConnectionStatus } from '../../utils/const'
 
@@ -23,7 +24,6 @@ export enum NeuronWalletActions {
   UpdateAppUpdaterStatus = 'updateAppUpdaterStatus',
 }
 export enum AppActions {
-  UpdateTransactionID = 'updateTransactionID',
   AddSendOutput = 'addSendOutput',
   RemoveSendOutput = 'removeSendOutput',
   UpdateSendOutput = 'updateSendOutput',
@@ -58,6 +58,7 @@ export type StateActions = NeuronWalletActions | AppActions
 export type StateDispatch = React.Dispatch<{ type: StateActions; payload: any }> // TODO: add type of payload
 export type StateWithDispatch = State.AppWithNeuronWallet & { dispatch: StateDispatch }
 
+<<<<<<< HEAD
 export const reducer = (
   state: State.AppWithNeuronWallet,
   { type, payload }: { type: StateActions; payload: any }
@@ -85,23 +86,47 @@ export const reducer = (
         wallet: incomingWallet || wallet,
         chain: {
           ...state.chain,
+=======
+/* eslint-disable no-param-reassign */
+export const reducer = produce(
+  (
+    state: State.AppWithNeuronWallet,
+    { type, payload }: { type: StateActions; payload: any }
+  ): State.AppWithNeuronWallet => {
+    const { app } = state
+    if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-action')) {
+      console.group(`type: ${type}`)
+      console.info(payload)
+      console.groupEnd()
+    }
+    switch (type) {
+      // Actions of Neuron Wallet
+      case NeuronWalletActions.InitAppState: {
+        const {
+          wallets,
+          wallet: incomingWallet,
+          networks,
+          currentNetworkID: networkID,
+          transactions,
+          syncedBlockNumber,
+          connectionStatus,
+          codeHash,
+        } = payload
+        state.wallet = incomingWallet || state.wallet
+        Object.assign(state.chain, {
+>>>>>>> 9ec3c634... refactor: use immer to simplify reducer
           networkID,
           transactions,
           connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
           tipBlockNumber: syncedBlockNumber,
-        },
-        settings: {
-          general: {
-            ...state.settings.general,
-          },
-          networks,
-          wallets,
-        },
-        updater: {
+        })
+        Object.assign(state.settings, { networks, wallets })
+        state.updater = {
           checking: false,
           downloadProgress: -1,
           version: '',
           releaseNotes: '',
+<<<<<<< HEAD
         },
       }
     }
@@ -192,363 +217,215 @@ export const reducer = (
         ...state,
         app: {
           ...app,
+=======
+        }
+        break
+      }
+      case NeuronWalletActions.UpdateCodeHash: {
+        state.chain.codeHash = payload
+        break
+      }
+      case NeuronWalletActions.UpdateAddressListAndBalance:
+      case NeuronWalletActions.UpdateCurrentWallet: {
+        Object.assign(state.wallet, payload)
+        break
+      }
+      case NeuronWalletActions.UpdateWalletList: {
+        state.settings.wallets = payload
+        break
+      }
+      case NeuronWalletActions.UpdateAddressDescription: {
+        state.wallet.addresses.forEach(addr => {
+          if (addr.address === payload.address) {
+            addr.description = payload.description
+          }
+        })
+        break
+      }
+      case NeuronWalletActions.UpdateTransactionList: {
+        state.chain.transactions = payload
+        break
+      }
+      case NeuronWalletActions.UpdateTransactionDescription: {
+        state.chain.transactions.items.forEach(tx => {
+          if (tx.hash === payload.hash) {
+            tx.description = payload.description
+          }
+        })
+        break
+      }
+      case NeuronWalletActions.UpdateNetworkList: {
+        state.settings.networks = payload
+        break
+      }
+      case NeuronWalletActions.UpdateCurrentNetworkID: {
+        Object.assign(state.app, {
+>>>>>>> 9ec3c634... refactor: use immer to simplify reducer
           tipBlockNumber: '0',
           chain: '',
           difficulty: BigInt(0),
           epoch: '',
-        },
-        chain: {
-          ...chain,
-          networkID: payload,
-        },
+        })
+        state.chain.networkID = payload
+        break
+      }
+      case NeuronWalletActions.UpdateConnectionStatus: {
+        state.chain.connectionStatus = payload
+        break
+      }
+      case NeuronWalletActions.UpdateSyncedBlockNumber: {
+        state.chain.tipBlockNumber = payload
+        break
+      }
+      case NeuronWalletActions.UpdateAppUpdaterStatus: {
+        state.updater = payload
+        break
+      }
+      case NeuronWalletActions.UpdateNervosDaoData: {
+        state.nervosDAO = payload
+        break
+      }
+      // Actions of App
+      case AppActions.UpdateChainInfo: {
+        Object.assign(state.app, payload)
+        break
+      }
+      case AppActions.AddSendOutput: {
+        state.app.send.outputs.push(initStates.app.send.outputs[0])
+        state.app.messages.send = null
+        break
+      }
+      case AppActions.RemoveSendOutput: {
+        state.app.send.outputs.splice(payload, 1)
+        state.app.messages.send = null
+        break
+      }
+      case AppActions.UpdateSendOutput: {
+        /**
+         * payload:{ idx, item: { address, capacity } }
+         */
+        Object.assign(state.app.send.outputs[payload.idx], payload.item)
+        state.app.messages.send = null
+        break
+      }
+      case AppActions.UpdateSendPrice: {
+        /**
+         * payload: new price
+         */
+        state.app.send.price = payload
+        break
+      }
+      case AppActions.UpdateSendDescription: {
+        /**
+         * payload: new description
+         */
+        state.app.send.description = payload
+        break
+      }
+      case AppActions.UpdateGeneratedTx: {
+        state.app.send.generatedTx = payload || null
+        break
+      }
+      case AppActions.ClearSendState: {
+        state.app.send = initStates.app.send
+        break
+      }
+      case AppActions.RequestPassword: {
+        state.app.passwordRequest = payload
+        break
+      }
+      case AppActions.DismissPasswordRequest: {
+        state.app.passwordRequest = initStates.app.passwordRequest
+        break
+      }
+      case AppActions.UpdatePassword: {
+        state.app.passwordRequest.password = payload
+        break
+      }
+      case AppActions.UpdateMessage: {
+        /**
+         * payload: {type,content, timestamp}
+         */
+        Object.assign(state.app.messages, payload)
+        break
+      }
+      case AppActions.AddNotification: {
+        /**
+         * payload: { type, content }
+         */
+        // NOTICE: for simplicty, only one notification will be displayed
+        state.app.notifications.push(payload)
+        state.app.showTopAlert = true
+        break
+      }
+      case AppActions.DismissNotification: {
+        /**
+         * payload: timstamp
+         */
+        state.app.showTopAlert =
+          app.notifications.findIndex(message => message.timestamp === payload) === app.notifications.length - 1
+            ? false
+            : app.showTopAlert
+        state.app.notifications = state.app.notifications.filter(({ timestamp }) => timestamp !== payload)
+        state.app.showAllNotifications = state.app.notifications.length > 1
+        break
+      }
+      case AppActions.ClearNotificationsOfCode: {
+        const notifications = state.app.notifications.filter(({ code }) => code !== payload)
+        const showTopAlert =
+          state.app.showTopAlert &&
+          notifications.length > 0 &&
+          !(
+            state.app.notifications.length > 0 &&
+            state.app.notifications[state.app.notifications.length - 1].code === payload
+          )
+        state.app.notifications = notifications
+        state.app.showTopAlert = showTopAlert
+        break
+      }
+      case AppActions.ClearNotifications: {
+        state.app.notifications = []
+        break
+      }
+      case AppActions.CleanTransactions: {
+        state.chain.transactions = initStates.chain.transactions
+        break
+      }
+      case AppActions.UpdateLoadings: {
+        Object.assign(state.app.loadings, payload)
+        break
+      }
+      case AppActions.UpdateAlertDialog: {
+        state.app.alertDialog = payload
+        break
+      }
+      case AppActions.PopIn: {
+        state.app.popups.push(payload)
+        break
+      }
+      case AppActions.PopOut: {
+        state.app.popups.shift()
+        break
+      }
+      case AppActions.ToggleTopAlertVisibility: {
+        state.app.showTopAlert = payload === undefined ? !state.app.showTopAlert : payload
+        if (!state.app.showTopAlert) {
+          state.app.notifications.pop()
+        }
+        break
+      }
+      case AppActions.ToggleAllNotificationVisibility: {
+        state.app.showAllNotifications = payload === undefined ? !app.showAllNotifications : payload
+        break
+      }
+      case AppActions.ToggleIsAllowedToFetchList: {
+        state.app.isAllowedToFetchList = payload === undefined ? !app.isAllowedToFetchList : payload
+        break
+      }
+      default: {
+        break
       }
     }
-    case NeuronWalletActions.UpdateConnectionStatus: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          connectionStatus: payload,
-        },
-      }
-    }
-    case NeuronWalletActions.UpdateSyncedBlockNumber: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          tipBlockNumber: payload,
-        },
-      }
-    }
-    case NeuronWalletActions.UpdateAppUpdaterStatus: {
-      return {
-        ...state,
-        updater: payload,
-      }
-    }
-    case NeuronWalletActions.UpdateNervosDaoData: {
-      return {
-        ...state,
-        nervosDAO: payload,
-      }
-    }
-    // Actions of App
-    case AppActions.UpdateChainInfo: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          ...payload,
-        },
-      }
-    }
-    case AppActions.UpdateTransactionID: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            txID: Math.round(Math.random() * 100000).toString(),
-          },
-        },
-      }
-    }
-    case AppActions.AddSendOutput: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            outputs: [...app.send.outputs, initStates.app.send.outputs[0]],
-          },
-          messages: {
-            ...app.messages,
-            send: null,
-          },
-        },
-      }
-    }
-    case AppActions.RemoveSendOutput: {
-      /**
-       * payload: index of the output to be removed
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: { ...app.send, outputs: app.send.outputs.filter((_, idx) => idx !== payload) },
-          messages: {
-            ...app.messages,
-            send: null,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateSendOutput: {
-      /**
-       * payload:{ idx, item: { address, capacity } }
-       */
-      const outputs = [...app.send.outputs]
-      outputs[payload.idx] = {
-        ...outputs[payload.idx],
-        ...payload.item,
-      }
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            outputs,
-          },
-          messages: {
-            ...app.messages,
-            send: null,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateSendPrice: {
-      /**
-       * payload: new price
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            price: payload,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateSendDescription: {
-      /**
-       * payload: new description
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            description: payload,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateGeneratedTx: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: {
-            ...app.send,
-            generatedTx: payload || null,
-          },
-        },
-      }
-    }
-    case AppActions.ClearSendState: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          send: initStates.app.send,
-        },
-      }
-    }
-    case AppActions.RequestPassword: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          passwordRequest: payload,
-        },
-      }
-    }
-    case AppActions.DismissPasswordRequest: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          passwordRequest: initStates.app.passwordRequest,
-        },
-      }
-    }
-    case AppActions.UpdatePassword: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          passwordRequest: {
-            ...app.passwordRequest,
-            password: payload,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateMessage: {
-      /**
-       * payload: {type,content, timestamp}
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          messages: {
-            ...app.messages,
-            ...payload,
-          },
-        },
-      }
-    }
-    case AppActions.AddNotification: {
-      /**
-       * payload: { type, content }
-       */
-      // NOTICE: for simplicty, only one notification will be displayed
-      return {
-        ...state,
-        app: {
-          ...app,
-          notifications: [...app.notifications, payload],
-          showTopAlert: true,
-        },
-      }
-    }
-    case AppActions.DismissNotification: {
-      /**
-       * payload: timstamp
-       */
-      return {
-        ...state,
-        app: {
-          ...app,
-          messages: {
-            ...app.messages,
-          },
-          notifications: app.notifications.filter(({ timestamp }) => timestamp !== payload),
-          showAllNotifications: app.notifications.length > 1,
-          showTopAlert:
-            app.notifications.findIndex(message => message.timestamp === payload) === app.notifications.length - 1
-              ? false
-              : app.showTopAlert,
-        },
-      }
-    }
-    case AppActions.ClearNotificationsOfCode: {
-      const notifications = app.notifications.filter(({ code }) => code !== payload)
-      return {
-        ...state,
-        app: {
-          ...app,
-          messages: {
-            ...app.messages,
-          },
-          showTopAlert:
-            app.showTopAlert &&
-            notifications.length > 0 &&
-            !(app.notifications.length > 0 && app.notifications[app.notifications.length - 1].code === payload),
-          notifications,
-        },
-      }
-    }
-    case AppActions.ClearNotifications: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          messages: {
-            ...app.messages,
-          },
-          notifications: [],
-        },
-      }
-    }
-    case AppActions.CleanTransactions: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          transactions: initStates.chain.transactions,
-        },
-      }
-    }
-    case AppActions.UpdateLoadings: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          loadings: {
-            ...app.loadings,
-            ...payload,
-          },
-        },
-      }
-    }
-    case AppActions.UpdateAlertDialog: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          alertDialog: payload,
-        },
-      }
-    }
-    case AppActions.PopIn: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          popups: [...app.popups, payload],
-        },
-      }
-    }
-    case AppActions.PopOut: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          popups: app.popups.slice(1),
-        },
-      }
-    }
-    case AppActions.ToggleTopAlertVisibility: {
-      const showTopAlert = payload === undefined ? !app.showTopAlert : payload
-      return {
-        ...state,
-        app: {
-          ...app,
-          showTopAlert,
-          notifications: showTopAlert ? app.notifications : app.notifications.slice(0, -1),
-        },
-      }
-    }
-    case AppActions.ToggleAllNotificationVisibility: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          showAllNotifications: payload === undefined ? !app.showAllNotifications : payload,
-        },
-      }
-    }
-    case AppActions.ToggleIsAllowedToFetchList: {
-      return {
-        ...state,
-        app: {
-          ...app,
-          isAllowedToFetchList: payload === undefined ? !app.isAllowedToFetchList : payload,
-        },
-      }
-    }
-    default: {
-      return state
-    }
+    return state
   }
-}
+)

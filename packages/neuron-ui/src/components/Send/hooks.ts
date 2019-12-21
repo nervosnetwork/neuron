@@ -160,10 +160,6 @@ const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
     (walletID: string = '') => () => {
       if (verifyTransactionOutputs(items)) {
         dispatch({
-          type: AppActions.UpdateTransactionID,
-          payload: null,
-        })
-        dispatch({
           type: AppActions.RequestPassword,
           payload: {
             walletID,
