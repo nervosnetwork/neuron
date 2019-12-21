@@ -130,14 +130,7 @@ export const reducer = (
 /* eslint-disable no-param-reassign */
 export const reducer = produce(
   (state: State.AppWithNeuronWallet, action: StateAction): State.AppWithNeuronWallet => {
-    const { type } = action
-    const payload = 'payload' in action ? action.payload : undefined
-    if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-action')) {
-      console.group(`type: ${type}`)
-      console.info(payload)
-      console.groupEnd()
-    }
-    switch (type) {
+    switch (action.type) {
       // Actions of Neuron Wallet
       case NeuronWalletActions.InitAppState: {
         const {
@@ -149,7 +142,7 @@ export const reducer = produce(
           syncedBlockNumber,
           connectionStatus,
           codeHash,
-        } = payload
+        } = action.payload
         state.wallet = incomingWallet || state.wallet
         Object.assign(state.chain, {
 >>>>>>> 9ec3c634... refactor: use immer to simplify reducer
@@ -260,40 +253,40 @@ export const reducer = produce(
         break
       }
       case NeuronWalletActions.UpdateCodeHash: {
-        state.chain.codeHash = payload
+        state.chain.codeHash = action.payload
         break
       }
       case NeuronWalletActions.UpdateAddressListAndBalance:
       case NeuronWalletActions.UpdateCurrentWallet: {
-        Object.assign(state.wallet, payload)
+        Object.assign(state.wallet, action.payload)
         break
       }
       case NeuronWalletActions.UpdateWalletList: {
-        state.settings.wallets = payload
+        state.settings.wallets = action.payload
         break
       }
       case NeuronWalletActions.UpdateAddressDescription: {
         state.wallet.addresses.forEach(addr => {
-          if (addr.address === payload.address) {
-            addr.description = payload.description
+          if (addr.address === action.payload.address) {
+            addr.description = action.payload.description
           }
         })
         break
       }
       case NeuronWalletActions.UpdateTransactionList: {
-        state.chain.transactions = payload
+        state.chain.transactions = action.payload
         break
       }
       case NeuronWalletActions.UpdateTransactionDescription: {
         state.chain.transactions.items.forEach(tx => {
-          if (tx.hash === payload.hash) {
-            tx.description = payload.description
+          if (tx.hash === action.payload.hash) {
+            tx.description = action.payload.description
           }
         })
         break
       }
       case NeuronWalletActions.UpdateNetworkList: {
-        state.settings.networks = payload
+        state.settings.networks = action.payload
         break
       }
       case NeuronWalletActions.UpdateCurrentNetworkID: {
@@ -304,28 +297,28 @@ export const reducer = produce(
           difficulty: BigInt(0),
           epoch: '',
         })
-        state.chain.networkID = payload
+        state.chain.networkID = action.payload
         break
       }
       case NeuronWalletActions.UpdateConnectionStatus: {
-        state.chain.connectionStatus = payload
+        state.chain.connectionStatus = action.payload
         break
       }
       case NeuronWalletActions.UpdateSyncedBlockNumber: {
-        state.chain.tipBlockNumber = payload
+        state.chain.tipBlockNumber = action.payload
         break
       }
       case NeuronWalletActions.UpdateAppUpdaterStatus: {
-        state.updater = payload
+        state.updater = action.payload
         break
       }
       case NeuronWalletActions.UpdateNervosDaoData: {
-        state.nervosDAO = payload
+        state.nervosDAO = action.payload
         break
       }
       // Actions of App
       case AppActions.UpdateChainInfo: {
-        Object.assign(state.app, payload)
+        Object.assign(state.app, action.payload)
         break
       }
       case AppActions.AddSendOutput: {
@@ -334,7 +327,7 @@ export const reducer = produce(
         break
       }
       case AppActions.RemoveSendOutput: {
-        state.app.send.outputs.splice(payload, 1)
+        state.app.send.outputs.splice(action.payload, 1)
         state.app.messages.send = null
         break
       }
@@ -342,7 +335,7 @@ export const reducer = produce(
         /**
          * payload:{ idx, item: { address, capacity } }
          */
-        Object.assign(state.app.send.outputs[payload.idx], payload.item)
+        Object.assign(state.app.send.outputs[action.payload.idx], action.payload.item)
         state.app.messages.send = null
         break
       }
@@ -350,18 +343,18 @@ export const reducer = produce(
         /**
          * payload: new price
          */
-        state.app.send.price = payload
+        state.app.send.price = action.payload
         break
       }
       case AppActions.UpdateSendDescription: {
         /**
          * payload: new description
          */
-        state.app.send.description = payload
+        state.app.send.description = action.payload
         break
       }
       case AppActions.UpdateGeneratedTx: {
-        state.app.send.generatedTx = payload || null
+        state.app.send.generatedTx = action.payload || null
         break
       }
       case AppActions.ClearSendState: {
@@ -369,7 +362,7 @@ export const reducer = produce(
         break
       }
       case AppActions.RequestPassword: {
-        state.app.passwordRequest = payload
+        state.app.passwordRequest = { ...action.payload, password: '' }
         break
       }
       case AppActions.DismissPasswordRequest: {
@@ -377,14 +370,14 @@ export const reducer = produce(
         break
       }
       case AppActions.UpdatePassword: {
-        state.app.passwordRequest.password = payload
+        state.app.passwordRequest.password = action.payload
         break
       }
       case AppActions.UpdateMessage: {
         /**
          * payload: {type,content, timestamp}
          */
-        Object.assign(state.app.messages, payload)
+        Object.assign(state.app.messages, action.payload)
         break
       }
       case AppActions.AddNotification: {
@@ -392,7 +385,7 @@ export const reducer = produce(
          * payload: { type, content }
          */
         // NOTICE: for simplicty, only one notification will be displayed
-        state.app.notifications.push(payload)
+        state.app.notifications.push(action.payload)
         state.app.showTopAlert = true
         break
       }
@@ -401,24 +394,24 @@ export const reducer = produce(
          * payload: timstamp
          */
         state.app.showTopAlert =
-          state.app.notifications.findIndex(message => message.timestamp === payload) ===
+          state.app.notifications.findIndex(message => message.timestamp === action.payload) ===
           state.app.notifications.length - 1
             ? false
             : state.app.showTopAlert
-        state.app.notifications = state.app.notifications.filter(({ timestamp }) => timestamp !== payload)
+        state.app.notifications = state.app.notifications.filter(({ timestamp }) => timestamp !== action.payload)
         state.app.showAllNotifications = state.app.showAllNotifications
           ? state.app.notifications.length > 0
           : state.app.showAllNotifications
         break
       }
       case AppActions.ClearNotificationsOfCode: {
-        const notifications = state.app.notifications.filter(({ code }) => code !== payload)
+        const notifications = state.app.notifications.filter(({ code }) => code !== action.payload)
         const showTopAlert =
           state.app.showTopAlert &&
           notifications.length > 0 &&
           !(
             state.app.notifications.length > 0 &&
-            state.app.notifications[state.app.notifications.length - 1].code === payload
+            state.app.notifications[state.app.notifications.length - 1].code === action.payload
           )
         state.app.notifications = notifications
         state.app.showTopAlert = showTopAlert
@@ -433,15 +426,15 @@ export const reducer = produce(
         break
       }
       case AppActions.UpdateLoadings: {
-        Object.assign(state.app.loadings, payload)
+        Object.assign(state.app.loadings, action.payload)
         break
       }
       case AppActions.UpdateAlertDialog: {
-        state.app.alertDialog = payload
+        state.app.alertDialog = action.payload
         break
       }
       case AppActions.PopIn: {
-        state.app.popups.push(payload)
+        state.app.popups.push(action.payload)
         break
       }
       case AppActions.PopOut: {
@@ -449,18 +442,18 @@ export const reducer = produce(
         break
       }
       case AppActions.ToggleTopAlertVisibility: {
-        state.app.showTopAlert = payload === undefined ? !state.app.showTopAlert : payload
+        state.app.showTopAlert = action.payload === undefined ? !state.app.showTopAlert : action.payload
         if (!state.app.showTopAlert) {
           state.app.notifications.pop()
         }
         break
       }
       case AppActions.ToggleAllNotificationVisibility: {
-        state.app.showAllNotifications = payload === undefined ? !state.app.showAllNotifications : payload
+        state.app.showAllNotifications = action.payload === undefined ? !state.app.showAllNotifications : action.payload
         break
       }
       case AppActions.ToggleIsAllowedToFetchList: {
-        state.app.isAllowedToFetchList = payload === undefined ? !state.app.isAllowedToFetchList : payload
+        state.app.isAllowedToFetchList = action.payload === undefined ? !state.app.isAllowedToFetchList : action.payload
         break
       }
       default: {
