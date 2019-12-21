@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import Button from 'widgets/Button'
 import { useDialog } from 'utils/hooks'
 
 import styles from './compensationPeriodDialog.module.scss'
@@ -49,9 +50,7 @@ const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: Compensatio
           })}
       </ul>
       <div className={styles.actions}>
-        <button type="button" onClick={onDismiss}>
-          {t('common.ok')}
-        </button>
+        <Button type="ok" onClick={onDismiss} label={t('common.ok')} />
       </div>
     </dialog>
   )

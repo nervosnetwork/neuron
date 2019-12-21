@@ -1,0 +1,51 @@
+$error-red: #d50000;
+
+.textField {
+  display: grid;
+  grid-template:
+    'label input'auto 'blank error'minmax(0.6875rem, auto) / auto 1fr;
+  grid-gap: 4px;
+
+  &[data-required] {
+    label::after {
+      display: inline;
+      content: '*';
+    }
+  }
+
+  &[data-has-error="true"] {
+    input {
+      border-color: $error-red;
+    }
+  }
+
+  label {
+    grid-area: label;
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    letter-spacing: 0.7px;
+    color: #000000;
+  }
+
+  input {
+    grid-area: input;
+    font-size: 0.75rem;
+    letter-spacing: 0.6px;
+    color: #434343;
+    border: solid 1px #000000;
+    padding: 4.5px;
+  }
+}
+
+.stack {
+  grid-template:
+    'label'auto 'input'auto 'error'minmax(0.6875rem, auto) /auto;
+}
+
+.errorMessage {
+  grid-area: error;
+  color: $error-red;
+  letter-spacing: 0.45px;
+  font-size: 0.5625rem;
+  line-height: 0.6875rem;
+}

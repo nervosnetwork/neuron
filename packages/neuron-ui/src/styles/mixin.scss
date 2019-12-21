@@ -16,25 +16,6 @@
 @mixin dialogFooter {
   display: flex;
   justify-content: flex-end;
-
-  button {
-    width: 5.125rem;
-    height: 1.875rem;
-    border: none;
-    font-size: 0.75rem;
-    letter-spacing: 0.6px;
-  }
-
-  .cancel {
-    background: #e3e3e3;
-    color: #000;
-  }
-
-  .submit {
-    background: var(--nervos-green);
-    color: #fff;
-    margin-left: 9px;
-  }
 }
 
 @mixin dialogConfirmButton {

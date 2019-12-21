@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import Button from 'widgets/Button'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
 import { useCalculateEpochs, useDialog } from 'utils/hooks'
@@ -110,12 +111,8 @@ const WithdrawDialog = ({
         </>
       ) : null}
       <div className={styles.footer}>
-        <button type="button" aria-label={t('nervos-dao.cancel')} onClick={onDismiss} className={styles.cancel}>
-          {t('nervos-dao.cancel')}
-        </button>
-        <button type="submit" aria-label={t('nervos-dao.proceed')} onClick={onSubmit} className={styles.submit}>
-          {t('nervos-dao.proceed')}
-        </button>
+        <Button type="cancel" aria-label={t('nervos-dao.cancel')} onClick={onDismiss} label={t('nervos-dao.cancel')} />
+        <Button type="submit" aria-label={t('nervos-dao.proceed')} onClick={onSubmit} label={t('nervos-dao.proceed')} />
       </div>
     </dialog>
   )

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { dismissAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
 import { useDialog } from 'utils/hooks'
+import Button from 'widgets/Button'
 import styles from './alertDialog.module.scss'
 
 const AlertDialog = ({
@@ -30,9 +31,7 @@ const AlertDialog = ({
         </>
       ) : null}
       <div className={styles.actions}>
-        <button type="button" onClick={onDismiss}>
-          {t('common.confirm')}
-        </button>
+        <Button type="confirm" onClick={onDismiss} label={t('common.confirm')} />
       </div>
     </dialog>
   )
