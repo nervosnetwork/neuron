@@ -19,6 +19,7 @@
     color: #000;
   }
 
+  &[data-type='primary'],
   &[data-type='ok'],
   &[data-type="submit"],
   &[data-type="confirm"] {
