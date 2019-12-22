@@ -1,6 +1,6 @@
 import { CapacityUnit } from 'utils/const'
 
-const appState: State.App = {
+const appState: Readonly<State.App> = {
   tipBlockNumber: '',
   tipBlockHash: '',
   tipBlockTimestamp: 0,

@@ -356,7 +356,7 @@ export const useOnActionClick = ({
   walletID,
   setActiveRecord,
 }: {
-  records: State.NervosDAORecord[]
+  records: Readonly<State.NervosDAORecord[]>
   clearGeneratedTx: () => void
   dispatch: React.Dispatch<StateAction>
   walletID: string
@@ -437,7 +437,7 @@ export const useUpdateWithdrawList = ({
   tipBlockHash,
   setWithdrawList,
 }: {
-  records: State.NervosDAORecord[]
+  records: Readonly<State.NervosDAORecord[]>
   tipBlockHash: string
   setWithdrawList: React.Dispatch<React.SetStateAction<(string | null)[]>>
 }) =>
@@ -471,7 +471,7 @@ export const useUpdateDepositEpochList = ({
   setDepositEpochList,
   connectionStatus,
 }: {
-  records: State.NervosDAORecord[]
+  records: Readonly<State.NervosDAORecord[]>
   setDepositEpochList: React.Dispatch<React.SetStateAction<(string | null)[]>>
   connectionStatus: State.ConnectionStatus
 }) =>

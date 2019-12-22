@@ -62,7 +62,7 @@ const History = ({
         <TransactionList
           isLoading={isLoading}
           walletID={id}
-          items={items}
+          items={items as State.Transaction[]}
           tipBlockNumber={tipBlockNumber}
           isMainnet={isMainnet}
           dispatch={dispatch}

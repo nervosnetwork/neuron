@@ -20,17 +20,11 @@ import QRScanner from 'widgets/QRScanner'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, CapacityUnit, ErrorCode, MAINNET_TAG } from 'utils/const'
+import { PlaceHolders, ErrorCode, MAINNET_TAG } from 'utils/const'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 
 import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
-
-export interface TransactionOutput {
-  address: string
-  amount: string
-  unit: CapacityUnit
-}
 
 const Send = ({
   app: {

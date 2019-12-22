@@ -87,10 +87,7 @@ export const verifyPasswordComplexity = (password: string) => {
   return true
 }
 
-export const verifyTransactionOutputs = (
-  items: { address: string; amount: string }[] = [],
-  ignoreLastAmount: boolean = false
-) => {
+export const verifyTransactionOutputs = (items: Readonly<State.Output[]> = [], ignoreLastAmount: boolean = false) => {
   return !items.some((item, i) => {
     if (item.address === '' || verifyAddress(item.address) !== true) {
       return true
