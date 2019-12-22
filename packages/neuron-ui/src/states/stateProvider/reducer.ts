@@ -3,7 +3,6 @@ import { ConnectionStatus } from '../../utils/const'
 
 export enum NeuronWalletActions {
   InitAppState = 'initAppState',
-  UpdateCodeHash = 'updateCodeHash',
   // wallets
   UpdateCurrentWallet = 'updateCurrentWallet',
   UpdateWalletList = 'updateWalletList',
@@ -80,7 +79,6 @@ export const reducer = (
         transactions,
         syncedBlockNumber,
         connectionStatus,
-        codeHash,
       } = payload
       return {
         ...state,
@@ -89,7 +87,6 @@ export const reducer = (
           ...state.chain,
           networkID,
           transactions,
-          codeHash,
           connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
           tipBlockNumber: syncedBlockNumber,
         },
@@ -105,15 +102,6 @@ export const reducer = (
           downloadProgress: -1,
           version: '',
           releaseNotes: '',
-        },
-      }
-    }
-    case NeuronWalletActions.UpdateCodeHash: {
-      return {
-        ...state,
-        chain: {
-          ...chain,
-          codeHash: payload,
         },
       }
     }
