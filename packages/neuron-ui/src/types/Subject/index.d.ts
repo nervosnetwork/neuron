@@ -12,9 +12,6 @@ declare namespace Command {
 }
 
 declare namespace Subject {
-  interface SystemScript {
-    codeHash: string
-  }
   interface DataUpdateMetaInfo {
     walletID?: string
     dataType: 'address' | 'transaction' | 'current-wallet' | 'wallets' | 'network'

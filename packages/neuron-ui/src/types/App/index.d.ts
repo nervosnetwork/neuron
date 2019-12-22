@@ -139,7 +139,6 @@ declare namespace State {
     networkID: string
     connectionStatus: ConnectionStatus
     tipBlockNumber: string
-    codeHash: string
     transactions: {
       pageNo: number
       pageSize: number

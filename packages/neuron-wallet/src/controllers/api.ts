@@ -9,7 +9,6 @@ import { NetworkType, NetworkID, Network } from 'types/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ConnectionStatusSubject } from 'models/subjects/node'
-import { SystemScriptSubject } from 'models/subjects/system-script'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
@@ -43,7 +42,6 @@ export default class ApiController {
         networks = [],
         syncedBlockNumber = '0',
         connectionStatus = false,
-        codeHash = '',
       ] = await Promise.all([
         networksService.getCurrentID(),
         networksService.getAll(),
@@ -62,14 +60,6 @@ export default class ApiController {
             status => { resolve(status) },
             () => { resolve(false) },
             () => { resolve(false) }
-          )
-        }),
-
-        new Promise(resolve => {
-          SystemScriptSubject.pipe(take(1)).subscribe(
-            ({ codeHash: currentCodeHash }) => resolve(currentCodeHash),
-            () => { resolve('') },
-            () => { resolve('') }
           )
         }),
       ])
@@ -96,7 +86,6 @@ export default class ApiController {
         transactions,
         syncedBlockNumber,
         connectionStatus,
-        codeHash,
       }
 
       return { status: ResponseCode.Success, result: initState }

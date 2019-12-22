@@ -2,7 +2,6 @@ import { debounceTime, sampleTime } from 'rxjs/operators'
 
 import CommandSubject from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
-import { DebouncedSystemScriptSubject } from 'models/subjects/system-script'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import { SyncedBlockNumberSubject, ConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
@@ -24,10 +23,6 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkID = '' }) => {
     dispatcher.sendMessage('current-network-id-updated', currentNetworkID)
-  })
-
-  DebouncedSystemScriptSubject.subscribe(params => {
-    dispatcher.sendMessage('system-script-updated', params)
   })
 
   ConnectionStatusSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(params => {
