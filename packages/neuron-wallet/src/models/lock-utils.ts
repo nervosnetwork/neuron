@@ -8,7 +8,6 @@ import {
 import NodeService from 'services/node'
 import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
 import ConvertTo from 'types/convert-to'
-import { SystemScriptSubject } from 'models/subjects/system-script'
 import Core from '@nervosnetwork/ckb-sdk-core'
 
 export interface SystemScript {
@@ -70,7 +69,6 @@ export default class LockUtils {
   static setSystemScript(info: SystemScript) {
     LockUtils.systemScriptInfo = info
     LockUtils.previousURL = NodeService.getInstance().core.rpc.node.url
-    SystemScriptSubject.next({ codeHash: info.codeHash })
   }
 
   addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
