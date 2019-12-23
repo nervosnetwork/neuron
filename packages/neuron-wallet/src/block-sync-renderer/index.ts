@@ -75,6 +75,8 @@ export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = f
   killBlockSyncTask()
   if (shouldSync) {
     await createBlockSyncTask()
+  } else {
+    SyncedBlockNumberSubject.next('-1')
   }
 }
 
