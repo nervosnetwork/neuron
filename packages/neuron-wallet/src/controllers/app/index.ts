@@ -7,6 +7,7 @@ import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
 import { subscribe } from './subscribe'
 import { ApiController } from 'controllers'
+import WalletsService from 'services/wallets'
 
 const app = electronApp || (remote && remote.app)
 
@@ -31,6 +32,12 @@ export default class AppController {
 
   public updateMenu = () => {
     updateApplicationMenu(this.mainWindow)
+  }
+
+  public updateWindowTitle = () => {
+    const currentWallet = WalletsService.getInstance().getCurrent()
+    const title = currentWallet ? `${currentWallet.name} - Neuron` : 'Neuron'
+    this.mainWindow?.setTitle(title)
   }
 
   public openWindow = () => {
@@ -70,9 +77,8 @@ export default class AppController {
       if (this.mainWindow) {
         this.mainWindow.show()
         this.mainWindow.focus()
+        this.updateWindowTitle()
         logger.info('The main window is ready to show')
-      } else {
-        logger.error('The main window is not initialized on ready to show')
       }
     })
 

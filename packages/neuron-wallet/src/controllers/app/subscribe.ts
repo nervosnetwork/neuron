@@ -11,6 +11,7 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
   updateMenu: () => void
+  updateWindowTitle: () => void
 }
 
 const DEBOUNCE_TIME = 50
@@ -44,6 +45,7 @@ export const subscribe = (dispatcher: AppResponder) => {
   WalletListSubject.pipe(debounceTime(50)).subscribe(() => {
     dataUpdateSubject.next({ dataType: 'wallets', actionType: 'update' })
     dispatcher.updateMenu()
+    dispatcher.updateWindowTitle()
   })
 
   CurrentWalletSubject.pipe(debounceTime(50)).subscribe(async params => {
@@ -51,6 +53,7 @@ export const subscribe = (dispatcher: AppResponder) => {
     if (params.currentWallet) {
       dataUpdateSubject.next({ dataType: 'current-wallet', actionType: 'update' })
     }
+    dispatcher.updateWindowTitle()
   })
 
   AppUpdaterSubject.subscribe(params => {
