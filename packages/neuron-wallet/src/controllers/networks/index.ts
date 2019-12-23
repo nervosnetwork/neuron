@@ -1,6 +1,6 @@
 import { dialog } from 'electron'
 import { distinctUntilChanged } from 'rxjs/operators'
-import { NetworkType, NetworkID, Network } from 'types/network'
+import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import NodeService from 'services/node'
 import { ResponseCode } from 'utils/const'
@@ -41,7 +41,7 @@ export default class NetworksController {
     }
   }
 
-  public get(id: NetworkID) {
+  public get(id: string) {
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
     }
@@ -74,7 +74,7 @@ export default class NetworksController {
     }
   }
 
-  public async update(id: NetworkID, options: Partial<Network>) {
+  public async update(id: string, options: Partial<Network>) {
     if (options.name && options.name === 'error') {
       throw new InvalidName('Network')
     }
@@ -94,7 +94,7 @@ export default class NetworksController {
     }
   }
 
-  public async delete(id: NetworkID) {
+  public async delete(id: string) {
     const network = networksService.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
@@ -149,7 +149,7 @@ export default class NetworksController {
     throw new CurrentNetworkNotSet()
   }
 
-  public async activate(id: NetworkID) {
+  public async activate(id: string) {
     await networksService.activate(id)
     this.notifyListChange()
     this.notifyCurrentNetworkChange()

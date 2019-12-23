@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
-import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
+import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
@@ -14,7 +14,7 @@ import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 
 let backgroundWindow: BrowserWindow | null
-let network: NetworkWithID | null
+let network: Network | null
 
 const updateAllAddressesTxCount = async (url: string) => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
@@ -55,7 +55,7 @@ const syncNetwork = async (rescan = false) => {
   }
 }
 
-export const switchToNetwork = async (newNetwork: NetworkWithID, reconnected = false, shouldSync = true) => {
+export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   const previousNetwork = network
   network = newNetwork
 

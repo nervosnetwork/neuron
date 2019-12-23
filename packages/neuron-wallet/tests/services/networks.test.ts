@@ -1,5 +1,5 @@
 import NetworksService from '../../src/services/networks'
-import { NetworkWithID } from '../../src/types/network'
+import { Network } from '../../src/models/network'
 import i18n from '../../src/utils/i18n'
 
 const ERROR_MESSAGE = {
@@ -9,7 +9,7 @@ const ERROR_MESSAGE = {
 }
 
 describe(`Unit tests of networks service`, () => {
-  const newNetwork: NetworkWithID = {
+  const newNetwork: Network = {
     name: `new network`,
     remote: `http://localhost:8114`,
     type: 0,

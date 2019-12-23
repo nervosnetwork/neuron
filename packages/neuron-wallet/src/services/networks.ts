@@ -6,9 +6,9 @@ import Store from 'models/store'
 
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
 
-const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
+const presetNetworks: { selected: string, networks: Network[] } = {
   selected: 'mainnet',
   networks: [
     {
@@ -20,6 +20,11 @@ const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
       chain: 'ckb',
     }
   ]
+}
+
+enum NetworksKey {
+  List = 'networks',
+  Current = 'selected',
 }
 
 export default class NetworksService extends Store {
@@ -42,19 +47,19 @@ export default class NetworksService extends Store {
   }
 
   public getAll = () => {
-    return this.readSync<NetworkWithID[]>(NetworksKey.List) || presetNetworks.networks
+    return this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
   }
 
-  public getCurrent(): NetworkWithID {
+  public getCurrent(): Network {
     return this.get(this.getCurrentID()) || this.defaultOne()! // Should always have at least one network
   }
 
-  public get(@Required id: NetworkID) {
+  public get(@Required id: string) {
     const list = this.getAll()
     return list.find(item => item.id === id) || null
   }
 
-  public updateAll(@Required networks: NetworkWithID[]) {
+  public updateAll(@Required networks: Network[]) {
     if (!Array.isArray(networks)) {
       throw new InvalidFormat('Networks')
     }
@@ -62,7 +67,7 @@ export default class NetworksService extends Store {
   }
 
   @Validate
-  public async create(@Required name: NetworkName, @Required remote: NetworkRemote, type: NetworkType = NetworkType.Normal) {
+  public async create(@Required name: string, @Required remote: string, type: NetworkType = NetworkType.Normal) {
     const list = this.getAll()
     if (list.some(item => item.name === name)) {
       throw new UsedName('Network')
@@ -83,7 +88,7 @@ export default class NetworksService extends Store {
   }
 
   @Validate
-  public async update(@Required id: NetworkID, @Required options: Partial<Network>) {
+  public async update(@Required id: string, @Required options: Partial<Network>) {
     const list = this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
@@ -97,7 +102,7 @@ export default class NetworksService extends Store {
   }
 
   @Validate
-  public async delete(@Required id: NetworkID) {
+  public async delete(@Required id: string) {
     const networkToDelete = this.get(id)
     if (!networkToDelete) {
       throw new NetworkNotFound(id)
@@ -115,7 +120,7 @@ export default class NetworksService extends Store {
   }
 
   @Validate
-  public async activate(@Required id: NetworkID) {
+  public async activate(@Required id: string) {
     const network = this.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
@@ -145,7 +150,7 @@ export default class NetworksService extends Store {
   }
 
   // Refresh a network's genesis and chain info
-  private async refreshChainInfo(network: NetworkWithID): Promise<NetworkWithID> {
+  private async refreshChainInfo(network: Network): Promise<Network> {
     if (network.type === NetworkType.Default) {
       // Default mainnet network is not editable
       return network

@@ -5,7 +5,7 @@ import env from 'env'
 import i18n from 'utils/i18n'
 import { showWindow } from './app/show-window'
 import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController, DaoController } from 'controllers'
-import { NetworkType, NetworkID, Network } from 'types/network'
+import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ConnectionStatusSubject } from 'models/subjects/node'
@@ -217,11 +217,11 @@ export default class ApiController {
       return this.networksController?.getAll()
     })
 
-    handle('create-network', async (_, { name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) => {
-      return this.networksController?.create({ name, remote, type, genesisHash, chain })
+    handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
+      return this.networksController?.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
-    handle('update-network', async (_, { networkID, options }: { networkID: NetworkID, options: Partial<Network> }) => {
+    handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
       return this.networksController?.update(networkID, options)
     })
 
@@ -229,11 +229,11 @@ export default class ApiController {
       return this.networksController?.currentID()
     })
 
-    handle('set-current-network-id', async (_, id: NetworkID) => {
+    handle('set-current-network-id', async (_, id: string) => {
       return this.networksController?.activate(id)
     })
 
-    handle('delete-network', async (_, id: NetworkID) => {
+    handle('delete-network', async (_, id: string) => {
       return this.networksController?.delete(id)
     })
 

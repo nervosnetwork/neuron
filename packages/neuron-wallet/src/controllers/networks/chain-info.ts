@@ -3,14 +3,14 @@ import { updateMetaInfo, getMetaInfo } from 'database/chain/meta-info'
 import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import DaoUtils from 'models/dao-utils'
-import { NetworkWithID, EMPTY_GENESIS_HASH } from 'types/network'
+import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import GetBlocks from 'block-sync-renderer/sync/get-blocks'
 
 // Open connection to a network and maintain chain info in database.
 export default class ChainInfo {
-  private network: NetworkWithID
+  private network: Network
 
-  constructor(network: NetworkWithID) {
+  constructor(network: Network) {
     this.network = network
   }
 
