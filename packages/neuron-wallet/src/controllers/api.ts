@@ -217,8 +217,8 @@ export default class ApiController {
       return this.networksController?.getAll()
     })
 
-    handle('create-network', async (_, { name, remote, type = NetworkType.Normal, genesisHash = '0x', chain = 'ckb' }: Network) => {
-      return this.networksController?.create({ name, remote, type, genesisHash, chain, id: '' })
+    handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
+      return this.networksController?.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
