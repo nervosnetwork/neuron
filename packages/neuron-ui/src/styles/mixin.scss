@@ -37,3 +37,18 @@
   background-color: #e3e3e3;
   color: #666;
 }
+
+@mixin formFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 15px;
+
+  button {
+    margin-left: 10px;
+
+    &:first-of-type {
+      margin-left: 0;
+    }
+  }
+}

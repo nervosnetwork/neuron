@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Icon, TooltipHost, Spinner } from 'office-ui-fabric-react'
+import { Stack, Text, Icon, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -17,6 +17,7 @@ import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
 import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
@@ -248,7 +249,6 @@ const NervosDAO = ({
         <div>
           <Button
             type="primary"
-            aria-label={t('nervos-dao.deposit')}
             disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
             onClick={() => setShowDepositDialog(true)}
             label={t('nervos-dao.deposit')}

@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Spinner } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { showOpenDialog } from 'services/remote'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
@@ -9,6 +8,7 @@ import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 import { ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import styles from './importKeystore.module.scss'
 
@@ -174,17 +174,7 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
             )
           }
         >
-          {loading ? (
-            <Spinner
-              styles={{
-                circle: {
-                  borderColor: ' #3cc68a #c4f3df #c4f3df #c4f3df',
-                },
-              }}
-            />
-          ) : (
-            (t('import-keystore.button.submit') as string)
-          )}
+          {loading ? <Spinner /> : (t('import-keystore.button.submit') as string)}
         </Button>
       </div>
     </div>

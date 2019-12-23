@@ -47,7 +47,7 @@ const Settings = ({
   const [t] = useTranslation()
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
+    <Stack tokens={{ childrenGap: 15, padding: '39px 0 0 0' }}>
       <Pivot
         selectedKey={location.pathname}
         onLinkClick={(pivotItem?: PivotItem) => {

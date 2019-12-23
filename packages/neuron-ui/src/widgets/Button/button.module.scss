@@ -9,14 +9,24 @@
   border: none;
   margin: 0;
 
-  &[data-type='default'] {
+  &[data-type='default'],
+  &[data-type='reset'] {
     background-color: #fff;
     color: #000;
+    border: 1px solid #000;
+
+    &:focus {
+      box-shadow: 0 0 5px #000;
+    }
   }
 
   &[data-type="cancel"] {
     background-color: #e3e3e3;
     color: #000;
+
+    &:focus {
+      box-shadow: 0 0 5px #e3e3e3;
+    }
   }
 
   &[data-type='primary'],
@@ -25,10 +35,21 @@
   &[data-type="confirm"] {
     background-color: var(--nervos-green);
     color: #fff;
+
+    &:focus {
+      box-shadow: 0 0 5px var(--nervos-green);
+    }
+  }
+
+  &:active {
+    color: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
   }
 
   &[disabled] {
     background-color: rgb(243, 242, 241) !important;
     color: rgb(161, 159, 157) !important;
+    box-shadow: none;
   }
+
 }

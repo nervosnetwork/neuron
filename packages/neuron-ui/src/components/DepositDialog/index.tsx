@@ -85,18 +85,8 @@ const DepositDialog = ({
             </p>
           </div>
           <div className={styles.footer}>
-            <Button
-              type="cancel"
-              aria-label={t('nervos-dao.cancel')}
-              onClick={onDismiss}
-              label={t('nervos-dao.cancel')}
-            />
-            <Button
-              type="submit"
-              aria-label={t('nervos-dao.proceed')}
-              onClick={onSubmit}
-              label={t('nervos-dao.proceed')}
-            />
+            <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
+            <Button type="submit" onClick={onSubmit} label={t('nervos-dao.proceed')} />
           </div>
         </>
       )}

@@ -4,7 +4,8 @@
   display: grid;
   grid-template:
     'amount deposit'107px 'records records'auto/ 450px 1fr;
-  padding: 54px 31px 41px 31px;
+  // padding: 54px 31px 41px 31px; this size is from design, but not used now
+  padding: 39px 0 0;
 }
 
 .amount {
