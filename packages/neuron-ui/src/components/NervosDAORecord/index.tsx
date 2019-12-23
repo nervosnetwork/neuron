@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import Button from 'widgets/Button'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { showAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
@@ -194,15 +195,14 @@ const DAORecord = ({
               title={t('nervos-dao.explanation-of-epochs-period')}
             />
           )}
-          <button
-            type="button"
+          <Button
+            type="primary"
             data-tx-hash={txHash}
             data-index={index}
             onClick={onActionClick}
             disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
-          >
-            {actionLabel}
-          </button>
+            label={actionLabel}
+          />
         </div>
       </div>
       <div className={styles.secondaryInfo}>

@@ -73,13 +73,9 @@ $progress-grey: #e3e3e3;
   align-items: center;
 
   button {
-    background-color: var(--nervos-green);
-    color: #fff;
     width: 8.75rem;
     height: 1.5rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.6px;
-    border: none;
+    line-height: 0.75rem;
   }
 }
 

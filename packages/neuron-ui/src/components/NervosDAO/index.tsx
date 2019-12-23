@@ -247,7 +247,7 @@ const NervosDAO = ({
       <div className={styles.deposit}>
         <div>
           <Button
-            type="confirm"
+            type="primary"
             aria-label={t('nervos-dao.deposit')}
             disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
             onClick={() => setShowDepositDialog(true)}
