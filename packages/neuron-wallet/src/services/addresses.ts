@@ -17,6 +17,9 @@ export interface AddressMetaInfo {
 }
 
 export default class AddressService {
+  // <= 3
+  private static minUnusedAddressCount: number = 3
+
   public static generateAndSave = (
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
@@ -57,18 +60,18 @@ export default class AddressService {
     AddressCreatedSubject.getSubject().next(addrs)
   }
 
-  public static checkAndGenerateSave = (
+  public static checkAndGenerateSave(
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
-  ) => {
+  ) {
     const addressVersion = AddressService.getAddressVersion()
     const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
     if (
-      unusedReceivingCount > 3 &&
-      unusedChangeCount > 3
+      unusedReceivingCount > this.minUnusedAddressCount &&
+      unusedChangeCount > this.minUnusedAddressCount
     ) {
       return undefined
     }
@@ -76,14 +79,17 @@ export default class AddressService {
     const maxIndexChangeAddress = AddressDao.maxAddressIndex(walletId, AddressType.Change, addressVersion)
     const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
     const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
+
+    const receivingCount: number = unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount
+    const changeCount: number = unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount
     return AddressService.generateAndSave(
       walletId,
       extendedKey,
       isImporting,
       nextReceivingIndex,
       nextChangeIndex,
-      receivingAddressCount,
-      changeAddressCount
+      receivingCount,
+      changeCount
     )
   }
 
@@ -103,7 +109,8 @@ export default class AddressService {
     receivingAddressCount: number = 20,
     changeAddressCount: number = 10
   ) => {
-    if (receivingAddressCount < 1 || changeAddressCount < 1) {
+    // can be only receiving OR only change
+    if (receivingAddressCount < 1 && changeAddressCount < 1) {
       throw new Error('Address number error.')
     } else if (receivingAddressCount > MAX_ADDRESS_COUNT || changeAddressCount > MAX_ADDRESS_COUNT) {
       throw new Error('Address number error.')
