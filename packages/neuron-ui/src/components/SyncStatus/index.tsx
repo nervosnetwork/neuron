@@ -17,7 +17,7 @@ const SyncStatus = ({
     )
   }
 
-  if (BigInt(syncedBlockNumber) < BigInt(0)) {
+  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0') {
     return (
       <div className={styles.sync}>
         <span>{t('navbar.sync-not-start')}</span>
