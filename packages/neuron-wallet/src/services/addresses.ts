@@ -18,7 +18,7 @@ export interface AddressMetaInfo {
 
 export default class AddressService {
   // <= 3
-  private static generateCheckDividingLine: number = 3
+  private static minUnusedAddressCount: number = 3
 
   public static generateAndSave = (
     walletId: string,
@@ -70,8 +70,8 @@ export default class AddressService {
     const addressVersion = AddressService.getAddressVersion()
     const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
     if (
-      unusedReceivingCount > this.generateCheckDividingLine &&
-      unusedChangeCount > this.generateCheckDividingLine
+      unusedReceivingCount > this.minUnusedAddressCount &&
+      unusedChangeCount > this.minUnusedAddressCount
     ) {
       return undefined
     }
@@ -80,8 +80,8 @@ export default class AddressService {
     const nextReceivingIndex = maxIndexReceivingAddress === undefined ? 0 : maxIndexReceivingAddress.addressIndex + 1
     const nextChangeIndex = maxIndexChangeAddress === undefined ? 0 : maxIndexChangeAddress.addressIndex + 1
 
-    const receivingCount: number = unusedReceivingCount > this.generateCheckDividingLine ? 0 : receivingAddressCount
-    const changeCount: number = unusedChangeCount > this.generateCheckDividingLine ? 0 : changeAddressCount
+    const receivingCount: number = unusedReceivingCount > this.minUnusedAddressCount ? 0 : receivingAddressCount
+    const changeCount: number = unusedChangeCount > this.minUnusedAddressCount ? 0 : changeAddressCount
     return AddressService.generateAndSave(
       walletId,
       extendedKey,
