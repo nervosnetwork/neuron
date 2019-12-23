@@ -252,7 +252,7 @@ const Transaction = () => {
   }, [])
 
   const onExplorerBtnClick = useCallback(() => {
-    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
+    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
     openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
   }, [transaction.hash, isMainnet])
 
