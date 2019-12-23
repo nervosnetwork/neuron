@@ -1,18 +1,9 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Stack,
-  Label,
-  Text,
-  List,
-  TextField,
-  PrimaryButton,
-  DefaultButton,
-  IconButton,
-  Spinner,
-  Separator,
-} from 'office-ui-fabric-react'
+import { Stack, Label, Text, List, TextField, IconButton, Separator } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
@@ -25,6 +16,7 @@ import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 
 import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
+import styles from './send.module.scss'
 
 const Send = ({
   app: {
@@ -68,7 +60,7 @@ const Send = ({
   const isMainnet = (network && network.chain === MAINNET_TAG) || false
 
   return (
-    <Stack verticalFill tokens={{ childrenGap: 15, padding: '20px 0 0 0' }}>
+    <Stack verticalFill tokens={{ childrenGap: 15, padding: '39px 0 0 0' }}>
       <Stack.Item>
         <List
           items={outputs}
@@ -145,25 +137,24 @@ const Send = ({
                         required
                         validateOnLoad={false}
                         onGetErrorMessage={onGetAmountErrorMessage}
+                        suffix="CKB"
                       />
                     </Stack.Item>
                     <Stack.Item styles={{ root: { width: '43px', paddingLeft: '5px' } }}>
-                      <span>(CKB)</span>
+                      <Button
+                        className={styles.maxBtn}
+                        type="default"
+                        onClick={onSendMaxClick}
+                        disabled={!verifyTransactionOutputs(outputs, true)}
+                        label="Max"
+                        data-is-on={isSendMax}
+                      />
                     </Stack.Item>
                   </Stack>
 
                   <Stack.Item>
                     {idx === outputs.length - 1 ? (
                       <Stack horizontal>
-                        <DefaultButton
-                          onClick={onSendMaxClick}
-                          style={{
-                            boxShadow: isSendMax ? 'inset 0 0 5px #000' : 'none',
-                          }}
-                          disabled={!verifyTransactionOutputs(outputs, true)}
-                        >
-                          Max
-                        </DefaultButton>
                         <IconButton
                           disabled={!verifyTransactionOutputs(outputs, false) || isSendMax}
                           iconProps={{
@@ -239,21 +230,17 @@ const Send = ({
         </Stack.Item>
       </Stack>
 
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton type="reset" onClick={onClear} disabled={isSendMax}>
-          {t('send.clear')}
-        </DefaultButton>
-        {sending ? (
-          <Spinner />
-        ) : (
-          <PrimaryButton
-            type="submit"
-            onClick={onSubmit(walletID)}
-            disabled={connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx}
-            text={t('send.send')}
-          />
-        )}
-      </Stack>
+      <div className={styles.actions}>
+        <Button type="reset" onClick={onClear} disabled={isSendMax} label={t('send.clear')} />
+        <Button
+          type="submit"
+          onClick={onSubmit(walletID)}
+          disabled={connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx}
+          label={t('send.send')}
+        >
+          {sending ? <Spinner /> : (t('send.send') as string)}
+        </Button>
+      </div>
     </Stack>
   )
 }

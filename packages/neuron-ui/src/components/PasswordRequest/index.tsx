@@ -1,9 +1,12 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useRef, useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Label, Modal, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
+import TextField from 'widgets/TextField'
+import { useDialog } from 'utils/hooks'
 import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
 import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
+import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = ({
   app: {
@@ -16,6 +19,9 @@ const PasswordRequest = ({
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  const dialogRef = useRef<HTMLDialogElement | null>(null)
+  useDialog({ show: actionType, dialogRef })
+
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
   const onDismiss = useCallback(() => {
     dispatch({
@@ -58,56 +64,53 @@ const PasswordRequest = ({
   }, [dispatch, walletID, password, actionType, description, history, isSending, generatedTx])
 
   const onChange = useCallback(
-    (_e, value?: string) => {
-      if (undefined !== value) {
-        if (/\s/.test(value)) {
-          return
-        }
-        dispatch({
-          type: AppActions.UpdatePassword,
-          payload: value,
-        })
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      if (/\s/.test(value)) {
+        return
       }
+      dispatch({
+        type: AppActions.UpdatePassword,
+        payload: value,
+      })
     },
     [dispatch]
   )
   const disabled = !password || (actionType === 'send' && isSending)
   const onKeyPress = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter' && !disabled) {
         onConfirm()
       }
     },
     [onConfirm, disabled]
   )
+  const title = t(`password-request.${actionType}.title`, { name: wallet ? wallet.name : '' })
+
   if (!wallet) {
     return null
   }
+
   return (
-    <Modal isOpen={!!actionType} onDismiss={onDismiss}>
-      <Stack
-        tokens={{ childrenGap: 15 }}
-        styles={{
-          root: {
-            padding: 30,
-          },
-        }}
-      >
-        <Text variant="xLarge">{t(`password-request.${actionType}.title`, { name: wallet ? wallet.name : '' })}</Text>
-        <Label required title="password">
-          {t('password-request.password')}
-        </Label>
-        <TextField value={password} type="password" onChange={onChange} autoFocus onKeyPress={onKeyPress} />
-        <Stack horizontalAlign="end" horizontal tokens={{ childrenGap: 15 }}>
-          <DefaultButton onClick={onDismiss} ariaLabel="cancel" name="cancel">
-            {t('common.cancel')}
-          </DefaultButton>
-          <PrimaryButton type="submit" onClick={onConfirm} disabled={disabled} ariaLabel="confirm" name="confirm">
-            {t('common.confirm')}
-          </PrimaryButton>
-        </Stack>
-      </Stack>
-    </Modal>
+    <dialog ref={dialogRef} className={styles.dialog}>
+      <h2 className={styles.title} title={title} aria-label={title}>
+        {title}
+      </h2>
+      <TextField
+        label={t('password-request.password')}
+        value={password}
+        field="password"
+        type="password"
+        title={t('password-request.password')}
+        onChange={onChange}
+        autoFocus
+        onKeyPress={onKeyPress}
+      />
+      <div className={styles.footer}>
+        <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
+        <Button label={t('common.confirm')} type="submit" onClick={onConfirm} disabled={disabled} />
+      </div>
+    </dialog>
   )
 }
 

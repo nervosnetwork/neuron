@@ -118,6 +118,36 @@ navbar {
   text-overflow: ellipsis;
 }
 
+
+// hack search field
+.ms-SearchBox.is-active,
+.ms-TextField.is-active {
+  border-color: var(--nervos-green) !important;
+
+  .ms-TextField-fieldGroup {
+    border-color: var(--nervos-green) !important;
+  }
+}
+
+.ms-SearchBox-iconContainer {
+  color: var(--nervos-green);
+}
+
+// hack fabric pivot
+.ms-Pivot-link.is-selected:before {
+  background-color: var(--nervos-green);
+}
+
+
+// hack fabric choice field
+.ms-ChoiceField-field.is-checked {
+
+  &::before,
+  &::after {
+    border-color: var(--nervos-green);
+  }
+}
+
 // hack fabric slider
 .ms-Slider-active {
   background: var(--nervos-green) !important;

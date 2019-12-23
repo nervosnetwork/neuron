@@ -1,0 +1,21 @@
+.container {
+  display: grid;
+  grid-template:
+    'wallets'auto 'actions'auto;
+  grid-row-gap: 15px;
+
+}
+
+.wallets {
+  grid-area: wallets;
+
+}
+
+.actions {
+  grid-area: actions;
+
+  button {
+    width: 9.375rem;
+    margin-right: 15px;
+  }
+}

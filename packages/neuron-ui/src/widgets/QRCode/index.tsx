@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import canvg from 'canvg'
 import { useTranslation } from 'react-i18next'
+import Button from 'widgets/Button'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import styles from './qrcode.module.scss'
@@ -153,12 +154,8 @@ const QRCode = ({
         <canvas ref={canvasRef} width={size} height={size} />
       </div>
       <div className={styles.actions}>
-        <button type="button" aria-label={t('qrcode.copy')} title={t('qrcode.copy')} onClick={onCopy}>
-          {t('qrcode.copy')}
-        </button>
-        <button type="button" aria-label={t('qrcode.save')} title={t('qrcode.save')} onClick={onDownload}>
-          {t('qrcode.save')}
-        </button>
+        <Button type="primary" label={t('qrcode.copy')} onClick={onCopy} />
+        <Button type="primary" label={t('qrcode.save')} onClick={onDownload} />
       </div>
     </div>
   )

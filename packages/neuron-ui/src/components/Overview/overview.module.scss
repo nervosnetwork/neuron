@@ -6,7 +6,8 @@ $pending-color: #b3b3b3;
   display: grid;
   grid-template:
     'wallet-name wallet-name'auto 'balance status'auto 'activities-title activities-title'auto 'activities activities'auto/ 1fr auto;
-  padding: 39px 11px 0;
+  // padding: 39px 11px 0; this size is from design, but not used now.
+  padding: 39px 0 0;
 }
 
 .walletName,

@@ -5,6 +5,7 @@ const TextField = ({
   label,
   field,
   value,
+  hint,
   error,
   onChange,
   onClick,
@@ -14,10 +15,12 @@ const TextField = ({
   stack = true,
   required = false,
   readOnly = false,
+  ...rest
 }: {
   field: string
   label?: string
   value?: string
+  hint?: string
   error?: string
   type?: 'text' | 'password' | 'file'
   onChange?: (e: React.SyntheticEvent<HTMLInputElement>) => void
@@ -27,6 +30,8 @@ const TextField = ({
   required?: boolean
   readOnly?: boolean
   placeholder?: string
+
+  [key: string]: any
 }) => {
   return (
     <div
@@ -51,7 +56,9 @@ const TextField = ({
         onChange={onChange}
         onClick={onClick}
         readOnly={readOnly}
+        {...rest}
       />
+      {hint ? <span className={styles.hint}>{hint}</span> : null}
       {error ? <span className={styles.errorMessage}>{error}</span> : null}
     </div>
   )

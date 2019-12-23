@@ -1,0 +1,71 @@
+@import '../../styles//mixin.scss';
+$button-gap: 10px;
+$line-gap: 15px;
+
+@mixin center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+}
+
+.welcome {
+  @include center;
+  align-items: center;
+
+  .slogan {
+    font-size: 1.5rem;
+    padding: 60px 0 55px 0;
+    font-weight: 600;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    button {
+      margin: 0 40px;
+    }
+  }
+
+  button {
+    width: 225px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.mnemonic {
+  @include center;
+
+  .actions {
+    @include formFooter;
+  }
+}
+
+.submission {
+  @include center;
+
+  .input {
+    position: relative;
+    margin-bottom: 5px;
+
+    &:after {
+      position: absolute;
+      display: block;
+      font-size: 10px;
+      content: attr(data-chars);
+      right: 5px;
+      top: calc(1.5rem + 10px);
+      color: #666;
+    }
+  }
+
+  .actions {
+    @include formFooter;
+  }
+}

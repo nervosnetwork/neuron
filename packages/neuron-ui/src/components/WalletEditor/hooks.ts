@@ -16,8 +16,10 @@ export const useWalletEditor = () => {
     initialize,
     name: {
       value: name,
-      onChange: (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) =>
-        undefined !== value && setName(value),
+      onChange: (e: React.SyntheticEvent<HTMLInputElement>) => {
+        const { value } = e.target as HTMLInputElement
+        setName(value)
+      },
     },
   }
 }
