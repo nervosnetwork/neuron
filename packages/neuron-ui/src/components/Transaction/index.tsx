@@ -377,7 +377,7 @@ const Transaction = () => {
             )})`}
           </Text>
           <DetailsList
-            items={transaction.inputs}
+            items={transaction.inputs as State.DetailedInput[]}
             columns={inputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             onItemContextMenu={onInputContextMenu}
@@ -392,7 +392,7 @@ const Transaction = () => {
             )})`}
           </Text>
           <DetailsList
-            items={transaction.outputs}
+            items={transaction.outputs as State.DetailedOutput[]}
             columns={outputColumns}
             checkboxVisibility={CheckboxVisibility.hidden}
             onItemContextMenu={onOutputContextMenu}

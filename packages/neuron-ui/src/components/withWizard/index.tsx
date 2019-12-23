@@ -14,7 +14,7 @@ export interface WithWizardState {
 export interface WizardProps {
   state: WithWizardState
   elements: Element[]
-  wallets: State.WalletIdentity[]
+  wallets: Readonly<State.WalletIdentity[]>
   rootPath: string
   dispatch: React.Dispatch<any>
 }

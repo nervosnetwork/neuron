@@ -49,6 +49,7 @@
     "canvg": "2.0.0",
     "grommet-icons": "4.4.0",
     "i18next": "17.0.13",
+    "immer": "5.1.0",
     "office-ui-fabric-react": "7.31.1",
     "qr.js": "0.0.0",
     "react": "16.12.0",

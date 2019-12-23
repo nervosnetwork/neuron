@@ -8,8 +8,6 @@ import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutput
 import { ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
 import calculateFee from 'utils/calculateFee'
 
-import { TransactionOutput } from '.'
-
 let generateTxTimer: ReturnType<typeof setTimeout>
 
 Object.defineProperty(generateTx, 'type', {
@@ -30,7 +28,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
 }: {
   walletID: string
   price: string
-  items: TransactionOutput[]
+  items: Readonly<State.Output[]>
   setTotalAmount: Function
   setErrorMessage: Function
   updateTransactionOutput?: Function
@@ -108,7 +106,6 @@ const useAddTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(() => {
     dispatch({
       type: AppActions.AddSendOutput,
-      payload: null,
     })
   }, [dispatch])
 
@@ -125,7 +122,7 @@ const useRemoveTransactionOutput = (dispatch: StateDispatch) =>
 
 const useOnTransactionChange = (
   walletID: string,
-  items: TransactionOutput[],
+  items: State.Output[],
   price: string,
   dispatch: StateDispatch,
   isSendMax: boolean,
@@ -155,14 +152,10 @@ const useOnTransactionChange = (
   }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage])
 }
 
-const useOnSubmit = (items: TransactionOutput[], dispatch: StateDispatch) =>
+const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =>
   useCallback(
     (walletID: string = '') => () => {
       if (verifyTransactionOutputs(items)) {
-        dispatch({
-          type: AppActions.UpdateTransactionID,
-          payload: null,
-        })
         dispatch({
           type: AppActions.RequestPassword,
           payload: {
@@ -224,7 +217,6 @@ const useSendDescriptionChange = (dispatch: StateDispatch) =>
 const clear = (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.ClearSendState,
-    payload: null,
   })
 }
 
@@ -232,7 +224,7 @@ const useClear = (dispatch: StateDispatch) => useCallback(() => clear(dispatch),
 
 export const useInitialize = (
   walletID: string,
-  items: TransactionOutput[],
+  items: Readonly<State.Output[]>,
   generatedTx: any | null,
   price: string,
   sending: boolean,

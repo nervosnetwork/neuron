@@ -165,7 +165,7 @@ export const addressesToBalance = (addresses: State.Address[] = []) => {
     .toString()
 }
 
-export const outputsToTotalAmount = (outputs: { amount: string; unit: CapacityUnit }[]) => {
+export const outputsToTotalAmount = (outputs: Readonly<State.Output[]>) => {
   const totalCapacity = outputs.reduce((total, cur) => {
     if (Number.isNaN(+cur.amount)) {
       return total

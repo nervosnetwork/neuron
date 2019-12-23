@@ -59,7 +59,7 @@ type EditorType = ReturnType<typeof useNetworkEditor>
 
 export const useInitialize = (
   id: string = '',
-  networks: State.Network[] = [],
+  networks: Readonly<State.Network[]> = [],
   initialize: Function,
   dispatch: StateDispatch
 ) => {
@@ -131,7 +131,7 @@ export const useIsInputsValid = (
     return !(nameRes === true && URLRes === true)
   }, [editor.name.value, editor.remote.value, usedNetworkNames])
   const notModified = useMemo(
-    () => cachedNetwork && (cachedNetwork.name === editor.name.value && cachedNetwork.remote === editor.remote.value),
+    () => cachedNetwork && cachedNetwork.name === editor.name.value && cachedNetwork.remote === editor.remote.value,
     [cachedNetwork, editor.name.value, editor.remote.value]
   )
   return { hasError, notModified }
@@ -141,7 +141,7 @@ export const useHandleSubmit = (
   id: string = '',
   name: string = '',
   remote: string = '',
-  networks: State.Network[] = [],
+  networks: Readonly<State.Network[]> = [],
   history: any,
   dispatch: StateDispatch
 ) =>
