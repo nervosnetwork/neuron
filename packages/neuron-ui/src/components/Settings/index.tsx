@@ -1,14 +1,13 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { Route, RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Pivot, PivotItem, IconButton, Text } from 'office-ui-fabric-react'
+import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
-import { WalletWizardPath } from 'components/WalletWizard'
 
 import { Routes } from 'utils/const'
 
@@ -46,28 +45,9 @@ const Settings = ({
   ...neuronWalletState
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
-  const { id } = neuronWalletState.wallet
-  const onLeave = useCallback(() => {
-    return id ? history.push(Routes.Overview) : history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-  }, [id, history])
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
-      <Stack horizontal>
-        <Stack.Item align="center">
-          <IconButton
-            iconProps={{ iconName: 'Leave' }}
-            onClick={onLeave}
-            styles={{ root: { marginRight: 20 }, flexContainer: { display: 'block', width: '32px' } }}
-          />
-        </Stack.Item>
-        <Stack.Item align="center">
-          <Text variant="xLarge" as="h1">
-            {t('navbar.settings')}
-          </Text>
-        </Stack.Item>
-      </Stack>
-
       <Pivot
         selectedKey={location.pathname}
         onLinkClick={(pivotItem?: PivotItem) => {
