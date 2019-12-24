@@ -4,12 +4,6 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import env from 'env'
 import i18n from 'utils/i18n'
 import { showWindow } from './app/show-window'
-import TransactionsController from 'controllers/transactions'
-import WalletsController from 'controllers/wallets'
-import SyncController from 'controllers/sync'
-import NetworksController from 'controllers/networks'
-import UpdateController from 'controllers/update'
-import DaoController from 'controllers/dao'
 import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
@@ -17,17 +11,24 @@ import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
+import WalletsController from 'controllers/wallets'
+import TransactionsController from 'controllers/transactions'
+import DaoController from 'controllers/dao'
+import NetworksController from 'controllers/networks'
+import UpdateController from 'controllers/update'
+import SyncController from 'controllers/sync'
+
 /**
  * @class ApiController
  * @description Handle channel messages from neuron UI renderer process
  */
 export default class ApiController {
-  networksController: NetworksController | null = null
+  private walletsController = new WalletsController()
+  private networksController = new NetworksController()
 
   public async mount() {
     this.registerHandlers()
 
-    this.networksController = new NetworksController()
     this.networksController.start()
   }
 
@@ -70,7 +71,7 @@ export default class ApiController {
       ])
 
       const addresses: Controller.Address[] = await (currentWallet
-        ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+        ? this.walletsController.getAllAddresses(currentWallet.id).then(res => res.result)
         : [])
 
       const transactions = currentWallet
@@ -109,71 +110,71 @@ export default class ApiController {
     // Wallets
 
     handle('get-all-wallets', async () => {
-      return WalletsController.getAll()
+      return this.walletsController.getAll()
     })
 
     handle('get-current-wallet', async () => {
-      return WalletsController.getCurrent()
+      return this.walletsController.getCurrent()
     })
 
     handle('set-current-wallet', async (_, id: string) => {
-      return WalletsController.activate(id)
+      return this.walletsController.activate(id)
     })
 
     handle('import-mnemonic', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return WalletsController.importMnemonic(params)
+      return this.walletsController.importMnemonic(params)
     })
 
     handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
-      return WalletsController.importKeystore(params)
+      return this.walletsController.importKeystore(params)
     })
 
     handle('create-wallet', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return WalletsController.create(params)
+      return this.walletsController.create(params)
     })
 
     handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
-      return WalletsController.update(params)
+      return this.walletsController.update(params)
     })
 
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
-      return WalletsController.delete({ id, password })
+      return this.walletsController.delete({ id, password })
     })
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
-      return WalletsController.backup({ id, password })
+      return this.walletsController.backup({ id, password })
     })
 
     handle('get-all-addresses', async (_, id: string) => {
-      return WalletsController.getAllAddresses(id)
+      return this.walletsController.getAllAddresses(id)
     })
 
     handle('update-address-description', async (_, params: { walletID: string, address: string, description: string }) => {
-      return WalletsController.updateAddressDescription(params)
+      return this.walletsController.updateAddressDescription(params)
     })
 
     handle('request-password', async (_, { walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) => {
-      WalletsController.requestPassword(walletID, action)
+      this.walletsController.requestPassword(walletID, action)
     })
 
     handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) => {
-      return WalletsController.sendTx(params)
+      return this.walletsController.sendTx(params)
     })
 
     handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return WalletsController.generateTx(params)
+      return this.walletsController.generateTx(params)
     })
 
     handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return WalletsController.generateSendingAllTx(params)
+      return this.walletsController.generateSendingAllTx(params)
     })
 
     handle('generate-mnemonic', async () => {
-      return WalletsController.generateMnemonic()
+      return this.walletsController.generateMnemonic()
     })
 
     handle('validate-mnemonic', async (_, mnemonic: string) => {
-      return WalletsController.validateMnemonic(mnemonic)
+      return this.walletsController.validateMnemonic(mnemonic)
     })
 
     // Transactions
@@ -219,27 +220,27 @@ export default class ApiController {
     // Networks
 
     handle('get-all-networks', async () => {
-      return this.networksController?.getAll()
+      return this.networksController.getAll()
     })
 
     handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
-      return this.networksController?.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
+      return this.networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
-      return this.networksController?.update(networkID, options)
+      return this.networksController.update(networkID, options)
     })
 
     handle('get-current-network-id', async () => {
-      return this.networksController?.currentID()
+      return this.networksController.currentID()
     })
 
     handle('set-current-network-id', async (_, id: string) => {
-      return this.networksController?.activate(id)
+      return this.networksController.activate(id)
     })
 
     handle('delete-network', async (_, id: string) => {
-      return this.networksController?.delete(id)
+      return this.networksController.delete(id)
     })
 
     // Updater
