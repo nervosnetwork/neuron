@@ -25,6 +25,7 @@ import SyncController from 'controllers/sync'
 export default class ApiController {
   private walletsController = new WalletsController()
   private networksController = new NetworksController()
+  private daoController = new DaoController()
 
   public async mount() {
     this.registerHandlers()
@@ -198,23 +199,23 @@ export default class ApiController {
     // Dao
 
     handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
-      return DaoController.getDaoCells(params)
+      return this.daoController.getDaoCells(params)
     })
 
     handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
-      return DaoController.generateDepositTx(params)
+      return this.daoController.generateDepositTx(params)
     })
 
     handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
-      return DaoController.generateDepositAllTx(params)
+      return this.daoController.generateDepositAllTx(params)
     })
 
     handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
-      return DaoController.startWithdrawFromDao(params)
+      return this.daoController.startWithdrawFromDao(params)
     })
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
-      return DaoController.withdrawFromDao(params)
+      return this.daoController.withdrawFromDao(params)
     })
 
     // Networks
