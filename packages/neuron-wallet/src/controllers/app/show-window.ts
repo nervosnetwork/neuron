@@ -4,7 +4,9 @@ import env from 'env'
 
 const showWindow = (url: string, title: string): BrowserWindow => {
 	const win = new BrowserWindow({
-		width: 1200,
+    width: 1200,
+    minWidth: 900,
+    minHeight: 600,
 		show: false,
 		webPreferences: {
 			preload: path.join(__dirname, './preload.js'),
