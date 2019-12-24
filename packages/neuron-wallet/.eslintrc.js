@@ -21,7 +21,7 @@ module.exports = {
     "implicit-arrow-linebreak": "off",
     "arrow-parens": [2, "as-needed"],
     "max-len": [2, {
-      "code": 140,
+      "code": 150,
       "ignoreComments": true,
       "ignoreTrailingComments": true,
       "ignoreUrls": true,

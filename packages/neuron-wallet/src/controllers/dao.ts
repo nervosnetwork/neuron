@@ -7,13 +7,10 @@ import LockUtils from 'models/lock-utils'
 import TransactionSender from 'services/transaction-sender'
 
 export default class DaoController {
-  public static async getDaoCells(
-    params: Controller.Params.GetDaoCellsParams
-  ): Promise<Controller.Response<Cell[]>> {
+  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
     const { walletID } = params
-    const addresses = (await AddressesService.allAddressesByWalletId(walletID)).map(addr => addr.address)
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
-    .addressesToAllLockHashes(addresses)
+    const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
+    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
     const cells = await CellsService.getDaoCells(lockHashes)
 
     if (!cells) {
@@ -26,17 +23,13 @@ export default class DaoController {
     }
   }
 
-  public static async generateDepositTx(params: {
-    walletID: string,
-    capacity: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
+  public async generateDepositTx(params: { walletID: string, capacity: string, fee: string, feeRate: string }):
+    Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = new TransactionSender()
-    const tx = await transactionSender.generateDepositTx(
+
+    const tx = await new TransactionSender().generateDepositTx(
       params.walletID,
       params.capacity,
       params.fee,
@@ -48,16 +41,13 @@ export default class DaoController {
     }
   }
 
-  public static async generateDepositAllTx(params: {
-    walletID: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
+  public async generateDepositAllTx(params: { walletID: string, fee: string, feeRate: string }):
+    Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = new TransactionSender()
-    const tx = await transactionSender.generateDepositAllTx(
+
+    const tx = await new TransactionSender().generateDepositAllTx(
       params.walletID,
       params.fee,
       params.feeRate,
@@ -68,17 +58,13 @@ export default class DaoController {
     }
   }
 
-  public static async startWithdrawFromDao(params: {
-    walletID: string,
-    outPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
+  public async startWithdrawFromDao(params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }):
+    Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = new TransactionSender()
-    const tx = await transactionSender.startWithdrawFromDao(
+
+    const tx = await new TransactionSender().startWithdrawFromDao(
       params.walletID,
       params.outPoint,
       params.fee,
@@ -90,18 +76,13 @@ export default class DaoController {
     }
   }
 
-  public static async withdrawFromDao(params: {
-    walletID: string,
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
+  public async withdrawFromDao(params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }):
+    Promise<Controller.Response<TransactionWithoutHash>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
-    const transactionSender = new TransactionSender()
-    const tx = await transactionSender.withdrawFromDao(
+
+    const tx = await new TransactionSender().withdrawFromDao(
       params.walletID,
       params.depositOutPoint,
       params.withdrawingOutPoint,

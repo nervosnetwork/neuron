@@ -4,25 +4,33 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import env from 'env'
 import i18n from 'locales/i18n'
 import { showWindow } from './app/show-window'
-import { TransactionsController, WalletsController, SyncController, NetworksController, UpdateController, DaoController } from 'controllers'
 import { NetworkType, Network } from 'models/network'
+import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import { ConnectionStatusSubject } from 'models/subjects/node'
 import { ResponseCode } from 'utils/const'
 import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
+
+import WalletsController from 'controllers/wallets'
+import TransactionsController from 'controllers/transactions'
+import DaoController from 'controllers/dao'
+import NetworksController from 'controllers/networks'
+import UpdateController from 'controllers/update'
+import SyncController from 'controllers/sync'
 
 /**
  * @class ApiController
  * @description Handle channel messages from neuron UI renderer process
  */
 export default class ApiController {
-  networksController: NetworksController | null = null
+  private walletsController = new WalletsController()
+  private transactionsController = new TransactionsController()
+  private daoController = new DaoController()
+  private networksController = new NetworksController()
 
   public async mount() {
     this.registerHandlers()
 
-    this.networksController = new NetworksController()
     this.networksController.start()
   }
 
@@ -46,7 +54,7 @@ export default class ApiController {
         networksService.getCurrentID(),
         networksService.getAll(),
 
-        SyncController.currentBlockNumber()
+        new SyncController().currentBlockNumber()
           .then(res => {
             if (res.status) {
               return res.result.currentBlockNumber
@@ -65,11 +73,11 @@ export default class ApiController {
       ])
 
       const addresses: Controller.Address[] = await (currentWallet
-        ? WalletsController.getAllAddresses(currentWallet.id).then(res => res.result)
+        ? this.walletsController.getAllAddresses(currentWallet.id).then(res => res.result)
         : [])
 
       const transactions = currentWallet
-        ? await TransactionsController.getAllByKeywords({
+        ? await this.transactionsController.getAllByKeywords({
             pageNo: 1,
             pageSize: 15,
             keywords: '',
@@ -104,85 +112,85 @@ export default class ApiController {
     // Wallets
 
     handle('get-all-wallets', async () => {
-      return WalletsController.getAll()
+      return this.walletsController.getAll()
     })
 
     handle('get-current-wallet', async () => {
-      return WalletsController.getCurrent()
+      return this.walletsController.getCurrent()
     })
 
     handle('set-current-wallet', async (_, id: string) => {
-      return WalletsController.activate(id)
+      return this.walletsController.activate(id)
     })
 
     handle('import-mnemonic', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return WalletsController.importMnemonic(params)
+      return this.walletsController.importMnemonic(params)
     })
 
     handle('import-keystore', async (_, params: { name: string; password: string; keystorePath: string }) => {
-      return WalletsController.importKeystore(params)
+      return this.walletsController.importKeystore(params)
     })
 
     handle('create-wallet', async (_, params: { name: string; password: string; mnemonic: string }) => {
-      return WalletsController.create(params)
+      return this.walletsController.create(params)
     })
 
     handle('update-wallet', async (_, params: { id: string; password: string; name: string; newPassword?: string }) => {
-      return WalletsController.update(params)
+      return this.walletsController.update(params)
     })
 
     handle('delete-wallet', async (_, { id = '', password = '' }) => {
-      return WalletsController.delete({ id, password })
+      return this.walletsController.delete({ id, password })
     })
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
-      return WalletsController.backup({ id, password })
+      return this.walletsController.backup({ id, password })
     })
 
     handle('get-all-addresses', async (_, id: string) => {
-      return WalletsController.getAllAddresses(id)
+      return this.walletsController.getAllAddresses(id)
     })
 
     handle('update-address-description', async (_, params: { walletID: string, address: string, description: string }) => {
-      return WalletsController.updateAddressDescription(params)
+      return this.walletsController.updateAddressDescription(params)
     })
 
     handle('request-password', async (_, { walletID, action }: { walletID: string, action: 'delete-wallet' | 'backup-wallet' }) => {
-      WalletsController.requestPassword(walletID, action)
+      this.walletsController.requestPassword(walletID, action)
     })
 
     handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) => {
-      return WalletsController.sendTx(params)
+      return this.walletsController.sendTx(params)
     })
 
     handle('generate-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return WalletsController.generateTx(params)
+      return this.walletsController.generateTx(params)
     })
 
     handle('generate-send-all-tx', async (_, params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) => {
-      return WalletsController.generateSendingAllTx(params)
+      return this.walletsController.generateSendingAllTx(params)
     })
 
     handle('generate-mnemonic', async () => {
-      return WalletsController.generateMnemonic()
+      return this.walletsController.generateMnemonic()
     })
 
     handle('validate-mnemonic', async (_, mnemonic: string) => {
-      return WalletsController.validateMnemonic(mnemonic)
+      return this.walletsController.validateMnemonic(mnemonic)
     })
 
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return TransactionsController.getAllByKeywords(params)
+      return this.transactionsController.getAllByKeywords(params)
     })
 
     handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
-      return TransactionsController.get(walletID, hash)
+      return this.transactionsController.get(walletID, hash)
     })
 
     handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
-      return TransactionsController.updateDescription(params)
+      return this.transactionsController.updateDescription(params)
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
@@ -192,49 +200,49 @@ export default class ApiController {
     // Dao
 
     handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {
-      return DaoController.getDaoCells(params)
+      return this.daoController.getDaoCells(params)
     })
 
     handle('generate-dao-deposit-tx', async (_, params: { walletID: string, capacity: string, fee: string, feeRate: string }) => {
-      return DaoController.generateDepositTx(params)
+      return this.daoController.generateDepositTx(params)
     })
 
     handle('generate-dao-deposit-all-tx', async (_, params: { walletID: string, fee: string, feeRate: string }) => {
-      return DaoController.generateDepositAllTx(params)
+      return this.daoController.generateDepositAllTx(params)
     })
 
     handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
-      return DaoController.startWithdrawFromDao(params)
+      return this.daoController.startWithdrawFromDao(params)
     })
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
-      return DaoController.withdrawFromDao(params)
+      return this.daoController.withdrawFromDao(params)
     })
 
     // Networks
 
     handle('get-all-networks', async () => {
-      return this.networksController?.getAll()
+      return this.networksController.getAll()
     })
 
     handle('create-network', async (_, { name, remote, type = NetworkType.Normal }: Network) => {
-      return this.networksController?.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
+      return this.networksController.create({ name, remote, type, genesisHash: '0x', chain: 'ckb', id: '' })
     })
 
     handle('update-network', async (_, { networkID, options }: { networkID: string, options: Partial<Network> }) => {
-      return this.networksController?.update(networkID, options)
+      return this.networksController.update(networkID, options)
     })
 
     handle('get-current-network-id', async () => {
-      return this.networksController?.currentID()
+      return this.networksController.currentID()
     })
 
     handle('set-current-network-id', async (_, id: string) => {
-      return this.networksController?.activate(id)
+      return this.networksController.activate(id)
     })
 
     handle('delete-network', async (_, id: string) => {
-      return this.networksController?.delete(id)
+      return this.networksController.delete(id)
     })
 
     // Updater
@@ -254,7 +262,7 @@ export default class ApiController {
     // Settings
 
     handle('clear-cache', async () => {
-      return SyncController.clearCache()
+      return new SyncController().clearCache()
     })
   }
 
