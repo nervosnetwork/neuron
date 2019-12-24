@@ -1,8 +1,39 @@
 @import '../../styles/mixin.scss';
 
+.iconBtn {
+  appearance: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+
+
+
+  &[disabled] {
+    img[data-type='add'] {
+      filter: brightness(1.2) grayscale(1)
+    }
+
+    img[data-type='remove'] {
+      filter: contrast(0.4) grayscale(1) brightness(2);
+    }
+  }
+}
+
 .maxBtn[data-is-on=true] {
-  color: rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
 }
 
 .actions {

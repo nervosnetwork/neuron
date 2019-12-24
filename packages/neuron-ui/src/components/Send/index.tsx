@@ -1,20 +1,21 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Label, Text, List, TextField, IconButton, Separator } from 'office-ui-fabric-react'
+import { Stack, Label, Text, List, TextField, Separator } from 'office-ui-fabric-react'
+import TransactionFeePanel from 'components/TransactionFeePanel'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-
-import TransactionFeePanel from 'components/TransactionFeePanel'
 import QRScanner from 'widgets/QRScanner'
+import AddOutput from 'widgets/Icons/AddOutput.png'
+import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, ErrorCode, MAINNET_TAG } from 'utils/const'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-
 import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
+
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -50,8 +51,8 @@ const Send = ({
     onSendMaxClick,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage)
-  const leftStackWidth = '70%'
   const labelWidth = '140px'
+  const inputWidth = 325
 
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
@@ -70,17 +71,17 @@ const Send = ({
             }
             return (
               <Stack tokens={{ childrenGap: 15 }}>
-                <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-                  <Stack
-                    horizontal
-                    verticalAlign="start"
-                    styles={{ root: { width: leftStackWidth } }}
-                    tokens={{ childrenGap: 20 }}
-                  >
+                <Stack
+                  horizontal
+                  verticalAlign="end"
+                  horizontalAlign="space-between"
+                  styles={{ root: { position: 'relative' } }}
+                >
+                  <Stack horizontal verticalAlign="start" tokens={{ childrenGap: 20 }}>
                     <Stack.Item styles={{ root: { width: labelWidth } }}>
                       <Label>{t('send.address')}</Label>
                     </Stack.Item>
-                    <Stack.Item styles={{ root: { flex: 1 } }}>
+                    <Stack.Item styles={{ root: { width: 325 } }}>
                       <TextField
                         data-field="address"
                         data-idx={idx}
@@ -90,6 +91,11 @@ const Send = ({
                         required
                         validateOnLoad={false}
                         onGetErrorMessage={onGetAddressErrorMessage(isMainnet)}
+                        styles={{
+                          root: {
+                            width: inputWidth,
+                          },
+                        }}
                       />
                     </Stack.Item>
                     <Stack styles={{ root: { width: '48px' } }} verticalAlign="start">
@@ -106,27 +112,30 @@ const Send = ({
 
                   <Stack.Item>
                     {outputs.length > 1 ? (
-                      <IconButton
+                      <button
+                        type="button"
                         disabled={isSendMax}
-                        iconProps={{ iconName: isSendMax ? 'DisabledRemove' : 'Remove' }}
-                        text={t('send.remove-this')}
+                        aria-label={t('send.remove-this')}
                         onClick={() => removeTransactionOutput(idx)}
-                      />
+                        className={styles.iconBtn}
+                      >
+                        <img src={RemoveOutput} alt="Remove Output" data-type="remove" />
+                      </button>
                     ) : null}
                   </Stack.Item>
                 </Stack>
 
-                <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-                  <Stack
-                    horizontal
-                    verticalAlign="start"
-                    styles={{ root: { width: leftStackWidth } }}
-                    tokens={{ childrenGap: 20 }}
-                  >
+                <Stack
+                  horizontal
+                  verticalAlign="end"
+                  horizontalAlign="space-between"
+                  styles={{ root: { position: 'relative' } }}
+                >
+                  <Stack horizontal verticalAlign="start" tokens={{ childrenGap: 20 }}>
                     <Stack.Item styles={{ root: { width: labelWidth } }}>
                       <Label>{t('send.amount')}</Label>
                     </Stack.Item>
-                    <Stack.Item styles={{ root: { flex: 1 } }}>
+                    <Stack.Item styles={{ root: { width: 325 } }}>
                       <TextField
                         data-field="amount"
                         data-idx={idx}
@@ -141,28 +150,31 @@ const Send = ({
                       />
                     </Stack.Item>
                     <Stack.Item styles={{ root: { width: '43px', paddingLeft: '5px' } }}>
-                      <Button
-                        className={styles.maxBtn}
-                        type="default"
-                        onClick={onSendMaxClick}
-                        disabled={!verifyTransactionOutputs(outputs, true)}
-                        label="Max"
-                        data-is-on={isSendMax}
-                      />
+                      {idx === outputs.length - 1 ? (
+                        <Button
+                          className={styles.maxBtn}
+                          type="default"
+                          onClick={onSendMaxClick}
+                          disabled={!verifyTransactionOutputs(outputs, true)}
+                          label="Max"
+                          data-is-on={isSendMax}
+                        />
+                      ) : null}
                     </Stack.Item>
                   </Stack>
 
                   <Stack.Item>
                     {idx === outputs.length - 1 ? (
                       <Stack horizontal>
-                        <IconButton
+                        <button
+                          type="button"
                           disabled={!verifyTransactionOutputs(outputs, false) || isSendMax}
-                          iconProps={{
-                            iconName: !verifyTransactionOutputs(outputs, false) || isSendMax ? 'DisabledAdd' : 'Add',
-                          }}
                           onClick={() => addTransactionOutput()}
-                          ariaLabel={t('send.add-one')}
-                        />
+                          aria-label={t('send.add-one')}
+                          className={styles.iconBtn}
+                        >
+                          <img src={AddOutput} alt="Add Output" data-type="add" />
+                        </button>
                       </Stack>
                     ) : null}
                   </Stack.Item>
@@ -185,7 +197,6 @@ const Send = ({
           verticalAlign="start"
           styles={{
             root: {
-              width: leftStackWidth,
               display: outputs.length > 1 || errorMessageUnderTotal ? 'flex' : 'none',
             },
           }}
@@ -204,7 +215,7 @@ const Send = ({
             />
           </Stack.Item>
         </Stack>
-        <Stack horizontal verticalAlign="end" styles={{ root: { width: leftStackWidth } }} tokens={{ childrenGap: 20 }}>
+        <Stack horizontal verticalAlign="end" tokens={{ childrenGap: 20 }}>
           <Stack.Item styles={{ root: { width: labelWidth } }}>
             <Label>{t('send.description')}</Label>
           </Stack.Item>
@@ -214,6 +225,7 @@ const Send = ({
               alt={t('send.description')}
               value={send.description}
               onChange={onDescriptionChange}
+              styles={{ root: { width: inputWidth } }}
             />
           </Stack.Item>
         </Stack>

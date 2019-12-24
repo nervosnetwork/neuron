@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 $success-color: #3cc68a;
 $failed-color: #d50000;
 $pending-color: #b3b3b3;
@@ -44,6 +46,7 @@ $pending-color: #b3b3b3;
   position: relative;
 
   &>div {
+    @include BoldText;
     display: flex;
     height: 30px;
     justify-content: center;
@@ -53,39 +56,49 @@ $pending-color: #b3b3b3;
     font-weight: 600;
     letter-spacing: 0.6px;
     color: #000;
-  }
 
-
-  section {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    width: 100%;
-    background-color: #f5f5f5;
-    box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
-    padding: 6px 0;
-    z-index: 1;
-
-    &>div {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 11px;
-
-      &>span {
-        font-size: 9px;
-        font-weight: 600;
-        letter-spacing: 0.45px;
-        color: #000;
-
-        &:last-child {
-          font-weight: normal;
-        }
-      }
-
+    &:hover {
+      @include SemiBoldText;
+      color: #fff;
+      background-color: var(--nervos-green);
     }
   }
+}
 
+section {
+  @include MediumText;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background-color: #e3e3e3;
+  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  z-index: 1;
+
+  &>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 11px;
+
+    &:hover {
+      @include SemiBoldText;
+      background-color: #d1d1d1;
+    }
+
+    &>span {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.45px;
+      color: #000;
+
+      &:last-child {
+        font-weight: normal;
+      }
+    }
+
+  }
 }
 
 .recentActivities {

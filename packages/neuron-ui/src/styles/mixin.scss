@@ -1,3 +1,21 @@
+// font
+@mixin BoldText {
+  font-family: "Montserrat-Bold", "SourceHanSansCN-Bold";
+}
+
+@mixin SemiBoldText {
+  font-family: "Montserrat-SemiBold", "SourceHanSansCN-Medium";
+}
+
+@mixin MediumText {
+  font-family: "Montserrat-Medium", "SourceHanSansCN-Medium";
+}
+
+@mixin RegularText {
+  font-family: "Montserrat-Regular", "SourceHanSansCN-Regular";
+}
+
+// layout
 @mixin dialogContainer {
   border: none;
   border-radius: 2px;

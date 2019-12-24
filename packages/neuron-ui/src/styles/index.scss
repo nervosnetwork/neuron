@@ -1,4 +1,5 @@
 @import './layout.scss';
+@import './font.scss';
 @import './color.scss';
 
 * {
@@ -118,6 +119,11 @@ navbar {
   text-overflow: ellipsis;
 }
 
+
+// hack fabric toggle
+.ms-Toggle.is-checked .ms-Toggle-background {
+  background: var(--nervos-green) !important;
+}
 
 // hack search field
 .ms-SearchBox.is-active,

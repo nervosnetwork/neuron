@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TooltipHost, IconButton } from 'office-ui-fabric-react'
+import { TooltipHost } from 'office-ui-fabric-react'
+import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
@@ -34,7 +35,14 @@ const Receive = ({
         <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
           <>
             <input readOnly value={accountAddress} onClick={copyAddress} />
-            <IconButton iconProps={{ iconName: 'Copy' }} onClick={copyAddress} />
+            <button
+              type="button"
+              aria-label={t('receive.click-to-copy')}
+              onClick={copyAddress}
+              className={styles.copyBtn}
+            >
+              <Copy />
+            </button>
           </>
         </TooltipHost>
       </div>
