@@ -1,5 +1,5 @@
-import { 
-  app, 
+import {
+  app,
   shell,
   BrowserWindow,
   dialog,
