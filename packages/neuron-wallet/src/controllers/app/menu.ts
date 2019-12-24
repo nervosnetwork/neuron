@@ -6,7 +6,7 @@ import {
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import env from 'env'
 import UpdateController from 'controllers/update'
 import WalletsService from 'services/wallets'

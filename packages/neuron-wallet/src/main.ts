@@ -1,7 +1,7 @@
 import { app } from 'electron'
 
 import AppController from 'controllers/app'
-import { changeLanguage } from 'utils/i18n'
+import { changeLanguage } from 'locales/i18n'
 
 const appController = new AppController()
 

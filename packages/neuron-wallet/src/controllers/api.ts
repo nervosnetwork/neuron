@@ -2,7 +2,7 @@ import { take } from 'rxjs/operators'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 
 import env from 'env'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import { showWindow } from './app/show-window'
 import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
