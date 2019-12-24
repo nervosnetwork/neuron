@@ -3,7 +3,7 @@ import { app } from 'electron'
 import WalletService from 'services/wallets'
 import NodeController from 'controllers/node'
 import AppController from 'controllers/app'
-import { changeLanguage } from 'utils/i18n'
+import { changeLanguage } from 'locales/i18n'
 import env from 'env'
 import { register as registerListeners } from 'listeners/main'
 

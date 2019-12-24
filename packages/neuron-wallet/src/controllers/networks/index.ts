@@ -7,7 +7,7 @@ import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import ChainInfo from './chain-info'
 import logger from 'utils/logger'
 

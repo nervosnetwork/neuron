@@ -1,6 +1,6 @@
 import NetworksService from '../../src/services/networks'
 import { Network } from '../../src/models/network'
-import i18n from '../../src/utils/i18n'
+import i18n from '../../src/locales/i18n'
 
 const ERROR_MESSAGE = {
   MISSING_ARG: `Missing required argument`,

@@ -1,6 +1,6 @@
 import i18n from 'i18next'
-import zh from 'locales/zh'
-import en from 'locales/en'
+import zh from './zh'
+import en from './en'
 
 i18n.init({
   resources: {
