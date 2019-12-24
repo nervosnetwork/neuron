@@ -1,4 +1,4 @@
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 
 export class InvalidAddress extends Error {
   constructor(address: string) {

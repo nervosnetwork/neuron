@@ -20,7 +20,7 @@ import {
   InvalidJSON,
   InvalidAddress,
 } from 'exceptions'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import AddressService from 'services/addresses'
 import { TransactionWithoutHash } from 'types/cell-types'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'

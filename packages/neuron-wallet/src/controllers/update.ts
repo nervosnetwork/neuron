@@ -1,6 +1,6 @@
 import { dialog } from 'electron'
 import { autoUpdater, UpdateInfo } from 'electron-updater'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import AppUpdaterSubject from 'models/subjects/app-updater'
 
 export default class UpdateController {

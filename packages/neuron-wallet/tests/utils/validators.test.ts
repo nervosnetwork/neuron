@@ -1,5 +1,5 @@
 import { verifyPasswordComplexity } from '../../src/decorators/validators'
-import i18n from '../../src/utils/i18n'
+import i18n from '../../src/locales/i18n'
 import { MIN_PASSWORD_LENGTH } from '../../src/utils/const'
 
 describe('validators', () => {
