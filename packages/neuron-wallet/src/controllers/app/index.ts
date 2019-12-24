@@ -23,7 +23,7 @@ export default class AppController {
 
   public start = async () => {
     if (!env.isTestMode) {
-      await NodeController.startNode()
+      await new NodeController().startNode()
     }
 
     registerListeners()
@@ -36,7 +36,7 @@ export default class AppController {
 
   public end = () => {
     if (!env.isTestMode) {
-      NodeController.stopNode()
+      new NodeController().stopNode()
     }
   }
 

@@ -54,7 +54,7 @@ export default class ApiController {
         networksService.getCurrentID(),
         networksService.getAll(),
 
-        SyncController.currentBlockNumber()
+        new SyncController().currentBlockNumber()
           .then(res => {
             if (res.status) {
               return res.result.currentBlockNumber
@@ -262,7 +262,7 @@ export default class ApiController {
     // Settings
 
     handle('clear-cache', async () => {
-      return SyncController.clearCache()
+      return new SyncController().clearCache()
     })
   }
 
