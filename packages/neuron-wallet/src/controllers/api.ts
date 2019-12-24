@@ -24,8 +24,9 @@ import SyncController from 'controllers/sync'
  */
 export default class ApiController {
   private walletsController = new WalletsController()
-  private networksController = new NetworksController()
+  private transactionsController = new TransactionsController()
   private daoController = new DaoController()
+  private networksController = new NetworksController()
 
   public async mount() {
     this.registerHandlers()
@@ -76,7 +77,7 @@ export default class ApiController {
         : [])
 
       const transactions = currentWallet
-        ? await TransactionsController.getAllByKeywords({
+        ? await this.transactionsController.getAllByKeywords({
             pageNo: 1,
             pageSize: 15,
             keywords: '',
@@ -181,15 +182,15 @@ export default class ApiController {
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return TransactionsController.getAllByKeywords(params)
+      return this.transactionsController.getAllByKeywords(params)
     })
 
     handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
-      return TransactionsController.get(walletID, hash)
+      return this.transactionsController.get(walletID, hash)
     })
 
     handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
-      return TransactionsController.updateDescription(params)
+      return this.transactionsController.updateDescription(params)
     })
 
     handle('show-transaction-details', async (_, hash: string) => {

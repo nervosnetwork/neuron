@@ -1,6 +1,5 @@
 import { Transaction } from 'types/cell-types'
 import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } from 'services/tx'
-
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
 
@@ -8,27 +7,21 @@ import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
 
-const CELL_COUNT_THRESHOLD = 10
-
 export default class TransactionsController {
-  public static async getAll(
-    params: TransactionsByLockHashesParam,
-  ): Promise<Controller.Response<PaginationResult<Transaction>>> {
+  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
-
     if (!transactions) {
       throw new ServiceHasNoResponse('Transactions')
     }
 
     return {
       status: ResponseCode.Success,
-      result: { ...params, ...transactions },
+      result: { ...params, ...transactions }
     }
   }
 
-  public static async getAllByKeywords(
-    params: Controller.Params.TransactionsByKeywords,
-  ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
+  public async getAllByKeywords(params: Controller.Params.TransactionsByKeywords):
+    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
@@ -42,18 +35,12 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: {
-        ...params,
-        ...transactions,
-        keywords,
-        walletID,
-      },
+      result: { ...params, ...transactions, keywords, walletID }
     }
   }
 
-  public static async getAllByAddresses(
-    params: Controller.Params.TransactionsByAddresses,
-  ): Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
+  public async getAllByAddresses(params: Controller.Params.TransactionsByAddresses):
+    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
     const { pageNo, pageSize, addresses = '' } = params
 
     let searchAddresses = addresses
@@ -70,22 +57,19 @@ export default class TransactionsController {
     }
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
-
     if (!transactions) {
       throw new ServiceHasNoResponse('Transactions')
     }
+
     return {
       status: ResponseCode.Success,
-      result: { ...params, ...transactions },
+      result: { ...params, ...transactions }
     }
   }
 
-  public static async get(
-    walletID: string,
-    hash: string,
-  ): Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
+  private cellCountThreshold = 10
+  public async get(walletID: string, hash: string): Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
     const transaction = await TransactionsService.get(hash)
-
     if (!transaction) {
       throw new TransactionNotFound(hash)
     }
@@ -94,6 +78,7 @@ export default class TransactionsController {
     if (!wallet) {
       throw new CurrentWalletNotSet()
     }
+
     const addresses: string[] = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
@@ -114,30 +99,27 @@ export default class TransactionsController {
     transaction.value = value.toString()
     const inputsCount = transaction.inputs ? transaction.inputs.length.toString() : '0'
     if (transaction.inputs) {
-      transaction.inputs = transaction.inputs.slice(0, CELL_COUNT_THRESHOLD)
+      transaction.inputs = transaction.inputs.slice(0, this.cellCountThreshold)
     }
     const outputsCount = transaction.outputs ? transaction.outputs.length.toString() : '0'
     if (transaction.outputs) {
       transaction.outputs = transaction.outputs
         .sort((o1, o2) => +o1.outPoint!.index - +o2.outPoint!.index)
-        .slice(0, CELL_COUNT_THRESHOLD)
+        .slice(0, this.cellCountThreshold)
     }
 
     return {
       status: ResponseCode.Success,
-      result: { ...transaction, outputsCount, inputsCount },
+      result: { ...transaction, outputsCount, inputsCount }
     }
   }
 
-  public static async updateDescription({ hash, description }: { hash: string; description: string }) {
+  public async updateDescription({ hash, description }: { hash: string; description: string }) {
     await TransactionsService.updateDescription(hash, description)
 
     return {
       status: ResponseCode.Success,
-      result: {
-        hash,
-        description,
-      },
+      result: { hash, description }
     }
   }
 }
