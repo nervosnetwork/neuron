@@ -18,7 +18,13 @@ declare interface Window {
 }
 
 declare module '*.json' {
-  const value: any
+  const value: string
+  export default value
+}
+
+declare module '*.svg' {
+  const value: string
+  export const ReactComponent = value
   export default value
 }
 
