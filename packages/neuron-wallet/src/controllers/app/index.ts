@@ -6,8 +6,10 @@ import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
 import { subscribe } from './subscribe'
-import { ApiController } from 'controllers'
+import { register as registerListeners } from 'listeners/main'
 import WalletsService from 'services/wallets'
+import ApiController from 'controllers/api'
+import NodeController from 'controllers/node'
 
 const app = electronApp || (remote && remote.app)
 
@@ -20,8 +22,22 @@ export default class AppController {
   }
 
   public start = async () => {
+    if (!env.isTestMode) {
+      await NodeController.startNode()
+    }
+
+    registerListeners()
+
+    WalletsService.getInstance().generateAddressesIfNecessary()
+
     this.apiController.mount()
     this.openWindow()
+  }
+
+  public end = () => {
+    if (!env.isTestMode) {
+      NodeController.stopNode()
+    }
   }
 
   public sendMessage = (channel: string, obj: any) => {

@@ -8,7 +8,7 @@ import {
 } from 'electron'
 import i18n from 'utils/i18n'
 import env from 'env'
-import { UpdateController } from 'controllers'
+import UpdateController from 'controllers/update'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
 
