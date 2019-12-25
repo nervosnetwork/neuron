@@ -3,6 +3,9 @@
 $progress-green: #3cc68a;
 $progress-yellow: #f7ae4d;
 $progress-grey: #e3e3e3;
+$progress-green-hover: #21b574;
+$progress-yellow-hover: #fa8f00;
+$progress-grey-hover: #888;
 $progress-indicator-color: #000;
 $progress-indicator-height: 36px;
 $progress-bar-height: 18px;
@@ -43,6 +46,10 @@ $progress-indicator-offet: ($progress-bar-height - $progress-indicator-height) /
     height: $progress-bar-height;
     border-radius: 2px;
     background: linear-gradient(90deg, $progress-green 0%, $progress-green 76.7%, $progress-yellow 76.7%, $progress-yellow 96.7%, $progress-grey 96.7%, $progress-grey 100%);
+  }
+
+  &:hover::-webkit-progress-bar {
+    background: linear-gradient(90deg, $progress-green-hover 0%, $progress-green-hover 76.7%, $progress-yellow-hover 76.7%, $progress-yellow-hover 96.7%, $progress-grey-hover 96.7%, $progress-grey-hover 100%);
   }
 
   &::-webkit-progress-value {

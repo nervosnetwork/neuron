@@ -310,6 +310,7 @@ const Submission = ({
             onChange={onChange}
             maxLength={input.maxLength}
             hint={input.hint ? t(input.hint) : undefined}
+            suffix={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : undefined}
           />
         </div>
       ))}

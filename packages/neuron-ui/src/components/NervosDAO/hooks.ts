@@ -186,6 +186,15 @@ export const useUpdateDepositValue = ({
     ]
   )
 
+export const useOnDepositValueChange = ({ updateDepositValue }: { updateDepositValue: (value: string) => void }) =>
+  useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      updateDepositValue(value)
+    },
+    [updateDepositValue]
+  )
+
 export const useUpdateGlobalAPC = ({
   tipBlockTimestamp,
   genesisBlockTimestamp,
@@ -493,6 +502,7 @@ export default {
   useUpdateMaxDeposit,
   useClearGeneratedTx,
   useUpdateDepositValue,
+  useOnDepositValueChange,
   useCompensationPeriods,
   useOnDepositDialogDismiss,
   useOnDepositDialogSubmit,

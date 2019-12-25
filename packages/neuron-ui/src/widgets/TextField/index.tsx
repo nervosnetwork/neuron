@@ -1,4 +1,5 @@
 import React from 'react'
+import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import styles from './textField.module.scss'
 
 const TextField = ({
@@ -12,6 +13,7 @@ const TextField = ({
   type = 'text',
   className = '',
   placeholder = '',
+  suffix,
   stack = true,
   required = false,
   readOnly = false,
@@ -26,6 +28,7 @@ const TextField = ({
   onChange?: (e: React.SyntheticEvent<HTMLInputElement>) => void
   onClick?: (e: React.SyntheticEvent<HTMLInputElement>) => void
   className?: string
+  suffix?: string | undefined
   stack?: boolean
   required?: boolean
   readOnly?: boolean
@@ -44,22 +47,30 @@ const TextField = ({
           {label}
         </label>
       ) : null}
-      <input
-        id={field}
-        data-field={field}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        title={label}
-        name={label}
-        arial-label={label}
-        onChange={onChange}
-        onClick={onClick}
-        readOnly={readOnly}
-        {...rest}
-      />
+      <div className={styles.input}>
+        <input
+          id={field}
+          data-field={field}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          title={label}
+          name={label}
+          arial-label={label}
+          onChange={onChange}
+          onClick={onClick}
+          readOnly={readOnly}
+          {...rest}
+        />
+        {suffix ? <span className={styles.suffix}>{suffix}</span> : null}
+      </div>
       {hint ? <span className={styles.hint}>{hint}</span> : null}
-      {error ? <span className={styles.errorMessage}>{error}</span> : null}
+      {error ? (
+        <span className={styles.errorMessage}>
+          <Attention />
+          {error}
+        </span>
+      ) : null}
     </div>
   )
 }

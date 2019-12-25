@@ -19,7 +19,8 @@
   font-size: 0.875rem;
   line-height: 1.4;
   letter-spacing: 0.7px;
-  margin-top: 22px;
+  margin-top: 11px;
+  margin-bottom: 20px;
 
   &>span:first-of-type:after {
     display: inline;
@@ -32,7 +33,7 @@
 .errorMessage {
   display: flex;
   align-items: center;
-  height: 20px;
+  height: 1rem;
   color: red;
   font-size: 0.625rem;
 }

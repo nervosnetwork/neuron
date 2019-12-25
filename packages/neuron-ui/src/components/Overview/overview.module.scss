@@ -14,9 +14,9 @@ $pending-color: #b3b3b3;
 
 .walletName,
 .recentActivitiesTitle {
+  @include BoldText;
   font-size: 1.375rem;
   line-height: 1.22em;
-  font-weight: bold;
   letter-spacing: 1.1px;
   color: #000;
   margin: 0;
@@ -46,12 +46,12 @@ $pending-color: #b3b3b3;
   position: relative;
 
   &>div {
-    @include BoldText;
+    @include MediumText;
     display: flex;
     height: 30px;
     justify-content: center;
     align-items: center;
-    background-color: #d1d1d1;
+    background-color: #e3e3e3;
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.6px;
@@ -59,19 +59,17 @@ $pending-color: #b3b3b3;
 
     &:hover {
       @include SemiBoldText;
-      color: #fff;
-      background-color: var(--nervos-green);
+      background-color: #d1d1d1;
     }
   }
 }
 
 section {
-  @include MediumText;
   position: absolute;
   left: 0;
   top: 100%;
   width: 100%;
-  background-color: #e3e3e3;
+  background-color: #f5f5f5;
   box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
   padding: 6px 0;
   z-index: 1;
@@ -83,8 +81,7 @@ section {
     padding: 6px 11px;
 
     &:hover {
-      @include SemiBoldText;
-      background-color: #d1d1d1;
+      background-color: #e3e3e3;
     }
 
     &>span {
@@ -103,7 +100,13 @@ section {
 
 .recentActivities {
   grid-area: activities;
-  border-collapse: collapse;
+  padding: 0px 11px 16px;
+  background-color: #fff;
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
 
   tr {
     height: 46px;

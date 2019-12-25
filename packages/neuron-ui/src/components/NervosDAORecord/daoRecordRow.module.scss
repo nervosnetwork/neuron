@@ -1,6 +1,9 @@
 $progress-green: #3cc68a;
 $progress-yellow: #f7ae4d;
 $progress-grey: #e3e3e3;
+$progress-green-hover: #21b574;
+$progress-yellow-hover: #fa8f00;
+$progress-grey-hover: #888;
 
 .daoRecord {
   display: flex;
@@ -88,17 +91,26 @@ $progress-grey: #e3e3e3;
 
   &[data-stage='stage1'] {
     background-color: $progress-green;
+
+    &:hover {
+      background-color: $progress-green-hover;
+    }
   }
 
   &[data-stage='stage2'] {
     background-color: $progress-yellow;
+
+    &:hover {
+      background-color: $progress-yellow-hover;
+    }
   }
 
   &[data-stage='stage3'] {
     background-color: $progress-grey;
+
+    &:hover {
+      background-color: $progress-grey-hover;
+    }
   }
 
-  &:hover {
-    filter: brightness(1.1);
-  }
 }

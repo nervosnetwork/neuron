@@ -1,0 +1,86 @@
+@import '../../styles/mixin.scss';
+
+.itemContainer {
+  @include RegularText;
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #b3b3b3;
+
+  .summary {
+    @include MediumText;
+    display: grid;
+    grid-template:
+      'time status'auto 'amount confirmations'auto/ auto auto;
+    grid-gap: 3px;
+    padding: 15px 33px;
+
+    time,
+    span {
+      pointer-events: none;
+    }
+
+    time {
+      grid-area: time;
+    }
+
+    .status {
+      grid-area: status;
+      text-align: right;
+    }
+
+    .amount {
+      grid-area: amount;
+      color: var(--nervos-green);
+    }
+
+    .confirmations {
+      grid-area: confirmations;
+      text-align: right;
+      font-size: 0.625rem;
+      color: #434343;
+      letter-spacing: 0.5px;
+    }
+  }
+
+
+  .detail {
+    padding: 0 33px;
+    display: none;
+    color: #434343;
+
+    &>div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+
+      &>span:first-of-type {
+        @include MediumText;
+      }
+    }
+
+    .txHash {
+      display: flex;
+
+      @media screen and (max-width: 1080px) {
+        span:first-of-type {
+          width: 50vw;
+        }
+
+      }
+    }
+
+    .descriptionField {
+      @include descriptionField;
+    }
+  }
+
+  &[data-is-open="true"] {
+
+    .detail {
+      display: block;
+    }
+  }
+}

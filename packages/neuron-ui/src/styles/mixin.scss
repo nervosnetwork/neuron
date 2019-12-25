@@ -25,8 +25,8 @@
 }
 
 @mixin dialogTitle {
+  @include BoldText;
   font-size: 1.125rem;
-  font-weight: bold;
   letter-spacing: 0.9px;
   margin-bottom: 25px;
 }
@@ -68,5 +68,26 @@
     &:first-of-type {
       margin-left: 0;
     }
+  }
+}
+
+@mixin descriptionField {
+  display: flex;
+
+  &>div {
+    border-color: transparent !important;
+
+    input::-webkit-input-placeholder {
+      color: #b3b3b3;
+      font-size: 0.625rem;
+    }
+  }
+
+  &:hover>div {
+    border-color: #b3b3b3 !important;
+  }
+
+  &:focus-within>div {
+    border-color: #333 !important;
   }
 }

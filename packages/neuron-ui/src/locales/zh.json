@@ -251,7 +251,8 @@
       "select": "选择",
       "backup": "备份",
       "edit": "编辑",
-      "delete": "删除"
+      "delete": "删除",
+      "double-click-to-edit": "双击编辑"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -288,8 +289,6 @@
         "keystore-password": "密码",
         "deposit": "存入金额"
       },
-      "mainnet-address-required": "请输入主网地址",
-      "testnet-address-required": "请输出测试网地址",
       "run-ckb-guide": "如何运行一个 CKB 节点?",
       "codes": {
         "-3": "",
@@ -310,7 +309,9 @@
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "摄像头不可用或被禁用。",
-        "305": "$t(messages.fields.address)不能为空。"
+        "305": "$t(messages.fields.address)不能为空。",
+        "306": "请输入主网地址",
+        "307": "请输出测试网地址"
       }
     },
     "sync": {

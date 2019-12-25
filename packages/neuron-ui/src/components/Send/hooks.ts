@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import produce from 'immer'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
 import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
-import { ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
+import { ErrorCode, MAINNET_TAG } from 'utils/const'
 import calculateFee from 'utils/calculateFee'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
@@ -94,7 +95,7 @@ const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
         payload: {
           idx,
           item: {
-            [field]: value.replace(/\s/, ''),
+            [field]: value,
           },
         },
       })
@@ -168,48 +169,100 @@ const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =
     [dispatch, items]
   )
 
-const useOnItemChange = (updateTransactionOutput: Function) =>
+const useOnItemChange = (
+  updateTransactionOutput: Function,
+  setOutputErrors: React.Dispatch<React.SetStateAction<any>>
+) =>
   useCallback(
-    (e: any, value?: string) => {
-      const { field = '', idx = -1 } = e.target.dataset
-      if (undefined !== value) {
-        if (field === 'amount') {
-          const amount = value.replace(/,/g, '')
-          if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
-            return
-          }
-          updateTransactionOutput(field)(idx)(amount)
-        } else {
-          updateTransactionOutput(field)(idx)(value)
+    (e: any) => {
+      const {
+        value,
+        dataset: { field = '', idx = -1, chainType = MAINNET_TAG },
+      } = e.target
+      if (field === 'amount') {
+        const amount = value.replace(/,/g, '') || '0'
+        if (Number.isNaN(+amount) || /[^\d.]/.test(amount) || +amount < 0) {
+          return
         }
+        updateTransactionOutput(field)(idx)(amount)
+
+        let amountErrorCode = ''
+        const msg = verifyAmount(amount)
+        if (typeof msg === 'object') {
+          amountErrorCode = `${msg.code}`
+        } else if (!verifyAmountRange(amount)) {
+          amountErrorCode = `${ErrorCode.AmountTooSmall}`
+        }
+        setOutputErrors(
+          /* eslint-disable no-param-reassign */
+          produce(errors => {
+            if (errors[idx]) {
+              errors[idx].amountErrorCode = amountErrorCode
+            } else {
+              errors[idx] = {
+                amountErrorCode,
+                addrErrorCode: '',
+              }
+            }
+          })
+          /* eslint-enable no-param-reassign */
+        )
+        return
+      }
+      if (field === 'address') {
+        const address = value
+        updateTransactionOutput(field)(idx)(address)
+
+        let addrErrorCode = ''
+        if (address === '') {
+          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
+        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
+          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
+        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
+          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
+        } else if (!verifyAddress(address)) {
+          addrErrorCode = `${ErrorCode.FieldInvalid}`
+        }
+        setOutputErrors(
+          /* eslint-disable no-param-reassign */
+          produce(errors => {
+            if (errors[idx]) {
+              errors[idx].addrErrorCode = addrErrorCode
+            } else {
+              errors[idx] = {
+                addrErrorCode,
+                amountErrorCode: '',
+              }
+            }
+          })
+          /* eslint-enable no-param-reassign */
+        )
       }
     },
-    [updateTransactionOutput]
+    [updateTransactionOutput, setOutputErrors]
   )
 
 const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
   useCallback(
-    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
-      if (undefined !== value) {
-        const price = value.split('.')[0].replace(/[^\d]/g, '')
-        dispatch({
-          type: AppActions.UpdateSendPrice,
-          payload: price.replace(/,/g, ''),
-        })
-      }
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      const price = value.split('.')[0].replace(/[^\d]/g, '')
+      dispatch({
+        type: AppActions.UpdateSendPrice,
+        payload: price.replace(/,/g, ''),
+      })
     },
     [dispatch]
   )
 
 const useSendDescriptionChange = (dispatch: StateDispatch) =>
   useCallback(
-    (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
-      if (undefined !== value) {
-        dispatch({
-          type: AppActions.UpdateSendDescription,
-          payload: value,
-        })
-      }
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const { value } = e.target as HTMLInputElement
+      dispatch({
+        type: AppActions.UpdateSendDescription,
+        payload: value,
+      })
     },
     [dispatch]
   )
@@ -228,14 +281,14 @@ export const useInitialize = (
   generatedTx: any | null,
   price: string,
   sending: boolean,
-  dispatch: React.Dispatch<any>,
-  t: any
+  dispatch: React.Dispatch<any>
 ) => {
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
 
   const [totalAmount, setTotalAmount] = useState('0')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSendMax, setIsSendMax] = useState(false)
+  const [outputErrors, setOutputErrors] = useState<{ addrErrorCode: string; amountErrorCode: string }[]>([])
 
   const outputs = useMemo(() => items.map(item => ({ ...item, disabled: isSendMax || sending })), [
     items,
@@ -244,7 +297,7 @@ export const useInitialize = (
   ])
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
-  const onItemChange = useOnItemChange(updateTransactionOutput)
+  const onItemChange = useOnItemChange(updateTransactionOutput, setOutputErrors)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
@@ -290,51 +343,6 @@ export const useInitialize = (
     clear(dispatch)
   }, [walletID, dispatch])
 
-  const onGetAddressErrorMessage: (isMainnet: boolean) => (addr: string) => string = useCallback(
-    (isMainnet: boolean) => (addr: string) => {
-      if (addr === '') {
-        return t(`messages.codes.${ErrorCode.AddressIsEmpty}`)
-      }
-      if (isMainnet && !addr.startsWith('ckb')) {
-        return t(`messages.mainnet-address-required`)
-      }
-      if (!isMainnet && !addr.startsWith('ckt')) {
-        return t(`messages.testnet-address-required`)
-      }
-      if (!verifyAddress(addr)) {
-        return t(`messages.codes.${ErrorCode.FieldInvalid}`, {
-          fieldName: 'address',
-          fieldValue: addr,
-        })
-      }
-      return ''
-    },
-    [t]
-  )
-
-  const onGetAmountErrorMessage = useCallback(
-    (text: string) => {
-      const amount = text.replace(/,/g, '') || '0'
-
-      const msg = verifyAmount(amount)
-      if (typeof msg === 'object') {
-        return t(`messages.codes.${msg.code}`, {
-          fieldName: 'amount',
-          fieldValue: amount,
-          length: MAX_DECIMAL_DIGITS,
-        })
-      }
-      if (!verifyAmountRange(amount)) {
-        return t(`messages.codes.${ErrorCode.AmountTooSmall}`, {
-          amount,
-        })
-      }
-
-      return undefined
-    },
-    [t]
-  )
-
   return {
     outputs,
     fee,
@@ -346,10 +354,9 @@ export const useInitialize = (
     removeTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
-    onGetAddressErrorMessage,
-    onGetAmountErrorMessage,
     onSubmit,
     onClear,
+    outputErrors,
     errorMessage,
     setErrorMessage,
     isSendMax,

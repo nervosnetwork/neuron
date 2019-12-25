@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, Icon, TooltipHost } from 'office-ui-fabric-react'
+import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -18,6 +18,7 @@ import DAORecord from 'components/NervosDAORecord'
 import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
+import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
@@ -61,6 +62,7 @@ const NervosDAO = ({
     maxDepositErrorMessage,
     t,
   })
+  const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
   const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
     setShowDepositDialog,
     setDepositValue,
@@ -117,7 +119,7 @@ const NervosDAO = ({
     return (
       <>
         <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
-        <Stack>
+        <Stack className={styles.recordsContainer}>
           {records.map((record, i) => {
             let stage = 'deposited'
             if (record.depositOutPoint) {
@@ -165,7 +167,7 @@ const NervosDAO = ({
         show={showDepositDialog}
         value={depositValue}
         fee={fee}
-        onChange={(_e: any, value: string) => updateDepositValue(value)}
+        onChange={onDepositValueChange}
         onDismiss={onDepositDialogDismiss}
         onSubmit={onDepositDialogSubmit}
         onSlide={onSlide}
@@ -215,11 +217,23 @@ const NervosDAO = ({
     }
     const epochInfo = epochParser(epoch)
     return (
-      <Stack tokens={{ childrenGap: 10 }}>
-        <Text as="span" variant="small" block>{`Epoch number: ${epochInfo.number}`}</Text>
-        <Text as="span" variant="small" block>{`Epoch index: ${epochInfo.index}`}</Text>
-        <Text as="span" variant="small" block>{`Epoch length: ${epochInfo.length}`}</Text>
-        <Text as="span" variant="small" block>{`APC: ~${globalAPC}%`}</Text>
+      <Stack className={styles.info}>
+        <div>
+          <span>Epoch number</span>
+          <span>{`${epochInfo.number}`}</span>
+        </div>
+        <div>
+          <span>Epoch index</span>
+          <span>{`${epochInfo.index}`}</span>
+        </div>
+        <div>
+          <span>Epoch length</span>
+          <span>{epochInfo.length}</span>
+        </div>
+        <div>
+          <span>APC</span>
+          <span>{`~${globalAPC}%`}</span>
+        </div>
       </Stack>
     )
   }, [epoch, globalAPC])
@@ -254,10 +268,20 @@ const NervosDAO = ({
             label={t('nervos-dao.deposit')}
           />
           <TooltipHost
+            calloutProps={{
+              gapSpace: 7,
+            }}
             content={EpochInfo}
-            styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: 9 } }}
+            styles={{
+              root: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 9,
+              },
+            }}
           >
-            <Icon iconName="info" />
+            <Info />
           </TooltipHost>
         </div>
       </div>

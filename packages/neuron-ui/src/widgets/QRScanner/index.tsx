@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
+import { TextField, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import jsQR from 'jsqr'
 
@@ -111,7 +112,13 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
 
   return (
     <>
-      <button style={styles && styles.trigger} onClick={onOpen} type="button" className={localStyles.scanBtn}>
+      <button
+        style={styles && styles.trigger}
+        onClick={onOpen}
+        type="button"
+        aria-label="qr-btn"
+        className={localStyles.scanBtn}
+      >
         <Scan />
       </button>
       <Dialog hidden={!open} onDismiss={onDismiss} maxWidth="900px" minWidth="500xp">
@@ -128,8 +135,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         >
           <TextField readOnly value={data} label={label} underlined />
           <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-            <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton onClick={onSubmit}>{t('common.confirm')}</PrimaryButton>
+            <Button type="cancel" onClick={onDismiss} label={t('common.cancel')} />
+            <Button type="submit" onClick={onSubmit} label={t('common.confirm')} />
           </Stack>
         </DialogFooter>
       </Dialog>

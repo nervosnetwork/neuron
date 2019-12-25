@@ -161,40 +161,52 @@ const Overview = ({
       }
     })
     return (
-      <table className={styles.recentActivities}>
-        <thead>
-          <tr>
-            {['date', 'type', 'amount', 'status'].map(field => {
-              const title = t(`overview.${field}`)
+      <div className={styles.recentActivities}>
+        <table>
+          <thead>
+            <tr>
+              {['date', 'type', 'amount', 'status'].map(field => {
+                const title = t(`overview.${field}`)
+                return (
+                  <th key={field} title={title} aria-label={title}>
+                    {title}
+                  </th>
+                )
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {activities.map(item => {
+              const {
+                confirmations,
+                createdAt,
+                status,
+                hash,
+                statusLabel,
+                timestamp,
+                typeLabel,
+                value,
+                nervosDao,
+              } = item
+              const time = uniformTimeFormatter(timestamp || createdAt)
+
               return (
-                <th key={field} title={title} aria-label={title}>
-                  {title}
-                </th>
+                <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
+                  <td title={time}>{time.split(' ')[0]}</td>
+                  <td>{nervosDao ? 'Nervos DAO' : typeLabel}</td>
+                  <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
+                  <td className={styles.txStatus} data-status={status}>
+                    <div>
+                      <span>{statusLabel}</span>
+                      {confirmations ? <span>{confirmations}</span> : null}
+                    </div>
+                  </td>
+                </tr>
               )
             })}
-          </tr>
-        </thead>
-        <tbody>
-          {activities.map(item => {
-            const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, value, nervosDao } = item
-            const time = uniformTimeFormatter(timestamp || createdAt)
-
-            return (
-              <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
-                <td title={time}>{time.split(' ')[0]}</td>
-                <td>{nervosDao ? 'Nervos DAO' : typeLabel}</td>
-                <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
-                <td className={styles.txStatus} data-status={status}>
-                  <div>
-                    <span>{statusLabel}</span>
-                    {confirmations ? <span>{confirmations}</span> : null}
-                  </div>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     )
   }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 

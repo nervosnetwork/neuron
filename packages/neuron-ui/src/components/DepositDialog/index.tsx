@@ -1,6 +1,8 @@
 import React, { useMemo, useRef } from 'react'
-import { TextField, Slider, Spinner, SpinnerSize } from 'office-ui-fabric-react'
+import { Slider, SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation, Trans } from 'react-i18next'
+import TextField from 'widgets/TextField'
+import Spinner from 'widgets/Spinner'
 import Button from 'widgets/Button'
 import { openExternal } from 'services/remote'
 import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
@@ -67,17 +69,18 @@ const DepositDialog = ({
             {t('nervos-dao.deposit-dialog-title')}
           </h2>
           <TextField
-            label={`${t('nervos-dao.deposit')}*`}
+            field="depositValue"
+            label={`${t('nervos-dao.deposit')}`}
             value={localNumberFormatter(value)}
             onChange={onChange}
             suffix="CKB"
           />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
+          <div className={styles.errorMessage}>{errorMessage}</div>
           <div className={styles.fee}>
             <span>{t('nervos-dao.fee')}</span>
             <span>{fee}</span>
           </div>
-          <div className={styles.errorMessage}>{errorMessage}</div>
           <div className={styles.notice}>
             <h2 aria-label={t('nervos-dao.notice')}>{t('nervos-dao.notice')}</h2>
             <p>

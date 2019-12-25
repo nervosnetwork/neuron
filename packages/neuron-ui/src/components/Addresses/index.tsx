@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TextField, IconButton, getTheme } from 'office-ui-fabric-react'
+import TextField from 'widgets/TextField'
 
 import { openExternal, openContextMenu } from 'services/remote'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
@@ -29,9 +29,6 @@ const Addresses = ({
     onDescriptionChange,
     onDescriptionSelected,
   } = useLocalDescription('address', walletID, dispatch)
-
-  const theme = getTheme()
-  const { semanticColors } = theme
 
   const onContextMenu = useCallback(
     item => {
@@ -64,32 +61,33 @@ const Addresses = ({
   )
 
   return (
-    <table className={styles.addressList}>
-      <thead>
-        <tr>
-          {['type', 'address', 'description', 'balance', 'transactions'].map(field => (
-            <th key={field}>{t(`addresses.${field}`)}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {addresses.map(addr => {
-          const isSelected = localDescription.key === addr.address
-          const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
-          return (
-            <tr key={addr.address} onContextMenu={() => onContextMenu(addr)}>
-              <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
-                {typeLabel}
-              </td>
-              <td className={`${styles.address} monospacedFont`}>
-                <div data-address={addr.address}>
-                  <span className="textOverflow">{addr.address.slice(0, -6)}</span>
-                  <span>{addr.address.slice(-6)}</span>
-                </div>
-              </td>
-              <td className={styles.description} title={addr.description}>
-                <>
+    <div className={styles.container}>
+      <table className={styles.addressList}>
+        <thead>
+          <tr>
+            {['type', 'address', 'description', 'balance', 'transactions'].map(field => (
+              <th key={field}>{t(`addresses.${field}`)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {addresses.map(addr => {
+            const isSelected = localDescription.key === addr.address
+            const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
+            return (
+              <tr key={addr.address} onContextMenu={() => onContextMenu(addr)}>
+                <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
+                  {typeLabel}
+                </td>
+                <td className={`${styles.address} monospacedFont`}>
+                  <div data-address={addr.address}>
+                    <span className="textOverflow">{addr.address.slice(0, -6)}</span>
+                    <span>{addr.address.slice(-6)}</span>
+                  </div>
+                </td>
+                <td title={addr.description}>
                   <TextField
+                    field="description"
                     data-description-key={addr.address}
                     data-description-value={addr.description}
                     borderless
@@ -99,37 +97,23 @@ const Addresses = ({
                     onKeyPress={isSelected ? onDescriptionPress : undefined}
                     onChange={isSelected ? onDescriptionChange : undefined}
                     readOnly={!isSelected}
-                    styles={{
-                      root: {
-                        flex: 1,
-                      },
-                      fieldGroup: {
-                        backgroundColor: isSelected ? '#fff' : 'transparent',
-                        borderColor: 'transparent',
-                        border: isSelected ? `1px solid ${semanticColors.inputBorder}!important` : 'none',
-                      },
-                    }}
+                    onDoubleClick={onDescriptionSelected}
+                    className={styles.descriptionField}
+                    placeholder={t('common.double-click-to-edit')}
                   />
-                  {isSelected ? null : (
-                    <IconButton
-                      iconProps={{ iconName: 'Edit' }}
-                      className="editButton"
-                      onClick={onDescriptionSelected(addr.address, addr.description)}
-                    />
-                  )}
-                </>
-              </td>
-              <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
-                {`${shannonToCKBFormatter(addr.balance)} CKB`}
-              </td>
-              <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
-                {localNumberFormatter(addr.txCount)}
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+                </td>
+                <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
+                  <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
+                </td>
+                <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
+                  {localNumberFormatter(addr.txCount)}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }
 

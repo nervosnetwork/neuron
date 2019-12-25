@@ -102,4 +102,6 @@ export enum ErrorCode {
   FieldNotFound = 303,
   CameraUnavailable = 304,
   AddressIsEmpty = 305,
+  MainnetAddressRequired = 306,
+  TestnetAddressRequired = 307,
 }
