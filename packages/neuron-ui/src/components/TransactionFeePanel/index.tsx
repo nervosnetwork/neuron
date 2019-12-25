@@ -28,18 +28,13 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
   const [showDetail, setShowDetail] = useState(false)
   const leftStackWidth = '70%'
   const labelWidth = '140px'
-  const actionSpacer = (
-    <Stack.Item styles={{ root: { width: '48px' } }}>
-      <span> </span>
-    </Stack.Item>
-  )
 
   const selectedSpeed = calculateSpeed(+price)
 
   return (
     <Stack tokens={{ childrenGap: 15 }} aria-label="transaction fee">
-      <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-        <Stack horizontal tokens={{ childrenGap: 20 }} styles={{ root: { width: leftStackWidth } }}>
+      <Stack tokens={{ childrenGap: 15 }}>
+        <Stack horizontal tokens={{ childrenGap: 20 }}>
           <Stack.Item styles={{ root: { width: labelWidth } }}>
             <Label>{t('send.fee')}</Label>
           </Stack.Item>
@@ -48,6 +43,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
               value={`${fee} CKB`}
               readOnly
               styles={{
+                root: { width: 325 },
                 field: {
                   color: '#888',
                 },
@@ -57,7 +53,6 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
               }}
             />
           </Stack.Item>
-          {actionSpacer}
         </Stack>
 
         <Stack.Item>
@@ -67,6 +62,8 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             }}
             label={t('send.advanced-fee-settings')}
             inlineLabel
+            onText=" "
+            offText=" "
           />
         </Stack.Item>
       </Stack>
@@ -91,9 +88,9 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
               onChange={onPriceChange}
               aria-label="price"
               suffix="shannons/kB"
+              styles={{ root: { width: 325 } }}
             />
           </Stack.Item>
-          {actionSpacer}
         </Stack>
 
         <Stack horizontal tokens={{ childrenGap: 20 }}>

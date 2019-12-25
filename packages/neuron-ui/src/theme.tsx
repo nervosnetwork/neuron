@@ -2,7 +2,6 @@ import React from 'react'
 import { loadTheme, getTheme } from 'office-ui-fabric-react'
 
 import {
-  AddCircle as AddIcon,
   Alert as AlertIcon,
   Checkmark as SuccessIcon,
   CircleInformation as InfoIcon,
@@ -28,7 +27,6 @@ import {
   Search as SearchIcon,
   SettingsOption as SettingsIcon,
   StatusGood as MatchedIcon,
-  SubtractCircle as RemoveIcon,
   Update as UpdateIcon,
   Update as PendingIcon,
 } from 'grommet-icons'
@@ -72,11 +70,6 @@ registerIcons({
     Scan: <ScanIcon />,
     Import: <ImportIcon color="white" />,
     Create: <CreateIcon />,
-    Add: <AddIcon style={{ marginTop: '-4px' }} />,
-    DisabledAdd: <AddIcon color="#a19f9d" style={{ marginTop: '-4px' }} />,
-    Remove: <RemoveIcon color="red" style={{ marginTop: '-4px' }} />,
-    DisabledRemove: <RemoveIcon color="#a19f9d" style={{ marginTop: '-4px' }} />,
-    Copy: <CopyIcon />,
     Clear: <ClearIcon size="16px" />,
     Dismiss: <DismissIcon size="16px" />,
     Leave: <LeaveIcon />,

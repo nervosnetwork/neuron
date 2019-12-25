@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  TextField,
-  PrimaryButton,
-  DefaultButton,
-  Dialog,
-  DialogFooter,
-  Stack,
-  IconButton,
-} from 'office-ui-fabric-react'
+import { TextField, PrimaryButton, DefaultButton, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
+import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import jsQR from 'jsqr'
 
 import { showErrorMessage } from 'services/remote'
 import { drawPolygon } from 'utils/canvasActions'
 import { verifyAddress } from 'utils/validators'
 import { ErrorCode } from 'utils/const'
+import localStyles from './qrScanner.module.scss'
 
 interface QRScannerProps {
   title: string
@@ -117,25 +111,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
 
   return (
     <>
-      <button
-        style={
-          (styles && styles.trigger) || {
-            lineHeight: '1',
-            background: 'none',
-            border: 'none',
-            outline: 'none',
-          }
-        }
-        onClick={onOpen}
-        type="button"
-      >
-        <IconButton
-          iconProps={{ iconName: 'Scan' }}
-          styles={{
-            root: { padding: 0 },
-            flexContainer: { display: 'block', width: '32px' },
-          }}
-        />
+      <button style={styles && styles.trigger} onClick={onOpen} type="button" className={localStyles.scanBtn}>
+        <Scan />
       </button>
       <Dialog hidden={!open} onDismiss={onDismiss} maxWidth="900px" minWidth="500xp">
         <h1>{title}</h1>

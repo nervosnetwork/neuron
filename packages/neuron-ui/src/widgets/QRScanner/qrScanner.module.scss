@@ -1,0 +1,12 @@
+.scanBtn {
+  line-height: 1;
+  background: none;
+  border: none;
+  outline: none;
+
+  &:hover {
+    g {
+      stroke: var(--nervos-green);
+    }
+  }
+}
