@@ -11,6 +11,7 @@
   padding: 7px 0;
   border: none;
   margin: 0;
+  box-sizing: border-box;
 
   &[data-type='default'],
   &[data-type='reset'] {
@@ -18,10 +19,8 @@
     color: #000;
     border: 1px solid #000;
 
-    &:hover,
-    &:focus {
+    &:hover {
       @include SemiBoldText;
-      box-shadow: 0 0 5px #000;
     }
   }
 
@@ -29,11 +28,9 @@
     background-color: #e3e3e3;
     color: #000;
 
-    &:hover,
-    &:focus {
+    &:hover {
       @include SemiBoldText;
       background-color: #d1d1d1;
-      box-shadow: 0 0 5px #e3e3e3;
     }
   }
 
@@ -44,17 +41,15 @@
     background-color: var(--nervos-green);
     color: #fff;
 
-    &:hover,
-    &:focus {
+    &:hover {
       @include SemiBoldText;
       background-color: #21b574;
-      box-shadow: 0 0 5px var(--nervos-green);
     }
   }
 
   &:active {
-    color: rgba(255, 255, 255, 0.8);
-    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+    @include SemiBoldText;
+    filter: invert(0.2);
   }
 
   &[disabled] {

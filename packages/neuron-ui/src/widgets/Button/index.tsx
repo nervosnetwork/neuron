@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import styles from './button.module.scss'
 
 const Button = ({
@@ -18,20 +18,12 @@ const Button = ({
   children?: React.ReactChild
   [key: string]: any
 }) => {
-  const onBtnClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      onClick(e)
-      ;(e.target as HTMLButtonElement).blur()
-    },
-    [onClick]
-  )
-
   return (
     <button
       className={`${styles.button} ${className}`}
       type="button"
       data-type={type}
-      onClick={onBtnClick}
+      onClick={onClick}
       aria-label={label}
       title={label}
       disabled={disabled}
