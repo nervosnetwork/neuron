@@ -90,7 +90,6 @@ const Addresses = ({
                     field="description"
                     data-description-key={addr.address}
                     data-description-value={addr.description}
-                    borderless
                     title={addr.description}
                     value={isSelected ? localDescription.description : addr.description || ''}
                     onBlur={isSelected ? onDescriptionFieldBlur : undefined}

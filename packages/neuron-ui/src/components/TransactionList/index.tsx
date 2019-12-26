@@ -155,7 +155,6 @@ const TransactionList = ({
                     onBlur={isSelected ? onDescriptionFieldBlur : undefined}
                     onKeyPress={isSelected ? onDescriptionPress : undefined}
                     onChange={isSelected ? onDescriptionChange : undefined}
-                    borderless
                     readOnly={!isSelected}
                     onDoubleClick={onDescriptionSelected}
                     className={styles.descriptionField}

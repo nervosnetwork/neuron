@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import produce from 'immer'
+import { TFunction } from 'i18next'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
@@ -26,6 +27,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   setErrorMessage,
   updateTransactionOutput,
   dispatch,
+  t,
 }: {
   walletID: string
   price: string
@@ -34,6 +36,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   setErrorMessage: Function
   updateTransactionOutput?: Function
   dispatch: StateDispatch
+  t: TFunction
 }) => {
   const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
   if (verifyTransactionOutputs(items, type === 'all')) {
@@ -69,7 +72,10 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
           }
           return res.result
         }
-        throw new Error(res.message.content)
+        if (res.status === 0) {
+          throw new Error(res.message.content)
+        }
+        throw new Error(t(`messages.codes.${res.status}`))
       })
       .catch((err: Error) => {
         dispatch({
@@ -128,7 +134,8 @@ const useOnTransactionChange = (
   dispatch: StateDispatch,
   isSendMax: boolean,
   setTotalAmount: Function,
-  setErrorMessage: Function
+  setErrorMessage: Function,
+  t: TFunction
 ) => {
   useEffect(() => {
     clearTimeout(generateTxTimer)
@@ -148,9 +155,10 @@ const useOnTransactionChange = (
         setTotalAmount,
         setErrorMessage,
         dispatch,
+        t,
       })
     }, 300)
-  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage])
+  }, [walletID, items, price, isSendMax, dispatch, setTotalAmount, setErrorMessage, t])
 }
 
 const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =>
@@ -281,7 +289,8 @@ export const useInitialize = (
   generatedTx: any | null,
   price: string,
   sending: boolean,
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<any>,
+  t: TFunction
 ) => {
   const fee = useMemo(() => calculateFee(generatedTx), [generatedTx])
 
@@ -314,12 +323,13 @@ export const useInitialize = (
       setErrorMessage,
       updateTransactionOutput,
       dispatch,
+      t,
     }).then(tx => {
       if (!tx) {
         setIsSendMax(false)
       }
     })
-  }, [walletID, updateTransactionOutput, price, items, dispatch])
+  }, [walletID, updateTransactionOutput, price, items, dispatch, t])
 
   const onSendMaxClick = useCallback(() => {
     if (!isSendMax) {

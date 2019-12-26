@@ -297,6 +297,8 @@
         "102": "$t(messages.fields.{{fieldName}})无效。",
         "103": "$t(messages.fields.keystore-password) 不正确。",
         "104": "未连接到节点，请重启 Neuron。",
+        "105": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
+        "106": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",

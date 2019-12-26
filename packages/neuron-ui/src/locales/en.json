@@ -297,6 +297,8 @@
         "102": "$t(messages.fields.{{fieldName}}) is invalid.",
         "103": "$t(messages.fields.keystore-password) is incorrect.",
         "104": "Fail to connect to the node, please restart Neuron.",
+        "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
+        "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",

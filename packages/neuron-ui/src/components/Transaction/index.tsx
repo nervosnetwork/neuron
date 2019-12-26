@@ -52,7 +52,7 @@ const Transaction = () => {
       }
       getTransaction({ hash, walletID: currentWallet.id })
         .then(res => {
-          if (res.status) {
+          if (res.status === 1) {
             setTransaction(res.result)
           } else {
             showErrorMessage(
