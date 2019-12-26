@@ -166,7 +166,7 @@ export const useUpdateDepositValue = ({
             type: AppActions.UpdateGeneratedTx,
             payload: maxDepositTx,
           })
-          setErrorMessage(maxDepositErrorMessage)
+          setErrorMessage(maxDepositErrorMessage || t('messages.remain-ckb-for-withdraw'))
         } else {
           setErrorMessage(t(`messages.codes.${ErrorCode.AmountNotEnough}`))
         }

@@ -273,6 +273,7 @@
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
+      "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "fields": {
         "wallet": "钱包",
         "name": "名称",

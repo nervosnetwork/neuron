@@ -174,6 +174,7 @@ const NervosDAO = ({
         maxDepositAmount={maxDepositAmount}
         isDepositing={sending}
         errorMessage={errorMessage}
+        isTxGenerated={!!send.generatedTx}
       />
     )
   }, [
@@ -186,6 +187,7 @@ const NervosDAO = ({
     maxDepositAmount,
     sending,
     errorMessage,
+    send.generatedTx,
   ])
 
   const MemoizedWithdrawDialog = useMemo(() => {
