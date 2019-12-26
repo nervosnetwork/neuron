@@ -1,4 +1,8 @@
-type TxStatusType = 'pending' | 'proposed' | 'committed'
+export enum TxStatusType {
+  Pending = 'pending',
+  Proposed = 'proposed',
+  Committed = 'committed',
+}
 
 export interface TxStatusInterface {
   blockHash: string | null
@@ -20,5 +24,19 @@ export class TxStatus implements TxStatusInterface {
 
   public get status(): TxStatusType {
     return this._status
+  }
+
+  public toSDK() {
+    return {
+      blockHash: this.blockHash,
+      status: this.status,
+    }
+  }
+
+  public static fromSDK(txStatus: any): TxStatus {
+    return new TxStatus({
+      blockHash: txStatus.blockHash,
+      status: txStatus.status as TxStatusType
+    })
   }
 }
