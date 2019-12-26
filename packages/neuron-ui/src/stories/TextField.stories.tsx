@@ -14,6 +14,7 @@ stories.add('Basic', () => {
     value: text('Value', 'value'),
     error: text('Error', 'error'),
     type: text('Type', 'text') as 'text' | 'password',
+    suffix: text('Suffix', 'suffix'),
     onChange: () => {},
   }
   return <TextField {...props} />

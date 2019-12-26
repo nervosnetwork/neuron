@@ -1,3 +1,5 @@
+@import '../../styles//mixin.scss';
+
 $hover-bg-color: #3cc68a4d;
 $left-padding: 15px;
 
@@ -25,6 +27,7 @@ $left-padding: 15px;
   grid-area: navs;
 
   button {
+    @include MediumText;
     appearance: none;
     border: none;
     color: white;
@@ -36,10 +39,12 @@ $left-padding: 15px;
     padding-left: $left-padding;
 
     &:hover {
+      @include SemiBoldText;
       background-color: $hover-bg-color;
     }
 
     &[data-active=true] {
+      @include MediumText;
       background-color: var(--nervos-green);
     }
   }

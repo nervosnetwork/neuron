@@ -51,18 +51,11 @@ $line-gap: 15px;
   @include center;
 
   .input {
-    position: relative;
     margin-bottom: 5px;
+  }
 
-    &:after {
-      position: absolute;
-      display: block;
-      font-size: 10px;
-      content: attr(data-chars);
-      right: 5px;
-      top: calc(1.5rem + 10px);
-      color: #666;
-    }
+  .chars {
+    font-size: 10px;
   }
 
   .actions {

@@ -36,6 +36,21 @@
 
 }
 
+.info {
+  width: 220px;
+  @include RegularText;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 18.5px 0;
+
+  &>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4.5px 23px;
+  }
+}
+
 .deposit {
   grid-area: deposit;
 
@@ -64,10 +79,15 @@
 .records {
   grid-area: records;
 
+  .recordsContainer {
+    background-color: #fff;
+    padding: 0 15px;
+  }
+
   .recordsTitle {
+    @include BoldText;
     line-height: 1.6875rem;
     font-size: 1.375rem;
-    font-weight: bold;
     letter-spacing: 1.1px;
     color: #000;
     margin: 0 0 19px 0;

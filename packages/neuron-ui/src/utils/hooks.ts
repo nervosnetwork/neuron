@@ -65,22 +65,32 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
-    (e: any, value?: string) => {
-      const key = e.target.dataset.descriptionKey
-      setLocalDescription({
-        key,
-        description: value || '',
-      })
+    (e: React.SyntheticEvent<any>) => {
+      const {
+        dataset: { descriptionKey: key },
+        value,
+      } = e.target as HTMLInputElement
+      if (key) {
+        setLocalDescription({
+          key,
+          description: value || '',
+        })
+      }
     },
     [setLocalDescription]
   )
   const onDescriptionSelected = useCallback(
-    (hash: string, originDesc: string) => () => {
-      dispatch({
-        type: AppActions.ToggleIsAllowedToFetchList,
-        payload: false,
-      })
-      setLocalDescription({ key: hash, description: originDesc })
+    (e: React.SyntheticEvent<any>) => {
+      const {
+        dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
+      } = e.target as HTMLElement
+      if (key) {
+        dispatch({
+          type: AppActions.ToggleIsAllowedToFetchList,
+          payload: false,
+        })
+        setLocalDescription({ key, description: originDesc })
+      }
     },
     [setLocalDescription, dispatch]
   )

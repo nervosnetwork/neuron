@@ -251,7 +251,8 @@
       "select": "Select",
       "backup": "Backup",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "double-click-to-edit": "Double click to edit"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -288,8 +289,6 @@
         "keystore-password": "Password",
         "deposit": "Deposit"
       },
-      "mainnet-address-required": "Please enter a mainnet address",
-      "testnet-address-required": "Please enter a testnet address",
       "run-ckb-guide": "How to run a CKB node?",
       "codes": {
         "-3": "",
@@ -310,7 +309,9 @@
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
-        "305": "$t(messages.fields.address) cannot be empty."
+        "305": "$t(messages.fields.address) cannot be empty.",
+        "306": "Please enter a mainnet address",
+        "307": "Please enter a testnet address"
       }
     },
     "sync": {

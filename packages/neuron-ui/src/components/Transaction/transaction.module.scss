@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   display: grid;
   grid-template:
@@ -17,6 +19,7 @@
   }
 
   th {
+    @include BoldText;
     height: 2.625rem;
     text-align: left;
   }
@@ -56,9 +59,9 @@
 .infoTitle,
 .inputsTitle,
 .outputsTitle {
+  @include BoldText;
   line-height: 1.125rem;
   font-size: 1.125rem;
-  font-weight: bold;
   letter-spacing: 0.9px;
   color: #000000;
   padding: 0;
@@ -97,6 +100,7 @@
 
 .outputsTitle {
   grid-area: outputs-title;
+  margin-top: 20px;
   margin-bottom: 8px;
 }
 
@@ -106,8 +110,8 @@
 
 .explorerNavButton {
   position: fixed;
-  right: 10px;
-  bottom: 10px;
+  right: 15px;
+  bottom: 15px;
   height: 30px;
   width: 30px;
   display: flex;
@@ -132,6 +136,7 @@
 
   &:hover {
     width: 100px;
+    border-radius: 2px;
 
     span {
       display: flex;

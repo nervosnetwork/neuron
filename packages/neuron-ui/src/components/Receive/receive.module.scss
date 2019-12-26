@@ -23,6 +23,10 @@
 .copyBtn {
   appearance: none;
   border: none;
+
+  &:hover g {
+    stroke: var(--nervos-green);
+  }
 }
 
 .notation {

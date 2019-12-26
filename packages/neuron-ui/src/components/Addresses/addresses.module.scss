@@ -1,5 +1,14 @@
+@import '../../styles/mixin.scss';
+
 $receiving-color: var(--nervos-green);
 $change-color: #6666cc;
+
+.container {
+  background-color: #fff;
+  margin-top: 33px;
+  padding: 2px 15px 47px 15px;
+  overflow: scroll;
+}
 
 .addressList {
   width: 100%;
@@ -8,7 +17,7 @@ $change-color: #6666cc;
 
   tbody {
     tr:hover {
-      background-color: #eee;
+      background-color: #f5f5f5;
     }
   }
 
@@ -89,24 +98,31 @@ $change-color: #6666cc;
         }
       }
 
-      @media screen and (max-width: 1160px) {
-        width: 15vw;
+      @media screen and (max-width: 1350px) {
+        width: 20vw;
       }
 
-      @media screen and (max-width: 980px) {
+      @media screen and (max-width: 1160px) {
         width: 10vw;
       }
 
     }
   }
 
-  .description {
-    display: flex;
-    min-width: 100px;
+  .descriptionField {
+    @include descriptionField;
   }
 
   .balance {
-    min-width: 200px;
+    span {
+      display: inline-block;
+      min-width: 200px;
+
+      @media screen and (max-width:1160px) {
+        min-width: auto;
+        width: 8vw;
+      }
+    }
   }
 
   .txCount {
