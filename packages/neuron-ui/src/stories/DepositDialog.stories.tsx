@@ -13,6 +13,7 @@ const props = {
   maxDepositAmount: BigInt('30000000000'),
   isDepositing: false,
   errorMessage: 'Amount is not enough',
+  isTxGenerated: true,
 }
 
 const stories = storiesOf('Deposit Dialog', module)
