@@ -85,17 +85,14 @@ const PasswordRequest = ({
     },
     [onConfirm, disabled]
   )
-  const title = t(`password-request.${actionType}.title`, { name: wallet ? wallet.name : '' })
-
   if (!wallet) {
     return null
   }
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
-      <h2 className={styles.title} title={title} aria-label={title}>
-        {title}
-      </h2>
+      <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
+      <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
       <TextField
         label={t('password-request.password')}
         value={password}

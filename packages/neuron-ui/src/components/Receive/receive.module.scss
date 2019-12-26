@@ -23,6 +23,12 @@
 .copyBtn {
   appearance: none;
   border: none;
+  background: transparent;
+
+  svg {
+    pointer-events: none;
+  }
+
 
   &:hover g {
     stroke: var(--nervos-green);

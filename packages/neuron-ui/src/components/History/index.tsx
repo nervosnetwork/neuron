@@ -49,24 +49,32 @@ const History = ({
   const List = useMemo(() => {
     return (
       <Stack className={styles.history}>
-        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
-          <SearchBox
-            value={keywords}
-            styles={{ root: { width: 500 } }}
-            placeholder={t('history.search.placeholder')}
-            onChange={onKeywordsChange}
-            onSearch={onSearch}
-            iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
-          />
-        </Stack>
-        <TransactionList
-          isLoading={isLoading}
-          walletID={id}
-          items={items as State.Transaction[]}
-          tipBlockNumber={tipBlockNumber}
-          isMainnet={isMainnet}
-          dispatch={dispatch}
+        <SearchBox
+          value={keywords}
+          styles={{
+            root: {
+              background: '#e3e3e3',
+              border: 'none',
+              borderRadius: 0,
+              fontSize: '0.75rem',
+              fontFamily: 'Montserrat-Regular',
+            },
+          }}
+          placeholder={t('history.search.placeholder')}
+          onChange={onKeywordsChange}
+          onSearch={onSearch}
+          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
+        <div className={styles.listContainer}>
+          <TransactionList
+            isLoading={isLoading}
+            walletID={id}
+            items={items as State.Transaction[]}
+            tipBlockNumber={tipBlockNumber}
+            isMainnet={isMainnet}
+            dispatch={dispatch}
+          />
+        </div>
         <div className={styles.pagination}>
           <Pagination
             selectedPageIndex={pageNo - 1}

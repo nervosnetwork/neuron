@@ -43,6 +43,18 @@ $textfieldWidth: calc(100vw - 370px);
 
 .balance {
   margin-bottom: 29px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  label {
+    margin-right: 25px;
+
+    &:after {
+      display: inline;
+      content: ':'
+    }
+  }
 
   label,
   span {

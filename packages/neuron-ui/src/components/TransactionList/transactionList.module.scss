@@ -1,5 +1,9 @@
 @import '../../styles/mixin.scss';
 
+$success-color: #3cc68a;
+$failed-color: #d50000;
+$pending-color: #b3b3b3;
+
 .itemContainer {
   @include RegularText;
   font-size: 0.875rem;
@@ -9,13 +13,19 @@
   flex-direction: column;
   border-bottom: 1px solid #b3b3b3;
 
+  &:last-of-type {
+    border-bottom: none;
+  }
+
   .summary {
     @include MediumText;
+    position: relative;
     display: grid;
     grid-template:
-      'time status'auto 'amount confirmations'auto/ auto auto;
+      'time status'auto 'amount confirmations'auto/ 1fr 130px;
+    justify-items: start;
     grid-gap: 3px;
-    padding: 15px 33px;
+    padding: 15px 0 15px 33px;
 
     time,
     span {
@@ -42,6 +52,48 @@
       font-size: 0.625rem;
       color: #434343;
       letter-spacing: 0.5px;
+    }
+
+    &:before {
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      transform: translateY(-50%);
+      transform-origin: 0 5px;
+      transition: transform 0.3s;
+      display: block;
+      content: '';
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-left-color: #000;
+    }
+
+    &:after {
+      position: absolute;
+      top: calc(15px + 0.4375rem);
+      right: 0;
+      display: block;
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    &[data-status='confirming'],
+    &[data-status='pending'] {
+      &:after {
+        background-color: $pending-color;
+      }
+    }
+
+    &[data-status='success']:after {
+
+      background-color: $success-color;
+    }
+
+    &[data-status='failed']:after {
+      background-color: $failed-color;
     }
   }
 
@@ -78,6 +130,9 @@
   }
 
   &[data-is-open="true"] {
+    .summary:before {
+      transform: translateY(-50%) rotate(90deg);
+    }
 
     .detail {
       display: block;
