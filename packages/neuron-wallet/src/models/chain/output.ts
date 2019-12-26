@@ -1,6 +1,7 @@
 import { ScriptInterface, Script } from './script'
 import { OutPointInterface } from './out-point'
 import OutPoint from './out-point'
+import HexUtils from '../../utils/hex';
 
 export interface OutputInterface {
   capacity: string
@@ -123,6 +124,22 @@ export class Output implements OutputInterface {
 
   public get depositTimestamp(): string | undefined {
     return this._depositTimestamp
+  }
+
+  public toSDK(): CKBComponents.CellOutput {
+    return {
+      capacity: HexUtils.toHex(this.capacity),
+      lock: this.lock.toSDK(),
+      type: this.type ? this.type.toSDK() : undefined
+    }
+  }
+
+  public static fromSDK(output: CKBComponents.CellOutput): Output {
+    return new Output({
+      capacity: output.capacity,
+      lock: Script.fromSDK(output.lock),
+      type: output.type ? Script.fromSDK(output.type) : undefined,
+    })
   }
 }
 

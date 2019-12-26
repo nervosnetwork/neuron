@@ -34,10 +34,10 @@ export class CellDep implements CellDepInterface {
     }
   }
 
-  public fromSDK(sdkCellDep: CKBComponents.CellDep): CellDep {
+  public static fromSDK(cellDep: CKBComponents.CellDep): CellDep {
     return new CellDep({
-      outPoint: OutPoint.fromSDK(sdkCellDep.outPoint!),
-      depType: sdkCellDep.depType as DepType,
+      outPoint: OutPoint.fromSDK(cellDep.outPoint!),
+      depType: cellDep.depType as DepType,
     })
   }
 }

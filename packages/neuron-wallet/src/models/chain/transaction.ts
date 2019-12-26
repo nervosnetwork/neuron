@@ -1,7 +1,10 @@
-import { CellDepInterface, CellDep } from './cell-dep';
+import { CellDepInterface, CellDep } from './cell-dep'
 import Input, { InputInterface } from './input'
 import Output, { OutputInterface } from './output'
 import { WitnessArgsInterface, WitnessArgs } from './witness-args'
+import HexUtils from 'utils/hex'
+import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { BlockHeaderInterface } from './block-header'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -183,6 +186,42 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
   public get updatedAt(): string | undefined {
     return this._updatedAt
   }
+
+  public witnessesAsString(): string[] {
+    return this.witnesses.map(wit => {
+      if (typeof wit === 'string') {
+        return wit
+      }
+      return serializeWitnessArgs(wit)
+    })
+  }
+
+  public toSDK(): CKBComponents.RawTransaction {
+    return {
+      version: HexUtils.toHex(this.version),
+      inputs: this.inputs.map(i => i.toSDK()),
+      outputs: this.outputs.map(o => o.toSDK()),
+      cellDeps: this.cellDeps.map(cd => cd.toSDK()),
+      headerDeps: this.headerDeps,
+      outputsData: this.outputsData,
+      witnesses: this.witnessesAsString(),
+    }
+  }
+
+  public static fromSDK(tx: CKBComponents.RawTransaction, blockHeader?: BlockHeaderInterface): TransactionWithoutHash {
+    return new TransactionWithoutHash({
+      version: tx.version,
+      cellDeps: tx.cellDeps.map(cd => CellDep.fromSDK(cd)),
+      headerDeps: tx.headerDeps,
+      witnesses: tx.witnesses,
+      inputs: tx.inputs.map(i => Input.fromSDK(i)),
+      outputs: tx.outputs.map(o => Output.fromSDK(o)),
+      outputsData: tx.outputsData,
+      timestamp: blockHeader?.timestamp,
+      blockNumber: blockHeader?.number,
+      blockHash: blockHeader?.hash
+    })
+  }
 }
 
 export class Transaction extends TransactionWithoutHash implements TransactionInterface {
@@ -195,6 +234,21 @@ export class Transaction extends TransactionWithoutHash implements TransactionIn
 
   public get hash(): string {
     return this._hash
+  }
+
+  public toSDK(): CKBComponents.Transaction {
+    return {
+      hash: this.hash,
+      ...super.toSDK(),
+    }
+  }
+
+  public static fromSDK(tx: CKBComponents.Transaction, blockHeader?: BlockHeaderInterface): Transaction {
+    const t: TransactionWithoutHashInterface = super.fromSDK(tx, blockHeader)
+    return new Transaction({
+      hash: tx.hash,
+      ...t,
+    })
   }
 }
 

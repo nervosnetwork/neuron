@@ -1,5 +1,6 @@
 import OutPoint, { OutPointInterface } from './out-point'
 import { ScriptInterface, Script } from './script'
+import HexUtils from 'utils/hex'
 
 export interface InputInterface {
   previousOutput: OutPointInterface | null
@@ -51,6 +52,20 @@ export class Input implements InputInterface {
 
   public get inputIndex(): string | undefined {
     return this._inputIndex
+  }
+
+  public toSDK(): CKBComponents.CellInput {
+    return {
+      since: HexUtils.toHex(this.since!),
+      previousOutput: this.previousOutput?.toSDK() || null
+    }
+  }
+
+  public static fromSDK(input: CKBComponents.CellInput): Input {
+    return new Input({
+      since: input.since,
+      previousOutput: input.previousOutput ? OutPoint.fromSDK(input.previousOutput) : null
+    })
   }
 }
 
