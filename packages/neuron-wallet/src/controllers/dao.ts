@@ -1,13 +1,15 @@
-import { Cell, OutPoint, TransactionWithoutHash } from 'types/cell-types'
 import { ServiceHasNoResponse, IsRequired } from 'exceptions'
 import { ResponseCode } from 'utils/const'
 import AddressesService from 'services/addresses'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import TransactionSender from 'services/transaction-sender'
+import Output from 'models/chain/output'
+import { TransactionWithoutHash } from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
 
 export default class DaoController {
-  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
+  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Output[]>> {
     const { walletID } = params
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)

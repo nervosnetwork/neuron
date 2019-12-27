@@ -3,8 +3,6 @@ import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
 import GetBlocks from 'block-sync-renderer/sync/get-blocks'
 import NetworksService from 'services/networks'
-import { Transaction, TransactionWithStatus } from 'types/cell-types'
-import TypeConvert from 'types/type-convert'
 import BlockNumber from 'block-sync-renderer/sync/block-number'
 import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
@@ -18,7 +16,10 @@ import TransactionEntity from 'database/chain/entities/transaction'
 import DaoUtils from 'models/dao-utils'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
-import NodeService from 'services/node';
+import NodeService from 'services/node'
+import { Transaction } from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
+import { Script } from 'models/chain/script'
 
 export interface LockHashInfo {
   lockHash: string
@@ -97,11 +98,11 @@ export default class IndexerQueue {
             this.indexed = true
           }
           const daoScriptInfo = await DaoUtils.daoScript(this.url)
-          const daoScriptHash = LockUtils.computeScriptHash({
+          const daoScriptHash = LockUtils.computeScriptHash(new Script({
             codeHash: daoScriptInfo.codeHash,
             args: "0x",
             hashType: daoScriptInfo.hashType,
-          })
+          }))
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
@@ -172,16 +173,6 @@ export default class IndexerQueue {
     })
   }
 
-  public getTransaction = async (txHash: string): Promise<TransactionWithStatus> => {
-    let txWithStatus = this.txCache.get(txHash)
-    if (!txWithStatus) {
-      const transactionWithStatus = await this.getBlocksService.getTransaction(txHash)
-      txWithStatus = TypeConvert.toTransactionWithStatus(transactionWithStatus)
-      this.txCache.push(txWithStatus)
-    }
-    return txWithStatus
-  }
-
   // type: 'createdBy' | 'consumedBy'
   public pipeline = async (lockHash: string, type: TxPointType, startBlockNumber: bigint, daoScriptHash: string) => {
     let page = 0
@@ -205,11 +196,11 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber() - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
-          const transactionWithStatus = await this.getTransaction(txPoint.txHash)
-          const transaction: Transaction = transactionWithStatus.transaction
+          const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
+          const transaction: Transaction = transactionWithStatus!.transaction
           const txUniqueFlag = {
             txHash: transaction.hash,
-            blockHash: transactionWithStatus.txStatus.blockHash!
+            blockHash: transactionWithStatus!.txStatus.blockHash!
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
             const address = LockUtils.lockScriptToAddress(
@@ -224,49 +215,42 @@ export default class IndexerQueue {
           let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
-              for (const [inputIndex, input] of transaction.inputs!.entries()) {
+              for (const [inputIndex, input] of transaction.inputs.entries()) {
                 if (input.previousOutput!.txHash === this.emptyTxHash) {
                   continue
                 }
                 const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
-                const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+                const previousTx: Transaction = previousTxWithStatus!.transaction
                 const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-                input.lock = previousOutput.lock
-                input.lockHash = LockUtils.lockScriptToHash(input.lock)
-                input.capacity = previousOutput.capacity
-                input.inputIndex = inputIndex.toString()
+                input.setLock(previousOutput.lock)
+                input.setCapacity(previousOutput.capacity)
+                input.setInputIndex(inputIndex.toString())
                 if (
                   type === TxPointType.CreatedBy &&
                   previousOutput.type &&
                   LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
-                  previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+                  previousTx.outputsData[+input.previousOutput!.index] === '0x0000000000000000'
                 ) {
-                  transaction.outputs![+txPoint.index].depositOutPoint = {
+                  transaction.outputs[+txPoint.index]!.setDepositOutPoint(new OutPoint({
                     txHash: input.previousOutput!.txHash,
                     index: input.previousOutput!.index,
-                  }
+                  }))
                 }
               }
 
               const outputs = transaction.outputs!
-              for (let i = 0; i < outputs.length; ++i) {
-                const output = outputs[i]
+              for (const [i, output] of outputs.entries()) {
                 const typeScript = output.type
-                if (typeScript) {
-                  output.typeHash = LockUtils.computeScriptHash(typeScript)
-                  if (output.typeHash === daoScriptHash) {
-                    output.daoData = transaction.outputsData![i]
-                  }
+                if (typeScript && output.typeHash === daoScriptHash) {
+                  output.setDaoData(transaction.outputsData[i])
                 }
               }
             }
-            const { blockHash } = transactionWithStatus.txStatus
+            const { blockHash } = transactionWithStatus!.txStatus
             if (blockHash) {
               const blockHeader = await this.getBlocksService.getHeader(blockHash)
               if (blockHeader) {
-                transaction.blockHash = blockHash
-                transaction.blockNumber = blockHeader.number
-                transaction.timestamp = blockHeader.timestamp
+                transaction.setBlockHeader(blockHeader)
               }
             }
             txEntity = await TransactionPersistor.saveFetchTx(transaction)
@@ -280,11 +264,11 @@ export default class IndexerQueue {
             )
             this.latestCreatedBy.push(txUniqueFlag)
           } else if (type === TxPointType.ConsumedBy) {
-            const input = txEntity.inputs[parseInt(txPoint.index, 16)]
+            const input = txEntity!.inputs[+txPoint.index]
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
             if (output) {
               address = LockUtils.lockScriptToAddress(
-                output.lock,
+                new Script(output.lock),
                 NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
               )
             }

@@ -1,4 +1,3 @@
-import { Block, BlockHeader } from 'types/cell-types'
 import { TransactionPersistor } from 'services/tx'
 import logger from 'utils/logger'
 import LockUtils from 'models/lock-utils'
@@ -9,9 +8,13 @@ import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
 import ArrayUtils from 'utils/array'
 import CheckTx from './check-and-save/tx'
-import TypeConvert from 'types/type-convert'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
+import { Block } from 'models/chain/block'
+import { BlockHeader } from 'models/chain/block-header'
+import OutPoint from 'models/chain/out-point'
+import { TransactionWithStatus } from 'models/chain/transaction-with-status'
+import { Script } from 'models/chain/script'
 
 export default class Queue {
   private lockHashes: string[]
@@ -128,11 +131,11 @@ export default class Queue {
     }
 
     const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash = LockUtils.computeScriptHash({
+    const daoScriptHash = LockUtils.computeScriptHash(new Script({
       codeHash: daoScriptInfo.codeHash,
       args: "0x",
       hashType: daoScriptInfo.hashType,
-    })
+    }))
 
     // 3. check and save
     await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
@@ -159,17 +162,16 @@ export default class Queue {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs!.entries()) {
               const previousTxHash = input.previousOutput!.txHash
-              let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+              let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {
                 previousTxWithStatus = await this.getBlocksService.getTransaction(previousTxHash)
                 cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
               }
-              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousTx = previousTxWithStatus!.transaction
               const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-              input.lock = previousOutput.lock
-              input.lockHash = LockUtils.lockScriptToHash(input.lock)
-              input.capacity = previousOutput.capacity
-              input.inputIndex = inputIndex.toString()
+              input.setLock(previousOutput.lock)
+              input.setCapacity(previousOutput.capacity)
+              input.setInputIndex(inputIndex.toString())
 
               if (
                 previousOutput.type &&
@@ -178,10 +180,10 @@ export default class Queue {
               ) {
                 const output = tx.outputs![inputIndex]
                 if (output) {
-                  output.depositOutPoint = {
+                  output.setDepositOutPoint(new OutPoint({
                     txHash: input.previousOutput!.txHash,
                     index: input.previousOutput!.index,
-                  }
+                  }))
                 }
               }
             }

@@ -1,9 +1,9 @@
 import { getConnection, In } from 'typeorm'
-import { TransactionStatus } from 'types/cell-types'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
 import { OutputStatus } from './params'
 import TransactionsService from './transaction-service'
+import { TransactionStatus } from 'models/chain/transaction'
 
 export class FailedTransaction {
   public static pendings = async (): Promise<TransactionEntity[]> => {

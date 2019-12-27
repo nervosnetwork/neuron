@@ -6,9 +6,9 @@ import {
   parseAddress
 } from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
-import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
-import ConvertTo from 'types/convert-to'
 import Core from '@nervosnetwork/ckb-sdk-core'
+import OutPoint from './chain/out-point'
+import { ScriptHashType, Script } from './chain/script'
 
 export interface SystemScript {
   codeHash: string
@@ -46,7 +46,7 @@ export default class LockUtils {
 
     return {
       codeHash,
-      outPoint: { txHash, index },
+      outPoint: new OutPoint({ txHash, index }),
       hashType: hashType as ScriptHashType
     }
   }
@@ -72,11 +72,11 @@ export default class LockUtils {
   }
 
   addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
-    return {
+    return new Script({
       codeHash: this.systemScript.codeHash,
       args: LockUtils.addressToBlake160(address),
       hashType,
-    }
+    })
   }
 
   addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {
@@ -95,8 +95,7 @@ export default class LockUtils {
   }
 
   static computeScriptHash = (script: Script): string => {
-    const ckbScript: CKBComponents.Script = ConvertTo.toSdkScript(script)
-    const hash: string = scriptToHash(ckbScript)
+    const hash: string = scriptToHash(script.toSDK())
     if (!hash.startsWith('0x')) {
       return `0x${hash}`
     }

@@ -9,7 +9,6 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
-import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -17,6 +16,8 @@ import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
+import OutPoint from 'models/chain/out-point'
+import { TransactionWithoutHash } from 'models/chain/transaction'
 
 /**
  * @class ApiController

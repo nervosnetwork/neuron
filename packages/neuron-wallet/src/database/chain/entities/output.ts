@@ -1,6 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint, Cell } from 'types/cell-types'
 import TransactionEntity from './transaction'
+import { ScriptInterface } from 'models/chain/script'
+import OutPoint from 'models/chain/out-point'
+import { Output as OutputModel } from 'models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {
@@ -22,7 +24,7 @@ export default class Output extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  lock!: Script
+  lock!: ScriptInterface
 
   @Column({
     type: 'varchar',
@@ -38,7 +40,7 @@ export default class Output extends BaseEntity {
     type: 'simple-json',
     nullable: true,
   })
-  typeScript: Script | null = null
+  typeScript: ScriptInterface | null = null
 
   @Column({
     type: 'varchar',
@@ -70,18 +72,18 @@ export default class Output extends BaseEntity {
   depositIndex: string | null = null
 
   public outPoint(): OutPoint {
-    return {
+    return new OutPoint({
       txHash: this.outPointTxHash,
       index: this.outPointIndex,
-    }
+    })
   }
 
   public depositOutPoint(): OutPoint | undefined {
     if (this.depositTxHash && this.depositIndex) {
-      return {
+      return new OutPoint({
         txHash: this.depositTxHash,
         index: this.depositIndex
-      }
+      })
     }
     return undefined
   }
@@ -89,23 +91,22 @@ export default class Output extends BaseEntity {
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
-  public toInterface(): Cell {
-    const timestamp = this.transaction && (this.transaction.timestamp || this.transaction.createdAt)
-    const blockNumber = this.transaction && this.transaction.blockNumber
-    const blockHash = this.transaction && this.transaction.blockHash
-    return {
+  public toInterface(): OutputModel {
+    const timestamp = this.transaction?.timestamp || this.transaction?.createdAt
+
+    return new OutputModel({
       capacity: this.capacity,
       lock: this.lock,
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
       status: this.status,
       type: this.typeScript,
-      typeHash: this.typeHash,
+      typeHash: this.typeHash ? this.typeHash : undefined,
       daoData: this.daoData,
       timestamp,
-      blockNumber,
-      blockHash,
+      blockNumber: this.transaction?.blockNumber,
+      blockHash: this.transaction?.blockHash,
       depositOutPoint: this.depositOutPoint(),
-    }
+    })
   }
 }

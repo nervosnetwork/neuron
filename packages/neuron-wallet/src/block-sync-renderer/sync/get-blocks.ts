@@ -1,10 +1,13 @@
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { generateCore } from 'services/sdk-core'
 
-import { Block, BlockHeader } from 'types/cell-types'
-import TypeConvert from 'types/type-convert'
 import HexUtils from 'utils/hex'
 import CommonUtils from 'utils/common'
+import { Block } from 'models/chain/block'
+import { BlockHeader } from 'models/chain/block-header'
+import { TransactionWithStatus } from 'models/chain/transaction-with-status'
+import { OutPoint } from 'models/chain/out-point'
+import { CellWithStatus } from 'models/chain/cell-with-status'
 
 export default class GetBlocks {
   private retryTime: number
@@ -20,7 +23,7 @@ export default class GetBlocks {
   public getRangeBlocks = async (blockNumbers: string[]): Promise<Block[]> => {
     const blocks: Block[] = await Promise.all(
       blockNumbers.map(async num => {
-        return this.retryGetBlock(num)
+        return (await this.retryGetBlock(num))!
       })
     )
 
@@ -30,7 +33,7 @@ export default class GetBlocks {
   public getRangeBlockHeaders = async (blockNumbers: string[]): Promise<BlockHeader[]> => {
     const headers: BlockHeader[] = await Promise.all(
       blockNumbers.map(async num => {
-        return this.retryGetBlockHeader(num)
+        return (await this.retryGetBlockHeader(num))!
       })
     )
 
@@ -41,50 +44,67 @@ export default class GetBlocks {
     return this.core.rpc.getTipBlockNumber()
   }
 
-  public retryGetBlock = async (num: string): Promise<Block> => {
-    const block: Block = await this.retry(async () => {
+  public retryGetBlock = async (num: string): Promise<Block | undefined> => {
+    return this.retry(async () => {
       return await this.getBlockByNumber(num)
     })
-
-    return block
   }
 
-  public retryGetBlockHeader = async (num: string): Promise<BlockHeader> => {
-    const header: BlockHeader = await this.retry(async () => {
-      return await this.getBlockHeaderByNumber(num)
+  public retryGetBlockHeader = async (num: string): Promise<BlockHeader | undefined> => {
+    return this.retry(async () => {
+      return this.getBlockHeaderByNumber(num)
     })
-
-    return header
   }
 
-  public getTransaction = async (hash: string): Promise<CKBComponents.TransactionWithStatus> => {
-    return await this.core.rpc.getTransaction(hash)
+  public getTransaction = async (hash: string): Promise<TransactionWithStatus | undefined> => {
+    const result = await this.core.rpc.getTransaction(hash)
+    if (result) {
+      return TransactionWithStatus.fromSDK(result)
+    }
+    return undefined
+  }
+
+  public async getLiveCell(outPoint: OutPoint, withData: boolean = false): Promise<CellWithStatus> {
+    const result = await this.core.rpc.getLiveCell(outPoint.toSDK(), withData)
+    return CellWithStatus.fromSDK(result)
   }
 
   public getHeader = async (hash: string): Promise<BlockHeader | undefined> => {
     const result = await this.core.rpc.getHeader(hash)
     if (result) {
-      return TypeConvert.toBlockHeader(result)
+      return BlockHeader.fromSDK(result)
     }
     return undefined
   }
 
-  public getBlockByNumber = async (num: string): Promise<Block> => {
-    const block = await this.core.rpc.getBlockByNumber(HexUtils.toHex(num))
-    return TypeConvert.toBlock(block)
+  public getHeaderByNumber = async (num: string): Promise<BlockHeader | undefined> => {
+    const result = await this.core.rpc.getHeaderByNumber(HexUtils.toHex(num))
+    if (result) {
+      return BlockHeader.fromSDK(result)
+    }
+    return undefined
   }
 
-  public getBlockHeaderByNumber = async (num: string): Promise<BlockHeader> => {
+  public getBlockByNumber = async (num: string): Promise<Block | undefined> => {
+    const block = await this.core.rpc.getBlockByNumber(HexUtils.toHex(num))
+    if (block) {
+      return Block.fromSDK(block)
+    }
+    return undefined
+  }
+
+  public getBlockHeaderByNumber = async (num: string): Promise<BlockHeader | undefined> => {
     const header = await this.core.rpc.getHeaderByNumber(HexUtils.toHex(num))
-    return TypeConvert.toBlockHeader(header)
+    if (header) {
+      return BlockHeader.fromSDK(header)
+    }
+    return undefined
   }
 
   public genesisBlockHash = async (): Promise<string> => {
-    const hash: string = await this.retry(async () => {
-      return await this.core.rpc.getBlockHash('0x0')
+    return this.retry(async () => {
+      return this.core.rpc.getBlockHash('0x0')
     })
-
-    return hash
   }
 
   public getChain = async (): Promise<string> => {

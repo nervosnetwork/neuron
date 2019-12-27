@@ -2,12 +2,12 @@ import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
 import { OutputStatus } from '../../src/services/tx/params'
-import { ScriptHashType, Script, TransactionStatus } from '../../src/types/cell-types'
 import CellsService from '../../src/services/cells'
-import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet';
+import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
 import TransactionFee from '../../src/models/transaction-fee'
+import { ScriptHashType, ScriptInterface } from '../../src/models/chain/script'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -57,7 +57,7 @@ describe('CellsService', () => {
     capacity: string,
     status: OutputStatus,
     hasData: boolean,
-    typeScript: Script | null,
+    typeScript: ScriptInterface | null,
     who: any = bob,
     daoData: string | null = null,
     transaction: TransactionEntity | null = null
@@ -83,7 +83,7 @@ describe('CellsService', () => {
     capacity: string,
     status: OutputStatus,
     hasData: boolean,
-    typeScript: Script | null,
+    typeScript: ScriptInterface | null,
     who: any = bob
   ) => {
     const cell = generateCell(capacity, status, hasData, typeScript, who)
@@ -91,11 +91,11 @@ describe('CellsService', () => {
     return cell
   }
 
-  const typeScript: Script = {
+  const typeScript = new Script({
     codeHash: randomHex(),
     args: '',
     hashType: ScriptHashType.Data,
-  }
+  })
 
   it('getLiveCell', async () => {
     const capacity = '1000'

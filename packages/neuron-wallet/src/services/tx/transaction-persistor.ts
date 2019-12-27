@@ -1,13 +1,13 @@
 import { getConnection, QueryRunner } from 'typeorm'
-import { OutPoint, Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
-import LockUtils from 'models/lock-utils'
 import { OutputStatus, TxSaveType } from './params'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
+import { Transaction, TransactionStatus, TransactionWithoutHash, TransactionWithoutHashInterface } from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
 
 export class TransactionPersistor {
   // After the tx is sent:
@@ -138,12 +138,12 @@ export class TransactionPersistor {
     const tx = new TransactionEntity()
     tx.hash = transaction.hash
     tx.version = transaction.version
-    tx.headerDeps = transaction.headerDeps!
-    tx.cellDeps = transaction.cellDeps!
+    tx.headerDeps = transaction.headerDeps
+    tx.cellDeps = transaction.cellDeps
     tx.timestamp = transaction.timestamp!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
-    tx.witnesses = transaction.witnesses!
+    tx.witnesses = transaction.witnessesAsString()
     tx.description = transaction.description
     // update tx status here
     tx.status = outputStatus === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
@@ -273,13 +273,6 @@ export class TransactionPersistor {
     saveType: TxSaveType
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    tx.outputs = tx.outputs!.map(o => {
-      const output = o
-      if (!output.lockHash) {
-        output.lockHash = LockUtils.lockScriptToHash(output.lock!)
-      }
-      return output
-    })
 
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
@@ -309,10 +302,10 @@ export class TransactionPersistor {
     transaction: TransactionWithoutHash,
     txHash: string
   ): Promise<TransactionEntity> => {
-    const tx: Transaction = {
+    const tx = new Transaction({
+      ...(transaction as TransactionWithoutHashInterface),
       hash: txHash,
-      ...transaction,
-    }
+    })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
   }

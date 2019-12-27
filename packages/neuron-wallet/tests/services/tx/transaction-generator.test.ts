@@ -1,6 +1,5 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import { ScriptHashType, Script, TransactionWithoutHash, OutPoint } from '../../../src/types/cell-types';
 import { OutputStatus, TargetOutput } from '../../../src/services/tx/params';
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
@@ -8,6 +7,9 @@ import LockUtils from '../../../src/models/lock-utils'
 import DaoUtils from '../../../src/models/dao-utils'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
+import { ScriptHashType, Script } from '../../../src/models/chain/script';
+import { TransactionWithoutHash } from '../../../src/models/chain/transaction';
+import OutPoint from '../../../src/models/chain/out-point'
 
 const systemScript = {
   outPoint: {
@@ -27,11 +29,11 @@ const daoScript = {
   hashType: ScriptHashType.Type,
 }
 
-const daoTypeScript: Script = {
+const daoTypeScript = new Script({
   "codeHash": "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
   "hashType": ScriptHashType.Type,
   "args": "0x"
-}
+})
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -619,10 +621,10 @@ describe('TransactionGenerator', () => {
     const daoData = "0x0000000000000000"
     const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, daoTypeScript, alice, daoData)
     const depositDaoCell = depositDaoOutput.toInterface()
-    const depositOutPoint: OutPoint = {
+    const depositOutPoint = new OutPoint({
       txHash: '0x' + '2'.repeat(64),
       index: '0'
-    }
+    })
     beforeEach(async done => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),

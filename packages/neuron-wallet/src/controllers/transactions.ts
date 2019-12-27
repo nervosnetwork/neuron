@@ -1,4 +1,3 @@
-import { Transaction } from 'types/cell-types'
 import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } from 'services/tx'
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
@@ -6,6 +5,8 @@ import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
+import { Transaction } from 'models/chain/transaction'
+import { TransactionInterface } from '../models/chain/transaction';
 
 export default class TransactionsController {
   public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<Transaction>>> {
@@ -68,7 +69,8 @@ export default class TransactionsController {
   }
 
   private cellCountThreshold = 10
-  public async get(walletID: string, hash: string): Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
+  public async get(walletID: string, hash: string):
+    Promise<Controller.Response<TransactionInterface & { outputsCount: string; inputsCount: string }>> {
     const transaction = await TransactionsService.get(hash)
     if (!transaction) {
       throw new TransactionNotFound(hash)
@@ -101,7 +103,7 @@ export default class TransactionsController {
     if (transaction.inputs) {
       transaction.inputs = transaction.inputs.slice(0, this.cellCountThreshold)
     }
-    const outputsCount = transaction.outputs ? transaction.outputs.length.toString() : '0'
+    const outputsCount = transaction.outputs ? transaction.outputs?.length.toString() : '0'
     if (transaction.outputs) {
       transaction.outputs = transaction.outputs
         .sort((o1, o2) => +o1.outPoint!.index - +o2.outPoint!.index)
@@ -110,7 +112,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { ...transaction, outputsCount, inputsCount }
+      result: { ...(transaction as TransactionInterface), outputsCount, inputsCount }
     }
   }
 

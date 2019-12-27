@@ -1,7 +1,8 @@
 import { ScriptInterface, Script } from './script'
 import { OutPointInterface } from './out-point'
 import OutPoint from './out-point'
-import HexUtils from '../../utils/hex';
+import HexUtils from 'utils/hex'
+import LockUtils from '../lock-utils'
 
 export interface OutputInterface {
   capacity: string
@@ -42,10 +43,10 @@ export class Output implements OutputInterface {
     data,
     lock,
     type,
-    outPoint,
-    status,
     lockHash,
     typeHash,
+    outPoint,
+    status,
     daoData,
     timestamp,
     blockNumber,
@@ -56,11 +57,11 @@ export class Output implements OutputInterface {
     this._capacity = BigInt(capacity).toString()
     this._data = data
     this._lock = lock.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
+    this._lockHash = lockHash || LockUtils.computeScriptHash(this._lock)
     this._type = type?.constructor.name === 'Object' ? new Script(type) : (type as Script)
+    this._typeHash = typeHash || (this._type ? LockUtils.computeScriptHash(this._type) : undefined)
     this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
     this._status = status
-    this._lockHash = lockHash
-    this._typeHash = typeHash
     this._daoData = daoData
     this._timestamp = BigInt(timestamp).toString()
     this._blockNumber = BigInt(blockNumber).toString()
@@ -74,8 +75,16 @@ export class Output implements OutputInterface {
     return this._capacity
   }
 
+  public set capacity(value: string) {
+    this._capacity = value
+  }
+
   public get data(): string | undefined {
     return this._data
+  }
+
+  public setData(value: string) {
+    this._data = value
   }
 
   public get lock(): Script {
@@ -106,6 +115,11 @@ export class Output implements OutputInterface {
     return this._daoData
   }
 
+  public setDaoData(value: string) {
+    this._daoData = value
+    this._data = value
+  }
+
   public get timestamp(): string | null | undefined {
     return this._timestamp
   }
@@ -122,8 +136,16 @@ export class Output implements OutputInterface {
     return this._depositOutPoint
   }
 
+  public setDepositOutPoint(value: OutPoint) {
+    this._depositOutPoint = value
+  }
+
   public get depositTimestamp(): string | undefined {
     return this._depositTimestamp
+  }
+
+  public setDepositTimestamp(value: string) {
+    this._depositTimestamp = value
   }
 
   public toSDK(): CKBComponents.CellOutput {

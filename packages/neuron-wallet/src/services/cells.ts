@@ -1,13 +1,16 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
-import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
-import { TransactionStatus, WitnessArgs } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
-import TransactionSize from '../models/transaction-size';
+import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
+import Output from 'models/chain/output'
+import { TransactionStatus } from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
+import Input from 'models/chain/input'
+import { WitnessArgs } from 'models/chain/witness-args'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -42,7 +45,7 @@ export default class CellsService {
 
   public static getDaoCells = async (
     lockHashes: string[],
-  ): Promise<Cell[]> => {
+  ): Promise<Output[]> => {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
@@ -71,8 +74,8 @@ export default class CellsService {
     for (const output of cells) {
       if (output.depositOutPoint) {
         const tx = txs.filter(t => t.hash === output.depositOutPoint!.txHash)[0]
-        if (tx) {
-          output.depositTimestamp = tx.timestamp
+        if (tx && tx.timestamp) {
+          output.setDepositTimestamp(tx.timestamp)
         }
       }
     }
@@ -80,7 +83,7 @@ export default class CellsService {
     return cells
   }
 
-  public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
+  public static getLiveCell = async (outPoint: OutPoint): Promise<Output | undefined> => {
     const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
 
     if (!cellEntity) {
@@ -180,13 +183,13 @@ export default class CellsService {
     }
     let hasChangeOutput: boolean = false
     liveCells.every(cell => {
-      const input: Input = {
+      const input: Input = new Input({
         previousOutput: cell.outPoint(),
         since: '0',
         lock: cell.lock,
         lockHash: cell.lockHash,
         capacity: cell.capacity,
-      }
+      })
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
@@ -262,13 +265,13 @@ export default class CellsService {
       })
 
     const inputs: Input[] = cellEntities.map(cell => {
-      return {
+      return new Input({
         previousOutput: cell.outPoint(),
         since: '0',
         lock: cell.lock,
         lockHash: cell.lockHash,
         capacity: cell.capacity,
-      }
+      })
     })
 
     return inputs

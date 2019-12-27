@@ -1,5 +1,4 @@
 import { getConnection } from 'typeorm'
-import { Transaction, Cell, OutPoint } from 'types/cell-types'
 import OutputEntity from 'database/chain/entities/output'
 import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
@@ -7,6 +6,10 @@ import CheckOutput from './output'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import WalletService from 'services/wallets'
+import { Transaction } from 'models/chain/transaction'
+import Output from 'models/chain/output'
+import OutPoint from 'models/chain/out-point'
+import { Script } from 'models/chain/script'
 
 export default class CheckTx {
   private tx: Transaction
@@ -24,7 +27,7 @@ export default class CheckTx {
   }
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
-    const outputs: Cell[] = this.filterOutputs(lockHashes)
+    const outputs: Output[] = this.filterOutputs(lockHashes)
     const inputAddresses = await this.filterInputs(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
@@ -50,20 +53,19 @@ export default class CheckTx {
   }
 
   public filterOutputs = (lockHashes: string[]) => {
-    const cells: Cell[] = this.tx.outputs!.map((output, index) => {
+    const cells: Output[] = this.tx.outputs!.map((output, index) => {
       const checkOutput = new CheckOutput(output)
       const result = checkOutput.checkLockHash(lockHashes)
       if (result) {
         if (output.type) {
-          this.tx.outputs![index].typeHash = LockUtils.computeScriptHash(output.type)
           if (output.typeHash === this.daoTypeHash) {
-            this.tx.outputs![index].daoData = this.tx.outputsData![index]
+            this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
           }
         }
         return output
       }
       return false
-    }).filter(cell => !!cell) as Cell[]
+    }).filter(cell => !!cell) as Output[]
     return cells
   }
 
@@ -83,7 +85,7 @@ export default class CheckTx {
         if (output && lockHashes.includes(output.lockHash)) {
           addresses.push(
             LockUtils.lockScriptToAddress(
-              output.lock,
+              new Script(output.lock),
               NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
           )

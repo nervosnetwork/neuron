@@ -2,10 +2,11 @@ import TransactionEntity from '../../../src/database/chain/entities/transaction'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import InputEntity from '../../../src/database/chain/entities/input'
 import { getConnection } from 'typeorm'
-import { TransactionStatus, ScriptHashType } from '../../../src/types/cell-types'
 import initConnection from '../../../src/database/chain/ormconfig'
 import IndexerTransaction from '../../../src/services/tx/indexer-transaction'
 import { OutputStatus } from '../../../src/services/tx/params'
+import { TransactionStatus } from '../../../src/models/chain/transaction'
+import { ScriptHashType } from '../../../src/models/chain/script'
 
 describe('IndexerTransaction', () => {
   const tx1: TransactionEntity = new TransactionEntity()

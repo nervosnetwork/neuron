@@ -1,4 +1,3 @@
-import { TransactionWithoutHash, Cell, DepType, Input, OutPoint } from 'types/cell-types'
 import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
@@ -8,6 +7,12 @@ import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import { CapacityNotEnough } from 'exceptions/wallet'
+import { TransactionWithoutHash } from 'models/chain/transaction'
+import Output from 'models/chain/output'
+import { DepType } from 'models/chain/cell-dep'
+import Input from 'models/chain/input'
+import OutPoint from 'models/chain/out-point'
+import { WitnessArgs } from 'models/chain/witness-args'
 
 export class TransactionGenerator {
   public static CHANGE_OUTPUT_SIZE = 101
@@ -28,7 +33,7 @@ export class TransactionGenerator {
 
     const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
 
-    const outputs: Cell[] = targetOutputs.map(o => {
+    const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
       if (BigInt(capacity) < minCellCapacity) {
@@ -37,7 +42,7 @@ export class TransactionGenerator {
 
       const blake160: string = LockUtils.addressToBlake160(address)
 
-      const output: Cell = {
+      const output = new Output({
         capacity,
         data: '0x',
         lock: {
@@ -45,12 +50,12 @@ export class TransactionGenerator {
           args: blake160,
           hashType,
         },
-      }
+      })
 
       return output
     })
 
-    const tx: TransactionWithoutHash = {
+    const tx = new TransactionWithoutHash({
       version: '0',
       cellDeps: [
         {
@@ -63,7 +68,7 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
-    }
+    })
 
     const baseSize: number = TransactionSize.tx(tx)
     const {
@@ -90,7 +95,7 @@ export class TransactionGenerator {
 
       const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
-      const output: Cell = {
+      const output = new Output({
         capacity: changeCapacity.toString(),
         data: '0x',
         lock: {
@@ -98,7 +103,7 @@ export class TransactionGenerator {
           args: changeBlake160,
           hashType,
         },
-      }
+      })
 
       outputs.push(output)
       tx.outputsData!.push('0x')
@@ -131,7 +136,7 @@ export class TransactionGenerator {
       .reduce((result, c) => result + c, BigInt(0))
 
     const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
-    const outputs: Cell[] = targetOutputs.map((o, index) => {
+    const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address } = o
 
       // skip last output
@@ -141,7 +146,7 @@ export class TransactionGenerator {
 
       const blake160: string = LockUtils.addressToBlake160(address)
 
-      const output: Cell = {
+      const output = new Output({
         capacity,
         data: '0x',
         lock: {
@@ -149,12 +154,12 @@ export class TransactionGenerator {
           args: blake160,
           hashType,
         },
-      }
+      })
 
       return output
     })
 
-    const tx: TransactionWithoutHash = {
+    const tx = new TransactionWithoutHash({
       version: '0',
       cellDeps: [
         {
@@ -167,7 +172,7 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
-    }
+    })
 
     // change
     let finalFee: bigint = feeInt
@@ -209,7 +214,7 @@ export class TransactionGenerator {
 
     const capacityInt: bigint = BigInt(capacity)
 
-    const output: Cell = {
+    const output: Output = new Output({
       capacity: capacity,
       lock: {
         codeHash,
@@ -223,12 +228,11 @@ export class TransactionGenerator {
       },
       data: '0x0000000000000000',
       daoData: '0x0000000000000000',
-    }
-    output.typeHash = LockUtils.computeScriptHash(output.type!)
+    })
 
-    const outputs: Cell[] = [output]
+    const outputs: Output[] = [output]
 
-    const tx: TransactionWithoutHash = {
+    const tx = new TransactionWithoutHash({
       version: '0',
       cellDeps: [
         {
@@ -245,7 +249,7 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: []
-    }
+    })
 
     const baseSize: number = TransactionSize.tx(tx)
 
@@ -272,7 +276,7 @@ export class TransactionGenerator {
 
       const changeCapacity = BigInt(capacities) - capacityInt - finalFeeInt
 
-      const changeOutput: Cell = {
+      const changeOutput = new Output({
         capacity: changeCapacity.toString(),
         data: '0x',
         lock: {
@@ -280,7 +284,7 @@ export class TransactionGenerator {
           args: changeBlake160,
           hashType
         },
-      }
+      })
 
       outputs.push(changeOutput)
       tx.outputsData!.push(changeOutput.data!)
@@ -313,7 +317,7 @@ export class TransactionGenerator {
       .map(input => BigInt(input.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const output: Cell = {
+    const output = new Output({
       capacity: totalCapacity.toString(),
       lock: {
         codeHash,
@@ -327,12 +331,11 @@ export class TransactionGenerator {
       },
       data: '0x0000000000000000',
       daoData: '0x0000000000000000',
-    }
-    output.typeHash = LockUtils.computeScriptHash(output.type!)
+    })
 
-    const outputs: Cell[] = [output]
+    const outputs: Output[] = [output]
 
-    const tx: TransactionWithoutHash = {
+    const tx = new TransactionWithoutHash({
       version: '0',
       cellDeps: [
         {
@@ -349,7 +352,7 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
-    }
+    })
 
     // change
     let finalFee: bigint = feeInt
@@ -371,7 +374,7 @@ export class TransactionGenerator {
   public static startWithdrawFromDao = async (
     lockHashes: string[],
     outPoint: OutPoint,
-    prevOutput: Cell,
+    prevOutput: Output,
     depositBlockNumber: string,
     depositBlockHash: string,
     changeAddress: string,
@@ -384,14 +387,12 @@ export class TransactionGenerator {
     const output = prevOutput
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(BigInt(depositBlockNumber))
-    output.data = `0x${buf.toString('hex')}`
-    output.typeHash = LockUtils.computeScriptHash(output.type!)
-    output.daoData = output.data
-    output.depositOutPoint = outPoint
+    output.setDaoData(`0x${buf.toString('hex')}`)
+    output.setDepositOutPoint(outPoint)
 
-    const outputs: Cell[] = [output]
+    const outputs: Output[] = [output]
 
-    const tx: TransactionWithoutHash = {
+    const tx = new TransactionWithoutHash({
       version: '0',
       cellDeps: [
         {
@@ -410,25 +411,21 @@ export class TransactionGenerator {
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
       witnesses: [],
-    }
+    })
 
     const baseSize: number = TransactionSize.tx(tx)
 
-    const input: Input = {
+    const input = new Input({
       previousOutput: outPoint,
       since: '0',
       lock: output.lock,
       lockHash: LockUtils.lockScriptToHash(output.lock),
       capacity: output.capacity,
-    }
+    })
 
     const append = {
       input,
-      witness: {
-        lock: '0x' + '0'.repeat(130),
-        inputType: undefined,
-        outputType: undefined,
-      }
+      witness: WitnessArgs.emptyLock()
     }
 
     const {
@@ -456,7 +453,7 @@ export class TransactionGenerator {
       const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
       const changeCapacity = BigInt(capacities) - finalFeeInt
 
-      const changeOutput: Cell = {
+      const changeOutput = new Output({
         capacity: changeCapacity.toString(),
         data: '0x',
         lock: {
@@ -464,10 +461,10 @@ export class TransactionGenerator {
           args: changeBlake160,
           hashType
         },
-      }
+      })
 
       outputs.push(changeOutput)
-      tx.outputsData!.push(changeOutput.data!)
+      tx.outputsData.push(changeOutput.data!)
     }
 
     return tx

@@ -1,8 +1,8 @@
 import { TransactionCache } from '../../../src/block-sync-renderer/indexer/transaction-cache'
-import { TransactionWithStatus } from '../../../src/types/cell-types';
+import { TransactionWithStatus } from 'models/chain/transaction-with-status'
 
 describe('TransactionCache', () => {
-  const txWithStatus: TransactionWithStatus = {
+  const txWithStatus = new TransactionWithStatus({
     transaction: {
       version: '',
       hash: '',
@@ -11,7 +11,7 @@ describe('TransactionCache', () => {
       blockHash: '',
       status: 'committed',
     }
-  }
+  })
 
   it('unique', () => {
     const cache = new TransactionCache(10)

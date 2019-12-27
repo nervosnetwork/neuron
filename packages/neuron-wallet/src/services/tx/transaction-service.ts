@@ -1,11 +1,11 @@
 import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
+import { Transaction, TransactionWithoutHash, TransactionStatus } from 'models/chain/transaction'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -214,7 +214,7 @@ export class TransactionsService {
       ) {
         nervosDao = true
       }
-      return {
+      return new Transaction({
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
@@ -226,7 +226,7 @@ export class TransactionsService {
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
         blockNumber: tx.blockNumber,
-      }
+      })
     })
 
     return {

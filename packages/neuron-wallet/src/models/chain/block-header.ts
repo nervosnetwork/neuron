@@ -4,6 +4,7 @@ export interface BlockHeaderInterface {
   hash: string
   parentHash: string
   number: string
+  epoch: string
 }
 
 export class BlockHeader implements BlockHeaderInterface {
@@ -12,14 +13,16 @@ export class BlockHeader implements BlockHeaderInterface {
   private _hash: string
   private _parentHash: string
   private _number: string
+  private _epoch: string
 
-  constructor({ version, timestamp, hash, parentHash, number }: BlockHeaderInterface) {
+  constructor({ version, timestamp, hash, parentHash, number, epoch }: BlockHeaderInterface) {
     // convert to regular string
     this._version = BigInt(version).toString()
     this._timestamp = BigInt(timestamp).toString()
     this._hash = hash
     this._parentHash = parentHash
     this._number = BigInt(number).toString()
+    this._epoch = BigInt(epoch).toString()
   }
 
   public get version(): string {
@@ -42,6 +45,10 @@ export class BlockHeader implements BlockHeaderInterface {
     return this._number
   }
 
+  public get epoch(): string {
+    return this._epoch
+  }
+
   public static fromSDK(sdkHeader: CKBComponents.BlockHeader): BlockHeader {
     return new BlockHeader({
       version: sdkHeader.version,
@@ -49,6 +56,7 @@ export class BlockHeader implements BlockHeaderInterface {
       number: sdkHeader.number,
       hash: sdkHeader.hash,
       parentHash: sdkHeader.parentHash,
+      epoch: sdkHeader.epoch,
     })
   }
 }

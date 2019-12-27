@@ -22,7 +22,7 @@ export class CellWithStatus implements CellWithStatusInterface {
     return this._status
   }
 
-  public static fromSDK(cellWithStatus: CellWithStatusInterface): CellWithStatus {
+  public static fromSDK(cellWithStatus: { cell: CKBComponents.LiveCell, status: CKBComponents.CellStatus }): CellWithStatus {
     return new CellWithStatus({
       cell: cellWithStatus.cell ? CellInfo.fromSDK(cellWithStatus.cell) : undefined,
       status: cellWithStatus.status,

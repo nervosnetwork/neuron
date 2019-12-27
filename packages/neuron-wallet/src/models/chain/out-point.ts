@@ -5,7 +5,7 @@ export interface OutPointInterface {
   index: string
 }
 
-export default class OutPoint implements OutPointInterface {
+export class OutPoint implements OutPointInterface {
   private _txHash: string
   private _index: string
 
@@ -37,3 +37,5 @@ export default class OutPoint implements OutPointInterface {
     })
   }
 }
+
+export default OutPoint

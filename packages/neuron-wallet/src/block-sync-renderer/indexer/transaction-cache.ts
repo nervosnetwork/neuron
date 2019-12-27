@@ -1,4 +1,4 @@
-import { TransactionWithStatus } from "types/cell-types"
+import { TransactionWithStatus } from 'models/chain/transaction-with-status'
 
 export class TransactionCache {
   private limit: number

@@ -22,4 +22,11 @@ export class Block implements BlockInterface {
   public get transactions(): Transaction[] {
     return this._transactions
   }
+
+  public static fromSDK(block: CKBComponents.Block): Block {
+    return new Block({
+      header: BlockHeader.fromSDK(block.header),
+      transactions: block.transactions.map(tx => Transaction.fromSDK(tx))
+    })
+  }
 }

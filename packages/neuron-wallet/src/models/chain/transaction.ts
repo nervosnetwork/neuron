@@ -4,7 +4,7 @@ import Output, { OutputInterface } from './output'
 import { WitnessArgsInterface, WitnessArgs } from './witness-args'
 import HexUtils from 'utils/hex'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import { BlockHeaderInterface } from './block-header'
+import { BlockHeaderInterface, BlockHeader } from './block-header'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -127,8 +127,16 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     return this._inputs
   }
 
+  public set inputs(value: Input[]) {
+    this._inputs = value
+  }
+
   public get outputs(): Output[] {
     return this._outputs
+  }
+
+  public set outputs(value: Output[]) {
+    this._outputs = value
   }
 
   public get outputsData(): string[] {
@@ -139,16 +147,32 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     return this._witnesses
   }
 
+  public set witnesses(value: (WitnessArgs | string)[]) {
+    this._witnesses = value
+  }
+
   public get value(): string | undefined {
     return this._value
+  }
+
+  public set value(v: string | undefined) {
+    this._value = v
   }
 
   public get fee(): string | undefined {
     return this._fee
   }
 
+  public set fee(value: string | undefined) {
+    this._fee = value
+  }
+
   public get interest(): string | undefined {
     return this._interest
+  }
+
+  public set interest(value: string | undefined) {
+    this._interest = value
   }
 
   public get type(): string | undefined {
@@ -161,6 +185,10 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
 
   public get description(): string {
     return this._description
+  }
+
+  public set description(value: string) {
+    this._description = value
   }
 
   public get nervosDao(): boolean {
@@ -194,6 +222,12 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
       }
       return serializeWitnessArgs(wit)
     })
+  }
+
+  public setBlockHeader(blockHeader: BlockHeader) {
+    this._timestamp = blockHeader.timestamp
+    this._blockHash = blockHeader.hash
+    this._blockNumber = blockHeader.number
   }
 
   public toSDK(): CKBComponents.RawTransaction {

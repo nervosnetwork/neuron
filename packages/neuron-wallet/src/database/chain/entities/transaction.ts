@@ -10,10 +10,11 @@ import {
   AfterUpdate,
   AfterRemove,
 } from 'typeorm'
-import { Transaction as TransactionInterface, TransactionStatus, CellDep } from 'types/cell-types'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
+import { Transaction as TransactionModel, TransactionStatus } from 'models/chain/transaction'
+import { CellDep } from 'models/chain/cell-dep'
 
 @Entity()
 export default class Transaction extends BaseEntity {
@@ -93,10 +94,10 @@ export default class Transaction extends BaseEntity {
   @OneToMany(_type => OutputEntity, output => output.transaction)
   outputs!: OutputEntity[]
 
-  public toInterface(): TransactionInterface {
+  public toInterface(): TransactionModel {
     const inputs = this.inputs ? this.inputs.map(input => input.toInterface()) : []
     const outputs = this.outputs ? this.outputs.map(output => output.toInterface()) : []
-    return {
+    return new TransactionModel({
       hash: this.hash,
       version: this.version,
       cellDeps: this.cellDeps,
@@ -111,7 +112,7 @@ export default class Transaction extends BaseEntity {
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-    }
+    })
   }
 
   @BeforeInsert()

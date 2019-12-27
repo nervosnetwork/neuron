@@ -22,9 +22,9 @@ import {
 } from 'exceptions'
 import i18n from 'locales/i18n'
 import AddressService from 'services/addresses'
-import { TransactionWithoutHash } from 'types/cell-types'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
+import { TransactionWithoutHash } from 'models/chain/transaction'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
