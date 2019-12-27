@@ -2,7 +2,6 @@ import { ScriptInterface, Script } from './script'
 import { OutPointInterface } from './out-point'
 import OutPoint from './out-point'
 import HexUtils from 'utils/hex'
-import LockUtils from '../lock-utils'
 
 export interface OutputInterface {
   capacity: string
@@ -57,9 +56,9 @@ export class Output implements OutputInterface {
     this._capacity = BigInt(capacity).toString()
     this._data = data
     this._lock = lock.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
-    this._lockHash = lockHash || LockUtils.computeScriptHash(this._lock)
+    this._lockHash = lockHash || this._lock.computeHash()
     this._type = type?.constructor.name === 'Object' ? new Script(type) : (type as Script)
-    this._typeHash = typeHash || (this._type ? LockUtils.computeScriptHash(this._type) : undefined)
+    this._typeHash = typeHash || this._type?.computeHash()
     this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
     this._status = status
     this._daoData = daoData

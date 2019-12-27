@@ -1,6 +1,5 @@
 import { TransactionPersistor } from 'services/tx'
 import logger from 'utils/logger'
-import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 
 import GetBlocks from './get-blocks'
@@ -131,11 +130,11 @@ export default class Queue {
     }
 
     const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash = LockUtils.computeScriptHash(new Script({
+    const daoScriptHash: string = new Script({
       codeHash: daoScriptInfo.codeHash,
       args: "0x",
       hashType: daoScriptInfo.hashType,
-    }))
+    }).computeHash()
 
     // 3. check and save
     await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
@@ -175,7 +174,7 @@ export default class Queue {
 
               if (
                 previousOutput.type &&
-                LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                previousOutput.type.computeHash() === daoScriptHash &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]

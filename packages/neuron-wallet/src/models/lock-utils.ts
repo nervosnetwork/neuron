@@ -1,5 +1,4 @@
 import {
-  scriptToHash,
   AddressPrefix,
   bech32Address,
   AddressType,
@@ -80,8 +79,7 @@ export default class LockUtils {
   }
 
   addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {
-    const lock = this.addressToLockScript(address, hashType)
-    return LockUtils.lockScriptToHash(lock)
+    return this.addressToLockScript(address, hashType).computeHash()
   }
 
   addressToAllLockHashes(address: string): string[] {
@@ -92,19 +90,6 @@ export default class LockUtils {
     return addresses.map(addr => {
       return this.addressToAllLockHashes(addr)
     }).reduce((acc, val) => acc.concat(val), [])
-  }
-
-  static computeScriptHash = (script: Script): string => {
-    const hash: string = scriptToHash(script.toSDK())
-    if (!hash.startsWith('0x')) {
-      return `0x${hash}`
-    }
-    return hash
-  }
-
-  // use SDK lockScriptToHash
-  static lockScriptToHash = (lock: Script) => {
-    return LockUtils.computeScriptHash(lock)
   }
 
   static lockScriptToAddress(lock: Script, prefix: AddressPrefix = AddressPrefix.Mainnet): string {

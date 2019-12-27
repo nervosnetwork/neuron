@@ -329,7 +329,7 @@ export default class TransactionSender {
       previousOutput: withdrawingOutPoint,
       since: minimalSince.toString(),
       lock: previousOutput.lock,
-      lockHash: LockUtils.computeScriptHash(previousOutput.lock),
+      lockHash: previousOutput.lock.computeHash(),
       capacity: previousOutput.capacity,
     })
 

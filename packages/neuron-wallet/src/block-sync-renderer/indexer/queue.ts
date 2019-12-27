@@ -98,11 +98,11 @@ export default class IndexerQueue {
             this.indexed = true
           }
           const daoScriptInfo = await DaoUtils.daoScript(this.url)
-          const daoScriptHash = LockUtils.computeScriptHash(new Script({
+          const daoScriptHash: string = new Script({
             codeHash: daoScriptInfo.codeHash,
             args: "0x",
             hashType: daoScriptInfo.hashType,
-          }))
+          }).computeHash()
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
@@ -228,7 +228,7 @@ export default class IndexerQueue {
                 if (
                   type === TxPointType.CreatedBy &&
                   previousOutput.type &&
-                  LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                  previousOutput.type.computeHash() === daoScriptHash &&
                   previousTx.outputsData[+input.previousOutput!.index] === '0x0000000000000000'
                 ) {
                   transaction.outputs[+txPoint.index]!.setDepositOutPoint(new OutPoint({

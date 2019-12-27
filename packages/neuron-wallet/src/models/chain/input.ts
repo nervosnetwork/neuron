@@ -1,7 +1,6 @@
 import OutPoint, { OutPointInterface } from './out-point'
 import { ScriptInterface, Script } from './script'
 import HexUtils from 'utils/hex'
-import LockUtils from '../lock-utils'
 
 export interface InputInterface {
   previousOutput: OutPointInterface | null
@@ -28,7 +27,7 @@ export class Input implements InputInterface {
 
     this._previousOutput = previousOutput?.constructor.name === 'Object' ? new OutPoint(previousOutput) : (previousOutput as OutPoint)
     this._lock = lock?.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
-    this._lockHash = this._lock ? LockUtils.computeScriptHash(this._lock) : undefined
+    this._lockHash = this._lock?.computeHash()
   }
 
   public get previousOutput(): OutPoint | null {
@@ -57,7 +56,7 @@ export class Input implements InputInterface {
 
   public setLock(value: Script) {
     this._lock = value
-    this._lockHash = LockUtils.computeScriptHash(this._lock)
+    this._lockHash = this._lock.computeHash()
   }
 
   public get inputIndex(): string | undefined {

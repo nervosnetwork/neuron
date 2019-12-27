@@ -419,7 +419,7 @@ export class TransactionGenerator {
       previousOutput: outPoint,
       since: '0',
       lock: output.lock,
-      lockHash: LockUtils.lockScriptToHash(output.lock),
+      lockHash: output.lock.computeHash(),
       capacity: output.capacity,
     })
 

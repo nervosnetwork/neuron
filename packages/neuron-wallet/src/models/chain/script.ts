@@ -1,3 +1,5 @@
+import { scriptToHash } from "@nervosnetwork/ckb-sdk-utils"
+import HexUtils from 'utils/hex'
 
 export enum ScriptHashType {
   Data = 'data',
@@ -31,6 +33,11 @@ export class Script implements ScriptInterface {
 
   public get hashType(): ScriptHashType {
     return this._hashType
+  }
+
+  public computeHash(): string {
+    const hash: string = scriptToHash(this.toSDK())
+    return HexUtils.addPrefix(hash)
   }
 
   public toSDK(): CKBComponents.Script {
