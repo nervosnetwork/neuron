@@ -4,7 +4,7 @@ export interface TransactionPointInterface {
   index: string
 }
 
-export class TransactionPoint {
+export class TransactionPoint implements TransactionPointInterface {
   private _blockNumber: string
   private _txHash: string
   private _index: string

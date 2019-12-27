@@ -4,7 +4,7 @@ export interface LockHashIndexStateInterface {
   blockHash: string
 }
 
-export class LockHashIndexState {
+export class LockHashIndexState implements LockHashIndexStateInterface {
   private _lockHash: string
   private _blockNumber: string
   private _blockHash: string

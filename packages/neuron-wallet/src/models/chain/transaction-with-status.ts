@@ -6,7 +6,7 @@ export interface TransactionWithStatusInterface {
   txStatus: TxStatusInterface
 }
 
-export class TransactionWithStatus {
+export class TransactionWithStatus implements TransactionWithStatusInterface {
   private _transaction: Transaction
   private _txStatus: TxStatus
 
