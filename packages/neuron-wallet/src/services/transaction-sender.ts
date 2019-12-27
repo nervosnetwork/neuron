@@ -23,7 +23,7 @@ import Input from 'models/chain/input'
 import { WitnessArgs } from 'models/chain/witness-args'
 import OutPoint from 'models/chain/out-point'
 import Output from 'models/chain/output'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks';
+import RpcService from 'services/rpc-service'
 import { BlockHeader } from 'models/chain/block-header'
 import { DepType } from 'models/chain/cell-dep'
 
@@ -271,24 +271,24 @@ export default class TransactionSender {
     const mode = new FeeMode(feeRateInt)
 
     const url: string = NodeService.getInstance().core.node.url
-    const getBlockService = new GetBlocks(url)
+    const rpcService = new RpcService(url)
 
-    const cellStatus = await getBlockService.getLiveCell(withdrawingOutPoint, true)
+    const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
-    const prevTx = (await getBlockService.getTransaction(withdrawingOutPoint.txHash))!
+    const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
     if (prevTx.txStatus.status !== 'committed') {
       throw new TransactionIsNotCommittedYet()
     }
     const content = cellStatus.cell!.data!.content
     const buf = Buffer.from(content.slice(2), 'hex')
     const depositBlockNumber: bigint = buf.readBigUInt64LE()
-    const depositBlockHeader: BlockHeader = (await getBlockService.getHeaderByNumber(depositBlockNumber.toString()))!
+    const depositBlockHeader: BlockHeader = (await rpcService.getHeaderByNumber(depositBlockNumber.toString()))!
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
     const depositCapacity: bigint = BigInt(cellStatus.cell!.output.capacity)
 
-    const withdrawBlockHeader = (await getBlockService.getHeader(prevTx.txStatus.blockHash!))!
+    const withdrawBlockHeader = (await rpcService.getHeader(prevTx.txStatus.blockHash!))!
     const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
 
     const withdrawFraction = withdrawEpoch.index * depositEpoch.length

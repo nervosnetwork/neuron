@@ -9,7 +9,7 @@ import { TransactionWithStatus } from 'models/chain/transaction-with-status'
 import { OutPoint } from 'models/chain/out-point'
 import { CellWithStatus } from 'models/chain/cell-with-status'
 
-export default class GetBlocks {
+export default class RpcService {
   private retryTime: number
   private retryInterval: number
   private core: Core

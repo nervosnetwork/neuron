@@ -1,7 +1,7 @@
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks'
+import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import BlockNumber from 'block-sync-renderer/sync/block-number'
 import LockUtils from 'models/lock-utils'
@@ -34,7 +34,7 @@ enum TxPointType {
 export default class IndexerQueue {
   private lockHashInfos: LockHashInfo[]
   private indexerRPC: IndexerRPC
-  private getBlocksService: GetBlocks
+  private rpcService: RpcService
   private per = 50
   private interval = 1000
   private blockNumberService: BlockNumber
@@ -59,7 +59,7 @@ export default class IndexerQueue {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.indexerRPC = new IndexerRPC(url)
-    this.getBlocksService = new GetBlocks(url)
+    this.rpcService = new RpcService(url)
     this.blockNumberService = new BlockNumber()
   }
 
@@ -135,7 +135,7 @@ export default class IndexerQueue {
         const tip = this.tipBlockNumber()
         const txs = await IndexerTransaction.txHashes()
         for (const tx of txs) {
-          const result = await this.getBlocksService.getTransaction(tx.hash)
+          const result = await this.rpcService.getTransaction(tx.hash)
           if (!result) {
             await IndexerTransaction.deleteTxWhenFork(tx.hash)
             this.txCache.delete(tx.hash)
@@ -196,7 +196,7 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber() - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
-          const transactionWithStatus = await this.getBlocksService.getTransaction(txPoint.txHash)
+          const transactionWithStatus = await this.rpcService.getTransaction(txPoint.txHash)
           const transaction: Transaction = transactionWithStatus!.transaction
           const txUniqueFlag = {
             txHash: transaction.hash,
@@ -219,7 +219,7 @@ export default class IndexerQueue {
                 if (input.previousOutput!.txHash === this.emptyTxHash) {
                   continue
                 }
-                const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
+                const previousTxWithStatus = await this.rpcService.getTransaction(input.previousOutput!.txHash)
                 const previousTx: Transaction = previousTxWithStatus!.transaction
                 const previousOutput = previousTx.outputs![+input.previousOutput!.index]
                 input.setLock(previousOutput.lock)
@@ -248,7 +248,7 @@ export default class IndexerQueue {
             }
             const { blockHash } = transactionWithStatus!.txStatus
             if (blockHash) {
-              const blockHeader = await this.getBlocksService.getHeader(blockHash)
+              const blockHeader = await this.rpcService.getHeader(blockHash)
               if (blockHeader) {
                 transaction.setBlockHeader(blockHeader)
               }

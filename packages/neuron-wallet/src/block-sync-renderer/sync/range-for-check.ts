@@ -1,5 +1,5 @@
 import BlockNumber from './block-number'
-import GetBlocks from './get-blocks'
+import RpcService from 'services/rpc-service'
 import ArrayUtils from 'utils/array'
 import { BlockHeader } from 'models/chain/block-header'
 
@@ -31,8 +31,8 @@ export default class RangeForCheck {
     const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
     const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
 
-    const getBlocksService = new GetBlocks(this.url)
-    const headers: BlockHeader[] = await getBlocksService.getRangeBlockHeaders(blockNumbers)
+    const rpcService = new RpcService(this.url)
+    const headers: BlockHeader[] = await rpcService.getRangeBlockHeaders(blockNumbers)
 
     return headers
   }

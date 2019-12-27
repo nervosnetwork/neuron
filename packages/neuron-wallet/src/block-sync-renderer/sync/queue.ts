@@ -2,7 +2,7 @@ import { TransactionPersistor } from 'services/tx'
 import logger from 'utils/logger'
 import DaoUtils from 'models/dao-utils'
 
-import GetBlocks from './get-blocks'
+import RpcService from 'services/rpc-service'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
 import ArrayUtils from 'utils/array'
@@ -17,7 +17,7 @@ import { Script } from 'models/chain/script'
 
 export default class Queue {
   private lockHashes: string[]
-  private getBlocksService: GetBlocks
+  private rpcService: RpcService
   private startBlockNumber: bigint
   private endBlockNumber: bigint
   private rangeForCheck: RangeForCheck
@@ -43,7 +43,7 @@ export default class Queue {
   ) {
     this.lockHashes = lockHashes
     this.url = url
-    this.getBlocksService = new GetBlocks(url)
+    this.rpcService = new RpcService(url)
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck
@@ -119,7 +119,7 @@ export default class Queue {
 
   public pipeline = async (blockNumbers: string[]) => {
     // 1. get blocks
-    const blocks: Block[] = await this.getBlocksService.getRangeBlocks(blockNumbers)
+    const blocks: Block[] = await this.rpcService.getRangeBlocks(blockNumbers)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
     // 2. check blockHeaders
@@ -163,7 +163,7 @@ export default class Queue {
               const previousTxHash = input.previousOutput!.txHash
               let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {
-                previousTxWithStatus = await this.getBlocksService.getTransaction(previousTxHash)
+                previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
                 cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
               }
               const previousTx = previousTxWithStatus!.transaction

@@ -4,7 +4,7 @@ import Core from '@nervosnetwork/ckb-sdk-core'
 import LockUtils from 'models/lock-utils'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks'
+import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import NodeService from 'services/node'
@@ -14,8 +14,8 @@ import { TransactionWithStatus } from 'models/chain/transaction-with-status'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().core.rpc.node.url
-  const getBlockService = new GetBlocks(url)
-  const txWithStatus: TransactionWithStatus | undefined = await getBlockService.getTransaction(hash)
+  const rpcService = new RpcService(url)
+  const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
   if (!txWithStatus) {
     return {
       tx: txWithStatus,
@@ -68,11 +68,11 @@ const trackingStatus = async () => {
   if (successTxs.length > 0) {
     const url: string = NodeService.getInstance().core.rpc.node.url
     const core = new Core(url)
-    const getBlockService = new GetBlocks(core.rpc.node.url)
+    const rpcService = new RpcService(core.rpc.node.url)
     for (const successTx of successTxs) {
       const transaction = successTx.tx!
       const { blockHash } = successTx
-      const blockHeader = await getBlockService.getHeader(blockHash!)
+      const blockHeader = await rpcService.getHeader(blockHash!)
       if (blockHeader) {
         transaction.setBlockHeader(blockHeader)
         await TransactionPersistor.saveFetchTx(transaction)

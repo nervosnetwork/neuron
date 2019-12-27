@@ -4,7 +4,7 @@ import logger from 'utils/logger'
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
-import GetBlocks from './get-blocks'
+import RpcService from 'services/rpc-service'
 import CommonUtils from 'utils/common'
 import NodeService from 'services/node'
 
@@ -54,8 +54,8 @@ export default class BlockListener {
     }
 
     try {
-      const getBlocksService = new GetBlocks(this.url)
-      const currentTip = await getBlocksService.getTipBlockNumber()
+      const rpcService = new RpcService(this.url)
+      const currentTip = await rpcService.getTipBlockNumber()
       const startBlockNumber = await this.getStartBlockNumber()
       this.queue = new Queue(
         this.url,
