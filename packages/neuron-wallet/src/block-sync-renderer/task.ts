@@ -1,18 +1,18 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
-import IndexerRPC from 'block-sync-renderer/indexer/indexer-rpc'
 import BlockListener from 'block-sync-renderer/sync/block-listener'
 import IndexerQueue from 'block-sync-renderer/indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import CommonUtils from 'utils/common'
+import RpcService from 'services/rpc-service'
 
 const isIndexerEnabled = async (url: string): Promise<boolean> => {
-  const indexerRPC = new IndexerRPC(url)
+  const rpcService = new RpcService(url)
   try {
     await CommonUtils.retry(3, 100, () => {
-      return indexerRPC.getLockHashIndexStates()
+      return rpcService.getLockHashIndexStates()
     })
     return true
   } catch {

@@ -8,7 +8,6 @@ import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
 
-import IndexerRPC from './indexer-rpc'
 import HexUtils from 'utils/hex'
 import { TxUniqueFlagCache } from './tx-unique-flag'
 import { TransactionCache } from './transaction-cache'
@@ -33,7 +32,6 @@ enum TxPointType {
 
 export default class IndexerQueue {
   private lockHashInfos: LockHashInfo[]
-  private indexerRPC: IndexerRPC
   private rpcService: RpcService
   private per = 50
   private interval = 1000
@@ -58,7 +56,6 @@ export default class IndexerQueue {
   constructor(url: string, lockHashInfos: LockHashInfo[]) {
     this.lockHashInfos = lockHashInfos
     this.url = url
-    this.indexerRPC = new IndexerRPC(url)
     this.rpcService = new RpcService(url)
     this.blockNumberService = new BlockNumber()
   }
@@ -153,7 +150,7 @@ export default class IndexerQueue {
 
   public getCurrentBlockNumber = async (lockHashes: string[]) => {
     // get lock hash indexer status
-    const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
+    const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const blockNumbers = lockHashIndexStates
       .filter(state => lockHashes.includes(state.lockHash))
       .map(state => HexUtils.toDecimal(state.blockNumber))
@@ -163,13 +160,13 @@ export default class IndexerQueue {
   }
 
   public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
-    const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
+    const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
     await ArrayUtils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
       const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
-      await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
+      await this.rpcService.indexLockHash(info.lockHash, indexFrom)
     })
   }
 
@@ -178,7 +175,7 @@ export default class IndexerQueue {
     let page = 0
     let stopped = false
     while (!stopped) {
-      const txs = await this.indexerRPC.getTransactionsByLockHash(lockHash, `0x${page.toString(16)}`, `0x${this.per.toString(16)}`)
+      const txs = await this.rpcService.getTransactionsByLockHash(lockHash, page.toString(), this.per.toString())
       if (txs.length < this.per) {
         stopped = true
       }

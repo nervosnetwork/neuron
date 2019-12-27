@@ -2,12 +2,12 @@ import { TransactionPointInterface, TransactionPoint } from './transaction-point
 
 export interface CellTransactionInterface {
   createdBy: TransactionPointInterface
-  consumedBy?: TransactionPointInterface | null
+  consumedBy: TransactionPointInterface | null
 }
 
 export class CellTransaction implements CellTransactionInterface {
   private _createdBy: TransactionPoint
-  private _consumedBy?: TransactionPoint | null
+  private _consumedBy: TransactionPoint | null
 
   constructor({ createdBy, consumedBy }: CellTransactionInterface) {
     this._createdBy = createdBy.constructor.name === 'Object' ? new TransactionPoint(createdBy) : (createdBy as TransactionPoint)
@@ -18,7 +18,7 @@ export class CellTransaction implements CellTransactionInterface {
     return this._createdBy
   }
 
-  public get consumedBy(): TransactionPoint | null | undefined {
+  public get consumedBy(): TransactionPoint | null {
     return this._consumedBy
   }
 
