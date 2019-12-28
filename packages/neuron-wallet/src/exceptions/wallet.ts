@@ -43,6 +43,7 @@ export class LiveCapacityNotEnough extends Error {
 }
 
 export class CapacityNotEnoughForChange extends Error {
+  public code = 105
   constructor() {
     super(i18n.t('messages.capacity-not-enough-for-change'))
   }

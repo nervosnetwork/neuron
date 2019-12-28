@@ -3,7 +3,7 @@ interface SuccessFromController {
   result: any
 }
 interface FailureFromController {
-  status: 0
+  status: 0 | 105
   message:
     | string
     | {

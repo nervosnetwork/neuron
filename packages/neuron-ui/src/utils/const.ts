@@ -88,6 +88,7 @@ export enum ErrorCode {
   AmountTooSmall = 101,
   PasswordIncorrect = 103,
   NodeDisconnected = 104,
+  CapacityNotEnoughForChange = 105,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,

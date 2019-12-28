@@ -157,8 +157,12 @@ export const useUpdateDepositValue = ({
                 type: AppActions.UpdateGeneratedTx,
                 payload: res.result,
               })
-            } else {
+            } else if (res.status === 0) {
               setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
+            } else if (res.status === ErrorCode.CapacityNotEnoughForChange) {
+              setErrorMessage(t(`messages.codes.106`))
+            } else {
+              setErrorMessage(t(`messages.codes.${res.status}`))
             }
           })
         } else if (BigInt(capacity) === maxDepositAmount) {
