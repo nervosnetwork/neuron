@@ -15,7 +15,7 @@ export class CellDep implements CellDepInterface {
   private _depType: DepType
 
   constructor({ outPoint, depType }: CellDepInterface) {
-    this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
+    this._outPoint = outPoint ? (outPoint instanceof OutPoint ? outPoint : new OutPoint(outPoint)) : outPoint
     this._depType = depType
   }
 

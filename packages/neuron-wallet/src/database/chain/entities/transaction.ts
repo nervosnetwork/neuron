@@ -14,7 +14,7 @@ import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
 import { Transaction as TransactionModel, TransactionStatus } from 'models/chain/transaction'
-import { CellDep } from 'models/chain/cell-dep'
+import { CellDepInterface } from 'models/chain/cell-dep'
 
 @Entity()
 export default class Transaction extends BaseEntity {
@@ -31,7 +31,7 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  cellDeps: CellDep[] = []
+  cellDeps: CellDepInterface[] = []
 
   @Column({
     type: 'simple-json',

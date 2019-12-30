@@ -10,7 +10,7 @@ export class CellWithStatus implements CellWithStatusInterface {
   private _status: string
 
   constructor({ cell, status }: CellWithStatusInterface) {
-    this._cell = cell ? (cell.constructor.name === 'Object' ? new CellInfo(cell) : (cell as CellInfo)) : undefined
+    this._cell = cell ? (cell instanceof CellInfo ? cell : new CellInfo(cell)) : undefined
     this._status = status
   }
 

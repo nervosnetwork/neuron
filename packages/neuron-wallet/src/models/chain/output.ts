@@ -55,17 +55,18 @@ export class Output implements OutputInterface {
   }: OutputInterface) {
     this._capacity = BigInt(capacity).toString()
     this._data = data
-    this._lock = lock.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
+    this._lock = lock instanceof Script ? lock : new Script(lock)
     this._lockHash = lockHash || this._lock.computeHash()
-    this._type = type ? (type.constructor.name === 'Object' ? new Script(type) : (type as Script)) : type
+    this._type = type ? (type instanceof Script ? type : new Script(type)) : type
     this._typeHash = typeHash || this._type?.computeHash()
-    this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
+    this._outPoint = outPoint ? (outPoint instanceof OutPoint ? outPoint : new OutPoint(outPoint)) : outPoint
     this._status = status
     this._daoData = daoData
     this._timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
     this._blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
     this._blockHash = blockHash
-    this._depositOutPoint = depositOutPoint?.constructor.name === 'Object' ? new OutPoint(depositOutPoint) : (depositOutPoint as OutPoint)
+    this._depositOutPoint = depositOutPoint ?
+      (depositOutPoint instanceof OutPoint ? depositOutPoint : new OutPoint(depositOutPoint)) : depositOutPoint
     this._depositTimestamp = depositTimestamp ? BigInt(depositTimestamp).toString() : depositTimestamp
   }
 

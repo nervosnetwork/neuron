@@ -11,8 +11,8 @@ export class Block implements BlockInterface {
   private _transactions: Transaction[]
 
   constructor({ header, transactions }: BlockInterface) {
-    this._header = header.constructor.name === 'Object' ? new BlockHeader(header) : (header as BlockHeader)
-    this._transactions = transactions.map(tx => tx.constructor.name === 'Object' ? new Transaction(tx): tx) as Transaction[]
+    this._header = header instanceof BlockHeader ? header : new BlockHeader(header)
+    this._transactions = transactions.map(tx => tx instanceof Transaction ? tx : new Transaction(tx))
   }
 
   public get header(): BlockHeader {

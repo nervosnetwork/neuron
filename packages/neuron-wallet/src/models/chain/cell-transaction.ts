@@ -10,8 +10,8 @@ export class CellTransaction implements CellTransactionInterface {
   private _consumedBy: TransactionPoint | null
 
   constructor({ createdBy, consumedBy }: CellTransactionInterface) {
-    this._createdBy = createdBy.constructor.name === 'Object' ? new TransactionPoint(createdBy) : (createdBy as TransactionPoint)
-    this._consumedBy = consumedBy ? (consumedBy.constructor.name === 'Object' ? new TransactionPoint(consumedBy) : (consumedBy as TransactionPoint)) : consumedBy
+    this._createdBy = createdBy instanceof TransactionPoint ? createdBy : new TransactionPoint(createdBy)
+    this._consumedBy = consumedBy ? (consumedBy instanceof TransactionPoint ? consumedBy : new TransactionPoint(consumedBy)) : consumedBy
   }
 
   public get createdBy(): TransactionPoint {

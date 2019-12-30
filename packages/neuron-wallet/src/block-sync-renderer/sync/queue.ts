@@ -153,13 +153,12 @@ export default class Queue {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
-      for (let i = 0; i < block.transactions.length; ++i) {
-        const tx = block.transactions[i]
+      for (const [i, tx] of block.transactions.entries()) {
         const checkTx = new CheckTx(tx, this.url, daoScriptHash)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
-            for (const [inputIndex, input] of tx.inputs!.entries()) {
+            for (const [inputIndex, input] of tx.inputs.entries()) {
               const previousTxHash = input.previousOutput!.txHash
               let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {

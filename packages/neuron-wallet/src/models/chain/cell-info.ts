@@ -11,8 +11,8 @@ export class CellInfo implements CellInfoInterface {
   private _data?: CellData
 
   constructor({ output, data }: CellInfoInterface) {
-    this._output = output.constructor.name === 'Object' ? new Output(output) : (output as Output)
-    this._data = data ? (data.constructor.name === 'Object' ? new CellData(data) : (data as CellData)) : undefined
+    this._output = output instanceof Output ? output : new Output(output)
+    this._data = data ? (data instanceof CellData ? data : new CellData(data)) : undefined
   }
 
   public get output(): Output {

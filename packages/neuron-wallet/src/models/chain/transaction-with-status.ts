@@ -11,8 +11,8 @@ export class TransactionWithStatus implements TransactionWithStatusInterface {
   private _txStatus: TxStatus
 
   constructor({ transaction, txStatus }: TransactionWithStatusInterface) {
-    this._transaction = transaction.constructor.name === 'Object' ? new Transaction(transaction) : (transaction as Transaction)
-    this._txStatus = txStatus.constructor.name === 'Object' ? new TxStatus(txStatus) : (txStatus as TxStatus)
+    this._transaction = transaction instanceof Transaction ? transaction : new Transaction(transaction)
+    this._txStatus = txStatus instanceof TxStatus ? txStatus : new TxStatus(txStatus)
   }
 
   public get transaction(): Transaction {

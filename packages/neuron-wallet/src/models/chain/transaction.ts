@@ -86,17 +86,17 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     updatedAt
   }: TransactionWithoutHashInterface) {
     this._version = BigInt(version).toString()
-    this._cellDeps = cellDeps?.map(cd => cd.constructor.name === "Object" ? new CellDep(cd) : cd) as CellDep[] || []
+    this._cellDeps = cellDeps?.map(cd => cd instanceof CellDep ? cd : new CellDep(cd)) || []
     this._headerDeps = headerDeps || []
-    this._inputs = inputs?.map(i => i.constructor.name === 'Object' ? new Input(i) : i) as Input[] || []
-    this._outputs = outputs?.map(o => o.constructor.name === 'Object' ? new Output(o) : o) as Output[] || []
+    this._inputs = inputs?.map(i => i instanceof Input ? i : new Input(i)) || []
+    this._outputs = outputs?.map(o => o instanceof Output ? o : new Output(o)) || []
     this._outputsData = outputsData || this._outputs.map(o => o.data || '0x')
     this._value = value ? BigInt(value).toString() : value
     this._witnesses = witnesses?.map(wit => {
       if (typeof wit === 'string') {
         return wit
       }
-      return wit.constructor.name === 'Object' ? new WitnessArgs(wit) : (wit as WitnessArgs)
+      return wit instanceof WitnessArgs ? wit : new WitnessArgs(wit)
     }) || []
     this._type = type
     this._description = description || ''

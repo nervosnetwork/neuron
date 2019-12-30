@@ -139,7 +139,7 @@ export class TransactionPersistor {
     tx.hash = transaction.hash
     tx.version = transaction.version
     tx.headerDeps = transaction.headerDeps
-    tx.cellDeps = transaction.cellDeps
+    tx.cellDeps = transaction.cellDeps.map(cd => cd.toInterface())
     tx.timestamp = transaction.timestamp!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
@@ -161,7 +161,7 @@ export class TransactionPersistor {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
-      input.lock = i.lock || null
+      input.lock = i.lock?.toInterface() || null
       input.since = i.since!
       if (i.inputIndex) {
         input.inputIndex = i.inputIndex
@@ -183,17 +183,17 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
-    const outputs: OutputEntity[] = transaction.outputs!.map((o, index) => {
+    const outputs: OutputEntity[] = transaction.outputs.map((o, index) => {
       const output = new OutputEntity()
       output.outPointTxHash = transaction.hash
       output.outPointIndex = index.toString()
       output.capacity = o.capacity
-      output.lock = o.lock
+      output.lock = o.lock.toInterface()
       output.lockHash = o.lockHash!
       output.transaction = tx
       output.status = outputStatus
       if (o.type) {
-        output.typeScript = o.type
+        output.typeScript = o.type.toInterface()
         output.typeHash = o.typeHash ? o.typeHash : null
       }
       const data = outputsData[index]

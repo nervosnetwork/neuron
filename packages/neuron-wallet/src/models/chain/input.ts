@@ -25,8 +25,8 @@ export class Input implements InputInterface {
     this._capacity = capacity ? BigInt(capacity).toString() : capacity
     this._inputIndex = inputIndex ? (+inputIndex).toString() : undefined
 
-    this._previousOutput = previousOutput?.constructor.name === 'Object' ? new OutPoint(previousOutput) : (previousOutput as OutPoint)
-    this._lock = lock?.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
+    this._previousOutput = previousOutput ? (previousOutput instanceof OutPoint ? previousOutput : new OutPoint(previousOutput)) : previousOutput
+    this._lock = lock ? (lock instanceof Script ? lock : new Script(lock)) : lock
     this._lockHash = this._lock?.computeHash()
   }
 
