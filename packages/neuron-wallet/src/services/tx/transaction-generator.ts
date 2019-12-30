@@ -105,7 +105,7 @@ export class TransactionGenerator {
         },
       })
 
-      outputs.push(output)
+      tx.outputs.push(output)
       tx.outputsData!.push('0x')
     }
 
@@ -286,7 +286,7 @@ export class TransactionGenerator {
         },
       })
 
-      outputs.push(changeOutput)
+      tx.outputs.push(changeOutput)
       tx.outputsData!.push(changeOutput.data!)
     }
 
@@ -463,7 +463,7 @@ export class TransactionGenerator {
         },
       })
 
-      outputs.push(changeOutput)
+      tx.outputs.push(changeOutput)
       tx.outputsData.push(changeOutput.data!)
     }
 

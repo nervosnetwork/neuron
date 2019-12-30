@@ -33,6 +33,14 @@ export class WitnessArgs implements WitnessArgsInterface {
     this._lock = WitnessArgs.EMPTY_LOCK
   }
 
+  public toInterface(): WitnessArgsInterface {
+    return {
+      lock: this.lock,
+      inputType: this.inputType,
+      outputType: this.outputType,
+    }
+  }
+
   public static generateEmpty(): WitnessArgs {
     return new WitnessArgs({
       lock: undefined,

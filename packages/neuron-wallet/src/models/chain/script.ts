@@ -40,6 +40,14 @@ export class Script implements ScriptInterface {
     return HexUtils.addPrefix(hash)
   }
 
+  public toInterface(): ScriptInterface {
+    return {
+      args: this.args,
+      codeHash: this.codeHash,
+      hashType: this.hashType
+    }
+  }
+
   public toSDK(): CKBComponents.Script {
     return {
       args: this.args,

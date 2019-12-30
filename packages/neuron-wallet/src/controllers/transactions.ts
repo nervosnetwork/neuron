@@ -112,7 +112,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { ...(transaction as TransactionInterface), outputsCount, inputsCount }
+      result: { ...transaction.toInterface(), outputsCount, inputsCount }
     }
   }
 

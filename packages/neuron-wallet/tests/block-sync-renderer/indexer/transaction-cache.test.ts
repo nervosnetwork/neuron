@@ -1,5 +1,6 @@
 import { TransactionCache } from '../../../src/block-sync-renderer/indexer/transaction-cache'
 import { TransactionWithStatus } from 'models/chain/transaction-with-status'
+import { TxStatusType } from '../../../src/models/chain/tx-status'
 
 describe('TransactionCache', () => {
   const txWithStatus = new TransactionWithStatus({
@@ -9,7 +10,7 @@ describe('TransactionCache', () => {
     },
     txStatus: {
       blockHash: '',
-      status: 'committed',
+      status: TxStatusType.Committed,
     }
   })
 
@@ -23,16 +24,16 @@ describe('TransactionCache', () => {
   it('limit', () => {
     const cache = new TransactionCache(10)
     Array.from({ length: 20 }).map((_value, index) => {
-      cache.push({
+      cache.push(new TransactionWithStatus({
         transaction: {
           version: '',
           hash: index.toString(),
         },
         txStatus: {
           blockHash: '',
-          status: 'committed',
+          status: TxStatusType.Committed,
         }
-      })
+      }))
     })
 
     expect(cache.size()).toEqual(10)
@@ -41,29 +42,29 @@ describe('TransactionCache', () => {
   it('pop head', () => {
     const cache = new TransactionCache(10)
     Array.from({ length: 20 }).map((_value, index) => {
-      cache.push({
+      cache.push(new TransactionWithStatus({
         transaction: {
           version: '',
           hash: index.toString(),
         },
         txStatus: {
           blockHash: '',
-          status: 'committed',
+          status: TxStatusType.Committed,
         }
-      })
+      }))
     })
 
     const result = Array.from({ length: 10 }).map((_value, index) => {
-      return {
+      return new TransactionWithStatus({
         transaction: {
           version: '',
           hash: (index + 10).toString(),
         },
         txStatus: {
           blockHash: '',
-          status: 'committed',
+          status: TxStatusType.Committed,
         }
-      }
+      })
     })
 
     expect(cache.size()).toEqual(10)

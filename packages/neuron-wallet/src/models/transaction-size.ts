@@ -43,12 +43,7 @@ export default class TransactionSize {
   }
 
   public static secpLockWitness(): number {
-    const wit = new WitnessArgs({
-      lock: '0x' + '0'.repeat(130),
-      inputType: undefined,
-      outputType: undefined,
-    })
-    return TransactionSize.witness(wit)
+    return TransactionSize.witness(WitnessArgs.emptyLock())
   }
 
   public static emptyWitness(): number {

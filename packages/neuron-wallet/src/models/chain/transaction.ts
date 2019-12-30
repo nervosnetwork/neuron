@@ -91,7 +91,7 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     this._inputs = inputs?.map(i => i.constructor.name === 'Object' ? new Input(i) : i) as Input[] || []
     this._outputs = outputs?.map(o => o.constructor.name === 'Object' ? new Output(o) : o) as Output[] || []
     this._outputsData = outputsData || this._outputs.map(o => o.data || '0x')
-    this._value = BigInt(value).toString()
+    this._value = value ? BigInt(value).toString() : value
     this._witnesses = witnesses?.map(wit => {
       if (typeof wit === 'string') {
         return wit
@@ -101,8 +101,8 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     this._type = type
     this._description = description || ''
     this._status = status
-    this._fee = BigInt(fee).toString()
-    this._interest = BigInt(interest).toString()
+    this._fee = fee ? BigInt(fee).toString() : fee
+    this._interest = interest ? BigInt(interest).toString() : interest
     this._nervosDao = nervosDao || false
     this._blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
     this._blockHash = blockHash
@@ -156,7 +156,7 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
   }
 
   public set value(v: string | undefined) {
-    this._value = v
+    this._value = v ? BigInt(v).toString() : v
   }
 
   public get fee(): string | undefined {
@@ -164,7 +164,7 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
   }
 
   public set fee(value: string | undefined) {
-    this._fee = value
+    this._fee = value ? BigInt(value).toString() : value
   }
 
   public get interest(): string | undefined {
@@ -172,7 +172,7 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
   }
 
   public set interest(value: string | undefined) {
-    this._interest = value
+    this._interest = value ? BigInt(value).toString() : value
   }
 
   public get type(): string | undefined {
@@ -230,6 +230,35 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     this._blockNumber = blockHeader.number
   }
 
+  public toInterface(): TransactionWithoutHashInterface {
+    return {
+      version: this.version,
+      cellDeps: this.cellDeps.map(cd => cd.toInterface()),
+      headerDeps: this.headerDeps,
+      inputs: this.inputs.map(i => i.toInterface()),
+      outputs: this.outputs.map(o => o.toInterface()),
+      outputsData: this.outputsData,
+      witnesses: this.witnesses.map(wit => {
+        if (typeof wit === 'string') {
+          return wit
+        }
+        return wit.toInterface()
+      }),
+      value: this.value,
+      fee: this.fee,
+      interest: this.interest,
+      type: this.type,
+      status: this.status,
+      description: this.description,
+      nervosDao: this.nervosDao,
+      blockNumber: this.blockNumber,
+      blockHash: this.blockHash,
+      timestamp: this.timestamp,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    }
+  }
+
   public toSDK(): CKBComponents.RawTransaction {
     return {
       version: HexUtils.toHex(this.version),
@@ -270,6 +299,13 @@ export class Transaction extends TransactionWithoutHash implements TransactionIn
     return this._hash
   }
 
+  public toInterface(): TransactionInterface {
+    return {
+      hash: this.hash,
+      ...super.toInterface(),
+    }
+  }
+
   public toSDK(): CKBComponents.Transaction {
     return {
       hash: this.hash,
@@ -278,10 +314,9 @@ export class Transaction extends TransactionWithoutHash implements TransactionIn
   }
 
   public static fromSDK(tx: CKBComponents.Transaction, blockHeader?: BlockHeaderInterface): Transaction {
-    const t: TransactionWithoutHashInterface = super.fromSDK(tx, blockHeader)
     return new Transaction({
       hash: tx.hash,
-      ...t,
+      ...super.fromSDK(tx, blockHeader).toInterface(),
     })
   }
 }

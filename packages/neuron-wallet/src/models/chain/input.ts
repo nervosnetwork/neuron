@@ -21,8 +21,8 @@ export class Input implements InputInterface {
 
   // check hex string
   constructor({ previousOutput, since, capacity, lock, inputIndex }: InputInterface) {
-    this._since = BigInt(since).toString()
-    this._capacity = BigInt(capacity).toString()
+    this._since = since ? BigInt(since).toString() : since
+    this._capacity = capacity ? BigInt(capacity).toString() : capacity
     this._inputIndex = inputIndex ? (+inputIndex).toString() : undefined
 
     this._previousOutput = previousOutput?.constructor.name === 'Object' ? new OutPoint(previousOutput) : (previousOutput as OutPoint)
@@ -65,6 +65,17 @@ export class Input implements InputInterface {
 
   public setInputIndex(value: string) {
     this._inputIndex = BigInt(value).toString()
+  }
+
+  public toInterface(): InputInterface {
+    return {
+      previousOutput: this.previousOutput?.toInterface() || null,
+      since: this.since,
+      capacity: this.capacity,
+      lockHash: this.lockHash,
+      lock: this.lock?.toInterface(),
+      inputIndex: this.inputIndex,
+    }
   }
 
   public toSDK(): CKBComponents.CellInput {

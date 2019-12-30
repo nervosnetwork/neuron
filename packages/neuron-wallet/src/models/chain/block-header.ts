@@ -49,6 +49,17 @@ export class BlockHeader implements BlockHeaderInterface {
     return this._epoch
   }
 
+  public toInterface(): BlockHeaderInterface {
+    return {
+      version: this.version,
+      timestamp: this.timestamp,
+      hash: this.hash,
+      parentHash: this.parentHash,
+      number: this.number,
+      epoch: this.epoch,
+    }
+  }
+
   public static fromSDK(sdkHeader: CKBComponents.BlockHeader): BlockHeader {
     return new BlockHeader({
       version: sdkHeader.version,

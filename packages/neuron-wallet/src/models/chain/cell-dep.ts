@@ -27,6 +27,13 @@ export class CellDep implements CellDepInterface {
     return this._depType
   }
 
+  public toInterface(): CellDepInterface {
+    return {
+      outPoint: this.outPoint.toInterface(),
+      depType: this.depType,
+    }
+  }
+
   public toSDK(): CKBComponents.CellDep {
     return {
       outPoint: this.outPoint.toSDK(),

@@ -62,11 +62,11 @@ export class Output implements OutputInterface {
     this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
     this._status = status
     this._daoData = daoData
-    this._timestamp = BigInt(timestamp).toString()
-    this._blockNumber = BigInt(blockNumber).toString()
+    this._timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
+    this._blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
     this._blockHash = blockHash
     this._depositOutPoint = depositOutPoint?.constructor.name === 'Object' ? new OutPoint(depositOutPoint) : (depositOutPoint as OutPoint)
-    this._depositTimestamp = BigInt(depositTimestamp).toString()
+    this._depositTimestamp = depositTimestamp ? BigInt(depositTimestamp).toString() : depositTimestamp
   }
 
   // getter
@@ -145,6 +145,25 @@ export class Output implements OutputInterface {
 
   public setDepositTimestamp(value: string) {
     this._depositTimestamp = value
+  }
+
+  public toInterface(): OutputInterface {
+    return {
+      capacity: this.capacity,
+      data: this.data,
+      lock: this.lock.toInterface(),
+      type: this.type?.toInterface(),
+      lockHash: this.lockHash,
+      typeHash: this.typeHash,
+      outPoint: this.outPoint?.toInterface(),
+      status: this.status,
+      daoData: this.daoData,
+      timestamp: this.timestamp,
+      blockNumber: this.blockNumber,
+      blockHash: this.blockHash,
+      depositOutPoint: this.depositOutPoint?.toInterface(),
+      depositTimestamp: this.depositTimestamp,
+    }
   }
 
   public toSDK(): CKBComponents.CellOutput {

@@ -51,7 +51,7 @@ const bob = {
     args: '0x36c329ed630d6ce750712a477543672adab57f4c',
     hashType: ScriptHashType.Type,
   },
-  lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
+  lockHash: '0x27161d1287c4b472bdff08a9510591d6cb5caa5b4ad7af451dbcd01e10efefac',
   address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
   blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
 }
@@ -62,7 +62,7 @@ const alice = {
     args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
     hashType: ScriptHashType.Type,
   },
-  lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
+  lockHash: '0x154d47f1f2f2b30f6377ba80dd92f61a7ff3a005ec79e01113e09359dbdb31ac',
   address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
   blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
 }

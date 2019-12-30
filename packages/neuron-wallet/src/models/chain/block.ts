@@ -23,6 +23,13 @@ export class Block implements BlockInterface {
     return this._transactions
   }
 
+  public toInterface(): BlockInterface {
+    return {
+      header: this.header.toInterface(),
+      transactions: this.transactions.map(tx => tx.toInterface())
+    }
+  }
+
   public static fromSDK(block: CKBComponents.Block): Block {
     return new Block({
       header: BlockHeader.fromSDK(block.header),

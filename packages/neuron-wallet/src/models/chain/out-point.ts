@@ -1,4 +1,4 @@
-import HexUtils from "utils/hex"
+import HexUtils from 'utils/hex'
 
 export interface OutPointInterface {
   txHash: string
@@ -21,6 +21,13 @@ export class OutPoint implements OutPointInterface {
 
   public get index(): string {
     return this._index
+  }
+
+  public toInterface(): OutPointInterface {
+    return {
+      txHash: this.txHash,
+      index: this.index,
+    }
   }
 
   public toSDK(): CKBComponents.OutPoint {
