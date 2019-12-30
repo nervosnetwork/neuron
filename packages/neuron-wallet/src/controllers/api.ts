@@ -16,8 +16,8 @@ import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
-import OutPoint from 'models/chain/out-point'
-import { TransactionWithoutHash } from 'models/chain/transaction'
+import { OutPointInterface } from 'models/chain/out-point'
+import { TransactionWithoutHashInterface } from 'models/chain/transaction'
 
 /**
  * @class ApiController
@@ -160,7 +160,7 @@ export default class ApiController {
       this.walletsController.requestPassword(walletID, action)
     })
 
-    handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) => {
+    handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHashInterface, password: string, description?: string }) => {
       return this.walletsController.sendTx(params)
     })
 
@@ -212,11 +212,11 @@ export default class ApiController {
       return this.daoController.generateDepositAllTx(params)
     })
 
-    handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }) => {
+    handle('start-withdraw-from-dao', async (_, params: { walletID: string, outPoint: OutPointInterface, fee: string, feeRate: string }) => {
       return this.daoController.startWithdrawFromDao(params)
     })
 
-    handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
+    handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPointInterface, withdrawingOutPoint: OutPointInterface, fee: string, feeRate: string }) => {
       return this.daoController.withdrawFromDao(params)
     })
 

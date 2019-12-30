@@ -24,7 +24,7 @@ import i18n from 'locales/i18n'
 import AddressService from 'services/addresses'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
-import { TransactionWithoutHash } from 'models/chain/transaction'
+import { TransactionWithoutHash, TransactionWithoutHashInterface } from 'models/chain/transaction'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -256,14 +256,14 @@ export default class WalletsController {
     }
   }
 
-  public async sendTx(params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) {
+  public async sendTx(params: { walletID: string, tx: TransactionWithoutHashInterface, password: string, description?: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const hash = await new TransactionSender().sendTx(
       params.walletID,
-      params.tx,
+      new TransactionWithoutHash(params.tx),
       params.password,
       params.description
     )

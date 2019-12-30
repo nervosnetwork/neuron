@@ -5,11 +5,10 @@ import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
-import { Transaction } from 'models/chain/transaction'
-import { TransactionInterface } from '../models/chain/transaction';
+import { TransactionInterface } from 'models/chain/transaction'
 
 export default class TransactionsController {
-  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<Transaction>>> {
+  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<TransactionInterface>>> {
     const transactions = await TransactionsService.getAll(params)
     if (!transactions) {
       throw new ServiceHasNoResponse('Transactions')
@@ -22,7 +21,7 @@ export default class TransactionsController {
   }
 
   public async getAllByKeywords(params: Controller.Params.TransactionsByKeywords):
-    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
+    Promise<Controller.Response<PaginationResult<TransactionInterface> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
@@ -41,7 +40,7 @@ export default class TransactionsController {
   }
 
   public async getAllByAddresses(params: Controller.Params.TransactionsByAddresses):
-    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
+    Promise<Controller.Response<PaginationResult<TransactionInterface> & Controller.Params.TransactionsByAddresses>> {
     const { pageNo, pageSize, addresses = '' } = params
 
     let searchAddresses = addresses

@@ -4,12 +4,12 @@ import AddressesService from 'services/addresses'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import TransactionSender from 'services/transaction-sender'
-import Output from 'models/chain/output'
-import { TransactionWithoutHash } from 'models/chain/transaction'
-import OutPoint from 'models/chain/out-point'
+import { OutputInterface } from 'models/chain/output'
+import { TransactionWithoutHashInterface } from 'models/chain/transaction'
+import OutPoint, { OutPointInterface } from 'models/chain/out-point'
 
 export default class DaoController {
-  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Output[]>> {
+  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<OutputInterface[]>> {
     const { walletID } = params
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
@@ -21,12 +21,12 @@ export default class DaoController {
 
     return {
       status: ResponseCode.Success,
-      result: cells,
+      result: cells.map(c => c.toInterface()),
     }
   }
 
   public async generateDepositTx(params: { walletID: string, capacity: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+    Promise<Controller.Response<TransactionWithoutHashInterface>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -39,12 +39,12 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 
   public async generateDepositAllTx(params: { walletID: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+    Promise<Controller.Response<TransactionWithoutHashInterface>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -56,44 +56,48 @@ export default class DaoController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 
-  public async startWithdrawFromDao(params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+  public async startWithdrawFromDao(params: { walletID: string, outPoint: OutPointInterface, fee: string, feeRate: string }):
+    Promise<Controller.Response<TransactionWithoutHashInterface>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const tx = await new TransactionSender().startWithdrawFromDao(
       params.walletID,
-      params.outPoint,
+      new OutPoint(params.outPoint),
       params.fee,
       params.feeRate,
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 
-  public async withdrawFromDao(params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+  public async withdrawFromDao(params: {
+    walletID: string,
+    depositOutPoint: OutPointInterface,
+    withdrawingOutPoint: OutPointInterface,
+    fee: string, feeRate: string
+  }): Promise<Controller.Response<TransactionWithoutHashInterface>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const tx = await new TransactionSender().withdrawFromDao(
       params.walletID,
-      params.depositOutPoint,
-      params.withdrawingOutPoint,
+      new OutPoint(params.depositOutPoint),
+      new OutPoint(params.withdrawingOutPoint),
       params.fee,
       params.feeRate,
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 }
