@@ -1,7 +1,7 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
-import { OutputStatus } from './params'
+import { OutputStatus } from 'models/chain/output'
 import TransactionsService from './transaction-service'
 import { TransactionStatus } from 'models/chain/transaction'
 

@@ -2,7 +2,7 @@ import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
 import { ScriptInterface } from 'models/chain/script'
 import OutPoint from 'models/chain/out-point'
-import { Output as OutputModel } from 'models/chain/output'
+import { Output as OutputModel, OutputStatus } from 'models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {
@@ -99,7 +99,7 @@ export default class Output extends BaseEntity {
       lock: this.lock,
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
-      status: this.status,
+      status: this.status as OutputStatus,
       type: this.typeScript,
       typeHash: this.typeHash ? this.typeHash : undefined,
       daoData: this.daoData,

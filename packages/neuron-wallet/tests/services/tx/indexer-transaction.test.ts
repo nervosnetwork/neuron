@@ -4,7 +4,7 @@ import InputEntity from '../../../src/database/chain/entities/input'
 import { getConnection } from 'typeorm'
 import initConnection from '../../../src/database/chain/ormconfig'
 import IndexerTransaction from '../../../src/services/tx/indexer-transaction'
-import { OutputStatus } from '../../../src/services/tx/params'
+import { OutputStatus } from '../../../src/models/chain/output'
 import { TransactionStatus } from '../../../src/models/chain/transaction'
 import { ScriptHashType } from '../../../src/models/chain/script'
 

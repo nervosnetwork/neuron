@@ -3,7 +3,7 @@ import TransactionEntity from 'database/chain/entities/transaction'
 import ArrayUtils from 'utils/array'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
-import { OutputStatus } from './params'
+import { OutputStatus } from 'models/chain/output'
 import { TransactionStatus } from 'models/chain/transaction'
 
 export default class IndexerTransaction {

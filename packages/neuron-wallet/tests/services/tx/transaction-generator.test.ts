@@ -1,15 +1,16 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import { OutputStatus, TargetOutput } from '../../../src/services/tx/params';
+import { TargetOutput } from '../../../src/services/tx/params'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator from '../../../src/services/tx/transaction-generator'
 import LockUtils from '../../../src/models/lock-utils'
 import DaoUtils from '../../../src/models/dao-utils'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
-import { ScriptHashType, Script } from '../../../src/models/chain/script';
-import { TransactionWithoutHash } from '../../../src/models/chain/transaction';
+import { ScriptHashType, Script } from '../../../src/models/chain/script'
+import { TransactionWithoutHash } from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
+import { OutputStatus } from '../../../src/models/chain/output'
 
 const systemScript = {
   outPoint: {

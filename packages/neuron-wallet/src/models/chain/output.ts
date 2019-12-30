@@ -3,13 +3,21 @@ import { OutPointInterface } from './out-point'
 import OutPoint from './out-point'
 import HexUtils from 'utils/hex'
 
+export enum OutputStatus {
+  Sent = 'sent',
+  Live = 'live',
+  Pending = 'pending',
+  Dead = 'dead',
+  Failed = 'failed',
+}
+
 export interface OutputInterface {
   capacity: string
   data?: string
   lock: ScriptInterface
   type?: ScriptInterface | null
   outPoint?: OutPointInterface
-  status?: string
+  status?: OutputStatus
   lockHash?: string
   typeHash?: string
   daoData?: string | null
@@ -26,7 +34,7 @@ export class Output implements OutputInterface {
   private _lock: Script
   private _type?: Script | null
   private _outPoint?: OutPoint
-  private _status?: string
+  private _status?: OutputStatus
   private _lockHash?: string
   private _typeHash?: string
   private _daoData?: string | null
@@ -102,7 +110,7 @@ export class Output implements OutputInterface {
     return this._outPoint
   }
 
-  public get status(): string | undefined {
+  public get status(): OutputStatus | undefined {
     return this._status
   }
 
