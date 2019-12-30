@@ -37,7 +37,6 @@ const Receive = ({
             <input readOnly value={accountAddress} onClick={copyAddress} />
             <button
               type="button"
-              title={t('receive.click-to-copy')}
               aria-label={t('receive.click-to-copy')}
               onClick={copyAddress}
               className={styles.copyBtn}
