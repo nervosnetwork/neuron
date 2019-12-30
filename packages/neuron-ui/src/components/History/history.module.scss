@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .history {
   // need more discussion
   // min-height: calc(100vh - 100px);
@@ -14,4 +16,9 @@
     flex-direction: column;
     justify-content: flex-end
   }
+}
+
+.noTxs {
+  @include MediumText;
+  padding: 20px 13px;
 }
