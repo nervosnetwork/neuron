@@ -114,13 +114,24 @@ $pending-color: #b3b3b3;
     }
 
     .txHash {
-      display: flex;
+      &>div {
+        display: flex;
 
-      @media screen and (max-width: 1080px) {
         span:first-of-type {
-          width: 50vw;
+          text-align: right;
         }
 
+        @media screen and (max-width: 1200px) {
+          span:first-of-type {
+            width: 40vw;
+          }
+        }
+
+        @media screen and (max-width: 1080px) {
+          span:first-of-type {
+            width: 30vw;
+          }
+        }
       }
     }
 
