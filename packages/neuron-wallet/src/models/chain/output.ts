@@ -57,7 +57,7 @@ export class Output implements OutputInterface {
     this._data = data
     this._lock = lock.constructor.name === 'Object' ? new Script(lock) : (lock as Script)
     this._lockHash = lockHash || this._lock.computeHash()
-    this._type = type?.constructor.name === 'Object' ? new Script(type) : (type as Script)
+    this._type = type ? (type.constructor.name === 'Object' ? new Script(type) : (type as Script)) : type
     this._typeHash = typeHash || this._type?.computeHash()
     this._outPoint = outPoint?.constructor.name === 'Object' ? new OutPoint(outPoint) : (outPoint as OutPoint)
     this._status = status
@@ -152,7 +152,7 @@ export class Output implements OutputInterface {
       capacity: this.capacity,
       data: this.data,
       lock: this.lock.toInterface(),
-      type: this.type?.toInterface(),
+      type: this.type ? this.type.toInterface() : this.type,
       lockHash: this.lockHash,
       typeHash: this.typeHash,
       outPoint: this.outPoint?.toInterface(),
@@ -170,7 +170,7 @@ export class Output implements OutputInterface {
     return {
       capacity: HexUtils.toHex(this.capacity),
       lock: this.lock.toSDK(),
-      type: this.type ? this.type.toSDK() : undefined
+      type: this.type ? this.type.toSDK() : this.type
     }
   }
 
@@ -178,7 +178,7 @@ export class Output implements OutputInterface {
     return new Output({
       capacity: output.capacity,
       lock: Script.fromSDK(output.lock),
-      type: output.type ? Script.fromSDK(output.type) : undefined,
+      type: output.type ? Script.fromSDK(output.type) : output.type,
     })
   }
 }
