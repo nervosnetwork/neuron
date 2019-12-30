@@ -31,8 +31,8 @@
       "epoch": "Epoch",
       "difficulty": "Difficulty",
       "address": "Address",
-      "confirmation": "{{confirmationCount}}/{{threshold}} Confirmation",
-      "confirmations": "{{confirmationCount}}/{{threshold}} Confirmations",
+      "confirmation": "{{confirmationCount}} Confirmation",
+      "confirmations": "{{confirmationCount}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
@@ -41,7 +41,8 @@
       "statusLabel": {
         "success": "Success",
         "failed": "Failed",
-        "pending": "Pending"
+        "pending": "Pending",
+        "confirming": "Confirming"
       }
     },
     "wizard": {
