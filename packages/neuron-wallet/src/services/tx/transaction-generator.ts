@@ -105,8 +105,7 @@ export class TransactionGenerator {
         },
       })
 
-      tx.outputs.push(output)
-      tx.outputsData!.push('0x')
+      tx.addOutput(output)
     }
 
     return tx
@@ -286,8 +285,7 @@ export class TransactionGenerator {
         },
       })
 
-      tx.outputs.push(changeOutput)
-      tx.outputsData!.push(changeOutput.data!)
+      tx.addOutput(changeOutput)
     }
 
     tx.fee = finalFee
@@ -463,8 +461,7 @@ export class TransactionGenerator {
         },
       })
 
-      tx.outputs.push(changeOutput)
-      tx.outputsData.push(changeOutput.data!)
+      tx.addOutput(changeOutput)
     }
 
     return tx

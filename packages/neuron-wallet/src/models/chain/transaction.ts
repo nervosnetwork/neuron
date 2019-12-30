@@ -230,6 +230,11 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     this._blockNumber = blockHeader.number
   }
 
+  public addOutput(output: Output) {
+    this._outputs.push(output)
+    this._outputsData.push(output.data || '0x')
+  }
+
   public toInterface(): TransactionWithoutHashInterface {
     return {
       version: this.version,
