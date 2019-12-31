@@ -85,7 +85,7 @@ const Addresses = ({
                     <span>{addr.address.slice(-6)}</span>
                   </div>
                 </td>
-                <td title={addr.description}>
+                <td title={addr.description} className={styles.description}>
                   <TextField
                     field="description"
                     data-description-key={addr.address}
