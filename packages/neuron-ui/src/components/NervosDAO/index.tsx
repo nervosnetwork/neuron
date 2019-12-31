@@ -253,6 +253,7 @@ const NervosDAO = ({
 
   return (
     <div className={styles.nervosDAOContainer}>
+      <h1 className={styles.walletName}>{wallet.name}</h1>
       <div className={styles.amount}>
         {lockAndFreeProperties.map(({ label, value }) => (
           <div key={label} title={label} aria-label={label} className={styles.amountProperty}>
