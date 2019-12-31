@@ -10,23 +10,23 @@ import { ScriptHashType } from '../../../src/models/chain/script'
 
 describe('IndexerTransaction', () => {
   const tx1: TransactionEntity = new TransactionEntity()
-  tx1.hash = '0x0001'
+  tx1.hash = '0x' + '0'.repeat(64)
   tx1.version = '0x0'
   tx1.cellDeps = []
   tx1.headerDeps = []
   tx1.witnesses = []
   tx1.timestamp = (+new Date()).toString()
   tx1.blockNumber = '0x1'
-  tx1.blockHash = '0x000001'
+  tx1.blockHash = '0x' + '0'.repeat(64)
   tx1.status = TransactionStatus.Success
   tx1.inputs = []
   tx1.outputs = []
 
   const tx1Input = new InputEntity()
-  tx1Input.outPointTxHash = '0x0000'
+  tx1Input.outPointTxHash = '0x' + '1'.repeat(64)
   tx1Input.outPointIndex = '0'
   tx1Input.since = '0'
-  tx1Input.lockHash = '0x'
+  tx1Input.lockHash = '0x' + '2'.repeat(64)
   tx1Input.capacity = '100'
   tx1.inputs.push(tx1Input)
 
@@ -43,14 +43,14 @@ describe('IndexerTransaction', () => {
 
 
   const tx2 = new TransactionEntity()
-  tx2.hash = '0x0002'
+  tx2.hash = '0x' + '2'.repeat(64)
   tx2.version = '0x0'
   tx2.cellDeps = []
   tx2.headerDeps = []
   tx2.witnesses = []
   tx2.timestamp = (+new Date()).toString()
   tx2.blockNumber = '0x2'
-  tx2.blockHash = '0x000002'
+  tx2.blockHash = '0x' + '0'.repeat(64)
   tx2.status = TransactionStatus.Success
   tx2.inputs = []
   tx2.outputs = []

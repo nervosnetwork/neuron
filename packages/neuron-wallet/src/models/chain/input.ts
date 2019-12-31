@@ -1,6 +1,7 @@
 import OutPoint, { OutPointInterface } from './out-point'
 import { ScriptInterface, Script } from './script'
 import HexUtils from 'utils/hex'
+import TypeChecker from 'utils/type-checker'
 
 export interface InputInterface {
   previousOutput: OutPointInterface | null
@@ -28,6 +29,9 @@ export class Input implements InputInterface {
     this._previousOutput = previousOutput ? (previousOutput instanceof OutPoint ? previousOutput : new OutPoint(previousOutput)) : previousOutput
     this._lock = lock ? (lock instanceof Script ? lock : new Script(lock)) : lock
     this._lockHash = this._lock?.computeHash()
+
+    TypeChecker.hashChecker(this._lockHash)
+    TypeChecker.numberChecker(this._since, this._capacity, this._inputIndex)
   }
 
   public get previousOutput(): OutPoint | null {

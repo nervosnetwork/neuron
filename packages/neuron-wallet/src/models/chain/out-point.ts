@@ -1,4 +1,5 @@
 import HexUtils from 'utils/hex'
+import TypeChecker from 'utils/type-checker'
 
 export interface OutPointInterface {
   txHash: string
@@ -13,6 +14,9 @@ export class OutPoint implements OutPointInterface {
   constructor({ txHash, index }: OutPointInterface) {
     this._txHash = txHash
     this._index = (+index).toString()
+
+    TypeChecker.hashChecker(this._txHash)
+    TypeChecker.numberChecker(this._index)
   }
 
   public get txHash(): string {

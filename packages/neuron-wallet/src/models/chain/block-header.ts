@@ -1,3 +1,5 @@
+import TypeChecker from "utils/type-checker"
+
 export interface BlockHeaderInterface {
   version: string
   timestamp: string
@@ -23,6 +25,9 @@ export class BlockHeader implements BlockHeaderInterface {
     this._parentHash = parentHash
     this._number = BigInt(number).toString()
     this._epoch = BigInt(epoch).toString()
+
+    TypeChecker.hashChecker(this._hash, this._parentHash)
+    TypeChecker.numberChecker(this._version, this._timestamp, this._number, this._epoch)
   }
 
   public get version(): string {

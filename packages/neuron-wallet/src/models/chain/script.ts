@@ -1,5 +1,6 @@
 import { scriptToHash } from "@nervosnetwork/ckb-sdk-utils"
 import HexUtils from 'utils/hex'
+import TypeChecker from "utils/type-checker"
 
 export enum ScriptHashType {
   Data = 'data',
@@ -21,6 +22,8 @@ export class Script implements ScriptInterface {
     this._args = args
     this._codeHash = codeHash
     this._hashType = hashType
+
+    TypeChecker.hashChecker(this._codeHash)
   }
 
   public get args(): string {

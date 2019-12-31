@@ -1,3 +1,5 @@
+import TypeChecker from 'utils/type-checker'
+
 export interface CellDataInterface {
   content: string,
   hash: string,
@@ -10,6 +12,8 @@ export class CellData implements CellDataInterface {
   constructor({ content, hash }: CellDataInterface) {
     this._content = content
     this._hash = hash
+
+    TypeChecker.hashChecker(this._hash)
   }
 
   public get content(): string {

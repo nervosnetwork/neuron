@@ -5,6 +5,7 @@ import { WitnessArgsInterface, WitnessArgs } from './witness-args'
 import HexUtils from 'utils/hex'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 import { BlockHeaderInterface, BlockHeader } from './block-header'
+import TypeCheckerUtils from 'utils/type-checker'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -109,6 +110,18 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
     this._timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
     this._createdAt = createdAt ? BigInt(createdAt).toString() : createdAt
     this._updatedAt = updatedAt ? BigInt(updatedAt).toString() : updatedAt
+
+    TypeCheckerUtils.hashChecker(...this._headerDeps, this._blockHash)
+    TypeCheckerUtils.numberChecker(
+      this._version,
+      this._value,
+      this._fee,
+      this._interest,
+      this._blockNumber,
+      this._timestamp,
+      this._createdAt,
+      this._updatedAt
+    )
   }
 
   public get version(): string {

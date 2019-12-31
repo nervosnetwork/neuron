@@ -1,3 +1,5 @@
+import TypeChecker from "utils/type-checker"
+
 export interface TransactionPointInterface {
   blockNumber: string
   txHash: string
@@ -13,6 +15,9 @@ export class TransactionPoint implements TransactionPointInterface {
     this._blockNumber = BigInt(blockNumber).toString()
     this._txHash = txHash
     this._index = (+index).toString()
+
+    TypeChecker.hashChecker(this._txHash)
+    TypeChecker.numberChecker(this._blockNumber, this._index)
   }
 
   public get blockNumber(): string {

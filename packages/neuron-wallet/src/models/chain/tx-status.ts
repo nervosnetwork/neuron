@@ -1,3 +1,5 @@
+import TypeCheckerUtils from "utils/type-checker"
+
 export enum TxStatusType {
   Pending = 'pending',
   Proposed = 'proposed',
@@ -16,6 +18,8 @@ export class TxStatus implements TxStatusInterface {
   constructor({ blockHash, status }: TxStatusInterface) {
     this._blockHash = blockHash
     this._status = status
+
+    TypeCheckerUtils.hashChecker(this._blockHash)
   }
 
   public get blockHash(): string | null {

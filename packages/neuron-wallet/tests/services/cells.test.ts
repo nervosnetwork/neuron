@@ -413,7 +413,7 @@ describe('CellsService', () => {
         tx.status = TransactionStatus.Success
         tx.witnesses = []
         tx.blockNumber = '1'
-        tx.blockHash = '0x10'
+        tx.blockHash = '0x' + '10'.repeat(32)
         return tx
       }
       beforeEach(async done => {

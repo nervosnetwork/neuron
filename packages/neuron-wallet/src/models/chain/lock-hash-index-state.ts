@@ -1,3 +1,5 @@
+import TypeChecker from "utils/type-checker"
+
 export interface LockHashIndexStateInterface {
   lockHash: string
   blockNumber: string
@@ -13,6 +15,9 @@ export class LockHashIndexState implements LockHashIndexStateInterface {
     this._lockHash = lockHash
     this._blockNumber = BigInt(blockNumber).toString()
     this._blockHash = blockHash
+
+    TypeChecker.hashChecker(this._lockHash, this._blockHash)
+    TypeChecker.numberChecker(this._blockNumber)
   }
 
   public get lockHash(): string {

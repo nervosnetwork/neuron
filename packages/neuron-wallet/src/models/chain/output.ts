@@ -2,6 +2,7 @@ import { ScriptInterface, Script } from './script'
 import { OutPointInterface } from './out-point'
 import OutPoint from './out-point'
 import HexUtils from 'utils/hex'
+import TypeChecker from 'utils/type-checker'
 
 export enum OutputStatus {
   Sent = 'sent',
@@ -79,6 +80,9 @@ export class Output implements OutputInterface {
     this._depositOutPoint = depositOutPoint ?
       (depositOutPoint instanceof OutPoint ? depositOutPoint : new OutPoint(depositOutPoint)) : depositOutPoint
     this._depositTimestamp = depositTimestamp ? BigInt(depositTimestamp).toString() : depositTimestamp
+
+    TypeChecker.hashChecker(this._lockHash, this._typeHash, this._blockHash)
+    TypeChecker.numberChecker(this._capacity, this._timestamp, this._blockNumber, this._depositTimestamp)
   }
 
   // getter
