@@ -24,7 +24,7 @@ const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
   const neuronWallet = useState()
   const {
     wallet: { name },
-    app: { tipBlockNumber = '0' },
+    app: { tipBlockNumber = '0', tipBlockTimestamp },
     chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
@@ -68,7 +68,11 @@ const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
         connectionStatus={connectionStatus}
         onAction={() => history.push(Routes.SettingsNetworks)}
       />
-      <SyncStatus tipBlockNumber={tipBlockNumber} syncedBlockNumber={syncedBlockNumber} />
+      <SyncStatus
+        tipBlockNumber={tipBlockNumber}
+        tipBlockTimestamp={tipBlockTimestamp}
+        syncedBlockNumber={syncedBlockNumber}
+      />
     </aside>
   )
 }

@@ -43,7 +43,8 @@
         "failed": "失败",
         "pending": "已提交",
         "confirming": "确认中"
-      }
+      },
+      "syncing": "同步中"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -321,6 +322,7 @@
     },
     "sync": {
       "synced": "同步完成",
+      "syncing": "同步中",
       "block-number": "区块高度"
     },
     "pagination": {

@@ -38,7 +38,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
   ) : null
 const PropertyList = ({
   properties,
-  cellStyles = { labelWidth: '100px', valueWidth: '200px', height: 'auto', color: 'inherit' },
+  cellStyles = { labelWidth: '100px', valueWidth: '280px', height: 'auto', color: 'inherit' },
 }: {
   properties: Property[]
   cellStyles?: CellStyles

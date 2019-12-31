@@ -14,7 +14,7 @@ import {
   uniformTimeFormatter,
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, MAX_TIP_BLOCK_DELAY } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -46,7 +46,7 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
 
 const Overview = ({
   dispatch,
-  app: { tipBlockNumber, chain, epoch, difficulty },
+  app: { tipBlockNumber, tipBlockTimestamp, chain, epoch, difficulty },
   wallet: { id, name, balance = '' },
   chain: {
     tipBlockNumber: syncedBlockNumber,
@@ -79,7 +79,9 @@ const Overview = ({
     () => [
       {
         label: t('overview.balance'),
-        value: `${shannonToCKBFormatter(balance)} CKB`,
+        value: `${shannonToCKBFormatter(balance)} CKB${
+          tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= Date.now() ? '' : `(${t('overview.syncing')})`
+        }`,
       },
     ],
     [t, balance]
