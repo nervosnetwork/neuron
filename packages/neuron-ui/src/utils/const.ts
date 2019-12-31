@@ -7,7 +7,7 @@ export const MIN_AMOUNT = 61
 export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
-export const CONFIRMATION_THRESHOLD = 30
+export const CONFIRMATION_THRESHOLD = 300
 
 export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'

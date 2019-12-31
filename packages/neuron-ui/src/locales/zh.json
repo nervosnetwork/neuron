@@ -31,8 +31,8 @@
       "epoch": "Epoch",
       "difficulty": "难度",
       "address": "地址",
-      "confirmation": "{{confirmationCount}}/{{threshold}} 个确认",
-      "confirmations": "{{confirmationCount}}/{{threshold}} 个确认",
+      "confirmation": "{{confirmationCount}} 个确认",
+      "confirmations": "{{confirmationCount}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
@@ -41,7 +41,8 @@
       "statusLabel": {
         "success": "成功",
         "failed": "失败",
-        "pending": "已提交"
+        "pending": "已提交",
+        "confirming": "确认中"
       }
     },
     "wizard": {
