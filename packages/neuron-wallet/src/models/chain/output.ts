@@ -31,7 +31,7 @@ export interface OutputInterface {
 
 export class Output implements OutputInterface {
   private _capacity: string
-  private _data?: string
+  private _data: string
   private _lock: Script
   private _type?: Script | null
   private _outPoint?: OutPoint
@@ -72,7 +72,7 @@ export class Output implements OutputInterface {
 
     // if daoData exists, data should equals to daoData
     this._daoData = daoData
-    this._data = this._daoData || data
+    this._data = this._daoData || data || '0x'
 
     this._timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
     this._blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
@@ -94,7 +94,7 @@ export class Output implements OutputInterface {
     this._capacity = value
   }
 
-  public get data(): string | undefined {
+  public get data(): string {
     return this._data
   }
 
