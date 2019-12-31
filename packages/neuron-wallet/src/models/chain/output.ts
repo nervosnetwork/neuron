@@ -33,11 +33,11 @@ export class Output implements OutputInterface {
   private _capacity: string
   private _data: string
   private _lock: Script
+  private _lockHash: string
   private _type?: Script | null
+  private _typeHash?: string
   private _outPoint?: OutPoint
   private _status?: OutputStatus
-  private _lockHash?: string
-  private _typeHash?: string
   private _daoData?: string | null
   private _timestamp?: string | null
   private _blockNumber?: string | null
@@ -118,7 +118,7 @@ export class Output implements OutputInterface {
     return this._status
   }
 
-  public get lockHash(): string | undefined {
+  public get lockHash(): string {
     return this._lockHash
   }
 
