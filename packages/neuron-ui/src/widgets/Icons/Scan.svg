@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.4 (67378) - http://www.bohemiancoding.com/sketch -->
-    <title>Receive_scan</title>
-    <desc>Created with Sketch.</desc>
+    <title>Scan</title>
     <g id="Receive_scan" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <path d="M1.34366925,4.81481481 L0,4.81481481 L0,0 L4.81481481,0 L4.81481481,1.25525898 L1.34366925,1.25525898 L1.34366925,4.81481481 Z M26,4.81481481 L24.6563307,4.81481481 L24.6563307,1.25525898 L21.1851852,1.25525898 L21.1851852,0 L26,0 L26,4.81481481 Z M4.81481481,26 L0,26 L0,21.1851852 L1.34366925,21.1851852 L1.34366925,24.744741 L4.81481481,24.744741 L4.81481481,26 Z M26,26 L21.1851852,26 L21.1851852,24.744741 L24.6563307,24.744741 L24.6563307,21.1851852 L26,21.1851852 L26,26 Z M0,13 L26,13 L26,13.962963 L0,13.962963 L0,13 Z" id="Shape-Copy" fill="#000000" fill-rule="nonzero"></path>
     </g>

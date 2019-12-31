@@ -18,17 +18,13 @@ import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
-const genTypeLabel = (
-  type: 'send' | 'receive',
-  confirmationCount: number,
-  status: 'pending' | 'success' | 'failed'
-) => {
+const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming' | 'success' | 'failed') => {
   switch (type) {
     case 'send': {
       if (status === 'failed') {
         return 'sent'
       }
-      if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
+      if (status === 'pending' || status === 'confirming') {
         return 'sending'
       }
       return 'sent'
@@ -37,7 +33,7 @@ const genTypeLabel = (
       if (status === 'failed') {
         return 'received'
       }
-      if (status === 'pending' || confirmationCount < CONFIRMATION_THRESHOLD) {
+      if (status === 'pending' || status === 'confirming') {
         return 'receiving'
       }
       return 'received'
@@ -133,22 +129,20 @@ const Overview = ({
             : 1 + Math.max(+syncedBlockNumber, +tipBlockNumber) - +item.blockNumber
 
         if (status === 'success' && confirmationCount < CONFIRMATION_THRESHOLD) {
-          status = 'pending'
+          status = 'confirming' as any
 
           if (confirmationCount === 1) {
             confirmations = t('overview.confirmation', {
               confirmationCount: localNumberFormatter(confirmationCount),
-              threshold: CONFIRMATION_THRESHOLD,
             })
           } else if (confirmationCount > 1) {
             confirmations = `${t('overview.confirmations', {
               confirmationCount: localNumberFormatter(confirmationCount),
-              threshold: CONFIRMATION_THRESHOLD,
             })}`
           }
         }
 
-        typeLabel = genTypeLabel(item.type, confirmationCount, status)
+        typeLabel = genTypeLabel(item.type, status)
       }
 
       return {

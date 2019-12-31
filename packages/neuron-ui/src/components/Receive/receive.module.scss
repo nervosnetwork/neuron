@@ -23,9 +23,16 @@
 .copyBtn {
   appearance: none;
   border: none;
+  background: transparent;
 
-  &:hover g {
-    stroke: var(--nervos-green);
+  &:hover {
+
+    g,
+    path {
+
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
   }
 }
 

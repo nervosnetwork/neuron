@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
+import { ReactComponent as EpochBtn } from 'widgets/Icons/EpochBtn.svg'
 import { ckbCore, getHeaderByNumber } from 'services/chain'
 import { showAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
@@ -173,43 +174,41 @@ const DAORecord = ({
   }, [onClick, epoch, depositEpoch, withdrawingEpoch, t, dispatch])
 
   return (
-    <div className={styles.daoRecord}>
-      <div className={styles.primaryInfo}>
-        <div className={styles.compensation}>
-          {compensation >= BigInt(0)
-            ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
-            : ''}
-        </div>
-        <div className={styles.depositAmount}>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
-        <div className={styles.actions}>
-          {depositOutPoint || !compensationPeriod || connectionStatus === 'offline' ? null : (
-            <span
-              data-stage={compensationStage}
-              data-block-hash={blockHash}
-              role="button"
-              className={styles.epochsDialogBtn}
-              onClick={onCompensationPeriodExplanationClick}
-              onKeyPress={onCompensationPeriodExplanationClick}
-              tabIndex={0}
-              aria-label={t('nervos-dao.explanation-of-epochs-period')}
-              title={t('nervos-dao.explanation-of-epochs-period')}
-            />
-          )}
-          <Button
-            type="primary"
-            data-tx-hash={txHash}
-            data-index={index}
-            onClick={onActionClick}
-            disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
-            label={actionLabel}
-          />
-        </div>
+    <div className={styles.container}>
+      <div className={styles.compensation}>
+        {compensation >= BigInt(0)
+          ? `${depositOutPoint ? '' : '~'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
+          : ''}
       </div>
-      <div className={styles.secondaryInfo}>
-        <span>{t('nervos-dao.deposit-at', { time: uniformTimeFormatter(+timestamp) })}</span>
-        <span>{`APC: ~${apc}%`}</span>
-        <span>{metaInfo}</span>
+      <div className={styles.depositAmount}>{`${shannonToCKBFormatter(capacity)} CKB`}</div>
+      {depositOutPoint || !compensationPeriod || connectionStatus === 'offline' ? null : (
+        <div
+          data-stage={compensationStage}
+          data-block-hash={blockHash}
+          role="button"
+          className={styles.epochsDialogBtn}
+          onClick={onCompensationPeriodExplanationClick}
+          onKeyPress={onCompensationPeriodExplanationClick}
+          tabIndex={0}
+          aria-label={t('nervos-dao.explanation-of-epochs-period')}
+          title={t('nervos-dao.explanation-of-epochs-period')}
+        >
+          <EpochBtn />
+        </div>
+      )}
+      <div className={styles.actions}>
+        <Button
+          type="primary"
+          data-tx-hash={txHash}
+          data-index={index}
+          onClick={onActionClick}
+          disabled={connectionStatus === 'offline' || (depositOutPoint && !ready)}
+          label={actionLabel}
+        />
       </div>
+      <time className={styles.time}>{uniformTimeFormatter(+timestamp)}</time>
+      <span className={styles.apc}>{`APC: ~${apc}%`}</span>
+      <span className={styles.info}>{metaInfo}</span>
     </div>
   )
 }

@@ -52,7 +52,7 @@ const Transaction = () => {
       }
       getTransaction({ hash, walletID: currentWallet.id })
         .then(res => {
-          if (res.status) {
+          if (res.status === 1) {
             setTransaction(res.result)
           } else {
             showErrorMessage(
@@ -218,10 +218,10 @@ const Transaction = () => {
         {t('history.basic-information')}
       </h2>
       <div className={styles.infoDetail} onContextMenu={onInfoContextMenu} data-tx-hash={transaction.hash}>
-        {basicInfoItems.map(({ label, value }) => (
+        {basicInfoItems.map(({ label, value }, idx) => (
           <div key={label}>
             <span>{label}</span>
-            <span>{value}</span>
+            <span className={!idx ? 'monospacedFont' : ''}>{value}</span>
           </div>
         ))}
       </div>

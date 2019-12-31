@@ -138,7 +138,7 @@ const TransactionList = ({
               </div>
               <div title={tx.hash} className={styles.txHash}>
                 <span>{t('history.transaction-hash')}</span>
-                <div className={`${styles.txHash} monospacedFont`}>
+                <div className="monospacedFont">
                   <span className="textOverflow">{tx.hash.slice(0, -6)}</span>
                   <span>{tx.hash.slice(-6)}</span>
                 </div>
@@ -155,7 +155,6 @@ const TransactionList = ({
                     onBlur={isSelected ? onDescriptionFieldBlur : undefined}
                     onKeyPress={isSelected ? onDescriptionPress : undefined}
                     onChange={isSelected ? onDescriptionChange : undefined}
-                    borderless
                     readOnly={!isSelected}
                     onDoubleClick={onDescriptionSelected}
                     className={styles.descriptionField}

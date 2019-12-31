@@ -21,6 +21,7 @@ interface DepositDialogProps {
   maxDepositAmount: bigint
   isDepositing: boolean
   errorMessage: string
+  isTxGenerated: boolean
 }
 
 const DepositDialog = ({
@@ -34,6 +35,7 @@ const DepositDialog = ({
   onDismiss,
   isDepositing,
   errorMessage,
+  isTxGenerated,
 }: DepositDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
@@ -89,7 +91,7 @@ const DepositDialog = ({
           </div>
           <div className={styles.footer}>
             <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
-            <Button type="submit" onClick={onSubmit} label={t('nervos-dao.proceed')} />
+            <Button type="submit" onClick={onSubmit} label={t('nervos-dao.proceed')} disabled={!isTxGenerated} />
           </div>
         </>
       )}

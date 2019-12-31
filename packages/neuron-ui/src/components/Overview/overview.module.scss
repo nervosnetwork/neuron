@@ -3,6 +3,7 @@
 $success-color: #3cc68a;
 $failed-color: #d50000;
 $pending-color: #b3b3b3;
+$confirming-color: #b3b3b3;
 
 .overview {
   display: grid;
@@ -152,6 +153,12 @@ section {
     }
 
     &[data-status="pending"]>div::after {
+      background-color: $pending-color;
+      filter: drop-shadow(0 0 1px $pending-color);
+      animation: blink 5s infinite;
+    }
+
+    &[data-status="confirming"]>div::after {
       background-color: $pending-color;
       filter: drop-shadow(0 0 1px $pending-color);
       animation: blink 5s infinite;

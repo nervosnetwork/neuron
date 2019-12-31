@@ -31,8 +31,8 @@
       "epoch": "Epoch",
       "difficulty": "难度",
       "address": "地址",
-      "confirmation": "{{confirmationCount}}/{{threshold}} 个确认",
-      "confirmations": "{{confirmationCount}}/{{threshold}} 个确认",
+      "confirmation": "{{confirmationCount}} 个确认",
+      "confirmations": "{{confirmationCount}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
@@ -41,7 +41,8 @@
       "statusLabel": {
         "success": "成功",
         "failed": "失败",
-        "pending": "已提交"
+        "pending": "已提交",
+        "confirming": "确认中"
       }
     },
     "wizard": {
@@ -145,7 +146,8 @@
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
-      "copy-transaction-hash": "复制交易哈希"
+      "copy-transaction-hash": "复制交易哈希",
+      "no-txs": "没有交易记录"
     },
     "transaction": {
       "date": "时间",
@@ -273,6 +275,7 @@
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
+      "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -297,6 +300,8 @@
         "102": "$t(messages.fields.{{fieldName}})无效。",
         "103": "$t(messages.fields.keystore-password) 不正确。",
         "104": "未连接到节点，请重启 Neuron。",
+        "105": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
+        "106": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",

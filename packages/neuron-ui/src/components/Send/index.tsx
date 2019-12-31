@@ -49,8 +49,8 @@ const Send = ({
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
-  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch)
-  useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage)
+  } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
+  useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
 
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage

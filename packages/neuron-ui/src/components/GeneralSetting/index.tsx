@@ -114,7 +114,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
             />
           ) : (
             <Button
-              label={t('updates.check-updates')}
+              label={t(`updates.${updater.checking ? 'checking-updates' : 'check-updates'}`)}
               type="default"
               onClick={checkUpdates}
               disabled={updater.checking}
@@ -140,7 +140,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
         <Stack horizontal horizontalAlign="start">
           <Button
             type="default"
-            label={t('settings.general-clear-cache')}
+            label={t(`settings.general.${clearingCache ? 'clearing-cache' : 'clear-cache'}`)}
             onClick={clearCache}
             disabled={clearingCache}
           >
