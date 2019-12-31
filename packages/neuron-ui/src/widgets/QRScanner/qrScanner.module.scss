@@ -5,8 +5,11 @@
   outline: none;
 
   &:hover {
-    g {
+
+    g,
+    path {
       stroke: var(--nervos-green);
+      fill: var(--nervos-green);
     }
   }
 }

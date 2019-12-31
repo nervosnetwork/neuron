@@ -25,13 +25,14 @@
   border: none;
   background: transparent;
 
-  svg {
-    pointer-events: none;
-  }
+  &:hover {
 
+    g,
+    path {
 
-  &:hover g {
-    stroke: var(--nervos-green);
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
   }
 }
 
