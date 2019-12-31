@@ -230,7 +230,7 @@ const NervosDAO = ({
         </div>
         <div>
           <span>Epoch length</span>
-          <span>{epochInfo.length}</span>
+          <span>{`${epochInfo.length}`}</span>
         </div>
         <div>
           <span>APC</span>
