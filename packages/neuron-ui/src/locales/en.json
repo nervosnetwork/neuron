@@ -43,7 +43,8 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      }
+      },
+      "syncing": "Syncing"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -321,6 +322,7 @@
     },
     "sync": {
       "synced": "Synced",
+      "syncing": "Syncing",
       "block-number": "block number"
     },
     "pagination": {
