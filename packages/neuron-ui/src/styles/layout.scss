@@ -26,6 +26,9 @@ footer {
   grid-area: content;
   overflow: auto;
   padding: 15px 30px;
+  &::-webkit-scrollbar{
+    display: none;
+  }
 }
 
 .notification {
