@@ -100,10 +100,12 @@ $textfieldWidth: calc(100vw - 370px);
 }
 
 .maxBtn {
-  width: 3.4375rem;
+  width: 3.125rem;
   height: 1.625rem;
   min-width: auto;
-  margin-top: 21px;
+  margin-top: 22px;
+  padding: 0;
+  line-height: auto;
 
   &[data-is-on=true] {
     color: rgba(255, 255, 255, 0.8) !important;
