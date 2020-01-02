@@ -121,6 +121,12 @@ $change-color: #6666cc;
 
   .descriptionField {
     @include descriptionField;
+
+    @media screen and (max-width: 1500px) {
+      input {
+        width: 100px;
+      }
+    }
   }
 
   .balance {
