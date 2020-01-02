@@ -149,8 +149,13 @@ $pending-color: #b3b3b3;
         text-align: right;
         padding: 0;
 
-        &::-webkit-input-placeholder {
-          font-size: 0.875rem;
+        &:focus {
+          padding: 0 7px;
+        }
+
+        &:not(:focus)::-webkit-input-placeholder {
+          padding-right: 7px;
+          font-size: 0.75rem;
           text-align: right;
         }
       }
