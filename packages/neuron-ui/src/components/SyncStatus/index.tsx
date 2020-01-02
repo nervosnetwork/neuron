@@ -2,13 +2,13 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from 'containers/Navbar/navbar.module.scss'
-import { MAX_TIP_BLOCK_DELAY } from 'utils/const'
+import { MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
 
 const SyncStatus = ({
   tipBlockNumber = '',
   tipBlockTimestamp = 0,
   syncedBlockNumber = '',
-  bufferBlockNumber = 10,
+  bufferBlockNumber = BUFFER_BLOCK_NUMBER,
 }: React.PropsWithoutRef<{
   tipBlockNumber: string
   tipBlockTimestamp: number
@@ -36,7 +36,7 @@ const SyncStatus = ({
 
   return (
     <div className={styles.sync}>
-      {+syncedBlockNumber + bufferBlockNumber < +tipBlockNumber ? (
+      {BigInt(syncedBlockNumber) + BigInt(bufferBlockNumber) < BigInt(tipBlockNumber) ? (
         <>
           <span>{percentage}</span>
           <progress max={tipBlockNumber} value={syncedBlockNumber} />
