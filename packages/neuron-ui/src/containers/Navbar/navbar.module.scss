@@ -12,11 +12,13 @@ $left-padding: 15px;
 }
 
 .name {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   grid-area: name;
-  font-size: 0.75rem;
-  padding: 20px 11px 25px 19px;
+  font-size: 1rem;
+  padding: 20px 15px;
   color: var(--nervos-green);
-  line-height: 1.33;
   letter-spacing: 0.53px;
   margin: 0;
 }
