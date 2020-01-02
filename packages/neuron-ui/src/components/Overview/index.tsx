@@ -14,7 +14,7 @@ import {
   uniformTimeFormatter,
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, MAX_TIP_BLOCK_DELAY } from 'utils/const'
+import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -80,11 +80,16 @@ const Overview = ({
       {
         label: t('overview.balance'),
         value: `${shannonToCKBFormatter(balance)} CKB${
-          tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= Date.now() ? '' : `(${t('overview.syncing')})`
+          +tipBlockNumber > 0 &&
+          BigInt(syncedBlockNumber) >= BigInt(0) &&
+          BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) >= BigInt(tipBlockNumber) &&
+          tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < Date.now()
+            ? `(${t('overview.syncing')})`
+            : ''
         }`,
       },
     ],
-    [t, balance]
+    [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp]
   )
   const blockchainStatusProperties = useMemo(
     () => [
