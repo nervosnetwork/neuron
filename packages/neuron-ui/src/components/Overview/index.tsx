@@ -77,22 +77,36 @@ const Overview = ({
 
   const now = Date.now()
 
-  const balanceProperties: Property[] = useMemo(
-    () => [
-      {
-        label: t('overview.balance'),
-        value: `${shannonToCKBFormatter(balance)} CKB${
+  const balanceProperties: Property[] = useMemo(() => {
+    const balanceValue = shannonToCKBFormatter(balance)
+    const [balanceInt, balanceDec] = balanceValue.split('.')
+    const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
+    const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
+    const balanceSuffixEl = (
+      <span>
+        {` CKB${
           +tipBlockNumber > 0 &&
           BigInt(syncedBlockNumber) >= BigInt(0) &&
           (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber) ||
             tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < now)
             ? `(${t('overview.syncing')})`
             : ''
-        }`,
+        }`}
+      </span>
+    )
+    return [
+      {
+        label: t('overview.balance'),
+        value: (
+          <>
+            {balanceIntEl}
+            {balanceDecEl}
+            {balanceSuffixEl}
+          </>
+        ),
       },
-    ],
-    [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp, now]
-  )
+    ]
+  }, [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp, now])
   const blockchainStatusProperties = useMemo(
     () => [
       {

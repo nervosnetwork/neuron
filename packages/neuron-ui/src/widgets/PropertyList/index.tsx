@@ -20,7 +20,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
     <div className={styles.propertyCell} style={{ height: item.height || 'auto' }} aria-label="property">
       <span
         className={styles.label}
-        style={{ width: item.labelWidth || 'auto', fontWeight: 600, fontSize: theme.fonts.small.fontSize }}
+        style={{ width: item.labelWidth || 'auto', fontSize: '1.125rem' }}
         title={item.label}
         aria-label={item.label}
       >
