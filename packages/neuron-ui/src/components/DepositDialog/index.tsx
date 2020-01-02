@@ -39,7 +39,7 @@ const DepositDialog = ({
 }: DepositDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show, dialogRef })
+  useDialog({ show, dialogRef, onClose: onDismiss })
 
   const rfcLink = useMemo(
     () => (

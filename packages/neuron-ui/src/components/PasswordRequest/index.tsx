@@ -20,14 +20,14 @@ const PasswordRequest = ({
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show: actionType, dialogRef })
-
-  const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
   const onDismiss = useCallback(() => {
     dispatch({
       type: AppActions.DismissPasswordRequest,
     })
   }, [dispatch])
+  useDialog({ show: actionType, dialogRef, onClose: onDismiss })
+
+  const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
   const onConfirm = useCallback(() => {
     switch (actionType) {
