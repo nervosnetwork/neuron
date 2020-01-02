@@ -18,7 +18,7 @@ interface CompensationPeriodDialogProps {
 const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: CompensationPeriodDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show: compensationPeriod, dialogRef })
+  useDialog({ show: compensationPeriod, dialogRef, onClose: onDismiss })
 
   let pastEpochs = 0
   if (compensationPeriod) {

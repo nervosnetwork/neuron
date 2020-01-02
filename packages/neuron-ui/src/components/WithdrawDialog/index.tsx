@@ -25,7 +25,7 @@ const WithdrawDialog = ({
   const [withdrawValue, setWithdrawValue] = useState('')
 
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show: record, dialogRef })
+  useDialog({ show: record, dialogRef, onClose: onDismiss })
 
   useEffect(() => {
     if (record) {

@@ -296,6 +296,6 @@ const NervosDAO = ({
   )
 }
 
-NervosDAO.displayName = 'NervosDAOao'
+NervosDAO.displayName = 'NervosDAO'
 
 export default NervosDAO
