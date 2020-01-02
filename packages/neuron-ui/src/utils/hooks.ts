@@ -125,19 +125,20 @@ export const useDialog = ({
   onClose: () => void
 }) => {
   useEffect(() => {
-    if (dialogRef.current) {
+    const ref = dialogRef.current
+    if (ref) {
       if (show) {
-        if (!dialogRef.current.open) {
-          dialogRef.current.showModal()
+        if (!ref.open) {
+          ref.showModal()
         }
       } else {
-        dialogRef.current.close()
+        ref.close()
       }
-      dialogRef.current.addEventListener('close', onClose)
+      ref.addEventListener('close', onClose)
     }
     return () => {
-      if (dialogRef.current) {
-        dialogRef.current.removeEventListener('close', onClose)
+      if (ref) {
+        ref.removeEventListener('close', onClose)
       }
     }
   }, [show, dialogRef, onClose])
