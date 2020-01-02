@@ -193,7 +193,7 @@ const Send = ({
       </div>
 
       <div className={styles.actions}>
-        <Button type="reset" onClick={onClear} disabled={isSendMax} label={t('send.clear')} />
+        <Button type="reset" onClick={onClear} label={t('send.clear')} />
         <Button
           type="submit"
           onClick={onSubmit(walletID)}

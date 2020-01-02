@@ -360,7 +360,8 @@
       "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs)",
       "explanation-of-epochs-period": "Compensation Period",
       "current-epochs-period": "Current Compensation Period",
-      "stage-of-current-epoch": "Progress: {{pastEpochs}} / {{totalEpochs}} epochs",
+      "progress": "Progress: ",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
       "left-time": "Left time: about {{leftDays}} days {{leftHours}} hours",
       "detailed-explanation-of-epochs-period": "A compensation period in Nervos DAO consists of 180 epochs (estimated 30 days). Users may apply unlock for their deposits any time during every compensation period, then withdraw their deposits and compensations when that compensation period ends. It is worth mentioning that the compensations will stop accumulating as soon as users apply unlock. So we suggest that users apply unlock for their deposits at a time that closes enough to the end of a compensation period.",
       "terms-in-explanation-of-epochs-period": "If you did not apply unlock during this compensation period, the next compensation period will start automatically.\nIt is suggested that users apply unlock during YELLOW epochs."

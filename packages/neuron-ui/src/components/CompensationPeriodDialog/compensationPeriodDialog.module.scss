@@ -35,6 +35,12 @@ $progress-indicator-offet: ($progress-bar-height - $progress-indicator-height) /
   margin: 0 0 12px 0;
 }
 
+.stage {
+  span:last-of-type {
+    font-weight: bold;
+  }
+}
+
 .epochsProgress {
   display: block;
   appearance: none;
@@ -66,14 +72,14 @@ $progress-indicator-offet: ($progress-bar-height - $progress-indicator-height) /
 .notes {
   margin: 19px 0 0 0;
   line-height: 1.4;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.5px;
 }
 
 .terms {
   list-style-type: disc;
   margin: 10px 0 28px 15px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
 
   li {
     padding-bottom: 5px;

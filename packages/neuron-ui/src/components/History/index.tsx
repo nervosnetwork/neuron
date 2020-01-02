@@ -56,7 +56,7 @@ const History = ({
               background: '#e3e3e3',
               border: 'none',
               borderRadius: 0,
-              fontSize: '0.75rem',
+              fontSize: '1rem',
               fontFamily: 'Montserrat-Regular',
             },
           }}
