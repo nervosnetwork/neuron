@@ -38,6 +38,11 @@ $confirming-color: #b3b3b3;
   grid-area: balance;
 }
 
+.balanceInt {
+  @include BoldText;
+  font-size: 1.125rem;
+}
+
 .blockchainStatus {
   grid-area: status;
   appearance: none;
