@@ -75,6 +75,8 @@ const Overview = ({
     history.push(Routes.History)
   }, [history])
 
+  const now = Date.now()
+
   const balanceProperties: Property[] = useMemo(
     () => [
       {
@@ -83,13 +85,13 @@ const Overview = ({
           +tipBlockNumber > 0 &&
           BigInt(syncedBlockNumber) >= BigInt(0) &&
           (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber) ||
-            tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < Date.now())
+            tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < now)
             ? `(${t('overview.syncing')})`
             : ''
         }`,
       },
     ],
-    [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp]
+    [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp, now]
   )
   const blockchainStatusProperties = useMemo(
     () => [
