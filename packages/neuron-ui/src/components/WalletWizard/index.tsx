@@ -318,7 +318,7 @@ const Submission = ({
         </div>
       ))}
 
-      <Stack className={styles.conditions}>
+      <Stack>
         <Stack horizontal tokens={{ childrenGap: 3 }}>
           {isNameUnused ? <Icon iconName="Matched" /> : <Icon iconName="Unmatched" />}
           <Text variant="xSmall">{t('wizard.new-name')}</Text>
