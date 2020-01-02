@@ -82,8 +82,8 @@ const Overview = ({
         value: `${shannonToCKBFormatter(balance)} CKB${
           +tipBlockNumber > 0 &&
           BigInt(syncedBlockNumber) >= BigInt(0) &&
-          BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) >= BigInt(tipBlockNumber) &&
-          tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < Date.now()
+          (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber) ||
+            tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < Date.now())
             ? `(${t('overview.syncing')})`
             : ''
         }`,
