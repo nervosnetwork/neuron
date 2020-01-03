@@ -162,6 +162,10 @@ $change-color: #6666cc;
   .descriptionField {
     @include descriptionField;
 
+    input {
+      font-size: 0.875rem;
+    }
+
     &>div {
       border: none;
     }
