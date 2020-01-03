@@ -28,7 +28,7 @@ const TextField = ({
   onChange?: (e: React.SyntheticEvent<HTMLInputElement>) => void
   onClick?: (e: React.SyntheticEvent<HTMLInputElement>) => void
   className?: string
-  suffix?: string | undefined
+  suffix?: string | React.ReactNode | undefined
   stack?: boolean
   required?: boolean
   readOnly?: boolean
