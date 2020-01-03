@@ -31,9 +31,10 @@ export class Block implements BlockInterface {
   }
 
   public static fromSDK(block: CKBComponents.Block): Block {
+    const header = BlockHeader.fromSDK(block.header)
     return new Block({
-      header: BlockHeader.fromSDK(block.header),
-      transactions: block.transactions.map(tx => Transaction.fromSDK(tx))
+      header,
+      transactions: block.transactions.map(tx => Transaction.fromSDK(tx, header))
     })
   }
 }

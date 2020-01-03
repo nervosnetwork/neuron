@@ -58,7 +58,7 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const cells = outputs.map(o => o.toInterface())
+    const cells: Output[] = outputs.map(o => o.toInterface())
 
     const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
 
