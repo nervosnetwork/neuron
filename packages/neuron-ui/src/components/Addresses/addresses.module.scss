@@ -59,8 +59,7 @@ $change-color: #6666cc;
 
 
   .type {
-    min-width: 150px;
-    width: 150px;
+    width: 100px;
     word-wrap: none;
   }
 
@@ -85,6 +84,25 @@ $change-color: #6666cc;
       display: flex;
       position: relative;
 
+      .addressOverflow {
+        word-break: break-all;
+        text-align: right;
+        height: 1rem;
+        overflow: hidden;
+        text-align: right;
+      }
+
+      .ellipsis {
+        display: none;
+      }
+
+      @media screen and (max-width: 1365px) {
+
+        .ellipsis {
+          display: inline;
+        }
+      }
+
       @media screen and (max-width: 1680px) {
         width: 30vw;
 
@@ -108,9 +126,6 @@ $change-color: #6666cc;
         width: 20vw;
       }
 
-      @media screen and (max-width: 1160px) {
-        width: 10vw;
-      }
 
     }
   }

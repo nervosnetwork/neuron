@@ -86,7 +86,8 @@ const Addresses = ({
                 </td>
                 <td className={`${styles.address} monospacedFont`}>
                   <div data-address={addr.address}>
-                    <span className="textOverflow">{addr.address.slice(0, -6)}</span>
+                    <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                    <span className={styles.ellipsis}>...</span>
                     <span>{addr.address.slice(-6)}</span>
                   </div>
                 </td>
