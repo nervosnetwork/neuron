@@ -27,6 +27,13 @@ import RpcService from 'services/rpc-service'
 import { BlockHeader } from 'models/chain/block-header'
 import { DepType } from 'models/chain/cell-dep'
 
+interface SignInfo {
+  witnessArgs: WitnessArgs
+  lockHash: string
+  witness: string
+  blake160: string
+}
+
 export default class TransactionSender {
   private walletService: WalletService
 
@@ -56,7 +63,7 @@ export default class TransactionSender {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries = tx.inputs.map((input: Input, index: number) => {
+    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
       const blake160: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
       const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
@@ -78,8 +85,8 @@ export default class TransactionSender {
 
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
 
-      const serializedWitnesses = witnessesArgs
-        .map((value: any, index: number) => {
+      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
+        .map((value: SignInfo, index: number) => {
           const args = value.witnessArgs
           if (index === 0) {
             return args
@@ -91,7 +98,12 @@ export default class TransactionSender {
         })
       const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
-        witnesses: serializedWitnesses
+        witnesses: serializedWitnesses.map(wit => {
+          if (typeof wit === 'string') {
+            return wit
+          }
+          return wit.toSDK()
+        })
       })
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
@@ -361,7 +373,7 @@ export default class TransactionSender {
       interest: (BigInt(outputCapacity) - depositCapacity).toString(),
     })
     if (mode.isFeeRateMode()) {
-      const txSize: number = TransactionSize.tx(tx) + TransactionSize.witness(withdrawWitnessArgs)
+      const txSize: number = TransactionSize.tx(tx)
       const txFee: bigint = TransactionFee.fee(txSize, BigInt(feeRate))
       tx.fee = txFee.toString()
       output.capacity = (outputCapacity - txFee).toString()

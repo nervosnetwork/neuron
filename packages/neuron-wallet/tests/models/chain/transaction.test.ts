@@ -2,6 +2,7 @@ import { TransactionInterface, TransactionStatus, Transaction } from '../../../s
 import { DepType } from '../../../src/models/chain/cell-dep'
 import { ScriptHashType } from '../../../src/models/chain/script'
 import { WitnessArgs } from '../../../src/models/chain/witness-args'
+import { OutputStatus } from '../../../src/models/chain/output'
 
 describe('Transaction', () => {
   const hash = '0x' + '0'.repeat(64)
@@ -46,7 +47,7 @@ describe('Transaction', () => {
           txHash: hash,
           index: '0',
         },
-        status: 'live',
+        status: OutputStatus.Live,
         daoData: '0x',
       }
     ],
