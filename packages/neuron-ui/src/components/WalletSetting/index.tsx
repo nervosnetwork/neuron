@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
@@ -11,6 +11,7 @@ import { WalletWizardPath } from 'components/WalletWizard'
 
 import { openContextMenu, requestPassword } from 'services/remote'
 import { Routes, MnemonicAction } from 'utils/const'
+import { backToTop } from 'utils/animations'
 import styles from './walletSetting.module.scss'
 
 const buttons = [
@@ -38,6 +39,9 @@ const WalletSetting = ({
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    backToTop()
+  }, [])
 
   const onChange = useCallback(
     (_e, option) => {

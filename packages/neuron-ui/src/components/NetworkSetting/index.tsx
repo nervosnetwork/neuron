@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
@@ -9,6 +9,7 @@ import chainState from 'states/initStates/chain'
 import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
 import { Routes } from 'utils/const'
+import { backToTop } from 'utils/animations'
 import styles from './networkSetting.module.scss'
 
 const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
@@ -31,6 +32,9 @@ const NetworkSetting = ({
   history,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    backToTop()
+  }, [])
 
   const onChoiceChange = useCallback((_e, option?: IChoiceGroupOption) => {
     if (option) {
