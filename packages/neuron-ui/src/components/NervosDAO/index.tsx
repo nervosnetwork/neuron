@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, TooltipHost } from 'office-ui-fabric-react'
@@ -9,8 +9,8 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
 import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
-
 import { epochParser } from 'utils/parsers'
+import { backToTop } from 'utils/animations'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -38,6 +38,9 @@ const NervosDAO = ({
   chain: { connectionStatus },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    backToTop()
+  }, [])
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
