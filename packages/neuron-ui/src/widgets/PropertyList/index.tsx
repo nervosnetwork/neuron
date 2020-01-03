@@ -29,7 +29,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
       <span
         className={styles.value}
         style={{ width: item.valueWidth || 'auto', fontSize: theme.fonts.small.fontSize, textAlign: 'right' }}
-        title={`${item.value}`}
+        title={typeof item.value === 'string' ? `${item.value}` : ''}
         aria-label={item.label}
       >
         {item.value}
