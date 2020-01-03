@@ -50,6 +50,7 @@ $confirming-color: #b3b3b3;
   width: 220px;
   padding: 0;
   position: relative;
+  background-color: transparent;
 
   &>div {
     @include MediumText;
