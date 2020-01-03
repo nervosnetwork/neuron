@@ -157,9 +157,9 @@ const TransactionList = ({
                     onKeyPress={isSelected ? onDescriptionPress : undefined}
                     onChange={isSelected ? onDescriptionChange : undefined}
                     readOnly={!isSelected}
-                    onDoubleClick={onDescriptionSelected}
+                    onClick={onDescriptionSelected}
                     className={styles.descriptionField}
-                    placeholder={t('common.double-click-to-edit')}
+                    placeholder={t('common.click-to-edit')}
                   />
                 </span>
               </div>
