@@ -255,7 +255,7 @@
       "backup": "Backup",
       "edit": "Edit",
       "delete": "Delete",
-      "double-click-to-edit": "Double click to edit"
+      "click-to-edit": "Click to edit"
     },
     "notification-panel": {
       "title": "Notifications"

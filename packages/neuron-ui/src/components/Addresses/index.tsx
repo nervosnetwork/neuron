@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
 
 import { openExternal, openContextMenu } from 'services/remote'
@@ -104,7 +105,21 @@ const Addresses = ({
                     readOnly={!isSelected}
                     onDoubleClick={onDescriptionSelected}
                     className={styles.descriptionField}
-                    placeholder={t('common.double-click-to-edit')}
+                    suffix={
+                      isSelected ? (
+                        undefined
+                      ) : (
+                        <button
+                          type="button"
+                          data-description-key={addr.address}
+                          data-description-value={addr.description}
+                          onClick={onDescriptionSelected}
+                          className={styles.editBtn}
+                        >
+                          <Edit size="0.875rem" />
+                        </button>
+                      )
+                    }
                   />
                 </td>
                 <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>

@@ -255,7 +255,7 @@
       "backup": "备份",
       "edit": "编辑",
       "delete": "删除",
-      "double-click-to-edit": "双击编辑"
+      "click-to-edit": "点击编辑"
     },
     "notification-panel": {
       "title": "通知中心"

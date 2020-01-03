@@ -156,17 +156,19 @@ $pending-color: #b3b3b3;
     .descriptionField {
       @include descriptionField;
 
+      &>div {
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+      }
+
       input {
         font-size: 0.875rem;
         text-align: right;
         padding: 0;
-
-        &:focus {
-          padding: 0 7px;
-        }
+        border: none;
 
         &:not(:focus)::-webkit-input-placeholder {
-          padding-right: 7px;
           font-size: 0.75rem;
           text-align: right;
         }

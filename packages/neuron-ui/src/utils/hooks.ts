@@ -90,6 +90,14 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
           payload: false,
         })
         setLocalDescription({ key, description: originDesc })
+        try {
+          const input = document.querySelector<HTMLInputElement>(`input[data-description-key="${key}"]`)
+          if (input) {
+            input.focus()
+          }
+        } catch (err) {
+          console.warn(err)
+        }
       }
     },
     [setLocalDescription, dispatch]
