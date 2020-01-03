@@ -6,7 +6,7 @@ import { TxSaveType } from './params'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
-import { Transaction, TransactionStatus, TransactionWithoutHash, TransactionWithoutHashInterface } from 'models/chain/transaction'
+import { Transaction, TransactionStatus, TransactionWithoutHash } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import { OutputStatus } from 'models/chain/output'
 
@@ -304,7 +304,7 @@ export class TransactionPersistor {
     txHash: string
   ): Promise<TransactionEntity> => {
     const tx = new Transaction({
-      ...(transaction as TransactionWithoutHashInterface),
+      ...transaction.toInterface(),
       hash: txHash,
     })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)

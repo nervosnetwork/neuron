@@ -56,10 +56,10 @@ export default class TransactionSender {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries = tx.inputs!.map((input: Input, index: number) => {
+    const witnessSigningEntries = tx.inputs.map((input: Input, index: number) => {
       const blake160: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
-      const witnessArgs: WitnessArgs = typeof wit === 'string' ? WitnessArgs.generateEmpty() : wit
+      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
       return {
         // TODO: fill in required DAO's type witness here
         witnessArgs,

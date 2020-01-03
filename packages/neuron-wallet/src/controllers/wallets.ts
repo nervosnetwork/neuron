@@ -280,7 +280,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx = await new TransactionSender().generateTx(
+    const tx: TransactionWithoutHash = await new TransactionSender().generateTx(
       params.walletID,
       params.items,
       params.fee,
@@ -288,7 +288,7 @@ export default class WalletsController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 
@@ -299,7 +299,7 @@ export default class WalletsController {
     const addresses: string[] = params.items.map(i => i.address)
     this.checkAddresses(addresses)
 
-    const tx = await new TransactionSender().generateSendingAllTx(
+    const tx: TransactionWithoutHash = await new TransactionSender().generateSendingAllTx(
       params.walletID,
       params.items,
       params.fee,
@@ -307,7 +307,7 @@ export default class WalletsController {
     )
     return {
       status: ResponseCode.Success,
-      result: tx,
+      result: tx.toInterface(),
     }
   }
 
