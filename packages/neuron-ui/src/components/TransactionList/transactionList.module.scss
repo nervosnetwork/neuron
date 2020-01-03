@@ -117,18 +117,30 @@ $pending-color: #b3b3b3;
       &>div {
         display: flex;
 
-        span:first-of-type {
+        .hashOverflow {
+          word-break: break-all;
+          text-align: right;
+          height: 1rem;
+          overflow: hidden;
           text-align: right;
         }
 
+        .ellipsis {
+          display: none;
+        }
+
         @media screen and (max-width: 1200px) {
-          span:first-of-type {
+          .hashOverflow {
             width: 40vw;
+          }
+
+          .ellipsis {
+            display: inline
           }
         }
 
         @media screen and (max-width: 1080px) {
-          span:first-of-type {
+          .hashOverflow {
             width: 30vw;
           }
         }

@@ -173,8 +173,8 @@
       "description": "Description",
       "balance": "Balance",
       "transactions": "Transactions",
-      "receiving-address": "Receiving Address",
-      "change-address": "Change Address",
+      "receiving-address": "Receiving",
+      "change-address": "Change",
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
       "view-on-explorer": "View on Explorer"
