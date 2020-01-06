@@ -11,9 +11,13 @@
       "history": "交易历史",
       "addresses": "地址管理",
       "settings": "设置",
-      "nervos-dao": "Nervos DAO"
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "未连接到节点",
+      "sync-not-start": "同步尚未开始"
     },
     "overview": {
+      "date": "日期",
+      "type": "类型",
       "balance": "余额",
       "recent-activities": "最近收支",
       "no-recent-activities": "没有收支记录",
@@ -27,8 +31,8 @@
       "epoch": "Epoch",
       "difficulty": "难度",
       "address": "地址",
-      "confirmation": "{{confirmationCount}}/{{threshold}} 个确认",
-      "confirmations": "{{confirmationCount}}/{{threshold}} 个确认",
+      "confirmation": "{{confirmationCount}} 个确认",
+      "confirmations": "{{confirmationCount}} 个确认",
       "sent": "已发送",
       "sending": "正在发送",
       "received": "已收款",
@@ -37,8 +41,10 @@
       "statusLabel": {
         "success": "成功",
         "failed": "失败",
-        "pending": "已提交"
-      }
+        "pending": "已提交",
+        "confirming": "确认中"
+      },
+      "syncing": "同步中"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -127,7 +133,7 @@
       "previous": "前一页",
       "next": "后一页",
       "last": "最后一页",
-      "description": "标签",
+      "description": "备注",
       "status": "状态",
       "pending": "已提交",
       "success": "成功",
@@ -141,7 +147,8 @@
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
-      "copy-transaction-hash": "复制交易哈希"
+      "copy-transaction-hash": "复制交易哈希",
+      "no-txs": "没有交易记录"
     },
     "transaction": {
       "date": "时间",
@@ -163,14 +170,11 @@
       "type": "类型",
       "address": "地址",
       "identifier": "标志",
-      "description": "标签",
+      "description": "备注",
       "balance": "余额",
       "transactions": "交易总数",
       "receiving-address": "收款地址",
       "change-address": "找零地址",
-      "display-testnet-addresses": "显示测试网地址",
-      "display-mainnet-addresses": "显示主网地址",
-      "mainnet-address-caution": "请注意, 当前显示的是主网地址",
       "copy-address": "复制地址",
       "request-payment": "请求支付",
       "view-on-explorer": "在浏览器中查看"
@@ -234,12 +238,9 @@
       "copy": "复制图片",
       "save": "保存图片"
     },
-    "footer": {
-      "fail-to-fetch-tip-block-number": "无法获取最新高度",
-      "sync-not-start": "同步尚未开始"
-    },
     "common": {
       "or": "或",
+      "ok": "确认",
       "confirm": "确认",
       "open": "打开",
       "cancel": "取消",
@@ -253,7 +254,8 @@
       "select": "选择",
       "backup": "备份",
       "edit": "编辑",
-      "delete": "删除"
+      "delete": "删除",
+      "click-to-edit": "点击编辑"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -274,6 +276,7 @@
       "addr-copied": "已复制地址到剪贴板",
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
+      "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -290,35 +293,36 @@
         "keystore-password": "密码",
         "deposit": "存入金额"
       },
-      "mainnet-address-required": "请输入主网地址",
-      "testnet-address-required": "请输出测试网地址",
       "run-ckb-guide": "如何运行一个 CKB 节点?",
       "codes": {
         "-3": "",
-        "100": "余额不足",
-        "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 61 CKB 的值",
-        "102": "$t(messages.fields.{{fieldName}})无效",
-        "103": "$t(messages.fields.keystore-password) 不正确",
-        "104": "未连接到节点",
-        "201": "缺少$t(messages.fields.{{fieldName}})",
-        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用",
-        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}",
-        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短, 其长度应不小于 {{length}}",
-        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效",
-        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其小数位应不超过 {{length}} 位",
-        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值不能为负数",
-        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值应以 http(s):// 开始",
-        "209": "$t(messages.fields.{{fieldName}})不能包含空格",
-        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除",
-        "302": "无法启动应用",
-        "303": "未找到$t(messages.fields.{{fieldName}})",
-        "304": "摄像头不可用或被禁用",
-        "305": "$t(messages.fields.address)不能为空"
+        "100": "余额不足。",
+        "101": "金额 {{amount}} CKB 太小, 请输入一个不小于 61 CKB 的值。",
+        "102": "$t(messages.fields.{{fieldName}})无效。",
+        "103": "$t(messages.fields.keystore-password) 不正确。",
+        "104": "未连接到节点，请重启 Neuron。",
+        "105": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
+        "106": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
+        "201": "缺少$t(messages.fields.{{fieldName}})。",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短, 其长度应不小于 {{length}}。",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效。",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其小数位应不超过 {{length}} 位。",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值不能为负数。",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值应以 http(s):// 开始。",
+        "209": "$t(messages.fields.{{fieldName}})不能包含空格。",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
+        "303": "未找到$t(messages.fields.{{fieldName}})。",
+        "304": "摄像头不可用或被禁用。",
+        "305": "$t(messages.fields.address)不能为空。",
+        "306": "请输入主网地址",
+        "307": "请输出测试网地址"
       }
     },
     "sync": {
-      "syncing": "同步中",
       "synced": "同步完成",
+      "syncing": "同步中",
       "block-number": "区块高度"
     },
     "pagination": {
@@ -344,6 +348,7 @@
       "proceed": "继续",
       "compensation": "锁定补贴",
       "notice-wait-time": "注意: 您需要等待 {{epochs}} epochs {{blocks}} 区块(约 {{days}} 天)完成最终取出操作。",
+      "deposit-dialog-title": "存入 Nervos DAO",
       "deposit-terms": "Nervos DAO 需要 102 CKBytes 作为锁定记录的存储，这部分 CKBytes 是无法产生锁定补贴的。请查看 <0>Nervos DAO RFC</0> 以了解 Nervos DAO 更多信息。",
       "deposited-action-label": "申请取出",
       "withdrawing-action-label": "取出",
@@ -352,7 +357,14 @@
       "blocks-left": " 还需等待 {{epochs}} epochs {{blocks}} 个块(约 {{days}} 天)",
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
       "insufficient-period-alert-title": "Header 引用无效",
-      "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期为 4 个 epochs)"
+      "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期为 4 个 epochs，约 16 小时)",
+      "explanation-of-epochs-period": "补偿周期说明",
+      "current-epochs-period": "当前补偿周期",
+      "progress": "进度: ",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
+      "left-time": "距离结束时间: 约 {{leftDays}} 天 {{leftHours}} 小时",
+      "detailed-explanation-of-epochs-period": "Nervos DAO 以每 180 个 epoch 作为一个补偿周期（约 30 天）。在每一个补偿周期内，用户可以随时发起取出申请，并在本补偿周期结束后完成取款。需要注意的是，用户发出申请后，补偿周期结束前的区块补偿将不会被累加到用户的取款金额中。因此，建议您在补偿周期接近结束时再提交取出申请，这样获得的区块补偿会更多。",
+      "terms-in-explanation-of-epochs-period": "如果在当前补偿周期内没有提出取出申请，下一个补偿周期将自动开始，无需手动操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建议您在黄色区域发起取出申请。"
     },
     "updates": {
       "check-updates": "检查更新",

@@ -1,4 +1,7 @@
 @import './layout.scss';
+@import './font.scss';
+@import './color.scss';
+@import './mixin.scss';
 
 * {
   user-select: none;
@@ -24,22 +27,16 @@ html {
 }
 
 body {
+  @include RegularText;
   margin: 0;
   padding: 0;
-  background: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background: #f8f8f8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 navbar {
   border-bottom: solid 1px #ccc;
-}
-
-.main-content {
-  background-color: white;
 }
 
 .label {
@@ -100,6 +97,10 @@ navbar {
       align-items: center;
       display: none;
       background-color: transparent;
+
+      span {
+        pointer-events: none;
+      }
     }
 
     &:hover {
@@ -113,8 +114,66 @@ navbar {
 }
 
 .textOverflow {
+  word-break: keep-all;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+
+// hack fabric toggle
+.ms-Toggle.is-checked .ms-Toggle-background {
+  background: var(--nervos-green) !important;
+}
+
+// hack search field
+.ms-SearchBox.is-active,
+.ms-TextField.is-active {
+  border-color: var(--nervos-green) !important;
+
+  .ms-TextField-fieldGroup {
+    border-color: var(--nervos-green) !important;
+  }
+}
+
+.ms-SearchBox-iconContainer {
+  color: var(--nervos-green);
+}
+
+// hack fabric pivot
+.ms-Pivot-link.is-selected:before {
+  background-color: var(--nervos-green);
+}
+
+
+// hack fabric choice field
+.ms-ChoiceField-field.is-checked {
+
+  &::before,
+  &::after {
+    border-color: var(--nervos-green);
+  }
+}
+
+// hack fabric slider
+.ms-Slider-active {
+  background: var(--nervos-green) !important;
+}
+
+.ms-Slider-inactive {
+  background: rgb(200, 198, 196) !important;
+}
+
+.ms-Slider-thumb {
+  background: var(--nervos-green) !important;
+  border: none !important;
+  top: -4px;
+  width: 12px;
+  height: 12px;
+
+  &:hover {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  }
 }
 
 // hack fabric ui experimental pagination style

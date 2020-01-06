@@ -1,8 +1,8 @@
-import { startCkbNode, stopCkbNode } from 'startup/ckb-runner'
+import { startCkbNode, stopCkbNode } from 'services/ckb-runner'
 import { ResponseCode } from 'utils/const'
 
 export default class NodeController {
-  public static async startNode() {
+  public async startNode() {
     await startCkbNode()
 
     return {
@@ -11,7 +11,7 @@ export default class NodeController {
     }
   }
 
-  public static stopNode() {
+  public stopNode() {
     stopCkbNode()
 
     return {

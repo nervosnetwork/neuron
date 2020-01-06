@@ -4,7 +4,6 @@ export enum LocalCacheKey {
   Wallets = 'wallets',
   CurrentWallet = 'currentWallet',
   CurrentNetworkID = 'currentNetworkID',
-  SystemScript = 'systemScript',
 }
 
 export const addresses = {
@@ -106,22 +105,6 @@ export const currentNetworkID = {
   },
 }
 
-export const systemScript = {
-  save: ({ codeHash = '' }: { codeHash: string }) => {
-    window.localStorage.setItem(LocalCacheKey.SystemScript, JSON.stringify({ codeHash }))
-    return true
-  },
-  load: (): { codeHash: string } => {
-    try {
-      const systemScriptStr = window.localStorage.getItem(LocalCacheKey.SystemScript) || `{codeHash: ''}`
-      return JSON.parse(systemScriptStr)
-    } catch {
-      console.error(`Cannot parse system script`)
-      return { codeHash: '' }
-    }
-  },
-}
-
 export default {
   LocalCacheKey,
   addresses,
@@ -129,5 +112,4 @@ export default {
   wallets,
   currentWallet,
   currentNetworkID,
-  systemScript,
 }

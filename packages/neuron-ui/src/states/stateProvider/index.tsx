@@ -2,7 +2,7 @@ import React, { createContext, useReducer, useContext } from 'react'
 import initStates from 'states/initStates'
 import { StateDispatch, reducer } from './reducer'
 
-export const NeuronWalletContext = createContext<typeof initStates>(initStates)
+export const NeuronWalletContext = createContext<State.AppWithNeuronWallet>(initStates)
 
 const withProviders = (Comp: React.ComponentType<{ dispatch: StateDispatch }>) => (props: React.Props<any>) => {
   const [providers, dispatch] = useReducer(reducer, initStates)

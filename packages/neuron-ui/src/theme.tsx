@@ -2,7 +2,6 @@ import React from 'react'
 import { loadTheme, getTheme } from 'office-ui-fabric-react'
 
 import {
-  AddCircle as AddIcon,
   Alert as AlertIcon,
   Checkmark as SuccessIcon,
   CircleInformation as InfoIcon,
@@ -11,7 +10,6 @@ import {
   Copy as CopyIcon,
   Domain as ExplorerIcon,
   Down as ArrowDownIcon,
-  FormEdit as EditIcon,
   FormClose as ClearIcon,
   FormAdd as CreateIcon,
   FormPreviousLink as LeaveIcon,
@@ -28,7 +26,6 @@ import {
   Search as SearchIcon,
   SettingsOption as SettingsIcon,
   StatusGood as MatchedIcon,
-  SubtractCircle as RemoveIcon,
   Update as UpdateIcon,
   Update as PendingIcon,
 } from 'grommet-icons'
@@ -62,7 +59,7 @@ registerIcons({
     completed: <SuccessIcon size="16px" />,
     cancel: <DismissIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" color={semanticColors.primaryButtonBackground} />,
-    Search: <SearchIcon size="16px" color={semanticColors.menuIcon} />,
+    Search: <SearchIcon size="16px" color="#000" />,
     FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
@@ -72,11 +69,6 @@ registerIcons({
     Scan: <ScanIcon />,
     Import: <ImportIcon color="white" />,
     Create: <CreateIcon />,
-    Add: <AddIcon style={{ marginTop: '-4px' }} />,
-    DisabledAdd: <AddIcon color="#a19f9d" style={{ marginTop: '-4px' }} />,
-    Remove: <RemoveIcon color="red" style={{ marginTop: '-4px' }} />,
-    DisabledRemove: <RemoveIcon color="#a19f9d" style={{ marginTop: '-4px' }} />,
-    Copy: <CopyIcon />,
     Clear: <ClearIcon size="16px" />,
     Dismiss: <DismissIcon size="16px" />,
     Leave: <LeaveIcon />,
@@ -90,7 +82,6 @@ registerIcons({
     TransactionFailure: <FailIcon size="14px" color="#d50000" />,
     TransactionPending: <PendingIcon size="14px" style={{ animation: 'rotate360 3s linear infinite' }} />,
     Keystore: <KeystoreIcon color="white" style={{ transform: 'scale(0.6)' }} />,
-    Edit: <EditIcon color="#000" size="20px" />,
     Settings: <SettingsIcon size="20px" />,
     Explorer: <ExplorerIcon size="16px" color="#FFF" />,
   },

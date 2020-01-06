@@ -1,0 +1,15 @@
+.scanBtn {
+  line-height: 1;
+  background: none;
+  border: none;
+  outline: none;
+
+  &:hover {
+
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
+}

@@ -131,6 +131,81 @@ describe('Key tests with db', () => {
     expect(final.length).toEqual((2 + 1) * 2 * 2)
   })
 
+  it('checkAndGenerateSave receiving and change', () => {
+    AddressDao.updateAll([])
+    AddressService.generateAndSave(walletId, extendedKey, undefined, 0, 0, 4, 4)
+
+    AddressDao.updateAll(
+      AddressDao.getAll()
+        .map(addr => {
+          if (addr.addressIndex <= 1) {
+            addr.txCount = 1
+          }
+          return addr
+        })
+    )
+
+    AddressService.checkAndGenerateSave(walletId, extendedKey, undefined, 4, 4)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Receiving).length
+    ).toEqual(16)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Change).length
+    ).toEqual(16)
+  })
+
+  it('checkAndGenerateSave only receiving', () => {
+    AddressDao.updateAll([])
+    AddressService.generateAndSave(walletId, extendedKey, undefined, 0, 0, 4, 4)
+
+    AddressDao.updateAll(
+      AddressDao.getAll()
+        .map(addr => {
+          if (addr.addressType === AddressType.Receiving && addr.addressIndex <= 1) {
+            addr.txCount = 1
+          }
+          return addr
+        })
+    )
+
+    AddressService.checkAndGenerateSave(walletId, extendedKey, undefined, 4, 4)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Receiving).length
+    ).toEqual(16)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Change).length
+    ).toEqual(8)
+  })
+
+  it('checkAndGenerateSave only change', () => {
+    AddressDao.updateAll([])
+    AddressService.generateAndSave(walletId, extendedKey, undefined, 0, 0, 4, 4)
+
+    AddressDao.updateAll(
+      AddressDao.getAll()
+        .map(addr => {
+          if (addr.addressType === AddressType.Change && addr.addressIndex <= 1) {
+            addr.txCount = 1
+          }
+          return addr
+        })
+    )
+
+    AddressService.checkAndGenerateSave(walletId, extendedKey, undefined, 4, 4)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Receiving).length
+    ).toEqual(8)
+
+    expect(
+      AddressDao.getAll().filter(addr => addr.addressType === AddressType.Change).length
+    ).toEqual(16)
+  })
+
   it('generateAndSave with two wallet', () => {
     generate()
     generate('2')

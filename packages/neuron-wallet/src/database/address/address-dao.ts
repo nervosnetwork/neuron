@@ -1,4 +1,3 @@
-import { remote } from 'electron'
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
@@ -83,6 +82,18 @@ export default class AddressDao {
 
     AddressStore.updateAll(toUpdate.concat(others))
     return toUpdate
+  }
+
+  public static resetAddresses = () => {
+    const all = AddressStore.getAll()
+    all.forEach(addr => {
+      addr.txCount = 0
+      addr.liveBalance = '0'
+      addr.sentBalance = '0'
+      addr.pendingBalance = '0'
+      addr.balance = '0'
+    })
+    AddressStore.updateAll(all)
   }
 
   public static nextUnusedAddress(walletId: string, version: AddressVersion): Address | undefined {
@@ -202,11 +213,6 @@ export default class AddressDao {
   }
 }
 
-const isRenderer = process && process.type === 'renderer'
-const addressDbChangedSubject = isRenderer
-  ? remote.require('./models/subjects/address-db-changed-subject').default.getSubject()
-  : AddressDbChangedSubject.getSubject()
-
 /// Persist all addresses as array in `addresses/index.json`.
 class AddressStore {
   static MODULE_NAME = 'addresses'
@@ -251,6 +257,6 @@ class AddressStore {
   }
 
   static changed() {
-    addressDbChangedSubject.next("Updated")
+    AddressDbChangedSubject.getSubject().next("Updated")
   }
 }

@@ -11,6 +11,7 @@ import {
   toggleTopAlertVisibility,
   dismissNotification,
 } from 'states/stateProvider/actionCreators'
+import AlertDialog from 'widgets/AlertDialog'
 import { ErrorCode, RUN_NODE_GUIDE_URL } from 'utils/const'
 import styles from './Notification.module.scss'
 
@@ -61,7 +62,7 @@ const TopAlertActions = ({
 
 export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const {
-    app: { notifications = [], popups = [], showTopAlert = false, showAllNotifications = false },
+    app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
   } = useContext(NeuronWalletContext)
   const [t] = useTranslation()
 
@@ -174,6 +175,7 @@ export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispa
           )
         })}
       </Panel>
+      <AlertDialog content={alertDialog} dispatch={dispatch} />
     </div>
   )
 }

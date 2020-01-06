@@ -23,35 +23,6 @@ export const getWinID = () => {
   return window.remote.getCurrentWindow().id
 }
 
-export const validateMnemonic = (mnemonic: string): boolean => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return true
-  }
-  // TODO: use api controller, do NOT require models
-  const { validateMnemonic: remoteValidateMnemonic } = window.remote.require('./models/keys/mnemonic')
-  return remoteValidateMnemonic(mnemonic)
-}
-
-export const generateMnemonic = (): string => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    return ''
-  }
-  // TODO: use api controller, do NOT require models
-  const { generateMnemonic: remoteGenerateMnemonic } = window.remote.require('./models/keys/key')
-  return remoteGenerateMnemonic()
-}
-
-export const showMessage = (options: any, callback: Function) => {
-  if (!window.remote) {
-    console.warn(REMOTE_MODULE_NOT_FOUND)
-    window.alert(options.message)
-  } else {
-    window.remote.require('electron').dialog.showMessageBox(options, callback)
-  }
-}
-
 export const showErrorMessage = (title: string, content: string) => {
   if (!window.remote) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
@@ -61,17 +32,12 @@ export const showErrorMessage = (title: string, content: string) => {
   }
 }
 
-export const showOpenDialog = (opt: { title: string; message?: string; onUpload: Function }) => {
+export const showOpenDialog = (options: { title: string; message?: string }) => {
   if (!window.remote) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
+    return Promise.reject()
   }
-  const { onUpload, ...options } = opt
-  return window.remote.require('electron').dialog.showOpenDialog(
-    {
-      ...options,
-    },
-    onUpload
-  )
+  return window.remote.require('electron').dialog.showOpenDialog(options)
 }
 
 export const openExternal = (url: string) => {
@@ -94,9 +60,6 @@ export const openContextMenu = (template: { label: string; click: Function }[]):
 
 export default {
   getLocale,
-  validateMnemonic,
-  generateMnemonic,
-  showMessage,
   showErrorMessage,
   showOpenDialog,
   getWinID,

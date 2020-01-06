@@ -11,9 +11,13 @@
       "history": "History",
       "addresses": "Addresses",
       "settings": "Settings",
-      "nervos-dao": "Nervos DAO"
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "Connection error",
+      "sync-not-start": "Sync not started yet"
     },
     "overview": {
+      "date": "Date",
+      "type": "Type",
       "balance": "Balance",
       "recent-activities": "Recent Activities",
       "no-recent-activities": "No Recent Activities",
@@ -27,8 +31,8 @@
       "epoch": "Epoch",
       "difficulty": "Difficulty",
       "address": "Address",
-      "confirmation": "{{confirmationCount}}/{{threshold}} Confirmation",
-      "confirmations": "{{confirmationCount}}/{{threshold}} Confirmations",
+      "confirmation": "{{confirmationCount}} Confirmation",
+      "confirmations": "{{confirmationCount}} Confirmations",
       "sent": "Sent",
       "sending": "Sending",
       "received": "Received",
@@ -37,8 +41,10 @@
       "statusLabel": {
         "success": "Success",
         "failed": "Failed",
-        "pending": "Pending"
-      }
+        "pending": "Pending",
+        "confirming": "Confirming"
+      },
+      "syncing": "Syncing"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -141,7 +147,8 @@
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
-      "copy-transaction-hash": "Copy Transaction Hash"
+      "copy-transaction-hash": "Copy Transaction Hash",
+      "no-txs": "No Transaction History"
     },
     "transaction": {
       "date": "Date",
@@ -166,11 +173,8 @@
       "description": "Description",
       "balance": "Balance",
       "transactions": "Transactions",
-      "receiving-address": "Receiving Address",
-      "change-address": "Change Address",
-      "display-testnet-addresses": "Display Testnet Addresses",
-      "display-mainnet-addresses": "Display Mainnet Addresses",
-      "mainnet-address-caution": "CAUTION: these are the MAINNET addresses",
+      "receiving-address": "Receiving",
+      "change-address": "Change",
       "copy-address": "Copy Address",
       "request-payment": "Request Payment",
       "view-on-explorer": "View on Explorer"
@@ -234,12 +238,9 @@
       "copy": "Copy image",
       "save": "Save image"
     },
-    "footer": {
-      "fail-to-fetch-tip-block-number": "Cannot fetch tip block number",
-      "sync-not-start": "Synchronization not started yet"
-    },
     "common": {
       "or": "or",
+      "ok": "Ok",
       "confirm": "Confirm",
       "open": "Open",
       "cancel": "Cancel",
@@ -253,7 +254,8 @@
       "select": "Select",
       "backup": "Backup",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "click-to-edit": "Click to edit"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -274,6 +276,7 @@
       "addr-copied": "Address has been copied to the clipboard",
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",
+      "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -290,35 +293,36 @@
         "keystore-password": "Password",
         "deposit": "Deposit"
       },
-      "mainnet-address-required": "Please enter a mainnet address",
-      "testnet-address-required": "Please enter a testnet address",
       "run-ckb-guide": "How to run a CKB node?",
       "codes": {
         "-3": "",
-        "100": "Amount is not enough",
-        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB",
-        "102": "$t(messages.fields.{{fieldName}}) is invalid",
-        "103": "$t(messages.fields.keystore-password) is incorrect",
-        "104": "Fail to connect to the node",
-        "201": "$t(messages.fields.{{fieldName}}) is required",
-        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used",
-        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}",
-        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too short, it should be longer than or equal to {{length}}",
-        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid",
-        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places",
-        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative",
+        "100": "Amount is not enough.",
+        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB.",
+        "102": "$t(messages.fields.{{fieldName}}) is invalid.",
+        "103": "$t(messages.fields.keystore-password) is incorrect.",
+        "104": "Fail to connect to the node, please restart Neuron.",
+        "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
+        "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
+        "201": "$t(messages.fields.{{fieldName}}) is required.",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too short, it should be longer than or equal to {{length}}.",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid.",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative.",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
-        "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces",
-        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed",
-        "302": "Fail to launch the app",
-        "303": "$t(messages.fields.{{fieldName}}) is not found",
-        "304": "Camera is unavailable or disabled",
-        "305": "$t(messages.fields.address) cannot be empty"
+        "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
+        "303": "$t(messages.fields.{{fieldName}}) is not found.",
+        "304": "Camera is unavailable or disabled.",
+        "305": "$t(messages.fields.address) cannot be empty.",
+        "306": "Please enter a mainnet address",
+        "307": "Please enter a testnet address"
       }
     },
     "sync": {
-      "syncing": "Syncing",
       "synced": "Synced",
+      "syncing": "Syncing",
       "block-number": "block number"
     },
     "pagination": {
@@ -344,6 +348,7 @@
       "proceed": "Proceed",
       "compensation": "Compensation",
       "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "deposit-dialog-title": "Deposit Nervos DAO",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
       "deposited-action-label": "Request withdraw",
       "withdrawing-action-label": "Withdraw",
@@ -352,7 +357,14 @@
       "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
       "withdraw-alert": "Hint: these are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "insufficient-period-alert-title": "Referenced Header is Invalid",
-      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs)"
+      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs, around 16 hours)",
+      "explanation-of-epochs-period": "Compensation Period",
+      "current-epochs-period": "Current Compensation Period",
+      "progress": "Progress: ",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
+      "left-time": "Left time: about {{leftDays}} days {{leftHours}} hours",
+      "detailed-explanation-of-epochs-period": "A compensation period in Nervos DAO consists of 180 epochs (estimated 30 days). Users may apply unlock for their deposits any time during every compensation period, then withdraw their deposits and compensations when that compensation period ends. It is worth mentioning that the compensations will stop accumulating as soon as users apply unlock. So we suggest that users apply unlock for their deposits at a time that closes enough to the end of a compensation period.",
+      "terms-in-explanation-of-epochs-period": "If you did not apply unlock during this compensation period, the next compensation period will start automatically.\nIt is suggested that users apply unlock during YELLOW epochs."
     },
     "updates": {
       "check-updates": "Check for Updates",

@@ -10,6 +10,7 @@ declare interface Window {
   require: any
   nativeImage: any
   ipcRenderer: {
+    invoke(channel: string, ...args: any[]): Promise<any>
     on(channel: string, listener: Function)
     removeListener(channel: string, listener: Function)
     removeAllListeners(channel: string)
@@ -17,7 +18,18 @@ declare interface Window {
 }
 
 declare module '*.json' {
-  const value: any
+  const value: string
+  export default value
+}
+
+declare module '*.svg' {
+  const value: string
+  export const ReactComponent = value
+  export default value
+}
+
+declare module '*.png' {
+  const value: string
   export default value
 }
 

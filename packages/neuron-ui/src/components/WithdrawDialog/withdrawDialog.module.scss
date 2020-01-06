@@ -1,0 +1,42 @@
+@import "../../styles//mixin.scss";
+
+.dialog {
+  @include dialogContainer;
+  padding: 20px 30px;
+
+  &::backdrop {
+    @include overlay;
+  }
+}
+
+.title {
+  @include dialogTitle;
+}
+
+.deposit,
+.compensation {
+  display: flex;
+  align-items: center;
+  height: 1rem;
+  font-size: 0.875rem;
+}
+
+.message,
+.errorMessage {
+  display: flex;
+  align-items: center;
+  height: 0.75rem;
+  font-size: 0.625rem;
+}
+
+.errorMessage {
+  color: red;
+}
+
+.footer {
+  @include dialogFooter;
+
+  button:last-of-type {
+    margin-left: 9px;
+  }
+}

@@ -1,4 +1,4 @@
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 
 export class CurrentWalletNotSet extends Error {
   constructor() {
@@ -36,7 +36,14 @@ export class CapacityNotEnough extends Error {
   }
 }
 
+export class LiveCapacityNotEnough extends Error {
+  constructor() {
+    super(i18n.t('messages.live-capacity-not-enough'))
+  }
+}
+
 export class CapacityNotEnoughForChange extends Error {
+  public code = 105
   constructor() {
     super(i18n.t('messages.capacity-not-enough-for-change'))
   }
@@ -55,6 +62,7 @@ export default {
   EmptyPassword,
   CodeHashNotLoaded,
   CapacityNotEnough,
+  LiveCapacityNotEnough,
   CapacityNotEnoughForChange,
   InvalidKeystore,
 }

@@ -9,7 +9,6 @@ import 'utils/i18n'
 import Navbar from 'containers/Navbar'
 import Notification from 'containers/Notification'
 import Main from 'containers/Main'
-import Footer from 'containers/Footer'
 import Transaction from 'components/Transaction'
 import ErrorBoundary from 'components/ErrorBoundary'
 import withProviders from 'states/stateProvider'
@@ -26,12 +25,6 @@ export const containers: CustomRouter.Route[] = [
     path: '/',
     exact: false,
     comp: Main,
-  },
-  {
-    name: 'Footer',
-    path: '/',
-    exact: false,
-    comp: Footer,
   },
   {
     name: 'Notification',

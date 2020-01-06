@@ -1,0 +1,225 @@
+@import '../../styles/mixin.scss';
+
+$success-color: #3cc68a;
+$failed-color: #d50000;
+$pending-color: #b3b3b3;
+$confirming-color: #b3b3b3;
+
+.overview {
+  display: grid;
+  grid-template:
+    'wallet-name wallet-name'auto 'balance status'auto 'activities-title activities-title'auto 'activities activities'auto/ 1fr auto;
+  // padding: 39px 11px 0; this size is from design, but not used now.
+  padding: 39px 0 0;
+}
+
+.walletName,
+.recentActivitiesTitle {
+  @include BoldText;
+  font-size: 1.375rem;
+  line-height: 1.22em;
+  letter-spacing: 1.1px;
+  color: #000;
+  margin: 0;
+}
+
+.walletName {
+  grid-area: wallet-name;
+  margin-bottom: 11px;
+}
+
+.recentActivitiesTitle {
+  grid-area: activities-title;
+  margin-top: 45px;
+  margin-bottom: 17px;
+}
+
+.balance {
+  grid-area: balance;
+}
+
+.balanceInt {
+  @include BoldText;
+  font-size: 1.125rem;
+}
+
+.blockchainStatus {
+  grid-area: status;
+  appearance: none;
+  border: none;
+  width: 220px;
+  padding: 0;
+  position: relative;
+  background-color: transparent;
+
+  &>div {
+    @include MediumText;
+    display: flex;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    background-color: #e3e3e3;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    color: #000;
+
+    &:hover {
+      @include SemiBoldText;
+      background-color: #d1d1d1;
+    }
+  }
+}
+
+section {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background-color: #f5f5f5;
+  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  z-index: 1;
+
+  &>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 11px;
+
+    &:hover {
+      background-color: #e3e3e3;
+    }
+
+    &>span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.45px;
+      color: #000;
+
+      &:last-child {
+        font-weight: normal;
+      }
+    }
+
+  }
+}
+
+.recentActivities {
+  grid-area: activities;
+  padding: 0px 11px 16px;
+  background-color: #fff;
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  tr {
+    height: 46px;
+    border-bottom: 1px solid #b3b3b3;
+    padding: 0 15px;
+  }
+
+  tbody {
+    tr:hover {
+      background-color: #eee;
+    }
+  }
+
+  th {
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    color: #000;
+    line-height: 1em;
+    padding: 16px 0;
+  }
+
+  td {
+    font-size: 0.875rem;
+    line-height: 1em;
+    padding: 2px 0;
+    letter-spacing: 0.7px;
+    color: #000;
+  }
+
+  .txStatus {
+    &>div::after {
+      position: absolute;
+      display: block;
+      content: '';
+      border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &[data-status="pending"]>div::after {
+      background-color: $pending-color;
+      filter: drop-shadow(0 0 1px $pending-color);
+      animation: blink 5s infinite;
+    }
+
+    &[data-status="confirming"]>div::after {
+      background-color: $pending-color;
+      filter: drop-shadow(0 0 1px $pending-color);
+      animation: blink 5s infinite;
+    }
+
+    &[data-status="success"]>div::after {
+      background-color: $success-color;
+      filter: drop-shadow(0 0 1px $success-color);
+    }
+
+    &[data-status="failed"]>div::after {
+      background-color: $failed-color;
+      filter: drop-shadow(0 0 1px $failed-color);
+    }
+
+    &>div {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 150px;
+
+      &>span:first-child {
+        flex: 1
+      }
+
+      &>span:nth-child(2) {
+        color: #626262;
+        font-size: 0.625rem;
+        line-height: 0.8125rem;
+        letter-spacing: 0.5px;
+        margin-top: 3px;
+      }
+    }
+  }
+}
+
+.linkToHistory {
+  font-size: 0.625rem;
+  letter-spacing: 0.5px;
+  color: #000;
+  margin-top: 13px;
+
+  &>span:hover {
+    color: var(--nervos-green);
+  }
+}
+
+@keyframes blink {
+
+  from,
+  to {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}

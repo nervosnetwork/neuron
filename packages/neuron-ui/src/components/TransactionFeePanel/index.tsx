@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import { Stack, Label, TextField, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
+import { Stack, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
+import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
 import { Price } from 'utils/const'
+import { localNumberFormatter } from 'utils/formatters'
 
 interface TransactionFee {
   fee: string
@@ -25,49 +27,29 @@ const calculateSpeed = (price: number) => {
 const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, onPriceChange }: TransactionFee) => {
   const [t] = useTranslation()
   const [showDetail, setShowDetail] = useState(false)
-  const leftStackWidth = '70%'
-  const labelWidth = '140px'
-  const actionSpacer = (
-    <Stack.Item styles={{ root: { width: '48px' } }}>
-      <span> </span>
-    </Stack.Item>
-  )
 
   const selectedSpeed = calculateSpeed(+price)
 
   return (
     <Stack tokens={{ childrenGap: 15 }} aria-label="transaction fee">
-      <Stack horizontal verticalAlign="end" horizontalAlign="space-between">
-        <Stack horizontal tokens={{ childrenGap: 20 }} styles={{ root: { width: leftStackWidth } }}>
-          <Stack.Item styles={{ root: { width: labelWidth } }}>
-            <Label>{t('send.fee')}</Label>
-          </Stack.Item>
-          <Stack.Item grow>
-            <TextField
-              value={`${fee} CKB`}
-              readOnly
-              styles={{
-                field: {
-                  color: '#888',
-                },
-                fieldGroup: {
-                  borderColor: '#eee!important',
-                },
-              }}
-            />
-          </Stack.Item>
-          {actionSpacer}
-        </Stack>
+      <Stack tokens={{ childrenGap: 15 }}>
+        <TextField label={t('send.fee')} field="fee" value={`${fee} CKB`} readOnly disabled />
 
-        <Stack.Item>
-          <Toggle
-            onChange={() => {
-              setShowDetail(!showDetail)
-            }}
-            label={t('send.advanced-fee-settings')}
-            inlineLabel
-          />
-        </Stack.Item>
+        <Toggle
+          onChange={() => {
+            setShowDetail(!showDetail)
+          }}
+          label={t('send.advanced-fee-settings')}
+          inlineLabel
+          onText=" "
+          offText=" "
+          styles={{
+            label: {
+              fontSize: 14,
+              fontWeight: 500,
+            },
+          }}
+        />
       </Stack>
 
       <Stack
@@ -75,47 +57,73 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
         styles={{
           root: {
             maxHeight: showDetail ? '100vw' : '0',
-            width: leftStackWidth,
             overflow: 'hidden',
           },
         }}
       >
-        <Stack horizontal tokens={{ childrenGap: 20 }}>
-          <Stack.Item styles={{ root: { width: labelWidth } }}>
-            <Label>{t('send.price')}</Label>
-          </Stack.Item>
-          <Stack.Item grow>
-            <TextField value={price} onChange={onPriceChange} aria-label="price" suffix="shannons/kB" />
-          </Stack.Item>
-          {actionSpacer}
-        </Stack>
+        <TextField
+          label={t('send.price')}
+          field="price"
+          value={localNumberFormatter(price)}
+          onChange={onPriceChange}
+          suffix="shannons/kB"
+        />
 
-        <Stack horizontal tokens={{ childrenGap: 20 }}>
-          <Stack.Item styles={{ root: { width: labelWidth } }}>
-            <Label>{t('send.expected-speed')}</Label>
-          </Stack.Item>
-          <Stack.Item>
-            <Dropdown
-              dropdownWidth={140}
-              selectedKey={selectedSpeed}
-              options={[
-                { key: Price.Immediately, text: 'immediately' },
-                { key: Price.TenBlocks, text: '~ 10 blocks' },
-                { key: Price.HundredBlocks, text: '~ 100 blocks' },
-                { key: Price.FiveHundredsBlocks, text: '~ 500 blocks' },
-              ]}
-              onRenderCaretDown={() => {
-                return <Icon iconName="ArrowDown" />
-              }}
-              onChange={(e: any, item?: IDropdownOption) => {
-                if (item) {
-                  onPriceChange(e, item.key)
-                }
-              }}
-              aria-label="expected speed"
-            />
-          </Stack.Item>
-        </Stack>
+        <Dropdown
+          label={t('send.expected-speed')}
+          selectedKey={selectedSpeed}
+          options={[
+            { key: Price.Immediately, text: 'immediately' },
+            { key: Price.TenBlocks, text: '~ 10 blocks' },
+            { key: Price.HundredBlocks, text: '~ 100 blocks' },
+            { key: Price.FiveHundredsBlocks, text: '~ 500 blocks' },
+          ]}
+          onRenderCaretDown={() => {
+            return <Icon iconName="ArrowDown" />
+          }}
+          onChange={(e: any, item?: IDropdownOption) => {
+            if (item) {
+              e.target.value = item.key
+              onPriceChange(e)
+            }
+          }}
+          aria-label="expected speed"
+          styles={{
+            label: {
+              fontSize: '0.75rem',
+              fontWeight: 500,
+            },
+
+            title: {
+              fontSize: '1rem',
+              fontWeight: 500,
+              height: '1.625rem',
+              lineHeight: '1.625rem',
+            },
+            dropdownOptionText: {
+              fontSize: '1rem',
+              height: '1.625rem',
+              lineHeight: '1.625rem',
+              boxShadow: 'border-box',
+            },
+            dropdownItem: {
+              fontSize: '1rem',
+              height: '1.625rem',
+              lineHeight: '1.625rem',
+              boxShadow: 'border-box',
+              minHeight: 'auto',
+            },
+            dropdownItemSelected: {
+              height: '1.625rem',
+              lineHeight: '1.625rem',
+              minHeight: 'auto',
+              backgroundColor: '#e3e3e3',
+            },
+            root: {
+              fontSize: '1rem',
+            },
+          }}
+        />
       </Stack>
     </Stack>
   )

@@ -1,26 +1,19 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Stack,
-  Icon,
-  Text,
-  Label,
-  Image,
-  PrimaryButton,
-  DefaultButton,
-  TextField,
-  FontSizes,
-  Spinner,
-} from 'office-ui-fabric-react'
+import { Stack, Icon, Text, TextField, FontSizes } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
+import CustomTextField from 'widgets/TextField'
+import Spinner from 'widgets/Spinner'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
 
-import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH } from 'utils/const'
+import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
+import styles from './walletWizard.module.scss'
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -76,38 +69,40 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
   )
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="center" tokens={{ childrenGap: 50 }}>
-      <Stack.Item>
-        <Image src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" />
-      </Stack.Item>
-
-      <Stack.Item>
-        <Text variant="xLargePlus">{t('wizard.welcome-to-nervos-neuron')}</Text>
-      </Stack.Item>
-
-      <Stack horizontal horizontalAlign="center" verticalAlign="center" tokens={{ childrenGap: 40 }}>
-        <PrimaryButton
-          styles={{ root: [{ height: '60px' }] }}
-          text={t('wizard.import-mnemonic')}
+    <div className={styles.welcome}>
+      <img src={`${process.env.PUBLIC_URL}/icon.png`} width="120px" className={styles.logo} alt="logo" />
+      <span className={styles.slogan}>{t('wizard.welcome-to-nervos-neuron')}</span>
+      <div className={styles.actions}>
+        <Button
+          type="primary"
+          label={t('wizard.import-mnemonic')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`)}
-          iconProps={{ iconName: 'Import', styles: buttonGrommetIconStyles }}
-        />
+        >
+          <>
+            <Icon iconName="Import" styles={buttonGrommetIconStyles} />
+            {t('wizard.import-mnemonic')}
+          </>
+        </Button>
         <span>{t('common.or')}</span>
-        <PrimaryButton
-          styles={{ root: [{ height: '60px' }] }}
-          text={t('wizard.import-keystore')}
-          onClick={next(Routes.ImportKeystore)}
-          iconProps={{ iconName: 'Keystore', styles: buttonGrommetIconStyles }}
-        />
+        <Button type="primary" label={t('wizard.import-keystore')} onClick={next(Routes.ImportKeystore)}>
+          <>
+            <Icon iconName="Keystore" styles={buttonGrommetIconStyles} />
+            {t('wizard.import-keystore')}
+          </>
+        </Button>
         <span>{t('common.or')}</span>
-        <DefaultButton
-          styles={{ root: [{ height: '60px' }] }}
-          text={t('wizard.create-new-wallet')}
+        <Button
+          type="default"
+          label={t('wizard.create-new-wallet')}
           onClick={next(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`)}
-          iconProps={{ iconName: 'Create', styles: buttonGrommetIconStyles }}
-        />
-      </Stack>
-    </Stack>
+        >
+          <>
+            <Icon iconName="Create" styles={buttonGrommetIconStyles} />
+            {t('wizard.create-new-wallet')}
+          </>
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -132,10 +127,14 @@ const Mnemonic = ({
 
   useEffect(() => {
     if (type === MnemonicAction.Create) {
-      const mnemonic = generateMnemonic()
-      dispatch({
-        type: 'generated',
-        payload: mnemonic,
+      generateMnemonic().then(res => {
+        // Should always succeed
+        if (res.status === 1) {
+          dispatch({
+            type: 'generated',
+            payload: res.result,
+          })
+        }
       })
     } else {
       dispatch({
@@ -165,21 +164,29 @@ const Mnemonic = ({
         type: 'imported',
         payload: trimmedMnemonic,
       })
-      const isMnemonicValid = validateMnemonic(trimmedMnemonic)
-      if (isMnemonicValid) {
-        history.push(
-          `${rootPath}${WalletWizardPath.Submission}/${
-            type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
-          }`
-        )
-      } else {
-        showErrorMessage(t(`messages.error`), t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic' }))
-      }
+      validateMnemonic(trimmedMnemonic).then(res => {
+        let isMnemonicValid = false
+        if (res.status === 1) {
+          isMnemonicValid = res.result
+        }
+        if (isMnemonicValid) {
+          history.push(
+            `${rootPath}${WalletWizardPath.Submission}/${
+              type === MnemonicAction.Verify ? MnemonicAction.Create : MnemonicAction.Import
+            }`
+          )
+        } else {
+          showErrorMessage(
+            t(`messages.error`),
+            t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'mnemonic' })
+          )
+        }
+      })
     }
   }, [isCreate, history, rootPath, type, imported, t, dispatch])
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
+    <div className={styles.mnemonic}>
       <Text variant="xLargePlus">{t(message)}</Text>
       <TextField
         autoFocus
@@ -202,11 +209,11 @@ const Mnemonic = ({
           },
         }}
       />
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-      </Stack>
-    </Stack>
+      <div className={styles.actions}>
+        <Button type="cancel" label={t('wizard.back')} onClick={history.goBack} />
+        <Button type="submit" label={t('wizard.next')} onClick={onNext} disabled={disableNext} />
+      </div>
+    </div>
   )
 }
 
@@ -245,17 +252,18 @@ const Submission = ({
   }, [loading, dispatch, wallets, t])
 
   const onChange = useCallback(
-    (e: any, value?: string) => {
-      const { field } = e.target.dataset
-      if (undefined !== value) {
-        if (['password', 'confirmPassword'].includes(field) && /\s/.test(value)) {
-          return
-        }
-        dispatch({
-          type: field,
-          payload: value,
-        })
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const {
+        value,
+        dataset: { field = '' },
+      } = e.target as HTMLInputElement
+      if (['password', 'confirmPassword'].includes(field) && /\s/.test(value)) {
+        return
       }
+      dispatch({
+        type: field,
+        payload: value,
+      })
     },
     [dispatch]
   )
@@ -285,19 +293,27 @@ const Submission = ({
   const disableNext = !(isNameUnused && isPwdComplex && isPwdSame)
 
   return (
-    <Stack verticalFill verticalAlign="center" horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
-      <Text variant="xxLargePlus">{t(message)}</Text>
+    <div className={styles.submission}>
+      <Text variant="xxLargePlus" styles={{ root: { paddingBottom: '20px' } }}>
+        {t(message)}
+      </Text>
       {submissionInputs.map(input => (
-        <div key={input.key}>
-          <Label required>{t(`wizard.${input.label}`)}</Label>
-          <TextField
-            data-field={input.key}
+        <div
+          key={input.key}
+          className={styles.input}
+          data-chars={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : ''}
+        >
+          <CustomTextField
+            label={t(`wizard.${input.label}`)}
+            field={input.key}
             autoFocus={input.autoFocus}
-            type={input.type}
+            type={input.type as 'password' | 'text'}
             value={state[input.key]}
             onChange={onChange}
-            description={t(input.hint || '')}
             maxLength={input.maxLength}
+            hint={input.hint ? t(input.hint) : undefined}
+            suffix={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : undefined}
+            className={styles.submissionField}
           />
         </div>
       ))}
@@ -317,17 +333,18 @@ const Submission = ({
         </Stack>
       </Stack>
 
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={history.goBack} text={t('wizard.back')} />
-        {loading ? (
-          <PrimaryButton disabled>
-            <Spinner />
-          </PrimaryButton>
-        ) : (
-          <PrimaryButton type="submit" onClick={onNext} disabled={disableNext} text={t('wizard.next')} />
-        )}
-      </Stack>
-    </Stack>
+      <div className={styles.actions}>
+        <Button type="cancel" onClick={history.goBack} label={t('wizard.back')} />
+        <Button
+          type="submit"
+          onClick={onNext}
+          label={loading ? 'loading' : t('wizard.next')}
+          disabled={disableNext || loading}
+        >
+          {loading ? <Spinner /> : (t('wizard.next') as string)}
+        </Button>
+      </div>
+    </div>
   )
 }
 

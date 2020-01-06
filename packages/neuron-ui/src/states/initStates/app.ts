@@ -1,6 +1,6 @@
 import { CapacityUnit } from 'utils/const'
 
-const appState: State.App = {
+const appState: Readonly<State.App> = {
   tipBlockNumber: '',
   tipBlockHash: '',
   tipBlockTimestamp: 0,
@@ -34,6 +34,7 @@ const appState: State.App = {
   },
   popups: [],
   notifications: [],
+  alertDialog: null,
   loadings: {
     sending: false,
     addressList: false,

@@ -1,37 +1,27 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, DefaultButton, Icon, TooltipHost, Spinner } from 'office-ui-fabric-react'
-import PropertyList from 'widgets/PropertyList'
+import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
-import { AppActions, StateWithDispatch } from 'states/stateProvider/reducer'
-import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
+import { StateWithDispatch } from 'states/stateProvider/reducer'
 
-import calculateAPC from 'utils/calculateAPC'
 import calculateFee from 'utils/calculateFee'
-import { shannonToCKBFormatter, CKBToShannonFormatter } from 'utils/formatters'
-import {
-  MIN_AMOUNT,
-  MIN_DEPOSIT_AMOUNT,
-  MEDIUM_FEE_RATE,
-  SHANNON_CKB_RATIO,
-  MAX_DECIMAL_DIGITS,
-  MILLISECONDS_IN_YEAR,
-  CapacityUnit,
-} from 'utils/const'
-import { verifyAmount } from 'utils/validators'
-
-import { generateDepositTx, generateDepositAllTx, generateWithdrawTx, generateClaimTx } from 'services/remote'
-import { getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
+import { shannonToCKBFormatter } from 'utils/formatters'
+import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
 import { epochParser } from 'utils/parsers'
+import { backToTop } from 'utils/animations'
 
-import DAORecord from 'components/CustomRows/DAORecordRow'
+import DepositDialog from 'components/DepositDialog'
+import WithdrawDialog from 'components/WithdrawDialog'
+import DAORecord from 'components/NervosDAORecord'
+import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
+import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
+import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
 
-import DepositDialog from './DepositDialog'
-import WithdrawDialog from './WithdrawDialog'
-
-let timer: NodeJS.Timeout
+import hooks from './hooks'
+import styles from './nervosDAO.module.scss'
 
 const NervosDAO = ({
   app: {
@@ -48,6 +38,9 @@ const NervosDAO = ({
   chain: { connectionStatus },
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const [t] = useTranslation()
+  useEffect(() => {
+    backToTop()
+  }, [])
   const [depositValue, setDepositValue] = useState(`${MIN_DEPOSIT_AMOUNT}`)
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
@@ -55,283 +48,81 @@ const NervosDAO = ({
   const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
+  const [blockHashInCompensationDialog, setBlockHashInCompensationPeriodDialog] = useState('')
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
+  const [depositEpochList, setDepositEpochList] = useState<(string | null)[]>([])
+  const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
+  const updateDepositValue = hooks.useUpdateDepositValue({
+    setDepositValue,
+    setErrorMessage,
+    clearGeneratedTx,
+    maxDepositAmount,
+    maxDepositTx,
+    dispatch,
+    walletID: wallet.id,
+    maxDepositErrorMessage,
+    t,
+  })
+  const onDepositValueChange = hooks.useOnDepositValueChange({ updateDepositValue })
+  const onDepositDialogDismiss = hooks.useOnDepositDialogDismiss({
+    setShowDepositDialog,
+    setDepositValue,
+    setErrorMessage,
+  })
 
-  const clearGeneratedTx = useCallback(() => {
-    dispatch({
-      type: AppActions.ClearSendState,
-      payload: null,
-    })
-  }, [dispatch])
+  const onDepositDialogSubmit = hooks.useOnDepositDialogSubmit({
+    setShowDepositDialog,
+    setDepositValue,
+    dispatch,
+    walletID: wallet.id,
+  })
+  const onWithdrawDialogDismiss = hooks.useOnWithdrawDialogDismiss(setActiveRecord)
 
-  const updateDepositValue = useCallback(
-    (value: string) => {
-      if (Number.isNaN(+value) || /[^\d.]/.test(value) || +value < 0) {
-        return
-      }
-      clearTimeout(timer)
-      timer = setTimeout(() => {
-        setErrorMessage('')
-        clearGeneratedTx()
+  hooks.useUpdateMaxDeposit({ wallet, setMaxDepositAmount, setMaxDepositTx, setMaxDepositErrorMessage })
+  hooks.useInitData({ clearGeneratedTx, dispatch, updateDepositValue, wallet, setGenesisBlockTimestamp })
+  hooks.useUpdateGlobalAPC({ tipBlockTimestamp, genesisBlockTimestamp, setGlobalAPC })
+  const onWithdrawDialogSubmit = hooks.useOnWithdrawDialogSubmit({
+    activeRecord,
+    setActiveRecord,
+    clearGeneratedTx,
+    walletID: wallet.id,
+    dispatch,
+  })
 
-        const verifyRes = verifyAmount(value)
-        if (verifyRes !== true) {
-          setErrorMessage(t(`messages.codes.${verifyRes.code}`, { fieldName: 'deposit', length: MAX_DECIMAL_DIGITS }))
-          return
-        }
-
-        if (BigInt(CKBToShannonFormatter(value)) < BigInt(MIN_DEPOSIT_AMOUNT * SHANNON_CKB_RATIO)) {
-          setErrorMessage(t('nervos-dao.minimal-fee-required', { minimal: MIN_DEPOSIT_AMOUNT }))
-          return
-        }
-
-        const capacity = CKBToShannonFormatter(value, CapacityUnit.CKB)
-        if (BigInt(capacity) < maxDepositAmount) {
-          generateDepositTx({
-            feeRate: `${MEDIUM_FEE_RATE}`,
-            capacity,
-            walletID: wallet.id,
-          }).then(res => {
-            if (res.status === 1) {
-              dispatch({
-                type: AppActions.UpdateGeneratedTx,
-                payload: res.result,
-              })
-            } else {
-              setErrorMessage(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-            }
-          })
-        } else {
-          dispatch({
-            type: AppActions.UpdateGeneratedTx,
-            payload: maxDepositTx,
-          })
-          setErrorMessage(maxDepositErrorMessage)
-        }
-      }, 500)
-      setDepositValue(value)
-    },
-    [clearGeneratedTx, maxDepositAmount, maxDepositTx, dispatch, wallet.id, maxDepositErrorMessage, t]
+  const onCompensationPeriodExplanationClick = hooks.useOnCompensationPeriodExplanationClick(
+    setBlockHashInCompensationPeriodDialog
   )
-
-  useEffect(() => {
-    updateNervosDaoData({ walletID: wallet.id })(dispatch)
-    updateDepositValue(
-      `${
-        BigInt(wallet.balance) > BigInt(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`))
-          ? BigInt(MIN_DEPOSIT_AMOUNT)
-          : BigInt(0)
-      }`
-    )
-    getHeaderByNumber('0x0')
-      .then(header => setGenesisBlockTimestamp(+header.timestamp))
-      .catch(err => console.error(err))
-    return () => {
-      clearNervosDaoData()(dispatch)
-      clearGeneratedTx()
-    }
-  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance])
-
-  useEffect(() => {
-    generateDepositAllTx({
-      walletID: wallet.id,
-      feeRate: `${MEDIUM_FEE_RATE}`,
-    })
-      .then(res => {
-        if (res.status === 1) {
-          const fee = BigInt(res.result.fee)
-          const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
-          setMaxDepositAmount(maxValue)
-          setMaxDepositTx(res.result)
-          setMaxDepositErrorMessage('')
-        } else {
-          throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-        }
-      })
-      .catch(err => {
-        setMaxDepositAmount(BigInt(0))
-        setMaxDepositTx(undefined)
-        setMaxDepositErrorMessage(err.message)
-      })
-  }, [wallet.id, wallet.balance])
-
-  useEffect(() => {
-    if (tipBlockTimestamp) {
-      const endYearNumber = (tipBlockTimestamp - +(genesisBlockTimestamp || 0)) / MILLISECONDS_IN_YEAR
-      try {
-        const apc = calculateAPC({
-          startYearNumber: 0,
-          endYearNumber,
-        })
-        setGlobalAPC(apc)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  }, [tipBlockTimestamp, genesisBlockTimestamp])
-
-  const onDepositDialogDismiss = () => {
-    setShowDepositDialog(false)
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
-    setErrorMessage('')
-  }
-
-  const onDepositDialogSubmit = () => {
-    setShowDepositDialog(false)
-    setDepositValue(`${MIN_DEPOSIT_AMOUNT}`)
-    dispatch({
-      type: AppActions.RequestPassword,
-      payload: {
-        walletID: wallet.id,
-        actionType: 'send',
-      },
-    })
-  }
-
-  const onWithdrawDialogDismiss = () => {
-    setActiveRecord(null)
-  }
-
-  const onWithdrawDialogSubmit = () => {
-    if (activeRecord) {
-      generateWithdrawTx({
-        walletID: wallet.id,
-        outPoint: activeRecord.outPoint,
-        feeRate: `${MEDIUM_FEE_RATE}`,
-      })
-        .then((res: any) => {
-          if (res.status === 1) {
-            dispatch({
-              type: AppActions.UpdateGeneratedTx,
-              payload: res.result,
-            })
-            dispatch({
-              type: AppActions.RequestPassword,
-              payload: {
-                walletID: wallet.id,
-                actionType: 'send',
-              },
-            })
-          } else {
-            clearGeneratedTx()
-            throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-          }
-        })
-        .catch((err: Error) => {
-          dispatch({
-            type: AppActions.AddNotification,
-            payload: {
-              type: 'alert',
-              timestamp: +new Date(),
-              content: err.message,
-            },
-          })
-        })
-    }
-    setActiveRecord(null)
-  }
-
-  const onActionClick = useCallback(
-    (e: any) => {
-      const { dataset } = e.target
-      const outPoint = {
-        txHash: dataset.txHash,
-        index: dataset.index,
-      }
-      const record = records.find(r => r.outPoint.txHash === outPoint.txHash && r.outPoint.index === outPoint.index)
-      if (record) {
-        if (record.depositOutPoint) {
-          generateClaimTx({
-            walletID: wallet.id,
-            withdrawingOutPoint: record.outPoint,
-            depositOutPoint: record.depositOutPoint,
-            feeRate: `${MEDIUM_FEE_RATE}`,
-          })
-            .then((res: any) => {
-              if (res.status === 1) {
-                dispatch({
-                  type: AppActions.UpdateGeneratedTx,
-                  payload: res.result,
-                })
-                dispatch({
-                  type: AppActions.RequestPassword,
-                  payload: {
-                    walletID: wallet.id,
-                    actionType: 'send',
-                  },
-                })
-              } else {
-                clearGeneratedTx()
-                throw new Error(`${typeof res.message === 'string' ? res.message : res.message.content}`)
-              }
-            })
-            .catch((err: Error) => {
-              dispatch({
-                type: AppActions.AddNotification,
-                payload: {
-                  type: 'alert',
-                  timestamp: +new Date(),
-                  content: err.message,
-                },
-              })
-            })
-        } else {
-          setActiveRecord(record)
-        }
-      }
-    },
-    [records, clearGeneratedTx, dispatch, wallet.id]
+  const onCompensationPeriodDialogDismiss = hooks.useOnCompensationPeriodDialogDismiss(
+    setBlockHashInCompensationPeriodDialog
   )
+  const onActionClick = hooks.useOnActionClick({
+    records,
+    clearGeneratedTx,
+    dispatch,
+    walletID: wallet.id,
+    setActiveRecord,
+  })
 
-  const onSlide = useCallback(
-    (value: number) => {
-      const amount =
-        maxDepositAmount - BigInt(CKBToShannonFormatter(`${value}`)) < BigInt(SHANNON_CKB_RATIO * MIN_AMOUNT)
-          ? shannonToCKBFormatter(`${maxDepositAmount}`, false, '')
-          : `${value}`
-      updateDepositValue(amount)
-    },
-    [updateDepositValue, maxDepositAmount]
-  )
+  const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
+  hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
+  const compensationPeriods = hooks.useCompensationPeriods({ depositEpochList, currentEpoch: epoch })
 
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
   )} CKB`
+  hooks.useUpdateWithdrawList({
+    records,
+    tipBlockHash,
+    setWithdrawList,
+  })
 
-  useEffect(() => {
-    Promise.all(
-      records.map(async ({ outPoint, depositOutPoint, blockHash }) => {
-        if (!tipBlockHash) {
-          return null
-        }
-        const withdrawBlockHash = depositOutPoint ? blockHash : tipBlockHash
-        const formattedDepositOutPoint = depositOutPoint
-          ? {
-              txHash: depositOutPoint.txHash,
-              index: `0x${BigInt(depositOutPoint.index).toString(16)}`,
-            }
-          : {
-              txHash: outPoint.txHash,
-              index: `0x${BigInt(outPoint.index).toString(16)}`,
-            }
-        return calculateDaoMaximumWithdraw(formattedDepositOutPoint, withdrawBlockHash).catch(() => null)
-      })
-    )
-      .then(res => {
-        setWithdrawList(res)
-      })
-      .catch(console.error)
-  }, [records, tipBlockHash])
-
-  const Records = useMemo(() => {
+  const MemoizedRecords = useMemo(() => {
     return (
       <>
-        <Text as="h2" variant="xxLarge">
-          {t('nervos-dao.deposit-records')}
-        </Text>
-        <Stack>
+        <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
+        <Stack className={styles.recordsContainer}>
           {records.map((record, i) => {
             let stage = 'deposited'
             if (record.depositOutPoint) {
@@ -340,15 +131,18 @@ const NervosDAO = ({
             return (
               <DAORecord
                 {...record}
+                compensationPeriod={compensationPeriods[i]}
                 withdraw={withdrawList[i]}
                 actionLabel={t(`nervos-dao.${stage}-action-label`)}
                 key={JSON.stringify(record.outPoint)}
                 onClick={onActionClick}
+                onCompensationPeriodExplanationClick={onCompensationPeriodExplanationClick}
                 tipBlockNumber={tipBlockNumber}
                 tipBlockTimestamp={tipBlockTimestamp}
                 epoch={epoch}
                 genesisBlockTimestamp={genesisBlockTimestamp}
                 connectionStatus={connectionStatus}
+                dispatch={dispatch}
               />
             )
           })}
@@ -360,12 +154,64 @@ const NervosDAO = ({
     withdrawList,
     t,
     onActionClick,
+    onCompensationPeriodExplanationClick,
     tipBlockNumber,
     epoch,
+    compensationPeriods,
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
+    dispatch,
   ])
+
+  const MemoizedDepositDialog = useMemo(() => {
+    return (
+      <DepositDialog
+        show={showDepositDialog}
+        value={depositValue}
+        fee={fee}
+        onChange={onDepositValueChange}
+        onDismiss={onDepositDialogDismiss}
+        onSubmit={onDepositDialogSubmit}
+        onSlide={onSlide}
+        maxDepositAmount={maxDepositAmount}
+        isDepositing={sending}
+        errorMessage={errorMessage}
+        isTxGenerated={!!send.generatedTx}
+      />
+    )
+  }, [
+    showDepositDialog,
+    depositValue,
+    fee,
+    onDepositDialogDismiss,
+    onDepositDialogSubmit,
+    onSlide,
+    maxDepositAmount,
+    sending,
+    errorMessage,
+    send.generatedTx,
+  ])
+
+  const MemoizedWithdrawDialog = useMemo(() => {
+    return activeRecord ? (
+      <WithdrawDialog
+        record={activeRecord}
+        onDismiss={onWithdrawDialogDismiss}
+        onSubmit={onWithdrawDialogSubmit}
+        tipBlockHash={tipBlockHash}
+        currentEpoch={epoch}
+      />
+    ) : null
+  }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
+
+  const MemoizedCompensationPeriodDialog = useMemo(() => {
+    const index = records.findIndex(r => r.blockHash === blockHashInCompensationDialog)
+    const compensationPeriod = compensationPeriods[index] || null
+    return (
+      <CompensationPeriodDialog compensationPeriod={compensationPeriod} onDismiss={onCompensationPeriodDialogDismiss} />
+    )
+  }, [records, blockHashInCompensationDialog, onCompensationPeriodDialogDismiss, compensationPeriods])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -376,11 +222,23 @@ const NervosDAO = ({
     }
     const epochInfo = epochParser(epoch)
     return (
-      <Stack tokens={{ childrenGap: 10 }}>
-        <Text as="span" variant="small" block>{`Epoch number: ${epochInfo.number}`}</Text>
-        <Text as="span" variant="small" block>{`Epoch index: ${epochInfo.index}`}</Text>
-        <Text as="span" variant="small" block>{`Epoch length: ${epochInfo.length}`}</Text>
-        <Text as="span" variant="small" block>{`APC: ~${globalAPC}%`}</Text>
+      <Stack className={styles.info}>
+        <div>
+          <span>Epoch number</span>
+          <span>{`${epochInfo.number}`}</span>
+        </div>
+        <div>
+          <span>Epoch index</span>
+          <span>{`${epochInfo.index}`}</span>
+        </div>
+        <div>
+          <span>Epoch length</span>
+          <span>{`${epochInfo.length}`}</span>
+        </div>
+        <div>
+          <span>APC</span>
+          <span>{`~${globalAPC}%`}</span>
+        </div>
       </Stack>
     )
   }, [epoch, globalAPC])
@@ -397,56 +255,50 @@ const NervosDAO = ({
   ]
 
   return (
-    <>
-      <Stack tokens={{ childrenGap: 15 }} horizontalAlign="stretch">
-        <Text as="h1" variant="xxLarge">
-          {wallet.name}
-        </Text>
-        <Stack horizontal tokens={{ childrenGap: 15 }}>
-          <Stack style={{ minWidth: '250px' }} tokens={{ childrenGap: 10 }}>
-            <PropertyList properties={lockAndFreeProperties} />
-          </Stack>
-          <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 15 }}>
-            <DefaultButton
-              text={t('nervos-dao.deposit')}
-              disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-              onClick={() => setShowDepositDialog(true)}
-            />
-            <TooltipHost
-              content={EpochInfo}
-              styles={{ root: { display: 'flex', justifyContent: 'center', alignItems: 'center' } }}
-            >
-              <Icon iconName="info" />
-            </TooltipHost>
-          </Stack>
-        </Stack>
-        {Records}
-      </Stack>
-      <DepositDialog
-        show={showDepositDialog}
-        value={depositValue}
-        fee={fee}
-        onChange={(_e: any, value: string) => updateDepositValue(value)}
-        onDismiss={onDepositDialogDismiss}
-        onSubmit={onDepositDialogSubmit}
-        onSlide={onSlide}
-        maxDepositAmount={maxDepositAmount}
-        isDepositing={sending}
-        errorMessage={errorMessage}
-      />
-      {activeRecord ? (
-        <WithdrawDialog
-          record={activeRecord}
-          onDismiss={onWithdrawDialogDismiss}
-          onSubmit={onWithdrawDialogSubmit}
-          tipBlockHash={tipBlockHash}
-          currentEpoch={epoch}
-        />
-      ) : null}
-    </>
+    <div className={styles.nervosDAOContainer}>
+      <h1 className={styles.walletName}>{wallet.name}</h1>
+      <div className={styles.amount}>
+        {lockAndFreeProperties.map(({ label, value }) => (
+          <div key={label} title={label} aria-label={label} className={styles.amountProperty}>
+            <span>{label}</span>
+            <span>{value}</span>
+          </div>
+        ))}
+      </div>
+      <div className={styles.deposit}>
+        <div>
+          <Button
+            type="primary"
+            disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
+            onClick={() => setShowDepositDialog(true)}
+            label={t('nervos-dao.deposit')}
+          />
+          <TooltipHost
+            calloutProps={{
+              gapSpace: 7,
+            }}
+            content={EpochInfo}
+            styles={{
+              root: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 9,
+              },
+            }}
+          >
+            <Info />
+          </TooltipHost>
+        </div>
+      </div>
+      <div className={styles.records}>{MemoizedRecords}</div>
+      {MemoizedDepositDialog}
+      {MemoizedWithdrawDialog}
+      {MemoizedCompensationPeriodDialog}
+    </div>
   )
 }
 
-NervosDAO.displayName = 'NervosDAOao'
+NervosDAO.displayName = 'NervosDAO'
 
 export default NervosDAO

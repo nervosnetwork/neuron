@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import canvg from 'canvg'
-import { Stack, DefaultButton } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import Button from 'widgets/Button'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
+import styles from './qrcode.module.scss'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
 
@@ -78,11 +79,8 @@ const QRCode = ({
   level = ErrorCorrectLevel.Q,
   bgColor = '#FFF',
   fgColor = '#000',
-  onQRCodeClick,
   includeMargin = false,
-  exportable = false,
   dispatch,
-  remark,
 }: {
   value: string
   size: number
@@ -90,11 +88,8 @@ const QRCode = ({
   level?: ErrorCorrectLevel
   bgColor?: string
   fgColor?: string
-  onQRCodeClick?: React.MouseEventHandler
   includeMargin?: boolean
-  exportable?: boolean
   dispatch: StateDispatch
-  remark?: JSX.Element
 }) => {
   const [t] = useTranslation()
   const qrcode = new QRCodeImpl(-1, level)
@@ -103,7 +98,7 @@ const QRCode = ({
   qrcode.make()
 
   const cells = qrcode.modules || []
-  const margin = includeMargin ? 1 : 0
+  const margin = includeMargin ? 3 : 0
   const fgPath = generatePath(cells, margin)
   const numCells = cells.length + margin * 2
 
@@ -154,18 +149,15 @@ const QRCode = ({
   }, [svgStr, size])
 
   return (
-    <Stack tokens={{ childrenGap: 15 }} horizontalAlign="center" verticalAlign="center">
-      <Stack.Item>
-        <canvas ref={canvasRef} width={size} height={size} onClick={onQRCodeClick} />
-      </Stack.Item>
-      {remark || null}
-      {exportable ? (
-        <Stack horizontal horizontalAlign="space-between" styles={{ root: { minWidth: 500 } }}>
-          <DefaultButton onClick={onCopy}>{t('qrcode.copy')}</DefaultButton>
-          <DefaultButton onClick={onDownload}>{t('qrcode.save')}</DefaultButton>
-        </Stack>
-      ) : null}
-    </Stack>
+    <div className={styles.qrcode}>
+      <div className={styles.pic}>
+        <canvas ref={canvasRef} width={size} height={size} />
+      </div>
+      <div className={styles.actions}>
+        <Button type="primary" label={t('qrcode.copy')} onClick={onCopy} />
+        <Button type="primary" label={t('qrcode.save')} onClick={onDownload} />
+      </div>
+    </div>
   )
 }
 

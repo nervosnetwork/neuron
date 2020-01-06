@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
+import { epochParser } from 'utils/parsers'
+import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -63,22 +65,40 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
     [submitDescription]
   )
   const onDescriptionChange = useCallback(
-    (e: any, value?: string) => {
-      const key = e.target.dataset.descriptionKey
-      setLocalDescription({
-        key,
-        description: value || '',
-      })
+    (e: React.SyntheticEvent<any>) => {
+      const {
+        dataset: { descriptionKey: key },
+        value,
+      } = e.target as HTMLInputElement
+      if (key) {
+        setLocalDescription({
+          key,
+          description: value || '',
+        })
+      }
     },
     [setLocalDescription]
   )
   const onDescriptionSelected = useCallback(
-    (hash: string, originDesc: string) => () => {
-      dispatch({
-        type: AppActions.ToggleIsAllowedToFetchList,
-        payload: false,
-      })
-      setLocalDescription({ key: hash, description: originDesc })
+    (e: React.SyntheticEvent<any>) => {
+      const {
+        dataset: { descriptionKey: key, descriptionValue: originDesc = '' },
+      } = e.target as HTMLElement
+      if (key) {
+        dispatch({
+          type: AppActions.ToggleIsAllowedToFetchList,
+          payload: false,
+        })
+        setLocalDescription({ key, description: originDesc })
+        try {
+          const input = document.querySelector<HTMLInputElement>(`input[data-description-key="${key}"]`)
+          if (input) {
+            input.focus()
+          }
+        } catch (err) {
+          console.warn(err)
+        }
+      }
     },
     [setLocalDescription, dispatch]
   )
@@ -91,4 +111,45 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
   }
 }
 
-export default { useGoBack, useLocalDescription }
+export const useCalculateEpochs = ({ depositEpoch, currentEpoch }: { depositEpoch: string; currentEpoch: string }) =>
+  useMemo(() => {
+    const depositEpochInfo = epochParser(depositEpoch)
+    const currentEpochInfo = epochParser(currentEpoch)
+    const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
+    return {
+      depositEpochInfo,
+      currentEpochInfo,
+      targetEpochNumber,
+    }
+  }, [depositEpoch, currentEpoch])
+
+export const useDialog = ({
+  show,
+  dialogRef,
+  onClose,
+}: {
+  show: any
+  dialogRef: React.MutableRefObject<HTMLDialogElement | null>
+  onClose: () => void
+}) => {
+  useEffect(() => {
+    const ref = dialogRef.current
+    if (ref) {
+      if (show) {
+        if (!ref.open) {
+          ref.showModal()
+        }
+      } else {
+        ref.close()
+      }
+      ref.addEventListener('close', onClose)
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener('close', onClose)
+      }
+    }
+  }, [show, dialogRef, onClose])
+}
+
+export default { useGoBack, useLocalDescription, useCalculateEpochs, useDialog }

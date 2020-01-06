@@ -1,7 +1,7 @@
-import { currentNetworkID, systemScript } from 'services/localCache'
+import { currentNetworkID } from 'services/localCache'
 import { ConnectionStatus } from 'utils/const'
 
-export const transactionState: State.DetailedTransaction = {
+export const transactionState: Readonly<State.DetailedTransaction> = {
   value: '',
   hash: '',
   type: 'receive',
@@ -18,13 +18,13 @@ export const transactionState: State.DetailedTransaction = {
   blockNumber: '',
   blockHash: '',
   witnesses: [],
+  nervosDao: false,
 }
 
-const chainState: State.Chain = {
+const chainState: Readonly<State.Chain> = {
   networkID: currentNetworkID.load(),
   connectionStatus: ConnectionStatus.Offline,
   tipBlockNumber: '',
-  codeHash: systemScript.load().codeHash,
   transactions: {
     pageNo: 1,
     pageSize: 15,

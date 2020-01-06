@@ -1,0 +1,73 @@
+@import "../../styles/mixin.scss";
+
+.dialog {
+  @include dialogContainer;
+  padding: 51px 73px;
+
+  &::backdrop {
+    @include overlay;
+  }
+}
+
+.title {
+  @include dialogTitle;
+}
+
+.fee {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.7px;
+  margin-top: 11px;
+  margin-bottom: 20px;
+
+  &>span:first-of-type:after {
+    display: inline;
+    content: ':';
+    font-weight: 600;
+  }
+}
+
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  height: 1rem;
+  color: red;
+  font-size: 0.625rem;
+}
+
+.notice {
+  h2 {
+    line-height: 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    padding: 0;
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.625rem;
+    letter-spacing: 0.5px;
+    margin: 6px 0 28px 0;
+  }
+}
+
+.rfcLink {
+  font-size: 0.625rem;
+  letter-spacing: 0.45px;
+  color: var(--nervos-green);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer {
+  @include dialogFooter;
+
+  button:last-of-type {
+    margin-left: 9px;
+  }
+}

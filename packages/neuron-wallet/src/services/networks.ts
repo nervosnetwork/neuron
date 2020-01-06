@@ -1,18 +1,14 @@
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { v4 as uuid } from 'uuid'
-import { DefaultNetworkUnremovable, LackOfDefaultNetwork } from 'exceptions/network'
+import { DefaultNetworkUnremovable } from 'exceptions/network'
 
 import Store from 'models/store'
 
 import { Validate, Required } from 'decorators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
-import { NetworkListSubject, CurrentNetworkIDSubject } from 'models/subjects/networks'
-import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkID, NetworkName, NetworkRemote, NetworksKey, NetworkType, Network, NetworkWithID } from 'types/network'
-import NetworkSwitchSubject from 'models/subjects/network-switch-subject'
+import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
 
-const isMainProcess = process && process.type === 'browser'
-
-const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
+const presetNetworks: { selected: string, networks: Network[] } = {
   selected: 'mainnet',
   networks: [
     {
@@ -24,6 +20,11 @@ const presetNetworks: { selected: string, networks: NetworkWithID[] } = {
       chain: 'ckb',
     }
   ]
+}
+
+enum NetworksKey {
+  List = 'networks',
+  Current = 'selected',
 }
 
 export default class NetworksService extends Store {
@@ -39,68 +40,26 @@ export default class NetworksService extends Store {
   constructor() {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
-    this.on(NetworksKey.List, async (_, currentNetworkList: NetworkWithID[] = []) => {
-      if (isMainProcess) {
-        NetworkListSubject.next({ currentNetworkList })
-      }
-
-      const currentID = this.getCurrentID()
-      if (currentNetworkList.find(network => network.id === currentID)) {
-        return
-      }
-
-      const defaultNetwork = this.defaultOne()
-      if (!defaultNetwork) {
-        throw new LackOfDefaultNetwork()
-      }
-      this.activate(defaultNetwork.id)
-    })
-
-    this.on(NetworksKey.Current, async (_, currentNetworkID: NetworkID) => {
-      const currentNetwork = this.get(currentNetworkID)
-      if (!currentNetwork) {
-        throw new NetworkNotFound(currentNetworkID)
-      }
-      if (isMainProcess) {
-        CurrentNetworkIDSubject.next({ currentNetworkID })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
-      }
-    })
-  }
-
-  public notifyAll = () => {
-    const currentNetworkList = this.getAll()
-    if (isMainProcess) {
-      NetworkListSubject.next({ currentNetworkList })
-    }
-
     const currentNetwork = this.getCurrent()
-    if (currentNetwork) {
-      if (currentNetwork.type !== NetworkType.Default) {
-        this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
-      }
-
-      if (isMainProcess) {
-        CurrentNetworkIDSubject.next({ currentNetworkID: currentNetwork.id })
-        NetworkSwitchSubject.getSubject().next(currentNetwork)
-      }
+    if (currentNetwork.type !== NetworkType.Default) {
+      this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
     }
   }
 
   public getAll = () => {
-    return this.readSync<NetworkWithID[]>(NetworksKey.List) || presetNetworks.networks
+    return this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
   }
 
-  public getCurrent(): NetworkWithID {
+  public getCurrent(): Network {
     return this.get(this.getCurrentID()) || this.defaultOne()! // Should always have at least one network
   }
 
-  public get(@Required id: NetworkID) {
+  public get(@Required id: string) {
     const list = this.getAll()
     return list.find(item => item.id === id) || null
   }
 
-  public updateAll(@Required networks: NetworkWithID[]) {
+  public updateAll(@Required networks: Network[]) {
     if (!Array.isArray(networks)) {
       throw new InvalidFormat('Networks')
     }
@@ -108,37 +67,28 @@ export default class NetworksService extends Store {
   }
 
   @Validate
-  public async create(@Required name: NetworkName, @Required remote: NetworkRemote, type: NetworkType = NetworkType.Normal) {
+  public async create(@Required name: string, @Required remote: string, type: NetworkType = NetworkType.Normal) {
     const list = this.getAll()
     if (list.some(item => item.name === name)) {
       throw new UsedName('Network')
     }
 
-    const core = new Core(remote)
-
-    const chain = await core.rpc
-      .getBlockchainInfo()
-      .then(info => info.chain)
-      .catch(() => 'ckb_dev')
-    const genesisHash = await core.rpc
-      .getBlockHash('0x0')
-      .catch(() => EMPTY_GENESIS_HASH)
-
-    const newOne = {
+    const properties = {
       id: uuid(),
       name,
       remote,
-      genesisHash,
       type,
-      chain,
+      genesisHash: EMPTY_GENESIS_HASH,
+      chain: 'ckb_dev'
     }
+    const network = await this.refreshChainInfo(properties)
 
-    this.updateAll([...list, newOne])
-    return newOne
+    this.updateAll([...list, network])
+    return network
   }
 
   @Validate
-  public async update(@Required id: NetworkID, @Required options: Partial<Network>) {
+  public async update(@Required id: string, @Required options: Partial<Network>) {
     const list = this.getAll()
     const network = list.find(item => item.id === id)
     if (!network) {
@@ -146,35 +96,13 @@ export default class NetworksService extends Store {
     }
 
     Object.assign(network, options)
-    if (!options.chain) {
-      const core = new Core(network.remote)
-
-      const chain = await core.rpc
-        .getBlockchainInfo()
-        .then(info => info.chain)
-        .catch(() => '')
-      if (chain !== '') {
-        network.chain = chain
-      }
-
-      const genesisHash = await core.rpc
-        .getBlockHash('0x0')
-        .catch(() => EMPTY_GENESIS_HASH)
-      if (genesisHash !== EMPTY_GENESIS_HASH) {
-        network.genesisHash = genesisHash
-      }
-    }
+    Object.assign(network, await this.refreshChainInfo(network))
 
     this.updateAll(list)
-
-    if (this.getCurrentID() === id && isMainProcess) {
-      CurrentNetworkIDSubject.next({ currentNetworkID: id })
-      NetworkSwitchSubject.getSubject().next(network)
-    }
   }
 
   @Validate
-  public async delete(@Required id: NetworkID) {
+  public async delete(@Required id: string) {
     const networkToDelete = this.get(id)
     if (!networkToDelete) {
       throw new NetworkNotFound(id)
@@ -183,22 +111,21 @@ export default class NetworksService extends Store {
       throw new DefaultNetworkUnremovable()
     }
 
-    const prevNetworkList = this.getAll()
-    const currentNetworkList = prevNetworkList.filter(item => item.id !== id)
-    this.updateAll(currentNetworkList)
+    if (this.getCurrentID() === id) {
+      this.writeSync(NetworksKey.Current, null)
+    }
+
+    const list = this.getAll().filter(item => item.id !== id)
+    this.updateAll(list)
   }
 
   @Validate
-  public async activate(@Required id: NetworkID) {
+  public async activate(@Required id: string) {
     const network = this.get(id)
     if (!network) {
       throw new NetworkNotFound(id)
     }
-
-    // No need to update the default mainnet's genesis hash
-    if (network.type !== NetworkType.Default) {
-      this.update(id, {})
-    }
+    this.update(id, {}) // Trigger chain info refresh
 
     this.writeSync(NetworksKey.Current, id)
   }
@@ -219,6 +146,31 @@ export default class NetworksService extends Store {
     if (this.isMainnet()) {
       return "https://explorer.nervos.org"
     }
-    return "https://explorer.nervos.org/testnet"
+    return "https://explorer.nervos.org/aggron"
+  }
+
+  // Refresh a network's genesis and chain info
+  private async refreshChainInfo(network: Network): Promise<Network> {
+    if (network.type === NetworkType.Default) {
+      // Default mainnet network is not editable
+      return network
+    }
+
+    const ckb = new CKB(network.remote)
+
+    const genesisHash = await ckb.rpc
+      .getBlockHash('0x0')
+      .catch(() => EMPTY_GENESIS_HASH)
+    const chain = await ckb.rpc
+      .getBlockchainInfo()
+      .then(info => info.chain)
+      .catch(() => '')
+
+    if (genesisHash !== network.genesisHash && chain !== '') {
+      network.genesisHash = genesisHash
+      network.chain = chain
+    }
+
+    return network
   }
 }

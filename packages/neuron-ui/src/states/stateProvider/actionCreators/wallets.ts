@@ -7,7 +7,7 @@ import {
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
-  getNervosDaoData,
+  getDaoData,
   sendTx,
   getAddressesByWalletID,
   updateAddressDescription as updateRemoteAddressDescription,
@@ -176,7 +176,6 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => (
         }
         dispatch({
           type: AppActions.DismissPasswordRequest,
-          payload: null,
         })
       })
       .catch(err => {
@@ -236,7 +235,6 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
 export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.DismissPasswordRequest,
-    payload: null,
   })
   deleteRemoteWallet(params).then(res => {
     if (res.status === 1) {
@@ -254,7 +252,6 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
 export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch: StateDispatch) => {
   dispatch({
     type: AppActions.DismissPasswordRequest,
-    payload: null,
   })
   backupRemoteWallet(params).then(res => {
     if (res.status === 1) {
@@ -269,7 +266,7 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
 }
 
 export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
-  getNervosDaoData(walletID).then(res => {
+  getDaoData(walletID).then(res => {
     if (res.status === 1) {
       dispatch({
         type: NeuronWalletActions.UpdateNervosDaoData,

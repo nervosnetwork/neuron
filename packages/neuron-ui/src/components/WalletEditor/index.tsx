@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps, Link } from 'react-router-dom'
-import { Stack, TextField, PrimaryButton, DefaultButton } from 'office-ui-fabric-react'
+import { Stack } from 'office-ui-fabric-react'
+import TextField from 'widgets/TextField'
+import Button from 'widgets/Button'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
@@ -57,16 +59,17 @@ const WalletEditor = ({
       <Stack tokens={{ childrenGap: 15 }}>
         {inputs.map(inputProps => (
           <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} key={inputProps.label} required errorMessage={hint || undefined} />
+            <TextField {...inputProps} field={inputProps.label} required error={hint || undefined} />
           </Stack.Item>
         ))}
       </Stack>
       <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        <PrimaryButton
+        <Button type="cancel" onClick={goBack} label={t('common.cancel')} />
+        <Button
+          type="submit"
           onClick={onConfirm}
+          label={t('common.save')}
           disabled={hint !== null || editor.name.value === wallet.name}
-          text={t('common.save')}
         />
       </Stack>
     </Stack>

@@ -6,7 +6,7 @@ import NetworksService from 'services/networks'
 import Keystore from 'models/keys/keystore'
 import Keychain from 'models/keys/keychain'
 import { validateMnemonic, mnemonicToSeedSync } from 'models/keys/mnemonic'
-import { AccountExtendedPublicKey, ExtendedPrivateKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, ExtendedPrivateKey, generateMnemonic } from 'models/keys/key'
 import CommandSubject from 'models/subjects/command'
 import { ResponseCode } from 'utils/const'
 import {
@@ -20,16 +20,15 @@ import {
   InvalidJSON,
   InvalidAddress,
 } from 'exceptions'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import AddressService from 'services/addresses'
-import WalletCreatedSubject from 'models/subjects/wallet-created-subject'
-import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
+import { TransactionWithoutHash } from 'types/cell-types'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
+import TransactionSender from 'services/transaction-sender'
 
 export default class WalletsController {
-  public static async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
-    const walletsService = WalletsService.getInstance()
-    const wallets = walletsService.getAll()
+  public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
+    const wallets = WalletsService.getInstance().getAll()
     if (!wallets) {
       throw new ServiceHasNoResponse('Wallet')
     }
@@ -39,13 +38,12 @@ export default class WalletsController {
     }
   }
 
-  public static async get(id: string): Promise<Controller.Response<Wallet>> {
-    const walletsService = WalletsService.getInstance()
+  public async get(id: string): Promise<Controller.Response<Wallet>> {
     if (typeof id === 'undefined') {
       throw new IsRequired('ID')
     }
 
-    const wallet = walletsService.get(id)
+    const wallet = WalletsService.getInstance().get(id)
     if (!wallet) {
       throw new WalletNotFound(id)
     }
@@ -55,54 +53,15 @@ export default class WalletsController {
     }
   }
 
-  public static async importMnemonic({
-    name,
-    password,
-    mnemonic,
-  }: {
-    name: string
-    password: string
-    mnemonic: string
-  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    const result = await WalletsController.createByMnemonic({
-      name,
-      password,
-      mnemonic,
-      isImporting: true,
-    })
-
-    WalletCreatedSubject.getSubject().next('import')
-
-    return result
+  public async importMnemonic({ name, password, mnemonic }: { name: string, password: string, mnemonic: string }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    return await this.createByMnemonic({ name, password, mnemonic, isImporting: true })
   }
 
-  public static async create({
-    name,
-    password,
-    mnemonic,
-  }: {
-    name: string
-    password: string
-    mnemonic: string
-  }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
-    const result = await WalletsController.createByMnemonic({
-      name,
-      password,
-      mnemonic,
-      isImporting: false,
-    })
-
-    WalletCreatedSubject.getSubject().next('create')
-
-    return result
+  public async create({ name, password, mnemonic }: { name: string, password: string, mnemonic: string }): Promise<Controller.Response<Omit<WalletProperties, 'extendedKey'>>> {
+    return await this.createByMnemonic({ name, password, mnemonic, isImporting: false })
   }
 
-  private static async createByMnemonic({
-    name,
-    password,
-    mnemonic,
-    isImporting,
-  }: {
+  private async createByMnemonic({ name, password, mnemonic, isImporting }: {
     name: string
     password: string
     mnemonic: string
@@ -148,15 +107,8 @@ export default class WalletsController {
     }
   }
 
-  public static async importKeystore({
-    name,
-    password,
-    keystorePath,
-  }: {
-    name: string
-    password: string
-    keystorePath: string
-  }): Promise<Controller.Response<Wallet>> {
+  public async importKeystore({ name, password, keystorePath }: { name: string, password: string, keystorePath: string }):
+    Promise<Controller.Response<Wallet>> {
     if (password === undefined) {
       throw new IsRequired('Password')
     }
@@ -186,8 +138,7 @@ export default class WalletsController {
       keystore: keystoreObject,
     })
 
-    await walletsService.generateAddressesById(wallet.id, true)
-    WalletCreatedSubject.getSubject().next('import')
+    walletsService.generateAddressesById(wallet.id, true)
 
     return {
       status: ResponseCode.Success,
@@ -195,19 +146,8 @@ export default class WalletsController {
     }
   }
 
-  // TODO: update addresses?
-
-  public static async update({
-    id,
-    name,
-    password,
-    newPassword,
-  }: {
-    id: string
-    password: string
-    name: string
-    newPassword?: string
-  }): Promise<Controller.Response<Wallet>> {
+  public async update({ id, name, password, newPassword }: { id: string, password: string, name: string, newPassword?: string }):
+    Promise<Controller.Response<Wallet>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
     if (!wallet) {
@@ -231,10 +171,7 @@ export default class WalletsController {
     }
   }
 
-  public static async delete({
-    id = '',
-    password = '',
-  }: Controller.Params.DeleteWallet): Promise<Controller.Response<any>> {
+  public async delete({ id = '', password = '' }: Controller.Params.DeleteWallet): Promise<Controller.Response<any>> {
     if (password === '') {
       throw new EmptyPassword()
     }
@@ -249,10 +186,7 @@ export default class WalletsController {
     }
   }
 
-  public static async backup({
-    id = '',
-    password = '',
-  }: Controller.Params.BackupWallet): Promise<Controller.Response<boolean>> {
+  public async backup({ id = '', password = '' }: Controller.Params.BackupWallet): Promise<Controller.Response<boolean>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
 
@@ -275,7 +209,7 @@ export default class WalletsController {
     })
   }
 
-  public static async getCurrent() {
+  public async getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {
       status: ResponseCode.Success,
@@ -283,7 +217,7 @@ export default class WalletsController {
     }
   }
 
-  public static async activate(id: string) {
+  public async activate(id: string) {
     const walletsService = WalletsService.getInstance()
     walletsService.setCurrent(id)
     const currentWallet = walletsService.getCurrent() as FileKeystoreWallet
@@ -296,7 +230,7 @@ export default class WalletsController {
     }
   }
 
-  public static async getAllAddresses(id: string) {
+  public async getAllAddresses(id: string) {
     const addresses = AddressService.allAddressesByWalletId(id).map(
       ({
         address,
@@ -322,18 +256,12 @@ export default class WalletsController {
     }
   }
 
-  public static async sendTx(params: {
-    walletID: string
-    tx: TransactionWithoutHash
-    password: string
-    description?: string
-  }) {
+  public async sendTx(params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
-    const walletsService = WalletsService.getInstance()
-    const hash = await walletsService.sendTx(
+    const hash = await new TransactionSender().sendTx(
       params.walletID,
       params.tx,
       params.password,
@@ -345,23 +273,14 @@ export default class WalletsController {
     }
   }
 
-  public static async generateTx(params: {
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    fee: string
-    feeRate: string
-  }) {
+  public async generateTx(params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
     const addresses: string[] = params.items.map(i => i.address)
-    WalletsController.checkAddresses(addresses)
+    this.checkAddresses(addresses)
 
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateTx(
+    const tx = await new TransactionSender().generateTx(
       params.walletID,
       params.items,
       params.fee,
@@ -373,23 +292,14 @@ export default class WalletsController {
     }
   }
 
-  public static async generateSendingAllTx(params: {
-    walletID: string
-    items: {
-      address: string
-      capacity: string
-    }[]
-    fee: string
-    feeRate: string
-  }) {
+  public async generateSendingAllTx(params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
     const addresses: string[] = params.items.map(i => i.address)
-    WalletsController.checkAddresses(addresses)
+    this.checkAddresses(addresses)
 
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateSendingAllTx(
+    const tx = await new TransactionSender().generateSendingAllTx(
       params.walletID,
       params.items,
       params.fee,
@@ -401,106 +311,8 @@ export default class WalletsController {
     }
   }
 
-  public static async generateDepositTx(params: {
-    walletID: string,
-    capacity: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateDepositTx(
-      params.walletID,
-      params.capacity,
-      params.fee,
-      params.feeRate,
-    )
-    return {
-      status: ResponseCode.Success,
-      result: tx,
-    }
-  }
-
-  public static async startWithdrawFromDao(params: {
-    walletID: string,
-    outPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.startWithdrawFromDao(
-      params.walletID,
-      params.outPoint,
-      params.fee,
-      params.feeRate,
-    )
-    return {
-      status: ResponseCode.Success,
-      result: tx,
-    }
-  }
-
-  public static async withdrawFromDao(params: {
-    walletID: string,
-    depositOutPoint: OutPoint,
-    withdrawingOutPoint: OutPoint,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.withdrawFromDao(
-      params.walletID,
-      params.depositOutPoint,
-      params.withdrawingOutPoint,
-      params.fee,
-      params.feeRate,
-    )
-    return {
-      status: ResponseCode.Success,
-      result: tx,
-    }
-  }
-
-  public static async generateDepositAllTx(params: {
-    walletID: string,
-    fee: string,
-    feeRate: string,
-  }): Promise<Controller.Response<TransactionWithoutHash>> {
-    if (!params) {
-      throw new IsRequired('Parameters')
-    }
-    const walletsService = WalletsService.getInstance()
-    const tx = await walletsService.generateDepositAllTx(
-      params.walletID,
-      params.fee,
-      params.feeRate,
-    )
-    return {
-      status: ResponseCode.Success,
-      result: tx,
-    }
-  }
-
-  public static async updateAddressDescription({
-    walletID,
-    address,
-    description,
-  }: {
-    walletID: string
-    address: string
-    description: string
-  }) {
-    const walletService = WalletsService.getInstance()
-    const wallet = walletService.get(walletID)
-
+  public async updateAddressDescription({ walletID, address, description }: { walletID: string, address: string, description: string }) {
+    const wallet = WalletsService.getInstance().get(walletID)
     AddressService.updateDescription(wallet.id, address, description)
 
     return {
@@ -513,7 +325,7 @@ export default class WalletsController {
     }
   }
 
-  public static async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
+  public async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
     const window = BrowserWindow.getFocusedWindow()
     if (window) {
       CommandSubject.next({
@@ -524,7 +336,21 @@ export default class WalletsController {
     }
   }
 
-  private static checkAddresses = (addresses: string[]) => {
+  public validateMnemonic(mnemonic: string) {
+    return {
+      status: ResponseCode.Success,
+      result: validateMnemonic(mnemonic)
+    }
+  }
+
+  public generateMnemonic() {
+    return {
+      status: ResponseCode.Success,
+      result: generateMnemonic()
+    }
+  }
+
+  private checkAddresses = (addresses: string[]) => {
     const isMainnet = NetworksService.getInstance().isMainnet()
     addresses.forEach(address => {
       if (isMainnet && !address.startsWith('ckb')) {
@@ -535,13 +361,13 @@ export default class WalletsController {
         throw new TestnetAddressRequired(address)
       }
 
-      if (!WalletsController.verifyAddress(address)) {
+      if (!this.verifyAddress(address)) {
         throw new InvalidAddress(address)
       }
     })
   }
 
-  private static verifyAddress = (address: string): boolean => {
+  private verifyAddress = (address: string): boolean => {
     if (typeof address !== 'string' || address.length !== 46) {
       return false
     }

@@ -1,0 +1,94 @@
+// font
+@mixin BoldText {
+  font-family: "Montserrat-Bold", "SourceHanSansCN-Bold";
+}
+
+@mixin SemiBoldText {
+  font-family: "Montserrat-SemiBold", "SourceHanSansCN-Medium";
+}
+
+@mixin MediumText {
+  font-family: "Montserrat-Medium", "SourceHanSansCN-Medium";
+}
+
+@mixin RegularText {
+  font-family: "Montserrat-Regular", "SourceHanSansCN-Regular";
+}
+
+// layout
+@mixin dialogContainer {
+  border: none;
+  border-radius: 2px;
+  box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+  min-width: 500px;
+  max-width: 545px;
+  box-sizing: border-box;
+}
+
+@mixin dialogTitle {
+  @include BoldText;
+  font-size: 1.125rem;
+  letter-spacing: 0.9px;
+  margin-bottom: 25px;
+}
+
+@mixin dialogFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@mixin dialogConfirmButton {
+  border: none;
+  width: 5.125rem;
+  height: 1.875rem;
+  background-color: var(--nervos-green);
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.6px;
+}
+
+@mixin overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+}
+
+@mixin disabledBtn {
+  background-color: #e3e3e3;
+  color: #666;
+}
+
+@mixin formFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 15px;
+
+  button {
+    margin-left: 10px;
+
+    &:first-of-type {
+      margin-left: 0;
+    }
+  }
+}
+
+@mixin descriptionField {
+  display: flex;
+
+  &>div {
+    border-color: transparent !important;
+
+    input::-webkit-input-placeholder {
+      color: #b3b3b3;
+      font-size: 0.75rem;
+    }
+  }
+
+  &:hover>div {
+    border-color: #b3b3b3 !important;
+  }
+
+  &:focus-within>div {
+    border-color: #333 !important;
+  }
+}

@@ -10,16 +10,10 @@ import {
   AfterUpdate,
   AfterRemove,
 } from 'typeorm'
-import { remote } from 'electron'
 import { Transaction as TransactionInterface, TransactionStatus, CellDep } from 'types/cell-types'
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
-
-const isRenderer = process && process.type === 'renderer'
-const txDbChangedSubject = isRenderer
-  ? remote.require('./models/subjects/tx-db-changed-subject').default.getSubject()
-  : TxDbChangedSubject.getSubject()
 
 @Entity()
 export default class Transaction extends BaseEntity {
@@ -150,7 +144,7 @@ export default class Transaction extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    txDbChangedSubject.next({
+    TxDbChangedSubject.getSubject().next({
       event,
       tx: this.toInterface(),
     })

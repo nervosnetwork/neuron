@@ -10,6 +10,7 @@ import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
+import styles from './history.module.scss'
 
 const History = ({
   app: {
@@ -47,45 +48,60 @@ const History = ({
 
   const List = useMemo(() => {
     return (
-      <Stack>
-        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
-          <SearchBox
-            value={keywords}
-            styles={{ root: { width: 500 } }}
-            placeholder={t('history.search.placeholder')}
-            onChange={onKeywordsChange}
-            onSearch={onSearch}
-            iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
-          />
-        </Stack>
-        <TransactionList
-          isLoading={isLoading}
-          walletID={id}
-          items={items}
-          tipBlockNumber={tipBlockNumber}
-          isMainnet={isMainnet}
-          dispatch={dispatch}
-        />
-        <Pagination
-          selectedPageIndex={pageNo - 1}
-          pageCount={Math.ceil(totalCount / pageSize)}
-          itemsPerPage={pageSize}
-          totalItemCount={totalCount}
-          previousPageAriaLabel={t('pagination.previous-page')}
-          nextPageAriaLabel={t('pagination.next-page')}
-          firstPageAriaLabel={t('pagination.first-page')}
-          lastPageAriaLabel={t('pagination.last-page')}
-          pageAriaLabel={t('pagination.page')}
-          selectedAriaLabel={t('pagination.selected')}
-          firstPageIconProps={{ iconName: 'FirstPage' }}
-          previousPageIconProps={{ iconName: 'PrevPage' }}
-          nextPageIconProps={{ iconName: 'NextPage' }}
-          lastPageIconProps={{ iconName: 'LastPage' }}
-          format="buttons"
-          onPageChange={(idx: number) => {
-            history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
+      <Stack className={styles.history}>
+        <SearchBox
+          value={keywords}
+          styles={{
+            root: {
+              background: '#e3e3e3',
+              border: 'none',
+              borderRadius: 0,
+              fontSize: '1rem',
+              fontFamily: 'Montserrat-Regular',
+            },
           }}
+          placeholder={t('history.search.placeholder')}
+          onChange={onKeywordsChange}
+          onSearch={onSearch}
+          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
+        <div className={styles.listContainer}>
+          {totalCount ? (
+            <TransactionList
+              isLoading={isLoading}
+              walletID={id}
+              items={items as State.Transaction[]}
+              tipBlockNumber={tipBlockNumber}
+              isMainnet={isMainnet}
+              dispatch={dispatch}
+            />
+          ) : null}
+        </div>
+        {totalCount ? null : <div className={styles.noTxs}>{t('history.no-txs')}</div>}
+        <div className={styles.pagination}>
+          {totalCount ? (
+            <Pagination
+              selectedPageIndex={pageNo - 1}
+              pageCount={Math.ceil(totalCount / pageSize)}
+              itemsPerPage={pageSize}
+              totalItemCount={totalCount}
+              previousPageAriaLabel={t('pagination.previous-page')}
+              nextPageAriaLabel={t('pagination.next-page')}
+              firstPageAriaLabel={t('pagination.first-page')}
+              lastPageAriaLabel={t('pagination.last-page')}
+              pageAriaLabel={t('pagination.page')}
+              selectedAriaLabel={t('pagination.selected')}
+              firstPageIconProps={{ iconName: 'FirstPage' }}
+              previousPageIconProps={{ iconName: 'PrevPage' }}
+              nextPageIconProps={{ iconName: 'NextPage' }}
+              lastPageIconProps={{ iconName: 'LastPage' }}
+              format="buttons"
+              onPageChange={(idx: number) => {
+                history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
+              }}
+            />
+          ) : null}
+        </div>
       </Stack>
     )
   }, [

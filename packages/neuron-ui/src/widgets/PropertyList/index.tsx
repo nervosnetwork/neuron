@@ -20,7 +20,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
     <div className={styles.propertyCell} style={{ height: item.height || 'auto' }} aria-label="property">
       <span
         className={styles.label}
-        style={{ width: item.labelWidth || 'auto', fontWeight: 600, fontSize: theme.fonts.small.fontSize }}
+        style={{ width: item.labelWidth || 'auto', fontSize: '1.125rem' }}
         title={item.label}
         aria-label={item.label}
       >
@@ -29,7 +29,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
       <span
         className={styles.value}
         style={{ width: item.valueWidth || 'auto', fontSize: theme.fonts.small.fontSize, textAlign: 'right' }}
-        title={`${item.value}`}
+        title={typeof item.value === 'string' ? `${item.value}` : ''}
         aria-label={item.label}
       >
         {item.value}
@@ -38,7 +38,7 @@ const onRenderCell = (item?: Property & CellStyles) =>
   ) : null
 const PropertyList = ({
   properties,
-  cellStyles = { labelWidth: '100px', valueWidth: '200px', height: 'auto', color: 'inherit' },
+  cellStyles = { labelWidth: '100px', valueWidth: '280px', height: 'auto', color: 'inherit' },
 }: {
   properties: Property[]
   cellStyles?: CellStyles

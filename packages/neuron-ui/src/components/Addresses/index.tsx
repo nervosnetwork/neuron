@@ -1,32 +1,20 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Stack,
-  ShimmeredDetailsList,
-  TextField,
-  IColumn,
-  CheckboxVisibility,
-  DefaultButton,
-  IconButton,
-  Text,
-  getTheme,
-} from 'office-ui-fabric-react'
+import { Edit } from 'grommet-icons'
+import TextField from 'widgets/TextField'
 
 import { openExternal, openContextMenu } from 'services/remote'
-import { ckbCore } from 'services/chain'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { onRenderRow } from 'utils/fabricUIRender'
 import { Routes, MAINNET_TAG } from 'utils/const'
+import { backToTop } from 'utils/animations'
 import getExplorerUrl from 'utils/getExplorerUrl'
+import styles from './addresses.module.scss'
 
 const Addresses = ({
-  app: {
-    loadings: { addressList: isLoading },
-  },
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
   settings: { networks = [] },
@@ -34,8 +22,11 @@ const Addresses = ({
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
   const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
-  const [showMainnetAddress, setShowMainnetAddress] = useState(false)
   const [t] = useTranslation()
+
+  useEffect(() => {
+    backToTop()
+  }, [])
 
   const {
     localDescription,
@@ -45,226 +36,104 @@ const Addresses = ({
     onDescriptionSelected,
   } = useLocalDescription('address', walletID, dispatch)
 
-  const theme = getTheme()
-  const { semanticColors } = theme
-
-  const addressColumns: IColumn[] = useMemo(
-    () => [
-      {
-        name: 'addresses.type',
-        key: 'type',
-        fieldName: 'type',
-        minWidth: 150,
-        maxWidth: 150,
-        onRender: (item?: State.Address) => {
-          if (undefined === item) {
-            return null
-          }
-          if (item.type === 0) {
-            return <span style={{ color: '#28b463' }}>{t('addresses.receiving-address')}</span>
-          }
-          return <span style={{ color: '#cccc00' }}>{t('addresses.change-address')}</span>
-        },
-      },
-      {
-        name: 'addresses.address',
-        key: 'address',
-        fieldName: 'address',
-        className: 'monospacedFont',
-        minWidth: 100,
-        maxWidth: 500,
-        onRender: (item?: State.Address, _index?: number, column?: IColumn) => {
-          if (item) {
-            if (column && (column.calculatedWidth || 0) < 420) {
-              return (
-                <div
-                  title={item.address}
-                  style={{
-                    overflow: 'hidden',
-                    display: 'flex',
-                  }}
-                >
-                  <span className="textOverflow">{item.address.slice(0, -6)}</span>
-                  <span>{item.address.slice(-6)}</span>
-                </div>
-              )
-            }
-            return (
-              <span className="textOverflow" title={item.address}>
-                {item.address}
-              </span>
-            )
-          }
-          return '-'
-        },
-      },
-      {
-        name: 'addresses.description',
-        key: 'description',
-        fieldName: 'description',
-        minWidth: 100,
-        onRender: (item?: State.Address) => {
-          const isSelected = item && localDescription.key === item.address
-          return item ? (
-            <>
-              <TextField
-                data-description-key={item.address}
-                data-description-value={item.description}
-                borderless
-                title={item.description}
-                value={isSelected ? localDescription.description : item.description || ''}
-                onBlur={isSelected ? onDescriptionFieldBlur : undefined}
-                onKeyPress={isSelected ? onDescriptionPress : undefined}
-                onChange={isSelected ? onDescriptionChange : undefined}
-                readOnly={!isSelected}
-                styles={{
-                  root: {
-                    flex: 1,
-                  },
-                  fieldGroup: {
-                    backgroundColor: isSelected ? '#fff' : 'transparent',
-                    borderColor: 'transparent',
-                    border: isSelected ? `1px solid ${semanticColors.inputBorder}!important` : 'none',
-                  },
-                }}
-              />
-              {isSelected ? null : (
-                <IconButton
-                  iconProps={{ iconName: 'Edit' }}
-                  className="editButton"
-                  onClick={onDescriptionSelected(item.address, item.description)}
-                />
-              )}
-            </>
-          ) : null
-        },
-      },
-      {
-        name: 'addresses.balance',
-        key: 'balance',
-        fieldName: 'balance',
-        minWidth: 200,
-        maxWidth: 250,
-        onRender: (item?: State.Address) => {
-          if (item) {
-            return (
-              <span title={`${item.balance} shannon`} className="textOverflow">
-                {`${shannonToCKBFormatter(item.balance)} CKB`}
-              </span>
-            )
-          }
-          return '-'
-        },
-      },
-      {
-        name: 'addresses.transactions',
-        key: 'transactions',
-        fieldName: 'txCount',
-        minWidth: 100,
-        maxWidth: 200,
-        onRender: (item?: State.Address) => {
-          if (item) {
-            return localNumberFormatter(item.txCount)
-          }
-          return '-'
-        },
-      },
-    ],
-    [
-      onDescriptionChange,
-      localDescription,
-      onDescriptionFieldBlur,
-      onDescriptionPress,
-      onDescriptionSelected,
-      t,
-      semanticColors,
-    ]
-  )
-
   const onContextMenu = useCallback(
     item => {
       if (item && item.address) {
-        if (showMainnetAddress) {
-          const menuTemplate = [
-            {
-              label: t('addresses.copy-address'),
-              click: () => {
-                window.clipboard.writeText(item.address)
-              },
+        const menuTemplate = [
+          {
+            label: t('addresses.copy-address'),
+            click: () => {
+              window.clipboard.writeText(item.address)
             },
-          ]
-          openContextMenu(menuTemplate)
-        } else {
-          const menuTemplate = [
-            {
-              label: t('addresses.copy-address'),
-              click: () => {
-                window.clipboard.writeText(item.address)
-              },
+          },
+          {
+            label: t('addresses.request-payment'),
+            click: () => {
+              history.push(`${Routes.Receive}/${item.address}`)
             },
-            {
-              label: t('addresses.request-payment'),
-              click: () => {
-                history.push(`${Routes.Receive}/${item.address}`)
-              },
+          },
+          {
+            label: t('addresses.view-on-explorer'),
+            click: () => {
+              const explorerUrl = getExplorerUrl(isMainnet)
+              openExternal(`${explorerUrl}/address/${item.address}`)
             },
-            {
-              label: t('addresses.view-on-explorer'),
-              click: () => {
-                const explorerUrl = getExplorerUrl(isMainnet)
-                openExternal(`${explorerUrl}/address/${item.address}`)
-              },
-            },
-          ]
-          openContextMenu(menuTemplate)
-        }
+          },
+        ]
+        openContextMenu(menuTemplate)
       }
     },
-    [t, showMainnetAddress, isMainnet, history]
-  )
-  const List = useMemo(
-    () => (
-      <ShimmeredDetailsList
-        enableShimmer={isLoading}
-        checkboxVisibility={CheckboxVisibility.hidden}
-        columns={addressColumns
-          .filter(col => !showMainnetAddress || col.key === 'address')
-          .map(col => ({ ...col, name: t(col.name) }))}
-        items={addresses.map(addr => ({
-          ...addr,
-          address: showMainnetAddress
-            ? ckbCore.utils.bech32Address(addr.identifier, {
-                prefix: ckbCore.utils.AddressPrefix.Mainnet,
-                type: ckbCore.utils.AddressType.HashIdx,
-                codeHashOrCodeHashIndex: '0x00',
-              }) || ''
-            : addr.address,
-        }))}
-        onItemContextMenu={onContextMenu}
-        className="listWithDesc"
-        onRenderRow={onRenderRow}
-      />
-    ),
-    [isLoading, addressColumns, addresses, showMainnetAddress, onContextMenu, t]
+    [t, isMainnet, history]
   )
 
   return (
-    <>
-      <Stack verticalAlign="center" horizontalAlign="start" tokens={{ childrenGap: 15 }}>
-        {!isMainnet ? (
-          <DefaultButton
-            text={t(`addresses.display-${showMainnetAddress ? 'testnet' : 'mainnet'}-addresses`)}
-            onClick={() => setShowMainnetAddress(!showMainnetAddress)}
-          />
-        ) : null}
-        {showMainnetAddress && !isMainnet ? (
-          <Text variant="medium" style={{ color: semanticColors.errorText }}>
-            {t('addresses.mainnet-address-caution')}
-          </Text>
-        ) : null}
-      </Stack>
-      {List}
-    </>
+    <div className={styles.container}>
+      <table className={styles.addressList}>
+        <thead>
+          <tr>
+            {['type', 'address', 'description', 'balance', 'transactions'].map(field => (
+              <th key={field}>{t(`addresses.${field}`)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {addresses.map(addr => {
+            const isSelected = localDescription.key === addr.address
+            const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
+            return (
+              <tr key={addr.address} onContextMenu={() => onContextMenu(addr)}>
+                <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
+                  {typeLabel}
+                </td>
+                <td className={`${styles.address} monospacedFont`}>
+                  <div data-address={addr.address}>
+                    <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                    <span className={styles.ellipsis}>...</span>
+                    <span>{addr.address.slice(-6)}</span>
+                  </div>
+                </td>
+                <td title={addr.description} className={styles.description}>
+                  <TextField
+                    field="description"
+                    data-description-key={addr.address}
+                    data-description-value={addr.description}
+                    title={addr.description}
+                    value={isSelected ? localDescription.description : addr.description || ''}
+                    onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                    onKeyPress={isSelected ? onDescriptionPress : undefined}
+                    onChange={isSelected ? onDescriptionChange : undefined}
+                    readOnly={!isSelected}
+                    onDoubleClick={onDescriptionSelected}
+                    className={styles.descriptionField}
+                    suffix={
+                      isSelected ? (
+                        undefined
+                      ) : (
+                        <button
+                          type="button"
+                          data-description-key={addr.address}
+                          data-description-value={addr.description}
+                          onClick={onDescriptionSelected}
+                          className={styles.editBtn}
+                        >
+                          <Edit size="0.875rem" />
+                        </button>
+                      )
+                    }
+                  />
+                </td>
+                <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
+                  <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
+                </td>
+                <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
+                  {localNumberFormatter(addr.txCount)}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Stack, Spinner } from 'office-ui-fabric-react'
+import { Stack } from 'office-ui-fabric-react'
+import Spinner from 'widgets/Spinner'
 import { handleViewError } from 'services/remote'
 
 const handleError = (error: Error) => {

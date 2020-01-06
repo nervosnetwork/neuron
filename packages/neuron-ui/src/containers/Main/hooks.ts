@@ -11,7 +11,6 @@ import {
 
 import { getWinID } from 'services/remote'
 import {
-  SystemScript as SystemScriptSubject,
   DataUpdate as DataUpdateSubject,
   NetworkList as NetworkListSubject,
   CurrentNetworkID as CurrentNetworkIDSubject,
@@ -22,11 +21,7 @@ import {
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
 import { ConnectionStatus, ErrorCode } from 'utils/const'
-import {
-  networks as networksCache,
-  currentNetworkID as currentNetworkIDCache,
-  systemScript as systemScriptCache,
-} from 'services/localCache'
+import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 4000
@@ -88,11 +83,8 @@ export const useOnCurrentWalletChange = ({
   dispatch: StateDispatch
 }) => {
   useEffect(() => {
-    if (walletID) {
-      initAppState()(dispatch, history)
-    } else {
-      initAppState()(dispatch, history)
-    }
+    console.info(`switching to ${walletID}`)
+    initAppState()(dispatch, history)
   }, [walletID, dispatch, history])
 }
 
@@ -111,13 +103,6 @@ export const useSubscription = ({
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
   useEffect(() => {
-    const systemScriptSubscription = SystemScriptSubject.subscribe(({ codeHash = '' }: { codeHash: string }) => {
-      systemScriptCache.save({ codeHash })
-      dispatch({
-        type: NeuronWalletActions.UpdateCodeHash,
-        payload: codeHash,
-      })
-    })
     const dataUpdateSubscription = DataUpdateSubject.subscribe(({ dataType, walletID: walletIDOfMessage }: any) => {
       if (walletIDOfMessage && walletIDOfMessage !== walletID) {
         return
@@ -225,7 +210,6 @@ export const useSubscription = ({
       }
     })
     return () => {
-      systemScriptSubscription.unsubscribe()
       dataUpdateSubscription.unsubscribe()
       networkListSubscription.unsubscribe()
       currentNetworkIDSubscription.unsubscribe()

@@ -1,0 +1,24 @@
+.container {
+  display: grid;
+  grid-template:
+    'networks'auto 'actions'auto;
+  grid-row-gap: 15px;
+}
+
+.networks {
+  grid-area: networks;
+}
+
+.network {
+  span:nth-of-type(2) {
+    margin: 0 5px;
+  }
+}
+
+.actions {
+  grid-area: actions;
+
+  button {
+    width: 9.375rem;
+  }
+}

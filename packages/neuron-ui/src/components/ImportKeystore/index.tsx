@@ -1,24 +1,33 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, DefaultButton, PrimaryButton, TextField, Spinner } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { showOpenDialog } from 'services/remote'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
+import TextField from 'widgets/TextField'
+import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 import { ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import styles from './importKeystore.module.scss'
 
 interface KeystoreFields {
   path: string
+  pathError: string
   name: string | undefined
+  nameError: ''
   password: string
+  passwordError: string
 }
 
 const defaultFields: KeystoreFields = {
   path: '',
+  pathError: '',
   name: undefined,
+  nameError: '',
   password: '',
+  passwordError: '',
 }
 
 const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
@@ -42,28 +51,20 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
     }
   }, [wallets, fields, setFields, t])
 
-  const exsitingNames = useMemo(() => {
-    return wallets.map(w => w.name)
-  }, [wallets])
-
-  const isNameUsed = useMemo(() => {
-    return exsitingNames.includes(fields.name || '')
-  }, [exsitingNames, fields.name])
-
   const onFileClick = useCallback(() => {
     showOpenDialog({
       title: 'import keystore',
-      onUpload: (filePaths: string[]) => {
-        if (!filePaths || filePaths.length === 0) {
-          return
-        }
-        const filePath = filePaths[0]
-        setFields({
-          ...fields,
-          path: filePath,
-        })
-      },
     })
+      .then(({ filePaths }: { filePaths: string[] }) => {
+        const filePath = filePaths[0]
+        if (filePath) {
+          setFields({
+            ...fields,
+            path: filePath,
+          })
+        }
+      })
+      .catch((err: Error) => console.error(err))
   }, [fields])
 
   const onSubmit = useCallback(() => {
@@ -80,67 +81,103 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
     }, 200)
   }, [fields.name, fields.password, fields.path, history, dispatch, loading])
 
+  const onChange = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const {
+        value,
+        dataset: { field },
+      } = e.target as HTMLInputElement
+      if (field !== undefined && value !== undefined) {
+        let maxLength: number | undefined
+        if (field === 'name') {
+          maxLength = MAX_WALLET_NAME_LENGTH
+        } else if (field === 'password') {
+          maxLength = MAX_PASSWORD_LENGTH
+        }
+        if (value === '') {
+          setFields(state => ({
+            ...state,
+            [field]: value,
+            [`${field}Error`]: t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: `keystore-${field}` }),
+          }))
+          return
+        }
+
+        if (field === 'name' && wallets.find(w => w.name === value)) {
+          setFields(state => ({
+            ...state,
+            name: value,
+            nameError: t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `keystore-name`, fieldValue: '' }),
+          }))
+          return
+        }
+
+        if (maxLength && value.length > maxLength) {
+          setFields(state => ({
+            ...state,
+            [field]: value,
+            [`${field}Error`]: t(`messages.codes.${ErrorCode.FieldTooLong}`, {
+              fieldName: `keystore-${field}`,
+              fieldValue: '',
+              length: maxLength,
+            }),
+          }))
+          return
+        }
+        setFields(state => ({
+          ...state,
+          [field]: value,
+          [`${field}Error`]: '',
+        }))
+      }
+    },
+    [setFields, wallets, t]
+  )
+
   return (
-    <Stack verticalFill verticalAlign="center" tokens={{ childrenGap: 15 }}>
-      <Stack tokens={{ childrenGap: 15 }}>
-        {Object.entries(fields).map(([key, value]) => {
-          let maxLength: number | undefined
-          if (key === 'name') {
-            maxLength = MAX_WALLET_NAME_LENGTH
-          } else if (key === 'password') {
-            maxLength = MAX_PASSWORD_LENGTH
-          }
+    <div className={styles.container}>
+      {Object.entries(fields)
+        .filter(([key]) => !key.endsWith('Error'))
+        .map(([key, value]) => {
           return (
-            <TextField
-              key={key}
-              onClick={key === 'path' ? onFileClick : undefined}
-              label={t(`import-keystore.label.${key}`)}
-              placeholder={t(`import-keystore.placeholder.${key}`)}
-              type={key === 'password' ? 'password' : 'text'}
-              readOnly={key === 'path'}
-              value={value}
-              validateOnLoad={false}
-              onGetErrorMessage={(text?: string) => {
-                if (text === '') {
-                  return t(`messages.codes.${ErrorCode.FieldRequired}`, { fieldName: `keystore-${key}` })
-                }
-                if (key === 'name' && isNameUsed) {
-                  return t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: `keystore-name`, fieldValue: '' })
-                }
-                if (text && maxLength && text.length > maxLength) {
-                  return t(`messages.codes.${ErrorCode.FieldTooLong}`, {
-                    fieldName: `keystore-${key}`,
-                    fieldValue: '',
-                    length: maxLength,
-                  })
-                }
-                return ''
-              }}
-              onChange={(_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-                if (newValue !== undefined) {
-                  setFields({
-                    ...fields,
-                    [key]: newValue,
-                  })
-                }
-              }}
-            />
+            <>
+              <TextField
+                key={key}
+                field={key}
+                onClick={key === 'path' ? onFileClick : undefined}
+                label={t(`import-keystore.label.${key}`)}
+                placeholder={t(`import-keystore.placeholder.${key}`)}
+                type={key === 'password' ? 'password' : 'text'}
+                readOnly={key === 'path'}
+                value={value}
+                error={fields[`${key}Error` as keyof KeystoreFields]}
+                onChange={onChange}
+              />
+            </>
           )
         })}
-      </Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 15 }}>
-        <DefaultButton onClick={goBack}>{t('import-keystore.button.back')}</DefaultButton>
-        {loading ? (
-          <PrimaryButton disabled>
-            <Spinner />
-          </PrimaryButton>
-        ) : (
-          <PrimaryButton disabled={!(fields.name && fields.path && fields.password && !isNameUsed)} onClick={onSubmit}>
-            {t('import-keystore.button.submit')}
-          </PrimaryButton>
-        )}
-      </Stack>
-    </Stack>
+      <div className={styles.actions}>
+        <Button type="cancel" onClick={goBack} label={t('import-keystore.button.back')} />
+        <Button
+          type="submit"
+          onClick={onSubmit}
+          label={t('import-keystore.button.submit')}
+          disabled={
+            loading ||
+            !!(
+              !fields.name ||
+              !fields.path ||
+              !fields.password ||
+              fields.nameError ||
+              fields.passwordError ||
+              fields.passwordError
+            )
+          }
+        >
+          {loading ? <Spinner /> : (t('import-keystore.button.submit') as string)}
+        </Button>
+      </div>
+    </div>
   )
 }
 

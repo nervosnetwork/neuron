@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  TextField,
-  PrimaryButton,
-  DefaultButton,
-  Dialog,
-  DialogFooter,
-  Stack,
-  IconButton,
-} from 'office-ui-fabric-react'
+import { TextField, Dialog, DialogFooter, Stack } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
+import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import jsQR from 'jsqr'
 
 import { showErrorMessage } from 'services/remote'
 import { drawPolygon } from 'utils/canvasActions'
 import { verifyAddress } from 'utils/validators'
 import { ErrorCode } from 'utils/const'
+import localStyles from './qrScanner.module.scss'
 
 interface QRScannerProps {
   title: string
@@ -118,24 +113,13 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
   return (
     <>
       <button
-        style={
-          (styles && styles.trigger) || {
-            lineHeight: '1',
-            background: 'none',
-            border: 'none',
-            outline: 'none',
-          }
-        }
+        style={styles && styles.trigger}
         onClick={onOpen}
         type="button"
+        aria-label="qr-btn"
+        className={localStyles.scanBtn}
       >
-        <IconButton
-          iconProps={{ iconName: 'Scan' }}
-          styles={{
-            root: { padding: 0 },
-            flexContainer: { display: 'block', width: '32px' },
-          }}
-        />
+        <Scan />
       </button>
       <Dialog hidden={!open} onDismiss={onDismiss} maxWidth="900px" minWidth="500xp">
         <h1>{title}</h1>
@@ -151,8 +135,8 @@ const QRScanner = ({ title, label, onConfirm, styles }: QRScannerProps) => {
         >
           <TextField readOnly value={data} label={label} underlined />
           <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-            <DefaultButton onClick={onDismiss}>{t('common.cancel')}</DefaultButton>
-            <PrimaryButton onClick={onSubmit}>{t('common.confirm')}</PrimaryButton>
+            <Button type="cancel" onClick={onDismiss} label={t('common.cancel')} />
+            <Button type="submit" onClick={onSubmit} label={t('common.confirm')} />
           </Stack>
         </DialogFooter>
       </Dialog>

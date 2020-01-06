@@ -1,7 +1,7 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
 import { Cell, OutPoint, Input } from 'types/cell-types'
-import { CapacityNotEnough, CapacityNotEnoughForChange } from 'exceptions'
+import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
 import { TransactionStatus, WitnessArgs } from 'types/cell-types'
@@ -132,31 +132,34 @@ export default class CellsService {
     // use min secp size (without data)
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
-    // if (capacityInt < BigInt(MIN_CELL_CAPACITY)) {
-    //   throw new Error(`capacity can't be less than ${MIN_CELL_CAPACITY}`)
-    // }
-
     // only live cells, skip which has data or type
     const cellEntities: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
-          status: OutputStatus.Live,
+          status: In([OutputStatus.Live, OutputStatus.Sent]),
           hasData: false,
           typeScript: null,
         },
       })
+    const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
+    const sentBalance: bigint = cellEntities
+      .filter(c => c.status === OutputStatus.Sent)
+      .map(c => BigInt(c.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
     if (
-      cellEntities.length === 0 &&
+      liveCells.length === 0 &&
+      sentBalance === BigInt(0) &&
       (
-        (mode.isFeeRateMode() && feeRateInt !== 0n) ||
-        (mode.isFeeMode() && feeInt !== 0n)
+        (mode.isFeeRateMode() && feeRateInt !== BigInt(0)) ||
+        (mode.isFeeMode() && feeInt !== BigInt(0))
       )
     ) {
       throw new CapacityNotEnough()
     }
-    cellEntities.sort((a, b) => {
+    liveCells.sort((a, b) => {
       const result = BigInt(a.capacity) - BigInt(b.capacity)
       if (result > BigInt(0)) {
         return 1
@@ -176,7 +179,7 @@ export default class CellsService {
       totalSize += TransactionSize.witness(append.witness)
     }
     let hasChangeOutput: boolean = false
-    cellEntities.every(cell => {
+    liveCells.every(cell => {
       const input: Input = {
         previousOutput: cell.outPoint(),
         since: '0',
@@ -224,11 +227,17 @@ export default class CellsService {
     const totalCapacities = capacityInt + finalFee
 
     if (inputCapacities < totalCapacities) {
+      if (inputCapacities + sentBalance >= totalCapacities) {
+        throw new LiveCapacityNotEnough()
+      }
       throw new CapacityNotEnough()
     }
 
     const diffCapacities = inputCapacities - totalCapacities
     if (diffCapacities < minChangeCapacity && diffCapacities !== BigInt(0)) {
+      if (diffCapacities + sentBalance === BigInt(0) || diffCapacities + sentBalance >= minChangeCapacity) {
+        throw new LiveCapacityNotEnough()
+      }
       throw new CapacityNotEnoughForChange()
     }
 

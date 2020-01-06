@@ -1,0 +1,196 @@
+@import '../../styles/mixin.scss';
+
+$receiving-color: var(--nervos-green);
+$change-color: #6666cc;
+
+.container {
+  background-color: #fff;
+  margin-top: 48px;
+  padding: 2px 15px 47px 15px;
+}
+
+.addressList {
+  width: 100%;
+  border-collapse: collapse;
+
+  tbody {
+    input+span {
+      display: none !important;
+    }
+
+    tr:hover {
+      background-color: #f5f5f5;
+
+      input+span {
+        display: flex !important;
+      }
+    }
+  }
+
+  th,
+  td {
+    text-align: left;
+  }
+
+  tr {
+    border-bottom: 1px solid #b3b3b3;
+  }
+
+
+  th {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    color: #000;
+    padding: 18px 0;
+
+  }
+
+  td {
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    color: #000;
+    padding: 10px 0;
+
+    &:not(:last-child) {
+      padding-right: 20px;
+
+      @media screen and (max-width: 1350px) {
+        padding-right: 10px;
+      }
+
+      @media screen and (max-width: 1160px) {
+        padding-right: 5px;
+      }
+    }
+  }
+
+
+  .type {
+    width: 100px;
+    word-wrap: none;
+  }
+
+  .type[data-type='receiving'] {
+    color: $receiving-color;
+  }
+
+  .type[data-type='change'] {
+    color: $change-color;
+  }
+
+  .address {
+    &:hover {
+      div::after {
+        display: block;
+      }
+    }
+
+    div {
+      min-width: 100px;
+      max-width: 500px;
+      display: flex;
+      position: relative;
+
+      .addressOverflow {
+        word-break: break-all;
+        text-align: right;
+        height: 1rem;
+        overflow: hidden;
+        text-align: right;
+      }
+
+      .ellipsis {
+        display: none;
+      }
+
+      @media screen and (max-width: 1365px) {
+
+        .ellipsis {
+          display: inline;
+        }
+      }
+
+      @media screen and (max-width: 1680px) {
+        width: 30vw;
+
+        &::after {
+          position: absolute;
+          top: 150%;
+          left: 50%;
+          content: attr(data-address);
+          font-size: 0.875rem;
+          letter-spacing: 0.5px;
+          color: #000;
+          box-shadow: 1px 2px 6px 0 rgba(97, 97, 97, 0.5);
+          background: #fff;
+          padding: 5px 16px;
+          transform: translateX(-50%);
+          display: none;
+        }
+      }
+
+      @media screen and (max-width: 1350px) {
+        width: 20vw;
+      }
+
+
+    }
+  }
+
+  .description {
+    width: 137px;
+    display: flex;
+    align-items: center;
+
+    .editBtn {
+      appearance: none;
+      border: none;
+      background-color: transparent;
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        pointer-events: none;
+      }
+    }
+  }
+
+  .descriptionField {
+    @include descriptionField;
+
+    input {
+      font-size: 0.875rem;
+    }
+
+    &>div {
+      border: none;
+    }
+
+    @media screen and (max-width: 1500px) {
+      input {
+        width: 100px;
+      }
+    }
+  }
+
+  .balance {
+    span {
+      display: inline-block;
+      min-width: 200px;
+
+      @media screen and (max-width:1160px) {
+        min-width: auto;
+        width: 8vw;
+      }
+    }
+  }
+
+  .txCount {
+    min-width: 100px;
+  }
+
+}

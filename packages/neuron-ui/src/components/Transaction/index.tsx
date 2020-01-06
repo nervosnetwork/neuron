@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, DetailsList, Text, CheckboxVisibility, IColumn, Icon } from 'office-ui-fabric-react'
+import { Icon } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import {
   getTransaction,
@@ -16,23 +16,7 @@ import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { ErrorCode, MAINNET_TAG } from 'utils/const'
-import { explorerNavButton } from './style.module.scss'
-
-const MIN_CELL_WIDTH = 70
-
-const CompactAddress = ({ address }: { address: string }) => (
-  <div
-    title={address}
-    style={{
-      overflow: 'hidden',
-      display: 'flex',
-    }}
-    className="monospacedFont"
-  >
-    <span className="textOverflow">{address.slice(0, -6)}</span>
-    <span>{address.slice(-6)}</span>
-  </div>
-)
+import styles from './transaction.module.scss'
 
 const Transaction = () => {
   const [t] = useTranslation()
@@ -41,162 +25,6 @@ const Transaction = () => {
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
-
-  const inputColumns: IColumn[] = useMemo(
-    () =>
-      [
-        {
-          key: 'index',
-          name: t('transaction.index'),
-          minWidth: 60,
-          maxWidth: 60,
-          onRender: (_input?: State.DetailedInput, index?: number) => {
-            if (undefined !== index) {
-              return index
-            }
-            return null
-          },
-        },
-        {
-          key: 'address',
-          name: t('transaction.address'),
-          minWidth: 200,
-          maxWidth: 500,
-          onRender: (input?: State.DetailedInput, _index?: number, column?: IColumn) => {
-            if (!input) {
-              return null
-            }
-            if (!input.lock) {
-              return t('transaction.cell-from-cellbase')
-            }
-            try {
-              const address = ckbCore.utils.bech32Address(input.lock.args, {
-                prefix: addressPrefix,
-                type: ckbCore.utils.AddressType.HashIdx,
-                codeHashOrCodeHashIndex: '0x00',
-              })
-              if (column && (column.calculatedWidth || 0) < 450) {
-                return <CompactAddress address={address} />
-              }
-              return (
-                <span title={address} className="monospacedFont">
-                  {address}
-                </span>
-              )
-            } catch {
-              return null
-            }
-          },
-        },
-        {
-          key: 'capacity',
-          name: t('transaction.amount'),
-          minWidth: 100,
-          maxWidth: 250,
-          onRender: (input?: State.DetailedOutput) => {
-            if (input) {
-              return `${shannonToCKBFormatter(input.capacity)} CKB`
-            }
-            return null
-          },
-        },
-      ].map(
-        (col): IColumn => ({
-          ariaLabel: col.name,
-          fieldName: col.key,
-          ...col,
-        })
-      ),
-    [addressPrefix, t]
-  )
-
-  const outputColumns: IColumn[] = useMemo(
-    () =>
-      [
-        {
-          key: 'index',
-          name: t('transaction.index'),
-          minWidth: 60,
-          maxWidth: 60,
-          onRender: (item?: State.DetailedOutput) => {
-            if (item) {
-              return item.outPoint.index
-            }
-            return null
-          },
-        },
-        {
-          key: 'address',
-          name: t('transaction.address'),
-          minWidth: 200,
-          maxWidth: 500,
-          onRender: (output?: State.DetailedOutput, _index?: number, column?: IColumn) => {
-            if (!output) {
-              return null
-            }
-            try {
-              const address = ckbCore.utils.bech32Address(output.lock.args, {
-                prefix: addressPrefix,
-                type: ckbCore.utils.AddressType.HashIdx,
-                codeHashOrCodeHashIndex: '0x00',
-              })
-              if (column && (column.calculatedWidth || 0) < 450) {
-                return <CompactAddress address={address} />
-              }
-              return (
-                <span title={address} className="monospacedFont">
-                  {address}
-                </span>
-              )
-            } catch {
-              return null
-            }
-          },
-        },
-        {
-          key: 'capacity',
-          name: t('transaction.amount'),
-          minWidth: 100,
-          maxWidth: 250,
-          onRender: (output?: State.DetailedOutput) => {
-            if (output) {
-              return `${shannonToCKBFormatter(output.capacity)} CKB`
-            }
-            return null
-          },
-        },
-      ].map(col => ({
-        ariaLabel: col.name,
-        fieldName: col.key,
-        ...col,
-      })),
-    [addressPrefix, t]
-  )
-
-  const basicInfoColumns: IColumn[] = useMemo(
-    () =>
-      [
-        {
-          key: 'label',
-          name: 'label',
-          minWidth: 100,
-          maxWidth: 120,
-        },
-        {
-          key: 'value',
-          name: 'value',
-          minWidth: 150,
-        },
-      ].map(
-        (col): IColumn => ({
-          minWidth: MIN_CELL_WIDTH,
-          ariaLabel: col.name,
-          fieldName: col.key,
-          ...col,
-        })
-      ),
-    []
-  )
 
   useEffect(() => {
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
@@ -224,7 +52,7 @@ const Transaction = () => {
       }
       getTransaction({ hash, walletID: currentWallet.id })
         .then(res => {
-          if (res.status) {
+          if (res.status === 1) {
             setTransaction(res.result)
           } else {
             showErrorMessage(
@@ -252,7 +80,7 @@ const Transaction = () => {
   }, [])
 
   const onExplorerBtnClick = useCallback(() => {
-    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/testnet'
+    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
     openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
   }, [transaction.hash, isMainnet])
 
@@ -277,14 +105,17 @@ const Transaction = () => {
     [t, transaction]
   )
 
-  const onBasicInfoContextMenu = useCallback(
-    (property: { label: string; value: string }, index?: number) => {
-      if (index === 0 && property && property.value) {
+  const onInfoContextMenu = useCallback(
+    (e: React.SyntheticEvent) => {
+      const {
+        dataset: { txHash },
+      } = e.target as HTMLDivElement
+      if (txHash) {
         const menuTemplate = [
           {
             label: t('common.copy-tx-hash'),
             click: () => {
-              window.clipboard.writeText(property.value)
+              window.clipboard.writeText(txHash)
             },
           },
         ]
@@ -294,11 +125,14 @@ const Transaction = () => {
     [t]
   )
 
-  const onInputContextMenu = useCallback(
-    (input?: State.DetailedInput) => {
-      if (input && input.lock && input.lock.args) {
+  const onCellContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      const {
+        dataset: { args },
+      } = (e.target as HTMLTableCellElement).parentElement as HTMLTableRowElement
+      if (args) {
         try {
-          const address = ckbCore.utils.bech32Address(input.lock.args, {
+          const address = ckbCore.utils.bech32Address(args, {
             prefix: addressPrefix,
             type: ckbCore.utils.AddressType.HashIdx,
             codeHashOrCodeHashIndex: '0x00',
@@ -320,97 +154,114 @@ const Transaction = () => {
     [addressPrefix, t]
   )
 
-  const onOutputContextMenu = useCallback(
-    (output?: State.DetailedOutput) => {
-      if (output && output.lock && output.lock.args) {
-        try {
-          const address = ckbCore.utils.bech32Address(output.lock.args, {
-            prefix: addressPrefix,
-            type: ckbCore.utils.AddressType.HashIdx,
-            codeHashOrCodeHashIndex: '0x00',
-          })
-          const menuTemplate = [
-            {
-              label: t('common.copy-address'),
-              click: () => {
-                window.clipboard.writeText(address)
-              },
-            },
-          ]
-          openContextMenu(menuTemplate)
-        } catch (err) {
-          console.error(err)
+  const inputsTitle = useMemo(
+    () => `${t('transaction.inputs')} (${transaction.inputs.length}/${localNumberFormatter(transaction.inputsCount)})`,
+    [transaction.inputs.length, transaction.inputsCount, t]
+  )
+
+  const outputsTitle = useMemo(() => {
+    return `${t('transaction.outputs')} (${transaction.outputs.length}/${localNumberFormatter(
+      transaction.outputsCount
+    )})`
+  }, [transaction.outputs.length, transaction.outputsCount, t])
+
+  const renderList = useCallback(
+    (cells: Readonly<(State.DetailedInput | State.DetailedOutput)[]>) =>
+      cells.map((cell, index) => {
+        let address = ''
+        if (!cell.lock) {
+          address = t('transaction.cell-from-cellbase')
+        } else {
+          try {
+            address = ckbCore.utils.bech32Address(cell.lock.args, {
+              prefix: addressPrefix,
+              type: ckbCore.utils.AddressType.HashIdx,
+              codeHashOrCodeHashIndex: '0x00',
+            })
+          } catch (err) {
+            console.error(err)
+          }
         }
-      }
-    },
-    [addressPrefix, t]
+
+        return (
+          <tr
+            key={cell.lockHash || ''}
+            data-args={(cell && cell.lock && cell.lock.args) || ''}
+            onContextMenu={onCellContextMenu}
+          >
+            <td title={`${index}`}>{index}</td>
+            <td title={address} className="monospacedFont">
+              {address}
+            </td>
+            <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
+          </tr>
+        )
+      }),
+    [t, onCellContextMenu, addressPrefix]
   )
 
   if (error.code) {
     return (
-      <Stack verticalFill verticalAlign="center" horizontalAlign="center">
+      <div className={styles.error}>
         {error.message || t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'transaction' })}
-      </Stack>
+      </div>
     )
   }
 
   return (
-    <Stack tokens={{ childrenGap: 15 }}>
-      <Stack tokens={{ childrenGap: 15 }}>
-        <Text variant="xLarge" as="h1">
-          {t('history.basic-information')}
-        </Text>
-        <DetailsList
-          columns={basicInfoColumns}
-          items={basicInfoItems}
-          checkboxVisibility={CheckboxVisibility.hidden}
-          compact
-          isHeaderVisible={false}
-          onItemContextMenu={onBasicInfoContextMenu}
-        />
-      </Stack>
-      <Stack tokens={{ childrenGap: 15 }} verticalFill>
-        <Stack.Item>
-          <Text variant="xLarge" as="h1">
-            {`${t('transaction.inputs')} (${transaction.inputs.length}/${localNumberFormatter(
-              transaction.inputsCount
-            )})`}
-          </Text>
-          <DetailsList
-            items={transaction.inputs}
-            columns={inputColumns}
-            checkboxVisibility={CheckboxVisibility.hidden}
-            onItemContextMenu={onInputContextMenu}
-            compact
-            isHeaderVisible
-          />
-        </Stack.Item>
-        <Stack.Item>
-          <Text variant="xLarge" as="h1">
-            {`${t('transaction.outputs')} (${transaction.outputs.length}/${localNumberFormatter(
-              transaction.outputsCount
-            )})`}
-          </Text>
-          <DetailsList
-            items={transaction.outputs}
-            columns={outputColumns}
-            checkboxVisibility={CheckboxVisibility.hidden}
-            onItemContextMenu={onOutputContextMenu}
-            compact
-            isHeaderVisible
-          />
-        </Stack.Item>
-      </Stack>
+    <div className={styles.container}>
+      <h2
+        className={styles.infoTitle}
+        title={t('history.basic-information')}
+        aria-label={t('history.basic-information')}
+      >
+        {t('history.basic-information')}
+      </h2>
+      <div className={styles.infoDetail} onContextMenu={onInfoContextMenu} data-tx-hash={transaction.hash}>
+        {basicInfoItems.map(({ label, value }, idx) => (
+          <div key={label}>
+            <span>{label}</span>
+            <span className={!idx ? 'monospacedFont' : ''}>{value}</span>
+          </div>
+        ))}
+      </div>
+      <h2 className={styles.inputsTitle} title={inputsTitle} aria-label={inputsTitle}>
+        {inputsTitle}
+      </h2>
+      <table className={styles.inputList}>
+        <thead>
+          <tr>
+            {['index', 'address', 'amount'].map(field => (
+              <th key={field}>{t(`transaction.${field}`)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{renderList(transaction.inputs)}</tbody>
+      </table>
+      <h2 className={styles.outputsTitle} title={outputsTitle} aria-label={outputsTitle}>
+        {outputsTitle}
+      </h2>
+      <table className={styles.outputList}>
+        <thead>
+          <tr>
+            {['index', 'address', 'amount'].map(field => (
+              <th key={field}>{t(`transaction.${field}`)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{renderList(transaction.outputs)}</tbody>
+      </table>
+
       <button
         type="button"
-        className={explorerNavButton}
+        className={styles.explorerNavButton}
         title={t('transaction.view-in-explorer-button-title')}
         onClick={onExplorerBtnClick}
       >
         <Icon iconName="Explorer" />
         <span>{t('transaction.view-in-explorer')}</span>
       </button>
-    </Stack>
+    </div>
   )
 }
 

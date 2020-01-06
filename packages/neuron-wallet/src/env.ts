@@ -6,17 +6,13 @@ const app = electronApp || (remote && remote.app) || {
   getPath(aPath: string): string {
     return path.join(os.tmpdir(), aPath)
   },
-  getName(): string {
-    return 'Fake App'
-  },
+  name: 'Fake App',
   getLocale(): string {
     return 'en'
   }
 }
 
-const { NODE_ENV } = process.env
-
-const isTestMode = NODE_ENV === 'test'
+const isTestMode = process.env.NODE_ENV === 'test'
 const isDevMode = !app.isPackaged && !isTestMode
 
 const fileBase = (() => {
@@ -29,19 +25,11 @@ const fileBase = (() => {
   return 'dev/'
 })()
 
-interface ENV {
-  isDevMode: boolean
-  fileBasePath: string
-  mainURL: string
-  remote: string
-  isTestMode: boolean
-}
-const env: ENV = {
+const env = {
   isDevMode,
-  fileBasePath: path.resolve(app.getPath('userData'), fileBase),
-  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`,
-  remote: 'http://localhost:8114',
   isTestMode,
+  fileBasePath: path.resolve(app.getPath('userData'), fileBase),
+  mainURL: isDevMode ? 'http://localhost:3000' : `file://${path.join(__dirname, '../dist/neuron-ui/index.html')}`
 }
 
 export default env

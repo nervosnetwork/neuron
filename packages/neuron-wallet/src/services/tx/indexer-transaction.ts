@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import TransactionEntity from 'database/chain/entities/transaction'
-import Utils from 'services/sync/utils'
+import ArrayUtils from 'utils/array'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import { TransactionStatus } from 'types/cell-types'
@@ -35,7 +35,7 @@ export default class IndexerTransaction {
 
     // reset previous output to OutputStatus.Live
     await getConnection().transaction(async transactionalEntityManager => {
-      await Utils.mapSeries(tx.inputs, async (input: InputEntity) => {
+      await ArrayUtils.mapSeries(tx.inputs, async (input: InputEntity) => {
         if (!input.lockHash) {
           return
         }
@@ -54,8 +54,8 @@ export default class IndexerTransaction {
     })
   }
 
-  public static updateInputLockHash = async (txHash: string, index: string) => {
-    const output = await getConnection()
+  public static updateInputLockHash = async (txHash: string, index: string): Promise<OutputEntity | undefined> => {
+    const output: OutputEntity | undefined = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
@@ -93,6 +93,6 @@ export default class IndexerTransaction {
       return output
     }
 
-    return undefined
+    return output
   }
 }

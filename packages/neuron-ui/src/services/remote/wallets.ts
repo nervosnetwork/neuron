@@ -1,86 +1,30 @@
-import { apiMethodWrapper } from './apiMethodWrapper'
+import { remoteApi } from './remoteApiWrapper'
 
-export const updateWallet = apiMethodWrapper(api => (params: Controller.UpdateWalletParams) => api.updateWallet(params))
-
-export const getCurrentWallet = apiMethodWrapper<void>(api => () => api.getCurrentWallet())
-
-export const getWalletList = apiMethodWrapper<void>(api => () => api.getAllWallets())
-
-export const createWallet = apiMethodWrapper(api => (params: Controller.CreateWalletParams) => api.createWallet(params))
-
-export const importMnemonic = apiMethodWrapper(api => (params: Controller.ImportMnemonicParams) =>
-  api.importMnemonic(params)
+export const getWalletList = remoteApi<void>('get-all-wallets')
+export const getCurrentWallet = remoteApi<void>('get-current-wallet')
+export const setCurrentWallet = remoteApi<Controller.SetCurrentWalletParams>('set-current-wallet')
+export const importMnemonic = remoteApi<Controller.ImportMnemonicParams>('import-mnemonic')
+export const importKeystore = remoteApi<Controller.ImportKeystoreParams>('import-keystore')
+export const createWallet = remoteApi<Controller.CreateWalletParams>('create-wallet')
+export const updateWallet = remoteApi<Controller.UpdateWalletParams>('update-wallet')
+export const deleteWallet = remoteApi<Controller.DeleteWalletParams>('delete-wallet')
+export const backupWallet = remoteApi<Controller.DeleteWalletParams>('backup-wallet')
+export const getAddressesByWalletID = remoteApi<Controller.GetAddressesByWalletIDParams>('get-all-addresses')
+export const updateAddressDescription = remoteApi<Controller.UpdateAddressDescriptionParams>(
+  'update-address-description'
 )
+export const requestPassword = remoteApi<Controller.RequestPasswordParams>('request-password')
+export const sendTx = remoteApi<Controller.SendTransactionParams>('send-tx')
+export const generateTx = remoteApi<Controller.GenerateTransactionParams>('generate-tx')
+export const generateSendingAllTx = remoteApi<Controller.GenerateSendingAllTransactionParams>('generate-send-all-tx')
+export const generateMnemonic = remoteApi<void>('generate-mnemonic')
+export const validateMnemonic = remoteApi<string>('validate-mnemonic')
 
-export const importKeystore = apiMethodWrapper(api => (params: Controller.ImportKeystoreParams) =>
-  api.importKeystore(params)
+// Dao
+export const getDaoData = remoteApi<Controller.GetNervosDaoDataParams>('get-dao-data')
+export const generateDaoDepositTx = remoteApi<Controller.DepositParams>('generate-dao-deposit-tx')
+export const generateDaoDepositAllTx = remoteApi<Controller.GenerateDepositAllTransactionParams>(
+  'generate-dao-deposit-all-tx'
 )
-
-export const deleteWallet = apiMethodWrapper(api => (params: Controller.DeleteWalletParams) => api.deleteWallet(params))
-
-export const backupWallet = apiMethodWrapper(api => (params: Controller.DeleteWalletParams) => api.backupWallet(params))
-
-export const setCurrentWallet = apiMethodWrapper(api => (id: Controller.SetCurrentWalletParams) =>
-  api.setCurrentWallet(id)
-)
-
-export const generateTx = apiMethodWrapper(api => (params: Controller.GenerateTransactionParams) =>
-  api.generateTx(params)
-)
-
-export const generateSendingAllTx = apiMethodWrapper(api => (params: Controller.GenerateSendingAllTransactionParams) =>
-  api.generateSendingAllTx(params)
-)
-
-export const generateDepositAllTx = apiMethodWrapper<Controller.GenerateDepositAllTransactionParams>(api => params =>
-  api.generateDepositAllTx(params)
-)
-export const requestPassword = apiMethodWrapper<Controller.RequestPasswordParams>(api => params =>
-  api.requestPassword(params)
-)
-
-export const sendTx = apiMethodWrapper(api => (params: Controller.SendTransactionParams) => api.sendTx(params))
-
-export const getAddressesByWalletID = apiMethodWrapper(api => (walletID: Controller.GetAddressesByWalletIDParams) =>
-  api.getAddressesByWalletID(walletID)
-)
-
-export const updateAddressDescription = apiMethodWrapper(api => (params: Controller.UpdateAddressDescriptionParams) =>
-  api.updateAddressDescription(params)
-)
-
-export const getNervosDaoData = apiMethodWrapper(api => (params: Controller.GetNervosDaoDataParams) =>
-  api.getDaoCells(params)
-)
-
-export const generateDepositTx = apiMethodWrapper(api => (params: Controller.DepositParams) =>
-  api.generateDepositTx(params)
-)
-
-export const generateWithdrawTx = apiMethodWrapper(api => (params: Controller.WithdrawParams) =>
-  api.startWithdrawFromDao(params)
-)
-
-export const generateClaimTx = apiMethodWrapper(api => (params: Controller.ClaimParams) => api.withdrawFromDao(params))
-
-export default {
-  updateWallet,
-  getWalletList,
-  createWallet,
-  importMnemonic,
-  importKeystore,
-  deleteWallet,
-  backupWallet,
-  getCurrentWallet,
-  generateTx,
-  generateSendingAllTx,
-  generateDepositAllTx,
-  requestPassword,
-  sendTx,
-  getAddressesByWalletID,
-  updateAddressDescription,
-  getNervosDaoData,
-  generateDepositTx,
-  generateWithdrawTx,
-  generateClaimTx,
-}
+export const generateDaoWithdrawTx = remoteApi<Controller.WithdrawParams>('start-withdraw-from-dao')
+export const generateDaoClaimTx = remoteApi<Controller.ClaimParams>('withdraw-from-dao')

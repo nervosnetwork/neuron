@@ -6,15 +6,38 @@ import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
 import { subscribe } from './subscribe'
+import { register as registerListeners } from 'listeners/main'
+import WalletsService from 'services/wallets'
+import ApiController from 'controllers/api'
+import NodeController from 'controllers/node'
 
 const app = electronApp || (remote && remote.app)
 
 export default class AppController {
-  public mainWindow: BrowserWindow | null
+  public mainWindow: BrowserWindow | null = null
+  private apiController = new ApiController()
 
   constructor() {
-    this.mainWindow = null
     subscribe(this)
+  }
+
+  public start = async () => {
+    if (!env.isTestMode) {
+      await new NodeController().startNode()
+    }
+
+    registerListeners()
+
+    WalletsService.getInstance().generateAddressesIfNecessary()
+
+    this.apiController.mount()
+    this.openWindow()
+  }
+
+  public end = () => {
+    if (!env.isTestMode) {
+      new NodeController().stopNode()
+    }
   }
 
   public sendMessage = (channel: string, obj: any) => {
@@ -25,6 +48,12 @@ export default class AppController {
 
   public updateMenu = () => {
     updateApplicationMenu(this.mainWindow)
+  }
+
+  public updateWindowTitle = () => {
+    const currentWallet = WalletsService.getInstance().getCurrent()
+    const title = currentWallet ? `${currentWallet.name} - Neuron` : 'Neuron'
+    this.mainWindow?.setTitle(title)
   }
 
   public openWindow = () => {
@@ -64,9 +93,8 @@ export default class AppController {
       if (this.mainWindow) {
         this.mainWindow.show()
         this.mainWindow.focus()
+        this.updateWindowTitle()
         logger.info('The main window is ready to show')
-      } else {
-        logger.error('The main window is not initialized on ready to show')
       }
     })
 

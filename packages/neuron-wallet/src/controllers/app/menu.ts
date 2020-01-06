@@ -1,14 +1,14 @@
-import { 
-  app, 
+import {
+  app,
   shell,
   BrowserWindow,
   dialog,
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
-import i18n from 'utils/i18n'
+import i18n from 'locales/i18n'
 import env from 'env'
-import { UpdateController } from 'controllers'
+import UpdateController from 'controllers/update'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
 
@@ -32,8 +32,8 @@ const separator: MenuItemConstructorOptions = {
 const showAbout = () => {
   const options = {
     type: 'info',
-    title: app.getName(),
-    message: app.getName(),
+    title: app.name,
+    message: app.name,
     detail: app.getVersion(),
     buttons: ['OK'],
     cancelId: 0,
@@ -66,12 +66,12 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
 
   const appMenuItem: MenuItemConstructorOptions = {
     id: 'app',
-    label: app.getName(),
+    label: app.name,
     submenu: [
       {
         id: 'about',
         label: i18n.t('application-menu.neuron.about', {
-          app: app.getName(),
+          app: app.name,
         }),
         role: 'about',
         click: () => { showAbout() },
@@ -95,7 +95,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       separator,
       {
         label: i18n.t('application-menu.neuron.quit', {
-          app: app.getName(),
+          app: app.name,
         }),
         role: 'quit',
       },
@@ -237,7 +237,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     helpSubmenu.push({
       id: 'about',
       label: i18n.t('application-menu.neuron.about', {
-        app: app.getName(),
+        app: app.name
       }),
       role: 'about',
       click: () => { showAbout() }

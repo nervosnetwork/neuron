@@ -1,11 +1,13 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, TextField, TooltipHost, Modal, IconButton } from 'office-ui-fabric-react'
+import { TooltipHost } from 'office-ui-fabric-react'
+import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
+import styles from './receive.module.scss'
 
 const Receive = ({
   wallet: { addresses = [] },
@@ -13,7 +15,6 @@ const Receive = ({
   dispatch,
 }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
   const [t] = useTranslation()
-  const [showLargeQRCode, setShowLargeQRCode] = useState(false)
 
   const accountAddress = useMemo(
     () =>
@@ -30,27 +31,21 @@ const Receive = ({
 
   const Address = useMemo(
     () => (
-      <Stack styles={{ root: { flex: 1, minWidth: 500 } }}>
+      <div className={styles.address}>
         <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
-          <Stack horizontal horizontalAlign="stretch" tokens={{ childrenGap: 15 }}>
-            <TextField
-              styles={{
-                root: {
-                  flex: 1,
-                  color: '#888',
-                },
-                fieldGroup: {
-                  borderColor: '#eee!important',
-                },
-              }}
-              readOnly
-              placeholder={accountAddress}
+          <>
+            <input readOnly value={accountAddress} onClick={copyAddress} />
+            <button
+              type="button"
+              aria-label={t('receive.click-to-copy')}
               onClick={copyAddress}
-            />
-            <IconButton iconProps={{ iconName: 'Copy' }} onClick={copyAddress} />
-          </Stack>
+              className={styles.copyBtn}
+            >
+              <Copy />
+            </button>
+          </>
         </TooltipHost>
-      </Stack>
+      </div>
     ),
     [copyAddress, accountAddress, t]
   )
@@ -61,48 +56,9 @@ const Receive = ({
 
   return (
     <>
-      <Stack tokens={{ childrenGap: 10 }} horizontalAlign="center">
-        <Text as="p" variant="medium">
-          {`${t('receive.address', { network: accountAddress.startsWith('ckb') ? 'CKB Mainnet' : 'CKB Testnet' })}`}
-        </Text>
-        <Stack style={{ alignSelf: 'center' }}>
-          <QRCode
-            value={accountAddress}
-            onQRCodeClick={() => setShowLargeQRCode(true)}
-            size={256}
-            exportable
-            includeMargin
-            dispatch={dispatch}
-            remark={Address}
-          />
-        </Stack>
-        <Text as="p" variant="medium">
-          {t('receive.prompt')}
-        </Text>
-      </Stack>
-
-      <Modal isOpen={showLargeQRCode} onDismiss={() => setShowLargeQRCode(false)}>
-        <Stack
-          styles={{
-            root: {
-              background: '#eee',
-            },
-          }}
-        >
-          <Text
-            variant="large"
-            as="h1"
-            style={{
-              padding: '0 15px',
-            }}
-          >
-            {t('receive.address-qrcode')}
-          </Text>
-        </Stack>
-        <Stack tokens={{ padding: '15px' }}>
-          <QRCode value={accountAddress} size={400} dispatch={dispatch} />
-        </Stack>
-      </Modal>
+      <QRCode value={accountAddress} size={256} includeMargin dispatch={dispatch} />
+      {Address}
+      <p className={styles.notation}>{t('receive.prompt')}</p>
     </>
   )
 }

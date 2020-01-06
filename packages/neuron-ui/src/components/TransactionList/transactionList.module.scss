@@ -1,0 +1,188 @@
+@import '../../styles/mixin.scss';
+
+$success-color: #3cc68a;
+$failed-color: #d50000;
+$pending-color: #b3b3b3;
+
+.itemContainer {
+  @include RegularText;
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #b3b3b3;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  .summary {
+    @include MediumText;
+    position: relative;
+    display: grid;
+    grid-template:
+      'time status'auto 'amount confirmations'auto/ 1fr 130px;
+    justify-items: start;
+    grid-gap: 3px;
+    padding: 15px 0 15px 33px;
+
+    time,
+    span {
+      pointer-events: none;
+    }
+
+    time {
+      grid-area: time;
+    }
+
+    .status {
+      grid-area: status;
+      text-align: right;
+    }
+
+    .amount {
+      grid-area: amount;
+      color: var(--nervos-green);
+    }
+
+    .confirmations {
+      grid-area: confirmations;
+      text-align: right;
+      font-size: 0.625rem;
+      color: #434343;
+      letter-spacing: 0.5px;
+    }
+
+    &:before {
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      transform: translateY(-50%);
+      transform-origin: 0 5px;
+      transition: transform 0.3s;
+      display: block;
+      content: '';
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-left-color: #000;
+    }
+
+    &:after {
+      position: absolute;
+      top: calc(15px + 0.4375rem);
+      right: 0;
+      display: block;
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    &[data-status='confirming'],
+    &[data-status='pending'] {
+      &:after {
+        background-color: $pending-color;
+      }
+    }
+
+    &[data-status='success']:after {
+
+      background-color: $success-color;
+    }
+
+    &[data-status='failed']:after {
+      background-color: $failed-color;
+    }
+  }
+
+
+  .detail {
+    padding: 0 33px;
+    display: none;
+    color: #434343;
+
+    &>div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+
+      &>span:first-of-type {
+        @include MediumText;
+      }
+    }
+
+    .txHash {
+      &>div {
+        display: flex;
+
+        .hashOverflow {
+          word-break: break-all;
+          text-align: right;
+          height: 1rem;
+          overflow: hidden;
+          text-align: right;
+        }
+
+        .ellipsis {
+          display: none;
+        }
+
+        @media screen and (max-width: 1200px) {
+          .hashOverflow {
+            width: 40vw;
+          }
+
+          .ellipsis {
+            display: inline
+          }
+        }
+
+        @media screen and (max-width: 1080px) {
+          .hashOverflow {
+            width: 30vw;
+          }
+        }
+      }
+    }
+
+    .description {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .descriptionField {
+      @include descriptionField;
+
+      &>div {
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+      }
+
+      input {
+        font-size: 0.875rem;
+        text-align: right;
+        padding: 0;
+        border: none;
+
+        &:not(:focus)::-webkit-input-placeholder {
+          font-size: 0.75rem;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  &[data-is-open="true"] {
+    .summary:before {
+      transform: translateY(-50%) rotate(90deg);
+    }
+
+    .detail {
+      display: block;
+    }
+  }
+}

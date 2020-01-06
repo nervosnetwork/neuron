@@ -13,6 +13,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '120',
       status: 'pending',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -24,6 +25,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '120',
       status: 'pending',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -35,6 +37,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '120',
       status: 'success',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -46,6 +49,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '120',
       status: 'success',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -57,6 +61,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '0',
       status: 'success',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -68,6 +73,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '0',
       status: 'success',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -79,6 +85,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -90,6 +97,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -101,6 +109,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -112,6 +121,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -123,6 +133,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -134,6 +145,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: false,
     },
     {
       type: 'send',
@@ -145,6 +157,7 @@ const transactions: {
       description: 'description of send transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: true,
     },
     {
       type: 'receive',
@@ -156,6 +169,7 @@ const transactions: {
       description: 'description of receive transaction',
       blockNumber: '0',
       status: 'failed',
+      nervosDao: false,
     },
   ],
 }

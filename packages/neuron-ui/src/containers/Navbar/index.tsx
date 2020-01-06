@@ -1,12 +1,14 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { createPortal } from 'react-dom'
 import { RouteComponentProps } from 'react-router-dom'
-import { Stack, Pivot, PivotItem, PivotLinkFormat, PivotLinkSize, IconButton, getTheme } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+
+import NetworkStatus from 'components/NetworkStatus'
+import SyncStatus from 'components/SyncStatus'
 
 import { Routes, FULL_SCREENS } from 'utils/const'
+import styles from './navbar.module.scss'
 
 const menuItems = [
   { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview },
@@ -15,93 +17,69 @@ const menuItems = [
   { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
   { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO },
   { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
+  { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
 ]
 
-const theme = getTheme()
-const styles = {
-  root: [
-    {
-      background: theme.palette.neutralLighter,
-      height: '44px',
-    },
-  ],
-  link: [
-    {
-      padding: '0 30px',
-    },
-  ],
-  linkIsSelected: [
-    {
-      padding: '0 30px',
-    },
-  ],
-}
-
-const Navbar = ({
-  location: { pathname },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
   const neuronWallet = useState()
   const {
-    settings: { wallets = [] },
+    wallet: { name },
+    app: { tipBlockNumber = '0', tipBlockTimestamp },
+    chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t] = useTranslation()
 
-  const pivotItems = menuItems
-
-  const selectedKey = useMemo(() => {
-    const selectedTab = pivotItems.find(item => item.key === pathname.split('/')[1])
-    if (selectedTab) {
-      return selectedTab.key
-    }
-    return null
-  }, [pathname, pivotItems])
+  const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
+  const selectedKey: string | null = selectedTab ? selectedTab.key : null
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
   }
 
+  const menus = menuItems.map(item => (
+    <button
+      type="button"
+      key={item.key}
+      title={t(item.name)}
+      name={t(item.name)}
+      aria-label={t(item.name)}
+      data-link={item.url}
+      data-active={item.key === selectedKey}
+      onClick={() => history.push(item.url)}
+    >
+      {t(item.name)}
+    </button>
+  ))
+  const currentNetwork = networks.find(n => n.id === networkID)
+
+  const networkName = currentNetwork ? currentNetwork.name : null
+
   return (
-    <Stack horizontal horizontalAlign="space-between" verticalAlign="stretch">
-      <Pivot
-        selectedKey={selectedKey}
-        onLinkClick={(pivotItem?: PivotItem) => {
-          if (pivotItem && pivotItem.props) {
-            const linkDesc = Object.getOwnPropertyDescriptor(pivotItem.props, 'data-link')
-            if (linkDesc && typeof linkDesc.value === 'string') {
-              history.push(linkDesc.value)
-            }
-          }
-        }}
-        headersOnly
-        linkFormat={PivotLinkFormat.tabs}
-        linkSize={PivotLinkSize.large}
-        styles={styles}
+    <aside className={styles.sidebar}>
+      <button
+        type="button"
+        className={styles.name}
+        title={name}
+        aria-label={name}
+        onClick={() => history.push(Routes.SettingsWallets)}
       >
-        {pivotItems.map(pivotItem => (
-          <PivotItem
-            headerText={t(pivotItem.name)}
-            itemKey={pivotItem.key}
-            key={pivotItem.key}
-            data-link={pivotItem.url}
-          />
-        ))}
-      </Pivot>
-      <IconButton
-        iconProps={{ iconName: 'Settings' }}
-        onClick={() => history.push(Routes.SettingsGeneral)}
-        styles={{
-          root: {
-            height: 'auto',
-            width: '44px',
-            marginRight: '8px',
-          },
-          icon: {
-            height: '20px',
-          },
-        }}
+        {name}
+      </button>
+      <nav role="navigation" className={styles.navs}>
+        {menus}
+      </nav>
+      <NetworkStatus
+        networkName={networkName}
+        connectionStatus={connectionStatus}
+        onAction={() => history.push(Routes.SettingsNetworks)}
       />
-    </Stack>
+      <SyncStatus
+        tipBlockNumber={tipBlockNumber}
+        tipBlockTimestamp={tipBlockTimestamp}
+        syncedBlockNumber={syncedBlockNumber}
+      />
+    </aside>
   )
 }
 

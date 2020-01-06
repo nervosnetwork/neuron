@@ -1,6 +1,8 @@
+@import '../../styles/mixin.scss';
+
 .propertyCell {
   display: flex;
-  padding: 5px 5px;
+  padding: 5px 5px 5px 0;
   font-size: 14px;
 
   .label,
@@ -12,6 +14,7 @@
   }
 
   .label {
+    @include BoldText;
     grid-area: label;
     padding-right: 15px;
   }

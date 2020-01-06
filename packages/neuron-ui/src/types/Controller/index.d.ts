@@ -88,7 +88,6 @@ declare namespace Controller {
     options: Partial<{ name: string; remote: string }>
   }
 
-  type DeleteNetworkParams = string
   interface UpdateTransactionDescriptionParams {
     hash: string
     description: string

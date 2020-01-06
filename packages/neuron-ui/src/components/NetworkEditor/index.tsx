@@ -1,58 +1,123 @@
-import React, { useMemo, useRef } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useParams, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, DefaultButton, TextField, Spinner } from 'office-ui-fabric-react'
+import { Stack } from 'office-ui-fabric-react'
+import TextField from 'widgets/TextField'
+import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 
 import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { verifyNetworkName, verifyURL } from 'utils/validators'
 import { useGoBack } from 'utils/hooks'
-import { useInitialize, useInputs, useNetworkEditor, useIsInputsValid, useHandleSubmit } from './hooks'
+import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
+import { useHandleSubmit } from './hooks'
+import styles from './networkEditor.module.scss'
 
 const NetworkEditor = ({
   app: {
     loadings: { network: isUpdating = false },
   },
   settings: { networks = [] },
-  match: {
-    params: { id = '' },
-  },
-  history,
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
-  const editor = useNetworkEditor()
-  const [t] = useTranslation()
+}: React.PropsWithoutRef<StateWithDispatch>) => {
+  const { id } = useParams()
+  const history = useHistory()
   const cachedNetworks = useRef(networks)
-  const cachedNetwork = cachedNetworks.current.find(network => network.id === id)
+  const cachedNetwork = useMemo(() => cachedNetworks.current.find(network => network.id === id), [cachedNetworks, id])
   const usedNetworkNames = useMemo(
     () => networks.map(n => n.name).filter(name => name !== ((cachedNetwork && cachedNetwork.name) || '')),
     [networks, cachedNetwork]
   )
-  const inputs = useInputs(editor, usedNetworkNames, t)
+  const [t] = useTranslation()
+  const [editor, setEditor] = useState({
+    name: '',
+    nameError: '',
+    url: '',
+    urlError: '',
+  })
+  useEffect(() => {
+    if (cachedNetwork) {
+      setEditor({
+        name: cachedNetwork.name,
+        nameError: '',
+        url: cachedNetwork.remote,
+        urlError: '',
+      })
+    }
+  }, [cachedNetwork])
+  const onChange = useCallback(
+    (e: React.SyntheticEvent<HTMLInputElement>) => {
+      const {
+        value,
+        dataset: { field = '' },
+      } = e.target as HTMLInputElement
+      let error = ''
+      if (field === 'name') {
+        const res = verifyNetworkName(value, usedNetworkNames)
+        if (typeof res === 'object') {
+          error = t(`messages.codes.${res.code}`, {
+            fieldName: 'name',
+            fieldValue: '',
+            length: MAX_NETWORK_NAME_LENGTH,
+          })
+        }
+      } else if (field === 'url') {
+        const res = verifyURL(value)
+        if (typeof res === 'object') {
+          error = t(`messages.codes.${res.code}`, { fieldName: 'remote', fieldValue: value })
+        }
+      }
+      setEditor(state => ({
+        ...state,
+        [field]: value,
+        [`${field}Error`]: error,
+      }))
+    },
+    [setEditor, t, usedNetworkNames]
+  )
   const goBack = useGoBack(history)
-  useInitialize(id, networks, editor.initialize, dispatch)
 
-  const { hasError, notModified } = useIsInputsValid(editor, usedNetworkNames, cachedNetwork)
-  const handleSubmit = useHandleSubmit(id, editor.name.value, editor.remote.value, networks, history, dispatch)
+  const handleSubmit = useHandleSubmit(id, editor.name, editor.url, networks, history, dispatch)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
       <h1>{t('settings.network.edit-network.title')}</h1>
       <Stack tokens={{ childrenGap: 15 }}>
-        {inputs.map(inputProps => (
-          <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} key={inputProps.label} required validateOnLoad={false} />
-          </Stack.Item>
-        ))}
+        <TextField
+          value={editor.url}
+          field="url"
+          onChange={onChange}
+          label={t('settings.network.edit-network.rpc-url')}
+          error={editor.urlError}
+          placeholder="http://localhost:8114"
+        />
+        <TextField
+          value={editor.name}
+          field="name"
+          onChange={onChange}
+          label={t('settings.network.edit-network.name')}
+          error={editor.nameError}
+          placeholder="My Custom Node"
+        />
       </Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <DefaultButton onClick={goBack} text={t('common.cancel')} />
-        {isUpdating ? (
-          <PrimaryButton disabled>
-            <Spinner />
-          </PrimaryButton>
-        ) : (
-          <PrimaryButton disabled={hasError || notModified} onClick={handleSubmit} text={t('common.save')} />
-        )}
-      </Stack>
+      <div className={styles.actions}>
+        <Button type="cancel" label={t('common.cancel')} onClick={goBack} />
+        <Button
+          type="submit"
+          label={isUpdating ? 'updating' : t('common.save')}
+          onClick={handleSubmit}
+          disabled={
+            !!(
+              editor.nameError ||
+              editor.urlError ||
+              (cachedNetwork && editor.name === cachedNetwork.name) ||
+              isUpdating
+            )
+          }
+        >
+          {isUpdating ? <Spinner /> : (t('common.save') as string)}
+        </Button>
+      </div>
     </Stack>
   )
 }

@@ -1,0 +1,120 @@
+@import '../../styles/mixin.scss';
+$textfieldWidth: calc(100vw - 370px);
+
+.outputContainer {
+  display: grid;
+  grid-template:
+    'address scanner add-or-remove'auto 'amount max add-or-remove'auto/ $textfieldWidth 50px 30px;
+  grid-gap: 15px;
+  padding: 28px 0 34px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #b3b3b3;
+
+  .addressField {
+    grid-area: address;
+  }
+
+  button[aria-label="qr-btn"] {
+    padding-top: 10px;
+    grid-area: scanner;
+  }
+
+  .amountField {
+    grid-area: amount;
+  }
+
+  .maxBtn {
+    grid-area: max;
+  }
+
+  .iconBtns {
+    grid-area: add-or-remove;
+    padding: 30px 0;
+  }
+}
+
+.info {
+  width: $textfieldWidth;
+  display: grid;
+  grid-template: 'textfield'auto;
+  grid-gap: 15px;
+  padding: 24px 0 34px;
+}
+
+.balance {
+  margin-bottom: 29px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  label {
+    margin-right: 25px;
+
+    &:after {
+      display: inline;
+      content: ':'
+    }
+  }
+
+  label,
+  span {
+    @include BoldText;
+    font-size: 1.375rem;
+    letter-spacing: 1.1;
+  }
+}
+
+.iconBtns {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.iconBtn {
+  appearance: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+
+
+
+  &[disabled] {
+    img[data-type='add'] {
+      filter: brightness(1.2) grayscale(1)
+    }
+
+    img[data-type='remove'] {
+      filter: contrast(0.4) grayscale(1) brightness(2);
+    }
+  }
+}
+
+.maxBtn {
+  width: 3.125rem;
+  height: 1.875rem;
+  min-width: auto;
+  margin-top: 22px;
+  padding: 0;
+  line-height: auto;
+
+  &[data-is-on=true] {
+    color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
+  }
+
+}
+
+
+.actions {
+  @include formFooter;
+}

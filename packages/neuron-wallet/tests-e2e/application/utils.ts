@@ -1,18 +1,6 @@
-import { SpectronClient } from 'spectron'
 import { AllElectron } from 'electron'
 
-export const getElementByTagName = async (client: SpectronClient, tagName: string, textContent: string) => {
-  const elements = await client.elements(`<${tagName} />`)
-  for (let index = 0; index < elements.value.length; index++) {
-    const element = elements.value[index];
-    const text = await client.elementIdText(element.ELEMENT)
-    if (text.value === textContent) {
-      return element
-    }
-  }
-  return null
-}
-
+// TODO: Refactor this! Integration tests should reply on UI operation, not IPC communications!
 export const clickMenu = (electron: AllElectron, labels: string[]) => {
   return electron.ipcRenderer.send('E2E_CLICK_MENU_ITEM', labels)
 }
@@ -35,11 +23,4 @@ export const editNetwork = (electron: AllElectron, networkId: string) => {
 
 export const deleteNetwork = (electron: AllElectron, networkId: string) => {
   return electron.ipcRenderer.send('E2E_DELETE_NETWORK', [networkId])
-}
-
-export const sleep = (delay: number) => {
-  var start = (new Date()).getTime();
-  while ((new Date()).getTime() - start < delay) {
-    continue;
-  }
 }

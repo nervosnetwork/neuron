@@ -7,7 +7,9 @@ export const MIN_AMOUNT = 61
 export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
-export const CONFIRMATION_THRESHOLD = 30
+export const CONFIRMATION_THRESHOLD = 300
+export const MAX_TIP_BLOCK_DELAY = 180000
+export const BUFFER_BLOCK_NUMBER = 10
 
 export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'
@@ -78,14 +80,7 @@ export enum MnemonicAction {
   Import = 'import',
 }
 
-export const FULL_SCREENS = [
-  `${Routes.Transaction}/`,
-  `/wizard/`,
-  `/keystore/`,
-  `${Routes.Settings}/`,
-  `${Routes.WalletEditor}/`,
-  `${Routes.NetworkEditor}/`,
-]
+export const FULL_SCREENS = [`${Routes.Transaction}/`, `/wizard/`, `/keystore/`]
 
 export enum ErrorCode {
   // Errors from RPC
@@ -95,6 +90,7 @@ export enum ErrorCode {
   AmountTooSmall = 101,
   PasswordIncorrect = 103,
   NodeDisconnected = 104,
+  CapacityNotEnoughForChange = 105,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
@@ -106,8 +102,9 @@ export enum ErrorCode {
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
   FieldIrremovable = 301,
-  FailToLaunch = 302,
   FieldNotFound = 303,
   CameraUnavailable = 304,
   AddressIsEmpty = 305,
+  MainnetAddressRequired = 306,
+  TestnetAddressRequired = 307,
 }

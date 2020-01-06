@@ -12,7 +12,6 @@ const FallbackSubject = {
 
 const SubjectConstructor = <T>(
   channel:
-    | 'system-script-updated'
     | 'data-updated'
     | 'current-wallet-updated'
     | 'wallet-list-updated'
@@ -38,7 +37,6 @@ const SubjectConstructor = <T>(
       }
     : FallbackSubject
 }
-export const SystemScript = SubjectConstructor<Subject.SystemScript>('system-script-updated')
 export const DataUpdate = SubjectConstructor<Subject.DataUpdateMetaInfo>('data-updated')
 export const CurrentWallet = SubjectConstructor<any>('current-wallet-updated')
 export const WalletList = SubjectConstructor<any[]>('wallet-list-updated')
@@ -50,7 +48,6 @@ export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-up
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 
 export default {
-  SystemScript,
   DataUpdate,
   CurrentWallet,
   WalletList,

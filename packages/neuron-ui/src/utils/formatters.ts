@@ -134,12 +134,20 @@ export const shannonToCKBFormatter = (shannon: string = '0', showPositiveSign?: 
 }
 
 export const localNumberFormatter = (num: string | number | bigint = 0) => {
-  if (typeof num !== 'bigint' && Number.isNaN(+num)) {
-    console.warn(`Nuumber is not a valid number`)
-    return num
+  if (num === '' || num === undefined || num === null) {
+    return ''
   }
-  const n: any = BigInt(num)
-  return numberFormatter.format(n)
+  if (typeof num === 'bigint') {
+    return numberFormatter.format(num as any)
+  }
+  if (Number.isNaN(+num)) {
+    console.warn(`Nuumber is not a valid number`)
+    return num.toString()
+  }
+  const parts = num.toString().split('.')
+  const n: any = BigInt(parts[0])
+  parts[0] = numberFormatter.format(n)
+  return parts.join('.')
 }
 
 export const uniformTimeFormatter = (time: string | number | Date) => {
@@ -157,7 +165,7 @@ export const addressesToBalance = (addresses: State.Address[] = []) => {
     .toString()
 }
 
-export const outputsToTotalAmount = (outputs: { amount: string; unit: CapacityUnit }[]) => {
+export const outputsToTotalAmount = (outputs: Readonly<State.Output[]>) => {
   const totalCapacity = outputs.reduce((total, cur) => {
     if (Number.isNaN(+cur.amount)) {
       return total

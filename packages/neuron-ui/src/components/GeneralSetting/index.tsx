@@ -1,11 +1,13 @@
 import React, { useContext, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, PrimaryButton, Button, Spinner, Text, ProgressIndicator } from 'office-ui-fabric-react'
+import { Stack, Text, ProgressIndicator } from 'office-ui-fabric-react'
+import Button from 'widgets/Button'
+import Spinner from 'widgets/Spinner'
 import { NeuronWalletContext } from 'states/stateProvider'
 import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
-import { releaseNotesStyle } from './style.module.scss'
+import styles from './style.module.scss'
 
 const UpdateDownloadStatus = ({
   progress = 0,
@@ -33,21 +35,17 @@ const UpdateDownloadStatus = ({
           {t('updates.updates-found-do-you-want-to-update', { version: newVersion })}
         </Text>
         <h3>{t('updates.release-notes')}</h3>
-        <div className={releaseNotesStyle}>
+        <div className={styles.releaseNotesStyle}>
           <div dangerouslySetInnerHTML={releaseNotesHtml()} />
         </div>
         <Stack horizontal horizontalAlign="start">
-          <PrimaryButton
+          <Button
+            type="primary"
             onClick={download}
             disabled={!available}
-            styles={{
-              root: {
-                minWidth: 180,
-              },
-            }}
-          >
-            {t('updates.download-update')}
-          </PrimaryButton>
+            label={t('updates.download-update')}
+            style={{ minWidth: '180px' }}
+          />
         </Stack>
       </Stack>
     )
@@ -64,17 +62,13 @@ const UpdateDownloadStatus = ({
           {t('updates.updates-downloaded-about-to-quit-and-install')}
         </Text>
         <Stack horizontal horizontalAlign="start">
-          <PrimaryButton
+          <Button
+            type="primary"
             onClick={quitAndInstall}
             disabled={!downloaded}
-            styles={{
-              root: {
-                minWidth: 180,
-              },
-            }}
-          >
-            {t('updates.quit-and-install')}
-          </PrimaryButton>
+            style={{ minWidth: '180px' }}
+            label={t('updates.quit-and-install')}
+          />
         </Stack>
       </Stack>
     )
@@ -109,7 +103,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
   }, [dispatch])
 
   return (
-    <Stack tokens={{ childrenGap: 25 }}>
+    <Stack tokens={{ childrenGap: 25 }} className={styles.container}>
       <Stack>
         <Stack horizontal horizontalAlign="start">
           {updater.version !== '' || updater.downloadProgress >= 0 ? (
@@ -120,14 +114,10 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
             />
           ) : (
             <Button
+              label={t(`updates.${updater.checking ? 'checking-updates' : 'check-updates'}`)}
+              type="default"
               onClick={checkUpdates}
               disabled={updater.checking}
-              ariaDescription="Check updates"
-              styles={{
-                root: {
-                  minWidth: 180,
-                },
-              }}
             >
               {updater.checking ? (
                 <Spinner
@@ -136,7 +126,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
                   labelPosition="right"
                 />
               ) : (
-                t('updates.check-updates')
+                (t('updates.check-updates') as string)
               )}
             </Button>
           )}
@@ -149,14 +139,10 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
         </Text>
         <Stack horizontal horizontalAlign="start">
           <Button
+            type="default"
+            label={t(`settings.general.${clearingCache ? 'clearing-cache' : 'clear-cache'}`)}
             onClick={clearCache}
             disabled={clearingCache}
-            ariaDescription="Clear cache"
-            styles={{
-              root: {
-                minWidth: 180,
-              },
-            }}
           >
             {clearingCache ? (
               <Spinner
@@ -165,7 +151,7 @@ const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) 
                 labelPosition="right"
               />
             ) : (
-              t('settings.general.clear-cache')
+              (t('settings.general.clear-cache') as string)
             )}
           </Button>
         </Stack>
