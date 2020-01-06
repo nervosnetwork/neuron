@@ -6,7 +6,7 @@ import { OutputStatus } from '../../../src/models/chain/output'
 
 describe('Transaction', () => {
   const hash = '0x' + '0'.repeat(64)
-  const timestamp = (+new Date()).toString()
+  const timestamp = '1578284127550'
   const transactionInterface: TransactionInterface = {
     hash,
     version: '0',
@@ -72,6 +72,10 @@ describe('Transaction', () => {
 
   it('new', () => {
     expect(tx.hash).toEqual(hash)
+  })
+
+  it('computeHash', () => {
+    expect(tx.computeHash()).toEqual("0xf09ef3072ec48a89ed772abd98feb1dd0f3c5074fcc00628c1a82e697aca92e4")
   })
 
   it('toInterface', () => {

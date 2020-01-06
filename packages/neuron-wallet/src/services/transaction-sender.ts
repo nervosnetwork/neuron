@@ -49,7 +49,7 @@ export default class TransactionSender {
     }
 
     const { core } = NodeService.getInstance()
-    const txHash = core.utils.rawTransactionToHash(tx.toSDK())
+    const txHash: string = tx.computeHash()
 
     const addressInfos = this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)

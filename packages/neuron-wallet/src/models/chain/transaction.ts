@@ -3,7 +3,7 @@ import Input, { InputInterface } from './input'
 import Output, { OutputInterface } from './output'
 import { WitnessArgsInterface, WitnessArgs } from './witness-args'
 import HexUtils from 'utils/hex'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
 import { BlockHeaderInterface, BlockHeader } from './block-header'
 import TypeCheckerUtils from 'utils/type-checker'
 
@@ -246,6 +246,10 @@ export class TransactionWithoutHash implements TransactionWithoutHashInterface {
   public addOutput(output: Output) {
     this._outputs.push(output)
     this._outputsData.push(output.data || '0x')
+  }
+
+  public computeHash(): string {
+    return rawTransactionToHash(this.toSDK())
   }
 
   public toInterface(): TransactionWithoutHashInterface {
