@@ -294,7 +294,9 @@ const Submission = ({
 
   return (
     <div className={styles.submission}>
-      <Text variant="xxLargePlus">{t(message)}</Text>
+      <Text variant="xxLargePlus" styles={{ root: { paddingBottom: '20px' } }}>
+        {t(message)}
+      </Text>
       {submissionInputs.map(input => (
         <div
           key={input.key}
@@ -311,6 +313,7 @@ const Submission = ({
             maxLength={input.maxLength}
             hint={input.hint ? t(input.hint) : undefined}
             suffix={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : undefined}
+            className={styles.submissionField}
           />
         </div>
       ))}

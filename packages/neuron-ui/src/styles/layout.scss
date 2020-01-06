@@ -26,6 +26,16 @@ footer {
   grid-area: content;
   overflow: auto;
   padding: 15px 30px;
+  &::-webkit-scrollbar{
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb{
+    background: #999;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-track{
+    background: transparent;
+  }
 }
 
 .notification {

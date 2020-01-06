@@ -3,9 +3,19 @@
 .nervosDAOContainer {
   display: grid;
   grid-template:
-    'amount deposit'107px 'records records'auto/ 450px 1fr;
+    'wallet-name wallet-name'auto 'amount deposit'107px 'records records'auto/ 450px 1fr;
   // padding: 54px 31px 41px 31px; this size is from design, but not used now
   padding: 39px 0 0;
+}
+
+.walletName {
+  @include BoldText;
+  grid-area: wallet-name;
+  font-size: 1.375rem;
+  line-height: 1.22em;
+  letter-spacing: 1.1px;
+  color: #000;
+  margin: 0 0 11px 0;
 }
 
 .amount {
@@ -39,7 +49,7 @@
 .info {
   width: 220px;
   @include RegularText;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 18.5px 0;
 

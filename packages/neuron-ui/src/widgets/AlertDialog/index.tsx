@@ -16,11 +16,10 @@ const AlertDialog = ({
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
-  useDialog({ show: content, dialogRef })
-
   const onDismiss = useCallback(() => {
     dismissAlertDialog()(dispatch)
   }, [dispatch])
+  useDialog({ show: content, dialogRef, onClose: onDismiss })
 
   return (
     <dialog ref={dialogRef} className={styles.alertDialog}>

@@ -95,19 +95,19 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             },
 
             title: {
-              fontSize: '0.75rem',
+              fontSize: '1rem',
               fontWeight: 500,
               height: '1.625rem',
               lineHeight: '1.625rem',
             },
             dropdownOptionText: {
-              fontSize: '0.75rem',
+              fontSize: '1rem',
               height: '1.625rem',
               lineHeight: '1.625rem',
               boxShadow: 'border-box',
             },
             dropdownItem: {
-              fontSize: '0.75rem',
+              fontSize: '1rem',
               height: '1.625rem',
               lineHeight: '1.625rem',
               boxShadow: 'border-box',
@@ -120,7 +120,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
               backgroundColor: '#e3e3e3',
             },
             root: {
-              fontSize: '0.75rem',
+              fontSize: '1rem',
             },
           }}
         />

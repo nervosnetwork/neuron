@@ -6,7 +6,7 @@ $progress-yellow-hover: #fa8f00;
 $progress-grey-hover: #888;
 
 @mixin secondaryInfo {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: #434343;
   letter-spacing: 0.5px;
   align-self: start
@@ -15,7 +15,7 @@ $progress-grey-hover: #888;
 .container {
   display: grid;
   grid-template:
-    'compensation deposit-amount epoch-btn action-btn'auto 'time apc blank info'auto / 1fr 1fr 24px 150px;
+    'compensation deposit-amount blank epoch-btn action-btn'auto 'time apc info info info'auto / 5fr 5fr 2fr 24px 140px;
   grid-gap: 9px;
   align-items: center;
   justify-items: start;
@@ -129,5 +129,7 @@ $progress-grey-hover: #888;
   .info {
     @include secondaryInfo;
     grid-area: info;
+    justify-self: flex-end;
+    word-break: break-all;
   }
 }

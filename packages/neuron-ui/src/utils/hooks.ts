@@ -118,21 +118,30 @@ export const useCalculateEpochs = ({ depositEpoch, currentEpoch }: { depositEpoc
 export const useDialog = ({
   show,
   dialogRef,
+  onClose,
 }: {
   show: any
   dialogRef: React.MutableRefObject<HTMLDialogElement | null>
+  onClose: () => void
 }) => {
   useEffect(() => {
-    if (dialogRef.current) {
+    const ref = dialogRef.current
+    if (ref) {
       if (show) {
-        if (!dialogRef.current.open) {
-          dialogRef.current.showModal()
+        if (!ref.open) {
+          ref.showModal()
         }
       } else {
-        dialogRef.current.close()
+        ref.close()
+      }
+      ref.addEventListener('close', onClose)
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener('close', onClose)
       }
     }
-  }, [show, dialogRef])
+  }, [show, dialogRef, onClose])
 }
 
 export default { useGoBack, useLocalDescription, useCalculateEpochs, useDialog }

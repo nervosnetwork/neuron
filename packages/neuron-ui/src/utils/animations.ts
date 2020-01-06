@@ -1,12 +1,9 @@
 export const backToTop = (elm?: HTMLElement) => {
-  const container = elm || (document.querySelector('main > div') as HTMLElement)
-  if (container) {
-    container.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-      inline: 'nearest',
-    })
-  }
+  const container = elm || (document.querySelector('main') as HTMLElement)
+  container.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
 }
 
 export default {

@@ -46,7 +46,7 @@ $error-red: #d50000;
 
     input {
       @include RegularText;
-      font-size: 0.75rem;
+      font-size: 1rem;
       flex: 1;
       border: none;
       padding: 4.5px;
@@ -67,7 +67,7 @@ $error-red: #d50000;
       color: #434343;
       letter-spacing: 0.6px;
       padding: 0 10px;
-      font-size: 0.75rem;
+      font-size: 1rem;
     }
 
     &:focus-within {

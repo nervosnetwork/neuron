@@ -135,8 +135,30 @@ $pending-color: #b3b3b3;
       }
     }
 
+    .description {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .descriptionField {
       @include descriptionField;
+
+      input {
+        font-size: 0.875rem;
+        text-align: right;
+        padding: 0;
+
+        &:focus {
+          padding: 0 7px;
+        }
+
+        &:not(:focus)::-webkit-input-placeholder {
+          padding-right: 7px;
+          font-size: 0.75rem;
+          text-align: right;
+        }
+      }
     }
   }
 

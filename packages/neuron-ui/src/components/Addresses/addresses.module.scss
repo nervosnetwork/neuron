@@ -7,7 +7,6 @@ $change-color: #6666cc;
   background-color: #fff;
   margin-top: 48px;
   padding: 2px 15px 47px 15px;
-  overflow: scroll;
 }
 
 .addressList {
@@ -47,6 +46,14 @@ $change-color: #6666cc;
 
     &:not(:last-child) {
       padding-right: 20px;
+
+      @media screen and (max-width: 1350px) {
+        padding-right: 10px;
+      }
+
+      @media screen and (max-width: 1160px) {
+        padding-right: 5px;
+      }
     }
   }
 
@@ -108,8 +115,18 @@ $change-color: #6666cc;
     }
   }
 
+  .description {
+    width: 137px;
+  }
+
   .descriptionField {
     @include descriptionField;
+
+    @media screen and (max-width: 1500px) {
+      input {
+        width: 100px;
+      }
+    }
   }
 
   .balance {

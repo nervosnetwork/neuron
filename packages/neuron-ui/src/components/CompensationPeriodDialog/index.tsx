@@ -18,7 +18,7 @@ interface CompensationPeriodDialogProps {
 const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: CompensationPeriodDialogProps) => {
   const [t] = useTranslation()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
-  useDialog({ show: compensationPeriod, dialogRef })
+  useDialog({ show: compensationPeriod, dialogRef, onClose: onDismiss })
 
   let pastEpochs = 0
   if (compensationPeriod) {
@@ -38,7 +38,10 @@ const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: Compensatio
   return (
     <dialog ref={dialogRef} className={styles.compensationPeriodDialog}>
       <h2 className={styles.title}>{t('nervos-dao.current-epochs-period')}</h2>
-      <div className={styles.stage}>{t('nervos-dao.stage-of-current-epoch', { pastEpochs, totalEpochs: 180 })}</div>
+      <div className={styles.stage}>
+        <span>{t('nervos-dao.progress')}</span>
+        <span>{t('nervos-dao.stage-of-current-epoch', { pastEpochs, totalEpochs: 180 })}</span>
+      </div>
       <div className={styles.leftTime}>{t('nervos-dao.left-time', { leftDays, leftHours })}</div>
       <progress className={styles.epochsProgress} max="180" value={pastEpochs} />
       <p className={styles.notes}>{t('nervos-dao.detailed-explanation-of-epochs-period')}</p>

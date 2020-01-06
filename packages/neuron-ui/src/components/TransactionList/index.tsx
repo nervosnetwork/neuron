@@ -41,7 +41,7 @@ const TransactionList = ({
       const {
         dataset: { hash = '' },
       } = e.target as HTMLElement
-      setTxHash(hash)
+      setTxHash(currentHash => (currentHash === hash ? '' : hash))
     },
     [setTxHash]
   )
