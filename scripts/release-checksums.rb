@@ -12,7 +12,7 @@ macos_dmg = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Ne
 linux_appimage = "https://github.com/nervosnetwork/neuron/releases/download/#{tag}/Neuron-#{tag}-x86_64.AppImage"
 
 def get_sha256_checksum(url)
-  content = open(url).read
+  content = URI.open(url).read
   Digest::SHA256.hexdigest(content)
 end
 
