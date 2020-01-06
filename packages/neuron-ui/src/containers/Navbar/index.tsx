@@ -57,9 +57,15 @@ const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
 
   return (
     <aside className={styles.sidebar}>
-      <h1 className={styles.name} title={name} aria-label={name}>
+      <button
+        type="button"
+        className={styles.name}
+        title={name}
+        aria-label={name}
+        onClick={() => history.push(Routes.SettingsWallets)}
+      >
         {name}
-      </h1>
+      </button>
       <nav role="navigation" className={styles.navs}>
         {menus}
       </nav>
