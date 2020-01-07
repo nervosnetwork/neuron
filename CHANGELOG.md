@@ -1,41 +1,6 @@
-# [0.26.2](https://github.com/nervosnetwork/neuron/compare/v0.26.0...v0.26.2) (2020-01-06)
+# [0.26.3](https://github.com/nervosnetwork/neuron/compare/v0.26.0...v0.26.3) (2020-01-07)
 
-Happy New Year and welcome to the v0.26.2 release of Neuron!
-
-Note: v0.26.2 is a hotfix release for v0.26.1, which addressed a font rendering issue on Linux and Windows.
-
-### New look and feel
-
-Neuron has a new look and feel that we hope you will like. We're still designing and tweaking many of the UI parts so please stay tuned as there're more to come in future releases.
-
-### Bundled CKB node
-
-CKB v0.26.1 was released on Dec 30th, 2019. This version of CKB node is now bundled and preconfigured in Neuron.
-
-### Nervos DAO
-
-There're many improvements for Nervos DAO feature, some of the key changes include:
-
-* Allow depositing all balance to Nervos DAO. When the user does so, show hint to remind them to reserve some CKB for withdraw operation.
-* Added the Current Compensation Period dialog showing explanation of epochs period.
-* Label Nervos DAO transactions in recent activities.
-
-### Electron 7
-
-We updated to Electron 7 in this release. Electron 7 added `ipcRenderer.invoke()` and `ipcMain.handle()` for asynchronous request/response-style IPC, which are recommended over the `remote` module. To take advantage of that, we refactored data flow between wallet core and UI layers, replacing `remote` usage with `ipcRenderer.invoke()` and `ipcMain.handle()`.
-
-### Bug fixes
-
-* Fixed a lot of bugs related to block syncing.
-* Fixed minor bugs with Nervos DAO feature.
-* Fixed an issue that transaction detail window shows blank content.
-* Fixed a bug that allows transaction fee price to be set as non-integer number.
-
-
-
-# [0.26.1](https://github.com/nervosnetwork/neuron/compare/v0.26.0...v0.26.1) (2020-01-06)
-
-Happy New Year and welcome to the v0.26.1 release of Neuron!
+Happy New Year and welcome to the v0.26.3 release of Neuron!
 
 ### New look and feel
 
