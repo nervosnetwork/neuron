@@ -24,9 +24,9 @@ export default class BlockHeader {
     return new BlockHeader(
       header.version,
       header.timestamp,
-      header.number,
       header.hash,
       header.parentHash,
+      header.number,
       header.epoch,
     )
   }
