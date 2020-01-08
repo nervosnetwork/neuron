@@ -5,14 +5,23 @@ import { changeLanguage } from 'locales/i18n'
 
 const appController = new AppController()
 
-app.on('ready', async () => {
-  changeLanguage(app.getLocale())
+const singleInstanceLock = app.requestSingleInstanceLock()
+if (singleInstanceLock) {
+  app.on('ready', async () => {
+    changeLanguage(app.getLocale())
 
-  appController.start()
-})
+    appController.start()
+  })
 
-app.on('before-quit', async () => {
-  appController.end()
-})
+  app.on('before-quit', async () => {
+    appController.end()
+  })
 
-app.on('activate', appController.openWindow)
+  app.on('activate', appController.openWindow)
+
+  app.on('second-instance', () => {
+    appController.restoreWindow()
+  })
+} else {
+  app.quit()
+}
