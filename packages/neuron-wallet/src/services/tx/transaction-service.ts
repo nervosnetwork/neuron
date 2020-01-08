@@ -300,7 +300,7 @@ export class TransactionsService {
       return undefined
     }
 
-    const transaction: Transaction = tx.toInterface()
+    const transaction: Transaction = tx.toModel()
 
     return transaction
   }

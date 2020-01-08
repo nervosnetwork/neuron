@@ -58,7 +58,7 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const cells: Output[] = outputs.map(o => o.toInterface())
+    const cells: Output[] = outputs.map(o => o.toModel())
 
     const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
 
@@ -89,7 +89,7 @@ export default class CellsService {
       return undefined
     }
 
-    return cellEntity.toInterface()
+    return cellEntity.toModel()
   }
 
   private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {

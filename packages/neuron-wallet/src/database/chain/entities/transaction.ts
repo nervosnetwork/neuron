@@ -97,9 +97,9 @@ export default class Transaction extends BaseEntity {
   @OneToMany(_type => OutputEntity, output => output.transaction)
   outputs!: OutputEntity[]
 
-  public toInterface(): TransactionModel {
-    const inputs: Input[] = this.inputs ? this.inputs.map(input => input.toInterface()) : []
-    const outputs: Output[] = this.outputs ? this.outputs.map(output => output.toInterface()) : []
+  public toModel(): TransactionModel {
+    const inputs: Input[] = this.inputs ? this.inputs.map(input => input.toModel()) : []
+    const outputs: Output[] = this.outputs ? this.outputs.map(output => output.toModel()) : []
     return TransactionModel.fromObject({
       hash: this.hash,
       version: this.version,
@@ -157,7 +157,7 @@ export default class Transaction extends BaseEntity {
   private changed = (event: string) => {
     TxDbChangedSubject.getSubject().next({
       event,
-      tx: this.toInterface(),
+      tx: this.toModel(),
     })
   }
 }

@@ -91,7 +91,7 @@ export default class Output extends BaseEntity {
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
-  public toInterface(): OutputModel {
+  public toModel(): OutputModel {
     const timestamp = this.transaction?.timestamp || this.transaction?.createdAt
 
     return OutputModel.fromObject({

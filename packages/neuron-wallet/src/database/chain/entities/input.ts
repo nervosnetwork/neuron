@@ -66,7 +66,7 @@ export default class Input extends BaseEntity {
     )
   }
 
-  public toInterface(): InputModel {
+  public toModel(): InputModel {
     return new InputModel(
       this.previousOutput(),
       this.since,
