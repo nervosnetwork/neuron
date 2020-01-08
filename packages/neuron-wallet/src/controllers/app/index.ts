@@ -64,6 +64,17 @@ export default class AppController {
     this.createWindow()
   }
 
+  public restoreWindow = () => {
+    if (!this.mainWindow) {
+      return
+    }
+
+    if (this.mainWindow.isMinimized()) {
+      this.mainWindow.restore()
+    }
+    this.mainWindow.focus()
+  }
+
   createWindow = () => {
     const windowState = windowStateKeeper({
       defaultWidth: 1366,
