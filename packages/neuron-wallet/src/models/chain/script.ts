@@ -20,6 +20,14 @@ export default class Script {
     TypeChecker.hashChecker(this.codeHash)
   }
 
+  public static fromObject({ codeHash, args, hashType }: {
+    codeHash: string,
+    args: string,
+    hashType: ScriptHashType
+  }): Script {
+    return new Script(codeHash, args, hashType)
+  }
+
   public computeHash(): string {
     const hash: string = scriptToHash(this.toSDK())
     return HexUtils.addPrefix(hash)

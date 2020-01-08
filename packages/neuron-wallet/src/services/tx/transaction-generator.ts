@@ -145,7 +145,6 @@ export class TransactionGenerator {
       headerDeps: [],
       inputs: allInputs,
       outputs,
-      outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
     })
 
@@ -164,11 +163,11 @@ export class TransactionGenerator {
       .slice(0, -1)
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
-    outputs[outputs.length - 1].capacity = (totalCapacity - capacitiesExceptLast - finalFee).toString()
+    tx.outputs[outputs.length - 1].setCapacity((totalCapacity - capacitiesExceptLast - finalFee).toString())
     tx.fee = finalFee.toString()
 
     // check
-    if (outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !== totalCapacity) {
+    if (tx.outputs.map(o => BigInt(o.capacity)).reduce((result, c) => result + c, BigInt(0)) + finalFee !== totalCapacity) {
       throw new Error('generateSendingAllTx Error')
     }
 
@@ -304,7 +303,7 @@ export class TransactionGenerator {
       finalFee = TransactionFee.fee(txSize, feeRateInt)
     }
 
-    output.capacity = (BigInt(output.capacity) - finalFee).toString()
+    tx.outputs[0].capacity = (BigInt(output.capacity) - finalFee).toString()
     tx.fee = finalFee.toString()
 
     return tx

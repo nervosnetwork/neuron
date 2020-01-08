@@ -9,6 +9,14 @@ export default class WitnessArgs {
     this.outputType = outputType
   }
 
+  public static fromObject({ lock, inputType, outputType }: {
+    lock?: string,
+    inputType?: string,
+    outputType?: string
+  }): WitnessArgs {
+    return new WitnessArgs(lock, inputType, outputType)
+  }
+
   public setEmptyLock() {
     this.lock = WitnessArgs.EMPTY_LOCK
   }

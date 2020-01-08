@@ -13,6 +13,10 @@ export default class OutPoint {
     TypeChecker.numberChecker(this.index)
   }
 
+  public static fromObject({ txHash, index}: { txHash: string, index: string }): OutPoint {
+    return new OutPoint(txHash, index)
+  }
+
   public toSDK(): CKBComponents.OutPoint {
     return {
       txHash: this.txHash,

@@ -11,6 +11,13 @@ export default class CellDep {
     public depType: DepType
   ) {}
 
+  public static fromObject({ outPoint, depType }: { outPoint: OutPoint, depType: DepType }): CellDep {
+    return new CellDep(
+      OutPoint.fromObject(outPoint),
+      depType,
+    )
+  }
+
   public toSDK(): CKBComponents.CellDep {
     return {
       outPoint: this.outPoint.toSDK(),

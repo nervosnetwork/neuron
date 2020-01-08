@@ -82,18 +82,18 @@ export default class Output {
   ): Output {
     return new Output(
       capacity,
-      lock,
-      type,
+      Script.fromObject(lock),
+      type ? Script.fromObject(type) : type,
       data,
       lockHash,
       typeHash,
-      outPoint,
+      outPoint ? OutPoint.fromObject(outPoint) : outPoint,
       status,
       daoData,
       timestamp,
       blockNumber,
       blockHash,
-      depositOutPoint,
+      depositOutPoint ? OutPoint.fromObject(depositOutPoint) : depositOutPoint,
       depositTimestamp
     )
   }

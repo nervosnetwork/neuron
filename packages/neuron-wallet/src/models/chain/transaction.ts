@@ -112,12 +112,17 @@ export default class Transaction {
   }): Transaction {
     return new Transaction(
       version,
-      cellDeps || [],
+      (cellDeps || []).map(cd => CellDep.fromObject(cd)),
       headerDeps || [],
-      inputs || [],
-      outputs || [],
+      (inputs || []).map(i => Input.fromObject(i)),
+      (outputs || []).map(o => Output.fromObject(o)),
       outputsData,
-      witnesses || [],
+      (witnesses || []).map(wit => {
+        if (typeof wit === 'string') {
+          return wit
+        }
+        return WitnessArgs.fromObject(wit)
+      }),
       hash,
       timestamp,
       blockNumber,
@@ -167,7 +172,7 @@ export default class Transaction {
   }
 
   public computeHash(): string {
-    return rawTransactionToHash(this.toSDK())
+    return rawTransactionToHash(this.toSDKRawTransaction())
   }
 
   public toSDKRawTransaction(): CKBComponents.RawTransaction {

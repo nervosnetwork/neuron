@@ -114,7 +114,7 @@ export default class TransactionSender {
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
-    await core.rpc.sendTransaction(tx.toSDK())
+    await core.rpc.sendTransaction(tx.toSDKRawTransaction())
 
     tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
