@@ -6,7 +6,7 @@ import initConnection from '../../../src/database/chain/ormconfig'
 import IndexerTransaction from '../../../src/services/tx/indexer-transaction'
 import { OutputStatus } from '../../../src/models/chain/output'
 import { TransactionStatus } from '../../../src/models/chain/transaction'
-import { ScriptHashType } from '../../../src/models/chain/script'
+import Script, { ScriptHashType } from '../../../src/models/chain/script'
 
 describe('IndexerTransaction', () => {
   const tx1: TransactionEntity = new TransactionEntity()
@@ -34,7 +34,7 @@ describe('IndexerTransaction', () => {
   tx1Output.capacity = '100000000000'
   tx1Output.outPointTxHash = tx1.hash
   tx1Output.outPointIndex = '0'
-  tx1Output.lock = {"args":"0x94c1720fdff98d1c0100cfb0e7ae42e470b53019","codeHash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hashType":"type" as ScriptHashType}
+  tx1Output.lock = Script.fromObject({"args":"0x94c1720fdff98d1c0100cfb0e7ae42e470b53019","codeHash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hashType":"type" as ScriptHashType})
   tx1Output.status = 'live'
   tx1Output.lockHash = '0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105'
   tx1Output.hasData = false
@@ -67,7 +67,7 @@ describe('IndexerTransaction', () => {
   tx2Output.capacity = '50000000000'
   tx2Output.outPointTxHash = tx2.hash
   tx2Output.outPointIndex = '0'
-  tx2Output.lock = {"args":"0x94c1720fdff98d1c0100cfb0e7ae42e470b53019","codeHash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hashType":"type" as ScriptHashType}
+  tx2Output.lock = Script.fromObject({"args":"0x94c1720fdff98d1c0100cfb0e7ae42e470b53019","codeHash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8","hashType":"type" as ScriptHashType})
   tx2Output.status = 'live'
   tx2Output.lockHash = '0xb58a6fa6f2c57ed45fbdfc7fcebd5c79575590ecf190b72fa6e6a767d57cb105'
   tx2Output.hasData = false
