@@ -27,8 +27,8 @@ export default class CheckTx {
   }
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
-    const outputs: Output[] = this.filterOutputs(lockHashes)
-    const inputAddresses = await this.filterInputs(lockHashes)
+    const outputs: Output[] = this.filterOutputsOfWallets(lockHashes)
+    const inputAddresses = await this.filterInputsOfWallets(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(
@@ -52,8 +52,8 @@ export default class CheckTx {
     return false
   }
 
-  public filterOutputs = (lockHashes: string[]) => {
-    const cells: Output[] = this.tx.outputs!.map((output, index) => {
+  public filterOutputsOfWallets = (lockHashes: string[]) => {
+    const outputs: Output[] = this.tx.outputs!.map((output, index) => {
       const checkOutput = new CheckOutput(output)
       const result = checkOutput.checkLockHash(lockHashes)
       if (result) {
@@ -65,11 +65,11 @@ export default class CheckTx {
         return output
       }
       return false
-    }).filter(cell => !!cell) as Output[]
-    return cells
+    }).filter(output => !!output) as Output[]
+    return outputs
   }
 
-  public filterInputs = async (lockHashes: string[]): Promise<string[]> => {
+  public filterInputsOfWallets = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []
