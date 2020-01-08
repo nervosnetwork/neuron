@@ -1,7 +1,7 @@
 import { ReplaySubject } from 'rxjs'
 import ProcessUtils from 'utils/process'
 import { remote } from 'electron'
-import { Transaction } from 'models/chain/transaction'
+import Transaction from 'models/chain/transaction'
 
 export interface TransactionChangedMessage {
   event: string

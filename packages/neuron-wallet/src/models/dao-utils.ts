@@ -21,10 +21,7 @@ export default class DaoUtils {
 
     const genesisBlock = await core.rpc.getBlockByNumber(BigInt(0))
     const systemCellTransaction = genesisBlock.transactions[0]
-    const daoOutPoint = new OutPoint({
-      txHash: systemCellTransaction.hash,
-      index: '0x2'
-    })
+    const daoOutPoint = new OutPoint(systemCellTransaction.hash, '0x2')
 
     const daoTypeHash = scriptToHash(systemCellTransaction.outputs[2].type!)
 

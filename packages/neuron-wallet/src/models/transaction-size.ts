@@ -2,8 +2,8 @@ import { serializeOutput, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-ut
 import HexUtils from 'utils/hex'
 import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
-import { WitnessArgs } from './chain/witness-args'
-import { TransactionWithoutHash } from './chain/transaction'
+import WitnessArgs from './chain/witness-args'
+import Transaction from './chain/transaction'
 
 export default class TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4
@@ -50,7 +50,7 @@ export default class TransactionSize {
     return TransactionSize.witness('0x')
   }
 
-  public static tx(tx: TransactionWithoutHash): number {
+  public static tx(tx: Transaction): number {
     return [
       this.base(),
       this.cellDep() * tx.cellDeps.length,

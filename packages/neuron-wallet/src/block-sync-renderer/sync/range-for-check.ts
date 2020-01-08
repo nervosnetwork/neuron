@@ -1,7 +1,7 @@
 import BlockNumber from './block-number'
 import RpcService from 'services/rpc-service'
 import ArrayUtils from 'utils/array'
-import { BlockHeader } from 'models/chain/block-header'
+import BlockHeader from 'models/chain/block-header'
 
 export enum CheckResultType {
   FirstNotMatch = 'first-not-match',

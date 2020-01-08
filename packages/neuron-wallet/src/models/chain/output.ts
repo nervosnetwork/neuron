@@ -1,5 +1,4 @@
-import { ScriptInterface, Script } from './script'
-import { OutPointInterface } from './out-point'
+import Script from './script'
 import OutPoint from './out-point'
 import HexUtils from 'utils/hex'
 import TypeChecker from 'utils/type-checker'
@@ -12,174 +11,112 @@ export enum OutputStatus {
   Failed = 'failed',
 }
 
-export interface OutputInterface {
-  capacity: string
-  data?: string
-  lock: ScriptInterface
-  type?: ScriptInterface | null
-  outPoint?: OutPointInterface
-  status?: OutputStatus
-  lockHash?: string
-  typeHash?: string
-  daoData?: string | null
-  timestamp?: string | null
-  blockNumber?: string | null
-  blockHash?: string | null
-  depositOutPoint?: OutPointInterface
-  depositTimestamp?: string
-}
-
-export class Output implements OutputInterface {
-  private _capacity: string
-  private _data: string
-  private _lock: Script
-  private _lockHash: string
-  private _type?: Script | null
-  private _typeHash?: string
-  private _outPoint?: OutPoint
-  private _status?: OutputStatus
-  private _daoData?: string | null
-  private _timestamp?: string | null
-  private _blockNumber?: string | null
-  private _blockHash?: string | null
-  private _depositOutPoint?: OutPoint
-  private _depositTimestamp?: string
+export default class Output {
+  public data: string
+  public lockHash: string
 
   // check hex number
-  constructor({
-    capacity,
-    data,
-    lock,
-    type,
-    lockHash,
-    typeHash,
-    outPoint,
-    status,
-    daoData,
-    timestamp,
-    blockNumber,
-    blockHash,
-    depositOutPoint,
-    depositTimestamp
-  }: OutputInterface) {
-    this._capacity = BigInt(capacity).toString()
-    this._lock = lock instanceof Script ? lock : new Script(lock)
-    this._lockHash = lockHash || this._lock.computeHash()
-    this._type = type ? (type instanceof Script ? type : new Script(type)) : type
-    this._typeHash = typeHash || this._type?.computeHash()
-    this._outPoint = outPoint ? (outPoint instanceof OutPoint ? outPoint : new OutPoint(outPoint)) : outPoint
-    this._status = status
+  constructor(
+    public capacity: string,
+    public lock: Script,
+    public type?: Script | null,
+    data?: string,
+    lockHash?: string,
+    public typeHash?: string,
+    public outPoint?: OutPoint,
+    public status?: OutputStatus,
+    public daoData?: string | null,
+    public timestamp?: string | null,
+    public blockNumber?: string | null,
+    public blockHash?: string | null,
+    public depositOutPoint?: OutPoint,
+    public depositTimestamp?: string
+  ) {
+    this.capacity = BigInt(capacity).toString()
+    this.lockHash = lockHash || this.lock.computeHash()
+    this.typeHash = typeHash || this.type?.computeHash()
 
     // if daoData exists, data should equals to daoData
-    this._daoData = daoData
-    this._data = this._daoData || data || '0x'
+    this.data = this.daoData || data || '0x'
 
-    this._timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
-    this._blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
-    this._blockHash = blockHash
-    this._depositOutPoint = depositOutPoint ?
-      (depositOutPoint instanceof OutPoint ? depositOutPoint : new OutPoint(depositOutPoint)) : depositOutPoint
-    this._depositTimestamp = depositTimestamp ? BigInt(depositTimestamp).toString() : depositTimestamp
+    this.timestamp = timestamp ? BigInt(timestamp).toString() : timestamp
+    this.blockNumber = blockNumber ? BigInt(blockNumber).toString() : blockNumber
+    this.depositTimestamp = depositTimestamp ? BigInt(depositTimestamp).toString() : depositTimestamp
 
-    TypeChecker.hashChecker(this._lockHash, this._typeHash, this._blockHash)
-    TypeChecker.numberChecker(this._capacity, this._timestamp, this._blockNumber, this._depositTimestamp)
+    TypeChecker.hashChecker(this.lockHash, this.typeHash, this.blockHash)
+    TypeChecker.numberChecker(this.capacity, this.timestamp, this.blockNumber, this.depositTimestamp)
   }
 
-  // getter
-  public get capacity(): string {
-    return this._capacity
+  public static fromObject(
+    {
+      capacity,
+      data,
+      lock,
+      type,
+      lockHash,
+      typeHash,
+      outPoint,
+      status,
+      daoData,
+      timestamp,
+      blockNumber,
+      blockHash,
+      depositOutPoint,
+      depositTimestamp
+    }: {
+      capacity: string
+      data?: string
+      lock: Script
+      type?: Script | null
+      outPoint?: OutPoint
+      status?: OutputStatus
+      lockHash?: string
+      typeHash?: string
+      daoData?: string | null
+      timestamp?: string | null
+      blockNumber?: string | null
+      blockHash?: string | null
+      depositOutPoint?: OutPoint
+      depositTimestamp?: string
+    }
+  ): Output {
+    return new Output(
+      capacity,
+      lock,
+      type,
+      data,
+      lockHash,
+      typeHash,
+      outPoint,
+      status,
+      daoData,
+      timestamp,
+      blockNumber,
+      blockHash,
+      depositOutPoint,
+      depositTimestamp
+    )
   }
 
-  public set capacity(value: string) {
-    this._capacity = value
-  }
-
-  public get data(): string {
-    return this._data
+  public setCapacity(value: string) {
+    this.capacity = value
   }
 
   public setData(value: string) {
-    this._data = value
-  }
-
-  public get lock(): Script {
-    return this._lock
-  }
-
-  public get type(): Script | null | undefined {
-    return this._type
-  }
-
-  public get outPoint(): OutPoint | undefined {
-    return this._outPoint
-  }
-
-  public get status(): OutputStatus | undefined {
-    return this._status
-  }
-
-  public get lockHash(): string {
-    return this._lockHash
-  }
-
-  public get typeHash(): string | undefined {
-    return this._typeHash
-  }
-
-  public get daoData(): string | null | undefined {
-    return this._daoData
+    this.data = value
   }
 
   public setDaoData(value: string) {
-    this._daoData = value
-    this._data = value
-  }
-
-  public get timestamp(): string | null | undefined {
-    return this._timestamp
-  }
-
-  public get blockNumber(): string | null | undefined {
-    return this._blockNumber
-  }
-
-  public get blockHash(): string | null | undefined {
-    return this._blockHash
-  }
-
-  public get depositOutPoint(): OutPoint | undefined {
-    return this._depositOutPoint
+    this.daoData = value
+    this.data = value
   }
 
   public setDepositOutPoint(value: OutPoint) {
-    this._depositOutPoint = value
-  }
-
-  public get depositTimestamp(): string | undefined {
-    return this._depositTimestamp
+    this.depositOutPoint = value
   }
 
   public setDepositTimestamp(value: string) {
-    this._depositTimestamp = value
-  }
-
-  public toInterface(): OutputInterface {
-    return {
-      capacity: this.capacity,
-      data: this.data,
-      lock: this.lock.toInterface(),
-      type: this.type ? this.type.toInterface() : this.type,
-      lockHash: this.lockHash,
-      typeHash: this.typeHash,
-      outPoint: this.outPoint?.toInterface(),
-      status: this.status,
-      daoData: this.daoData,
-      timestamp: this.timestamp,
-      blockNumber: this.blockNumber,
-      blockHash: this.blockHash,
-      depositOutPoint: this.depositOutPoint?.toInterface(),
-      depositTimestamp: this.depositTimestamp,
-    }
+    this.depositTimestamp = value
   }
 
   public toSDK(): CKBComponents.CellOutput {
@@ -191,12 +128,10 @@ export class Output implements OutputInterface {
   }
 
   public static fromSDK(output: CKBComponents.CellOutput): Output {
-    return new Output({
-      capacity: output.capacity,
-      lock: Script.fromSDK(output.lock),
-      type: output.type ? Script.fromSDK(output.type) : output.type,
-    })
+    return new Output(
+      output.capacity,
+      Script.fromSDK(output.lock),
+      output.type ? Script.fromSDK(output.type) : output.type,
+    )
   }
 }
-
-export default Output

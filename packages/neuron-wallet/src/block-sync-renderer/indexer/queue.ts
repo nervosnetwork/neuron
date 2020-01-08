@@ -16,9 +16,9 @@ import DaoUtils from 'models/dao-utils'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
 import NodeService from 'services/node'
-import { Transaction } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
-import { Script } from 'models/chain/script'
+import Script from 'models/chain/script'
+import Transaction from 'models/chain/transaction'
 
 export interface LockHashInfo {
   lockHash: string
@@ -95,11 +95,11 @@ export default class IndexerQueue {
             this.indexed = true
           }
           const daoScriptInfo = await DaoUtils.daoScript(this.url)
-          const daoScriptHash: string = new Script({
-            codeHash: daoScriptInfo.codeHash,
-            args: "0x",
-            hashType: daoScriptInfo.hashType,
-          }).computeHash()
+          const daoScriptHash: string = new Script(
+            daoScriptInfo.codeHash,
+            "0x",
+            daoScriptInfo.hashType,
+          ).computeHash()
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
@@ -196,7 +196,7 @@ export default class IndexerQueue {
           const transactionWithStatus = await this.rpcService.getTransaction(txPoint.txHash)
           const transaction: Transaction = transactionWithStatus!.transaction
           const txUniqueFlag = {
-            txHash: transaction.hash,
+            txHash: transaction.hash!,
             blockHash: transactionWithStatus!.txStatus.blockHash!
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
@@ -209,7 +209,7 @@ export default class IndexerQueue {
           }
 
           // tx timestamp / blockNumber / blockHash
-          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
+          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash!)
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
               for (const [inputIndex, input] of transaction.inputs.entries()) {
@@ -228,10 +228,10 @@ export default class IndexerQueue {
                   previousOutput.type.computeHash() === daoScriptHash &&
                   previousTx.outputsData[+input.previousOutput!.index] === '0x0000000000000000'
                 ) {
-                  transaction.outputs[+txPoint.index]!.setDepositOutPoint(new OutPoint({
-                    txHash: input.previousOutput!.txHash,
-                    index: input.previousOutput!.index,
-                  }))
+                  transaction.outputs[+txPoint.index]!.setDepositOutPoint(new OutPoint(
+                    input.previousOutput!.txHash,
+                    input.previousOutput!.index
+                  ))
                 }
               }
 
@@ -265,7 +265,7 @@ export default class IndexerQueue {
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
             if (output) {
               address = LockUtils.lockScriptToAddress(
-                new Script(output.lock),
+                new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
                 NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
               )
             }

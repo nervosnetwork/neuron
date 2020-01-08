@@ -13,8 +13,11 @@ import {
 import TxDbChangedSubject from 'models/subjects/tx-db-changed-subject'
 import InputEntity from './input'
 import OutputEntity from './output'
-import { Transaction as TransactionModel, TransactionStatus } from 'models/chain/transaction'
-import { CellDepInterface } from 'models/chain/cell-dep'
+import TransactionModel, { TransactionStatus } from 'models/chain/transaction'
+import CellDep, { DepType } from 'models/chain/cell-dep'
+import OutPoint from 'models/chain/out-point'
+import Input from 'models/chain/input'
+import Output from 'models/chain/output'
 
 @Entity()
 export default class Transaction extends BaseEntity {
@@ -31,7 +34,7 @@ export default class Transaction extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  cellDeps: CellDepInterface[] = []
+  cellDeps: CellDep[] = []
 
   @Column({
     type: 'simple-json',
@@ -95,12 +98,17 @@ export default class Transaction extends BaseEntity {
   outputs!: OutputEntity[]
 
   public toInterface(): TransactionModel {
-    const inputs = this.inputs ? this.inputs.map(input => input.toInterface()) : []
-    const outputs = this.outputs ? this.outputs.map(output => output.toInterface()) : []
-    return new TransactionModel({
+    const inputs: Input[] = this.inputs ? this.inputs.map(input => input.toInterface()) : []
+    const outputs: Output[] = this.outputs ? this.outputs.map(output => output.toInterface()) : []
+    return TransactionModel.fromObject({
       hash: this.hash,
       version: this.version,
-      cellDeps: this.cellDeps,
+      cellDeps: this.cellDeps?.map((cd: any) => {
+        if (cd instanceof CellDep) {
+          return cd
+        }
+        return new CellDep(new OutPoint(cd.outPoint.txHash, cd.outPoint.index), cd.depType as DepType)
+      }) || [],
       headerDeps: this.headerDeps,
       inputs,
       outputs,
@@ -108,10 +116,12 @@ export default class Transaction extends BaseEntity {
       blockNumber: this.blockNumber,
       blockHash: this.blockHash,
       witnesses: this.witnesses,
-      description: this.description,
+      description: this.description || '',
       status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      outputsData: [],
+      nervosDao: false
     })
   }
 

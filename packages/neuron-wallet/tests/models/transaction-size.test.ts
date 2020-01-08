@@ -1,30 +1,18 @@
 import TransactionSize from '../../src/models/transaction-size'
 import HexUtils from '../../src/utils/hex'
-import { ScriptHashType } from '../../src/models/chain/script'
-import { WitnessArgs } from '../../src/models/chain/witness-args'
-import { Transaction } from '../../src/models/chain/transaction'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
+import WitnessArgs from '../../src/models/chain/witness-args'
+import Transaction from '../../src/models/chain/transaction'
 import Output from '../../src/models/chain/output'
 
 describe('TransactionSize', () => {
-  const output = new Output({
+  const output = Output.fromObject({
     "capacity": "0x174876e800",
-    "lock": {
-      "codeHash": "0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88",
-      "args": "0x59a27ef3ba84f061517d13f42cf44ed020610061",
-      "hashType": "type" as ScriptHashType
-    },
-    "type": {
-      "codeHash": "0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6",
-      "args": "0x",
-      "hashType": "data" as ScriptHashType
-    }
+    "lock": new Script("0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88", "0x59a27ef3ba84f061517d13f42cf44ed020610061", ScriptHashType.Type),
+    "type": new Script("0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6", "0x", ScriptHashType.Data),
   })
 
-  const witnessArgs = new WitnessArgs({
-    "lock": "",
-    "inputType": "0x",
-    "outputType": ""
-  })
+  const witnessArgs = new WitnessArgs('', '0x', '')
 
   it('output', () => {
     const result = TransactionSize.output(output)

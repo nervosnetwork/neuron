@@ -1,42 +1,23 @@
 import TypeChecker from "utils/type-checker"
 
-export interface TransactionPointInterface {
-  blockNumber: string
-  txHash: string
-  index: string
-}
+export default class TransactionPoint {
+  constructor(
+    public blockNumber: string,
+    public txHash: string,
+    public index: string
+  ) {
+    this.blockNumber = BigInt(blockNumber).toString()
+    this.index = (+index).toString()
 
-export class TransactionPoint implements TransactionPointInterface {
-  private _blockNumber: string
-  private _txHash: string
-  private _index: string
-
-  constructor({ blockNumber, txHash, index }: TransactionPointInterface) {
-    this._blockNumber = BigInt(blockNumber).toString()
-    this._txHash = txHash
-    this._index = (+index).toString()
-
-    TypeChecker.hashChecker(this._txHash)
-    TypeChecker.numberChecker(this._blockNumber, this._index)
-  }
-
-  public get blockNumber(): string {
-    return this._blockNumber
-  }
-
-  public get txHash(): string {
-    return this._txHash
-  }
-
-  public get index(): string {
-    return this._index
+    TypeChecker.hashChecker(this.txHash)
+    TypeChecker.numberChecker(this.blockNumber, this.index)
   }
 
   public static fromSDK(txPoint: CKBComponents.TransactionPoint): TransactionPoint {
-    return new TransactionPoint({
-      blockNumber: txPoint.blockNumber,
-      txHash: txPoint.txHash,
-      index: txPoint.index,
-    })
+    return new TransactionPoint(
+      txPoint.blockNumber,
+      txPoint.txHash,
+      txPoint.index
+    )
   }
 }

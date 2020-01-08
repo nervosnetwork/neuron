@@ -1,40 +1,17 @@
-import { BlockHeaderInterface, BlockHeader } from './block-header'
-import { TransactionInterface, Transaction } from './transaction'
+import BlockHeader from './block-header'
+import Transaction from './transaction'
 
-export interface BlockInterface {
-  header: BlockHeaderInterface
-  transactions: TransactionInterface[]
-}
-
-export class Block implements BlockInterface {
-  private _header: BlockHeader
-  private _transactions: Transaction[]
-
-  constructor({ header, transactions }: BlockInterface) {
-    this._header = header instanceof BlockHeader ? header : new BlockHeader(header)
-    this._transactions = transactions.map(tx => tx instanceof Transaction ? tx : new Transaction(tx))
-  }
-
-  public get header(): BlockHeader {
-    return this._header
-  }
-
-  public get transactions(): Transaction[] {
-    return this._transactions
-  }
-
-  public toInterface(): BlockInterface {
-    return {
-      header: this.header.toInterface(),
-      transactions: this.transactions.map(tx => tx.toInterface())
-    }
-  }
+export default class Block {
+  constructor(
+    public header: BlockHeader,
+    public transactions: Transaction[]
+  ) {}
 
   public static fromSDK(block: CKBComponents.Block): Block {
     const header = BlockHeader.fromSDK(block.header)
-    return new Block({
+    return new Block(
       header,
-      transactions: block.transactions.map(tx => Transaction.fromSDK(tx, header))
-    })
+      block.transactions.map(tx => Transaction.fromSDK(tx, header))
+    )
   }
 }

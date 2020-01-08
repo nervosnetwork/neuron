@@ -3,13 +3,13 @@ import { generateCore } from 'services/sdk-core'
 
 import HexUtils from 'utils/hex'
 import CommonUtils from 'utils/common'
-import { Block } from 'models/chain/block'
-import { BlockHeader } from 'models/chain/block-header'
-import { TransactionWithStatus } from 'models/chain/transaction-with-status'
-import { OutPoint } from 'models/chain/out-point'
-import { CellWithStatus } from 'models/chain/cell-with-status'
-import { LockHashIndexState } from 'models/chain/lock-hash-index-state'
-import { CellTransaction } from 'models/chain/cell-transaction'
+import Block from 'models/chain/block'
+import BlockHeader from 'models/chain/block-header'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
+import OutPoint from 'models/chain/out-point'
+import CellWithStatus from 'models/chain/cell-with-status'
+import LockHashIndexState from 'models/chain/lock-hash-index-state'
+import CellTransaction from 'models/chain/cell-transaction'
 
 export default class RpcService {
   private retryTime: number

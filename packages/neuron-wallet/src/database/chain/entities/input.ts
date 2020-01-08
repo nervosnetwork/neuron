@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import Transaction from './transaction'
 import OutPoint from 'models/chain/out-point'
-import { Input as InputModel } from 'models/chain/input'
-import { ScriptInterface } from 'models/chain/script'
+import InputModel from 'models/chain/input'
+import Script from 'models/chain/script'
 
 // cellbase input may have same OutPoint
 @Entity()
@@ -39,7 +39,7 @@ export default class Input extends BaseEntity {
     type: 'simple-json',
     nullable: true,
   })
-  lock: ScriptInterface | null = null
+  lock: Script | null = null
 
   @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
   transaction!: Transaction
@@ -60,18 +60,20 @@ export default class Input extends BaseEntity {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
     }
-    return new OutPoint({
-      txHash: this.outPointTxHash,
-      index: this.outPointIndex,
-    })
+    return new OutPoint(
+      this.outPointTxHash,
+      this.outPointIndex,
+    )
   }
 
   public toInterface(): InputModel {
-    return new InputModel({
-      previousOutput: this.previousOutput(),
-      capacity: this.capacity,
-      lockHash: this.lockHash,
-      lock: this.lock,
-    })
+    return new InputModel(
+      this.previousOutput(),
+      this.since,
+      this.capacity,
+      this.lock,
+      this.lockHash,
+      this.inputIndex,
+    )
   }
 }

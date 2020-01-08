@@ -1,8 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
-import { ScriptInterface } from 'models/chain/script'
+import Script from 'models/chain/script'
 import OutPoint from 'models/chain/out-point'
-import { Output as OutputModel, OutputStatus } from 'models/chain/output'
+import OutputModel, { OutputStatus } from 'models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {
@@ -24,7 +24,7 @@ export default class Output extends BaseEntity {
   @Column({
     type: 'simple-json',
   })
-  lock!: ScriptInterface
+  lock!: Script
 
   @Column({
     type: 'varchar',
@@ -40,7 +40,7 @@ export default class Output extends BaseEntity {
     type: 'simple-json',
     nullable: true,
   })
-  typeScript: ScriptInterface | null = null
+  typeScript: Script | null = null
 
   @Column({
     type: 'varchar',
@@ -72,18 +72,18 @@ export default class Output extends BaseEntity {
   depositIndex: string | null = null
 
   public outPoint(): OutPoint {
-    return new OutPoint({
-      txHash: this.outPointTxHash,
-      index: this.outPointIndex,
-    })
+    return new OutPoint(
+      this.outPointTxHash,
+      this.outPointIndex,
+    )
   }
 
   public depositOutPoint(): OutPoint | undefined {
     if (this.depositTxHash && this.depositIndex) {
-      return new OutPoint({
-        txHash: this.depositTxHash,
-        index: this.depositIndex
-      })
+      return new OutPoint(
+        this.depositTxHash,
+        this.depositIndex
+      )
     }
     return undefined
   }
@@ -94,13 +94,13 @@ export default class Output extends BaseEntity {
   public toInterface(): OutputModel {
     const timestamp = this.transaction?.timestamp || this.transaction?.createdAt
 
-    return new OutputModel({
+    return OutputModel.fromObject({
       capacity: this.capacity,
-      lock: this.lock,
+      lock: new Script(this.lock.codeHash, this.lock.args, this.lock.hashType),
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
       status: this.status as OutputStatus,
-      type: this.typeScript,
+      type: this.typeScript ? new Script(this.typeScript.codeHash, this.typeScript.args, this.typeScript.hashType) : this.typeScript,
       typeHash: this.typeHash ? this.typeHash : undefined,
       daoData: this.daoData,
       timestamp,

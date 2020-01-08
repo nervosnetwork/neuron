@@ -9,7 +9,7 @@ import Output, { OutputStatus } from 'models/chain/output'
 import { TransactionStatus } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
-import { WitnessArgs } from 'models/chain/witness-args'
+import WitnessArgs from 'models/chain/witness-args'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -182,13 +182,13 @@ export default class CellsService {
     }
     let hasChangeOutput: boolean = false
     liveCells.every(cell => {
-      const input: Input = new Input({
-        previousOutput: cell.outPoint(),
-        since: '0',
-        lock: cell.lock,
-        lockHash: cell.lockHash,
-        capacity: cell.capacity,
-      })
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock,
+        cell.lockHash
+      )
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
@@ -264,13 +264,13 @@ export default class CellsService {
       })
 
     const inputs: Input[] = cellEntities.map(cell => {
-      return new Input({
-        previousOutput: cell.outPoint(),
-        since: '0',
-        lock: cell.lock,
-        lockHash: cell.lockHash,
-        capacity: cell.capacity,
-      })
+      return new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock,
+        cell.lockHash,
+      )
     })
 
     return inputs

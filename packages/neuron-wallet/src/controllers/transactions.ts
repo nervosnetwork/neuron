@@ -5,10 +5,10 @@ import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
 import LockUtils from 'models/lock-utils'
-import { TransactionInterface } from 'models/chain/transaction'
+import Transaction from 'models/chain/transaction'
 
 export default class TransactionsController {
-  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<TransactionInterface>>> {
+  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<Transaction>>> {
     const transactions = await TransactionsService.getAll(params)
     if (!transactions) {
       throw new ServiceHasNoResponse('Transactions')
@@ -21,7 +21,7 @@ export default class TransactionsController {
   }
 
   public async getAllByKeywords(params: Controller.Params.TransactionsByKeywords):
-    Promise<Controller.Response<PaginationResult<TransactionInterface> & Controller.Params.TransactionsByKeywords>> {
+    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
@@ -40,7 +40,7 @@ export default class TransactionsController {
   }
 
   public async getAllByAddresses(params: Controller.Params.TransactionsByAddresses):
-    Promise<Controller.Response<PaginationResult<TransactionInterface> & Controller.Params.TransactionsByAddresses>> {
+    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
     const { pageNo, pageSize, addresses = '' } = params
 
     let searchAddresses = addresses
@@ -69,7 +69,7 @@ export default class TransactionsController {
 
   private cellCountThreshold = 10
   public async get(walletID: string, hash: string):
-    Promise<Controller.Response<TransactionInterface & { outputsCount: string; inputsCount: string }>> {
+    Promise<Controller.Response<Transaction & { outputsCount: string; inputsCount: string }>> {
     const transaction = await TransactionsService.get(hash)
     if (!transaction) {
       throw new TransactionNotFound(hash)
@@ -111,7 +111,7 @@ export default class TransactionsController {
 
     return {
       status: ResponseCode.Success,
-      result: { ...transaction.toInterface(), outputsCount, inputsCount }
+      result: { ...transaction, outputsCount, inputsCount } as Transaction & { outputsCount: string; inputsCount: string }
     }
   }
 

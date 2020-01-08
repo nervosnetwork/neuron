@@ -18,14 +18,15 @@ import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import logger from 'utils/logger'
 import Keychain from 'models/keys/keychain'
-import { TransactionWithoutHash } from 'models/chain/transaction'
 import Input from 'models/chain/input'
-import { WitnessArgs } from 'models/chain/witness-args'
 import OutPoint from 'models/chain/out-point'
 import Output from 'models/chain/output'
 import RpcService from 'services/rpc-service'
-import { BlockHeader } from 'models/chain/block-header'
-import { DepType } from 'models/chain/cell-dep'
+import CellDep, { DepType } from 'models/chain/cell-dep'
+import WitnessArgs from 'models/chain/witness-args'
+import Transaction from 'models/chain/transaction'
+import BlockHeader from 'models/chain/block-header'
+import Script from 'models/chain/script'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -41,7 +42,7 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
+  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '') => {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -94,7 +95,7 @@ export default class TransactionSender {
           if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
             return '0x'
           }
-          return serializeWitnessArgs(args)
+          return serializeWitnessArgs(args.toSDK())
         })
       const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
@@ -126,7 +127,7 @@ export default class TransactionSender {
     return txHash
   }
 
-  public calculateFee = async (tx: TransactionWithoutHash) => {
+  public calculateFee = async (tx: Transaction) => {
     const inputCapacities = tx.inputs!
       .map(input => BigInt(input.capacity!))
       .reduce((result, c) => result + c, BigInt(0))
@@ -145,7 +146,7 @@ export default class TransactionSender {
     }[] = [],
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -159,7 +160,7 @@ export default class TransactionSender {
 
     const changeAddress: string = this.getChangeAddress()
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+    const tx: Transaction = await TransactionGenerator.generateTx(
       lockHashes,
       targetOutputs,
       changeAddress,
@@ -178,7 +179,7 @@ export default class TransactionSender {
     }[] = [],
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -190,7 +191,7 @@ export default class TransactionSender {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
       lockHashes,
       targetOutputs,
       fee,
@@ -205,7 +206,7 @@ export default class TransactionSender {
     capacity: string,
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -233,7 +234,7 @@ export default class TransactionSender {
     outPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     // only for check wallet exists
     this.walletService.get(walletID)
 
@@ -255,7 +256,7 @@ export default class TransactionSender {
 
     const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
     const prevOutput = Output.fromSDK(cellStatus.cell.output)
-    const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
+    const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       lockHashes,
       outPoint,
       prevOutput,
@@ -275,7 +276,7 @@ export default class TransactionSender {
     withdrawingOutPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const DAO_LOCK_PERIOD_EPOCHS = BigInt(180)
 
     const feeInt = BigInt(fee)
@@ -324,43 +325,32 @@ export default class TransactionSender {
     const address = await AddressesService.nextUnusedAddress(walletID)
     const blake160 = LockUtils.addressToBlake160(address!.address)
 
-    const output: Output = new Output({
-      capacity: outputCapacity.toString(),
-      lock: {
-        codeHash,
-        hashType,
-        args: blake160,
-      },
-      data: '0x'
-    })
+    const output: Output = new Output(
+      outputCapacity.toString(),
+      new Script(codeHash, blake160, hashType),
+      undefined,
+      '0x'
+    )
 
     const outputs: Output[] = [output]
 
     const previousOutput = cellStatus.cell!.output
-    const input: Input = new Input({
-      previousOutput: withdrawingOutPoint,
-      since: minimalSince.toString(),
-      lock: previousOutput.lock,
-      lockHash: previousOutput.lock.computeHash(),
-      capacity: previousOutput.capacity,
-    })
+    const input: Input = new Input(
+      withdrawingOutPoint,
+      minimalSince.toString(),
+      previousOutput.capacity,
+      previousOutput.lock
+    )
 
-    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs({
-      lock: WitnessArgs.EMPTY_LOCK,
-      inputType: '0x0000000000000000',
-      outputType: undefined,
-    })
-    const tx: TransactionWithoutHash = new TransactionWithoutHash({
+    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(
+      WitnessArgs.EMPTY_LOCK,
+      '0x0000000000000000'
+    )
+    const tx: Transaction = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        {
-          outPoint: secpOutPoint,
-          depType: DepType.DepGroup,
-        },
-        {
-          outPoint: daoScriptInfo.outPoint,
-          depType: DepType.Code,
-        },
+        new CellDep(secpOutPoint, DepType.DepGroup),
+        new CellDep(daoScriptInfo.outPoint, DepType.Code)
       ],
       headerDeps: [
         depositBlockHeader.hash,
@@ -391,7 +381,7 @@ export default class TransactionSender {
     walletID: string = '',
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)

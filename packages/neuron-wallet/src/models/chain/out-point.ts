@@ -1,37 +1,16 @@
 import HexUtils from 'utils/hex'
 import TypeChecker from 'utils/type-checker'
 
-export interface OutPointInterface {
-  txHash: string
-  index: string
-}
-
-export class OutPoint implements OutPointInterface {
-  private _txHash: string
-  private _index: string
-
+export default class OutPoint {
   // check hex string
-  constructor({ txHash, index }: OutPointInterface) {
-    this._txHash = txHash
-    this._index = (+index).toString()
+  constructor(
+    public txHash: string,
+    public index: string
+  ) {
+    this.index = (+index).toString()
 
-    TypeChecker.hashChecker(this._txHash)
-    TypeChecker.numberChecker(this._index)
-  }
-
-  public get txHash(): string {
-    return this._txHash
-  }
-
-  public get index(): string {
-    return this._index
-  }
-
-  public toInterface(): OutPointInterface {
-    return {
-      txHash: this.txHash,
-      index: this.index,
-    }
+    TypeChecker.hashChecker(this.txHash)
+    TypeChecker.numberChecker(this.index)
   }
 
   public toSDK(): CKBComponents.OutPoint {
@@ -41,12 +20,10 @@ export class OutPoint implements OutPointInterface {
     }
   }
 
-  public static fromSDK(sdkOutPoint: CKBComponents.OutPoint): OutPoint {
-    return new OutPoint({
-      txHash: sdkOutPoint.txHash,
-      index: sdkOutPoint.index,
-    })
+  public static fromSDK(outPoint: CKBComponents.OutPoint): OutPoint {
+    return new OutPoint(
+      outPoint.txHash,
+      outPoint.index,
+    )
   }
 }
-
-export default OutPoint

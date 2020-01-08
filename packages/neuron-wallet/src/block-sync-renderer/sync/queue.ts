@@ -9,11 +9,11 @@ import ArrayUtils from 'utils/array'
 import CheckTx from './check-and-save/tx'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
-import { Block } from 'models/chain/block'
-import { BlockHeader } from 'models/chain/block-header'
 import OutPoint from 'models/chain/out-point'
-import { TransactionWithStatus } from 'models/chain/transaction-with-status'
-import { Script } from 'models/chain/script'
+import Block from 'models/chain/block'
+import BlockHeader from 'models/chain/block-header'
+import Script from 'models/chain/script'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class Queue {
   private lockHashes: string[]
@@ -130,11 +130,11 @@ export default class Queue {
     }
 
     const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash: string = new Script({
-      codeHash: daoScriptInfo.codeHash,
-      args: "0x",
-      hashType: daoScriptInfo.hashType,
-    }).computeHash()
+    const daoScriptHash: string = new Script(
+      daoScriptInfo.codeHash,
+      "0x",
+      daoScriptInfo.hashType
+    ).computeHash()
 
     // 3. check and save
     await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
@@ -178,10 +178,10 @@ export default class Queue {
               ) {
                 const output = tx.outputs![inputIndex]
                 if (output) {
-                  output.setDepositOutPoint(new OutPoint({
-                    txHash: input.previousOutput!.txHash,
-                    index: input.previousOutput!.index,
-                  }))
+                  output.setDepositOutPoint(new OutPoint(
+                    input.previousOutput!.txHash,
+                    input.previousOutput!.index,
+                  ))
                 }
               }
             }

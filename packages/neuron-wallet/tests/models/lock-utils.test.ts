@@ -1,6 +1,6 @@
 import LockUtils from '../../src/models/lock-utils'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { ScriptHashType, Script } from '../../src/models/chain/script'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
 
 const systemScript = {
   outPoint: {
@@ -41,7 +41,7 @@ describe('LockUtils Test', () => {
 
     const lockScript: Script = new LockUtils(await LockUtils.systemScript()).addressToLockScript(bob.address)
 
-    expect(lockScript.toInterface()).toEqual(bob.lockScript)
+    expect({ ...lockScript }).toEqual(bob.lockScript)
   })
 
   it('addressToLockHash', async () => {
@@ -78,7 +78,10 @@ describe('LockUtils Test', () => {
   })
 
   it('lockScriptToAddress', async () => {
-    const address: string = LockUtils.lockScriptToAddress(new Script(bob.lockScript), AddressPrefix.Testnet)
+    const address: string = LockUtils.lockScriptToAddress(
+      new Script(bob.lockScript.codeHash, bob.lockScript.args, bob.lockScript.hashType),
+      AddressPrefix.Testnet
+    )
 
     expect(address).toEqual(bob.address)
   })

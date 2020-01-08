@@ -7,7 +7,7 @@ import {
 import NodeService from 'services/node'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import OutPoint from './chain/out-point'
-import { ScriptHashType, Script } from './chain/script'
+import Script, { ScriptHashType } from './chain/script'
 
 export interface SystemScript {
   codeHash: string
@@ -45,7 +45,7 @@ export default class LockUtils {
 
     return {
       codeHash,
-      outPoint: new OutPoint({ txHash, index }),
+      outPoint: new OutPoint(txHash, index),
       hashType: hashType as ScriptHashType
     }
   }
@@ -71,11 +71,11 @@ export default class LockUtils {
   }
 
   addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
-    return new Script({
-      codeHash: this.systemScript.codeHash,
-      args: LockUtils.addressToBlake160(address),
-      hashType,
-    })
+    return new Script(
+      this.systemScript.codeHash,
+      LockUtils.addressToBlake160(address),
+      hashType
+    )
   }
 
   addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {

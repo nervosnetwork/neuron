@@ -7,8 +7,8 @@ import LockUtils from '../../../src/models/lock-utils'
 import DaoUtils from '../../../src/models/dao-utils'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
-import { ScriptHashType, Script } from '../../../src/models/chain/script'
-import { TransactionWithoutHash } from '../../../src/models/chain/transaction'
+import Script, { ScriptHashType } from '../../../src/models/chain/script'
+import Transaction from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import { OutputStatus } from '../../../src/models/chain/output'
 
@@ -30,11 +30,11 @@ const daoScript = {
   hashType: ScriptHashType.Type,
 }
 
-const daoTypeScript = new Script({
-  "codeHash": "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
-  "hashType": ScriptHashType.Type,
-  "args": "0x"
-})
+const daoTypeScript = new Script(
+  "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+  "0x",
+  ScriptHashType.Type
+)
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -127,7 +127,7 @@ describe('TransactionGenerator', () => {
     describe('with feeRate 1000', () => {
       it('capacity 500', async () => {
         const feeRate = '1000'
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -157,7 +157,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000', async () => {
         const feeRate = '1000'
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -185,7 +185,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee, no change output', async () => {
         const feeRate = '1000'
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -214,7 +214,7 @@ describe('TransactionGenerator', () => {
 
       it('capacity 1000 - fee + 1 shannon', async () => {
         const feeRate = '1000'
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -244,7 +244,7 @@ describe('TransactionGenerator', () => {
         await getConnection().manager.save(aliceCell)
 
         const feeRate = '1000'
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash, alice.lockHash],
           [
             {
@@ -271,7 +271,7 @@ describe('TransactionGenerator', () => {
     describe('with fee 1000', () => {
       const fee = '1000'
       it('capacity 500', async () => {
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -294,7 +294,7 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000', async () => {
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -317,7 +317,7 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000 - fee', async () => {
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -340,7 +340,7 @@ describe('TransactionGenerator', () => {
       })
 
       it('capacity 1000 - fee + 1 shannon', async () => {
-        const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+        const tx: Transaction = await TransactionGenerator.generateTx(
           [bob.lockHash],
           [
             {
@@ -395,7 +395,7 @@ describe('TransactionGenerator', () => {
     it('with fee 800', async () => {
       const fee = '800'
       const feeInt = BigInt(fee)
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
         lockHashes,
         targetOutputs,
         fee,
@@ -420,7 +420,7 @@ describe('TransactionGenerator', () => {
 
     it('with feeRate 1000', async () => {
       const feeRate = '1000'
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
         lockHashes,
         targetOutputs,
         '0',
@@ -464,7 +464,7 @@ describe('TransactionGenerator', () => {
     const feeRateInt = BigInt(feeRate)
 
     it('capacity 500', async () => {
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+      const tx: Transaction = await TransactionGenerator.generateDepositTx(
         [bob.lockHash],
         toShannon('500'),
         bob.address,
@@ -480,7 +480,7 @@ describe('TransactionGenerator', () => {
 
     it('capacity 1000', async () => {
       const feeRate = '1000'
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+      const tx: Transaction = await TransactionGenerator.generateDepositTx(
         [bob.lockHash],
         toShannon('1000'),
         bob.address,
@@ -495,7 +495,7 @@ describe('TransactionGenerator', () => {
     })
 
     it('capacity 1000 - fee, no change output', async () => {
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+      const tx: Transaction = await TransactionGenerator.generateDepositTx(
         [bob.lockHash],
         (BigInt(1000 * 10**8 - 453)).toString(),
         bob.address,
@@ -514,7 +514,7 @@ describe('TransactionGenerator', () => {
       const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
       await getConnection().manager.save(aliceCell)
 
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositTx(
+      const tx: Transaction = await TransactionGenerator.generateDepositTx(
         [bob.lockHash, alice.lockHash],
         BigInt(3000 * 10**8).toString(),
         alice.address,
@@ -601,7 +601,7 @@ describe('TransactionGenerator', () => {
       const aliceCell = generateCell(toShannon('1500'), OutputStatus.Live, false, null, alice)
       await getConnection().manager.save(aliceCell)
 
-      const tx: TransactionWithoutHash = await TransactionGenerator.generateDepositAllTx(
+      const tx: Transaction = await TransactionGenerator.generateDepositAllTx(
         [bob.lockHash, alice.lockHash],
         bob.address,
         '0',
@@ -622,10 +622,7 @@ describe('TransactionGenerator', () => {
     const daoData = "0x0000000000000000"
     const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, daoTypeScript, alice, daoData)
     const depositDaoCell = depositDaoOutput.toInterface()
-    const depositOutPoint = new OutPoint({
-      txHash: '0x' + '2'.repeat(64),
-      index: '0'
-    })
+    const depositOutPoint = new OutPoint('0x' + '2'.repeat(64), '0')
     beforeEach(async done => {
       const cells: OutputEntity[] = [
         generateCell(toShannon('1000'), OutputStatus.Live, false, null),
@@ -641,7 +638,7 @@ describe('TransactionGenerator', () => {
     const feeRateInt = BigInt(feeRate)
 
     it('deposit first', async () => {
-      const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
+      const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
         [bob.lockHash, alice.lockHash],
         depositOutPoint,
         depositDaoCell,

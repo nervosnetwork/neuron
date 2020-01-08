@@ -10,7 +10,7 @@ import { AddressPrefix } from 'models/keys/address'
 import NodeService from 'services/node'
 import WalletService from 'services/wallets'
 import { TransactionStatus } from 'models/chain/transaction'
-import { TransactionWithStatus } from 'models/chain/transaction-with-status'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().core.rpc.node.url

@@ -6,10 +6,10 @@ import CheckOutput from './output'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import WalletService from 'services/wallets'
-import { Transaction } from 'models/chain/transaction'
 import Output from 'models/chain/output'
 import OutPoint from 'models/chain/out-point'
-import { Script } from 'models/chain/script'
+import Transaction from 'models/chain/transaction'
+import Script from 'models/chain/script'
 
 export default class CheckTx {
   private tx: Transaction
@@ -85,7 +85,7 @@ export default class CheckTx {
         if (output && lockHashes.includes(output.lockHash)) {
           addresses.push(
             LockUtils.lockScriptToAddress(
-              new Script(output.lock),
+              new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
               NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
             )
           )

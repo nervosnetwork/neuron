@@ -5,7 +5,7 @@ import LockUtils from 'models/lock-utils'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
-import { Transaction, TransactionWithoutHash, TransactionStatus, TransactionInterface } from 'models/chain/transaction'
+import Transaction, { TransactionStatus } from 'models/chain/transaction'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -129,7 +129,7 @@ export class TransactionsService {
   public static getAll = async (
     params: TransactionsByLockHashesParam,
     searchValue: string = ''
-  ): Promise<PaginationResult<TransactionInterface>> => {
+  ): Promise<PaginationResult<Transaction>> => {
     try {
       // if connection not found, which means no database to connect
       // it happened when no node connected and no previous database found.
@@ -214,7 +214,7 @@ export class TransactionsService {
       ) {
         nervosDao = true
       }
-      return new Transaction({
+      return Transaction.fromObject({
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
@@ -231,14 +231,14 @@ export class TransactionsService {
 
     return {
       totalCount: totalCount || 0,
-      items: txs.map(tx => tx.toInterface()),
+      items: txs,
     }
   }
 
   public static getAllByAddresses = async (
     params: TransactionsByAddressesParam,
     searchValue: string = ''
-  ): Promise<PaginationResult<TransactionInterface>> => {
+  ): Promise<PaginationResult<Transaction>> => {
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
       .addressesToAllLockHashes(params.addresses)
 
@@ -255,7 +255,7 @@ export class TransactionsService {
   public static getAllByPubkeys = async (
     params: TransactionsByPubkeysParams,
     searchValue: string = ''
-  ): Promise<PaginationResult<TransactionInterface>> => {
+  ): Promise<PaginationResult<Transaction>> => {
     const addresses: string[] = params.pubkeys.map(pubkey => {
       const addr = pubkeyToAddress(pubkey)
       return addr
@@ -305,7 +305,7 @@ export class TransactionsService {
     return transaction
   }
 
-  public static blake160sOfTx = (tx: TransactionWithoutHash | Transaction) => {
+  public static blake160sOfTx = (tx: Transaction) => {
     let inputBlake160s: string[] = []
     let outputBlake160s: string[] = []
     if (tx.inputs) {
