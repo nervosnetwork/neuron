@@ -125,7 +125,7 @@ const TransactionList = ({
               <span className={styles.status} title={statusLabel}>
                 {statusLabel}
               </span>
-              {status === 'success' || status === 'confirming' ? (
+              {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
                 <span className={styles.confirmations} title={confirmationsLabel}>
                   {confirmationsLabel}
                 </span>
