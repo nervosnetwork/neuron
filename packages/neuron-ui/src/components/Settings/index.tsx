@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
+import { Route, useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
@@ -38,13 +38,10 @@ const settingPanels: CustomRouter.Route[] = [
   },
 ]
 
-const Settings = ({
-  location,
-  history,
-  dispatch,
-  ...neuronWalletState
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Settings = ({ dispatch, ...neuronWalletState }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
+  const location = useLocation()
 
   return (
     <Stack tokens={{ childrenGap: 15, padding: '39px 0 0 0' }}>
@@ -67,9 +64,7 @@ const Settings = ({
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={routerProps => {
-            return <container.comp {...neuronWalletState} {...routerProps} dispatch={dispatch} />
-          }}
+          render={() => <container.comp {...neuronWalletState} dispatch={dispatch} />}
         />
       ))}
     </Stack>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'states/stateProvider'
 
@@ -20,7 +20,9 @@ const menuItems = [
   { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
 ]
 
-const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
+const Navbar = () => {
+  const history = useHistory()
+  const { pathname } = useLocation()
   const neuronWallet = useState()
   const {
     wallet: { name },

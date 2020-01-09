@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps, Link } from 'react-router-dom'
+import { Link, useHistory, useRouteMatch } from 'react-router-dom'
 import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
@@ -24,15 +24,12 @@ const WalletNotFound = () => {
   )
 }
 
-const WalletEditor = ({
-  settings: { wallets = [] },
-  history,
-  dispatch,
-  match: {
-    params: { id },
-  },
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ id: string }>>) => {
+const WalletEditor = ({ settings: { wallets = [] }, dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
+  const {
+    params: { id },
+  } = useRouteMatch()
 
   const wallet = useMemo(() => wallets.find(w => w.id === id), [id, wallets]) || { id: '', name: '' }
   const usedNames = wallets.map(w => w.name).filter(n => n !== wallet.name)

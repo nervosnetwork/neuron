@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
@@ -15,10 +15,10 @@ const PasswordRequest = ({
     passwordRequest: { walletID = '', actionType = null, password = '' },
   },
   settings: { wallets = [] },
-  history,
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   const onDismiss = useCallback(() => {
     dispatch({

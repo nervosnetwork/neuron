@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { useHistory, useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Icon, Text, TextField, FontSizes } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
@@ -53,8 +54,9 @@ const submissionInputs = [
   },
 ]
 
-const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementProps<{ rootPath: string }>) => {
+const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => {
   const [t] = useTranslation()
+  const history = useHistory()
   useEffect(() => {
     if (wallets.length) {
       history.push(Routes.Overview)
@@ -108,16 +110,12 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
 
 Welcome.displayName = 'Welcome'
 
-const Mnemonic = ({
-  state = initState,
-  rootPath = '/wizard',
-  match: {
-    params: { type = MnemonicAction.Create },
-  },
-  history,
-  dispatch,
-}: WizardElementProps<{ type: string }>) => {
+const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardElementProps) => {
   const { generated, imported } = state
+  const history = useHistory()
+  const {
+    params: { type = MnemonicAction.Create },
+  } = useRouteMatch<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
@@ -219,16 +217,12 @@ const Mnemonic = ({
 
 Mnemonic.displayName = 'Mnemonic'
 
-const Submission = ({
-  state = initState,
-  wallets = [],
-  match: {
-    params: { type = MnemonicAction.Create },
-  },
-  history,
-  dispatch,
-}: WizardElementProps<{ type: string }>) => {
+const Submission = ({ state = initState, wallets = [], dispatch }: WizardElementProps) => {
   const { name, password, confirmPassword, imported } = state
+  const history = useHistory()
+  const {
+    params: { type = MnemonicAction.Create },
+  } = useRouteMatch<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const [loading, setLoading] = useState(false)
   const message = 'wizard.set-wallet-name-and-password'

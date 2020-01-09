@@ -1,6 +1,5 @@
 import React, { useContext, useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
 import { openExternal } from 'services/remote'
@@ -60,7 +59,7 @@ const TopAlertActions = ({
   </Stack>
 )
 
-export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const {
     app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
   } = useContext(NeuronWalletContext)

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
+import { Route, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState } from 'states/stateProvider'
@@ -116,10 +116,8 @@ export const mainContents: CustomRouter.Route[] = [
   },
 ]
 
-const MainContent = ({
-  history,
-  dispatch,
-}: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
+const MainContent = ({ dispatch }: React.PropsWithoutRef<{ dispatch: StateDispatch }>) => {
+  const history = useHistory()
   const neuronWalletState = useState()
   const {
     app: { isAllowedToFetchList = true },
@@ -163,9 +161,7 @@ const MainContent = ({
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={routerProps => {
-            return <container.comp {...routerProps} {...neuronWalletState} dispatch={dispatch} />
-          }}
+          render={() => <container.comp {...neuronWalletState} dispatch={dispatch} />}
         />
       ))}
     </>

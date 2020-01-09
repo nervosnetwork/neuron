@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
@@ -29,9 +29,9 @@ const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; 
 const NetworkSetting = ({
   chain = chainState,
   settings: { networks = [] },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
   useEffect(() => {
     backToTop()
   }, [])

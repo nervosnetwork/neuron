@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
@@ -52,9 +52,9 @@ const Overview = ({
     tipBlockNumber: syncedBlockNumber,
     transactions: { items = [] },
   },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
   const [isStatusShow, setIsStatusShow] = useState(false)
 
   useEffect(() => {
