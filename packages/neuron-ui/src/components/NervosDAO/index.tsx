@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
@@ -36,7 +35,7 @@ const NervosDAO = ({
   dispatch,
   nervosDAO: { records },
   chain: { connectionStatus },
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
   useEffect(() => {
     backToTop()

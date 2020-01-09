@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { TooltipHost } from 'office-ui-fabric-react'
 import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
@@ -9,12 +9,9 @@ import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import styles from './receive.module.scss'
 
-const Receive = ({
-  wallet: { addresses = [] },
-  match: { params },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
+const Receive = ({ wallet: { addresses = [] }, dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const { params } = useRouteMatch()
 
   const accountAddress = useMemo(
     () =>

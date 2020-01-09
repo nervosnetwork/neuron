@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
@@ -24,11 +24,11 @@ const History = ({
     transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
   },
   settings: { networks },
-  history,
-  location: { search },
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
+  const history = useHistory()
+  const { search } = useLocation()
   const isMainnet = useMemo(() => {
     const network = networks.find(n => n.id === networkID)
     return !!(network && network.chain === MAINNET_TAG)

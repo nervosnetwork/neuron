@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
@@ -18,11 +18,11 @@ const Addresses = ({
   wallet: { addresses = [], id: walletID },
   chain: { networkID },
   settings: { networks = [] },
-  history,
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
   const [t] = useTranslation()
+  const history = useHistory()
 
   useEffect(() => {
     backToTop()

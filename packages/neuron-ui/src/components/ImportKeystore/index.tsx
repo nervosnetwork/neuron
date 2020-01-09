@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { showOpenDialog } from 'services/remote'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
@@ -30,13 +30,13 @@ const defaultFields: KeystoreFields = {
   passwordError: '',
 }
 
-const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch>) => {
   const [t] = useTranslation()
   const {
-    history,
     dispatch,
     settings: { wallets },
   } = props
+  const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
   const [loading, setLoading] = useState(false)
   const goBack = useGoBack(history)

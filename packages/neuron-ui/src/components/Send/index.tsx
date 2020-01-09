@@ -1,5 +1,4 @@
 import React from 'react'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Label, Text, List } from 'office-ui-fabric-react'
 import TransactionFeePanel from 'components/TransactionFeePanel'
@@ -29,7 +28,7 @@ const Send = ({
   chain: { networkID, connectionStatus },
   settings: { networks = [] },
   dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
+}: React.PropsWithoutRef<StateWithDispatch>) => {
   const { t } = useTranslation()
   const {
     outputs,
