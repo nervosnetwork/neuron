@@ -28,7 +28,7 @@ export default class CheckTx {
 
   public check = async (lockHashes: string[]): Promise<string[]> => {
     const outputs: Output[] = this.selectOutputsOfWallets(lockHashes)
-    const inputAddresses = await this.selectInputsOfWallets(lockHashes)
+    const inputAddresses = await this.selectInputAddressesOfWallets(lockHashes)
 
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(
@@ -52,7 +52,7 @@ export default class CheckTx {
     return false
   }
 
-  public selectOutputsOfWallets = (lockHashes: string[]) => {
+  public selectOutputsOfWallets = (lockHashes: string[]): Output[] => {
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
       const checkOutput = new CheckOutput(output)
       const result = checkOutput.checkLockHash(lockHashes)
@@ -69,7 +69,7 @@ export default class CheckTx {
     return outputs
   }
 
-  public selectInputsOfWallets = async (lockHashes: string[]): Promise<string[]> => {
+  public selectInputAddressesOfWallets = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []
