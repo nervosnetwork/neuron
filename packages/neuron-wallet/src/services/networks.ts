@@ -4,7 +4,7 @@ import { DefaultNetworkUnremovable } from 'exceptions/network'
 
 import Store from 'models/store'
 
-import { Validate, Required } from 'decorators'
+import { Validate, Required } from 'utils/validators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
 
