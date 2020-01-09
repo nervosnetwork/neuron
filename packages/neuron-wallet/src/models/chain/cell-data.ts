@@ -1,10 +1,13 @@
 import TypeChecker from 'utils/type-checker'
 
 export default class CellData {
-  constructor(
-    public content: string,
-    public hash: string
-  ) {
+  public content: string
+  public hash: string
+
+  constructor(content: string, hash: string) {
+    this.content = content
+    this.hash = hash
+
     TypeChecker.hashChecker(this.hash)
   }
 

@@ -14,36 +14,66 @@ export enum TransactionStatus {
 }
 
 export default class Transaction {
+  public version: string
+  public cellDeps: CellDep[] = []
+  public headerDeps: string[] = []
+  public inputs: Input[] = []
+  public outputs: Output[] = []
   public outputsData: string[]
+  public witnesses: (WitnessArgs | string)[] = []
+
+  public hash?: string
+
+  public timestamp?: string
+  public blockNumber?: string
+  public blockHash?: string
+
+  public value?: string
+  public fee?: string
+  public interest?: string
+
+  public type?: string
+  public status?: TransactionStatus
+  public description: string = '' // Default to ''
+
+  public nervosDao: boolean = false // Default to false
+
+  public createdAt?: string
+  public updatedAt?: string
 
   constructor(
-    public version: string,
-    public cellDeps: CellDep[] = [],
-    public headerDeps: string[] = [],
-    public inputs: Input[] = [],
-    public outputs: Output[] = [],
+    version: string,
+    cellDeps: CellDep[] = [],
+    headerDeps: string[] = [],
+    inputs: Input[] = [],
+    outputs: Output[] = [],
     outputsData?: string[],
-    public witnesses: (WitnessArgs | string)[] = [],
-
-    public hash?: string,
-
-    public timestamp?: string,
-    public blockNumber?: string,
-    public blockHash?: string,
-
-    public value?: string,
-    public fee?: string,
-    public interest?: string,
-
-    public type?: string,
-    public status?: TransactionStatus,
-    public description: string = '', // Default to ''
-
-    public nervosDao: boolean = false, // Default to false
-
-    public createdAt?: string,
-    public updatedAt?: string
+    witnesses: (WitnessArgs | string)[] = [],
+    hash?: string,
+    timestamp?: string,
+    blockNumber?: string,
+    blockHash?: string,
+    value?: string,
+    fee?: string,
+    interest?: string,
+    type?: string,
+    status?: TransactionStatus,
+    description: string = '', // Default to ''
+    nervosDao: boolean = false, // Default to false
+    createdAt?: string,
+    updatedAt?: string
   ) {
+    this.cellDeps = cellDeps
+    this.headerDeps = headerDeps
+    this.inputs = inputs
+    this.outputs = outputs
+    this.witnesses = witnesses
+    this.hash = hash
+    this.blockHash = blockHash
+    this.type = type
+    this.status = status
+    this.description = description
+    this.nervosDao = nervosDao
     this.version = BigInt(version).toString()
     this.value = value ? BigInt(value).toString() : value
     this.fee = fee ? BigInt(fee).toString() : fee

@@ -1,12 +1,14 @@
 import TypeChecker from "utils/type-checker"
 
 export default class LockHashIndexState {
-  constructor(
-    public lockHash: string,
-    public blockNumber: string,
-    public blockHash: string
-  ) {
+  public lockHash: string
+  public blockNumber: string
+  public blockHash: string
+
+  constructor(lockHash: string, blockNumber: string, blockHash: string) {
+    this.lockHash = lockHash
     this.blockNumber = BigInt(blockNumber).toString()
+    this.blockHash = blockHash
 
     TypeChecker.hashChecker(this.lockHash, this.blockHash)
     TypeChecker.numberChecker(this.blockNumber)

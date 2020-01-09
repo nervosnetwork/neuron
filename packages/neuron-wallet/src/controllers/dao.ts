@@ -5,11 +5,11 @@ import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import TransactionSender from 'services/transaction-sender'
 import OutPoint from 'models/chain/out-point'
-import Output from 'models/chain/output'
+import Cell from 'models/chain/output'
 import Transaction from 'models/chain/transaction'
 
 export default class DaoController {
-  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Output[]>> {
+  public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
     const { walletID } = params
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)

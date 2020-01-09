@@ -5,7 +5,7 @@ import FeeMode from 'models/fee-mode'
 import TransactionEntity from 'database/chain/entities/transaction'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
-import Output, { OutputStatus } from 'models/chain/output'
+import Cell, { OutputStatus } from 'models/chain/output'
 import { TransactionStatus } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
@@ -44,7 +44,7 @@ export default class CellsService {
 
   public static getDaoCells = async (
     lockHashes: string[],
-  ): Promise<Output[]> => {
+  ): Promise<Cell[]> => {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
@@ -58,7 +58,7 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const cells: Output[] = outputs.map(o => o.toModel())
+    const cells: Cell[] = outputs.map(o => o.toModel())
 
     const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
 
@@ -82,7 +82,7 @@ export default class CellsService {
     return cells
   }
 
-  public static getLiveCell = async (outPoint: OutPoint): Promise<Output | undefined> => {
+  public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
     const cellEntity: OutputEntity | undefined = await CellsService.getLiveCellEntity(outPoint)
 
     if (!cellEntity) {

@@ -2,11 +2,12 @@ import HexUtils from 'utils/hex'
 import TypeChecker from 'utils/type-checker'
 
 export default class OutPoint {
+  public txHash: string
+  public index: string
+
   // check hex string
-  constructor(
-    public txHash: string,
-    public index: string
-  ) {
+  constructor(txHash: string, index: string) {
+    this.txHash = txHash
     this.index = (+index).toString()
 
     TypeChecker.hashChecker(this.txHash)

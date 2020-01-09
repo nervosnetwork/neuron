@@ -4,18 +4,27 @@ import HexUtils from 'utils/hex'
 import TypeChecker from 'utils/type-checker'
 
 export default class Input {
+  public previousOutput: OutPoint | null
+  public since?: string
+  public capacity?: string | null
+  public lock?: Script | null
+  public lockHash?: string | null
+  public inputIndex?: string | null
+
   // don't using = directly, using setXxx instead
   // check hex string
   constructor(
-    public previousOutput: OutPoint | null,
-    public since?: string,
-    public capacity?: string | null,
-    public lock?: Script | null,
-    public lockHash?: string | null,
-    public inputIndex?: string | null
+    previousOutput: OutPoint | null,
+    since?: string,
+    capacity?: string | null,
+    lock?: Script | null,
+    lockHash?: string | null,
+    inputIndex?: string | null
   ) {
+    this.previousOutput = previousOutput
     this.since = since ? BigInt(since).toString() : since
     this.capacity = capacity ? BigInt(capacity).toString() : capacity
+    this.lock = lock
     this.inputIndex = inputIndex ? (+inputIndex).toString() : undefined
 
     this.lockHash = lockHash || this.lock?.computeHash()

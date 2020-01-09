@@ -7,10 +7,12 @@ export enum TxStatusType {
 }
 
 export default class TxStatus {
-  constructor(
-    public blockHash: string | null,
-    public status: TxStatusType
-  ) {
+  public blockHash: string | null
+  public status: TxStatusType
+
+  constructor(blockHash: string | null, status: TxStatusType) {
+    this.blockHash = blockHash
+    this.status = status
     TypeCheckerUtils.hashChecker(this.blockHash)
   }
 

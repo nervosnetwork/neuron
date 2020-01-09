@@ -2,10 +2,13 @@ import Transaction from './transaction'
 import TxStatus from './tx-status'
 
 export default class TransactionWithStatus {
-  constructor(
-    public transaction: Transaction,
-    public txStatus: TxStatus
-  ) {}
+  public transaction: Transaction
+  public txStatus: TxStatus
+
+  constructor(transaction: Transaction, txStatus: TxStatus) {
+    this.transaction = transaction
+    this.txStatus = txStatus
+  }
 
   public static fromSDK(txWithStatus: CKBComponents.TransactionWithStatus): TransactionWithStatus {
     return new TransactionWithStatus(

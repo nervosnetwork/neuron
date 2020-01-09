@@ -1,11 +1,13 @@
 export default class WitnessArgs {
   public static EMPTY_LOCK = '0x' + '0'.repeat(130)
 
-  constructor(
-    public lock?: string,
-    public inputType?: string,
-    public outputType?: string
-  ) {
+  public lock?: string
+  public inputType?: string
+  public outputType?: string
+
+  constructor(lock?: string, inputType?: string, outputType?: string) {
+    this.lock = lock
+    this.inputType = inputType
     this.outputType = outputType
   }
 

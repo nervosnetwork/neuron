@@ -6,10 +6,13 @@ export enum DepType {
 }
 
 export default class CellDep {
-  constructor(
-    public outPoint: OutPoint,
-    public depType: DepType
-  ) {}
+  public outPoint: OutPoint
+  public depType: DepType
+
+  constructor(outPoint: OutPoint, depType: DepType) {
+    this.outPoint = outPoint
+    this.depType = depType
+  }
 
   public static fromObject({ outPoint, depType }: { outPoint: OutPoint, depType: DepType }): CellDep {
     return new CellDep(

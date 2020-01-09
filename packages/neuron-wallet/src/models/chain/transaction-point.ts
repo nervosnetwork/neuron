@@ -1,11 +1,12 @@
 import TypeChecker from "utils/type-checker"
 
 export default class TransactionPoint {
-  constructor(
-    public blockNumber: string,
-    public txHash: string,
-    public index: string
-  ) {
+  public blockNumber: string
+  public txHash: string
+  public index: string
+
+  constructor(blockNumber: string, txHash: string, index: string) {
+    this.txHash = txHash
     this.blockNumber = BigInt(blockNumber).toString()
     this.index = (+index).toString()
 

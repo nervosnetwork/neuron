@@ -12,29 +12,48 @@ export enum OutputStatus {
 }
 
 export default class Output {
+  public capacity: string
+  public lock: Script
+  public type?: Script | null
   public data: string
   public lockHash: string
+  public typeHash?: string
+  public outPoint?: OutPoint
+  public status?: OutputStatus
+  public daoData?: string | null
+  public timestamp?: string | null
+  public blockNumber?: string | null
+  public blockHash?: string | null
+  public depositOutPoint?: OutPoint
+  public depositTimestamp?: string
 
   // check hex number
   constructor(
-    public capacity: string,
-    public lock: Script,
-    public type?: Script | null,
+    capacity: string,
+    lock: Script,
+    type?: Script | null,
     data?: string,
     lockHash?: string,
-    public typeHash?: string,
-    public outPoint?: OutPoint,
-    public status?: OutputStatus,
-    public daoData?: string | null,
-    public timestamp?: string | null,
-    public blockNumber?: string | null,
-    public blockHash?: string | null,
-    public depositOutPoint?: OutPoint,
-    public depositTimestamp?: string
+    typeHash?: string,
+    outPoint?: OutPoint,
+    status?: OutputStatus,
+    daoData?: string | null,
+    timestamp?: string | null,
+    blockNumber?: string | null,
+    blockHash?: string | null,
+    depositOutPoint?: OutPoint,
+    depositTimestamp?: string
   ) {
     this.capacity = BigInt(capacity).toString()
+    this.lock = lock
+    this.type = type
     this.lockHash = lockHash || this.lock.computeHash()
     this.typeHash = typeHash || this.type?.computeHash()
+    this.outPoint = outPoint
+    this.status = status
+    this.daoData = daoData
+    this.blockHash = blockHash
+    this.depositOutPoint = depositOutPoint
 
     // if daoData exists, data should equals to daoData
     this.data = this.daoData || data || '0x'

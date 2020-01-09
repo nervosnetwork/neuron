@@ -8,11 +8,11 @@ export enum ScriptHashType {
 }
 
 export default class Script {
-  constructor(
-    public codeHash: string,
-    public args: string,
-    public hashType: ScriptHashType
-  ) {
+  public codeHash: string
+  public args: string
+  public hashType: ScriptHashType
+
+  constructor(codeHash: string, args: string, hashType: ScriptHashType) {
     this.args = args
     this.codeHash = codeHash
     this.hashType = hashType
