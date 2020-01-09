@@ -1,13 +1,14 @@
 import { getConnection } from 'typeorm'
 import { initConnection } from '../../src/database/chain/ormconfig'
 import OutputEntity from '../../src/database/chain/entities/output'
-import { OutputStatus } from '../../src/services/tx/params'
-import { ScriptHashType, Script, TransactionStatus } from '../../src/types/cell-types'
+import { OutputStatus } from '../../src/models/chain/output'
 import CellsService from '../../src/services/cells'
-import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet';
+import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from '../../src/exceptions/wallet'
 import TransactionEntity from '../../src/database/chain/entities/transaction'
 import TransactionSize from '../../src/models/transaction-size'
 import TransactionFee from '../../src/models/transaction-fee'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
+import { TransactionStatus } from '../../src/models/chain/transaction'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -32,23 +33,23 @@ describe('CellsService', () => {
   })
 
   const bob = {
-    lockScript: {
-      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-      hashType: ScriptHashType.Type,
-    },
-    lockHash: '0xecaeea8c8581d08a3b52980272001dbf203bc6fa2afcabe7cc90cc2afff488ba',
+    lockScript: new Script(
+      '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+      '0x36c329ed630d6ce750712a477543672adab57f4c',
+      ScriptHashType.Type
+    ),
+    lockHash: '0x27161d1287c4b472bdff08a9510591d6cb5caa5b4ad7af451dbcd01e10efefac',
     address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
     blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
   }
 
   const alice = {
-    lockScript: {
-      codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-      args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-      hashType: ScriptHashType.Type,
-    },
-    lockHash: '0x489306d801d54bee2d8562ae20fdc53635b568f8107bddff15bb357f520cc02c',
+    lockScript: new Script(
+      '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
+      '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+      ScriptHashType.Type
+    ),
+    lockHash: '0x154d47f1f2f2b30f6377ba80dd92f61a7ff3a005ec79e01113e09359dbdb31ac',
     address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
     blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
   }
@@ -91,11 +92,7 @@ describe('CellsService', () => {
     return cell
   }
 
-  const typeScript: Script = {
-    codeHash: randomHex(),
-    args: '',
-    hashType: ScriptHashType.Data,
-  }
+  const typeScript = new Script(randomHex(), '0x', ScriptHashType.Data)
 
   it('getLiveCell', async () => {
     const capacity = '1000'
@@ -412,7 +409,7 @@ describe('CellsService', () => {
         tx.status = TransactionStatus.Success
         tx.witnesses = []
         tx.blockNumber = '1'
-        tx.blockHash = '0x10'
+        tx.blockHash = '0x' + '10'.repeat(32)
         return tx
       }
       beforeEach(async done => {

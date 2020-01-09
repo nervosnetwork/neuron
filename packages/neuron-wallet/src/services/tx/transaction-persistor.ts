@@ -1,13 +1,14 @@
 import { getConnection, QueryRunner } from 'typeorm'
-import { OutPoint, Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
-import LockUtils from 'models/lock-utils'
-import { OutputStatus, TxSaveType } from './params'
+import { TxSaveType } from './params'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
+import OutPoint from 'models/chain/out-point'
+import { OutputStatus } from 'models/chain/output'
+import Transaction, { TransactionStatus } from 'models/chain/transaction'
 
 export class TransactionPersistor {
   // After the tx is sent:
@@ -136,14 +137,14 @@ export class TransactionPersistor {
   ): Promise<TransactionEntity> => {
     const connection = getConnection()
     const tx = new TransactionEntity()
-    tx.hash = transaction.hash
+    tx.hash = transaction.hash || transaction.computeHash()
     tx.version = transaction.version
-    tx.headerDeps = transaction.headerDeps!
-    tx.cellDeps = transaction.cellDeps!
+    tx.headerDeps = transaction.headerDeps
+    tx.cellDeps = transaction.cellDeps
     tx.timestamp = transaction.timestamp!
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
-    tx.witnesses = transaction.witnesses!
+    tx.witnesses = transaction.witnessesAsString()
     tx.description = transaction.description
     // update tx status here
     tx.status = outputStatus === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
@@ -183,9 +184,9 @@ export class TransactionPersistor {
     }
 
     const outputsData = transaction.outputsData!
-    const outputs: OutputEntity[] = transaction.outputs!.map((o, index) => {
+    const outputs: OutputEntity[] = transaction.outputs.map((o, index) => {
       const output = new OutputEntity()
-      output.outPointTxHash = transaction.hash
+      output.outPointTxHash = transaction.hash || transaction.computeHash()
       output.outPointIndex = index.toString()
       output.capacity = o.capacity
       output.lock = o.lock
@@ -273,13 +274,6 @@ export class TransactionPersistor {
     saveType: TxSaveType
   ): Promise<TransactionEntity> => {
     const tx: Transaction = transaction
-    tx.outputs = tx.outputs!.map(o => {
-      const output = o
-      if (!output.lockHash) {
-        output.lockHash = LockUtils.lockScriptToHash(output.lock!)
-      }
-      return output
-    })
 
     let txEntity: TransactionEntity
     if (saveType === TxSaveType.Sent) {
@@ -306,13 +300,13 @@ export class TransactionPersistor {
   }
 
   public static saveSentTx = async (
-    transaction: TransactionWithoutHash,
+    transaction: Transaction,
     txHash: string
   ): Promise<TransactionEntity> => {
-    const tx: Transaction = {
-      hash: txHash,
+    const tx = Transaction.fromObject({
       ...transaction,
-    }
+      hash: txHash,
+    })
     const txEntity: TransactionEntity = await TransactionPersistor.convertTransactionAndSave(tx, TxSaveType.Sent)
     return txEntity
   }

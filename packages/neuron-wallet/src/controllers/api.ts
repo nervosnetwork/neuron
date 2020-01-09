@@ -9,7 +9,6 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
-import { TransactionWithoutHash, OutPoint } from 'types/cell-types'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -17,6 +16,8 @@ import DaoController from 'controllers/dao'
 import NetworksController from 'controllers/networks'
 import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
+import Transaction from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
 
 /**
  * @class ApiController
@@ -159,7 +160,7 @@ export default class ApiController {
       this.walletsController.requestPassword(walletID, action)
     })
 
-    handle('send-tx', async (_, params: { walletID: string, tx: TransactionWithoutHash, password: string, description?: string }) => {
+    handle('send-tx', async (_, params: { walletID: string, tx: Transaction, password: string, description?: string }) => {
       return this.walletsController.sendTx(params)
     })
 

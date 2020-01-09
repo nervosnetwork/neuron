@@ -1,6 +1,6 @@
-import { Script, ScriptHashType } from '../../src/types/cell-types'
 import LockUtils from '../../src/models/lock-utils'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
 
 const systemScript = {
   outPoint: {
@@ -34,12 +34,6 @@ describe('LockUtils Test', () => {
     blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
   }
 
-  it('lockScriptToHash', async () => {
-    const lockHash: string = await LockUtils.lockScriptToHash(bob.lockScript)
-
-    expect(lockHash).toEqual(bob.lockHash)
-  })
-
   it('addressToLockScript', async () => {
     const mockContractInfo = jest.fn()
     mockContractInfo.mockReturnValue(systemScript)
@@ -47,7 +41,7 @@ describe('LockUtils Test', () => {
 
     const lockScript: Script = new LockUtils(await LockUtils.systemScript()).addressToLockScript(bob.address)
 
-    expect(lockScript).toEqual(bob.lockScript)
+    expect({ ...lockScript }).toEqual(bob.lockScript)
   })
 
   it('addressToLockHash', async () => {
@@ -84,7 +78,10 @@ describe('LockUtils Test', () => {
   })
 
   it('lockScriptToAddress', async () => {
-    const address: string = LockUtils.lockScriptToAddress(bob.lockScript, AddressPrefix.Testnet)
+    const address: string = LockUtils.lockScriptToAddress(
+      new Script(bob.lockScript.codeHash, bob.lockScript.args, bob.lockScript.hashType),
+      AddressPrefix.Testnet
+    )
 
     expect(address).toEqual(bob.address)
   })

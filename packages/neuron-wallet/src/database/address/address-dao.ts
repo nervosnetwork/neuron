@@ -2,11 +2,11 @@ import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
-import { TransactionStatus } from 'types/cell-types'
-import { OutputStatus } from 'services/tx/params'
+import { OutputStatus } from 'models/chain/output'
 import NodeService from 'services/node'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
+import { TransactionStatus } from 'models/chain/transaction'
 
 export enum AddressVersion {
   Testnet = 'testnet',

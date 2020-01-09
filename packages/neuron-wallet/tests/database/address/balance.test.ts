@@ -36,7 +36,7 @@ describe('balance', () => {
     expect(addr.balance).toEqual((1000 + 100).toString())
   })
 
-  it('the balance returned by the toInterface() is correct', async () => {
+  it('the balance returned by the toModel() is correct', async () => {
     const address = generateAddress('1000', '100', '300')
     const addrs: Address[] = AddressDao.create([address])
     const addr = addrs[0]

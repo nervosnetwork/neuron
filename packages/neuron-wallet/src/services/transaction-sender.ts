@@ -1,9 +1,7 @@
-import { TransactionWithoutHash, WitnessArgs, OutPoint, Cell, Input, DepType } from 'types/cell-types'
 import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
-import ConvertTo from 'types/convert-to'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionsService, TransactionGenerator } from './tx'
 import NetworksService from './networks'
@@ -14,13 +12,28 @@ import { Address } from 'database/address/address-dao'
 import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
-import TypeConvert from 'types/type-convert'
 import FeeMode from 'models/fee-mode'
 import DaoUtils from 'models/dao-utils'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import logger from 'utils/logger'
 import Keychain from 'models/keys/keychain'
+import Input from 'models/chain/input'
+import OutPoint from 'models/chain/out-point'
+import Output from 'models/chain/output'
+import RpcService from 'services/rpc-service'
+import CellDep, { DepType } from 'models/chain/cell-dep'
+import WitnessArgs from 'models/chain/witness-args'
+import Transaction from 'models/chain/transaction'
+import BlockHeader from 'models/chain/block-header'
+import Script from 'models/chain/script'
+
+interface SignInfo {
+  witnessArgs: WitnessArgs
+  lockHash: string
+  witness: string
+  blake160: string
+}
 
 export default class TransactionSender {
   private walletService: WalletService
@@ -29,7 +42,7 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: TransactionWithoutHash, password: string = '', description: string = '') => {
+  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '') => {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -37,7 +50,7 @@ export default class TransactionSender {
     }
 
     const { core } = NodeService.getInstance()
-    const txHash = core.utils.rawTransactionToHash(ConvertTo.toSdkTxWithoutHash(tx))
+    const txHash: string = tx.computeHash()
 
     const addressInfos = this.getAddressInfos(walletID)
     const paths = addressInfos.map(info => info.path)
@@ -51,13 +64,10 @@ export default class TransactionSender {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries = tx.inputs!.map((input: Input, index: number) => {
+    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
       const blake160: string = input.lock!.args!
-      const witnessArgs: WitnessArgs = (tx.witnessArgs && tx.witnessArgs[index]) || {
-        lock: undefined,
-        inputType: undefined,
-        outputType: undefined
-      }
+      const wit: WitnessArgs | string = tx.witnesses[index]
+      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
       return {
         // TODO: fill in required DAO's type witness here
         witnessArgs,
@@ -72,12 +82,12 @@ export default class TransactionSender {
     for (const lockHash of lockHashes) {
       const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
       // A 65-byte empty signature used as placeholder
-      witnessesArgs[0].witnessArgs.lock = '0x' + '0'.repeat(130)
+      witnessesArgs[0].witnessArgs.setEmptyLock()
 
       const privateKey = findPrivateKey(witnessesArgs[0].blake160)
 
-      const serializedWitnesses = witnessesArgs
-        .map((value: any, index: number) => {
+      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
+        .map((value: SignInfo, index: number) => {
           const args = value.witnessArgs
           if (index === 0) {
             return args
@@ -85,11 +95,16 @@ export default class TransactionSender {
           if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
             return '0x'
           }
-          return serializeWitnessArgs(args)
+          return serializeWitnessArgs(args.toSDK())
         })
       const signed = core.signWitnesses(privateKey)({
         transactionHash: txHash,
-        witnesses: serializedWitnesses
+        witnesses: serializedWitnesses.map(wit => {
+          if (typeof wit === 'string') {
+            return wit
+          }
+          return wit.toSDK()
+        })
       })
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
@@ -99,8 +114,7 @@ export default class TransactionSender {
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
-    const txToSend = ConvertTo.toSdkTxWithoutHash(tx)
-    await core.rpc.sendTransaction(txToSend)
+    await core.rpc.sendTransaction(tx.toSDKRawTransaction())
 
     tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
@@ -113,7 +127,7 @@ export default class TransactionSender {
     return txHash
   }
 
-  public calculateFee = async (tx: TransactionWithoutHash) => {
+  public calculateFee = async (tx: Transaction) => {
     const inputCapacities = tx.inputs!
       .map(input => BigInt(input.capacity!))
       .reduce((result, c) => result + c, BigInt(0))
@@ -132,7 +146,7 @@ export default class TransactionSender {
     }[] = [],
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -146,7 +160,7 @@ export default class TransactionSender {
 
     const changeAddress: string = this.getChangeAddress()
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateTx(
+    const tx: Transaction = await TransactionGenerator.generateTx(
       lockHashes,
       targetOutputs,
       changeAddress,
@@ -165,7 +179,7 @@ export default class TransactionSender {
     }[] = [],
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -177,7 +191,7 @@ export default class TransactionSender {
       capacity: BigInt(item.capacity).toString(),
     }))
 
-    const tx: TransactionWithoutHash = await TransactionGenerator.generateSendingAllTx(
+    const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
       lockHashes,
       targetOutputs,
       fee,
@@ -192,7 +206,7 @@ export default class TransactionSender {
     capacity: string,
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -220,13 +234,12 @@ export default class TransactionSender {
     outPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     // only for check wallet exists
     this.walletService.get(walletID)
 
     const { core } = NodeService.getInstance()
-    const sdkOutPoint = ConvertTo.toSdkOutPoint(outPoint)
-    const cellStatus = await core.rpc.getLiveCell(sdkOutPoint, false)
+    const cellStatus = await core.rpc.getLiveCell(outPoint.toSDK(), false)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
@@ -242,8 +255,8 @@ export default class TransactionSender {
     const depositBlockHeader = await core.rpc.getHeader(prevTx.txStatus.blockHash!)
 
     const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
-    const prevOutput = TypeConvert.toOutput(cellStatus.cell.output)
-    const tx: TransactionWithoutHash = await TransactionGenerator.startWithdrawFromDao(
+    const prevOutput = Output.fromSDK(cellStatus.cell.output)
+    const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       lockHashes,
       outPoint,
       prevOutput,
@@ -263,32 +276,32 @@ export default class TransactionSender {
     withdrawingOutPoint: OutPoint,
     fee: string = '0',
     feeRate: string = '0'
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const DAO_LOCK_PERIOD_EPOCHS = BigInt(180)
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const { core } = NodeService.getInstance()
+    const url: string = NodeService.getInstance().core.node.url
+    const rpcService = new RpcService(url)
 
-    const sdkWithdrawingOutPoint = ConvertTo.toSdkOutPoint(withdrawingOutPoint)
-    const cellStatus = await core.rpc.getLiveCell(sdkWithdrawingOutPoint, true)
+    const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
     if (cellStatus.status !== 'live') {
       throw new CellIsNotYetLive()
     }
-    const prevTx = await core.rpc.getTransaction(withdrawingOutPoint.txHash)
+    const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
     if (prevTx.txStatus.status !== 'committed') {
       throw new TransactionIsNotCommittedYet()
     }
-    const content = cellStatus.cell.data!.content
+    const content = cellStatus.cell!.data!.content
     const buf = Buffer.from(content.slice(2), 'hex')
     const depositBlockNumber: bigint = buf.readBigUInt64LE()
-    const depositBlockHeader = await core.rpc.getHeaderByNumber(depositBlockNumber)
+    const depositBlockHeader: BlockHeader = (await rpcService.getHeaderByNumber(depositBlockNumber.toString()))!
     const depositEpoch = this.parseEpoch(BigInt(depositBlockHeader.epoch))
-    const depositCapacity: bigint = BigInt(cellStatus.cell.output.capacity)
+    const depositCapacity: bigint = BigInt(cellStatus.cell!.output.capacity)
 
-    const withdrawBlockHeader = await core.rpc.getHeader(prevTx.txStatus.blockHash!)
+    const withdrawBlockHeader = (await rpcService.getHeader(prevTx.txStatus.blockHash!))!
     const withdrawEpoch = this.parseEpoch(BigInt(withdrawBlockHeader.epoch))
 
     const withdrawFraction = withdrawEpoch.index * depositEpoch.length
@@ -312,43 +325,32 @@ export default class TransactionSender {
     const address = await AddressesService.nextUnusedAddress(walletID)
     const blake160 = LockUtils.addressToBlake160(address!.address)
 
-    const output: Cell = {
-      capacity: outputCapacity.toString(),
-      lock: {
-        codeHash,
-        hashType,
-        args: blake160,
-      },
-      data: '0x'
-    }
+    const output: Output = new Output(
+      outputCapacity.toString(),
+      new Script(codeHash, blake160, hashType),
+      undefined,
+      '0x'
+    )
 
-    const outputs: Cell[] = [output]
+    const outputs: Output[] = [output]
 
-    const previousOutput = TypeConvert.toOutput(cellStatus.cell.output)
-    const input: Input = {
-      previousOutput: withdrawingOutPoint,
-      since: minimalSince.toString(),
-      lock: previousOutput.lock,
-      lockHash: LockUtils.computeScriptHash(previousOutput.lock),
-      capacity: previousOutput.capacity,
-    }
+    const previousOutput = cellStatus.cell!.output
+    const input: Input = new Input(
+      withdrawingOutPoint,
+      minimalSince.toString(),
+      previousOutput.capacity,
+      previousOutput.lock
+    )
 
-    const withdrawWitnessArgs: WitnessArgs = {
-      lock: '0x' + '0'.repeat(130),
-      inputType: '0x0000000000000000',
-      outputType: undefined,
-    }
-    const tx: TransactionWithoutHash = {
+    const withdrawWitnessArgs: WitnessArgs = new WitnessArgs(
+      WitnessArgs.EMPTY_LOCK,
+      '0x0000000000000000'
+    )
+    const tx: Transaction = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        {
-          outPoint: secpOutPoint,
-          depType: DepType.DepGroup,
-        },
-        {
-          outPoint: daoScriptInfo.outPoint,
-          depType: DepType.Code,
-        },
+        new CellDep(secpOutPoint, DepType.DepGroup),
+        new CellDep(daoScriptInfo.outPoint, DepType.Code)
       ],
       headerDeps: [
         depositBlockHeader.hash,
@@ -357,12 +359,11 @@ export default class TransactionSender {
       inputs: [input],
       outputs,
       outputsData: outputs.map(o => o.data || '0x'),
-      witnesses: [],
-      witnessArgs: [withdrawWitnessArgs],
+      witnesses: [withdrawWitnessArgs],
       interest: (BigInt(outputCapacity) - depositCapacity).toString(),
-    }
+    })
     if (mode.isFeeRateMode()) {
-      const txSize: number = TransactionSize.tx(tx) + TransactionSize.witness(withdrawWitnessArgs)
+      const txSize: number = TransactionSize.tx(tx)
       const txFee: bigint = TransactionFee.fee(txSize, BigInt(feeRate))
       tx.fee = txFee.toString()
       output.capacity = (outputCapacity - txFee).toString()
@@ -380,7 +381,7 @@ export default class TransactionSender {
     walletID: string = '',
     fee: string = '0',
     feeRate: string = '0',
-  ): Promise<TransactionWithoutHash> => {
+  ): Promise<Transaction> => {
     const addressInfos = this.getAddressInfos(walletID)
 
     const addresses: string[] = addressInfos.map(info => info.address)
@@ -403,7 +404,7 @@ export default class TransactionSender {
 
     const { core } = NodeService.getInstance()
     const result = await core.rpc.calculateDaoMaximumWithdraw(
-      ConvertTo.toSdkOutPoint(depositOutPoint),
+      depositOutPoint.toSDK(),
       withdrawBlockHash,
     )
 

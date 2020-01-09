@@ -1,13 +1,15 @@
 import { getConnection, In } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
-import { Cell, OutPoint, Input } from 'types/cell-types'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
-import { OutputStatus } from './tx/params'
 import FeeMode from 'models/fee-mode'
-import { TransactionStatus, WitnessArgs } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
-import TransactionSize from '../models/transaction-size';
+import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
+import Cell, { OutputStatus } from 'models/chain/output'
+import { TransactionStatus } from 'models/chain/transaction'
+import OutPoint from 'models/chain/out-point'
+import Input from 'models/chain/input'
+import WitnessArgs from 'models/chain/witness-args'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -56,7 +58,7 @@ export default class CellsService {
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const cells = outputs.map(o => o.toInterface())
+    const cells: Cell[] = outputs.map(o => o.toModel())
 
     const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
 
@@ -71,8 +73,8 @@ export default class CellsService {
     for (const output of cells) {
       if (output.depositOutPoint) {
         const tx = txs.filter(t => t.hash === output.depositOutPoint!.txHash)[0]
-        if (tx) {
-          output.depositTimestamp = tx.timestamp
+        if (tx && tx.timestamp) {
+          output.setDepositTimestamp(tx.timestamp)
         }
       }
     }
@@ -87,7 +89,7 @@ export default class CellsService {
       return undefined
     }
 
-    return cellEntity.toInterface()
+    return cellEntity.toModel()
   }
 
   private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
@@ -180,13 +182,13 @@ export default class CellsService {
     }
     let hasChangeOutput: boolean = false
     liveCells.every(cell => {
-      const input: Input = {
-        previousOutput: cell.outPoint(),
-        since: '0',
-        lock: cell.lock,
-        lockHash: cell.lockHash,
-        capacity: cell.capacity,
-      }
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock,
+        cell.lockHash
+      )
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
@@ -262,13 +264,13 @@ export default class CellsService {
       })
 
     const inputs: Input[] = cellEntities.map(cell => {
-      return {
-        previousOutput: cell.outPoint(),
-        since: '0',
-        lock: cell.lock,
-        lockHash: cell.lockHash,
-        capacity: cell.capacity,
-      }
+      return new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock,
+        cell.lockHash,
+      )
     })
 
     return inputs

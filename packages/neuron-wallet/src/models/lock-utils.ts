@@ -1,14 +1,13 @@
 import {
-  scriptToHash,
   AddressPrefix,
   bech32Address,
   AddressType,
   parseAddress
 } from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
-import { OutPoint, Script, ScriptHashType } from 'types/cell-types'
-import ConvertTo from 'types/convert-to'
 import Core from '@nervosnetwork/ckb-sdk-core'
+import OutPoint from './chain/out-point'
+import Script, { ScriptHashType } from './chain/script'
 
 export interface SystemScript {
   codeHash: string
@@ -46,7 +45,7 @@ export default class LockUtils {
 
     return {
       codeHash,
-      outPoint: { txHash, index },
+      outPoint: new OutPoint(txHash, index),
       hashType: hashType as ScriptHashType
     }
   }
@@ -72,16 +71,15 @@ export default class LockUtils {
   }
 
   addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
-    return {
-      codeHash: this.systemScript.codeHash,
-      args: LockUtils.addressToBlake160(address),
-      hashType,
-    }
+    return new Script(
+      this.systemScript.codeHash,
+      LockUtils.addressToBlake160(address),
+      hashType
+    )
   }
 
   addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {
-    const lock = this.addressToLockScript(address, hashType)
-    return LockUtils.lockScriptToHash(lock)
+    return this.addressToLockScript(address, hashType).computeHash()
   }
 
   addressToAllLockHashes(address: string): string[] {
@@ -92,20 +90,6 @@ export default class LockUtils {
     return addresses.map(addr => {
       return this.addressToAllLockHashes(addr)
     }).reduce((acc, val) => acc.concat(val), [])
-  }
-
-  static computeScriptHash = (script: Script): string => {
-    const ckbScript: CKBComponents.Script = ConvertTo.toSdkScript(script)
-    const hash: string = scriptToHash(ckbScript)
-    if (!hash.startsWith('0x')) {
-      return `0x${hash}`
-    }
-    return hash
-  }
-
-  // use SDK lockScriptToHash
-  static lockScriptToHash = (lock: Script) => {
-    return LockUtils.computeScriptHash(lock)
   }
 
   static lockScriptToAddress(lock: Script, prefix: AddressPrefix = AddressPrefix.Mainnet): string {

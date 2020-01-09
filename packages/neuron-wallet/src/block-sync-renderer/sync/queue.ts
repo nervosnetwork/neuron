@@ -1,21 +1,23 @@
-import { Block, BlockHeader } from 'types/cell-types'
 import { TransactionPersistor } from 'services/tx'
 import logger from 'utils/logger'
-import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 
-import GetBlocks from './get-blocks'
+import RpcService from 'services/rpc-service'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import BlockNumber from './block-number'
 import ArrayUtils from 'utils/array'
 import CheckTx from './check-and-save/tx'
-import TypeConvert from 'types/type-convert'
 import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
+import OutPoint from 'models/chain/out-point'
+import Block from 'models/chain/block'
+import BlockHeader from 'models/chain/block-header'
+import Script from 'models/chain/script'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export default class Queue {
   private lockHashes: string[]
-  private getBlocksService: GetBlocks
+  private rpcService: RpcService
   private startBlockNumber: bigint
   private endBlockNumber: bigint
   private rangeForCheck: RangeForCheck
@@ -41,7 +43,7 @@ export default class Queue {
   ) {
     this.lockHashes = lockHashes
     this.url = url
-    this.getBlocksService = new GetBlocks(url)
+    this.rpcService = new RpcService(url)
     this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck
@@ -117,7 +119,7 @@ export default class Queue {
 
   public pipeline = async (blockNumbers: string[]) => {
     // 1. get blocks
-    const blocks: Block[] = await this.getBlocksService.getRangeBlocks(blockNumbers)
+    const blocks: Block[] = await this.rpcService.getRangeBlocks(blockNumbers)
     const blockHeaders: BlockHeader[] = blocks.map(block => block.header)
 
     // 2. check blockHeaders
@@ -128,11 +130,11 @@ export default class Queue {
     }
 
     const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash = LockUtils.computeScriptHash({
-      codeHash: daoScriptInfo.codeHash,
-      args: "0x",
-      hashType: daoScriptInfo.hashType,
-    })
+    const daoScriptHash: string = new Script(
+      daoScriptInfo.codeHash,
+      "0x",
+      daoScriptInfo.hashType
+    ).computeHash()
 
     // 3. check and save
     await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
@@ -151,37 +153,35 @@ export default class Queue {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
-      for (let i = 0; i < block.transactions.length; ++i) {
-        const tx = block.transactions[i]
+      for (const [i, tx] of block.transactions.entries()) {
         const checkTx = new CheckTx(tx, this.url, daoScriptHash)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
-            for (const [inputIndex, input] of tx.inputs!.entries()) {
+            for (const [inputIndex, input] of tx.inputs.entries()) {
               const previousTxHash = input.previousOutput!.txHash
-              let previousTxWithStatus = cachedPreviousTxs.get(previousTxHash)
+              let previousTxWithStatus: TransactionWithStatus | undefined = cachedPreviousTxs.get(previousTxHash)
               if (!previousTxWithStatus) {
-                previousTxWithStatus = await this.getBlocksService.getTransaction(previousTxHash)
+                previousTxWithStatus = await this.rpcService.getTransaction(previousTxHash)
                 cachedPreviousTxs.set(previousTxHash, previousTxWithStatus)
               }
-              const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+              const previousTx = previousTxWithStatus!.transaction
               const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-              input.lock = previousOutput.lock
-              input.lockHash = LockUtils.lockScriptToHash(input.lock)
-              input.capacity = previousOutput.capacity
-              input.inputIndex = inputIndex.toString()
+              input.setLock(previousOutput.lock)
+              input.setCapacity(previousOutput.capacity)
+              input.setInputIndex(inputIndex.toString())
 
               if (
                 previousOutput.type &&
-                LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
+                previousOutput.type.computeHash() === daoScriptHash &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]
                 if (output) {
-                  output.depositOutPoint = {
-                    txHash: input.previousOutput!.txHash,
-                    index: input.previousOutput!.index,
-                  }
+                  output.setDepositOutPoint(new OutPoint(
+                    input.previousOutput!.txHash,
+                    input.previousOutput!.index,
+                  ))
                 }
               }
             }

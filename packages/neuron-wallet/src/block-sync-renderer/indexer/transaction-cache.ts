@@ -1,4 +1,4 @@
-import { TransactionWithStatus } from "types/cell-types"
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 export class TransactionCache {
   private limit: number
@@ -10,7 +10,7 @@ export class TransactionCache {
   }
 
   public push(value: TransactionWithStatus) {
-    const key = value.transaction.hash
+    const key = value.transaction.hash!
 
     if (this.store.has(key)) {
       return
