@@ -20,18 +20,25 @@ export default class BlockNumber {
   }
 
   public updateCurrent = async (current: bigint): Promise<void> => {
+    this.current = current
+    CurrentBlockSubject.getSubject().next({
+      blockNumber: current.toString()
+    })
+
     let blockNumberEntity = await this.blockNumber()
+    if (blockNumberEntity && current - BigInt(blockNumberEntity.value) < BigInt(1000)) {
+      // Only persist block number for every 1,000 blocks to reduce DB write.
+      // Practically it's unnecessary to save every block height, as iterating
+      // blocks is fast.
+      return
+    }
+
     if (!blockNumberEntity) {
       blockNumberEntity = new SyncInfoEntity()
       blockNumberEntity.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
     }
     blockNumberEntity.value = current.toString()
     await getConnection().manager.save(blockNumberEntity)
-    // broadcast current block number updated
-    CurrentBlockSubject.getSubject().next({
-      blockNumber: blockNumberEntity.value,
-    })
-    this.current = current
   }
 
   private blockNumber = async (): Promise<SyncInfoEntity | undefined> => {
