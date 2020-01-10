@@ -18,7 +18,6 @@ import TransactionWithStatus from 'models/chain/transaction-with-status'
 export default class Queue {
   private lockHashes: string[]
   private rpcService: RpcService
-  private startBlockNumber: bigint
   private endBlockNumber: bigint
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
@@ -35,7 +34,6 @@ export default class Queue {
   constructor(
     url: string,
     lockHashes: string[],
-    startBlockNumber: string,
     endBlockNumber: string,
     currentBlockNumber: BlockNumber,
     rangeForCheck: RangeForCheck = new RangeForCheck(url)
@@ -43,7 +41,6 @@ export default class Queue {
     this.lockHashes = lockHashes
     this.url = url
     this.rpcService = new RpcService(url)
-    this.startBlockNumber = BigInt(startBlockNumber)
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck
     this.currentBlockNumber = currentBlockNumber
@@ -207,18 +204,6 @@ export default class Queue {
     }
 
     return checkResult
-  }
-
-  public reset = (startBlockNumber: string, endBlockNumber: string) => {
-    const startInt: bigint = BigInt(startBlockNumber)
-    const endInt: bigint = BigInt(endBlockNumber)
-
-    if (this.startBlockNumber > this.endBlockNumber) {
-      return
-    }
-
-    this.startBlockNumber = startInt
-    this.endBlockNumber = endInt
   }
 
   public resetEndBlockNumber = (endBlockNumber: string) => {

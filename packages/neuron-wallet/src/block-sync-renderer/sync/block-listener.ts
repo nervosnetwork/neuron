@@ -51,11 +51,9 @@ export default class BlockListener {
     try {
       const rpcService = new RpcService(this.url)
       const currentTip = await rpcService.getTipBlockNumber()
-      const startBlockNumber = await this.getStartBlockNumber()
       this.queue = new Queue(
         this.url,
         this.lockHashes,
-        startBlockNumber,
         currentTip,
         this.currentBlockNumber,
         this.rangeForCheck
@@ -88,23 +86,15 @@ export default class BlockListener {
     }
   }
 
-  public getStartBlockNumber = async (): Promise<string> => {
-    const current = await this.currentBlockNumber.getCurrent()
-    const startBlockNumber: string = (current + BigInt(1)).toString()
-    return startBlockNumber
-  }
-
   public regenerate = async (tipNumber: string): Promise<void> => {
     if (this.queue) {
       if (BigInt(tipNumber) > BigInt(0)) {
         this.queue.resetEndBlockNumber(tipNumber)
       }
     } else {
-      const startBlockNumber: string = await this.getStartBlockNumber()
       this.queue = new Queue(
         this.url,
         this.lockHashes,
-        startBlockNumber,
         tipNumber,
         this.currentBlockNumber,
         this.rangeForCheck
