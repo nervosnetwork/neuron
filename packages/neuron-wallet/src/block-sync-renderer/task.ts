@@ -24,7 +24,7 @@ const isIndexerEnabled = async (url: string): Promise<boolean> => {
 // Normal block syncing with BlockListener.
 // This runs when CKB Indexer module is not enabled.
 let blockListener: BlockListener | null
-const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[], rescan: boolean) => {
+const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
   if (blockListener) {
     await blockListener.stopAndWait()
   }
@@ -36,16 +36,13 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
   await initConnection(genesisBlockHash)
 
   blockListener = new BlockListener(url, lockHashes)
-  if (rescan) {
-    await new BlockNumber().updateCurrent(BigInt(-1))
-  }
   blockListener.start()
 }
 
 // Indexer syncing with IndexerQueue.
 // This runs when CKB Indexer module is enabled.
 let indexerQueue: IndexerQueue | null
-const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
@@ -63,8 +60,7 @@ const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lo
     }
   })
 
-  indexerQueue = new IndexerQueue(nodeURL, lockHashInfos)
-
+  indexerQueue = new IndexerQueue(url, lockHashInfos)
   indexerQueue.start()
   indexerQueue.processFork()
 }
@@ -73,7 +69,10 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
   if (await isIndexerEnabled(url)) {
     await startIndexerSyncing(url, genesisHash, lockHashes)
   } else {
-    await startBlockSyncing(url, genesisHash, lockHashes, rescan)
+    if (rescan) {
+      await new BlockNumber().updateCurrent(BigInt(-1))
+    }
+    await startBlockSyncing(url, genesisHash, lockHashes)
   }
 })
 
