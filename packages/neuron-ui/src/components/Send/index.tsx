@@ -9,7 +9,8 @@ import QRScanner from 'widgets/QRScanner'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
@@ -19,16 +20,16 @@ import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const Send = ({
-  app: {
-    send = appState.send,
-    loadings: { sending = false },
-  },
-  wallet: { id: walletID = '', balance = '' },
-  chain: { networkID, connectionStatus },
-  settings: { networks = [] },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch>) => {
+const Send = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const {
+    app: {
+      send = appState.send,
+      loadings: { sending = false },
+    },
+    wallet: { id: walletID = '', balance = '' },
+    chain: { networkID, connectionStatus },
+    settings: { networks = [] },
+  } = useGlobalState()
   const { t } = useTranslation()
   const {
     outputs,

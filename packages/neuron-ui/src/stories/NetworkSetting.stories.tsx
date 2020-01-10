@@ -39,7 +39,6 @@ Object.entries(states).forEach(([title, networks]) => {
       {...initStates}
       chain={{ ...initStates.chain, networkID: networks.length ? networks[0].id : '' }}
       settings={{ ...initStates.settings, networks }}
-      dispatch={() => {}}
     />
   ))
 })

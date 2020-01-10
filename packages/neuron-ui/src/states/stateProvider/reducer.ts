@@ -95,7 +95,6 @@ export type StateAction =
   | { type: NeuronWalletActions.UpdateAppUpdaterStatus; payload: State.AppUpdater }
 
 export type StateDispatch = React.Dispatch<StateAction> // TODO: add type of payload
-export type StateWithDispatch = State.AppWithNeuronWallet & { dispatch: StateDispatch }
 
 /* eslint-disable no-param-reassign */
 export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action: StateAction) => {

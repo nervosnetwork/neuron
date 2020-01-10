@@ -4,19 +4,20 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { useDialog } from 'utils/hooks'
-import { StateWithDispatch, AppActions } from 'states/stateProvider/reducer'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = ({
-  app: {
-    send: { description, generatedTx },
-    loadings: { sending: isSending = false },
-    passwordRequest: { walletID = '', actionType = null, password = '' },
-  },
-  settings: { wallets = [] },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch>) => {
+const PasswordRequest = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const {
+    app: {
+      send: { description, generatedTx },
+      loadings: { sending: isSending = false },
+      passwordRequest: { walletID = '', actionType = null, password = '' },
+    },
+    settings: { wallets = [] },
+  } = useGlobalState()
   const [t] = useTranslation()
   const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
