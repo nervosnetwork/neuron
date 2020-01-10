@@ -26,10 +26,11 @@ export default class BlockNumber {
     })
 
     let blockNumberEntity = await this.blockNumber()
-    if (blockNumberEntity && current - BigInt(blockNumberEntity.value) < BigInt(1000)) {
+    if (current !== BigInt(-1) && blockNumberEntity && current - BigInt(blockNumberEntity.value) < BigInt(1000)) {
       // Only persist block number for every 1,000 blocks to reduce DB write.
       // Practically it's unnecessary to save every block height, as iterating
       // blocks is fast.
+      // -1 means restart
       return
     }
 

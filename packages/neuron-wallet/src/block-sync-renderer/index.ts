@@ -12,6 +12,8 @@ import AddressService from 'services/addresses'
 import BlockNumber from 'block-sync-renderer/sync/block-number'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
+import NodeService from 'services/node'
+import RpcService from 'services/rpc-service'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
@@ -24,6 +26,13 @@ const updateAllAddressesTxCount = async (url: string) => {
 AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
   const hasUsedAddresses = addresses.some(address => address.isImporting === true)
   killBlockSyncTask()
+  const url: string = NodeService.getInstance().core.node.url
+  const rpcService = new RpcService(url)
+  const genesisBlockHash: string = await rpcService.genesisBlockHash()
+  if (network?.chain === 'ckb' && genesisBlockHash !== network.genesisHash) {
+    SyncedBlockNumberSubject.next('-1')
+    return
+  }
   await createBlockSyncTask(hasUsedAddresses)
 })
 
