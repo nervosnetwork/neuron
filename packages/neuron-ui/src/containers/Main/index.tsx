@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Route, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useState } from 'states/stateProvider'
+import { useState as useGlobalState } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 
 import Overview from 'components/Overview'
@@ -116,15 +116,14 @@ export const mainContents: CustomRouter.Route[] = [
   },
 ]
 
-const MainContent = ({ dispatch }: React.PropsWithoutRef<{ dispatch: StateDispatch }>) => {
+const MainContent = ({ dispatch }: { dispatch: StateDispatch }) => {
   const history = useHistory()
-  const neuronWalletState = useState()
   const {
     app: { isAllowedToFetchList = true },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
-  } = neuronWalletState
+  } = useGlobalState()
   const { networkID } = chain
   const [, i18n] = useTranslation()
 
@@ -154,18 +153,18 @@ const MainContent = ({ dispatch }: React.PropsWithoutRef<{ dispatch: StateDispat
     dispatch,
   })
 
-  return (
-    <>
-      {mainContents.map(container => (
-        <Route
-          exact={container.exact}
-          path={`${container.path}${container.params || ''}`}
-          key={container.name}
-          render={() => <container.comp {...neuronWalletState} dispatch={dispatch} />}
-        />
-      ))}
-    </>
-  )
+  const routes = useMemo(() => {
+    return mainContents.map(container => (
+      <Route
+        exact={container.exact}
+        path={`${container.path}${container.params || ''}`}
+        key={container.name}
+        render={() => <container.comp dispatch={dispatch} />}
+      />
+    ))
+  }, [dispatch])
+
+  return <>{routes}</>
 }
 
 MainContent.displayName = 'Main'

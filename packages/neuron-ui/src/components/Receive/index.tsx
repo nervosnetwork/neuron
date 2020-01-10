@@ -4,12 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { TooltipHost } from 'office-ui-fabric-react'
 import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import styles from './receive.module.scss'
 
-const Receive = ({ wallet: { addresses = [] }, dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
+const Receive = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const {
+    wallet: { addresses = [] },
+  } = useGlobalState()
   const [t] = useTranslation()
   const { params } = useRouteMatch()
 

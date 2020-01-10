@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
@@ -22,20 +23,20 @@ import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
-const NervosDAO = ({
-  app: {
-    send = appState.send,
-    loadings: { sending = false },
-    tipBlockNumber,
-    tipBlockHash,
-    tipBlockTimestamp,
-    epoch,
-  },
-  wallet,
-  dispatch,
-  nervosDAO: { records },
-  chain: { connectionStatus },
-}: React.PropsWithoutRef<StateWithDispatch>) => {
+const NervosDAO = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const {
+    app: {
+      send = appState.send,
+      loadings: { sending = false },
+      tipBlockNumber,
+      tipBlockHash,
+      tipBlockTimestamp,
+      epoch,
+    },
+    wallet,
+    nervosDAO: { records },
+    chain: { connectionStatus },
+  } = useGlobalState()
   const [t] = useTranslation()
   useEffect(() => {
     backToTop()

@@ -1,16 +1,20 @@
+// TODO: figure out how to mock context
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
+import { action } from '@storybook/addon-actions'
 import Addresses from 'components/Addresses'
 import initStates from 'states/initStates'
 import addressesStates from './data/addresses'
 
-const stories = storiesOf('Addresses', module)
+const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
+const stories = storiesOf('Addresses', module).addDecorator(StoryRouter())
 
 Object.entries(addressesStates).forEach(([title, addresses]) => {
-  stories.add(title, () => (
-    <Addresses {...initStates} wallet={{ ...initStates.wallet, addresses }} dispatch={() => {}} />
-  ))
+  const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
+  console.info(globalState)
+  stories.add(title, () => <Addresses dispatch={dispatch} />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -23,5 +27,7 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     balance: text(`${idx}-Balance`, addr.balance),
     index: number(`${idx}-Index`, addr.index),
   }))
-  return <Addresses {...initStates} wallet={{ ...initStates.wallet, addresses }} dispatch={() => {}} />
+  const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
+  console.info(globalState)
+  return <Addresses dispatch={dispatch} />
 })

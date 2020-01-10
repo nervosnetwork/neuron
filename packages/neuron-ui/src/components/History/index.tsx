@@ -5,27 +5,28 @@ import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
 
 import TransactionList from 'components/TransactionList'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
 
-const History = ({
-  app: {
-    tipBlockNumber: chainBlockNumber,
-    loadings: { transactionList: isLoading },
-  },
-  wallet: { id },
-  chain: {
-    networkID,
-    tipBlockNumber: syncedBlockNumber,
-    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
-  },
-  settings: { networks },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch>) => {
+const History = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const {
+    app: {
+      tipBlockNumber: chainBlockNumber,
+      loadings: { transactionList: isLoading },
+    },
+    wallet: { id },
+    chain: {
+      networkID,
+      tipBlockNumber: syncedBlockNumber,
+      transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
+    },
+    settings: { networks },
+  } = useGlobalState()
   const [t] = useTranslation()
   const history = useHistory()
   const { search } = useLocation()

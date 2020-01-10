@@ -3,7 +3,8 @@ import { Route, useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGloablState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
@@ -38,7 +39,8 @@ const settingPanels: CustomRouter.Route[] = [
   },
 ]
 
-const Settings = ({ dispatch, ...neuronWalletState }: React.PropsWithoutRef<StateWithDispatch>) => {
+const Settings = ({ dispatch }: { dispatch: StateDispatch }) => {
+  const globalState = useGloablState()
   const [t] = useTranslation()
   const history = useHistory()
   const location = useLocation()
@@ -64,7 +66,7 @@ const Settings = ({ dispatch, ...neuronWalletState }: React.PropsWithoutRef<Stat
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={() => <container.comp {...neuronWalletState} dispatch={dispatch} />}
+          render={() => <container.comp {...globalState} dispatch={dispatch} />}
         />
       ))}
     </Stack>

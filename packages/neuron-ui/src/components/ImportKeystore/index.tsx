@@ -2,8 +2,9 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { showOpenDialog } from 'services/remote'
+import { useState as useGlobalState } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
 import TextField from 'widgets/TextField'
@@ -30,12 +31,11 @@ const defaultFields: KeystoreFields = {
   passwordError: '',
 }
 
-const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch>) => {
+const ImportKeystore = ({ dispatch }: { dispatch: StateDispatch }) => {
   const [t] = useTranslation()
   const {
-    dispatch,
     settings: { wallets },
-  } = props
+  } = useGlobalState()
   const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
   const [loading, setLoading] = useState(false)
