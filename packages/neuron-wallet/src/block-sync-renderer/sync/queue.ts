@@ -46,10 +46,6 @@ export default class Queue {
     this.currentBlockNumber = currentBlockNumber
   }
 
-  public setLockHashes = (lockHashes: string[]): void => {
-    this.lockHashes = lockHashes
-  }
-
   public start = async () => {
     while (!this.stopped) {
       try {

@@ -1,11 +1,11 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
-import logger from 'utils/logger'
 
 import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
+import logger from 'utils/logger'
 
 export default class BlockListener {
   private lockHashes: string[]
@@ -26,24 +26,6 @@ export default class BlockListener {
     this.currentBlockNumber = new BlockNumber()
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = tipNumberSubject
-  }
-
-  public setLockHashes = (lockHashes: string[]) => {
-    const hashes = [...new Set(lockHashes)]
-    this.lockHashes = hashes
-    if (!this.queue) {
-      return
-    }
-    this.queue.setLockHashes(hashes)
-  }
-
-  public appendLockHashes = (lockHashes: string[]) => {
-    const hashes = this.lockHashes.concat(lockHashes)
-    this.setLockHashes(hashes)
-  }
-
-  public getLockHashes = (): string[] => {
-    return this.lockHashes
   }
 
   // start listening
@@ -86,7 +68,7 @@ export default class BlockListener {
     }
   }
 
-  public regenerate = async (tipNumber: string): Promise<void> => {
+  private regenerate = async (tipNumber: string): Promise<void> => {
     if (this.queue) {
       if (BigInt(tipNumber) > BigInt(0)) {
         this.queue.resetEndBlockNumber(tipNumber)
