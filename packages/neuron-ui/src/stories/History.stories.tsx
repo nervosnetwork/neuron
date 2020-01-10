@@ -5,7 +5,6 @@ import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import History from 'components/History'
 import initStates from 'states/initStates'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import transactions from './data/transactions'
 
 const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
@@ -15,7 +14,7 @@ const stateTemplate = {
   dispatch,
 }
 
-const states: { [title: string]: StateWithDispatch } = {
+const states: { [title: string]: any } = {
   'Has not transactions': {
     ...stateTemplate,
     chain: {

@@ -4,7 +4,7 @@ import { Stack, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { NeuronWalletContext } from 'states/stateProvider'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
 import styles from './style.module.scss'
@@ -13,7 +13,11 @@ const UpdateDownloadStatus = ({
   progress = 0,
   newVersion = '',
   releaseNotes = '',
-}: React.PropsWithoutRef<{ progress: number; newVersion: string; releaseNotes: string }>) => {
+}: {
+  progress: number
+  newVersion: string
+  releaseNotes: string
+}) => {
   const [t] = useTranslation()
   const available = newVersion !== '' && progress < 0
   const downloaded = progress >= 1
@@ -83,7 +87,7 @@ const UpdateDownloadStatus = ({
   )
 }
 
-const GeneralSetting = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch>) => {
+const GeneralSetting = ({ dispatch }: { dispatch: StateDispatch }) => {
   const [t] = useTranslation()
   const { updater } = useContext(NeuronWalletContext)
   const [clearingCache, setClearingCache] = useState(false)
