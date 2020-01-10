@@ -5,7 +5,6 @@ import Queue from './queue'
 import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import RpcService from 'services/rpc-service'
-import CommonUtils from 'utils/common'
 import NodeService from 'services/node'
 
 export default class BlockListener {
@@ -48,11 +47,7 @@ export default class BlockListener {
   }
 
   // start listening
-  public start = async (restart: boolean = false) => {
-    if (restart) {
-      await this.currentBlockNumber.updateCurrent(BigInt(-1))
-    }
-
+  public start = async () => {
     try {
       const rpcService = new RpcService(this.url)
       const currentTip = await rpcService.getTipBlockNumber()
@@ -75,23 +70,6 @@ export default class BlockListener {
         await this.regenerate(num)
       }
     })
-  }
-
-  private tipBlockNumber = (): bigint => {
-    return BigInt(NodeService.getInstance().tipBlockNumber)
-  }
-
-  public setToTip = async () => {
-    const timeout = 5000
-    const startAt = +new Date()
-    while (this.tipBlockNumber() === BigInt(0)) {
-      const now = +new Date()
-      if (now - startAt > timeout) {
-        return
-      }
-      await CommonUtils.sleep(100)
-    }
-    await this.currentBlockNumber.updateCurrent(this.tipBlockNumber())
   }
 
   public stop = () => {

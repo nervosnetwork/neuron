@@ -1,6 +1,7 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
 import BlockListener from 'block-sync-renderer/sync/block-listener'
+import BlockNumber from 'block-sync-renderer/sync/block-number'
 import IndexerQueue from 'block-sync-renderer/indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
@@ -35,7 +36,10 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
   await initConnection(genesisBlockHash)
 
   blockListener = new BlockListener(url, lockHashes)
-  blockListener.start(rescan)
+  if (rescan) {
+    await new BlockNumber().updateCurrent(BigInt(-1))
+  }
+  blockListener.start()
 }
 
 // Indexer syncing with IndexerQueue.
