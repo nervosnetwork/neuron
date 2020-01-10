@@ -37,9 +37,8 @@ export default class Queue {
     lockHashes: string[],
     startBlockNumber: string,
     endBlockNumber: string,
-    currentBlockNumber: BlockNumber = new BlockNumber(),
-    rangeForCheck: RangeForCheck = new RangeForCheck(url),
-    start: boolean = true
+    currentBlockNumber: BlockNumber,
+    rangeForCheck: RangeForCheck = new RangeForCheck(url)
   ) {
     this.lockHashes = lockHashes
     this.url = url
@@ -48,9 +47,6 @@ export default class Queue {
     this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = rangeForCheck
     this.currentBlockNumber = currentBlockNumber
-    if (start) {
-      this.start()
-    }
   }
 
   public setLockHashes = (lockHashes: string[]): void => {

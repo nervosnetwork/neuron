@@ -65,6 +65,7 @@ export default class BlockListener {
         this.currentBlockNumber,
         this.rangeForCheck
       )
+      this.queue.start()
     } catch (err) {
       logger.error(`BlockListener start error:`, err)
     }
@@ -130,6 +131,7 @@ export default class BlockListener {
         this.currentBlockNumber,
         this.rangeForCheck
       )
+      this.queue.start()
     }
   }
 }
