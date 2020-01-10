@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { showTransactionDetails } from 'services/remote'
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
 import {
@@ -45,7 +44,7 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
   }
 }
 
-const Overview = ({ dispatch }: { dispatch: StateDispatch }) => {
+const Overview = () => {
   const {
     app: { tipBlockNumber, tipBlockTimestamp, chain, epoch, difficulty },
     wallet: { id, name, balance = '' },
@@ -54,6 +53,7 @@ const Overview = ({ dispatch }: { dispatch: StateDispatch }) => {
       transactions: { items = [] },
     },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
   const [isStatusShow, setIsStatusShow] = useState(false)

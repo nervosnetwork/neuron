@@ -3,8 +3,7 @@ import { Route, useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
-import { useState as useGloablState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGloablState, useDispatch } from 'states/stateProvider'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
@@ -23,27 +22,28 @@ const settingPanels: CustomRouter.Route[] = [
     name: `GeneralSetting`,
     path: Routes.SettingsGeneral,
     exact: false,
-    comp: GeneralSetting,
+    component: GeneralSetting,
   },
   {
     name: `WalletsSetting`,
     path: Routes.SettingsWallets,
     exact: false,
-    comp: Wallets,
+    component: Wallets,
   },
   {
     name: `NetworkSetting`,
     path: Routes.SettingsNetworks,
     exact: true,
-    comp: NetworkSetting,
+    component: NetworkSetting,
   },
 ]
 
-const Settings = ({ dispatch }: { dispatch: StateDispatch }) => {
+const Settings = () => {
   const globalState = useGloablState()
-  const [t] = useTranslation()
+  const dispatch = useDispatch()
   const history = useHistory()
   const location = useLocation()
+  const [t] = useTranslation()
 
   return (
     <Stack tokens={{ childrenGap: 15, padding: '39px 0 0 0' }}>
@@ -66,7 +66,7 @@ const Settings = ({ dispatch }: { dispatch: StateDispatch }) => {
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={() => <container.comp {...globalState} dispatch={dispatch} />}
+          render={() => <container.component {...globalState} dispatch={dispatch} />}
         />
       ))}
     </Stack>

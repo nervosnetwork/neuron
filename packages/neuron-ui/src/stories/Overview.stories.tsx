@@ -8,8 +8,6 @@ import initStates from 'states/initStates'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
-const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
-
 const stateTemplate = {
   dispatch: (dispatchAction: any) => action(dispatchAction),
   ...initStates,
@@ -65,7 +63,7 @@ const stories = storiesOf(`Overview`, module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
   console.info(props)
-  stories.add(title, () => <Overview dispatch={dispatch} />)
+  stories.add(title, () => <Overview />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -118,5 +116,5 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     },
   }
   console.info(props)
-  return <Overview dispatch={dispatch} />
+  return <Overview />
 })

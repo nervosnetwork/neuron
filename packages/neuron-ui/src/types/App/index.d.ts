@@ -214,6 +214,6 @@ declare namespace CustomRouter {
     path: string
     params?: string
     exact?: boolean
-    comp: React.FunctionComponent<any>
+    component: React.FunctionComponent<any>
   }
 }

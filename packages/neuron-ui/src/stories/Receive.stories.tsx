@@ -29,7 +29,8 @@ const states = {
 const stories = storiesOf('Receive', module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
-  stories.add(title, () => <Receive {...props} />)
+  console.info(props)
+  stories.add(title, () => <Receive />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -48,5 +49,6 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       })),
     },
   }
-  return <Receive {...props} dispatch={() => {}} />
+  console.info(props)
+  return <Receive />
 })

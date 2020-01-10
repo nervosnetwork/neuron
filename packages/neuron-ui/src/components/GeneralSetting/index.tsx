@@ -1,9 +1,8 @@
-import React, { useContext, useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stack, Text, ProgressIndicator } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { NeuronWalletContext } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
@@ -87,9 +86,8 @@ const UpdateDownloadStatus = ({
   )
 }
 
-const GeneralSetting = ({ dispatch }: { dispatch: StateDispatch }) => {
+const GeneralSetting = ({ updater, dispatch }: { updater: State.AppUpdater; dispatch: StateDispatch }) => {
   const [t] = useTranslation()
-  const { updater } = useContext(NeuronWalletContext)
   const [clearingCache, setClearingCache] = useState(false)
 
   const checkUpdates = useCallback(() => {

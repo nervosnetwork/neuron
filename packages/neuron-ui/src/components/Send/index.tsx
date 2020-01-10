@@ -9,8 +9,7 @@ import QRScanner from 'widgets/QRScanner'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
 import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
@@ -20,7 +19,7 @@ import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const Send = ({ dispatch }: { dispatch: StateDispatch }) => {
+const Send = () => {
   const {
     app: {
       send = appState.send,
@@ -30,6 +29,7 @@ const Send = ({ dispatch }: { dispatch: StateDispatch }) => {
     chain: { networkID, connectionStatus },
     settings: { networks = [] },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const { t } = useTranslation()
   const {
     outputs,

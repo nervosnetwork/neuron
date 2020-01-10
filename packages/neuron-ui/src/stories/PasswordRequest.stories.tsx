@@ -1,11 +1,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
-import { action } from '@storybook/addon-actions'
 import PasswordRequest from 'components/PasswordRequest'
 import initStates from 'states/initStates'
-
-const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
 
 const states: { [title: string]: State.AppWithNeuronWallet } = {
   'Wallet not Found': {
@@ -100,5 +97,5 @@ const stories = storiesOf('PasswordRequest', module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
   console.info(props)
-  stories.add(title, () => <PasswordRequest dispatch={dispatch} />)
+  stories.add(title, () => <PasswordRequest />)
 })

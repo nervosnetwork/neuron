@@ -1,17 +1,33 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { showOpenDialog } from 'services/remote'
+import i18n from 'i18next'
+import { importKeystore, showOpenDialog, showErrorMessage } from 'services/remote'
 import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
-import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import { Routes, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import styles from './importKeystore.module.scss'
+
+export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
+  history: ReturnType<typeof useHistory>
+) => {
+  return importKeystore(params).then(res => {
+    if (res.status === 1) {
+      history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+    } else if (res.message) {
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
+      }
+    }
+  })
+}
 
 interface KeystoreFields {
   path: string
@@ -31,7 +47,7 @@ const defaultFields: KeystoreFields = {
   passwordError: '',
 }
 
-const ImportKeystore = ({ dispatch }: { dispatch: StateDispatch }) => {
+const ImportKeystore = () => {
   const [t] = useTranslation()
   const {
     settings: { wallets },
@@ -77,9 +93,9 @@ const ImportKeystore = ({ dispatch }: { dispatch: StateDispatch }) => {
         name: fields.name || '',
         keystorePath: fields.path,
         password: fields.password,
-      })(dispatch, history).finally(() => setLoading(false))
+      })(history).finally(() => setLoading(false))
     }, 200)
-  }, [fields.name, fields.password, fields.path, history, dispatch, loading])
+  }, [fields.name, fields.password, fields.path, history, loading])
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {

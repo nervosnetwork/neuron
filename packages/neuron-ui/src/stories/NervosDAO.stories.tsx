@@ -8,8 +8,6 @@ import initStates from 'states/initStates'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
-const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
-
 const stateTemplate = {
   dispatch: (dispatchAction: any) => action(dispatchAction),
   ...initStates,
@@ -119,7 +117,7 @@ const stories = storiesOf(`Nervos DAO`, module)
 
 Object.entries(states).forEach(([title, props]) => {
   console.info(props)
-  stories.add(title, () => <NervosDAO dispatch={dispatch} />)
+  stories.add(title, () => <NervosDAO />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -157,5 +155,5 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     },
   }
   console.info(props)
-  return <NervosDAO dispatch={dispatch} />
+  return <NervosDAO />
 })

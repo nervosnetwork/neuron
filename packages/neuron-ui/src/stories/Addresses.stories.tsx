@@ -3,18 +3,16 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
-import { action } from '@storybook/addon-actions'
 import Addresses from 'components/Addresses'
 import initStates from 'states/initStates'
 import addressesStates from './data/addresses'
 
-const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
 const stories = storiesOf('Addresses', module).addDecorator(StoryRouter())
 
 Object.entries(addressesStates).forEach(([title, addresses]) => {
   const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
   console.info(globalState)
-  stories.add(title, () => <Addresses dispatch={dispatch} />)
+  stories.add(title, () => <Addresses />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -29,5 +27,5 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
   }))
   const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
   console.info(globalState)
-  return <Addresses dispatch={dispatch} />
+  return <Addresses />
 })

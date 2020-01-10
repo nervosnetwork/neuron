@@ -106,7 +106,7 @@ const stories = storiesOf('History', module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
   console.info(props)
-  stories.add(title, () => <History dispatch={dispatch} />)
+  stories.add(title, () => <History />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -135,5 +135,5 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     },
   }
   console.info(props)
-  return <History dispatch={dispatch} />
+  return <History />
 })

@@ -18,38 +18,30 @@ export const containers: CustomRouter.Route[] = [
     name: 'Navbar',
     path: '/',
     exact: false,
-    comp: Navbar,
+    component: Navbar,
   },
   {
     name: 'Main',
     path: '/',
     exact: false,
-    comp: Main,
+    component: Main,
   },
   {
     name: 'Notification',
     path: '/',
     exact: false,
-    comp: Notification,
+    component: Notification,
   },
 ]
 
-const App = withProviders(({ dispatch }: any) => (
-  <Router>
-    {containers.map(container => {
-      return (
-        <Route
-          {...container}
-          key={container.name}
-          render={routeProps => (
-            <ErrorBoundary>
-              <container.comp {...routeProps} dispatch={dispatch} />
-            </ErrorBoundary>
-          )}
-        />
-      )
-    })}
-  </Router>
+const App = withProviders(() => (
+  <ErrorBoundary>
+    <Router>
+      {containers.map(container => {
+        return <Route {...container} key={container.name} />
+      })}
+    </Router>
+  </ErrorBoundary>
 ))
 
 Object.defineProperty(App, 'displayName', {
