@@ -35,14 +35,13 @@ export default class Queue {
     url: string,
     lockHashes: string[],
     endBlockNumber: string,
-    currentBlockNumber: BlockNumber,
-    rangeForCheck: RangeForCheck = new RangeForCheck(url)
+    currentBlockNumber: BlockNumber
   ) {
     this.lockHashes = lockHashes
     this.url = url
     this.rpcService = new RpcService(url)
     this.endBlockNumber = BigInt(endBlockNumber)
-    this.rangeForCheck = rangeForCheck
+    this.rangeForCheck = new RangeForCheck(url)
     this.currentBlockNumber = currentBlockNumber
   }
 

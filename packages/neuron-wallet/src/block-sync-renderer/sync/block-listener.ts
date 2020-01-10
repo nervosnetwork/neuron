@@ -1,7 +1,6 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
 
 import Queue from './queue'
-import RangeForCheck from './range-for-check'
 import BlockNumber from './block-number'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
@@ -12,7 +11,6 @@ export default class BlockListener {
   private lockHashes: string[]
 
   private currentBlockNumber: BlockNumber
-  private rangeForCheck: RangeForCheck
   private tipNumberSubject: BehaviorSubject<string | undefined>
 
   private queue: Queue | undefined
@@ -23,7 +21,6 @@ export default class BlockListener {
     this.lockHashes = lockHashes
 
     this.currentBlockNumber = new BlockNumber()
-    this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
   }
 
@@ -36,8 +33,7 @@ export default class BlockListener {
         this.url,
         this.lockHashes,
         currentTip,
-        this.currentBlockNumber,
-        this.rangeForCheck
+        this.currentBlockNumber
       )
       this.queue.start()
     } catch (err) {
@@ -77,8 +73,7 @@ export default class BlockListener {
         this.url,
         this.lockHashes,
         tipNumber,
-        this.currentBlockNumber,
-        this.rangeForCheck
+        this.currentBlockNumber
       )
       this.queue.start()
     }
