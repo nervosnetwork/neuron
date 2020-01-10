@@ -1,8 +1,8 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
-import BlockListener from 'block-sync-renderer/sync/block-listener'
-import BlockNumber from 'block-sync-renderer/sync/block-number'
-import IndexerQueue from 'block-sync-renderer/indexer/queue'
+import BlockNumber from './sync/block-number'
+import Queue from './sync/queue'
+import IndexerQueue from './indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
@@ -23,10 +23,10 @@ const isIndexerEnabled = async (url: string): Promise<boolean> => {
 
 // Normal block syncing with BlockListener.
 // This runs when CKB Indexer module is not enabled.
-let blockListener: BlockListener | null
+let syncQueue: Queue | null
 const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
-  if (blockListener) {
-    await blockListener.stopAndWait()
+  if (syncQueue) {
+    await syncQueue.stopAndWait()
   }
 
   // TODO: Do not clean meta info here!!!
@@ -35,8 +35,8 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
 
   await initConnection(genesisBlockHash)
 
-  blockListener = new BlockListener(url, lockHashes)
-  blockListener.start()
+  syncQueue = new Queue(url, lockHashes)
+  syncQueue.start()
 }
 
 // Indexer syncing with IndexerQueue.
@@ -79,8 +79,8 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
 window.addEventListener('beforeunload', () => {
   unregisterTxStatusListener()
 
-  blockListener?.stop()
-  blockListener = null
+  syncQueue?.stop()
+  syncQueue = null
 
   indexerQueue?.stop()
   indexerQueue = null
