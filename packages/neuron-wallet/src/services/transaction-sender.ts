@@ -127,17 +127,6 @@ export default class TransactionSender {
     return txHash
   }
 
-  public calculateFee = async (tx: Transaction) => {
-    const inputCapacities = tx.inputs!
-      .map(input => BigInt(input.capacity!))
-      .reduce((result, c) => result + c, BigInt(0))
-    const outputCapacities = tx.outputs!
-      .map(output => BigInt(output.capacity!))
-      .reduce((result, c) => result + c, BigInt(0))
-
-    return (inputCapacities - outputCapacities).toString()
-  }
-
   public generateTx = async (
     walletID: string = '',
     items: {
