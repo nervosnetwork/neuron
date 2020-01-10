@@ -18,7 +18,7 @@ import TransactionWithStatus from 'models/chain/transaction-with-status'
 export default class Queue {
   private lockHashes: string[]
   private rpcService: RpcService
-  private endBlockNumber: bigint
+  private endBlockNumber: bigint = BigInt(0)
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
 
@@ -31,21 +31,17 @@ export default class Queue {
 
   private url: string
 
-  constructor(
-    url: string,
-    lockHashes: string[],
-    endBlockNumber: string,
-    currentBlockNumber: BlockNumber
-  ) {
+  constructor(url: string, lockHashes: string[]) {
     this.lockHashes = lockHashes
     this.url = url
     this.rpcService = new RpcService(url)
-    this.endBlockNumber = BigInt(endBlockNumber)
     this.rangeForCheck = new RangeForCheck(url)
-    this.currentBlockNumber = currentBlockNumber
+    this.currentBlockNumber = new BlockNumber()
   }
 
   public start = async () => {
+    await this.expandToTip()
+
     while (!this.stopped) {
       try {
         this.inProcess = true
@@ -201,7 +197,7 @@ export default class Queue {
     return checkResult
   }
 
-  public resetEndBlockNumber = (endBlockNumber: string) => {
-    this.endBlockNumber = BigInt(endBlockNumber)
+  public expandToTip = async () => {
+    this.endBlockNumber = BigInt(await this.rpcService.getTipBlockNumber())
   }
 }

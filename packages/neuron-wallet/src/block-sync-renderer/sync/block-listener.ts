@@ -1,8 +1,6 @@
 import { BehaviorSubject, Subscription } from 'rxjs'
 
 import Queue from './queue'
-import BlockNumber from './block-number'
-import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import logger from 'utils/logger'
 
@@ -10,7 +8,6 @@ export default class BlockListener {
   private url: string
   private lockHashes: string[]
 
-  private currentBlockNumber: BlockNumber
   private tipNumberSubject: BehaviorSubject<string | undefined>
 
   private queue: Queue | undefined
@@ -20,21 +17,13 @@ export default class BlockListener {
     this.url = url
     this.lockHashes = lockHashes
 
-    this.currentBlockNumber = new BlockNumber()
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
   }
 
   // start listening
   public start = async () => {
     try {
-      const rpcService = new RpcService(this.url)
-      const currentTip = await rpcService.getTipBlockNumber()
-      this.queue = new Queue(
-        this.url,
-        this.lockHashes,
-        currentTip,
-        this.currentBlockNumber
-      )
+      this.queue = new Queue(this.url, this.lockHashes)
       this.queue.start()
     } catch (err) {
       logger.error(`BlockListener start error:`, err)
@@ -66,15 +55,10 @@ export default class BlockListener {
   private regenerate = async (tipNumber: string): Promise<void> => {
     if (this.queue) {
       if (BigInt(tipNumber) > BigInt(0)) {
-        this.queue.resetEndBlockNumber(tipNumber)
+        this.queue.expandToTip()
       }
     } else {
-      this.queue = new Queue(
-        this.url,
-        this.lockHashes,
-        tipNumber,
-        this.currentBlockNumber
-      )
+      this.queue = new Queue(this.url, this.lockHashes)
       this.queue.start()
     }
   }
