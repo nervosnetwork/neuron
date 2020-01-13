@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import { useDialog } from 'utils/hooks'
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { AppActions } from 'states/stateProvider/reducer'
 import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
 import styles from './passwordRequest.module.scss'
 
-const PasswordRequest = ({ dispatch }: { dispatch: StateDispatch }) => {
+const PasswordRequest = () => {
   const {
     app: {
       send: { description, generatedTx },
@@ -18,6 +18,7 @@ const PasswordRequest = ({ dispatch }: { dispatch: StateDispatch }) => {
     },
     settings: { wallets = [] },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)

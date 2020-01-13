@@ -4,16 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { TooltipHost } from 'office-ui-fabric-react'
 import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import styles from './receive.module.scss'
 
-const Receive = ({ dispatch }: { dispatch: StateDispatch }) => {
+const Receive = () => {
   const {
     wallet: { addresses = [] },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
   const { params } = useRouteMatch()
 

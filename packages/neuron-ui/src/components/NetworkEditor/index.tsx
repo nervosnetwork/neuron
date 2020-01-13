@@ -6,21 +6,21 @@ import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { verifyNetworkName, verifyURL } from 'utils/validators'
 import { useGoBack } from 'utils/hooks'
 import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
 import { useHandleSubmit } from './hooks'
 import styles from './networkEditor.module.scss'
 
-const NetworkEditor = ({ dispatch }: { dispatch: StateDispatch }) => {
+const NetworkEditor = () => {
   const {
     app: {
       loadings: { network: isUpdating = false },
     },
     settings: { networks = [] },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const { id } = useParams()
   const history = useHistory()
   const cachedNetworks = useRef(networks)

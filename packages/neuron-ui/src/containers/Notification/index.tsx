@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
 import { openExternal } from 'services/remote'
-import { useState as useGlobalState } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import {
   toggleAllNotificationVisibility,
@@ -59,10 +59,11 @@ const TopAlertActions = ({
   </Stack>
 )
 
-export const NoticeContent = ({ dispatch }: { dispatch: StateDispatch }) => {
+export const NoticeContent = () => {
   const {
     app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
 
   const notificationsInDesc = useMemo(() => [...notifications].reverse(), [notifications])

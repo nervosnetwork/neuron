@@ -5,15 +5,14 @@ import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
 
 import TransactionList from 'components/TransactionList'
-import { useState as useGlobalState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
 
-const History = ({ dispatch }: { dispatch: StateDispatch }) => {
+const History = () => {
   const {
     app: {
       tipBlockNumber: chainBlockNumber,
@@ -27,6 +26,7 @@ const History = ({ dispatch }: { dispatch: StateDispatch }) => {
     },
     settings: { networks },
   } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
   const { search } = useLocation()
