@@ -2,13 +2,17 @@ import { getConnection, QueryRunner } from 'typeorm'
 import InputEntity from 'database/chain/entities/input'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
-import { TxSaveType } from './params'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import OutPoint from 'models/chain/out-point'
 import { OutputStatus } from 'models/chain/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
+
+export enum TxSaveType {
+  Sent = 'sent',
+  Fetch = 'fetch',
+}
 
 export class TransactionPersistor {
   // After the tx is sent:
