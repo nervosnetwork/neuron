@@ -118,3 +118,29 @@ $textfieldWidth: calc(100vw - 370px);
 .actions {
   @include formFooter;
 }
+
+.scanBtn {
+  line-height: 1;
+  background: none;
+  border: none;
+  outline: none;
+
+  svg {
+    pointer-events: none;
+  }
+
+  &:hover {
+
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
+
+  &.busy {
+    cursor: progress !important;
+    stroke: #666;
+    fill: #666;
+  }
+}

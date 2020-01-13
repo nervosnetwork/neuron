@@ -277,6 +277,7 @@
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
+      "no-valid-addresses-found": "No valid addresses found",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
