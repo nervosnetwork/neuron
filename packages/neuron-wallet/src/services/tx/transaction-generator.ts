@@ -1,7 +1,6 @@
 import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
-import { TargetOutput } from './params'
 import DaoUtils from 'models/dao-utils'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
@@ -14,6 +13,11 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
+
+export interface TargetOutput {
+  address: string
+  capacity: string
+}
 
 export class TransactionGenerator {
   public static CHANGE_OUTPUT_SIZE = 101
