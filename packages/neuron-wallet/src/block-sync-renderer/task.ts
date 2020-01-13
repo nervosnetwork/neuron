@@ -1,7 +1,8 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
-import BlockListener from 'block-sync-renderer/sync/block-listener'
-import IndexerQueue from 'block-sync-renderer/indexer/queue'
+import BlockNumber from './sync/block-number'
+import Queue from './sync/queue'
+import IndexerQueue from './indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
@@ -22,10 +23,10 @@ const isIndexerEnabled = async (url: string): Promise<boolean> => {
 
 // Normal block syncing with BlockListener.
 // This runs when CKB Indexer module is not enabled.
-let blockListener: BlockListener | null
-const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[], rescan: boolean) => {
-  if (blockListener) {
-    await blockListener.stopAndWait()
+let syncQueue: Queue | null
+const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
+  if (syncQueue) {
+    await syncQueue.stopAndWait()
   }
 
   // TODO: Do not clean meta info here!!!
@@ -34,14 +35,14 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
 
   await initConnection(genesisBlockHash)
 
-  blockListener = new BlockListener(url, lockHashes)
-  blockListener.start(rescan)
+  syncQueue = new Queue(url, lockHashes)
+  syncQueue.start()
 }
 
 // Indexer syncing with IndexerQueue.
 // This runs when CKB Indexer module is enabled.
 let indexerQueue: IndexerQueue | null
-const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
@@ -59,8 +60,7 @@ const startIndexerSyncing = async (nodeURL: string, genesisBlockHash: string, lo
     }
   })
 
-  indexerQueue = new IndexerQueue(nodeURL, lockHashInfos)
-
+  indexerQueue = new IndexerQueue(url, lockHashInfos)
   indexerQueue.start()
   indexerQueue.processFork()
 }
@@ -69,15 +69,18 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
   if (await isIndexerEnabled(url)) {
     await startIndexerSyncing(url, genesisHash, lockHashes)
   } else {
-    await startBlockSyncing(url, genesisHash, lockHashes, rescan)
+    if (rescan) {
+      await new BlockNumber().updateCurrent(BigInt(-1))
+    }
+    await startBlockSyncing(url, genesisHash, lockHashes)
   }
 })
 
 window.addEventListener('beforeunload', () => {
   unregisterTxStatusListener()
 
-  blockListener?.stop()
-  blockListener = null
+  syncQueue?.stop()
+  syncQueue = null
 
   indexerQueue?.stop()
   indexerQueue = null

@@ -1,27 +1,32 @@
-import { TransactionPersistor } from 'services/tx'
-import logger from 'utils/logger'
-import DaoUtils from 'models/dao-utils'
+import { BehaviorSubject, Subscription } from 'rxjs'
 
-import RpcService from 'services/rpc-service'
-import RangeForCheck, { CheckResultType } from './range-for-check'
-import BlockNumber from './block-number'
-import ArrayUtils from 'utils/array'
-import CheckTx from './check-and-save/tx'
-import CommonUtils from 'utils/common'
+import { TransactionPersistor } from 'services/tx'
+import NodeService from 'services/node'
 import WalletService from 'services/wallets'
+import RpcService from 'services/rpc-service'
+import DaoUtils from 'models/dao-utils'
 import OutPoint from 'models/chain/out-point'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import ArrayUtils from 'utils/array'
+import CommonUtils from 'utils/common'
+import logger from 'utils/logger'
+import RangeForCheck, { CheckResultType } from './range-for-check'
+import BlockNumber from './block-number'
+import CheckTx from './check-and-save/tx'
 
 export default class Queue {
   private lockHashes: string[]
+  private url: string
   private rpcService: RpcService
-  private startBlockNumber: bigint
-  private endBlockNumber: bigint
+  private endBlockNumber: bigint = BigInt(0)
   private rangeForCheck: RangeForCheck
   private currentBlockNumber: BlockNumber
+
+  private tipNumberSubject: BehaviorSubject<string | undefined>
+  private tipNumberListener: Subscription | undefined
 
   private fetchSize: number = 4
 
@@ -30,34 +35,24 @@ export default class Queue {
 
   private yieldTime = 1
 
-  private url: string
-
-  constructor(
-    url: string,
-    lockHashes: string[],
-    startBlockNumber: string,
-    endBlockNumber: string,
-    currentBlockNumber: BlockNumber = new BlockNumber(),
-    rangeForCheck: RangeForCheck = new RangeForCheck(url),
-    start: boolean = true
-  ) {
+  constructor(url: string, lockHashes: string[]) {
     this.lockHashes = lockHashes
     this.url = url
     this.rpcService = new RpcService(url)
-    this.startBlockNumber = BigInt(startBlockNumber)
-    this.endBlockNumber = BigInt(endBlockNumber)
-    this.rangeForCheck = rangeForCheck
-    this.currentBlockNumber = currentBlockNumber
-    if (start) {
-      this.start()
-    }
-  }
-
-  public setLockHashes = (lockHashes: string[]): void => {
-    this.lockHashes = lockHashes
+    this.rangeForCheck = new RangeForCheck(url)
+    this.currentBlockNumber = new BlockNumber()
+    this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
   }
 
   public start = async () => {
+    await this.expandToTip(await this.rpcService.getTipBlockNumber())
+
+    this.tipNumberListener = this.tipNumberSubject.subscribe(async num => {
+      if (num) {
+        await this.expandToTip(num)
+      }
+    })
+
     while (!this.stopped) {
       try {
         this.inProcess = true
@@ -98,6 +93,9 @@ export default class Queue {
   }
 
   public stop = () => {
+    if (this.tipNumberListener) {
+      this.tipNumberListener.unsubscribe()
+    }
     this.stopped = true
   }
 
@@ -213,19 +211,9 @@ export default class Queue {
     return checkResult
   }
 
-  public reset = (startBlockNumber: string, endBlockNumber: string) => {
-    const startInt: bigint = BigInt(startBlockNumber)
-    const endInt: bigint = BigInt(endBlockNumber)
-
-    if (this.startBlockNumber > this.endBlockNumber) {
-      return
+  private expandToTip = async (tipNumber: string) => {
+    if (BigInt(tipNumber) > BigInt(0)) {
+      this.endBlockNumber = BigInt(tipNumber)
     }
-
-    this.startBlockNumber = startInt
-    this.endBlockNumber = endInt
-  }
-
-  public resetEndBlockNumber = (endBlockNumber: string) => {
-    this.endBlockNumber = BigInt(endBlockNumber)
   }
 }
