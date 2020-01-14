@@ -145,14 +145,14 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
-  public checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
+  private checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const checkTx = new CheckTx(tx, this.url, daoScriptHash)
+        const checkTx = new CheckTx(tx, daoScriptHash)
         const addresses = await checkTx.check(lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
