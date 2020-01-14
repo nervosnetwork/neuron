@@ -4,7 +4,7 @@ import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import { SyncedBlockNumberSubject } from 'models/subjects/node'
+import SyncedBlockNumberSubject from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import NetworksService from 'services/networks'
@@ -42,7 +42,7 @@ const syncNetwork = async (rescan = false) => {
   if (rescan) {
     await blockNumber.reset()
   }
-  SyncedBlockNumberSubject.next((await blockNumber.getCurrent()).toString())
+  SyncedBlockNumberSubject.getSubject().next((await blockNumber.getCurrent()).toString())
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',
@@ -79,7 +79,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   if (shouldSync) {
     await createBlockSyncTask()
   } else {
-    SyncedBlockNumberSubject.next('-1')
+    SyncedBlockNumberSubject.getSubject().next('-1')
   }
 }
 

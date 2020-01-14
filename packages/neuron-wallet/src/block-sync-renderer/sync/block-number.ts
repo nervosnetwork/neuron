@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
-import CurrentBlockSubject from 'models/subjects/current-block-subject'
+import SyncedBlockNumberSubject from "models/subjects/node"
 
 // Current scanned and processed block number
 export default class BlockNumber {
@@ -22,9 +22,7 @@ export default class BlockNumber {
 
   public updateCurrent = async (current: bigint): Promise<void> => {
     this.current = current
-    CurrentBlockSubject.getSubject().next({
-      blockNumber: current.toString()
-    })
+    SyncedBlockNumberSubject.getSubject().next(current.toString())
 
     let blockNumberEntity = await this.blockNumber()
     if (blockNumberEntity && current - BigInt(blockNumberEntity.value) < BigInt(1000)) {
