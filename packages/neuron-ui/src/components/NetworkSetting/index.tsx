@@ -59,7 +59,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
           },
           {
             label: t('common.edit'),
-            enabled: !isDefault,
+            enabled: true,
             click: () => {
               history.push(`${Routes.NetworkEditor}/${item.id}`)
             },
