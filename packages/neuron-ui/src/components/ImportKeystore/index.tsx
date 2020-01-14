@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
-import { importKeystore, showOpenDialog, showErrorMessage } from 'services/remote'
+import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
 import { useState as useGlobalState } from 'states/stateProvider'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
@@ -55,6 +55,7 @@ const ImportKeystore = () => {
   const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
   const [loading, setLoading] = useState(false)
+  const [openingFile, setOpeningFile] = useState(false)
   const goBack = useGoBack(history)
 
   useEffect(() => {
@@ -68,7 +69,8 @@ const ImportKeystore = () => {
   }, [wallets, fields, setFields, t])
 
   const onFileClick = useCallback(() => {
-    showOpenDialog({
+    setOpeningFile(true)
+    showOpenDialogModal({
       title: 'import keystore',
     })
       .then(({ filePaths }: { filePaths: string[] }) => {
@@ -81,6 +83,9 @@ const ImportKeystore = () => {
         }
       })
       .catch((err: Error) => console.error(err))
+      .finally(() => {
+        setOpeningFile(false)
+      })
   }, [fields])
 
   const onSubmit = useCallback(() => {
@@ -165,6 +170,7 @@ const ImportKeystore = () => {
                 placeholder={t(`import-keystore.placeholder.${key}`)}
                 type={key === 'password' ? 'password' : 'text'}
                 readOnly={key === 'path'}
+                disabled={key === 'path' && openingFile}
                 value={value}
                 error={fields[`${key}Error` as keyof KeystoreFields]}
                 onChange={onChange}
