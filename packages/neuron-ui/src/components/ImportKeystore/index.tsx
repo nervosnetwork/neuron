@@ -55,6 +55,7 @@ const ImportKeystore = () => {
   const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
   const [loading, setLoading] = useState(false)
+  const [openingFile, setOpeningFile] = useState(false)
   const goBack = useGoBack(history)
 
   useEffect(() => {
@@ -68,6 +69,7 @@ const ImportKeystore = () => {
   }, [wallets, fields, setFields, t])
 
   const onFileClick = useCallback(() => {
+    setOpeningFile(true)
     showOpenDialog({
       title: 'import keystore',
     })
@@ -81,6 +83,9 @@ const ImportKeystore = () => {
         }
       })
       .catch((err: Error) => console.error(err))
+      .finally(() => {
+        setOpeningFile(false)
+      })
   }, [fields])
 
   const onSubmit = useCallback(() => {
@@ -165,6 +170,7 @@ const ImportKeystore = () => {
                 placeholder={t(`import-keystore.placeholder.${key}`)}
                 type={key === 'password' ? 'password' : 'text'}
                 readOnly={key === 'path'}
+                disabled={key === 'path' && openingFile}
                 value={value}
                 error={fields[`${key}Error` as keyof KeystoreFields]}
                 onChange={onChange}
