@@ -1,11 +1,9 @@
 import { getConnection } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
-import { TransactionPersistor } from 'services/tx'
 import LockUtils from 'models/lock-utils'
 import CheckOutput from './output'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
-import WalletService from 'services/wallets'
 import Output from 'models/chain/output'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
@@ -13,16 +11,10 @@ import Script from 'models/chain/script'
 
 export default class CheckTx {
   private tx: Transaction
-  private url: string
   private daoTypeHash: string
 
-  constructor(
-    tx: Transaction,
-    url: string,
-    daoTypeHash: string
-  ) {
+  constructor(tx: Transaction, daoTypeHash: string) {
     this.tx = tx
-    this.url = url
     this.daoTypeHash = daoTypeHash
   }
 
@@ -42,17 +34,7 @@ export default class CheckTx {
     return addresses
   }
 
-  public checkAndSave = async (lockHashes: string[]): Promise<boolean> => {
-    const addresses = await this.check(lockHashes)
-    if (addresses.length > 0) {
-      await TransactionPersistor.saveFetchTx(this.tx)
-      await WalletService.updateUsedAddresses(addresses, this.url)
-      return true
-    }
-    return false
-  }
-
-  public selectOutputsOfWallets = (lockHashes: string[]): Output[] => {
+  private selectOutputsOfWallets = (lockHashes: string[]): Output[] => {
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
       const checkOutput = new CheckOutput(output)
       const result = checkOutput.checkLockHash(lockHashes)
@@ -69,7 +51,7 @@ export default class CheckTx {
     return outputs
   }
 
-  public selectInputAddressesOfWallets = async (lockHashes: string[]): Promise<string[]> => {
+  private selectInputAddressesOfWallets = async (lockHashes: string[]): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []

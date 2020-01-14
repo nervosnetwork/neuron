@@ -4,7 +4,7 @@ import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import { SyncedBlockNumberSubject } from 'models/subjects/node'
+import SyncedBlockNumberSubject from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
 import NetworksService from 'services/networks'
@@ -38,8 +38,11 @@ const syncNetwork = async (rescan = false) => {
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
 
-  const blockNumber = await (new BlockNumber()).getCurrent()
-  SyncedBlockNumberSubject.next(blockNumber.toString())
+  const blockNumber = new BlockNumber()
+  if (rescan) {
+    await blockNumber.reset()
+  }
+  SyncedBlockNumberSubject.getSubject().next((await blockNumber.getCurrent()).toString())
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',
@@ -48,7 +51,7 @@ const syncNetwork = async (rescan = false) => {
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
-      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes, rescan)
+      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes)
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
@@ -76,7 +79,7 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   if (shouldSync) {
     await createBlockSyncTask()
   } else {
-    SyncedBlockNumberSubject.next('-1')
+    SyncedBlockNumberSubject.getSubject().next('-1')
   }
 }
 

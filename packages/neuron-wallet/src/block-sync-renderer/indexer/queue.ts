@@ -35,7 +35,7 @@ export default class IndexerQueue {
   private rpcService: RpcService
   private per = 50
   private interval = 1000
-  private blockNumberService: BlockNumber
+  private currentBlockNumber: BlockNumber
 
   private stopped = false
   private indexed = false
@@ -57,7 +57,7 @@ export default class IndexerQueue {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.rpcService = new RpcService(url)
-    this.blockNumberService = new BlockNumber()
+    this.currentBlockNumber = new BlockNumber()
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -84,12 +84,12 @@ export default class IndexerQueue {
       try {
         this.inProcess = true
         if (this.resetFlag) {
-          await this.blockNumberService.updateCurrent(BigInt(-1))
+          await this.currentBlockNumber.reset()
           this.resetFlag = false
         }
         const { lockHashInfos } = this
-        const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
-        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber()) {
+        const blockNumber: bigint = await this.currentBlockNumber.getCurrent()
+        if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
             this.indexed = true
@@ -103,13 +103,13 @@ export default class IndexerQueue {
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber, daoScriptHash)
+            await this.pipeline(lockHash, TxPointType.CreatedBy, blockNumber, daoScriptHash)
           }
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.ConsumedBy, currentBlockNumber, daoScriptHash)
+            await this.pipeline(lockHash, TxPointType.ConsumedBy, blockNumber, daoScriptHash)
           }
           if (minBlockNumber) {
-            await this.blockNumberService.updateCurrent(minBlockNumber)
+            await this.currentBlockNumber.updateCurrent(minBlockNumber)
           }
         }
         await this.yield(this.interval)

@@ -3,7 +3,7 @@ import { debounceTime, sampleTime } from 'rxjs/operators'
 import CommandSubject from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
-import { SyncedBlockNumberSubject, ConnectionStatusSubject } from 'models/subjects/node'
+import SyncedBlockNumberSubject, { ConnectionStatusSubject } from 'models/subjects/node'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
 import dataUpdateSubject from 'models/subjects/data-update'
 import AppUpdaterSubject from 'models/subjects/app-updater'
@@ -14,23 +14,20 @@ interface AppResponder {
   updateWindowTitle: () => void
 }
 
-const DEBOUNCE_TIME = 50
-const SAMPLE_TIME = 500
-
 export const subscribe = (dispatcher: AppResponder) => {
-  NetworkListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkList = [] }) => {
+  NetworkListSubject.pipe(debounceTime(50)).subscribe(({ currentNetworkList = [] }) => {
     dispatcher.sendMessage('network-list-updated', currentNetworkList)
   })
 
-  CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkID = '' }) => {
+  CurrentNetworkIDSubject.pipe(debounceTime(50)).subscribe(({ currentNetworkID = '' }) => {
     dispatcher.sendMessage('current-network-id-updated', currentNetworkID)
   })
 
-  ConnectionStatusSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(params => {
+  ConnectionStatusSubject.pipe(debounceTime(50)).subscribe(params => {
     dispatcher.sendMessage('connection-status-updated', params)
   })
 
-  SyncedBlockNumberSubject.pipe(sampleTime(SAMPLE_TIME)).subscribe(params => {
+  SyncedBlockNumberSubject.getSubject().pipe(sampleTime(1000)).subscribe(params => {
     dispatcher.sendMessage('synced-block-number-updated', params)
   })
 

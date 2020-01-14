@@ -1,6 +1,5 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
-import BlockNumber from './sync/block-number'
 import Queue from './sync/queue'
 import IndexerQueue from './indexer/queue'
 import LockUtils from 'models/lock-utils'
@@ -65,13 +64,10 @@ const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHa
   indexerQueue.processFork()
 }
 
-ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[], rescan = false) => {
+ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[]) => {
   if (await isIndexerEnabled(url)) {
     await startIndexerSyncing(url, genesisHash, lockHashes)
   } else {
-    if (rescan) {
-      await new BlockNumber().updateCurrent(BigInt(-1))
-    }
     await startBlockSyncing(url, genesisHash, lockHashes)
   }
 })
