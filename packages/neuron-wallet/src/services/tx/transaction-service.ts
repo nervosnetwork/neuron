@@ -179,15 +179,14 @@ export class TransactionsService {
       .map(i => i.outPointTxHash)
       .filter(h => !!h) as string[]
 
-    const daoCellOutPoints: { txHash: string, index: string }[] = await getConnection()
+    const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .select("output.outPointTxHash", "txHash")
       .addSelect("output.outPointIndex", "index")
-      .where('output.daoData IS NOT NULL AND output.outPointTxHash IN (:...inputPreviousTxHashes)', {
-        inputPreviousTxHashes,
-      })
-      .getRawMany()
+      .where('output.daoData IS NOT NULL')
+      .getRawMany())
+      .filter(o => inputPreviousTxHashes.includes(o.txHash))
 
     const txs: Transaction[] = transactions!.map(tx => {
       const outputCapacities: bigint = tx.outputs
