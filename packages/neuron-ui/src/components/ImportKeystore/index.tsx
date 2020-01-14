@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
-import { importKeystore, showOpenDialog, showErrorMessage } from 'services/remote'
+import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
 import { useState as useGlobalState } from 'states/stateProvider'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
@@ -70,7 +70,7 @@ const ImportKeystore = () => {
 
   const onFileClick = useCallback(() => {
     setOpeningFile(true)
-    showOpenDialog({
+    showOpenDialogModal({
       title: 'import keystore',
     })
       .then(({ filePaths }: { filePaths: string[] }) => {

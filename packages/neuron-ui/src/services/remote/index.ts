@@ -40,6 +40,14 @@ export const showOpenDialog = (options: { title: string; message?: string }) => 
   return window.remote.require('electron').dialog.showOpenDialog(options)
 }
 
+export const showOpenDialogModal = (options: { title: string; message?: string }) => {
+  if (!window.remote) {
+    window.alert(REMOTE_MODULE_NOT_FOUND)
+    return Promise.reject()
+  }
+  return window.remote.require('electron').dialog.showOpenDialog(window.remote.getCurrentWindow(), options)
+}
+
 export const openExternal = (url: string) => {
   if (!window.remote) {
     window.open(url)
