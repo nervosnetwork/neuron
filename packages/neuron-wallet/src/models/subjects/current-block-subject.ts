@@ -6,7 +6,7 @@ export interface CurrentBlockInfo {
   blockNumber: string
 }
 
-// subscribe this Subject to monitor which addresses are used
+// Subscribe this subject to monitor which best block is processed
 export class CurrentBlockSubject {
   private static subject = new ReplaySubject<CurrentBlockInfo>(1)
 

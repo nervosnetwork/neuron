@@ -2,6 +2,7 @@ import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import CurrentBlockSubject from 'models/subjects/current-block-subject'
 
+// Current scanned and processed block number
 export default class BlockNumber {
   private current: bigint | undefined = undefined
 
@@ -39,6 +40,10 @@ export default class BlockNumber {
     }
     blockNumberEntity.value = current.toString()
     await getConnection().manager.save(blockNumberEntity)
+  }
+
+  public reset = async(): Promise<void> => {
+    return this.updateCurrent(BigInt(-1))
   }
 
   private blockNumber = async (): Promise<SyncInfoEntity | undefined> => {

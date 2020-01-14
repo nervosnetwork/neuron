@@ -40,7 +40,7 @@ const syncNetwork = async (rescan = false) => {
 
   const blockNumber = new BlockNumber()
   if (rescan) {
-      await blockNumber.updateCurrent(BigInt(-1))
+    await blockNumber.reset()
   }
   SyncedBlockNumberSubject.next((await blockNumber.getCurrent()).toString())
   DataUpdateSubject.next({
