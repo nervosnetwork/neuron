@@ -41,9 +41,7 @@ export default class NetworksService extends Store {
     super('networks', 'index.json', JSON.stringify(presetNetworks))
 
     const currentNetwork = this.getCurrent()
-    if (currentNetwork.type !== NetworkType.Default) {
-      this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
-    }
+    this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
   }
 
   public getAll = () => {
@@ -151,11 +149,6 @@ export default class NetworksService extends Store {
 
   // Refresh a network's genesis and chain info
   private async refreshChainInfo(network: Network): Promise<Network> {
-    if (network.type === NetworkType.Default) {
-      // Default mainnet network is not editable
-      return network
-    }
-
     const ckb = new CKB(network.remote)
 
     const genesisHash = await ckb.rpc
