@@ -14,18 +14,16 @@ interface AppResponder {
   updateWindowTitle: () => void
 }
 
-const DEBOUNCE_TIME = 50
-
 export const subscribe = (dispatcher: AppResponder) => {
-  NetworkListSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkList = [] }) => {
+  NetworkListSubject.pipe(debounceTime(50)).subscribe(({ currentNetworkList = [] }) => {
     dispatcher.sendMessage('network-list-updated', currentNetworkList)
   })
 
-  CurrentNetworkIDSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(({ currentNetworkID = '' }) => {
+  CurrentNetworkIDSubject.pipe(debounceTime(50)).subscribe(({ currentNetworkID = '' }) => {
     dispatcher.sendMessage('current-network-id-updated', currentNetworkID)
   })
 
-  ConnectionStatusSubject.pipe(debounceTime(DEBOUNCE_TIME)).subscribe(params => {
+  ConnectionStatusSubject.pipe(debounceTime(50)).subscribe(params => {
     dispatcher.sendMessage('connection-status-updated', params)
   })
 
