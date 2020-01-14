@@ -48,8 +48,8 @@ declare namespace State {
     readonly witnesses: string[]
   }
   interface Output {
-    readonly address: string
-    readonly amount: string
+    readonly address: string | undefined
+    readonly amount: string | undefined
     readonly unit: any
   }
   type MessageType = 'success' | 'warning' | 'alert'

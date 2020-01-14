@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Label, Text, List } from 'office-ui-fabric-react'
 import TransactionFeePanel from 'components/TransactionFeePanel'
@@ -12,9 +12,15 @@ import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
+import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG } from 'utils/const'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
+import {
+  verifyTotalAmount,
+  verifyTransactionOutputs,
+  verifyAmount,
+  verifyAmountRange,
+  verifyAddress,
+} from 'utils/validators'
 
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
@@ -44,18 +50,50 @@ const Send = () => {
     updateTransactionPrice,
     onDescriptionChange,
     onClear,
-    outputErrors,
     errorMessage,
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
-
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
   const network = networks.find(n => n.id === networkID)
+
+  const outputErrors = useMemo(() => {
+    return outputs.map(({ address, amount }) => {
+      let amountErrorCode = ''
+      let addrErrorCode = ''
+
+      // skip amount = ''
+      const amountVeriMsg = verifyAmount(amount)
+      if (amount !== undefined) {
+        if (typeof amountVeriMsg === 'object') {
+          amountErrorCode = `${amountVeriMsg.code}`
+        } else if (!verifyAmountRange(amount)) {
+          amountErrorCode = `${ErrorCode.AmountTooSmall}`
+        }
+      }
+      if (address !== undefined) {
+        const chainType = network ? network.chain : ''
+        if (address === '') {
+          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
+        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
+          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
+        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
+          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
+        } else if (!verifyAddress(address)) {
+          addrErrorCode = `${ErrorCode.FieldInvalid}`
+        }
+      }
+
+      return {
+        addrErrorCode,
+        amountErrorCode,
+      }
+    })
+  }, [outputs, network])
 
   return (
     <div style={{ padding: '39px 0 0 0' }}>
@@ -88,7 +126,7 @@ const Send = () => {
                   required
                   maxLength={100}
                   error={
-                    outputErrors[idx] && outputErrors[idx].addrErrorCode
+                    outputErrors[idx].addrErrorCode
                       ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
                           fieldName: 'address',
                           fieldValue: item.address || '',
@@ -109,7 +147,7 @@ const Send = () => {
                   required
                   suffix="CKB"
                   error={
-                    outputErrors[idx] && outputErrors[idx].amountErrorCode
+                    outputErrors[idx].amountErrorCode
                       ? t(`messages.codes.${outputErrors[idx].amountErrorCode}`, {
                           fieldName: 'amount',
                           fieldValue: localNumberFormatter(item.amount),

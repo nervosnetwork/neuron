@@ -1,13 +1,11 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import produce from 'immer'
 import { TFunction } from 'i18next'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
 import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
-import { ErrorCode, MAINNET_TAG } from 'utils/const'
+import { verifyTransactionOutputs } from 'utils/validators'
 import calculateFee from 'utils/calculateFee'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
@@ -47,7 +45,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
     const realParams = {
       walletID,
       items: items.map(item => ({
-        address: item.address,
+        address: item.address || '',
         capacity: CKBToShannonFormatter(item.amount, item.unit),
       })),
       feeRate: price,
@@ -177,15 +175,12 @@ const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =
     [dispatch, items]
   )
 
-const useOnItemChange = (
-  updateTransactionOutput: Function,
-  setOutputErrors: React.Dispatch<React.SetStateAction<any>>
-) =>
+const useOnItemChange = (updateTransactionOutput: Function) =>
   useCallback(
     (e: any) => {
       const {
         value,
-        dataset: { field = '', idx = -1, chainType = MAINNET_TAG },
+        dataset: { field = '', idx = -1 },
       } = e.target
       if (field === 'amount') {
         const amount = value.replace(/,/g, '') || '0'
@@ -193,61 +188,14 @@ const useOnItemChange = (
           return
         }
         updateTransactionOutput(field)(idx)(amount)
-
-        let amountErrorCode = ''
-        const msg = verifyAmount(amount)
-        if (typeof msg === 'object') {
-          amountErrorCode = `${msg.code}`
-        } else if (!verifyAmountRange(amount)) {
-          amountErrorCode = `${ErrorCode.AmountTooSmall}`
-        }
-        setOutputErrors(
-          /* eslint-disable no-param-reassign */
-          produce(errors => {
-            if (errors[idx]) {
-              errors[idx].amountErrorCode = amountErrorCode
-            } else {
-              errors[idx] = {
-                amountErrorCode,
-                addrErrorCode: '',
-              }
-            }
-          })
-          /* eslint-enable no-param-reassign */
-        )
         return
       }
       if (field === 'address') {
         const address = value
         updateTransactionOutput(field)(idx)(address)
-
-        let addrErrorCode = ''
-        if (address === '') {
-          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
-        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
-          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
-        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
-          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
-        } else if (!verifyAddress(address)) {
-          addrErrorCode = `${ErrorCode.FieldInvalid}`
-        }
-        setOutputErrors(
-          /* eslint-disable no-param-reassign */
-          produce(errors => {
-            if (errors[idx]) {
-              errors[idx].addrErrorCode = addrErrorCode
-            } else {
-              errors[idx] = {
-                addrErrorCode,
-                amountErrorCode: '',
-              }
-            }
-          })
-          /* eslint-enable no-param-reassign */
-        )
       }
     },
-    [updateTransactionOutput, setOutputErrors]
+    [updateTransactionOutput]
   )
 
 const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
@@ -297,7 +245,6 @@ export const useInitialize = (
   const [totalAmount, setTotalAmount] = useState('0')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSendMax, setIsSendMax] = useState(false)
-  const [outputErrors, setOutputErrors] = useState<{ addrErrorCode: string; amountErrorCode: string }[]>([])
 
   const outputs = useMemo(() => items.map(item => ({ ...item, disabled: isSendMax || sending })), [
     items,
@@ -306,7 +253,7 @@ export const useInitialize = (
   ])
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
-  const onItemChange = useOnItemChange(updateTransactionOutput, setOutputErrors)
+  const onItemChange = useOnItemChange(updateTransactionOutput)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
@@ -366,7 +313,6 @@ export const useInitialize = (
     onDescriptionChange,
     onSubmit,
     onClear,
-    outputErrors,
     errorMessage,
     setErrorMessage,
     isSendMax,

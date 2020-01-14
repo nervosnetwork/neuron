@@ -11,8 +11,8 @@ const appState: Readonly<State.App> = {
     txID: '',
     outputs: [
       {
-        address: '',
-        amount: '',
+        address: undefined,
+        amount: undefined,
         unit: CapacityUnit.CKB,
       },
     ],
