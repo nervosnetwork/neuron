@@ -167,7 +167,7 @@ export const addressesToBalance = (addresses: State.Address[] = []) => {
 
 export const outputsToTotalAmount = (outputs: Readonly<State.Output[]>) => {
   const totalCapacity = outputs.reduce((total, cur) => {
-    if (Number.isNaN(+cur.amount)) {
+    if (Number.isNaN(+(cur.amount || ''))) {
       return total
     }
     return total + BigInt(CKBToShannonFormatter(cur.amount, cur.unit))
