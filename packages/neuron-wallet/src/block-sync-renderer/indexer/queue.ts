@@ -45,8 +45,6 @@ export default class IndexerQueue {
 
   private inProcess = false
 
-  private resetFlag = false
-
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
   private txCache: TransactionCache = new TransactionCache(100)
 
@@ -74,10 +72,6 @@ export default class IndexerQueue {
     this.setLockHashInfos(infos)
   }
 
-  public reset = () => {
-    this.resetFlag = true
-  }
-
   private tipBlockNumber = (): bigint => {
     return BigInt(NodeService.getInstance().tipBlockNumber)
   }
@@ -86,10 +80,6 @@ export default class IndexerQueue {
     while (!this.stopped) {
       try {
         this.inProcess = true
-        if (this.resetFlag) {
-          await this.currentBlockNumber.reset()
-          this.resetFlag = false
-        }
         const { lockHashInfos } = this
         const blockNumber: bigint = await this.currentBlockNumber.getNextBlock()
         if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
