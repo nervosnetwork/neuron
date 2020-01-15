@@ -15,8 +15,26 @@ $textfieldWidth: calc(100vw - 370px);
   }
 
   button[aria-label="qr-btn"] {
+    position: relative;
     padding-top: 10px;
     grid-area: scanner;
+
+    &:hover {
+      &:after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -20px;
+        right: -45px;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+        color: #000;
+        box-shadow: 1px 2px 6px 0 rgba(97, 97, 97, 0.5);
+        background: #fff;
+        white-space: nowrap;
+        padding: 5px 16px;
+        z-index: 1;
+      }
+    }
   }
 
   .amountField {
@@ -117,4 +135,30 @@ $textfieldWidth: calc(100vw - 370px);
 
 .actions {
   @include formFooter;
+}
+
+.scanBtn {
+  line-height: 1;
+  background: none;
+  border: none;
+  outline: none;
+
+  svg {
+    pointer-events: none;
+  }
+
+  &:hover {
+
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
+
+  &.busy {
+    cursor: progress !important;
+    stroke: #666;
+    fill: #666;
+  }
 }

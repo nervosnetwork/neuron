@@ -107,7 +107,8 @@
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
       "expected-speed": "Expected speed",
-      "total-cycles": "Total RISC-V Cycles"
+      "total-cycles": "Total RISC-V Cycles",
+      "scan-screen-qr-code": "Scan the QR Code on the screen"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
@@ -277,6 +278,7 @@
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
+      "no-valid-addresses-found": "No valid addresses found",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

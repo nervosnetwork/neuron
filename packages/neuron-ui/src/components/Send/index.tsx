@@ -5,7 +5,7 @@ import TransactionFeePanel from 'components/TransactionFeePanel'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import QRScanner from 'widgets/QRScanner'
+import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 
@@ -49,6 +49,7 @@ const Send = () => {
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
+    onScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
 
@@ -119,14 +120,18 @@ const Send = () => {
                       : ''
                   }
                 />
-                <QRScanner
-                  title={t('send.scan-to-get-address')}
-                  label={t('send.address')}
-                  onConfirm={(data: string) => {
-                    const e = { target: { dataset: { field: 'address', idx }, value: data } }
-                    onItemChange(e)
-                  }}
-                />
+                <button
+                  data-idx={idx}
+                  data-chain-type={network ? network.chain : ''}
+                  style={styles && styles.trigger}
+                  onClick={onScan}
+                  type="button"
+                  aria-label="qr-btn"
+                  className={styles.scanBtn}
+                  data-title={t('send.scan-screen-qr-code')}
+                >
+                  <Scan />
+                </button>
 
                 {idx === outputs.length - 1 ? (
                   <Button
