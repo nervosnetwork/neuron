@@ -23,7 +23,7 @@ const isIndexerEnabled = async (url: string): Promise<boolean> => {
 // Normal block syncing with BlockListener.
 // This runs when CKB Indexer module is not enabled.
 let syncQueue: Queue | null
-const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[], startBlockNumber: bigint) => {
   if (syncQueue) {
     await syncQueue.stopAndWait()
   }
@@ -34,14 +34,14 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
 
   await initConnection(genesisBlockHash)
 
-  syncQueue = new Queue(url, lockHashes)
+  syncQueue = new Queue(url, lockHashes, startBlockNumber)
   syncQueue.start()
 }
 
 // Indexer syncing with IndexerQueue.
 // This runs when CKB Indexer module is enabled.
 let indexerQueue: IndexerQueue | null
-const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[]) => {
+const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[], startBlockNumber: bigint) => {
   if (indexerQueue) {
     await indexerQueue.stopAndWait()
   }
@@ -59,16 +59,16 @@ const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHa
     }
   })
 
-  indexerQueue = new IndexerQueue(url, lockHashInfos)
+  indexerQueue = new IndexerQueue(url, lockHashInfos, startBlockNumber)
   indexerQueue.start()
   indexerQueue.processFork()
 }
 
-ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[]) => {
+ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[], startBlockNumber: string) => {
   if (await isIndexerEnabled(url)) {
-    await startIndexerSyncing(url, genesisHash, lockHashes)
+    await startIndexerSyncing(url, genesisHash, lockHashes, BigInt(startBlockNumber))
   } else {
-    await startBlockSyncing(url, genesisHash, lockHashes)
+    await startBlockSyncing(url, genesisHash, lockHashes, BigInt(startBlockNumber))
   }
 })
 

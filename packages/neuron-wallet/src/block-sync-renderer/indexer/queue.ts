@@ -1,24 +1,27 @@
+import { ipcRenderer } from 'electron'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+
 import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
+import HexUtils from 'utils/hex'
+import CommonUtils from 'utils/common'
+
 import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
-import BlockNumber from 'block-sync-renderer/sync/block-number'
-import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
-
-import HexUtils from 'utils/hex'
-import { TxUniqueFlagCache } from './tx-unique-flag'
-import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
-import DaoUtils from 'models/dao-utils'
-import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
 import NodeService from 'services/node'
+
 import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
+import DaoUtils from 'models/dao-utils'
 import Transaction from 'models/chain/transaction'
+import LockUtils from 'models/lock-utils'
+
+import { TxUniqueFlagCache } from './tx-unique-flag'
+import { TransactionCache } from './transaction-cache'
 
 export interface LockHashInfo {
   lockHash: string
@@ -35,14 +38,12 @@ export default class IndexerQueue {
   private rpcService: RpcService
   private per = 50
   private interval = 1000
-  private currentBlockNumber: BlockNumber
+  private startBlockNumber: bigint
 
   private stopped = false
   private indexed = false
 
   private inProcess = false
-
-  private resetFlag = false
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
   private txCache: TransactionCache = new TransactionCache(100)
@@ -53,11 +54,11 @@ export default class IndexerQueue {
 
   private static CHECK_SIZE = 50
 
-  constructor(url: string, lockHashInfos: LockHashInfo[]) {
+  constructor(url: string, lockHashInfos: LockHashInfo[], startBlockNumber: bigint) {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.rpcService = new RpcService(url)
-    this.currentBlockNumber = new BlockNumber()
+    this.startBlockNumber = startBlockNumber
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -71,10 +72,6 @@ export default class IndexerQueue {
     this.setLockHashInfos(infos)
   }
 
-  public reset = () => {
-    this.resetFlag = true
-  }
-
   private tipBlockNumber = (): bigint => {
     return BigInt(NodeService.getInstance().tipBlockNumber)
   }
@@ -83,12 +80,8 @@ export default class IndexerQueue {
     while (!this.stopped) {
       try {
         this.inProcess = true
-        if (this.resetFlag) {
-          await this.currentBlockNumber.reset()
-          this.resetFlag = false
-        }
         const { lockHashInfos } = this
-        const blockNumber: bigint = await this.currentBlockNumber.getCurrent()
+        const blockNumber: bigint = this.startBlockNumber
         if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
@@ -109,7 +102,8 @@ export default class IndexerQueue {
             await this.pipeline(lockHash, TxPointType.ConsumedBy, blockNumber, daoScriptHash)
           }
           if (minBlockNumber) {
-            await this.currentBlockNumber.updateCurrent(minBlockNumber)
+            this.startBlockNumber = minBlockNumber
+            ipcRenderer.invoke('synced-block-number-updated', this.startBlockNumber.toString())
           }
         }
         await this.yield(this.interval)

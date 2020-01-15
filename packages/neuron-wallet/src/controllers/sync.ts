@@ -1,4 +1,4 @@
-import BlockNumber from 'block-sync-renderer/sync/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 import { createBlockSyncTask, killBlockSyncTask } from 'block-sync-renderer'
 import ChainCleaner from 'database/chain/cleaner'
 import { ResponseCode } from 'utils/const'
@@ -18,8 +18,8 @@ export default class SyncController {
   }
 
   public async currentBlockNumber() {
-    const blockNumber = new BlockNumber()
-    const current: bigint = await blockNumber.getCurrent()
+    const blockNumber = new SyncedBlockNumber()
+    const current: bigint = await blockNumber.getNextBlock()
 
     return {
       status: ResponseCode.Success,

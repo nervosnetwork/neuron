@@ -19,10 +19,7 @@ import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 
-/**
- * @class ApiController
- * @description Handle channel messages from neuron UI renderer process
- */
+// Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
   private walletsController = new WalletsController()
   private transactionsController = new TransactionsController()

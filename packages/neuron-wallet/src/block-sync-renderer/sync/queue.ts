@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron'
 import { BehaviorSubject, Subscription } from 'rxjs'
 
 import { TransactionPersistor } from 'services/tx'
@@ -14,33 +15,33 @@ import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
-import BlockNumber from './block-number'
 import CheckTx from './check-and-save/tx'
 
 export default class Queue {
-  private lockHashes: string[]
   private url: string
+  private lockHashes: string[]
   private rpcService: RpcService
-  private endBlockNumber: bigint = BigInt(0)
+
+  private currentBlockNumber = BigInt(0)
+  private endBlockNumber = BigInt(0)
   private rangeForCheck: RangeForCheck
-  private currentBlockNumber: BlockNumber
+
+  private fetchSize: number = 4
 
   private tipNumberSubject: BehaviorSubject<string | undefined>
   private tipNumberListener: Subscription | undefined
-
-  private fetchSize: number = 4
 
   private stopped: boolean = false
   private inProcess: boolean = false
 
   private yieldTime = 1
 
-  constructor(url: string, lockHashes: string[]) {
-    this.lockHashes = lockHashes
+  constructor(url: string, lockHashes: string[], startBlockNumber: bigint) {
     this.url = url
+    this.lockHashes = lockHashes
+    this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
-    this.currentBlockNumber = new BlockNumber()
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
   }
 
@@ -58,10 +59,8 @@ export default class Queue {
         this.inProcess = true
 
         if (this.lockHashes.length !== 0) {
-          let current: bigint = await this.currentBlockNumber.getCurrent()
-
-          const startNumber: bigint = current + BigInt(1)
-          const endNumber: bigint = current + BigInt(this.fetchSize)
+          const startNumber = this.currentBlockNumber
+          const endNumber = this.currentBlockNumber + BigInt(this.fetchSize)
           const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
 
           if (realEndNumber >= this.endBlockNumber) {
@@ -82,14 +81,10 @@ export default class Queue {
           logger.error(`sync error:`, err)
         }
       } finally {
-        await this.yield(this.yieldTime)
+        await CommonUtils.sleep(this.yieldTime)
         this.inProcess = false
       }
     }
-  }
-
-  private yield = async (millisecond: number = 1) => {
-    await CommonUtils.sleep(millisecond)
   }
 
   public stop = () => {
@@ -106,7 +101,7 @@ export default class Queue {
       if (now - startAt > timeout) {
         return
       }
-      await this.yield(50)
+      await CommonUtils.sleep(50)
     }
   }
 
@@ -139,7 +134,7 @@ export default class Queue {
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]
-    await this.currentBlockNumber.updateCurrent(BigInt(lastBlock.header.number))
+    this.updateCurrentBlockNumber(BigInt(lastBlock.header.number) + BigInt(1))
 
     // 5. update range
     this.rangeForCheck.pushRange(blockHeaders)
@@ -196,22 +191,25 @@ export default class Queue {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === CheckResultType.FirstNotMatch) {
-        const range = await this.rangeForCheck.getRange()
+        const range = await this.rangeForCheck.getRange(this.currentBlockNumber)
         const rangeFirstBlockHeader: BlockHeader = range[0]
-        await this.currentBlockNumber.updateCurrent(BigInt(rangeFirstBlockHeader.number))
+        this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        throw new Error(`chain forked: ${checkResult.type}`)
-      } else if (checkResult.type === CheckResultType.BlockHeadersNotMatch) {
-        // throw here and retry 5 times
-        throw new Error(`chain forked: ${checkResult.type}`)
       }
+
+      throw new Error(`chain forked: ${checkResult.type}`)
     }
 
     return checkResult
   }
 
-  private expandToTip = async (tipNumber: string) => {
+  private updateCurrentBlockNumber(blockNumber: BigInt) {
+    this.currentBlockNumber = BigInt(blockNumber)
+    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
+  }
+
+  private async expandToTip(tipNumber: string) {
     if (BigInt(tipNumber) > BigInt(0)) {
       this.endBlockNumber = BigInt(tipNumber)
     }

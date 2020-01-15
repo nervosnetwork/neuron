@@ -1,4 +1,3 @@
-import BlockNumber from './block-number'
 import RpcService from 'services/rpc-service'
 import ArrayUtils from 'utils/array'
 import BlockHeader from 'models/chain/block-header'
@@ -17,24 +16,11 @@ export default class RangeForCheck {
     this.url = url
   }
 
-  public getRange = async (): Promise<BlockHeader[]> => {
+  public getRange = async (blockNumber: bigint): Promise<BlockHeader[]> => {
     if (this.range.length < this.checkSize) {
-      this.range = await this.generateRange()
+      this.range = await this.generateRange(blockNumber)
     }
     return this.range
-  }
-
-  public generateRange = async (): Promise<BlockHeader[]> => {
-    const blockNumberService = new BlockNumber()
-    const currentBlockNumber: bigint = await blockNumberService.getCurrent()
-    const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
-    const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
-    const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
-
-    const rpcService = new RpcService(this.url)
-    const headers: BlockHeader[] = await rpcService.getRangeBlockHeaders(blockNumbers)
-
-    return headers
   }
 
   public setRange = (range: BlockHeader[]) => {
@@ -68,7 +54,7 @@ export default class RangeForCheck {
   public check = (blockHeaders: BlockHeader[]) => {
     if (blockHeaders.length === 0 || this.range.length === 0) {
       return {
-        success: true,
+        success: true
       }
     }
     const lastBlockHeader = this.range[this.range.length - 1]
@@ -76,7 +62,7 @@ export default class RangeForCheck {
     if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
       return {
         success: false,
-        type: CheckResultType.FirstNotMatch,
+        type: CheckResultType.FirstNotMatch
       }
     }
 
@@ -93,7 +79,16 @@ export default class RangeForCheck {
     }
 
     return {
-      success: true,
+      success: true
     }
+  }
+
+  private generateRange = async (currentBlockNumber: bigint): Promise<BlockHeader[]> => {
+    const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
+    const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
+    const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
+
+    const rpcService = new RpcService(this.url)
+    return await rpcService.getRangeBlockHeaders(blockNumbers)
   }
 }
