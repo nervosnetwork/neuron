@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 
 import ArrayUtils from 'utils/array'
@@ -17,7 +18,6 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import DaoUtils from 'models/dao-utils'
 import Transaction from 'models/chain/transaction'
-import SyncedBlockNumber from 'models/synced-block-number'
 import LockUtils from 'models/lock-utils'
 
 import { TxUniqueFlagCache } from './tx-unique-flag'
@@ -38,7 +38,7 @@ export default class IndexerQueue {
   private rpcService: RpcService
   private per = 50
   private interval = 1000
-  private currentBlockNumber: SyncedBlockNumber
+  private startBlockNumber: bigint
 
   private stopped = false
   private indexed = false
@@ -54,11 +54,11 @@ export default class IndexerQueue {
 
   private static CHECK_SIZE = 50
 
-  constructor(url: string, lockHashInfos: LockHashInfo[]) {
+  constructor(url: string, lockHashInfos: LockHashInfo[], startBlockNumber: bigint) {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.rpcService = new RpcService(url)
-    this.currentBlockNumber = new SyncedBlockNumber()
+    this.startBlockNumber = startBlockNumber
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -81,7 +81,7 @@ export default class IndexerQueue {
       try {
         this.inProcess = true
         const { lockHashInfos } = this
-        const blockNumber: bigint = await this.currentBlockNumber.getNextBlock()
+        const blockNumber: bigint = this.startBlockNumber
         if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
@@ -102,7 +102,8 @@ export default class IndexerQueue {
             await this.pipeline(lockHash, TxPointType.ConsumedBy, blockNumber, daoScriptHash)
           }
           if (minBlockNumber) {
-            await this.currentBlockNumber.setNextBlock(minBlockNumber)
+            this.startBlockNumber = minBlockNumber
+            ipcRenderer.invoke('synced-block-number-updated', this.startBlockNumber.toString())
           }
         }
         await this.yield(this.interval)

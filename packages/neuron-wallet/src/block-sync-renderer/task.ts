@@ -60,7 +60,7 @@ const startIndexerSyncing = async (url: string, genesisBlockHash: string, lockHa
     }
   })
 
-  indexerQueue = new IndexerQueue(url, lockHashInfos)
+  indexerQueue = new IndexerQueue(url, lockHashInfos, await new SyncedBlockNumber().getNextBlock())
   indexerQueue.start()
   indexerQueue.processFork()
 }
