@@ -8,7 +8,7 @@ $error-red: #d50000;
     'label input'auto 'blank message'minmax(0.6875rem, auto) / auto 1fr;
   grid-gap: 4px;
 
-  &[data-required] {
+  &[data-required="true"] {
     label::after {
       display: inline;
       content: '*';

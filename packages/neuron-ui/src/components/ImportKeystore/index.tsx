@@ -168,6 +168,7 @@ const ImportKeystore = () => {
                 value={value}
                 error={fields[`${key}Error` as keyof KeystoreFields]}
                 onChange={onChange}
+                required
               />
             </>
           )
