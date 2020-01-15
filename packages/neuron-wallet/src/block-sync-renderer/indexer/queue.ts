@@ -1,24 +1,27 @@
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+
 import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
+import HexUtils from 'utils/hex'
+import CommonUtils from 'utils/common'
+
 import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
-import BlockNumber from 'block-sync-renderer/sync/block-number'
-import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
-
-import HexUtils from 'utils/hex'
-import { TxUniqueFlagCache } from './tx-unique-flag'
-import { TransactionCache } from './transaction-cache'
 import TransactionEntity from 'database/chain/entities/transaction'
-import DaoUtils from 'models/dao-utils'
-import CommonUtils from 'utils/common'
 import WalletService from 'services/wallets'
 import NodeService from 'services/node'
+
 import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
+import DaoUtils from 'models/dao-utils'
 import Transaction from 'models/chain/transaction'
+import BlockNumber from 'models/block-number'
+import LockUtils from 'models/lock-utils'
+
+import { TxUniqueFlagCache } from './tx-unique-flag'
+import { TransactionCache } from './transaction-cache'
 
 export interface LockHashInfo {
   lockHash: string
