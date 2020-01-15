@@ -17,7 +17,7 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import DaoUtils from 'models/dao-utils'
 import Transaction from 'models/chain/transaction'
-import BlockNumber from 'models/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 import LockUtils from 'models/lock-utils'
 
 import { TxUniqueFlagCache } from './tx-unique-flag'
@@ -38,7 +38,7 @@ export default class IndexerQueue {
   private rpcService: RpcService
   private per = 50
   private interval = 1000
-  private currentBlockNumber: BlockNumber
+  private currentBlockNumber: SyncedBlockNumber
 
   private stopped = false
   private indexed = false
@@ -60,7 +60,7 @@ export default class IndexerQueue {
     this.lockHashInfos = lockHashInfos
     this.url = url
     this.rpcService = new RpcService(url)
-    this.currentBlockNumber = new BlockNumber()
+    this.currentBlockNumber = new SyncedBlockNumber()
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -91,7 +91,7 @@ export default class IndexerQueue {
           this.resetFlag = false
         }
         const { lockHashInfos } = this
-        const blockNumber: bigint = await this.currentBlockNumber.getCurrent()
+        const blockNumber: bigint = await this.currentBlockNumber.getNextBlock()
         if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
@@ -112,7 +112,7 @@ export default class IndexerQueue {
             await this.pipeline(lockHash, TxPointType.ConsumedBy, blockNumber, daoScriptHash)
           }
           if (minBlockNumber) {
-            await this.currentBlockNumber.updateCurrent(minBlockNumber)
+            await this.currentBlockNumber.setNextBlock(minBlockNumber)
           }
         }
         await this.yield(this.interval)

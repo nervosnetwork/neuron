@@ -4,7 +4,7 @@ import Queue from './sync/queue'
 import IndexerQueue from './indexer/queue'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import BlockNumber from 'models/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -35,7 +35,7 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
 
   await initConnection(genesisBlockHash)
 
-  syncQueue = new Queue(url, lockHashes, await new BlockNumber().getCurrent())
+  syncQueue = new Queue(url, lockHashes, await new SyncedBlockNumber().getNextBlock())
   syncQueue.start()
 }
 

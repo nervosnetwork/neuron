@@ -7,7 +7,7 @@ import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import SyncedBlockNumberSubject from 'models/subjects/node'
 import LockUtils from 'models/lock-utils'
 import DaoUtils from 'models/dao-utils'
-import BlockNumber from 'models/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import logger from 'utils/logger'
@@ -38,11 +38,11 @@ const syncNetwork = async (rescan = false) => {
   LockUtils.cleanInfo()
   DaoUtils.cleanInfo()
 
-  const blockNumber = new BlockNumber()
+  const blockNumber = new SyncedBlockNumber()
   if (rescan) {
     await blockNumber.reset()
   }
-  SyncedBlockNumberSubject.getSubject().next((await blockNumber.getCurrent()).toString())
+  SyncedBlockNumberSubject.getSubject().next((await blockNumber.getNextBlock()).toString())
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',

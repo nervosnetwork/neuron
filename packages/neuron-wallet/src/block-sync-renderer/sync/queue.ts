@@ -59,7 +59,7 @@ export default class Queue {
         this.inProcess = true
 
         if (this.lockHashes.length !== 0) {
-          const startNumber = this.currentBlockNumber + BigInt(1)
+          const startNumber = this.currentBlockNumber
           const endNumber = this.currentBlockNumber + BigInt(this.fetchSize)
           const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
 
@@ -134,7 +134,7 @@ export default class Queue {
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]
-    this.updateCurrentBlockNumber(BigInt(lastBlock.header.number))
+    this.updateCurrentBlockNumber(BigInt(lastBlock.header.number) + BigInt(1))
 
     // 5. update range
     this.rangeForCheck.pushRange(blockHeaders)
@@ -196,11 +196,9 @@ export default class Queue {
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        throw new Error(`chain forked: ${checkResult.type}`)
-      } else if (checkResult.type === CheckResultType.BlockHeadersNotMatch) {
-        // throw here and retry 5 times
-        throw new Error(`chain forked: ${checkResult.type}`)
       }
+
+      throw new Error(`chain forked: ${checkResult.type}`)
     }
 
     return checkResult

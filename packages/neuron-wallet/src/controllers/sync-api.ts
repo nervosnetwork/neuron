@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import BlockNumber from 'models/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 
 // Handle channel messages from sync renderer process
 export default class SyncApiController {
@@ -10,7 +10,7 @@ export default class SyncApiController {
 
   private registerHandlers() {
     this.handle('synced-block-number-updated', async (_, blockNumber) => {
-      new BlockNumber().updateCurrent(BigInt(blockNumber))
+      new SyncedBlockNumber().setNextBlock(BigInt(blockNumber))
     })
   }
 

@@ -1,4 +1,4 @@
-import BlockNumber from 'models/block-number'
+import SyncedBlockNumber from 'models/synced-block-number'
 import RpcService from 'services/rpc-service'
 import ArrayUtils from 'utils/array'
 import BlockHeader from 'models/chain/block-header'
@@ -25,7 +25,7 @@ export default class RangeForCheck {
   }
 
   public generateRange = async (): Promise<BlockHeader[]> => {
-    const currentBlockNumber: bigint = await new BlockNumber().getCurrent()
+    const currentBlockNumber: bigint = await new SyncedBlockNumber().getNextBlock()
     const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
     const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
     const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
@@ -67,7 +67,7 @@ export default class RangeForCheck {
   public check = (blockHeaders: BlockHeader[]) => {
     if (blockHeaders.length === 0 || this.range.length === 0) {
       return {
-        success: true,
+        success: true
       }
     }
     const lastBlockHeader = this.range[this.range.length - 1]
@@ -75,7 +75,7 @@ export default class RangeForCheck {
     if (lastBlockHeader.hash !== firstBlockHeader.parentHash) {
       return {
         success: false,
-        type: CheckResultType.FirstNotMatch,
+        type: CheckResultType.FirstNotMatch
       }
     }
 
@@ -92,7 +92,7 @@ export default class RangeForCheck {
     }
 
     return {
-      success: true,
+      success: true
     }
   }
 }
