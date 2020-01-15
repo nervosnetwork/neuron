@@ -1,4 +1,3 @@
-import SyncedBlockNumber from 'models/synced-block-number'
 import RpcService from 'services/rpc-service'
 import ArrayUtils from 'utils/array'
 import BlockHeader from 'models/chain/block-header'
@@ -17,23 +16,11 @@ export default class RangeForCheck {
     this.url = url
   }
 
-  public getRange = async (): Promise<BlockHeader[]> => {
+  public getRange = async (blockNumber: bigint): Promise<BlockHeader[]> => {
     if (this.range.length < this.checkSize) {
-      this.range = await this.generateRange()
+      this.range = await this.generateRange(blockNumber)
     }
     return this.range
-  }
-
-  public generateRange = async (): Promise<BlockHeader[]> => {
-    const currentBlockNumber: bigint = await new SyncedBlockNumber().getNextBlock()
-    const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
-    const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
-    const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
-
-    const rpcService = new RpcService(this.url)
-    const headers: BlockHeader[] = await rpcService.getRangeBlockHeaders(blockNumbers)
-
-    return headers
   }
 
   public setRange = (range: BlockHeader[]) => {
@@ -94,5 +81,14 @@ export default class RangeForCheck {
     return {
       success: true
     }
+  }
+
+  private generateRange = async (currentBlockNumber: bigint): Promise<BlockHeader[]> => {
+    const startBlockNumber: bigint = currentBlockNumber - BigInt(this.checkSize)
+    const realStartBlockNumber: bigint = startBlockNumber > BigInt(0) ? startBlockNumber : BigInt(0)
+    const blockNumbers = ArrayUtils.range(realStartBlockNumber.toString(), currentBlockNumber.toString())
+
+    const rpcService = new RpcService(this.url)
+    return await rpcService.getRangeBlockHeaders(blockNumbers)
   }
 }

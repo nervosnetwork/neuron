@@ -191,7 +191,7 @@ export default class Queue {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === CheckResultType.FirstNotMatch) {
-        const range = await this.rangeForCheck.getRange()
+        const range = await this.rangeForCheck.getRange(this.currentBlockNumber)
         const rangeFirstBlockHeader: BlockHeader = range[0]
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
