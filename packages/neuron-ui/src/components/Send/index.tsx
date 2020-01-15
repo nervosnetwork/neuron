@@ -128,6 +128,7 @@ const Send = () => {
                   type="button"
                   aria-label="qr-btn"
                   className={styles.scanBtn}
+                  data-title={t('send.scan-screen-qr-code')}
                 >
                   <Scan />
                 </button>

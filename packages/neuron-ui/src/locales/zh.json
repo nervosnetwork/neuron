@@ -107,7 +107,8 @@
       "advanced-fee-settings": "交易费高级设置",
       "price": "单价",
       "expected-speed": "预期成交速度",
-      "total-cycles": "RISC-V Cycles 总数"
+      "total-cycles": "RISC-V Cycles 总数",
+      "scan-screen-qr-code": "扫描屏幕上的二维码"
     },
     "receive": {
       "click-to-copy": "点击复制地址",

@@ -107,7 +107,8 @@
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
       "expected-speed": "Expected speed",
-      "total-cycles": "Total RISC-V Cycles"
+      "total-cycles": "Total RISC-V Cycles",
+      "scan-screen-qr-code": "Scan the QR Code on the screen"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
