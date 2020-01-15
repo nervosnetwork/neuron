@@ -42,7 +42,9 @@ const syncNetwork = async (rescan = false) => {
   if (rescan) {
     await blockNumber.reset()
   }
-  SyncedBlockNumberSubject.getSubject().next((await blockNumber.getNextBlock()).toString())
+  const startBlockNumber = (await blockNumber.getNextBlock()).toString()
+  SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
+
   DataUpdateSubject.next({
     dataType: 'transaction',
     actionType: 'update',
@@ -51,7 +53,13 @@ const syncNetwork = async (rescan = false) => {
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
-      backgroundWindow.webContents.send("block-sync:start", network.remote, network.genesisHash, lockHashes)
+      backgroundWindow.webContents.send(
+        "block-sync:start",
+         network.remote,
+         network.genesisHash,
+         lockHashes,
+         startBlockNumber
+        )
     }
     // re init txCount in addresses if switch network
     await updateAllAddressesTxCount(network.remote)
