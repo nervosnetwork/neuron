@@ -15,14 +15,13 @@ const Receive = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
-  const { params } = useRouteMatch()
+  const {
+    params: { address },
+  } = useRouteMatch()
 
   const accountAddress = useMemo(
-    () =>
-      params.address ||
-      (addresses.find(addr => addr.type === 0 && addr.txCount === 0) || { address: '' }).address ||
-      '',
-    [params, addresses]
+    () => address || (addresses.find(addr => addr.type === 0 && addr.txCount === 0) || { address: '' }).address || '',
+    [address, addresses]
   )
 
   const copyAddress = useCallback(() => {
