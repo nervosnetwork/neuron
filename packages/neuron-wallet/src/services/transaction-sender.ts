@@ -227,13 +227,14 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const { core } = NodeService.getInstance()
-    const cellStatus = await core.rpc.getLiveCell(outPoint.toSDK(), false)
-    if (cellStatus.status !== 'live') {
+    const url: string = NodeService.getInstance().core.node.url
+    const rpcService = new RpcService(url)
+    const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
+    if (!cellWithStatus.isLive()) {
       throw new CellIsNotYetLive()
     }
-    const prevTx = await core.rpc.getTransaction(outPoint.txHash)
-    if (prevTx.txStatus.status !== 'committed') {
+    const prevTx = await rpcService.getTransaction(outPoint.txHash)
+    if (!prevTx || !prevTx.txStatus.isCommitted()) {
       throw new TransactionIsNotCommittedYet()
     }
 
@@ -241,16 +242,16 @@ export default class TransactionSender {
     const addresses: string[] = addressInfos.map(info => info.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
-    const depositBlockHeader = await core.rpc.getHeader(prevTx.txStatus.blockHash!)
+    const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
     const changeAddress = await AddressesService.nextUnusedChangeAddress(walletID)
-    const prevOutput = Output.fromSDK(cellStatus.cell.output)
+    const prevOutput = cellWithStatus.cell!.output
     const tx: Transaction = await TransactionGenerator.startWithdrawFromDao(
       lockHashes,
       outPoint,
       prevOutput,
-      depositBlockHeader.number,
-      depositBlockHeader.hash,
+      depositBlockHeader!.number,
+      depositBlockHeader!.hash,
       changeAddress!.address,
       fee,
       feeRate,
@@ -276,11 +277,11 @@ export default class TransactionSender {
     const rpcService = new RpcService(url)
 
     const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
-    if (cellStatus.status !== 'live') {
+    if (!cellStatus.isLive()) {
       throw new CellIsNotYetLive()
     }
     const prevTx = (await rpcService.getTransaction(withdrawingOutPoint.txHash))!
-    if (prevTx.txStatus.status !== 'committed') {
+    if (!prevTx.txStatus.isCommitted()) {
       throw new TransactionIsNotCommittedYet()
     }
     const content = cellStatus.cell!.data!.content

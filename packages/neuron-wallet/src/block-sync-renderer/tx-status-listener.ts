@@ -23,7 +23,7 @@ const getTransactionStatus = async (hash: string) => {
       blockHash: null,
     }
   }
-  if (txWithStatus.txStatus.status === 'committed') {
+  if (txWithStatus.txStatus.isCommitted()) {
     return {
       tx: txWithStatus.transaction,
       status: TransactionStatus.Success,
