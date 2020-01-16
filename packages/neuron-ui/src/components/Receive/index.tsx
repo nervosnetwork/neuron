@@ -21,7 +21,7 @@ const Receive = () => {
 
   const accountAddress = useMemo(
     () => address || (addresses.find(addr => addr.type === 0 && addr.txCount === 0) || { address: '' }).address || '',
-    [addresses]
+    [address, addresses]
   )
 
   const copyAddress = useCallback(() => {
