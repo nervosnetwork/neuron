@@ -33,7 +33,7 @@ export default class Input {
     TypeChecker.numberChecker(this.since, this.capacity, this.inputIndex)
   }
 
-  public static fromObject({ previousOutput, since, capacity, lock, inputIndex }: {
+  public static fromObject({ previousOutput, since, capacity, lock, lockHash, inputIndex }: {
     previousOutput: OutPoint | null,
     since?: string,
     capacity?: string | null,
@@ -46,6 +46,7 @@ export default class Input {
       since,
       capacity,
       lock ? Script.fromObject(lock) : lock,
+      lockHash,
       inputIndex,
     )
   }
