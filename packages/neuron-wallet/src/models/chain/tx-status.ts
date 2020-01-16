@@ -16,6 +16,18 @@ export default class TxStatus {
     TypeCheckerUtils.hashChecker(this.blockHash)
   }
 
+  public isPending(): boolean {
+    return this.status === TxStatusType.Pending
+  }
+
+  public isProposed(): boolean {
+    return this.status === TxStatusType.Proposed
+  }
+
+  public isCommitted(): boolean {
+    return this.status === TxStatusType.Committed
+  }
+
   public toSDK() {
     return {
       blockHash: this.blockHash,
