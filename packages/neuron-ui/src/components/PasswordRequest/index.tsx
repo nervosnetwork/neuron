@@ -104,6 +104,7 @@ const PasswordRequest = () => {
         onChange={onChange}
         autoFocus
         onKeyPress={onKeyPress}
+        required
       />
       <div className={styles.footer}>
         <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />

@@ -342,6 +342,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
             hint={input.hint ? t(input.hint) : undefined}
             suffix={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : undefined}
             className={styles.submissionField}
+            required
           />
         </div>
       ))}

@@ -91,6 +91,7 @@ const NetworkEditor = () => {
           label={t('settings.network.edit-network.rpc-url')}
           error={editor.urlError}
           placeholder="http://localhost:8114"
+          required
         />
         <TextField
           value={editor.name}
@@ -99,6 +100,7 @@ const NetworkEditor = () => {
           label={t('settings.network.edit-network.name')}
           error={editor.nameError}
           placeholder="My Custom Node"
+          required
         />
       </Stack>
       <div className={styles.actions}>
