@@ -155,9 +155,6 @@ export default class Transaction extends BaseEntity {
   }
 
   private changed = (event: string) => {
-    TxDbChangedSubject.getSubject().next({
-      event,
-      tx: this.toModel(),
-    })
+    TxDbChangedSubject.getSubject().next({ event })
   }
 }
