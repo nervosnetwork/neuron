@@ -10,7 +10,6 @@ import OutPoint from 'models/chain/out-point'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import Script from 'models/chain/script'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
@@ -134,17 +133,14 @@ export default class Queue {
   }
 
   private daoScriptHash = async (): Promise<string> => {
-    const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScript = new Script(
-      daoScriptInfo.codeHash,
-      "0x",
-      daoScriptInfo.hashType
-    )
-    return daoScript.computeHash()
+    await DaoUtils.daoScript(this.url)
+    return DaoUtils.scriptHash
   }
 
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
+    const daoScriptHash = await this.daoScriptHash()
+
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
@@ -168,8 +164,7 @@ export default class Queue {
               input.setInputIndex(inputIndex.toString())
 
               if (
-                previousOutput.type &&
-                previousOutput.type.computeHash() === await this.daoScriptHash() &&
+                previousOutput.type?.computeHash() === daoScriptHash &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]

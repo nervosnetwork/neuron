@@ -32,13 +32,8 @@ export default class CheckTx {
   }
 
   private daoScriptHash = async (): Promise<string> => {
-    const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScript = new Script(
-      daoScriptInfo.codeHash,
-      "0x",
-      daoScriptInfo.hashType
-    )
-    return daoScript.computeHash()
+    await DaoUtils.daoScript(this.url)
+    return DaoUtils.scriptHash
   }
 
   private selectOutputsOfWallets = async (lockHashes: string[], daoScriptHash: string): Promise<Output[]> => {
