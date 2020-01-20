@@ -15,7 +15,7 @@ import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
-import CheckTx from './check-and-save/tx'
+import CheckTx from './check-tx'
 
 export default class Queue {
   private url: string
