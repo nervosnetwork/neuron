@@ -9,7 +9,10 @@ import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import Script from 'models/chain/script'
 
-export default class CheckTx {
+// Search for all addresses related to a transaction. These addresses include:
+//   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
+//   * Addresses for this transaction's outputs. (Addresses that receive something from this tx)
+export default class TxAddressFinder {
   private url: string
   private lockHashes: Set<string>
   private tx: Transaction
@@ -55,26 +58,24 @@ export default class CheckTx {
   }
 
   private selectInputAddresses = async (): Promise<string[]> => {
-    const inputs = this.tx.inputs!
-
     const addresses: string[] = []
+    const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
+
     for (const input of inputs) {
-      const outPoint: OutPoint | null = input.previousOutput
-      if (outPoint) {
-        const output = await getConnection()
-          .getRepository(OutputEntity)
-          .findOne({
-            outPointTxHash: outPoint.txHash,
-            outPointIndex: outPoint.index,
-          })
-        if (output && this.lockHashes.has(output.lockHash)) {
-          addresses.push(
-            LockUtils.lockScriptToAddress(
-              new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
-              NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-            )
+      const outPoint: OutPoint = input.previousOutput!
+      const output = await getConnection()
+        .getRepository(OutputEntity)
+        .findOne({
+          outPointTxHash: outPoint.txHash,
+          outPointIndex: outPoint.index,
+        })
+      if (output && this.lockHashes.has(output.lockHash)) {
+        addresses.push(
+          LockUtils.lockScriptToAddress(
+            new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
+            NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
           )
-        }
+        )
       }
     }
 

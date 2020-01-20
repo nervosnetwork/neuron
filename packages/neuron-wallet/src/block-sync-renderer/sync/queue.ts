@@ -14,7 +14,7 @@ import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
-import CheckTx from './check-tx'
+import TxAddressFinder from './tx-address-finder'
 
 export default class Queue {
   private url: string
@@ -146,8 +146,7 @@ export default class Queue {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const checkTx = new CheckTx(this.url, this.lockHashes, tx)
-        const addresses = await checkTx.addresses()
+        const addresses = await new TxAddressFinder(this.url, this.lockHashes, tx).addresses()
         if (addresses.length > 0) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
