@@ -11,18 +11,19 @@ import Script from 'models/chain/script'
 
 export default class CheckTx {
   private url: string
+  private lockHashes: Set<string>
   private tx: Transaction
 
-  constructor(url: string, tx: Transaction) {
+  constructor(url: string, lockHashes: string[], tx: Transaction) {
     this.url = url
+    this.lockHashes = new Set(lockHashes)
     this.tx = tx
   }
 
-  public check = async (lockHashes: string[]): Promise<string[]> => {
-    const daoScriptHash = await this.daoScriptHash()
-    const outputs: Output[] = await this.selectOutputsOfWallets(lockHashes, daoScriptHash)
-    const inputAddresses = await this.selectInputAddressesOfWallets(lockHashes)
+  public addresses = async (): Promise<string[]> => {
+    const inputAddresses = await this.selectInputAddresses()
 
+    const outputs: Output[] = await this.selectOutputs()
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const outputAddresses: string[] = outputs.map(output => {
       return LockUtils.lockScriptToAddress(output.lock, addressPrefix)
@@ -36,9 +37,10 @@ export default class CheckTx {
     return DaoUtils.scriptHash
   }
 
-  private selectOutputsOfWallets = async (lockHashes: string[], daoScriptHash: string): Promise<Output[]> => {
+  private selectOutputs = async (): Promise<Output[]> => {
+    const daoScriptHash = await this.daoScriptHash()
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
-      if (lockHashes.includes(output.lockHash!)) {
+      if (this.lockHashes.has(output.lockHash!)) {
         if (output.type) {
           if (output.typeHash === daoScriptHash) {
             this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
@@ -52,7 +54,7 @@ export default class CheckTx {
     return outputs
   }
 
-  private selectInputAddressesOfWallets = async (lockHashes: string[]): Promise<string[]> => {
+  private selectInputAddresses = async (): Promise<string[]> => {
     const inputs = this.tx.inputs!
 
     const addresses: string[] = []
@@ -65,7 +67,7 @@ export default class CheckTx {
             outPointTxHash: outPoint.txHash,
             outPointIndex: outPoint.index,
           })
-        if (output && lockHashes.includes(output.lockHash)) {
+        if (output && this.lockHashes.has(output.lockHash)) {
           addresses.push(
             LockUtils.lockScriptToAddress(
               new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),

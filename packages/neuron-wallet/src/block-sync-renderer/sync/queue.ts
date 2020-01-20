@@ -146,8 +146,8 @@ export default class Queue {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const checkTx = new CheckTx(this.url, tx)
-        const addresses = await checkTx.check(this.lockHashes)
+        const checkTx = new CheckTx(this.url, this.lockHashes, tx)
+        const addresses = await checkTx.addresses()
         if (addresses.length > 0) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
