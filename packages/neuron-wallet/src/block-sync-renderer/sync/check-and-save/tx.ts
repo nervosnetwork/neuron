@@ -1,7 +1,6 @@
 import { getConnection } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
 import LockUtils from 'models/lock-utils'
-import CheckOutput from './output'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import Output from 'models/chain/output'
@@ -36,9 +35,7 @@ export default class CheckTx {
 
   private selectOutputsOfWallets = (lockHashes: string[]): Output[] => {
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
-      const checkOutput = new CheckOutput(output)
-      const result = checkOutput.checkLockHash(lockHashes)
-      if (result) {
+      if (lockHashes.includes(output.lockHash!)) {
         if (output.type) {
           if (output.typeHash === this.daoTypeHash) {
             this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
@@ -48,6 +45,7 @@ export default class CheckTx {
       }
       return false
     }).filter(output => !!output) as Output[]
+
     return outputs
   }
 
