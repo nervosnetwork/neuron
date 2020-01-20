@@ -9,13 +9,12 @@ import DaoUtils from 'models/dao-utils'
 import OutPoint from 'models/chain/out-point'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
-import Script from 'models/chain/script'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
-import CheckTx from './check-and-save/tx'
+import TxAddressFinder from './tx-address-finder'
 
 export default class Queue {
   private url: string
@@ -122,15 +121,8 @@ export default class Queue {
       return
     }
 
-    const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash: string = new Script(
-      daoScriptInfo.codeHash,
-      "0x",
-      daoScriptInfo.hashType
-    ).computeHash()
-
     // 3. check and save
-    await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
+    await this.checkAndSave(blocks)
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]
@@ -140,15 +132,21 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
-  private checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
+  private daoScriptHash = async (): Promise<string> => {
+    await DaoUtils.daoScript(this.url)
+    return DaoUtils.scriptHash
+  }
+
+  private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
+    const daoScriptHash = await this.daoScriptHash()
+
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const checkTx = new CheckTx(tx, daoScriptHash)
-        const addresses = await checkTx.check(lockHashes)
+        const addresses = await new TxAddressFinder(this.url, this.lockHashes, tx).addresses()
         if (addresses.length > 0) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
@@ -165,8 +163,7 @@ export default class Queue {
               input.setInputIndex(inputIndex.toString())
 
               if (
-                previousOutput.type &&
-                previousOutput.type.computeHash() === daoScriptHash &&
+                previousOutput.type?.computeHash() === daoScriptHash &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]
@@ -187,7 +184,7 @@ export default class Queue {
     cachedPreviousTxs.clear()
   }
 
-  public checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
+  private checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === CheckResultType.FirstNotMatch) {
