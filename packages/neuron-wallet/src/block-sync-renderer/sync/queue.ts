@@ -9,8 +9,8 @@ import DaoUtils from 'models/dao-utils'
 import OutPoint from 'models/chain/out-point'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
-import Script from 'models/chain/script'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import Script from 'models/chain/script'
 import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
@@ -122,15 +122,8 @@ export default class Queue {
       return
     }
 
-    const daoScriptInfo = await DaoUtils.daoScript(this.url)
-    const daoScriptHash: string = new Script(
-      daoScriptInfo.codeHash,
-      "0x",
-      daoScriptInfo.hashType
-    ).computeHash()
-
     // 3. check and save
-    await this.checkAndSave(blocks, this.lockHashes, daoScriptHash)
+    await this.checkAndSave(blocks)
 
     // 4. update currentBlockNumber
     const lastBlock = blocks[blocks.length - 1]
@@ -140,15 +133,25 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
-  private checkAndSave = async (blocks: Block[], lockHashes: string[], daoScriptHash: string): Promise<void> => {
+  private daoScriptHash = async (): Promise<string> => {
+    const daoScriptInfo = await DaoUtils.daoScript(this.url)
+    const daoScript = new Script(
+      daoScriptInfo.codeHash,
+      "0x",
+      daoScriptInfo.hashType
+    )
+    return daoScript.computeHash()
+  }
+
+  private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const checkTx = new CheckTx(tx, daoScriptHash)
-        const addresses = await checkTx.check(lockHashes)
+        const checkTx = new CheckTx(this.url, tx)
+        const addresses = await checkTx.check(this.lockHashes)
         if (addresses.length > 0) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
@@ -166,7 +169,7 @@ export default class Queue {
 
               if (
                 previousOutput.type &&
-                previousOutput.type.computeHash() === daoScriptHash &&
+                previousOutput.type.computeHash() === await this.daoScriptHash() &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]
@@ -187,7 +190,7 @@ export default class Queue {
     cachedPreviousTxs.clear()
   }
 
-  public checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
+  private checkBlockHeader = async (blockHeaders: BlockHeader[]) => {
     const checkResult = this.rangeForCheck.check(blockHeaders)
     if (!checkResult.success) {
       if (checkResult.type === CheckResultType.FirstNotMatch) {
