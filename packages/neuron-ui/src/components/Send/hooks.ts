@@ -41,11 +41,17 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   t: TFunction
 }) => {
   const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
-  if (verifyTransactionOutputs(items, type === 'all')) {
-    if (type === 'common') {
+  if (items.length === 1 && items[0].amount === undefined) {
+    setTotalAmount('0')
+  } else if (type === 'common') {
+    try {
       const totalAmount = outputsToTotalAmount(items)
       setTotalAmount(totalAmount)
+    } catch (err) {
+      console.warn(err)
     }
+  }
+  if (verifyTransactionOutputs(items, type === 'all')) {
     const realParams = {
       walletID,
       items: items.map(item => ({
