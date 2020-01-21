@@ -55,7 +55,7 @@ mac:
   gatekeeperAssess: false
   entitlements: assets/entitlements.plist
   entitlementsInherit: assets/entitlements.plist
-  electronLanguages: ["en", "zh", "zh_CN"]
+  electronLanguages: ["en", "zh", "zh_CN", "zh_TW"]
   target:
     - dmg
     - zip
