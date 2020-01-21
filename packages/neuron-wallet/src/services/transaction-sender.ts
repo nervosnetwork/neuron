@@ -356,10 +356,10 @@ export default class TransactionSender {
       const txSize: number = TransactionSize.tx(tx)
       const txFee: bigint = TransactionFee.fee(txSize, BigInt(feeRate))
       tx.fee = txFee.toString()
-      output.capacity = (outputCapacity - txFee).toString()
+      tx.outputs[0].capacity = (outputCapacity - txFee).toString()
     } else {
       tx.fee = fee
-      output.capacity = (outputCapacity - feeInt).toString()
+      tx.outputs[0].capacity = (outputCapacity - feeInt).toString()
     }
 
     logger.debug('withdrawFromDao fee:', tx.fee)
