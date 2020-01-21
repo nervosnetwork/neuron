@@ -7,9 +7,10 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, SyncStatus } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
+import getSyncStatus from 'utils/getSyncStatus'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -34,7 +35,7 @@ const NervosDAO = () => {
     },
     wallet,
     nervosDAO: { records },
-    chain: { connectionStatus },
+    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -116,6 +117,13 @@ const NervosDAO = () => {
     records,
     tipBlockHash,
     setWithdrawList,
+  })
+
+  const syncStatus = getSyncStatus({
+    tipBlockNumber,
+    tipBlockTimestamp,
+    syncedBlockNumber,
+    currentTimestamp: Date.now(),
   })
 
   const MemoizedRecords = useMemo(() => {
@@ -264,6 +272,9 @@ const NervosDAO = () => {
             <span>{value}</span>
           </div>
         ))}
+        {SyncStatus.Syncing === syncStatus ? (
+          <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+        ) : null}
       </div>
       <div className={styles.deposit}>
         <div>

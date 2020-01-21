@@ -14,7 +14,8 @@ import {
   uniformTimeFormatter,
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
+import getSyncStatus from 'utils/getSyncStatus'
+import { SyncStatus as SyncStatusEnum, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -58,6 +59,13 @@ const Overview = () => {
   const history = useHistory()
   const [isStatusShow, setIsStatusShow] = useState(false)
 
+  const syncStatus = getSyncStatus({
+    syncedBlockNumber,
+    tipBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
+
   useEffect(() => {
     if (id) {
       backToTop()
@@ -76,38 +84,29 @@ const Overview = () => {
     history.push(Routes.History)
   }, [history])
 
-  const now = Date.now()
-
   const balanceProperties: Property[] = useMemo(() => {
     const balanceValue = shannonToCKBFormatter(balance)
     const [balanceInt, balanceDec] = balanceValue.split('.')
     const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
     const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
-    const balanceSuffixEl = (
-      <span>
-        {` CKB${
-          +tipBlockNumber > 0 &&
-          BigInt(syncedBlockNumber) >= BigInt(0) &&
-          (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber) ||
-            tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < now)
-            ? `(${t('overview.syncing')})`
-            : ''
-        }`}
-      </span>
-    )
+    const balanceSuffixEl = ' CKB'
+    const prompt = SyncStatusEnum.Syncing === syncStatus ? t('sync.syncing-balance') : ''
     return [
       {
         label: t('overview.balance'),
         value: (
-          <>
-            {balanceIntEl}
-            {balanceDecEl}
-            {balanceSuffixEl}
-          </>
+          <div className={styles.balanceValue}>
+            <span>
+              {balanceIntEl}
+              {balanceDecEl}
+              {balanceSuffixEl}
+            </span>
+            <span className={styles.balancePrompt}>{prompt}</span>
+          </div>
         ),
       },
     ]
-  }, [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp, now])
+  }, [t, balance, syncStatus])
   const blockchainStatusProperties = useMemo(
     () => [
       {

@@ -2,50 +2,35 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from 'containers/Navbar/navbar.module.scss'
-import { MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils/const'
 
 const SyncStatus = ({
-  tipBlockNumber = '',
-  tipBlockTimestamp = 0,
-  syncedBlockNumber = '',
-  bufferBlockNumber = BUFFER_BLOCK_NUMBER,
+  syncStatus,
+  connectionStatus,
 }: React.PropsWithoutRef<{
-  tipBlockNumber: string
-  tipBlockTimestamp: number
-  syncedBlockNumber: string
-  bufferBlockNumber?: number
+  syncStatus: SyncStatusEnum
+  connectionStatus: State.ConnectionStatus
 }>) => {
   const [t] = useTranslation()
-  if (tipBlockNumber === '') {
+  if (SyncStatusEnum.FailToFetchTipBlock === syncStatus) {
     return (
-      <div className={styles.sync}>
+      <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
         <span>{t('navbar.fail-to-fetch-tip-block-number')}</span>
       </div>
     )
   }
 
-  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0') {
+  if (SyncStatusEnum.SyncNotStart === syncStatus) {
     return (
-      <div className={styles.sync}>
+      <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
         <span>{t('navbar.sync-not-start')}</span>
       </div>
     )
   }
 
-  const percentage = `${((+syncedBlockNumber / +tipBlockNumber) * 100).toFixed(2)}%`
-
   return (
-    <div className={styles.sync}>
-      {BigInt(syncedBlockNumber) + BigInt(bufferBlockNumber) < BigInt(tipBlockNumber) ? (
-        <>
-          <span>{percentage}</span>
-          <progress max={tipBlockNumber} value={syncedBlockNumber} />
-        </>
-      ) : (
-        <span title={percentage}>
-          {t(`sync.${tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= Date.now() ? 'synced' : 'syncing'}`)}
-        </span>
-      )}
+    <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
+      <span>{t(`sync.${SyncStatusEnum.SyncCompleted === syncStatus ? 'synced' : 'syncing'}`)}</span>
     </div>
   )
 }
