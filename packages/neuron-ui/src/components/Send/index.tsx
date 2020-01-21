@@ -113,7 +113,7 @@ const Send = () => {
         </div>
         <div>
           <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
-          {SyncStatus.Syncing === syncStatus ? (
+          {[SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ? (
             <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
           ) : null}
         </div>

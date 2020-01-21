@@ -90,7 +90,9 @@ const Overview = () => {
     const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
     const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
     const balanceSuffixEl = ' CKB'
-    const prompt = SyncStatusEnum.Syncing === syncStatus ? t('sync.syncing-balance') : ''
+    const prompt = [SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)
+      ? t('sync.syncing-balance')
+      : ''
     return [
       {
         label: t('overview.balance'),

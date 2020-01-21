@@ -325,7 +325,8 @@
       "synced": "同步完成",
       "syncing": "同步中",
       "block-number": "區塊高度",
-      "syncing-balance": "區塊同步中, 正在獲取最新余額..."
+      "syncing-balance": "區塊同步中, 正在獲取最新余額...",
+      "slow": "同步緩慢，請檢查網絡"
     },
     "pagination": {
       "previous-page": "上一頁",

@@ -1,5 +1,9 @@
 import { SyncStatus, BUFFER_BLOCK_NUMBER, MAX_TIP_BLOCK_DELAY } from 'utils/const'
 
+const tenMins = 10 * 60 * 1000
+let blockNumber10MinAgo: string = ''
+let timestamp10MinAgo: number | undefined
+
 export default ({
   syncedBlockNumber,
   tipBlockNumber,
@@ -11,12 +15,25 @@ export default ({
   tipBlockTimestamp: number
   currentTimestamp: number
 }) => {
+  if (!timestamp10MinAgo) {
+    timestamp10MinAgo = currentTimestamp
+    blockNumber10MinAgo = tipBlockNumber
+  }
+
   const now = Math.floor(currentTimestamp / 1000) * 1000
   if (tipBlockNumber === '') {
     return SyncStatus.FailToFetchTipBlock
   }
   if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0') {
     return SyncStatus.SyncNotStart
+  }
+
+  if (timestamp10MinAgo + tenMins < currentTimestamp) {
+    if (BigInt(blockNumber10MinAgo) >= BigInt(tipBlockNumber)) {
+      return SyncStatus.SyncPending
+    }
+    timestamp10MinAgo = currentTimestamp
+    blockNumber10MinAgo = tipBlockNumber
   }
   if (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber)) {
     return SyncStatus.Syncing

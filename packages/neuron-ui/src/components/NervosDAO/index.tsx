@@ -272,7 +272,7 @@ const NervosDAO = () => {
             <span>{value}</span>
           </div>
         ))}
-        {SyncStatus.Syncing === syncStatus ? (
+        {[SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ? (
           <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
         ) : null}
       </div>

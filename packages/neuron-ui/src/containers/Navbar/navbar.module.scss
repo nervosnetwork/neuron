@@ -93,6 +93,10 @@ $left-padding: 15px;
       animation: rotate 1s infinite linear;
     }
 
+    &[data-sync-status=SyncPending]::before {
+      background: #ED784A !important;
+    }
+
   }
 }
 

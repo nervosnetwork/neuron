@@ -23,14 +23,30 @@ const SyncStatus = ({
   if (SyncStatusEnum.SyncNotStart === syncStatus) {
     return (
       <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
-        <span>{t('navbar.sync-not-start')}</span>
+        <span style={{ color: 'red' }}>{t('navbar.sync-not-start')}</span>
+      </div>
+    )
+  }
+
+  if (SyncStatusEnum.SyncPending === syncStatus) {
+    return (
+      <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
+        <span style={{ color: '#ED784A' }}>{t('sync.slow')}</span>
+      </div>
+    )
+  }
+
+  if (SyncStatusEnum.SyncCompleted === syncStatus) {
+    return (
+      <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
+        <span>{t('sync.synced')}</span>
       </div>
     )
   }
 
   return (
     <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
-      <span>{t(`sync.${SyncStatusEnum.SyncCompleted === syncStatus ? 'synced' : 'syncing'}`)}</span>
+      <span>{t('sync.syncing')}</span>
     </div>
   )
 }
