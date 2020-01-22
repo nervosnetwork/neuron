@@ -5,7 +5,7 @@ import {
   parseAddress
 } from '@nervosnetwork/ckb-sdk-utils'
 import NodeService from 'services/node'
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import OutPoint from './chain/out-point'
 import Script, { ScriptHashType } from './chain/script'
 
@@ -27,9 +27,9 @@ export default class LockUtils {
   private static previousURL: string | undefined
 
   static async loadSystemScript(nodeURL: string): Promise<SystemScript> {
-    const core = new Core(nodeURL)
+    const ckb = new CKB(nodeURL)
 
-    const systemCell = await core.loadSecp256k1Dep()
+    const systemCell = await ckb.loadSecp256k1Dep()
     let { codeHash } = systemCell
     const { outPoint, hashType } = systemCell
     let { txHash } = outPoint
@@ -50,7 +50,7 @@ export default class LockUtils {
     }
   }
 
-  static async systemScript(nodeURL: string = NodeService.getInstance().core.rpc.node.url): Promise<SystemScript> {
+  static async systemScript(nodeURL: string = NodeService.getInstance().ckb.rpc.node.url): Promise<SystemScript> {
     if (LockUtils.systemScriptInfo && nodeURL === LockUtils.previousURL) {
       return LockUtils.systemScriptInfo
     }
@@ -67,7 +67,7 @@ export default class LockUtils {
 
   static setSystemScript(info: SystemScript) {
     LockUtils.systemScriptInfo = info
-    LockUtils.previousURL = NodeService.getInstance().core.rpc.node.url
+    LockUtils.previousURL = NodeService.getInstance().ckb.rpc.node.url
   }
 
   addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {

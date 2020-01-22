@@ -341,7 +341,7 @@ export class TransactionsService {
   public static getCountByAddressAndStatus = async (
     address: string,
     status: TransactionStatus[],
-    url: string = NodeService.getInstance().core.rpc.node.url
+    url: string = NodeService.getInstance().ckb.rpc.node.url
   ): Promise<number> => {
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)

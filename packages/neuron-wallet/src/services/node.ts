@@ -1,4 +1,4 @@
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
 import https from 'https'
@@ -32,7 +32,7 @@ class NodeService {
 
   private _tipBlockNumber: string = '0'
 
-  public core: Core = new Core('')
+  public ckb: CKB = new CKB('')
 
   constructor() {
     this.start()
@@ -68,14 +68,14 @@ class NodeService {
     }
     if (url.startsWith('https')) {
       const httpsAgent = new https.Agent({ keepAlive: true })
-      this.core.setNode({ url, httpsAgent })
+      this.ckb.setNode({ url, httpsAgent })
     } else {
       const httpAgent = new http.Agent({ keepAlive: true })
-      this.core.setNode({ url, httpAgent })
+      this.ckb.setNode({ url, httpAgent })
     }
     this.tipNumberSubject.next('0')
     this.connectionStatusSubject.next(false)
-    return this.core
+    return this.ckb
   }
 
   public start = () => {
@@ -90,7 +90,7 @@ class NodeService {
       .pipe(
         delay(this.delayTime),
         flatMap(() => {
-          return this.core.rpc
+          return this.ckb.rpc
             .getTipBlockNumber()
             .then(tipNumber => {
               this.connectionStatusSubject.next(true)

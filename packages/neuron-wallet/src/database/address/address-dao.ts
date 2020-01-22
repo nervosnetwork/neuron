@@ -55,7 +55,7 @@ export default class AddressDao {
   // balance is the balance of the cells those who don't hold data or type script
   public static updateTxCountAndBalances = async (
     addresses: string[],
-    url: string = NodeService.getInstance().core.rpc.node.url
+    url: string = NodeService.getInstance().ckb.rpc.node.url
   ): Promise<Address[]> => {
     const all = AddressStore.getAll()
     const toUpdate = all.filter(value => {

@@ -95,7 +95,7 @@ export default class AddressService {
 
   public static updateTxCountAndBalances = async (
     addresses: string[],
-    url: string = NodeService.getInstance().core.rpc.node.url
+    url: string = NodeService.getInstance().ckb.rpc.node.url
   ): Promise<Address[]> => {
     return AddressDao.updateTxCountAndBalances(addresses, url)
   }

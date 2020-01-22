@@ -1,6 +1,6 @@
 import { interval } from 'rxjs'
 import { getConnection } from 'typeorm'
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import LockUtils from 'models/lock-utils'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
@@ -13,7 +13,7 @@ import { TransactionStatus } from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 const getTransactionStatus = async (hash: string) => {
-  const url: string = NodeService.getInstance().core.rpc.node.url
+  const url: string = NodeService.getInstance().ckb.rpc.node.url
   const rpcService = new RpcService(url)
   const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
   if (!txWithStatus) {
@@ -61,14 +61,14 @@ const trackingStatus = async () => {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    const { core } = NodeService.getInstance()
-    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
+    const { ckb } = NodeService.getInstance()
+    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
   }
 
   if (successTxs.length > 0) {
-    const url: string = NodeService.getInstance().core.rpc.node.url
-    const core = new Core(url)
-    const rpcService = new RpcService(core.rpc.node.url)
+    const url: string = NodeService.getInstance().ckb.rpc.node.url
+    const ckb = new CKB(url)
+    const rpcService = new RpcService(ckb.rpc.node.url)
     for (const successTx of successTxs) {
       const transaction = successTx.tx!
       const { blockHash } = successTx
