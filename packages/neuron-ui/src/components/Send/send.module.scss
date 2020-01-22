@@ -93,6 +93,8 @@ $textfieldWidth: calc(100vw - 370px);
     color: var(--nervos-green);
     font-size: 0.8rem;
     margin-top: 3px;
+    word-break: keep-all;
+    white-space: nowrap;
   }
 }
 
