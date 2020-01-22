@@ -269,6 +269,12 @@ const NervosDAO = () => {
         {t('sync.sync-failed')}
       </span>
     )
+  } else if (SyncStatus.SyncNotStart === syncStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
+        {t('sync.sync-not-start')}
+      </span>
+    )
   } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }

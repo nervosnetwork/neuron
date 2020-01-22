@@ -327,7 +327,8 @@
       "block-number": "区块高度",
       "syncing-balance": "区块同步中, 正在获取最新余额",
       "slow": "同步缓慢，请检查网络",
-      "sync-failed": "连接失败, 请检查网络"
+      "sync-failed": "连接失败, 请检查网络",
+      "sync-not-start": "同步尚未开始, 请尝试重启"
     },
     "pagination": {
       "previous-page": "上一页",

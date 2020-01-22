@@ -98,6 +98,12 @@ const Overview = () => {
           {t('sync.sync-failed')}
         </span>
       )
+    } else if (SyncStatusEnum.SyncNotStart === syncStatus) {
+      prompt = (
+        <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'break-all', whiteSpace: 'pre-line' }}>
+          {t('sync.sync-not-start')}
+        </span>
+      )
     } else if ([SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)) {
       prompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
     }
@@ -106,7 +112,7 @@ const Overview = () => {
         label: t('overview.balance'),
         value: (
           <div className={styles.balanceValue}>
-            <span>
+            <span style={{ width: '280px' }}>
               {balanceIntEl}
               {balanceDecEl}
               {balanceSuffixEl}
