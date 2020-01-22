@@ -12,7 +12,7 @@ import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG, SyncStatus } from 'utils/const'
+import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG, SyncStatus, ConnectionStatus } from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import {
@@ -105,6 +105,17 @@ const Send = () => {
     })
   }, [outputs, network])
 
+  let balancePrompt = null
+  if (ConnectionStatus.Offline === connectionStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-failed')}
+      </span>
+    )
+  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+  }
+
   return (
     <div style={{ padding: '39px 0 0 0' }}>
       <div className={styles.balance}>
@@ -113,9 +124,7 @@ const Send = () => {
         </div>
         <div>
           <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
-          {[SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ? (
-            <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-          ) : null}
+          {balancePrompt}
         </div>
       </div>
       <div>
