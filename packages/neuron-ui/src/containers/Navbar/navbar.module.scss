@@ -6,7 +6,7 @@ $left-padding: 15px;
 .sidebar {
   display: grid;
   grid-template:
-    'name'75px 'navs'1fr 'network'22px 'sync'auto / var(--sidebar-width);
+    'name'75px 'navs'1fr 'network'22px 'sync'3.125rem / var(--sidebar-width);
   height: 100vh;
   background: black;
 }
@@ -106,10 +106,6 @@ $left-padding: 15px;
   flex-direction: column;
   grid-area: sync;
   font-size: 0.8rem;
-
-  &[data-online=false] {
-    opacity: 0;
-  }
 
   span {
     padding-left: $left-padding * 2;

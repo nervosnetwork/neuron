@@ -15,7 +15,7 @@ import {
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
 import getSyncStatus from 'utils/getSyncStatus'
-import { SyncStatus as SyncStatusEnum, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -52,6 +52,7 @@ const Overview = () => {
     chain: {
       tipBlockNumber: syncedBlockNumber,
       transactions: { items = [] },
+      connectionStatus,
     },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -90,9 +91,16 @@ const Overview = () => {
     const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
     const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
     const balanceSuffixEl = ' CKB'
-    const prompt = [SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)
-      ? t('sync.syncing-balance')
-      : ''
+    let prompt = null
+    if (ConnectionStatus.Offline === connectionStatus) {
+      prompt = (
+        <span className={styles.balancePrompt} style={{ color: 'red' }}>
+          {t('sync.sync-failed')}
+        </span>
+      )
+    } else if ([SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)) {
+      prompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+    }
     return [
       {
         label: t('overview.balance'),
@@ -103,12 +111,12 @@ const Overview = () => {
               {balanceDecEl}
               {balanceSuffixEl}
             </span>
-            <span className={styles.balancePrompt}>{prompt}</span>
+            {prompt}
           </div>
         ),
       },
     ]
-  }, [t, balance, syncStatus])
+  }, [t, balance, syncStatus, connectionStatus])
   const blockchainStatusProperties = useMemo(
     () => [
       {

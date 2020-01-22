@@ -323,10 +323,11 @@
     },
     "sync": {
       "synced": "同步完成",
-      "syncing": "同步中",
+      "syncing": "區塊同步中",
       "block-number": "區塊高度",
-      "syncing-balance": "區塊同步中, 正在獲取最新余額...",
-      "slow": "同步緩慢，請檢查網絡"
+      "syncing-balance": "區塊同步中, 正在獲取最新余額",
+      "slow": "同步緩慢，請檢查網絡",
+      "sync-failed": "连接失败, 请检查网络"
     },
     "pagination": {
       "previous-page": "上一頁",
