@@ -31,7 +31,7 @@ const SyncStatus = ({
   if (SyncStatusEnum.SyncPending === syncStatus) {
     return (
       <div className={styles.sync} data-online={connectionStatus === ConnectionStatus.Online}>
-        <span style={{ color: '#ED784A' }}>{t('sync.slow')}</span>
+        <span style={{ color: '#f7ae4d' }}>{t('sync.slow')}</span>
       </div>
     )
   }
