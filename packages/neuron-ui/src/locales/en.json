@@ -326,7 +326,8 @@
       "syncing": "Syncing",
       "block-number": "block number",
       "syncing-balance": "Balance is under updating...",
-      "slow": "Sync is slow"
+      "slow": "Sync is slow",
+      "sync-failed": "Sync failed"
     },
     "pagination": {
       "previous-page": "Previous page",

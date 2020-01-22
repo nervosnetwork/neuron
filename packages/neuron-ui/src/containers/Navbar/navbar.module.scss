@@ -107,10 +107,6 @@ $left-padding: 15px;
   grid-area: sync;
   font-size: 0.8rem;
 
-  &[data-online=false] {
-    opacity: 0;
-  }
-
   span {
     padding-left: $left-padding * 2;
     padding-bottom: 12px;
