@@ -62,28 +62,41 @@ $left-padding: 15px;
   align-items: center;
   grid-area: network;
   color: #fff;
-  padding-left: $left-padding;
+  padding-left: $left-padding * 2;
   font-size: 0.8rem;
   font-weight: bold;
 
   span {
+    position: relative;
     display: flex;
     align-items: center;
     line-height: 1em;
 
-    &::after {
+    &::before {
+      position: absolute;
       display: block;
       content: '';
-      width: 0.5rem;
-      height: 0.5rem;
+      width: 0.75rem;
+      height: 0.75rem;
       border-radius: 100%;
       background: red;
-      margin-left: 0.5rem;
+      right: 100%;
+      margin-right: 5px;
     }
 
-    &[data-online=true]::after {
+    &[data-online=true]::before {
       background: green !important;
     }
+
+    &[data-sync-status=Syncing][data-online=true]::before {
+      background-image: url("data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:%23fff;%7D.cls-2,.cls-3,.cls-4,.cls-5%7Bfill:%233c9;%7D.cls-2%7Bopacity:0.2;%7D.cls-3%7Bopacity:0.8;%7D.cls-4%7Bopacity:0.6;%7D.cls-5%7Bopacity:0.4;%7D%3C/style%3E%3C/defs%3E%3Ccircle class='cls-1' cx='11' cy='11' r='10.24'/%3E%3Cpolygon class='cls-2' points='3.7 3.56 6.45 1.69 10.39 0.48 11.61 1.04 13.29 5.02 12.64 8.39 11.39 11 10.39 8.14 9.33 6.23 7.66 4.72 5.38 3.52 3.7 3.56'/%3E%3Cpolygon class='cls-3' points='11.38 0.36 14.59 1.25 18.06 3.48 18.42 4.77 16.46 8.63 13.47 10.32 10.68 11.05 12.21 8.43 12.98 6.39 13.05 4.13 12.5 1.62 11.38 0.36'/%3E%3Cpolygon class='cls-4' points='18.63 3.92 20.43 6.71 21.54 10.68 20.95 11.89 16.92 13.46 13.57 12.73 10.99 11.42 13.88 10.49 15.81 9.48 17.37 7.84 18.25 5.27 18.63 3.92'/%3E%3Cpolygon class='cls-5' points='21.34 11.28 20.66 14.53 18.65 18.13 17.39 18.57 13.41 16.87 11.54 13.99 10.64 11.24 13.35 12.61 15.43 13.25 17.69 13.18 20.16 12.47 21.34 11.28'/%3E%3Cpolygon class='cls-2' points='18.42 18.29 15.72 20.22 11.81 21.53 10.57 21 8.79 17.06 9.36 13.68 10.54 11.04 11.62 13.88 12.72 15.75 14.43 17.22 16.74 18.36 18.42 18.29'/%3E%3Cpolygon class='cls-3' points='10.73 21.53 7.46 20.98 3.77 19.13 3.28 17.88 4.82 13.84 7.62 11.85 10.32 10.83 9.07 13.6 8.52 15.71 8.68 17.95 9.49 20.39 10.73 21.53'/%3E%3Cpolygon class='cls-4' points='3.42 18.22 1.7 15.38 0.69 11.38 1.31 10.19 5.38 8.71 8.71 9.53 11.25 10.91 8.34 11.77 6.38 12.73 4.79 14.32 3.47 16.54 3.42 18.22'/%3E%3Cpolygon class='cls-5' points='0.38 11.05 0.94 7.77 2.81 4.1 4.06 3.61 8.1 5.17 10.07 7.98 11.07 10.69 8.32 9.42 6.21 8.86 3.96 9.01 1.52 9.81 0.38 11.05'/%3E%3Cpath class='cls-1' d='M11,0A11,11,0,1,0,22,11,11,11,0,0,0,11,0ZM21,10.71a6.82,6.82,0,0,1-4.78,1.95h0a6.77,6.77,0,0,1-4-1.27,7.84,7.84,0,0,0,6.53-6.67A10,10,0,0,1,21,10.71Zm-3.14-7a6.84,6.84,0,0,1-5.69,6.66A7.86,7.86,0,0,0,12.06,1a10,10,0,0,1,5.79,2.69ZM10.7,1a6.86,6.86,0,0,1,.69,8.73A7.87,7.87,0,0,0,4.73,3.22,9.87,9.87,0,0,1,10.7,1ZM3.75,4.14a6.86,6.86,0,0,1,6.64,5.7,7.88,7.88,0,0,0-9.33.07A9.88,9.88,0,0,1,3.75,4.14ZM3.2,17.24a10,10,0,0,1-2.19-6,6.88,6.88,0,0,1,8.74-.65A7.87,7.87,0,0,0,3.2,17.24Zm.91,1a6.86,6.86,0,0,1,5.73-6.62A7.85,7.85,0,0,0,9.9,21a10,10,0,0,1-5.79-2.72ZM11.25,21a6.82,6.82,0,0,1-1.92-4.78,6.92,6.92,0,0,1,1.28-4,7.85,7.85,0,0,0,6.64,6.54A9.91,9.91,0,0,1,11.25,21Zm7-3.12a6.84,6.84,0,0,1-6.64-5.71,7.7,7.7,0,0,0,4.58,1.5h0a7.78,7.78,0,0,0,4.73-1.6,10,10,0,0,1-2.67,5.8Z'/%3E%3C/svg%3E") !important;
+      animation: rotate 1s infinite linear;
+    }
+
+    &[data-sync-status=SyncPending]::before {
+      background: #ED784A !important;
+    }
+
   }
 }
 
@@ -92,13 +105,16 @@ $left-padding: 15px;
   display: flex;
   flex-direction: column;
   grid-area: sync;
-  color: #fff;
   font-size: 0.8rem;
 
+  &[data-online=false] {
+    opacity: 0;
+  }
+
   span {
-    padding-left: $left-padding;
+    padding-left: $left-padding * 2;
     padding-bottom: 12px;
-    color: #b3b3b3;
+    color: var(--nervos-green);
   }
 
   progress {
@@ -116,5 +132,15 @@ $left-padding: 15px;
     &::-webkit-progress-value {
       background: var(--nervos-green);
     }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0)
+  }
+
+  to {
+    transform: rotate(359deg);
   }
 }

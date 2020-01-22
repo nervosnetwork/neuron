@@ -38,6 +38,26 @@ $confirming-color: #b3b3b3;
   grid-area: balance;
 }
 
+.balanceValue {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  span {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-all;
+    overflow: hidden;
+  }
+}
+
+.balancePrompt {
+  @include BoldText;
+  color: var(--nervos-green);
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
 .balanceInt {
   @include BoldText;
   font-size: 1.125rem;

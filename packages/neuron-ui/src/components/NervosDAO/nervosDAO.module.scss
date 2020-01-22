@@ -24,7 +24,6 @@
 
   .amountProperty {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     font-size: 0.875rem;
     letter-spacing: 0.7px;
@@ -34,14 +33,33 @@
       margin-bottom: 11px;
     }
 
-    span:first-of-type {
-      font-weight: 600;
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: keep-all;
+      white-space: nowrap;
 
-      &::after {
-        display: inline;
-        content: ':';
+      &:first-of-type {
+        font-weight: 600;
+        flex-basis: 100px;
+        flex-shrink: 0;
+
+        &::after {
+          display: inline;
+          content: ':';
+        }
+
       }
     }
+
+  }
+
+  .balancePrompt {
+    @include BoldText;
+    margin-left: 100px;
+    color: var(--nervos-green);
+    font-size: 0.8rem;
+    margin-top: 3px;
   }
 
 }

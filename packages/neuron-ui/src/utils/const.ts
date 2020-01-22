@@ -108,3 +108,11 @@ export enum ErrorCode {
   MainnetAddressRequired = 306,
   TestnetAddressRequired = 307,
 }
+
+export enum SyncStatus {
+  FailToFetchTipBlock,
+  SyncNotStart,
+  SyncPending,
+  Syncing,
+  SyncCompleted,
+}
