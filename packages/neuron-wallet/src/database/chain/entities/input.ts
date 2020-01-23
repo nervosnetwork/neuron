@@ -1,6 +1,8 @@
 import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { OutPoint, Input as InputInterface, Script } from 'types/cell-types'
 import Transaction from './transaction'
+import OutPoint from 'models/chain/out-point'
+import InputModel from 'models/chain/input'
+import Script from 'models/chain/script'
 
 // cellbase input may have same OutPoint
 @Entity()
@@ -58,18 +60,20 @@ export default class Input extends BaseEntity {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
     }
-    return {
-      txHash: this.outPointTxHash,
-      index: this.outPointIndex,
-    }
+    return new OutPoint(
+      this.outPointTxHash,
+      this.outPointIndex,
+    )
   }
 
-  public toInterface(): InputInterface {
-    return {
-      previousOutput: this.previousOutput(),
-      capacity: this.capacity,
-      lockHash: this.lockHash,
-      lock: this.lock,
-    }
+  public toModel(): InputModel {
+    return new InputModel(
+      this.previousOutput(),
+      this.since,
+      this.capacity,
+      this.lock,
+      this.lockHash,
+      this.inputIndex,
+    )
   }
 }

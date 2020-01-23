@@ -62,6 +62,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
         }}
       >
         <TextField
+          required
           label={t('send.price')}
           field="price"
           value={localNumberFormatter(price)}

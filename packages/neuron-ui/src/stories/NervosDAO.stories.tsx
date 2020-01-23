@@ -1,12 +1,10 @@
+// TODO: figure out how to mock context
 import React from 'react'
-import { Route } from 'react-router-dom'
 import { storiesOf } from '@storybook/react'
 import { withKnobs, text } from '@storybook/addon-knobs'
-import StoryRouter from 'storybook-react-router'
 import { action } from '@storybook/addon-actions'
 import NervosDAO from 'components/NervosDAO'
 import initStates from 'states/initStates'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
@@ -115,14 +113,11 @@ const states = {
   'Has receipts': stateTemplate,
 }
 
-const NervosDAOWithRouteProps = (props: StateWithDispatch) => (
-  <Route path="/" render={routeProps => <NervosDAO {...routeProps} {...props} />} />
-)
-
-const stories = storiesOf(`Nervos DAO`, module).addDecorator(StoryRouter())
+const stories = storiesOf(`Nervos DAO`, module)
 
 Object.entries(states).forEach(([title, props]) => {
-  stories.add(title, () => <NervosDAOWithRouteProps {...props} />)
+  console.info(props)
+  stories.add(title, () => <NervosDAO />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -159,5 +154,6 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       ],
     },
   }
-  return <NervosDAOWithRouteProps {...props} />
+  console.info(props)
+  return <NervosDAO />
 })

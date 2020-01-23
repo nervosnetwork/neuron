@@ -43,8 +43,7 @@
         "failed": "失败",
         "pending": "已提交",
         "confirming": "确认中"
-      },
-      "syncing": "同步中"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -107,7 +106,8 @@
       "advanced-fee-settings": "交易费高级设置",
       "price": "单价",
       "expected-speed": "预期成交速度",
-      "total-cycles": "RISC-V Cycles 总数"
+      "total-cycles": "RISC-V Cycles 总数",
+      "scan-screen-qr-code": "扫描屏幕上的二维码"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
@@ -277,6 +277,7 @@
       "qrcode-copied": "已复制二维码到剪贴板",
       "view-the-run-node-doc": "打开浏览器查看文档",
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
+      "no-valid-addresses-found": "未找到有效地址",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -317,13 +318,17 @@
         "304": "摄像头不可用或被禁用。",
         "305": "$t(messages.fields.address)不能为空。",
         "306": "请输入主网地址",
-        "307": "请输出测试网地址"
+        "307": "请输入测试网地址"
       }
     },
     "sync": {
       "synced": "同步完成",
-      "syncing": "同步中",
-      "block-number": "区块高度"
+      "syncing": "区块同步中",
+      "block-number": "区块高度",
+      "syncing-balance": "区块同步中, 正在获取最新余额",
+      "slow": "同步缓慢，请检查网络",
+      "sync-failed": "连接失败, 请检查网络",
+      "sync-not-start": "同步尚未开始, 请尝试重启"
     },
     "pagination": {
       "previous-page": "上一页",

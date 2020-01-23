@@ -1,11 +1,11 @@
 import React, { useEffect, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
 
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { openExternal, openContextMenu } from 'services/remote'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 
 import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
@@ -14,15 +14,17 @@ import { backToTop } from 'utils/animations'
 import getExplorerUrl from 'utils/getExplorerUrl'
 import styles from './addresses.module.scss'
 
-const Addresses = ({
-  wallet: { addresses = [], id: walletID },
-  chain: { networkID },
-  settings: { networks = [] },
-  history,
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
-  const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
+const Addresses = () => {
+  const {
+    wallet: { addresses = [], id: walletID },
+    chain: { networkID },
+    settings: { networks = [] },
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
+  const history = useHistory()
+
+  const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
 
   useEffect(() => {
     backToTop()

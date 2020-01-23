@@ -1,12 +1,10 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
 import { storiesOf } from '@storybook/react'
 import { withKnobs, text, boolean } from '@storybook/addon-knobs'
 import StoryRouter from 'storybook-react-router'
 import { action } from '@storybook/addon-actions'
 import Overview from 'components/Overview'
 import initStates from 'states/initStates'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
@@ -61,14 +59,11 @@ const states = {
   'Has more than 10 Activities': stateTemplate,
 }
 
-const OverviewWithRouteProps = (props: StateWithDispatch) => (
-  <Route path="/" render={routeProps => <Overview {...routeProps} {...props} />} />
-)
-
 const stories = storiesOf(`Overview`, module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
-  stories.add(title, () => <OverviewWithRouteProps {...props} />)
+  console.info(props)
+  stories.add(title, () => <Overview />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -120,5 +115,6 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       ],
     },
   }
-  return <OverviewWithRouteProps {...props} />
+  console.info(props)
+  return <Overview />
 })

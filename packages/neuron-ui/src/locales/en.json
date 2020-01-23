@@ -43,8 +43,7 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      },
-      "syncing": "Syncing"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -107,7 +106,8 @@
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
       "expected-speed": "Expected speed",
-      "total-cycles": "Total RISC-V Cycles"
+      "total-cycles": "Total RISC-V Cycles",
+      "scan-screen-qr-code": "Scan the QR Code on the screen"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
@@ -277,6 +277,7 @@
       "qrcode-copied": "QR Code has been copied to the clipboard",
       "view-the-run-node-doc": "View the guide in browser",
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
+      "no-valid-addresses-found": "No valid addresses found",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -322,8 +323,12 @@
     },
     "sync": {
       "synced": "Synced",
-      "syncing": "Syncing",
-      "block-number": "block number"
+      "syncing": "Synchronizing",
+      "block-number": "block number",
+      "syncing-balance": "Balance is updating",
+      "slow": "Sync is slow",
+      "sync-failed": "Sync failed, please check network",
+      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet"
     },
     "pagination": {
       "previous-page": "Previous page",

@@ -4,7 +4,7 @@ import LockUtils from 'models/lock-utils'
 import logger from 'utils/logger'
 import DaoUtils from 'models/dao-utils'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks'
+import RpcService from 'services/rpc-service'
 
 // Open connection to a network and maintain chain info in database.
 export default class ChainInfo {
@@ -20,7 +20,7 @@ export default class ChainInfo {
     let genesisHash = EMPTY_GENESIS_HASH
 
     try {
-      genesisHash = await new GetBlocks(this.network.remote).genesisBlockHash()
+      genesisHash = await new RpcService(this.network.remote).genesisBlockHash()
       // If fetched genesis hash doesn't match that of the network, still initalize DB.
       // This would mostly only happens when using default mainnet network but connected to a wrong node.
       await initConnection(genesisHash)

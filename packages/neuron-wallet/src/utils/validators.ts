@@ -36,17 +36,17 @@ export const verifyPasswordComplexity = (password: string) => {
   }
 }
 
-const Required = (target: Object, propertyKey: string | symbol, index: number) => {
+export const Required = (target: Object, propertyKey: string | symbol, index: number) => {
   const indices: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey) || []
   indices.push(index)
   Reflect.defineMetadata(requiredMetadataKey, indices, target, propertyKey)
 }
 
-const Password = (target: Object, propertyKey: string | symbol, parameterIndex: number) => {
+export const Password = (target: Object, propertyKey: string | symbol, parameterIndex: number) => {
   Reflect.defineMetadata(passwordMetadataKey, parameterIndex, target, propertyKey)
 }
 
-const Validate = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+export const Validate = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
   const originalMethod = descriptor.value
   return {
     ...descriptor,
@@ -67,10 +67,4 @@ const Validate = (target: any, propertyKey: string, descriptor: PropertyDescript
       return originalMethod.apply(this, args)
     },
   }
-}
-
-export default {
-  Required,
-  Password,
-  Validate,
 }

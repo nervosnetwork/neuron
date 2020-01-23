@@ -1,11 +1,10 @@
-import React, { useContext, useMemo, useCallback, MouseEventHandler } from 'react'
+import React, { useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
 import { openExternal } from 'services/remote'
-import { NeuronWalletContext } from 'states/stateProvider'
-import { StateWithDispatch, StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import {
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
@@ -60,10 +59,11 @@ const TopAlertActions = ({
   </Stack>
 )
 
-export const NoticeContent = ({ dispatch }: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+export const NoticeContent = () => {
   const {
     app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
-  } = useContext(NeuronWalletContext)
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
 
   const notificationsInDesc = useMemo(() => [...notifications].reverse(), [notifications])

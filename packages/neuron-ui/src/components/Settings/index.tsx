@@ -1,9 +1,9 @@
 import React from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
+import { Route, useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGloablState, useDispatch } from 'states/stateProvider'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
@@ -22,28 +22,27 @@ const settingPanels: CustomRouter.Route[] = [
     name: `GeneralSetting`,
     path: Routes.SettingsGeneral,
     exact: false,
-    comp: GeneralSetting,
+    component: GeneralSetting,
   },
   {
     name: `WalletsSetting`,
     path: Routes.SettingsWallets,
     exact: false,
-    comp: Wallets,
+    component: Wallets,
   },
   {
     name: `NetworkSetting`,
     path: Routes.SettingsNetworks,
     exact: true,
-    comp: NetworkSetting,
+    component: NetworkSetting,
   },
 ]
 
-const Settings = ({
-  location,
-  history,
-  dispatch,
-  ...neuronWalletState
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Settings = () => {
+  const globalState = useGloablState()
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const location = useLocation()
   const [t] = useTranslation()
 
   return (
@@ -67,9 +66,7 @@ const Settings = ({
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={routerProps => {
-            return <container.comp {...neuronWalletState} {...routerProps} dispatch={dispatch} />
-          }}
+          render={() => <container.component {...globalState} dispatch={dispatch} />}
         />
       ))}
     </Stack>

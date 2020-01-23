@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { Route } from 'react-router-dom'
+import { useState as useGlobalState } from 'states/stateProvider'
 
 export interface Element {
   path: string
@@ -19,7 +19,7 @@ export interface WizardProps {
   dispatch: React.Dispatch<any>
 }
 
-export interface WizardElementProps<T = {}> extends RouteComponentProps<T> {
+export interface WizardElementProps {
   wallets: State.Wallet[]
   rootPath: string
   state: WithWizardState
@@ -49,9 +49,7 @@ const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) =
       <Route
         key={element.path}
         path={`${rootPath}${element.path || ''}${element.params || ''}`}
-        render={(props: RouteComponentProps) => (
-          <element.comp {...props} rootPath={rootPath} wallets={wallets} state={state} dispatch={dispatch} />
-        )}
+        render={() => <element.comp rootPath={rootPath} wallets={wallets} state={state} dispatch={dispatch} />}
       />
     ))}
   </>
@@ -59,13 +57,13 @@ const Wizard = ({ state, elements, wallets, rootPath, dispatch }: WizardProps) =
 
 Wizard.displayName = 'Wizard'
 
-const withWizard = (elements: Element[], initState: WithWizardState) => ({
-  settings: { wallets = [] },
-  match: { url: rootPath = '/wizard' },
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const withWizard = (elements: Element[], initState: WithWizardState) => () => {
+  const {
+    settings: { wallets = [] },
+  } = useGlobalState()
   const [state, dispatch] = useReducer(reducer, initState)
 
-  return <Wizard rootPath={rootPath} state={state} wallets={wallets} dispatch={dispatch} elements={elements} />
+  return <Wizard rootPath="/wizard" state={state} wallets={wallets} dispatch={dispatch} elements={elements} />
 }
 
 export default withWizard

@@ -1,0 +1,386 @@
+{
+  "translation": {
+    "launch-screen": {
+      "loading-wallets": "錢包加載中"
+    },
+    "navbar": {
+      "overview": "總覽",
+      "wallet": "錢包",
+      "send": "轉帳",
+      "receive": "收款",
+      "history": "交易歷史",
+      "addresses": "地址管理",
+      "settings": "設定",
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "未連接到節點",
+      "sync-not-start": "同步尚未開始"
+    },
+    "overview": {
+      "date": "日期",
+      "type": "類型",
+      "balance": "餘額",
+      "recent-activities": "最近收支",
+      "no-recent-activities": "沒有收支記錄",
+      "activity": "收支活動",
+      "datetime": "時間",
+      "status": "狀態",
+      "amount": "金額",
+      "blockchain-status": "鏈狀態",
+      "chain-identity": "鏈 ID",
+      "tip-block-number": "區塊高度",
+      "epoch": "Epoch",
+      "difficulty": "難度",
+      "address": "地址",
+      "confirmation": "{{confirmationCount}} 個確認",
+      "confirmations": "{{confirmationCount}} 個確認",
+      "sent": "已發送",
+      "sending": "正在發送",
+      "received": "已收款",
+      "receiving": "正在收款",
+      "more": "查看更多記錄",
+      "statusLabel": {
+        "success": "成功",
+        "failed": "失敗",
+        "pending": "已提交",
+        "confirming": "確認中"
+      }
+    },
+    "wizard": {
+      "welcome-to-nervos-neuron": "歡迎使用 Neuron",
+      "create-or-import-your-first-wallet": "創建或導入您的第一個錢包",
+      "create-new-wallet": "創建新錢包",
+      "import-mnemonic": "導入助記詞",
+      "import-keystore": "導入 Keystore 檔案",
+      "import-wallet": "導入錢包",
+      "next": "下一步",
+      "back": "上一步",
+      "name": "錢包名稱",
+      "your-wallet-seed-is": "已生成新的助記詞",
+      "input-your-seed": "請輸入您的助記詞",
+      "password": "密碼",
+      "confirm-password": "確認密碼",
+      "set-wallet-name-and-password": "為新錢包命名，並設置密碼",
+      "set-wallet-name": "為錢包設定名稱",
+      "set-a-strong-password-to-protect-your-wallet": "請設定一個强密碼用於保護您的錢包",
+      "wallet-suffix": "錢包 {{suffix}}",
+      "write-down-seed": "請記下您的助記詞並保存到安全的地方",
+      "new-name": "輸入新的錢包名稱",
+      "complex-password": "密碼為 8 至 50 比特由大寫字母、小寫字母、數位、特殊符號中至少三類字元組成的字串，且必須以字母或者數位開頭",
+      "same-password": "兩次輸入密碼應一致"
+    },
+    "import-keystore": {
+      "label": {
+        "path": "Keystore 檔案",
+        "name": "錢包名稱",
+        "password": "密碼"
+      },
+      "placeholder": {
+        "path": "選擇 Keystore 檔案",
+        "name": "新錢包名稱",
+        "password": "輸入密碼以驗證 Keystore"
+      },
+      "button": {
+        "back": "返回",
+        "submit": "提交"
+      }
+    },
+    "detail": {
+      "more-transactions": "更多交易記錄"
+    },
+    "send": {
+      "address": "地址",
+      "amount": "金額",
+      "send": "發送",
+      "clear": "清除",
+      "confirm-password": "確認密碼",
+      "to": "收款地址",
+      "input-password-to-confirm": "輸入密碼以確認本次交易",
+      "scan-to-get-address": "掃描二維碼以獲取地址",
+      "total-amount": "總金額",
+      "description": "備註",
+      "description-optional": "備註(選填)",
+      "balance": "餘額",
+      "add-one": "添加",
+      "remove-this": "删除",
+      "fee": "交易費",
+      "advanced-fee-settings": "交易費高級設定",
+      "price": "單價",
+      "expected-speed": "預期成交速度",
+      "total-cycles": "RISC-V Cycles 總數",
+      "scan-screen-qr-code": "掃描荧幕上的二維碼"
+    },
+    "receive": {
+      "click-to-copy": "點擊複製地址",
+      "address-not-found": "未找到地址",
+      "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址管理頁面。",
+      "address-qrcode": "地址二維碼",
+      "address": "{{network}} 地址"
+    },
+    "history": {
+      "meta": "元信息",
+      "type": "交易類型",
+      "date": "時間",
+      "timestamp": "時間",
+      "amount": "金額",
+      "transaction-hash": "交易雜湊",
+      "send": "轉帳",
+      "receive": "收款",
+      "other": "其他",
+      "more-actions": "更多操作",
+      "detail": "詳情",
+      "explorer": "瀏覽器",
+      "first": "第一頁",
+      "previous": "前一頁",
+      "next": "後一頁",
+      "last": "最後一頁",
+      "description": "備註",
+      "status": "狀態",
+      "pending": "已提交",
+      "success": "成功",
+      "failed": "失敗",
+      "confirming": "確認中",
+      "blockNumber": "區塊高度",
+      "basic-information": "基本資訊",
+      "search": {
+        "placeholder": "使用交易雜湊、地址或日期(yyyy-mm-dd)進行蒐索"
+      },
+      "confirmations": "確認次數",
+      "confirming-with-count": "已確認 {{confirmations}} 次",
+      "view-on-explorer": "在瀏覽器中查看",
+      "copy-transaction-hash": "複製交易雜湊",
+      "no-txs": "沒有交易記錄"
+    },
+    "transaction": {
+      "date": "時間",
+      "transaction-hash": "交易雜湊",
+      "block-number": "區塊高度",
+      "goBack": "返回",
+      "index": "序號",
+      "address": "地址",
+      "income": "收入",
+      "amount": "數量",
+      "inputs": "輸入",
+      "outputs": "輸出",
+      "view-in-explorer": "瀏覽器",
+      "view-in-explorer-button-title": "瀏覽器中查看詳情",
+      "cell-from-cellbase": "來自 Cellbase"
+    },
+    "addresses": {
+      "addresses": "地址",
+      "type": "類型",
+      "address": "地址",
+      "identifier": "標誌",
+      "description": "備註",
+      "balance": "餘額",
+      "transactions": "交易總數",
+      "receiving-address": "收款地址",
+      "change-address": "找零地址",
+      "copy-address": "複製地址",
+      "request-payment": "請求支付",
+      "view-on-explorer": "在瀏覽器中查看"
+    },
+    "settings": {
+      "go-to-overview": "返回總覽畫面",
+      "setting-tabs": {
+        "general": "通用",
+        "wallets": "錢包",
+        "network": "網絡"
+      },
+      "general": {
+        "clear-cache": "清空緩存",
+        "clearing-cache": "清空中…",
+        "clear-cache-description": "當資料同步或顯示出現問題時，可以清空緩存，Neuron 會重新同步所有塊數據。",
+        "show": "顯示",
+        "hide": "隱藏"
+      },
+      "wallet-manager": {
+        "edit-wallet": {
+          "wallet-name": "錢包名稱",
+          "password": "密碼",
+          "new-password": "新密碼",
+          "confirm-password": "確認密碼",
+          "edit-wallet": "編輯錢包"
+        },
+        "delete-wallet-title": "請輸入 {{name}} 的密碼",
+        "password": "密碼",
+        "wallet-detail": {
+          "balance": "餘額"
+        }
+      },
+      "network": {
+        "online": "線上",
+        "offline": "離線",
+        "add-network": "添加網絡",
+        "edit-network": {
+          "title": "添加或編輯網絡",
+          "rpc-url": "RPC地址",
+          "name": "名稱"
+        },
+        "mainnet": "主網",
+        "testnet": "測試網",
+        "devnet": "開發網"
+      }
+    },
+    "password-request": {
+      "wallet-not-found": "找不到該錢包",
+      "password": "密碼",
+      "send": {
+        "title": "發起交易"
+      },
+      "delete": {
+        "title": "删除錢包 {{name}}"
+      },
+      "backup": {
+        "title": "備份錢包 {{name}}"
+      }
+    },
+    "qrcode": {
+      "copy": "複製圖片",
+      "save": "保存圖片"
+    },
+    "common": {
+      "or": "或",
+      "ok": "確認",
+      "confirm": "確認",
+      "open": "打開",
+      "cancel": "取消",
+      "save": "保存",
+      "toggle": {
+        "on": "開",
+        "off": "關"
+      },
+      "copy-tx-hash": "複製交易 Hash",
+      "copy-address": "複製地址",
+      "select": "選擇",
+      "backup": "備份",
+      "edit": "編輯",
+      "delete": "删除",
+      "click-to-edit": "點擊編輯"
+    },
+    "notification-panel": {
+      "title": "通知中心"
+    },
+    "message-types": {
+      "warning": "警告",
+      "alert": "錯誤",
+      "success": "成功"
+    },
+    "messages": {
+      "error": "錯誤",
+      "unknown-error": "未知錯誤",
+      "update-wallet-successfully": "已更新錢包資訊",
+      "delete-wallet-successfully": "已删除錢包",
+      "create-network-successfully": "已添加新節點",
+      "update-network-successfully": "已更新節點資訊",
+      "clear-cache-successfully": "已清空數據緩存",
+      "addr-copied": "已複製地址到剪貼板",
+      "qrcode-copied": "已複製二維碼到剪貼板",
+      "view-the-run-node-doc": "打開瀏覽器查看檔案",
+      "remain-ckb-for-withdraw": "建議保留部分 CKB 作為提現手續費",
+      "no-valid-addresses-found": "未找到有效地址",
+      "fields": {
+        "wallet": "錢包",
+        "name": "名稱",
+        "password": "密碼",
+        "remote": "RPC URL",
+        "network": "網絡",
+        "address": "地址",
+        "amount": "金額",
+        "transaction": "交易",
+        "default-address": "默認地址",
+        "mnemonic": "助記詞",
+        "keystore-path": "Keystore 檔案",
+        "keystore-name": "錢包名稱",
+        "keystore-password": "密碼",
+        "deposit": "存入金額"
+      },
+      "run-ckb-guide": "如何運行一個 CKB 節點？",
+      "codes": {
+        "-3": "",
+        "100": "餘額不足。",
+        "101": "金額 {{amount}} CKB太小，請輸入一個不小於 61 CKB 的值。",
+        "102": "$t(messages.fields.{{fieldName}})無效。",
+        "103": "$t(messages.fields.keystore-password)不正確。",
+        "104": "未連接到節點，請重啓 Neuron。",
+        "105": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
+        "106": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
+        "201": "缺少$t(messages.fields.{{fieldName}})。",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太短，其長度應不小於 {{length}}。",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效。",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其小數位應不超過 {{length}}比特。",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其值不能為負數。",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其值應以http(s)：//開始。",
+        "209": "$t(messages.fields.{{fieldName}}) 不能包含空格。",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
+        "303": "未找到$t(messages.fields.{{fieldName}})。",
+        "304": "監視器不可用或被禁用。",
+        "305": "$t(messages.fields.address)不能為空。",
+        "306": "請輸入主網地址",
+        "307": "請輸入測試網地址"
+      }
+    },
+    "sync": {
+      "synced": "同步完成",
+      "syncing": "區塊同步中",
+      "block-number": "區塊高度",
+      "syncing-balance": "區塊同步中, 正在獲取最新余額",
+      "slow": "同步緩慢，請檢查網絡",
+      "sync-failed": "连接失败, 请检查网络",
+      "sync-not-start": "同步尚未开始, 请尝试重启"
+    },
+    "pagination": {
+      "previous-page": "上一頁",
+      "next-page": "下一頁",
+      "first-page": "首頁",
+      "last-page": "尾頁",
+      "page": "頁碼",
+      "selected": "當前頁"
+    },
+    "nervos-dao": {
+      "free": "當前可用",
+      "locked": "已鎖定",
+      "deposit": "存入",
+      "deposit-records": "鎖定記錄",
+      "apc": "年化鎖定補貼率",
+      "deposit-at": "存入於{{time}}",
+      "fee": "手續費",
+      "deposit-to-nervos-dao": "存入 Nervos DAO",
+      "withdraw-from-nervos-dao": "從 Nervos DAO 取出",
+      "notice": "注意",
+      "cancel": "取消",
+      "proceed": "繼續",
+      "compensation": "鎖定補貼",
+      "notice-wait-time": "注意：您需要等待 {{epochs}} epochs {{blocks}} 區塊(約 {{days}} 天)完成最終取出操作。",
+      "deposit-dialog-title": "存入 Nervos DAO",
+      "deposit-terms": "Nervos DAO 需要 102 CKBytes作為鎖定記錄的存儲，這部分 CKBytes 是無法產生鎖定補貼的。請查看 <0>Nervos DAO RFC</0> 以瞭解 Nervos DAO 更多資訊。",
+      "deposited-action-label": "申請取出",
+      "withdrawing-action-label": "取出",
+      "minimal-fee-required": "存入數量應不少於 {{minimal}} CKBytes",
+      "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
+      "blocks-left": "還需等待 {{epochs}} epochs {{blocks}} 個塊(約 {{days}} 天)",
+      "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
+      "insufficient-period-alert-title": "Header 引用無效",
+      "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期為 4 個epochs，約 16 小時)",
+      "explanation-of-epochs-period": "補償週期說明",
+      "current-epochs-period": "當前補償週期",
+      "progress": "進度：",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
+      "left-time": "距離結束時間: 約 {{leftDays}} 天 {{leftHours}} 小時",
+      "detailed-explanation-of-epochs-period": "Nervos DAO 以每180個 epoch 作為一個補償週期(約 30 天)。在每一個補償週期內，用戶可以隨時發起取出申請，並在本補償週期結束後完成取款。需要注意的是，用戶發出申請後，補償週期結束前的區塊補償將不會被累加到用戶的取款金額中。囙此，建議您在補償週期接近結束時再提交取出申請，這樣獲得的區塊補償會更多。",
+      "terms-in-explanation-of-epochs-period": "如果在當前補償週期內沒有提出取出申請，下一個補償週期將自動開始，無需手動操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建議您在黃色區域發起取出申請。"
+    },
+    "updates": {
+      "check-updates": "檢查更新",
+      "checking-updates": "正在檢查…",
+      "downloading-update": "正在下載更新…",
+      "update-not-available": "已經在使用最新版本",
+      "release-notes": "Release Notes:",
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載。要下載和安裝嗎？",
+      "download-update": "下載安裝",
+      "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
+      "quit-and-install": "安裝並重啓應用"
+    }
+  }
+}

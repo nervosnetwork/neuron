@@ -1,16 +1,33 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { showOpenDialog } from 'services/remote'
-import { importWalletWithKeystore } from 'states/stateProvider/actionCreators'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import i18n from 'i18next'
+import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
+import { useState as useGlobalState } from 'states/stateProvider'
 import { useGoBack } from 'utils/hooks'
 import generateWalletName from 'utils/generateWalletName'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import { Routes, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import styles from './importKeystore.module.scss'
+
+export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
+  history: ReturnType<typeof useHistory>
+) => {
+  return importKeystore(params).then(res => {
+    if (res.status === 1) {
+      history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+    } else if (res.message) {
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
+      }
+    }
+  })
+}
 
 interface KeystoreFields {
   path: string
@@ -30,15 +47,15 @@ const defaultFields: KeystoreFields = {
   passwordError: '',
 }
 
-const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const ImportKeystore = () => {
   const [t] = useTranslation()
   const {
-    history,
-    dispatch,
     settings: { wallets },
-  } = props
+  } = useGlobalState()
+  const history = useHistory()
   const [fields, setFields] = useState(defaultFields)
   const [loading, setLoading] = useState(false)
+  const [openingFile, setOpeningFile] = useState(false)
   const goBack = useGoBack(history)
 
   useEffect(() => {
@@ -52,7 +69,8 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
   }, [wallets, fields, setFields, t])
 
   const onFileClick = useCallback(() => {
-    showOpenDialog({
+    setOpeningFile(true)
+    showOpenDialogModal({
       title: 'import keystore',
     })
       .then(({ filePaths }: { filePaths: string[] }) => {
@@ -65,6 +83,9 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
         }
       })
       .catch((err: Error) => console.error(err))
+      .finally(() => {
+        setOpeningFile(false)
+      })
   }, [fields])
 
   const onSubmit = useCallback(() => {
@@ -77,9 +98,9 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
         name: fields.name || '',
         keystorePath: fields.path,
         password: fields.password,
-      })(dispatch, history).finally(() => setLoading(false))
+      })(history).finally(() => setLoading(false))
     }, 200)
-  }, [fields.name, fields.password, fields.path, history, dispatch, loading])
+  }, [fields.name, fields.password, fields.path, history, loading])
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -149,9 +170,11 @@ const ImportKeystore = (props: React.PropsWithoutRef<StateWithDispatch & RouteCo
                 placeholder={t(`import-keystore.placeholder.${key}`)}
                 type={key === 'password' ? 'password' : 'text'}
                 readOnly={key === 'path'}
+                disabled={key === 'path' && openingFile}
                 value={value}
                 error={fields[`${key}Error` as keyof KeystoreFields]}
                 onChange={onChange}
+                required
               />
             </>
           )

@@ -1,28 +1,18 @@
-import { Cell, ScriptHashType, WitnessArgs } from '../../src/types/cell-types'
 import TransactionSize from '../../src/models/transaction-size'
 import HexUtils from '../../src/utils/hex'
-import TypeConvert from '../../src/types/type-convert'
+import Script, { ScriptHashType } from '../../src/models/chain/script'
+import WitnessArgs from '../../src/models/chain/witness-args'
+import Transaction from '../../src/models/chain/transaction'
+import Output from '../../src/models/chain/output'
 
 describe('TransactionSize', () => {
-  const output: Cell = {
+  const output = Output.fromObject({
     "capacity": "0x174876e800",
-    "lock": {
-      "codeHash": "0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88",
-      "args": "0x59a27ef3ba84f061517d13f42cf44ed020610061",
-      "hashType": "type" as ScriptHashType
-    },
-    "type": {
-      "codeHash": "0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6",
-      "args": "0x",
-      "hashType": "data" as ScriptHashType
-    }
-  }
+    "lock": new Script("0x68d5438ac952d2f584abf879527946a537e82c7f3c1cbf6d8ebf9767437d8e88", "0x59a27ef3ba84f061517d13f42cf44ed020610061", ScriptHashType.Type),
+    "type": new Script("0xece45e0979030e2f8909f76258631c42333b1e906fd9701ec3600a464a90b8f6", "0x", ScriptHashType.Data),
+  })
 
-  const witnessArgs: WitnessArgs = {
-    "lock": "",
-    "inputType": "0x",
-    "outputType": ""
-  }
+  const witnessArgs = new WitnessArgs('', '0x', '')
 
   it('output', () => {
     const result = TransactionSize.output(output)
@@ -35,11 +25,7 @@ describe('TransactionSize', () => {
   })
 
   it('witnessArgs only lock', () => {
-    const witnessArgs: WitnessArgs = {
-      lock: '0x' + '0'.repeat(130),
-      inputType: undefined,
-      outputType: undefined,
-    }
+    const witnessArgs = WitnessArgs.emptyLock()
 
     const result = TransactionSize.witness(witnessArgs)
     expect(result).toEqual(85 + 4 + 4)
@@ -132,7 +118,7 @@ describe('TransactionSize', () => {
       "0x82df73581bcd08cb9aa270128d15e79996229ce8ea9e4f985b49fbf36762c5c37936caf3ea3784ee326f60b8992924fcf496f9503c907982525a3436f01ab32900"
     ]
   }
-  const tx = TypeConvert.toTransaction(sdkTx)
+  const tx = Transaction.fromSDK(sdkTx)
 
   it('tx', () => {
     const length = TransactionSize.tx(tx)

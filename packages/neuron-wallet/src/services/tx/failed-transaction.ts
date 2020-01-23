@@ -1,9 +1,9 @@
 import { getConnection, In } from 'typeorm'
-import { TransactionStatus } from 'types/cell-types'
 import OutputEntity from 'database/chain/entities/output'
 import TransactionEntity from 'database/chain/entities/transaction'
-import { OutputStatus } from './params'
+import { OutputStatus } from 'models/chain/output'
 import TransactionsService from './transaction-service'
+import { TransactionStatus } from 'models/chain/transaction'
 
 export class FailedTransaction {
   public static pendings = async (): Promise<TransactionEntity[]> => {
@@ -65,7 +65,7 @@ export class FailedTransaction {
     )
     const previous = previousOutputs.filter(output => output) as OutputEntity[]
     await getConnection().manager.save([...txToUpdate, ...allOutputs, ...previous])
-    const blake160s = txs.map(tx => TransactionsService.blake160sOfTx(tx.toInterface()))
+    const blake160s = txs.map(tx => TransactionsService.blake160sOfTx(tx.toModel()))
     const uniqueBlake160s = [...new Set(blake160s.reduce((acc, val) => acc.concat(val), []))]
     return uniqueBlake160s
   }

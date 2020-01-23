@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, SyncStatus, ConnectionStatus } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
+import getSyncStatus from 'utils/getSyncStatus'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -23,20 +23,21 @@ import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
-const NervosDAO = ({
-  app: {
-    send = appState.send,
-    loadings: { sending = false },
-    tipBlockNumber,
-    tipBlockHash,
-    tipBlockTimestamp,
-    epoch,
-  },
-  wallet,
-  dispatch,
-  nervosDAO: { records },
-  chain: { connectionStatus },
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const NervosDAO = () => {
+  const {
+    app: {
+      send = appState.send,
+      loadings: { sending = false },
+      tipBlockNumber,
+      tipBlockHash,
+      tipBlockTimestamp,
+      epoch,
+    },
+    wallet,
+    nervosDAO: { records },
+    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber },
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
   useEffect(() => {
     backToTop()
@@ -116,6 +117,13 @@ const NervosDAO = ({
     records,
     tipBlockHash,
     setWithdrawList,
+  })
+
+  const syncStatus = getSyncStatus({
+    tipBlockNumber,
+    tipBlockTimestamp,
+    syncedBlockNumber,
+    currentTimestamp: Date.now(),
   })
 
   const MemoizedRecords = useMemo(() => {
@@ -254,6 +262,23 @@ const NervosDAO = ({
     },
   ]
 
+  let balancePrompt = null
+  if (ConnectionStatus.Offline === connectionStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-failed')}
+      </span>
+    )
+  } else if (SyncStatus.SyncNotStart === syncStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
+        {t('sync.sync-not-start')}
+      </span>
+    )
+  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+  }
+
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.walletName}>{wallet.name}</h1>
@@ -264,6 +289,7 @@ const NervosDAO = ({
             <span>{value}</span>
           </div>
         ))}
+        {balancePrompt}
       </div>
       <div className={styles.deposit}>
         <div>

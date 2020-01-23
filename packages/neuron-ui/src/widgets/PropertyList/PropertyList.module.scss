@@ -17,6 +17,7 @@
     @include BoldText;
     grid-area: label;
     padding-right: 15px;
+    flex-shrink: 0;
   }
 
   .value {

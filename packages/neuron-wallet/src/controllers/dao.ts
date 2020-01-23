@@ -1,10 +1,12 @@
-import { Cell, OutPoint, TransactionWithoutHash } from 'types/cell-types'
 import { ServiceHasNoResponse, IsRequired } from 'exceptions'
 import { ResponseCode } from 'utils/const'
 import AddressesService from 'services/addresses'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import TransactionSender from 'services/transaction-sender'
+import OutPoint from 'models/chain/out-point'
+import Cell from 'models/chain/output'
+import Transaction from 'models/chain/transaction'
 
 export default class DaoController {
   public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
@@ -24,7 +26,7 @@ export default class DaoController {
   }
 
   public async generateDepositTx(params: { walletID: string, capacity: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+    Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -42,7 +44,7 @@ export default class DaoController {
   }
 
   public async generateDepositAllTx(params: { walletID: string, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+    Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -59,14 +61,14 @@ export default class DaoController {
   }
 
   public async startWithdrawFromDao(params: { walletID: string, outPoint: OutPoint, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+    Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const tx = await new TransactionSender().startWithdrawFromDao(
       params.walletID,
-      params.outPoint,
+      new OutPoint(params.outPoint.txHash, params.outPoint.index),
       params.fee,
       params.feeRate,
     )
@@ -76,16 +78,20 @@ export default class DaoController {
     }
   }
 
-  public async withdrawFromDao(params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }):
-    Promise<Controller.Response<TransactionWithoutHash>> {
+  public async withdrawFromDao(params: {
+    walletID: string,
+    depositOutPoint: OutPoint,
+    withdrawingOutPoint: OutPoint,
+    fee: string, feeRate: string
+  }): Promise<Controller.Response<Transaction>> {
     if (!params) {
       throw new IsRequired('Parameters')
     }
 
     const tx = await new TransactionSender().withdrawFromDao(
       params.walletID,
-      params.depositOutPoint,
-      params.withdrawingOutPoint,
+      new OutPoint(params.depositOutPoint.txHash, params.depositOutPoint.index),
+      new OutPoint(params.withdrawingOutPoint.txHash, params.withdrawingOutPoint.index),
       params.fee,
       params.feeRate,
     )

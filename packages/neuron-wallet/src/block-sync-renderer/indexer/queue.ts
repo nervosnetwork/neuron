@@ -1,24 +1,27 @@
+import { ipcRenderer } from 'electron'
 import {  AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+
 import ArrayUtils from 'utils/array'
 import logger from 'utils/logger'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks'
+import HexUtils from 'utils/hex'
+import CommonUtils from 'utils/common'
+
+import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
-import { Transaction, TransactionWithStatus } from 'types/cell-types'
-import TypeConvert from 'types/type-convert'
-import BlockNumber from 'block-sync-renderer/sync/block-number'
-import LockUtils from 'models/lock-utils'
 import TransactionPersistor from 'services/tx/transaction-persistor'
 import IndexerTransaction from 'services/tx/indexer-transaction'
+import TransactionEntity from 'database/chain/entities/transaction'
+import WalletService from 'services/wallets'
+import NodeService from 'services/node'
 
-import IndexerRPC from './indexer-rpc'
-import HexUtils from 'utils/hex'
+import OutPoint from 'models/chain/out-point'
+import Script from 'models/chain/script'
+import DaoUtils from 'models/dao-utils'
+import Transaction from 'models/chain/transaction'
+import LockUtils from 'models/lock-utils'
+
 import { TxUniqueFlagCache } from './tx-unique-flag'
 import { TransactionCache } from './transaction-cache'
-import TransactionEntity from 'database/chain/entities/transaction'
-import DaoUtils from 'models/dao-utils'
-import CommonUtils from 'utils/common'
-import WalletService from 'services/wallets'
-import NodeService from 'services/node';
 
 export interface LockHashInfo {
   lockHash: string
@@ -32,18 +35,15 @@ enum TxPointType {
 
 export default class IndexerQueue {
   private lockHashInfos: LockHashInfo[]
-  private indexerRPC: IndexerRPC
-  private getBlocksService: GetBlocks
+  private rpcService: RpcService
   private per = 50
   private interval = 1000
-  private blockNumberService: BlockNumber
+  private startBlockNumber: bigint
 
   private stopped = false
   private indexed = false
 
   private inProcess = false
-
-  private resetFlag = false
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
   private txCache: TransactionCache = new TransactionCache(100)
@@ -54,12 +54,11 @@ export default class IndexerQueue {
 
   private static CHECK_SIZE = 50
 
-  constructor(url: string, lockHashInfos: LockHashInfo[]) {
+  constructor(url: string, lockHashInfos: LockHashInfo[], startBlockNumber: bigint) {
     this.lockHashInfos = lockHashInfos
     this.url = url
-    this.indexerRPC = new IndexerRPC(url)
-    this.getBlocksService = new GetBlocks(url)
-    this.blockNumberService = new BlockNumber()
+    this.rpcService = new RpcService(url)
+    this.startBlockNumber = startBlockNumber
   }
 
   public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
@@ -73,10 +72,6 @@ export default class IndexerQueue {
     this.setLockHashInfos(infos)
   }
 
-  public reset = () => {
-    this.resetFlag = true
-  }
-
   private tipBlockNumber = (): bigint => {
     return BigInt(NodeService.getInstance().tipBlockNumber)
   }
@@ -85,33 +80,30 @@ export default class IndexerQueue {
     while (!this.stopped) {
       try {
         this.inProcess = true
-        if (this.resetFlag) {
-          await this.blockNumberService.updateCurrent(BigInt(-1))
-          this.resetFlag = false
-        }
         const { lockHashInfos } = this
-        const currentBlockNumber: bigint = await this.blockNumberService.getCurrent()
-        if (!this.indexed || currentBlockNumber !== this.tipBlockNumber()) {
+        const blockNumber: bigint = this.startBlockNumber
+        if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
             this.indexed = true
           }
           const daoScriptInfo = await DaoUtils.daoScript(this.url)
-          const daoScriptHash = LockUtils.computeScriptHash({
-            codeHash: daoScriptInfo.codeHash,
-            args: "0x",
-            hashType: daoScriptInfo.hashType,
-          })
+          const daoScriptHash: string = new Script(
+            daoScriptInfo.codeHash,
+            "0x",
+            daoScriptInfo.hashType,
+          ).computeHash()
           const lockHashes: string[] = lockHashInfos.map(info => info.lockHash)
           const minBlockNumber = await this.getCurrentBlockNumber(lockHashes)
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.CreatedBy, currentBlockNumber, daoScriptHash)
+            await this.pipeline(lockHash, TxPointType.CreatedBy, blockNumber, daoScriptHash)
           }
           for (const lockHash of lockHashes) {
-            await this.pipeline(lockHash, TxPointType.ConsumedBy, currentBlockNumber, daoScriptHash)
+            await this.pipeline(lockHash, TxPointType.ConsumedBy, blockNumber, daoScriptHash)
           }
           if (minBlockNumber) {
-            await this.blockNumberService.updateCurrent(minBlockNumber)
+            this.startBlockNumber = minBlockNumber
+            ipcRenderer.invoke('synced-block-number-updated', this.startBlockNumber.toString())
           }
         }
         await this.yield(this.interval)
@@ -134,7 +126,7 @@ export default class IndexerQueue {
         const tip = this.tipBlockNumber()
         const txs = await IndexerTransaction.txHashes()
         for (const tx of txs) {
-          const result = await this.getBlocksService.getTransaction(tx.hash)
+          const result = await this.rpcService.getTransaction(tx.hash)
           if (!result) {
             await IndexerTransaction.deleteTxWhenFork(tx.hash)
             this.txCache.delete(tx.hash)
@@ -152,7 +144,7 @@ export default class IndexerQueue {
 
   public getCurrentBlockNumber = async (lockHashes: string[]) => {
     // get lock hash indexer status
-    const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
+    const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const blockNumbers = lockHashIndexStates
       .filter(state => lockHashes.includes(state.lockHash))
       .map(state => HexUtils.toDecimal(state.blockNumber))
@@ -162,24 +154,14 @@ export default class IndexerQueue {
   }
 
   public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
-    const lockHashIndexStates = await this.indexerRPC.getLockHashIndexStates()
+    const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
 
     await ArrayUtils.mapSeries(nonIndexedLockHashInfos, async (info: LockHashInfo) => {
       const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
-      await this.indexerRPC.indexLockHash(info.lockHash, indexFrom)
+      await this.rpcService.indexLockHash(info.lockHash, indexFrom)
     })
-  }
-
-  public getTransaction = async (txHash: string): Promise<TransactionWithStatus> => {
-    let txWithStatus = this.txCache.get(txHash)
-    if (!txWithStatus) {
-      const transactionWithStatus = await this.getBlocksService.getTransaction(txHash)
-      txWithStatus = TypeConvert.toTransactionWithStatus(transactionWithStatus)
-      this.txCache.push(txWithStatus)
-    }
-    return txWithStatus
   }
 
   // type: 'createdBy' | 'consumedBy'
@@ -187,7 +169,7 @@ export default class IndexerQueue {
     let page = 0
     let stopped = false
     while (!stopped) {
-      const txs = await this.indexerRPC.getTransactionsByLockHash(lockHash, `0x${page.toString(16)}`, `0x${this.per.toString(16)}`)
+      const txs = await this.rpcService.getTransactionsByLockHash(lockHash, page.toString(), this.per.toString())
       if (txs.length < this.per) {
         stopped = true
       }
@@ -205,11 +187,11 @@ export default class IndexerQueue {
           txPoint &&
           (BigInt(txPoint.blockNumber) >= startBlockNumber || this.tipBlockNumber() - BigInt(txPoint.blockNumber) < IndexerQueue.CHECK_SIZE)
         ) {
-          const transactionWithStatus = await this.getTransaction(txPoint.txHash)
-          const transaction: Transaction = transactionWithStatus.transaction
+          const transactionWithStatus = await this.rpcService.getTransaction(txPoint.txHash)
+          const transaction: Transaction = transactionWithStatus!.transaction
           const txUniqueFlag = {
-            txHash: transaction.hash,
-            blockHash: transactionWithStatus.txStatus.blockHash!
+            txHash: transaction.hash!,
+            blockHash: transactionWithStatus!.txStatus.blockHash!
           }
           if (type === TxPointType.CreatedBy && this.latestCreatedBy.includes(txUniqueFlag)) {
             const address = LockUtils.lockScriptToAddress(
@@ -221,52 +203,45 @@ export default class IndexerQueue {
           }
 
           // tx timestamp / blockNumber / blockHash
-          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash)
+          let txEntity: TransactionEntity | undefined = await TransactionPersistor.get(transaction.hash!)
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
-              for (const [inputIndex, input] of transaction.inputs!.entries()) {
+              for (const [inputIndex, input] of transaction.inputs.entries()) {
                 if (input.previousOutput!.txHash === this.emptyTxHash) {
                   continue
                 }
-                const previousTxWithStatus = await this.getBlocksService.getTransaction(input.previousOutput!.txHash)
-                const previousTx = TypeConvert.toTransaction(previousTxWithStatus.transaction)
+                const previousTxWithStatus = await this.rpcService.getTransaction(input.previousOutput!.txHash)
+                const previousTx: Transaction = previousTxWithStatus!.transaction
                 const previousOutput = previousTx.outputs![+input.previousOutput!.index]
-                input.lock = previousOutput.lock
-                input.lockHash = LockUtils.lockScriptToHash(input.lock)
-                input.capacity = previousOutput.capacity
-                input.inputIndex = inputIndex.toString()
+                input.setLock(previousOutput.lock)
+                input.setCapacity(previousOutput.capacity)
+                input.setInputIndex(inputIndex.toString())
                 if (
                   type === TxPointType.CreatedBy &&
                   previousOutput.type &&
-                  LockUtils.computeScriptHash(previousOutput.type) === daoScriptHash &&
-                  previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
+                  previousOutput.type.computeHash() === daoScriptHash &&
+                  previousTx.outputsData[+input.previousOutput!.index] === '0x0000000000000000'
                 ) {
-                  transaction.outputs![+txPoint.index].depositOutPoint = {
-                    txHash: input.previousOutput!.txHash,
-                    index: input.previousOutput!.index,
-                  }
+                  transaction.outputs[+txPoint.index]!.setDepositOutPoint(new OutPoint(
+                    input.previousOutput!.txHash,
+                    input.previousOutput!.index
+                  ))
                 }
               }
 
               const outputs = transaction.outputs!
-              for (let i = 0; i < outputs.length; ++i) {
-                const output = outputs[i]
+              for (const [i, output] of outputs.entries()) {
                 const typeScript = output.type
-                if (typeScript) {
-                  output.typeHash = LockUtils.computeScriptHash(typeScript)
-                  if (output.typeHash === daoScriptHash) {
-                    output.daoData = transaction.outputsData![i]
-                  }
+                if (typeScript && output.typeHash === daoScriptHash) {
+                  output.setDaoData(transaction.outputsData[i])
                 }
               }
             }
-            const { blockHash } = transactionWithStatus.txStatus
+            const { blockHash } = transactionWithStatus!.txStatus
             if (blockHash) {
-              const blockHeader = await this.getBlocksService.getHeader(blockHash)
+              const blockHeader = await this.rpcService.getHeader(blockHash)
               if (blockHeader) {
-                transaction.blockHash = blockHash
-                transaction.blockNumber = blockHeader.number
-                transaction.timestamp = blockHeader.timestamp
+                transaction.setBlockHeader(blockHeader)
               }
             }
             txEntity = await TransactionPersistor.saveFetchTx(transaction)
@@ -280,11 +255,11 @@ export default class IndexerQueue {
             )
             this.latestCreatedBy.push(txUniqueFlag)
           } else if (type === TxPointType.ConsumedBy) {
-            const input = txEntity.inputs[parseInt(txPoint.index, 16)]
+            const input = txEntity!.inputs[+txPoint.index]
             const output = await IndexerTransaction.updateInputLockHash(input.outPointTxHash!, input.outPointIndex!)
             if (output) {
               address = LockUtils.lockScriptToAddress(
-                output.lock,
+                new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
                 NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
               )
             }

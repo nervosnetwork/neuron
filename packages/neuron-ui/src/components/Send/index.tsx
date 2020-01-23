@@ -1,35 +1,44 @@
-import React from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Label, Text, List } from 'office-ui-fabric-react'
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import QRScanner from 'widgets/QRScanner'
+import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS } from 'utils/const'
+import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG, SyncStatus, ConnectionStatus } from 'utils/const'
+import getSyncStatus from 'utils/getSyncStatus'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import { verifyTotalAmount, verifyTransactionOutputs } from 'utils/validators'
+import {
+  verifyTotalAmount,
+  verifyTransactionOutputs,
+  verifyAmount,
+  verifyAmountRange,
+  verifyAddress,
+} from 'utils/validators'
 
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
-const Send = ({
-  app: {
-    send = appState.send,
-    loadings: { sending = false },
-  },
-  wallet: { id: walletID = '', balance = '' },
-  chain: { networkID, connectionStatus },
-  settings: { networks = [] },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps<{ address: string }>>) => {
+const Send = () => {
+  const {
+    app: {
+      send = appState.send,
+      loadings: { sending = false },
+      tipBlockNumber,
+      tipBlockTimestamp,
+    },
+    wallet: { id: walletID = '', balance = '' },
+    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
+    settings: { networks = [] },
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const { t } = useTranslation()
   const {
     outputs,
@@ -44,18 +53,74 @@ const Send = ({
     updateTransactionPrice,
     onDescriptionChange,
     onClear,
-    outputErrors,
     errorMessage,
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
+    onScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
-
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
   const network = networks.find(n => n.id === networkID)
+
+  const syncStatus = getSyncStatus({
+    tipBlockNumber,
+    syncedBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
+
+  const outputErrors = useMemo(() => {
+    return outputs.map(({ address, amount }) => {
+      let amountErrorCode = ''
+      let addrErrorCode = ''
+
+      const amountVeriMsg = verifyAmount(amount)
+      if (amount !== undefined) {
+        if (typeof amountVeriMsg === 'object') {
+          amountErrorCode = `${amountVeriMsg.code}`
+        } else if (!verifyAmountRange(amount)) {
+          amountErrorCode = `${ErrorCode.AmountTooSmall}`
+        }
+      }
+      if (address !== undefined) {
+        const chainType = network ? network.chain : ''
+        if (address === '') {
+          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
+        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
+          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
+        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
+          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
+        } else if (!verifyAddress(address)) {
+          addrErrorCode = `${ErrorCode.FieldInvalid}`
+        }
+      }
+
+      return {
+        addrErrorCode,
+        amountErrorCode,
+      }
+    })
+  }, [outputs, network])
+
+  let balancePrompt = null
+  if (ConnectionStatus.Offline === connectionStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-failed')}
+      </span>
+    )
+  } else if (SyncStatus.SyncNotStart === syncStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-not-start')}
+      </span>
+    )
+  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+  }
 
   return (
     <div style={{ padding: '39px 0 0 0' }}>
@@ -65,6 +130,7 @@ const Send = ({
         </div>
         <div>
           <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
+          {balancePrompt}
         </div>
       </div>
       <div>
@@ -81,14 +147,13 @@ const Send = ({
                   label={t('send.address')}
                   field="address"
                   data-idx={idx}
-                  data-chain-type={network ? network.chain : ''}
                   disabled={item.disabled}
                   value={item.address || ''}
                   onChange={onItemChange}
                   required
                   maxLength={100}
                   error={
-                    outputErrors[idx] && outputErrors[idx].addrErrorCode
+                    outputErrors[idx].addrErrorCode
                       ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
                           fieldName: 'address',
                           fieldValue: item.address || '',
@@ -109,7 +174,7 @@ const Send = ({
                   required
                   suffix="CKB"
                   error={
-                    outputErrors[idx] && outputErrors[idx].amountErrorCode
+                    outputErrors[idx].amountErrorCode
                       ? t(`messages.codes.${outputErrors[idx].amountErrorCode}`, {
                           fieldName: 'amount',
                           fieldValue: localNumberFormatter(item.amount),
@@ -119,14 +184,17 @@ const Send = ({
                       : ''
                   }
                 />
-                <QRScanner
-                  title={t('send.scan-to-get-address')}
-                  label={t('send.address')}
-                  onConfirm={(data: string) => {
-                    const e = { target: { dataset: { field: 'address', idx }, value: data } }
-                    onItemChange(e)
-                  }}
-                />
+                <button
+                  data-idx={idx}
+                  style={styles && styles.trigger}
+                  onClick={onScan}
+                  type="button"
+                  aria-label="qr-btn"
+                  className={styles.scanBtn}
+                  data-title={t('send.scan-screen-qr-code')}
+                >
+                  <Scan />
+                </button>
 
                 {idx === outputs.length - 1 ? (
                   <Button

@@ -1,6 +1,8 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
-import { Script, OutPoint, Cell } from 'types/cell-types'
 import TransactionEntity from './transaction'
+import Script from 'models/chain/script'
+import OutPoint from 'models/chain/out-point'
+import OutputModel, { OutputStatus } from 'models/chain/output'
 
 @Entity()
 export default class Output extends BaseEntity {
@@ -70,18 +72,18 @@ export default class Output extends BaseEntity {
   depositIndex: string | null = null
 
   public outPoint(): OutPoint {
-    return {
-      txHash: this.outPointTxHash,
-      index: this.outPointIndex,
-    }
+    return new OutPoint(
+      this.outPointTxHash,
+      this.outPointIndex,
+    )
   }
 
   public depositOutPoint(): OutPoint | undefined {
     if (this.depositTxHash && this.depositIndex) {
-      return {
-        txHash: this.depositTxHash,
-        index: this.depositIndex
-      }
+      return new OutPoint(
+        this.depositTxHash,
+        this.depositIndex
+      )
     }
     return undefined
   }
@@ -89,23 +91,22 @@ export default class Output extends BaseEntity {
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
-  public toInterface(): Cell {
-    const timestamp = this.transaction && (this.transaction.timestamp || this.transaction.createdAt)
-    const blockNumber = this.transaction && this.transaction.blockNumber
-    const blockHash = this.transaction && this.transaction.blockHash
-    return {
+  public toModel(): OutputModel {
+    const timestamp = this.transaction?.timestamp || this.transaction?.createdAt
+
+    return OutputModel.fromObject({
       capacity: this.capacity,
-      lock: this.lock,
+      lock: new Script(this.lock.codeHash, this.lock.args, this.lock.hashType),
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
-      status: this.status,
-      type: this.typeScript,
-      typeHash: this.typeHash,
+      status: this.status as OutputStatus,
+      type: this.typeScript ? new Script(this.typeScript.codeHash, this.typeScript.args, this.typeScript.hashType) : this.typeScript,
+      typeHash: this.typeHash ? this.typeHash : undefined,
       daoData: this.daoData,
       timestamp,
-      blockNumber,
-      blockHash,
+      blockNumber: this.transaction?.blockNumber,
+      blockHash: this.transaction?.blockHash,
       depositOutPoint: this.depositOutPoint(),
-    }
+    })
   }
 }

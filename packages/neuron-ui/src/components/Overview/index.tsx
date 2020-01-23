@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
 
 import { showTransactionDetails } from 'services/remote'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
 import {
@@ -14,7 +14,8 @@ import {
   uniformTimeFormatter,
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
-import { PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD, MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
+import getSyncStatus from 'utils/getSyncStatus'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -44,18 +45,27 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
   }
 }
 
-const Overview = ({
-  dispatch,
-  app: { tipBlockNumber, tipBlockTimestamp, chain, epoch, difficulty },
-  wallet: { id, name, balance = '' },
-  chain: {
-    tipBlockNumber: syncedBlockNumber,
-    transactions: { items = [] },
-  },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const Overview = () => {
+  const {
+    app: { tipBlockNumber, tipBlockTimestamp, chain, epoch, difficulty },
+    wallet: { id, name, balance = '' },
+    chain: {
+      tipBlockNumber: syncedBlockNumber,
+      transactions: { items = [] },
+      connectionStatus,
+    },
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
+  const history = useHistory()
   const [isStatusShow, setIsStatusShow] = useState(false)
+
+  const syncStatus = getSyncStatus({
+    syncedBlockNumber,
+    tipBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
 
   useEffect(() => {
     if (id) {
@@ -75,38 +85,44 @@ const Overview = ({
     history.push(Routes.History)
   }, [history])
 
-  const now = Date.now()
-
   const balanceProperties: Property[] = useMemo(() => {
     const balanceValue = shannonToCKBFormatter(balance)
     const [balanceInt, balanceDec] = balanceValue.split('.')
     const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
     const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
-    const balanceSuffixEl = (
-      <span>
-        {` CKB${
-          +tipBlockNumber > 0 &&
-          BigInt(syncedBlockNumber) >= BigInt(0) &&
-          (BigInt(syncedBlockNumber) + BigInt(BUFFER_BLOCK_NUMBER) < BigInt(tipBlockNumber) ||
-            tipBlockTimestamp + MAX_TIP_BLOCK_DELAY < now)
-            ? `(${t('overview.syncing')})`
-            : ''
-        }`}
-      </span>
-    )
+    const balanceSuffixEl = ' CKB'
+    let prompt = null
+    if (ConnectionStatus.Offline === connectionStatus) {
+      prompt = (
+        <span className={styles.balancePrompt} style={{ color: 'red' }}>
+          {t('sync.sync-failed')}
+        </span>
+      )
+    } else if (SyncStatusEnum.SyncNotStart === syncStatus) {
+      prompt = (
+        <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'break-all', whiteSpace: 'pre-line' }}>
+          {t('sync.sync-not-start')}
+        </span>
+      )
+    } else if ([SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)) {
+      prompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+    }
     return [
       {
         label: t('overview.balance'),
         value: (
-          <>
-            {balanceIntEl}
-            {balanceDecEl}
-            {balanceSuffixEl}
-          </>
+          <div className={styles.balanceValue}>
+            <span style={{ width: '280px' }}>
+              {balanceIntEl}
+              {balanceDecEl}
+              {balanceSuffixEl}
+            </span>
+            {prompt}
+          </div>
         ),
       },
     ]
-  }, [t, balance, syncedBlockNumber, tipBlockNumber, tipBlockTimestamp, now])
+  }, [t, balance, syncStatus, connectionStatus])
   const blockchainStatusProperties = useMemo(
     () => [
       {

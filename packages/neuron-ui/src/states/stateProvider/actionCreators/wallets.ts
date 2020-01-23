@@ -1,9 +1,6 @@
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
-  createWallet,
-  importMnemonic,
-  importKeystore,
   getCurrentWallet,
   updateWallet,
   setCurrentWallet as setRemoteCurrentWallet,
@@ -13,12 +10,10 @@ import {
   updateAddressDescription as updateRemoteAddressDescription,
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
-  showErrorMessage,
 } from 'services/remote'
 import { emptyWallet } from 'states/initStates/wallet'
 import { emptyNervosDaoData } from 'states/initStates/nervosDAO'
 import { WalletWizardPath } from 'components/WalletWizard'
-import i18n from 'utils/i18n'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
 import { Routes, ErrorCode } from 'utils/const'
 import { addressesToBalance, failureResToNotification } from 'utils/formatters'
@@ -39,60 +34,6 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any)
       currentWalletCache.save(payload)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
-    }
-  })
-}
-
-export const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  _dispatch: StateDispatch,
-  history: any
-) => {
-  return createWallet(params).then(res => {
-    if (res.status === 1) {
-      history.push(Routes.Overview)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
-      }
-    }
-  })
-}
-
-export const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
-  _dispatch: StateDispatch,
-  history: any
-) => {
-  return importMnemonic(params).then(res => {
-    if (res.status === 1) {
-      history.push(Routes.Overview)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
-      }
-    }
-  })
-}
-
-export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
-  _dispatch: StateDispatch,
-  history: any
-) => {
-  return importKeystore(params).then(res => {
-    if (res.status === 1) {
-      history.push(Routes.Overview)
-    } else if (res.status > 0) {
-      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
-    } else if (res.message) {
-      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
-      if (msg) {
-        showErrorMessage(i18n.t(`messages.error`), msg)
-      }
     }
   })
 }
@@ -286,8 +227,6 @@ export const clearNervosDaoData = () => (dispatch: StateDispatch) => {
 }
 
 export default {
-  createWalletWithMnemonic,
-  importWalletWithMnemonic,
   updateCurrentWallet,
   updateWalletList,
   updateWallet,

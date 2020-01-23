@@ -17,6 +17,13 @@ export default class HexUtils {
     return hex
   }
 
+  public static addPrefix(hex: string): string {
+    if (hex.startsWith('0x')) {
+      return hex
+    }
+    return `0x${hex}`
+  }
+
   public static byteLength(hex: string): number {
     return Buffer.byteLength(HexUtils.removePrefix(hex), 'hex')
   }

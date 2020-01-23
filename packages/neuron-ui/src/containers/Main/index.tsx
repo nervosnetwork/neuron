@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
+import { Route, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useState } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import Overview from 'components/Overview'
 import WalletWizard from 'components/WalletWizard'
@@ -29,104 +28,102 @@ export const mainContents: CustomRouter.Route[] = [
     name: `Launch`,
     path: Routes.Launch,
     exact: true,
-    comp: LaunchScreen,
+    component: LaunchScreen,
   },
   {
     name: `General`,
     path: Routes.Overview,
     exact: true,
-    comp: Overview,
+    component: Overview,
   },
   {
     name: `Send`,
     path: Routes.Send,
     params: `/:address?`,
     exact: false,
-    comp: Send,
+    component: Send,
   },
   {
     name: `Receive`,
     path: Routes.Receive,
     params: `/:address?`,
     exact: false,
-    comp: Receive,
+    component: Receive,
   },
   {
     name: `History`,
     path: Routes.History,
     exact: false,
-    comp: History,
+    component: History,
   },
   {
     name: `Transaction`,
     path: Routes.Transaction,
     params: `/:hash`,
     exact: false,
-    comp: Transaction,
+    component: Transaction,
   },
   {
     name: `Addresses`,
     path: Routes.Addresses,
     exact: false,
-    comp: Addresses,
+    component: Addresses,
   },
   {
     name: `Settings`,
     path: Routes.Settings,
     exact: false,
-    comp: Settings,
+    component: Settings,
   },
   {
     name: `NetworkEditor`,
     path: Routes.NetworkEditor,
     params: '/:id',
     exact: false,
-    comp: NetworkEditor,
+    component: NetworkEditor,
   },
   {
     name: `WalletEditor`,
     path: Routes.WalletEditor,
     params: '/:id',
     exact: false,
-    comp: WalletEditor,
+    component: WalletEditor,
   },
   {
     name: `WalletWizard`,
     path: Routes.WalletWizard,
     exact: false,
-    comp: WalletWizard,
+    component: WalletWizard,
   },
   {
     name: `ImportKeystore`,
     path: Routes.ImportKeystore,
     exact: false,
-    comp: ImportKeystore,
+    component: ImportKeystore,
   },
   {
     name: `PasswordRequest`,
     path: '/',
     exact: false,
-    comp: PasswordRequest,
+    component: PasswordRequest,
   },
   {
     name: `NervosDAO`,
     path: Routes.NervosDAO,
     exact: true,
-    comp: NervosDAO,
+    component: NervosDAO,
   },
 ]
 
-const MainContent = ({
-  history,
-  dispatch,
-}: React.PropsWithoutRef<{ dispatch: StateDispatch } & RouteComponentProps>) => {
-  const neuronWalletState = useState()
+const MainContent = () => {
+  const history = useHistory()
   const {
     app: { isAllowedToFetchList = true },
     wallet: { id: walletID = '' },
     chain,
     settings: { networks = [] },
-  } = neuronWalletState
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const { networkID } = chain
   const [, i18n] = useTranslation()
 
@@ -163,9 +160,7 @@ const MainContent = ({
           exact={container.exact}
           path={`${container.path}${container.params || ''}`}
           key={container.name}
-          render={routerProps => {
-            return <container.comp {...routerProps} {...neuronWalletState} dispatch={dispatch} />
-          }}
+          component={container.component}
         />
       ))}
     </>

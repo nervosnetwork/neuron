@@ -10,12 +10,14 @@ import { register as registerListeners } from 'listeners/main'
 import WalletsService from 'services/wallets'
 import ApiController from 'controllers/api'
 import NodeController from 'controllers/node'
+import SyncApiController from 'controllers/sync-api'
 
 const app = electronApp || (remote && remote.app)
 
 export default class AppController {
   public mainWindow: BrowserWindow | null = null
   private apiController = new ApiController()
+  private syncApiController = new SyncApiController()
 
   constructor() {
     subscribe(this)
@@ -31,6 +33,7 @@ export default class AppController {
     WalletsService.getInstance().generateAddressesIfNecessary()
 
     this.apiController.mount()
+    this.syncApiController.mount()
     this.openWindow()
   }
 
@@ -62,6 +65,17 @@ export default class AppController {
     }
 
     this.createWindow()
+  }
+
+  public restoreWindow = () => {
+    if (!this.mainWindow) {
+      return
+    }
+
+    if (this.mainWindow.isMinimized()) {
+      this.mainWindow.restore()
+    }
+    this.mainWindow.focus()
   }
 
   createWindow = () => {

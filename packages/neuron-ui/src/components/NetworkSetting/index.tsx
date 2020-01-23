@@ -1,10 +1,9 @@
 import React, { useEffect, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import chainState from 'states/initStates/chain'
 import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
@@ -26,12 +25,9 @@ const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; 
   }
 }
 
-const NetworkSetting = ({
-  chain = chainState,
-  settings: { networks = [] },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: State.AppWithNeuronWallet) => {
   const [t] = useTranslation()
+  const history = useHistory()
   useEffect(() => {
     backToTop()
   }, [])
@@ -63,7 +59,7 @@ const NetworkSetting = ({
           },
           {
             label: t('common.edit'),
-            enabled: !isDefault,
+            enabled: true,
             click: () => {
               history.push(`${Routes.NetworkEditor}/${item.id}`)
             },

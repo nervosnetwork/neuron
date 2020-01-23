@@ -1,19 +1,54 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { useHistory, useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import i18n from 'utils/i18n'
 import { Stack, Icon, Text, TextField, FontSizes } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import CustomTextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
-import { generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
-import { createWalletWithMnemonic, importWalletWithMnemonic } from 'states/stateProvider/actionCreators'
+import { createWallet, importMnemonic, generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 
 import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
 import styles from './walletWizard.module.scss'
+
+const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
+  history: ReturnType<typeof useHistory>
+) => {
+  return createWallet(params).then(res => {
+    if (res.status === 1) {
+      history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+    } else if (res.message) {
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
+      }
+    }
+  })
+}
+
+const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
+  history: ReturnType<typeof useHistory>
+) => {
+  return importMnemonic(params).then(res => {
+    if (res.status === 1) {
+      history.push(Routes.Overview)
+    } else if (res.status > 0) {
+      showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
+    } else if (res.message) {
+      const msg = typeof res.message === 'string' ? res.message : res.message.content || ''
+      if (msg) {
+        showErrorMessage(i18n.t(`messages.error`), msg)
+      }
+    }
+  })
+}
 
 export enum WalletWizardPath {
   Welcome = '/welcome',
@@ -53,8 +88,9 @@ const submissionInputs = [
   },
 ]
 
-const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementProps<{ rootPath: string }>) => {
+const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => {
   const [t] = useTranslation()
+  const history = useHistory()
   useEffect(() => {
     if (wallets.length) {
       history.push(Routes.Overview)
@@ -108,16 +144,12 @@ const Welcome = ({ rootPath = '/wizard', wallets = [], history }: WizardElementP
 
 Welcome.displayName = 'Welcome'
 
-const Mnemonic = ({
-  state = initState,
-  rootPath = '/wizard',
-  match: {
-    params: { type = MnemonicAction.Create },
-  },
-  history,
-  dispatch,
-}: WizardElementProps<{ type: string }>) => {
+const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardElementProps) => {
   const { generated, imported } = state
+  const history = useHistory()
+  const {
+    params: { type = MnemonicAction.Create },
+  } = useRouteMatch<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const isCreate = type === MnemonicAction.Create
   const message = isCreate ? 'wizard.your-wallet-seed-is' : 'wizard.input-your-seed'
@@ -219,16 +251,12 @@ const Mnemonic = ({
 
 Mnemonic.displayName = 'Mnemonic'
 
-const Submission = ({
-  state = initState,
-  wallets = [],
-  match: {
-    params: { type = MnemonicAction.Create },
-  },
-  history,
-  dispatch,
-}: WizardElementProps<{ type: string }>) => {
+const Submission = ({ state = initState, wallets = [], dispatch }: WizardElementProps) => {
   const { name, password, confirmPassword, imported } = state
+  const history = useHistory()
+  const {
+    params: { type = MnemonicAction.Create },
+  } = useRouteMatch<{ type: MnemonicAction }>()
   const [t] = useTranslation()
   const [loading, setLoading] = useState(false)
   const message = 'wizard.set-wallet-name-and-password'
@@ -280,12 +308,12 @@ const Submission = ({
     setLoading(true)
     setTimeout(() => {
       if (type === MnemonicAction.Create) {
-        createWalletWithMnemonic(p)(dispatch, history).finally(() => setLoading(false))
+        createWalletWithMnemonic(p)(history).finally(() => setLoading(false))
       } else {
-        importWalletWithMnemonic(p)(dispatch, history).finally(() => setLoading(false))
+        importWalletWithMnemonic(p)(history).finally(() => setLoading(false))
       }
     }, 0)
-  }, [type, name, password, imported, history, dispatch, loading])
+  }, [type, name, password, imported, history, loading])
 
   const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
   const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
@@ -314,6 +342,7 @@ const Submission = ({
             hint={input.hint ? t(input.hint) : undefined}
             suffix={input.type === 'password' ? `${state[input.key].length}/${MAX_PASSWORD_LENGTH}` : undefined}
             className={styles.submissionField}
+            required
           />
         </div>
       ))}

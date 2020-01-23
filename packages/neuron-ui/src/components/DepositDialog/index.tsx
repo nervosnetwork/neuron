@@ -76,6 +76,7 @@ const DepositDialog = ({
             value={localNumberFormatter(value)}
             onChange={onChange}
             suffix="CKB"
+            required
           />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
           <div className={styles.errorMessage}>{errorMessage}</div>

@@ -1,20 +1,20 @@
 import React from 'react'
-import { Route, RouteComponentProps } from 'react-router-dom'
 import { storiesOf } from '@storybook/react'
+import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
-import StoryRouter from 'storybook-react-router'
 import History from 'components/History'
 import initStates from 'states/initStates'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import transactions from './data/transactions'
+
+const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
 
 const stateTemplate = {
   ...initStates,
-  dispatch: (dispatchAction: any) => action(dispatchAction),
+  dispatch,
 }
 
-const states: { [title: string]: StateWithDispatch } = {
+const states: { [title: string]: any } = {
   'Has not transactions': {
     ...stateTemplate,
     chain: {
@@ -102,14 +102,11 @@ const states: { [title: string]: StateWithDispatch } = {
   },
 }
 
-const HistoryWithRouteProps = (props: StateWithDispatch) => (
-  <Route path="/" render={(routeProps: RouteComponentProps) => <History {...routeProps} {...props} />} />
-)
-
 const stories = storiesOf('History', module).addDecorator(StoryRouter())
 
 Object.entries(states).forEach(([title, props]) => {
-  stories.add(title, () => <HistoryWithRouteProps {...props} />)
+  console.info(props)
+  stories.add(title, () => <History />)
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -137,5 +134,6 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       },
     },
   }
-  return <HistoryWithRouteProps {...props} />
+  console.info(props)
+  return <History />
 })

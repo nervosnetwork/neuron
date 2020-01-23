@@ -1,3 +1,33 @@
+# [0.27.0](https://github.com/nervosnetwork/neuron/compare/v0.26.3...v0.27.0) (2020-01-23)
+
+Happy Spring Festival!
+
+### Bundled CKB node
+
+CKB v0.27.0 was released on Jan 10th, 2020. This version of CKB node is now bundled and preconfigured in Neuron.
+
+### Electron
+
+We updated to Electron 7.1.9, which has fixed a bug that would cause updater to fail to download new version of Neuron.
+
+So far Electron 7's asynchronous request/response-style IPC has been working very well, we are going to migrate more internal communications to use that.
+
+### Syncing
+
+We've improved the sync and block scan, making it more stable and faster (up to 2x on macOS and 3-4x on Windows). Block and other data's DB access was tweaked to write less frequently and read more quickly. We're still tweaking this and planning to enable CKB's indexer module in the near future, to make the sync a lot faster.
+
+### Other features and changes
+
+* Prevent multiple instances of Neuron from running at the same time.
+* Change the QR reader to read an image from the desktop, instead of scanning with the camera.
+* Update the network and sync status display to show more information.
+
+### Bug fixes
+
+* Fixed an issue that when a transaction has many inputs or outputs the wallet cannot load it and the UI would display empty history list.
+* Fixed an issue that could occur when sending transaction.
+
+
 # [0.26.3](https://github.com/nervosnetwork/neuron/compare/v0.26.0...v0.26.3) (2020-01-07)
 
 Happy New Year and welcome to the v0.26.3 release of Neuron!

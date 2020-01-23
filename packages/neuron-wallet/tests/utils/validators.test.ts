@@ -1,4 +1,4 @@
-import { verifyPasswordComplexity } from '../../src/decorators/validators'
+import { verifyPasswordComplexity } from '../../src/utils/validators'
 import i18n from '../../src/locales/i18n'
 import { MIN_PASSWORD_LENGTH } from '../../src/utils/const'
 

@@ -1,34 +1,35 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
 
 import TransactionList from 'components/TransactionList'
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import { Routes, MAINNET_TAG } from 'utils/const'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
 
-const History = ({
-  app: {
-    tipBlockNumber: chainBlockNumber,
-    loadings: { transactionList: isLoading },
-  },
-  wallet: { id },
-  chain: {
-    networkID,
-    tipBlockNumber: syncedBlockNumber,
-    transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
-  },
-  settings: { networks },
-  history,
-  location: { search },
-  dispatch,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+const History = () => {
+  const {
+    app: {
+      tipBlockNumber: chainBlockNumber,
+      loadings: { transactionList: isLoading },
+    },
+    wallet: { id },
+    chain: {
+      networkID,
+      tipBlockNumber: syncedBlockNumber,
+      transactions: { pageNo = 1, pageSize = 15, totalCount = 0, items = [] },
+    },
+    settings: { networks },
+  } = useGlobalState()
+  const dispatch = useDispatch()
   const [t] = useTranslation()
+  const history = useHistory()
+  const { search } = useLocation()
   const isMainnet = useMemo(() => {
     const network = networks.find(n => n.id === networkID)
     return !!(network && network.chain === MAINNET_TAG)

@@ -1,14 +1,16 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import produce from 'immer'
 import { TFunction } from 'i18next'
+import i18n from 'utils/i18n'
+import jsQR from 'jsqr'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
+import { captureScreenshot, showErrorMessage } from 'services/remote'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
 import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { verifyAddress, verifyAmount, verifyAmountRange, verifyTransactionOutputs } from 'utils/validators'
-import { ErrorCode, MAINNET_TAG } from 'utils/const'
+import { verifyTransactionOutputs, verifyAddress } from 'utils/validators'
 import calculateFee from 'utils/calculateFee'
+import styles from './send.module.scss'
 
 let generateTxTimer: ReturnType<typeof setTimeout>
 
@@ -39,15 +41,21 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
   t: TFunction
 }) => {
   const { value: type } = Object.getOwnPropertyDescriptor(generator, 'type')!
-  if (verifyTransactionOutputs(items, type === 'all')) {
-    if (type === 'common') {
+  if (items.length === 1 && items[0].amount === undefined) {
+    setTotalAmount('0')
+  } else if (type === 'common') {
+    try {
       const totalAmount = outputsToTotalAmount(items)
       setTotalAmount(totalAmount)
+    } catch (err) {
+      console.warn(err)
     }
+  }
+  if (verifyTransactionOutputs(items, type === 'all')) {
     const realParams = {
       walletID,
       items: items.map(item => ({
-        address: item.address,
+        address: item.address || '',
         capacity: CKBToShannonFormatter(item.amount, item.unit),
       })),
       feeRate: price,
@@ -177,15 +185,12 @@ const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =
     [dispatch, items]
   )
 
-const useOnItemChange = (
-  updateTransactionOutput: Function,
-  setOutputErrors: React.Dispatch<React.SetStateAction<any>>
-) =>
+const useOnItemChange = (updateTransactionOutput: Function) =>
   useCallback(
     (e: any) => {
       const {
         value,
-        dataset: { field = '', idx = -1, chainType = MAINNET_TAG },
+        dataset: { field = '', idx = -1 },
       } = e.target
       if (field === 'amount') {
         const amount = value.replace(/,/g, '') || '0'
@@ -193,61 +198,14 @@ const useOnItemChange = (
           return
         }
         updateTransactionOutput(field)(idx)(amount)
-
-        let amountErrorCode = ''
-        const msg = verifyAmount(amount)
-        if (typeof msg === 'object') {
-          amountErrorCode = `${msg.code}`
-        } else if (!verifyAmountRange(amount)) {
-          amountErrorCode = `${ErrorCode.AmountTooSmall}`
-        }
-        setOutputErrors(
-          /* eslint-disable no-param-reassign */
-          produce(errors => {
-            if (errors[idx]) {
-              errors[idx].amountErrorCode = amountErrorCode
-            } else {
-              errors[idx] = {
-                amountErrorCode,
-                addrErrorCode: '',
-              }
-            }
-          })
-          /* eslint-enable no-param-reassign */
-        )
         return
       }
       if (field === 'address') {
         const address = value
         updateTransactionOutput(field)(idx)(address)
-
-        let addrErrorCode = ''
-        if (address === '') {
-          addrErrorCode = `${ErrorCode.AddressIsEmpty}`
-        } else if (chainType === MAINNET_TAG && !address.startsWith('ckb')) {
-          addrErrorCode = `${ErrorCode.MainnetAddressRequired}`
-        } else if (chainType !== MAINNET_TAG && !address.startsWith('ckt')) {
-          addrErrorCode = `${ErrorCode.TestnetAddressRequired}`
-        } else if (!verifyAddress(address)) {
-          addrErrorCode = `${ErrorCode.FieldInvalid}`
-        }
-        setOutputErrors(
-          /* eslint-disable no-param-reassign */
-          produce(errors => {
-            if (errors[idx]) {
-              errors[idx].addrErrorCode = addrErrorCode
-            } else {
-              errors[idx] = {
-                addrErrorCode,
-                amountErrorCode: '',
-              }
-            }
-          })
-          /* eslint-enable no-param-reassign */
-        )
       }
     },
-    [updateTransactionOutput, setOutputErrors]
+    [updateTransactionOutput]
   )
 
 const useUpdateTransactionPrice = (dispatch: StateDispatch) =>
@@ -297,7 +255,6 @@ export const useInitialize = (
   const [totalAmount, setTotalAmount] = useState('0')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSendMax, setIsSendMax] = useState(false)
-  const [outputErrors, setOutputErrors] = useState<{ addrErrorCode: string; amountErrorCode: string }[]>([])
 
   const outputs = useMemo(() => items.map(item => ({ ...item, disabled: isSendMax || sending })), [
     items,
@@ -306,7 +263,7 @@ export const useInitialize = (
   ])
 
   const updateTransactionOutput = useUpdateTransactionOutput(dispatch)
-  const onItemChange = useOnItemChange(updateTransactionOutput, setOutputErrors)
+  const onItemChange = useOnItemChange(updateTransactionOutput)
   const addTransactionOutput = useAddTransactionOutput(dispatch)
   const removeTransactionOutput = useRemoveTransactionOutput(dispatch)
   const updateTransactionPrice = useUpdateTransactionPrice(dispatch)
@@ -343,6 +300,37 @@ export const useInitialize = (
     }
   }, [updateSendingAllTransaction, setIsSendMax, isSendMax, outputs.length, updateTransactionOutput, items])
 
+  const onScan = useCallback(
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const {
+        dataset: { idx },
+      } = e.target as HTMLButtonElement
+      if (idx !== undefined && !(e.target as HTMLButtonElement).classList.contains(styles.busy)) {
+        ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.add(styles.busy))
+        setTimeout(async () => {
+          const codes = await captureScreenshot().then(imageDataList =>
+            imageDataList.map(imageData =>
+              jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: 'dontInvert',
+              })
+            )
+          )
+          for (let i = 0; i < codes.length; i++) {
+            if (codes[i] && codes[i]!.data && verifyAddress(codes[i]!.data)) {
+              const event = { target: { dataset: { field: 'address', idx }, value: codes[i]!.data } }
+              onItemChange(event)
+              ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
+              return
+            }
+          }
+          showErrorMessage(i18n.t('messages.error'), i18n.t('messages.no-valid-addresses-found'))
+          ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
+        }, 100)
+      }
+    },
+    [onItemChange]
+  )
+
   useEffect(() => {
     if (isSendMax) {
       updateSendingAllTransaction()
@@ -366,11 +354,11 @@ export const useInitialize = (
     onDescriptionChange,
     onSubmit,
     onClear,
-    outputErrors,
     errorMessage,
     setErrorMessage,
     isSendMax,
     onSendMaxClick,
+    onScan,
   }
 }
 

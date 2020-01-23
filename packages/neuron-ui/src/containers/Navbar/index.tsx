@@ -1,13 +1,15 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'states/stateProvider'
+import { useState as useGlobalState } from 'states/stateProvider'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 
+import getSyncStatus from 'utils/getSyncStatus'
 import { Routes, FULL_SCREENS } from 'utils/const'
+
 import styles from './navbar.module.scss'
 
 const menuItems = [
@@ -20,8 +22,10 @@ const menuItems = [
   { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
 ]
 
-const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
-  const neuronWallet = useState()
+const Navbar = () => {
+  const history = useHistory()
+  const { pathname } = useLocation()
+  const neuronWallet = useGlobalState()
   const {
     wallet: { name },
     app: { tipBlockNumber = '0', tipBlockTimestamp },
@@ -32,6 +36,13 @@ const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
 
   const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
   const selectedKey: string | null = selectedTab ? selectedTab.key : null
+
+  const syncStatus = getSyncStatus({
+    syncedBlockNumber,
+    tipBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -70,15 +81,12 @@ const Navbar = ({ location: { pathname }, history }: RouteComponentProps) => {
         {menus}
       </nav>
       <NetworkStatus
+        syncStatus={syncStatus}
         networkName={networkName}
         connectionStatus={connectionStatus}
         onAction={() => history.push(Routes.SettingsNetworks)}
       />
-      <SyncStatus
-        tipBlockNumber={tipBlockNumber}
-        tipBlockTimestamp={tipBlockTimestamp}
-        syncedBlockNumber={syncedBlockNumber}
-      />
+      <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} />
     </aside>
   )
 }

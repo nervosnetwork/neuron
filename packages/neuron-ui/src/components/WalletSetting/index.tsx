@@ -1,10 +1,10 @@
 import React, { useEffect, useCallback } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
+import { StateDispatch } from 'states/stateProvider/reducer'
 import { setCurrentWallet } from 'states/stateProvider/actionCreators'
 
 import { WalletWizardPath } from 'components/WalletWizard'
@@ -36,9 +36,9 @@ const WalletSetting = ({
   wallet: { id: currentID = '' },
   settings: { wallets = [] },
   dispatch,
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+}: State.AppWithNeuronWallet & { dispatch: StateDispatch }) => {
   const [t] = useTranslation()
+  const history = useHistory()
   useEffect(() => {
     backToTop()
   }, [])

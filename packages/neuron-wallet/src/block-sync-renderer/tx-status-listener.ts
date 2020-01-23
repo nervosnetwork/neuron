@@ -1,37 +1,37 @@
 import { interval } from 'rxjs'
 import { getConnection } from 'typeorm'
 import Core from '@nervosnetwork/ckb-sdk-core'
-import { TransactionStatus } from 'types/cell-types'
 import LockUtils from 'models/lock-utils'
 import { FailedTransaction, TransactionPersistor } from 'services/tx'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
-import TypeConvert from 'types/type-convert'
-import GetBlocks from 'block-sync-renderer/sync/get-blocks'
+import RpcService from 'services/rpc-service'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import NodeService from 'services/node'
 import WalletService from 'services/wallets'
+import { TransactionStatus } from 'models/chain/transaction'
+import TransactionWithStatus from 'models/chain/transaction-with-status'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().core.rpc.node.url
-  const core = new Core(url)
-  const tx = (await core.rpc.getTransaction(hash)) as CKBComponents.TransactionWithStatus
-  if (!tx) {
+  const rpcService = new RpcService(url)
+  const txWithStatus: TransactionWithStatus | undefined = await rpcService.getTransaction(hash)
+  if (!txWithStatus) {
     return {
-      tx,
+      tx: txWithStatus,
       status: TransactionStatus.Failed,
       blockHash: null,
     }
   }
-  if (tx.txStatus.status === 'committed') {
+  if (txWithStatus.txStatus.isCommitted()) {
     return {
-      tx: TypeConvert.toTransaction(tx.transaction),
+      tx: txWithStatus.transaction,
       status: TransactionStatus.Success,
-      blockHash: tx.txStatus.blockHash,
+      blockHash: txWithStatus.txStatus.blockHash,
     }
   }
   return {
-    tx: TypeConvert.toTransaction(tx.transaction),
+    tx: txWithStatus.transaction,
     status: TransactionStatus.Pending,
     blockHash: null,
   }
@@ -68,15 +68,13 @@ const trackingStatus = async () => {
   if (successTxs.length > 0) {
     const url: string = NodeService.getInstance().core.rpc.node.url
     const core = new Core(url)
-    const getBlockService = new GetBlocks(core.rpc.node.url)
+    const rpcService = new RpcService(core.rpc.node.url)
     for (const successTx of successTxs) {
-      const transaction = successTx.tx
+      const transaction = successTx.tx!
       const { blockHash } = successTx
-      const blockHeader = await getBlockService.getHeader(blockHash!)
+      const blockHeader = await rpcService.getHeader(blockHash!)
       if (blockHeader) {
-        transaction.blockHash = blockHash!
-        transaction.blockNumber = blockHeader.number
-        transaction.timestamp = blockHeader.timestamp
+        transaction.setBlockHeader(blockHeader)
         await TransactionPersistor.saveFetchTx(transaction)
       }
     }

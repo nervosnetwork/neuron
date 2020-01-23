@@ -1,17 +1,18 @@
 import React, { useEffect } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, PanelType, SpinnerSize } from 'office-ui-fabric-react'
+import { useState as useGlobalState } from 'states/stateProvider'
 import Spinner from 'widgets/Spinner'
 
-import { StateWithDispatch } from 'states/stateProvider/reducer'
 import { Routes } from 'utils/const'
 
-export const LaunchScreen = ({
-  wallet: { id = '' },
-  history,
-}: React.PropsWithoutRef<StateWithDispatch & RouteComponentProps>) => {
+export const LaunchScreen = () => {
+  const {
+    wallet: { id = '' },
+  } = useGlobalState()
   const { t } = useTranslation()
+  const history = useHistory()
 
   useEffect(() => {
     if (id) {

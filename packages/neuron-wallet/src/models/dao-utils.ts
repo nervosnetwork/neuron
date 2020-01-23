@@ -1,8 +1,9 @@
 import NodeService from 'services/node'
-import { ScriptHashType } from 'types/cell-types'
 import Core from '@nervosnetwork/ckb-sdk-core'
 import { SystemScript } from './lock-utils'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
+import Script, { ScriptHashType } from './chain/script'
+import OutPoint from 'models/chain/out-point'
 
 export default class DaoUtils {
   daoScript: SystemScript
@@ -12,18 +13,15 @@ export default class DaoUtils {
   }
 
   static daoScriptInfo: SystemScript | undefined
-
   static previousURL: string | undefined
+  static scriptHash: string = ""
 
   static async loadDaoScript(nodeURL: string): Promise<SystemScript> {
     const core = new Core(nodeURL)
 
     const genesisBlock = await core.rpc.getBlockByNumber(BigInt(0))
     const systemCellTransaction = genesisBlock.transactions[0]
-    const daoOutPoint = {
-      txHash: systemCellTransaction.hash,
-      index: '0x2'
-    }
+    const daoOutPoint = new OutPoint(systemCellTransaction.hash, '0x2')
 
     const daoTypeHash = scriptToHash(systemCellTransaction.outputs[2].type!)
 
@@ -41,6 +39,7 @@ export default class DaoUtils {
 
     DaoUtils.daoScriptInfo = await DaoUtils.loadDaoScript(nodeURL)
     DaoUtils.previousURL = nodeURL
+    DaoUtils.scriptHash = new Script(DaoUtils.daoScriptInfo.codeHash, "0x", DaoUtils.daoScriptInfo.hashType).computeHash()
 
     return DaoUtils.daoScriptInfo
   }

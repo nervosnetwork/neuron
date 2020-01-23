@@ -1,11 +1,9 @@
 import { ReplaySubject } from 'rxjs'
-import { Transaction } from 'types/cell-types'
 import ProcessUtils from 'utils/process'
 import { remote } from 'electron'
 
 export interface TransactionChangedMessage {
   event: string
-  tx: Transaction
 }
 
 // subscribe this Subject to monitor any transaction table changes

@@ -1,11 +1,11 @@
 import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { Transaction, TransactionWithoutHash, TransactionStatus } from 'types/cell-types'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
 import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
+import Transaction, { TransactionStatus } from 'models/chain/transaction'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -179,15 +179,14 @@ export class TransactionsService {
       .map(i => i.outPointTxHash)
       .filter(h => !!h) as string[]
 
-    const daoCellOutPoints: { txHash: string, index: string }[] = await getConnection()
+    const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .select("output.outPointTxHash", "txHash")
       .addSelect("output.outPointIndex", "index")
-      .where('output.daoData IS NOT NULL AND output.outPointTxHash IN (:...inputPreviousTxHashes)', {
-        inputPreviousTxHashes,
-      })
-      .getRawMany()
+      .where('output.daoData IS NOT NULL')
+      .getRawMany())
+      .filter(o => inputPreviousTxHashes.includes(o.txHash))
 
     const txs: Transaction[] = transactions!.map(tx => {
       const outputCapacities: bigint = tx.outputs
@@ -214,7 +213,7 @@ export class TransactionsService {
       ) {
         nervosDao = true
       }
-      return {
+      return Transaction.fromObject({
         timestamp: tx.timestamp,
         value: value.toString(),
         hash: tx.hash,
@@ -226,7 +225,7 @@ export class TransactionsService {
         createdAt: tx.createdAt,
         updatedAt: tx.updatedAt,
         blockNumber: tx.blockNumber,
-      }
+      })
     })
 
     return {
@@ -300,12 +299,12 @@ export class TransactionsService {
       return undefined
     }
 
-    const transaction: Transaction = tx.toInterface()
+    const transaction: Transaction = tx.toModel()
 
     return transaction
   }
 
-  public static blake160sOfTx = (tx: TransactionWithoutHash | Transaction) => {
+  public static blake160sOfTx = (tx: Transaction) => {
     let inputBlake160s: string[] = []
     let outputBlake160s: string[] = []
     if (tx.inputs) {

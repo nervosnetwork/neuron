@@ -2,9 +2,14 @@ import React, { createContext, useReducer, useContext } from 'react'
 import initStates from 'states/initStates'
 import { StateDispatch, reducer } from './reducer'
 
-export const NeuronWalletContext = createContext<State.AppWithNeuronWallet>(initStates)
+const basicDispatch = console.info
 
-const withProviders = (Comp: React.ComponentType<{ dispatch: StateDispatch }>) => (props: React.Props<any>) => {
+export const NeuronWalletContext = createContext<{ state: State.AppWithNeuronWallet; dispatch: StateDispatch }>({
+  state: initStates,
+  dispatch: basicDispatch,
+})
+
+const withProviders = (Comp: React.ComponentType) => (props: React.Props<any>) => {
   const [providers, dispatch] = useReducer(reducer, initStates)
 
   Object.defineProperty(Comp, 'displayName', {
@@ -12,12 +17,13 @@ const withProviders = (Comp: React.ComponentType<{ dispatch: StateDispatch }>) =
   })
 
   return (
-    <NeuronWalletContext.Provider value={providers}>
-      <Comp {...props} dispatch={dispatch} />
+    <NeuronWalletContext.Provider value={{ state: providers, dispatch }}>
+      <Comp {...props} />
     </NeuronWalletContext.Provider>
   )
 }
 
-export const useState = () => useContext(NeuronWalletContext)
+export const useState = () => useContext(NeuronWalletContext).state
+export const useDispatch = () => useContext(NeuronWalletContext).dispatch
 
 export default withProviders
