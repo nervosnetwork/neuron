@@ -7,7 +7,9 @@ import { useState as useGlobalState } from 'states/stateProvider'
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 
+import getSyncStatus from 'utils/getSyncStatus'
 import { Routes, FULL_SCREENS } from 'utils/const'
+
 import styles from './navbar.module.scss'
 
 const menuItems = [
@@ -34,6 +36,13 @@ const Navbar = () => {
 
   const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
   const selectedKey: string | null = selectedTab ? selectedTab.key : null
+
+  const syncStatus = getSyncStatus({
+    syncedBlockNumber,
+    tipBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
     return null
@@ -72,15 +81,12 @@ const Navbar = () => {
         {menus}
       </nav>
       <NetworkStatus
+        syncStatus={syncStatus}
         networkName={networkName}
         connectionStatus={connectionStatus}
         onAction={() => history.push(Routes.SettingsNetworks)}
       />
-      <SyncStatus
-        tipBlockNumber={tipBlockNumber}
-        tipBlockTimestamp={tipBlockTimestamp}
-        syncedBlockNumber={syncedBlockNumber}
-      />
+      <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} />
     </aside>
   )
 }

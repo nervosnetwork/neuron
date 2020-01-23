@@ -2,21 +2,26 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from 'containers/Navbar/navbar.module.scss'
-import { MAX_TIP_BLOCK_DELAY, BUFFER_BLOCK_NUMBER } from 'utils/const'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils/const'
 
 const SyncStatus = ({
-  tipBlockNumber = '',
-  tipBlockTimestamp = 0,
-  syncedBlockNumber = '',
-  bufferBlockNumber = BUFFER_BLOCK_NUMBER,
+  syncStatus,
+  connectionStatus,
 }: React.PropsWithoutRef<{
-  tipBlockNumber: string
-  tipBlockTimestamp: number
-  syncedBlockNumber: string
-  bufferBlockNumber?: number
+  syncStatus: SyncStatusEnum
+  connectionStatus: State.ConnectionStatus
 }>) => {
   const [t] = useTranslation()
-  if (tipBlockNumber === '') {
+
+  if (connectionStatus === ConnectionStatus.Offline) {
+    return (
+      <div className={styles.sync}>
+        <span style={{ color: 'red' }}>{t('sync.sync-failed')}</span>
+      </div>
+    )
+  }
+
+  if (SyncStatusEnum.FailToFetchTipBlock === syncStatus) {
     return (
       <div className={styles.sync}>
         <span>{t('navbar.fail-to-fetch-tip-block-number')}</span>
@@ -24,28 +29,33 @@ const SyncStatus = ({
     )
   }
 
-  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0') {
+  if (SyncStatusEnum.SyncNotStart === syncStatus) {
     return (
       <div className={styles.sync}>
-        <span>{t('navbar.sync-not-start')}</span>
+        <span style={{ color: 'red' }}>{t('navbar.sync-not-start')}</span>
       </div>
     )
   }
 
-  const percentage = `${((+syncedBlockNumber / +tipBlockNumber) * 100).toFixed(2)}%`
+  if (SyncStatusEnum.SyncPending === syncStatus) {
+    return (
+      <div className={styles.sync}>
+        <span style={{ color: '#f7ae4d' }}>{t('sync.slow')}</span>
+      </div>
+    )
+  }
+
+  if (SyncStatusEnum.SyncCompleted === syncStatus) {
+    return (
+      <div className={styles.sync}>
+        <span>{t('sync.synced')}</span>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.sync}>
-      {BigInt(syncedBlockNumber) + BigInt(bufferBlockNumber) < BigInt(tipBlockNumber) ? (
-        <>
-          <span>{percentage}</span>
-          <progress max={tipBlockNumber} value={syncedBlockNumber} />
-        </>
-      ) : (
-        <span title={percentage}>
-          {t(`sync.${tipBlockTimestamp + MAX_TIP_BLOCK_DELAY >= Date.now() ? 'synced' : 'syncing'}`)}
-        </span>
-      )}
+      <span>{t('sync.syncing')}</span>
     </div>
   )
 }

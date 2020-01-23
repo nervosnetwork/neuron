@@ -43,8 +43,7 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      },
-      "syncing": "Syncing"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -324,8 +323,12 @@
     },
     "sync": {
       "synced": "Synced",
-      "syncing": "Syncing",
-      "block-number": "block number"
+      "syncing": "Synchronizing",
+      "block-number": "block number",
+      "syncing-balance": "Balance is updating",
+      "slow": "Sync is slow",
+      "sync-failed": "Sync failed, please check network",
+      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet"
     },
     "pagination": {
       "previous-page": "Previous page",

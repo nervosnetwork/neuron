@@ -7,9 +7,10 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, SyncStatus, ConnectionStatus } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
+import getSyncStatus from 'utils/getSyncStatus'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -34,7 +35,7 @@ const NervosDAO = () => {
     },
     wallet,
     nervosDAO: { records },
-    chain: { connectionStatus },
+    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -116,6 +117,13 @@ const NervosDAO = () => {
     records,
     tipBlockHash,
     setWithdrawList,
+  })
+
+  const syncStatus = getSyncStatus({
+    tipBlockNumber,
+    tipBlockTimestamp,
+    syncedBlockNumber,
+    currentTimestamp: Date.now(),
   })
 
   const MemoizedRecords = useMemo(() => {
@@ -254,6 +262,23 @@ const NervosDAO = () => {
     },
   ]
 
+  let balancePrompt = null
+  if (ConnectionStatus.Offline === connectionStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-failed')}
+      </span>
+    )
+  } else if (SyncStatus.SyncNotStart === syncStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
+        {t('sync.sync-not-start')}
+      </span>
+    )
+  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+  }
+
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.walletName}>{wallet.name}</h1>
@@ -264,6 +289,7 @@ const NervosDAO = () => {
             <span>{value}</span>
           </div>
         ))}
+        {balancePrompt}
       </div>
       <div className={styles.deposit}>
         <div>

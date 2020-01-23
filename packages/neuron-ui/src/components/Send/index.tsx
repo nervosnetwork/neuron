@@ -12,7 +12,8 @@ import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG } from 'utils/const'
+import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG, SyncStatus, ConnectionStatus } from 'utils/const'
+import getSyncStatus from 'utils/getSyncStatus'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import {
   verifyTotalAmount,
@@ -30,9 +31,11 @@ const Send = () => {
     app: {
       send = appState.send,
       loadings: { sending = false },
+      tipBlockNumber,
+      tipBlockTimestamp,
     },
     wallet: { id: walletID = '', balance = '' },
-    chain: { networkID, connectionStatus },
+    chain: { networkID, connectionStatus, tipBlockNumber: syncedBlockNumber },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -62,12 +65,18 @@ const Send = () => {
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
   const network = networks.find(n => n.id === networkID)
 
+  const syncStatus = getSyncStatus({
+    tipBlockNumber,
+    syncedBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+  })
+
   const outputErrors = useMemo(() => {
     return outputs.map(({ address, amount }) => {
       let amountErrorCode = ''
       let addrErrorCode = ''
 
-      // skip amount = ''
       const amountVeriMsg = verifyAmount(amount)
       if (amount !== undefined) {
         if (typeof amountVeriMsg === 'object') {
@@ -96,6 +105,23 @@ const Send = () => {
     })
   }, [outputs, network])
 
+  let balancePrompt = null
+  if (ConnectionStatus.Offline === connectionStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-failed')}
+      </span>
+    )
+  } else if (SyncStatus.SyncNotStart === syncStatus) {
+    balancePrompt = (
+      <span className={styles.balancePrompt} style={{ color: 'red' }}>
+        {t('sync.sync-not-start')}
+      </span>
+    )
+  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
+  }
+
   return (
     <div style={{ padding: '39px 0 0 0' }}>
       <div className={styles.balance}>
@@ -104,6 +130,7 @@ const Send = () => {
         </div>
         <div>
           <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
+          {balancePrompt}
         </div>
       </div>
       <div>

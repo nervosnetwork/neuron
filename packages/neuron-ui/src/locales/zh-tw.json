@@ -43,8 +43,7 @@
         "failed": "失敗",
         "pending": "已提交",
         "confirming": "確認中"
-      },
-      "syncing": "同步中"
+      }
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -319,13 +318,17 @@
         "304": "監視器不可用或被禁用。",
         "305": "$t(messages.fields.address)不能為空。",
         "306": "請輸入主網地址",
-        "307": "請輸出測試網地址"
+        "307": "請輸入測試網地址"
       }
     },
     "sync": {
       "synced": "同步完成",
-      "syncing": "同步中",
-      "block-number": "區塊高度"
+      "syncing": "區塊同步中",
+      "block-number": "區塊高度",
+      "syncing-balance": "區塊同步中, 正在獲取最新余額",
+      "slow": "同步緩慢，請檢查網絡",
+      "sync-failed": "连接失败, 请检查网络",
+      "sync-not-start": "同步尚未开始, 请尝试重启"
     },
     "pagination": {
       "previous-page": "上一頁",
