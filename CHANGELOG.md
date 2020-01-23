@@ -1,5 +1,7 @@
 # [0.27.0](https://github.com/nervosnetwork/neuron/compare/v0.26.3...v0.27.0) (2020-01-23)
 
+Happy Spring Festival!
+
 ### Bundled CKB node
 
 CKB v0.27.0 was released on Jan 10th, 2020. This version of CKB node is now bundled and preconfigured in Neuron.
@@ -20,6 +22,10 @@ We've improved the sync and block scan, making it more stable and faster (up to 
 * Change the QR reader to read an image from the desktop, instead of scanning with the camera.
 * Update the network and sync status display to show more information.
 
+### Bug fixes
+
+* Fixed an issue that when a transaction has many inputs or outputs the wallet cannot load it and the UI would display empty history list.
+* Fixed an issue that could occur when sending transaction.
 
 
 # [0.26.3](https://github.com/nervosnetwork/neuron/compare/v0.26.0...v0.26.3) (2020-01-07)
