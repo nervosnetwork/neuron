@@ -173,7 +173,9 @@ export default class IndexerQueue {
       if (txs.length < this.per) {
         stopped = true
       }
-      logger.debug(`indexer txs for: ${type} ${lockHash}, page: ${page}, tx count: ${txs.length}`)
+      if (txs.length > 0) {
+        logger.debug(`indexer txs for: ${type} ${lockHash}, page: ${page}, tx count: ${txs.length}`)
+      }
 
       for (const tx of txs) {
         let txPoint: CKBComponents.TransactionPoint | null = null
