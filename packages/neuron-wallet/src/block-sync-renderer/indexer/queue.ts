@@ -41,16 +41,13 @@ export default class IndexerQueue {
   private startBlockNumber: bigint
 
   private stopped = false
-  private indexed = false
-
   private inProcess = false
+  private indexed = false
 
   private latestCreatedBy: TxUniqueFlagCache = new TxUniqueFlagCache(100)
   private txCache: TransactionCache = new TransactionCache(100)
 
   private url: string
-
-  private emptyTxHash = '0x' + '0'.repeat(64)
 
   private static CHECK_SIZE = 50
 
@@ -74,7 +71,6 @@ export default class IndexerQueue {
         if (!this.indexed || blockNumber !== this.tipBlockNumber()) {
           if (!this.indexed) {
             await this.indexLockHashes(lockHashInfos)
-            this.indexed = true
           }
           const daoScriptInfo = await DaoUtils.daoScript(this.url)
           const daoScriptHash: string = new Script(
@@ -149,6 +145,8 @@ export default class IndexerQueue {
       const indexFrom: string | undefined = info.isImporting ? '0x0' : undefined
       await this.rpcService.indexLockHash(info.lockHash, indexFrom)
     })
+
+    this.indexed = true
   }
 
   // type: 'createdBy' | 'consumedBy'
@@ -196,7 +194,7 @@ export default class IndexerQueue {
           if (!txEntity || !txEntity.blockHash) {
             if (!txEntity) {
               for (const [inputIndex, input] of transaction.inputs.entries()) {
-                if (input.previousOutput!.txHash === this.emptyTxHash) {
+                if (input.previousOutput!.txHash === '0x' + '0'.repeat(64)) {
                   continue
                 }
                 const previousTxWithStatus = await this.rpcService.getTransaction(input.previousOutput!.txHash)
