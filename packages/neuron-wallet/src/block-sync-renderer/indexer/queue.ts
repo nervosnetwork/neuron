@@ -61,17 +61,6 @@ export default class IndexerQueue {
     this.startBlockNumber = startBlockNumber
   }
 
-  public setLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
-    const infos = [...new Set(lockHashInfos)]
-    this.lockHashInfos = infos
-    this.indexed = false
-  }
-
-  public appendLockHashInfos = (lockHashInfos: LockHashInfo[]): void => {
-    const infos = this.lockHashInfos.concat(lockHashInfos)
-    this.setLockHashInfos(infos)
-  }
-
   private tipBlockNumber = (): bigint => {
     return BigInt(NodeService.getInstance().tipBlockNumber)
   }
@@ -142,18 +131,16 @@ export default class IndexerQueue {
     }
   }
 
-  public getCurrentBlockNumber = async (lockHashes: string[]) => {
-    // get lock hash indexer status
+  private getCurrentBlockNumber = async (lockHashes: string[]) => {
     const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const blockNumbers = lockHashIndexStates
       .filter(state => lockHashes.includes(state.lockHash))
       .map(state => HexUtils.toDecimal(state.blockNumber))
     const uniqueBlockNumbers = [...new Set(blockNumbers)]
-    const blockNumbersBigInt = uniqueBlockNumbers.map(num => BigInt(num))
-    return ArrayUtils.min(blockNumbersBigInt)
+    return uniqueBlockNumbers.sort().map(num => BigInt(num))[0] ?? BigInt(0)
   }
 
-  public indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
+  private indexLockHashes = async (lockHashInfos: LockHashInfo[]) => {
     const lockHashIndexStates = await this.rpcService.getLockHashIndexStates()
     const indexedLockHashes: string[] = lockHashIndexStates.map(state => state.lockHash)
     const nonIndexedLockHashInfos = lockHashInfos.filter(i => !indexedLockHashes.includes(i.lockHash))
