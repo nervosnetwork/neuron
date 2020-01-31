@@ -1,6 +1,5 @@
 import { app as electronApp, remote } from 'electron'
 import path from 'path'
-import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import logger from 'utils/logger'
 
@@ -61,27 +60,8 @@ const initCkb = async () => {
   })
 }
 
-// Enable all avaiable modules to have Indexer
-const enableAllModules = () => {
-  const configFilePath = path.resolve(ckbDataPath(), 'ckb.toml')
-  try {
-    let data = fs.readFileSync(configFilePath, 'utf8')
-      // Enable all modules by removing the current config, and using the full list.
-      if (data.includes('# List of API modules: ')) {
-        let content = data.replace(/modules =/g, '# modules =')
-        content = content.replace(/# List of API modules: /g, 'modules = ')
-        fs.writeFileSync(configFilePath, content)
-      }
-  } catch (error) {
-    logger.error('Enable CKB Indexer module fail:', error)
-  }
-}
-
 export const startCkbNode = async () => {
   initCkb().then(async () => {
-    logger.info('Enable CKB Indexer module...')
-    enableAllModules()
-
     logger.info('Starting CKB...')
     ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
     ckb.stderr && ckb.stderr.on('data', data => {
