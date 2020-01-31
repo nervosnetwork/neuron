@@ -2,15 +2,11 @@ import { v4 as uuid } from 'uuid'
 import { AccountExtendedPublicKey } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
-import LockUtils from 'models/lock-utils'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
 import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets'
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 
 import FileService from './file'
 import AddressService from './addresses'
-import { deindexLockHashes } from '../block-sync-renderer/indexer/deindex'
-import NetworksService from 'services/networks'
 import ProcessUtils from 'utils/process'
 import { Address } from 'database/address/address-dao'
 
@@ -241,29 +237,6 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
-    const addressInterfaces = AddressService.deleteByWalletId(id)
-    this.deindexAddresses(addressInterfaces.map(addr => addr.address))
-  }
-
-  private deindexAddresses = async (addresses: string[]) => {
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const addressesWithEnvPrefix: string[] = addresses.filter(addr => addr.startsWith(prefix))
-
-    if (addressesWithEnvPrefix.length === 0) {
-      return
-    }
-    const addrs: string[] = AddressService.findByAddresses(addressesWithEnvPrefix).map(addr => addr.address)
-    const deindexAddresses: string[] = addresses.filter(item => addrs.indexOf(item) < 0);
-    // only deindex if no same wallet
-    if (deindexAddresses.length !== 0) {
-      const lockHashes: string[] = await Promise.all(
-        deindexAddresses.map(async address => {
-          return new LockUtils(await LockUtils.systemScript()).addressToLockHash(address)
-        })
-      )
-      // don't await
-      deindexLockHashes(lockHashes)
-    }
   }
 
   public setCurrent = (id: string) => {

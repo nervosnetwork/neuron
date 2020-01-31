@@ -8,8 +8,6 @@ import BlockHeader from 'models/chain/block-header'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import OutPoint from 'models/chain/out-point'
 import CellWithStatus from 'models/chain/cell-with-status'
-import LockHashIndexState from 'models/chain/lock-hash-index-state'
-import CellTransaction from 'models/chain/cell-transaction'
 
 export default class RpcService {
   private retryTime: number
@@ -119,25 +117,5 @@ export default class RpcService {
 
   private async retry<T>(func: () => T): Promise<T> {
     return CommonUtils.retry(this.retryTime, this.retryInterval, func)
-  }
-
-  // Indexer
-  public async deindexLockHash(lockHash: string): Promise<null> {
-    return this.ckb.rpc.deindexLockHash(lockHash)
-  }
-
-  public async indexLockHash(lockHash: string, indexFrom?: string | undefined): Promise<LockHashIndexState> {
-    const result = await this.ckb.rpc.indexLockHash(lockHash, indexFrom ? HexUtils.toHex(indexFrom) : undefined)
-    return LockHashIndexState.fromSDK(result)
-  }
-
-  public async getTransactionsByLockHash(lockHash: string, page: string, per: string, reverseOrder: boolean = false): Promise<CellTransaction[]> {
-    const result = await this.ckb.rpc.getTransactionsByLockHash(lockHash, HexUtils.toHex(page), HexUtils.toHex(per), reverseOrder)
-    return result.map(r => CellTransaction.fromSDK(r))
-  }
-
-  public async getLockHashIndexStates() {
-    const states = await this.ckb.rpc.getLockHashIndexStates()
-    return states.map(s => LockHashIndexState.fromSDK(s))
   }
 }
