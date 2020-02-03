@@ -5,27 +5,23 @@ import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import History from 'components/History'
 import initStates from 'states/initStates'
+import { NeuronWalletContext } from 'states/stateProvider'
 import transactions from './data/transactions'
 
 const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))
 
-const stateTemplate = {
-  ...initStates,
-  dispatch,
-}
-
 const states: { [title: string]: any } = {
   'Has not transactions': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
-      transactions: { ...stateTemplate.chain.transactions, items: transactions['Empty List'] },
+      ...initStates.chain,
+      transactions: { ...initStates.chain.transactions, items: transactions['Empty List'] },
     },
   },
   '1 item and PageNo.1': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 1,
         pageSize: 15,
@@ -36,9 +32,9 @@ const states: { [title: string]: any } = {
     },
   },
   '15 items and PageNo.1': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 1,
         pageSize: 15,
@@ -49,9 +45,9 @@ const states: { [title: string]: any } = {
     },
   },
   '16 items and PageNo.2': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 2,
         pageSize: 15,
@@ -62,9 +58,9 @@ const states: { [title: string]: any } = {
     },
   },
   '200 items and PageNo.1': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 1,
         pageSize: 15,
@@ -75,9 +71,9 @@ const states: { [title: string]: any } = {
     },
   },
   '200 items and pageNo.2': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 2,
         pageSize: 15,
@@ -88,9 +84,9 @@ const states: { [title: string]: any } = {
     },
   },
   '200 items and pageNo.14': {
-    ...stateTemplate,
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: 14,
         pageSize: 15,
@@ -104,16 +100,19 @@ const states: { [title: string]: any } = {
 
 const stories = storiesOf('History', module).addDecorator(StoryRouter())
 
-Object.entries(states).forEach(([title, props]) => {
-  console.info(props)
-  stories.add(title, () => <History />)
+Object.entries(states).forEach(([title, state]) => {
+  stories.add(title, () => (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <History />
+    </NeuronWalletContext.Provider>
+  ))
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
-  const props = {
-    ...stateTemplate,
+  const state = {
+    ...initStates,
     chain: {
-      ...stateTemplate.chain,
+      ...initStates.chain,
       transactions: {
         pageNo: number('Page No', 14),
         pageSize: number('Page Size', 15),
@@ -134,6 +133,9 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       },
     },
   }
-  console.info(props)
-  return <History />
+  return (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <History />
+    </NeuronWalletContext.Provider>
+  )
 })
