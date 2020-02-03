@@ -351,6 +351,7 @@ export default class WalletsController {
         winID: window.id,
         type: action,
         payload: walletID,
+        dispatchToUI: true
       })
     }
   }

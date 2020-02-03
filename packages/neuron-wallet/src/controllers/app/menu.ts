@@ -10,7 +10,7 @@ import i18n from 'locales/i18n'
 import env from 'env'
 import UpdateController from 'controllers/update'
 import WalletsService from 'services/wallets'
-import CommandSubject, { ApiCommandSubject} from 'models/subjects/command'
+import CommandSubject from 'models/subjects/command'
 
 enum URL {
   Preference = '/settings/general',
@@ -44,14 +44,14 @@ const showAbout = () => {
 const navTo = (url: string) => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    CommandSubject.next({ winID: window.id, type: 'nav', payload: url })
+    CommandSubject.next({ winID: window.id, type: 'nav', payload: url, dispatchToUI: true })
   }
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID })
+    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID, dispatchToUI: true })
   }
 }
 
@@ -159,7 +159,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           if (!currentWallet) {
             return
           }
-          ApiCommandSubject.next({ type: 'export-xpubkey', payload: currentWallet.id })
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({ winID: window.id, type: 'export-xpubkey', payload: currentWallet.id, dispatchToUI: false })
+          }
         }
       },
       {
