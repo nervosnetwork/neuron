@@ -64,7 +64,7 @@
     "@types/webdriverio": "4.13.0",
     "axios": "0.19.0",
     "devtron": "1.4.0",
-    "electron": "7.1.9",
+    "electron": "7.1.11",
     "electron-builder": "22.2.0",
     "electron-devtools-installer": "2.2.4",
     "electron-notarize": "0.2.1",
