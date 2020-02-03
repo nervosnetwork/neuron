@@ -209,6 +209,14 @@ export default class WalletsController {
     })
   }
 
+  public async exportXPubkey(_id: string = ''): Promise<Controller.Response<boolean>> {
+    // TODO: export extended public key
+    return {
+      status: ResponseCode.Success,
+      result: true
+    }
+  }
+
   public async getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {

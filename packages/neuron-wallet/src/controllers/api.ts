@@ -145,6 +145,10 @@ export default class ApiController {
       return this.walletsController.backup({ id, password })
     })
 
+    handle('export-xpubkey', async (_, id: string) => {
+      return this.walletsController.exportXPubkey(id)
+    })
+
     handle('get-all-addresses', async (_, id: string) => {
       return this.walletsController.getAllAddresses(id)
     })
