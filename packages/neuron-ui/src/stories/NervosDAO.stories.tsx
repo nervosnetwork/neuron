@@ -5,11 +5,13 @@ import { withKnobs, text } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import NervosDAO from 'components/NervosDAO'
 import initStates from 'states/initStates'
+import { NeuronWalletContext } from 'states/stateProvider'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
+const dispatch = action('Dispatch')
+
 const stateTemplate = {
-  dispatch: (dispatchAction: any) => action(dispatchAction),
   ...initStates,
   app: {
     ...initStates.app,
@@ -115,13 +117,17 @@ const states = {
 
 const stories = storiesOf(`Nervos DAO`, module)
 
-Object.entries(states).forEach(([title, props]) => {
-  console.info(props)
-  stories.add(title, () => <NervosDAO />)
+Object.entries(states).forEach(([title, state]) => {
+  console.info(state)
+  stories.add(title, () => (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <NervosDAO />
+    </NeuronWalletContext.Provider>
+  ))
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
-  const props = {
+  const state = {
     dispatch: (dispatchAction: any) => action(dispatchAction),
     ...initStates,
     app: {
@@ -154,6 +160,10 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       ],
     },
   }
-  console.info(props)
-  return <NervosDAO />
+  console.info(state)
+  return (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <NervosDAO />
+    </NeuronWalletContext.Provider>
+  )
 })

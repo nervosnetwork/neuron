@@ -5,11 +5,14 @@ import StoryRouter from 'storybook-react-router'
 import { action } from '@storybook/addon-actions'
 import Overview from 'components/Overview'
 import initStates from 'states/initStates'
+import { NeuronWalletContext } from 'states/stateProvider'
 import transactions from './data/transactions'
 import addresses from './data/addresses'
 
+const dispatch = action('Dispatch')
+
 const stateTemplate = {
-  dispatch: (dispatchAction: any) => action(dispatchAction),
+  dispatch,
   ...initStates,
   app: {
     ...initStates.app,
@@ -61,14 +64,17 @@ const states = {
 
 const stories = storiesOf(`Overview`, module).addDecorator(StoryRouter())
 
-Object.entries(states).forEach(([title, props]) => {
-  console.info(props)
-  stories.add(title, () => <Overview />)
+Object.entries(states).forEach(([title, state]) => {
+  stories.add(title, () => (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <Overview />
+    </NeuronWalletContext.Provider>
+  ))
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
-  const props = {
-    dispatch: (dispatchAction: any) => action(dispatchAction),
+  const state = {
+    dispatch,
     ...initStates,
     app: {
       ...initStates.app,
@@ -115,6 +121,9 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       ],
     },
   }
-  console.info(props)
-  return <Overview />
+  return (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <Overview />
+    </NeuronWalletContext.Provider>
+  )
 })
