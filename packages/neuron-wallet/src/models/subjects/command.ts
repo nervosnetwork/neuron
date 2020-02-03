@@ -6,4 +6,10 @@ const CommandSubject = new Subject<{
   payload: string | null
 }>()
 
+// Commands that don't dispatch to UI
+export const ApiCommandSubject = new Subject<{
+  type: 'export-xpubkey'
+  payload: string | null
+}>()
+
 export default CommandSubject

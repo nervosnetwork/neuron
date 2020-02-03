@@ -10,7 +10,7 @@ import i18n from 'locales/i18n'
 import env from 'env'
 import UpdateController from 'controllers/update'
 import WalletsService from 'services/wallets'
-import CommandSubject from 'models/subjects/command'
+import CommandSubject, { ApiCommandSubject} from 'models/subjects/command'
 
 enum URL {
   Preference = '/settings/general',
@@ -150,6 +150,17 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           }
           requestPassword(currentWallet.id, 'backup-wallet')
         },
+      },
+      {
+        id: 'export-xpubkey',
+        label: i18n.t('application-menu.wallet.export-xpubkey'),
+        enabled: hasCurrentWallet,
+        click: () => {
+          if (!currentWallet) {
+            return
+          }
+          ApiCommandSubject.next({ type: 'export-xpubkey', payload: currentWallet.id })
+        }
       },
       {
         id: 'delete',

@@ -1,6 +1,6 @@
 import { debounceTime, sampleTime } from 'rxjs/operators'
 
-import CommandSubject from 'models/subjects/command'
+import CommandSubject, { ApiCommandSubject } from 'models/subjects/command'
 import DataUpdateSubject from 'models/subjects/data-update'
 import { CurrentNetworkIDSubject, NetworkListSubject } from 'models/subjects/networks'
 import SyncedBlockNumberSubject, { ConnectionStatusSubject } from 'models/subjects/node'
@@ -10,6 +10,7 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
+  runCommand: (command: string, arg: any) => void
   updateMenu: () => void
   updateWindowTitle: () => void
 }
@@ -33,6 +34,10 @@ export const subscribe = (dispatcher: AppResponder) => {
 
   CommandSubject.subscribe(params => {
     dispatcher.sendMessage('command', params)
+  })
+
+  ApiCommandSubject.subscribe(params => {
+    dispatcher.runCommand(params.type, params.payload)
   })
 
   DataUpdateSubject.subscribe(data => {

@@ -32,6 +32,12 @@ export default class ApiController {
     this.networksController.start()
   }
 
+  public runCommand(command: string, params: string) {
+    if (command === 'export-xpubkey') {
+      this.walletsController.exportXPubkey(params)
+    }
+  }
+
   private registerHandlers() {
     const handle = this.handleChannel
 
