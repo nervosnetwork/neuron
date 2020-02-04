@@ -49,6 +49,10 @@ export default class AppController {
     }
   }
 
+  public runCommand = (command: string, obj: any) => {
+    this.apiController.runCommand(command, obj)
+  }
+
   public updateMenu = () => {
     updateApplicationMenu(this.mainWindow)
   }

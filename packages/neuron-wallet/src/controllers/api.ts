@@ -32,6 +32,12 @@ export default class ApiController {
     this.networksController.start()
   }
 
+  public runCommand(command: string, params: string) {
+    if (command === 'export-xpubkey') {
+      this.walletsController.exportXPubkey(params)
+    }
+  }
+
   private registerHandlers() {
     const handle = this.handleChannel
 
@@ -143,6 +149,10 @@ export default class ApiController {
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
       return this.walletsController.backup({ id, password })
+    })
+
+    handle('export-xpubkey', async (_, id: string) => {
+      return this.walletsController.exportXPubkey(id)
     })
 
     handle('get-all-addresses', async (_, id: string) => {
