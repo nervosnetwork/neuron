@@ -209,41 +209,39 @@ export default class WalletsController {
     })
   }
 
-  public async importXPubkey(): Promise<Controller.Response<Wallet>> {
-    return new Promise((resolve, reject) => {
-      dialog.showOpenDialog(
-        BrowserWindow.getFocusedWindow()!,
-        {
-          title: i18n.t('messages.import-extended-public-key'),
-          filters: [{ name: 'JSON File', extensions: ['json'] }]
-        }
-      ).then((value: OpenDialogReturnValue) => {
-        const filePath = value.filePaths[0]
-        if (filePath) {
-          try {
-            const name = filePath.split(/[\\/]/).pop()!.split('.')[0] + "-Watch Only" // File name (without extension)
-            const content = fs.readFileSync(filePath, 'utf8')
-            const json: { xpubkey: string } = JSON.parse(content)
-            const accountExtendedPublicKey = AccountExtendedPublicKey.parse(json.xpubkey)
+  public async importXPubkey(): Promise<Controller.Response<Wallet> | undefined> {
+    return dialog.showOpenDialog(
+      BrowserWindow.getFocusedWindow()!,
+      {
+        title: i18n.t('messages.import-extended-public-key'),
+        filters: [{ name: 'JSON File', extensions: ['json'] }]
+      }
+    ).then((value: OpenDialogReturnValue) => {
+      const filePath = value.filePaths[0]
+      if (filePath) {
+        try {
+          const name = filePath.split(/[\\/]/).pop()!.split('.')[0] + "-Watch Only" // File name (without extension)
+          const content = fs.readFileSync(filePath, 'utf8')
+          const json: { xpubkey: string } = JSON.parse(content)
+          const accountExtendedPublicKey = AccountExtendedPublicKey.parse(json.xpubkey)
 
-            const walletsService = WalletsService.getInstance()
-            const wallet = walletsService.create({
-              id: '',
-              name,
-              extendedKey: accountExtendedPublicKey.serialize(),
-              keystore: Keystore.createEmpty()
-            })
+          const walletsService = WalletsService.getInstance()
+          const wallet = walletsService.create({
+            id: '',
+            name,
+            extendedKey: accountExtendedPublicKey.serialize(),
+            keystore: Keystore.createEmpty()
+          })
 
-            walletsService.generateAddressesById(wallet.id, true)
-            resolve({
-              status: ResponseCode.Success,
-              result: wallet
-            })
-          } catch {
-            reject(new InvalidJSON())
+          walletsService.generateAddressesById(wallet.id, true)
+          return {
+            status: ResponseCode.Success,
+            result: wallet
           }
+        } catch {
+          throw new InvalidJSON()
         }
-      })
+      }
     })
   }
 
