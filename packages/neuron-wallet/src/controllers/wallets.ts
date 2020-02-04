@@ -195,21 +195,26 @@ export default class WalletsController {
     }
 
     const keystore = wallet.loadKeystore()
-    return new Promise(resolve => {
-      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
-        (returnValue: SaveDialogReturnValue) => {
-          if (returnValue.filePath) {
-            fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
-            resolve({
-              status: ResponseCode.Success,
-              result: true,
-            })
-          }
-        })
+    return dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow()!,
+      { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
+    ).then((returnValue: SaveDialogReturnValue) => {
+      if (returnValue.filePath) {
+        fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
+        return {
+          status: ResponseCode.Success,
+          result: true,
+        }
+      } else {
+        return  {
+          status: ResponseCode.Fail,
+          result: false
+        }
+      }
     })
   }
 
-  public async importXPubkey(): Promise<Controller.Response<Wallet> | undefined> {
+  public async importXPubkey(): Promise<Controller.Response<Wallet>> {
     return dialog.showOpenDialog(
       BrowserWindow.getFocusedWindow()!,
       {
@@ -242,25 +247,32 @@ export default class WalletsController {
           throw new InvalidJSON()
         }
       }
+
+      return { status: ResponseCode.Fail }
     })
   }
 
   public async exportXPubkey(id: string = ''): Promise<Controller.Response<boolean>> {
     const walletsService = WalletsService.getInstance()
     const wallet = walletsService.get(id)
-
     const xpubkey = wallet.accountExtendedPublicKey()
-    return new Promise(resolve => {
-      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' })
-        .then((returnValue: SaveDialogReturnValue) => {
-          if (returnValue.filePath) {
-            fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
-            resolve({
-              status: ResponseCode.Success,
-              result: true,
-            })
-          }
-        })
+
+    return dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow()!,
+      { title: i18n.t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' }
+    ).then((returnValue: SaveDialogReturnValue) => {
+      if (returnValue.filePath) {
+        fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
+        return {
+          status: ResponseCode.Success,
+          result: true
+        }
+      } else {
+        return {
+          status: ResponseCode.Fail,
+          result: false
+        }
+      }
     })
   }
 
