@@ -39,7 +39,7 @@ export default class ApiController {
 
     if (command === 'import-xpubkey') {
       this.walletsController.importXPubkey().catch(error => {
-        dialog.showMessageBox({ type: 'error', buttons: [], message: error.stack })
+        dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
       })
     }
   }
