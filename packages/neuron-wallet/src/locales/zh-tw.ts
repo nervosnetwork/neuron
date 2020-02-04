@@ -23,6 +23,7 @@ export default {
         'change-password': '修改密碼',
         'import-mnemonic': '導入助記詞',
         'import-keystore': '導入 Keystore 檔案',
+        'import-xpubkey': '導入 Extended Public Key',
       },
       edit: {
         label: '編輯',

@@ -23,6 +23,7 @@ export default {
         'change-password': 'Change Password',
         'import-mnemonic': 'Import Wallet Seed',
         'import-keystore': 'Import from Keystore',
+        'import-xpubkey': 'Import Extended Public Key',
       },
       edit: {
         label: 'Edit',

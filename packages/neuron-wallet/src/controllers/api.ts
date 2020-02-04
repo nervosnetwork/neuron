@@ -36,6 +36,10 @@ export default class ApiController {
     if (command === 'export-xpubkey') {
       this.walletsController.exportXPubkey(params)
     }
+
+    if (command === 'import-xpubkey') {
+      // TODO: hook importing xpubkey feature
+    }
   }
 
   private registerHandlers() {
