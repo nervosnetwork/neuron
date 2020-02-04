@@ -18,6 +18,7 @@ import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
+import logger from 'utils/logger'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -38,7 +39,9 @@ export default class ApiController {
     }
 
     if (command === 'import-xpubkey') {
-      // TODO: hook importing xpubkey feature
+      this.walletsController.importXPubkey().catch(error => {
+        logger.error("Import extended public key error: ", error) // TODO: display error to user.
+      })
     }
   }
 

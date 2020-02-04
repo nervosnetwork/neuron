@@ -79,6 +79,7 @@ export default {
       'missing-required-argument': '缺少必要参数。',
       'save-keystore': '保存 Keystore 文件。',
       'save-extended-public-key': '保存 Extended Public Key。',
+      'import-extended-public-key': '导入 Extended Public Key。',
       'invalid-mnemonic': '助记词不合法，请检查。',
       'unsupported-cipher': '不支持的 Cipher。',
       'capacity-not-enough': '余额不足。',

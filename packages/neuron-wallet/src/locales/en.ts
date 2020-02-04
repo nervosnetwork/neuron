@@ -80,6 +80,7 @@ export default {
       'missing-required-argument': 'Missing required argument.',
       'save-keystore': 'Save Keystore.',
       'save-extended-public-key': 'Save Extended Public Key.',
+      'import-extended-public-key': 'Import Extended Public Key.',
       'invalid-mnemonic': 'Wallet seed is invalid, please check it again.',
       'unsupported-cipher': 'Unsupported cipher.',
       'capacity-not-enough': 'Insufficient balance.',
