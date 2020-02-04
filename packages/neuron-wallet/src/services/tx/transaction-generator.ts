@@ -1,4 +1,4 @@
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
+import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
 import DaoUtils from 'models/dao-utils'
@@ -13,6 +13,7 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
+import FullAddress from 'models/full-address'
 
 export interface TargetOutput {
   address: string
@@ -36,21 +37,22 @@ export class TransactionGenerator {
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
-
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
-      if (BigInt(capacity) < minCellCapacity) {
-        throw new CapacityTooSmall()
+      let lockScript: Script | undefined
+      if (FullAddress.isFullFormat(address)) {
+        lockScript = FullAddress.parse(address)
+      } else {
+        const blake160: string = LockUtils.addressToBlake160(address)
+        lockScript = new Script(codeHash, blake160, hashType)
       }
 
-      const blake160: string = LockUtils.addressToBlake160(address)
+      const output = new Output(capacity, lockScript)
 
-      const output = new Output(
-        capacity,
-        new Script(codeHash, blake160, hashType)
-      )
+      if (BigInt(capacity) < output.calculateBytesize()) {
+        throw new CapacityTooSmall()
+      }
 
       return output
     })
@@ -124,21 +126,23 @@ export class TransactionGenerator {
       .map(input => BigInt(input.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
     const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address } = o
 
-      // skip last output
-      if (BigInt(capacity) < minCellCapacity && index !== targetOutputs.length - 1) {
-        throw new CapacityTooSmall()
+      let lockScript: Script | undefined
+      if (FullAddress.isFullFormat(address)) {
+        lockScript = FullAddress.parse(address)
+      } else {
+        const blake160: string = LockUtils.addressToBlake160(address)
+        lockScript = new Script(codeHash, blake160, hashType)
       }
 
-      const blake160: string = LockUtils.addressToBlake160(address)
+      const output = new Output(capacity, lockScript)
 
-      const output = new Output(
-        capacity,
-        new Script(codeHash, blake160, hashType)
-      )
+      // skip last output
+      if (BigInt(capacity) < output.calculateBytesize() && index !== targetOutputs.length - 1) {
+        throw new CapacityTooSmall()
+      }
 
       return output
     })

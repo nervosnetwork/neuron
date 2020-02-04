@@ -368,11 +368,13 @@ export default class WalletsController {
   }
 
   private verifyAddress = (address: string): boolean => {
-    if (typeof address !== 'string' || address.length !== 46) {
+    if (typeof address !== 'string') {
       return false
     }
     try {
-      return parseAddress(address, 'hex').startsWith('0x0100')
+      const result = parseAddress(address, 'hex')
+      // short address with codeHashIndex = 0x00, or full address
+      return (result.startsWith('0x0100') && address.length === 46) || result.startsWith('0x02') || result.startsWith('0x04')
     } catch (err) {
       return false
     }

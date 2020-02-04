@@ -33,6 +33,10 @@ export default class Script {
     return HexUtils.addPrefix(hash)
   }
 
+  public calculateBytesize(): number {
+    return 1 + HexUtils.byteLength(this.codeHash) + HexUtils.byteLength(this.args)
+  }
+
   public toSDK(): CKBComponents.Script {
     return {
       args: this.args,
