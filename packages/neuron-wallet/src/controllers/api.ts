@@ -1,5 +1,5 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { ipcMain, IpcMainInvokeEvent, dialog } from 'electron'
 
 import env from 'env'
 import i18n from 'locales/i18n'
@@ -18,7 +18,6 @@ import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
-import logger from 'utils/logger'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -40,7 +39,7 @@ export default class ApiController {
 
     if (command === 'import-xpubkey') {
       this.walletsController.importXPubkey().catch(error => {
-        logger.error("Import extended public key error: ", error) // TODO: display error to user.
+        dialog.showMessageBox({ type: 'error', buttons: [], message: error.stack })
       })
     }
   }
