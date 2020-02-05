@@ -1,5 +1,6 @@
 import { ExtendedPrivateKey } from '../../../src/models/keys/key'
 import Keystore from '../../../src/models/keys/keystore'
+import { IncorrectPassword } from '../../../src/exceptions/wallet'
 
 const fixture = {
   privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
@@ -68,5 +69,23 @@ describe('load ckb cli origin keystore', () => {
     expect(
       () => Keystore.fromJson(keystoreString)
     ).toThrowError()
+  })
+})
+
+describe("create empty keystore", () => {
+  const keystore = Keystore.createEmpty()
+
+  it("has empty cipertext and mac", () => {
+    expect(keystore.crypto.ciphertext).toEqual("")
+    expect(keystore.crypto.mac).toEqual("")
+  })
+
+  it("won't verify password", () => {
+    expect(keystore.checkPassword("")).toBeFalsy()
+    expect(keystore.checkPassword("anypassword")).toBeFalsy()
+  })
+
+  it("cannot decrypt", () => {
+    expect(() => keystore.decrypt("")).toThrowError(new IncorrectPassword())
   })
 })

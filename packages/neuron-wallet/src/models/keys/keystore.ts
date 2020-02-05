@@ -52,6 +52,32 @@ export default class Keystore {
     }
   }
 
+  // Create an empty keystore object that contains empty private key
+  static createEmpty = () => {
+    const salt = crypto.randomBytes(32)
+    const iv = crypto.randomBytes(16)
+    const kdfparams: KdfParams = {
+      dklen: 32,
+      salt: salt.toString('hex'),
+      n: 2 ** 18,
+      r: 8,
+      p: 1,
+    }
+    return new Keystore(
+      {
+        ciphertext: '',
+        cipherparams: {
+          iv: iv.toString('hex'),
+        },
+        cipher: CIPHER,
+        kdf: 'scrypt',
+        kdfparams,
+        mac: ''
+      },
+      uuid()
+    )
+  }
+
   static create = (
     extendedPrivateKey: ExtendedPrivateKey,
     password: string,
