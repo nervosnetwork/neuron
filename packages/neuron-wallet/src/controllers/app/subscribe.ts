@@ -10,6 +10,7 @@ import AppUpdaterSubject from 'models/subjects/app-updater'
 
 interface AppResponder {
   sendMessage: (channel: string, arg: any) => void
+  runCommand: (command: string, arg: any) => void
   updateMenu: () => void
   updateWindowTitle: () => void
 }
@@ -32,7 +33,11 @@ export const subscribe = (dispatcher: AppResponder) => {
   })
 
   CommandSubject.subscribe(params => {
-    dispatcher.sendMessage('command', params)
+    if (params.dispatchToUI) {
+      dispatcher.sendMessage('command', params)
+    } else {
+      dispatcher.runCommand(params.type, params.payload)
+    }
   })
 
   DataUpdateSubject.subscribe(data => {

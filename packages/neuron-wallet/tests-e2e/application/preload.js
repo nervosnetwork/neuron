@@ -7,13 +7,13 @@ const servicesNetworks = require("../../dist/services/networks").default;
 electron.ipcMain.on('E2E_EDIT_WALLET', function (event, arg) {
     const walletId = arg[0];
     const window = electron.BrowserWindow.getFocusedWindow()
-    CommandSubject.next({ winID: window.id, type: 'nav', payload: `/editwallet/${walletId}` })
+    CommandSubject.next({ winID: window.id, type: 'navigate-to-url', payload: `/editwallet/${walletId}`, dispatchToUI: true })
 });
 
 electron.ipcMain.on('E2E_EDIT_NETWORK', function (event, arg) {
     const networkId = arg[0];
     const window = electron.BrowserWindow.getFocusedWindow()
-    CommandSubject.next({ winID: window.id, type: 'nav', payload: `/network/${networkId}` })
+    CommandSubject.next({ winID: window.id, type: 'navigate-to-url', payload: `/network/${networkId}`, dispatchToUI: true })
 });
 
 electron.ipcMain.on('E2E_DELETE_NETWORK', function (event, arg) {

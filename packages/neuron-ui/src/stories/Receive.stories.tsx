@@ -5,7 +5,10 @@ import { withKnobs, text, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import Receive from 'components/Receive'
 import initStates from 'states/initStates'
+import { NeuronWalletContext } from 'states/stateProvider'
 import addresses from './data/addresses'
+
+const dispatch = action('Dispatch')
 
 const states = {
   'Has no addresses': {
@@ -28,13 +31,16 @@ const states = {
 
 const stories = storiesOf('Receive', module).addDecorator(StoryRouter())
 
-Object.entries(states).forEach(([title, props]) => {
-  console.info(props)
-  stories.add(title, () => <Receive />)
+Object.entries(states).forEach(([title, state]) => {
+  stories.add(title, () => (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <Receive />
+    </NeuronWalletContext.Provider>
+  ))
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
-  const props = {
+  const state = {
     ...initStates,
     wallet: {
       ...initStates.wallet,
@@ -49,6 +55,9 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
       })),
     },
   }
-  console.info(props)
-  return <Receive />
+  return (
+    <NeuronWalletContext.Provider value={{ state, dispatch }}>
+      <Receive />
+    </NeuronWalletContext.Provider>
+  )
 })

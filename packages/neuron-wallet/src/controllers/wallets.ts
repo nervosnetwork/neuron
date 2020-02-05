@@ -209,6 +209,25 @@ export default class WalletsController {
     })
   }
 
+  public async exportXPubkey(id: string = ''): Promise<Controller.Response<boolean>> {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.get(id)
+
+    const xpubkey = wallet.accountExtendedPublicKey()
+    return new Promise(resolve => {
+      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' }).then(
+        (returnValue: SaveDialogReturnValue) => {
+          if (returnValue.filePath) {
+            fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
+            resolve({
+              status: ResponseCode.Success,
+              result: true,
+            })
+          }
+        })
+    })
+  }
+
   public async getCurrent() {
     const currentWallet = WalletsService.getInstance().getCurrent() || null
     return {
@@ -332,6 +351,7 @@ export default class WalletsController {
         winID: window.id,
         type: action,
         payload: walletID,
+        dispatchToUI: true
       })
     }
   }

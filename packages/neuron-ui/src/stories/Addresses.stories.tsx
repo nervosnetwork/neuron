@@ -3,16 +3,22 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
+import { action } from '@storybook/addon-actions'
 import Addresses from 'components/Addresses'
 import initStates from 'states/initStates'
+import { NeuronWalletContext } from 'states/stateProvider'
 import addressesStates from './data/addresses'
 
 const stories = storiesOf('Addresses', module).addDecorator(StoryRouter())
+const dispatch = action('Dispatch')
 
 Object.entries(addressesStates).forEach(([title, addresses]) => {
   const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
-  console.info(globalState)
-  stories.add(title, () => <Addresses />)
+  stories.add(title, () => (
+    <NeuronWalletContext.Provider value={{ state: globalState, dispatch }}>
+      <Addresses />
+    </NeuronWalletContext.Provider>
+  ))
 })
 
 stories.addDecorator(withKnobs).add('With knobs', () => {
@@ -26,6 +32,9 @@ stories.addDecorator(withKnobs).add('With knobs', () => {
     index: number(`${idx}-Index`, addr.index),
   }))
   const globalState = { ...initStates, wallet: { ...initStates.wallet, addresses } }
-  console.info(globalState)
-  return <Addresses />
+  return (
+    <NeuronWalletContext.Provider value={{ state: globalState, dispatch }}>
+      <Addresses />
+    </NeuronWalletContext.Provider>
+  )
 })
