@@ -1,5 +1,5 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { ipcMain, IpcMainInvokeEvent, dialog } from 'electron'
 
 import env from 'env'
 import i18n from 'locales/i18n'
@@ -35,6 +35,12 @@ export default class ApiController {
   public runCommand(command: string, params: string) {
     if (command === 'export-xpubkey') {
       this.walletsController.exportXPubkey(params)
+    }
+
+    if (command === 'import-xpubkey') {
+      this.walletsController.importXPubkey().catch(error => {
+        dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+      })
     }
   }
 

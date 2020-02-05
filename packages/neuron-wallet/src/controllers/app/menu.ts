@@ -135,8 +135,18 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           {
             id: 'import-with-keystore',
             label: i18n.t('application-menu.wallet.import-keystore'),
-            click: () => { navigateTo(URL.ImportKeystore )},
+            click: () => { navigateTo(URL.ImportKeystore) }
           },
+          {
+            id: 'import-with-xpubkey',
+            label: i18n.t('application-menu.wallet.import-xpubkey'),
+            click: () => {
+              const window = BrowserWindow.getFocusedWindow()
+              if (window) {
+                CommandSubject.next({ winID: window.id, type: 'import-xpubkey', payload: null, dispatchToUI: false })
+              }
+            }
+          }
         ],
       },
       separator,

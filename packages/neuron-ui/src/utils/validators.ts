@@ -11,7 +11,7 @@ import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 
 export const verifyAddress = (address: string, isMainnet?: boolean): boolean => {
-  if (typeof address !== 'string' || address.length !== 46) {
+  if (typeof address !== 'string') {
     return false
   }
   if (isMainnet === true && !address.startsWith('ckb')) {
@@ -21,7 +21,14 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
     return false
   }
   try {
-    return ckbCore.utils.parseAddress(address, 'hex').startsWith('0x0100')
+    const parsed = ckbCore.utils.parseAddress(address, 'hex')
+    if (parsed.startsWith('0x02') || parsed.startsWith('0x04')) {
+      return true
+    }
+    if (parsed.startsWith('0x01') && !(parsed.startsWith('0x0100') || parsed.startsWith('0x0101'))) {
+      return false
+    }
+    return true
   } catch (err) {
     return false
   }
