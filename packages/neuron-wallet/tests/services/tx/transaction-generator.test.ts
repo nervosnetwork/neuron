@@ -67,6 +67,16 @@ const alice = {
   blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
 }
 
+const fullAddressInfo = {
+  lockScript: {
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    args: '0x1234',
+    hashType: ScriptHashType.Type,
+  },
+  lockHash: '0x00e823d538d9a390faff0e0f0210fb8220f5a28a810603039fe23f556150ad89',
+  address: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy35nl24gm',
+}
+
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
@@ -124,6 +134,7 @@ describe('TransactionGenerator', () => {
     })
 
     describe('with feeRate 1000', () => {
+      const feeRate = '1000'
       it('capacity 500', async () => {
         const feeRate = '1000'
         const tx: Transaction = await TransactionGenerator.generateTx(
@@ -264,6 +275,69 @@ describe('TransactionGenerator', () => {
         const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
 
         expect(tx.fee).toEqual(expectedFee.toString())
+      })
+
+      describe('with full address', () => {
+        it(`only full address, 43 capacity`, async () => {
+          const tx: Transaction = await TransactionGenerator.generateTx(
+            [bob.lockHash],
+            [
+              {
+                address: fullAddressInfo.address,
+                capacity: BigInt(43 * 10**8).toString()
+              }
+            ],
+            bob.address,
+            '0',
+            feeRate
+          )
+
+          const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+          const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+
+          expect(tx.fee).toEqual(expectedFee.toString())
+        })
+
+        it('only full address, 42 capacity', async () => {
+          expect(
+            TransactionGenerator.generateTx(
+              [bob.lockHash],
+              [
+                {
+                  address: fullAddressInfo.address,
+                  capacity: BigInt(42 * 10**8).toString()
+                }
+              ],
+              bob.address,
+              '0',
+              feeRate
+            )
+          ).rejects.toThrowError()
+        })
+
+        it(`full address and bob's output`, async () => {
+          const tx: Transaction = await TransactionGenerator.generateTx(
+            [bob.lockHash],
+            [
+              {
+                address: fullAddressInfo.address,
+                capacity: BigInt(1000 * 10**8).toString()
+              },
+              {
+                address: bob.address,
+                capacity: BigInt(1000 * 10**8).toString(),
+              },
+            ],
+            bob.address,
+            '0',
+            feeRate
+          )
+
+          const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() + TransactionSize.emptyWitness()
+          const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+
+          expect(tx.fee).toEqual(expectedFee.toString())
+        })
       })
     })
 
@@ -446,6 +520,58 @@ describe('TransactionGenerator', () => {
         }
       })
       expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+    })
+
+    it('full address with feeRate 1000, 43 capacity', async () => {
+      const feeRate = '1000'
+      const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+        lockHashes,
+        [
+          {
+            address: fullAddressInfo.address,
+            capacity: toShannon('43')
+          },
+          {
+            address: fullAddressInfo.address,
+            capacity: toShannon('0')
+          }
+        ],
+        '0',
+        feeRate
+      )
+
+      const outputCapacities = tx.outputs!
+        .map(output => BigInt(output.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+
+      const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness() * 2 + TransactionSize.emptyWitness()
+
+      const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+      expect(tx.fee).toEqual(expectedFee.toString())
+      expect(tx.outputs[0].capacity).toEqual(toShannon('43'))
+      expect(outputCapacities + BigInt(tx.fee)).toEqual(totalCapacities)
+    })
+
+    it('full address with feeRate 1000, 42 capacity', async () => {
+      const feeRate = '1000'
+
+      expect(
+        TransactionGenerator.generateSendingAllTx(
+          lockHashes,
+          [
+            {
+              address: fullAddressInfo.address,
+              capacity: toShannon('42')
+            },
+            {
+              address: fullAddressInfo.address,
+              capacity: toShannon('0')
+            }
+          ],
+          '0',
+          feeRate
+        )
+      ).rejects.toThrowError()
     })
   })
 

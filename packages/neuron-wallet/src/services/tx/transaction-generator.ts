@@ -50,8 +50,9 @@ export class TransactionGenerator {
 
       const output = new Output(capacity, lockScript)
 
-      if (BigInt(capacity) < output.calculateBytesize()) {
-        throw new CapacityTooSmall()
+      const outputSize = output.calculateBytesize()
+      if (BigInt(capacity) < BigInt(outputSize) * BigInt(10**8)) {
+        throw new CapacityTooSmall(outputSize.toString())
       }
 
       return output
@@ -140,8 +141,9 @@ export class TransactionGenerator {
       const output = new Output(capacity, lockScript)
 
       // skip last output
-      if (BigInt(capacity) < output.calculateBytesize() && index !== targetOutputs.length - 1) {
-        throw new CapacityTooSmall()
+      const outputSize = output.calculateBytesize()
+      if (BigInt(capacity) < (BigInt(outputSize) * BigInt(10**8)) && index !== targetOutputs.length - 1) {
+        throw new CapacityTooSmall(outputSize.toString())
       }
 
       return output
