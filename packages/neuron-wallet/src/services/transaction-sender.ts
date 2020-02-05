@@ -114,7 +114,7 @@ export default class TransactionSender {
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
-    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction())
+    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
 
     tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
