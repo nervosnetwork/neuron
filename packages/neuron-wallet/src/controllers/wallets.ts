@@ -436,13 +436,20 @@ export default class WalletsController {
   }
 
   private verifyAddress = (address: string): boolean => {
-    if (typeof address !== 'string' || address.length !== 46) {
+  if (typeof address !== 'string') {
+    return false
+  }
+  try {
+    const parsed = parseAddress(address, 'hex')
+    if (parsed.startsWith('0x02') || parsed.startsWith('0x04')) {
+      return true
+    }
+    if (parsed.startsWith('0x01') && !(parsed.startsWith('0x0100') || parsed.startsWith('0x0101'))) {
       return false
     }
-    try {
-      return parseAddress(address, 'hex').startsWith('0x0100')
-    } catch (err) {
-      return false
-    }
+    return true
+  } catch (err) {
+    return false
+  }
   }
 }
