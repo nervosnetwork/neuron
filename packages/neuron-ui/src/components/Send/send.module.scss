@@ -15,6 +15,7 @@ $textfieldWidth: calc(100vw - 370px);
   }
 
   button[aria-label="qr-btn"] {
+    display: none;
     position: relative;
     padding-top: 10px;
     grid-area: scanner;
