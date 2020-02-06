@@ -138,6 +138,14 @@ export default class Output {
     this.depositTimestamp = value
   }
 
+  public calculateBytesize(): number {
+    let bytesize = 8 + HexUtils.byteLength(this.data) + this.lock.calculateBytesize()
+    if (this.type) {
+      bytesize += this.type.calculateBytesize()
+    }
+    return bytesize
+  }
+
   public toSDK(): CKBComponents.CellOutput {
     return {
       capacity: HexUtils.toHex(this.capacity),
