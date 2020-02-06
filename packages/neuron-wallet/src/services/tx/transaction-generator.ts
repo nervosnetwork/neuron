@@ -13,7 +13,7 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
-import FullAddress from 'models/full-address'
+import AddressParser from 'models/address-parser'
 
 export interface TargetOutput {
   address: string
@@ -40,13 +40,9 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
-      let lockScript: Script | undefined
-      if (FullAddress.isFullFormat(address)) {
-        lockScript = FullAddress.parse(address)
-      } else {
-        const blake160: string = LockUtils.addressToBlake160(address)
-        lockScript = new Script(codeHash, blake160, hashType)
-      }
+      const lockScript = new AddressParser(address)
+        .setDefaultLockScript(codeHash, hashType)
+        .parse()
 
       const output = new Output(capacity, lockScript)
 
@@ -130,13 +126,9 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address } = o
 
-      let lockScript: Script | undefined
-      if (FullAddress.isFullFormat(address)) {
-        lockScript = FullAddress.parse(address)
-      } else {
-        const blake160: string = LockUtils.addressToBlake160(address)
-        lockScript = new Script(codeHash, blake160, hashType)
-      }
+      const lockScript: Script = new AddressParser(address)
+        .setDefaultLockScript(codeHash, hashType)
+        .parse()
 
       const output = new Output(capacity, lockScript)
 
