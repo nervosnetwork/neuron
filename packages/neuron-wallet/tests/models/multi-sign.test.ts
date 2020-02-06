@@ -12,10 +12,16 @@ describe('MultiSign Test', () => {
     hash: "0x56f281b3d4bb5fc73c751714af0bf78eb8aba0d8"
   }
   const expectedArgs = '0x56f281b3d4bb5fc73c751714af0bf78eb8aba0d80200007800f00020'
+  const serialized = "0x0000010136c329ed630d6ce750712a477543672adab57f4c"
 
   it('since', () => {
     const since = new MultiSign().since(minutes, currentBlockNumber)
     expect(since).toEqual(expectedSince)
+  })
+
+  it('serialize', () => {
+    const s = new MultiSign().serialize(bob.blake160)
+    expect(s).toEqual(serialized)
   })
 
   it('hash', () => {

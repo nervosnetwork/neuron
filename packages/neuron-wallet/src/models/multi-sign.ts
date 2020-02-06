@@ -1,13 +1,13 @@
 import Blake2b from "./blake2b"
 
 export default class MultiSign {
-  multiSignScript(blake160: string) {
+  serialize(blake160: string) {
     // S = '0x00', R = '0x00', M = '0x01', N = '0x01'
     return '0x00000101' + blake160.slice(2)
   }
 
   hash(blake160: string): string {
-    return Blake2b.digest(this.multiSignScript(blake160)).slice(0, 42)
+    return Blake2b.digest(this.serialize(blake160)).slice(0, 42)
   }
 
   since(minutes: number, currentBlockNumber: number): string {
