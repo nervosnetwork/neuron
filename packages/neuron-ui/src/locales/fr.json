@@ -1,0 +1,386 @@
+{
+  "translation": {
+    "launch-screen": {
+      "loading-wallets": "Portefeuilles de chargement"
+    },
+    "navbar": {
+      "overview": "Aperçu",
+      "wallet": "Portefeuille",
+      "send": "Envoyer",
+      "receive": "Recevoir",
+      "history": "Histoire",
+      "addresses": "Adresses",
+      "settings": "Réglages",
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "Erreur de connexion",
+      "sync-not-start": "La synchronisation n'a pas encore commencé"
+    },
+    "overview": {
+      "date": "Date",
+      "type": "Type",
+      "balance": "Équilibre",
+      "recent-activities": "Activités récentes",
+      "no-recent-activities": "Aucune activité récente",
+      "activity": "Activité",
+      "datetime": "Date et heure",
+      "status": "Statut",
+      "amount": "Montant",
+      "blockchain-status": "Statut de la blockchain",
+      "chain-identity": "Identité de la chaîne",
+      "tip-block-number": "Numéro de bloc",
+      "epoch": "Époque",
+      "difficulty": "Difficulté",
+      "address": "Adresse",
+      "confirmation": "{{confirmationCount}} Confirmation",
+      "confirmations": "{{confirmationCount}} Confirmations",
+      "sent": "Expédié",
+      "sending": "Envoi en cours",
+      "received": "Reçue",
+      "receiving": "Réception",
+      "more": "Plus d'activités",
+      "statusLabel": {
+        "success": "Succès",
+        "failed": "Échoué",
+        "pending": "En attente",
+        "confirming": "Confirmation"
+      }
+    },
+    "wizard": {
+      "welcome-to-nervos-neuron": "Bienvenue chez Neuron",
+      "create-or-import-your-first-wallet": "Créez ou importez votre premier portefeuille",
+      "create-new-wallet": "Créer un portefeuille",
+      "import-mnemonic": "Importer des graines de portefeuille",
+      "import-keystore": "Importer depuis Keystore",
+      "import-wallet": "Importer un portefeuille",
+      "next": "Prochain",
+      "back": "Retour",
+      "name": "Nom",
+      "your-wallet-seed-is": "Votre nouvelle graine de portefeuille a été générée",
+      "input-your-seed": "Please input your wallet seedVeuillez saisir votre graine de portefeuille",
+      "password": "Mot de passe",
+      "confirm-password": "Confirmez le mot de passe",
+      "set-wallet-name-and-password": "Nommez votre nouveau portefeuille et choisissez un mot de passe fort pour le protéger",
+      "set-wallet-name": "Donnez un nom à votre nouveau portefeuille",
+      "set-a-strong-password-to-protect-your-wallet": "Créez un mot de passe fort pour protéger votre portefeuille",
+      "wallet-suffix": "Portefeuille {{suffix}}",
+      "write-down-seed": "Notez votre graine de portefeuille et conservez-la dans un endroit sûr",
+      "new-name": "Utilisez un nom inutilisé pour le nouveau portefeuille",
+      "complex-password": "Le mot de passe doit comporter entre 8 et 50 caractères et contenir au moins trois catégories de caractères parmi les suivantes: lettres majuscules, lettres minuscules, chiffres et symboles spéciaux, et doit commencer par une lettre ou un chiffre.",
+      "same-password": "Le mot de passe et le mot de passe de confirmation doivent correspondre"
+    },
+    "import-keystore": {
+      "label": {
+        "path": "Fichier de clés",
+        "name": "Nom du portefeuille",
+        "password": "Mot de passe"
+      },
+      "placeholder": {
+        "path": "Cliquez pour sélectionner le fichier de clés",
+        "name": "Nom du nouveau portefeuille",
+        "password": "Mot de passe pour vérifier le magasin de clés"
+      },
+      "button": {
+        "back": "Retour",
+        "submit": "Soumettre"
+      }
+    },
+    "detail": {
+      "more-transactions": "Plus"
+    },
+    "send": {
+      "address": "Envoyer à",
+      "amount": "Montant",
+      "send": "Envoyer",
+      "clear": "Claire",
+      "confirm-password": "Confirmez le mot de passe",
+      "to": "À",
+      "input-password-to-confirm": "Saisissez le mot de passe pour confirmer",
+      "scan-to-get-address": "Scan QR code to read the address to send to",
+      "total-amount": "Total Amount",
+      "description": "Description",
+      "description-optional": "Description (optional)",
+      "balance": "Balance",
+      "add-one": "Add One More",
+      "remove-this": "Remove This",
+      "fee": "Transaction Fee",
+      "advanced-fee-settings": "Advanced fee settings",
+      "price": "Price",
+      "expected-speed": "Expected speed",
+      "total-cycles": "Total RISC-V Cycles",
+      "scan-screen-qr-code": "Scan the QR Code on the screen"
+    },
+    "receive": {
+      "click-to-copy": "Click to copy the address",
+      "address-not-found": "Address not found",
+      "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
+      "address-qrcode": "Address QR Code",
+      "address": "{{network}} Address"
+    },
+    "history": {
+      "meta": "Meta",
+      "type": "Type",
+      "date": "Date",
+      "timestamp": "Time",
+      "amount": "Amount",
+      "transaction-hash": "Transaction Hash",
+      "send": "Send",
+      "receive": "Receive",
+      "other": "Other",
+      "more-actions": "More Actions",
+      "detail": "Detail",
+      "explorer": "Explorer",
+      "first": "First",
+      "previous": "Previous",
+      "next": "Next",
+      "last": "Last",
+      "description": "Description",
+      "status": "Status",
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "confirming": "Confirming",
+      "blockNumber": "Block Number",
+      "basic-information": "Basic Information",
+      "search": {
+        "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
+      },
+      "confirmations": "Confirmations",
+      "confirming-with-count": "{{confirmations}} Confirmations",
+      "view-on-explorer": "View on Explorer",
+      "copy-transaction-hash": "Copy Transaction Hash",
+      "no-txs": "No Transaction History"
+    },
+    "transaction": {
+      "date": "Date",
+      "transaction-hash": "Transaction Hash",
+      "block-number": "Block Number",
+      "goBack": "Go back",
+      "index": "Index",
+      "address": "Address",
+      "income": "Income",
+      "amount": "Amount",
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "view-in-explorer": "Explorer",
+      "view-in-explorer-button-title": "View on explorer",
+      "cell-from-cellbase": "From cellbase"
+    },
+    "addresses": {
+      "addresses": "Addresses",
+      "type": "Type",
+      "address": "Address",
+      "identifier": "Identifier",
+      "description": "Description",
+      "balance": "Balance",
+      "transactions": "Transactions",
+      "receiving-address": "Receiving",
+      "change-address": "Change",
+      "copy-address": "Copy Address",
+      "request-payment": "Request Payment",
+      "view-on-explorer": "View on Explorer"
+    },
+    "settings": {
+      "go-to-overview": "Go to Overview",
+      "setting-tabs": {
+        "general": "General",
+        "wallets": "Wallets",
+        "network": "Network"
+      },
+      "general": {
+        "clear-cache": "Clear Cache",
+        "clearing-cache": "Clearing...",
+        "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
+        "show": "Show",
+        "hide": "Hide"
+      },
+      "wallet-manager": {
+        "edit-wallet": {
+          "wallet-name": "Wallet Name",
+          "password": "Password",
+          "new-password": "New Password",
+          "confirm-password": "Confirm Password",
+          "edit-wallet": "Edit Wallet"
+        },
+        "delete-wallet-title": "Please Enter {{name}} Password",
+        "password": "Password",
+        "wallet-detail": {
+          "balance": "Balance"
+        }
+      },
+      "network": {
+        "online": "Online",
+        "offline": "Offline",
+        "add-network": "Add Network",
+        "edit-network": {
+          "title": "Add or Edit Network",
+          "rpc-url": "RPC URL",
+          "name": "Name"
+        },
+        "mainnet": "Mainnet",
+        "testnet": "Testnet",
+        "devnet": "Devnet"
+      }
+    },
+    "password-request": {
+      "wallet-not-found": "The wallet is not found",
+      "password": "Password",
+      "send": {
+        "title": "Submit the transaction"
+      },
+      "delete": {
+        "title": "Delete the {{name}} wallet"
+      },
+      "backup": {
+        "title": "Backup the {{name}} wallet"
+      }
+    },
+    "qrcode": {
+      "copy": "Copy image",
+      "save": "Save image"
+    },
+    "common": {
+      "or": "or",
+      "ok": "Ok",
+      "confirm": "Confirm",
+      "open": "Open",
+      "cancel": "Cancel",
+      "save": "Save",
+      "toggle": {
+        "on": "On",
+        "off": "Off"
+      },
+      "copy-tx-hash": "Copy Transaction Hash",
+      "copy-address": "Copy Address",
+      "select": "Select",
+      "backup": "Backup",
+      "edit": "Edit",
+      "delete": "Delete",
+      "click-to-edit": "Click to edit"
+    },
+    "notification-panel": {
+      "title": "Notifications"
+    },
+    "message-types": {
+      "warning": "warning",
+      "alert": "alert",
+      "success": "success"
+    },
+    "messages": {
+      "error": "Error",
+      "unknown-error": "Unknown error",
+      "update-wallet-successfully": "The wallet was updated",
+      "delete-wallet-successfully": "The wallet was deleted",
+      "create-network-successfully": "The network was created",
+      "update-network-successfully": "The network was updated",
+      "clear-cache-successfully": "The cache was cleared",
+      "addr-copied": "Address has been copied to the clipboard",
+      "qrcode-copied": "QR Code has been copied to the clipboard",
+      "view-the-run-node-doc": "View the guide in browser",
+      "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
+      "no-valid-addresses-found": "No valid addresses found",
+      "fields": {
+        "wallet": "Wallet",
+        "name": "Name",
+        "password": "Password",
+        "remote": "RPC URL",
+        "network": "Network",
+        "address": "Address",
+        "amount": "Amount",
+        "transaction": "Transaction",
+        "default-address": "Default Address",
+        "mnemonic": "Mnemonic",
+        "keystore-path": "Keystore File",
+        "keystore-name": "Wallet name",
+        "keystore-password": "Password",
+        "deposit": "Deposit"
+      },
+      "run-ckb-guide": "How to run a CKB node?",
+      "codes": {
+        "-3": "",
+        "100": "Amount is not enough.",
+        "101": "The amount {{amount}} CKB is too small, please enter an amount no less than 61 CKB.",
+        "102": "$t(messages.fields.{{fieldName}}) is invalid.",
+        "103": "$t(messages.fields.keystore-password) is incorrect.",
+        "104": "Fail to connect to the node, please restart Neuron.",
+        "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
+        "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
+        "201": "$t(messages.fields.{{fieldName}}) is required.",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too short, it should be longer than or equal to {{length}}.",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid.",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, please enter the $t(messages.fields.{{fieldName}}) with no more than {{length}} decimal places.",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative.",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
+        "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
+        "303": "$t(messages.fields.{{fieldName}}) is not found.",
+        "304": "Camera is unavailable or disabled.",
+        "305": "$t(messages.fields.address) cannot be empty.",
+        "306": "Please enter a mainnet address",
+        "307": "Please enter a testnet address"
+      }
+    },
+    "sync": {
+      "synced": "Synced",
+      "syncing": "Synchronizing",
+      "block-number": "block number",
+      "syncing-balance": "Balance is updating",
+      "slow": "Sync is slow",
+      "sync-failed": "Sync failed, please check network",
+      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet"
+    },
+    "pagination": {
+      "previous-page": "Previous page",
+      "next-page": "Next page",
+      "first-page": "First page",
+      "last-page": "Last page",
+      "page": "Page",
+      "selected": "Current page"
+    },
+    "nervos-dao": {
+      "free": "Free",
+      "locked": "Locked",
+      "deposit": "Deposit",
+      "deposit-records": "Deposit Records",
+      "apc": "APC",
+      "deposit-at": "Deposit at {{time}}",
+      "fee": "Transaction fee",
+      "deposit-to-nervos-dao": "Deposit to Nervos DAO",
+      "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",
+      "notice": "Notice",
+      "cancel": "Cancel",
+      "proceed": "Proceed",
+      "compensation": "Compensation",
+      "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
+      "deposit-dialog-title": "Deposit Nervos DAO",
+      "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
+      "deposited-action-label": "Request withdraw",
+      "withdrawing-action-label": "Withdraw",
+      "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
+      "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
+      "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
+      "withdraw-alert": "Hint: these are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
+      "insufficient-period-alert-title": "Referenced Header is Invalid",
+      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs, around 16 hours)",
+      "explanation-of-epochs-period": "Compensation Period",
+      "current-epochs-period": "Current Compensation Period",
+      "progress": "Progress: ",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
+      "left-time": "Left time: about {{leftDays}} days {{leftHours}} hours",
+      "detailed-explanation-of-epochs-period": "A compensation period in Nervos DAO consists of 180 epochs (estimated 30 days). Users may apply unlock for their deposits any time during every compensation period, then withdraw their deposits and compensations when that compensation period ends. It is worth mentioning that the compensations will stop accumulating as soon as users apply unlock. So we suggest that users apply unlock for their deposits at a time that closes enough to the end of a compensation period.",
+      "terms-in-explanation-of-epochs-period": "If you did not apply unlock during this compensation period, the next compensation period will start automatically.\nIt is suggested that users apply unlock during YELLOW epochs."
+    },
+    "updates": {
+      "check-updates": "Check for Updates",
+      "checking-updates": "Checking...",
+      "downloading-update": "Downloading update...",
+      "update-not-available": "There are currently no updates available.",
+      "release-notes": "Release Notes:",
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and install now?",
+      "download-update": "Install Update",
+      "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
+      "quit-and-install": "Install and relaunch"
+    }
+  }
+}
