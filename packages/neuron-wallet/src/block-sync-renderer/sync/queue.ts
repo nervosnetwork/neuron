@@ -27,7 +27,7 @@ export default class Queue {
 
   private fetchSize: number = 4
 
-  private tipNumberSubject: BehaviorSubject<string | undefined>
+  private tipNumberSubject: BehaviorSubject<string>
   private tipNumberListener: Subscription | undefined
 
   private stopped: boolean = false
