@@ -10,20 +10,31 @@ export default class MultiSign {
     return Blake2b.digest(this.serialize(blake160)).slice(0, 42)
   }
 
-  since(minutes: number, currentBlockNumber: number): string {
-    const epochs = parseInt((minutes / 240).toString(), 10) + currentBlockNumber
-    const leftMinutes = minutes % 240
-    const result = this.epochSince(BigInt(240), BigInt(leftMinutes), BigInt(epochs))
+  since(minutes: number, headerEpoch: string): string {
+    const currentEpochInfo = this.parseEpoch(BigInt(headerEpoch))
+    const totalMinutes = minutes +
+      parseInt((parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString()) * 240).toString())
+    const leftMinutes = totalMinutes % 240
+    const epochs: bigint = BigInt(parseInt((totalMinutes / 240).toString(), 10)) + currentEpochInfo.number
+    const result = this.epochSince(BigInt(240), BigInt(leftMinutes), epochs)
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(result)
     return `0x${buf.toString('hex')}`
   }
 
-  args(blake160: string, minutes: number, currentBlockNumber: number): string {
-    return this.hash(blake160) + this.since(minutes, currentBlockNumber).slice(2)
+  args(blake160: string, minutes: number, headerEpoch: string): string {
+    return this.hash(blake160) + this.since(minutes, headerEpoch).slice(2)
   }
 
   private epochSince(length: bigint, index: bigint, number: bigint): bigint {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
+  }
+
+  private parseEpoch(epoch: bigint) {
+    return {
+      length: (epoch >> BigInt(40)) & BigInt(0xFFFF),
+      index: (epoch >> BigInt(24)) & BigInt(0xFFFF),
+      number: epoch & BigInt(0xFFFFFF)
+    }
   }
 }
