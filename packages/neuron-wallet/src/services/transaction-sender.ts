@@ -27,6 +27,7 @@ import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
+import MultiSign from 'models/multi-sign'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -42,7 +43,7 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '') => {
+  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '', isMultiSign: boolean = false) => {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -106,6 +107,12 @@ export default class TransactionSender {
           return wit.toSDK()
         })
       })
+
+      if (isMultiSign) {
+        const wit = WitnessArgs.deserialize(signed[0] as string)
+        wit.lock = new MultiSign().serialize(witnessesArgs[0].blake160) + wit.lock?.slice(2)
+        signed[0] = serializeWitnessArgs(wit.toSDK())
+      }
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
         witnessesArgs[i].witness = signed[i] as string
