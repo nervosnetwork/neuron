@@ -178,13 +178,8 @@ navbar {
 // hack fabric ui experimental pagination style
 .ms-Pagination-container {
   position: relative;
-
-  &>div:last-child {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+  flex-direction: row-reverse;
+  justify-content: space-between;
 
   button[aria-selected=false] {
     color: #0078d4 !important;
