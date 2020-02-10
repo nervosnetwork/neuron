@@ -196,7 +196,7 @@ const Transaction = () => {
         return (
           <tr key={cell.lockHash || ''} data-address={address} onContextMenu={onCellContextMenu}>
             <td title={`${index}`}>{index}</td>
-            <td title={address} className="monospacedFont">
+            <td title={address} className={`monospacedFont ${styles.addressCell}`}>
               {address}
             </td>
             <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
