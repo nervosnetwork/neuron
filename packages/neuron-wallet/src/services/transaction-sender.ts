@@ -61,13 +61,14 @@ export default class TransactionSender {
     return txHash
   }
 
-  private sign(walletID: string = '', tx: Transaction, password: string = '', isMultiSign: boolean = false) {
+  private sign(walletID: string = '', transaction: Transaction, password: string = '', isMultiSign: boolean = false) {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
       throw new IsRequired('Password')
     }
 
+    const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
 
