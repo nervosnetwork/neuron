@@ -1,5 +1,6 @@
 import { remoteApi } from './remoteApiWrapper'
 
+export const getSystemCodeHash = remoteApi<void>('get-system-codehash')
 export const getNeuronWalletState = remoteApi<void>('load-init-data')
 export const openInWindow = remoteApi<Controller.OpenInWindowParams>('open-in-window')
 export const handleViewError = remoteApi<string>('handle-view-error')

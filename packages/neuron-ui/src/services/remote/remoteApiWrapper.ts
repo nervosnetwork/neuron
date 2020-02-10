@@ -25,6 +25,7 @@ export const RemoteNotLoadError = {
 // Action: Electron channel
 type Action =
   // App
+  | 'get-system-codehash'
   | 'load-init-data'
   | 'open-in-window'
   | 'handle-view-error'
