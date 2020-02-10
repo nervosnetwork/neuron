@@ -3,7 +3,7 @@ import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import { TransactionPersistor, TransactionsService, TransactionGenerator } from './tx'
+import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
 import NetworksService from './networks'
 import { AddressPrefix } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
@@ -146,10 +146,7 @@ export default class TransactionSender {
 
   public generateTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
@@ -179,10 +176,7 @@ export default class TransactionSender {
 
   public generateSendingAllTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
