@@ -16,7 +16,6 @@ describe('MultiSign Test', () => {
 
   it('since', () => {
     const since = new MultiSign().since(minutes, headerEpoch)
-    console.warn('since:', since)
     expect(since).toEqual(expectedSince)
   })
 
