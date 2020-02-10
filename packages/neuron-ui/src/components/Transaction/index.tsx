@@ -171,7 +171,7 @@ const Transaction = () => {
           address = t('transaction.cell-from-cellbase')
         } else {
           try {
-            if (cell.lock.codeHash === systemCodeHash) {
+            if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
               address = ckbCore.utils.bech32Address(cell.lock.args, {
                 prefix: addressPrefix,
                 type: ckbCore.utils.AddressType.HashIdx,
