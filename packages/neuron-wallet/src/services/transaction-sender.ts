@@ -43,7 +43,25 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '', isMultiSign: boolean = false) => {
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '', isMultiSign: boolean = false) {
+    const tx = this.sign(walletID, transaction, password, isMultiSign)
+
+    const { ckb } = NodeService.getInstance()
+    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+    const txHash = tx.hash!
+
+    tx.description = description
+    await TransactionPersistor.saveSentTx(tx, txHash)
+
+    // update addresses txCount and balance
+    const blake160s = TransactionsService.blake160sOfTx(tx)
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
+    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
+    return txHash
+  }
+
+  private sign(walletID: string = '', tx: Transaction, password: string = '', isMultiSign: boolean = false) {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -120,18 +138,9 @@ export default class TransactionSender {
     }
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.hash = txHash
 
-    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
-
-    tx.description = description
-    await TransactionPersistor.saveSentTx(tx, txHash)
-
-    // update addresses txCount and balance
-    const blake160s = TransactionsService.blake160sOfTx(tx)
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
-    return txHash
+    return tx
   }
 
   public generateTx = async (
