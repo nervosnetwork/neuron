@@ -340,7 +340,7 @@ export default class WalletsController {
     }
   }
 
-  public async generateTx(params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) {
+  public async generateTx(params: { walletID: string, items: { address: string, capacity: string, date?: string }[], fee: string, feeRate: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -349,7 +349,13 @@ export default class WalletsController {
 
     const tx: Transaction = await new TransactionSender().generateTx(
       params.walletID,
-      params.items,
+      params.items.map(i => {
+        return {
+          address: i.address,
+          capacity: i.capacity,
+          minutes: i.date ? this.getMinutes(i.date) : undefined
+        }
+      }),
       params.fee,
       params.feeRate,
     )
@@ -359,7 +365,8 @@ export default class WalletsController {
     }
   }
 
-  public async generateSendingAllTx(params: { walletID: string, items: { address: string, capacity: string }[], fee: string, feeRate: string }) {
+  public async generateSendingAllTx(
+    params: { walletID: string, items: { address: string, capacity: string, date?: string }[], fee: string, feeRate: string }) {
     if (!params) {
       throw new IsRequired('Parameters')
     }
@@ -368,7 +375,13 @@ export default class WalletsController {
 
     const tx: Transaction = await new TransactionSender().generateSendingAllTx(
       params.walletID,
-      params.items,
+      params.items.map(i => {
+        return {
+          address: i.address,
+          capacity: i.capacity,
+          minutes: i.date ? this.getMinutes(i.date) : undefined
+        }
+      }),
       params.fee,
       params.feeRate,
     )
@@ -376,6 +389,13 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: tx,
     }
+  }
+
+  private getMinutes(date: string): string {
+    const day = +new Date(new Date(date).toDateString())
+    const now = +new Date()
+    const minutes = parseInt(((day - now) / 1000 / 60).toString())
+    return minutes.toString()
   }
 
   public async updateAddressDescription({ walletID, address, description }: { walletID: string, address: string, description: string }) {
