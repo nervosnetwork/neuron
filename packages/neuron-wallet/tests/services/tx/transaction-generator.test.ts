@@ -103,7 +103,7 @@ describe('TransactionGenerator', () => {
     MultiSignUtils.multiSignScript = mockMultiSignScriptInfo.bind(MultiSignUtils)
 
     const mockCurrentEpoch = jest.fn()
-    mockCurrentEpoch.mockReturnValue('0x')
+    mockCurrentEpoch.mockReturnValue('0x7080018000001')
     // @ts-ignore: Private method
     TransactionGenerator.getCurrentHeaderEpoch = mockCurrentEpoch.bind(TransactionGenerator)
   })
@@ -356,6 +356,32 @@ describe('TransactionGenerator', () => {
           const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
 
           expect(tx.fee).toEqual(expectedFee.toString())
+        })
+      })
+
+      describe('with date', () => {
+        it('capacity 500', async () => {
+          const tx: Transaction = await TransactionGenerator.generateTx(
+            [bob.lockHash],
+            [
+              {
+                address: bob.address,
+                capacity: toShannon('500'),
+                minutes: '1000'
+              }
+            ],
+            bob.address,
+            '0',
+            feeRate
+          )
+
+          const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.secpLockWitness()
+
+          const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+          expect(expectedFee).toEqual(BigInt(472))
+          expect(tx.fee).toEqual(expectedFee.toString())
+
+          expect(tx.outputs[0].lock.codeHash).toEqual(multiSignScript.codeHash)
         })
       })
     })
