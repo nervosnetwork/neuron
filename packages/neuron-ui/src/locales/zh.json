@@ -278,6 +278,7 @@
       "view-the-run-node-doc": "打开浏览器查看文档",
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
+      "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "fields": {
         "wallet": "钱包",
         "name": "名称",

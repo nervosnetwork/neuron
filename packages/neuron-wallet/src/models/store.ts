@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import FileService from 'services/file'
-import logger from 'utils/logger'
 
 class Store extends EventEmitter {
   public moduleName: string
@@ -39,7 +38,6 @@ class Store extends EventEmitter {
       const content = JSON.parse(data)
       return key ? content[key] : content
     } catch (err) {
-      logger.error(`[store]: ${err.message}`)
       const content = JSON.parse(this.defaultValue)
       return key ? content[key] : content
     }

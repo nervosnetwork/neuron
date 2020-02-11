@@ -5,6 +5,7 @@
     "sourceMap": true,
     "declaration": true,
     "emitDecoratorMetadata": true,
+    "incremental": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {

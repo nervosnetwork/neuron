@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import {
+  getSystemCodeHash,
   getTransaction,
   showErrorMessage,
   getAllNetworks,
@@ -20,6 +21,7 @@ import styles from './transaction.module.scss'
 
 const Transaction = () => {
   const [t] = useTranslation()
+  const [systemCodeHash, setSystemCodeHash] = useState<string>('')
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
@@ -27,6 +29,11 @@ const Transaction = () => {
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
   useEffect(() => {
+    getSystemCodeHash().then(res => {
+      if (res.status === 1) {
+        setSystemCodeHash(res.result)
+      }
+    })
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
       .then(([networksRes, idRes]) => {
         if (networksRes.status === 1 && idRes.status === 1) {
@@ -128,30 +135,21 @@ const Transaction = () => {
   const onCellContextMenu = useCallback(
     (e: React.MouseEvent) => {
       const {
-        dataset: { args },
+        dataset: { address },
       } = (e.target as HTMLTableCellElement).parentElement as HTMLTableRowElement
-      if (args) {
-        try {
-          const address = ckbCore.utils.bech32Address(args, {
-            prefix: addressPrefix,
-            type: ckbCore.utils.AddressType.HashIdx,
-            codeHashOrCodeHashIndex: '0x00',
-          })
-          const menuTemplate = [
-            {
-              label: t('common.copy-address'),
-              click: () => {
-                window.clipboard.writeText(address)
-              },
+      if (address) {
+        const menuTemplate = [
+          {
+            label: t('common.copy-address'),
+            click: () => {
+              window.clipboard.writeText(address)
             },
-          ]
-          openContextMenu(menuTemplate)
-        } catch (err) {
-          console.error(err)
-        }
+          },
+        ]
+        openContextMenu(menuTemplate)
       }
     },
-    [addressPrefix, t]
+    [t]
   )
 
   const inputsTitle = useMemo(
@@ -173,31 +171,39 @@ const Transaction = () => {
           address = t('transaction.cell-from-cellbase')
         } else {
           try {
-            address = ckbCore.utils.bech32Address(cell.lock.args, {
-              prefix: addressPrefix,
-              type: ckbCore.utils.AddressType.HashIdx,
-              codeHashOrCodeHashIndex: '0x00',
-            })
+            if (cell.lock.codeHash === systemCodeHash && cell.lock.hashType === 'type') {
+              address = ckbCore.utils.bech32Address(cell.lock.args, {
+                prefix: addressPrefix,
+                type: ckbCore.utils.AddressType.HashIdx,
+                codeHashOrCodeHashIndex: '0x00',
+              })
+            } else {
+              address = ckbCore.utils.fullPayloadToAddress({
+                arg: cell.lock.args,
+                prefix: addressPrefix,
+                type:
+                  cell.lock.hashType === 'data'
+                    ? ckbCore.utils.AddressType.DataCodeHash
+                    : ckbCore.utils.AddressType.TypeCodeHash,
+                codeHash: cell.lock.codeHash,
+              })
+            }
           } catch (err) {
             console.error(err)
           }
         }
 
         return (
-          <tr
-            key={cell.lockHash || ''}
-            data-args={(cell && cell.lock && cell.lock.args) || ''}
-            onContextMenu={onCellContextMenu}
-          >
+          <tr key={cell.lockHash || ''} data-address={address} onContextMenu={onCellContextMenu}>
             <td title={`${index}`}>{index}</td>
-            <td title={address} className="monospacedFont">
+            <td title={address} className={`monospacedFont ${styles.addressCell}`}>
               {address}
             </td>
             <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
           </tr>
         )
       }),
-    [t, onCellContextMenu, addressPrefix]
+    [t, onCellContextMenu, addressPrefix, systemCodeHash]
   )
 
   if (error.code) {
