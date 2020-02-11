@@ -27,10 +27,7 @@ declare namespace State {
 
   interface DetailedOutput {
     readonly capacity: string
-    readonly lock: Readonly<{
-      args: string
-      codeHash: string
-    }>
+    readonly lock: Readonly<CKBComponents.Script>
     readonly lockHash: string
     readonly outPoint: Readonly<{
       index: string

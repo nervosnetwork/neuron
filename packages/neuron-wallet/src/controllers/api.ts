@@ -9,6 +9,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
+import LockUtils from 'models/lock-utils'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -48,6 +49,14 @@ export default class ApiController {
     const handle = this.handleChannel
 
     // App
+    handle('get-system-codehash', async () => {
+      const lockUtils = new LockUtils(await LockUtils.systemScript())
+      return {
+        status: ResponseCode.Success,
+        result: lockUtils.systemScript.codeHash
+      }
+    })
+
     handle('load-init-data', async () => {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
