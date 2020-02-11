@@ -1,0 +1,121 @@
+{
+  "epochInfos": [
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 1,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 1,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 181
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 179,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 179,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 1,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 179,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 179,
+        "index": 1,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 180,
+        "index": 0,
+        "length": 100
+      },
+      "expected": 180
+    },
+    {
+      "depositEpochInfo": {
+        "number": 0,
+        "index": 0,
+        "length": 100
+      },
+      "withdrawingEpochInfo": {
+        "number": 180,
+        "index": 1,
+        "length": 100
+      },
+      "expected": 360
+    },
+    {
+      "depositEpochInfo": {
+        "number": 1,
+        "index": 634,
+        "length": 1800
+      },
+      "withdrawingEpochInfo": {
+        "number": 4,
+        "index": 820,
+        "length": 1800
+      },
+      "expected": 181
+    }
+  ]
+}
