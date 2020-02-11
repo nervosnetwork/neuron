@@ -71,6 +71,12 @@ export default class Output extends BaseEntity {
   })
   depositIndex: string | null = null
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  multiSignBlake160: string | null = null
+
   public outPoint(): OutPoint {
     return new OutPoint(
       this.outPointTxHash,
