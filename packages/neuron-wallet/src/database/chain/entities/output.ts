@@ -113,6 +113,7 @@ export default class Output extends BaseEntity {
       blockNumber: this.transaction?.blockNumber,
       blockHash: this.transaction?.blockHash,
       depositOutPoint: this.depositOutPoint(),
+      multiSignBlake160: this.multiSignBlake160,
     })
   }
 }

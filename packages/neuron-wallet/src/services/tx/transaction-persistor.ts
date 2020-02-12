@@ -168,6 +168,7 @@ export class TransactionPersistor {
       input.lockHash = i.lockHash || null
       input.lock = i.lock || null
       input.since = i.since!
+      input.multiSignBlake160 = i.multiSignBlake160 || null
       if (i.inputIndex) {
         input.inputIndex = i.inputIndex
       }
@@ -197,6 +198,7 @@ export class TransactionPersistor {
       output.lockHash = o.lockHash!
       output.transaction = tx
       output.status = outputStatus
+      output.multiSignBlake160 = o.multiSignBlake160 || null
       if (o.type) {
         output.typeScript = o.type
         output.typeHash = o.typeHash ? o.typeHash : null

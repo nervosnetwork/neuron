@@ -80,6 +80,7 @@ export default class Input extends BaseEntity {
       this.lock,
       this.lockHash,
       this.inputIndex,
+      this.multiSignBlake160
     )
   }
 }

@@ -19,9 +19,9 @@ export default class MultiSignUtils {
     const rpcService = new RpcService(nodeURL)
 
     const genesisBlock = await rpcService.getBlockByNumber('0')
-    const tx = genesisBlock!.transactions[1]
-    const outPoint = new OutPoint(tx.hash!, '1')
-    const codeHash = tx.outputs[4].type!.computeHash()
+
+    const outPoint = new OutPoint(genesisBlock!.transactions[1].hash!, '1')
+    const codeHash = genesisBlock!.transactions[0].outputs[4].type!.computeHash()
     const hashType = ScriptHashType.Type
 
     return {

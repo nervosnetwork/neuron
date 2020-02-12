@@ -47,20 +47,21 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address, minutes } = o
 
-      let lockScript = new AddressParser(address)
+      const lockScript = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
         .parse()
 
+      const output = new Output(capacity, lockScript)
       if (minutes && minutes !== '') {
         const blake160 = lockScript.args
-        lockScript = Script.fromObject({
+        const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
           args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
           hashType: multiSignScript.hashType,
         })
+        output.setLock(script)
+        output.setMultiSignBlake160(script.args.slice(0, 42))
       }
-
-      const output = new Output(capacity, lockScript)
 
       const outputSize = output.calculateBytesize()
       if (BigInt(capacity) < BigInt(outputSize) * BigInt(10**8)) {
@@ -144,20 +145,21 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address, minutes } = o
 
-      let lockScript: Script = new AddressParser(address)
+      const lockScript: Script = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
         .parse()
 
+      const output = new Output(capacity, lockScript)
       if (minutes && minutes !== '') {
         const blake160 = lockScript.args
-        lockScript = Script.fromObject({
+        const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
           args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
           hashType: multiSignScript.hashType,
         })
+        output.setLock(script)
+        output.setMultiSignBlake160(script.args.slice(0, 42))
       }
-
-      const output = new Output(capacity, lockScript)
 
       // skip last output
       const outputSize = output.calculateBytesize()

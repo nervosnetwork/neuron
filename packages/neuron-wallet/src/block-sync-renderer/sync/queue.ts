@@ -35,13 +35,18 @@ export default class Queue {
 
   private yieldTime = 1
 
-  constructor(url: string, lockHashes: string[], startBlockNumber: bigint) {
+  private multiSignCodeHash: string
+  private multiSignBlake160s: string[]
+
+  constructor(url: string, lockHashes: string[], startBlockNumber: bigint, multiSignCodeHash: string, multiSignBlake160s: string[]) {
     this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
+    this.multiSignCodeHash = multiSignCodeHash
+    this.multiSignBlake160s = multiSignBlake160s
   }
 
   public start = async () => {
@@ -146,8 +151,9 @@ export default class Queue {
         logger.debug(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const addresses = await new TxAddressFinder(this.url, this.lockHashes, tx).addresses()
-        if (addresses.length > 0) {
+        const [shouldSave, addresses] = await new TxAddressFinder(
+          this.url, this.lockHashes, tx, this.multiSignCodeHash, this.multiSignBlake160s).addresses()
+        if (shouldSave) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
               const previousTxHash = input.previousOutput!.txHash
