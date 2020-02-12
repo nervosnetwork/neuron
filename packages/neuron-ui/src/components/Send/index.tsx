@@ -8,6 +8,7 @@ import Spinner from 'widgets/Spinner'
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
+import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
@@ -140,6 +141,15 @@ const Send = () => {
             if (undefined === item || undefined === idx) {
               return null
             }
+            const errorMsg = outputErrors[idx].addrErrorCode
+              ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
+                  fieldName: 'address',
+                  fieldValue: item.address || '',
+                })
+              : undefined
+            const fullAddrInfo =
+              !errorMsg && item.address && item.address.length !== 46 ? t('messages.full-addr-info') : ''
+
             return (
               <div className={styles.outputContainer}>
                 <TextField
@@ -152,15 +162,14 @@ const Send = () => {
                   onChange={onItemChange}
                   required
                   maxLength={100}
-                  error={
-                    outputErrors[idx].addrErrorCode
-                      ? t(`messages.codes.${outputErrors[idx].addrErrorCode}`, {
-                          fieldName: 'address',
-                          fieldValue: item.address || '',
-                        })
-                      : undefined
-                  }
+                  error={errorMsg}
                 />
+                {fullAddrInfo ? (
+                  <div className={styles.fullAddrInfo}>
+                    <Attention />
+                    <span>{fullAddrInfo}</span>
+                  </div>
+                ) : null}
 
                 <TextField
                   className={styles.amountField}

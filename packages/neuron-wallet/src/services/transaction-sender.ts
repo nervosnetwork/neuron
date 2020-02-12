@@ -49,7 +49,7 @@ export default class TransactionSender {
       throw new IsRequired('Password')
     }
 
-    const { core } = NodeService.getInstance()
+    const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
 
     const addressInfos = this.getAddressInfos(walletID)
@@ -97,7 +97,7 @@ export default class TransactionSender {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-      const signed = core.signWitnesses(privateKey)({
+      const signed = ckb.signWitnesses(privateKey)({
         transactionHash: txHash,
         witnesses: serializedWitnesses.map(wit => {
           if (typeof wit === 'string') {
@@ -114,7 +114,7 @@ export default class TransactionSender {
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
 
-    await core.rpc.sendTransaction(tx.toSDKRawTransaction())
+    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
 
     tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
@@ -123,7 +123,7 @@ export default class TransactionSender {
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, core.rpc.node.url)
+    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
     return txHash
   }
 
@@ -227,7 +227,7 @@ export default class TransactionSender {
     // only for check wallet exists
     this.walletService.get(walletID)
 
-    const url: string = NodeService.getInstance().core.node.url
+    const url: string = NodeService.getInstance().ckb.node.url
     const rpcService = new RpcService(url)
     const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
     if (!cellWithStatus.isLive()) {
@@ -273,7 +273,7 @@ export default class TransactionSender {
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const url: string = NodeService.getInstance().core.node.url
+    const url: string = NodeService.getInstance().ckb.node.url
     const rpcService = new RpcService(url)
 
     const cellStatus = await rpcService.getLiveCell(withdrawingOutPoint, true)
@@ -392,8 +392,8 @@ export default class TransactionSender {
 
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
 
-    const { core } = NodeService.getInstance()
-    const result = await core.rpc.calculateDaoMaximumWithdraw(
+    const { ckb } = NodeService.getInstance()
+    const result = await ckb.rpc.calculateDaoMaximumWithdraw(
       depositOutPoint.toSDK(),
       withdrawBlockHash,
     )

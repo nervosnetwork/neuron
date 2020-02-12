@@ -2,6 +2,7 @@
 $textfieldWidth: calc(100vw - 370px);
 
 .outputContainer {
+  position: relative;
   display: grid;
   grid-template:
     'address scanner add-or-remove'auto 'amount max add-or-remove'auto/ $textfieldWidth 50px 30px;
@@ -15,6 +16,7 @@ $textfieldWidth: calc(100vw - 370px);
   }
 
   button[aria-label="qr-btn"] {
+    display: none;
     position: relative;
     padding-top: 10px;
     grid-area: scanner;
@@ -35,6 +37,33 @@ $textfieldWidth: calc(100vw - 370px);
         z-index: 1;
       }
     }
+  }
+
+  .fullAddrInfo {
+    display: flex;
+    position: absolute;
+    width: calc(100vw - 370px);
+    height: 1.375rem;
+    top: 50%;
+    transform: translateY(-102%);
+    color: #d50000;
+
+    span {
+      display: block;
+      letter-spacing: 0.45px;
+      font-size: 0.5625rem;
+      line-height: 0.6875rem;
+      word-break: break-all;
+    }
+
+    svg {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      margin-right: 5px;
+      margin-top: 0.125rem;
+    }
+
   }
 
   .amountField {

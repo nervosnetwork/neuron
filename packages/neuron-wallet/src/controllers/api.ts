@@ -1,5 +1,5 @@
 import { take } from 'rxjs/operators'
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { ipcMain, IpcMainInvokeEvent, dialog } from 'electron'
 
 import env from 'env'
 import i18n from 'locales/i18n'
@@ -9,6 +9,7 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
+import LockUtils from 'models/lock-utils'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -32,10 +33,30 @@ export default class ApiController {
     this.networksController.start()
   }
 
+  public runCommand(command: string, params: string) {
+    if (command === 'export-xpubkey') {
+      this.walletsController.exportXPubkey(params)
+    }
+
+    if (command === 'import-xpubkey') {
+      this.walletsController.importXPubkey().catch(error => {
+        dialog.showMessageBox({ type: 'error', buttons: [], message: error.message })
+      })
+    }
+  }
+
   private registerHandlers() {
     const handle = this.handleChannel
 
     // App
+    handle('get-system-codehash', async () => {
+      const lockUtils = new LockUtils(await LockUtils.systemScript())
+      return {
+        status: ResponseCode.Success,
+        result: lockUtils.systemScript.codeHash
+      }
+    })
+
     handle('load-init-data', async () => {
       const walletsService = WalletsService.getInstance()
       const networksService = NetworksService.getInstance()
@@ -143,6 +164,10 @@ export default class ApiController {
 
     handle('backup-wallet', async (_, { id = '', password = '' }) => {
       return this.walletsController.backup({ id, password })
+    })
+
+    handle('export-xpubkey', async (_, id: string) => {
+      return this.walletsController.exportXPubkey(id)
     })
 
     handle('get-all-addresses', async (_, id: string) => {

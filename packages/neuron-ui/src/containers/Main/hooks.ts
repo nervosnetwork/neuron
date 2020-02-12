@@ -179,7 +179,7 @@ export const useSubscription = ({
     const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
       if (winID && getWinID() === winID) {
         switch (type) {
-          case 'nav': {
+          case 'navigate-to-url': {
             history.push(payload)
             break
           }

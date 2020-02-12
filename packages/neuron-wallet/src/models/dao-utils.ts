@@ -1,5 +1,5 @@
 import NodeService from 'services/node'
-import Core from '@nervosnetwork/ckb-sdk-core'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { SystemScript } from './lock-utils'
 import { scriptToHash } from '@nervosnetwork/ckb-sdk-utils'
 import Script, { ScriptHashType } from './chain/script'
@@ -17,9 +17,9 @@ export default class DaoUtils {
   static scriptHash: string = ""
 
   static async loadDaoScript(nodeURL: string): Promise<SystemScript> {
-    const core = new Core(nodeURL)
+    const ckb = new CKB(nodeURL)
 
-    const genesisBlock = await core.rpc.getBlockByNumber(BigInt(0))
+    const genesisBlock = await ckb.rpc.getBlockByNumber(BigInt(0))
     const systemCellTransaction = genesisBlock.transactions[0]
     const daoOutPoint = new OutPoint(systemCellTransaction.hash, '0x2')
 
@@ -32,7 +32,7 @@ export default class DaoUtils {
     }
   }
 
-  static async daoScript(nodeURL: string = NodeService.getInstance().core.rpc.node.url): Promise<SystemScript> {
+  static async daoScript(nodeURL: string = NodeService.getInstance().ckb.rpc.node.url): Promise<SystemScript> {
     if (DaoUtils.daoScriptInfo && nodeURL === DaoUtils.previousURL) {
       return DaoUtils.daoScriptInfo
     }
@@ -50,6 +50,6 @@ export default class DaoUtils {
 
   static setDaoScript(info: SystemScript) {
     DaoUtils.daoScriptInfo = info
-    DaoUtils.previousURL = NodeService.getInstance().core.rpc.node.url
+    DaoUtils.previousURL = NodeService.getInstance().ckb.rpc.node.url
   }
 }

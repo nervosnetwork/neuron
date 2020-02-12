@@ -4,16 +4,19 @@ import { getLocale } from 'services/remote'
 
 import zh from 'locales/zh.json'
 import en from 'locales/en.json'
-
-const locale = getLocale()
-const lng = ['zh', 'zh-CN'].includes(locale) ? 'zh' : 'en'
+import zhTW from 'locales/zh-tw.json'
 
 i18n.use(initReactI18next).init({
   resources: {
     en,
     zh,
+    'zh-TW': zhTW,
   },
-  fallbackLng: lng,
+  lng: getLocale(),
+  fallbackLng: {
+    'zh-CN': ['zh'],
+    default: ['en'],
+  },
   interpolation: {
     escapeValue: false,
   },

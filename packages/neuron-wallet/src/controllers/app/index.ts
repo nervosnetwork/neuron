@@ -49,6 +49,10 @@ export default class AppController {
     }
   }
 
+  public runCommand = (command: string, obj: any) => {
+    this.apiController.runCommand(command, obj)
+  }
+
   public updateMenu = () => {
     updateApplicationMenu(this.mainWindow)
   }
@@ -96,7 +100,7 @@ export default class AppController {
       icon: path.join(__dirname, '../../neuron-ui/icon.png'),
       webPreferences: {
         devTools: env.isDevMode,
-        nodeIntegration: env.isDevMode || env.isTestMode,
+        nodeIntegration: false,
         preload: path.join(__dirname, './preload.js'),
       },
     })

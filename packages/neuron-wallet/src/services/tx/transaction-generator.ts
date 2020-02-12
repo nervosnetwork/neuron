@@ -1,4 +1,4 @@
-import CellsService, { MIN_CELL_CAPACITY } from 'services/cells'
+import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
 import DaoUtils from 'models/dao-utils'
@@ -13,6 +13,7 @@ import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
+import AddressParser from 'models/address-parser'
 
 export interface TargetOutput {
   address: string
@@ -36,21 +37,19 @@ export class TransactionGenerator {
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
-
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address } = o
 
-      if (BigInt(capacity) < minCellCapacity) {
-        throw new CapacityTooSmall()
+      const lockScript = new AddressParser(address)
+        .setDefaultLockScript(codeHash, hashType)
+        .parse()
+
+      const output = new Output(capacity, lockScript)
+
+      const outputSize = output.calculateBytesize()
+      if (BigInt(capacity) < BigInt(outputSize) * BigInt(10**8)) {
+        throw new CapacityTooSmall(outputSize.toString())
       }
-
-      const blake160: string = LockUtils.addressToBlake160(address)
-
-      const output = new Output(
-        capacity,
-        new Script(codeHash, blake160, hashType)
-      )
 
       return output
     })
@@ -124,21 +123,20 @@ export class TransactionGenerator {
       .map(input => BigInt(input.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
-    const minCellCapacity = BigInt(MIN_CELL_CAPACITY)
     const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address } = o
 
+      const lockScript: Script = new AddressParser(address)
+        .setDefaultLockScript(codeHash, hashType)
+        .parse()
+
+      const output = new Output(capacity, lockScript)
+
       // skip last output
-      if (BigInt(capacity) < minCellCapacity && index !== targetOutputs.length - 1) {
-        throw new CapacityTooSmall()
+      const outputSize = output.calculateBytesize()
+      if (BigInt(capacity) < (BigInt(outputSize) * BigInt(10**8)) && index !== targetOutputs.length - 1) {
+        throw new CapacityTooSmall(outputSize.toString())
       }
-
-      const blake160: string = LockUtils.addressToBlake160(address)
-
-      const output = new Output(
-        capacity,
-        new Script(codeHash, blake160, hashType)
-      )
 
       return output
     })

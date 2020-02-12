@@ -19,6 +19,10 @@ describe('Script', () => {
     expect(hash).toEqual(expectedLockHash)
   })
 
+  it('calculateBytesize', () => {
+    expect(script.calculateBytesize()).toEqual(53)
+  })
+
   it('toSDK', () => {
     const i = script.toSDK()
     expect(i.codeHash).toEqual(script.codeHash)

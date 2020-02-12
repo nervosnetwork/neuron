@@ -1,21 +1,25 @@
 import i18n from 'i18next'
 import zh from './zh'
 import en from './en'
+import zhTW from './zh-tw'
 
 i18n.init({
   resources: {
     en,
     zh,
+    "zh-TW": zhTW
   },
-  fallbackLng: 'en',
+  fallbackLng: {
+    'zh-CN': ['zh'],
+    default: ['en']
+  },
   interpolation: {
     escapeValue: false,
-  },
+  }
 })
 
 export const changeLanguage = (lng = 'en') => {
-  const language = ['zh', 'zh-CN'].includes(lng) ? 'zh' : 'en'
-  i18n.changeLanguage(language)
+  i18n.changeLanguage(lng)
 }
 
 export default i18n

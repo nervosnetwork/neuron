@@ -1,3 +1,29 @@
+# 0.28.0 (2020-02-13)
+
+### Bundled CKB node
+
+CKB v0.28.0 was released on Feb 4th, 2020. This version of CKB node is now bundled and preconfigured in Neuron.
+
+### Full Payload Format address
+
+Full Payload Format (long) address support is ready with this release. For those of you who are curious about what long address is, let's see an example:
+
+Before this release, Neuron only supported Short Payload Format (short) address, e.g., `ckb1qyqt8xaupvm8837nv3gtc9x0ekkj64vud3jqfwyw5v`.
+
+From this release, Neuron will support Full Payload Format (long) address as well, e.g.,  `ckb1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xw3vumhs9nvu786dj9p0q5elx66t24n3kxgj53qks`.
+
+### Extended public key
+
+We've added a new feature to export and import extended public key for a wallet. A wallet imported by extended public key runs in watch only mode. It can sync, show balance and transaction histories as a regular wallet, but it cannot sign and send transaction.
+
+Please note that for this release we didn't implement any UI limitations to wallet imported by extended public key. This means you could still try to send transaction from it; but when you do so, it would fail when verifying your wallet password.
+
+### Electron
+
+We updated Electron to 7.1.11.
+
+
+
 # [0.27.0](https://github.com/nervosnetwork/neuron/compare/v0.26.3...v0.27.0) (2020-01-23)
 
 Happy Spring Festival!

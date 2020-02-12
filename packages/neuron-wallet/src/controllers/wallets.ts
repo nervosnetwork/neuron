@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { parseAddress } from '@nervosnetwork/ckb-sdk-utils'
-import { dialog, SaveDialogReturnValue, BrowserWindow } from 'electron'
+import { dialog, SaveDialogReturnValue, BrowserWindow, OpenDialogReturnValue } from 'electron'
 import WalletsService, { Wallet, WalletProperties, FileKeystoreWallet } from 'services/wallets'
 import NetworksService from 'services/networks'
 import Keystore from 'models/keys/keystore'
@@ -195,17 +195,84 @@ export default class WalletsController {
     }
 
     const keystore = wallet.loadKeystore()
-    return new Promise(resolve => {
-      dialog.showSaveDialog(BrowserWindow.getFocusedWindow()!, { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }).then(
-        (returnValue: SaveDialogReturnValue) => {
-          if (returnValue.filePath) {
-            fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
-            resolve({
-              status: ResponseCode.Success,
-              result: true,
-            })
+    return dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow()!,
+      { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
+    ).then((returnValue: SaveDialogReturnValue) => {
+      if (returnValue.filePath) {
+        fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
+        return {
+          status: ResponseCode.Success,
+          result: true,
+        }
+      } else {
+        return  {
+          status: ResponseCode.Fail,
+          result: false
+        }
+      }
+    })
+  }
+
+  public async importXPubkey(): Promise<Controller.Response<Wallet>> {
+    return dialog.showOpenDialog(
+      BrowserWindow.getFocusedWindow()!,
+      {
+        title: i18n.t('messages.import-extended-public-key'),
+        filters: [{ name: 'JSON File', extensions: ['json'] }]
+      }
+    ).then((value: OpenDialogReturnValue) => {
+      const filePath = value.filePaths[0]
+      if (filePath) {
+        try {
+          const name = filePath.split(/[\\/]/).pop()!.split('.')[0] + "-Watch Only" // File name (without extension)
+          const content = fs.readFileSync(filePath, 'utf8')
+          const json: { xpubkey: string } = JSON.parse(content)
+          const accountExtendedPublicKey = AccountExtendedPublicKey.parse(json.xpubkey)
+
+          const walletsService = WalletsService.getInstance()
+          const wallet = walletsService.create({
+            id: '',
+            name,
+            extendedKey: accountExtendedPublicKey.serialize(),
+            keystore: Keystore.createEmpty()
+          })
+
+          walletsService.generateAddressesById(wallet.id, true)
+          return {
+            status: ResponseCode.Success,
+            result: wallet
           }
-        })
+        } catch {
+          throw new InvalidJSON()
+        }
+      }
+
+      return { status: ResponseCode.Fail }
+    })
+  }
+
+  public async exportXPubkey(id: string = ''): Promise<Controller.Response<boolean>> {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.get(id)
+    const xpubkey = wallet.accountExtendedPublicKey()
+
+    return dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow()!,
+      { title: i18n.t('messages.save-extended-public-key'), defaultPath: wallet.name + '-xpubkey.json' }
+    ).then((returnValue: SaveDialogReturnValue) => {
+      if (returnValue.filePath) {
+        fs.writeFileSync(returnValue.filePath, JSON.stringify({ xpubkey: xpubkey.serialize() }))
+        return {
+          status: ResponseCode.Success,
+          result: true
+        }
+      } else {
+        return {
+          status: ResponseCode.Fail,
+          result: false
+        }
+      }
     })
   }
 
@@ -332,6 +399,7 @@ export default class WalletsController {
         winID: window.id,
         type: action,
         payload: walletID,
+        dispatchToUI: true
       })
     }
   }
@@ -368,11 +436,13 @@ export default class WalletsController {
   }
 
   private verifyAddress = (address: string): boolean => {
-    if (typeof address !== 'string' || address.length !== 46) {
+    if (typeof address !== 'string') {
       return false
     }
     try {
-      return parseAddress(address, 'hex').startsWith('0x0100')
+      const result = parseAddress(address, 'hex')
+      // short address with codeHashIndex = 0x00, or full address
+      return (result.startsWith('0x0100') && address.length === 46) || result.startsWith('0x02') || result.startsWith('0x04')
     } catch (err) {
       return false
     }

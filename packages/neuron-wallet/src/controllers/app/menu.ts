@@ -41,17 +41,17 @@ const showAbout = () => {
   dialog.showMessageBox(options)
 }
 
-const navTo = (url: string) => {
+const navigateTo = (url: string) => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    CommandSubject.next({ winID: window.id, type: 'nav', payload: url })
+    CommandSubject.next({ winID: window.id, type: 'navigate-to-url', payload: url, dispatchToUI: true })
   }
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID })
+    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID, dispatchToUI: true })
   }
 }
 
@@ -81,7 +81,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
            new UpdateController().checkUpdates()
-           navTo(URL.Preference)
+           navigateTo(URL.Preference)
          }
       },
       separator,
@@ -90,7 +90,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
-        click: () => { navTo(URL.Preference) }
+        click: () => { navigateTo(URL.Preference) }
       },
       separator,
       {
@@ -121,7 +121,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       {
         id: 'create',
         label: i18n.t('application-menu.wallet.create-new'),
-        click: () => { navTo(URL.CreateWallet) }
+        click: () => { navigateTo(URL.CreateWallet) }
       },
       {
         id: 'import',
@@ -130,13 +130,23 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           {
             id: 'import-with-mnemonic',
             label: i18n.t('application-menu.wallet.import-mnemonic'),
-            click: () => { navTo(URL.ImportMnemonic) }
+            click: () => { navigateTo(URL.ImportMnemonic) }
           },
           {
             id: 'import-with-keystore',
             label: i18n.t('application-menu.wallet.import-keystore'),
-            click: () => { navTo(URL.ImportKeystore )},
+            click: () => { navigateTo(URL.ImportKeystore) }
           },
+          {
+            id: 'import-with-xpubkey',
+            label: i18n.t('application-menu.wallet.import-xpubkey'),
+            click: () => {
+              const window = BrowserWindow.getFocusedWindow()
+              if (window) {
+                CommandSubject.next({ winID: window.id, type: 'import-xpubkey', payload: null, dispatchToUI: false })
+              }
+            }
+          }
         ],
       },
       separator,
@@ -150,6 +160,20 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           }
           requestPassword(currentWallet.id, 'backup-wallet')
         },
+      },
+      {
+        id: 'export-xpubkey',
+        label: i18n.t('application-menu.wallet.export-xpubkey'),
+        enabled: hasCurrentWallet,
+        click: () => {
+          if (!currentWallet) {
+            return
+          }
+          const window = BrowserWindow.getFocusedWindow()
+          if (window) {
+            CommandSubject.next({ winID: window.id, type: 'export-xpubkey', payload: currentWallet.id, dispatchToUI: false })
+          }
+        }
       },
       {
         id: 'delete',
@@ -224,14 +248,14 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     helpSubmenu.push({
       id: 'preference',
       label: i18n.t('application-menu.help.settings'),
-      click: () => { navTo(URL.Preference) }
+      click: () => { navigateTo(URL.Preference) }
     })
     helpSubmenu.push({
       label: i18n.t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
         new UpdateController().checkUpdates()
-        navTo(URL.Preference)
+        navigateTo(URL.Preference)
       }
     })
     helpSubmenu.push({

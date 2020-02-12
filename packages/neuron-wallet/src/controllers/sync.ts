@@ -9,7 +9,7 @@ export default class SyncController {
     killBlockSyncTask()
     AddressDao.resetAddresses()
     await ChainCleaner.clean()
-    await createBlockSyncTask()
+    await createBlockSyncTask(true)
 
     return {
       status: ResponseCode.Success,

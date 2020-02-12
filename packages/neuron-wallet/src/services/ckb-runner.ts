@@ -61,7 +61,7 @@ const initCkb = async () => {
 }
 
 export const startCkbNode = async () => {
-  initCkb().then(() => {
+  initCkb().then(async () => {
     logger.info('Starting CKB...')
     ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
     ckb.stderr && ckb.stderr.on('data', data => {

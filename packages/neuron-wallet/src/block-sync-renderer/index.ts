@@ -104,7 +104,8 @@ export const createBlockSyncTask = async (rescan = false) => {
     height: 768,
     show: false,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: false,
+      preload: path.join(__dirname, './preload.js')
     }
   })
 
