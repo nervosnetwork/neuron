@@ -1,6 +1,9 @@
 import Blake2b from "./blake2b"
 
 export default class MultiSign {
+  // 1 epoch = 4h = 240min
+  EPOCH_MINUTES = 240
+
   serialize(blake160: string) {
     // S = '0x00', R = '0x00', M = '0x01', N = '0x01'
     return '0x00000101' + blake160.slice(2)
@@ -13,10 +16,10 @@ export default class MultiSign {
   since(minutes: number, headerEpoch: string): string {
     const currentEpochInfo = this.parseEpoch(BigInt(headerEpoch))
     const totalMinutes = minutes +
-      parseInt((parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString()) * 240).toString())
-    const leftMinutes = totalMinutes % 240
-    const epochs: bigint = BigInt(parseInt((totalMinutes / 240).toString(), 10)) + currentEpochInfo.number
-    const result = this.epochSince(BigInt(240), BigInt(leftMinutes), epochs)
+      parseInt((parseInt(currentEpochInfo.index.toString()) / parseInt(currentEpochInfo.length.toString()) * this.EPOCH_MINUTES).toString())
+    const leftMinutes = totalMinutes % this.EPOCH_MINUTES
+    const epochs: bigint = BigInt(parseInt((totalMinutes / this.EPOCH_MINUTES).toString(), 10)) + currentEpochInfo.number
+    const result = this.epochSince(BigInt(this.EPOCH_MINUTES), BigInt(leftMinutes), epochs)
     const buf = Buffer.alloc(8)
     buf.writeBigUInt64LE(result)
     return `0x${buf.toString('hex')}`
