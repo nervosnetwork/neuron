@@ -44,6 +44,11 @@ export default class RpcService {
     return this.ckb.rpc.getTipBlockNumber()
   }
 
+  public async getTipHeader(): Promise<BlockHeader> {
+    const result = await this.ckb.rpc.getTipHeader()
+    return BlockHeader.fromSDK(result)
+  }
+
   public async retryGetBlock(num: string): Promise<Block | undefined> {
     return this.retry(async () => {
       return await this.getBlockByNumber(num)

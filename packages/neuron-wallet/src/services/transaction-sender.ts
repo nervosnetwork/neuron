@@ -3,7 +3,7 @@ import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
 import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import { TransactionPersistor, TransactionsService, TransactionGenerator } from './tx'
+import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
 import NetworksService from './networks'
 import { AddressPrefix } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
@@ -27,6 +27,7 @@ import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
+import MultiSign from 'models/multi-sign'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -42,13 +43,32 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '') => {
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '', isMultiSign: boolean = false) {
+    const tx = this.sign(walletID, transaction, password, isMultiSign)
+
+    const { ckb } = NodeService.getInstance()
+    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+    const txHash = tx.hash!
+
+    tx.description = description
+    await TransactionPersistor.saveSentTx(tx, txHash)
+
+    // update addresses txCount and balance
+    const blake160s = TransactionsService.blake160sOfTx(tx)
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
+    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
+    return txHash
+  }
+
+  private sign(walletID: string = '', transaction: Transaction, password: string = '', isMultiSign: boolean = false) {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
       throw new IsRequired('Password')
     }
 
+    const tx = Transaction.fromObject(transaction)
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
 
@@ -107,32 +127,26 @@ export default class TransactionSender {
         })
       })
 
+      if (isMultiSign) {
+        const wit = WitnessArgs.deserialize(signed[0] as string)
+        wit.lock = new MultiSign().serialize(witnessesArgs[0].blake160) + wit.lock?.slice(2)
+        signed[0] = serializeWitnessArgs(wit.toSDK())
+      }
+
       for (let i = 0; i < witnessesArgs.length; ++i) {
         witnessesArgs[i].witness = signed[i] as string
       }
     }
 
     tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.hash = txHash
 
-    await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
-
-    tx.description = description
-    await TransactionPersistor.saveSentTx(tx, txHash)
-
-    // update addresses txCount and balance
-    const blake160s = TransactionsService.blake160sOfTx(tx)
-    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
-    return txHash
+    return tx
   }
 
   public generateTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
@@ -162,10 +176,7 @@ export default class TransactionSender {
 
   public generateSendingAllTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
