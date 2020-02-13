@@ -9,8 +9,9 @@ import TransactionFee from '../../../src/models/transaction-fee'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Transaction from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
-import { OutputStatus } from '../../../src/models/chain/output'
+import Output, { OutputStatus } from '../../../src/models/chain/output'
 import MultiSignUtils from '../../../src/models/multi-sign-utils'
+import MultiSign from '../../../src/models/multi-sign'
 
 const systemScript = {
   outPoint: {
@@ -824,6 +825,52 @@ describe('TransactionGenerator', () => {
       expect(tx.fee).toEqual(expectedFee.toString())
       expect(tx.inputs!.length).toEqual(2)
       expect(tx.outputs!.length).toEqual(2)
+    })
+  })
+
+  describe('generateWithdrawMultiSignTx', () => {
+    const prevOutput = Output.fromObject({
+      capacity: toShannon('1000'),
+      lock: Script.fromObject({
+        codeHash: multiSignScript.codeHash,
+        args: new MultiSign().args(bob.blake160, 100, '0x7080018000001'),
+        hashType: multiSignScript.hashType
+      })
+    })
+    const outPoint = OutPoint.fromObject({
+      txHash: '0x' + '0'.repeat(64),
+      index: '1'
+    })
+
+    describe('with feeRate 1000', () => {
+      const feeRate = '1000'
+      it('capacity 500', async () => {
+        const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
+          outPoint,
+          prevOutput,
+          bob.address,
+          '0',
+          feeRate
+        )
+
+        expect(tx.inputs.length).toEqual(1)
+        expect(tx.outputs.length).toEqual(1)
+        expect(tx.outputs[0].lock.codeHash).toEqual(systemScript.codeHash)
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        const expectedSize: number = TransactionSize.tx(tx) + TransactionSize.singleMultiSignWitness()
+        const expectedFee: bigint = TransactionFee.fee(expectedSize, BigInt(feeRate))
+
+        expect(expectedFee).toEqual(BigInt(355 + 24))
+        expect(inputCapacities - outputCapacities).toEqual(expectedFee)
+        expect(tx.fee).toEqual(expectedFee.toString())
+      })
     })
   })
 })

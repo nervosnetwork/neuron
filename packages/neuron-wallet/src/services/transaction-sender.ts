@@ -401,6 +401,40 @@ export default class TransactionSender {
     return tx
   }
 
+  public async generateWithdrawMultiSignTx(
+    walletID: string,
+    outPoint: OutPoint,
+    fee: string = '0',
+    feeRate: string = '0'
+  ) {
+      // only for check wallet exists
+      this.walletService.get(walletID)
+
+      const url: string = NodeService.getInstance().ckb.node.url
+      const rpcService = new RpcService(url)
+      const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
+      if (!cellWithStatus.isLive()) {
+        throw new CellIsNotYetLive()
+      }
+      const prevTx = await rpcService.getTransaction(outPoint.txHash)
+      if (!prevTx || !prevTx.txStatus.isCommitted()) {
+        throw new TransactionIsNotCommittedYet()
+      }
+
+      const receivingAddressInfo = await AddressesService.nextUnusedAddress(walletID)
+      const receivingAddress = receivingAddressInfo!.address
+      const prevOutput = cellWithStatus.cell!.output
+      const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
+        outPoint,
+        prevOutput,
+        receivingAddress,
+        fee,
+        feeRate,
+      )
+
+      return tx
+  }
+
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {
 
     const { ckb } = NodeService.getInstance()

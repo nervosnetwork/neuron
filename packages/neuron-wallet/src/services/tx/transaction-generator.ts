@@ -431,6 +431,59 @@ export class TransactionGenerator {
 
     return tx
   }
+
+  public static async generateWithdrawMultiSignTx(
+    outPoint: OutPoint,
+    prevOutput: Output,
+    receivingAddress: string,
+    fee: string,
+    feeRate: string,
+  ): Promise<Transaction> {
+    const systemLockScript = await LockUtils.systemScript()
+    const multiSignScript = await MultiSignUtils.multiSignScript()
+
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const lockScript = new AddressParser(receivingAddress)
+      .setDefaultLockScript(systemLockScript.codeHash, systemLockScript.hashType)
+      .parse()
+
+    // const outputs: Output[] = [output]
+    const output = Output.fromObject({
+      capacity: prevOutput.capacity,
+      lock: lockScript
+    })
+
+    const input = new Input(
+      outPoint,
+      '0',
+      prevOutput.capacity,
+      prevOutput.lock,
+    )
+    const tx = Transaction.fromObject({
+      version: '0',
+      cellDeps: [
+        new CellDep(multiSignScript.outPoint, DepType.DepGroup)
+      ],
+      headerDeps: [],
+      inputs: [input],
+      outputs: [output],
+      witnesses: [],
+    })
+
+    if (mode.isFeeRateMode()) {
+      const size = TransactionSize.tx(tx) + TransactionSize.singleMultiSignWitness()
+      const fee = TransactionFee.fee(size, feeRateInt)
+      tx.fee = fee.toString()
+    } else {
+      tx.fee = fee
+    }
+
+    tx.outputs[0].setCapacity((BigInt(output.capacity) - BigInt(tx.fee)).toString())
+
+    return tx
+  }
 }
 
 export default TransactionGenerator
