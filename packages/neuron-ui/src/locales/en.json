@@ -3,6 +3,12 @@
     "launch-screen": {
       "loading-wallets": "Loading wallets"
     },
+    "contextmenu": {
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "selectall": "Select All"
+    },
     "navbar": {
       "overview": "Overview",
       "wallet": "Wallet",

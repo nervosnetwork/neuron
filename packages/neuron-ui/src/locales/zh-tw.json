@@ -3,6 +3,12 @@
     "launch-screen": {
       "loading-wallets": "錢包加載中"
     },
+    "contextmenu": {
+      "cut": "剪切",
+      "copy": "複製",
+      "paste": "粘貼",
+      "selectall": "全部選中"
+    },
     "navbar": {
       "overview": "總覽",
       "wallet": "錢包",
