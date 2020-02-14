@@ -17,6 +17,7 @@ import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { ErrorCode, MAINNET_TAG } from 'utils/const'
+import { useOnDefaultContextMenu } from 'utils/hooks'
 import styles from './transaction.module.scss'
 
 const Transaction = () => {
@@ -27,6 +28,8 @@ const Transaction = () => {
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
+
+  const onDefaultContextMenu = useOnDefaultContextMenu(t)
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -112,28 +115,10 @@ const Transaction = () => {
     [t, transaction]
   )
 
-  const onInfoContextMenu = useCallback(
-    (e: React.SyntheticEvent) => {
-      const {
-        dataset: { txHash },
-      } = e.target as HTMLDivElement
-      if (txHash) {
-        const menuTemplate = [
-          {
-            label: t('common.copy-tx-hash'),
-            click: () => {
-              window.clipboard.writeText(txHash)
-            },
-          },
-        ]
-        openContextMenu(menuTemplate)
-      }
-    },
-    [t]
-  )
-
   const onCellContextMenu = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
       const {
         dataset: { address },
       } = (e.target as HTMLTableCellElement).parentElement as HTMLTableRowElement
@@ -215,7 +200,7 @@ const Transaction = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onContextMenu={onDefaultContextMenu}>
       <h2
         className={styles.infoTitle}
         title={t('history.basic-information')}
@@ -223,7 +208,7 @@ const Transaction = () => {
       >
         {t('history.basic-information')}
       </h2>
-      <div className={styles.infoDetail} onContextMenu={onInfoContextMenu} data-tx-hash={transaction.hash}>
+      <div className={styles.infoDetail}>
         {basicInfoItems.map(({ label, value }, idx) => (
           <div key={label}>
             <span>{label}</span>

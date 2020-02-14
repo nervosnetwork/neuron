@@ -77,7 +77,6 @@ export const useOnCurrentWalletChange = ({
 }: {
   walletID: string
   chain: State.Chain
-  i18n: any
   history: any
 
   dispatch: StateDispatch

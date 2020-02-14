@@ -55,11 +55,16 @@ const Receive = () => {
   }
 
   return (
-    <>
+    <div
+      onContextMenu={e => {
+        e.stopPropagation()
+        e.preventDefault()
+      }}
+    >
       <QRCode value={accountAddress} size={256} includeMargin dispatch={dispatch} />
       {Address}
       <p className={styles.notation}>{t('receive.prompt')}</p>
-    </>
+    </div>
   )
 }
 

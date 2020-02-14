@@ -39,7 +39,9 @@ const Addresses = () => {
   } = useLocalDescription('address', walletID, dispatch)
 
   const onContextMenu = useCallback(
-    item => {
+    (item: State.Address) => (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+      e.stopPropagation()
+      e.preventDefault()
       if (item && item.address) {
         const menuTemplate = [
           {
@@ -83,7 +85,7 @@ const Addresses = () => {
             const isSelected = localDescription.key === addr.address
             const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
             return (
-              <tr key={addr.address} onContextMenu={() => onContextMenu(addr)}>
+              <tr key={addr.address} onContextMenu={onContextMenu(addr)}>
                 <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
                   {typeLabel}
                 </td>

@@ -20,6 +20,7 @@ import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 
 import { Routes } from 'utils/const'
+import { useOnDefaultContextMenu } from 'utils/hooks'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -125,7 +126,7 @@ const MainContent = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { networkID } = chain
-  const [, i18n] = useTranslation()
+  const [t] = useTranslation()
 
   useSubscription({
     walletID,
@@ -148,13 +149,13 @@ const MainContent = () => {
   useOnCurrentWalletChange({
     walletID,
     chain,
-    i18n,
     history,
     dispatch,
   })
+  const onContextMenu = useOnDefaultContextMenu(t)
 
   return (
-    <>
+    <div onContextMenu={onContextMenu}>
       {mainContents.map(container => (
         <Route
           exact={container.exact}
@@ -163,7 +164,7 @@ const MainContent = () => {
           component={container.component}
         />
       ))}
-    </>
+    </div>
   )
 }
 

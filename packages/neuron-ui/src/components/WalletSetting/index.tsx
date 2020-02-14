@@ -53,6 +53,8 @@ const WalletSetting = ({
   )
   const onContextMenu = useCallback(
     (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+      e.stopPropagation()
+      e.preventDefault()
       const { id } = (e.target as HTMLSpanElement).dataset
       if (id) {
         const menuTemplate = [
