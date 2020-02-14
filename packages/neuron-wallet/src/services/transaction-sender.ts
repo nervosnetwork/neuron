@@ -40,6 +40,8 @@ interface SignInfo {
 }
 
 export default class TransactionSender {
+  static MULTI_SIGN_ARGS_LENGTH = 58
+
   private walletService: WalletService
 
   constructor() {
@@ -75,7 +77,9 @@ export default class TransactionSender {
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
 
-    const isMultiSign = !!tx.inputs.find(i => i.lock!.args.length === 58)
+    // Only one multi sign input now.
+    const isMultiSign = tx.inputs.length === 1 &&
+      tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
 
     const addressInfos = this.getAddressInfos(walletID)
     const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
@@ -88,7 +92,7 @@ export default class TransactionSender {
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
     const findPrivateKey = (args: string) => {
       let path: string | undefined
-      if (args.length === 58) {
+      if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
         path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
       } else {
         path = addressInfos.find(i => i.blake160 === args)!.path
