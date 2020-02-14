@@ -3,7 +3,7 @@ import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { verifyAmount } from 'utils/validators'
 import { epochParser } from 'utils/parsers'
-import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
+import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
 import calculateAPC from 'utils/calculateAPC'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
@@ -238,7 +238,7 @@ export const useCompensationPeriods = ({
       try {
         const depositEpochInfo = epochParser(depositEpoch)
         const currentEpochInfo = epochParser(currentEpoch)
-        const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
+        const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, currentEpochInfo)
         return {
           targetEpochNumber,
           currentEpochNumber: currentEpochInfo.number,

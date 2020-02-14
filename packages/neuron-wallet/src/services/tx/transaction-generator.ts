@@ -52,7 +52,7 @@ export class TransactionGenerator {
         .parse()
 
       const output = new Output(capacity, lockScript)
-      if (minutes && minutes !== '') {
+      if (minutes) {
         const blake160 = lockScript.args
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
@@ -150,7 +150,7 @@ export class TransactionGenerator {
         .parse()
 
       const output = new Output(capacity, lockScript)
-      if (minutes && minutes !== '') {
+      if (minutes) {
         const blake160 = lockScript.args
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
