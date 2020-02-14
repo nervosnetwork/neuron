@@ -455,9 +455,11 @@ export class TransactionGenerator {
       lock: lockScript
     })
 
+    const since = new MultiSign().parseSince(prevOutput.lock.args)
+
     const input = new Input(
       outPoint,
-      '0',
+      since.toString(),
       prevOutput.capacity,
       prevOutput.lock,
     )

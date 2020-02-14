@@ -2,7 +2,7 @@ import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
 import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
 import NetworksService from './networks'
 import { AddressPrefix } from 'models/keys/address'
@@ -28,12 +28,15 @@ import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
 import MultiSign from 'models/multi-sign'
+import Blake2b from 'models/blake2b'
+import HexUtils from 'utils/hex'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
   lockHash: string
   witness: string
-  blake160: string
+  lockArgs: string
 }
 
 export default class TransactionSender {
@@ -43,8 +46,8 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '', isMultiSign: boolean = false) {
-    const tx = this.sign(walletID, transaction, password, isMultiSign)
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '') {
+    const tx = this.sign(walletID, transaction, password)
 
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -61,7 +64,7 @@ export default class TransactionSender {
     return txHash
   }
 
-  private sign(walletID: string = '', transaction: Transaction, password: string = '', isMultiSign: boolean = false) {
+  private sign(walletID: string = '', transaction: Transaction, password: string = '') {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -72,11 +75,24 @@ export default class TransactionSender {
     const { ckb } = NodeService.getInstance()
     const txHash: string = tx.computeHash()
 
+    const isMultiSign = !!tx.inputs.find(i => i.lock!.args.length === 58)
+
     const addressInfos = this.getAddressInfos(walletID)
+    const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
+      return {
+        multiSignBlake160: new MultiSign().hash(i.blake160),
+        path: i.path
+      }
+    }) : []
     const paths = addressInfos.map(info => info.path)
     const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
-    const findPrivateKey = (blake160: string) => {
-      const { path } = addressInfos.find(i => i.blake160 === blake160)!
+    const findPrivateKey = (args: string) => {
+      let path: string | undefined
+      if (args.length === 58) {
+        path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
+      } else {
+        path = addressInfos.find(i => i.blake160 === args)!.path
+      }
       const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
       if (!pathAndPrivateKey) {
         throw new Error('no private key found')
@@ -85,7 +101,7 @@ export default class TransactionSender {
     }
 
     const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
-      const blake160: string = input.lock!.args!
+      const lockArgs: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
       const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
       return {
@@ -93,7 +109,7 @@ export default class TransactionSender {
         witnessArgs,
         lockHash: input.lockHash!,
         witness: '',
-        blake160,
+        lockArgs,
       }
     })
 
@@ -104,7 +120,7 @@ export default class TransactionSender {
       // A 65-byte empty signature used as placeholder
       witnessesArgs[0].witnessArgs.setEmptyLock()
 
-      const privateKey = findPrivateKey(witnessesArgs[0].blake160)
+      const privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
 
       const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
         .map((value: SignInfo, index: number) => {
@@ -117,20 +133,25 @@ export default class TransactionSender {
           }
           return serializeWitnessArgs(args.toSDK())
         })
-      const signed = ckb.signWitnesses(privateKey)({
-        transactionHash: txHash,
-        witnesses: serializedWitnesses.map(wit => {
-          if (typeof wit === 'string') {
-            return wit
-          }
-          return wit.toSDK()
-        })
-      })
+      let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
 
       if (isMultiSign) {
-        const wit = WitnessArgs.deserialize(signed[0] as string)
-        wit.lock = new MultiSign().serialize(witnessesArgs[0].blake160) + wit.lock?.slice(2)
+        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
+        const serializedMultiSign: string = new MultiSign().serialize(blake160)
+        signed = this.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign)
+        const wit = signed[0] as WitnessArgs
+        wit.lock = serializedMultiSign + wit.lock!.slice(2)
         signed[0] = serializeWitnessArgs(wit.toSDK())
+      } else {
+        signed = ckb.signWitnesses(privateKey)({
+          transactionHash: txHash,
+          witnesses: serializedWitnesses.map(wit => {
+            if (typeof wit === 'string') {
+              return wit
+            }
+            return wit.toSDK()
+          })
+        })
       }
 
       for (let i = 0; i < witnessesArgs.length; ++i) {
@@ -142,6 +163,37 @@ export default class TransactionSender {
     tx.hash = txHash
 
     return tx
+  }
+
+  private signSingleMultiSignScript(privateKey: string, witnesses: (string | WitnessArgs)[], txHash: string, serializedMultiSign: string) {
+    const firstWitness = witnesses[0]
+    if (typeof(firstWitness) === 'string') {
+      throw new Error('First witness must be WitnessArgs')
+    }
+    const restWitnesses = witnesses.slice(1)
+
+    const emptyWitness = WitnessArgs.fromObject({
+      ...firstWitness,
+      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130)
+    })
+    const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
+    const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
+    const blake2b = new Blake2b()
+    blake2b.update(txHash)
+    blake2b.update(toHexInLittleEndian(`0x${serialziedEmptyWitnessSize.toString(16)}`, 8))
+    blake2b.update(serializedEmptyWitness)
+
+    restWitnesses.forEach(w => {
+      const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
+      const byteLength = HexUtils.byteLength(wit)
+      blake2b.update(toHexInLittleEndian(`0x${byteLength.toString(16)}`, 8))
+      blake2b.update(wit)
+    })
+
+    const message = blake2b.digest()
+    const keyPair = new ECPair(privateKey)
+    emptyWitness.lock = keyPair.signRecoverable(message)
+    return [emptyWitness, ...restWitnesses]
   }
 
   public generateTx = async (
