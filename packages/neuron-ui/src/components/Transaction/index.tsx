@@ -9,7 +9,6 @@ import {
   getAllNetworks,
   getCurrentNetworkID,
   openExternal,
-  openContextMenu,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
@@ -29,7 +28,7 @@ const Transaction = () => {
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
 
-  const onDefaultContextMenu = useOnDefaultContextMenu(t)
+  const onContextMenu = useOnDefaultContextMenu(t)
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -115,28 +114,6 @@ const Transaction = () => {
     [t, transaction]
   )
 
-  const onCellContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-      const {
-        dataset: { address },
-      } = (e.target as HTMLTableCellElement).parentElement as HTMLTableRowElement
-      if (address) {
-        const menuTemplate = [
-          {
-            label: t('common.copy-address'),
-            click: () => {
-              window.clipboard.writeText(address)
-            },
-          },
-        ]
-        openContextMenu(menuTemplate)
-      }
-    },
-    [t]
-  )
-
   const inputsTitle = useMemo(
     () => `${t('transaction.inputs')} (${transaction.inputs.length}/${localNumberFormatter(transaction.inputsCount)})`,
     [transaction.inputs.length, transaction.inputsCount, t]
@@ -179,7 +156,7 @@ const Transaction = () => {
         }
 
         return (
-          <tr key={cell.lockHash || ''} data-address={address} onContextMenu={onCellContextMenu}>
+          <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
             <td title={address} className={`monospacedFont ${styles.addressCell}`}>
               {address}
@@ -188,7 +165,7 @@ const Transaction = () => {
           </tr>
         )
       }),
-    [t, onCellContextMenu, addressPrefix, systemCodeHash]
+    [t, addressPrefix, systemCodeHash]
   )
 
   if (error.code) {
@@ -200,7 +177,7 @@ const Transaction = () => {
   }
 
   return (
-    <div className={styles.container} onContextMenu={onDefaultContextMenu}>
+    <div className={styles.container} onContextMenu={onContextMenu}>
       <h2
         className={styles.infoTitle}
         title={t('history.basic-information')}
