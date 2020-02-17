@@ -301,7 +301,6 @@
         "keystore-password": "密碼",
         "deposit": "存入金額"
       },
-      "run-ckb-guide": "如何運行一個 CKB 節點？",
       "codes": {
         "-3": "",
         "100": "餘額不足。",

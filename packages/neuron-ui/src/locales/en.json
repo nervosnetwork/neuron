@@ -301,7 +301,6 @@
         "keystore-password": "Password",
         "deposit": "Deposit"
       },
-      "run-ckb-guide": "How to run a CKB node?",
       "codes": {
         "-3": "",
         "100": "Amount is not enough.",

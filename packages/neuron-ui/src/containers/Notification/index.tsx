@@ -2,7 +2,6 @@ import React, { useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
-import { openExternal } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import {
@@ -11,7 +10,6 @@ import {
   dismissNotification,
 } from 'states/stateProvider/actionCreators'
 import AlertDialog from 'widgets/AlertDialog'
-import { ErrorCode, RUN_NODE_GUIDE_URL } from 'utils/const'
 import styles from './Notification.module.scss'
 
 const notificationType = (type: 'success' | 'warning' | 'alert') => {
@@ -84,10 +82,6 @@ export const NoticeContent = () => {
     [dispatch]
   )
 
-  const onGuideLinkClick = useCallback(() => {
-    openExternal(RUN_NODE_GUIDE_URL)
-  }, [])
-
   return (
     <div>
       {showTopAlert && notification ? (
@@ -109,11 +103,6 @@ export const NoticeContent = () => {
           {notification.code
             ? t(`messages.codes.${notification.code}`, notification.meta)
             : notification.content || t('messages.unknown-error')}
-          {notification.code === ErrorCode.NodeDisconnected ? (
-            <Text as="span" variant="xSmall" className={styles.guide} onClick={onGuideLinkClick}>
-              {t('messages.run-ckb-guide')}
-            </Text>
-          ) : null}
         </MessageBar>
       ) : null}
 
