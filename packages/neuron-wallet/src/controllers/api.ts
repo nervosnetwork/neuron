@@ -19,6 +19,7 @@ import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
+import SingleMultiSignController from './single-multi-sign'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -26,6 +27,7 @@ export default class ApiController {
   private transactionsController = new TransactionsController()
   private daoController = new DaoController()
   private networksController = new NetworksController()
+  private singleMultiSignController = new SingleMultiSignController()
 
   public async mount() {
     this.registerHandlers()
@@ -240,6 +242,11 @@ export default class ApiController {
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
       return this.daoController.withdrawFromDao(params)
+    })
+
+    // SingleMultiSign
+    handle('get-single-multi-sign-cells', async (_, params: Controller.Params.GetSingleMultiSignCellsParams) => {
+      return this.singleMultiSignController.getSingleMultiSignCells(params)
     })
 
     // Networks

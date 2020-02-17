@@ -27,6 +27,12 @@ declare module Controller {
       walletID: string
     }
 
+    interface GetSingleMultiSignCellsParams {
+      walletID: string
+      pageNo: number
+      pageSize: number
+    }
+
     interface BackupWallet {
       id: string
       password: string

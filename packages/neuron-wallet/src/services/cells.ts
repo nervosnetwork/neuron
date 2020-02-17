@@ -14,6 +14,11 @@ import MultiSign from 'models/multi-sign'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
+export interface PaginationResult<T = any> {
+  totalCount: number
+  items: T[]
+}
+
 export default class CellsService {
   // exclude hasData = true and typeScript != null
   public static getBalance = async (
@@ -83,7 +88,7 @@ export default class CellsService {
     return cells
   }
 
-  public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number) {
+  public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number): Promise<PaginationResult<Cell>> {
     const multiSign = new MultiSign()
     const multiSignHashes: string[] = blake160s.map(blake160 => multiSign.hash(blake160))
 
