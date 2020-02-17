@@ -10,6 +10,7 @@ import { TransactionStatus } from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
+import MultiSign from 'models/multi-sign'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -80,6 +81,38 @@ export default class CellsService {
     }
 
     return cells
+  }
+
+  public static async getSingleMultiSignCells(blake160s: string[], pageNo: number, pageSize: number) {
+    const multiSign = new MultiSign()
+    const multiSignHashes: string[] = blake160s.map(blake160 => multiSign.hash(blake160))
+
+    const skip = (pageNo - 1) * pageSize
+
+    // live cells, empty data, empty type, and of provided blake160s
+    const query = getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeScript IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
+        liveStatus: OutputStatus.Live,
+        multiSignHashes,
+      })
+
+    const totalCount: number = await query.getCount()
+
+    const outputs: OutputEntity[] = await query
+      .orderBy('tx.timestamp', 'ASC')
+      .skip(skip)
+      .take(pageSize)
+      .getMany()
+
+    const cells: Cell[] = outputs.map(o => o.toModel())
+
+    return {
+      totalCount: totalCount || 0,
+      items: cells,
+    }
   }
 
   public static getLiveCell = async (outPoint: OutPoint): Promise<Cell | undefined> => {
