@@ -155,7 +155,7 @@ const MainContent = () => {
   const onContextMenu = useOnDefaultContextMenu(t)
 
   return (
-    <div onContextMenu={onContextMenu}>
+    <div onContextMenu={onContextMenu} style={{ height: '100%' }}>
       {mainContents.map(container => (
         <Route
           exact={container.exact}
