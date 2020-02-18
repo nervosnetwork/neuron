@@ -1,0 +1,386 @@
+{
+  "translation": {
+    "launch-screen": {
+      "loading-wallets": "Portefeuilles de chargement"
+    },
+    "navbar": {
+      "overview": "Aperçu",
+      "wallet": "Portefeuille",
+      "send": "Envoyer",
+      "receive": "Recevoir",
+      "history": "Histoire",
+      "addresses": "Adresses",
+      "settings": "Réglages",
+      "nervos-dao": "Nervos DAO",
+      "fail-to-fetch-tip-block-number": "Erreur de connexion",
+      "sync-not-start": "La synchronisation n'a pas encore commencé"
+    },
+    "overview": {
+      "date": "Date",
+      "type": "Type",
+      "balance": "Équilibre",
+      "recent-activities": "Activités récentes",
+      "no-recent-activities": "Aucune activité récente",
+      "activity": "Activité",
+      "datetime": "Date et heure",
+      "status": "Statut",
+      "amount": "Montant",
+      "blockchain-status": "Statut de la blockchain",
+      "chain-identity": "Identité de la chaîne",
+      "tip-block-number": "Numéro de bloc",
+      "epoch": "Époque",
+      "difficulty": "Difficulté",
+      "address": "Adresse",
+      "confirmation": "{{confirmationCount}} Confirmation",
+      "confirmations": "{{confirmationCount}} Confirmations",
+      "sent": "Expédié",
+      "sending": "Envoi en cours",
+      "received": "Reçue",
+      "receiving": "Réception",
+      "more": "Plus d'activités",
+      "statusLabel": {
+        "success": "Succès",
+        "failed": "Échoué",
+        "pending": "En attente",
+        "confirming": "Confirmation"
+      }
+    },
+    "wizard": {
+      "welcome-to-nervos-neuron": "Bienvenue chez Neuron",
+      "create-or-import-your-first-wallet": "Créez ou importez votre premier portefeuille",
+      "create-new-wallet": "Créer un portefeuille",
+      "import-mnemonic": "Importer des graines de portefeuille",
+      "import-keystore": "Importer depuis Keystore",
+      "import-wallet": "Importer un portefeuille",
+      "next": "Prochain",
+      "back": "Retour",
+      "name": "Nom",
+      "your-wallet-seed-is": "Votre nouvelle graine de portefeuille a été générée",
+      "input-your-seed": "Please input your wallet seedVeuillez saisir votre graine de portefeuille",
+      "password": "Mot de passe",
+      "confirm-password": "Confirmez le mot de passe",
+      "set-wallet-name-and-password": "Nommez votre nouveau portefeuille et choisissez un mot de passe fort pour le protéger",
+      "set-wallet-name": "Donnez un nom à votre nouveau portefeuille",
+      "set-a-strong-password-to-protect-your-wallet": "Créez un mot de passe fort pour protéger votre portefeuille",
+      "wallet-suffix": "Portefeuille {{suffix}}",
+      "write-down-seed": "Notez votre graine de portefeuille et conservez-la dans un endroit sûr",
+      "new-name": "Utilisez un nom inutilisé pour le nouveau portefeuille",
+      "complex-password": "Le mot de passe doit comporter entre 8 et 50 caractères et contenir au moins trois catégories de caractères parmi les suivantes: lettres majuscules, lettres minuscules, chiffres et symboles spéciaux, et doit commencer par une lettre ou un chiffre.",
+      "same-password": "Le mot de passe et le mot de passe de confirmation doivent correspondre"
+    },
+    "import-keystore": {
+      "label": {
+        "path": "Fichier de clés",
+        "name": "Nom du portefeuille",
+        "password": "Mot de passe"
+      },
+      "placeholder": {
+        "path": "Cliquez pour sélectionner le fichier de clés",
+        "name": "Nom du nouveau portefeuille",
+        "password": "Mot de passe pour vérifier le magasin de clés"
+      },
+      "button": {
+        "back": "Retour",
+        "submit": "Soumettre"
+      }
+    },
+    "detail": {
+      "more-transactions": "Plus"
+    },
+    "send": {
+      "address": "Envoyer à",
+      "amount": "Montant",
+      "send": "Envoyer",
+      "clear": "Claire",
+      "confirm-password": "Confirmez le mot de passe",
+      "to": "À",
+      "input-password-to-confirm": "Saisissez le mot de passe pour confirmer",
+      "scan-to-get-address": "Scannez le code QR pour lire l'adresse à laquelle envoyer",
+      "total-amount": "Montant total",
+      "description": "La description",
+      "description-optional": "Description (facultatif)",
+      "balance": "Équilibre",
+      "add-one": "Ajouter un de plus",
+      "remove-this": "Enlève ça",
+      "fee": "Frais de transaction",
+      "advanced-fee-settings": "Paramètres de frais avancés",
+      "price": "Prix",
+      "expected-speed": "Vitesse attendue",
+      "total-cycles": "Cycles RISC-V totaux",
+      "scan-screen-qr-code": "Scannez le QR Code à l'écran"
+    },
+    "receive": {
+      "click-to-copy": "Cliquez pour copier l'adresse",
+      "address-not-found": "Adresse introuvable",
+      "prompt": "Neuron choisit une nouvelle adresse de réception pour une meilleure confidentialité. Veuillez vous rendre dans le carnet d'adresses si vous souhaitez utiliser une adresse de réception précédemment utilisée.",
+      "address-qrcode": "Adresse QR Code",
+      "address": "{{network}} Adresse"
+    },
+    "history": {
+      "meta": "Meta",
+      "type": "Type",
+      "date": "Date",
+      "timestamp": "Temps",
+      "amount": "Montant",
+      "transaction-hash": "Hachage de transaction",
+      "send": "Envoyer",
+      "receive": "Recevoir",
+      "other": "Autre",
+      "more-actions": "Plus d'actions",
+      "detail": "Détail",
+      "explorer": "Exploratrice",
+      "first": "Première",
+      "previous": "Précédente",
+      "next": "Prochain",
+      "last": "Dernière",
+      "description": "La description",
+      "status": "Statut",
+      "pending": "En attente",
+      "success": "Succès",
+      "failed": "Échoué",
+      "confirming": "Confirmation",
+      "blockNumber": "Numéro de bloc",
+      "basic-information": "Informations de base",
+      "search": {
+        "placeholder": "Rechercher le hachage TX, l'adresse ou la date (yyyy-mm-dd)"
+      },
+      "confirmations": "Confirmations",
+      "confirming-with-count": "{{confirmations}} Confirmations",
+      "view-on-explorer": "Afficher sur l'explorateur",
+      "copy-transaction-hash": "Copier le hachage de transaction",
+      "no-txs": "Aucun historique de transaction"
+    },
+    "transaction": {
+      "date": "Date",
+      "transaction-hash": "Hachage de transaction",
+      "block-number": "Numéro de bloc",
+      "goBack": "Retourner",
+      "index": "Indice",
+      "address": "Adresse",
+      "income": "le revenu",
+      "amount": "Montant",
+      "inputs": "Contributions",
+      "outputs": "Les sorties",
+      "view-in-explorer": "Exploratrice",
+      "view-in-explorer-button-title": "Vue sur l'explorateur",
+      "cell-from-cellbase": "De la cellbase"
+    },
+    "addresses": {
+      "addresses": "Adresses",
+      "type": "Type",
+      "address": "Adresses",
+      "identifier": "Identifiant",
+      "description": "La description",
+      "balance": "Équilibre",
+      "transactions": "Transactions",
+      "receiving-address": "Réception",
+      "change-address": "Changement",
+      "copy-address": "Copier l'adresse",
+      "request-payment": "Demander le paiement",
+      "view-on-explorer": "Afficher sur l'explorateur"
+    },
+    "settings": {
+      "go-to-overview": "Accéder à l'aperçu",
+      "setting-tabs": {
+        "general": "Générale",
+        "wallets": "Portefeuilles",
+        "network": "Réseau"
+      },
+      "general": {
+        "clear-cache": "Vider le cache",
+        "clearing-cache": "Clairière...",
+        "clear-cache-description": "Vider le cache si vous rencontrez des problèmes de synchronisation des données ou d'équilibrage de l'affichage. Neuron analysera à nouveau les données des blocs.",
+        "show": "Spectacle",
+        "hide": "Cacher"
+      },
+      "wallet-manager": {
+        "edit-wallet": {
+          "wallet-name": "Nom du portefeuille",
+          "password": "Mot de passe",
+          "new-password": "Nouveau mot de passe",
+          "confirm-password": "Confirmez le mot de passe",
+          "edit-wallet": "Modifier le portefeuille"
+        },
+        "delete-wallet-title": "Veuillez entrer le mot de passe",
+        "password": "Mot de passe",
+        "wallet-detail": {
+          "balance": "Équilibre"
+        }
+      },
+      "network": {
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "add-network": "Ajouter un réseau",
+        "edit-network": {
+          "title": "Ajouter ou modifier un réseau",
+          "rpc-url": "RPC URL",
+          "name": "Nom"
+        },
+        "mainnet": "Mainnet",
+        "testnet": "Testnet",
+        "devnet": "Devnet"
+      }
+    },
+    "password-request": {
+      "wallet-not-found": "Le portefeuille est introuvable",
+      "password": "Mot de passe",
+      "send": {
+        "title": "Soumettre la transaction"
+      },
+      "delete": {
+        "title": "Supprimer le {{name}} portefeuille"
+      },
+      "backup": {
+        "title": "Sauvegardez le {{name}} portefeuille"
+      }
+    },
+    "qrcode": {
+      "copy": "Copier l'image",
+      "save": "Enregistrer l'image"
+    },
+    "common": {
+      "or": "ou",
+      "ok": "D'accord",
+      "confirm": "Confirmer",
+      "open": "Ouverte",
+      "cancel": "Annuler",
+      "save": "Sauvegarder",
+      "toggle": {
+        "on": "Sur",
+        "off": "De"
+      },
+      "copy-tx-hash": "Copier le hachage de transaction",
+      "copy-address": "Copier l'adresse",
+      "select": "Sélectionner",
+      "backup": "Sauvegarde",
+      "edit": "Éditer",
+      "delete": "Supprimer",
+      "click-to-edit": "Cliquez pour modifier"
+    },
+    "notification-panel": {
+      "title": "Notifications"
+    },
+    "message-types": {
+      "warning": "avertissement",
+      "alert": "alerte",
+      "success": "Succès"
+    },
+    "messages": {
+      "error": "Erreur",
+      "unknown-error": "Erreur inconnue",
+      "update-wallet-successfully": "Le portefeuille a été mis à jour",
+      "delete-wallet-successfully": "Le portefeuille a été supprimé",
+      "create-network-successfully": "Le réseau a été créé",
+      "update-network-successfully": "Le réseau a été mis à jour",
+      "clear-cache-successfully": "Le cache a été vidé",
+      "addr-copied": "L'adresse a été copiée dans le presse-papiers",
+      "qrcode-copied": "Le code QR a été copié dans le presse-papiers",
+      "view-the-run-node-doc": "Afficher le guide dans le navigateur",
+      "remain-ckb-for-withdraw": "Il est suggéré de réserver quelques CKBytes pour l'opération de retrait",
+      "no-valid-addresses-found": "Aucune adresse valide trouvée",
+      "fields": {
+        "wallet": "Portefeuille",
+        "name": "Nom",
+        "password": "Mot de passe",
+        "remote": "RPC URL",
+        "network": "Réseau",
+        "address": "Adresse",
+        "amount": "Montant",
+        "transaction": "Transaction",
+        "default-address": "Adresse par défaut",
+        "mnemonic": "Mnémonique",
+        "keystore-path": "Fichier de clés",
+        "keystore-name": "Nom du portefeuille",
+        "keystore-password": "Mot de passe",
+        "deposit": "Dépôt"
+      },
+      "run-ckb-guide": "Comment exécuter un nœud CKB?",
+      "codes": {
+        "-3": "",
+        "100": "Le montant ne suffit pas.",
+        "101": "Le montant {{amount}} CKB est trop petit, veuillez saisir un montant non inférieur à 61 CKB.",
+        "102": "$t(messages.fields.{{fieldName}}) est invalide.",
+        "103": "$t(messages.fields.keystore-password) est incorrect.",
+        "104": "Impossible de se connecter au nœud, veuillez redémarrer Neuron.",
+        "105": "Vous avez besoin de plus de capacités de changement (au moins 61 CKBytes), ou cliquez sur le bouton 'Max' pour envoyer tout votre solde.",
+        "106": "Vous avez besoin de plus de capacités de changement (au moins 61 CKBytes), ou glissez jusqu'au bout pour envoyer tout votre solde.",
+        "201": "$t(messages.fields.{{fieldName}}) est requis.",
+        "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} est utilisé.",
+        "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} est trop long, il doit être inférieur ou égal à {{length}}.",
+        "204": "$t(messages.fields.{{fieldName}}) {{fieldValue}} est trop court, il doit être supérieur ou égal à {{length}}.",
+        "205": "$t(messages.fields.{{fieldName}}) {{fieldValue}} est invalide.",
+        "206": "$t(messages.fields.{{fieldName}}) {{fieldValue}} n'est pas valide, veuillez saisir les $t(messages.fields.{{fieldName}}) avec au plus {{length}} décimales.",
+        "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} n'est pas valide, il ne peut pas être négatif.",
+        "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} n'est pas valide, il doit commencer par http(s)://",
+        "209": "$t(messages.fields.{{fieldName}}) ne devrait pas avoir d'espaces.",
+        "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} ne peut pas être supprimé.",
+        "303": "$t(messages.fields.{{fieldName}}) n'est pas trouvé.",
+        "304": "La caméra n'est pas disponible ou désactivée.",
+        "305": "$t(messages.fields.address) ne peut pas être vide.",
+        "306": "Veuillez saisir une adresse mainnet",
+        "307": "Veuillez saisir une adresse testnet"
+      }
+    },
+    "sync": {
+      "synced": "Synchronisé",
+      "syncing": "Synchronisation",
+      "block-number": "numéro de bloc",
+      "syncing-balance": "Le solde est en cours de mise à jour",
+      "slow": "La synchronisation est lente",
+      "sync-failed": "Échec de la synchronisation, veuillez vérifier le réseau",
+      "sync-not-start": "La synchronisation n'a pas encore commencé, veuillez essayer de redémarrer Neuron Wallet"
+    },
+    "pagination": {
+      "previous-page": "Page précédente",
+      "next-page": "Page suivante",
+      "first-page": "Première page",
+      "last-page": "Dernière page",
+      "page": "Page",
+      "selected": "Page actuelle"
+    },
+    "nervos-dao": {
+      "free": "Gratuite",
+      "locked": "Fermé à clé",
+      "deposit": "Dépôt",
+      "deposit-records": "Dossiers de dépôt",
+      "apc": "APC",
+      "deposit-at": "Dépôt à {{time}}",
+      "fee": "Frais de transaction",
+      "deposit-to-nervos-dao": "Dépôt à Nervos DAO",
+      "withdraw-from-nervos-dao": "Se retirer de Nervos DAO",
+      "notice": "Remarquer",
+      "cancel": "Annuler",
+      "proceed": "Procéder",
+      "compensation": "Compensation",
+      "notice-wait-time": "Remarque: vous devez attendre {{epochs}} époques {{blocks}} blocs(~{{days}} jours) pour terminer le retrait.",
+      "deposit-dialog-title": "Dépôt Nervos DAO",
+      "deposit-terms": "Nervos DAO a besoin de 102 CKBytes pour le stockage des cellules de dépôt, ce qui n'est pas rémunérateur. Veuillez consulter le <0>Nervos DAO RFC</0> pour plus d'informations sur Nervos DAO",
+      "deposited-action-label": "Demande de retrait",
+      "withdrawing-action-label": "Se désister",
+      "minimal-fee-required": "La capacité de dépôt minimum est de {{minimal}} CKBytes",
+      "compensation-accumulated": "Compensation de {{blockNumber}} blocs accumulée",
+      "blocks-left": "{{epochs}} époques {{blocks}} blocs à gauche(~{{days}} jours)",
+      "withdraw-alert": "Astuce: ce ne sont que {{epochs}} époques (~ {{hours}} heures) jusqu'à la fin de votre période de verrouillage actuelle. Si vous souhaitez vous retirer dans la période de verrouillage actuelle, veuillez envoyer la demande de retrait à temps Il y a {{nextLeftEpochs}} époques (~{{days}} jours) jusqu'à la fin de votre prochaine période de verrouillage.",
+      "insufficient-period-alert-title": "L'en-tête référencé n'est pas valide",
+      "insufficient-period-alert-message": "Seul un en-tête mature peut être référencé dans les transactions (la maturité nécessite 4 époques, environ 16 heures)",
+      "explanation-of-epochs-period": "Période d'indemnisation",
+      "current-epochs-period": "Période d'indemnisation actuelle",
+      "progress": "Progrès: ",
+      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} époques",
+      "left-time": "Temps restant: environ {{leftDays}} jours {{leftHours}} heures",
+      "detailed-explanation-of-epochs-period": "Une période d'indemnisation dans Nervos DAO se compose de 180 époques (environ 30 jours). Les utilisateurs peuvent demander le déverrouillage de leurs dépôts à tout moment pendant chaque période d'indemnisation, puis retirer leurs dépôts et compensations lorsque cette période d'indemnisation se termine. Il convient de mentionner que les compensations seront cesser de s'accumuler dès que les utilisateurs appliquent le déverrouillage. Nous suggérons donc aux utilisateurs d'appliquer le déverrouillage pour leurs dépôts à un moment qui se termine suffisamment jusqu'à la fin d'une période de compensation.",
+      "terms-in-explanation-of-epochs-period": "Si vous n'avez pas appliqué le déverrouillage pendant cette période de compensation, la prochaine période de compensation commencera automatiquement.\nIl est suggéré aux utilisateurs d'appliquer le déverrouillage pendant les périodes JAUNES."
+    },
+    "updates": {
+      "check-updates": "Vérifier les mises à jour",
+      "checking-updates": "Vérification...",
+      "downloading-update": "Téléchargement de la mise à jour...",
+      "update-not-available": "Il n'y a actuellement aucune mise à jour disponible.",
+      "release-notes": "Notes de version:",
+      "updates-found-do-you-want-to-update": "Une mise à jour ({{version}}) est disponible, voulez-vous télécharger et installer maintenant?",
+      "download-update": "Installer la mise à jour",
+      "updates-downloaded-about-to-quit-and-install": "Mise à jour téléchargée. Prêt à installer et relancer.",
+      "quit-and-install": "Installer et relancer"
+    }
+  }
+}
