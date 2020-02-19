@@ -16,7 +16,7 @@ import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { ErrorCode, MAINNET_TAG } from 'utils/const'
-import { useOnDefaultContextMenu } from 'utils/hooks'
+import { useOnDefaultContextMenu, useExitOnWalletChange } from 'utils/hooks'
 import styles from './transaction.module.scss'
 
 const Transaction = () => {
@@ -80,13 +80,7 @@ const Transaction = () => {
     }
   }, [t])
 
-  useEffect(() => {
-    window.addEventListener('storage', (e: StorageEvent) => {
-      if (e.key === 'currentWallet') {
-        window.close()
-      }
-    })
-  }, [])
+  useExitOnWalletChange()
 
   const onExplorerBtnClick = useCallback(() => {
     const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'

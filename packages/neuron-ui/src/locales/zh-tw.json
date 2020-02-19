@@ -414,6 +414,20 @@
       "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
       "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
       "timezone": "時區"
+    },
+    "sign-and-verify": {
+      "sign-or-verify-message": "簽名/驗簽信息",
+      "message": "信息",
+      "address": "地址",
+      "signature": "簽名",
+      "cancel": "取消",
+      "sign": "簽名",
+      "verify": "驗證",
+      "password": "密碼",
+      "confirm": "確認",
+      "verification-success": "驗證成功",
+      "verification-failure": "驗證失敗",
+      "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。"
     }
   }
 }

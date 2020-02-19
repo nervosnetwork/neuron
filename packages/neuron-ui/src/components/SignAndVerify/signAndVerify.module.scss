@@ -1,0 +1,212 @@
+@import '../../styles/mixin.scss';
+$inputHeight: 26px;
+
+.container {
+  padding: 40px 40px 50px;
+
+  .title {
+    @include BoldText;
+  }
+
+  .label {
+    @include MediumText;
+    margin: 0 0 4px 0;
+    padding: 0;
+  }
+
+  input,
+  textarea {
+    @include RegularText;
+    font-size: 12px !important;
+    display: block;
+    resize: unset;
+    width: 100%;
+    border: 1px solid #000;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    margin-bottom: 18px;
+  }
+
+  textarea {
+    height: 74px;
+  }
+
+  input {
+    height: $inputHeight;
+  }
+}
+
+.actions {
+  @include dialogFooter;
+  margin-top: 35px;
+
+  button {
+    margin-left: 9px;
+  }
+}
+
+.address {
+  position: relative;
+
+  .dropdownBtn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #d8d8d8;
+    border: 1px solid #000;
+    box-sizing: border-box;
+    height: $inputHeight;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+
+    img {
+      transform: scale(0.4);
+    }
+  }
+
+  .addrList {
+    @include SemiBoldText;
+    box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.23);
+    background-color: #ffffff;
+    max-height: 280px;
+    overflow: auto;
+    width: 100%;
+    font-size: 12px !important;
+    position: absolute;
+    top: calc(100% - 1px);
+    left: 0;
+    max-height: 280px;
+    transition: all 0.1s linear;
+    max-height: 0;
+    opacity: 0;
+
+    .addrOpt {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: $inputHeight;
+      padding: 0 12px;
+
+      * {
+        pointer-events: none;
+      }
+
+      span {
+        font-size: inherit;
+      }
+
+      &>span:nth-child(2) {
+        @include SemiBoldText;
+        padding: 0px 5px;
+        flex: 1;
+
+        &:before {
+          content: '('
+        }
+
+        &:after {
+          content: ')'
+        }
+      }
+
+      .addrType {
+        @include RegularText;
+        color: var(--nervos-green);
+        display: block;
+        width: 65px;
+        text-align: left;
+
+        &[data-type="1"] {
+          color: #6666cc;
+        }
+      }
+
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+    }
+  }
+
+  &:focus-within {
+    .dropdownBtn {
+      transform: rotate(180deg);
+    }
+
+    .addrList {
+      max-height: 280px;
+      opacity: 1;
+    }
+  }
+}
+
+.dialogContainer {
+  @include overlay;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+
+  .dialog {
+    @include dialogContainer;
+    padding: 57px 73px;
+    background-color: #fff;
+    min-width: auto;
+  }
+}
+
+.passwordDialog {
+  width: 400px;
+
+  h2 {
+    @include BoldText;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.9px;
+    margin: 0 0 15px 0;
+  }
+
+  input {
+    margin: auto;
+  }
+
+  .actions {
+    @include dialogFooter;
+  }
+}
+
+.resultDialog,
+.addressNotFound {
+  img {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 15px;
+  }
+
+  @include SemiBoldText;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.addressNotFound {
+  @include MediumText;
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+
+  button {
+    margin-top: 17px;
+    height: 30px;
+  }
+}

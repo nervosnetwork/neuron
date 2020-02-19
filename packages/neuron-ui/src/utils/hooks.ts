@@ -177,4 +177,24 @@ export const useOnDefaultContextMenu = (t: TFunction) =>
     openContextMenu(contextMenuTemplate)
   }, [t])
 
-export default { useGoBack, useLocalDescription, useCalculateEpochs, useDialog, useOnDefaultContextMenu }
+export const useExitOnWalletChange = () => {
+  const listener = (e: StorageEvent) => {
+    if (e.key === 'currentWallet') {
+      window.close()
+    }
+  }
+  return useEffect(() => {
+    window.addEventListener('storage', listener)
+    return () => {
+      window.removeEventListener('storage', listener)
+    }
+  }, [])
+}
+export default {
+  useGoBack,
+  useLocalDescription,
+  useCalculateEpochs,
+  useDialog,
+  useOnDefaultContextMenu,
+  useExitOnWalletChange,
+}

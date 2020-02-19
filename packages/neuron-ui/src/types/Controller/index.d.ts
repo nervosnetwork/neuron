@@ -128,4 +128,17 @@ declare namespace Controller {
     }
     feeRate: string
   }
+
+  interface SignMessageParams {
+    walletID: string
+    address: string
+    password: string
+    message: string
+  }
+
+  interface VerifyMessageParams {
+    address: string
+    signature: string
+    message: string
+  }
 }

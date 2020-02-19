@@ -23,7 +23,7 @@ $error-red: #d50000;
   }
 
   label {
-    @include RegularText;
+    @include MediumText;
     grid-area: label;
     font-size: 0.875rem;
     line-height: 1.125rem;

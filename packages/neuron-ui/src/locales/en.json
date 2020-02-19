@@ -414,6 +414,20 @@
       "nov": { "full": "November", "short": "Nov.", "tag": "N" },
       "dec": { "full": "December", "short": "Dec.", "tag": "D" },
       "timezone": "Time Zone"
+    },
+    "sign-and-verify": {
+      "sign-or-verify-message": "Sign or Verify Message",
+      "message": "Message",
+      "address": "Address",
+      "signature": "Signature",
+      "cancel": "Cancel",
+      "sign": "Sign",
+      "verify": "Verify",
+      "password": "Password",
+      "confirm": "Confirm",
+      "verification-success": "Verification Succeeded",
+      "verification-failure": "Verification Failed",
+      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
     }
   }
 }
