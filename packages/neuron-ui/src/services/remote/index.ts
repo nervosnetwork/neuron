@@ -58,7 +58,9 @@ export const openExternal = (url: string) => {
   }
 }
 
-export const openContextMenu = (template: { label: string; click: Function }[]): void => {
+export const openContextMenu = (
+  template: ({ label: string; click: Function } | { role: string } | { type: string })[]
+): void => {
   if (!window.remote) {
     window.alert(REMOTE_MODULE_NOT_FOUND)
   } else {

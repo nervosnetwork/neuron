@@ -63,9 +63,10 @@ const initCkb = async () => {
 export const startCkbNode = async () => {
   initCkb().then(async () => {
     logger.info('Starting CKB...')
-    ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()])
+    ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
     ckb.stderr && ckb.stderr.on('data', data => {
       logger.error('CKB run fail:', data.toString())
+      ckb = null
     })
 
     ckb.on('error', error => {

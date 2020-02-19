@@ -44,6 +44,8 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
 
   const onContextMenu = useCallback(
     (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e.stopPropagation()
+      e.preventDefault()
       const { networkId } = (e.target as HTMLElement).dataset
       const item = networks.find(n => n.id === networkId)
       if (item) {

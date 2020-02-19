@@ -3,6 +3,12 @@
     "launch-screen": {
       "loading-wallets": "錢包加載中"
     },
+    "contextmenu": {
+      "cut": "剪切",
+      "copy": "複製",
+      "paste": "粘貼",
+      "selectall": "全部選中"
+    },
     "navbar": {
       "overview": "總覽",
       "wallet": "錢包",
@@ -295,7 +301,6 @@
         "keystore-password": "密碼",
         "deposit": "存入金額"
       },
-      "run-ckb-guide": "如何運行一個 CKB 節點？",
       "codes": {
         "-3": "",
         "100": "餘額不足。",
