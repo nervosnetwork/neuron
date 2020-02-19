@@ -27,17 +27,22 @@ declare module Controller {
       walletID: string
     }
 
-    interface GetSingleMultiSignCellsParams {
+    interface GetCustomizedAssetCellsParams {
       walletID: string
       pageNo: number
       pageSize: number
     }
 
-    interface GenerateWithdrawMultiSignTxParams {
-      walletID: string,
-      outPoint: OutPoint,
-      fee: string,
+    interface GenerateWithdrawCustomizedCellTxParams {
+      walletID: string
+      outPoint: OutPoint
+      fee: string
       feeRate: string
+      customizedAssetInfo: {
+        lock: string
+        type: string
+        data: string
+      }
     }
 
     interface BackupWallet {

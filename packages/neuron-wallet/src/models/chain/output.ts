@@ -11,6 +11,13 @@ export enum OutputStatus {
   Failed = 'failed',
 }
 
+// empty string '' means not customized lock / type / data
+export interface CustomizedAssetInfo {
+  lock: string
+  type: string
+  data: string
+}
+
 export default class Output {
   public capacity: string
   public lock: Script
@@ -27,6 +34,8 @@ export default class Output {
   public depositOutPoint?: OutPoint
   public depositTimestamp?: string
   public multiSignBlake160?: string | null
+
+  public customizedAssetInfo?: CustomizedAssetInfo
 
   // check hex number
   constructor(
@@ -151,6 +160,10 @@ export default class Output {
 
   public setMultiSignBlake160(value: string) {
     this.multiSignBlake160 = value
+  }
+
+  public setCustomizedAssetInfo(value: CustomizedAssetInfo) {
+    this.customizedAssetInfo = value
   }
 
   public calculateBytesize(): number {

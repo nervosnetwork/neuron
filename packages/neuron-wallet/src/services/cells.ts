@@ -19,6 +19,10 @@ export interface PaginationResult<T = any> {
   items: T[]
 }
 
+export enum CustomizedLock {
+  SingleMultiSign = "SingleMultiSign"
+}
+
 export default class CellsService {
   // exclude hasData = true and typeScript != null
   public static getBalance = async (
@@ -112,7 +116,15 @@ export default class CellsService {
       .take(pageSize)
       .getMany()
 
-    const cells: Cell[] = outputs.map(o => o.toModel())
+    const cells: Cell[] = outputs.map(o => {
+      const cell = o.toModel()
+      cell.setCustomizedAssetInfo({
+        lock: CustomizedLock.SingleMultiSign,
+        type: '',
+        data: ''
+      })
+      return cell
+    })
 
     return {
       totalCount: totalCount || 0,

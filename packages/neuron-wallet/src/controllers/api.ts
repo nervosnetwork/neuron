@@ -19,7 +19,7 @@ import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
-import SingleMultiSignController from './single-multi-sign'
+import CustomizedAssetsController from './customized-assets'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -27,7 +27,7 @@ export default class ApiController {
   private transactionsController = new TransactionsController()
   private daoController = new DaoController()
   private networksController = new NetworksController()
-  private singleMultiSignController = new SingleMultiSignController()
+  private customizedAssetsController = new CustomizedAssetsController()
 
   public async mount() {
     this.registerHandlers()
@@ -244,13 +244,13 @@ export default class ApiController {
       return this.daoController.withdrawFromDao(params)
     })
 
-    // SingleMultiSign
-    handle('get-single-multi-sign-cells', async (_, params: Controller.Params.GetSingleMultiSignCellsParams) => {
-      return this.singleMultiSignController.getSingleMultiSignCells(params)
+    // Customized Asset
+    handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
+      return this.customizedAssetsController.getCustomizedAssetCells(params)
     })
 
-    handle('generate-withdraw-multi-sign-tx', async (_, params: Controller.Params.GenerateWithdrawMultiSignTxParams) => {
-      return this.singleMultiSignController.generateWithdrawMultiSignTx(params)
+    handle('generate-withdraw-customized-cell-tx', async (_, params: Controller.Params.GenerateWithdrawCustomizedCellTxParams) => {
+      return this.customizedAssetsController.generateWithdrawCustomizedCellTx(params)
     })
 
     // Networks
