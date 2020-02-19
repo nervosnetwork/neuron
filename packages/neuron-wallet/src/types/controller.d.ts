@@ -33,6 +33,13 @@ declare module Controller {
       pageSize: number
     }
 
+    interface GenerateWithdrawMultiSignTxParams {
+      walletID: string,
+      outPoint: OutPoint,
+      fee: string,
+      feeRate: string
+    }
+
     interface BackupWallet {
       id: string
       password: string

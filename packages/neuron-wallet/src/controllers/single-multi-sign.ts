@@ -3,6 +3,8 @@ import CellsService, { PaginationResult } from "services/cells"
 import Cell from 'models/chain/output'
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
+import Transaction from "models/chain/transaction"
+import TransactionSender from "services/transaction-sender"
 
 export default class SingleMultiSignController {
   public async getSingleMultiSignCells(
@@ -20,6 +22,26 @@ export default class SingleMultiSignController {
     return {
       status: ResponseCode.Success,
       result,
+    }
+  }
+
+  public async generateWithdrawMultiSignTx(
+    params: Controller.Params.GenerateWithdrawMultiSignTxParams
+  ): Promise<Controller.Response<Transaction>> {
+    const tx = await new TransactionSender().generateWithdrawMultiSignTx(
+      params.walletID,
+      params.outPoint,
+      params.fee,
+      params.feeRate
+    )
+
+    if (!tx) {
+      throw new ServiceHasNoResponse('GenerateWithdrawMultiSignTx')
+    }
+
+    return {
+      status: ResponseCode.Success,
+      result: tx,
     }
   }
 }

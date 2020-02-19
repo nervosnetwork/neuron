@@ -249,6 +249,10 @@ export default class ApiController {
       return this.singleMultiSignController.getSingleMultiSignCells(params)
     })
 
+    handle('generate-withdraw-multi-sign-tx', async (_, params: Controller.Params.GenerateWithdrawMultiSignTxParams) => {
+      return this.singleMultiSignController.generateWithdrawMultiSignTx(params)
+    })
+
     // Networks
 
     handle('get-all-networks', async () => {
