@@ -9,9 +9,10 @@ import { openExternal, openContextMenu } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
 import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { Routes, MAINNET_TAG } from 'utils/const'
+import { Routes } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import getExplorerUrl from 'utils/getExplorerUrl'
+import isMainnetUtil from 'utils/isMainnet'
 import styles from './addresses.module.scss'
 
 const Addresses = () => {
@@ -24,7 +25,7 @@ const Addresses = () => {
   const [t] = useTranslation()
   const history = useHistory()
 
-  const isMainnet = (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
+  const isMainnet = isMainnetUtil(networks, networkID)
 
   useEffect(() => {
     backToTop()

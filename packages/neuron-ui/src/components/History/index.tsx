@@ -7,7 +7,8 @@ import { Pagination } from '@uifabric/experiments'
 import TransactionList from 'components/TransactionList'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
-import { Routes, MAINNET_TAG } from 'utils/const'
+import { Routes } from 'utils/const'
+import isMainnetUtil from 'utils/isMainnet'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
@@ -30,10 +31,7 @@ const History = () => {
   const [t] = useTranslation()
   const history = useHistory()
   const { search } = useLocation()
-  const isMainnet = useMemo(() => {
-    const network = networks.find(n => n.id === networkID)
-    return !!(network && network.chain === MAINNET_TAG)
-  }, [networks, networkID])
+  const isMainnet = isMainnetUtil(networks, networkID)
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
   useEffect(() => {
