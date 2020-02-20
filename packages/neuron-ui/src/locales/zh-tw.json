@@ -113,7 +113,10 @@
       "price": "單價",
       "expected-speed": "預期成交速度",
       "total-cycles": "RISC-V Cycles 總數",
-      "scan-screen-qr-code": "掃描荧幕上的二維碼"
+      "scan-screen-qr-code": "掃描荧幕上的二維碼",
+      "set-locktime": "設置鎖定時間",
+      "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差",
+      "release-on": "鎖定至"
     },
     "receive": {
       "click-to-copy": "點擊複製地址",
@@ -261,7 +264,8 @@
       "backup": "備份",
       "edit": "編輯",
       "delete": "删除",
-      "click-to-edit": "點擊編輯"
+      "click-to-edit": "點擊編輯",
+      "notice": "注意事項"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -310,6 +314,7 @@
         "104": "未連接到節點，請重啓 Neuron。",
         "105": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者點擊 'Max' 按鈕發送全部餘額。",
         "106": "您需要有足够的餘額來支付找零(至少61 CKBytes)，或者拖動滑塊到最右端發送全部餘額。",
+        "107": "金額 {{amount}} CKB 太小，含锁定時間转账需要輸入一個不小於 69 CKB 的值。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太長，其長度應不超過 {{length}}。",
@@ -407,7 +412,8 @@
       "sept": { "full": "九月", "short": "九月", "tag": "九月" },
       "oct": { "full": "十月", "short": "十月", "tag": "十月" },
       "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
-      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" }
+      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
+      "timezone": "時區"
     }
   }
 }

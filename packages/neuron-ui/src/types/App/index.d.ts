@@ -48,6 +48,7 @@ declare namespace State {
     readonly address: string | undefined
     readonly amount: string | undefined
     readonly unit: any
+    readonly date?: string
   }
   type MessageType = 'success' | 'warning' | 'alert'
   interface Message<Code = number, Meta = Readonly<{ [key: string]: string | undefined }>> {

@@ -45,6 +45,9 @@
   color: #fff;
   font-size: 0.75rem;
   letter-spacing: 0.6px;
+  &:hover{
+    background-color: #21b574;
+  }
 }
 
 @mixin overlay {

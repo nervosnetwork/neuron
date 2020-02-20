@@ -202,8 +202,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.UpdateSendOutput: {
       /**
-       * payload:{ idx, item: { address, capacity } }
+       * payload:{ idx, item: { address, capacity, date } }
        */
+      if ('address' in action.payload.item) {
+        Object.assign(state.app.send.outputs[action.payload.idx], { date: undefined })
+      }
       Object.assign(state.app.send.outputs[action.payload.idx], action.payload.item)
       state.app.messages.send = null
       break
