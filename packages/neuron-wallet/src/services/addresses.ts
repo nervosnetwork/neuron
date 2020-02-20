@@ -7,7 +7,7 @@ import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NodeService from './node'
 import NetworksService from 'services/networks'
 
-const MAX_ADDRESS_COUNT = 30
+const MAX_ADDRESS_COUNT = 100
 
 export interface AddressMetaInfo {
   walletId: string

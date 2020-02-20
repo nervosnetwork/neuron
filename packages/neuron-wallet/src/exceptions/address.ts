@@ -18,4 +18,10 @@ export class TestnetAddressRequired extends Error {
   }
 }
 
-export default { InvalidAddress, MainnetAddressRequired, TestnetAddressRequired }
+export class AddressNotFound extends Error {
+  constructor() {
+    super(i18n.t('address-not-found'))
+  }
+}
+
+export default { InvalidAddress, MainnetAddressRequired, TestnetAddressRequired, AddressNotFound }
