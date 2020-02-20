@@ -77,7 +77,7 @@ export class TransactionsService {
       return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
     }
     if (type === SearchType.Date) {
-      const beginTimestamp = +new Date(value)
+      const beginTimestamp = +new Date(new Date(value).toDateString())
       const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
       return [
         `${
