@@ -122,4 +122,9 @@ describe(`SignAndVerify`, () => {
     const result = SignAndVerify.verify(info.address, info.sigBase64, info.message)
     expect(result).toBeTruthy()
   })
+
+  it('verify false', () => {
+    const result = SignAndVerify.verify(signInfo.address, info.sigBase64, info.message)
+    expect(result).toBeFalsy()
+  })
 })
