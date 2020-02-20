@@ -6,13 +6,15 @@ type SyncChannel =
 
 // Handle channel messages from sync renderer process
 export default class SyncApiController {
+  #syncedBlockNumber = new SyncedBlockNumber()
+
   public async mount() {
     this.registerHandlers()
   }
 
   private registerHandlers() {
     this.handle('synced-block-number-updated', async (_, blockNumber) => {
-      new SyncedBlockNumber().setNextBlock(BigInt(blockNumber))
+      this.#syncedBlockNumber.setNextBlock(BigInt(blockNumber))
     })
   }
 
