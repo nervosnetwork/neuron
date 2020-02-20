@@ -43,6 +43,7 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
+    "@bit/primefaces.primereact.calendar": "3.1.8",
     "@nervosnetwork/ckb-sdk-core": "0.27.1",
     "@uifabric/experiments": "7.18.6",
     "@uifabric/styling": "7.7.3",

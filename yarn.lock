@@ -980,6 +980,67 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@bit/primefaces.primereact.button@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.button/-/primefaces.primereact.button-3.1.8.tgz#1a1947f8769b18221dadeba1b261da86ae509631"
+  integrity sha1-GhlH+HabGCIdreuhsmHahq5QljE=
+  dependencies:
+    "@bit/primefaces.primereact.internal.utild" "3.1.8"
+    "@bit/primefaces.primereact.tooltip" "3.1.8"
+    classnames "^2.2.6"
+    prop-types "^15.6.2"
+    react "^16.6.3"
+
+"@bit/primefaces.primereact.calendar@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.calendar/-/primefaces.primereact.calendar-3.1.8.tgz#e982fbc411522855552ad6b8c8d4be7304a62d92"
+  integrity sha1-6YL7xBFSKFVVKta4yNS+cwSmLZI=
+  dependencies:
+    "@bit/primefaces.primereact.button" "3.1.8"
+    "@bit/primefaces.primereact.inputtext" "3.1.8"
+    "@bit/primefaces.primereact.tooltip" "3.1.8"
+    "@bit/primefaces.primereact.utils.dom-handler" "3.1.8"
+    classnames "^2.2.6"
+    prop-types "^15.6.2"
+    react "^16.6.3"
+    react-dom "^16.6.3"
+
+"@bit/primefaces.primereact.inputtext@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.inputtext/-/primefaces.primereact.inputtext-3.1.8.tgz#6580405dc14e1f63e77bde328f75367e6fe39bbf"
+  integrity sha1-ZYBAXcFOH2Pne94yj3U2fm/jm78=
+  dependencies:
+    "@bit/primefaces.primereact.keyfilter" "3.1.8"
+    "@bit/primefaces.primereact.tooltip" "3.1.8"
+    "@bit/primefaces.primereact.utils.dom-handler" "3.1.8"
+    classnames "^2.2.6"
+    prop-types "^15.6.2"
+    react "^16.6.3"
+
+"@bit/primefaces.primereact.internal.utild@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.internal.utild/-/primefaces.primereact.internal.utild-3.1.8.tgz#22cfabece052cb77732f346b7717599cfe9ac555"
+  integrity sha1-Is+r7OBSy3dzLzRrdxdZnP6axVU=
+
+"@bit/primefaces.primereact.keyfilter@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.keyfilter/-/primefaces.primereact.keyfilter-3.1.8.tgz#d58b722533e65d5188c0b6d77ed4a270617b5e9e"
+  integrity sha1-1YtyJTPmXVGIwLbXftSicGF7Xp4=
+  dependencies:
+    "@bit/primefaces.primereact.utils.dom-handler" "3.1.8"
+
+"@bit/primefaces.primereact.tooltip@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.tooltip/-/primefaces.primereact.tooltip-3.1.8.tgz#1dda8f20c375233b147779b785a32a313deba210"
+  integrity sha1-HdqPIMN1IzsUd3m3haMqMT3rohA=
+  dependencies:
+    "@bit/primefaces.primereact.utils.dom-handler" "3.1.8"
+
+"@bit/primefaces.primereact.utils.dom-handler@3.1.8":
+  version "3.1.8"
+  resolved "https://node.bit.dev/primefaces.primereact.utils.dom-handler/-/primefaces.primereact.utils.dom-handler-3.1.8.tgz#02a740dbe15d1f47aa412ade327e394d425a412f"
+  integrity sha1-AqdA2+FdH0eqQSreMn45TUJaQS8=
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.3.tgz#099139eaec7ebf07a27c1786a3ff64f39464d2ef"
@@ -5999,7 +6060,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5:
+classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
   integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
@@ -15763,7 +15824,7 @@ react-docgen@^5.0.0:
     node-dir "^0.1.10"
     strip-indent "^3.0.0"
 
-react-dom@16.12.0, react-dom@^16.8.3:
+react-dom@16.12.0, react-dom@^16.6.3, react-dom@^16.8.3:
   version "16.12.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.12.0.tgz#0da4b714b8d13c2038c9396b54a92baea633fe11"
   integrity sha512-LMxFfAGrcS3kETtQaCkTKjMiifahaMySFDn71fZUNpPHZQEzmk/GiAeIT8JSOrHB23fnuCOMruL2a8NYlw+8Gw==
@@ -16056,7 +16117,7 @@ react-transition-group@^2.2.1:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react@16.12.0, react@^16.8.3:
+react@16.12.0, react@^16.6.3, react@^16.8.3:
   version "16.12.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.12.0.tgz#0c0a9c6a142429e3614834d5a778e18aa78a0b83"
   integrity sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA==

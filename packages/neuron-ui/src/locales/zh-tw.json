@@ -387,6 +387,27 @@
       "download-update": "下載安裝",
       "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
       "quit-and-install": "安裝並重啓應用"
+    },
+    "datetime": {
+      "mon": { "full": "周一", "short": "周一", "tag": "周一" },
+      "tue": { "full": "周二", "short": "周二", "tag": "周二" },
+      "wed": { "full": "周三", "short": "周三", "tag": "周三" },
+      "thus": { "full": "周四", "short": "周四", "tag": "周四" },
+      "fri": { "full": "周五", "short": "周五", "tag": "周五" },
+      "sat": { "full": "周六", "short": "周六", "tag": "周六" },
+      "sun": { "full": "周日", "short": "周日", "tag": "周日" },
+      "jan": { "full": "一月", "short": "一月", "tag": "一月" },
+      "feb": { "full": "二月", "short": "二月", "tag": "二月" },
+      "mar": { "full": "三月", "short": "三月", "tag": "三月" },
+      "apr": { "full": "四月", "short": "四月", "tag": "四月" },
+      "may": { "full": "五月", "short": "五月", "tag": "五月" },
+      "june": { "full": "六月", "short": "六月", "tag": "六月" },
+      "july": { "full": "七月", "short": "七月", "tag": "七月" },
+      "aug": { "full": "八月", "short": "八月", "tag": "八月" },
+      "sept": { "full": "九月", "short": "九月", "tag": "九月" },
+      "oct": { "full": "十月", "short": "十月", "tag": "十月" },
+      "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
+      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" }
     }
   }
 }
