@@ -12,6 +12,8 @@ import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
+import MultiSignUtils from 'models/multi-sign-utils'
+import MultiSign from 'models/multi-sign'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
@@ -53,12 +55,18 @@ const syncNetwork = async (rescan = false) => {
   if (network.genesisHash !== EMPTY_GENESIS_HASH) {
     if (backgroundWindow) {
       const lockHashes = await AddressService.allLockHashes(network.remote)
+      const multiSignCodeHash: string = (await MultiSignUtils.multiSignScript()).codeHash
+      const blake160s = AddressService.allAddresses().map(address => address.blake160)
+      const multiSign = new MultiSign()
+      const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
       backgroundWindow.webContents.send(
         "block-sync:start",
          network.remote,
          network.genesisHash,
          lockHashes,
-         startBlockNumber
+         startBlockNumber,
+         multiSignCodeHash,
+         multiSignBlake160s
         )
     }
     // re init txCount in addresses if switch network

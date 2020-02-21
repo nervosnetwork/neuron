@@ -29,6 +29,13 @@ export default class MultiSign {
     return this.hash(blake160) + this.since(minutes, headerEpoch).slice(2)
   }
 
+  parseSince(args: string): bigint {
+    const str = args.slice(42)
+    const buf = Buffer.from(str, 'hex')
+    const sin: bigint = buf.readBigUInt64LE()
+    return sin
+  }
+
   private epochSince(length: bigint, index: bigint, number: bigint): bigint {
     return (BigInt(0x20) << BigInt(56)) + (length << BigInt(40)) + (index << BigInt(24)) + number
   }

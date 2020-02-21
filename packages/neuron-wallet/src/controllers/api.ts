@@ -20,6 +20,7 @@ import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
+import CustomizedAssetsController from './customized-assets'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -28,6 +29,7 @@ export default class ApiController {
   private daoController = new DaoController()
   private networksController = new NetworksController()
   private signAndVerifyController = new SignMessageController()
+  private customizedAssetsController = new CustomizedAssetsController()
 
   public async mount() {
     this.registerHandlers()
@@ -242,6 +244,15 @@ export default class ApiController {
 
     handle('withdraw-from-dao', async (_, params: { walletID: string, depositOutPoint: OutPoint, withdrawingOutPoint: OutPoint, fee: string, feeRate: string }) => {
       return this.daoController.withdrawFromDao(params)
+    })
+
+    // Customized Asset
+    handle('get-customized-asset-cells', async (_, params: Controller.Params.GetCustomizedAssetCellsParams) => {
+      return this.customizedAssetsController.getCustomizedAssetCells(params)
+    })
+
+    handle('generate-withdraw-customized-cell-tx', async (_, params: Controller.Params.GenerateWithdrawCustomizedCellTxParams) => {
+      return this.customizedAssetsController.generateWithdrawCustomizedCellTx(params)
     })
 
     // Networks

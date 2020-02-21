@@ -48,6 +48,13 @@ describe('TransactionSize', () => {
     ).toEqual(4 + 4)
   })
 
+  it('singleMultiSignWitness', () => {
+    // 24 bytes larger than secp, for serialized multi sign script
+    expect(
+      TransactionSize.singleMultiSignWitness()
+    ).toEqual(85 + 20 + 4 + 4 + 4)
+  })
+
   it('empty outputData', () => {
     const data = "0x"
     const length = TransactionSize.outputData(data)

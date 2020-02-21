@@ -387,6 +387,27 @@
       "download-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
+    },
+    "datetime": {
+      "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
+      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "T" },
+      "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
+      "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
+      "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
+      "sat": { "full": "Saturday", "short": "Sat.", "tag": "S" },
+      "sun": { "full": "Sunday", "short": "Sun.", "tag": "S" },
+      "jan": { "full": "January", "short": "Jan.", "tag": "J" },
+      "feb": { "full": "Febrary", "short": "Feb.", "tag": "F" },
+      "mar": { "full": "March", "short": "Mar.", "tag": "M" },
+      "apr": { "full": "April", "short": "Apr.", "tag": "A" },
+      "may": { "full": "May", "short": "May.", "tag": "M" },
+      "june": { "full": "June", "short": "June.", "tag": "J" },
+      "july": { "full": "July", "short": "July.", "tag": "J" },
+      "aug": { "full": "August", "short": "Aug.", "tag": "A" },
+      "sept": { "full": "September", "short": "Sept.", "tag": "S" },
+      "oct": { "full": "October", "short": "Oct.", "tag": "O" },
+      "nov": { "full": "November", "short": "Nov.", "tag": "N" },
+      "dec": { "full": "December", "short": "Dec.", "tag": "D" }
     }
   }
 }
