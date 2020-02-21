@@ -11,6 +11,13 @@ export enum OutputStatus {
   Failed = 'failed',
 }
 
+// empty string '' means not customized lock / type / data
+export interface CustomizedAssetInfo {
+  lock: string
+  type: string
+  data: string
+}
+
 export default class Output {
   public capacity: string
   public lock: Script
@@ -26,6 +33,9 @@ export default class Output {
   public blockHash?: string | null
   public depositOutPoint?: OutPoint
   public depositTimestamp?: string
+  public multiSignBlake160?: string | null
+
+  public customizedAssetInfo?: CustomizedAssetInfo
 
   // check hex number
   constructor(
@@ -42,7 +52,8 @@ export default class Output {
     blockNumber?: string | null,
     blockHash?: string | null,
     depositOutPoint?: OutPoint,
-    depositTimestamp?: string
+    depositTimestamp?: string,
+    multiSignBlake160?: string | null
   ) {
     this.capacity = BigInt(capacity).toString()
     this.lock = lock
@@ -54,6 +65,7 @@ export default class Output {
     this.daoData = daoData
     this.blockHash = blockHash
     this.depositOutPoint = depositOutPoint
+    this.multiSignBlake160 = multiSignBlake160
 
     // if daoData exists, data should equals to daoData
     this.data = this.daoData || data || '0x'
@@ -81,7 +93,8 @@ export default class Output {
       blockNumber,
       blockHash,
       depositOutPoint,
-      depositTimestamp
+      depositTimestamp,
+      multiSignBlake160,
     }: {
       capacity: string
       data?: string
@@ -97,6 +110,7 @@ export default class Output {
       blockHash?: string | null
       depositOutPoint?: OutPoint
       depositTimestamp?: string
+      multiSignBlake160?: string | null
     }
   ): Output {
     return new Output(
@@ -113,7 +127,8 @@ export default class Output {
       blockNumber,
       blockHash,
       depositOutPoint ? OutPoint.fromObject(depositOutPoint) : depositOutPoint,
-      depositTimestamp
+      depositTimestamp,
+      multiSignBlake160
     )
   }
 
@@ -136,6 +151,19 @@ export default class Output {
 
   public setDepositTimestamp(value: string) {
     this.depositTimestamp = value
+  }
+
+  public setLock(value: Script) {
+    this.lock = value
+    this.lockHash = value.computeHash()
+  }
+
+  public setMultiSignBlake160(value: string) {
+    this.multiSignBlake160 = value
+  }
+
+  public setCustomizedAssetInfo(value: CustomizedAssetInfo) {
+    this.customizedAssetInfo = value
   }
 
   public calculateBytesize(): number {

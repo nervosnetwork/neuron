@@ -56,6 +56,12 @@ export default class Input extends BaseEntity {
   })
   inputIndex: string | null = null
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  multiSignBlake160: string | null = null
+
   public previousOutput(): OutPoint | null {
     if (!this.outPointTxHash || !this.outPointIndex) {
       return null
@@ -74,6 +80,7 @@ export default class Input extends BaseEntity {
       this.lock,
       this.lockHash,
       this.inputIndex,
+      this.multiSignBlake160
     )
   }
 }

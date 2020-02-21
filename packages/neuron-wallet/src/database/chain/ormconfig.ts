@@ -19,6 +19,7 @@ import { AddOutputIndex1572226722928 } from './migrations/1572226722928-AddOutpu
 import { AddTypeHashToOutput1572852964749 } from './migrations/1572852964749-AddTypeHashToOutput'
 import { AddDepositOutPointToOutput1573305225465 } from './migrations/1573305225465-AddDepositOutPointToOutput'
 import { AddInputIndexToInput1573461100330 } from './migrations/1573461100330-AddInputIndexToInput'
+import { AddMultiSignBlake1601581405459272 } from './migrations/1581405459272-AddMultiSignBlake160'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -50,6 +51,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddTypeHashToOutput1572852964749,
       AddDepositOutPointToOutput1573305225465,
       AddInputIndexToInput1573461100330,
+      AddMultiSignBlake1601581405459272,
     ],
     logging,
     maxQueryExecutionTime: 30

@@ -92,7 +92,8 @@ export default {
       'cell-is-not-yet-live': '请耐心等待上一笔交易被区块链确认。',
       'transaction-is-not-committed-yet': '无法在链上找到交易所需要的 cell，请确保相关的交易已经被区块链确认。',
       'mainnet-address-required': '{{address}} 不是主网地址。',
-      'testnet-address-required': '{{address}} 不是测试网地址。'
+      'testnet-address-required': '{{address}} 不是测试网地址。',
+      'address-not-found': '当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。'
     },
     messageBox: {
       button: {

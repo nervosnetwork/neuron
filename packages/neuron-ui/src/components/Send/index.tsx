@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Label, Text, List } from 'office-ui-fabric-react'
+import { ckbCore } from 'services/chain'
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
@@ -8,12 +9,26 @@ import Spinner from 'widgets/Spinner'
 import { ReactComponent as Scan } from 'widgets/Icons/Scan.svg'
 import AddOutput from 'widgets/Icons/AddOutput.png'
 import RemoveOutput from 'widgets/Icons/RemoveOutput.png'
+import Edit from 'widgets/Icons/Edit.png'
+import ActiveEdit from 'widgets/Icons/ActiveEdit.png'
+import Trash from 'widgets/Icons/Trash.png'
+import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
+import Calendar from 'widgets/Icons/Calendar.png'
+import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import appState from 'states/initStates/app'
 
-import { PlaceHolders, ErrorCode, MAX_DECIMAL_DIGITS, MAINNET_TAG, SyncStatus, ConnectionStatus } from 'utils/const'
+import {
+  PlaceHolders,
+  ErrorCode,
+  MAX_DECIMAL_DIGITS,
+  MAINNET_TAG,
+  SyncStatus,
+  ConnectionStatus,
+  SINCE_FIELD_SIZE,
+} from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import {
@@ -24,6 +39,7 @@ import {
   verifyAddress,
 } from 'utils/validators'
 
+import DatetimePicker from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -49,6 +65,7 @@ const Send = () => {
     useOnTransactionChange,
     onItemChange,
     onSubmit,
+    updateTransactionOutput,
     addTransactionOutput,
     removeTransactionOutput,
     updateTransactionPrice,
@@ -60,6 +77,29 @@ const Send = () => {
     onSendMaxClick,
     onScan,
   } = useInitialize(walletID, send.outputs, send.generatedTx, send.price, sending, dispatch, t)
+
+  const [locktimeIndex, setLocktimeIndex] = useState<number>(-1)
+
+  const onLocktimeClick = useCallback(
+    e => {
+      const {
+        dataset: { index },
+      } = e.target
+      setLocktimeIndex(index)
+    },
+    [setLocktimeIndex]
+  )
+
+  const onRemoveLocktime = useCallback(
+    e => {
+      const {
+        dataset: { index },
+      } = e.target
+      updateTransactionOutput('date')(index)(undefined)
+    },
+    [updateTransactionOutput]
+  )
+
   useOnTransactionChange(walletID, outputs, send.price, dispatch, isSendMax, setTotalAmount, setErrorMessage, t)
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
@@ -74,16 +114,17 @@ const Send = () => {
   })
 
   const outputErrors = useMemo(() => {
-    return outputs.map(({ address, amount }) => {
+    return outputs.map(({ address, amount, date }) => {
       let amountErrorCode = ''
       let addrErrorCode = ''
+      const extraSize = date ? SINCE_FIELD_SIZE : 0
 
       const amountVeriMsg = verifyAmount(amount)
       if (amount !== undefined) {
         if (typeof amountVeriMsg === 'object') {
           amountErrorCode = `${amountVeriMsg.code}`
-        } else if (!verifyAmountRange(amount)) {
-          amountErrorCode = `${ErrorCode.AmountTooSmall}`
+        } else if (!verifyAmountRange(amount, extraSize)) {
+          amountErrorCode = extraSize ? `${ErrorCode.LocktimeAmountTooSmall}` : `${ErrorCode.AmountTooSmall}`
         }
       }
       if (address !== undefined) {
@@ -138,6 +179,8 @@ const Send = () => {
         <List
           items={outputs}
           onRenderCell={(item, idx) => {
+            const SHORT_ADDR_LENGTH = 46
+            const LOCKTIMEABLE_PREFIX = '0x0100'
             if (undefined === item || undefined === idx) {
               return null
             }
@@ -148,7 +191,19 @@ const Send = () => {
                 })
               : undefined
             const fullAddrInfo =
-              !errorMsg && item.address && item.address.length !== 46 ? t('messages.full-addr-info') : ''
+              !errorMsg && item.address && item.address.length !== SHORT_ADDR_LENGTH ? t('messages.full-addr-info') : ''
+
+            let locktimeAble = false
+            if (!errorMsg && item.address && item.address.length === SHORT_ADDR_LENGTH) {
+              try {
+                const parsed = ckbCore.utils.bytesToHex(ckbCore.utils.parseAddress(item.address))
+                if (parsed.startsWith(LOCKTIMEABLE_PREFIX)) {
+                  locktimeAble = true
+                }
+              } catch {
+                // ignore this
+              }
+            }
 
             return (
               <div className={styles.outputContainer}>
@@ -240,6 +295,29 @@ const Send = () => {
                     </button>
                   ) : null}
                 </div>
+                {locktimeAble ? (
+                  <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
+                    <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
+                    <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
+                    {item.date ? `${t('send.release-on')}: ${new Date(+item.date).toLocaleDateString()}` : null}
+                    <button type="button" data-index={idx} onClick={onLocktimeClick}>
+                      {item.date ? (
+                        <>
+                          <img data-status="inactive" className={styles.icon} src={Edit} alt="edit" />
+                          <img data-status="active" className={styles.icon} src={ActiveEdit} alt="active-edit" />
+                        </>
+                      ) : (
+                        t('send.set-locktime')
+                      )}
+                    </button>
+                    {item.date ? (
+                      <button type="button" data-index={idx} onClick={onRemoveLocktime}>
+                        <img data-status="inactive" className={styles.icon} src={Trash} alt="trash" />
+                        <img data-status="active" className={styles.icon} src={ActiveTrash} alt="active-trash" />
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             )
           }}
@@ -280,6 +358,23 @@ const Send = () => {
           {sending ? <Spinner /> : (t('send.send') as string)}
         </Button>
       </div>
+
+      {locktimeIndex > -1 ? (
+        <div className={styles.datetimePicker}>
+          <div className={styles.datetimeDialog}>
+            <DatetimePicker
+              onConfirm={(time: number) => {
+                updateTransactionOutput('date')(locktimeIndex)(`${time}`)
+                setLocktimeIndex(-1)
+              }}
+              preset={send.outputs[locktimeIndex]?.date}
+              onCancel={() => setLocktimeIndex(-1)}
+              title={t('send.set-locktime')}
+              notice={t('send.locktime-notice-content')}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

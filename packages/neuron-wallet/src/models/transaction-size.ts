@@ -4,6 +4,7 @@ import { serializeFixVec } from '@nervosnetwork/ckb-sdk-utils/lib/serialization'
 import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
+import MultiSign from './multi-sign'
 
 export default class TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4
@@ -48,6 +49,13 @@ export default class TransactionSize {
 
   public static emptyWitness(): number {
     return TransactionSize.witness('0x')
+  }
+
+  public static singleMultiSignWitness(): number {
+    const blake160 = '0x' + '0'.repeat(40)
+    const lock = new MultiSign().serialize(blake160) + '0'.repeat(130)
+    const wit = new WitnessArgs(lock)
+    return TransactionSize.witness(wit)
   }
 
   public static tx(tx: Transaction): number {

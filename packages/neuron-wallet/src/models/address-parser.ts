@@ -5,6 +5,8 @@ export default class AddressParser {
   private address: string
   private defaultLockScriptCodeHash: string = '0x'
   private defaultLockScriptHashType: ScriptHashType | undefined
+  private multiSignLockScriptCodeHash: string = '0x'
+  private multiSignLockScriptHashType: ScriptHashType | undefined
 
   constructor(address: string) {
     this.address = address
@@ -17,6 +19,13 @@ export default class AddressParser {
     return this
   }
 
+  setMultiSignLockScript(codeHash: string, hashType: ScriptHashType): AddressParser {
+    this.multiSignLockScriptCodeHash = codeHash
+    this.multiSignLockScriptHashType = hashType
+
+    return this
+  }
+
   parse(): Script {
     const result = parseAddress(this.address, 'hex')
     const formatType = '0x' + result.slice(2, 4)
@@ -24,14 +33,17 @@ export default class AddressParser {
     if (formatType === '0x01') {
       // short address
       const codeHashIndex = '0x' + result.slice(4, 6)
+      const args = '0x' + result.slice(6)
       if (codeHashIndex === '0x00') {
-        const args = '0x' + result.slice(6)
         if (this.defaultLockScriptCodeHash === '0x' || !this.defaultLockScriptHashType) {
           throw new Error('Please set default lock script info firstly!')
         }
         return new Script(this.defaultLockScriptCodeHash, args, this.defaultLockScriptHashType)
       } else if (codeHashIndex === '0x01') {
-        throw new Error('Not support for multi sign short address!')
+        if (this.multiSignLockScriptCodeHash === '0x' || !this.multiSignLockScriptHashType) {
+          throw new Error('Please set multi sign lock script info firstly!')
+        }
+        return new Script(this.multiSignLockScriptCodeHash, args, this.multiSignLockScriptHashType)
       } else {
         throw new Error('Address format error!')
       }

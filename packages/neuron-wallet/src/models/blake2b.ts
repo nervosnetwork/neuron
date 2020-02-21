@@ -12,6 +12,10 @@ export default class Blake2b {
     this.blake2b.update(hexToBytes(msg))
   }
 
+  public updateBuffer = (message: Buffer): void => {
+    this.blake2b.update(message)
+  }
+
   public digest = (): string => {
     return `0x${this.blake2b.digest('hex')}`
   }

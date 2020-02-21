@@ -27,6 +27,24 @@ declare module Controller {
       walletID: string
     }
 
+    interface GetCustomizedAssetCellsParams {
+      walletID: string
+      pageNo: number
+      pageSize: number
+    }
+
+    interface GenerateWithdrawCustomizedCellTxParams {
+      walletID: string
+      outPoint: OutPoint
+      fee: string
+      feeRate: string
+      customizedAssetInfo: {
+        lock: string
+        type: string
+        data: string
+      }
+    }
+
     interface BackupWallet {
       id: string
       password: string
@@ -34,6 +52,19 @@ declare module Controller {
     interface DeleteWallet {
       id: string
       password: string
+    }
+
+    interface SignParams {
+      walletID: string
+      address: string
+      password: string
+      message: string
+    }
+
+    interface VerifyParams {
+      address: string
+      signature: string
+      message: string
     }
   }
 
