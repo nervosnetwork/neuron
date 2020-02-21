@@ -110,7 +110,14 @@ const DatetimePicker = ({ preset = new Date(), onConfirm, onCancel, title, notic
         ) : (
           <input placeholder={t('send.release-on')} value={display} onChange={onInput} />
         )}
-        <Calendar value={selected} onChange={onCalendarChange} inline locale={locale} className={styles.calendar} />
+        <Calendar
+          value={selected}
+          minDate={new Date()}
+          onChange={onCalendarChange}
+          inline
+          locale={locale}
+          className={styles.calendar}
+        />
         {notice ? (
           <div className={styles.notice}>
             <h5>{t('common.notice')}</h5>
