@@ -68,12 +68,9 @@ const PasswordRequest = () => {
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
-      if (/\s/.test(value)) {
-        return
-      }
       dispatch({
         type: AppActions.UpdatePassword,
-        payload: value,
+        payload: value.trim(),
       })
     },
     [dispatch]
