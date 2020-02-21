@@ -8,6 +8,7 @@ import TransactionSender from '../../../src/services/transaction-sender'
 import Keystore from '../../../src/models/keys/keystore'
 import WalletService from '../../../src/services/wallets'
 import { AddressType } from '../../../src/models/keys/address'
+import WitnessArgs from '../../../src/models/chain/witness-args'
 
 describe('TransactionSender Test', () => {
   describe('sign', () => {
@@ -138,59 +139,64 @@ describe('TransactionSender Test', () => {
       })
     })
 
-    // describe('multi sign with since', () => {
-    //   const tx = Transaction .fromObject({
-    //     "version": "0x0",
-    //     "cellDeps": [
-    //       CellDep.fromObject({
-    //         "outPoint": OutPoint.fromObject({
-    //           "txHash": "0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d",
-    //           "index": "0x1"
-    //         }),
-    //         "depType": "depGroup" as DepType
-    //       })
-    //     ],
-    //     "headerDeps": [],
-    //     "inputs": [
-    //       Input.fromObject({
-    //         "previousOutput": OutPoint.fromSDK({
-    //           "txHash": "0xf1181e7d0ef95fa2e6c334f6aa647520a898d9f8259a2bb021a622434bc73a63",
-    //           "index": "0x0"
-    //         }),
-    //         "since": "0x2000f00078000002",
-    //         "lock": Script.fromObject({
-    //           "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
-    //           "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
-    //           "hashType": "type" as ScriptHashType
-    //         })
-    //       })
-    //     ],
-    //     "outputs": [
-    //       Output.fromObject({
-    //         "capacity": "0xd18c2e2800",
-    //         "lock": Script.fromObject({
-    //           "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
-    //           "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
-    //           "hashType": "type" as ScriptHashType
-    //         }),
-    //         "type": null
-    //       })
-    //     ],
-    //     "outputsData": [
-    //       "0x"
-    //     ],
-    //     "witnesses": [
-    //       "0x6d000000100000006d0000006d000000590000000000010136c329ed630d6ce750712a477543672adab57f4c1c12c81448189a3455996c31022b8a5407a3d54ff1710eaf4220375f906cb53423040ca9f81e56f41f2df0d6cfd124dbda30b8213a0b15173b745e20449afd5401"
-    //     ],
-    //     "hash": "0x7e69c5b95b25aa70e6e72f0e29ec7b92d6415f4bdacfb9562f9d40c3fddb8dca"
-    //   })
+    describe('multi sign with since', () => {
+      const tx = Transaction .fromObject({
+        "version": "0x0",
+        "cellDeps": [
+          CellDep.fromObject({
+            "outPoint": OutPoint.fromObject({
+              "txHash": "0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d",
+              "index": "0x1"
+            }),
+            "depType": "depGroup" as DepType
+          })
+        ],
+        "headerDeps": [],
+        "inputs": [
+          Input.fromObject({
+            "previousOutput": OutPoint.fromSDK({
+              "txHash": "0xf1181e7d0ef95fa2e6c334f6aa647520a898d9f8259a2bb021a622434bc73a63",
+              "index": "0x0"
+            }),
+            "since": "0x2000f00078000002",
+            "lock": Script.fromObject({
+              // "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
+              "args": "0x56f281b3d4bb5fc73c751714af0bf78eb8aba0d80200007800f00020",
+              "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+              "hashType": "type" as ScriptHashType
+            })
+          })
+        ],
+        "outputs": [
+          Output.fromObject({
+            "capacity": "0xd18c2e2800",
+            "lock": Script.fromObject({
+              "codeHash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+              "args": "0x36c329ed630d6ce750712a477543672adab57f4c",
+              "hashType": "type" as ScriptHashType
+            }),
+            "type": null
+          })
+        ],
+        "outputsData": [
+          "0x"
+        ],
+        "witnesses": [
+          new WitnessArgs()
+        ],
+        "hash": "0x7e69c5b95b25aa70e6e72f0e29ec7b92d6415f4bdacfb9562f9d40c3fddb8dca"
+      })
 
-    //   it('success', () => {
-    //     // @ts-ignore: Private method
-    //     const ntx = transactionSender.sign(walletID, tx, '1234', true)
+      const expectedWitness = [
+        "0x6d000000100000006d0000006d000000590000000000010136c329ed630d6ce750712a477543672adab57f4c1c12c81448189a3455996c31022b8a5407a3d54ff1710eaf4220375f906cb53423040ca9f81e56f41f2df0d6cfd124dbda30b8213a0b15173b745e20449afd5401"
+      ]
 
-    //     expect(ntx.witnesses[0]).toEqual(tx.witnesses[0])
-    //   })
-    // })
+      it('success', () => {
+        // @ts-ignore: Private method
+        const ntx = transactionSender.sign(walletID, tx, '1234')
+
+        expect(ntx.witnesses[0]).toEqual(expectedWitness[0])
+      })
+    })
   })
 })

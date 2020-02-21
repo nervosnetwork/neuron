@@ -6,7 +6,14 @@ import DaoUtils from 'models/dao-utils'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 
 let syncQueue: Queue | null
-const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHashes: string[], startBlockNumber: bigint) => {
+const startBlockSyncing = async (
+  url: string,
+  genesisBlockHash: string,
+  lockHashes: string[],
+  startBlockNumber: bigint,
+  multiSignCodeHash: string,
+  multiSignBlake160s: string[]
+) => {
   if (syncQueue) {
     await syncQueue.stopAndWait()
   }
@@ -17,13 +24,13 @@ const startBlockSyncing = async (url: string, genesisBlockHash: string, lockHash
 
   await initConnection(genesisBlockHash)
 
-  syncQueue = new Queue(url, lockHashes, startBlockNumber)
+  syncQueue = new Queue(url, lockHashes, multiSignCodeHash, multiSignBlake160s, startBlockNumber)
   syncQueue.start()
 }
 
 
-ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[], startBlockNumber: string) => {
-  await startBlockSyncing(url, genesisHash, lockHashes, BigInt(startBlockNumber))
+ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[], startBlockNumber: string, multiSignCodeHash: string, multiSignBlake160s: string[]) => {
+  await startBlockSyncing(url, genesisHash, lockHashes, BigInt(startBlockNumber), multiSignCodeHash, multiSignBlake160s)
 })
 
 window.addEventListener('beforeunload', () => {
