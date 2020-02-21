@@ -392,7 +392,7 @@
       "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
       "tue": { "full": "Tuesday", "short": "Tue.", "tag": "T" },
       "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
-      "thus": { "full": "Thusday", "short": "Thus.", "tag": "T" },
+      "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
       "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
       "sat": { "full": "Saturday", "short": "Sat.", "tag": "S" },
       "sun": { "full": "Sunday", "short": "Sun.", "tag": "S" },

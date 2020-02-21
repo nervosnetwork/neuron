@@ -13,9 +13,9 @@ const DatetimePicker = ({ preset = new Date(), onPick }: DatetimePickerProps) =>
 
   const locale: any = {
     firstDayOfWeek: 0,
-    dayNames: ['sun', 'mon', 'tues', 'wed', 'thus', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.full`)),
-    dayNamesShort: ['sun', 'mon', 'tue', 'wed', 'thus', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.short`)),
-    dayNamesMin: ['sun', 'mon', 'tue', 'wed', 'thus', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.tag`)),
+    dayNames: ['sun', 'mon', 'tues', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.full`)),
+    dayNamesShort: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.short`)),
+    dayNamesMin: ['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'].map(dayname => t(`datetime.${dayname}.tag`)),
     monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'june', 'july', 'aug', 'sept', 'oct', 'nov', 'dec'].map(monname =>
       t(`datetime.${monname}.short`)
     ),
