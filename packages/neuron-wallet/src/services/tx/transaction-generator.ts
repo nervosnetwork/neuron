@@ -49,6 +49,7 @@ export class TransactionGenerator {
 
       const lockScript = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
+        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
         .parse()
 
       const output = new Output(capacity, lockScript)
@@ -147,6 +148,7 @@ export class TransactionGenerator {
 
       const lockScript: Script = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
+        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
         .parse()
 
       const output = new Output(capacity, lockScript)

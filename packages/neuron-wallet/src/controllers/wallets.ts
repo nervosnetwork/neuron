@@ -461,8 +461,8 @@ export default class WalletsController {
     }
     try {
       const result = parseAddress(address, 'hex')
-      // short address with codeHashIndex = 0x00, or full address
-      return (result.startsWith('0x0100') && address.length === 46) || result.startsWith('0x02') || result.startsWith('0x04')
+      // short address with codeHashIndex = 0x00 / 0x01, or full address
+      return ((result.startsWith('0x0100') || result.startsWith('0x0101')) && address.length === 46) || result.startsWith('0x02') || result.startsWith('0x04')
     } catch (err) {
       return false
     }
