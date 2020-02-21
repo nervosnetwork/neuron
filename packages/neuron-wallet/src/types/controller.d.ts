@@ -53,6 +53,19 @@ declare module Controller {
       id: string
       password: string
     }
+
+    interface SignParams {
+      walletID: string
+      address: string
+      password: string
+      message: string
+    }
+
+    interface VerifyParams {
+      address: string
+      signature: string
+      message: string
+    }
   }
 
   interface Wallet {

@@ -93,7 +93,8 @@ export default {
       'cell-is-not-yet-live': 'Please wait until last transaction is confirmed by chain.',
       'transaction-is-not-committed-yet': 'Cannot find required cells on chain, please make sure the related transactions has been confirmed.',
       'mainnet-address-required': '{{address}} is not a mainnet address.',
-      'testnet-address-required': '{{address}} is not a testnet address.'
+      'testnet-address-required': '{{address}} is not a testnet address.',
+      'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.'
     },
     messageBox: {
       button: {
