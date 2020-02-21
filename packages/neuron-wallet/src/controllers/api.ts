@@ -19,7 +19,7 @@ import UpdateController from 'controllers/update'
 import SyncController from 'controllers/sync'
 import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
-import SignAndVerifyController from 'controllers/sign-and-verify'
+import SignMessageController from 'controllers/sign-message'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -27,7 +27,7 @@ export default class ApiController {
   private transactionsController = new TransactionsController()
   private daoController = new DaoController()
   private networksController = new NetworksController()
-  private signAndVerifyController = new SignAndVerifyController()
+  private signAndVerifyController = new SignMessageController()
 
   public async mount() {
     this.registerHandlers()

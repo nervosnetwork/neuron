@@ -9,7 +9,7 @@ import { ec as EC } from 'elliptic'
 import LockUtils from "models/lock-utils"
 import { AddressNotFound } from "exceptions"
 
-export default class SignAndVerify {
+export default class SignMessage {
   static GENERATE_COUNT = 100
   private static ec = new EC('secp256k1')
 
@@ -74,8 +74,8 @@ export default class SignAndVerify {
       extendedPubkey,
       lastReceivingIndex + 1,
       lastChangeIndex + 1,
-      SignAndVerify.GENERATE_COUNT,
-      SignAndVerify.GENERATE_COUNT
+      SignMessage.GENERATE_COUNT,
+      SignMessage.GENERATE_COUNT
     )
     let allAddresses: Address[] = []
     if (addressVersion === AddressVersion.Mainnet) {

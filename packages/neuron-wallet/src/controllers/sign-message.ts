@@ -1,10 +1,10 @@
-import SignAndVerify from "services/sign-and-verify"
+import SignMessage from "services/sign-message"
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
 
-export default class SignAndVerifyController {
+export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
-    const signature: string = SignAndVerify.sign(
+    const signature: string = SignMessage.sign(
       params.walletID,
       params.address,
       params.password,
@@ -21,7 +21,7 @@ export default class SignAndVerifyController {
   }
 
   public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<boolean>> {
-    const result: boolean = SignAndVerify.verify(
+    const result: boolean = SignMessage.verify(
       params.address,
       params.signature,
       params.message

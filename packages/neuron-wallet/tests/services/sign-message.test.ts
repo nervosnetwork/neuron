@@ -1,4 +1,4 @@
-import SignAndVerify from '../../src/services/sign-and-verify'
+import SignMessage from '../../src/services/sign-message'
 import WalletService, { Wallet } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
@@ -6,7 +6,7 @@ import AddressDao, { AddressVersion, Address } from "../../src/database/address/
 import AddressService from '../../src/services/addresses'
 import { AddressType } from '../../src/models/keys/address'
 
-describe(`SignAndVerify`, () => {
+describe(`SignMessage`, () => {
   const info = {
     privateKey: '0xe79f3207ea4980b7fed79956d5934249ceac4751a4fae01a0f7c4a96884bc4e3',
     message: 'HelloWorld',
@@ -46,7 +46,7 @@ describe(`SignAndVerify`, () => {
     let addresses: Address[] = []
     const walletService = new WalletService()
 
-    SignAndVerify.GENERATE_COUNT = 3
+    SignMessage.GENERATE_COUNT = 3
 
     beforeEach(() => {
       const extendedKey = new ExtendedPrivateKey(extendedKeyInfo.privateKey, extendedKeyInfo.chainCode)
@@ -76,7 +76,7 @@ describe(`SignAndVerify`, () => {
 
     it("generateAddresses", () => {
       // @ts-ignore: Private method
-      const allAddresses = SignAndVerify.generateAddresses(wallet.id, wallet, addresses, AddressVersion.Testnet)
+      const allAddresses = SignMessage.generateAddresses(wallet.id, wallet, addresses, AddressVersion.Testnet)
 
       expect(
         allAddresses
@@ -99,13 +99,13 @@ describe(`SignAndVerify`, () => {
 
     describe('sign', () => {
       it('not generate', () => {
-        const result = SignAndVerify.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
+        const result = SignMessage.sign(wallet.id, signInfo.address, extendedKeyInfo.password, signInfo.message)
 
         expect(result).toEqual(signInfo.sigBase64)
       })
 
       it('generate1', () => {
-        const result = SignAndVerify.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)
+        const result = SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)
 
         expect(result).toEqual(signInfo2.sigBase64)
       })
@@ -114,17 +114,17 @@ describe(`SignAndVerify`, () => {
 
   it("signByPrivateKey", () => {
     // @ts-ignore: Private method
-    const sig = SignAndVerify.signByPrivateKey(info.privateKey, info.message)
+    const sig = SignMessage.signByPrivateKey(info.privateKey, info.message)
     expect(sig).toEqual(info.sigBase64)
   })
 
   it('verify', () => {
-    const result = SignAndVerify.verify(info.address, info.sigBase64, info.message)
+    const result = SignMessage.verify(info.address, info.sigBase64, info.message)
     expect(result).toBeTruthy()
   })
 
   it('verify false', () => {
-    const result = SignAndVerify.verify(signInfo.address, info.sigBase64, info.message)
+    const result = SignMessage.verify(signInfo.address, info.sigBase64, info.message)
     expect(result).toBeFalsy()
   })
 })
