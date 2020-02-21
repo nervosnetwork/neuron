@@ -5,6 +5,8 @@ import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/k
 import AddressDao, { AddressVersion, Address } from "../../src/database/address/address-dao"
 import AddressService from '../../src/services/addresses'
 import { AddressType } from '../../src/models/keys/address'
+import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
+import Keychain from '../../src/models/keys/keychain'
 
 describe(`SignMessage`, () => {
   const info = {
@@ -17,28 +19,28 @@ describe(`SignMessage`, () => {
   }
 
   const extendedKeyInfo = {
-    privateKey: 'e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35',
-    publicKey: '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2',
-    chainCode: '873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508',
+    mnemonic: 'tank planet champion pottery together intact quick police asset flower sudden question',
     password: '123456Ab',
   }
 
   const signInfo = {
     index: 0,
-    privateKey: '0xfcba4708f1f07ddc00fc77422d7a70c72b3456f5fef3b2f68368cdee4e6fb498',
+    path: "m/44'/309'/0'/0/0",
+    privateKey: '0x848422863825f69e66dc7f48a3302459ec845395370c23578817456ad6b04b14',
     message: 'HelloWorld',
-    signature: '0x44a132e0068a4558d48a13853afe82fe840e1134bf43bd6b157235555ee798b14bec4a3da5e56eb380cf208b8d8043668cf0fccdb23525e32146d1879e08a2b900',
-    address: 'ckb1qyq2jse3ehy5danjhh7mrayeljm4rfdj5hvqw0atp4',
-    sigBase64: 'RKEy4AaKRVjUihOFOv6C/oQOETS/Q71rFXI1VV7nmLFL7Eo9peVus4DPIIuNgENmjPD8zbI1JeMhRtGHngiiuQA=',
+    signature: '0xd9139c161fb753c96ced8c24c810c1bb2252da0366496dbca0cba02d3441df7f48ef6ce00416e74e04e329ffdb0281da23fe1d2fbe10f673f1c3cb9184bd5d9f01',
+    address: 'ckb1qyqgnjay335t89u0rpwlr8e3vd9msu8fgcuszgdmkp',
+    sigBase64: '2ROcFh+3U8ls7YwkyBDBuyJS2gNmSW28oMugLTRB339I72zgBBbnTgTjKf/bAoHaI/4dL74Q9nPxw8uRhL1dnwE=',
   }
 
   const signInfo2 = {
     index: 2,
-    privateKey: '0x14ced302b7efdacbd7be1d769e7fdd08f5940b9d3f6e092d336009955acd15ec',
+    path: "m/44'/309'/0'/0/2",
+    privateKey: '0x72c0420a2ecfbe8a00a036570c6ce774a40cb344a03ede8eccf0279868485547',
     message: 'HelloWorld',
-    signature: '0x11cd502f423fe6e377f6e223de4e3690e733b592fa2b5c122b6dd2db95110f0516c221c2d6b6ea65f8e3bc236e7bddd906c4a579f419c9acd7bbd56f8b362fdc00',
-    address: 'ckb1qyqdgtdkdrtn0njzvtj8xjhk8ryefxsm2mysgr3vvv',
-    sigBase64: 'Ec1QL0I/5uN39uIj3k42kOcztZL6K1wSK23S25URDwUWwiHC1rbqZfjjvCNue93ZBsSlefQZyazXu9VvizYv3AA=',
+    signature: '0x8d83056a47c033d167dbdd78a7f4a74762bc2849af851c08ea893fd1bafd07df0d4042e438cb55251989091ddab413bbe57d8ee6ba5e369ad4b6aba1fa74b2b700',
+    address: 'ckb1qyqvxd762w0y6zufm2k3xu9eghmjzradf3psc4h22q',
+    sigBase64: 'jYMFakfAM9Fn2914p/SnR2K8KEmvhRwI6ok/0br9B98NQELkOMtVJRmJCR3atBO75X2O5rpeNprUtquh+nSytwA=',
   }
 
   describe('with extended key', () => {
@@ -49,24 +51,30 @@ describe(`SignMessage`, () => {
     SignMessage.GENERATE_COUNT = 3
 
     beforeEach(() => {
-      const extendedKey = new ExtendedPrivateKey(extendedKeyInfo.privateKey, extendedKeyInfo.chainCode)
-      const extendedPublicKey = new AccountExtendedPublicKey(extendedKeyInfo.publicKey, extendedKeyInfo.chainCode)
-      const serialized = extendedKey.serialize()
+      const seed = mnemonicToSeedSync(extendedKeyInfo.mnemonic)
+      const masterKeychain = Keychain.fromSeed(seed)
+      const extendedKey = new ExtendedPrivateKey(
+        masterKeychain.privateKey.toString('hex'),
+        masterKeychain.chainCode.toString('hex')
+      )
+      const keystore = Keystore.create(extendedKey, extendedKeyInfo.password)
 
-      const keyStore = Keystore.create(new ExtendedPrivateKey(extendedKeyInfo.privateKey, extendedKeyInfo.chainCode), extendedKeyInfo.password)
-      const wallet1 = {
-        name: 'wallet-test1',
+      const accountKeychain = masterKeychain.derivePath(AccountExtendedPublicKey.ckbAccountPath)
+      const accountExtendedPublicKey = new AccountExtendedPublicKey(
+        accountKeychain.publicKey.toString('hex'),
+        accountKeychain.chainCode.toString('hex')
+      )
+
+      wallet = walletService.create({
         id: '',
-        extendedKey: serialized,
-        keystore: keyStore
-      }
+        name: 'Test Wallet',
+        extendedKey: accountExtendedPublicKey.serialize(),
+        keystore,
+      })
 
-      const { id } = walletService.create(wallet1)
-      wallet = walletService.get(id)
+      AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, undefined, 0, 0, 2, 1)
 
-      AddressService.generateAndSave(id, extendedPublicKey, undefined, 0, 0, 2, 1)
-
-      addresses = AddressService.allAddressesByWalletId(id, AddressVersion.Mainnet)
+      addresses = AddressService.allAddressesByWalletId(wallet.id, AddressVersion.Mainnet)
     })
 
     afterEach(() => {
