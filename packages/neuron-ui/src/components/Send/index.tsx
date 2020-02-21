@@ -180,7 +180,7 @@ const Send = () => {
           items={outputs}
           onRenderCell={(item, idx) => {
             const SHORT_ADDR_LENGTH = 46
-            const LOCKTIMEABLE_PREFIX = '0x0101'
+            const LOCKTIMEABLE_PREFIX = '0x0100'
             if (undefined === item || undefined === idx) {
               return null
             }
