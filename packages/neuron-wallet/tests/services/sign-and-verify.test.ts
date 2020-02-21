@@ -12,7 +12,7 @@ describe(`SignAndVerify`, () => {
     message: 'HelloWorld',
     digest: '0xdfb48ccf7126479c052f68cb4202cd094632d30198a322e3c3638679bc73858d',
     signature: '0x33cb08f423e8e2c05b0810c01e0e0f89c37b2426de76e8a50a54b2df3141b2e915f89bdbd1ff815dc2a4d627bc006bdf6f3a02bd7f351f1a5746207883eb13c000',
-    address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
+    address: 'ckb1qyqrdsefa43s6m882pcj53m4gdnj4k440axqdt9rtd',
     sigBase64: 'M8sI9CPo4sBbCBDAHg4PicN7JCbeduilClSy3zFBsukV+Jvb0f+BXcKk1ie8AGvfbzoCvX81HxpXRiB4g+sTwAA='
   }
 
@@ -28,7 +28,7 @@ describe(`SignAndVerify`, () => {
     privateKey: '0xfcba4708f1f07ddc00fc77422d7a70c72b3456f5fef3b2f68368cdee4e6fb498',
     message: 'HelloWorld',
     signature: '0x44a132e0068a4558d48a13853afe82fe840e1134bf43bd6b157235555ee798b14bec4a3da5e56eb380cf208b8d8043668cf0fccdb23525e32146d1879e08a2b900',
-    address: 'ckt1qyq2jse3ehy5danjhh7mrayeljm4rfdj5hvqn2r5df',
+    address: 'ckb1qyq2jse3ehy5danjhh7mrayeljm4rfdj5hvqw0atp4',
     sigBase64: 'RKEy4AaKRVjUihOFOv6C/oQOETS/Q71rFXI1VV7nmLFL7Eo9peVus4DPIIuNgENmjPD8zbI1JeMhRtGHngiiuQA=',
   }
 
@@ -37,7 +37,7 @@ describe(`SignAndVerify`, () => {
     privateKey: '0x14ced302b7efdacbd7be1d769e7fdd08f5940b9d3f6e092d336009955acd15ec',
     message: 'HelloWorld',
     signature: '0x11cd502f423fe6e377f6e223de4e3690e733b592fa2b5c122b6dd2db95110f0516c221c2d6b6ea65f8e3bc236e7bddd906c4a579f419c9acd7bbd56f8b362fdc00',
-    address: 'ckt1qyqdgtdkdrtn0njzvtj8xjhk8ryefxsm2mys4x0nqs',
+    address: 'ckb1qyqdgtdkdrtn0njzvtj8xjhk8ryefxsm2mysgr3vvv',
     sigBase64: 'Ec1QL0I/5uN39uIj3k42kOcztZL6K1wSK23S25URDwUWwiHC1rbqZfjjvCNue93ZBsSlefQZyazXu9VvizYv3AA=',
   }
 
@@ -48,7 +48,7 @@ describe(`SignAndVerify`, () => {
 
     SignAndVerify.GENERATE_COUNT = 3
 
-    beforeAll(() => {
+    beforeEach(() => {
       const extendedKey = new ExtendedPrivateKey(extendedKeyInfo.privateKey, extendedKeyInfo.chainCode)
       const extendedPublicKey = new AccountExtendedPublicKey(extendedKeyInfo.publicKey, extendedKeyInfo.chainCode)
       const serialized = extendedKey.serialize()
@@ -66,10 +66,10 @@ describe(`SignAndVerify`, () => {
 
       AddressService.generateAndSave(id, extendedPublicKey, undefined, 0, 0, 2, 1)
 
-      addresses = AddressService.allAddressesByWalletId(id, AddressVersion.Testnet)
+      addresses = AddressService.allAddressesByWalletId(id, AddressVersion.Mainnet)
     })
 
-    afterAll(() => {
+    afterEach(() => {
       AddressDao.deleteAll()
       walletService.clearAll()
     })
