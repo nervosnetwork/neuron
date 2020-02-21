@@ -66,7 +66,7 @@ describe(`SignAndVerify`, () => {
 
       AddressService.generateAndSave(id, extendedPublicKey, undefined, 0, 0, 2, 1)
 
-      addresses = AddressService.allAddressesByWalletId(id)
+      addresses = AddressService.allAddressesByWalletId(id, AddressVersion.Testnet)
     })
 
     afterAll(() => {

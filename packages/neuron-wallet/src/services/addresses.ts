@@ -208,8 +208,11 @@ export default class AddressService {
     return AddressDao.allAddresses( AddressService.getAddressVersion())
   }
 
-  public static allAddressesByWalletId = (walletId: string): AddressInterface[] => {
-    return AddressDao.allAddressesByWalletId(walletId,  AddressService.getAddressVersion())
+  public static allAddressesByWalletId = (
+    walletId: string,
+    addressVersion: AddressVersion = AddressService.getAddressVersion()
+  ): AddressInterface[] => {
+    return AddressDao.allAddressesByWalletId(walletId, addressVersion)
   }
 
   public static allLockHashes = async (url: string): Promise<string[]> => {

@@ -17,8 +17,7 @@ export default class SignAndVerify {
     const addressVersion = address.startsWith('ckb') ? AddressVersion.Mainnet : AddressVersion.Testnet
     const wallet = WalletService.getInstance().get(walletID)
     const addresses = AddressService
-      .allAddressesByWalletId(walletID)
-      .filter(addr => addr.version === addressVersion)
+      .allAddressesByWalletId(walletID, addressVersion)
     let addr = addresses.find(addr => addr.address === address)
     if (!addr) {
       const allAddresses = this.generateAddresses(walletID, wallet, addresses, addressVersion)
