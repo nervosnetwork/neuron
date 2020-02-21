@@ -38,7 +38,7 @@ export default class Queue {
   private multiSignCodeHash: string
   private multiSignBlake160s: string[]
 
-  constructor(url: string, lockHashes: string[], startBlockNumber: bigint, multiSignCodeHash: string, multiSignBlake160s: string[]) {
+  constructor(url: string, lockHashes: string[], multiSignCodeHash: string, multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber

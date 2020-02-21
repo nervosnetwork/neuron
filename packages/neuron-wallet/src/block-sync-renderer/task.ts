@@ -24,7 +24,7 @@ const startBlockSyncing = async (
 
   await initConnection(genesisBlockHash)
 
-  syncQueue = new Queue(url, lockHashes, startBlockNumber, multiSignCodeHash, multiSignBlake160s)
+  syncQueue = new Queue(url, lockHashes, multiSignCodeHash, multiSignBlake160s, startBlockNumber)
   syncQueue.start()
 }
 
