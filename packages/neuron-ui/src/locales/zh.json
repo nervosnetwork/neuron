@@ -113,7 +113,10 @@
       "price": "单价",
       "expected-speed": "预期成交速度",
       "total-cycles": "RISC-V Cycles 总数",
-      "scan-screen-qr-code": "扫描屏幕上的二维码"
+      "scan-screen-qr-code": "扫描屏幕上的二维码",
+      "set-locktime": "设置锁定时间",
+      "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差",
+      "release-on": "锁定至"
     },
     "receive": {
       "click-to-copy": "点击复制地址",
@@ -261,7 +264,8 @@
       "backup": "备份",
       "edit": "编辑",
       "delete": "删除",
-      "click-to-edit": "点击编辑"
+      "click-to-edit": "点击编辑",
+      "notice": "注意事项"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -310,6 +314,7 @@
         "104": "未连接到节点，请重启 Neuron。",
         "105": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者点击 'Max' 按钮发送全部余额。",
         "106": "您需要有足够的余额来支付找零（至少 61 CKBytes），或者拖动滑块到最右端发送全部余额。",
+        "107": "金额 {{amount}} CKB 太小, 含锁定时间转账需要输入一个不小于 69 CKB 的值。",
         "201": "缺少$t(messages.fields.{{fieldName}})。",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 已被使用。",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 太长, 其长度应不超过 {{length}}。",
@@ -407,7 +412,8 @@
       "sept": { "full": "九月", "short": "九月", "tag": "九月" },
       "oct": { "full": "十月", "short": "十月", "tag": "十月" },
       "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
-      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" }
+      "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
+      "timezone": "时区"
     }
   }
 }

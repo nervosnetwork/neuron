@@ -3,6 +3,7 @@ import {
   MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
   MIN_AMOUNT,
+  SINCE_FIELD_SIZE,
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
   ErrorCode,
@@ -34,8 +35,8 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
 }
 
-export const verifyAmountRange = (amount: string = '') => {
-  return BigInt(CKBToShannonFormatter(amount)) >= BigInt(MIN_AMOUNT * SHANNON_CKB_RATIO)
+export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
+  return BigInt(CKBToShannonFormatter(amount)) >= BigInt((MIN_AMOUNT + extraSize) * SHANNON_CKB_RATIO)
 }
 
 export const verifyAmount = (amount: string = '0') => {
@@ -96,13 +97,14 @@ export const verifyPasswordComplexity = (password: string) => {
 
 export const verifyTransactionOutputs = (items: Readonly<State.Output[]> = [], ignoreLastAmount: boolean = false) => {
   return !items.some((item, i) => {
+    const extraSize = item.date ? SINCE_FIELD_SIZE : 0
     if (!item.address || verifyAddress(item.address) !== true) {
       return true
     }
     if (ignoreLastAmount && i === items.length - 1) {
       return false
     }
-    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount, extraSize) !== true) {
       return true
     }
     return false

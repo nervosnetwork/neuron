@@ -57,6 +57,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
       items: items.map(item => ({
         address: item.address || '',
         capacity: CKBToShannonFormatter(item.amount, item.unit),
+        date: item.date,
       })),
       feeRate: price,
     }
@@ -103,7 +104,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
 
 const useUpdateTransactionOutput = (dispatch: StateDispatch) =>
   useCallback(
-    (field: string) => (idx: number) => (value: string) => {
+    (field: string) => (idx: number) => (value: string | undefined) => {
       dispatch({
         type: AppActions.UpdateSendOutput,
         payload: {
@@ -317,8 +318,7 @@ export const useInitialize = (
           )
           for (let i = 0; i < codes.length; i++) {
             if (codes[i] && codes[i]!.data && verifyAddress(codes[i]!.data)) {
-              const event = { target: { dataset: { field: 'address', idx }, value: codes[i]!.data } }
-              onItemChange(event)
+              updateTransactionOutput('address')(+idx)(codes[i]!.data)
               ;[...document.querySelectorAll(`.${styles.scanBtn}`)].forEach(b => b.classList.remove(styles.busy))
               return
             }
@@ -350,6 +350,7 @@ export const useInitialize = (
     onItemChange,
     addTransactionOutput,
     removeTransactionOutput,
+    updateTransactionOutput,
     updateTransactionPrice,
     onDescriptionChange,
     onSubmit,
