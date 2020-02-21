@@ -49,6 +49,7 @@ export default class SyncedBlockNumber {
 
     if (!this.#blockNumberEntity) {
       this.#blockNumberEntity = new SyncInfoEntity()
+      this.#blockNumberEntity.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
       this.#blockNumberEntity.value = '0'
     }
 
