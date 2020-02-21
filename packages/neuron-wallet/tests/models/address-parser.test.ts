@@ -47,9 +47,12 @@ describe('AddressParser', () => {
     })
 
     it ('multi sign short address', () => {
-      expect(() => {
-        new AddressParser(multiSignAddressInfo.address).parse()
-      }).toThrowError()
+      const script = new AddressParser(multiSignAddressInfo.address)
+        .setMultiSignLockScript(multiSignAddressInfo.codeHash, multiSignAddressInfo.hashType)
+        .parse()
+      expect(script.codeHash).toEqual(multiSignAddressInfo.codeHash)
+      expect(script.args).toEqual(multiSignAddressInfo.args)
+      expect(script.hashType).toEqual(multiSignAddressInfo.hashType)
     })
   })
 
