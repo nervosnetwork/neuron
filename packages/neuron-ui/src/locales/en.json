@@ -113,7 +113,10 @@
       "price": "Price",
       "expected-speed": "Expected speed",
       "total-cycles": "Total RISC-V Cycles",
-      "scan-screen-qr-code": "Scan the QR Code on the screen"
+      "scan-screen-qr-code": "Scan the QR Code on the screen",
+      "set-locktime": "Set Locktime",
+      "locktime-notice-content": "According to the actual running block height, there may have some time variances in locktime.",
+      "release-on": "Release on"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
@@ -261,7 +264,8 @@
       "backup": "Backup",
       "edit": "Edit",
       "delete": "Delete",
-      "click-to-edit": "Click to edit"
+      "click-to-edit": "Click to edit",
+      "notice": "Notice"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -310,6 +314,7 @@
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
         "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
+        "107": "The amount {{amount}} CKB is too small, transfer with locktime requires an amount no less than 69 CKB.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
@@ -390,12 +395,12 @@
     },
     "datetime": {
       "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
-      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "T" },
+      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "Tu" },
       "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
       "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
       "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
-      "sat": { "full": "Saturday", "short": "Sat.", "tag": "S" },
-      "sun": { "full": "Sunday", "short": "Sun.", "tag": "S" },
+      "sat": { "full": "Saturday", "short": "Sat.", "tag": "Sa" },
+      "sun": { "full": "Sunday", "short": "Sun.", "tag": "Su" },
       "jan": { "full": "January", "short": "Jan.", "tag": "J" },
       "feb": { "full": "Febrary", "short": "Feb.", "tag": "F" },
       "mar": { "full": "March", "short": "Mar.", "tag": "M" },
@@ -403,11 +408,12 @@
       "may": { "full": "May", "short": "May.", "tag": "M" },
       "june": { "full": "June", "short": "June.", "tag": "J" },
       "july": { "full": "July", "short": "July.", "tag": "J" },
-      "aug": { "full": "August", "short": "Aug.", "tag": "A" },
+      "aug": { "full": "August", "short": "Aug.", "tag": "Aug" },
       "sept": { "full": "September", "short": "Sept.", "tag": "S" },
       "oct": { "full": "October", "short": "Oct.", "tag": "O" },
       "nov": { "full": "November", "short": "Nov.", "tag": "N" },
-      "dec": { "full": "December", "short": "Dec.", "tag": "D" }
+      "dec": { "full": "December", "short": "Dec.", "tag": "D" },
+      "timezone": "Time Zone"
     }
   }
 }

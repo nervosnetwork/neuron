@@ -4,6 +4,7 @@ export const ADDRESS_LENGTH = 46
 export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 50
 export const MIN_AMOUNT = 61
+export const SINCE_FIELD_SIZE = 8
 export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
@@ -90,6 +91,7 @@ export enum ErrorCode {
   PasswordIncorrect = 103,
   NodeDisconnected = 104,
   CapacityNotEnoughForChange = 105,
+  LocktimeAmountTooSmall = 107,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
