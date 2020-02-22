@@ -70,7 +70,7 @@ const PasswordRequest = () => {
       const { value } = e.target as HTMLInputElement
       dispatch({
         type: AppActions.UpdatePassword,
-        payload: value.trim(),
+        payload: value,
       })
     },
     [dispatch]

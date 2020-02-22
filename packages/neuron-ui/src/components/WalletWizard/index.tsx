@@ -287,7 +287,7 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
       } = e.target as HTMLInputElement
       dispatch({
         type: field,
-        payload: value.trim(),
+        payload: value,
       })
     },
     [dispatch]
