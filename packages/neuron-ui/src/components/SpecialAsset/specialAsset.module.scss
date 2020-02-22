@@ -1,0 +1,126 @@
+.container {
+  display: grid;
+  grid-template:
+    'datetime capacity indicators actions'1fr / 120px minmax(230px, 1fr) 50px 250px;
+  grid-column-gap: 15px;
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  height: 50px;
+  align-items: center;
+}
+
+.datetime {
+  grid-area: datetime;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  letter-spacing: 0.7px;
+  color: #000;
+  height: calc(100% - 0.875rem);
+
+  span:last-child {
+    color: #666;
+    font-size: 0.625rem;
+  }
+}
+
+.capacity {
+  grid-area: capacity;
+}
+
+.indicators {
+  grid-area: indicators;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 0.9375rem;
+
+  &>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: #949494;
+
+    &[data-on="true"] {
+      position: relative;
+      background-color: var(--nervos-green);
+
+      &:before {
+        position: absolute;
+        display: none;
+        content: attr(data-tooltip);
+        bottom: calc(100% + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.5625rem;
+        width: 62px;
+        line-height: 2em;
+        height: 12px;
+        font-family: "Montserrat-Regular";
+        line-height: 1.22;
+        letter-spacing: 0.45px;
+        background: #fff;
+        color: #000000;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+      }
+
+      &:after {
+        display: none;
+        position: absolute;
+        content: '';
+        border: 6px solid transparent;
+        border-top-color: #fff;
+        bottom: calc(100% - 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.3));
+        opacity: 0;
+      }
+
+      &:hover {
+
+        &:before,
+        &:after {
+          display: block;
+          animation: popup 0.2s ease-in forwards;
+        }
+      }
+    }
+  }
+}
+
+.actions {
+  grid-area: actions;
+
+  button {
+    height: 1.5rem;
+    width: 120px;
+    font-size: 0.8125rem;
+    padding: 0;
+  }
+}
+
+.detailBtn {
+  width: 80px;
+  border: none !important;
+  background: none !important;
+  text-decoration: underline;
+  color: #626262 !important;
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

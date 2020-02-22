@@ -1,0 +1,25 @@
+@import '../../styles/mixin.scss';
+
+.balance {
+  display: block;
+  font-size: 1rem;
+  font-family: 'Montserrat-Regular';
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: keep-all;
+
+  .int {
+    @include BoldText;
+    font-size: 1.125em;
+  }
+
+  .decimal {
+    font-size: 0.875em;
+  }
+
+  .suffix {
+    font-size: 1.125em;
+    padding-left: 3px;
+  }
+}

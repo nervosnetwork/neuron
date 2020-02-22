@@ -20,5 +20,7 @@ import './DepositDialog.stories'
 import './WithdrawDialog.stories'
 import './CompensationPeriodDialog.stories'
 import './TextField.stories'
+import './SpecialAsset.stories'
+import './Balance.stories'
 
 import './DatetimePicker.stories'

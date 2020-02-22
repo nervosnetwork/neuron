@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
+import Balance from 'widgets/Balance'
 
 import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
@@ -87,10 +88,6 @@ const Overview = () => {
 
   const balanceProperties: Property[] = useMemo(() => {
     const balanceValue = shannonToCKBFormatter(balance)
-    const [balanceInt, balanceDec] = balanceValue.split('.')
-    const balanceIntEl = <span className={styles.balanceInt}>{balanceInt}</span>
-    const balanceDecEl = balanceDec ? <span>{`.${balanceDec}`}</span> : null
-    const balanceSuffixEl = ' CKB'
     let prompt = null
     if (ConnectionStatus.Offline === connectionStatus) {
       prompt = (
@@ -112,11 +109,7 @@ const Overview = () => {
         label: t('overview.balance'),
         value: (
           <div className={styles.balanceValue}>
-            <span style={{ width: '280px' }}>
-              {balanceIntEl}
-              {balanceDecEl}
-              {balanceSuffixEl}
-            </span>
+            <Balance balance={balanceValue} style={{ width: '280px' }} />
             {prompt}
           </div>
         ),
