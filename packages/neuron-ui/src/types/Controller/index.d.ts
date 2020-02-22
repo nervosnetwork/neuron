@@ -149,7 +149,10 @@ declare namespace Controller {
   }
   interface UnlockSpecialAssetParams {
     walletID: string
-    outPoint: OutPoint
+    outPoint: {
+      txHash: string
+      index: string
+    }
     fee: string
     feeRate: string
     customizedAssetInfo: {

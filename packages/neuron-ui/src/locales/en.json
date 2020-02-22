@@ -432,14 +432,13 @@
     "special-assets": {
       "date": "Date",
       "capacity": "Capacity",
-      "type-script-tooltip":"Type Script",
+      "type-script-tooltip": "Type Script",
       "data-tooltip": "Data",
       "user-defined-asset": "User Defined Asset",
       "user-defined-asset-tooltip": "This is a user defined asset，Neuron cannot process it now，please use a third-party software to check.",
       "locked-asset": "Locked",
       "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs，estimated release date is {{year}}-{{month}}-{{day}}",
       "claim-asset": "Claim",
-      "claim-asset-tooltip": "Asset is unlocked",
       "view-details": "View Details",
       "release-success": "Asset was released, view details in History."
     }

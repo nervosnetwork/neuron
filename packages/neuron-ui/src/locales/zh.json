@@ -439,7 +439,6 @@
       "locked-asset": "已锁定",
       "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}年{{month}}月{{day}}日",
       "claim-asset": "领取",
-      "claim-asset-tooltip": "资产已解锁",
       "view-details": "查看详情",
       "release-success": "资产已解锁，可前往交易历史查看详情。"
     }
