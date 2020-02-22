@@ -52,6 +52,7 @@ export enum Routes {
   WalletEditor = '/editwallet',
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
+  SpecialAssets = '/special-assets',
 }
 
 export enum CapacityUnit {
@@ -117,4 +118,8 @@ export enum SyncStatus {
   SyncPending,
   Syncing,
   SyncCompleted,
+}
+
+export enum PRESET_SCRIPT {
+  Locktime = 'SingleMultiSign',
 }

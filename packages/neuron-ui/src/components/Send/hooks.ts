@@ -7,7 +7,12 @@ import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { captureScreenshot, showErrorMessage } from 'services/remote'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
-import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
+import {
+  outputsToTotalAmount,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+} from 'utils/formatters'
 import { verifyTransactionOutputs, verifyAddress } from 'utils/validators'
 import calculateFee from 'utils/calculateFee'
 import styles from './send.module.scss'
@@ -57,7 +62,7 @@ const updateTransactionWith = (generator: typeof generateTx | typeof generateSen
       items: items.map(item => ({
         address: item.address || '',
         capacity: CKBToShannonFormatter(item.amount, item.unit),
-        date: item.date,
+        date: item.date ? uniformTimeFormatter(item.date).split(' ')[0] : item.date,
       })),
       feeRate: price,
     }

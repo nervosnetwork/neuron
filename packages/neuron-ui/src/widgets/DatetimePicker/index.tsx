@@ -4,6 +4,7 @@ import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
 import styles from './datetimePicker.module.scss'
 
+const SECONDS_PER_DAY = 24 * 3600 * 1000
 let UTC: string | number = -new Date().getTimezoneOffset() / 60
 if (UTC > 0) {
   UTC = `UTC+${UTC}`
@@ -18,7 +19,13 @@ export interface DatetimePickerProps {
   onConfirm: Function
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
-const DatetimePicker = ({ preset = new Date(), onConfirm, onCancel, title, notice }: DatetimePickerProps) => {
+const DatetimePicker = ({
+  preset = new Date(Date.now() + SECONDS_PER_DAY),
+  onConfirm,
+  onCancel,
+  title,
+  notice,
+}: DatetimePickerProps) => {
   const [t] = useTranslation()
   const [status, setStatus] = useState<'done' | 'edit'>('done')
   const [datetime, setDatetime] = useState<any>(preset ? new Date(+preset) : null)
@@ -63,7 +70,7 @@ const DatetimePicker = ({ preset = new Date(), onConfirm, onCancel, title, notic
   )
 
   const onInput = useCallback(
-    (e: any) => {
+    e => {
       setDisplay(e.target.value)
     },
     [setDisplay]
@@ -112,7 +119,7 @@ const DatetimePicker = ({ preset = new Date(), onConfirm, onCancel, title, notic
         )}
         <Calendar
           value={selected}
-          minDate={new Date()}
+          minDate={new Date(Date.now())}
           onChange={onCalendarChange}
           inline
           locale={locale}

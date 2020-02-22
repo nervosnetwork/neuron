@@ -44,12 +44,13 @@
 .container {
   display: grid;
   grid-template:
-    'datetime capacity indicators actions'1fr / 120px minmax(230px, 1fr) 50px 250px;
+    'datetime capacity indicators actions'1fr / 120px 1fr 50px 250px;
   grid-column-gap: 15px;
   box-sizing: border-box;
-  border: 1px solid #eee;
+  border-bottom: 1px solid #b3b3b3;
   height: 50px;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .datetime {
@@ -70,6 +71,16 @@
 
 .capacity {
   grid-area: capacity;
+  overflow: hidden;
+
+  &>span {
+    transform: scale(0.875);
+    transform-origin: left center;
+
+    span {
+      font-family: "Montserrat-Regular", "SourceHanSansCN-Regular" !important;
+    }
+  }
 }
 
 .indicators {
@@ -107,7 +118,7 @@
     font-size: 0.8125rem;
     padding: 0;
 
-    &[disabled][data-tooltip] {
+    &.hasTooltip[disabled][data-tooltip] {
       @include tooltip;
       position: relative;
 

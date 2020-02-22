@@ -153,7 +153,6 @@ declare namespace Controller {
       txHash: string
       index: string
     }
-    fee: string
     feeRate: string
     customizedAssetInfo: {
       lock: string

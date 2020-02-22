@@ -34,6 +34,7 @@ const appState: Readonly<State.App> = {
     wizard: null,
   },
   popups: [],
+  globalDialog: null,
   notifications: [],
   alertDialog: null,
   loadings: {
