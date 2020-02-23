@@ -32,6 +32,10 @@ export default {
         paste: 'Paste',
         selectall: 'Select All',
       },
+      tools: {
+        label: "Tools",
+        "sign-and-verify": "Sign/verify message",
+      },
       window: {
         label: 'Window',
         minimize: 'Minimize',
@@ -119,6 +123,9 @@ export default {
       },
       transaction: {
         title: 'Transaction: {{hash}}',
+      },
+      'sign-and-verify':{
+        title: 'Sign/verify message'
       },
     },
     prompt: {

@@ -328,7 +328,7 @@ export const useInitialize = (
         }, 100)
       }
     },
-    [onItemChange]
+    [updateTransactionOutput]
   )
 
   useEffect(() => {

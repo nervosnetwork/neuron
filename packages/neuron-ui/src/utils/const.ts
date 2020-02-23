@@ -92,6 +92,7 @@ export enum ErrorCode {
   NodeDisconnected = 104,
   CapacityNotEnoughForChange = 105,
   LocktimeAmountTooSmall = 107,
+  AddressNotFound = 108,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,

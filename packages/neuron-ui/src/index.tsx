@@ -10,6 +10,7 @@ import Navbar from 'containers/Navbar'
 import Notification from 'containers/Notification'
 import Main from 'containers/Main'
 import Transaction from 'components/Transaction'
+import SignAndVerify from 'components/SignAndVerify'
 import ErrorBoundary from 'components/ErrorBoundary'
 import withProviders from 'states/stateProvider'
 
@@ -50,6 +51,8 @@ Object.defineProperty(App, 'displayName', {
 
 if (window.location.hash.startsWith('#/transaction/')) {
   ReactDOM.render(<Transaction />, document.getElementById('root'))
+} else if (window.location.hash.startsWith('#/sign-verify/')) {
+  ReactDOM.render(<SignAndVerify />, document.getElementById('root'))
 } else {
   ReactDOM.render(<App />, document.getElementById('root'))
 }

@@ -19,6 +19,7 @@ export class TestnetAddressRequired extends Error {
 }
 
 export class AddressNotFound extends Error {
+  code = 108
   constructor() {
     super(i18n.t('messages.address-not-found'))
   }
