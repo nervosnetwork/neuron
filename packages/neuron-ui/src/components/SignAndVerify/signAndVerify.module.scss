@@ -2,7 +2,7 @@
 $inputHeight: 26px;
 
 .container {
-  padding: 40px 40px 50px;
+  padding: 25px 10px 0px;
 
   .title {
     @include BoldText;
@@ -71,14 +71,12 @@ $inputHeight: 26px;
     @include SemiBoldText;
     box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.23);
     background-color: #ffffff;
-    max-height: 280px;
     overflow: auto;
     width: 100%;
     font-size: 12px !important;
     position: absolute;
     top: calc(100% - 1px);
     left: 0;
-    max-height: 280px;
     transition: all 0.1s linear;
     max-height: 0;
     opacity: 0;
@@ -138,7 +136,7 @@ $inputHeight: 26px;
     }
 
     .addrList {
-      max-height: 280px;
+      max-height: 220px;
       opacity: 1;
     }
   }
