@@ -15,7 +15,7 @@ export default ({
   tipBlockTimestamp: number
   currentTimestamp: number
 }) => {
-  if (!timestamp10MinAgo) {
+  if (!timestamp10MinAgo && tipBlockNumber !== '') {
     timestamp10MinAgo = currentTimestamp
     blockNumber10MinAgo = tipBlockNumber
   }
@@ -28,7 +28,7 @@ export default ({
     return SyncStatus.SyncNotStart
   }
 
-  if (timestamp10MinAgo + TEN_MINS < currentTimestamp) {
+  if (timestamp10MinAgo && timestamp10MinAgo + TEN_MINS < currentTimestamp) {
     if (BigInt(blockNumber10MinAgo) >= BigInt(tipBlockNumber)) {
       return SyncStatus.SyncPending
     }
