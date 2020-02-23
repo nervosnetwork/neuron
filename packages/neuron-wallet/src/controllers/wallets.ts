@@ -199,7 +199,12 @@ export default class WalletsController {
       BrowserWindow.getFocusedWindow()!,
       { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
     ).then((returnValue: SaveDialogReturnValue) => {
-      if (returnValue.filePath) {
+      if (returnValue.canceled) {
+        return {
+          status: ResponseCode.Success,
+          result: true
+        }
+      } else if (returnValue.filePath) {
         fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
         return {
           status: ResponseCode.Success,
