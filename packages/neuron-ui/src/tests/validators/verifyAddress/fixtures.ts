@@ -5,7 +5,7 @@ export default {
   },
   'multisig short address': {
     address: 'ckb1qyq5lv479ewscx3ms620sv34pgeuz6zagaaqklhtgg',
-    expected: true,
+    expected: false,
   },
   'full address': {
     address: 'ckb1qjda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xw3vumhs9nvu786dj9p0q5elx66t24n3kxgj53qks',

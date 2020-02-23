@@ -11,6 +11,10 @@ import {
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 
+const SHORT_ADDR_00_LENGTH = 46
+const SHORT_ADDR_00_PREFIX = '0x0100'
+const LONG_DATA_PREFIX = '0x02'
+const LONG_TYPE_PREFIX = '0x04'
 export const verifyAddress = (address: string, isMainnet?: boolean): boolean => {
   if (typeof address !== 'string') {
     return false
@@ -23,10 +27,10 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
   try {
     const parsed = ckbCore.utils.parseAddress(address, 'hex')
-    if (parsed.startsWith('0x02') || parsed.startsWith('0x04')) {
+    if (parsed.startsWith(LONG_DATA_PREFIX) || parsed.startsWith(LONG_TYPE_PREFIX)) {
       return true
     }
-    if (parsed.startsWith('0x01') && !(parsed.startsWith('0x0100') || parsed.startsWith('0x0101'))) {
+    if (!parsed.startsWith(SHORT_ADDR_00_PREFIX) || address.length !== SHORT_ADDR_00_LENGTH) {
       return false
     }
     return true
