@@ -102,8 +102,12 @@ const PasswordRequest = () => {
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
-      <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-      <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
+      {actionType === 'unlock' ? null : (
+        <>
+          <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
+          <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
+        </>
+      )}
       <TextField
         label={t('password-request.password')}
         value={password}
