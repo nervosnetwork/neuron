@@ -438,7 +438,7 @@
       "user-defined-asset": "自定义资产",
       "user-defined-asset-tooltip": "该资产为用户自定义资产，Neuron 暂时无法处理，请使用第三方应用操作该资产。",
       "locked-asset": "已锁定",
-      "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日",
+      "locked-asset-tooltip": "锁定时间根据区块链实际运行情况会有一定的误差, 锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日",
       "claim-asset": "领取",
       "view-details": "查看详情",
       "release-success": "资产已解锁，可前往交易历史查看详情。",
