@@ -443,7 +443,8 @@
       "claim-asset": "Claim",
       "view-details": "View Details",
       "release-success": "Asset was released, view details in History.",
-      "no-special-assets": "No customized assets"
+      "no-special-assets": "No customized assets",
+      "experimental": "Experimental"
     }
   }
 }

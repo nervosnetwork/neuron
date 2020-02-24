@@ -443,7 +443,8 @@
       "claim-asset": "領取",
       "view-details": "查看詳情",
       "release-success": "資產已解鎖，可前往交易歷史查看詳情。",
-      "no-special-assets": "沒有自定義資產"
+      "no-special-assets": "沒有自定義資產",
+      "experimental": "實驗室"
     }
   }
 }
