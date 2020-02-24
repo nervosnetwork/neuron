@@ -6,7 +6,7 @@ export default class SignMessageController {
   public async sign(params: Controller.Params.SignParams): Promise<Controller.Response<string>> {
     const signature: string = SignMessage.sign(
       params.walletID,
-      params.address,
+      params.address.trim(),
       params.password,
       params.message
     )
@@ -22,7 +22,7 @@ export default class SignMessageController {
 
   public async verify(params: Controller.Params.VerifyParams): Promise<Controller.Response<boolean>> {
     const result: boolean = SignMessage.verify(
-      params.address,
+      params.address.trim(),
       params.signature,
       params.message
     )
