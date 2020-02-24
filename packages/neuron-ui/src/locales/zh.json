@@ -442,7 +442,8 @@
       "claim-asset": "领取",
       "view-details": "查看详情",
       "release-success": "资产已解锁，可前往交易历史查看详情。",
-      "no-special-assets": "没有自定义资产"
+      "no-special-assets": "没有自定义资产",
+      "experimental": "实验室"
     }
   }
 }

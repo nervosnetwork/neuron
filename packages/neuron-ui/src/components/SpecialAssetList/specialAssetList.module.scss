@@ -1,7 +1,31 @@
 @import '../../styles/mixin.scss';
 
 .container {
-  margin-top: 48px;
+
+  .experimental {
+    padding: 3px 0 19px;
+    margin-right: -30px;
+    display: flex;
+    justify-content: flex-end;
+
+    position: relative;
+
+    img {
+      height: 26px;
+    }
+
+    .text {
+      position: absolute;
+      top: 3px;
+      right: 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 26px;
+      width: 100px;
+      font-size: 0.625rem;
+    }
+  }
 
   .listContainer {
     background-color: #fff;
