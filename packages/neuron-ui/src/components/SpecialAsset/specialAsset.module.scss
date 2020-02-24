@@ -44,7 +44,7 @@
 .container {
   display: grid;
   grid-template:
-    'datetime capacity indicators actions'1fr / 120px 1fr 50px 250px;
+    'datetime capacity indicators actions'1fr / 120px 1fr 50px 300px;
   grid-column-gap: 15px;
   box-sizing: border-box;
   border-bottom: 1px solid #b3b3b3;
@@ -114,7 +114,7 @@
 
   button {
     height: 1.5rem;
-    width: 120px;
+    width: 150px;
     font-size: 0.8125rem;
     padding: 0;
 
