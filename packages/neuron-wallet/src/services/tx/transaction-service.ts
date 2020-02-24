@@ -6,6 +6,8 @@ import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import logger from 'utils/logger'
+import InputEntity from 'database/chain/entities/input'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -238,17 +240,216 @@ export class TransactionsService {
     params: TransactionsByAddressesParam,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
+    const beginTime = +new Date()
+
+    try {
+      // if connection not found, which means no database to connect
+      // it happened when no node connected and no previous database found.
+      getConnection()
+    } catch (err) {
+      if (err.name === CONNECTION_NOT_FOUND_NAME) {
+        return {
+          totalCount: 0,
+          items: [],
+        }
+      }
+      throw err
+    }
+
+    const connection = getConnection()
+
+    const type: SearchType = TransactionsService.filterSearchType(searchValue)
+    if (type === SearchType.Amount || type === SearchType.Unknown) {
+      return {
+        totalCount: 0,
+        items: []
+      }
+    }
+
+    let lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
       .addressesToAllLockHashes(params.addresses)
 
-    return TransactionsService.getAll(
-      {
-        pageNo: params.pageNo,
-        pageSize: params.pageSize,
-        lockHashes,
-      },
-      searchValue
-    )
+    if (type === SearchType.Address) {
+      const hashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(searchValue)
+      if (lockHashes.includes(hashes[0])) {
+        lockHashes = hashes
+      } else {
+        return {
+          totalCount: 0,
+          items: []
+        }
+      }
+    }
+
+    // return TransactionsService.getAll(
+    //   {
+    //     pageNo: params.pageNo,
+    //     pageSize: params.pageSize,
+    //     lockHashes,
+    //   },
+    //   searchValue
+    // )
+    const repository = connection.getRepository(TransactionEntity)
+
+    let allTxHashes: string[] = []
+    if (type === SearchType.TxHash) {
+      allTxHashes = [searchValue]
+    } else if (type === SearchType.Date) {
+      const beginTimestamp = +new Date(new Date(searchValue).toDateString())
+      const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
+      allTxHashes = (await repository
+        .createQueryBuilder('tx')
+        .select("tx.hash", "txHash")
+        .where(
+          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
+          { lockHashes, beginTimestamp, endTimestamp }
+        )
+        .orderBy('tx.timestamp', 'DESC')
+        // .skip((params.pageNo - 1) * params.pageSize)
+        // .take(params.pageSize)
+        // .limit(params.pageSize)
+        .getRawMany())
+        .map(tx => tx.txHash)
+    } else {
+      allTxHashes = (await repository
+        .createQueryBuilder('tx')
+        .select("tx.hash", "txHash")
+        .where(
+          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes))`,
+          { lockHashes }
+        )
+        .orderBy('tx.timestamp', 'DESC')
+        // .skip((params.pageNo - 1) * params.pageSize)
+        // .take(params.pageSize)
+        // .limit(params.pageSize)
+        .getRawMany())
+        .map(tx => tx.txHash)
+    }
+
+    const skip = (params.pageNo - 1) * params.pageSize
+    const txHashes = allTxHashes.slice(skip, skip + params.pageSize)
+
+    // logger.info('txHashes:', txHashes)
+
+    const totalCount: number = allTxHashes.length
+
+    logger.info('skip:', (params.pageNo - 1) * params.pageSize)
+
+    // logger.info('before transactions')
+    // const transactions: TransactionEntity[] = await getConnection()
+    //   .getRepository(TransactionEntity)
+    //   .createQueryBuilder('tx')
+    //   .leftJoinAndSelect('tx.inputs', 'input')
+    //   .leftJoinAndSelect('tx.outputs', 'output')
+    //   .where(`tx.hash in (:...txHashes)`, { txHashes })
+    //   .orderBy(`tx.timestamp`, 'ASC')
+    //   .getMany()
+    //   // .skip((params.pageNo - 1) * params.pageSize)
+    //   // .take(params.pageSize)
+    //   // // .limit(params.pageSize)
+    //   // .getMany()
+    // logger.info('after transactions')
+
+    // logger.info('first tx:', transactions[0])
+
+    // logger.info('before transactions')
+    const transactions = await connection
+      .getRepository(TransactionEntity)
+      .createQueryBuilder('tx')
+      .where('tx.hash IN (:...txHashes)', { txHashes })
+      .orderBy(`tx.timestamp`, 'DESC')
+      .getMany()
+
+    // logger.info('before inputs')
+    const inputs = await connection
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .select('input.capacity', 'capacity')
+      .addSelect('input.transactionHash', 'transactionHash')
+      .addSelect('input.outPointTxHash', 'outPointTxHash')
+      .addSelect('input.outPointIndex', 'outPointIndex')
+      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes })
+      .getRawMany()
+
+    // logger.info('before outputs', JSON.stringify(inputs, null, 2))
+    const outputs = await connection
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select('output.capacity', 'capacity')
+      .addSelect('output.transactionHash', 'transactionHash')
+      .addSelect('output.daoData', 'daoData')
+      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
+      .getRawMany()
+
+    // logger.info('after outputs')
+
+    const inputPreviousTxHashes: string[] = inputs
+      .map(i => i.outPointTxHash)
+      .filter(h => !!h) as string[]
+
+    const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select("output.outPointTxHash", "txHash")
+      .addSelect("output.outPointIndex", "index")
+      .where('output.daoData IS NOT NULL')
+      .getRawMany())
+      .filter(o => inputPreviousTxHashes.includes(o.txHash))
+
+    const sums = new Map<string, bigint>()
+    const daoFlag = new Map<string, boolean>()
+    outputs.map(o => {
+      const s = sums.get(o.transactionHash) || BigInt(0)
+      sums.set(o.transactionHash, s + BigInt(o.capacity))
+
+      if (o.daoData) {
+        daoFlag.set(o.transactionHash, true)
+      }
+    })
+
+    inputs.map(i => {
+      const s = sums.get(i.transactionHash) || BigInt(0)
+      sums.set(i.transactionHash, s - BigInt(i.capacity))
+
+      const result = daoCellOutPoints.some(dc => {
+        return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
+      })
+      if (result) {
+        daoFlag.set(i.transactionHash, true)
+      }
+    })
+
+    // logger.info('totalCount:', totalCount)
+    // const txs: Transaction[] = transactions.map(tx => tx.toModel())
+    // txs.map(tx => {
+    //   tx.value = sums.get(tx.hash!)?.toString() || '0'
+    //   tx.type = tx.value > BigInt(0) ? 'receive' : 'send',
+    // })
+    const txs = transactions.map(tx => {
+      const value = sums.get(tx.hash!) || BigInt(0)
+      return Transaction.fromObject({
+        timestamp: tx.timestamp,
+        value: value.toString(),
+        hash: tx.hash,
+        version: tx.version,
+        type: value > BigInt(0) ? 'receive' : 'send',
+        nervosDao: daoFlag.get(tx.hash!),
+        status: tx.status,
+        description: tx.description,
+        createdAt: tx.createdAt,
+        updatedAt: tx.updatedAt,
+        blockNumber: tx.blockNumber,
+      })
+    })
+
+    // logger.info('txs:', JSON.stringify(txs, null, 2))
+    const afterTime = +new Date()
+    logger.info('execute time:', afterTime - beginTime)
+
+    return {
+      totalCount,
+      items: txs,
+    }
   }
 
   public static getAllByPubkeys = async (
