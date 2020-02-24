@@ -391,8 +391,9 @@ export default class WalletsController {
     }
   }
 
+  // date: timestamp
   private getMinutes(date: string): string {
-    const day = +new Date(new Date(date).toDateString())
+    const day = +date
     const now = +new Date()
     const minutes = parseInt(((day - now) / 1000 / 60).toString())
     return minutes.toString()
