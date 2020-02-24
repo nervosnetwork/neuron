@@ -2,9 +2,8 @@ import SignMessage from '../../src/services/sign-message'
 import WalletService, { Wallet } from '../../src/services/wallets'
 import Keystore from '../../src/models/keys/keystore'
 import { ExtendedPrivateKey, AccountExtendedPublicKey } from '../../src/models/keys/key'
-import AddressDao, { AddressVersion, Address } from "../../src/database/address/address-dao"
+import AddressDao from "../../src/database/address/address-dao"
 import AddressService from '../../src/services/addresses'
-import { AddressType } from '../../src/models/keys/address'
 import { mnemonicToSeedSync } from '../../src/models/keys/mnemonic'
 import Keychain from '../../src/models/keys/keychain'
 
@@ -45,7 +44,6 @@ describe(`SignMessage`, () => {
 
   describe('with extended key', () => {
     let wallet: Wallet
-    let addresses: Address[] = []
     const walletService = new WalletService()
 
     SignMessage.GENERATE_COUNT = 3
@@ -73,36 +71,11 @@ describe(`SignMessage`, () => {
       })
 
       AddressService.generateAndSave(wallet.id, accountExtendedPublicKey, undefined, 0, 0, 2, 1)
-
-      addresses = AddressService.allAddressesByWalletId(wallet.id, AddressVersion.Mainnet)
     })
 
     afterEach(() => {
       AddressDao.deleteAll()
       walletService.clearAll()
-    })
-
-    it("generateAddresses", () => {
-      // @ts-ignore: Private method
-      const allAddresses = SignMessage.generateAddresses(wallet.id, wallet, addresses, AddressVersion.Testnet)
-
-      expect(
-        allAddresses
-          .filter(addr => addr.addressType === AddressType.Receiving)
-          .map(addr => addr.addressIndex)
-          .sort()
-      ).toEqual(
-        Array.from({length: 5}).map((_, i) => i)
-      )
-
-      expect(
-        allAddresses
-          .filter(addr => addr.addressType === AddressType.Change)
-          .map(addr => addr.addressIndex)
-          .sort()
-      ).toEqual(
-        Array.from({length: 4}).map((_, i) => i)
-      )
     })
 
     describe('sign', () => {
@@ -112,10 +85,10 @@ describe(`SignMessage`, () => {
         expect(result).toEqual(signInfo.sigBase64)
       })
 
-      it('generate1', () => {
-        const result = SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)
-
-        expect(result).toEqual(signInfo2.sigBase64)
+      it('with generate', () => {
+        expect(() => {
+          SignMessage.sign(wallet.id, signInfo2.address, extendedKeyInfo.password, signInfo2.message)
+        }).toThrowError()
       })
     })
   })

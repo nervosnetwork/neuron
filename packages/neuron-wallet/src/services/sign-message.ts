@@ -1,7 +1,6 @@
 import AddressService from "./addresses"
 import WalletService, { Wallet } from "./wallets"
-import AddressDao, { Address, AddressVersion } from "database/address/address-dao"
-import { AddressType } from "models/keys/address"
+import { AddressVersion } from "database/address/address-dao"
 import Keychain from "models/keys/keychain"
 import Blake2b from "models/blake2b"
 import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
@@ -20,11 +19,7 @@ export default class SignMessage {
       .allAddressesByWalletId(walletID, addressVersion)
     let addr = addresses.find(addr => addr.address === address)
     if (!addr) {
-      const allAddresses = this.generateAddresses(walletID, wallet, addresses, addressVersion)
-      addr = allAddresses.find(addr => addr.address === address)
-      if (!addr) {
-        throw new AddressNotFound()
-      }
+      throw new AddressNotFound()
     }
 
     // find private key of address
@@ -63,27 +58,6 @@ export default class SignMessage {
     const recoverBlake160 = LockUtils.addressToBlake160(address)
 
     return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
-  }
-
-  private static generateAddresses(walletID: string, wallet: Wallet, addresses: Address[], addressVersion: AddressVersion): Address[] {
-    const extendedPubkey = wallet.accountExtendedPublicKey()
-    const lastReceivingIndex = AddressDao.maxAddressIndex(walletID, AddressType.Receiving, addressVersion)!.addressIndex
-    const lastChangeIndex = AddressDao.maxAddressIndex(walletID, AddressType.Change, addressVersion)!.addressIndex
-    const newAddresses = AddressService.generateAddresses(
-      walletID,
-      extendedPubkey,
-      lastReceivingIndex + 1,
-      lastChangeIndex + 1,
-      SignMessage.GENERATE_COUNT,
-      SignMessage.GENERATE_COUNT
-    )
-    let allAddresses: Address[] = []
-    if (addressVersion === AddressVersion.Mainnet) {
-      allAddresses = addresses.concat(newAddresses.mainnetReceiving).concat(newAddresses.mainnetChange)
-    } else {
-      allAddresses = addresses.concat(newAddresses.testnetReceiving).concat(newAddresses.testnetChange)
-    }
-    return allAddresses
   }
 
   private static getPrivateKey(wallet: Wallet, path: string, password: string): string {
