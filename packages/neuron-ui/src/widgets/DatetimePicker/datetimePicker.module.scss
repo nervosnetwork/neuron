@@ -232,4 +232,11 @@ $width: 374px;
     }
   }
 
+  .error {
+    @include RegularText;
+    color: red;
+    font-size: 0.75rem;
+    margin-top: 5px;
+  }
+
 }

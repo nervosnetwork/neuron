@@ -414,7 +414,8 @@
       "oct": { "full": "十月", "short": "十月", "tag": "十月" },
       "nov": { "full": "十一月", "short": "十一月", "tag": "十一月" },
       "dec": { "full": "十二月", "short": "十二月", "tag": "十二月" },
-      "timezone": "时区"
+      "timezone": "时区",
+      "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {
       "sign-or-verify-message": "签名/验签信息",
