@@ -414,7 +414,8 @@
       "oct": { "full": "October", "short": "Oct.", "tag": "O" },
       "nov": { "full": "November", "short": "Nov.", "tag": "N" },
       "dec": { "full": "December", "short": "Dec.", "tag": "D" },
-      "timezone": "Time Zone"
+      "timezone": "Time Zone",
+      "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
       "sign-or-verify-message": "Sign or Verify Message",

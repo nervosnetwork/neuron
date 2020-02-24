@@ -92,6 +92,10 @@ const DatetimePicker = ({
     selected = undefined
   }
 
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const isSinceTomorrow = new Date(display).getTime() >= new Date(tomorrow.toDateString()).getTime()
+
   return (
     <div className={styles.container} onClick={onCancel} role="presentation">
       <div
@@ -119,12 +123,13 @@ const DatetimePicker = ({
         )}
         <Calendar
           value={selected}
-          minDate={new Date(Date.now())}
+          minDate={new Date()}
           onChange={onCalendarChange}
           inline
           locale={locale}
           className={styles.calendar}
         />
+        {isSinceTomorrow ? null : <span className={styles.error}>{t('datetime.start-tomorrow')}</span>}
         {notice ? (
           <div className={styles.notice}>
             <h5>{t('common.notice')}</h5>
@@ -133,7 +138,7 @@ const DatetimePicker = ({
         ) : null}
         <div className={styles.actions}>
           <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
-          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={!selected} />
+          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={!selected || !isSinceTomorrow} />
         </div>
       </div>
     </div>
