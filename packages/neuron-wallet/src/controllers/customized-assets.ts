@@ -5,6 +5,7 @@ import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
 import Transaction from "models/chain/transaction"
 import TransactionSender from "services/transaction-sender"
+import OutPoint from "models/chain/out-point"
 
 export default class CustomizedAssetsController {
   public async getCustomizedAssetCells(
@@ -44,7 +45,7 @@ export default class CustomizedAssetsController {
   ): Promise<Controller.Response<Transaction>> {
     const tx = await new TransactionSender().generateWithdrawMultiSignTx(
       params.walletID,
-      params.outPoint,
+      OutPoint.fromObject(params.outPoint),
       params.fee,
       params.feeRate
     )
