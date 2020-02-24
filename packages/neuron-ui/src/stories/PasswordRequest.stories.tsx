@@ -80,6 +80,21 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       },
     },
   },
+  'Empty Password of Unlock': {
+    ...initStates,
+    settings: {
+      ...initStates.settings,
+      wallets: [{ id: '1', name: 'test wallet' }],
+    },
+    app: {
+      ...initStates.app,
+      passwordRequest: {
+        walletID: '1',
+        actionType: 'unlock',
+        password: '',
+      },
+    },
+  },
   'Send Transaction': {
     ...initStates,
     settings: {

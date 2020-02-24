@@ -242,6 +242,9 @@
       },
       "backup": {
         "title": "备份钱包 {{name}}"
+      },
+      "unlock": {
+        "title": "请输入钱包密码提取资产"
       }
     },
     "qrcode": {
