@@ -38,12 +38,12 @@ $change-color: #6666cc;
 
 
   th {
+    @include SemiBoldText;
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0.6px;
     color: #000;
     padding: 18px 0;
-
   }
 
   td {

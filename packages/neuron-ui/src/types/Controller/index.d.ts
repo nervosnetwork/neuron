@@ -141,4 +141,23 @@ declare namespace Controller {
     signature: string
     message: string
   }
+  // Special Assets
+  interface GetSpeicalAssetsParams {
+    walletID: string
+    pageNo: number
+    pageSize: number
+  }
+  interface UnlockSpecialAssetParams {
+    walletID: string
+    outPoint: {
+      txHash: string
+      index: string
+    }
+    feeRate: string
+    customizedAssetInfo: {
+      lock: string
+      type: string
+      data: string
+    }
+  }
 }

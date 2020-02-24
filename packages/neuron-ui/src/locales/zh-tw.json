@@ -18,6 +18,7 @@
       "addresses": "地址管理",
       "settings": "設定",
       "nervos-dao": "Nervos DAO",
+      "special-assets": "特殊資產",
       "fail-to-fetch-tip-block-number": "未連接到節點",
       "sync-not-start": "同步尚未開始"
     },
@@ -428,6 +429,20 @@
       "verification-success": "驗證成功",
       "verification-failure": "驗證失敗",
       "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。"
+    },
+    "special-assets": {
+      "date": "日期",
+      "capacity": "金额",
+      "type-script-tooltip": "Type Script",
+      "data-tooltip": "Data",
+      "user-defined-asset": "自定義資產",
+      "user-defined-asset-tooltip": "該資產為用戶自定義資產，Neuron 暫時無法處理，請使用第三方應用操作該資產。",
+      "locked-asset": "已鎖定",
+      "locked-asset-tooltip": "鎖定參數為 {{epochs}} epochs, 預計解鎖時間為 {{year}}年{{month}}月{{day}}日",
+      "claim-asset": "領取",
+      "view-details": "查看詳情",
+      "release-success": "資產已解鎖，可前往交易歷史查看詳情。",
+      "no-special-assets": "沒有特殊資產"
     }
   }
 }

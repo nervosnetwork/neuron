@@ -1,0 +1,39 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  margin-top: 48px;
+
+  .listContainer {
+    background-color: #fff;
+    padding: 2px 15px 48px;
+
+    .listHeader {
+      @include SemiBoldText;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 55px;
+      font-size: 1rem;
+      letter-spacing: 0.7px;
+      border-bottom: 1px solid #b3b3b3;
+
+      &>span {
+        flex-basis: 135px;
+      }
+
+    }
+  }
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end
+  }
+}
+
+.noItems {
+  @include MediumText;
+  padding: 20px 13px;
+}

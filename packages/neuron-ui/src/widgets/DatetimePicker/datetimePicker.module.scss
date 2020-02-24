@@ -16,6 +16,7 @@ $width: 374px;
 
     .p-datepicker-today span {
       color: var(--nervos-green);
+      pointer-events: none;
     }
 
     .p-datepicker-header {

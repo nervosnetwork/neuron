@@ -18,6 +18,7 @@ import WalletEditor from 'components/WalletEditor'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
+import SpecialAssetList from 'components/SpecialAssetList'
 
 import { Routes } from 'utils/const'
 import { useOnDefaultContextMenu } from 'utils/hooks'
@@ -114,6 +115,12 @@ export const mainContents: CustomRouter.Route[] = [
     exact: true,
     component: NervosDAO,
   },
+  {
+    name: `SpecialAssets`,
+    path: Routes.SpecialAssets,
+    exact: false,
+    component: SpecialAssetList,
+  },
 ]
 
 const MainContent = () => {
@@ -155,7 +162,7 @@ const MainContent = () => {
   const onContextMenu = useOnDefaultContextMenu(t)
 
   return (
-    <div onContextMenu={onContextMenu} style={{ height: '100%' }}>
+    <div onContextMenu={onContextMenu} style={{ height: '100%', overflow: 'auto' }}>
       {mainContents.map(container => (
         <Route
           exact={container.exact}

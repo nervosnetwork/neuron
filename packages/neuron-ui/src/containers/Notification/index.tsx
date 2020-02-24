@@ -8,7 +8,9 @@ import {
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
   dismissNotification,
+  dismissGlobalDialog,
 } from 'states/stateProvider/actionCreators'
+import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import styles from './Notification.module.scss'
 
@@ -59,7 +61,14 @@ const TopAlertActions = ({
 
 export const NoticeContent = () => {
   const {
-    app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
+    app: {
+      notifications = [],
+      alertDialog = null,
+      popups = [],
+      showTopAlert = false,
+      showAllNotifications = false,
+      globalDialog = null,
+    },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -81,6 +90,10 @@ export const NoticeContent = () => {
     },
     [dispatch]
   )
+
+  const onGlobalDialogDismiss = useCallback(() => {
+    dismissGlobalDialog()(dispatch)
+  }, [dispatch])
 
   return (
     <div>
@@ -164,6 +177,7 @@ export const NoticeContent = () => {
           )
         })}
       </Panel>
+      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} />
       <AlertDialog content={alertDialog} dispatch={dispatch} />
     </div>
   )

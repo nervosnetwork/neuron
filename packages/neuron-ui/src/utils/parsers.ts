@@ -1,6 +1,6 @@
 import { PAGE_SIZE } from './const'
 
-export const history = (search: string) => {
+export const listParams = (search: string) => {
   const query = new URLSearchParams(search)
   const keywords = query.get('keywords') || ''
   // use Object.fromEntries in ES10
@@ -21,7 +21,7 @@ export const prompt = (search: string) => {
   })
   return params
 }
-export const queryParsers = { history, prompt }
+export const queryParsers = { listParams, prompt }
 
 export const epochParser = (epoch: string) => {
   const e = BigInt(epoch)

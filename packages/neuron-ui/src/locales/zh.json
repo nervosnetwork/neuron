@@ -18,6 +18,7 @@
       "addresses": "地址管理",
       "settings": "设置",
       "nervos-dao": "Nervos DAO",
+      "special-assets": "特殊资产",
       "fail-to-fetch-tip-block-number": "未连接到节点",
       "sync-not-start": "同步尚未开始"
     },
@@ -428,6 +429,20 @@
       "verification-success": "验证成功",
       "verification-failure": "验证失败",
       "address-not-found": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。"
+    },
+    "special-assets": {
+      "date": "日期",
+      "capacity": "金额",
+      "type-script-tooltip": "Type Script",
+      "data-tooltip": "Data",
+      "user-defined-asset": "自定义资产",
+      "user-defined-asset-tooltip": "该资产为用户自定义资产，Neuron 暂时无法处理，请使用第三方应用操作该资产。",
+      "locked-asset": "已锁定",
+      "locked-asset-tooltip": "锁定参数为 {{epochs}} epochs, 预计解锁时间为 {{year}}年{{month}}月{{day}}日",
+      "claim-asset": "领取",
+      "view-details": "查看详情",
+      "release-success": "资产已解锁，可前往交易历史查看详情。",
+      "no-special-assets": "没有特殊资产"
     }
   }
 }

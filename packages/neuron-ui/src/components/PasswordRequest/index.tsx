@@ -59,6 +59,18 @@ const PasswordRequest = () => {
         })(dispatch)
         break
       }
+      case 'unlock': {
+        if (isSending) {
+          break
+        }
+        sendTransaction({
+          walletID,
+          tx: generatedTx,
+          description,
+          password,
+        })(dispatch, history, { type: 'unlock' })
+        break
+      }
       default: {
         break
       }

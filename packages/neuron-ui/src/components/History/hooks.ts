@@ -14,7 +14,7 @@ export const useSearch = (search: string = '', walletID: string = '', dispatch: 
 
   useEffect(() => {
     backToTop()
-    const params = queryParsers.history(search)
+    const params = queryParsers.listParams(search)
     setKeywords(params.keywords)
     updateTransactionList({ ...params, keywords: params.keywords, walletID })(dispatch)
   }, [search, walletID, dispatch])
