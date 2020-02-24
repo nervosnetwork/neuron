@@ -166,7 +166,7 @@ const SpecialAssetList = () => {
         const currentEpochInfo = epochParser(epoch)
         epochInfo = {
           target: Number(targetEpochInfo.number) + Number(targetEpochInfo.index) / Number(targetEpochInfo.length),
-          current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.number),
+          current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
         }
         if (epochInfo.target - epochInfo.current > 0) {
           status = 'locked-asset'
