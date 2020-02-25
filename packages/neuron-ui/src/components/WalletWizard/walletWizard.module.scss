@@ -3,11 +3,15 @@ $button-gap: 10px;
 $line-gap: 15px;
 
 @mixin center {
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  height: 100%;
 }
 
 .welcome {
