@@ -148,7 +148,7 @@ export default class Queue {
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
-        logger.debug(`Scanning from block #${block.header.number}`)
+        logger.info(`Scanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
         const [shouldSave, addresses] = await new TxAddressFinder(

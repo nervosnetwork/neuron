@@ -1,6 +1,7 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import SyncedBlockNumberSubject from "models/subjects/node"
+import logger from 'utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
@@ -31,6 +32,7 @@ export default class SyncedBlockNumber {
       let blockNumberEntity = await this.blockNumber()
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
+      logger.info("Saved synced block #" + current.toString())
     }
   }
 
