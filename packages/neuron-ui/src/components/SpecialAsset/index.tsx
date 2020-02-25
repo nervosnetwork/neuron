@@ -44,7 +44,7 @@ const SpecialAsset = ({
   const [t] = useTranslation()
   const [date, time] = uniformTimeFormatter(datetime).split(' ')
   let targetTime: undefined | number
-  if (epochsInfo?.target && epochsInfo?.current) {
+  if (epochsInfo?.target !== undefined && epochsInfo?.current !== undefined) {
     targetTime = Date.now() + (epochsInfo.target - epochsInfo.current) * MS_PER_EPOCHS
   }
 
