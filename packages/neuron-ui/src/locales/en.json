@@ -242,6 +242,9 @@
       },
       "backup": {
         "title": "Backup the {{name}} wallet"
+      },
+      "unlock":{
+        "title": "Please input wallet password to claim the asset"
       }
     },
     "qrcode": {

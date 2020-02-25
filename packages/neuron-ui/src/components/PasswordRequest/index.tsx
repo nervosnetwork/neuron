@@ -102,12 +102,8 @@ const PasswordRequest = () => {
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
-      {actionType === 'unlock' ? null : (
-        <>
-          <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-          <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
-        </>
-      )}
+      <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
+      {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
       <TextField
         label={t('password-request.password')}
         value={password}
@@ -118,6 +114,7 @@ const PasswordRequest = () => {
         autoFocus
         onKeyPress={onKeyPress}
         required
+        className={styles.passwordInput}
       />
       <div className={styles.footer}>
         <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
