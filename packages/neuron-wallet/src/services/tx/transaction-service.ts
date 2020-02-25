@@ -5,7 +5,6 @@ import LockUtils from 'models/lock-utils'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
-import logger from 'utils/logger'
 import InputEntity from 'database/chain/entities/input'
 
 export interface TransactionsByAddressesParam {
@@ -41,7 +40,7 @@ export enum SearchType {
 }
 
 export class TransactionsService {
-  public static filterSearchType = (value: string) => {
+  public static filterSearchType(value: string) {
     if (value === '') {
       return SearchType.Empty
     }
@@ -61,78 +60,7 @@ export class TransactionsService {
     return SearchType.Unknown
   }
 
-  // only deal with address / txHash / Date
-  private static searchSQL = async (params: TransactionsByLockHashesParam, type: SearchType, value: string = '') => {
-    const base = [
-      '(input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes))',
-      { lockHashes: params.lockHashes },
-    ]
-    if (type === SearchType.Empty) {
-      return base
-    }
-    if (type === SearchType.Address) {
-      const lockHashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
-      return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
-    }
-    if (type === SearchType.TxHash) {
-      return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
-    }
-    if (type === SearchType.Date) {
-      const beginTimestamp = +new Date(new Date(value).toDateString())
-      const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
-      return [
-        `${
-          base[0]
-        } AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
-        {
-          lockHashes: params.lockHashes,
-          beginTimestamp,
-          endTimestamp,
-        },
-      ]
-    }
-    return base
-  }
-
-  /// TODO: Decide if this should be supported.
-  /// For now just return empty results.
-  /// The second query (one after `if (result.totalCount > 100) {` will mostly cuase `SQLITE_ERROR: too many SQL variables` error.
-  public static searchByAmount = async (_params: TransactionsByLockHashesParam, _amount: string) => {
-    return {
-      totalCount: 0,
-      items: []
-    }
-    /*
-    // 1. get all transactions
-    const result = await TransactionsService.getAll({
-      pageNo: 1,
-      pageSize: 100,
-      lockHashes: params.lockHashes,
-    })
-
-    let transactions = result.items
-    if (result.totalCount > 100) {
-      transactions = (await TransactionsService.getAll({
-        pageNo: 1,
-        pageSize: result.totalCount,
-        lockHashes: params.lockHashes,
-      })).items
-    }
-    // 2. filter by value
-    const txs = transactions.filter(tx => tx.value === amount)
-    const skip = (params.pageNo - 1) * params.pageSize
-    return {
-      totalCount: txs.length || 0,
-      items: txs.slice(skip, skip + params.pageSize),
-    }*/
-  }
-
-  public static getAll = async (
-    params: TransactionsByLockHashesParam,
-    searchValue: string = ''
-  ): Promise<PaginationResult<Transaction>> => {
-    const skip = (params.pageNo - 1) * params.pageSize
-
+  public static async getAll(params: TransactionsByLockHashesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type = TransactionsService.filterSearchType(searchValue)
     if (type === SearchType.Amount) {
       return TransactionsService.searchByAmount(params, searchValue)
@@ -143,8 +71,8 @@ export class TransactionsService {
         items: [],
       }
     }
-    const searchParams = await TransactionsService.searchSQL(params, type, searchValue)
 
+    const searchParams = await TransactionsService.searchSQL(params, type, searchValue)
     const query = getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
@@ -156,7 +84,7 @@ export class TransactionsService {
 
     const transactions: TransactionEntity[] = await query
       .orderBy(`tx.timestamp`, 'DESC')
-      .skip(skip)
+      .skip((params.pageNo - 1) * params.pageSize)
       .take(params.pageSize)
       .getMany()
 
@@ -221,14 +149,40 @@ export class TransactionsService {
     }
   }
 
-  public static getAllByAddresses = async (
-    params: TransactionsByAddressesParam,
-    searchValue: string = ''
-  ): Promise<PaginationResult<Transaction>> => {
-    const beginTime = +new Date()
+  /// TODO: Decide if this should be supported.
+  /// For now just return empty results.
+  /// The second query (one after `if (result.totalCount > 100) {` will mostly cuase `SQLITE_ERROR: too many SQL variables` error.
+  public static async searchByAmount(_params: TransactionsByLockHashesParam, _amount: string) {
+    return {
+      totalCount: 0,
+      items: []
+    }
+    /*
+    // 1. get all transactions
+    const result = await TransactionsService.getAll({
+      pageNo: 1,
+      pageSize: 100,
+      lockHashes: params.lockHashes,
+    })
 
-    const connection = getConnection()
+    let transactions = result.items
+    if (result.totalCount > 100) {
+      transactions = (await TransactionsService.getAll({
+        pageNo: 1,
+        pageSize: result.totalCount,
+        lockHashes: params.lockHashes,
+      })).items
+    }
+    // 2. filter by value
+    const txs = transactions.filter(tx => tx.value === amount)
+    const skip = (params.pageNo - 1) * params.pageSize
+    return {
+      totalCount: txs.length || 0,
+      items: txs.slice(skip, skip + params.pageSize),
+    }*/
+  }
 
+  public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
     if (type === SearchType.Amount || type === SearchType.Unknown) {
       return {
@@ -237,8 +191,7 @@ export class TransactionsService {
       }
     }
 
-    let lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
-      .addressesToAllLockHashes(params.addresses)
+    let lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(params.addresses)
 
     if (type === SearchType.Address) {
       const hashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(searchValue)
@@ -252,6 +205,7 @@ export class TransactionsService {
       }
     }
 
+    const connection = getConnection()
     const repository = connection.getRepository(TransactionEntity)
 
     let allTxHashes: string[] = []
@@ -367,24 +321,16 @@ export class TransactionsService {
       })
     })
 
-    const afterTime = +new Date()
-    logger.debug('getAllByAddresses execute time:', afterTime - beginTime)
-
     return {
       totalCount,
       items: txs,
     }
   }
 
-  public static getAllByPubkeys = async (
-    params: TransactionsByPubkeysParams,
-    searchValue: string = ''
-  ): Promise<PaginationResult<Transaction>> => {
+  public static async getAllByPubkeys(params: TransactionsByPubkeysParams, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const addresses: string[] = params.pubkeys.map(pubkey => {
-      const addr = pubkeyToAddress(pubkey)
-      return addr
+      return pubkeyToAddress(pubkey)
     })
-
     const lockHashes = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     return TransactionsService.getAll(
@@ -397,7 +343,7 @@ export class TransactionsService {
     )
   }
 
-  public static get = async (hash: string): Promise<Transaction | undefined> => {
+  public static async get(hash: string): Promise<Transaction | undefined> {
     const tx = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('transaction')
@@ -413,12 +359,10 @@ export class TransactionsService {
       return undefined
     }
 
-    const transaction: Transaction = tx.toModel()
-
-    return transaction
+    return tx.toModel()
   }
 
-  public static blake160sOfTx = (tx: Transaction) => {
+  public static blake160sOfTx(tx: Transaction) {
     let inputBlake160s: string[] = []
     let outputBlake160s: string[] = []
     if (tx.inputs) {
@@ -433,10 +377,7 @@ export class TransactionsService {
   }
 
   // tx count with one lockHash and status
-  public static getCountByLockHashesAndStatus = async (
-    lockHashes: string[],
-    status: TransactionStatus[]
-  ): Promise<number> => {
+  public static async getCountByLockHashesAndStatus(lockHashes: string[], status: TransactionStatus[]): Promise<number> {
     const count: number = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
@@ -452,16 +393,16 @@ export class TransactionsService {
     return count
   }
 
-  public static getCountByAddressAndStatus = async (
+  public static async getCountByAddressAndStatus(
     address: string,
     status: TransactionStatus[],
     url: string = NodeService.getInstance().ckb.rpc.node.url
-  ): Promise<number> => {
+  ): Promise<number> {
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 
-  public static updateDescription = async (hash: string, description: string) => {
+  public static async updateDescription(hash: string, description: string) {
     const transactionEntity = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
@@ -475,6 +416,39 @@ export class TransactionsService {
     }
     transactionEntity.description = description
     return getConnection().manager.save(transactionEntity)
+  }
+
+  // only deal with address / txHash / Date
+  private static async searchSQL(params: TransactionsByLockHashesParam, type: SearchType, value: string = '') {
+    const base = [
+      '(input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes))',
+      { lockHashes: params.lockHashes },
+    ]
+    if (type === SearchType.Empty) {
+      return base
+    }
+    if (type === SearchType.Address) {
+      const lockHashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
+      return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
+    }
+    if (type === SearchType.TxHash) {
+      return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
+    }
+    if (type === SearchType.Date) {
+      const beginTimestamp = +new Date(new Date(value).toDateString())
+      const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
+      return [
+        `${
+          base[0]
+        } AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
+        {
+          lockHashes: params.lockHashes,
+          beginTimestamp,
+          endTimestamp,
+        },
+      ]
+    }
+    return base
   }
 }
 
