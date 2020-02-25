@@ -26,18 +26,6 @@ describe('transactions service', () => {
       expect(type).toBe(SearchType.Date)
     })
 
-    it('100', () => {
-      const amount = '100'
-      const type = TransactionsService.filterSearchType(amount)
-      expect(type).toBe(SearchType.Amount)
-    })
-
-    it('-100', () => {
-      const amount = '-100'
-      const type = TransactionsService.filterSearchType(amount)
-      expect(type).toBe(SearchType.Amount)
-    })
-
     it('-', () => {
       const value = '-'
       const type = TransactionsService.filterSearchType(value)
