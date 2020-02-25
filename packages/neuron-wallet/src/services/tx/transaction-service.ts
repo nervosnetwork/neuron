@@ -34,7 +34,6 @@ export enum SearchType {
   Address = 'address',
   TxHash = 'txHash',
   Date = 'date',
-  Amount = 'amount',
   Empty = 'empty',
   Unknown = 'unknown',
 }
@@ -55,16 +54,13 @@ export class TransactionsService {
       return SearchType.Date
     }
     if (value.match(/^(\d+|-\d+)$/)) {
-      return SearchType.Amount
+      // Amount search is not supported
     }
     return SearchType.Unknown
   }
 
   public static async getAll(params: TransactionsByLockHashesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Amount) {
-      return TransactionsService.searchByAmount(params, searchValue)
-    }
     if (type === SearchType.Unknown) {
       return {
         totalCount: 0,
@@ -149,42 +145,9 @@ export class TransactionsService {
     }
   }
 
-  /// TODO: Decide if this should be supported.
-  /// For now just return empty results.
-  /// The second query (one after `if (result.totalCount > 100) {` will mostly cuase `SQLITE_ERROR: too many SQL variables` error.
-  public static async searchByAmount(_params: TransactionsByLockHashesParam, _amount: string) {
-    return {
-      totalCount: 0,
-      items: []
-    }
-    /*
-    // 1. get all transactions
-    const result = await TransactionsService.getAll({
-      pageNo: 1,
-      pageSize: 100,
-      lockHashes: params.lockHashes,
-    })
-
-    let transactions = result.items
-    if (result.totalCount > 100) {
-      transactions = (await TransactionsService.getAll({
-        pageNo: 1,
-        pageSize: result.totalCount,
-        lockHashes: params.lockHashes,
-      })).items
-    }
-    // 2. filter by value
-    const txs = transactions.filter(tx => tx.value === amount)
-    const skip = (params.pageNo - 1) * params.pageSize
-    return {
-      totalCount: txs.length || 0,
-      items: txs.slice(skip, skip + params.pageSize),
-    }*/
-  }
-
   public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Amount || type === SearchType.Unknown) {
+    if (type === SearchType.Unknown) {
       return {
         totalCount: 0,
         items: []
