@@ -2,7 +2,6 @@ import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
-import { CONNECTION_NOT_FOUND_NAME } from 'database/chain/ormconfig'
 import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
@@ -132,20 +131,6 @@ export class TransactionsService {
     params: TransactionsByLockHashesParam,
     searchValue: string = ''
   ): Promise<PaginationResult<Transaction>> => {
-    try {
-      // if connection not found, which means no database to connect
-      // it happened when no node connected and no previous database found.
-      getConnection()
-    } catch (err) {
-      if (err.name === CONNECTION_NOT_FOUND_NAME) {
-        return {
-          totalCount: 0,
-          items: [],
-        }
-      }
-      throw err
-    }
-
     const skip = (params.pageNo - 1) * params.pageSize
 
     const type = TransactionsService.filterSearchType(searchValue)
@@ -242,20 +227,6 @@ export class TransactionsService {
   ): Promise<PaginationResult<Transaction>> => {
     const beginTime = +new Date()
 
-    try {
-      // if connection not found, which means no database to connect
-      // it happened when no node connected and no previous database found.
-      getConnection()
-    } catch (err) {
-      if (err.name === CONNECTION_NOT_FOUND_NAME) {
-        return {
-          totalCount: 0,
-          items: [],
-        }
-      }
-      throw err
-    }
-
     const connection = getConnection()
 
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
@@ -281,14 +252,6 @@ export class TransactionsService {
       }
     }
 
-    // return TransactionsService.getAll(
-    //   {
-    //     pageNo: params.pageNo,
-    //     pageSize: params.pageSize,
-    //     lockHashes,
-    //   },
-    //   searchValue
-    // )
     const repository = connection.getRepository(TransactionEntity)
 
     let allTxHashes: string[] = []
@@ -305,9 +268,6 @@ export class TransactionsService {
           { lockHashes, beginTimestamp, endTimestamp }
         )
         .orderBy('tx.timestamp', 'DESC')
-        // .skip((params.pageNo - 1) * params.pageSize)
-        // .take(params.pageSize)
-        // .limit(params.pageSize)
         .getRawMany())
         .map(tx => tx.txHash)
     } else {
@@ -319,9 +279,6 @@ export class TransactionsService {
           { lockHashes }
         )
         .orderBy('tx.timestamp', 'DESC')
-        // .skip((params.pageNo - 1) * params.pageSize)
-        // .take(params.pageSize)
-        // .limit(params.pageSize)
         .getRawMany())
         .map(tx => tx.txHash)
     }
@@ -329,30 +286,8 @@ export class TransactionsService {
     const skip = (params.pageNo - 1) * params.pageSize
     const txHashes = allTxHashes.slice(skip, skip + params.pageSize)
 
-    // logger.info('txHashes:', txHashes)
-
     const totalCount: number = allTxHashes.length
 
-    logger.info('skip:', (params.pageNo - 1) * params.pageSize)
-
-    // logger.info('before transactions')
-    // const transactions: TransactionEntity[] = await getConnection()
-    //   .getRepository(TransactionEntity)
-    //   .createQueryBuilder('tx')
-    //   .leftJoinAndSelect('tx.inputs', 'input')
-    //   .leftJoinAndSelect('tx.outputs', 'output')
-    //   .where(`tx.hash in (:...txHashes)`, { txHashes })
-    //   .orderBy(`tx.timestamp`, 'ASC')
-    //   .getMany()
-    //   // .skip((params.pageNo - 1) * params.pageSize)
-    //   // .take(params.pageSize)
-    //   // // .limit(params.pageSize)
-    //   // .getMany()
-    // logger.info('after transactions')
-
-    // logger.info('first tx:', transactions[0])
-
-    // logger.info('before transactions')
     const transactions = await connection
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
@@ -360,7 +295,6 @@ export class TransactionsService {
       .orderBy(`tx.timestamp`, 'DESC')
       .getMany()
 
-    // logger.info('before inputs')
     const inputs = await connection
       .getRepository(InputEntity)
       .createQueryBuilder('input')
@@ -371,7 +305,6 @@ export class TransactionsService {
       .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes })
       .getRawMany()
 
-    // logger.info('before outputs', JSON.stringify(inputs, null, 2))
     const outputs = await connection
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
@@ -380,8 +313,6 @@ export class TransactionsService {
       .addSelect('output.daoData', 'daoData')
       .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
       .getRawMany()
-
-    // logger.info('after outputs')
 
     const inputPreviousTxHashes: string[] = inputs
       .map(i => i.outPointTxHash)
@@ -419,12 +350,6 @@ export class TransactionsService {
       }
     })
 
-    // logger.info('totalCount:', totalCount)
-    // const txs: Transaction[] = transactions.map(tx => tx.toModel())
-    // txs.map(tx => {
-    //   tx.value = sums.get(tx.hash!)?.toString() || '0'
-    //   tx.type = tx.value > BigInt(0) ? 'receive' : 'send',
-    // })
     const txs = transactions.map(tx => {
       const value = sums.get(tx.hash!) || BigInt(0)
       return Transaction.fromObject({
@@ -442,9 +367,8 @@ export class TransactionsService {
       })
     })
 
-    // logger.info('txs:', JSON.stringify(txs, null, 2))
     const afterTime = +new Date()
-    logger.info('execute time:', afterTime - beginTime)
+    logger.debug('getAllByAddresses execute time:', afterTime - beginTime)
 
     return {
       totalCount,
@@ -474,17 +398,6 @@ export class TransactionsService {
   }
 
   public static get = async (hash: string): Promise<Transaction | undefined> => {
-    try {
-      // if connection not found, may means no database to connect
-      // it happened when no node connected and no previous database found.
-      getConnection()
-    } catch (err) {
-      if (err.name === CONNECTION_NOT_FOUND_NAME) {
-        return undefined
-      }
-      throw err
-    }
-
     const tx = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('transaction')
