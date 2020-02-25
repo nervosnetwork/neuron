@@ -50,7 +50,7 @@ const SpecialAsset = ({
 
   const onViewDetail = useCallback(() => {
     const explorerUrl = getExplorerUrl(isMainnet)
-    openExternal(`${explorerUrl}/transaction/${txHash}/${index}`)
+    openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
   }, [isMainnet, txHash, index])
 
   return (
