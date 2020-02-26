@@ -21,12 +21,12 @@ export default class NetworksController {
       .pipe(distinctUntilChanged())
       .subscribe(async (connected: boolean) => {
         if (connected) {
-          logger.debug('Network reconnected')
+          logger.debug('Network:\treconnected')
           await networksService.update(networksService.getCurrentID(), {})
           this.notifyListChange()
           await this.connectToNetwork(true)
         } else {
-          logger.debug('Network connection dropped')
+          logger.debug('Network:\tconnection dropped')
         }
       })
 
