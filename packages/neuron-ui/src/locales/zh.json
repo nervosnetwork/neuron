@@ -116,7 +116,7 @@
       "total-cycles": "RISC-V Cycles 总数",
       "scan-screen-qr-code": "扫描屏幕上的二维码",
       "set-locktime": "设置锁定时间",
-      "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差",
+      "locktime-notice-content": "锁定时间根据区块链实际运行情况会有一定的误差。",
       "release-on": "锁定至"
     },
     "receive": {

@@ -116,7 +116,7 @@
       "total-cycles": "Total RISC-V Cycles",
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",
-      "locktime-notice-content": "According to the actual running block height, there may have some time variances in locktime.",
+      "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
       "release-on": "Release on"
     },
     "receive": {
