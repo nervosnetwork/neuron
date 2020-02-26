@@ -28,7 +28,7 @@ export default class ChainInfo {
 
       return genesisHash === this.network.genesisHash
     } catch (err) {
-      logger.error('Fail to connect to the network. Is CKB node running?')
+      logger.error('Network:\tfail to connect to the network. Is CKB node running?')
 
       await initConnection(this.network.genesisHash)
       this.loadMetaInfo(this.network.genesisHash) // Load cached system scripts that txs could be used offline
@@ -43,7 +43,7 @@ export default class ChainInfo {
       const daoScriptInfo = await DaoUtils.daoScript(url)
       updateMetaInfo({ genesisBlockHash: genesisHash, systemScriptInfo, daoScriptInfo })
     } catch (error) {
-      logger.error('Update meta info cache failed:', error.toString())
+      logger.error('Database:\tupdate meta info cache failed:', error.toString())
     }
   }
 
@@ -54,7 +54,7 @@ export default class ChainInfo {
       LockUtils.setSystemScript(metaInfo.systemScriptInfo)
       DaoUtils.setDaoScript(metaInfo.daoScriptInfo)
     } catch (error) {
-      logger.error('Get cached meta info failed:', error.toString())
+      logger.error('Database:\tget cached meta info failed:', error.toString())
     }
   }
 }

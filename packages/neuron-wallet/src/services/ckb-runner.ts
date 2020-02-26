@@ -37,19 +37,19 @@ const ckbDataPath = (): string => {
 }
 
 const initCkb = async () => {
-  logger.info('Initializing CKB...')
+  logger.info('CKB:\tInitializing node...')
   return new Promise((resolve, reject) => {
     const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
     initCmd.stderr.on('data', data => {
-      logger.error('CKB init fail:', data.toString())
+      logger.error('CKB:\tinit fail:', data.toString())
     })
     initCmd.stdout.on('data', data => {
-      logger.log('CKB init result:', data.toString())
+      logger.log('CKB:\tinit result:', data.toString())
     })
 
     initCmd.on('error', error => {
       // Mostly ckb binary is not found
-      logger.error('CKB init fail:', error)
+      logger.error('CKB:\tinit fail:', error)
       reject()
     })
 
@@ -62,20 +62,20 @@ const initCkb = async () => {
 
 export const startCkbNode = async () => {
   initCkb().then(async () => {
-    logger.info('Starting CKB...')
+    logger.info('CKB:\tstarting node...')
     ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
     ckb.stderr && ckb.stderr.on('data', data => {
-      logger.error('CKB run fail:', data.toString())
+      logger.error('CKB:\trun fail:', data.toString())
       ckb = null
     })
 
     ckb.on('error', error => {
-      logger.error('CKB run fail:', error)
+      logger.error('CKB:\trun fail:', error)
       ckb = null
     })
 
     ckb.on('close', () => {
-      logger.info('CKB process closed.')
+      logger.info('CKB:\tprocess closed')
       ckb = null
     })
   })
@@ -83,7 +83,7 @@ export const startCkbNode = async () => {
 
 export const stopCkbNode = () => {
   if (ckb) {
-    logger.info('Killing CKB')
+    logger.info('CKB:\tkilling node')
     ckb.kill()
     ckb = null
   }
