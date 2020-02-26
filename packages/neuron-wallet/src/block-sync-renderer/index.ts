@@ -29,51 +29,6 @@ AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
   await createBlockSyncTask(hasUsedAddresses)
 })
 
-// Network switch or network connect
-// Param rescan: rescan start from genesis block.
-const syncNetwork = async (rescan = false) => {
-  if (!network) {
-    network = NetworksService.getInstance().getCurrent()
-  }
-
-  // TODO: Do not clean meta info here!!!
-  LockUtils.cleanInfo()
-  DaoUtils.cleanInfo()
-
-  const blockNumber = new SyncedBlockNumber()
-  if (rescan) {
-    await blockNumber.reset()
-  }
-  const startBlockNumber = (await blockNumber.getNextBlock()).toString()
-  SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
-
-  DataUpdateSubject.next({
-    dataType: 'transaction',
-    actionType: 'update',
-  })
-
-  if (network.genesisHash !== EMPTY_GENESIS_HASH) {
-    if (backgroundWindow) {
-      const lockHashes = await AddressService.allLockHashes(network.remote)
-      const multiSignCodeHash: string = (await MultiSignUtils.multiSignScript()).codeHash
-      const blake160s = AddressService.allAddresses().map(address => address.blake160)
-      const multiSign = new MultiSign()
-      const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
-      backgroundWindow.webContents.send(
-        "block-sync:start",
-         network.remote,
-         network.genesisHash,
-         lockHashes,
-         startBlockNumber,
-         multiSignCodeHash,
-         multiSignBlake160s
-        )
-    }
-    // re init txCount in addresses if switch network
-    await updateAllAddressesTxCount(network.remote)
-  }
-}
-
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {
   const previousNetwork = network
   network = newNetwork
@@ -86,9 +41,9 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
   }
 
   if (reconnected) {
-    logger.debug('Network reconnected to:', network)
+    logger.info('Network:\treconnected to:', network)
   } else {
-    logger.debug('Network switched to:', network)
+    logger.info('Network:\tswitched to:', network)
   }
 
   killBlockSyncTask()
@@ -102,11 +57,15 @@ export const switchToNetwork = async (newNetwork: Network, reconnected = false, 
 export const createBlockSyncTask = async (rescan = false) => {
   await CommonUtils.sleep(2000) // Do not start too fast
 
+  if (rescan) {
+    await new SyncedBlockNumber().setNextBlock(BigInt(0))
+  }
+
   if (backgroundWindow) {
     return
   }
 
-  logger.info('Start block sync background process')
+  logger.info('Sync:\tstarting background process')
   backgroundWindow = new BrowserWindow({
     width: 1366,
     height: 768,
@@ -118,7 +77,43 @@ export const createBlockSyncTask = async (rescan = false) => {
   })
 
   backgroundWindow.on('ready-to-show', async () => {
-    syncNetwork(rescan)
+    if (!network) {
+      network = NetworksService.getInstance().getCurrent()
+    }
+
+    // TODO: Do not clean meta info here!!!
+    LockUtils.cleanInfo()
+    DaoUtils.cleanInfo()
+
+    const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
+    SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
+    logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
+
+    DataUpdateSubject.next({
+      dataType: 'transaction',
+      actionType: 'update',
+    })
+
+    if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+      if (backgroundWindow) {
+        const lockHashes = await AddressService.allLockHashes(network.remote)
+        const multiSignCodeHash: string = (await MultiSignUtils.multiSignScript()).codeHash
+        const blake160s = AddressService.allAddresses().map(address => address.blake160)
+        const multiSign = new MultiSign()
+        const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+        backgroundWindow.webContents.send(
+          "block-sync:start",
+          network.remote,
+          network.genesisHash,
+          lockHashes,
+          startBlockNumber,
+          multiSignCodeHash,
+          multiSignBlake160s
+          )
+      }
+      // re init txCount in addresses if switch network
+      await updateAllAddressesTxCount(network.remote)
+    }
   })
 
   backgroundWindow.on('closed', () => {
@@ -130,7 +125,7 @@ export const createBlockSyncTask = async (rescan = false) => {
 
 export const killBlockSyncTask = () => {
   if (backgroundWindow) {
-    logger.info('Kill block sync background process')
+    logger.info('Sync:\tkill background process')
     backgroundWindow.close()
   }
 }
