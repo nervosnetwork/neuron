@@ -1,3 +1,23 @@
+# 0.29.0 (2020-03-22)
+
+### Bundled CKB node
+
+CKB v0.29.0 was released on Feb 26th, 2020. This version of CKB node is now bundled and preconfigured in Neuron.
+
+### New features
+
+We added several new features with this version:
+
+* Sign/Verify message: Sign a message with an address and its private key, or verify a signed message with an address and its public key.
+* Customized assets: List customized assets that have non-standard cells, e.g. transactions with locktime.
+* Transaction with locktime: Send a transaction that could only be released after the locktime.
+
+### Performance tweak
+
+Thanks to the community we have found and fixed a serious performance issue. Miner wallets usually receive transactions with huge amount of inputs. When syncing this kind of wallets Neuron became very slow and unresponsive, and couldn't calculate the balance correctly. With this release we've tweaked the sync process, making it run faster and handle transactions with many inputs/outputs properly.
+
+
+
 # 0.28.0 (2020-02-13)
 
 ### Bundled CKB node
