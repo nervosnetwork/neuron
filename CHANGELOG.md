@@ -9,7 +9,7 @@ CKB v0.29.0 was released on Feb 26th, 2020. This version of CKB node is now bund
 We added several new features with this version:
 
 * Sign/Verify message: Sign a message with an address and its private key, or verify a signed message with an address and its public key.
-* Customized assets: List customized assets that have non-standard cells, e.g. transactions with locktime.
+* Customized assets: List customized assets that have non-standard cells, e.g. cells with locktime.
 * Transaction with locktime: Send a transaction that could only be released after the locktime.
 
 ### Performance tweak
