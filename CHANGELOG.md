@@ -1,4 +1,6 @@
-# 0.29.0 (2020-03-02)
+# 0.29.0-rc1 (2020-03-02)
+
+This is an RC version to preview the changes in the next release.
 
 ### Bundled CKB node
 
