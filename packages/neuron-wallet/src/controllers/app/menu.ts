@@ -2,7 +2,6 @@ import {
   app,
   shell,
   BrowserWindow,
-  dialog,
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
@@ -31,15 +30,12 @@ const separator: MenuItemConstructorOptions = {
 }
 
 const showAbout = () => {
-  const options = {
-    type: 'info',
-    title: app.name,
-    message: app.name,
-    detail: app.getVersion(),
-    buttons: ['OK'],
-    cancelId: 0,
-  }
-  dialog.showMessageBox(options)
+  app.setAboutPanelOptions({
+    applicationName: app.name,
+    applicationVersion: app.getVersion(),
+    copyright: 'Copyright (C) Nervos Foundation.'
+  })
+  app.showAboutPanel()
 }
 
 const navigateTo = (url: string) => {
@@ -75,7 +71,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
           app: app.name,
         }),
         role: 'about',
-        click: () => { showAbout() },
+        click: () => { showAbout() }
       },
       {
         label: i18n.t('application-menu.neuron.check-updates'),
