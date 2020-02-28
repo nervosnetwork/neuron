@@ -21,7 +21,7 @@
   border-radius: 2px;
   box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
   min-width: 500px;
-  max-width: 545px;
+  max-width: 650px;
   box-sizing: border-box;
 }
 
@@ -45,6 +45,9 @@
   color: #fff;
   font-size: 0.75rem;
   letter-spacing: 0.6px;
+  &:hover{
+    background-color: #21b574;
+  }
 }
 
 @mixin overlay {

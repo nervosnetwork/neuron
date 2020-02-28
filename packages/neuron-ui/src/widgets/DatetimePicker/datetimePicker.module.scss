@@ -1,0 +1,242 @@
+@import '../../styles/mixin.scss';
+$width: 374px;
+
+:global {
+  .p-calendar {
+    @include RegularText;
+    user-select: none;
+
+    width: $width;
+    padding: 20px 0;
+    border: 1px solid #eee;
+    box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .p-datepicker-today span {
+      color: var(--nervos-green);
+      pointer-events: none;
+    }
+
+    .p-datepicker-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      margin-bottom: 16px;
+
+      .p-datepicker-next.p-link {
+        order: 1
+      }
+
+      @mixin chevron-line {
+        display: block;
+        content: '';
+        width: 8px;
+        height: 2px;
+        background: #000;
+        position: absolute;
+      }
+
+      button {
+        background-color: transparent;
+        border: none;
+        font-weight: bolder;
+        position: relative;
+        padding: 0;
+        width: 10px;
+      }
+
+      .pi-chevron-left {
+        &::before {
+          @include chevron-line;
+          left: 0;
+          top: 50%;
+          transform-origin: left center;
+          position: absolute;
+          transform: rotate(-45deg) translateY(50%);
+        }
+
+        &::after {
+          @include chevron-line;
+          left: 0;
+          top: 50%;
+          transform-origin: left center;
+          transform: rotate(45deg) translateY(-50%);
+        }
+      }
+
+
+      .pi-chevron-right {
+        &::before {
+          @include chevron-line;
+          right: 0;
+          top: 50%;
+          transform-origin: right center;
+          position: absolute;
+          transform: rotate(-45deg) translateY(-50%);
+        }
+
+        &::after {
+          @include chevron-line;
+          right: 0;
+          top: 50%;
+          transform-origin: right center;
+          transform: rotate(45deg) translateY(50%);
+        }
+      }
+
+
+      .p-datepicker-month {
+        margin-right: 5px;
+      }
+    }
+
+    .p-highlight {
+      background: var(--nervos-green);
+      color: #fff !important;
+    }
+
+    .p-disabled {
+      opacity: 0.2;
+    }
+
+    th {
+      color: rgba(0, 0, 0, 0.38);
+      font-size: 12px;
+    }
+
+    td {
+      span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        color: #000;
+        user-select: none;
+
+        font-size: 12px;
+        font-family: "Monsterrat-Regular";
+        margin: auto 3px;
+
+        &:not(.p-disabled):hover {
+          color: #fff;
+          background-color: var(--nervos-green);
+        }
+
+      }
+    }
+  }
+}
+
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+
+  .calendar {
+    display: none;
+  }
+
+
+  .popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    background: #fff;
+    padding: 60px 85px;
+    border-radius: 2px;
+    box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
+
+    .title {
+      @include dialogTitle;
+    }
+
+    .timezone {
+      span:first-child {
+        @include SemiBoldText;
+        margin-right: 5px;
+      }
+
+      @include RegularText;
+      margin-bottom: 8px;
+    }
+
+
+    input,
+    .displayedTime {
+      width: $width;
+      height: 26px;
+      font-size: 12px;
+      box-sizing: border-box;
+      border: 1px solid #eee;
+      padding: 5px;
+    }
+
+    .displayedTime {
+      span:first-child {
+        @include RegularText;
+        margin-right: 5px;
+      }
+
+      span:last-child {
+        @include SemiBoldText;
+      }
+    }
+
+    input {
+      border-color: var(--nervos-green);
+    }
+
+    &[data-status="edit"] {
+      .calendar {
+        display: flex;
+      }
+    }
+
+  }
+
+  .actions {
+    @include dialogFooter;
+    width: $width;
+    margin-top: 28px;
+
+    button:last-child {
+      @include dialogConfirmButton;
+      margin-left: 9px;
+    }
+  }
+
+  .notice {
+    @include RegularText;
+    width: $width;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+
+    h5 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.7px;
+      padding: 0;
+      margin: 22px auto 6px auto;
+    }
+  }
+
+  .error {
+    @include RegularText;
+    color: red;
+    font-size: 0.75rem;
+    margin-top: 5px;
+  }
+
+}

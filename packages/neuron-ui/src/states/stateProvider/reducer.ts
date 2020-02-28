@@ -32,6 +32,7 @@ export enum AppActions {
   UpdateGeneratedTx = 'updateGeneratedTx',
   ClearSendState = 'clearSendState',
   UpdateMessage = 'updateMessage',
+  SetGlobalDialog = 'setGlobalDialog',
   AddNotification = 'addNotification',
   DismissNotification = 'dismissNotification',
   ClearNotificationsOfCode = 'clearNotificationsOfCode',
@@ -62,6 +63,7 @@ export type StateAction =
   | { type: AppActions.UpdateGeneratedTx; payload: any }
   | { type: AppActions.ClearSendState }
   | { type: AppActions.UpdateMessage; payload: any }
+  | { type: AppActions.SetGlobalDialog; payload: 'unlock-success' | null }
   | { type: AppActions.AddNotification; payload: State.Message }
   | { type: AppActions.DismissNotification; payload: number } // payload: timestamp
   | { type: AppActions.ClearNotificationsOfCode; payload: ErrorCode } // payload: code
@@ -202,8 +204,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.UpdateSendOutput: {
       /**
-       * payload:{ idx, item: { address, capacity } }
+       * payload:{ idx, item: { address, capacity, date } }
        */
+      if ('address' in action.payload.item) {
+        Object.assign(state.app.send.outputs[action.payload.idx], { date: undefined })
+      }
       Object.assign(state.app.send.outputs[action.payload.idx], action.payload.item)
       state.app.messages.send = null
       break
@@ -247,6 +252,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
        * payload: {type,content, timestamp}
        */
       Object.assign(state.app.messages, action.payload)
+      break
+    }
+    case AppActions.SetGlobalDialog: {
+      state.app.globalDialog = action.payload
       break
     }
     case AppActions.AddNotification: {

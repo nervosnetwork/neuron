@@ -48,6 +48,8 @@ const TransactionList = ({
 
   const onContextMenu = useCallback(
     (e: React.SyntheticEvent<HTMLDivElement>) => {
+      e.stopPropagation()
+      e.preventDefault()
       const {
         dataset: { hash },
       } = e.target as HTMLDivElement

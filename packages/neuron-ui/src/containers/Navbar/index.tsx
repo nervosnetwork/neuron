@@ -18,6 +18,7 @@ const menuItems = [
   { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
   { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
   { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO },
+  { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets },
   { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
   { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
 ]

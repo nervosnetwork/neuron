@@ -47,6 +47,8 @@ type Action =
   | 'generate-send-all-tx'
   | 'generate-mnemonic'
   | 'validate-mnemonic'
+  | 'sign-message'
+  | 'verify-signature'
   // Transactions
   | 'get-transaction-list'
   | 'get-transaction'
@@ -58,6 +60,9 @@ type Action =
   | 'generate-dao-deposit-all-tx'
   | 'start-withdraw-from-dao'
   | 'withdraw-from-dao'
+  // Special Assets
+  | 'get-customized-asset-cells'
+  | 'generate-withdraw-customized-cell-tx'
   // Networks
   | 'get-all-networks'
   | 'create-network'

@@ -2,8 +2,8 @@ import WalletService, { Wallet } from 'services/wallets'
 import WalletsService from 'services/wallets'
 import { IsRequired } from 'exceptions'
 import NodeService from './node'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
-import { TransactionPersistor, TransactionsService, TransactionGenerator } from './tx'
+import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sdk-utils'
+import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
 import NetworksService from './networks'
 import { AddressPrefix } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
@@ -27,94 +27,33 @@ import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
 import Script from 'models/chain/script'
+import MultiSign from 'models/multi-sign'
+import Blake2b from 'models/blake2b'
+import HexUtils from 'utils/hex'
+import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
   lockHash: string
   witness: string
-  blake160: string
+  lockArgs: string
 }
 
 export default class TransactionSender {
+  static MULTI_SIGN_ARGS_LENGTH = 58
+
   private walletService: WalletService
 
   constructor() {
     this.walletService = WalletsService.getInstance()
   }
 
-  public sendTx = async (walletID: string = '', tx: Transaction, password: string = '', description: string = '') => {
-    const wallet = this.walletService.get(walletID)
-
-    if (password === '') {
-      throw new IsRequired('Password')
-    }
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '') {
+    const tx = this.sign(walletID, transaction, password)
 
     const { ckb } = NodeService.getInstance()
-    const txHash: string = tx.computeHash()
-
-    const addressInfos = this.getAddressInfos(walletID)
-    const paths = addressInfos.map(info => info.path)
-    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
-    const findPrivateKey = (blake160: string) => {
-      const { path } = addressInfos.find(i => i.blake160 === blake160)!
-      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
-      if (!pathAndPrivateKey) {
-        throw new Error('no private key found')
-      }
-      return pathAndPrivateKey.privateKey
-    }
-
-    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
-      const blake160: string = input.lock!.args!
-      const wit: WitnessArgs | string = tx.witnesses[index]
-      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
-      return {
-        // TODO: fill in required DAO's type witness here
-        witnessArgs,
-        lockHash: input.lockHash!,
-        witness: '',
-        blake160,
-      }
-    })
-
-    const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
-
-    for (const lockHash of lockHashes) {
-      const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
-      // A 65-byte empty signature used as placeholder
-      witnessesArgs[0].witnessArgs.setEmptyLock()
-
-      const privateKey = findPrivateKey(witnessesArgs[0].blake160)
-
-      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
-        .map((value: SignInfo, index: number) => {
-          const args = value.witnessArgs
-          if (index === 0) {
-            return args
-          }
-          if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
-            return '0x'
-          }
-          return serializeWitnessArgs(args.toSDK())
-        })
-      const signed = ckb.signWitnesses(privateKey)({
-        transactionHash: txHash,
-        witnesses: serializedWitnesses.map(wit => {
-          if (typeof wit === 'string') {
-            return wit
-          }
-          return wit.toSDK()
-        })
-      })
-
-      for (let i = 0; i < witnessesArgs.length; ++i) {
-        witnessesArgs[i].witness = signed[i] as string
-      }
-    }
-
-    tx.witnesses = witnessSigningEntries.map(w => w.witness)
-
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
+    const txHash = tx.hash!
 
     tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
@@ -127,12 +66,143 @@ export default class TransactionSender {
     return txHash
   }
 
+  private sign(walletID: string = '', transaction: Transaction, password: string = '') {
+    const wallet = this.walletService.get(walletID)
+
+    if (password === '') {
+      throw new IsRequired('Password')
+    }
+
+    const tx = Transaction.fromObject(transaction)
+    const { ckb } = NodeService.getInstance()
+    const txHash: string = tx.computeHash()
+
+    // Only one multi sign input now.
+    const isMultiSign = tx.inputs.length === 1 &&
+      tx.inputs[0].lock!.args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH
+
+    const addressInfos = this.getAddressInfos(walletID)
+    const multiSignBlake160s = isMultiSign ? addressInfos.map(i => {
+      return {
+        multiSignBlake160: new MultiSign().hash(i.blake160),
+        path: i.path
+      }
+    }) : []
+    const paths = addressInfos.map(info => info.path)
+    const pathAndPrivateKeys = this.getPrivateKeys(wallet, paths, password)
+    const findPrivateKey = (args: string) => {
+      let path: string | undefined
+      if (args.length === TransactionSender.MULTI_SIGN_ARGS_LENGTH) {
+        path = multiSignBlake160s.find(i => args.slice(0, 42) === i.multiSignBlake160)!.path
+      } else {
+        path = addressInfos.find(i => i.blake160 === args)!.path
+      }
+      const pathAndPrivateKey = pathAndPrivateKeys.find(p => p.path === path)
+      if (!pathAndPrivateKey) {
+        throw new Error('no private key found')
+      }
+      return pathAndPrivateKey.privateKey
+    }
+
+    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
+      const lockArgs: string = input.lock!.args!
+      const wit: WitnessArgs | string = tx.witnesses[index]
+      const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()
+      return {
+        // TODO: fill in required DAO's type witness here
+        witnessArgs,
+        lockHash: input.lockHash!,
+        witness: '',
+        lockArgs,
+      }
+    })
+
+    const lockHashes = new Set(witnessSigningEntries.map(w => w.lockHash))
+
+    for (const lockHash of lockHashes) {
+      const witnessesArgs = witnessSigningEntries.filter(w => w.lockHash === lockHash)
+      // A 65-byte empty signature used as placeholder
+      witnessesArgs[0].witnessArgs.setEmptyLock()
+
+      const privateKey = findPrivateKey(witnessesArgs[0].lockArgs)
+
+      const serializedWitnesses: (WitnessArgs | string)[] = witnessesArgs
+        .map((value: SignInfo, index: number) => {
+          const args = value.witnessArgs
+          if (index === 0) {
+            return args
+          }
+          if (args.lock === undefined && args.inputType === undefined && args.outputType === undefined) {
+            return '0x'
+          }
+          return serializeWitnessArgs(args.toSDK())
+        })
+      let signed: (string | CKBComponents.WitnessArgs | WitnessArgs)[] = []
+
+      if (isMultiSign) {
+        const blake160 = addressInfos.find(i => witnessesArgs[0].lockArgs.slice(0, 42) === new MultiSign().hash(i.blake160))!.blake160
+        const serializedMultiSign: string = new MultiSign().serialize(blake160)
+        signed = this.signSingleMultiSignScript(privateKey, serializedWitnesses, txHash, serializedMultiSign)
+        const wit = signed[0] as WitnessArgs
+        wit.lock = serializedMultiSign + wit.lock!.slice(2)
+        signed[0] = serializeWitnessArgs(wit.toSDK())
+      } else {
+        signed = ckb.signWitnesses(privateKey)({
+          transactionHash: txHash,
+          witnesses: serializedWitnesses.map(wit => {
+            if (typeof wit === 'string') {
+              return wit
+            }
+            return wit.toSDK()
+          })
+        })
+      }
+
+      for (let i = 0; i < witnessesArgs.length; ++i) {
+        witnessesArgs[i].witness = signed[i] as string
+      }
+    }
+
+    tx.witnesses = witnessSigningEntries.map(w => w.witness)
+    tx.hash = txHash
+
+    return tx
+  }
+
+  private signSingleMultiSignScript(privateKey: string, witnesses: (string | WitnessArgs)[], txHash: string, serializedMultiSign: string) {
+    const firstWitness = witnesses[0]
+    if (typeof(firstWitness) === 'string') {
+      throw new Error('First witness must be WitnessArgs')
+    }
+    const restWitnesses = witnesses.slice(1)
+
+    const emptyWitness = WitnessArgs.fromObject({
+      ...firstWitness,
+      lock: `0x` + serializedMultiSign.slice(2) + '0'.repeat(130)
+    })
+    const serializedEmptyWitness = serializeWitnessArgs(emptyWitness.toSDK())
+    const serialziedEmptyWitnessSize = HexUtils.byteLength(serializedEmptyWitness)
+    const blake2b = new Blake2b()
+    blake2b.update(txHash)
+    blake2b.update(toHexInLittleEndian(`0x${serialziedEmptyWitnessSize.toString(16)}`, 8))
+    blake2b.update(serializedEmptyWitness)
+
+    restWitnesses.forEach(w => {
+      const wit: string = typeof w === 'string' ? w : serializeWitnessArgs(w.toSDK())
+      const byteLength = HexUtils.byteLength(wit)
+      blake2b.update(toHexInLittleEndian(`0x${byteLength.toString(16)}`, 8))
+      blake2b.update(wit)
+    })
+
+    const message = blake2b.digest()
+    const keyPair = new ECPair(privateKey)
+    emptyWitness.lock = keyPair.signRecoverable(message)
+    return [emptyWitness, ...restWitnesses]
+  }
+
   public generateTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
@@ -162,10 +232,7 @@ export default class TransactionSender {
 
   public generateSendingAllTx = async (
     walletID: string = '',
-    items: {
-      address: string
-      capacity: string
-    }[] = [],
+    items: TargetOutput[] = [],
     fee: string = '0',
     feeRate: string = '0',
   ): Promise<Transaction> => {
@@ -388,6 +455,40 @@ export default class TransactionSender {
     )
 
     return tx
+  }
+
+  public async generateWithdrawMultiSignTx(
+    walletID: string,
+    outPoint: OutPoint,
+    fee: string = '0',
+    feeRate: string = '0'
+  ) {
+      // only for check wallet exists
+      this.walletService.get(walletID)
+
+      const url: string = NodeService.getInstance().ckb.node.url
+      const rpcService = new RpcService(url)
+      const cellWithStatus = await rpcService.getLiveCell(outPoint, false)
+      if (!cellWithStatus.isLive()) {
+        throw new CellIsNotYetLive()
+      }
+      const prevTx = await rpcService.getTransaction(outPoint.txHash)
+      if (!prevTx || !prevTx.txStatus.isCommitted()) {
+        throw new TransactionIsNotCommittedYet()
+      }
+
+      const receivingAddressInfo = await AddressesService.nextUnusedAddress(walletID)
+      const receivingAddress = receivingAddressInfo!.address
+      const prevOutput = cellWithStatus.cell!.output
+      const tx: Transaction = await TransactionGenerator.generateWithdrawMultiSignTx(
+        outPoint,
+        prevOutput,
+        receivingAddress,
+        fee,
+        feeRate,
+      )
+
+      return tx
   }
 
   public calculateDaoMaximumWithdraw = async (depositOutPoint: OutPoint, withdrawBlockHash: string): Promise<bigint> => {

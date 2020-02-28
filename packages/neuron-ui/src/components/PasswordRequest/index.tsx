@@ -59,6 +59,18 @@ const PasswordRequest = () => {
         })(dispatch)
         break
       }
+      case 'unlock': {
+        if (isSending) {
+          break
+        }
+        sendTransaction({
+          walletID,
+          tx: generatedTx,
+          description,
+          password,
+        })(dispatch, history, { type: 'unlock' })
+        break
+      }
       default: {
         break
       }
@@ -68,9 +80,6 @@ const PasswordRequest = () => {
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
-      if (/\s/.test(value)) {
-        return
-      }
       dispatch({
         type: AppActions.UpdatePassword,
         payload: value,
@@ -94,7 +103,7 @@ const PasswordRequest = () => {
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
       <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-      <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
+      {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
       <TextField
         label={t('password-request.password')}
         value={password}
@@ -105,6 +114,7 @@ const PasswordRequest = () => {
         autoFocus
         onKeyPress={onKeyPress}
         required
+        className={styles.passwordInput}
       />
       <div className={styles.footer}>
         <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />

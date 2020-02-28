@@ -2,16 +2,16 @@ import React, { useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
-import { openExternal } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import {
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
   dismissNotification,
+  dismissGlobalDialog,
 } from 'states/stateProvider/actionCreators'
+import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
-import { ErrorCode, RUN_NODE_GUIDE_URL } from 'utils/const'
 import styles from './Notification.module.scss'
 
 const notificationType = (type: 'success' | 'warning' | 'alert') => {
@@ -61,7 +61,14 @@ const TopAlertActions = ({
 
 export const NoticeContent = () => {
   const {
-    app: { notifications = [], alertDialog = null, popups = [], showTopAlert = false, showAllNotifications = false },
+    app: {
+      notifications = [],
+      alertDialog = null,
+      popups = [],
+      showTopAlert = false,
+      showAllNotifications = false,
+      globalDialog = null,
+    },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -84,9 +91,9 @@ export const NoticeContent = () => {
     [dispatch]
   )
 
-  const onGuideLinkClick = useCallback(() => {
-    openExternal(RUN_NODE_GUIDE_URL)
-  }, [])
+  const onGlobalDialogDismiss = useCallback(() => {
+    dismissGlobalDialog()(dispatch)
+  }, [dispatch])
 
   return (
     <div>
@@ -109,11 +116,6 @@ export const NoticeContent = () => {
           {notification.code
             ? t(`messages.codes.${notification.code}`, notification.meta)
             : notification.content || t('messages.unknown-error')}
-          {notification.code === ErrorCode.NodeDisconnected ? (
-            <Text as="span" variant="xSmall" className={styles.guide} onClick={onGuideLinkClick}>
-              {t('messages.run-ckb-guide')}
-            </Text>
-          ) : null}
         </MessageBar>
       ) : null}
 
@@ -175,6 +177,7 @@ export const NoticeContent = () => {
           )
         })}
       </Panel>
+      <GlobalDialog type={globalDialog} onDismiss={onGlobalDialogDismiss} />
       <AlertDialog content={alertDialog} dispatch={dispatch} />
     </div>
   )

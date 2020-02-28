@@ -86,7 +86,10 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
 
 export const sendTransaction = (params: Controller.SendTransactionParams) => (
   dispatch: StateDispatch,
-  history: any
+  history: any,
+  options?: {
+    type: 'unlock'
+  }
 ) => {
   dispatch({
     type: AppActions.UpdateLoadings,
@@ -102,7 +105,14 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => (
             type: AppActions.ClearNotificationsOfCode,
             payload: ErrorCode.PasswordIncorrect,
           })
-          history.push(Routes.History)
+          if (options && options.type === 'unlock') {
+            dispatch({
+              type: AppActions.SetGlobalDialog,
+              payload: 'unlock-success',
+            })
+          } else {
+            history.push(Routes.History)
+          }
         } else {
           addNotification({
             type: 'alert',

@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
+import { TFunction } from 'i18next'
+import { openContextMenu } from 'services/remote'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { epochParser } from 'utils/parsers'
@@ -152,4 +154,47 @@ export const useDialog = ({
   }, [show, dialogRef, onClose])
 }
 
-export default { useGoBack, useLocalDescription, useCalculateEpochs, useDialog }
+export const useOnDefaultContextMenu = (t: TFunction) =>
+  useCallback(() => {
+    const contextMenuTemplate = [
+      { label: t('contextmenu.cut'), role: 'cut' },
+      {
+        label: t('contextmenu.copy'),
+        role: 'copy',
+      },
+      {
+        label: t('contextmenu.paste'),
+        role: 'paste',
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: t('contextmenu.selectall'),
+        role: 'selectAll',
+      },
+    ]
+    openContextMenu(contextMenuTemplate)
+  }, [t])
+
+export const useExitOnWalletChange = () => {
+  const listener = (e: StorageEvent) => {
+    if (e.key === 'currentWallet') {
+      window.close()
+    }
+  }
+  return useEffect(() => {
+    window.addEventListener('storage', listener)
+    return () => {
+      window.removeEventListener('storage', listener)
+    }
+  }, [])
+}
+export default {
+  useGoBack,
+  useLocalDescription,
+  useCalculateEpochs,
+  useDialog,
+  useOnDefaultContextMenu,
+  useExitOnWalletChange,
+}

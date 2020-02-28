@@ -285,9 +285,6 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
         value,
         dataset: { field = '' },
       } = e.target as HTMLInputElement
-      if (['password', 'confirmPassword'].includes(field) && /\s/.test(value)) {
-        return
-      }
       dispatch({
         type: field,
         payload: value,

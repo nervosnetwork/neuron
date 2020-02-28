@@ -9,7 +9,6 @@ import {
   getAllNetworks,
   getCurrentNetworkID,
   openExternal,
-  openContextMenu,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
@@ -17,6 +16,7 @@ import { transactionState } from 'states/initStates/chain'
 
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { ErrorCode, MAINNET_TAG } from 'utils/const'
+import { useOnDefaultContextMenu, useExitOnWalletChange } from 'utils/hooks'
 import styles from './transaction.module.scss'
 
 const Transaction = () => {
@@ -27,6 +27,8 @@ const Transaction = () => {
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
+
+  const onContextMenu = useOnDefaultContextMenu(t)
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -78,13 +80,7 @@ const Transaction = () => {
     }
   }, [t])
 
-  useEffect(() => {
-    window.addEventListener('storage', (e: StorageEvent) => {
-      if (e.key === 'currentWallet') {
-        window.close()
-      }
-    })
-  }, [])
+  useExitOnWalletChange()
 
   const onExplorerBtnClick = useCallback(() => {
     const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
@@ -110,46 +106,6 @@ const Transaction = () => {
       },
     ],
     [t, transaction]
-  )
-
-  const onInfoContextMenu = useCallback(
-    (e: React.SyntheticEvent) => {
-      const {
-        dataset: { txHash },
-      } = e.target as HTMLDivElement
-      if (txHash) {
-        const menuTemplate = [
-          {
-            label: t('common.copy-tx-hash'),
-            click: () => {
-              window.clipboard.writeText(txHash)
-            },
-          },
-        ]
-        openContextMenu(menuTemplate)
-      }
-    },
-    [t]
-  )
-
-  const onCellContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      const {
-        dataset: { address },
-      } = (e.target as HTMLTableCellElement).parentElement as HTMLTableRowElement
-      if (address) {
-        const menuTemplate = [
-          {
-            label: t('common.copy-address'),
-            click: () => {
-              window.clipboard.writeText(address)
-            },
-          },
-        ]
-        openContextMenu(menuTemplate)
-      }
-    },
-    [t]
   )
 
   const inputsTitle = useMemo(
@@ -194,7 +150,7 @@ const Transaction = () => {
         }
 
         return (
-          <tr key={cell.lockHash || ''} data-address={address} onContextMenu={onCellContextMenu}>
+          <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
             <td title={address} className={`monospacedFont ${styles.addressCell}`}>
               {address}
@@ -203,7 +159,7 @@ const Transaction = () => {
           </tr>
         )
       }),
-    [t, onCellContextMenu, addressPrefix, systemCodeHash]
+    [t, addressPrefix, systemCodeHash]
   )
 
   if (error.code) {
@@ -215,7 +171,7 @@ const Transaction = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onContextMenu={onContextMenu}>
       <h2
         className={styles.infoTitle}
         title={t('history.basic-information')}
@@ -223,7 +179,7 @@ const Transaction = () => {
       >
         {t('history.basic-information')}
       </h2>
-      <div className={styles.infoDetail} onContextMenu={onInfoContextMenu} data-tx-hash={transaction.hash}>
+      <div className={styles.infoDetail}>
         {basicInfoItems.map(({ label, value }, idx) => (
           <div key={label}>
             <span>{label}</span>

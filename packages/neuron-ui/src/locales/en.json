@@ -3,6 +3,12 @@
     "launch-screen": {
       "loading-wallets": "Loading wallets"
     },
+    "contextmenu": {
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "selectall": "Select All"
+    },
     "navbar": {
       "overview": "Overview",
       "wallet": "Wallet",
@@ -12,6 +18,7 @@
       "addresses": "Addresses",
       "settings": "Settings",
       "nervos-dao": "Nervos DAO",
+      "special-assets": "Customized Assets",
       "fail-to-fetch-tip-block-number": "Connection error",
       "sync-not-start": "Sync not started yet"
     },
@@ -107,7 +114,10 @@
       "price": "Price",
       "expected-speed": "Expected speed",
       "total-cycles": "Total RISC-V Cycles",
-      "scan-screen-qr-code": "Scan the QR Code on the screen"
+      "scan-screen-qr-code": "Scan the QR Code on the screen",
+      "set-locktime": "Set Locktime",
+      "locktime-notice-content": "According to the actual running block height, there may be some time variances in locktime.",
+      "release-on": "Release on"
     },
     "receive": {
       "click-to-copy": "Click to copy the address",
@@ -232,6 +242,9 @@
       },
       "backup": {
         "title": "Backup the {{name}} wallet"
+      },
+      "unlock":{
+        "title": "Please input wallet password to claim the asset"
       }
     },
     "qrcode": {
@@ -255,7 +268,8 @@
       "backup": "Backup",
       "edit": "Edit",
       "delete": "Delete",
-      "click-to-edit": "Click to edit"
+      "click-to-edit": "Click to edit",
+      "notice": "Notice"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -295,7 +309,6 @@
         "keystore-password": "Password",
         "deposit": "Deposit"
       },
-      "run-ckb-guide": "How to run a CKB node?",
       "codes": {
         "-3": "",
         "100": "Amount is not enough.",
@@ -305,6 +318,7 @@
         "104": "Fail to connect to the node, please restart Neuron.",
         "105": "You need more capacities for change (at least 61 CKBytes), or click 'Max' button to send all your balance.",
         "106": "You need more capacities for change (at least 61 CKBytes), or slide to the end to send all your balance.",
+        "107": "The amount {{amount}} CKB is too small, transfer with locktime requires an amount no less than 69 CKB.",
         "201": "$t(messages.fields.{{fieldName}}) is required.",
         "202": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is used.",
         "203": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is too long, it should be shorter than or equal to {{length}}.",
@@ -382,6 +396,58 @@
       "download-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
+    },
+    "datetime": {
+      "mon": { "full": "Monday", "short": "Mon.", "tag": "M" },
+      "tue": { "full": "Tuesday", "short": "Tue.", "tag": "Tu" },
+      "wed": { "full": "Wednesday", "short": "Wed.", "tag": "W" },
+      "thur": { "full": "Thursday", "short": "Thur.", "tag": "T" },
+      "fri": { "full": "Friday", "short": "Fri.", "tag": "F" },
+      "sat": { "full": "Saturday", "short": "Sat.", "tag": "Sa" },
+      "sun": { "full": "Sunday", "short": "Sun.", "tag": "Su" },
+      "jan": { "full": "January", "short": "Jan.", "tag": "J" },
+      "feb": { "full": "Febrary", "short": "Feb.", "tag": "F" },
+      "mar": { "full": "March", "short": "Mar.", "tag": "M" },
+      "apr": { "full": "April", "short": "Apr.", "tag": "A" },
+      "may": { "full": "May", "short": "May.", "tag": "M" },
+      "june": { "full": "June", "short": "June.", "tag": "J" },
+      "july": { "full": "July", "short": "July.", "tag": "J" },
+      "aug": { "full": "August", "short": "Aug.", "tag": "Aug" },
+      "sept": { "full": "September", "short": "Sept.", "tag": "S" },
+      "oct": { "full": "October", "short": "Oct.", "tag": "O" },
+      "nov": { "full": "November", "short": "Nov.", "tag": "N" },
+      "dec": { "full": "December", "short": "Dec.", "tag": "D" },
+      "timezone": "Time Zone",
+      "start-tomorrow": "Selected time should start from tomorrow."
+    },
+    "sign-and-verify": {
+      "sign-or-verify-message": "Sign or Verify Message",
+      "message": "Message",
+      "address": "Address",
+      "signature": "Signature",
+      "cancel": "Cancel",
+      "sign": "Sign",
+      "verify": "Verify",
+      "password": "Password",
+      "confirm": "Confirm",
+      "verification-success": "Verification Succeeded",
+      "verification-failure": "Verification Failed",
+      "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
+    },
+    "special-assets": {
+      "date": "Date",
+      "capacity": "Capacity",
+      "type-script-tooltip": "Type Script",
+      "data-tooltip": "Data",
+      "user-defined-asset": "Uncataloged Asset",
+      "user-defined-asset-tooltip": "This is an uncataloged asset，Neuron cannot process it now，please use a third-party software to check.",
+      "locked-asset": "Locked",
+      "locked-asset-tooltip": "Lock parameter is {{epochs}} epochs, estimated release date is {{year}}-{{month}}-{{day}}(according to the actual running block height, there may be some time variances in locktime).",
+      "claim-asset": "Claim",
+      "view-details": "View Details",
+      "release-success": "Asset was released, view details in History.",
+      "no-special-assets": "No customized assets",
+      "experimental": "Experimental"
     }
   }
 }

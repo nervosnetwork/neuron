@@ -85,6 +85,13 @@ export const dismissNotification = (timestamp: number) => (dispatch: StateDispat
   })
 }
 
+export const dismissGlobalDialog = () => (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.SetGlobalDialog,
+    payload: null,
+  })
+}
+
 export const showAlertDialog = (content: { title: string; message: string }) => (
   dispatch: React.Dispatch<{ type: AppActions.UpdateAlertDialog; payload: { title: string; message: string } }>
 ) => {
@@ -128,6 +135,7 @@ export default {
   initAppState,
   addNotification,
   addPopup,
+  dismissGlobalDialog,
   dismissNotification,
   showAlertDialog,
   dismissAlertDialog,

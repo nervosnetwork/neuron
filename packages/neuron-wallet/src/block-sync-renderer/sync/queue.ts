@@ -35,13 +35,18 @@ export default class Queue {
 
   private yieldTime = 1
 
-  constructor(url: string, lockHashes: string[], startBlockNumber: bigint) {
+  private multiSignCodeHash: string
+  private multiSignBlake160s: string[]
+
+  constructor(url: string, lockHashes: string[], multiSignCodeHash: string, multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.url = url
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
+    this.multiSignCodeHash = multiSignCodeHash
+    this.multiSignBlake160s = multiSignBlake160s
   }
 
   public start = async () => {
@@ -75,9 +80,9 @@ export default class Queue {
         }
       } catch (err) {
         if (err.message.startsWith('connect ECONNREFUSED')) {
-          logger.debug(`sync error:`, err)
+          logger.debug(`Sync:\terror:`, err)
         } else {
-          logger.error(`sync error:`, err)
+          logger.error(`Sync:\terror:`, err)
         }
       } finally {
         await CommonUtils.sleep(this.yieldTime)
@@ -143,11 +148,12 @@ export default class Queue {
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
-        logger.debug(`Scanning from block #${block.header.number}`)
+        logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const addresses = await new TxAddressFinder(this.url, this.lockHashes, tx).addresses()
-        if (addresses.length > 0) {
+        const [shouldSave, addresses] = await new TxAddressFinder(
+          this.url, this.lockHashes, tx, this.multiSignCodeHash, this.multiSignBlake160s).addresses()
+        if (shouldSave) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
               const previousTxHash = input.previousOutput!.txHash
@@ -203,7 +209,7 @@ export default class Queue {
 
   private updateCurrentBlockNumber(blockNumber: BigInt) {
     this.currentBlockNumber = BigInt(blockNumber)
-    ipcRenderer.invoke('synced-block-number-updated', this.currentBlockNumber.toString())
+    ipcRenderer.invoke('synced-block-number-updated', (this.currentBlockNumber - BigInt(1)).toString())
   }
 
   private async expandToTip(tipNumber: string) {

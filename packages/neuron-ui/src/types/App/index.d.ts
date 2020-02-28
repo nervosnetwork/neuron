@@ -48,6 +48,7 @@ declare namespace State {
     readonly address: string | undefined
     readonly amount: string | undefined
     readonly unit: any
+    readonly date?: string
   }
   type MessageType = 'success' | 'warning' | 'alert'
   interface Message<Code = number, Meta = Readonly<{ [key: string]: string | undefined }>> {
@@ -71,7 +72,7 @@ declare namespace State {
   }
 
   interface PasswordRequest {
-    readonly actionType: 'send' | 'backup' | 'delete' | null
+    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | null
     readonly walletID: string
     readonly password: string
   }
@@ -87,11 +88,13 @@ declare namespace State {
     readonly epoch: string
     readonly send: Readonly<Send>
     readonly passwordRequest: PasswordRequest
+    // TODO: is the field used in the app?
     readonly messages: {
       readonly [index: string]: Message | null
     }
     readonly popups: Readonly<Popup[]>
     readonly notifications: Readonly<Message[]>
+    readonly globalDialog: 'unlock-success' | null
     readonly alertDialog: AlertDialog
     readonly loadings: Readonly<{
       sending: boolean

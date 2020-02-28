@@ -3,6 +3,7 @@ import {
   MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
   MIN_AMOUNT,
+  SINCE_FIELD_SIZE,
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
   ErrorCode,
@@ -10,6 +11,10 @@ import {
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 
+const SHORT_ADDR_00_LENGTH = 46
+const SHORT_ADDR_00_PREFIX = '0x0100'
+const LONG_DATA_PREFIX = '0x02'
+const LONG_TYPE_PREFIX = '0x04'
 export const verifyAddress = (address: string, isMainnet?: boolean): boolean => {
   if (typeof address !== 'string') {
     return false
@@ -22,10 +27,10 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
   try {
     const parsed = ckbCore.utils.parseAddress(address, 'hex')
-    if (parsed.startsWith('0x02') || parsed.startsWith('0x04')) {
+    if (parsed.startsWith(LONG_DATA_PREFIX) || parsed.startsWith(LONG_TYPE_PREFIX)) {
       return true
     }
-    if (parsed.startsWith('0x01') && !(parsed.startsWith('0x0100') || parsed.startsWith('0x0101'))) {
+    if (!parsed.startsWith(SHORT_ADDR_00_PREFIX) || address.length !== SHORT_ADDR_00_LENGTH) {
       return false
     }
     return true
@@ -34,8 +39,8 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
 }
 
-export const verifyAmountRange = (amount: string = '') => {
-  return BigInt(CKBToShannonFormatter(amount)) >= BigInt(MIN_AMOUNT * SHANNON_CKB_RATIO)
+export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
+  return BigInt(CKBToShannonFormatter(amount)) >= BigInt((MIN_AMOUNT + extraSize) * SHANNON_CKB_RATIO)
 }
 
 export const verifyAmount = (amount: string = '0') => {
@@ -96,13 +101,14 @@ export const verifyPasswordComplexity = (password: string) => {
 
 export const verifyTransactionOutputs = (items: Readonly<State.Output[]> = [], ignoreLastAmount: boolean = false) => {
   return !items.some((item, i) => {
+    const extraSize = item.date ? SINCE_FIELD_SIZE : 0
     if (!item.address || verifyAddress(item.address) !== true) {
       return true
     }
     if (ignoreLastAmount && i === items.length - 1) {
       return false
     }
-    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount) !== true) {
+    if (verifyAmount(item.amount) !== true || verifyAmountRange(item.amount, extraSize) !== true) {
       return true
     }
     return false

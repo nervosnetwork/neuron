@@ -14,6 +14,7 @@ const appState: Readonly<State.App> = {
         address: undefined,
         amount: undefined,
         unit: CapacityUnit.CKB,
+        date: undefined,
       },
     ],
     price: '1000',
@@ -33,6 +34,7 @@ const appState: Readonly<State.App> = {
     wizard: null,
   },
   popups: [],
+  globalDialog: null,
   notifications: [],
   alertDialog: null,
   loadings: {

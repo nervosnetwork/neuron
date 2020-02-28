@@ -237,6 +237,7 @@ export default class WalletService {
 
     this.listStore.writeSync(this.walletsKey, newWallets)
     wallet.deleteKeystore()
+    AddressService.deleteByWalletId(id)
   }
 
   public setCurrent = (id: string) => {

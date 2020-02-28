@@ -14,10 +14,15 @@ import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import AddressParser from 'models/address-parser'
+import MultiSignUtils from 'models/multi-sign-utils'
+import MultiSign from 'models/multi-sign'
+import RpcService from 'services/rpc-service'
+import NodeService from 'services/node'
 
 export interface TargetOutput {
   address: string
   capacity: string
+  minutes?: string
 }
 
 export class TransactionGenerator {
@@ -32,19 +37,32 @@ export class TransactionGenerator {
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
+    const multiSignScript = await MultiSignUtils.multiSignScript()
+    const currentHeaderEpoch = await TransactionGenerator.getCurrentHeaderEpoch()
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputs: Output[] = targetOutputs.map(o => {
-      const { capacity, address } = o
+      const { capacity, address, minutes } = o
 
       const lockScript = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
+        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
         .parse()
 
       const output = new Output(capacity, lockScript)
+      if (minutes) {
+        const blake160 = lockScript.args
+        const script = Script.fromObject({
+          codeHash: multiSignScript.codeHash,
+          args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
+          hashType: multiSignScript.hashType,
+        })
+        output.setLock(script)
+        output.setMultiSignBlake160(script.args.slice(0, 42))
+      }
 
       const outputSize = output.calculateBytesize()
       if (BigInt(capacity) < BigInt(outputSize) * BigInt(10**8)) {
@@ -108,6 +126,8 @@ export class TransactionGenerator {
     feeRate: string = '0'
   ): Promise<Transaction> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
+    const multiSignScript = await MultiSignUtils.multiSignScript()
+    const currentHeaderEpoch = await TransactionGenerator.getCurrentHeaderEpoch()
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -124,13 +144,24 @@ export class TransactionGenerator {
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputs: Output[] = targetOutputs.map((o, index) => {
-      const { capacity, address } = o
+      const { capacity, address, minutes } = o
 
       const lockScript: Script = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
+        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
         .parse()
 
       const output = new Output(capacity, lockScript)
+      if (minutes) {
+        const blake160 = lockScript.args
+        const script = Script.fromObject({
+          codeHash: multiSignScript.codeHash,
+          args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
+          hashType: multiSignScript.hashType,
+        })
+        output.setLock(script)
+        output.setMultiSignBlake160(script.args.slice(0, 42))
+      }
 
       // skip last output
       const outputSize = output.calculateBytesize()
@@ -174,6 +205,12 @@ export class TransactionGenerator {
     }
 
     return tx
+  }
+
+  private static async getCurrentHeaderEpoch(): Promise<string> {
+    const rpcService = new RpcService(NodeService.getInstance().ckb.node.url)
+    const currentHeader = await rpcService.getTipHeader()
+    return currentHeader.epoch
   }
 
   public static generateDepositTx = async (
@@ -393,6 +430,61 @@ export class TransactionGenerator {
 
       tx.addOutput(changeOutput)
     }
+
+    return tx
+  }
+
+  public static async generateWithdrawMultiSignTx(
+    outPoint: OutPoint,
+    prevOutput: Output,
+    receivingAddress: string,
+    fee: string,
+    feeRate: string,
+  ): Promise<Transaction> {
+    const systemLockScript = await LockUtils.systemScript()
+    const multiSignScript = await MultiSignUtils.multiSignScript()
+
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const lockScript = new AddressParser(receivingAddress)
+      .setDefaultLockScript(systemLockScript.codeHash, systemLockScript.hashType)
+      .parse()
+
+    // const outputs: Output[] = [output]
+    const output = Output.fromObject({
+      capacity: prevOutput.capacity,
+      lock: lockScript
+    })
+
+    const since = new MultiSign().parseSince(prevOutput.lock.args)
+
+    const input = new Input(
+      outPoint,
+      since.toString(),
+      prevOutput.capacity,
+      prevOutput.lock,
+    )
+    const tx = Transaction.fromObject({
+      version: '0',
+      cellDeps: [
+        new CellDep(multiSignScript.outPoint, DepType.DepGroup)
+      ],
+      headerDeps: [],
+      inputs: [input],
+      outputs: [output],
+      witnesses: [],
+    })
+
+    if (mode.isFeeRateMode()) {
+      const size = TransactionSize.tx(tx) + TransactionSize.singleMultiSignWitness()
+      const fee = TransactionFee.fee(size, feeRateInt)
+      tx.fee = fee.toString()
+    } else {
+      tx.fee = fee
+    }
+
+    tx.outputs[0].setCapacity((BigInt(output.capacity) - BigInt(tx.fee)).toString())
 
     return tx
   }

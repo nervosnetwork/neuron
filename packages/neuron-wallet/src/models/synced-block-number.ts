@@ -1,67 +1,60 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import SyncedBlockNumberSubject from "models/subjects/node"
+import logger from 'utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
-  private nextBlock: bigint | undefined = undefined
+  #blockNumberEntity: SyncInfoEntity | undefined = undefined
+  #nextBlock: bigint | undefined = undefined
+
+  private static lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).
-  public getNextBlock = async (): Promise<bigint> => {
-    if (this.nextBlock) {
-      return this.nextBlock
+  public async getNextBlock(): Promise<bigint> {
+    if (this.#nextBlock) {
+      return this.#nextBlock
     }
 
-    const blockNumberEntity: SyncInfoEntity | undefined = await this.blockNumber()
-
-    if (!blockNumberEntity) {
-      return BigInt(0)
-    }
-
-    return BigInt(blockNumberEntity.value)
+    return BigInt((await this.blockNumber()).value)
   }
 
-  public setNextBlock = async (current: bigint): Promise<void> => {
-    this.nextBlock = current
+  public async setNextBlock(current: bigint): Promise<void> {
+    this.#nextBlock = current
     SyncedBlockNumberSubject.getSubject().next(current.toString())
 
-    let blockNumberEntity = await this.blockNumber()
-
-    let skipSave = false
-    if (blockNumberEntity && current - BigInt(blockNumberEntity.value) < BigInt(1000)) {
+    if (current === BigInt(0) || SyncedBlockNumber.lastSavedBlock === BigInt(-1) || current - SyncedBlockNumber.lastSavedBlock >= BigInt(1000)) {
       // Only persist block number for every 1,000 blocks to reduce DB write.
       // Practically it's unnecessary to save every block height, as iterating
       // blocks is fast.
-      skipSave = true
-    }
-    if (current === BigInt(0)) {
-      // Initial or reset
-      skipSave = false
-    }
+      //
+      // Note: `#lastSavedBlock` is an instance property. If `SyncedBlockNumber` is used
+      //   in multiple places to write next block number, reading them would get inconsistent results.
 
-    if (skipSave) {
-      return
-    }
+      SyncedBlockNumber.lastSavedBlock = current
 
-    if (!blockNumberEntity) {
-      blockNumberEntity = new SyncInfoEntity()
-      blockNumberEntity.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
+      let blockNumberEntity = await this.blockNumber()
+      blockNumberEntity.value = current.toString()
+      getConnection().manager.save(blockNumberEntity)
+      logger.info("Database:\tsaved synced block #" + current.toString())
     }
-    blockNumberEntity.value = current.toString()
-    await getConnection().manager.save(blockNumberEntity)
   }
 
-  public reset = async(): Promise<void> => {
-    return this.setNextBlock(BigInt(0))
-  }
+  private async blockNumber(): Promise<SyncInfoEntity> {
+    if (!this.#blockNumberEntity) {
+      this.#blockNumberEntity = await getConnection()
+        .getRepository(SyncInfoEntity)
+        .findOne({
+          name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
+        })
+    }
 
-  private blockNumber = async (): Promise<SyncInfoEntity | undefined> => {
-    const blockNumberEntity: SyncInfoEntity | undefined = await getConnection()
-      .getRepository(SyncInfoEntity)
-      .findOne({
-        name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
-      })
+    if (!this.#blockNumberEntity) {
+      this.#blockNumberEntity = new SyncInfoEntity()
+      this.#blockNumberEntity.name = SyncInfoEntity.CURRENT_BLOCK_NUMBER
+      this.#blockNumberEntity.value = '0'
+    }
 
-    return blockNumberEntity
+    return this.#blockNumberEntity
   }
 }

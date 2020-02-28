@@ -9,6 +9,7 @@ import {
 import i18n from 'locales/i18n'
 import env from 'env'
 import UpdateController from 'controllers/update'
+import { showWindow } from 'controllers/app/show-window'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
 
@@ -213,6 +214,21 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     ],
   }
 
+  const toolsMenuItem: MenuItemConstructorOptions = {
+    id: 'tools',
+    label: i18n.t('application-menu.tools.label'),
+    submenu: [
+      {
+        label: i18n.t('application-menu.tools.sign-and-verify'),
+        enabled: hasCurrentWallet,
+        click: () => {
+          const currentWallet = walletsService.getCurrent()
+          showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`))
+        }
+      }
+    ]
+  }
+
   const windowMenuItem: MenuItemConstructorOptions = {
     id: 'window',
     label: i18n.t('application-menu.window.label'),
@@ -295,8 +311,8 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   }
 
   const applicationMenuTemplate = env.isDevMode
-    ? [walletMenuItem, editMenuItem, developMenuItem, windowMenuItem, helpMenuItem]
-    : [walletMenuItem, editMenuItem, windowMenuItem, helpMenuItem]
+    ? [walletMenuItem, editMenuItem, developMenuItem, toolsMenuItem, windowMenuItem, helpMenuItem]
+    : [walletMenuItem, editMenuItem, toolsMenuItem, windowMenuItem, helpMenuItem]
 
   if (isMac) {
     applicationMenuTemplate.unshift(appMenuItem)

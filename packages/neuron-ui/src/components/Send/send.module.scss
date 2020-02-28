@@ -5,7 +5,7 @@ $textfieldWidth: calc(100vw - 370px);
   position: relative;
   display: grid;
   grid-template:
-    'address scanner add-or-remove'auto 'amount max add-or-remove'auto/ $textfieldWidth 50px 30px;
+    'address scanner add-or-remove'auto 'amount max add-or-remove'auto 'locktime locktime locktime'auto/ $textfieldWidth 50px 30px;
   grid-gap: 15px;
   padding: 28px 0 34px;
   box-sizing: border-box;
@@ -205,5 +205,76 @@ $textfieldWidth: calc(100vw - 370px);
     cursor: progress !important;
     stroke: #666;
     fill: #666;
+  }
+}
+
+.locktime {
+  grid-area: locktime;
+  color: #000;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+
+  .icon {
+    height: 15px;
+    width: 15px;
+    pointer-events: none;
+
+    &[alt$="calendar"] {
+      margin-right: 6px;
+    }
+
+    &[data-status="active"] {
+      display: none;
+    }
+  }
+
+  button {
+    @include RegularText;
+    appearance: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    font-size: 14px !important;
+    background-color: transparent;
+    border: none;
+
+    &:hover {
+      img[data-status="inactive"] {
+        display: none
+      }
+
+      img[data-status="active"] {
+        display: block;
+      }
+    }
+  }
+
+  &[data-status="unset"]:hover {
+    button {
+      color: var(--nervos-green);
+    }
+
+    .icon {
+      &[data-status="active"] {
+        display: block;
+      }
+
+      &[data-status="inactive"] {
+        display: none;
+      }
+    }
+  }
+
+  &[data-status="set"] {
+    button {
+      margin-left: 13px;
+
+      &:hover {
+        color: var(--nervos-green);
+      }
+    }
   }
 }

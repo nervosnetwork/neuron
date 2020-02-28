@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.28.0",
+  "version": "0.29.0-rc1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -43,6 +43,7 @@
     "last 2 chrome versions"
   ],
   "dependencies": {
+    "@bit/primefaces.primereact.calendar": "3.1.8",
     "@nervosnetwork/ckb-sdk-core": "0.27.1",
     "@uifabric/experiments": "7.18.6",
     "@uifabric/styling": "7.7.3",

@@ -32,6 +32,10 @@ export default {
         paste: '粘貼',
         selectall: '全部選中',
       },
+      tools: {
+        label: "工具",
+        "sign-and-verify": "簽名/驗證信息",
+      },
       window: {
         label: '視窗',
         minimize: '最小化',
@@ -117,6 +121,9 @@ export default {
       },
       transaction: {
         title: '交易: {{hash}}',
+      },
+      'sign-and-verify':{
+        title: '簽名/驗證信息'
       },
     },
     prompt: {

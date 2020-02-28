@@ -4,6 +4,7 @@ export const ADDRESS_LENGTH = 46
 export const MIN_PASSWORD_LENGTH = 8
 export const MAX_PASSWORD_LENGTH = 50
 export const MIN_AMOUNT = 61
+export const SINCE_FIELD_SIZE = 8
 export const PAGE_SIZE = 15
 export const UNREMOVABLE_NETWORK = 'Testnet'
 export const UNREMOVABLE_NETWORK_ID = '0'
@@ -22,7 +23,6 @@ export const MEDIUM_FEE_RATE = 6000
 export const WITHDRAW_EPOCHS = 180
 export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
 
-export const RUN_NODE_GUIDE_URL = 'https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node'
 export const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
 
@@ -52,6 +52,7 @@ export enum Routes {
   WalletEditor = '/editwallet',
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
+  SpecialAssets = '/special-assets',
 }
 
 export enum CapacityUnit {
@@ -91,6 +92,8 @@ export enum ErrorCode {
   PasswordIncorrect = 103,
   NodeDisconnected = 104,
   CapacityNotEnoughForChange = 105,
+  LocktimeAmountTooSmall = 107,
+  AddressNotFound = 108,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
@@ -115,4 +118,8 @@ export enum SyncStatus {
   SyncPending,
   Syncing,
   SyncCompleted,
+}
+
+export enum PRESET_SCRIPT {
+  Locktime = 'SingleMultiSign',
 }
