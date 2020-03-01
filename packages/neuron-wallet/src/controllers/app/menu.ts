@@ -217,10 +217,10 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   const toolsMenuItem: MenuItemConstructorOptions = {
     id: 'tools',
     label: i18n.t('application-menu.tools.label'),
-    enabled: !!walletsService.getCurrent(),
     submenu: [
       {
         label: i18n.t('application-menu.tools.sign-and-verify'),
+        enabled: hasCurrentWallet,
         click: () => {
           const currentWallet = walletsService.getCurrent()
           showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`))

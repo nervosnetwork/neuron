@@ -34,7 +34,7 @@ export default {
       },
       tools: {
         label: "Tools",
-        "sign-and-verify": "Sign/verify message",
+        "sign-and-verify": "Sign/Verify Message",
       },
       window: {
         label: 'Window',

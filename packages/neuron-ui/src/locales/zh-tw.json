@@ -116,7 +116,7 @@
       "total-cycles": "RISC-V Cycles 總數",
       "scan-screen-qr-code": "掃描荧幕上的二維碼",
       "set-locktime": "設置鎖定時間",
-      "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差",
+      "locktime-notice-content": "鎖定時間根據區塊鏈實際運行情況會有一定的誤差。",
       "release-on": "鎖定至"
     },
     "receive": {

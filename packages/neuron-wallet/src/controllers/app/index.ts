@@ -112,7 +112,7 @@ export default class AppController {
         this.mainWindow.show()
         this.mainWindow.focus()
         this.updateWindowTitle()
-        logger.info('The main window is ready to show')
+        logger.info('Main window:\tThe main window is ready to show')
       }
     })
 

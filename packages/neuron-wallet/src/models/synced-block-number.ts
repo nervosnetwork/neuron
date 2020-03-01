@@ -1,15 +1,17 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
 import SyncedBlockNumberSubject from "models/subjects/node"
+import logger from 'utils/logger'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
   #nextBlock: bigint | undefined = undefined
-  #lastSavedBlock: bigint = BigInt(-1)
+
+  private static lastSavedBlock: bigint = BigInt(-1)
 
   // Get next block to scan. If syncing hasn't run yet return 0 (genesis block number).
-  public getNextBlock = async (): Promise<bigint> => {
+  public async getNextBlock(): Promise<bigint> {
     if (this.#nextBlock) {
       return this.#nextBlock
     }
@@ -17,28 +19,28 @@ export default class SyncedBlockNumber {
     return BigInt((await this.blockNumber()).value)
   }
 
-  public setNextBlock = async (current: bigint): Promise<void> => {
+  public async setNextBlock(current: bigint): Promise<void> {
     this.#nextBlock = current
     SyncedBlockNumberSubject.getSubject().next(current.toString())
 
-    if (current === BigInt(0) || this.#lastSavedBlock === BigInt(-1) || current - this.#lastSavedBlock >= BigInt(1000)) {
+    if (current === BigInt(0) || SyncedBlockNumber.lastSavedBlock === BigInt(-1) || current - SyncedBlockNumber.lastSavedBlock >= BigInt(1000)) {
       // Only persist block number for every 1,000 blocks to reduce DB write.
       // Practically it's unnecessary to save every block height, as iterating
       // blocks is fast.
+      //
+      // Note: `#lastSavedBlock` is an instance property. If `SyncedBlockNumber` is used
+      //   in multiple places to write next block number, reading them would get inconsistent results.
 
-      this.#lastSavedBlock = current
+      SyncedBlockNumber.lastSavedBlock = current
 
       let blockNumberEntity = await this.blockNumber()
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
+      logger.info("Database:\tsaved synced block #" + current.toString())
     }
   }
 
-  public reset = async(): Promise<void> => {
-    return this.setNextBlock(BigInt(0))
-  }
-
-  private blockNumber = async (): Promise<SyncInfoEntity> => {
+  private async blockNumber(): Promise<SyncInfoEntity> {
     if (!this.#blockNumberEntity) {
       this.#blockNumberEntity = await getConnection()
         .getRepository(SyncInfoEntity)

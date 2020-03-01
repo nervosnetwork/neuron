@@ -121,7 +121,7 @@ export class TransactionPersistor {
         }
         await queryRunner.commitTransaction()
       } catch (err) {
-        logger.error('saveWithFetch update error:', err)
+        logger.error('Database:\tsaveWithFetch update error:', err)
         await queryRunner.rollbackTransaction()
       } finally {
         await queryRunner.release()
@@ -236,7 +236,7 @@ export class TransactionPersistor {
       }
       await queryRunner.commitTransaction();
     } catch (err) {
-      logger.error('create transaction error:', err)
+      logger.error('Database:\tcreate transaction error:', err)
       await queryRunner.rollbackTransaction()
     } finally {
       await queryRunner.release()

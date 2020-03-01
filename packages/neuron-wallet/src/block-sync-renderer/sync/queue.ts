@@ -80,9 +80,9 @@ export default class Queue {
         }
       } catch (err) {
         if (err.message.startsWith('connect ECONNREFUSED')) {
-          logger.debug(`sync error:`, err)
+          logger.debug(`Sync:\terror:`, err)
         } else {
-          logger.error(`sync error:`, err)
+          logger.error(`Sync:\terror:`, err)
         }
       } finally {
         await CommonUtils.sleep(this.yieldTime)
@@ -148,7 +148,7 @@ export default class Queue {
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
-        logger.debug(`Scanning from block #${block.header.number}`)
+        logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
         const [shouldSave, addresses] = await new TxAddressFinder(
