@@ -17,6 +17,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   Type: {
     datetime: new Date().getTime(),
@@ -30,6 +31,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   Data: {
     datetime: new Date().getTime(),
@@ -43,6 +45,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   'User defined asset': {
     datetime: new Date().getTime(),
@@ -56,6 +59,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   Locked: {
     datetime: new Date().getTime(),
@@ -69,6 +73,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   Claim: {
     datetime: new Date().getTime(),
@@ -82,6 +87,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'online',
+    tipBlockTimestamp: Date.now(),
   },
   Offline: {
     datetime: new Date().getTime(),
@@ -95,6 +101,7 @@ const props: {
       index: '',
     },
     connectionStatus: 'offline',
+    tipBlockTimestamp: Date.now(),
   },
 }
 
