@@ -1,0 +1,83 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  @include overlay;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  form>div {
+    margin-bottom: 10px;
+
+    input:disabled {
+      background-color: transparent !important;
+      color: #666;
+      border-color: transparent !important;
+    }
+
+  }
+
+  .ckbField {
+    &>div {
+      border-color: transparent;
+    }
+  }
+
+  .title {
+    margin-bottom: 25px;
+    line-height: 1.27em;
+    font-weight: 900;
+  }
+
+  .dialogContainer {
+    @include dialogContainer;
+    width: 500px;
+    box-sizing: border-box;
+    background: #fff;
+    padding: 30px 50px;
+  }
+
+  .tokenIdContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    button {
+      border: none;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      &:hover {
+
+        g,
+        path {
+
+          stroke: var(--nervos-green);
+          fill: var(--nervos-green);
+        }
+      }
+    }
+  }
+
+  .footer {
+    @include dialogFooter;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.accountTypes {
+  label {
+    pointer-events: none;
+  }
+}

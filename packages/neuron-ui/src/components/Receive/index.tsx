@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { TooltipHost } from 'office-ui-fabric-react'
-import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
+import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import QRCode from 'widgets/QRCode'
