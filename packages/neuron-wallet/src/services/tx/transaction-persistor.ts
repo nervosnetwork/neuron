@@ -6,8 +6,9 @@ import ArrayUtils from 'utils/array'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import OutPoint from 'models/chain/out-point'
-import { OutputStatus } from 'models/chain/output'
+import Output, { OutputStatus } from 'models/chain/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import Input from 'models/chain/input'
 
 export enum TxSaveType {
   Sent = 'sent',
@@ -46,6 +47,57 @@ export class TransactionPersistor {
     const txEntity: TransactionEntity | undefined = await connection
       .getRepository(TransactionEntity)
       .findOne(transaction.hash)
+
+    // update multiSignBlake160
+    if (txEntity) {
+      const outputsToUpdate: Output[] = transaction.outputs.filter(o => !!o.multiSignBlake160)
+      const inputsToUpdate: Input[] = transaction.inputs.filter(i => !!i.multiSignBlake160)
+      if (outputsToUpdate.length || inputsToUpdate.length) {
+        // update multiSignBlake160Info
+        // also update input which previous output in outputsToUpdate
+        await getConnection().manager.transaction(async transactionalEntityManager => {
+          for (const o of outputsToUpdate) {
+            await transactionalEntityManager
+              .createQueryBuilder()
+              .update(OutputEntity)
+              .set({
+                multiSignBlake160: o.multiSignBlake160
+              })
+              .where({
+                outPointTxHash: o.outPoint!.txHash,
+                outPointIndex: o.outPoint!.index
+              })
+              .execute()
+
+            await transactionalEntityManager
+              .createQueryBuilder()
+              .update(InputEntity)
+              .set({
+                multiSignBlake160: o.multiSignBlake160
+              })
+              .where({
+                outPointTxHash: o.outPoint!.txHash,
+                outPointIndex: o.outPoint!.index
+              })
+              .execute()
+          }
+
+          for (const i of inputsToUpdate) {
+            await transactionalEntityManager
+              .createQueryBuilder()
+              .update(InputEntity)
+              .set({
+                multiSignBlake160: i.multiSignBlake160
+              })
+              .where({
+                outPointTxHash: i.previousOutput!.txHash,
+                outPointIndex: i.previousOutput!.index
+              })
+              .execute()
+          }
+        })
+      }
+    }
 
     // return if success
     if (txEntity && txEntity.status === TransactionStatus.Success) {
