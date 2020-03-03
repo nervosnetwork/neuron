@@ -51,7 +51,7 @@ const SpecialAssetList = () => {
   const dispatch = useDispatch()
 
   const {
-    app: { epoch, globalDialog },
+    app: { epoch, globalDialog, tipBlockTimestamp },
     wallet: { id },
     settings: { networks },
     chain: { networkID, connectionStatus },
@@ -188,10 +188,11 @@ const SpecialAssetList = () => {
           epochsInfo={epochInfo}
           onAction={onUnlock}
           connectionStatus={connectionStatus}
+          tipBlockTimestamp={tipBlockTimestamp}
         />
       )
     })
-  }, [cells, epoch, isMainnet, onUnlock, connectionStatus])
+  }, [cells, epoch, isMainnet, onUnlock, connectionStatus, tipBlockTimestamp])
 
   return (
     <div className={styles.container}>
