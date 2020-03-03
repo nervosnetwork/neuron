@@ -24,6 +24,8 @@ enum ExternalURL {
   Website = 'https://www.nervos.org/',
   Repository = 'https://github.com/nervosnetwork/neuron',
   Issues = 'https://github.com/nervosnetwork/neuron/issues',
+  Doc = 'https://docs.nervos.org/tooling/neuron.html',
+  Faq = 'https://docs.nervos.org/references/neuron-faq.html'
 }
 
 const separator: MenuItemConstructorOptions = {
@@ -246,6 +248,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
   }
 
   const helpSubmenu: MenuItemConstructorOptions[] = [
+    {
+      label: i18n.t('application-menu.help.documentation'),
+      click: () => { shell.openExternal(ExternalURL.Doc) }
+    },
+    {
+      label: i18n.t('application-menu.help.faq'),
+      click: () => { shell.openExternal(ExternalURL.Faq) }
+    },
+    separator,
     {
       label: i18n.t('application-menu.help.nervos-website'),
       click: () => { shell.openExternal(ExternalURL.Website) }

@@ -46,6 +46,8 @@ export default {
         'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
+        documentation: 'Documentation',
+        faq: 'Neuron FAQ',
         settings: 'Settings',
       },
       develop: {

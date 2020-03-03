@@ -7,6 +7,10 @@ Nervos CKB Desktop Wallet
 
 ---
 
+## FAQ
+
+Got a question about Neuron? Please check out the [FAQ](https://docs.nervos.org/references/neuron-faq.html).
+
 ## Quick Start
 
 ### Prerequisites
