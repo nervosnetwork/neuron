@@ -46,6 +46,8 @@ export default {
         'nervos-website': 'Nervos 網站',
         'source-code': '原始程式碼',
         'report-issue': '報告問題',
+        documentation: '使用文檔',
+        faq: 'Neuron FAQ',
         settings: '設定',
       },
       develop: {
