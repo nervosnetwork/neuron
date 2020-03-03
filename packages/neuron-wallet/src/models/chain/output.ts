@@ -166,6 +166,10 @@ export default class Output {
     this.customizedAssetInfo = value
   }
 
+  public setOutPoint(value: OutPoint) {
+    this.outPoint = value
+  }
+
   public calculateBytesize(): number {
     let bytesize = 8 + HexUtils.byteLength(this.data) + this.lock.calculateBytesize()
     if (this.type) {
