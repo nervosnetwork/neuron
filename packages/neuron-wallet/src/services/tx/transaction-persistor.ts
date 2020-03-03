@@ -50,13 +50,10 @@ export class TransactionPersistor {
 
     // update multiSignBlake160
     if (txEntity) {
-      const hasMultiSignBlake160Output: boolean = !!transaction.outputs.find(o => !!o.multiSignBlake160)
-      const hasMultiSignBlake160Input: boolean = !!transaction.inputs.find(i => !!i.multiSignBlake160)
-      if (hasMultiSignBlake160Output || hasMultiSignBlake160Input) {
+      const outputsToUpdate: Output[] = transaction.outputs.filter(o => !!o.multiSignBlake160)
+      const inputsToUpdate: Input[] = transaction.inputs.filter(i => !!i.multiSignBlake160)
+      if (outputsToUpdate.length || inputsToUpdate.length) {
         // update multiSignBlake160Info
-        const outputsToUpdate: Output[] = hasMultiSignBlake160Output ? transaction.outputs.filter(o => !!o.multiSignBlake160) : []
-        const inputsToUpdate: Input[] = hasMultiSignBlake160Input ? transaction.inputs.filter(i => !!i.multiSignBlake160) : []
-
         // also update input which previous output in outputsToUpdate
         await getConnection().manager.transaction(async transactionalEntityManager => {
           for (const o of outputsToUpdate) {
