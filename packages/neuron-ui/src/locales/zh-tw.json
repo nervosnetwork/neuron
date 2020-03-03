@@ -456,6 +456,13 @@
       "experimental": "實驗室"
     },
     "s-udt": {
+      "prompt": {
+        "offline": "TODO",
+        "sync-not-start": "TODO",
+        "syncing": "正在同步，當前數據可能不准確",
+        "has-no-s-udt": "尚未檢索到您持有的 sUDT 資產",
+        "has-s-udt": "顯示您持有的 sUDT 資產"
+      },
       "create-dialog": {
         "create-asset-account": "創建資產賬戶",
         "account-name": "賬戶名稱",

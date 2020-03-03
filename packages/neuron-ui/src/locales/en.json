@@ -456,6 +456,13 @@
       "experimental": "Experimental"
     },
     "s-udt": {
+      "prompt": {
+        "offline": "TODO",
+        "sync-not-start": "TODO",
+        "syncing": "Syncing, current data may be inaccurate",
+        "has-no-s-udt": "No sUDT asset has been detected",
+        "has-s-udt": "Your sUDT assets are listed below"
+      },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
