@@ -354,13 +354,7 @@ export default class WalletsController {
 
     const tx: Transaction = await new TransactionSender().generateTx(
       params.walletID,
-      params.items.map(i => {
-        return {
-          address: i.address,
-          capacity: i.capacity,
-          minutes: i.date ? this.getMinutes(i.date) : undefined
-        }
-      }),
+      params.items,
       params.fee,
       params.feeRate,
     )
@@ -380,13 +374,7 @@ export default class WalletsController {
 
     const tx: Transaction = await new TransactionSender().generateSendingAllTx(
       params.walletID,
-      params.items.map(i => {
-        return {
-          address: i.address,
-          capacity: i.capacity,
-          minutes: i.date ? this.getMinutes(i.date) : undefined
-        }
-      }),
+      params.items,
       params.fee,
       params.feeRate,
     )
@@ -394,14 +382,6 @@ export default class WalletsController {
       status: ResponseCode.Success,
       result: tx,
     }
-  }
-
-  // date: timestamp
-  private getMinutes(date: string): string {
-    const day = +date
-    const now = +new Date()
-    const minutes = parseInt(((day - now) / 1000 / 60).toString())
-    return minutes.toString()
   }
 
   public async updateAddressDescription({ walletID, address, description }: { walletID: string, address: string, description: string }) {
