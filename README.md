@@ -33,6 +33,8 @@ $ yarn bootstrap
 
 As of `v0.26.0`, Neuron bundles a CKB binary and starts it for Mainnet automatically. If you prefer to run a local CKB node yourself instead, please follow the [Nervos CKB doc](https://docs.nervos.org/references/neuron-wallet-guide.html#1-run-a-ckb-mainnet-node) to get it up and running before launching Neuron.
 
+**Note**: If you run CKB node on Windows but it fails to start, you may need to download and install the latest [Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
+
 ### Start Neuron in Development Mode
 
 ```shell
