@@ -272,7 +272,9 @@
       "edit": "编辑",
       "delete": "删除",
       "click-to-edit": "点击编辑",
-      "notice": "注意事项"
+      "notice": "注意事项",
+      "experimental": "实验室",
+      "close": "关闭"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -297,6 +299,7 @@
       "no-valid-addresses-found": "未找到有效地址",
       "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
+      "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
