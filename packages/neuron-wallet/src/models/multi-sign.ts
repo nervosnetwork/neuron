@@ -15,7 +15,7 @@ export default class MultiSign {
 
   since(minutes: number, headerEpoch: string): string {
     if (minutes < 0) {
-      throw new Error("minutes to calculate since can't smaller than 0")
+      throw new Error("minutes to calculate since can't be less than 0")
     }
     const currentEpochInfo = this.parseEpoch(BigInt(headerEpoch))
     const totalMinutes = minutes +
