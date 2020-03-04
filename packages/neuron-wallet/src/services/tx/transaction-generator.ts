@@ -58,7 +58,7 @@ export class TransactionGenerator {
       const output = new Output(capacity, lockScript)
       if (date) {
         const blake160 = lockScript.args
-        const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
           args: new MultiSign().args(blake160, +minutes, tipHeaderEpoch),
@@ -160,7 +160,7 @@ export class TransactionGenerator {
       const output = new Output(capacity, lockScript)
       if (date) {
         const blake160 = lockScript.args
-        const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
           args: new MultiSign().args(blake160, minutes, tipHeaderEpoch),
