@@ -64,6 +64,21 @@ describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
 
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().secpOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '0')]
+    ])
+
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().daoOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0xe2fb199810d49a4d8beec56718ba2593b665db9d52299a0f9e6e75416d73ff5c', '2')]
+    ])
+
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '1')]
+    ])
+
     const mockTipHeader = jest.fn()
     mockTipHeader.mockReturnValue(blockHeader)
     // @ts-ignore: Private method
