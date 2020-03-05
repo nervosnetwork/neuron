@@ -1,29 +1,16 @@
 import Script, { ScriptHashType } from "./chain/script"
 import { parseAddress } from "@nervosnetwork/ckb-sdk-utils"
+import SystemScriptInfo from "./system-script-info"
 
 export default class AddressParser {
   private address: string
-  private defaultLockScriptCodeHash: string = '0x'
-  private defaultLockScriptHashType: ScriptHashType | undefined
-  private multiSignLockScriptCodeHash: string = '0x'
-  private multiSignLockScriptHashType: ScriptHashType | undefined
+  private defaultLockScriptCodeHash: string = SystemScriptInfo.SECP_CODE_HASH
+  private defaultLockScriptHashType: ScriptHashType = SystemScriptInfo.SECP_HASH_TYPE
+  private multiSignLockScriptCodeHash: string = SystemScriptInfo.MULTI_SIGN_CODE_HASH
+  private multiSignLockScriptHashType: ScriptHashType = SystemScriptInfo.MULTI_SIGN_HASH_TYPE
 
   constructor(address: string) {
     this.address = address
-  }
-
-  setDefaultLockScript(codeHash: string, hashType: ScriptHashType): AddressParser {
-    this.defaultLockScriptCodeHash = codeHash
-    this.defaultLockScriptHashType = hashType
-
-    return this
-  }
-
-  setMultiSignLockScript(codeHash: string, hashType: ScriptHashType): AddressParser {
-    this.multiSignLockScriptCodeHash = codeHash
-    this.multiSignLockScriptHashType = hashType
-
-    return this
   }
 
   parse(): Script {

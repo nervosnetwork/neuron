@@ -4,10 +4,9 @@ import {
   AddressType,
   parseAddress
 } from '@nervosnetwork/ckb-sdk-utils'
-import NodeService from 'services/node'
-import CKB from '@nervosnetwork/ckb-sdk-core'
 import OutPoint from './chain/out-point'
 import Script, { ScriptHashType } from './chain/script'
+import SystemScriptInfo from './system-script-info'
 
 export interface SystemScript {
   codeHash: string
@@ -16,74 +15,16 @@ export interface SystemScript {
 }
 
 export default class LockUtils {
-  systemScript: SystemScript
-
-  constructor(systemScript: SystemScript) {
-    this.systemScript = systemScript
+  addressToLockScript(address: string): Script {
+    return SystemScriptInfo.generateSecpScript(LockUtils.addressToBlake160(address))
   }
 
-  private static systemScriptInfo: SystemScript | undefined
-
-  private static previousURL: string | undefined
-
-  static async loadSystemScript(nodeURL: string): Promise<SystemScript> {
-    const ckb = new CKB(nodeURL)
-
-    const systemCell = await ckb.loadSecp256k1Dep()
-    let { codeHash } = systemCell
-    const { outPoint, hashType } = systemCell
-    let { txHash } = outPoint
-    const { index } = outPoint
-
-    if (!codeHash.startsWith('0x')) {
-      codeHash = `0x${codeHash}`
-    }
-
-    if (!txHash.startsWith('0x')) {
-      txHash = `0x${txHash}`
-    }
-
-    return {
-      codeHash,
-      outPoint: new OutPoint(txHash, index),
-      hashType: hashType as ScriptHashType
-    }
-  }
-
-  static async systemScript(nodeURL: string = NodeService.getInstance().ckb.rpc.node.url): Promise<SystemScript> {
-    if (LockUtils.systemScriptInfo && nodeURL === LockUtils.previousURL) {
-      return LockUtils.systemScriptInfo
-    }
-
-    LockUtils.systemScriptInfo = await LockUtils.loadSystemScript(nodeURL)
-    LockUtils.previousURL = nodeURL
-
-    return LockUtils.systemScriptInfo
-  }
-
-  static cleanInfo(): void {
-    LockUtils.systemScriptInfo = undefined
-  }
-
-  static setSystemScript(info: SystemScript) {
-    LockUtils.systemScriptInfo = info
-    LockUtils.previousURL = NodeService.getInstance().ckb.rpc.node.url
-  }
-
-  addressToLockScript(address: string, hashType: ScriptHashType = ScriptHashType.Type): Script {
-    return new Script(
-      this.systemScript.codeHash,
-      LockUtils.addressToBlake160(address),
-      hashType
-    )
-  }
-
-  addressToLockHash(address: string, hashType: ScriptHashType = ScriptHashType.Type): string {
-    return this.addressToLockScript(address, hashType).computeHash()
+  addressToLockHash(address: string): string {
+    return this.addressToLockScript(address).computeHash()
   }
 
   addressToAllLockHashes(address: string): string[] {
-    return [this.addressToLockHash(address, ScriptHashType.Type)]
+    return [this.addressToLockHash(address)]
   }
 
   addressesToAllLockHashes(addresses: string[]): string[] {

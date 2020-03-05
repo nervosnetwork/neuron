@@ -1,24 +1,22 @@
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
-import DaoUtils from 'models/dao-utils'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import { CapacityNotEnough } from 'exceptions/wallet'
 import Output from 'models/chain/output'
-import CellDep, { DepType } from 'models/chain/cell-dep'
 import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
 import Script from 'models/chain/script'
 import Transaction from 'models/chain/transaction'
 import WitnessArgs from 'models/chain/witness-args'
 import AddressParser from 'models/address-parser'
-import MultiSignUtils from 'models/multi-sign-utils'
 import MultiSign from 'models/multi-sign'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
+import SystemScriptInfo from 'models/system-script-info'
 
 export interface TargetOutput {
   address: string
@@ -37,8 +35,7 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
-    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
-    const multiSignScript = await MultiSignUtils.multiSignScript()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const tipHeader = await TransactionGenerator.getTipHeader()
     const tipHeaderEpoch = tipHeader.epoch
     const tipHeaderTimestamp = tipHeader.timestamp
@@ -50,20 +47,13 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address, date } = o
 
-      const lockScript = new AddressParser(address)
-        .setDefaultLockScript(codeHash, hashType)
-        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
-        .parse()
+      const lockScript = new AddressParser(address).parse()
 
       const output = new Output(capacity, lockScript)
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
-        const script = Script.fromObject({
-          codeHash: multiSignScript.codeHash,
-          args: new MultiSign().args(blake160, +minutes, tipHeaderEpoch),
-          hashType: multiSignScript.hashType,
-        })
+        const script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, +minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
@@ -78,7 +68,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [new CellDep(outPoint, DepType.DepGroup)],
+      cellDeps: [secpCellDep],
       headerDeps: [],
       inputs: [],
       outputs,
@@ -113,7 +103,7 @@ export class TransactionGenerator {
 
       const output = new Output(
         changeCapacity.toString(),
-        new Script(codeHash, changeBlake160, hashType)
+        SystemScriptInfo.generateSecpScript(changeBlake160)
       )
 
       tx.addOutput(output)
@@ -129,8 +119,7 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
-    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
-    const multiSignScript = await MultiSignUtils.multiSignScript()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const tipHeader = await TransactionGenerator.getTipHeader()
     const tipHeaderEpoch = tipHeader.epoch
     const tipHeaderTimestamp = tipHeader.timestamp
@@ -152,20 +141,13 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map((o, index) => {
       const { capacity, address, date } = o
 
-      const lockScript: Script = new AddressParser(address)
-        .setDefaultLockScript(codeHash, hashType)
-        .setMultiSignLockScript(multiSignScript.codeHash, multiSignScript.hashType)
-        .parse()
+      const lockScript: Script = new AddressParser(address).parse()
 
       const output = new Output(capacity, lockScript)
       if (date) {
         const blake160 = lockScript.args
         const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
-        const script = Script.fromObject({
-          codeHash: multiSignScript.codeHash,
-          args: new MultiSign().args(blake160, minutes, tipHeaderEpoch),
-          hashType: multiSignScript.hashType,
-        })
+        const script: Script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
       }
@@ -181,7 +163,7 @@ export class TransactionGenerator {
 
     const tx = Transaction.fromObject({
       version: '0',
-      cellDeps: [new CellDep(outPoint, DepType.DepGroup)],
+      cellDeps: [secpCellDep],
       headerDeps: [],
       inputs: allInputs,
       outputs,
@@ -228,16 +210,16 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
-    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
     const blake160: string = LockUtils.addressToBlake160(receiveAddress)
-    const daoScriptInfo = await DaoUtils.daoScript()
 
     const capacityInt: bigint = BigInt(capacity)
 
     const output: Output = new Output(
       capacity,
-      new Script(codeHash, blake160, hashType),
-      new Script(daoScriptInfo.codeHash, '0x', daoScriptInfo.hashType)
+      SystemScriptInfo.generateSecpScript(blake160),
+      SystemScriptInfo.generateDaoScript('0x')
     )
     output.setDaoData('0x0000000000000000')
 
@@ -246,8 +228,8 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        new CellDep(outPoint, DepType.DepGroup),
-        new CellDep(daoScriptInfo.outPoint, DepType.Code)
+        secpCellDep,
+        daoCellDep
       ],
       headerDeps: [],
       inputs: [],
@@ -283,7 +265,7 @@ export class TransactionGenerator {
 
       const changeOutput = new Output(
         changeCapacity.toString(),
-        new Script(codeHash, changeBlake160, hashType)
+        SystemScriptInfo.generateSecpScript(changeBlake160)
       )
 
       tx.addOutput(changeOutput)
@@ -300,9 +282,9 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
-    const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
     const blake160: string = LockUtils.addressToBlake160(receiveAddress)
-    const daoScriptInfo = await DaoUtils.daoScript()
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -318,8 +300,8 @@ export class TransactionGenerator {
 
     const output = new Output(
       totalCapacity.toString(),
-      new Script(codeHash, blake160, hashType),
-      new Script(daoScriptInfo.codeHash, '0x', daoScriptInfo.hashType)
+      SystemScriptInfo.generateSecpScript(blake160),
+      SystemScriptInfo.generateDaoScript('0x')
     )
     output.setDaoData('0x0000000000000000')
 
@@ -328,8 +310,8 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        new CellDep(outPoint, DepType.DepGroup),
-        new CellDep(daoScriptInfo.outPoint, DepType.Code)
+        secpCellDep,
+        daoCellDep
       ],
       headerDeps: [],
       inputs: allInputs,
@@ -365,8 +347,8 @@ export class TransactionGenerator {
     fee: string = '0',
     feeRate: string = '0'
   ): Promise<Transaction> => {
-    const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
-    const daoScriptInfo = await DaoUtils.daoScript()
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
 
     const output = prevOutput
     const buf = Buffer.alloc(8)
@@ -379,8 +361,8 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        new CellDep(secpOutPoint, DepType.DepGroup),
-        new CellDep(daoScriptInfo.outPoint, DepType.Code)
+        secpCellDep,
+        daoCellDep
       ],
       headerDeps: [
         depositBlockHash,
@@ -432,7 +414,7 @@ export class TransactionGenerator {
 
       const changeOutput = new Output(
         changeCapacity.toString(),
-        new Script(codeHash, changeBlake160, hashType)
+        SystemScriptInfo.generateSecpScript(changeBlake160)
       )
 
       tx.addOutput(changeOutput)
@@ -448,15 +430,12 @@ export class TransactionGenerator {
     fee: string,
     feeRate: string,
   ): Promise<Transaction> {
-    const systemLockScript = await LockUtils.systemScript()
-    const multiSignScript = await MultiSignUtils.multiSignScript()
+    const multiSignCellDep = await SystemScriptInfo.getInstance().getMultiSignCellDep()
 
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const lockScript = new AddressParser(receivingAddress)
-      .setDefaultLockScript(systemLockScript.codeHash, systemLockScript.hashType)
-      .parse()
+    const lockScript = new AddressParser(receivingAddress).parse()
 
     // const outputs: Output[] = [output]
     const output = Output.fromObject({
@@ -475,7 +454,7 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        new CellDep(multiSignScript.outPoint, DepType.DepGroup)
+        multiSignCellDep
       ],
       headerDeps: [],
       inputs: [input],

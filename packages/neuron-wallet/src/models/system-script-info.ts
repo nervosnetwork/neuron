@@ -2,6 +2,7 @@ import OutPoint from "./chain/out-point"
 import CellDep, { DepType } from "./chain/cell-dep"
 import NetworksService from "services/networks"
 import RpcService from "services/rpc-service"
+import Script, { ScriptHashType } from "./chain/script"
 
 export default class SystemScriptInfo {
   static MAINNET_GENESIS_BLOCK_HASH = "0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5"
@@ -11,6 +12,10 @@ export default class SystemScriptInfo {
   static SECP_CODE_HASH = "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8"
   static DAO_CODE_HASH = "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e"
   static MULTI_SIGN_CODE_HASH = "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8"
+
+  static SECP_HASH_TYPE = ScriptHashType.Type
+  static DAO_HASH_TYPE = ScriptHashType.Type
+  static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
   private static instance: SystemScriptInfo
   static getInstance(): SystemScriptInfo {
@@ -69,6 +74,18 @@ export default class SystemScriptInfo {
       outPoint = this.multiSignOutPointInfo.get(genesisBlockHash)!
     }
     return new CellDep(outPoint, DepType.DepGroup)
+  }
+
+  public static generateSecpScript(args: string): Script {
+    return new Script(SystemScriptInfo.SECP_CODE_HASH, args, SystemScriptInfo.SECP_HASH_TYPE)
+  }
+
+  public static generateDaoScript(args: string = '0x'): Script {
+    return new Script(SystemScriptInfo.DAO_CODE_HASH, args, SystemScriptInfo.DAO_HASH_TYPE)
+  }
+
+  public static generateMultiSignScript(args: string): Script {
+    return new Script(SystemScriptInfo.MULTI_SIGN_CODE_HASH, args, SystemScriptInfo.MULTI_SIGN_HASH_TYPE)
   }
 
   private async loadInfos(url: string): Promise<void> {

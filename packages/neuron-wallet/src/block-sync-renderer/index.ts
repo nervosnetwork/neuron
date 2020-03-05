@@ -5,22 +5,19 @@ import { Address } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import SyncedBlockNumberSubject from 'models/subjects/node'
-import LockUtils from 'models/lock-utils'
-import DaoUtils from 'models/dao-utils'
 import SyncedBlockNumber from 'models/synced-block-number'
 import NetworksService from 'services/networks'
 import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
-import MultiSignUtils from 'models/multi-sign-utils'
 import MultiSign from 'models/multi-sign'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
 
-const updateAllAddressesTxCount = async (url: string) => {
+const updateAllAddressesTxCount = async () => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
-  await AddressService.updateTxCountAndBalances(addresses, url)
+  await AddressService.updateTxCountAndBalances(addresses)
 }
 
 AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
@@ -81,10 +78,6 @@ export const createBlockSyncTask = async (rescan = false) => {
       network = NetworksService.getInstance().getCurrent()
     }
 
-    // TODO: Do not clean meta info here!!!
-    LockUtils.cleanInfo()
-    DaoUtils.cleanInfo()
-
     const startBlockNumber = (await new SyncedBlockNumber().getNextBlock()).toString()
     SyncedBlockNumberSubject.getSubject().next(startBlockNumber)
     logger.info('Sync:\tbackground process started, scan from block #' + startBlockNumber)
@@ -96,8 +89,7 @@ export const createBlockSyncTask = async (rescan = false) => {
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
       if (backgroundWindow) {
-        const lockHashes = await AddressService.allLockHashes(network.remote)
-        const multiSignCodeHash: string = (await MultiSignUtils.multiSignScript()).codeHash
+        const lockHashes = await AddressService.allLockHashes()
         const blake160s = AddressService.allAddresses().map(address => address.blake160)
         const multiSign = new MultiSign()
         const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
@@ -107,12 +99,11 @@ export const createBlockSyncTask = async (rescan = false) => {
           network.genesisHash,
           lockHashes,
           startBlockNumber,
-          multiSignCodeHash,
           multiSignBlake160s
-          )
+        )
       }
       // re init txCount in addresses if switch network
-      await updateAllAddressesTxCount(network.remote)
+      await updateAllAddressesTxCount()
     }
   })
 

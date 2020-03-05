@@ -2,7 +2,6 @@ import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
-import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
@@ -154,10 +153,10 @@ export class TransactionsService {
       }
     }
 
-    let lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(params.addresses)
+    let lockHashes: string[] = new LockUtils().addressesToAllLockHashes(params.addresses)
 
     if (type === SearchType.Address) {
-      const hashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(searchValue)
+      const hashes = new LockUtils().addressToAllLockHashes(searchValue)
       if (lockHashes.includes(hashes[0])) {
         lockHashes = hashes
       } else {
@@ -294,7 +293,7 @@ export class TransactionsService {
     const addresses: string[] = params.pubkeys.map(pubkey => {
       return pubkeyToAddress(pubkey)
     })
-    const lockHashes = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes = new LockUtils().addressesToAllLockHashes(addresses)
 
     return TransactionsService.getAll(
       {
@@ -358,10 +357,9 @@ export class TransactionsService {
 
   public static async getCountByAddressAndStatus(
     address: string,
-    status: TransactionStatus[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
+    status: TransactionStatus[]
   ): Promise<number> {
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
+    const lockHashes: string[] = new LockUtils().addressToAllLockHashes(address)
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 
@@ -391,7 +389,7 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
+      const lockHashes = new LockUtils().addressToAllLockHashes(value)
       return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
     }
     if (type === SearchType.TxHash) {

@@ -2,15 +2,6 @@ import LockUtils from '../../src/models/lock-utils'
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 
-const systemScript = {
-  outPoint: {
-    txHash: '0xb815a396c5226009670e89ee514850dcde452bca746cdd6b41c104b50e559c70',
-    index: '0',
-  },
-  codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-  hashType: ScriptHashType.Type,
-}
-
 describe('LockUtils Test', () => {
   const bob = {
     lockScript: {
@@ -35,41 +26,25 @@ describe('LockUtils Test', () => {
   }
 
   it('addressToLockScript', async () => {
-    const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(systemScript)
-    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
-
-    const lockScript: Script = new LockUtils(await LockUtils.systemScript()).addressToLockScript(bob.address)
+    const lockScript: Script = new LockUtils().addressToLockScript(bob.address)
 
     expect({ ...lockScript }).toEqual(bob.lockScript)
   })
 
   it('addressToLockHash', async () => {
-    const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(systemScript)
-    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
-
-    const lockHash: string = new LockUtils(await LockUtils.systemScript()).addressToLockHash(bob.address)
+    const lockHash: string = new LockUtils().addressToLockHash(bob.address)
 
     expect(lockHash).toEqual(bob.lockHash)
   })
 
   it('addressToAllLockHashes', async () => {
-    const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(systemScript)
-    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
-
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(bob.address)
+    const lockHashes: string[] = new LockUtils().addressToAllLockHashes(bob.address)
 
     expect(lockHashes).toEqual([bob.lockHash])
   })
 
   it('addressesToAllLockHashes', async () => {
-    const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(systemScript)
-    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
-
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript())
+    const lockHashes: string[] = new LockUtils()
       .addressesToAllLockHashes([bob.address, alice.address])
 
     const expectedResult = [bob.lockHash, alice.lockHash]
