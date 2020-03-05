@@ -37,12 +37,6 @@ describe('LockUtils Test', () => {
     expect(lockHash).toEqual(bob.lockHash)
   })
 
-  it('addressToAllLockHashes', async () => {
-    const lockHashes: string[] = new LockUtils().addressToAllLockHashes(bob.address)
-
-    expect(lockHashes).toEqual([bob.lockHash])
-  })
-
   it('addressesToAllLockHashes', async () => {
     const lockHashes: string[] = new LockUtils()
       .addressesToAllLockHashes([bob.address, alice.address])

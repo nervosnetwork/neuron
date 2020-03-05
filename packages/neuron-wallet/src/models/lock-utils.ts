@@ -23,14 +23,10 @@ export default class LockUtils {
     return this.addressToLockScript(address).computeHash()
   }
 
-  addressToAllLockHashes(address: string): string[] {
-    return [this.addressToLockHash(address)]
-  }
-
   addressesToAllLockHashes(addresses: string[]): string[] {
     return addresses.map(addr => {
-      return this.addressToAllLockHashes(addr)
-    }).reduce((acc, val) => acc.concat(val), [])
+      return this.addressToLockHash(addr)
+    })
   }
 
   static lockScriptToAddress(lock: Script, prefix: AddressPrefix = AddressPrefix.Mainnet): string {

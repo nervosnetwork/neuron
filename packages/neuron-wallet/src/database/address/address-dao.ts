@@ -71,7 +71,7 @@ export default class AddressDao {
       ])
       addr.txCount = txCount
 
-      const lockHashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+      const lockHashes: string[] = [lockUtils.addressToLockHash(addr.address)]
       addr.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
       addr.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
       addr.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)

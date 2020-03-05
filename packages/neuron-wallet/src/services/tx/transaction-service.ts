@@ -156,9 +156,9 @@ export class TransactionsService {
     let lockHashes: string[] = new LockUtils().addressesToAllLockHashes(params.addresses)
 
     if (type === SearchType.Address) {
-      const hashes = new LockUtils().addressToAllLockHashes(searchValue)
-      if (lockHashes.includes(hashes[0])) {
-        lockHashes = hashes
+      const hash = new LockUtils().addressToLockHash(searchValue)
+      if (lockHashes.includes(hash)) {
+        lockHashes = [hash]
       } else {
         return {
           totalCount: 0,
@@ -359,7 +359,7 @@ export class TransactionsService {
     address: string,
     status: TransactionStatus[]
   ): Promise<number> {
-    const lockHashes: string[] = new LockUtils().addressToAllLockHashes(address)
+    const lockHashes: string[] = [new LockUtils().addressToLockHash(address)]
     return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
   }
 
@@ -389,8 +389,8 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHashes = new LockUtils().addressToAllLockHashes(value)
-      return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
+      const lockHash: string = new LockUtils().addressToLockHash(value)
+      return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
     }
     if (type === SearchType.TxHash) {
       return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
