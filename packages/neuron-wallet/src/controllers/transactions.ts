@@ -18,7 +18,13 @@ export default class TransactionsController {
 
     const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
     transactions.items = await Promise.all(transactions.items.map(async tx => {
-      tx.description = await getDescription(walletID, tx.hash!)
+      const description = await getDescription(walletID, tx.hash!)
+      if (description !== '') {
+        tx.description = description
+      } else if (tx.description !== '') {
+        // Legacy data has description but leveldb doesn't have it.
+        await setDescription(walletID, tx.hash!, tx.description)
+      }
       return tx
     }))
 
