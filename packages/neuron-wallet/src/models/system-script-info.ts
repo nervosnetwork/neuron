@@ -79,7 +79,7 @@ export default class SystemScriptInfo {
 
     // set secp info
     const secpOutPointTxHash = genesisBlock.transactions[1].hash!
-    this.secpOutPointInfo.set(genesisBlock.header.hash, new OutPoint(secpOutPointTxHash, '0'))
+    this.secpOutPointInfo.set(genesisBlockHash, new OutPoint(secpOutPointTxHash, '0'))
 
     // set dao info
     const daoOutPointTxHash = genesisBlock.transactions[0].hash!
