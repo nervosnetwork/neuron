@@ -3,7 +3,7 @@ import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { verifyAmount } from 'utils/validators'
 import { epochParser } from 'utils/parsers'
-import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
+import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import calculateAPC from 'utils/calculateAPC'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
@@ -25,7 +25,7 @@ import {
   generateDaoDepositTx,
   generateDaoClaimTx,
 } from 'services/remote'
-import { getHeader, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
+import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 
 let timer: NodeJS.Timeout
 
@@ -93,7 +93,8 @@ export const useInitData = ({
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
     }
-  }, [clearGeneratedTx, dispatch, updateDepositValue, wallet.id, wallet.balance, setGenesisBlockTimestamp])
+    // eslint-disable-next-line
+  }, [])
 
 export const useClearGeneratedTx = (dispatch: React.Dispatch<StateAction>) =>
   useCallback(() => {
@@ -238,12 +239,13 @@ export const useCompensationPeriods = ({
       try {
         const depositEpochInfo = epochParser(depositEpoch)
         const currentEpochInfo = epochParser(currentEpoch)
-        const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, currentEpochInfo)
+        const targetEpochValue = calculateClaimEpochValue(depositEpochInfo, currentEpochInfo)
         return {
-          targetEpochNumber,
-          currentEpochNumber: currentEpochInfo.number,
-          currentEpochIndex: currentEpochInfo.index,
-          currentEpochLength: currentEpochInfo.length,
+          depositEpochValue:
+            Number(depositEpochInfo.number) + Number(depositEpochInfo.index) / Number(depositEpochInfo.length),
+          targetEpochValue,
+          currentEpochValue:
+            Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
         }
       } catch {
         return null
@@ -491,11 +493,12 @@ export const useUpdateDepositEpochList = ({
   useEffect(() => {
     if (connectionStatus === 'online') {
       Promise.all(
-        records.map(({ blockHash }) =>
-          getHeader(blockHash)
+        records.map(({ daoData, depositOutPoint, blockNumber }) => {
+          const depositBlockNumber = depositOutPoint ? ckbCore.utils.toHexInLittleEndian(daoData) : blockNumber
+          return getHeaderByNumber(BigInt(depositBlockNumber))
             .then(header => header.epoch)
             .catch(() => null)
-        )
+        })
       ).then(epochsList => setDepositEpochList(epochsList))
     }
   }, [records, setDepositEpochList, connectionStatus])
