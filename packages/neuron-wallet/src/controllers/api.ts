@@ -100,7 +100,7 @@ export default class ApiController {
         : [])
 
       const transactions = currentWallet
-        ? await this.transactionsController.getAllByKeywords({
+        ? await this.transactionsController.getAll({
             pageNo: 1,
             pageSize: 15,
             keywords: '',
@@ -209,14 +209,14 @@ export default class ApiController {
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return this.transactionsController.getAllByKeywords(params)
+      return this.transactionsController.getAll(params)
     })
 
     handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
       return this.transactionsController.get(walletID, hash)
     })
 
-    handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
+    handle('update-transaction-description', async (_, params: { walletID: string; hash: string; description: string }) => {
       return this.transactionsController.updateDescription(params)
     })
 

@@ -1,69 +1,36 @@
-import { TransactionsService, PaginationResult, TransactionsByLockHashesParam } from 'services/tx'
+import { TransactionsService, PaginationResult } from 'services/tx'
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
 
 import { ResponseCode } from 'utils/const'
-import { TransactionNotFound, CurrentWalletNotSet, ServiceHasNoResponse } from 'exceptions'
+import { TransactionNotFound, CurrentWalletNotSet } from 'exceptions'
 import LockUtils from 'models/lock-utils'
 import Transaction from 'models/chain/transaction'
 
+import { set as setDescription, get as getDescription } from 'database/leveldb/transaction-description'
+
 export default class TransactionsController {
-  public async getAll(params: TransactionsByLockHashesParam): Promise<Controller.Response<PaginationResult<Transaction>>> {
-    const transactions = await TransactionsService.getAll(params)
-    if (!transactions) {
-      throw new ServiceHasNoResponse('Transactions')
-    }
-
-    return {
-      status: ResponseCode.Success,
-      result: { ...params, ...transactions }
-    }
-  }
-
-  public async getAllByKeywords(params: Controller.Params.TransactionsByKeywords):
+  public async getAll(params: Controller.Params.TransactionsByKeywords):
     Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByKeywords>> {
     const { pageNo = 1, pageSize = 15, keywords = '', walletID = '' } = params
 
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
 
-    const transactions = await TransactionsService
-      .getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
-      .catch(() => ({
-        totalCount: 0,
-        items: []
-      }))
+    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+    transactions.items = await Promise.all(transactions.items.map(async tx => {
+      const description = await getDescription(walletID, tx.hash!)
+      if (description !== '') {
+        tx.description = description
+      } else if (tx.description !== '') {
+        // Legacy data has description but leveldb doesn't have it.
+        await setDescription(walletID, tx.hash!, tx.description)
+      }
+      return tx
+    }))
 
     return {
       status: ResponseCode.Success,
       result: { ...params, ...transactions, keywords, walletID }
-    }
-  }
-
-  public async getAllByAddresses(params: Controller.Params.TransactionsByAddresses):
-    Promise<Controller.Response<PaginationResult<Transaction> & Controller.Params.TransactionsByAddresses>> {
-    const { pageNo, pageSize, addresses = '' } = params
-
-    let searchAddresses = addresses
-      .split(',')
-      .map(addr => addr.trim())
-      .filter(addr => addr !== '')
-
-    if (!searchAddresses.length) {
-      const wallet = WalletsService.getInstance().getCurrent()
-      if (!wallet) {
-        throw new CurrentWalletNotSet()
-      }
-      searchAddresses = AddressesService.allAddressesByWalletId(wallet.id).map(addr => addr.address)
-    }
-
-    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses: searchAddresses })
-    if (!transactions) {
-      throw new ServiceHasNoResponse('Transactions')
-    }
-
-    return {
-      status: ResponseCode.Success,
-      result: { ...params, ...transactions }
     }
   }
 
@@ -80,7 +47,7 @@ export default class TransactionsController {
       throw new CurrentWalletNotSet()
     }
 
-    const addresses: string[] = (await AddressesService.allAddressesByWalletId(wallet.id)).map(addr => addr.address)
+    const addresses: string[] = AddressesService.allAddressesByWalletId(wallet.id).map(addr => addr.address)
     const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
 
     const outputCapacities: bigint = transaction
@@ -109,14 +76,16 @@ export default class TransactionsController {
         .slice(0, this.cellCountThreshold)
     }
 
+    transaction.description = await getDescription(walletID, hash)
+
     return {
       status: ResponseCode.Success,
       result: { ...transaction, outputsCount, inputsCount } as Transaction & { outputsCount: string; inputsCount: string }
     }
   }
 
-  public async updateDescription({ hash, description }: { hash: string; description: string }) {
-    await TransactionsService.updateDescription(hash, description)
+  public async updateDescription({ walletID, hash, description }: { walletID: string; hash: string; description: string }) {
+    await setDescription(walletID, hash, description)
 
     return {
       status: ResponseCode.Success,
