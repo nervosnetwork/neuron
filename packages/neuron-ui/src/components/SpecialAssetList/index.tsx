@@ -164,8 +164,10 @@ const SpecialAssetList = () => {
       if (cell.customizedAssetInfo.lock === PRESET_SCRIPT.Locktime) {
         const targetEpochInfo = epochParser(ckbCore.utils.toHexInLittleEndian(`0x${cell.lock.args.slice(-16)}`))
         const currentEpochInfo = epochParser(epoch)
+        const targetEpochFraction =
+          Number(targetEpochInfo.length) > 0 ? Number(targetEpochInfo.index) / Number(targetEpochInfo.length) : 1
         epochInfo = {
-          target: Number(targetEpochInfo.number) + Number(targetEpochInfo.index) / Number(targetEpochInfo.length),
+          target: Number(targetEpochInfo.number) + Math.min(targetEpochFraction, 1),
           current: Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
         }
         if (epochInfo.target - epochInfo.current > 0) {
