@@ -113,7 +113,7 @@ const NetworkEditor = () => {
             !!(
               editor.nameError ||
               editor.urlError ||
-              (cachedNetwork && editor.name === cachedNetwork.name) ||
+              (cachedNetwork && editor.name === cachedNetwork.name && editor.url === cachedNetwork.remote) ||
               isUpdating
             )
           }
