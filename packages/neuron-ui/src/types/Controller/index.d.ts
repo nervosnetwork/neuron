@@ -89,6 +89,7 @@ declare namespace Controller {
   }
 
   interface UpdateTransactionDescriptionParams {
+    walletID: string
     hash: string
     description: string
   }
