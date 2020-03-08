@@ -1,4 +1,5 @@
 import { getConnection, In } from 'typeorm'
+import { OrmService } from '@pencroff/typeorm-better-sqlite3'
 import OutputEntity from 'database/chain/entities/output'
 import { CapacityNotEnough, CapacityNotEnoughForChange, LiveCapacityNotEnough } from 'exceptions'
 import FeeMode from 'models/fee-mode'
@@ -29,8 +30,11 @@ export default class CellsService {
     lockHashes: string[],
     status: OutputStatus
   ): Promise<string> => {
-    const cells: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const cells: OutputEntity[] = await orm
+      .getRepo(OutputEntity)
       .createQueryBuilder('output')
       .select([
         "output.lockHash",
@@ -55,8 +59,11 @@ export default class CellsService {
   public static getDaoCells = async (
     lockHashes: string[],
   ): Promise<Cell[]> => {
-    const outputs: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const outputs: OutputEntity[] = await orm
+      .getRepo(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(`(output.status = :liveStatus OR tx.status = :failedStatus) AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
@@ -72,8 +79,8 @@ export default class CellsService {
 
     const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
 
-    const txs = await getConnection()
-      .getRepository(TransactionEntity)
+    const txs = await orm
+      .getRepo(TransactionEntity)
       .createQueryBuilder('tx')
       .where({
         hash: In(txHashes)
@@ -99,8 +106,11 @@ export default class CellsService {
     const skip = (pageNo - 1) * pageSize
 
     // live cells, empty data, empty type, and of provided blake160s
-    const query = getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const query = orm
+      .getRepo(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
       .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeScript IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
@@ -143,8 +153,11 @@ export default class CellsService {
   }
 
   private static getLiveCellEntity = async (outPoint: OutPoint): Promise<OutputEntity | undefined> => {
-    const cellEntity: OutputEntity | undefined = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const cellEntity: OutputEntity | undefined = await orm
+      .getRepo(OutputEntity)
       .findOne({
         outPointTxHash: outPoint.txHash,
         outPointIndex: outPoint.index,
@@ -185,8 +198,11 @@ export default class CellsService {
     const minChangeCapacity = BigInt(MIN_CELL_CAPACITY)
 
     // only live cells, skip which has data or type
-    const cellEntities: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const cellEntities: OutputEntity[] = await orm
+      .getRepo(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
@@ -302,8 +318,11 @@ export default class CellsService {
   }
 
   public static gatherAllInputs = async (lockHashes: string[]): Promise<Input[]> => {
-    const cellEntities: OutputEntity[] = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const cellEntities: OutputEntity[] = await orm
+      .getRepo(OutputEntity)
       .find({
         where: {
           lockHash: In(lockHashes),
@@ -327,8 +346,11 @@ export default class CellsService {
   }
 
   public static allBlake160s = async (): Promise<string[]> => {
-    const outputEntities = await getConnection()
-      .getRepository(OutputEntity)
+    const orm = new OrmService()
+    const connection = getConnection()
+    await orm.useConnection(connection)
+    const outputEntities = await orm
+      .getRepo(OutputEntity)
       .createQueryBuilder('output')
       .getMany()
     const blake160s: string[] = outputEntities
