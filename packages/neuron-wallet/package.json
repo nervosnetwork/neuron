@@ -36,6 +36,8 @@
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "0.27.1",
     "@nervosnetwork/ckb-sdk-utils": "0.27.1",
+    "@pencroff/typeorm-better-sqlite3": "1.0.3",
+    "better-sqlite3": "6.0.1",
     "bn.js": "4.11.8",
     "chalk": "3.0.0",
     "electron-log": "4.0.0",
@@ -50,7 +52,7 @@
     "sha3": "2.0.7",
     "sqlite3": "4.1.1",
     "subleveldown": "^4.1.4",
-    "typeorm": "0.2.20",
+    "typeorm": "0.2.22",
     "uuid": "3.3.3"
   },
   "devDependencies": {
