@@ -213,7 +213,7 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId, addressVersion)
   }
 
-  public static allLockHashes = async (): Promise<string[]> => {
+  public static allLockHashes(): string[] {
     const lockUtils = new LockUtils()
     const addresses = AddressService.allAddresses().map(address => address.address)
     return lockUtils.addressesToAllLockHashes(addresses)

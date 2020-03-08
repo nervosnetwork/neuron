@@ -89,7 +89,7 @@ export const createBlockSyncTask = async (rescan = false) => {
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
       if (backgroundWindow) {
-        const lockHashes = await AddressService.allLockHashes()
+        const lockHashes = AddressService.allLockHashes()
         const blake160s = AddressService.allAddresses().map(address => address.blake160)
         const multiSign = new MultiSign()
         const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
