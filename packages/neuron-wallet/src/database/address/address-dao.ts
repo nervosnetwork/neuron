@@ -3,7 +3,6 @@ import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
 import { OutputStatus } from 'models/chain/output'
-import NodeService from 'services/node'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
@@ -54,8 +53,7 @@ export default class AddressDao {
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
   public static updateTxCountAndBalances = async (
-    addresses: string[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
+    addresses: string[]
   ): Promise<Address[]> => {
     const all = AddressStore.getAll()
     const toUpdate = all.filter(value => {
@@ -65,15 +63,15 @@ export default class AddressDao {
       return !addresses.includes(value.address)
     })
 
-    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
+    const lockUtils = new LockUtils()
     for (const addr of toUpdate) {
       const txCount: number = await TransactionsService.getCountByAddressAndStatus(addr.address, [
         TransactionStatus.Pending,
         TransactionStatus.Success,
-      ], url)
+      ])
       addr.txCount = txCount
 
-      const lockHashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
+      const lockHashes: string[] = [lockUtils.addressToLockHash(addr.address)]
       addr.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
       addr.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
       addr.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)

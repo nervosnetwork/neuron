@@ -13,7 +13,6 @@ import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
 import FeeMode from 'models/fee-mode'
-import DaoUtils from 'models/dao-utils'
 import TransactionSize from 'models/transaction-size'
 import TransactionFee from 'models/transaction-fee'
 import logger from 'utils/logger'
@@ -22,7 +21,6 @@ import Input from 'models/chain/input'
 import OutPoint from 'models/chain/out-point'
 import Output from 'models/chain/output'
 import RpcService from 'services/rpc-service'
-import CellDep, { DepType } from 'models/chain/cell-dep'
 import WitnessArgs from 'models/chain/witness-args'
 import Transaction from 'models/chain/transaction'
 import BlockHeader from 'models/chain/block-header'
@@ -31,6 +29,7 @@ import MultiSign from 'models/multi-sign'
 import Blake2b from 'models/blake2b'
 import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
+import SystemScriptInfo from 'models/system-script-info'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -62,7 +61,7 @@ export default class TransactionSender {
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
+    await WalletService.updateUsedAddresses(usedAddresses)
     return txHash
   }
 
@@ -210,7 +209,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -240,7 +239,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -267,7 +266,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
 
     const address = AddressesService.nextUnusedAddress(walletID)
 
@@ -307,7 +306,7 @@ export default class TransactionSender {
 
     const addressInfos = this.getAddressInfos(walletID)
     const addresses: string[] = addressInfos.map(info => info.address)
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
 
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
@@ -351,6 +350,10 @@ export default class TransactionSender {
     if (!prevTx.txStatus.isCommitted()) {
       throw new TransactionIsNotCommittedYet()
     }
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
+
     const content = cellStatus.cell!.data!.content
     const buf = Buffer.from(content.slice(2), 'hex')
     const depositBlockNumber: bigint = buf.readBigUInt64LE()
@@ -376,15 +379,12 @@ export default class TransactionSender {
 
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
-    const { codeHash, outPoint: secpOutPoint, hashType } = await LockUtils.systemScript()
-    const daoScriptInfo = await DaoUtils.daoScript()
-
     const address = await AddressesService.nextUnusedAddress(walletID)
     const blake160 = LockUtils.addressToBlake160(address!.address)
 
     const output: Output = new Output(
       outputCapacity.toString(),
-      new Script(codeHash, blake160, hashType),
+      new Script(SystemScriptInfo.SECP_CODE_HASH, blake160, SystemScriptInfo.SECP_HASH_TYPE),
       undefined,
       '0x'
     )
@@ -406,8 +406,8 @@ export default class TransactionSender {
     const tx: Transaction = Transaction.fromObject({
       version: '0',
       cellDeps: [
-        new CellDep(secpOutPoint, DepType.DepGroup),
-        new CellDep(daoScriptInfo.outPoint, DepType.Code)
+        secpCellDep,
+        daoCellDep
       ],
       headerDeps: [
         depositBlockHeader.hash,
@@ -443,7 +443,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
 
     const address = AddressesService.nextUnusedAddress(walletID)
 

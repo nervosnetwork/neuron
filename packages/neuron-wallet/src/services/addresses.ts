@@ -4,7 +4,6 @@ import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import NodeService from './node'
 import NetworksService from 'services/networks'
 
 const MAX_ADDRESS_COUNT = 100
@@ -94,10 +93,9 @@ export default class AddressService {
   }
 
   public static updateTxCountAndBalances = async (
-    addresses: string[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
+    addresses: string[]
   ): Promise<Address[]> => {
-    return AddressDao.updateTxCountAndBalances(addresses, url)
+    return AddressDao.updateTxCountAndBalances(addresses)
   }
 
   // Generate both receiving and change addresses.
@@ -215,8 +213,8 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId, addressVersion)
   }
 
-  public static allLockHashes = async (url: string): Promise<string[]> => {
-    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
+  public static allLockHashes(): string[] {
+    const lockUtils = new LockUtils()
     const addresses = AddressService.allAddresses().map(address => address.address)
     return lockUtils.addressesToAllLockHashes(addresses)
   }

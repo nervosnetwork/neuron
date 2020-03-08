@@ -281,8 +281,8 @@ export default class WalletService {
   }
 
   // TODO: move this method and generateTx/sendTx out of this file
-  public static async updateUsedAddresses(addresses: string[], url: string) {
-    const addrs = await AddressService.updateTxCountAndBalances(addresses, url)
+  public static async updateUsedAddresses(addresses: string[]) {
+    const addrs = await AddressService.updateTxCountAndBalances(addresses)
     const walletIds: string[] = addrs
       .map(addr => (addr as Address).walletId)
       .filter((value, idx, a) => a.indexOf(value) === idx)

@@ -32,24 +32,14 @@ describe('AddressParser', () => {
     })
 
     it('short address', () => {
-      const script = new AddressParser(shortAddressInfo.address)
-        .setDefaultLockScript(shortAddressInfo.codeHash, shortAddressInfo.hashType)
-        .parse()
+      const script = new AddressParser(shortAddressInfo.address).parse()
       expect(script.codeHash).toEqual(shortAddressInfo.codeHash)
       expect(script.args).toEqual(shortAddressInfo.args)
       expect(script.hashType).toEqual(shortAddressInfo.hashType)
     })
 
-    it('short address without set default lock script', () => {
-      expect(() => {
-        new AddressParser(shortAddressInfo.address).parse()
-      }).toThrowError()
-    })
-
     it ('multi sign short address', () => {
-      const script = new AddressParser(multiSignAddressInfo.address)
-        .setMultiSignLockScript(multiSignAddressInfo.codeHash, multiSignAddressInfo.hashType)
-        .parse()
+      const script = new AddressParser(multiSignAddressInfo.address).parse()
       expect(script.codeHash).toEqual(multiSignAddressInfo.codeHash)
       expect(script.args).toEqual(multiSignAddressInfo.args)
       expect(script.hashType).toEqual(multiSignAddressInfo.hashType)
