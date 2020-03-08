@@ -135,7 +135,6 @@ export default class Queue {
 
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
-    const daoScriptHash = SystemScriptInfo.DAO_CODE_HASH
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
@@ -159,7 +158,7 @@ export default class Queue {
               input.setInputIndex(inputIndex.toString())
 
               if (
-                previousOutput.type?.computeHash() === daoScriptHash &&
+                previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]

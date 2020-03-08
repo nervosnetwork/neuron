@@ -36,7 +36,6 @@ export default class TxAddressFinder {
   }
 
   private selectOutputs = (): [boolean, Output[]] => {
-    const daoScriptHash = SystemScriptInfo.DAO_CODE_HASH
     let shouldSync = false
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
       if (output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
@@ -48,7 +47,7 @@ export default class TxAddressFinder {
       }
       if (this.lockHashes.has(output.lockHash!)) {
         if (output.type) {
-          if (output.typeHash === daoScriptHash) {
+          if (output.typeHash === SystemScriptInfo.DAO_SCRIPT_HASH) {
             this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
           }
         }

@@ -13,6 +13,8 @@ export default class SystemScriptInfo {
   static DAO_HASH_TYPE = ScriptHashType.Type
   static MULTI_SIGN_HASH_TYPE = ScriptHashType.Type
 
+  static DAO_SCRIPT_HASH = new Script(SystemScriptInfo.DAO_CODE_HASH, '0x', SystemScriptInfo.DAO_HASH_TYPE).computeHash()
+
   private static instance: SystemScriptInfo
   static getInstance(): SystemScriptInfo {
     if (!SystemScriptInfo.instance) {
