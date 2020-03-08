@@ -375,7 +375,7 @@
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
       "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
-      "withdraw-alert": "Hint: these are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
+      "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "insufficient-period-alert-title": "Referenced Header is Invalid",
       "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs, around 16 hours)",
       "explanation-of-epochs-period": "Compensation Period",
