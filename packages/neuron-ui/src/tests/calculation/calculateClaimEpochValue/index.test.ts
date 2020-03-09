@@ -1,4 +1,4 @@
-import calculateClaimEpochNumber from 'utils/calculateClaimEpochNumber'
+import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import fixtures from './fixtures.json'
 
 interface EpochInfo {
@@ -25,7 +25,7 @@ describe('calculate claim epoch number', () => {
   )
 
   test.each(fixtureTable)(`(%s, %s) => %s`, (depositEpochInfo, withdrawingEpochInfo, expected) => {
-    const targetEpochNumber = calculateClaimEpochNumber(depositEpochInfo, withdrawingEpochInfo)
-    expect(Number(targetEpochNumber)).toBe(expected)
+    const targetEpochValue = calculateClaimEpochValue(depositEpochInfo, withdrawingEpochInfo)
+    expect(+targetEpochValue.toFixed(2)).toBe(expected)
   })
 })

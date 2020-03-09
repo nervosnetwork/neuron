@@ -132,27 +132,21 @@ const NervosDAO = () => {
         <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
         <Stack className={styles.recordsContainer}>
           {records.map((record, i) => {
-            let stage = 'deposited'
-            if (record.depositOutPoint) {
-              stage = 'withdrawing'
+            const props = {
+              ...record,
+              tipBlockTimestamp,
+              compensationPeriod: compensationPeriods[i],
+              withdrawCapacity: withdrawList[i],
+              key: `${record.outPoint.txHash}-${record.outPoint.index}`,
+              onClick: onActionClick,
+              onCompensationPeriodExplanationClick,
+              tipBlockNumber,
+              depositEpoch: depositEpochList[i] || '',
+              currentEpoch: epoch,
+              genesisBlockTimestamp,
+              connectionStatus,
             }
-            return (
-              <DAORecord
-                {...record}
-                compensationPeriod={compensationPeriods[i]}
-                withdraw={withdrawList[i]}
-                actionLabel={t(`nervos-dao.${stage}-action-label`)}
-                key={JSON.stringify(record.outPoint)}
-                onClick={onActionClick}
-                onCompensationPeriodExplanationClick={onCompensationPeriodExplanationClick}
-                tipBlockNumber={tipBlockNumber}
-                tipBlockTimestamp={tipBlockTimestamp}
-                epoch={epoch}
-                genesisBlockTimestamp={genesisBlockTimestamp}
-                connectionStatus={connectionStatus}
-                dispatch={dispatch}
-              />
-            )
+            return <DAORecord {...props} />
           })}
         </Stack>
       </>
@@ -169,7 +163,7 @@ const NervosDAO = () => {
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
-    dispatch,
+    depositEpochList,
   ])
 
   const MemoizedDepositDialog = useMemo(() => {
@@ -188,6 +182,7 @@ const NervosDAO = () => {
         isTxGenerated={!!send.generatedTx}
       />
     )
+    // eslint-disable-next-line
   }, [
     showDepositDialog,
     depositValue,

@@ -6,6 +6,7 @@ import HexUtils from 'utils/hex'
 import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-sdk-utils'
 import BlockHeader from './block-header'
 import TypeCheckerUtils from 'utils/type-checker'
+import OutPoint from './out-point'
 
 export enum TransactionStatus {
   Pending = 'pending',
@@ -227,15 +228,23 @@ export default class Transaction {
   }
 
   public static fromSDK(tx: CKBComponents.RawTransaction | CKBComponents.Transaction, blockHeader?: BlockHeader): Transaction {
+    const txHash: string | undefined = (tx as CKBComponents.Transaction).hash
+    const outputs = tx.outputs.map((o, i) => {
+      const output = Output.fromSDK(o)
+      if (txHash) {
+        output.setOutPoint(new OutPoint(txHash, i.toString()))
+      }
+      return output
+    })
     return new Transaction(
       tx.version,
       tx.cellDeps.map(cd => CellDep.fromSDK(cd)),
       tx.headerDeps,
       tx.inputs.map(i => Input.fromSDK(i)),
-      tx.outputs.map(o => Output.fromSDK(o)),
+      outputs,
       tx.outputsData,
       tx.witnesses,
-      (tx as CKBComponents.Transaction).hash,
+      txHash,
       blockHeader?.timestamp,
       blockHeader?.number,
       blockHeader?.hash

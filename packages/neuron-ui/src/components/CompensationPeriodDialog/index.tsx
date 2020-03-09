@@ -2,16 +2,15 @@ import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { useDialog } from 'utils/hooks'
+import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import styles from './compensationPeriodDialog.module.scss'
 
 interface CompensationPeriodDialogProps {
   onDismiss: () => void
   compensationPeriod: {
-    currentEpochNumber: bigint
-    currentEpochIndex: bigint
-    currentEpochLength: bigint
-    targetEpochNumber: bigint
+    currentEpochValue: number
+    targetEpochValue: number
   } | null
 }
 
@@ -20,18 +19,11 @@ const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: Compensatio
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: compensationPeriod, dialogRef, onClose: onDismiss })
 
-  let pastEpochs = 0
-  if (compensationPeriod) {
-    pastEpochs =
-      Number(compensationPeriod.currentEpochNumber) -
-      Number(compensationPeriod.targetEpochNumber) +
-      180 +
-      (compensationPeriod.currentEpochLength === BigInt(0)
-        ? 0
-        : +(Number(compensationPeriod.currentEpochIndex) / Number(compensationPeriod.currentEpochLength)).toFixed(1))
-  }
+  const pastEpochs = compensationPeriod
+    ? +(compensationPeriod.currentEpochValue - compensationPeriod.targetEpochValue + WITHDRAW_EPOCHS).toFixed(1)
+    : 0
 
-  const totalHours = Math.ceil((180 - pastEpochs) * 4)
+  const totalHours = Math.ceil((WITHDRAW_EPOCHS - pastEpochs) * 4)
   const leftDays = Math.floor(totalHours / 24)
   const leftHours = totalHours % 24
 

@@ -18,11 +18,12 @@ import MultiSignUtils from 'models/multi-sign-utils'
 import MultiSign from 'models/multi-sign'
 import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
+import BlockHeader from 'models/chain/block-header'
 
 export interface TargetOutput {
   address: string
   capacity: string
-  minutes?: string
+  date?: string // timestamp
 }
 
 export class TransactionGenerator {
@@ -38,14 +39,16 @@ export class TransactionGenerator {
   ): Promise<Transaction> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
     const multiSignScript = await MultiSignUtils.multiSignScript()
-    const currentHeaderEpoch = await TransactionGenerator.getCurrentHeaderEpoch()
+    const tipHeader = await TransactionGenerator.getTipHeader()
+    const tipHeaderEpoch = tipHeader.epoch
+    const tipHeaderTimestamp = tipHeader.timestamp
 
     const needCapacities: bigint = targetOutputs
       .map(o => BigInt(o.capacity))
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputs: Output[] = targetOutputs.map(o => {
-      const { capacity, address, minutes } = o
+      const { capacity, address, date } = o
 
       const lockScript = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
@@ -53,11 +56,12 @@ export class TransactionGenerator {
         .parse()
 
       const output = new Output(capacity, lockScript)
-      if (minutes) {
+      if (date) {
         const blake160 = lockScript.args
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
-          args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
+          args: new MultiSign().args(blake160, +minutes, tipHeaderEpoch),
           hashType: multiSignScript.hashType,
         })
         output.setLock(script)
@@ -127,7 +131,9 @@ export class TransactionGenerator {
   ): Promise<Transaction> => {
     const { codeHash, outPoint, hashType } = await LockUtils.systemScript()
     const multiSignScript = await MultiSignUtils.multiSignScript()
-    const currentHeaderEpoch = await TransactionGenerator.getCurrentHeaderEpoch()
+    const tipHeader = await TransactionGenerator.getTipHeader()
+    const tipHeaderEpoch = tipHeader.epoch
+    const tipHeaderTimestamp = tipHeader.timestamp
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -144,7 +150,7 @@ export class TransactionGenerator {
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputs: Output[] = targetOutputs.map((o, index) => {
-      const { capacity, address, minutes } = o
+      const { capacity, address, date } = o
 
       const lockScript: Script = new AddressParser(address)
         .setDefaultLockScript(codeHash, hashType)
@@ -152,11 +158,12 @@ export class TransactionGenerator {
         .parse()
 
       const output = new Output(capacity, lockScript)
-      if (minutes) {
+      if (date) {
         const blake160 = lockScript.args
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = Script.fromObject({
           codeHash: multiSignScript.codeHash,
-          args: new MultiSign().args(blake160, +minutes, currentHeaderEpoch),
+          args: new MultiSign().args(blake160, minutes, tipHeaderEpoch),
           hashType: multiSignScript.hashType,
         })
         output.setLock(script)
@@ -207,10 +214,10 @@ export class TransactionGenerator {
     return tx
   }
 
-  private static async getCurrentHeaderEpoch(): Promise<string> {
+  private static async getTipHeader(): Promise<BlockHeader> {
     const rpcService = new RpcService(NodeService.getInstance().ckb.node.url)
-    const currentHeader = await rpcService.getTipHeader()
-    return currentHeader.epoch
+    const tipHeader = await rpcService.getTipHeader()
+    return tipHeader
   }
 
   public static generateDepositTx = async (

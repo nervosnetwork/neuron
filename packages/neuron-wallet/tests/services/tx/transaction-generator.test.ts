@@ -10,6 +10,7 @@ import Script, { ScriptHashType } from '../../../src/models/chain/script'
 import Transaction from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
+import BlockHeader from '../../../src/models/chain/block-header'
 import MultiSignUtils from '../../../src/models/multi-sign-utils'
 import MultiSign from '../../../src/models/multi-sign'
 
@@ -88,6 +89,13 @@ const fullAddressInfo = {
   address: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy35nl24gm',
 }
 
+// diff = 1000min
+const date = '1580659200000'
+const tipTimestamp = '1580599200000'
+// number = 1, length = 1800, index = 24
+const tipEpoch = '0x7080018000001'
+const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0x' + '0'.repeat(64), '0', tipEpoch)
+
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
@@ -103,10 +111,10 @@ describe('TransactionGenerator', () => {
     mockMultiSignScriptInfo.mockReturnValue(multiSignScript)
     MultiSignUtils.multiSignScript = mockMultiSignScriptInfo.bind(MultiSignUtils)
 
-    const mockCurrentEpoch = jest.fn()
-    mockCurrentEpoch.mockReturnValue('0x7080018000001')
+    const mockTipHeader = jest.fn()
+    mockTipHeader.mockReturnValue(blockHeader)
     // @ts-ignore: Private method
-    TransactionGenerator.getCurrentHeaderEpoch = mockCurrentEpoch.bind(TransactionGenerator)
+    TransactionGenerator.getTipHeader = mockTipHeader.bind(TransactionGenerator)
   })
 
   afterAll(async () => {
@@ -368,7 +376,7 @@ describe('TransactionGenerator', () => {
               {
                 address: bob.address,
                 capacity: toShannon('500'),
-                minutes: '1000'
+                date,
               }
             ],
             bob.address,
@@ -383,6 +391,14 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedFee.toString())
 
           expect(tx.outputs[0].lock.codeHash).toEqual(multiSignScript.codeHash)
+
+          const multiSign = new MultiSign()
+          const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+          // @ts-ignore: Private method
+          const parsedEpoch = multiSign.parseEpoch(epoch)
+          expect(parsedEpoch.number).toEqual(BigInt(5))
+          expect(parsedEpoch.length).toEqual(BigInt(240))
+          expect(parsedEpoch.index).toEqual(BigInt(43))
         })
       })
     })
@@ -618,6 +634,34 @@ describe('TransactionGenerator', () => {
           feeRate
         )
       ).rejects.toThrowError()
+    })
+
+    describe('feeRate = 1000, with date', () => {
+      const feeRate = '1000'
+      it('capacity 500', async () => {
+        const tx: Transaction = await TransactionGenerator.generateSendingAllTx(
+          lockHashes,
+          [
+            {
+              address: bob.address,
+              capacity: toShannon('500'),
+              date,
+            }
+          ],
+          '0',
+          feeRate
+        )
+
+        expect(tx.outputs[0].lock.codeHash).toEqual(multiSignScript.codeHash)
+
+        const multiSign = new MultiSign()
+        const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+        // @ts-ignore: Private method
+        const parsedEpoch = multiSign.parseEpoch(epoch)
+        expect(parsedEpoch.number).toEqual(BigInt(5))
+        expect(parsedEpoch.length).toEqual(BigInt(240))
+        expect(parsedEpoch.index).toEqual(BigInt(43))
+      })
     })
   })
 
