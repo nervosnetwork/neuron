@@ -17,6 +17,7 @@ export default (depositEpochInfo: EpochInfo, withdrawingEpochInfo: EpochInfo) =>
     depositedEpochs < BigInt(WITHDRAW_EPOCHS)
       ? BigInt(WITHDRAW_EPOCHS)
       : ((depositedEpochs + BigInt(WITHDRAW_EPOCHS - 1)) / BigInt(WITHDRAW_EPOCHS)) * BigInt(WITHDRAW_EPOCHS)
-  const targetEpochNumber = depositEpochInfo.number + minLockEpochs
-  return targetEpochNumber
+  const targetEpochValue =
+    Number(depositEpochInfo.number + minLockEpochs) + Number(depositEpochInfo.index) / Number(depositEpochInfo.length)
+  return targetEpochValue
 }

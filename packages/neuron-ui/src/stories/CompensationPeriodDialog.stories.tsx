@@ -4,10 +4,8 @@ import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 
 const props = {
   compensationPeriod: {
-    currentEpochNumber: BigInt(170),
-    currentEpochIndex: BigInt(1),
-    currentEpochLength: BigInt(10),
-    targetEpochNumber: BigInt(180),
+    currentEpochValue: 170.1,
+    targetEpochValue: 180,
   },
   onDismiss: () => {},
 }

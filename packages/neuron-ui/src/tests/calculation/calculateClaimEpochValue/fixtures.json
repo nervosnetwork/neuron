@@ -63,7 +63,7 @@
         "index": 0,
         "length": 100
       },
-      "expected": 180
+      "expected": 180.01
     },
     {
       "depositEpochInfo": {
@@ -115,7 +115,7 @@
         "index": 820,
         "length": 1800
       },
-      "expected": 181
+      "expected": 181.35
     }
   ]
 }
