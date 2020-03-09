@@ -57,6 +57,7 @@ const fullAddressInfo = {
 // diff = 1000min
 const date = '1580659200000'
 const tipTimestamp = '1580599200000'
+// number = 1, length = 1800, index = 24
 const tipEpoch = '0x7080018000001'
 const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0x' + '0'.repeat(64), '0', tipEpoch)
 
@@ -359,6 +360,14 @@ describe('TransactionGenerator', () => {
           expect(tx.fee).toEqual(expectedFee.toString())
 
           expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+
+          const multiSign = new MultiSign()
+          const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+          // @ts-ignore: Private method
+          const parsedEpoch = multiSign.parseEpoch(epoch)
+          expect(parsedEpoch.number).toEqual(BigInt(5))
+          expect(parsedEpoch.length).toEqual(BigInt(240))
+          expect(parsedEpoch.index).toEqual(BigInt(43))
         })
       })
     })
@@ -613,6 +622,14 @@ describe('TransactionGenerator', () => {
         )
 
         expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+
+        const multiSign = new MultiSign()
+        const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+        // @ts-ignore: Private method
+        const parsedEpoch = multiSign.parseEpoch(epoch)
+        expect(parsedEpoch.number).toEqual(BigInt(5))
+        expect(parsedEpoch.length).toEqual(BigInt(240))
+        expect(parsedEpoch.index).toEqual(BigInt(43))
       })
     })
   })

@@ -4,6 +4,7 @@ import Button from 'widgets/Button'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
 import { useCalculateEpochs, useDialog } from 'utils/hooks'
+import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import styles from './withdrawDialog.module.scss'
 
@@ -59,25 +60,28 @@ const WithdrawDialog = ({
       })
   }, [record, tipBlockHash])
 
-  const { currentEpochInfo, targetEpochNumber } = useCalculateEpochs({ depositEpoch, currentEpoch })
+  const { currentEpochInfo, targetEpochValue } = useCalculateEpochs({ depositEpoch, currentEpoch })
 
-  const epochs = targetEpochNumber - currentEpochInfo.number - BigInt(1)
+  const epochs = +(
+    targetEpochValue -
+    (Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length))
+  ).toFixed(1)
   const message =
-    epochs >= BigInt(0)
+    epochs >= 0
       ? t('nervos-dao.notice-wait-time', {
           epochs: localNumberFormatter(epochs),
           blocks: localNumberFormatter(currentEpochInfo.length - currentEpochInfo.index),
-          days: localNumberFormatter(Math.round(Number(epochs) / 6)),
+          days: localNumberFormatter(Math.round(epochs / 6)),
         })
       : ''
 
   const alert =
-    epochs <= BigInt(5) && epochs >= BigInt(0)
+    epochs <= 5 && epochs >= 0
       ? t('nervos-dao.withdraw-alert', {
           epochs: localNumberFormatter(epochs),
-          hours: localNumberFormatter(epochs * BigInt(4)),
-          nextLeftEpochs: localNumberFormatter(epochs + BigInt(180)),
-          days: localNumberFormatter(Math.round((Number(epochs) + 180) / 6)),
+          hours: localNumberFormatter(epochs * 4),
+          nextLeftEpochs: localNumberFormatter(epochs + WITHDRAW_EPOCHS),
+          days: localNumberFormatter(Math.round((Number(epochs) + WITHDRAW_EPOCHS) / 6)),
         })
       : ''
 

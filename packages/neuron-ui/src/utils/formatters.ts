@@ -141,7 +141,7 @@ export const localNumberFormatter = (num: string | number | bigint = 0) => {
     return numberFormatter.format(num as any)
   }
   if (Number.isNaN(+num)) {
-    console.warn(`Nuumber is not a valid number`)
+    console.warn(`Number is not a valid number`)
     return num.toString()
   }
   const parts = num.toString().split('.')

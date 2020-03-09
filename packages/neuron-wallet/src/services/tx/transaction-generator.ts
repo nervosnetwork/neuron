@@ -52,7 +52,7 @@ export class TransactionGenerator {
       const output = new Output(capacity, lockScript)
       if (date) {
         const blake160 = lockScript.args
-        const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, +minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))
@@ -69,84 +69,84 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [secpCellDep],
-      headerDeps: [],
-      inputs: [],
-      outputs,
-      outputsData: outputs.map(output => output.data || '0x'),
-      witnesses: [],
-    })
+    headerDeps: [],
+    inputs: [],
+    outputs,
+    outputsData: outputs.map(output => output.data || '0x'),
+    witnesses: [],
+  })
 
-    const baseSize: number = TransactionSize.tx(tx)
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput,
-    } = await CellsService.gatherInputs(
-      needCapacities.toString(),
-      lockHashes,
-      fee,
-      feeRate,
-      baseSize,
-      TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+  const baseSize: number = TransactionSize.tx(tx)
+  const {
+    inputs,
+    capacities,
+    finalFee,
+    hasChangeOutput,
+  } = await CellsService.gatherInputs(
+    needCapacities.toString(),
+    lockHashes,
+    fee,
+    feeRate,
+    baseSize,
+    TransactionGenerator.CHANGE_OUTPUT_SIZE,
+    TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+  )
+  const finalFeeInt = BigInt(finalFee)
+  tx.inputs = inputs
+  tx.fee = finalFee
+
+  // change
+  if (hasChangeOutput) {
+    const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+
+    const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
+
+    const output = new Output(
+      changeCapacity.toString(),
+      SystemScriptInfo.generateSecpScript(changeBlake160)
     )
-    const finalFeeInt = BigInt(finalFee)
-    tx.inputs = inputs
-    tx.fee = finalFee
 
-    // change
-    if (hasChangeOutput) {
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
-
-      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
-
-      const output = new Output(
-        changeCapacity.toString(),
-        SystemScriptInfo.generateSecpScript(changeBlake160)
-      )
-
-      tx.addOutput(output)
-    }
-
-    return tx
+    tx.addOutput(output)
   }
 
-  // rest of capacity all send to last target output.
-  public static generateSendingAllTx = async (
-    lockHashes: string[],
-    targetOutputs: TargetOutput[],
-    fee: string = '0',
-    feeRate: string = '0'
-  ): Promise<Transaction> => {
-    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
-    const tipHeader = await TransactionGenerator.getTipHeader()
-    const tipHeaderEpoch = tipHeader.epoch
-    const tipHeaderTimestamp = tipHeader.timestamp
+  return tx
+}
 
-    const feeInt = BigInt(fee)
-    const feeRateInt = BigInt(feeRate)
-    const mode = new FeeMode(feeRateInt)
+// rest of capacity all send to last target output.
+public static generateSendingAllTx = async (
+  lockHashes: string[],
+  targetOutputs: TargetOutput[],
+  fee: string = '0',
+  feeRate: string = '0'
+): Promise<Transaction> => {
+  const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+  const tipHeader = await TransactionGenerator.getTipHeader()
+  const tipHeaderEpoch = tipHeader.epoch
+  const tipHeaderTimestamp = tipHeader.timestamp
 
-    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+  const feeInt = BigInt(fee)
+  const feeRateInt = BigInt(feeRate)
+  const mode = new FeeMode(feeRateInt)
 
-    if (allInputs.length === 0) {
-      throw new CapacityNotEnough()
-    }
+  const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
 
-    const totalCapacity: bigint = allInputs
-      .map(input => BigInt(input.capacity))
-      .reduce((result, c) => result + c, BigInt(0))
+  if (allInputs.length === 0) {
+    throw new CapacityNotEnough()
+  }
 
-    const outputs: Output[] = targetOutputs.map((o, index) => {
-      const { capacity, address, date } = o
+  const totalCapacity: bigint = allInputs
+    .map(input => BigInt(input.capacity))
+    .reduce((result, c) => result + c, BigInt(0))
 
-      const lockScript: Script = new AddressParser(address).parse()
+  const outputs: Output[] = targetOutputs.map((o, index) => {
+    const { capacity, address, date } = o
 
-      const output = new Output(capacity, lockScript)
-      if (date) {
-        const blake160 = lockScript.args
-        const minutes: number = +((BigInt(tipHeaderTimestamp) - BigInt(date)) / BigInt(1000 * 60)).toString()
+    const lockScript: Script = new AddressParser(address).parse()
+
+    const output = new Output(capacity, lockScript)
+    if (date) {
+      const blake160 = lockScript.args
+        const minutes: number = +((BigInt(date) - BigInt(tipHeaderTimestamp)) / BigInt(1000 * 60)).toString()
         const script: Script = SystemScriptInfo.generateMultiSignScript(new MultiSign().args(blake160, minutes, tipHeaderEpoch))
         output.setLock(script)
         output.setMultiSignBlake160(script.args.slice(0, 42))

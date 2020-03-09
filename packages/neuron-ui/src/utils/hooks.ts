@@ -4,7 +4,7 @@ import { openContextMenu } from 'services/remote'
 import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { epochParser } from 'utils/parsers'
-import calculateTargetEpochNumber from 'utils/calculateClaimEpochNumber'
+import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -118,11 +118,11 @@ export const useCalculateEpochs = ({ depositEpoch, currentEpoch }: { depositEpoc
   useMemo(() => {
     const depositEpochInfo = epochParser(depositEpoch)
     const currentEpochInfo = epochParser(currentEpoch)
-    const targetEpochNumber = calculateTargetEpochNumber(depositEpochInfo, currentEpochInfo)
+    const targetEpochValue = calculateClaimEpochValue(depositEpochInfo, currentEpochInfo)
     return {
       depositEpochInfo,
       currentEpochInfo,
-      targetEpochNumber,
+      targetEpochValue,
     }
   }, [depositEpoch, currentEpoch])
 

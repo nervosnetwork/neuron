@@ -19,6 +19,12 @@ describe('MultiSign Test', () => {
     expect(since).toEqual(expectedSince)
   })
 
+  it('since, minutes < 0', () => {
+    expect(() => {
+      new MultiSign().since(-1, headerEpoch)
+    }).toThrowError()
+  })
+
   it('serialize', () => {
     const s = new MultiSign().serialize(bob.blake160)
     expect(s).toEqual(serialized)
