@@ -1,11 +1,14 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConnectionStatus, SyncStatus } from 'utils/const'
+import { localNumberFormatter } from 'utils/formatters'
 
-import styles from 'containers/Navbar/navbar.module.scss'
+import styles from './networkStatus.module.scss'
 
-interface NetworkStatusProps {
+export interface NetworkStatusProps {
   networkName: string | null
+  tipBlockNumber: string
+  syncedBlockNumber: string
   connectionStatus: State.ConnectionStatus
   syncStatus: SyncStatus
   onAction: (e: React.SyntheticEvent) => void
@@ -13,6 +16,8 @@ interface NetworkStatusProps {
 
 const NetworkStatus = ({
   networkName = null,
+  tipBlockNumber,
+  syncedBlockNumber,
   connectionStatus = ConnectionStatus.Offline,
   onAction,
   syncStatus = SyncStatus.SyncNotStart,
@@ -28,7 +33,28 @@ const NetworkStatus = ({
       tabIndex={0}
     >
       {networkName ? (
-        <span data-online={connectionStatus === ConnectionStatus.Online} data-sync-status={SyncStatus[syncStatus]}>
+        <div className={styles.tooltip}>
+          <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
+          {tipBlockNumber ? (
+            <>
+              <span>{t('network-status.tooltip.total')}</span>
+              <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
+            </>
+          ) : null}
+          {+syncedBlockNumber >= 0 ? (
+            <>
+              <span>{t('network-status.tooltip.synced')}</span>
+              <span className={styles.blockNumber}>{localNumberFormatter(syncedBlockNumber)}</span>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+      {networkName ? (
+        <span
+          className={styles.name}
+          data-online={connectionStatus === ConnectionStatus.Online}
+          data-sync-status={SyncStatus[syncStatus]}
+        >
           {networkName}
         </span>
       ) : (
