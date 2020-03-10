@@ -4,10 +4,10 @@ import LockUtils from 'models/lock-utils'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import Output from 'models/chain/output'
-import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import Script from 'models/chain/script'
 import SystemScriptInfo from 'models/system-script-info'
+import ArrayUtils from 'utils/array'
 
 // Search for all addresses related to a transaction. These addresses include:
 //   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
@@ -65,31 +65,42 @@ export default class TxAddressFinder {
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
 
     let shouldSync = false
-    for (const input of inputs) {
-      const outPoint: OutPoint = input.previousOutput!
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .findOne({
-          outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index,
-        })
-      if (output && this.lockHashes.has(output.lockHash)) {
+    const inputOutPoints = inputs.map(i => {
+      return `${i.previousOutput!.txHash}:${i.previousOutput!.index}`
+    })
+
+    const outputs: OutputEntity[] = (await Promise.all(
+      ArrayUtils.eachSlice(inputOutPoints, 100).map(async outPoints => {
+        return getConnection()
+          .getRepository(OutputEntity)
+          .createQueryBuilder('output')
+          .where(`(output.outPointTxHash || ':' || output.outPointIndex) IN (:...outPoints)`, {
+            outPoints
+          })
+          .getMany()
+      })
+    )).reduce((acc, val) => acc.concat(val), [])
+
+    outputs.forEach(o => {
+      if (this.lockHashes.has(o.lockHash)) {
         shouldSync = true
         addresses.push(
           LockUtils.lockScriptToAddress(
-            new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
+            new Script(o.lock.codeHash, o.lock.args, o.lock.hashType),
             NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
           )
         )
       }
-      if (output && output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
-        const multiSignBlake160 = output.lock.args.slice(0, 42)
+
+      if (o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+        const multiSignBlake160 = o.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true
-          input.setMultiSignBlake160(multiSignBlake160)
+          const input = inputs.find(i => i.previousOutput!.txHash === o.outPointTxHash && i.previousOutput!.index === o.outPointIndex)
+          input!.setMultiSignBlake160(multiSignBlake160)
         }
       }
-    }
+    })
 
     return [shouldSync, addresses]
   }
