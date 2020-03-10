@@ -23,6 +23,12 @@ const NetworkStatus = ({
   syncStatus = SyncStatus.SyncNotStart,
 }: NetworkStatusProps) => {
   const [t] = useTranslation()
+
+  let synced = syncedBlockNumber
+  if (tipBlockNumber && BigInt(tipBlockNumber) < BigInt(syncedBlockNumber)) {
+    synced = tipBlockNumber
+  }
+
   return (
     <div
       role="link"
@@ -32,7 +38,7 @@ const NetworkStatus = ({
       onKeyPress={onAction}
       tabIndex={0}
     >
-      {networkName ? (
+      {networkName && (tipBlockNumber || +synced >= 0) ? (
         <div className={styles.tooltip}>
           <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
           {tipBlockNumber ? (
@@ -41,10 +47,10 @@ const NetworkStatus = ({
               <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
             </>
           ) : null}
-          {+syncedBlockNumber >= 0 ? (
+          {+synced >= 0 ? (
             <>
               <span>{t('network-status.tooltip.synced')}</span>
-              <span className={styles.blockNumber}>{localNumberFormatter(syncedBlockNumber)}</span>
+              <span className={styles.blockNumber}>{localNumberFormatter(synced)}</span>
             </>
           ) : null}
         </div>
