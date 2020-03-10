@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
@@ -34,11 +34,6 @@ const History = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
-  useEffect(() => {
-    if (id) {
-      history.push(`${Routes.History}?pageNo=1&keywords=${''}`)
-    }
-  }, [id, history])
   const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
 
   const tipBlockNumber = useMemo(() => {
