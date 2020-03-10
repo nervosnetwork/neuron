@@ -21,6 +21,38 @@ const states: { [index: string]: NetworkStatusProps } = {
     syncStatus: SyncStatus.Syncing,
     onAction: () => {},
   },
+  '100 synced and 0 tip': {
+    networkName: 'network',
+    tipBlockNumber: '0',
+    syncedBlockNumber: '100',
+    connectionStatus: 'offline' as any,
+    syncStatus: SyncStatus.Syncing,
+    onAction: () => {},
+  },
+  '100 synced and empty tip': {
+    networkName: 'network',
+    tipBlockNumber: '',
+    syncedBlockNumber: '100',
+    connectionStatus: 'offline' as any,
+    syncStatus: SyncStatus.Syncing,
+    onAction: () => {},
+  },
+  'not sycned and 100 tip': {
+    networkName: 'network',
+    tipBlockNumber: '100',
+    syncedBlockNumber: '-1',
+    connectionStatus: 'offline' as any,
+    syncStatus: SyncStatus.Syncing,
+    onAction: () => {},
+  },
+  'not synced and empty tip': {
+    networkName: 'network',
+    tipBlockNumber: '',
+    syncedBlockNumber: '-1',
+    connectionStatus: 'offline' as any,
+    syncStatus: SyncStatus.Syncing,
+    onAction: () => {},
+  },
 }
 
 const stories = storiesOf('Connection Status', module).addDecorator(withKnobs)
