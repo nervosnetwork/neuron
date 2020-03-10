@@ -22,6 +22,13 @@
       "fail-to-fetch-tip-block-number": "Connection error",
       "sync-not-start": "Sync not started yet"
     },
+    "network-status": {
+      "tooltip": {
+        "block-number": "Block Number",
+        "total": "Total",
+        "synced": "Synced"
+      }
+    },
     "overview": {
       "date": "Date",
       "type": "Type",

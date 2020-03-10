@@ -22,6 +22,13 @@
       "fail-to-fetch-tip-block-number": "未連接到節點",
       "sync-not-start": "同步尚未開始"
     },
+    "network-status": {
+      "tooltip": {
+        "block-number": "區塊高度",
+        "total": "總高度",
+        "synced": "已同步"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "類型",
