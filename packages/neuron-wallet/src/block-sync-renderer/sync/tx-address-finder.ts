@@ -69,10 +69,10 @@ export default class TxAddressFinder {
       return `${i.previousOutput!.txHash}:${i.previousOutput!.index}`
     })
 
+    const repository = getConnection().getRepository(OutputEntity)
     const outputs: OutputEntity[] = (await Promise.all(
       ArrayUtils.eachSlice(inputOutPoints, 100).map(async outPoints => {
-        return getConnection()
-          .getRepository(OutputEntity)
+        return repository
           .createQueryBuilder('output')
           .where(`(output.outPointTxHash || ':' || output.outPointIndex) IN (:...outPoints)`, {
             outPoints
@@ -81,13 +81,14 @@ export default class TxAddressFinder {
       })
     )).reduce((acc, val) => acc.concat(val), [])
 
+    const addrPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     outputs.forEach(o => {
       if (this.lockHashes.has(o.lockHash)) {
         shouldSync = true
         addresses.push(
           LockUtils.lockScriptToAddress(
             new Script(o.lock.codeHash, o.lock.args, o.lock.hashType),
-            NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+            addrPrefix
           )
         )
       }
