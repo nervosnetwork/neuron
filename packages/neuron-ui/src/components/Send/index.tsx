@@ -342,6 +342,7 @@ const Send = () => {
           label={t('send.description')}
           value={send.description}
           onChange={onDescriptionChange}
+          disabled={sending}
         />
         <TransactionFeePanel
           fee={shannonToCKBFormatter(fee)}
