@@ -1,6 +1,10 @@
 import React from 'react'
 import styles from './button.module.scss'
 
+const isNativeType = (type: string): type is 'button' | 'submit' | 'reset' => {
+  return ['button', 'submit', 'reset'].includes(type)
+}
+
 const Button = ({
   type = 'default',
   label,
@@ -12,16 +16,19 @@ const Button = ({
 }: {
   type?: 'default' | 'cancel' | 'ok' | 'submit' | 'confirm' | 'primary' | 'reset'
   label: string
-  onClick: any
+  onClick?: any
   disabled?: boolean
   className?: string
   children?: React.ReactChild
   [key: string]: any
 }) => {
+  const btnType = isNativeType(type) ? type : 'button'
+
   return (
+    // eslint-disable-next-line react/button-has-type
     <button
       className={`${styles.button} ${className}`}
-      type="button"
+      type={btnType}
       data-type={type}
       onClick={onClick}
       aria-label={label}

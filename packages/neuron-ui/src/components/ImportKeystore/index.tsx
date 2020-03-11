@@ -58,6 +58,17 @@ const ImportKeystore = () => {
   const [openingFile, setOpeningFile] = useState(false)
   const goBack = useGoBack(history)
 
+  const disabled =
+    loading ||
+    !!(
+      !fields.name ||
+      !fields.path ||
+      !fields.password ||
+      fields.nameError ||
+      fields.passwordError ||
+      fields.passwordError
+    )
+
   useEffect(() => {
     if (fields.name === undefined) {
       const name = generateWalletName(wallets, wallets.length + 1, t)
@@ -88,19 +99,23 @@ const ImportKeystore = () => {
       })
   }, [fields])
 
-  const onSubmit = useCallback(() => {
-    if (loading) {
-      return
-    }
-    setLoading(true)
-    setTimeout(() => {
-      importWalletWithKeystore({
-        name: fields.name || '',
-        keystorePath: fields.path,
-        password: fields.password,
-      })(history).finally(() => setLoading(false))
-    }, 200)
-  }, [fields.name, fields.password, fields.path, history, loading])
+  const onSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      if (loading || disabled) {
+        return
+      }
+      setLoading(true)
+      setTimeout(() => {
+        importWalletWithKeystore({
+          name: fields.name || '',
+          keystorePath: fields.path,
+          password: fields.password,
+        })(history).finally(() => setLoading(false))
+      }, 200)
+    },
+    [fields.name, fields.password, fields.path, history, loading, disabled]
+  )
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -156,7 +171,7 @@ const ImportKeystore = () => {
   )
 
   return (
-    <div className={styles.container}>
+    <form className={styles.container} onSubmit={onSubmit}>
       {Object.entries(fields)
         .filter(([key]) => !key.endsWith('Error'))
         .map(([key, value]) => {
@@ -181,26 +196,11 @@ const ImportKeystore = () => {
         })}
       <div className={styles.actions}>
         <Button type="cancel" onClick={goBack} label={t('import-keystore.button.back')} />
-        <Button
-          type="submit"
-          onClick={onSubmit}
-          label={t('import-keystore.button.submit')}
-          disabled={
-            loading ||
-            !!(
-              !fields.name ||
-              !fields.path ||
-              !fields.password ||
-              fields.nameError ||
-              fields.passwordError ||
-              fields.passwordError
-            )
-          }
-        >
+        <Button type="submit" label={t('import-keystore.button.submit')} disabled={disabled}>
           {loading ? <Spinner /> : (t('import-keystore.button.submit') as string)}
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
 
