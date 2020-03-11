@@ -31,51 +31,62 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const onConfirm = useCallback(() => {
-    switch (actionType) {
-      case 'send': {
-        if (isSending) {
+  const disabled = !password || (actionType === 'send' && isSending)
+
+  const onSubmit = useCallback(
+    (e?: React.FormEvent): void => {
+      if (disabled) {
+        return
+      }
+      if (e) {
+        e.preventDefault()
+      }
+      switch (actionType) {
+        case 'send': {
+          if (isSending) {
+            break
+          }
+          sendTransaction({
+            walletID,
+            tx: generatedTx,
+            description,
+            password,
+          })(dispatch, history)
           break
         }
-        sendTransaction({
-          walletID,
-          tx: generatedTx,
-          description,
-          password,
-        })(dispatch, history)
-        break
-      }
-      case 'delete': {
-        deleteWallet({
-          id: walletID,
-          password,
-        })(dispatch)
-        break
-      }
-      case 'backup': {
-        backupWallet({
-          id: walletID,
-          password,
-        })(dispatch)
-        break
-      }
-      case 'unlock': {
-        if (isSending) {
+        case 'delete': {
+          deleteWallet({
+            id: walletID,
+            password,
+          })(dispatch)
           break
         }
-        sendTransaction({
-          walletID,
-          tx: generatedTx,
-          description,
-          password,
-        })(dispatch, history, { type: 'unlock' })
-        break
+        case 'backup': {
+          backupWallet({
+            id: walletID,
+            password,
+          })(dispatch)
+          break
+        }
+        case 'unlock': {
+          if (isSending) {
+            break
+          }
+          sendTransaction({
+            walletID,
+            tx: generatedTx,
+            description,
+            password,
+          })(dispatch, history, { type: 'unlock' })
+          break
+        }
+        default: {
+          break
+        }
       }
-      default: {
-        break
-      }
-    }
-  }, [dispatch, walletID, password, actionType, description, history, isSending, generatedTx])
+    },
+    [dispatch, walletID, password, actionType, description, history, isSending, generatedTx, disabled]
+  )
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -87,39 +98,32 @@ const PasswordRequest = () => {
     },
     [dispatch]
   )
-  const disabled = !password || (actionType === 'send' && isSending)
-  const onKeyPress = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter' && !disabled) {
-        onConfirm()
-      }
-    },
-    [onConfirm, disabled]
-  )
+
   if (!wallet) {
     return null
   }
 
   return (
     <dialog ref={dialogRef} className={styles.dialog}>
-      <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-      {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
-      <TextField
-        label={t('password-request.password')}
-        value={password}
-        field="password"
-        type="password"
-        title={t('password-request.password')}
-        onChange={onChange}
-        autoFocus
-        onKeyPress={onKeyPress}
-        required
-        className={styles.passwordInput}
-      />
-      <div className={styles.footer}>
-        <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-        <Button label={t('common.confirm')} type="submit" onClick={onConfirm} disabled={disabled} />
-      </div>
+      <form onSubmit={onSubmit}>
+        <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
+        {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
+        <TextField
+          label={t('password-request.password')}
+          value={password}
+          field="password"
+          type="password"
+          title={t('password-request.password')}
+          onChange={onChange}
+          autoFocus
+          required
+          className={styles.passwordInput}
+        />
+        <div className={styles.footer}>
+          <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
+          <Button label={t('common.confirm')} type="submit" disabled={disabled} />
+        </div>
+      </form>
     </dialog>
   )
 }
