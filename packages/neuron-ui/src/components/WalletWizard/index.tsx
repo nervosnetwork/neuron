@@ -222,13 +222,13 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
 
   const onKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !disableNext) {
+      if (e.key === 'Enter') {
         e.stopPropagation()
         e.preventDefault()
         onNext()
       }
     },
-    [onNext, disableNext]
+    [onNext]
   )
 
   return (

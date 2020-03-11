@@ -55,6 +55,16 @@ const DatetimePicker = ({
     ].map(monname => t(`datetime.${monname}.short`)),
   }
 
+  let selected: Date | undefined = new Date(display)
+  if (selected.toString() === 'Invalid Date') {
+    selected = undefined
+  }
+
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const isSinceTomorrow = new Date(display).getTime() >= new Date(tomorrow.toDateString()).getTime()
+  const disabled = !selected || !isSinceTomorrow
+
   const onEdit = () => {
     setStatus('edit')
   }
@@ -84,17 +94,22 @@ const DatetimePicker = ({
   )
 
   const onSubmit = useCallback(() => {
+    if (disabled) {
+      return
+    }
     onConfirm(new Date(display).getTime())
-  }, [onConfirm, display])
+  }, [onConfirm, display, disabled])
 
-  let selected: Date | undefined = new Date(display)
-  if (selected.toString() === 'Invalid Date') {
-    selected = undefined
-  }
-
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  const isSinceTomorrow = new Date(display).getTime() >= new Date(tomorrow.toDateString()).getTime()
+  const onKeyPress = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        e.stopPropagation()
+        onSubmit()
+      }
+    },
+    [onSubmit]
+  )
 
   return (
     <div className={styles.container} onClick={onCancel} role="presentation">
@@ -119,7 +134,7 @@ const DatetimePicker = ({
             <span>{display}</span>
           </div>
         ) : (
-          <input placeholder={t('send.release-on')} value={display} onChange={onInput} />
+          <input placeholder={t('send.release-on')} value={display} onChange={onInput} onKeyPress={onKeyPress} />
         )}
         <Calendar
           value={selected}
@@ -138,7 +153,7 @@ const DatetimePicker = ({
         ) : null}
         <div className={styles.actions}>
           <Button type="cancel" label={t('common.cancel')} onClick={onCancel} />
-          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={!selected || !isSinceTomorrow} />
+          <Button type="submit" label={t('common.save')} onClick={onSubmit} disabled={disabled} />
         </div>
       </div>
     </div>
