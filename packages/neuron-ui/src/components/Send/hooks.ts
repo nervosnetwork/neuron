@@ -172,12 +172,16 @@ const useOnTransactionChange = (
 
 const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =>
   useCallback(
-    (walletID: string = '') => () => {
+    (e: React.FormEvent) => {
+      const {
+        dataset: { walletId },
+      } = e.target as HTMLFormElement
+      e.preventDefault()
       if (verifyTransactionOutputs(items)) {
         dispatch({
           type: AppActions.RequestPassword,
           payload: {
-            walletID,
+            walletID: walletId as string,
             actionType: 'send',
           },
         })
