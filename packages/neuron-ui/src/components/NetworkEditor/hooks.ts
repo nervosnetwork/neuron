@@ -17,10 +17,10 @@ export const useOnSubmit = (
 ) =>
   useCallback(
     (e: React.FormEvent): void => {
+      e.preventDefault()
       if (disabled) {
         return
       }
-      e.preventDefault()
       let errorMessage:
         | State.Message<ErrorCode, { fieldName: string; fieldValue?: string; length?: string }>
         | undefined

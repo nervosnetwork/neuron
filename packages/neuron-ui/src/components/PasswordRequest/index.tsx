@@ -35,11 +35,11 @@ const PasswordRequest = () => {
 
   const onSubmit = useCallback(
     (e?: React.FormEvent): void => {
-      if (disabled) {
-        return
-      }
       if (e) {
         e.preventDefault()
+      }
+      if (disabled) {
+        return
       }
       switch (actionType) {
         case 'send': {
