@@ -118,7 +118,7 @@ export const useOnSubmit = (
         },
       })(dispatch, history)
     },
-    [id, name, remote, networks, history, dispatch]
+    [id, name, remote, networks, history, dispatch, disabled]
   )
 
 export default {
