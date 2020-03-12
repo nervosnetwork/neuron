@@ -23,6 +23,8 @@ export const MEDIUM_FEE_RATE = 6000
 export const WITHDRAW_EPOCHS = 180
 export const IMMATURE_EPOCHS = 4
 export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
+export const HOURS_PER_EPOCH = 4
+export const HOURS_PER_DAY = 24
 
 export const CONNECTING_DEADLINE = Date.now() + 10_000
 
@@ -128,4 +130,10 @@ export const SyncStatusThatBalanceUpdating = [SyncStatus.Syncing, SyncStatus.Syn
 
 export enum PRESET_SCRIPT {
   Locktime = 'SingleMultiSign',
+}
+
+export enum CompensationPeriod {
+  SUGGEST_START = 0.767,
+  REQUEST_START = 0.967,
+  REQUEST_END = 1,
 }
