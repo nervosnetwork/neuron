@@ -1,0 +1,67 @@
+$progress-green: #3cc68a;
+$progress-yellow: #f7ae4d;
+$progress-grey: #e3e3e3;
+$progress-green-hover: #21b574;
+$progress-yellow-hover: #fa8f00;
+$progress-grey-hover: #888;
+$progress-indicator-color: #000;
+$progress-indicator-height: 20px;
+$progress-bar-height: 10px;
+$progress-indicator-offet: ($progress-bar-height - $progress-indicator-height) / 2;
+
+
+.progress {
+  display: block;
+  appearance: none;
+  width: 100%;
+  position: relative;
+  height: $progress-bar-height;
+
+  &::-webkit-progress-bar {
+    height: $progress-bar-height;
+    border-radius: 2px;
+    background: linear-gradient(90deg, $progress-grey 0%, $progress-grey 76.7%, $progress-green 76.7%, $progress-green 96.7%, $progress-yellow 96.7%, $progress-yellow 100%);
+    border-radius: $progress-bar-height/2;
+  }
+
+
+  &:hover::-webkit-progress-bar {
+    background: linear-gradient(90deg, $progress-grey-hover 0%, $progress-grey-hover 76.7%, $progress-green-hover 76.7%, $progress-green-hover 96.7%, $progress-yellow-hover 96.7%, $progress-yellow-hover 100%);
+  }
+
+  &::-webkit-progress-value {
+    position: relative;
+    background-color: transparent;
+  }
+
+  &[data-is-withdrawn='true'] {
+    pointer-events: none;
+
+    &::-webkit-progress-bar {
+      overflow: hidden;
+    }
+
+    &::-webkit-progress-value {
+      border-top-left-radius: $progress-bar-height/2;
+      border-bottom-left-radius: $progress-bar-height/2;
+      border-right: 1px solid #000;
+      box-shadow: 0 0 0 1500px rgba(255, 255, 255, 0.4);
+    }
+  }
+
+}
+
+.container {
+  position: relative;
+  box-sizing: border-box;
+  padding-top: 10px;
+
+  .indicator {
+    position: absolute;
+    display: block;
+    content: '';
+    border: 5px solid transparent;
+    border-top-color: $progress-indicator-color;
+    bottom: calc(100% - 13px);
+  }
+}
