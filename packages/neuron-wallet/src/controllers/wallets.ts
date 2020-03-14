@@ -25,6 +25,7 @@ import AddressService from 'services/addresses'
 import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/address'
 import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
+import logger from 'utils/logger'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -450,6 +451,7 @@ export default class WalletsController {
       // short address with codeHashIndex = 0x00, or full address
       return (result.startsWith('0x0100') && address.length === 46) || result.startsWith('0x02') || result.startsWith('0x04')
     } catch (err) {
+      logger.warn(`verify address error: ${err}`)
       return false
     }
   }

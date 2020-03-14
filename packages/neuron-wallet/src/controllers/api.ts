@@ -21,6 +21,7 @@ import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
+import logger from 'utils/logger'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -318,6 +319,8 @@ export default class ApiController {
         const res = await listener(event, args)
         return res
       } catch (err) {
+        logger.warn(`channel handling error: ${err}`)
+
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
         }
