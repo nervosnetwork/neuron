@@ -19,7 +19,7 @@ export class TransactionPersistor {
   // After the tx is sent:
   // 1. If the tx is not persisted before sending, output = sent, input = pending
   // 2. If the tx is already persisted before sending, do nothing
-  public static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
+  private static saveWithSent = async (transaction: Transaction): Promise<TransactionEntity> => {
     const txEntity: TransactionEntity | undefined = await getConnection()
       .getRepository(TransactionEntity)
       .findOne(transaction.hash)
@@ -42,7 +42,7 @@ export class TransactionPersistor {
   // After the tx is fetched:
   // 1. If the tx is not persisted before fetching, output = live, input = dead
   // 2. If the tx is already persisted before fetching, output = live, input = dead
-  public static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
+  private static saveWithFetch = async (transaction: Transaction): Promise<TransactionEntity> => {
     const connection = getConnection()
     const txEntity: TransactionEntity | undefined = await connection
       .getRepository(TransactionEntity)
@@ -201,7 +201,7 @@ export class TransactionPersistor {
     tx.blockHash = transaction.blockHash!
     tx.blockNumber = transaction.blockNumber!
     tx.witnesses = transaction.witnessesAsString()
-    tx.description = transaction.description
+    tx.description = '' // tx desc is saved in leveldb as wallet property
     // update tx status here
     tx.status = outputStatus === OutputStatus.Sent ? TransactionStatus.Pending : TransactionStatus.Success
     tx.inputs = []

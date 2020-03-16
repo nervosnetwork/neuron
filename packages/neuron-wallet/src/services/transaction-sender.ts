@@ -9,6 +9,7 @@ import { AddressPrefix } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressService from './addresses'
 import { Address } from 'database/address/address-dao'
+import { set as setDescription } from 'database/leveldb/transaction-description'
 import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
@@ -54,8 +55,10 @@ export default class TransactionSender {
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
-    tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
+    if (description !== '') {
+      setDescription(walletID, txHash, description)
+    }
 
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
