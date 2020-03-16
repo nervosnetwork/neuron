@@ -359,10 +359,11 @@ describe('TransactionGenerator', () => {
           expect(expectedFee).toEqual(BigInt(472))
           expect(tx.fee).toEqual(expectedFee.toString())
 
-          expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+          expect(multiSignOutput).toBeDefined()
 
           const multiSign = new MultiSign()
-          const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+          const epoch = multiSign.parseSince(multiSignOutput!.lock.args)
           // @ts-ignore: Private method
           const parsedEpoch = multiSign.parseEpoch(epoch)
           expect(parsedEpoch.number).toEqual(BigInt(5))
