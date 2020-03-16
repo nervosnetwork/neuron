@@ -17,6 +17,7 @@ import RpcService from 'services/rpc-service'
 import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
 import SystemScriptInfo from 'models/system-script-info'
+import ArrayUtils from 'utils/array'
 
 export interface TargetOutput {
   address: string
@@ -69,12 +70,12 @@ export class TransactionGenerator {
     const tx = Transaction.fromObject({
       version: '0',
       cellDeps: [secpCellDep],
-    headerDeps: [],
-    inputs: [],
-    outputs,
-    outputsData: outputs.map(output => output.data || '0x'),
-    witnesses: [],
-  })
+      headerDeps: [],
+      inputs: [],
+      outputs,
+      outputsData: outputs.map(output => output.data || '0x'),
+      witnesses: [],
+    })
 
   const baseSize: number = TransactionSize.tx(tx)
   const {
@@ -108,6 +109,8 @@ export class TransactionGenerator {
 
     tx.addOutput(output)
   }
+
+  tx.outputs = ArrayUtils.shuffle(tx.outputs)
 
   return tx
 }
