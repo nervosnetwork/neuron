@@ -30,6 +30,7 @@ import {
   SINCE_FIELD_SIZE,
 } from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import {
   verifyTotalAmount,
@@ -111,6 +112,7 @@ const Send = () => {
     syncedBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   const outputErrors = useMemo(() => {
