@@ -35,31 +35,43 @@ const PasswordRequest = ({
     [setPassword]
   )
 
-  const onConfirm = useCallback(() => {
-    setLoading(true)
-    onSubmit(password).finally(() => {
-      setLoading(false)
-    })
-  }, [setLoading, onSubmit, password])
+  const disabled = !password || loading
+
+  const onConfirm = useCallback(
+    (e: React.FormEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      if (disabled) {
+        return
+      }
+      setLoading(true)
+      onSubmit(password).finally(() => {
+        setLoading(false)
+      })
+    },
+    [setLoading, onSubmit, password, disabled]
+  )
   return (
     <div className={styles.passwordDialog}>
-      <h2>{t('sign-and-verify.sign')}</h2>
-      <TextField
-        type="password"
-        field={password}
-        value={password}
-        onChange={onChange}
-        required
-        label={t('sign-and-verify.password')}
-        error={error}
-        autoFocus
-      />
-      <div className={styles.actions}>
-        <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={onCancel} />
-        <Button type="primary" label={t('sign-and-verify.confirm')} disabled={!password || loading} onClick={onConfirm}>
-          {loading ? <Spinner /> : `${t('sign-and-verify.confirm')}`}
-        </Button>
-      </div>
+      <form onSubmit={onConfirm}>
+        <h2>{t('sign-and-verify.sign')}</h2>
+        <TextField
+          type="password"
+          field={password}
+          value={password}
+          onChange={onChange}
+          required
+          label={t('sign-and-verify.password')}
+          error={error}
+          autoFocus
+        />
+        <div className={styles.actions}>
+          <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={onCancel} />
+          <Button type="submit" label={t('sign-and-verify.confirm')} disabled={disabled} onClick={onConfirm}>
+            {loading ? <Spinner /> : `${t('sign-and-verify.confirm')}`}
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }
@@ -223,7 +235,7 @@ const SignAndVerify = () => {
         {wallet && wallet.addresses ? (
           <div role="presentation" className={styles.addrList} onClick={onAddrSelected}>
             {wallet.addresses.map(addr => (
-              <div className={styles.addrOpt} data-addr={addr.address}>
+              <div key={addr.address} className={styles.addrOpt} data-addr={addr.address}>
                 <span className="monospacedFont">{addr.address}</span>
                 <Balance balance={shannonToCKBFormatter(addr.balance)} />
                 <span className={styles.addrType} data-type={addr.type}>
