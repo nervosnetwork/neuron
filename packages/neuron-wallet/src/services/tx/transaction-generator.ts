@@ -73,7 +73,7 @@ export class TransactionGenerator {
       headerDeps: [],
       inputs: [],
       outputs,
-      outputsData: [],
+      outputsData: outputs.map(output => output.data || '0x'),
       witnesses: [],
     })
 
