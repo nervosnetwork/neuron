@@ -49,6 +49,7 @@ export default {
         documentation: '使用文檔',
         faq: 'Neuron FAQ',
         settings: '設定',
+        'export-debug-info': '導出調試信息',
       },
       develop: {
         develop: '開發',
@@ -142,6 +143,11 @@ export default {
       yes: '是',
       no: '否',
       ok: '確定',
+      error: '錯誤'
     },
   },
+  'export-debug-info':{
+    'export-debug-info': '導出調試信息',
+    'debug-info-exported': '調試信息已被導出至 {{ file }}'
+  }
 }
