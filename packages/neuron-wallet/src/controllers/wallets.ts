@@ -26,6 +26,7 @@ import { MainnetAddressRequired, TestnetAddressRequired } from 'exceptions/addre
 import TransactionSender from 'services/transaction-sender'
 import Transaction from 'models/chain/transaction'
 import logger from 'utils/logger'
+import { set as setDescription } from 'database/leveldb/transaction-description'
 
 export default class WalletsController {
   public async getAll(): Promise<Controller.Response<Pick<Wallet, 'id' | 'name'>[]>> {
@@ -337,9 +338,13 @@ export default class WalletsController {
     const hash = await new TransactionSender().sendTx(
       params.walletID,
       Transaction.fromObject(params.tx),
-      params.password,
-      params.description
+      params.password
     )
+    const description = params.description ?? ''
+    if (description !== '') {
+      await setDescription(params.walletID, hash, description)
+    }
+
     return {
       status: ResponseCode.Success,
       result: hash,

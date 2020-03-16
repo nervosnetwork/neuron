@@ -9,7 +9,6 @@ import { AddressPrefix } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressService from './addresses'
 import { Address } from 'database/address/address-dao'
-import { set as setDescription } from 'database/leveldb/transaction-description'
 import { PathAndPrivateKey } from 'models/keys/key'
 import AddressesService from 'services/addresses'
 import { CellIsNotYetLive, TransactionIsNotCommittedYet } from 'exceptions/dao'
@@ -48,7 +47,7 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '') {
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '') {
     const tx = this.sign(walletID, transaction, password)
 
     const { ckb } = NodeService.getInstance()
@@ -56,9 +55,6 @@ export default class TransactionSender {
     const txHash = tx.hash!
 
     await TransactionPersistor.saveSentTx(tx, txHash)
-    if (description !== '') {
-      await setDescription(walletID, txHash, description)
-    }
 
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
