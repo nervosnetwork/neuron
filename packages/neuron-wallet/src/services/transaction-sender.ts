@@ -57,7 +57,7 @@ export default class TransactionSender {
 
     await TransactionPersistor.saveSentTx(tx, txHash)
     if (description !== '') {
-      setDescription(walletID, txHash, description)
+      await setDescription(walletID, txHash, description)
     }
 
     // update addresses txCount and balance
