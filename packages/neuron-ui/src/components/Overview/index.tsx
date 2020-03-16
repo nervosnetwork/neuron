@@ -16,6 +16,7 @@ import {
 } from 'utils/formatters'
 import { epochParser } from 'utils/parsers'
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { SyncStatus as SyncStatusEnum, ConnectionStatus, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
@@ -54,7 +55,9 @@ const Overview = () => {
       tipBlockNumber: syncedBlockNumber,
       transactions: { items = [] },
       connectionStatus,
+      networkID,
     },
+    settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -66,6 +69,7 @@ const Overview = () => {
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   useEffect(() => {

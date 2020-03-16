@@ -11,6 +11,7 @@ import { MIN_DEPOSIT_AMOUNT, SyncStatus, ConnectionStatus } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -35,7 +36,8 @@ const NervosDAO = () => {
     },
     wallet,
     nervosDAO: { records },
-    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber },
+    chain: { connectionStatus, tipBlockNumber: syncedBlockNumber, networkID },
+    settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -124,6 +126,7 @@ const NervosDAO = () => {
     tipBlockTimestamp,
     syncedBlockNumber,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   const MemoizedRecords = useMemo(() => {

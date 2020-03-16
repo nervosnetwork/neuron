@@ -8,6 +8,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { Routes, FULL_SCREENS } from 'utils/const'
 
 import styles from './navbar.module.scss'
@@ -43,6 +44,7 @@ const Navbar = () => {
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
