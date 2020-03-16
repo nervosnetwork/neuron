@@ -73,7 +73,7 @@ export class TransactionGenerator {
       headerDeps: [],
       inputs: [],
       outputs,
-      outputsData: outputs.map(output => output.data || '0x'),
+      outputsData: [],
       witnesses: [],
     })
 
@@ -111,6 +111,7 @@ export class TransactionGenerator {
   }
 
   tx.outputs = ArrayUtils.shuffle(tx.outputs)
+  tx.outputsData = tx.outputs.map(output => output.data || '0x')
 
   return tx
 }
