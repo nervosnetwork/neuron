@@ -88,6 +88,8 @@ export const createBlockSyncTask = async (rescan = false) => {
     })
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
+      // re init txCount in addresses if switch network
+      await updateAllAddressesTxCount()
       if (backgroundWindow) {
         const lockHashes = AddressService.allLockHashes()
         const blake160s = AddressService.allAddresses().map(address => address.blake160)
@@ -102,8 +104,6 @@ export const createBlockSyncTask = async (rescan = false) => {
           multiSignBlake160s
         )
       }
-      // re init txCount in addresses if switch network
-      await updateAllAddressesTxCount()
     }
   })
 
