@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
@@ -156,8 +156,8 @@ export default class WalletService {
   public generateAddressesById = (
     id: string,
     isImporting: boolean,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
     AddressService.checkAndGenerateSave(
@@ -287,7 +287,7 @@ export default class WalletService {
       const wallet = WalletService.getInstance().get(id)
       const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
       // set isImporting to undefined means unknown
-      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, DefaultAddressNumber.Receiving, DefaultAddressNumber.Change)
     })
   }
 }
