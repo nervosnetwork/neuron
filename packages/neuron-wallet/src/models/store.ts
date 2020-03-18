@@ -1,6 +1,5 @@
 import EventEmitter from 'events'
 import FileService from 'services/file'
-import logger from 'utils/logger'
 
 class Store extends EventEmitter {
   public moduleName: string
@@ -39,7 +38,8 @@ class Store extends EventEmitter {
       const content = JSON.parse(data)
       return key ? content[key] : content
     } catch (err) {
-      logger.warn(`store read error: ${err}`)
+      // No need to log 'file not found' error. Store expects that situation
+      // and falls back to default value in such case.
       const content = JSON.parse(this.defaultValue)
       return key ? content[key] : content
     }
