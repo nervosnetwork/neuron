@@ -61,7 +61,7 @@ const trackingStatus = async () => {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses)
+    await WalletService.updateUsedAddresses(new Set(usedAddresses))
   }
 
   if (successTxs.length > 0) {

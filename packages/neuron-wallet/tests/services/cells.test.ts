@@ -141,31 +141,39 @@ describe('CellsService', () => {
     it('getBalance, Live, skip', async () => {
       await createCells()
 
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Live)
-      expect(balance).toEqual('100')
+      const balanceInfo = await CellsService.getBalance(new Set(lockHashes))
+      let balance = BigInt(0)
+      balanceInfo.liveBalance.forEach(v => balance += BigInt(v))
+      expect(balance.toString()).toEqual('100')
     })
 
     it('getBalance, Sent, skip', async () => {
       await createCells()
 
-      const balance: string = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
-      expect(balance).toEqual('200')
+      const balanceInfo = await CellsService.getBalance(new Set(lockHashes))
+      let balance = BigInt(0)
+      balanceInfo.sentBalance.forEach(v => balance += BigInt(v))
+      expect(balance.toString()).toEqual('200')
     })
 
     it('getBalance with alice', async () => {
       await createCells()
       await createCell('2222', OutputStatus.Live, false, null, alice)
 
-      const balance: string = await CellsService.getBalance([alice.lockHash, bob.lockHash], OutputStatus.Live)
-      expect(balance).toEqual((100 + 2222).toString())
+      const balanceInfo = await CellsService.getBalance(new Set([alice.lockHash, bob.lockHash]))
+      let balance = BigInt(0)
+      balanceInfo.liveBalance.forEach(v => balance += BigInt(v))
+      expect(balance.toString()).toEqual((100 + 2222).toString())
     })
 
     it(`get alice's balance`, async () => {
       await createCells()
       await createCell('2222', OutputStatus.Live, false, null, alice)
 
-      const balance: string = await CellsService.getBalance([alice.lockHash], OutputStatus.Live)
-      expect(balance).toEqual('2222')
+      const balanceInfo = await CellsService.getBalance(new Set([alice.lockHash]))
+      let balance = BigInt(0)
+      balanceInfo.liveBalance.forEach(v => balance += BigInt(v))
+      expect(balance.toString()).toEqual('2222')
     })
   })
 

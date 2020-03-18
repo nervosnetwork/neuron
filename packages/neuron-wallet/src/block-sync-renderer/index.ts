@@ -17,7 +17,7 @@ let network: Network | null
 
 const updateAllAddressesTxCount = async () => {
   const addresses = AddressService.allAddresses().map(addr => addr.address)
-  await AddressService.updateTxCountAndBalances(addresses)
+  await AddressService.updateTxCountAndBalances(new Set(addresses))
 }
 
 AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {

@@ -339,28 +339,17 @@ export class TransactionsService {
   }
 
   // tx count with one lockHash and status
-  public static async getCountByLockHashesAndStatus(lockHashes: string[], status: TransactionStatus[]): Promise<number> {
-    const count: number = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .where(
-        `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND tx.status IN (:...status)`,
-        {
-          lockHashes,
-          status,
-        }
-      )
-      .getCount()
+  public static async getCountByLockHashesAndStatus(lockHashes: Set<string>, status: Set<TransactionStatus>) {
+    const [sql, parameters] = getConnection().driver.escapeQueryWithParameters(`select lockHash, count(DISTINCT(transactionHash)) as cnt from (select lockHash, transactionHash from input union select lockHash, transactionHash from output) as cell left join (select tx.hash from 'transaction' as tx where tx.status in (:...status) AND tx.hash in (select transactionHash from input union select transactionHash from output)) as result on cell.transactionHash = result.hash where lockHash in (:...lockHashes) group by lockHash;`, { status: [...status], lockHashes: [...lockHashes] }, {})
 
-    return count
-  }
+    const count: { lockHash: string, cnt: number }[] = await getConnection().manager.query(sql, parameters)
 
-  public static async getCountByAddressAndStatus(
-    address: string,
-    status: TransactionStatus[]
-  ): Promise<number> {
-    const lockHashes: string[] = [new LockUtils().addressToLockHash(address)]
-    return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
+    const result = new Map<string, number>()
+    count.forEach(c => {
+      result.set(c.lockHash, c.cnt)
+    })
+
+    return result
   }
 
   public static async updateDescription(hash: string, description: string) {

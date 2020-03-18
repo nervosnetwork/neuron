@@ -8,7 +8,6 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
-import { Address } from 'database/address/address-dao'
 
 const fileService = FileService.getInstance()
 
@@ -281,16 +280,14 @@ export default class WalletService {
   }
 
   // TODO: move this method and generateTx/sendTx out of this file
-  public static async updateUsedAddresses(addresses: string[]) {
+  public static async updateUsedAddresses(addresses: Set<string>) {
     const addrs = await AddressService.updateTxCountAndBalances(addresses)
-    const walletIds: string[] = addrs
-      .map(addr => (addr as Address).walletId)
-      .filter((value, idx, a) => a.indexOf(value) === idx)
-    for (const id of walletIds) {
+    const walletIds: Set<string> = new Set(addrs.map(addr => addr.walletId))
+    walletIds.forEach(id => {
       const wallet = WalletService.getInstance().get(id)
       const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
       // set isImporting to undefined means unknown
       AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
-    }
+    })
   }
 }

@@ -25,31 +25,47 @@ export enum CustomizedLock {
 
 export default class CellsService {
   // exclude hasData = true and typeScript != null
-  public static getBalance = async (
-    lockHashes: string[],
-    status: OutputStatus
-  ): Promise<string> => {
-    const cells: OutputEntity[] = await getConnection()
+  public static async getBalance(lockHashes: Set<string>): Promise<{
+    liveBalance: Map<string, string>
+    sentBalance: Map<string, string>
+    pendingBalance: Map<string, string>
+  }> {
+    const cells: { status: string, lockHash: string, sumOfCapacity: string }[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
-      .select([
-        "output.lockHash",
-        "output.status",
-        "output.hasData",
-        "output.typeScript",
-        "output.capacity"
-      ])
+      .select('output.status', 'status')
+      .addSelect('output.lockHash', 'lockHash')
+      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
       .where({
-        lockHash: In(lockHashes),
-        status,
+        lockHash: In([...lockHashes]),
         hasData: false,
         typeScript: null,
       })
-      .getMany()
+      .groupBy('output.lockHash')
+      .addGroupBy('output.status')
+      .getRawMany()
 
-    const capacity: bigint = cells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
+    const liveBalance = new Map<string, string>()
+    const sentBalance = new Map<string, string>()
+    const pendingBalance = new Map<string, string>()
 
-    return capacity.toString()
+    cells.forEach(c => {
+      const lockHash: string = c.lockHash
+      const sumOfCapacity: string = c.sumOfCapacity
+      if (c.status === OutputStatus.Live) {
+        liveBalance.set(lockHash, sumOfCapacity)
+      } else if (c.status === OutputStatus.Sent) {
+        sentBalance.set(lockHash, sumOfCapacity)
+      } else if (c.status === OutputStatus.Pending) {
+        pendingBalance.set(lockHash, sumOfCapacity)
+      }
+    })
+
+    return {
+      liveBalance,
+      sentBalance,
+      pendingBalance,
+    }
   }
 
   public static getDaoCells = async (

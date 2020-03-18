@@ -172,7 +172,7 @@ export default class Queue {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          await WalletService.updateUsedAddresses(addresses)
+          await WalletService.updateUsedAddresses(new Set(addresses))
         }
       }
     }
