@@ -66,7 +66,7 @@ export default class ExportDebugController {
         blockNumber: syncedBlockNumber
       },
       ckb: {
-        url,
+        url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : 'http://****:port',
         version: ckbVersion,
         blockNumber: tipBlockNumber
       }
