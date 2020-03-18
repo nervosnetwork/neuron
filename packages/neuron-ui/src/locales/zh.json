@@ -25,7 +25,7 @@
     "network-status": {
       "tooltip": {
         "block-number": "区块高度",
-        "total": "总高度",
+        "tip-block": "已知最新区块",
         "synced": "已同步"
       }
     },

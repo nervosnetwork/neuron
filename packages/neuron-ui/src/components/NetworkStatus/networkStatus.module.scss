@@ -46,39 +46,43 @@ $hover-bg-color: #3cc68a4d;
     .tooltip {
       display: grid;
       opacity: 1;
-      bottom: 200%;
+      bottom: calc(100% + 18px);
     }
   }
 }
 
 .tooltip {
-  @include RegularText;
+  @include MonoText;
   display: none;
   position: absolute;
-  bottom: 120%;
+  bottom: calc(100% + 10px);
   left: 30px;
   display: grid;
   grid-template:
     'title title'auto 'label value'auto/ 100px 1fr;
-  grid-gap: 5px;
   background-color: #fff;
   color: #000;
-  padding: 5px 10px;
+  min-width: 140px;
+  padding: 5px;
   font-size: inherit;
-  border-radius: 2px;
+  border-radius: 1px;
   box-sizing: border-box;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.22);
-  font-weight: 100;
   transition: all 0.2s ease-in-out;
   opacity: 0;
   user-select: none;
   pointer-events: none;
+  font-size: 0.5625rem;
+  font-weight: 100;
+  line-height: 0.8125rem;
+  color: #666;
+  letter-spacing: 0.45px;
 
   .tooltipTitle {
-    @include SemiBoldText;
     grid-area: title;
     word-wrap: none;
     word-break: keep-all;
+    font-weight: 900;
   }
 
   .blockNumber {
@@ -98,7 +102,7 @@ $hover-bg-color: #3cc68a4d;
 
 @keyframes rotate {
   from {
-    transform: rotate(0)
+    transform: rotate(0);
   }
 
   to {
