@@ -43,7 +43,7 @@ const NetworkStatus = ({
           <span className={styles.tooltipTitle}>{t('network-status.tooltip.block-number')}</span>
           {tipBlockNumber ? (
             <>
-              <span>{t('network-status.tooltip.total')}</span>
+              <span>{t('network-status.tooltip.tip-block')}</span>
               <span className={styles.blockNumber}>{localNumberFormatter(tipBlockNumber)}</span>
             </>
           ) : null}

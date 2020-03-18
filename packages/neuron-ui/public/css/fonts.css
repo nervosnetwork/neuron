@@ -32,3 +32,8 @@
   font-family: 'SourceHanSansCN-Bold';
   src: url('../fonts/SourceHanSansCN-Bold.otf') format('truetype');
 }
+
+@font-face {
+  font-family: 'SourceCodePro-Regular';
+  src: url('../fonts/SourceCodePro-Regular.ttf') format('truetype')
+}
