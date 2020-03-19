@@ -51,13 +51,14 @@ export default class AddressDao {
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
-  public static async updateTxCountAndBalances(addresses: Set<string>): Promise<Address[]> {
+  public static async updateTxCountAndBalances(addresses: string[]): Promise<Address[]> {
+    const addressesSet = new Set(addresses)
     const all = AddressStore.getAll()
     const toUpdate = all.filter(value => {
-      return addresses.has(value.address)
+      return addressesSet.has(value.address)
     })
     const others = all.filter(value => {
-      return !addresses.has(value.address)
+      return !addressesSet.has(value.address)
     })
 
     const lockUtils = new LockUtils()

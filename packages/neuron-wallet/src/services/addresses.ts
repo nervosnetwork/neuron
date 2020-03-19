@@ -92,7 +92,7 @@ export default class AddressService {
     )
   }
 
-  public static async updateTxCountAndBalances(addresses: Set<string>): Promise<AddressInterface[]> {
+  public static async updateTxCountAndBalances(addresses: string[]): Promise<AddressInterface[]> {
     return AddressDao.updateTxCountAndBalances(addresses)
   }
 

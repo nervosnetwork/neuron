@@ -280,7 +280,7 @@ export default class WalletService {
   }
 
   // TODO: move this method and generateTx/sendTx out of this file
-  public static async updateUsedAddresses(addresses: Set<string>) {
+  public static async updateUsedAddresses(addresses: string[]) {
     const addrs = await AddressService.updateTxCountAndBalances(addresses)
     const walletIds: Set<string> = new Set(addrs.map(addr => addr.walletId))
     walletIds.forEach(id => {
