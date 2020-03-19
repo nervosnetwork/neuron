@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { useDialog } from 'utils/hooks'
+import getCompensationPeriodInfo from 'utils/getCompensationPeriod'
 import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import styles from './compensationPeriodDialog.module.scss'
@@ -19,13 +20,22 @@ const CompensationPeriodDialog = ({ onDismiss, compensationPeriod }: Compensatio
   const dialogRef = useRef<HTMLDialogElement | null>(null)
   useDialog({ show: compensationPeriod, dialogRef, onClose: onDismiss })
 
-  const pastEpochs = compensationPeriod
-    ? +(compensationPeriod.currentEpochValue - compensationPeriod.targetEpochValue + WITHDRAW_EPOCHS).toFixed(1)
-    : 0
-
-  const totalHours = Math.ceil((WITHDRAW_EPOCHS - pastEpochs) * 4)
-  const leftDays = Math.floor(totalHours / 24)
-  const leftHours = totalHours % 24
+  const {
+    pastEpochs,
+    leftTime: { days: leftDays, hours: leftHours },
+  }: ReturnType<typeof getCompensationPeriodInfo> = compensationPeriod
+    ? getCompensationPeriodInfo({
+        currentEpochValue: compensationPeriod.currentEpochValue,
+        endEpochValue: compensationPeriod.targetEpochValue,
+      })
+    : {
+        pastEpochs: 0,
+        leftTime: {
+          totalHours: WITHDRAW_EPOCHS * 4,
+          days: 30,
+          hours: 0,
+        },
+      }
 
   return (
     <dialog ref={dialogRef} className={styles.compensationPeriodDialog}>

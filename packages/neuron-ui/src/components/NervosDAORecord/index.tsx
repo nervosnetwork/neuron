@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { ReactComponent as EpochBtn } from 'widgets/Icons/EpochBtn.svg'
-import { WITHDRAW_EPOCHS, IMMATURE_EPOCHS } from 'utils/const'
+import { WITHDRAW_EPOCHS, IMMATURE_EPOCHS, CompensationPeriod } from 'utils/const'
 import { shannonToCKBFormatter, uniformTimeFormatter, localNumberFormatter } from 'utils/formatters'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import { epochParser } from 'utils/parsers'
@@ -73,9 +73,9 @@ export const DAORecord = ({
     ? +(currentEpochValue - compensationPeriod.targetEpochValue + WITHDRAW_EPOCHS).toFixed(1)
     : 0
   let compensationStage = 'stage1'
-  if (pastEpochsInPeriod > 0.967 * WITHDRAW_EPOCHS) {
+  if (pastEpochsInPeriod > CompensationPeriod.REQUEST_START * WITHDRAW_EPOCHS) {
     compensationStage = 'stage3'
-  } else if (pastEpochsInPeriod > 0.767 * WITHDRAW_EPOCHS) {
+  } else if (pastEpochsInPeriod > CompensationPeriod.SUGGEST_START * WITHDRAW_EPOCHS) {
     compensationStage = 'stage2'
   }
 

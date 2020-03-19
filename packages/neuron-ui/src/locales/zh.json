@@ -391,7 +391,17 @@
       "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
       "left-time": "距离结束时间: 约 {{leftDays}} 天 {{leftHours}} 小时",
       "detailed-explanation-of-epochs-period": "Nervos DAO 以每 180 个 epoch 作为一个补偿周期（约 30 天）。在每一个补偿周期内，用户可以随时发起取出申请，并在本补偿周期结束后完成取款。需要注意的是，用户发出申请后，补偿周期结束前的区块补偿将不会被累加到用户的取款金额中。因此，建议您在补偿周期接近结束时再提交取出申请，这样获得的区块补偿会更多。",
-      "terms-in-explanation-of-epochs-period": "如果在当前补偿周期内没有提出取出申请，下一个补偿周期将自动开始，无需手动操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建议您在黄色区域发起取出申请。"
+      "terms-in-explanation-of-epochs-period": "如果在当前补偿周期内没有提出取出申请，下一个补偿周期将自动开始，无需手动操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建议您在黄色区域发起取出申请。",
+      "compensation-period": {
+        "tooltip": {
+          "compensated-period": "已锁定时间",
+          "days-hours": "{{days}} 天 {{hours}} 小时",
+          "normal": "补偿数量较低，不建议发起提现交易",
+          "suggested": "建议在此区间提取以获得最大化补偿",
+          "ending": "提取请求可能被推迟并锁定 30 天",
+          "withdrawn": "已提取"
+        }
+      }
     },
     "updates": {
       "check-updates": "检查更新",

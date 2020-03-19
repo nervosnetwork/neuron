@@ -1,0 +1,14 @@
+[
+  {
+    "currentEpochValue": 170.1,
+    "endEpochValue": 180,
+    "expected": {
+      "pastEpochs": 170.1,
+      "leftTime": {
+        "totalHours": 40,
+        "days": 1,
+        "hours": 16
+      }
+    }
+  }
+]

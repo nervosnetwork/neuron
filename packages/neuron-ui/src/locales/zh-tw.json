@@ -391,7 +391,17 @@
       "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
       "left-time": "距離結束時間: 約 {{leftDays}} 天 {{leftHours}} 小時",
       "detailed-explanation-of-epochs-period": "Nervos DAO 以每180個 epoch 作為一個補償週期(約 30 天)。在每一個補償週期內，用戶可以隨時發起取出申請，並在本補償週期結束後完成取款。需要注意的是，用戶發出申請後，補償週期結束前的區塊補償將不會被累加到用戶的取款金額中。囙此，建議您在補償週期接近結束時再提交取出申請，這樣獲得的區塊補償會更多。",
-      "terms-in-explanation-of-epochs-period": "如果在當前補償週期內沒有提出取出申請，下一個補償週期將自動開始，無需手動操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建議您在黃色區域發起取出申請。"
+      "terms-in-explanation-of-epochs-period": "如果在當前補償週期內沒有提出取出申請，下一個補償週期將自動開始，無需手動操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建議您在黃色區域發起取出申請。",
+      "compensation-period": {
+        "tooltip": {
+          "compensated-period": "已鎖定時間",
+          "days-hours": "{{days}} 天 {{hours}} 小時",
+          "normal": "補償數量較低，不建議發起提現交易",
+          "suggested": "建議在此區間提取以獲得最大化補償",
+          "ending": "提取請求可能被推遲並鎖定 30 天",
+          "withdrawn": "已提取"
+        }
+      }
     },
     "updates": {
       "check-updates": "檢查更新",
