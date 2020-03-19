@@ -47,14 +47,13 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', description: string = '') {
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '') {
     const tx = this.sign(walletID, transaction, password)
 
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
     const txHash = tx.hash!
 
-    tx.description = description
     await TransactionPersistor.saveSentTx(tx, txHash)
 
     // update addresses txCount and balance

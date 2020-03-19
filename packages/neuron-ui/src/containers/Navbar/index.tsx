@@ -8,6 +8,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { Routes, FULL_SCREENS } from 'utils/const'
 
 import styles from './navbar.module.scss'
@@ -43,6 +44,7 @@ const Navbar = () => {
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   if (!wallets.length || FULL_SCREENS.find(url => pathname.startsWith(url))) {
@@ -81,13 +83,19 @@ const Navbar = () => {
       <nav role="navigation" className={styles.navs}>
         {menus}
       </nav>
-      <NetworkStatus
-        syncStatus={syncStatus}
-        networkName={networkName}
-        connectionStatus={connectionStatus}
-        onAction={() => history.push(Routes.SettingsNetworks)}
-      />
-      <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} />
+      <div className={styles.network}>
+        <NetworkStatus
+          syncStatus={syncStatus}
+          tipBlockNumber={tipBlockNumber}
+          syncedBlockNumber={syncedBlockNumber}
+          networkName={networkName}
+          connectionStatus={connectionStatus}
+          onAction={() => history.push(Routes.SettingsNetworks)}
+        />
+      </div>
+      <div className={styles.sync}>
+        <SyncStatus syncStatus={syncStatus} connectionStatus={connectionStatus} />
+      </div>
     </aside>
   )
 }

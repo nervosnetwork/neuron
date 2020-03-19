@@ -2,17 +2,16 @@
 // to keep persisted. Sqlite3 transaction table gets cleaned when user clears
 // cache or sync rebuilds txs.
 
-import { txdb } from './'
+import { maindb } from './'
 
 const makeKey = (walletID: string, txHash: string): string => {
-  return `description:${walletID}:${txHash}`
-
+  return `tx_desc:${walletID}:${txHash}`
 }
 
 export const get = async (walletID: string, txHash: string) => {
-  return txdb.get(makeKey(walletID, txHash)).catch(() => (''))
+  return maindb.get(makeKey(walletID, txHash)).catch(() => (''))
 }
 
 export const set = (walletID: string, txHash: string, description: string) => {
-  return txdb.put(makeKey(walletID, txHash), description)
+  return maindb.put(makeKey(walletID, txHash), description)
 }

@@ -10,7 +10,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { Routes, ErrorCode } from 'utils/const'
 
 import { useGoBack } from 'utils/hooks'
-import { useHint, useOnConfirm, useInputs, useWalletEditor } from './hooks'
+import { useHint, useOnSubmit, useInputs, useWalletEditor } from './hooks'
 
 const WalletNotFound = () => {
   const [t] = useTranslation()
@@ -47,8 +47,10 @@ const WalletEditor = () => {
 
   const inputs = useInputs(editor)
   const hint = useHint(editor.name.value, usedNames, t)
-  const onConfirm = useOnConfirm(editor.name.value, wallet.id, history, dispatch)
+  const disabled = hint !== null || editor.name.value === wallet.name
+
   const goBack = useGoBack(history)
+  const onSubmit = useOnSubmit(editor.name.value, wallet.id, history, dispatch, disabled)
 
   if (!wallet.id) {
     return <WalletNotFound />
@@ -56,23 +58,20 @@ const WalletEditor = () => {
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
-      <h1>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</h1>
-      <Stack tokens={{ childrenGap: 15 }}>
-        {inputs.map(inputProps => (
-          <Stack.Item key={inputProps.label}>
-            <TextField {...inputProps} field={inputProps.label} required error={hint || undefined} />
-          </Stack.Item>
-        ))}
-      </Stack>
-      <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-        <Button type="cancel" onClick={goBack} label={t('common.cancel')} />
-        <Button
-          type="submit"
-          onClick={onConfirm}
-          label={t('common.save')}
-          disabled={hint !== null || editor.name.value === wallet.name}
-        />
-      </Stack>
+      <form onSubmit={onSubmit}>
+        <h1>{t('settings.wallet-manager.edit-wallet.edit-wallet')}</h1>
+        <Stack tokens={{ childrenGap: 15 }}>
+          {inputs.map(inputProps => (
+            <Stack.Item key={inputProps.label}>
+              <TextField {...inputProps} field={inputProps.label} required error={hint || undefined} autoFocus />
+            </Stack.Item>
+          ))}
+        </Stack>
+        <Stack horizontal horizontalAlign="end" tokens={{ childrenGap: 10 }}>
+          <Button type="cancel" onClick={goBack} label={t('common.cancel')} />
+          <Button type="submit" label={t('common.save')} disabled={disabled} />
+        </Stack>
+      </form>
     </Stack>
   )
 }

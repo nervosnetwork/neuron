@@ -30,6 +30,7 @@ import {
   SINCE_FIELD_SIZE,
 } from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import {
   verifyTotalAmount,
@@ -104,6 +105,8 @@ const Send = () => {
   const errorMessageUnderTotal = verifyTotalAmount(totalAmount, fee, balance)
     ? errorMessage
     : t(`messages.codes.${ErrorCode.AmountNotEnough}`)
+
+  const disabled = connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx
   const network = networks.find(n => n.id === networkID)
 
   const syncStatus = getSyncStatus({
@@ -111,6 +114,7 @@ const Send = () => {
     syncedBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   const outputErrors = useMemo(() => {
@@ -165,7 +169,7 @@ const Send = () => {
   }
 
   return (
-    <div style={{ padding: '39px 0 0 0' }}>
+    <form style={{ padding: '39px 0 0 0' }} onSubmit={disabled ? undefined : onSubmit} data-wallet-id={walletID}>
       <div className={styles.balance}>
         <div>
           <Label>{t('send.balance')}</Label>
@@ -218,6 +222,7 @@ const Send = () => {
                   required
                   maxLength={100}
                   error={errorMsg}
+                  autoFocus
                 />
                 {fullAddrInfo ? (
                   <div className={styles.fullAddrInfo}>
@@ -339,6 +344,7 @@ const Send = () => {
           label={t('send.description')}
           value={send.description}
           onChange={onDescriptionChange}
+          disabled={sending}
         />
         <TransactionFeePanel
           fee={shannonToCKBFormatter(fee)}
@@ -349,12 +355,7 @@ const Send = () => {
 
       <div className={styles.actions}>
         <Button type="reset" onClick={onClear} label={t('send.clear')} />
-        <Button
-          type="submit"
-          onClick={onSubmit(walletID)}
-          disabled={connectionStatus === 'offline' || sending || !!errorMessageUnderTotal || !send.generatedTx}
-          label={t('send.send')}
-        >
+        <Button type="submit" disabled={disabled} label={t('send.send')}>
           {sending ? <Spinner /> : (t('send.send') as string)}
         </Button>
       </div>
@@ -375,7 +376,7 @@ const Send = () => {
           </div>
         </div>
       ) : null}
-    </div>
+    </form>
   )
 }
 

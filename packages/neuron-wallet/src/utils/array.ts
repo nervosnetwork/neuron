@@ -41,4 +41,21 @@ export default class ArrayUtils {
 
     return minValue
   }
+
+  public static shuffle<T>(array: T[]): T[] {
+    let result = array.slice()
+    let currentIndex = result.length
+    let temporaryValue, randomIndex
+
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex)
+      currentIndex -= 1
+
+      temporaryValue = result[currentIndex]
+      result[currentIndex] = result[randomIndex]
+      result[randomIndex] = temporaryValue
+    }
+
+    return result
+  }
 }

@@ -188,6 +188,9 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
     [dispatch]
   )
   const onNext = useCallback(() => {
+    if (disableNext) {
+      return
+    }
     if (isCreate) {
       history.push(`${rootPath}${WalletWizardPath.Mnemonic}/${MnemonicAction.Verify}`)
     } else {
@@ -215,7 +218,18 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
         }
       })
     }
-  }, [isCreate, history, rootPath, type, imported, t, dispatch])
+  }, [isCreate, history, rootPath, type, imported, t, dispatch, disableNext])
+
+  const onKeyPress = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter') {
+        e.stopPropagation()
+        e.preventDefault()
+        onNext()
+      }
+    },
+    [onNext]
+  )
 
   return (
     <div className={styles.mnemonic}>
@@ -228,6 +242,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
         readOnly={isCreate}
         value={isCreate ? generated : imported}
         onChange={onChange}
+        onKeyPress={onKeyPress}
         description={t(hint)}
         styles={{
           field: {
@@ -261,6 +276,11 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
   const [loading, setLoading] = useState(false)
   const message = 'wizard.set-wallet-name-and-password'
 
+  const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
+  const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
+  const isPwdSame = useMemo(() => password && password === confirmPassword, [password, confirmPassword])
+  const disableNext = !(isNameUnused && isPwdComplex && isPwdSame) || loading
+
   useEffect(() => {
     if (loading) {
       return
@@ -293,32 +313,31 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
     [dispatch]
   )
 
-  const onNext = useCallback(() => {
-    if (loading) {
-      return
-    }
-    const p = {
-      name,
-      password,
-      mnemonic: imported,
-    }
-    setLoading(true)
-    setTimeout(() => {
-      if (type === MnemonicAction.Create) {
-        createWalletWithMnemonic(p)(history).finally(() => setLoading(false))
-      } else {
-        importWalletWithMnemonic(p)(history).finally(() => setLoading(false))
+  const onNext = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      if (disableNext) {
+        return
       }
-    }, 0)
-  }, [type, name, password, imported, history, loading])
-
-  const isNameUnused = useMemo(() => name && !wallets.find(w => w.name === name), [name, wallets])
-  const isPwdComplex = useMemo(() => verifyPasswordComplexity(password) === true, [password])
-  const isPwdSame = useMemo(() => password && password === confirmPassword, [password, confirmPassword])
-  const disableNext = !(isNameUnused && isPwdComplex && isPwdSame)
+      const p = {
+        name,
+        password,
+        mnemonic: imported,
+      }
+      setLoading(true)
+      setTimeout(() => {
+        if (type === MnemonicAction.Create) {
+          createWalletWithMnemonic(p)(history).finally(() => setLoading(false))
+        } else {
+          importWalletWithMnemonic(p)(history).finally(() => setLoading(false))
+        }
+      }, 0)
+    },
+    [type, name, password, imported, history, disableNext]
+  )
 
   return (
-    <div className={styles.submission}>
+    <form onSubmit={onNext} className={styles.submission}>
       <Text variant="xxLargePlus" styles={{ root: { paddingBottom: '20px' } }}>
         {t(message)}
       </Text>
@@ -361,16 +380,11 @@ const Submission = ({ state = initState, wallets = [], dispatch }: WizardElement
 
       <div className={styles.actions}>
         <Button type="cancel" onClick={history.goBack} label={t('wizard.back')} />
-        <Button
-          type="submit"
-          onClick={onNext}
-          label={loading ? 'loading' : t('wizard.next')}
-          disabled={disableNext || loading}
-        >
+        <Button type="submit" label={loading ? 'loading' : t('wizard.next')} disabled={disableNext}>
           {loading ? <Spinner /> : (t('wizard.next') as string)}
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
 

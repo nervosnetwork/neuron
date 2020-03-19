@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useCallback, useRef } from 'react'
 import { Slider, SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation, Trans } from 'react-i18next'
 import TextField from 'widgets/TextField'
@@ -56,6 +56,18 @@ const DepositDialog = ({
     []
   )
   const maxValue = +(maxDepositAmount / BigInt(SHANNON_CKB_RATIO)).toString()
+  const disabled = !isTxGenerated
+
+  const onConfirm = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      if (disabled) {
+        return
+      }
+      onSubmit()
+    },
+    [onSubmit, disabled]
+  )
 
   if (!show) {
     return null
@@ -66,7 +78,7 @@ const DepositDialog = ({
       {isDepositing ? (
         <Spinner size={SpinnerSize.large} />
       ) : (
-        <>
+        <form onSubmit={onConfirm}>
           <h2 title={t('nervos-dao.deposit-dialog-title`')} className={styles.title}>
             {t('nervos-dao.deposit-dialog-title')}
           </h2>
@@ -92,9 +104,9 @@ const DepositDialog = ({
           </div>
           <div className={styles.footer}>
             <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
-            <Button type="submit" onClick={onSubmit} label={t('nervos-dao.proceed')} disabled={!isTxGenerated} />
+            <Button type="submit" label={t('nervos-dao.proceed')} disabled={disabled} />
           </div>
-        </>
+        </form>
       )}
     </dialog>
   )
