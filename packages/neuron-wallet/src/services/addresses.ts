@@ -1,5 +1,5 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
@@ -25,8 +25,8 @@ export default class AddressService {
     isImporting: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const addresses = AddressService.generateAddresses(
       walletId,
@@ -63,8 +63,8 @@ export default class AddressService {
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) {
     const addressVersion = AddressService.getAddressVersion()
     const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
@@ -92,9 +92,7 @@ export default class AddressService {
     )
   }
 
-  public static updateTxCountAndBalances = async (
-    addresses: string[]
-  ): Promise<Address[]> => {
+  public static async updateTxCountAndBalances(addresses: string[]): Promise<AddressInterface[]> {
     return AddressDao.updateTxCountAndBalances(addresses)
   }
 
@@ -104,8 +102,8 @@ export default class AddressService {
     extendedKey: AccountExtendedPublicKey,
     receivingStartIndex: number,
     changeStartIndex: number,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     // can be only receiving OR only change
     if (receivingAddressCount < 1 && changeAddressCount < 1) {
