@@ -56,13 +56,14 @@ $hover-bg-color: #3cc68a4d;
   display: none;
   position: absolute;
   bottom: calc(100% + 10px);
-  left: 30px;
+  left: 12px;
   display: grid;
   grid-template:
-    'title title'auto 'label value'auto/ 100px 1fr;
+    'title title'auto 'label value'auto/ auto 1fr;
+  column-gap: 5px;
   background-color: #fff;
   color: #000;
-  min-width: 140px;
+  min-width: 176px;
   padding: 8px 10px;
   border-radius: 1px;
   box-sizing: border-box;
@@ -74,6 +75,7 @@ $hover-bg-color: #3cc68a4d;
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.5em;
+  white-space: nowrap;
 
   .tooltipTitle {
     grid-area: title;
