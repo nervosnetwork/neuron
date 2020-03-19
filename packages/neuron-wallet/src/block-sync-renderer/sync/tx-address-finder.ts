@@ -71,7 +71,7 @@ export default class TxAddressFinder {
 
     const repository = getConnection().getRepository(OutputEntity)
     const outputs: OutputEntity[] = (await Promise.all(
-      ArrayUtils.eachSlice(inputOutPoints, 100).map(async outPoints => {
+      ArrayUtils.eachSlice(inputOutPoints, 800).map(async outPoints => {
         return repository
           .createQueryBuilder('output')
           .where(`(output.outPointTxHash || ':' || output.outPointIndex) IN (:...outPoints)`, {
