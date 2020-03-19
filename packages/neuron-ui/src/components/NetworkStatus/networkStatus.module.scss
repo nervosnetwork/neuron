@@ -63,8 +63,7 @@ $hover-bg-color: #3cc68a4d;
   background-color: #fff;
   color: #000;
   min-width: 140px;
-  padding: 5px;
-  font-size: inherit;
+  padding: 8px 10px;
   border-radius: 1px;
   box-sizing: border-box;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.22);
@@ -72,11 +71,9 @@ $hover-bg-color: #3cc68a4d;
   opacity: 0;
   user-select: none;
   pointer-events: none;
-  font-size: 0.5625rem;
-  font-weight: 100;
-  line-height: 0.8125rem;
-  color: #666;
-  letter-spacing: 0.45px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5em;
 
   .tooltipTitle {
     grid-area: title;
