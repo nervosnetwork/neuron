@@ -8,6 +8,7 @@ import Transaction from 'models/chain/transaction'
 import Script from 'models/chain/script'
 import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
+import Input from 'models/chain/input'
 
 // Search for all addresses related to a transaction. These addresses include:
 //   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
@@ -65,8 +66,12 @@ export default class TxAddressFinder {
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
 
     let shouldSync = false
-    const inputOutPoints = inputs.map(i => {
-      return `${i.previousOutput!.txHash}:${i.previousOutput!.index}`
+    const inputMap = new Map<string, Input>()
+    const inputOutPoints: string[] = []
+    inputs.forEach(i => {
+      const str = `${i.previousOutput!.txHash}:${i.previousOutput!.index}`
+      inputMap.set(str, i)
+      inputOutPoints.push(str)
     })
 
     const repository = getConnection().getRepository(OutputEntity)
@@ -82,6 +87,7 @@ export default class TxAddressFinder {
     )).reduce((acc, val) => acc.concat(val), [])
 
     const addrPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+
     outputs.forEach(o => {
       if (this.lockHashes.has(o.lockHash)) {
         shouldSync = true
@@ -97,7 +103,8 @@ export default class TxAddressFinder {
         const multiSignBlake160 = o.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true
-          const input = inputs.find(i => i.previousOutput!.txHash === o.outPointTxHash && i.previousOutput!.index === o.outPointIndex)
+          const key = o.outPointTxHash + ":" + o.outPointIndex
+          const input = inputMap.get(key)
           input!.setMultiSignBlake160(multiSignBlake160)
         }
       }
