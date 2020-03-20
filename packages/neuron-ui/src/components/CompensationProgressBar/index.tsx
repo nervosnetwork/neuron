@@ -17,11 +17,17 @@ const CompensationProgressBar = ({
 }: CompensationProgressBarProps) => {
   const isWithdrawn = withdrawEpochValue !== undefined
 
-  const currentCursor = isWithdrawn
+  let currentCursor = isWithdrawn
     ? Math.min(currentEpochValue, endEpochValue)
-    : 180 + currentEpochValue - endEpochValue
+    : WITHDRAW_EPOCHS + currentEpochValue - endEpochValue
 
-  const withdrawCursor = withdrawEpochValue || currentCursor
+  if (currentCursor > WITHDRAW_EPOCHS) {
+    currentCursor = WITHDRAW_EPOCHS
+  } else if (currentCursor < 0) {
+    currentCursor = 0
+  }
+
+  const withdrawCursor = withdrawEpochValue ? WITHDRAW_EPOCHS + withdrawEpochValue - endEpochValue : currentCursor
 
   return (
     <div className={styles.container} style={style}>

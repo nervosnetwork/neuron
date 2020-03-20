@@ -1,29 +1,32 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
+import { showTransactionDetails } from 'services/remote'
 import { getHeaderByNumber } from 'services/chain'
 import { MILLISECONDS_IN_YEAR } from 'utils/const'
 import calculateAPC from 'utils/calculateAPC'
 
-export const useUpdateEpochs = ({
-  depositOutPoint,
+export const useUpdateWithdrawEpochs = ({
+  isWithdrawn,
   blockNumber,
-  setWithdrawingEpoch,
+  setWithdrawEpoch,
+  setWithdrawTimestamp,
 }: {
-  depositOutPoint: CKBComponents.OutPoint | undefined
+  isWithdrawn: boolean
   blockNumber: CKBComponents.BlockNumber
-  setWithdrawingEpoch: React.Dispatch<string>
+  setWithdrawEpoch: React.Dispatch<string>
+  setWithdrawTimestamp: React.Dispatch<string>
 }) => {
   useEffect(() => {
-    if (depositOutPoint) {
-      // It's under withdrawing, the block number is the one that withdrawing starts at
+    if (isWithdrawn) {
       getHeaderByNumber(BigInt(blockNumber))
         .then(header => {
-          setWithdrawingEpoch(header.epoch)
+          setWithdrawEpoch(header.epoch)
+          setWithdrawTimestamp(header.timestamp)
         })
         .catch((err: Error) => {
           console.error(err)
         })
     }
-  }, [depositOutPoint, blockNumber, setWithdrawingEpoch])
+  }, [isWithdrawn, blockNumber, setWithdrawEpoch, setWithdrawTimestamp])
 }
 
 export const useUpdateApc = ({
@@ -68,4 +71,14 @@ export const useUpdateApc = ({
   }, [depositTimestamp, tipBlockTimestamp, timestamp, genesisBlockTimestamp, setApc])
 }
 
-export default { useUpdateEpochs, useUpdateApc }
+export const useOnTxRecordClick = () =>
+  useCallback((e: React.SyntheticEvent<HTMLButtonElement, MouseEvent>) => {
+    const {
+      dataset: { txHash },
+    } = e.target as HTMLButtonElement
+    if (txHash) {
+      showTransactionDetails(txHash)
+    }
+  }, [])
+
+export default { useUpdateWithdrawEpochs, useUpdateApc, useOnTxRecordClick }

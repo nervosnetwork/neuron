@@ -56,6 +56,18 @@ const props: { [index: string]: CompensationPeriodTooltipProps } = {
     endEpochValue: 180,
     isWithdrawn: true,
   },
+  'base less than deposit': {
+    depositEpochValue: 1,
+    baseEpochTimestamp: Date.now(),
+    baseEpochValue: 0,
+    endEpochValue: 181,
+  },
+  'base larger than end': {
+    depositEpochValue: 0,
+    baseEpochTimestamp: Date.now(),
+    baseEpochValue: 181,
+    endEpochValue: 180,
+  },
 }
 
 Object.keys(props).forEach(key => {
