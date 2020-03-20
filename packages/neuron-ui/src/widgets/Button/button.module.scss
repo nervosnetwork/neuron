@@ -55,9 +55,9 @@
   &[disabled] {
     border: none !important;
     font-family: "Montserrat-Medium", "SourceHanSansCN-Medium" !important;
-    background-color: rgb(243, 242, 241) !important;
-    color: rgb(161, 159, 157) !important;
+    opacity: 0.5;
     box-shadow: none !important;
+    pointer-events: none;
   }
 
 }

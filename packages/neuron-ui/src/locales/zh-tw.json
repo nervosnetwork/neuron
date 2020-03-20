@@ -372,21 +372,22 @@
       "notice-wait-time": "注意：您需要等待 {{epochs}} epochs {{blocks}} 區塊(約 {{days}} 天)完成最終取出操作。",
       "deposit-dialog-title": "存入 Nervos DAO",
       "deposit-terms": "Nervos DAO 需要 102 CKBytes作為鎖定記錄的存儲，這部分 CKBytes 是無法產生鎖定補貼的。請查看 <0>Nervos DAO RFC</0> 以瞭解 Nervos DAO 更多資訊。",
-      "deposited-action-label": "申請取出",
-      "withdrawing-action-label": "取出",
       "minimal-fee-required": "存入數量應不少於 {{minimal}} CKBytes",
       "compensation-accumulated": "已累計 {{blockNumber}} 個塊的鎖定補貼",
-      "blocks-left": "還需等待 {{epochs}} epochs {{blocks}} 個塊(約 {{days}} 天)",
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
-      "insufficient-period-alert-title": "Header 引用無效",
-      "insufficient-period-alert-message": "交易只能引用已成熟的 Header(成熟期為 4 個epochs，約 16 小時)",
-      "explanation-of-epochs-period": "補償週期說明",
-      "current-epochs-period": "當前補償週期",
-      "progress": "進度：",
-      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
-      "left-time": "距離結束時間: 約 {{leftDays}} 天 {{leftHours}} 小時",
-      "detailed-explanation-of-epochs-period": "Nervos DAO 以每180個 epoch 作為一個補償週期(約 30 天)。在每一個補償週期內，用戶可以隨時發起取出申請，並在本補償週期結束後完成取款。需要注意的是，用戶發出申請後，補償週期結束前的區塊補償將不會被累加到用戶的取款金額中。囙此，建議您在補償週期接近結束時再提交取出申請，這樣獲得的區塊補償會更多。",
-      "terms-in-explanation-of-epochs-period": "如果在當前補償週期內沒有提出取出申請，下一個補償週期將自動開始，無需手動操作。\n如果您希望取出存放在 Nervos DAO 的 CKBytes，建議您在黃色區域發起取出申請。",
+      "deposit-record": {
+        "deposited-at": "存入於",
+        "withdraw-action-label": "取出",
+        "unlock-action-label": "解鎖",
+        "record": "記錄",
+        "deposited": "存入",
+        "withdrawn": "提取",
+        "unlocked": "解鎖",
+        "tx-record": "交易記錄",
+        "locked-period": "鎖定時間",
+        "compensated-period": "補貼時間",
+        "days-hours": "{{days}} 天 {{hours}} 小時"
+      },
       "compensation-period": {
         "tooltip": {
           "compensated-period": "已鎖定時間",
@@ -395,6 +396,15 @@
           "suggested": "建議在此區間提取以獲得最大化補償",
           "ending": "提取請求可能被推遲並鎖定 30 天",
           "withdrawn": "已提取"
+        },
+        "stage-messages": {
+          "pending": "正在存入...",
+          "immature-for-withdraw": "16 小時內無法提取 CKB",
+          "next-compensation-cycle": "下一補償週期約在 {{days}} 天后開始",
+          "withdrawing": "正在提取...",
+          "compensation-cycle-will-end": "補償週期約在 {{days}} 天后結束",
+          "compensation-cycle-has-ended": "補償週期已結束, 可以解鎖 CKB",
+          "unlocking": "解鎖中..."
         }
       }
     },

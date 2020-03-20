@@ -16,7 +16,6 @@ import getCurrentUrl from 'utils/getCurrentUrl'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
-import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
@@ -25,6 +24,7 @@ import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
 const NervosDAO = () => {
+  const [focusedRecord, setFocusedRecord] = useState('')
   const {
     app: {
       send = appState.send,
@@ -51,7 +51,6 @@ const NervosDAO = () => {
   const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
-  const [blockHashInCompensationDialog, setBlockHashInCompensationPeriodDialog] = useState('')
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
@@ -94,12 +93,6 @@ const NervosDAO = () => {
     dispatch,
   })
 
-  const onCompensationPeriodExplanationClick = hooks.useOnCompensationPeriodExplanationClick(
-    setBlockHashInCompensationPeriodDialog
-  )
-  const onCompensationPeriodDialogDismiss = hooks.useOnCompensationPeriodDialogDismiss(
-    setBlockHashInCompensationPeriodDialog
-  )
   const onActionClick = hooks.useOnActionClick({
     records,
     clearGeneratedTx,
@@ -110,7 +103,6 @@ const NervosDAO = () => {
 
   const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
-  const compensationPeriods = hooks.useCompensationPeriods({ depositEpochList, currentEpoch: epoch })
 
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
@@ -135,21 +127,29 @@ const NervosDAO = () => {
         <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
         <Stack className={styles.recordsContainer}>
           {records.map((record, i) => {
+            const key = `${record.outPoint.txHash}-${record.outPoint.index}`
+
             const props = {
               ...record,
               tipBlockTimestamp,
-              compensationPeriod: compensationPeriods[i],
               withdrawCapacity: withdrawList[i],
-              key: `${record.outPoint.txHash}-${record.outPoint.index}`,
+              key,
               onClick: onActionClick,
-              onCompensationPeriodExplanationClick,
               tipBlockNumber,
               depositEpoch: depositEpochList[i] || '',
               currentEpoch: epoch,
               genesisBlockTimestamp,
               connectionStatus,
             }
-            return <DAORecord {...props} />
+            return (
+              <DAORecord
+                {...props}
+                isCollapsed={focusedRecord !== key}
+                onToggle={() => {
+                  setFocusedRecord(focusedRecord === key ? '' : key)
+                }}
+              />
+            )
           })}
         </Stack>
       </>
@@ -159,14 +159,14 @@ const NervosDAO = () => {
     withdrawList,
     t,
     onActionClick,
-    onCompensationPeriodExplanationClick,
     tipBlockNumber,
     epoch,
-    compensationPeriods,
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
     depositEpochList,
+    focusedRecord,
+    setFocusedRecord,
   ])
 
   const MemoizedDepositDialog = useMemo(() => {
@@ -210,14 +210,6 @@ const NervosDAO = () => {
       />
     ) : null
   }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
-
-  const MemoizedCompensationPeriodDialog = useMemo(() => {
-    const index = records.findIndex(r => r.blockHash === blockHashInCompensationDialog)
-    const compensationPeriod = compensationPeriods[index] || null
-    return (
-      <CompensationPeriodDialog compensationPeriod={compensationPeriod} onDismiss={onCompensationPeriodDialogDismiss} />
-    )
-  }, [records, blockHashInCompensationDialog, onCompensationPeriodDialogDismiss, compensationPeriods])
 
   const free = BigInt(wallet.balance)
   const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
@@ -318,7 +310,6 @@ const NervosDAO = () => {
       <div className={styles.records}>{MemoizedRecords}</div>
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
-      {MemoizedCompensationPeriodDialog}
     </div>
   )
 }
