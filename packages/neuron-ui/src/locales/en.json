@@ -372,21 +372,22 @@
       "notice-wait-time": "Notice: You need to wait {{epochs}} epochs {{blocks}} blocks(~{{days}} days) to complete the withdraw.",
       "deposit-dialog-title": "Deposit Nervos DAO",
       "deposit-terms": "Nervos DAO needs 102 CKBytes for deposit cell storage, which is not compensation-bearing. Please visit the <0>Nervos DAO RFC</0> for more information about Nervos DAO",
-      "deposited-action-label": "Request withdraw",
-      "withdrawing-action-label": "Withdraw",
       "minimal-fee-required": "The minimum deposit capacity is {{minimal}} CKBytes",
       "compensation-accumulated": "{{blockNumber}} blocks compensation accumulated",
-      "blocks-left": "{{epochs}} epochs {{blocks}} blocks left(~{{days}} days)",
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
-      "insufficient-period-alert-title": "Referenced Header is Invalid",
-      "insufficient-period-alert-message": "Only mature header can be referenced in transactions(Matureness requires 4 epochs, around 16 hours)",
-      "explanation-of-epochs-period": "Compensation Period",
-      "current-epochs-period": "Current Compensation Period",
-      "progress": "Progress: ",
-      "stage-of-current-epoch": "{{pastEpochs}} / {{totalEpochs}} epochs",
-      "left-time": "Left time: about {{leftDays}} days {{leftHours}} hours",
-      "detailed-explanation-of-epochs-period": "A compensation period in Nervos DAO consists of 180 epochs (estimated 30 days). Users may apply unlock for their deposits any time during every compensation period, then withdraw their deposits and compensations when that compensation period ends. It is worth mentioning that the compensations will stop accumulating as soon as users apply unlock. So we suggest that users apply unlock for their deposits at a time that closes enough to the end of a compensation period.",
-      "terms-in-explanation-of-epochs-period": "If you did not apply unlock during this compensation period, the next compensation period will start automatically.\nIt is suggested that users apply unlock during YELLOW epochs.",
+      "deposit-record": {
+        "deposited-at": "Deposited",
+        "withdraw-action-label": "Withdraw",
+        "unlock-action-label": "Unlock",
+        "record": "Record",
+        "deposited": "Deposited",
+        "withdrawn": "Withdrawn",
+        "unlocked": "Unlocked",
+        "tx-record": "Transaction Record",
+        "locked-period": "Locked Period",
+        "compensated-period": "Compensation Period",
+        "days-hours": "{{days}} days {{hours}} hours"
+      },
       "compensation-period": {
         "tooltip": {
           "compensated-period": "Compensated Period",
@@ -395,6 +396,15 @@
           "suggested": "Suggested withdraw period for maximized compensation",
           "ending": "Requested withdraw may be postponed and locked for an extra cycle of 30 days",
           "withdrawn": "Withdrawn"
+        },
+        "stage-messages": {
+          "pending": "Pending...",
+          "immature-for-withdraw": "CKB cannot be withdrawn in 16 hours",
+          "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
+          "withdrawing": "Withdrawing...",
+          "compensation-cycle-will-end": "Compensation cycle ends in approximately {{days}} days",
+          "compensation-cycle-has-ended": "Cycle has ended, CKB is ready to be unlocked",
+          "unlocking": "Unlocking..."
         }
       }
     },

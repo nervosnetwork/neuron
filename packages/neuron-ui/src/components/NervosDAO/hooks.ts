@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { verifyAmount } from 'utils/validators'
-import { epochParser } from 'utils/parsers'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import calculateAPC from 'utils/calculateAPC'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
@@ -224,35 +222,6 @@ export const useUpdateGlobalAPC = ({
     }
   }, [tipBlockTimestamp, genesisBlockTimestamp, setGlobalAPC])
 
-export const useCompensationPeriods = ({
-  depositEpochList,
-  currentEpoch,
-}: {
-  depositEpochList: (string | null)[]
-  currentEpoch: string
-}) =>
-  useMemo(() => {
-    return depositEpochList.map(depositEpoch => {
-      if (!depositEpoch) {
-        return null
-      }
-      try {
-        const depositEpochInfo = epochParser(depositEpoch)
-        const currentEpochInfo = epochParser(currentEpoch)
-        const targetEpochValue = calculateClaimEpochValue(depositEpochInfo, currentEpochInfo)
-        return {
-          depositEpochValue:
-            Number(depositEpochInfo.number) + Number(depositEpochInfo.index) / Number(depositEpochInfo.length),
-          targetEpochValue,
-          currentEpochValue:
-            Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
-        }
-      } catch {
-        return null
-      }
-    })
-  }, [depositEpochList, currentEpoch])
-
 export const useOnDepositDialogDismiss = ({
   setShowDepositDialog,
   setDepositValue,
@@ -347,22 +316,6 @@ export const useOnWithdrawDialogSubmit = ({
     }
     setActiveRecord(null)
   }, [activeRecord, setActiveRecord, clearGeneratedTx, walletID, dispatch])
-
-export const useOnCompensationPeriodExplanationClick = (setBlockHash: React.Dispatch<React.SetStateAction<string>>) =>
-  useCallback(
-    (e: React.SyntheticEvent<HTMLSpanElement, MouseEvent>) => {
-      const { dataset } = e.target as HTMLSpanElement
-      if (dataset.blockHash) {
-        setBlockHash(dataset.blockHash)
-      }
-    },
-    [setBlockHash]
-  )
-
-export const useOnCompensationPeriodDialogDismiss = (setBlockHash: React.Dispatch<''>) =>
-  useCallback(() => {
-    setBlockHash('')
-  }, [setBlockHash])
 
 export const useOnActionClick = ({
   records,
@@ -510,13 +463,10 @@ export default {
   useClearGeneratedTx,
   useUpdateDepositValue,
   useOnDepositValueChange,
-  useCompensationPeriods,
   useOnDepositDialogDismiss,
   useOnDepositDialogSubmit,
   useOnWithdrawDialogDismiss,
   useOnWithdrawDialogSubmit,
-  useOnCompensationPeriodExplanationClick,
-  useOnCompensationPeriodDialogDismiss,
   useOnActionClick,
   useOnSlide,
   useUpdateWithdrawList,

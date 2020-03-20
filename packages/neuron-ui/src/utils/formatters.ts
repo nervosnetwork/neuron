@@ -22,8 +22,10 @@ const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
   hour: '2-digit',
   minute: '2-digit',
   second: '2-digit',
-  hour12: false,
-})
+  // use hourCycle h23 instead of hour12 false for chrome 80 and electron 8
+  // hour12: false,
+  hourCycle: 'h23',
+} as Intl.DateTimeFormatOptions)
 
 export const queryFormatter = (params: { [index: string]: any }) => {
   const newQuery = new URLSearchParams()
@@ -185,6 +187,7 @@ export const failureResToNotification = (res: any): State.Message => {
   }
 }
 
+// TODO: deprecated after merging the dev branch which has removed difficulty.
 export const difficultyFormatter = (value: bigint) => {
   const units = new Map([
     ['YH', 1e24],
