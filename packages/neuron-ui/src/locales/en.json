@@ -356,11 +356,12 @@
       "selected": "Current page"
     },
     "nervos-dao": {
-      "free": "Free",
+      "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
-      "deposit-records": "Deposit Records",
-      "apc": "APC",
+      "deposit-records": "Deposits",
+      "completed-records": "Completed",
+      "apc": "Current APC",
       "deposit-at": "Deposit at {{time}}",
       "fee": "Transaction fee",
       "deposit-to-nervos-dao": "Deposit to Nervos DAO",
