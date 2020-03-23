@@ -1,100 +1,77 @@
 @import "../../styles/mixin.scss";
+$infoHeight: 1.75rem;
 
 .nervosDAOContainer {
   display: grid;
   grid-template:
-    'wallet-name wallet-name'auto 'amount deposit'107px 'records records'auto/ 450px 1fr;
-  // padding: 54px 31px 41px 31px; this size is from design, but not used now
-  padding: 39px 0 0;
+    'title title'auto 'free deposit''locked deposit'auto 'apc .'auto 'network-alert .'1.25rem 'records records'auto/ minmax(350px, 500px) 1fr;
+  column-gap: 30px;
 }
 
-.walletName {
-  @include BoldText;
-  grid-area: wallet-name;
+.title {
+  grid-area: title;
   font-size: 1.375rem;
-  line-height: 1.22em;
-  letter-spacing: 1.1px;
+  font-weight: 900;
+  line-height: 1.75rem;
   color: #000;
-  margin: 0 0 11px 0;
+  padding-top: 5px;
+  padding-bottom: 12px;
+  margin: 0;
 }
 
-.amount {
-  grid-area: amount;
-  padding-right: 75px;
-
-  .amountProperty {
-    display: flex;
-    align-items: center;
-    font-size: 0.875rem;
-    letter-spacing: 0.7px;
-    font-weight: 500;
-
-    &:first-of-type {
-      margin-bottom: 11px;
-    }
-
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      word-break: keep-all;
-      white-space: nowrap;
-
-      &:first-of-type {
-        font-weight: 600;
-        flex-basis: 100px;
-        flex-shrink: 0;
-
-        &::after {
-          display: inline;
-          content: ':';
-        }
-
-      }
-    }
-
-  }
-
-  .balancePrompt {
-    @include BoldText;
-    margin-left: 100px;
-    color: var(--nervos-green);
-    font-size: 0.8rem;
-    margin-top: 3px;
-  }
-
+.free {
+  grid-area: free;
 }
 
-.info {
-  width: 220px;
-  @include RegularText;
+.locked {
+  grid-area: locked;
+}
+
+.apc {
+  grid-area: apc;
+}
+
+.networkAlert {
+  grid-area: network-alert;
+  justify-self: flex-end;
   font-size: 0.75rem;
-  font-weight: 600;
-  padding: 18.5px 0;
+  color: var(--nervos-green);
+}
 
-  &>div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4.5px 23px;
+.free,
+.locked,
+.apc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: $infoHeight;
+  font-size: 0.875rem;
+
+  span:first-child {
+    font-weight: 600;
+    padding-right: 15px;
+
+    &:after {
+      content: ':';
+    }
+  }
+
+  span:last-child {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
 
 .deposit {
   grid-area: deposit;
-
-  &>div {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
+  justify-self: flex-end;
 
   button {
-    width: 5.125rem;
+    width: 9.6875rem;
     height: 1.875rem;
     color: #fff;
     font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.6px;
     background-color: var(--nervos-green);
     border: none;
 
@@ -107,22 +84,62 @@
 .records {
   grid-area: records;
 
-  .recordsContainer {
-    background-color: #fff;
-    padding: 0 15px;
-  }
-
-  .recordsTitle {
-    @include BoldText;
-    line-height: 1.6875rem;
-    font-size: 1.375rem;
-    letter-spacing: 1.1px;
-    color: #000;
+  .recordTab {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
     margin: 0 0 19px 0;
     padding: 0;
+    line-height: 1.6875rem;
+    font-size: 1.375rem;
+    color: #000;
+    border-bottom: 1px solid #ccc;
+
+    button {
+      @include MonoText;
+      appearance: none;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 1.875rem;
+      font-size: 1rem;
+      background-color: transparent;
+      padding: 0 0 6px 0;
+      margin: 0;
+      border: none;
+      font-weight: 900;
+
+      &:hover {
+        color: var(--nervos-green);
+        opacity: 0.8;
+      }
+
+
+    }
+
+    .underline {
+      display: block;
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 4px;
+      width: 50%;
+      background: var(--nervos-green);
+      box-sizing: border-box;
+      padding: 0;
+      transition: transform 0.1s ease-in-out;
+    }
+
+    &[data-idx='1'] {
+      .underline {
+        transform: translateX(100%);
+      }
+    }
   }
 
   &>div {
-    padding: 0 15px;
+    margin: 10px auto;
   }
+
 }
