@@ -9,6 +9,13 @@ import TransactionSize from '../../src/models/transaction-size'
 import TransactionFee from '../../src/models/transaction-fee'
 import Script, { ScriptHashType } from '../../src/models/chain/script'
 import { TransactionStatus } from '../../src/models/chain/transaction'
+import Transaction from '../../src/models/chain/transaction'
+import Output from '../../src/models/chain/output'
+import Input from '../../src/models/chain/input'
+import SystemScriptInfo from '../../src/models/system-script-info'
+import TransactionPersistor from '../../src/services/tx/transaction-persistor'
+import OutPoint from '../../src/models/chain/out-point'
+
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -408,7 +415,7 @@ describe('CellsService', () => {
 
     describe('getDaoCells', () => {
       const depositData = '0x0000000000000000'
-      const step1Data = '0x000000000000000a'
+      const withdrawData = '0x000000000000000a'
       const generateTx = (hash: string, timestamp: string) => {
         const tx = new TransactionEntity()
         tx.hash = hash
@@ -420,20 +427,177 @@ describe('CellsService', () => {
         tx.blockHash = '0x' + '10'.repeat(32)
         return tx
       }
-      beforeEach(async done => {
+
+      const createCells = async () => {
         const tx1 = generateTx('0x1234', '1572862777481')
         const tx2 = generateTx('0x5678', '1572862829087')
         const cells: OutputEntity[] = [
           generateCell(toShannon('1000'), OutputStatus.Live, false, null, bob, depositData, tx1),
-          generateCell(toShannon('2000'), OutputStatus.Live, false, null, bob, step1Data, tx1),
+          generateCell(toShannon('2000'), OutputStatus.Live, false, null, bob, withdrawData, tx1),
           generateCell(toShannon('3000'), OutputStatus.Live, false, null, bob, depositData, tx2),
-          generateCell(toShannon('4000'), OutputStatus.Live, false, null, bob, step1Data, tx2),
+          generateCell(toShannon('4000'), OutputStatus.Live, false, null, bob, withdrawData, tx2),
         ]
         await getConnection().manager.save([tx1, tx2, ...cells])
-        done()
+      }
+
+      const depositTxHash = '0x' + '0'.repeat(64)
+      const depositTx = Transaction.fromObject({
+        hash: depositTxHash,
+        version: '0x0',
+        timestamp: '1572862777481',
+        status: TransactionStatus.Success,
+        witnesses: [],
+        blockNumber: '1',
+        blockHash: '0x' + '1'.repeat(64),
+        inputs: [],
+        outputs: [Output.fromObject({
+          capacity: '1000',
+          daoData: depositData,
+          lock: bob.lockScript,
+          type: SystemScriptInfo.generateDaoScript()
+        })]
+      })
+
+      const withdrawTxHash = '0x' + '2'.repeat(64)
+      const withdrawTx = Transaction.fromObject({
+        hash: withdrawTxHash,
+        version: '0x0',
+        timestamp: '1572862777482',
+        status: TransactionStatus.Success,
+        witnesses: [],
+        blockNumber: '2',
+        blockHash: '0x' + '3'.repeat(64),
+        inputs: [Input.fromObject({
+          previousOutput: new OutPoint(depositTxHash, '0'),
+          since: '0'
+        })],
+        outputs: [Output.fromObject({
+          capacity: '1000',
+          daoData: withdrawData,
+          lock: bob.lockScript,
+          type: SystemScriptInfo.generateDaoScript(),
+          depositOutPoint: new OutPoint(depositTxHash, '0'),
+          depositTimestamp: depositTx.timestamp,
+        })],
+      })
+
+      const unlockTxHash = '0x' + '4'.repeat(64)
+      const unlockTx = Transaction.fromObject({
+        hash: unlockTxHash,
+        version: '0x0',
+        timestamp: '1572862777483',
+        status: TransactionStatus.Success,
+        witnesses: [],
+        blockNumber: '3',
+        blockHash: '0x' + '5'.repeat(64),
+        inputs: [Input.fromObject({
+          previousOutput: new OutPoint(withdrawTxHash, '0'),
+          since: '0'
+        })],
+        outputs: [Output.fromObject({
+          capacity: '1000',
+          lock: bob.lockScript,
+        })]
+      })
+
+      it('deposit', async () => {
+        await TransactionPersistor.saveFetchTx(depositTx)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Live)
+        expect(daoCell.outPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositTimestamp).toBeFalsy()
+        expect(daoCell.depositOutPoint).toBeFalsy()
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo).toBeFalsy()
+        expect(daoCell.unlockInfo).toBeFalsy()
+      })
+
+      it('deposit pending', async () => {
+        await TransactionPersistor.saveSentTx(depositTx, depositTxHash)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Sent)
+        expect(daoCell.outPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositTimestamp).toBeFalsy()
+        expect(daoCell.depositOutPoint).toBeFalsy()
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo).toBeFalsy()
+        expect(daoCell.unlockInfo).toBeFalsy()
+      })
+
+      it('withdraw', async () => {
+        await TransactionPersistor.saveFetchTx(depositTx)
+        await TransactionPersistor.saveFetchTx(withdrawTx)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Live)
+        expect(daoCell.outPoint!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.depositTimestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.depositOutPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositOutPoint!.index).toEqual('0')
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.withdrawInfo!.timestamp).toEqual(withdrawTx.timestamp)
+        expect(daoCell.unlockInfo).toBeFalsy()
+      })
+
+      it('withdraw pending', async () => {
+        await TransactionPersistor.saveFetchTx(depositTx)
+        await TransactionPersistor.saveSentTx(withdrawTx, withdrawTxHash)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Sent)
+        expect(daoCell.outPoint!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.depositTimestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.depositOutPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositOutPoint!.index).toEqual('0')
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.withdrawInfo!.timestamp).toEqual(withdrawTx.timestamp)
+        expect(daoCell.unlockInfo).toBeFalsy()
+      })
+
+      it('unlock', async () => {
+        await TransactionPersistor.saveFetchTx(depositTx)
+        await TransactionPersistor.saveFetchTx(withdrawTx)
+        await TransactionPersistor.saveFetchTx(unlockTx)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Dead)
+        expect(daoCell.outPoint!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.depositTimestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.depositOutPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositOutPoint!.index).toEqual('0')
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.withdrawInfo!.timestamp).toEqual(withdrawTx.timestamp)
+        expect(daoCell.unlockInfo!.txHash).toEqual(unlockTx.hash)
+        expect(daoCell.unlockInfo!.timestamp).toEqual(unlockTx.timestamp)
       })
 
       it('get all in correct order', async () => {
+        await createCells()
         const cells = await CellsService.getDaoCells(
           [bob.lockHash],
         )
@@ -447,6 +611,7 @@ describe('CellsService', () => {
       })
 
       it('make sure timestamp/blockNumber/blockHash', async () => {
+        await createCells()
         const cells = await CellsService.getDaoCells(
           [bob.lockHash],
         )
