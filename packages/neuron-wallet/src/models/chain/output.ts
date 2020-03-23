@@ -3,6 +3,8 @@ import OutPoint from './out-point'
 import HexUtils from 'utils/hex'
 import TypeChecker from 'utils/type-checker'
 
+// sent: pending transaction's output
+// pending: pending transaction's input
 export enum OutputStatus {
   Sent = 'sent',
   Live = 'live',
@@ -16,6 +18,11 @@ export interface CustomizedAssetInfo {
   lock: string
   type: string
   data: string
+}
+
+export interface DaoCellInfo {
+  timestamp: string
+  txHash: string
 }
 
 export default class Output {
@@ -36,6 +43,11 @@ export default class Output {
   public multiSignBlake160?: string | null
 
   public customizedAssetInfo?: CustomizedAssetInfo
+
+  // dao infos
+  public depositInfo?: DaoCellInfo
+  public withdrawInfo?: DaoCellInfo
+  public unlockInfo?: DaoCellInfo
 
   // check hex number
   constructor(
@@ -168,6 +180,18 @@ export default class Output {
 
   public setOutPoint(value: OutPoint) {
     this.outPoint = value
+  }
+
+  public setDepositInfo(value: DaoCellInfo) {
+    this.depositInfo = value
+  }
+
+  public setWithdrawInfo(value: DaoCellInfo)  {
+    this.withdrawInfo = value
+  }
+
+  public setUnlockInfo(value: DaoCellInfo) {
+    this.unlockInfo = value
   }
 
   public calculateBytesize(): number {
