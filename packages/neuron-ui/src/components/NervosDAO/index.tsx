@@ -45,13 +45,13 @@ const NervosDAO = () => {
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
+  const [withdrawList, setWithdrawList] = useState<Map<string, string | null>>(new Map())
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
-  const [depositEpochList, setDepositEpochList] = useState<(string | null)[]>([])
+  const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
   const updateDepositValue = hooks.useUpdateDepositValue({
     setDepositValue,
@@ -127,6 +127,16 @@ const NervosDAO = () => {
         setTabIdx(idx)
       }
     }
+    const filteredRecord = records.filter(record => {
+      if (record.status === 'failed') {
+        return false
+      }
+
+      if (tabIdx === '0') {
+        return record.status !== 'dead'
+      }
+      return record.status === 'dead'
+    })
     return (
       <>
         <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
@@ -138,31 +148,39 @@ const NervosDAO = () => {
           </button>
           <div className={styles.underline} />
         </div>
-        {records.map((record, i) => {
-          const key = `${record.outPoint.txHash}-${record.outPoint.index}`
+        {filteredRecord.length ? (
+          filteredRecord.map(record => {
+            const key = record.depositOutPoint
+              ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
+              : `${record.outPoint.txHash}-${record.outPoint.index}`
 
-          const props = {
-            ...record,
-            tipBlockTimestamp,
-            withdrawCapacity: withdrawList[i],
-            key,
-            onClick: onActionClick,
-            tipBlockNumber,
-            depositEpoch: depositEpochList[i] || '',
-            currentEpoch: epoch,
-            genesisBlockTimestamp,
-            connectionStatus,
-          }
-          return (
-            <DAORecord
-              {...props}
-              isCollapsed={focusedRecord !== key}
-              onToggle={() => {
-                setFocusedRecord(focusedRecord === key ? '' : key)
-              }}
-            />
-          )
-        })}
+            const props = {
+              ...record,
+              tipBlockTimestamp,
+              withdrawCapacity: withdrawList.get(key) || null,
+              key,
+              onClick: onActionClick,
+              tipBlockNumber,
+              depositEpoch: depositEpochList.get(key) || '',
+              currentEpoch: epoch,
+              genesisBlockTimestamp,
+              connectionStatus,
+            }
+            return (
+              <DAORecord
+                {...props}
+                isCollapsed={focusedRecord !== key}
+                onToggle={() => {
+                  setFocusedRecord(focusedRecord === key ? '' : key)
+                }}
+              />
+            )
+          })
+        ) : (
+          <div className={styles.noRecords}>
+            {t(`nervos-dao.deposit-record.no-${tabIdx === '0' ? 'deposit' : 'completed'}`)}
+          </div>
+        )}
       </>
     )
   }, [
@@ -225,7 +243,7 @@ const NervosDAO = () => {
   }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
 
   const free = BigInt(wallet.balance)
-  const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
+  const locked = [...withdrawList.values()].reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
 
   const info = [
     {

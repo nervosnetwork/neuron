@@ -40,6 +40,11 @@ const props: { [index: string]: CompensationProgressBarProps } = {
     currentEpochValue: 0,
     endEpochValue: 181,
   },
+  Pending: {
+    pending: true,
+    currentEpochValue: 0,
+    endEpochValue: 0,
+  },
 }
 
 Object.keys(props).forEach(key => {
