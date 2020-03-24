@@ -74,12 +74,13 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.daoData IS NOT NULL AND (output.status = :liveStatus OR output.status = :sentStatus OR tx.status = :failedStatus OR (output.status = :deadStatus AND output.depositTxHash is not null)) AND output.lockHash in (:...lockHashes)`, {
+      .where(`output.daoData IS NOT NULL AND (output.status = :liveStatus OR output.status = :sentStatus OR tx.status = :failedStatus OR ((output.status = :deadStatus OR output.status = :pendingStatus) AND output.depositTxHash is not null)) AND output.lockHash in (:...lockHashes)`, {
         lockHashes,
         liveStatus: OutputStatus.Live,
         sentStatus: OutputStatus.Sent,
         failedStatus: TransactionStatus.Failed,
         deadStatus: OutputStatus.Dead,
+        pendingStatus: OutputStatus.Pending,
       })
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
@@ -139,7 +140,7 @@ export default class CellsService {
           timestamp: withdrawTx!.timestamp!,
         })
 
-        if (output.status === OutputStatus.Dead) {
+        if (output.status === OutputStatus.Dead || output.status === OutputStatus.Pending) {
           // if unlocked, set unlockInfo
           const key = output.outPointTxHash + ':' + output.outPointIndex
           const unlockTx = unlockTxMap.get(key)!
