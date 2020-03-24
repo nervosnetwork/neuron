@@ -81,15 +81,19 @@ const CompensationPeriodTooltip = ({
       <div className={styles.times}>
         <div className={styles.normal}>{t('nervos-dao.compensation-period.tooltip.normal')}</div>
         <div className={styles.suggested}>
-          <div className={styles.time}>
-            {`${formatTime(suggestStartEpochTimestamp)} ~ ${formatTime(endingStartEpochTimestamp - SECS_PER_DAY)}`}
-          </div>
+          {suggestStartEpochTimestamp && endingStartEpochTimestamp ? (
+            <div className={styles.time}>
+              {`${formatTime(suggestStartEpochTimestamp)} ~ ${formatTime(endingStartEpochTimestamp - SECS_PER_DAY)}`}
+            </div>
+          ) : null}
           <div>{t('nervos-dao.compensation-period.tooltip.suggested')}</div>
         </div>
         <div className={styles.ending}>
-          <div className={styles.time}>
-            {`${formatTime(endingStartEpochTimestamp)} ~ ${formatTime(endEpochTimestamp)}`}
-          </div>
+          {endingStartEpochTimestamp && endEpochTimestamp ? (
+            <div className={styles.time}>
+              {`${formatTime(endingStartEpochTimestamp)} ~ ${formatTime(endEpochTimestamp)}`}
+            </div>
+          ) : null}
           <div>{t('nervos-dao.compensation-period.tooltip.ending')}</div>
         </div>
       </div>

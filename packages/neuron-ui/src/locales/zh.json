@@ -367,7 +367,6 @@
       "deposit-records": "存入",
       "completed-records": "已解锁",
       "apc": "当前年化锁定补贴率",
-      "deposit-at": "存入于 {{time}}",
       "fee": "手续费",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "从 Nervos DAO 取出",
@@ -383,6 +382,8 @@
       "withdraw-alert": "提示：本补贴申请距离 Nervos DAO 规则允许的最近一个锁定周期仅剩下 {{epochs}} 个 epoch (约 {{hours}} 小时)。 如果您希望在本锁定周期取出，请及时提交取出申请，以确保取出申请能在本锁定周期结束之前上链。下一个锁定周期的结束时间预计为 {{nextLeftEpochs}} 个 epochs (约 {{days}} 天)。",
       "deposit-record": {
         "deposited-at": "存入于",
+        "completed-at": "已取出",
+        "deposit-pending": "存入 提交中",
         "withdraw-action-label": "取出",
         "unlock-action-label": "解锁",
         "record": "记录",
@@ -392,7 +393,9 @@
         "tx-record": "交易记录",
         "locked-period": "锁定时间",
         "compensated-period": "补贴时间",
-        "days-hours": "{{days}} 天 {{hours}} 小时"
+        "days-hours": "{{days}} 天 {{hours}} 小时",
+        "no-deposit": "没有存入记录",
+        "no-completed": "没有解锁记录"
       },
       "compensation-period": {
         "tooltip": {
