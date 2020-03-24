@@ -2,7 +2,6 @@ import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import LockUtils from 'models/lock-utils'
-import NodeService from 'services/node'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
@@ -154,12 +153,12 @@ export class TransactionsService {
       }
     }
 
-    let lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(params.addresses)
+    let lockHashes: string[] = new LockUtils().addressesToAllLockHashes(params.addresses)
 
     if (type === SearchType.Address) {
-      const hashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(searchValue)
-      if (lockHashes.includes(hashes[0])) {
-        lockHashes = hashes
+      const hash = new LockUtils().addressToLockHash(searchValue)
+      if (lockHashes.includes(hash)) {
+        lockHashes = [hash]
       } else {
         return {
           totalCount: 0,
@@ -294,7 +293,7 @@ export class TransactionsService {
     const addresses: string[] = params.pubkeys.map(pubkey => {
       return pubkeyToAddress(pubkey)
     })
-    const lockHashes = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes = new LockUtils().addressesToAllLockHashes(addresses)
 
     return TransactionsService.getAll(
       {
@@ -340,29 +339,17 @@ export class TransactionsService {
   }
 
   // tx count with one lockHash and status
-  public static async getCountByLockHashesAndStatus(lockHashes: string[], status: TransactionStatus[]): Promise<number> {
-    const count: number = await getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .where(
-        `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND tx.status IN (:...status)`,
-        {
-          lockHashes,
-          status,
-        }
-      )
-      .getCount()
+  public static async getCountByLockHashesAndStatus(lockHashes: Set<string>, status: Set<TransactionStatus>) {
+    const [sql, parameters] = getConnection().driver.escapeQueryWithParameters(`select lockHash, count(DISTINCT(transactionHash)) as cnt from (select lockHash, transactionHash from input union select lockHash, transactionHash from output) as cell left join (select tx.hash from 'transaction' as tx where tx.status in (:...status) AND tx.hash in (select transactionHash from input union select transactionHash from output)) as result on cell.transactionHash = result.hash where lockHash in (:...lockHashes) group by lockHash;`, { status: [...status], lockHashes: [...lockHashes] }, {})
 
-    return count
-  }
+    const count: { lockHash: string, cnt: number }[] = await getConnection().manager.query(sql, parameters)
 
-  public static async getCountByAddressAndStatus(
-    address: string,
-    status: TransactionStatus[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
-  ): Promise<number> {
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript(url)).addressToAllLockHashes(address)
-    return TransactionsService.getCountByLockHashesAndStatus(lockHashes, status)
+    const result = new Map<string, number>()
+    count.forEach(c => {
+      result.set(c.lockHash, c.cnt)
+    })
+
+    return result
   }
 
   public static async updateDescription(hash: string, description: string) {
@@ -391,8 +378,8 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHashes = new LockUtils(await LockUtils.systemScript()).addressToAllLockHashes(value)
-      return ['input.lockHash IN (:...lockHashes) OR output.lockHash IN (:...lockHashes)', { lockHashes }]
+      const lockHash: string = new LockUtils().addressToLockHash(value)
+      return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
     }
     if (type === SearchType.TxHash) {
       return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]

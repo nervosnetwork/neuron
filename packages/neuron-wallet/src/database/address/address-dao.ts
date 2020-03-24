@@ -2,8 +2,6 @@ import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
 import LockUtils from 'models/lock-utils'
-import { OutputStatus } from 'models/chain/output'
-import NodeService from 'services/node'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
@@ -53,35 +51,49 @@ export default class AddressDao {
   // pendingBalance means balance of OutputStatus.Pending cells (sent from me, but not committed)
   // so the final balance is (liveBalance + sentBalance - pendingBalance)
   // balance is the balance of the cells those who don't hold data or type script
-  public static updateTxCountAndBalances = async (
-    addresses: string[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
-  ): Promise<Address[]> => {
+  public static async updateTxCountAndBalances(addresses: string[]): Promise<Address[]> {
+    const addressesSet = new Set(addresses)
     const all = AddressStore.getAll()
     const toUpdate = all.filter(value => {
-      return addresses.includes(value.address)
+      return addressesSet.has(value.address)
     })
     const others = all.filter(value => {
-      return !addresses.includes(value.address)
+      return !addressesSet.has(value.address)
     })
 
-    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
-    for (const addr of toUpdate) {
-      const txCount: number = await TransactionsService.getCountByAddressAndStatus(addr.address, [
-        TransactionStatus.Pending,
-        TransactionStatus.Success,
-      ], url)
-      addr.txCount = txCount
+    const lockUtils = new LockUtils()
+    const lockHashInfo = new Map<string, string>()
+    const lockHashes = new Set<string>()
+    toUpdate.forEach(addr => {
+      const address = addr.address
+      const lockHash: string = lockUtils.addressToLockHash(address)
+      lockHashInfo.set(address, lockHash)
+      lockHashes.add(lockHash)
+    })
 
-      const lockHashes: string[] = lockUtils.addressToAllLockHashes(addr.address)
-      addr.liveBalance = await CellsService.getBalance(lockHashes, OutputStatus.Live)
-      addr.sentBalance = await CellsService.getBalance(lockHashes, OutputStatus.Sent)
-      addr.pendingBalance = await CellsService.getBalance(lockHashes, OutputStatus.Pending)
-      addr.balance = (BigInt(addr.liveBalance) + BigInt(addr.sentBalance)).toString()
-    }
+    const balanceInfo = await CellsService.getBalance(lockHashes)
+    const txCountInfo = await TransactionsService.getCountByLockHashesAndStatus(lockHashes, new Set([
+      TransactionStatus.Pending,
+      TransactionStatus.Success,
+    ]))
 
-    AddressStore.updateAll(toUpdate.concat(others))
-    return toUpdate
+    const updated: Address[] = toUpdate.map(addr => {
+      const lockHash: string = lockHashInfo.get(addr.address)!
+      const liveBalance = balanceInfo.liveBalance.get(lockHash) || '0'
+      const sentBalance = balanceInfo.sentBalance.get(lockHash) || '0'
+      const pendingBalance = balanceInfo.pendingBalance.get(lockHash) || '0'
+      return {
+        ...addr,
+        txCount: txCountInfo.get(lockHash) || 0,
+        liveBalance,
+        sentBalance,
+        pendingBalance,
+        balance: (BigInt(liveBalance) + BigInt(sentBalance)).toString(),
+      }
+    })
+
+    AddressStore.updateAll(updated.concat(others))
+    return updated
   }
 
   public static resetAddresses = () => {

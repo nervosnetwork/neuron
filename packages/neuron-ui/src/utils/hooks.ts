@@ -33,6 +33,7 @@ export const useLocalDescription = (type: 'address' | 'transaction', walletID: s
         })
         if (localDescription.key && type === 'transaction') {
           updateTransactionDescription({
+            walletID,
             hash: localDescription.key,
             description: localDescription.description,
           })(dispatch)

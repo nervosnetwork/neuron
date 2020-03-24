@@ -46,7 +46,10 @@ export default {
         'nervos-website': 'Nervos Website',
         'source-code': 'Source Code',
         'report-issue': 'Report Issue',
+        documentation: 'Documentation',
+        faq: 'Neuron FAQ',
         settings: 'Settings',
+        'export-debug-info': 'Export Debug Information'
       },
       develop: {
         develop: 'Develop',
@@ -142,6 +145,11 @@ export default {
       yes: 'Yes',
       no: 'No',
       ok: 'OK',
+      error: 'Error',
     },
+    'export-debug-info':{
+      'export-debug-info': 'Export Debug Information',
+      'debug-info-exported': 'Debug information has been exported to {{ file }}'
+    }
   },
 }

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import React, { useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropertyList, { Property } from 'widgets/PropertyList'
@@ -8,14 +8,9 @@ import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import {
-  localNumberFormatter,
-  shannonToCKBFormatter,
-  difficultyFormatter,
-  uniformTimeFormatter,
-} from 'utils/formatters'
-import { epochParser } from 'utils/parsers'
+import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
 import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 import { SyncStatus as SyncStatusEnum, ConnectionStatus, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
@@ -48,24 +43,26 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
 
 const Overview = () => {
   const {
-    app: { tipBlockNumber, tipBlockTimestamp, chain, epoch, difficulty },
+    app: { tipBlockNumber, tipBlockTimestamp },
     wallet: { id, name, balance = '' },
     chain: {
       tipBlockNumber: syncedBlockNumber,
       transactions: { items = [] },
       connectionStatus,
+      networkID,
     },
+    settings: { networks },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
-  const [isStatusShow, setIsStatusShow] = useState(false)
 
   const syncStatus = getSyncStatus({
     syncedBlockNumber,
     tipBlockNumber,
     tipBlockTimestamp,
     currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
   })
 
   useEffect(() => {
@@ -116,27 +113,6 @@ const Overview = () => {
       },
     ]
   }, [t, balance, syncStatus, connectionStatus])
-  const blockchainStatusProperties = useMemo(
-    () => [
-      {
-        label: t('overview.chain-identity'),
-        value: chain,
-      },
-      {
-        label: t('overview.tip-block-number'),
-        value: localNumberFormatter(tipBlockNumber),
-      },
-      {
-        label: t('overview.epoch'),
-        value: epochParser(epoch).number.toString(),
-      },
-      {
-        label: t('overview.difficulty'),
-        value: difficultyFormatter(difficulty),
-      },
-    ],
-    [t, chain, epoch, difficulty, tipBlockNumber]
-  )
 
   const onRecentActivityDoubleClick = useCallback((e: React.SyntheticEvent) => {
     const cellElement = e.target as HTMLTableCellElement
@@ -236,42 +212,11 @@ const Overview = () => {
     )
   }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 
-  const onStatusClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      if ((e.target as HTMLDivElement).getAttribute('role') === 'button') {
-        setIsStatusShow(show => !show)
-      }
-    },
-    [setIsStatusShow]
-  )
-
-  const onStatusBlur = useCallback(() => {
-    setIsStatusShow(false)
-  }, [setIsStatusShow])
-
   return (
     <div className={styles.overview}>
       <h1 className={styles.walletName}>{name}</h1>
       <PropertyList properties={balanceProperties} />
-      <button
-        className={styles.blockchainStatus}
-        type="button"
-        title={t('overview.blockchain-status')}
-        onClick={onStatusClick}
-        onBlur={onStatusBlur}
-      >
-        <div role="button">{t('overview.blockchain-status')}</div>
-        {isStatusShow ? (
-          <section>
-            {blockchainStatusProperties.map(({ label, value }) => (
-              <div key={label} title={label}>
-                <span>{label}</span>
-                <span>{value}</span>
-              </div>
-            ))}
-          </section>
-        ) : null}
-      </button>
+
       <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
       {items.length ? (
         <>
@@ -285,7 +230,7 @@ const Overview = () => {
           ) : null}
         </>
       ) : (
-        <div>{t('overview.no-recent-activities')}</div>
+        <div className={styles.noActivities}>{t('overview.no-recent-activities')}</div>
       )}
     </div>
   )

@@ -38,6 +38,8 @@ class Store extends EventEmitter {
       const content = JSON.parse(data)
       return key ? content[key] : content
     } catch (err) {
+      // No need to log 'file not found' error. Store expects that situation
+      // and falls back to default value in such case.
       const content = JSON.parse(this.defaultValue)
       return key ? content[key] : content
     }

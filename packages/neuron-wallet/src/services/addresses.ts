@@ -1,10 +1,9 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
 import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
-import NodeService from './node'
 import NetworksService from 'services/networks'
 
 const MAX_ADDRESS_COUNT = 100
@@ -26,8 +25,8 @@ export default class AddressService {
     isImporting: boolean | undefined,
     receivingStartIndex: number,
     changeStartIndex: number,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const addresses = AddressService.generateAddresses(
       walletId,
@@ -64,8 +63,8 @@ export default class AddressService {
     walletId: string,
     extendedKey: AccountExtendedPublicKey,
     isImporting: boolean | undefined,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) {
     const addressVersion = AddressService.getAddressVersion()
     const [unusedReceivingCount, unusedChangeCount] = AddressDao.unusedAddressesCount(walletId, addressVersion)
@@ -93,11 +92,8 @@ export default class AddressService {
     )
   }
 
-  public static updateTxCountAndBalances = async (
-    addresses: string[],
-    url: string = NodeService.getInstance().ckb.rpc.node.url
-  ): Promise<Address[]> => {
-    return AddressDao.updateTxCountAndBalances(addresses, url)
+  public static async updateTxCountAndBalances(addresses: string[]): Promise<AddressInterface[]> {
+    return AddressDao.updateTxCountAndBalances(addresses)
   }
 
   // Generate both receiving and change addresses.
@@ -106,8 +102,8 @@ export default class AddressService {
     extendedKey: AccountExtendedPublicKey,
     receivingStartIndex: number,
     changeStartIndex: number,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     // can be only receiving OR only change
     if (receivingAddressCount < 1 && changeAddressCount < 1) {
@@ -215,8 +211,8 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId, addressVersion)
   }
 
-  public static allLockHashes = async (url: string): Promise<string[]> => {
-    const lockUtils = new LockUtils(await LockUtils.systemScript(url))
+  public static allLockHashes(): string[] {
+    const lockUtils = new LockUtils()
     const addresses = AddressService.allAddresses().map(address => address.address)
     return lockUtils.addressesToAllLockHashes(addresses)
   }

@@ -5,7 +5,6 @@ import { TransactionPersistor } from 'services/tx'
 import NodeService from 'services/node'
 import WalletService from 'services/wallets'
 import RpcService from 'services/rpc-service'
-import DaoUtils from 'models/dao-utils'
 import OutPoint from 'models/chain/out-point'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
@@ -15,9 +14,9 @@ import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
+import SystemScriptInfo from 'models/system-script-info'
 
 export default class Queue {
-  private url: string
   private lockHashes: string[]
   private rpcService: RpcService
 
@@ -35,17 +34,14 @@ export default class Queue {
 
   private yieldTime = 1
 
-  private multiSignCodeHash: string
   private multiSignBlake160s: string[]
 
-  constructor(url: string, lockHashes: string[], multiSignCodeHash: string, multiSignBlake160s: string[], startBlockNumber: bigint) {
-    this.url = url
+  constructor(url: string, lockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
-    this.multiSignCodeHash = multiSignCodeHash
     this.multiSignBlake160s = multiSignBlake160s
   }
 
@@ -137,22 +133,15 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
-  private daoScriptHash = async (): Promise<string> => {
-    await DaoUtils.daoScript(this.url)
-    return DaoUtils.scriptHash
-  }
-
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
-    const daoScriptHash = await this.daoScriptHash()
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const [shouldSave, addresses] = await new TxAddressFinder(
-          this.url, this.lockHashes, tx, this.multiSignCodeHash, this.multiSignBlake160s).addresses()
+        const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
         if (shouldSave) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
@@ -169,7 +158,7 @@ export default class Queue {
               input.setInputIndex(inputIndex.toString())
 
               if (
-                previousOutput.type?.computeHash() === daoScriptHash &&
+                previousOutput.type?.computeHash() === SystemScriptInfo.DAO_SCRIPT_HASH &&
                 previousTx.outputsData![+input.previousOutput!.index] === '0x0000000000000000'
               ) {
                 const output = tx.outputs![inputIndex]
@@ -183,7 +172,7 @@ export default class Queue {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          await WalletService.updateUsedAddresses(addresses, this.url)
+          await WalletService.updateUsedAddresses(addresses)
         }
       }
     }

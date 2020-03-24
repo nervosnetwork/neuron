@@ -22,6 +22,13 @@
       "fail-to-fetch-tip-block-number": "Connection error",
       "sync-not-start": "Sync not started yet"
     },
+    "network-status": {
+      "tooltip": {
+        "block-number": "Block Number",
+        "tip-block": "Tip Block",
+        "synced": "Synced"
+      }
+    },
     "overview": {
       "date": "Date",
       "type": "Type",
@@ -32,11 +39,6 @@
       "datetime": "Date & Time",
       "status": "Status",
       "amount": "Amount",
-      "blockchain-status": "Blockchain Status",
-      "chain-identity": "Chain Identity",
-      "tip-block-number": "Block Number",
-      "epoch": "Epoch",
-      "difficulty": "Difficulty",
       "address": "Address",
       "confirmation": "{{confirmationCount}} Confirmation",
       "confirmations": "{{confirmationCount}} Confirmations",

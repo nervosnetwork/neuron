@@ -9,7 +9,6 @@ import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
 import { ResponseCode } from 'utils/const'
-import LockUtils from 'models/lock-utils'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -21,6 +20,8 @@ import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
+import SystemScriptInfo from 'models/system-script-info'
+import logger from 'utils/logger'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -54,10 +55,9 @@ export default class ApiController {
 
     // App
     handle('get-system-codehash', async () => {
-      const lockUtils = new LockUtils(await LockUtils.systemScript())
       return {
         status: ResponseCode.Success,
-        result: lockUtils.systemScript.codeHash
+        result: SystemScriptInfo.SECP_CODE_HASH
       }
     })
 
@@ -100,7 +100,7 @@ export default class ApiController {
         : [])
 
       const transactions = currentWallet
-        ? await this.transactionsController.getAllByKeywords({
+        ? await this.transactionsController.getAll({
             pageNo: 1,
             pageSize: 15,
             keywords: '',
@@ -209,14 +209,14 @@ export default class ApiController {
     // Transactions
 
     handle('get-transaction-list', async (_, params: Controller.Params.TransactionsByKeywords) => {
-      return this.transactionsController.getAllByKeywords(params)
+      return this.transactionsController.getAll(params)
     })
 
     handle('get-transaction', async (_, { walletID, hash }: { walletID: string, hash: string }) => {
       return this.transactionsController.get(walletID, hash)
     })
 
-    handle('update-transaction-description', async (_, params: { hash: string; description: string }) => {
+    handle('update-transaction-description', async (_, params: { walletID: string; hash: string; description: string }) => {
       return this.transactionsController.updateDescription(params)
     })
 
@@ -319,6 +319,8 @@ export default class ApiController {
         const res = await listener(event, args)
         return res
       } catch (err) {
+        logger.warn(`channel handling error: ${err}`)
+
         if (err.code === 'ECONNREFUSED') {
           err.code = ApiController.NODE_DISCONNECTED_CODE
         }

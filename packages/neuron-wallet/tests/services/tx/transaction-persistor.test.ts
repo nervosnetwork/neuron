@@ -134,10 +134,13 @@ describe('TransactionPersistor', () => {
   describe('saveWithFetch', () => {
     it('multiSignBlake160', async () => {
       const multiSignBlake160 = '0x' + '6'.repeat(40)
+      // @ts-ignore: Private method
       await TransactionPersistor.saveWithFetch(tx)
+      // @ts-ignore: Private method
       await TransactionPersistor.saveWithFetch(tx2)
       const txDup = Transaction.fromObject({ ...tx })
       txDup.outputs[1].setMultiSignBlake160(multiSignBlake160)
+      // @ts-ignore: Private method
       await TransactionPersistor.saveWithFetch(txDup)
       const loadedTx = await getConnection()
         .getRepository(TransactionEntity)

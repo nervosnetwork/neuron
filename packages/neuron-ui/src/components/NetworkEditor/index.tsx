@@ -10,7 +10,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { verifyNetworkName, verifyURL } from 'utils/validators'
 import { useGoBack } from 'utils/hooks'
 import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
-import { useHandleSubmit } from './hooks'
+import { useOnSubmit } from './hooks'
 import styles from './networkEditor.module.scss'
 
 const NetworkEditor = () => {
@@ -36,6 +36,16 @@ const NetworkEditor = () => {
     url: '',
     urlError: '',
   })
+
+  const disabled = !!(
+    !editor.name ||
+    !editor.url ||
+    editor.nameError ||
+    editor.urlError ||
+    (cachedNetwork && editor.name === cachedNetwork.name && editor.url === cachedNetwork.remote) ||
+    isUpdating
+  )
+
   useEffect(() => {
     if (cachedNetwork) {
       setEditor({
@@ -46,6 +56,7 @@ const NetworkEditor = () => {
       })
     }
   }, [cachedNetwork])
+
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const {
@@ -78,49 +89,40 @@ const NetworkEditor = () => {
   )
   const goBack = useGoBack(history)
 
-  const handleSubmit = useHandleSubmit(id, editor.name, editor.url, networks, history, dispatch)
+  const onSubmit = useOnSubmit(id, editor.name, editor.url, networks, history, dispatch, disabled)
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>
-      <h1>{t('settings.network.edit-network.title')}</h1>
-      <Stack tokens={{ childrenGap: 15 }}>
-        <TextField
-          value={editor.url}
-          field="url"
-          onChange={onChange}
-          label={t('settings.network.edit-network.rpc-url')}
-          error={editor.urlError}
-          placeholder="http://localhost:8114"
-          required
-        />
-        <TextField
-          value={editor.name}
-          field="name"
-          onChange={onChange}
-          label={t('settings.network.edit-network.name')}
-          error={editor.nameError}
-          placeholder="My Custom Node"
-          required
-        />
-      </Stack>
-      <div className={styles.actions}>
-        <Button type="cancel" label={t('common.cancel')} onClick={goBack} />
-        <Button
-          type="submit"
-          label={isUpdating ? 'updating' : t('common.save')}
-          onClick={handleSubmit}
-          disabled={
-            !!(
-              editor.nameError ||
-              editor.urlError ||
-              (cachedNetwork && editor.name === cachedNetwork.name && editor.url === cachedNetwork.remote) ||
-              isUpdating
-            )
-          }
-        >
-          {isUpdating ? <Spinner /> : (t('common.save') as string)}
-        </Button>
-      </div>
+      <form onSubmit={onSubmit}>
+        <h1>{t('settings.network.edit-network.title')}</h1>
+        <Stack tokens={{ childrenGap: 15 }}>
+          <TextField
+            value={editor.url}
+            field="url"
+            onChange={onChange}
+            label={t('settings.network.edit-network.rpc-url')}
+            error={editor.urlError}
+            placeholder="http://localhost:8114"
+            required
+            autoFocus
+          />
+          <TextField
+            value={editor.name}
+            field="name"
+            onChange={onChange}
+            label={t('settings.network.edit-network.name')}
+            error={editor.nameError}
+            placeholder="My Custom Node"
+            required
+          />
+        </Stack>
+        <div className={styles.actions}>
+          <Button type="cancel" label={t('common.cancel')} onClick={goBack} />
+          <Button type="submit" label={isUpdating ? 'updating' : t('common.save')} disabled={disabled}>
+            {isUpdating ? <Spinner /> : (t('common.save') as string)}
+          </Button>
+        </div>
+      </form>
     </Stack>
   )
 }

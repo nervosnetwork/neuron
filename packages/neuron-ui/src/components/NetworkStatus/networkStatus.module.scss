@@ -1,0 +1,110 @@
+@import '../../styles/mixin.scss';
+$hover-bg-color: #3cc68a4d;
+
+.network {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: bold;
+
+  .name {
+    position: relative;
+    display: flex;
+    align-items: center;
+    line-height: 1em;
+
+    &::before {
+      position: absolute;
+      display: block;
+      content: '';
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 100%;
+      background: red;
+      right: 100%;
+      margin-right: 5px;
+    }
+
+    &[data-online=true]::before {
+      background: green;
+    }
+
+    &[data-sync-status=Syncing][data-online=true]::before {
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='12px' height='12px' viewBox='0 0 12 12' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3C!-- Generator: Sketch 52.4 (67378) - http://www.bohemiancoding.com/sketch --%3E%3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='Group-21' fill-rule='nonzero'%3E%3Cg id='Group-20' fill='%233CC68A'%3E%3Cpath d='M6.57415485,4.4408921e-16 C7.80752454,0.116139586 8.93293348,0.60523446 9.83751363,1.35114504 L7.58342421,3.60523446 C7.28244275,3.40567067 6.94056707,3.26172301 6.57415485,3.18811341 L6.57415485,4.4408921e-16 Z M10.648855,2.16412214 C11.3947655,3.06706652 11.8838604,4.19247546 12,5.42584515 L8.81352236,5.42584515 C8.73827699,5.05943293 8.59432933,4.71919302 8.39476554,4.41657579 L10.648855,2.16412214 Z M12,6.57415485 C11.8838604,7.80752454 11.3947655,8.93293348 10.648855,9.83751363 L8.39476554,7.58342421 C8.59432933,7.28244275 8.73827699,6.94056707 8.81352236,6.57415485 L12,6.57415485 Z M9.83751363,10.648855 C8.93293348,11.3947655 7.80752454,11.8838604 6.57415485,12 L6.57415485,8.81352236 C6.94056707,8.73827699 7.28244275,8.59432933 7.58342421,8.39476554 L9.83751363,10.648855 Z M5.42584515,12 C4.19247546,11.8838604 3.06706652,11.3947655 2.16412214,10.648855 L4.41657579,8.39476554 C4.71919302,8.59432933 5.05943293,8.73827699 5.42584515,8.81352236 L5.42584515,12 Z M1.35114504,9.83751363 C0.60523446,8.93293348 0.116139586,7.80752454 4.4408921e-16,6.57415485 L3.18811341,6.57415485 C3.26172301,6.94056707 3.40567067,7.28244275 3.60523446,7.58342421 L1.35114504,9.83751363 Z M0,5.42584515 C0.116139586,4.19247546 0.60523446,3.06706652 1.35114504,2.16412214 L3.60523446,4.41657579 C3.40567067,4.71919302 3.26172301,5.05943293 3.18811341,5.42584515 L0,5.42584515 Z M2.16412214,1.35114504 C3.06706652,0.60523446 4.19247546,0.116139586 5.42584515,0 L5.42584515,3.18811341 C5.05943293,3.26172301 4.71919302,3.40567067 4.41657579,3.60523446 L2.16412214,1.35114504 Z' id='Shape'%3E%3C/path%3E%3C/g%3E%3Cg id='Group-20-Copy' transform='translate(8.000000, 2.000000)' fill='%23FA8F00'%3E%3Cpath d='M2.64885496,0.164122137 C3.39476554,1.06706652 3.88386041,2.19247546 4,3.42584515 L0.813522356,3.42584515 C0.73827699,3.05943293 0.594329335,2.71919302 0.39476554,2.41657579 L2.64885496,0.164122137 Z M4,4.57415485 C3.88386041,5.80752454 3.39476554,6.93293348 2.64885496,7.83751363 L0.39476554,5.58342421 C0.594329335,5.28244275 0.73827699,4.94056707 0.813522356,4.57415485 L4,4.57415485 Z' id='Shape'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
+      animation: rotate 1s infinite linear;
+    }
+
+    &[data-sync-status=SyncPending]::before {
+      background: #f7ae4d !important;
+    }
+  }
+
+  &:hover {
+    .tooltip {
+      display: grid;
+      opacity: 1;
+      bottom: calc(100% + 18px);
+    }
+  }
+}
+
+.tooltip {
+  @include MonoText;
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 12px;
+  display: grid;
+  grid-template:
+    'title title'auto 'label value'auto/ auto 1fr;
+  column-gap: 5px;
+  background-color: #fff;
+  color: #000;
+  min-width: 176px;
+  padding: 8px 10px;
+  border-radius: 1px;
+  box-sizing: border-box;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.22);
+  transition: all 0.2s ease-in-out;
+  opacity: 0;
+  user-select: none;
+  pointer-events: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5em;
+  white-space: nowrap;
+
+  .tooltipTitle {
+    grid-area: title;
+    word-wrap: none;
+    word-break: keep-all;
+    font-weight: 900;
+  }
+
+  .blockNumber {
+    justify-self: flex-end;
+  }
+
+  &::after {
+    position: absolute;
+    top: 100%;
+    left: 60px;
+    display: block;
+    content: '';
+    border: 10px solid transparent;
+    border-top-color: #fff;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}

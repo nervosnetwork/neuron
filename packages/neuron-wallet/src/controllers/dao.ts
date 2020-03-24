@@ -12,7 +12,7 @@ export default class DaoController {
   public async getDaoCells(params: Controller.Params.GetDaoCellsParams): Promise<Controller.Response<Cell[]>> {
     const { walletID } = params
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
-    const lockHashes: string[] = new LockUtils(await LockUtils.systemScript()).addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
     const cells = await CellsService.getDaoCells(lockHashes)
 
     if (!cells) {

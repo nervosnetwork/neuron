@@ -1,4 +1,3 @@
-import { interval } from 'rxjs'
 import { getConnection } from 'typeorm'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import LockUtils from 'models/lock-utils'
@@ -11,6 +10,7 @@ import NodeService from 'services/node'
 import WalletService from 'services/wallets'
 import { TransactionStatus } from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import logger from 'utils/logger'
 
 const getTransactionStatus = async (hash: string) => {
   const url: string = NodeService.getInstance().ckb.rpc.node.url
@@ -61,8 +61,7 @@ const trackingStatus = async () => {
     const blake160s = await FailedTransaction.updateFailedTxs(failedTxs.map(tx => tx.hash))
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
-    const { ckb } = NodeService.getInstance()
-    await WalletService.updateUsedAddresses(usedAddresses, ckb.rpc.node.url)
+    await WalletService.updateUsedAddresses(usedAddresses)
   }
 
   if (successTxs.length > 0) {
@@ -83,16 +82,18 @@ const trackingStatus = async () => {
 
 export const register = () => {
   // every 5 seconds
-  interval(5000).subscribe(async () => {
+  setInterval(async () => {
+    logger.debug("periodically status tracking ...")
     try {
       getConnection()
       await trackingStatus()
     } catch (err) {
+      logger.warn(`status tracking error: ${err}`)
       if (err.name !== CONNECTION_NOT_FOUND_NAME) {
         throw err
       }
     }
-  })
+  }, 5000)
 }
 
 export const unregister = () => {

@@ -2,8 +2,6 @@ import { getConnection } from 'typeorm'
 import { initConnection } from '../../../src/database/chain/ormconfig'
 import OutputEntity from '../../../src/database/chain/entities/output'
 import TransactionGenerator, { TargetOutput } from '../../../src/services/tx/transaction-generator'
-import LockUtils from '../../../src/models/lock-utils'
-import DaoUtils from '../../../src/models/dao-utils'
 import TransactionSize from '../../../src/models/transaction-size'
 import TransactionFee from '../../../src/models/transaction-fee'
 import Script, { ScriptHashType } from '../../../src/models/chain/script'
@@ -11,41 +9,8 @@ import Transaction from '../../../src/models/chain/transaction'
 import OutPoint from '../../../src/models/chain/out-point'
 import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
-import MultiSignUtils from '../../../src/models/multi-sign-utils'
 import MultiSign from '../../../src/models/multi-sign'
-
-const systemScript = {
-  outPoint: {
-    txHash: '0xb815a396c5226009670e89ee514850dcde452bca746cdd6b41c104b50e559c70',
-    index: '0',
-  },
-  codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
-  hashType: ScriptHashType.Type,
-}
-
-const daoScript = {
-  outPoint: {
-    txHash: '0xa563884b3686078ec7e7677a5f86449b15cf2693f3c1241766c6996f206cc541',
-    index: '2',
-  },
-  codeHash: '0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e',
-  hashType: ScriptHashType.Type,
-}
-
-const daoTypeScript = new Script(
-  "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
-  "0x",
-  ScriptHashType.Type
-)
-
-const multiSignScript = {
-  outPoint: {
-    txHash: "0x0d9c4af3dd158d6359c9d25d0a600f1dd20b86072b85a095e7bc70c34509b73d",
-    index: '1'
-  },
-  codeHash: '0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8',
-  hashType: ScriptHashType.Type
-}
+import SystemScriptInfo from '../../../src/models/system-script-info'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -99,17 +64,21 @@ const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
     await initConnection('0x1234')
-    const mockContractInfo = jest.fn()
-    mockContractInfo.mockReturnValue(systemScript)
-    LockUtils.systemScript = mockContractInfo.bind(LockUtils)
 
-    const mockDaoScriptInfo = jest.fn()
-    mockDaoScriptInfo.mockReturnValue(daoScript)
-    DaoUtils.daoScript = mockDaoScriptInfo.bind(DaoUtils)
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().secpOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '0')]
+    ])
 
-    const mockMultiSignScriptInfo = jest.fn()
-    mockMultiSignScriptInfo.mockReturnValue(multiSignScript)
-    MultiSignUtils.multiSignScript = mockMultiSignScriptInfo.bind(MultiSignUtils)
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().daoOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0xe2fb199810d49a4d8beec56718ba2593b665db9d52299a0f9e6e75416d73ff5c', '2')]
+    ])
+
+    // @ts-ignore: Private method
+    SystemScriptInfo.getInstance().multiSignOutPointInfo = new Map<string, OutPoint>([
+      ['0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5', new OutPoint('0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', '1')]
+    ])
 
     const mockTipHeader = jest.fn()
     mockTipHeader.mockReturnValue(blockHeader)
@@ -390,10 +359,11 @@ describe('TransactionGenerator', () => {
           expect(expectedFee).toEqual(BigInt(472))
           expect(tx.fee).toEqual(expectedFee.toString())
 
-          expect(tx.outputs[0].lock.codeHash).toEqual(multiSignScript.codeHash)
+          const multiSignOutput = tx.outputs.find(o => o.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH)
+          expect(multiSignOutput).toBeDefined()
 
           const multiSign = new MultiSign()
-          const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
+          const epoch = multiSign.parseSince(multiSignOutput!.lock.args)
           // @ts-ignore: Private method
           const parsedEpoch = multiSign.parseEpoch(epoch)
           expect(parsedEpoch.number).toEqual(BigInt(5))
@@ -652,7 +622,7 @@ describe('TransactionGenerator', () => {
           feeRate
         )
 
-        expect(tx.outputs[0].lock.codeHash).toEqual(multiSignScript.codeHash)
+        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.MULTI_SIGN_CODE_HASH)
 
         const multiSign = new MultiSign()
         const epoch = multiSign.parseSince(tx.outputs[0].lock.args)
@@ -835,7 +805,7 @@ describe('TransactionGenerator', () => {
 
   describe('startWithdrawFromDao', () => {
     const daoData = "0x0000000000000000"
-    const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, daoTypeScript, alice, daoData)
+    const depositDaoOutput = generateCell(toShannon('3000'), OutputStatus.Live, true, SystemScriptInfo.generateDaoScript(), alice, daoData)
     const depositDaoCell = depositDaoOutput.toModel()
     const depositOutPoint = new OutPoint('0x' + '2'.repeat(64), '0')
     beforeEach(async done => {
@@ -875,11 +845,7 @@ describe('TransactionGenerator', () => {
   describe('generateWithdrawMultiSignTx', () => {
     const prevOutput = Output.fromObject({
       capacity: toShannon('1000'),
-      lock: Script.fromObject({
-        codeHash: multiSignScript.codeHash,
-        args: new MultiSign().args(bob.blake160, 100, '0x7080018000001'),
-        hashType: multiSignScript.hashType
-      })
+      lock: SystemScriptInfo.generateMultiSignScript(new MultiSign().args(bob.blake160, 100, '0x7080018000001'))
     })
     const outPoint = OutPoint.fromObject({
       txHash: '0x' + '0'.repeat(64),
@@ -899,7 +865,7 @@ describe('TransactionGenerator', () => {
 
         expect(tx.inputs.length).toEqual(1)
         expect(tx.outputs.length).toEqual(1)
-        expect(tx.outputs[0].lock.codeHash).toEqual(systemScript.codeHash)
+        expect(tx.outputs[0].lock.codeHash).toEqual(SystemScriptInfo.SECP_CODE_HASH)
 
         const inputCapacities = tx.inputs
           .map(input => BigInt(input.capacity))

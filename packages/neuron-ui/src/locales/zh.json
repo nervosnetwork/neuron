@@ -22,6 +22,13 @@
       "fail-to-fetch-tip-block-number": "未连接到节点",
       "sync-not-start": "同步尚未开始"
     },
+    "network-status": {
+      "tooltip": {
+        "block-number": "区块高度",
+        "tip-block": "已知最新区块",
+        "synced": "已同步"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "类型",
@@ -32,11 +39,6 @@
       "datetime": "时间",
       "status": "状态",
       "amount": "金额",
-      "blockchain-status": "链状态",
-      "chain-identity": "链 ID",
-      "tip-block-number": "区块高度",
-      "epoch": "Epoch",
-      "difficulty": "难度",
       "address": "地址",
       "confirmation": "{{confirmationCount}} 个确认",
       "confirmations": "{{confirmationCount}} 个确认",

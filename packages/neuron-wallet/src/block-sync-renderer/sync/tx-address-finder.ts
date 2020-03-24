@@ -3,34 +3,30 @@ import OutputEntity from 'database/chain/entities/output'
 import LockUtils from 'models/lock-utils'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
-import DaoUtils from 'models/dao-utils'
 import Output from 'models/chain/output'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import Script from 'models/chain/script'
+import SystemScriptInfo from 'models/system-script-info'
 
 // Search for all addresses related to a transaction. These addresses include:
 //   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
 //   * Addresses for this transaction's outputs. (Addresses that receive something from this tx)
 export default class TxAddressFinder {
-  private url: string
   private lockHashes: Set<string>
   private tx: Transaction
   private multiSignBlake160s: Set<string>
-  private multiSignCodeHash: string
 
-  constructor(url: string, lockHashes: string[], tx: Transaction, multiSignCodeHash: string, multiSignBlake160s: string[]) {
-    this.url = url
+  constructor(lockHashes: string[], tx: Transaction, multiSignBlake160s: string[]) {
     this.lockHashes = new Set(lockHashes)
     this.tx = tx
     this.multiSignBlake160s = new Set(multiSignBlake160s)
-    this.multiSignCodeHash = multiSignCodeHash
   }
 
   public addresses = async (): Promise<[boolean, string[]]> => {
     const inputAddressesResult = await this.selectInputAddresses()
 
-    const outputsResult: [boolean, Output[]] = await this.selectOutputs()
+    const outputsResult: [boolean, Output[]] = this.selectOutputs()
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const outputAddresses: string[] = outputsResult[1].map(output => {
       return LockUtils.lockScriptToAddress(output.lock, addressPrefix)
@@ -39,16 +35,10 @@ export default class TxAddressFinder {
     return [inputAddressesResult[0] || outputsResult[0], inputAddressesResult[1].concat(outputAddresses)]
   }
 
-  private daoScriptHash = async (): Promise<string> => {
-    await DaoUtils.daoScript(this.url)
-    return DaoUtils.scriptHash
-  }
-
-  private selectOutputs = async (): Promise<[boolean, Output[]]> => {
-    const daoScriptHash = await this.daoScriptHash()
+  private selectOutputs = (): [boolean, Output[]] => {
     let shouldSync = false
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
-      if (output.lock.codeHash === this.multiSignCodeHash) {
+      if (output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
         const multiSignBlake160 = output.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true
@@ -57,7 +47,7 @@ export default class TxAddressFinder {
       }
       if (this.lockHashes.has(output.lockHash!)) {
         if (output.type) {
-          if (output.typeHash === daoScriptHash) {
+          if (output.typeHash === SystemScriptInfo.DAO_SCRIPT_HASH) {
             this.tx.outputs![index].setDaoData(this.tx.outputsData![index])
           }
         }
@@ -92,7 +82,7 @@ export default class TxAddressFinder {
           )
         )
       }
-      if (output && output.lock.codeHash === this.multiSignCodeHash) {
+      if (output && output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
         const multiSignBlake160 = output.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true

@@ -22,6 +22,13 @@
       "fail-to-fetch-tip-block-number": "未連接到節點",
       "sync-not-start": "同步尚未開始"
     },
+    "network-status": {
+      "tooltip": {
+        "block-number": "區塊高度",
+        "tip-block": "已知最新區塊",
+        "synced": "已同步"
+      }
+    },
     "overview": {
       "date": "日期",
       "type": "類型",
@@ -32,11 +39,6 @@
       "datetime": "時間",
       "status": "狀態",
       "amount": "金額",
-      "blockchain-status": "鏈狀態",
-      "chain-identity": "鏈 ID",
-      "tip-block-number": "區塊高度",
-      "epoch": "Epoch",
-      "difficulty": "難度",
       "address": "地址",
       "confirmation": "{{confirmationCount}} 個確認",
       "confirmations": "{{confirmationCount}} 個確認",

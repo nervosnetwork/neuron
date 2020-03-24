@@ -1,3 +1,5 @@
+import logger from 'utils/logger'
+
 export default class CommonUtils {
   public static sleep = (ms: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -10,6 +12,7 @@ export default class CommonUtils {
       try {
         return callback()
       } catch (err) {
+        logger.warn(`function call error: ${err}, retry ${retryTime+1} ...`)
         await CommonUtils.sleep(interval)
       }
     }

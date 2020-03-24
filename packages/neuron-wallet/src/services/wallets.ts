@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { AccountExtendedPublicKey } from 'models/keys/key'
+import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Keystore from 'models/keys/keystore'
 import Store from 'models/store'
 import { WalletNotFound, IsRequired, UsedName } from 'exceptions'
@@ -8,7 +8,6 @@ import { WalletListSubject, CurrentWalletSubject } from 'models/subjects/wallets
 import FileService from './file'
 import AddressService from './addresses'
 import ProcessUtils from 'utils/process'
-import { Address } from 'database/address/address-dao'
 
 const fileService = FileService.getInstance()
 
@@ -157,8 +156,8 @@ export default class WalletService {
   public generateAddressesById = (
     id: string,
     isImporting: boolean,
-    receivingAddressCount: number = 20,
-    changeAddressCount: number = 10
+    receivingAddressCount: number = DefaultAddressNumber.Receiving,
+    changeAddressCount: number = DefaultAddressNumber.Change
   ) => {
     const accountExtendedPublicKey: AccountExtendedPublicKey = this.get(id).accountExtendedPublicKey()
     AddressService.checkAndGenerateSave(
@@ -281,16 +280,14 @@ export default class WalletService {
   }
 
   // TODO: move this method and generateTx/sendTx out of this file
-  public static async updateUsedAddresses(addresses: string[], url: string) {
-    const addrs = await AddressService.updateTxCountAndBalances(addresses, url)
-    const walletIds: string[] = addrs
-      .map(addr => (addr as Address).walletId)
-      .filter((value, idx, a) => a.indexOf(value) === idx)
-    for (const id of walletIds) {
+  public static async updateUsedAddresses(addresses: string[]) {
+    const addrs = await AddressService.updateTxCountAndBalances(addresses)
+    const walletIds: Set<string> = new Set(addrs.map(addr => addr.walletId))
+    walletIds.forEach(id => {
       const wallet = WalletService.getInstance().get(id)
       const accountExtendedPublicKey: AccountExtendedPublicKey = wallet.accountExtendedPublicKey()
       // set isImporting to undefined means unknown
-      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, 20, 10)
-    }
+      AddressService.checkAndGenerateSave(id, accountExtendedPublicKey, undefined, DefaultAddressNumber.Receiving, DefaultAddressNumber.Change)
+    })
   }
 }

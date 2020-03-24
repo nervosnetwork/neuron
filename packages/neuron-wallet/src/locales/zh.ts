@@ -46,7 +46,10 @@ export default {
         'nervos-website': 'Nervos 网站',
         'source-code': '源代码',
         'report-issue': '报告问题',
+        documentation: '使用文档',
+        faq: 'Neuron FAQ',
         settings: '设置',
+        'export-debug-info': '导出调试信息',
       },
       develop: {
         develop: '开发',
@@ -141,6 +144,11 @@ export default {
       yes: '是',
       no: '否',
       ok: '确定',
+      error: '错误'
     },
+    'export-debug-info':{
+      'export-debug-info': '导出调试信息',
+      'debug-info-exported': '调试信息已被导出至 {{ file }}'
+    }
   },
 }

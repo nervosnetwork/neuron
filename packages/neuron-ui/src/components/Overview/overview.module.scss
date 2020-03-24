@@ -8,7 +8,7 @@ $confirming-color: #b3b3b3;
 .overview {
   display: grid;
   grid-template:
-    'wallet-name wallet-name'auto 'balance status'auto 'activities-title activities-title'auto 'activities activities'auto/ 1fr auto;
+    'wallet-name wallet-name'auto 'balance balance'auto 'activities-title activities-title'auto 'activities activities'auto 'more-link more-link'auto/ 1fr auto;
   // padding: 39px 11px 0; this size is from design, but not used now.
   padding: 39px 0 0;
 }
@@ -54,34 +54,6 @@ $confirming-color: #b3b3b3;
 .balanceInt {
   @include BoldText;
   font-size: 1.125rem;
-}
-
-.blockchainStatus {
-  grid-area: status;
-  appearance: none;
-  border: none;
-  width: 220px;
-  padding: 0;
-  position: relative;
-  background-color: transparent;
-
-  &>div {
-    @include MediumText;
-    display: flex;
-    height: 30px;
-    justify-content: center;
-    align-items: center;
-    background-color: #e3e3e3;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.6px;
-    color: #000;
-
-    &:hover {
-      @include SemiBoldText;
-      background-color: #d1d1d1;
-    }
-  }
 }
 
 section {
@@ -215,6 +187,7 @@ section {
 }
 
 .linkToHistory {
+  grid-area: more-link;
   font-size: 0.625rem;
   letter-spacing: 0.5px;
   color: #000;
@@ -223,6 +196,10 @@ section {
   &>span:hover {
     color: var(--nervos-green);
   }
+}
+
+.noActivities {
+  grid-area: more-link;
 }
 
 @keyframes blink {

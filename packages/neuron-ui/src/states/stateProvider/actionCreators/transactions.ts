@@ -24,6 +24,7 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
   dispatch: StateDispatch
 ) => {
   const descriptionParams = {
+    walletID: params.walletID,
     hash: params.hash,
     description: params.description,
   }

@@ -3,21 +3,25 @@ import { SyncStatus, BUFFER_BLOCK_NUMBER, MAX_TIP_BLOCK_DELAY } from 'utils/cons
 const TEN_MINS = 10 * 60 * 1000
 let blockNumber10MinAgo: string = ''
 let timestamp10MinAgo: number | undefined
+let prevUrl: string | undefined
 
 export default ({
   syncedBlockNumber,
   tipBlockNumber,
   tipBlockTimestamp,
   currentTimestamp,
+  url,
 }: {
   syncedBlockNumber: string
   tipBlockNumber: string
   tipBlockTimestamp: number
   currentTimestamp: number
+  url: string | undefined
 }) => {
-  if (!timestamp10MinAgo && tipBlockNumber !== '') {
+  if ((!timestamp10MinAgo && tipBlockNumber !== '') || (prevUrl && url !== prevUrl && tipBlockNumber !== '')) {
     timestamp10MinAgo = currentTimestamp
     blockNumber10MinAgo = tipBlockNumber
+    prevUrl = url
   }
 
   const now = Math.floor(currentTimestamp / 1000) * 1000

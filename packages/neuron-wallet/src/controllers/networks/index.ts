@@ -130,6 +130,7 @@ export default class NetworksController {
           result: true,
         }
       } catch (err) {
+        logger.warn(`connect network error: ${err}`)
         dialog.showMessageBox({
           type: 'error',
           message: err.message,
