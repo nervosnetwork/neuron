@@ -32,6 +32,14 @@ const props: { [index: string]: CompensationProgressBarProps } = {
     endEpochValue: 180,
     withdrawEpochValue: 30,
   },
+  'Current larger than end': {
+    currentEpochValue: 181,
+    endEpochValue: 180,
+  },
+  'Current less than begin': {
+    currentEpochValue: 0,
+    endEpochValue: 181,
+  },
 }
 
 Object.keys(props).forEach(key => {

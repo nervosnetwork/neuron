@@ -12,7 +12,7 @@ $arrow-size: 10px;
   background: #fff;
   width: 320px;
   margin-top: $arrow-size;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
   border-radius: 2px;
   font-size: 0.75rem;
 
@@ -117,5 +117,6 @@ $arrow-size: 10px;
     height: 0;
     border: $arrow-size solid transparent;
     border-bottom-color: #fff;
+    filter: drop-shadow(0px -1px 1px rgba(0, 0, 0, 0.1))
   }
 }

@@ -1,135 +1,241 @@
-$progress-green: #3cc68a;
-$progress-yellow: #f7ae4d;
-$progress-grey: #e3e3e3;
-$progress-green-hover: #21b574;
-$progress-yellow-hover: #fa8f00;
-$progress-grey-hover: #888;
+@import "../../styles/mixin.scss";
 
-@mixin secondaryInfo {
-  font-size: 0.75rem;
-  color: #434343;
-  letter-spacing: 0.5px;
-  align-self: start
+@mixin textOverflow {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .container {
+  min-height: 102px;
+  padding: 8px 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
   display: grid;
-  grid-template:
-    'compensation deposit-amount blank epoch-btn action-btn'auto 'time apc info info info'auto / 5fr 5fr 2fr 24px 140px;
-  grid-gap: 9px;
-  align-items: center;
-  justify-items: start;
-  padding: 16px 0;
-  box-sizing: border-box;
-  border-bottom: 1px solid #b3b3b3;
+  grid-template: 'badge badge badge''amount stage action''compensation stage action''apc stage action''transactions transactions transactions';
+  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-columns: 230px 1fr 147px;
 
-  &:last-of-type {
-    border-bottom: none;
+  column-gap: 30px;
+
+  .collapse {
+    grid-area: 4/1/5/2;
+    align-self: flex-start;
+    padding-left: 10px;
+
+    button {
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 0 0 10px;
+      box-sizing: border-box;
+      border: none;
+    }
+
+    .collapseIcon {
+      display: block;
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-left-color: #000;
+      transition: transform 0.3s ease-in-out;
+      transform-origin: left center;
+    }
+  }
+
+  .badge {
+    grid-area: badge;
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 0.6875rem;
+
+    &>div {
+      font-size: 0.6875rem;
+      background-color: #eee;
+      border-radius: 3px;
+      padding: 2px 4px;
+
+      time {
+        padding-left: 5px;
+      }
+    }
+  }
+
+  .amount {
+    @include textOverflow;
+    grid-area: amount;
+    box-sizing: border-box;
+    justify-self: flex-end;
+    font-size: 0.875rem;
+    line-height: 1.125rem;
+    padding: 0 0 5px 25px;
   }
 
   .compensation {
+    @include textOverflow;
     grid-area: compensation;
+    box-sizing: border-box;
+    justify-self: flex-end;
     color: var(--nervos-green);
     font-size: 0.875rem;
-    letter-spacing: 0.7px;
-  }
-
-  .depositAmount {
-    grid-area: deposit-amount;
-    font-size: 0.875rem;
-    letter-spacing: 0.7px;
-  }
-
-  .epochsDialogBtn {
-    grid-area: epoch-btn;
-
-    width: 24px;
-    height: 24px;
-
-    svg {
-      pointer-events: none;
-    }
-
-    &[data-stage='stage1'] {
-
-      path,
-      g {
-        stroke: $progress-green;
-        fill: $progress-green;
-      }
-
-      &:hover {
-
-        path,
-        g {
-          stroke: $progress-green-hover;
-          fill: $progress-green-hover;
-        }
-      }
-    }
-
-    &[data-stage='stage2'] {
-
-      path,
-      g {
-        stroke: $progress-yellow;
-        fill: $progress-yellow;
-      }
-
-      &:hover {
-
-        path,
-        g {
-          stroke: $progress-yellow-hover;
-          fill: $progress-yellow-hover;
-        }
-      }
-    }
-
-    &[data-stage='stage3'] {
-
-      path,
-      g {
-        stroke: $progress-grey;
-        fill: $progress-grey;
-      }
-
-      &:hover {
-
-        path,
-        g {
-          stroke: $progress-grey-hover;
-          fill: $progress-grey-hover;
-        }
-      }
-    }
-  }
-
-  .actions {
-    grid-area: action-btn;
-
-    button {
-      grid-area: actionBtn;
-      width: 8.75rem;
-      height: 1.5rem;
-      line-height: 0.75rem;
-    }
-  }
-
-  .time {
-    @include secondaryInfo;
-    grid-area: time;
+    line-height: 1.125rem;
+    padding-left: 25px;
   }
 
   .apc {
-    @include secondaryInfo;
     grid-area: apc;
+    justify-self: flex-end;
+    font-size: 0.75rem;
+    line-height: 0.9375rem;
+    color: #434343;
+
+    span {
+      padding-left: 25px;
+    }
   }
 
-  .info {
-    @include secondaryInfo;
-    grid-area: info;
-    justify-self: flex-end;
-    word-break: break-all;
+  .stage {
+    position: relative;
+    grid-area: stage;
+    margin-top: -6px;
+
+    .tooltip {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      z-index: 999;
+      transform: translate(-50%, 30px);
+      transform-origin: top center;
+      transition: all 0.2s ease-in-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    div:first-child:hover+.tooltip {
+      opacity: 1;
+      transform: translate(-50%, 20px);
+    }
+
+    .message {
+      display: block;
+      color: #434343;
+      font-size: 0.6875rem;
+      line-height: 0.875rem;
+      margin-top: 4px;
+    }
+  }
+
+  .action {
+    grid-area: action;
+    padding-top: 7px;
+
+    button {
+      width: 8.75rem;
+      height: 1.5rem;
+      padding: 0;
+    }
+  }
+
+  .lockedPeriod {
+    grid-area: 2/2/3/4;
+  }
+
+  .compensatedPeriod {
+    grid-area: 3/2/4/4;
+  }
+
+  .lockedPeriod,
+  .compensatedPeriod {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 55px;
+    font-size: 0.75rem;
+    color: #434343;
+  }
+
+  .transactions {
+    display: grid;
+    grid-template:
+      'title deposited'auto '. withdrawn'auto '. unlocked'auto/ 205px 1fr;
+
+    box-sizing: border-box;
+    visibility: hidden;
+    grid-area: transactions;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.1s ease-in-out;
+    margin: 0 55px;
+    opacity: 0;
+    font-size: 0.75rem;
+    color: #434343;
+
+    .title {
+      grid-area: title;
+    }
+
+    .deposited {
+      grid-area: deposited;
+    }
+
+    .withdrawn {
+      grid-area: withdrawn;
+    }
+
+    .unlocked {
+      grid-area: unlocked;
+    }
+
+    .deposited,
+    .withdrawn,
+    .unlocked {
+      @include MonoText;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 1.7875rem;
+      padding: 0 2px;
+      appearance: none;
+      border: none;
+      box-sizing: border-box;
+
+      &::before {
+        position: absolute;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        content: attr(data-text);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(224, 224, 224, 0.9);
+        font-size: 0.75rem;
+        color: #666
+      }
+
+      &:hover::before {
+        display: flex;
+      }
+    }
+  }
+
+  &[data-is-collapsed='false'] {
+    .transactions {
+      visibility: visible;
+      max-height: 500px;
+      margin: 20px 55px 0;
+      border-top: 1px dashed #ccc;
+      padding: 17px 0;
+      opacity: 1;
+    }
+
+    .collapseIcon {
+      transform: rotate(90deg);
+    }
   }
 }

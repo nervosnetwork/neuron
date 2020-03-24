@@ -11,7 +11,12 @@ const HOURS_PER_EPOCH = 4 * HOUR
 const SECS_PER_DAY = 24 * HOUR
 
 const formatTime = (timestamp: number) => {
-  return uniformTimeFormatter(timestamp).split(' ')[0]
+  try {
+    return uniformTimeFormatter(timestamp).split(' ')[0]
+  } catch (err) {
+    console.warn(err)
+    return '-'
+  }
 }
 
 export interface CompensationPeriodTooltipProps {
@@ -30,11 +35,13 @@ const CompensationPeriodTooltip = ({
   isWithdrawn = false,
 }: CompensationPeriodTooltipProps) => {
   const [t] = useTranslation()
+  if (baseEpochValue < depositEpochValue || baseEpochValue > endEpochValue) {
+    return null
+  }
   const {
     leftTime: { totalHours },
   } = getCompensationPeriod({ currentEpochValue: baseEpochValue, endEpochValue })
   const endEpochTimestamp = totalHours * HOUR + baseEpochTimestamp
-  // TODO: the time in the design is ambiguous, more discussion needed
   const suggestStartEpochTimestamp =
     endEpochTimestamp - (1 - CompensationPeriod.SUGGEST_START) * WITHDRAW_EPOCHS * HOURS_PER_EPOCH
   const endingStartEpochTimestamp =
