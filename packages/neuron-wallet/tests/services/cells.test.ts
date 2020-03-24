@@ -588,6 +588,28 @@ describe('CellsService', () => {
         expect(daoCell.unlockInfo!.timestamp).toEqual(unlockTx.timestamp)
       })
 
+      it('unlock pending', async () => {
+        await TransactionPersistor.saveFetchTx(depositTx)
+        await TransactionPersistor.saveFetchTx(withdrawTx)
+        await TransactionPersistor.saveSentTx(unlockTx, unlockTxHash)
+
+        const daoCells = await CellsService.getDaoCells([bob.lockHash])
+
+        expect(daoCells.length).toEqual(1)
+        const daoCell = daoCells[0]!
+        expect(daoCell.status).toEqual(OutputStatus.Pending)
+        expect(daoCell.outPoint!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.depositTimestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.depositOutPoint!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositOutPoint!.index).toEqual('0')
+        expect(daoCell.depositInfo!.txHash).toEqual(depositTx.hash)
+        expect(daoCell.depositInfo!.timestamp).toEqual(depositTx.timestamp)
+        expect(daoCell.withdrawInfo!.txHash).toEqual(withdrawTx.hash)
+        expect(daoCell.withdrawInfo!.timestamp).toEqual(withdrawTx.timestamp)
+        expect(daoCell.unlockInfo!.txHash).toEqual(unlockTx.hash)
+        expect(daoCell.unlockInfo!.timestamp).toEqual(unlockTx.timestamp)
+      })
+
       it('get all in correct order', async () => {
         await createCells()
         const cells = await CellsService.getDaoCells(
