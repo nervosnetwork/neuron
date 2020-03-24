@@ -158,33 +158,47 @@ declare namespace State {
   }
 
   interface NervosDAORecord {
-    readonly blockNumber: string
+    readonly blockNumber: string // '0', the block of current status. Namely it's the deposit block number if the depositOutPoint is undefined, or the withdrawn block number if the depositOutPoint
     readonly blockHash: string
     readonly capacity: string
     readonly lock: Readonly<{
       codeHash: string
-      hashType: string
+      hashType: 'type' | 'data'
+      args: string
+    }>
+    readonly type: Readonly<{
+      codeHash: string
+      hashType: 'type' | 'data'
       args: string
     }>
     readonly lockHash: string
+    readonly typeHash: string | null
     readonly outPoint: Readonly<{
       txHash: string
-      index: string
+      index: string // '0'
     }>
+    readonly status: 'live' | 'dead' | 'sent' | 'pending' | 'failed' // 1. status === deat => record is completed; 2. status === sent => depositing or withdrawing; 3. status === live => record is deposited or locked; 4. status === pending => unlocking
+    readonly daoData: string // locktime epoch in le
+    readonly data: string
+    readonly timestamp: string
     readonly depositOutPoint?: Readonly<{
       txHash: string
       index: string
     }>
-    readonly status: 'live' | 'dead'
-    readonly type: Readonly<{
-      codeHash: string
-      hashType: string
-      args: string
-    }>
-    readonly typeHash: string | null
-    readonly daoData: string
-    readonly timestamp: string
     readonly depositTimestamp?: string
+    readonly multiSignBlake160: string | null
+    readonly depositInfo?: {
+      txHash: string
+      timestamp: string
+    }
+    readonly withdrawInfo?: {
+      txHash: string
+      timestamp: string
+    }
+    readonly unlockInfo?: {
+      txHash: string
+      timestamp: string
+    }
   }
 
   interface NervosDAO {

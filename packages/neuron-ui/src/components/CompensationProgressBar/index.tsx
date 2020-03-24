@@ -7,21 +7,28 @@ export interface CompensationProgressBarProps {
   endEpochValue: number
   currentEpochValue: number
   withdrawEpochValue?: number
+  pending?: boolean
 }
 
 const CompensationProgressBar = ({
   endEpochValue,
   currentEpochValue,
   withdrawEpochValue,
+  pending = false,
   style,
 }: CompensationProgressBarProps) => {
+  if (pending) {
+    return (
+      <div className={styles.container} style={style}>
+        <progress className={styles.pendingProgress} />
+      </div>
+    )
+  }
   const isWithdrawn = withdrawEpochValue !== undefined
 
-  let currentCursor = isWithdrawn
-    ? Math.min(currentEpochValue, endEpochValue)
-    : WITHDRAW_EPOCHS + currentEpochValue - endEpochValue
+  let currentCursor = (WITHDRAW_EPOCHS + currentEpochValue - endEpochValue) % WITHDRAW_EPOCHS
 
-  if (currentCursor > WITHDRAW_EPOCHS) {
+  if (currentEpochValue >= endEpochValue) {
     currentCursor = WITHDRAW_EPOCHS
   } else if (currentCursor < 0) {
     currentCursor = 0

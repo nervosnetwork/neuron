@@ -11,12 +11,12 @@ export const useUpdateWithdrawEpochs = ({
   setWithdrawTimestamp,
 }: {
   isWithdrawn: boolean
-  blockNumber: CKBComponents.BlockNumber
+  blockNumber: CKBComponents.BlockNumber | null
   setWithdrawEpoch: React.Dispatch<string>
   setWithdrawTimestamp: React.Dispatch<string>
 }) => {
   useEffect(() => {
-    if (isWithdrawn) {
+    if (isWithdrawn && blockNumber) {
       getHeaderByNumber(BigInt(blockNumber))
         .then(header => {
           setWithdrawEpoch(header.epoch)
