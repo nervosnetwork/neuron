@@ -4,8 +4,7 @@ $infoHeight: 1.75rem;
 .nervosDAOContainer {
   display: grid;
   grid-template:
-    'title title'auto 'free deposit''locked deposit'auto 'apc .'auto 'network-alert .'1.25rem 'records records'auto/ minmax(350px, 500px) 1fr;
-  column-gap: 30px;
+    'title title title'auto 'free network-alert deposit'auto 'locked . deposit'auto 'apc . .'auto 'records records records'auto/ minmax(350px, 500px) 35px 1fr;
 }
 
 .title {
@@ -33,9 +32,8 @@ $infoHeight: 1.75rem;
 
 .networkAlert {
   grid-area: network-alert;
-  justify-self: flex-end;
-  font-size: 0.75rem;
-  color: var(--nervos-green);
+  align-self: center;
+  justify-self: center;
 }
 
 .free,
@@ -66,6 +64,7 @@ $infoHeight: 1.75rem;
 .deposit {
   grid-area: deposit;
   justify-self: flex-end;
+  padding-left: 30px;
 
   button {
     width: 9.6875rem;
