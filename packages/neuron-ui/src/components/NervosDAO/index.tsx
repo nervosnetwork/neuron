@@ -6,7 +6,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, SyncStatus, ConnectionStatus } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
@@ -14,6 +14,7 @@ import getCurrentUrl from 'utils/getCurrentUrl'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
 
 import hooks from './hooks'
@@ -260,23 +261,6 @@ const NervosDAO = () => {
     },
   ]
 
-  let balancePrompt = null
-  if (ConnectionStatus.Offline === connectionStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red' }}>
-        {t('sync.sync-failed')}
-      </span>
-    )
-  } else if (SyncStatus.SyncNotStart === syncStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
-        {t('sync.sync-not-start')}
-      </span>
-    )
-  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
-    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-  }
-
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.title}>Nervos DAO</h1>
@@ -289,7 +273,9 @@ const NervosDAO = () => {
           </div>
         )
       })}
-      <div className={styles.networkAlert}>{balancePrompt}</div>
+      <div className={styles.networkAlert}>
+        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+      </div>
       <div className={styles.deposit}>
         <Button
           type="primary"
