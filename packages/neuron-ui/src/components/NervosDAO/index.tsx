@@ -14,6 +14,7 @@ import getCurrentUrl from 'utils/getCurrentUrl'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
 
 import hooks from './hooks'
@@ -260,6 +261,7 @@ const NervosDAO = () => {
     },
   ]
 
+<<<<<<< HEAD
   let balancePrompt = null
   if (ConnectionStatus.Offline === connectionStatus) {
     balancePrompt = (
@@ -277,6 +279,8 @@ const NervosDAO = () => {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 
+=======
+>>>>>>> feat: use tooltip to indicate users the balance is under syncing
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.title}>Nervos DAO</h1>
@@ -289,7 +293,9 @@ const NervosDAO = () => {
           </div>
         )
       })}
-      <div className={styles.networkAlert}>{balancePrompt}</div>
+      <div className={styles.networkAlert}>
+        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+      </div>
       <div className={styles.deposit}>
         <Button
           type="primary"
