@@ -68,7 +68,7 @@ stages:
   - job: win
     displayName: Windows
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'vs2017-win2016'
     strategy:
       matrix:
         node_12_x:
@@ -80,10 +80,6 @@ stages:
       displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
-    - script: |
-        npm install --global node-gyp@latest
-        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
-      displayName: 'Install node-gyp'
     - script: |
         yarn bootstrap
         set CI=false
