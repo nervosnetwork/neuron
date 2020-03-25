@@ -1,5 +1,6 @@
 import { app as electronApp, remote } from 'electron'
 import path from 'path'
+import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
 import logger from 'utils/logger'
 
@@ -39,6 +40,11 @@ const ckbDataPath = (): string => {
 const initCkb = async () => {
   logger.info('CKB:\tInitializing node...')
   return new Promise((resolve, reject) => {
+    if (fs.existsSync(path.join(ckbDataPath(), 'ckb.toml'))) {
+      logger.log('CKB:\tinit: config file detected, skip ckb init.')
+      return resolve()
+    }
+
     const initCmd = spawn(ckbBinary(), ['init', '--chain', 'mainnet', '-C', ckbDataPath()])
     initCmd.stderr.on('data', data => {
       logger.error('CKB:\tinit fail:', data.toString())
@@ -61,23 +67,23 @@ const initCkb = async () => {
 }
 
 export const startCkbNode = async () => {
-  initCkb().then(async () => {
-    logger.info('CKB:\tstarting node...')
-    ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
-    ckb.stderr && ckb.stderr.on('data', data => {
-      logger.error('CKB:\trun fail:', data.toString())
-      ckb = null
-    })
+  await initCkb()
 
-    ckb.on('error', error => {
-      logger.error('CKB:\trun fail:', error)
-      ckb = null
-    })
+  logger.info('CKB:\tstarting node...')
+  ckb = spawn(ckbBinary(), ['run', '-C', ckbDataPath()], { stdio: ['ignore', 'ignore', 'pipe'] })
+  ckb.stderr && ckb.stderr.on('data', data => {
+    logger.error('CKB:\trun fail:', data.toString())
+    ckb = null
+  })
 
-    ckb.on('close', () => {
-      logger.info('CKB:\tprocess closed')
-      ckb = null
-    })
+  ckb.on('error', error => {
+    logger.error('CKB:\trun fail:', error)
+    ckb = null
+  })
+
+  ckb.on('close', () => {
+    logger.info('CKB:\tprocess closed')
+    ckb = null
   })
 }
 
