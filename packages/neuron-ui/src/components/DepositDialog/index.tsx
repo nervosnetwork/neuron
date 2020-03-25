@@ -4,9 +4,10 @@ import { useTranslation, Trans } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
 import Button from 'widgets/Button'
+import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { openExternal } from 'services/remote'
 import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
-import { localNumberFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { useDialog } from 'utils/hooks'
 import styles from './depositDialog.module.scss'
 
@@ -92,15 +93,13 @@ const DepositDialog = ({
           />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
           <div className={styles.errorMessage}>{errorMessage}</div>
+          <div className={styles.notice}>
+            <Attention />
+            <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
+          </div>
           <div className={styles.fee}>
             <span>{t('nervos-dao.fee')}</span>
-            <span>{fee}</span>
-          </div>
-          <div className={styles.notice}>
-            <h2 aria-label={t('nervos-dao.notice')}>{t('nervos-dao.notice')}</h2>
-            <p>
-              <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
-            </p>
+            <span>{`${shannonToCKBFormatter(fee)} CKB`}</span>
           </div>
           <div className={styles.footer}>
             <Button type="cancel" onClick={onDismiss} label={t('nervos-dao.cancel')} />
