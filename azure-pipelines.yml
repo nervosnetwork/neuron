@@ -80,8 +80,10 @@ stages:
       displayName: 'Install Node.js'
     - script: yarn global add lerna
       displayName: 'Install lerna'
-    - script: npm install --global --production windows-build-tools --vs2015 # yarn global add windows-build-tools
-      displayName: 'Install windows-build-tools'
+    - script: |
+        npm install --global node-gyp@latest
+        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+      displayName: 'Install node-gyp'
     - script: |
         yarn bootstrap
         set CI=false
