@@ -78,10 +78,10 @@ stages:
       inputs:
         versionSpec: $(node_version)
       displayName: 'Install Node.js'
-    - script: |
-        yarn global add lerna
-        npm install --global --production windows-build-tools
+    - script: yarn global add lerna
       displayName: 'Install lerna'
+    - script: yarn global add windows-build-tools
+      displayName: 'Install windows-build-tools'
     - script: |
         yarn bootstrap
         set CI=false
