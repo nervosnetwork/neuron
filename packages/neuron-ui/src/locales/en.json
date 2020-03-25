@@ -367,7 +367,6 @@
       "deposit-records": "Deposits",
       "completed-records": "Completed",
       "apc": "Current APC",
-      "deposit-at": "Deposit at {{time}}",
       "fee": "Transaction fee",
       "deposit-to-nervos-dao": "Deposit to Nervos DAO",
       "withdraw-from-nervos-dao": "Withdraw from Nervos DAO",
@@ -382,6 +381,8 @@
       "withdraw-alert": "Hint: there are only {{epochs}} epochs (~{{hours}} hours) until the end of your current lock period. If you wish to withdraw in current lock period, please send withdraw request in time. There are {{nextLeftEpochs}} epochs(~{{days}} days) until the end of your next lock period.",
       "deposit-record": {
         "deposited-at": "Deposited",
+        "completed-at": "Completed",
+        "deposit-pending": "Deposit Pending",
         "withdraw-action-label": "Withdraw",
         "unlock-action-label": "Unlock",
         "record": "Record",
@@ -391,7 +392,9 @@
         "tx-record": "Transaction Record",
         "locked-period": "Locked Period",
         "compensated-period": "Compensation Period",
-        "days-hours": "{{days}} days {{hours}} hours"
+        "days-hours": "{{days}} days {{hours}} hours",
+        "no-deposit": "No Deposit",
+        "no-completed": "No Completed"
       },
       "compensation-period": {
         "tooltip": {

@@ -367,7 +367,6 @@
       "deposit-records": "存入",
       "completed-records": "已解鎖",
       "apc": "當前年化鎖定補貼率",
-      "deposit-at": "存入於{{time}}",
       "fee": "手續費",
       "deposit-to-nervos-dao": "存入 Nervos DAO",
       "withdraw-from-nervos-dao": "從 Nervos DAO 取出",
@@ -382,6 +381,8 @@
       "withdraw-alert": "提示：本補貼申請距離 Nervos DAO 規則允許的最近一個鎖定週期僅剩下 {{epochs}} 個 epoch (約 {{hours}} 小時)。如果您希望在本鎖定週期取出，請及時提交取出申請，以確保取出申請能在本鎖定週期結束之前上鏈。下一個鎖定週期的結束時間預計為 {{nextLeftEpochs}} 個 epochs (約 {{days}} 天)。",
       "deposit-record": {
         "deposited-at": "存入於",
+        "completed-at": "已取出",
+        "deposit-pending": "存入 提交中",
         "withdraw-action-label": "取出",
         "unlock-action-label": "解鎖",
         "record": "記錄",
@@ -391,7 +392,9 @@
         "tx-record": "交易記錄",
         "locked-period": "鎖定時間",
         "compensated-period": "補貼時間",
-        "days-hours": "{{days}} 天 {{hours}} 小時"
+        "days-hours": "{{days}} 天 {{hours}} 小時",
+        "no-deposit": "沒有存入記錄",
+        "no-completed": "沒有解鎖記錄"
       },
       "compensation-period": {
         "tooltip": {

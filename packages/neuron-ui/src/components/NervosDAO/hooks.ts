@@ -1,9 +1,10 @@
 import { useEffect, useCallback } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
+import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
+
 import { verifyAmount } from 'utils/validators'
 import calculateAPC from 'utils/calculateAPC'
-import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
 import { CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import {
@@ -26,6 +27,10 @@ import {
 import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 
 let timer: NodeJS.Timeout
+
+const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
+  return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
+}
 
 export const useUpdateMaxDeposit = ({
   wallet,
@@ -77,6 +82,9 @@ export const useInitData = ({
 }) =>
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
+    const intervalId = setInterval(() => {
+      updateNervosDaoData({ walletID: wallet.id })(dispatch)
+    }, 3000)
     updateDepositValue(
       `${
         BigInt(wallet.balance) > BigInt(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`))
@@ -88,6 +96,7 @@ export const useInitData = ({
       .then(header => setGenesisBlockTimestamp(+header.timestamp))
       .catch(err => console.error(err))
     return () => {
+      clearInterval(intervalId)
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
     }
@@ -407,7 +416,7 @@ export const useUpdateWithdrawList = ({
 }: {
   records: Readonly<State.NervosDAORecord[]>
   tipBlockHash: string
-  setWithdrawList: React.Dispatch<React.SetStateAction<(string | null)[]>>
+  setWithdrawList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
 }) =>
   useEffect(() => {
     Promise.all(
@@ -429,7 +438,14 @@ export const useUpdateWithdrawList = ({
       })
     )
       .then(res => {
-        setWithdrawList(res)
+        const withdrawList = new Map()
+        if (tipBlockHash) {
+          records.forEach((record, idx) => {
+            const key = getRecordKey(record)
+            withdrawList.set(key, res[idx])
+          })
+        }
+        setWithdrawList(withdrawList)
       })
       .catch(console.error)
   }, [records, tipBlockHash, setWithdrawList])
@@ -440,7 +456,7 @@ export const useUpdateDepositEpochList = ({
   connectionStatus,
 }: {
   records: Readonly<State.NervosDAORecord[]>
-  setDepositEpochList: React.Dispatch<React.SetStateAction<(string | null)[]>>
+  setDepositEpochList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
   connectionStatus: State.ConnectionStatus
 }) =>
   useEffect(() => {
@@ -448,11 +464,21 @@ export const useUpdateDepositEpochList = ({
       Promise.all(
         records.map(({ daoData, depositOutPoint, blockNumber }) => {
           const depositBlockNumber = depositOutPoint ? ckbCore.utils.toHexInLittleEndian(daoData) : blockNumber
+          if (!depositBlockNumber) {
+            return null
+          }
           return getHeaderByNumber(BigInt(depositBlockNumber))
             .then(header => header.epoch)
             .catch(() => null)
         })
-      ).then(epochsList => setDepositEpochList(epochsList))
+      ).then(res => {
+        const epochList = new Map()
+        records.forEach((record, idx) => {
+          const key = getRecordKey(record)
+          epochList.set(key, res[idx])
+        })
+        setDepositEpochList(epochList)
+      })
     }
   }, [records, setDepositEpochList, connectionStatus])
 

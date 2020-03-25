@@ -11,7 +11,7 @@ const props = {
     capacity: '0x12300000000',
     lock: {
       codeHash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab61',
-      hashType: 'type',
+      hashType: 'type' as any,
       args: '0x',
     },
     lockHash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab61',
@@ -26,11 +26,13 @@ const props = {
     status: 'live' as any,
     type: {
       codeHash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab61',
-      hashType: 'type',
+      hashType: 'type' as any,
       args: '0x',
     },
     typeHash: '0x70abeeaa2ed08b7d7659341a122b9a2f2ede99bb6bd0df7398d7ffe488beab61',
     daoData: '0x00000000',
+    data: '0x00000000',
+    multiSignBlake160: null,
     timestamp: Date.now().toString(),
     depositTimestamp: Date.now().toString(),
   },
