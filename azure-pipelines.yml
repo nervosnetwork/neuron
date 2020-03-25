@@ -68,7 +68,7 @@ stages:
   - job: win
     displayName: Windows
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'vs2017-win2016'
     strategy:
       matrix:
         node_12_x:
