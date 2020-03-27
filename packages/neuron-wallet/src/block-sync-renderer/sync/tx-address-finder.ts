@@ -37,7 +37,7 @@ export default class TxAddressFinder {
   private selectOutputs = (): [boolean, Output[]] => {
     let shouldSync = false
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
-      if (output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      if (SystemScriptInfo.isMultiSignScript(output.lock)) {
         const multiSignBlake160 = output.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true
@@ -79,7 +79,7 @@ export default class TxAddressFinder {
           AddressGenerator.generate(output.lock, prefix)
         )
       }
-      if (output && output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {
+      if (output && SystemScriptInfo.isMultiSignScript(output.lock)) {
         const multiSignBlake160 = output.lock.args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true

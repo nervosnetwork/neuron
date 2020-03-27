@@ -37,7 +37,7 @@ export default class AddressParser {
 
   public static toBlake160(address: string) {
     const lockScript = AddressParser.parse(address)
-    if (!(lockScript.codeHash === SystemScriptInfo.SECP_CODE_HASH && lockScript.hashType === SystemScriptInfo.SECP_HASH_TYPE)) {
+    if (!SystemScriptInfo.isSecpScript(lockScript)) {
       throw new Error(`address: ${address} not short address`)
     }
     return lockScript.args
