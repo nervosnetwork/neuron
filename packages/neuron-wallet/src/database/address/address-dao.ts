@@ -1,10 +1,10 @@
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
 import CellsService from 'services/cells'
-import LockUtils from 'models/lock-utils'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
+import AddressParser from 'models/address-parser'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -61,12 +61,11 @@ export default class AddressDao {
       return !addressesSet.has(value.address)
     })
 
-    const lockUtils = new LockUtils()
     const lockHashInfo = new Map<string, string>()
     const lockHashes = new Set<string>()
     toUpdate.forEach(addr => {
       const address = addr.address
-      const lockHash: string = lockUtils.addressToLockHash(address)
+      const lockHash: string = new AddressParser(address).parse().computeHash()
       lockHashInfo.set(address, lockHash)
       lockHashes.add(lockHash)
     })

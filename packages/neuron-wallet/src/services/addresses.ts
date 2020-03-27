@@ -1,10 +1,10 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
-import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
+import AddressParser from 'models/address-parser'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -158,7 +158,7 @@ export default class AddressService {
     ).address
 
     const addressToParse = NetworksService.getInstance().isMainnet() ? mainnetAddress : testnetAddress
-    const blake160: string = LockUtils.addressToBlake160(addressToParse)
+    const blake160: string = AddressParser.toBlake160(addressToParse)
 
     const testnetAddressInfo: AddressInterface = {
       walletId: addressMetaInfo.walletId,
@@ -212,9 +212,8 @@ export default class AddressService {
   }
 
   public static allLockHashes(): string[] {
-    const lockUtils = new LockUtils()
     const addresses = AddressService.allAddresses().map(address => address.address)
-    return lockUtils.addressesToAllLockHashes(addresses)
+    return AddressParser.batchToLockHash(addresses)
   }
 
   public static usedAddresses = (walletId: string): AddressInterface[] => {

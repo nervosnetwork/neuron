@@ -46,4 +46,15 @@ describe('AddressParser', () => {
     })
   })
 
+  it('batchParse', () => {
+    const result = AddressParser.batchParse([shortAddressInfo.address, fullAddressInfo.address])
+    expect(result.length).toEqual(2)
+    expect(result[0].codeHash).toEqual(shortAddressInfo.codeHash)
+    expect(result[0].args).toEqual(shortAddressInfo.args)
+    expect(result[0].hashType).toEqual(shortAddressInfo.hashType)
+    expect(result[1].codeHash).toEqual(fullAddressInfo.codeHash)
+    expect(result[1].args).toEqual(fullAddressInfo.args)
+    expect(result[1].hashType).toEqual(fullAddressInfo.hashType)
+  })
+
 })

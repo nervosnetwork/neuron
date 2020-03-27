@@ -1,13 +1,12 @@
 import { getConnection } from 'typeorm'
 import OutputEntity from 'database/chain/entities/output'
-import LockUtils from 'models/lock-utils'
 import NetworksService from 'services/networks'
 import { AddressPrefix } from 'models/keys/address'
 import Output from 'models/chain/output'
 import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
-import Script from 'models/chain/script'
 import SystemScriptInfo from 'models/system-script-info'
+import AddressGenerator from 'models/address-generator'
 
 // Search for all addresses related to a transaction. These addresses include:
 //   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
@@ -29,7 +28,7 @@ export default class TxAddressFinder {
     const outputsResult: [boolean, Output[]] = this.selectOutputs()
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const outputAddresses: string[] = outputsResult[1].map(output => {
-      return LockUtils.lockScriptToAddress(output.lock, addressPrefix)
+      return AddressGenerator.toShort(output.lock, addressPrefix)
     })
 
     return [inputAddressesResult[0] || outputsResult[0], inputAddressesResult[1].concat(outputAddresses)]
@@ -63,6 +62,7 @@ export default class TxAddressFinder {
   private selectInputAddresses = async (): Promise<[boolean, string[]]> => {
     const addresses: string[] = []
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
+    const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
     let shouldSync = false
     for (const input of inputs) {
@@ -76,10 +76,7 @@ export default class TxAddressFinder {
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
         addresses.push(
-          LockUtils.lockScriptToAddress(
-            new Script(output.lock.codeHash, output.lock.args, output.lock.hashType),
-            NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-          )
+          AddressGenerator.generate(output.lock, prefix)
         )
       }
       if (output && output.lock.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH) {

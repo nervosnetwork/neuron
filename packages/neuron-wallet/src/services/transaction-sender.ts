@@ -6,7 +6,6 @@ import { serializeWitnessArgs, toHexInLittleEndian } from '@nervosnetwork/ckb-sd
 import { TransactionPersistor, TransactionsService, TransactionGenerator, TargetOutput } from './tx'
 import NetworksService from './networks'
 import { AddressPrefix } from 'models/keys/address'
-import LockUtils from 'models/lock-utils'
 import AddressService from './addresses'
 import { Address } from 'database/address/address-dao'
 import { PathAndPrivateKey } from 'models/keys/key'
@@ -30,6 +29,8 @@ import Blake2b from 'models/blake2b'
 import HexUtils from 'utils/hex'
 import ECPair from '@nervosnetwork/ckb-sdk-utils/lib/ecpair'
 import SystemScriptInfo from 'models/system-script-info'
+import AddressParser from 'models/address-parser'
+import AddressGenerator from 'models/address-generator'
 
 interface SignInfo {
   witnessArgs: WitnessArgs
@@ -59,7 +60,7 @@ export default class TransactionSender {
     // update addresses txCount and balance
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
-    const usedAddresses = blake160s.map(blake160 => LockUtils.blake160ToAddress(blake160, prefix))
+    const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
     await WalletService.updateUsedAddresses(usedAddresses)
     return txHash
   }
@@ -208,7 +209,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -238,7 +239,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const targetOutputs = items.map(item => ({
       ...item,
@@ -265,7 +266,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const address = AddressesService.nextUnusedAddress(walletID)
 
@@ -305,7 +306,7 @@ export default class TransactionSender {
 
     const addressInfos = this.getAddressInfos(walletID)
     const addresses: string[] = addressInfos.map(info => info.address)
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const depositBlockHeader = await rpcService.getHeader(prevTx.txStatus.blockHash!)
 
@@ -379,7 +380,7 @@ export default class TransactionSender {
     const outputCapacity: bigint = await this.calculateDaoMaximumWithdraw(depositOutPoint, withdrawBlockHeader.hash)
 
     const address = await AddressesService.nextUnusedAddress(walletID)
-    const blake160 = LockUtils.addressToBlake160(address!.address)
+    const blake160 = AddressParser.toBlake160(address!.address)
 
     const output: Output = new Output(
       outputCapacity.toString(),
@@ -442,7 +443,7 @@ export default class TransactionSender {
 
     const addresses: string[] = addressInfos.map(info => info.address)
 
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const address = AddressesService.nextUnusedAddress(walletID)
 
