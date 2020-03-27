@@ -156,7 +156,7 @@ export class TransactionsService {
     let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
 
     if (type === SearchType.Address) {
-      const hash = new AddressParser(searchValue).parse().computeHash()
+      const hash = AddressParser.parse(searchValue).computeHash()
       if (lockHashes.includes(hash)) {
         lockHashes = [hash]
       } else {
@@ -378,7 +378,7 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHash: string = new AddressParser(value).parse().computeHash()
+      const lockHash: string = AddressParser.parse(value).computeHash()
       return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
     }
     if (type === SearchType.TxHash) {

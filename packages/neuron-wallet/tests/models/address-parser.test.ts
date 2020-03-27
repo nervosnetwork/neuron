@@ -25,21 +25,21 @@ describe('AddressParser', () => {
 
   describe('parse', () => {
     it('full address', () => {
-      const script = new AddressParser(fullAddressInfo.address).parse()
+      const script = AddressParser.parse(fullAddressInfo.address)
       expect(script.codeHash).toEqual(fullAddressInfo.codeHash)
       expect(script.args).toEqual(fullAddressInfo.args)
       expect(script.hashType).toEqual(fullAddressInfo.hashType)
     })
 
     it('short address', () => {
-      const script = new AddressParser(shortAddressInfo.address).parse()
+      const script = AddressParser.parse(shortAddressInfo.address)
       expect(script.codeHash).toEqual(shortAddressInfo.codeHash)
       expect(script.args).toEqual(shortAddressInfo.args)
       expect(script.hashType).toEqual(shortAddressInfo.hashType)
     })
 
     it ('multi sign short address', () => {
-      const script = new AddressParser(multiSignAddressInfo.address).parse()
+      const script = AddressParser.parse(multiSignAddressInfo.address)
       expect(script.codeHash).toEqual(multiSignAddressInfo.codeHash)
       expect(script.args).toEqual(multiSignAddressInfo.args)
       expect(script.hashType).toEqual(multiSignAddressInfo.hashType)

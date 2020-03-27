@@ -3,14 +3,8 @@ import { parseAddress } from "@nervosnetwork/ckb-sdk-utils"
 import SystemScriptInfo from "./system-script-info"
 
 export default class AddressParser {
-  private address: string
-
-  constructor(address: string) {
-    this.address = address
-  }
-
-  parse(): Script {
-    const result = parseAddress(this.address, 'hex')
+  public static parse(address: string): Script {
+    const result = parseAddress(address, 'hex')
     const formatType = '0x' + result.slice(2, 4)
 
     if (formatType === '0x01') {
@@ -34,7 +28,7 @@ export default class AddressParser {
   }
 
   public static batchParse(addresses: string[]): Script[] {
-    return addresses.map(addr => new AddressParser(addr).parse())
+    return addresses.map(addr => AddressParser.parse(addr))
   }
 
   public static batchToLockHash(addresses: string[]): string[] {
@@ -42,7 +36,7 @@ export default class AddressParser {
   }
 
   public static toBlake160(address: string) {
-    const lockScript = new AddressParser(address).parse()
+    const lockScript = AddressParser.parse(address)
     if (!(lockScript.codeHash === SystemScriptInfo.SECP_CODE_HASH && lockScript.hashType === SystemScriptInfo.SECP_HASH_TYPE)) {
       throw new Error(`address: ${address} not short address`)
     }

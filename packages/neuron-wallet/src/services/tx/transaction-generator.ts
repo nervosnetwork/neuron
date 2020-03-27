@@ -47,7 +47,7 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address, date } = o
 
-      const lockScript = new AddressParser(address).parse()
+      const lockScript = AddressParser.parse(address)
 
       const output = new Output(capacity, lockScript)
       if (date) {
@@ -144,7 +144,7 @@ public static generateSendingAllTx = async (
   const outputs: Output[] = targetOutputs.map((o, index) => {
     const { capacity, address, date } = o
 
-    const lockScript: Script = new AddressParser(address).parse()
+    const lockScript: Script = AddressParser.parse(address)
 
     const output = new Output(capacity, lockScript)
     if (date) {
@@ -438,7 +438,7 @@ public static generateSendingAllTx = async (
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const lockScript = new AddressParser(receivingAddress).parse()
+    const lockScript = AddressParser.parse(receivingAddress)
 
     // const outputs: Output[] = [output]
     const output = Output.fromObject({

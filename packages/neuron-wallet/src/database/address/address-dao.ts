@@ -65,7 +65,7 @@ export default class AddressDao {
     const lockHashes = new Set<string>()
     toUpdate.forEach(addr => {
       const address = addr.address
-      const lockHash: string = new AddressParser(address).parse().computeHash()
+      const lockHash: string = AddressParser.parse(address).computeHash()
       lockHashInfo.set(address, lockHash)
       lockHashes.add(lockHash)
     })
