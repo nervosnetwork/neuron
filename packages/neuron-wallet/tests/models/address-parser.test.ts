@@ -25,25 +25,36 @@ describe('AddressParser', () => {
 
   describe('parse', () => {
     it('full address', () => {
-      const script = new AddressParser(fullAddressInfo.address).parse()
+      const script = AddressParser.parse(fullAddressInfo.address)
       expect(script.codeHash).toEqual(fullAddressInfo.codeHash)
       expect(script.args).toEqual(fullAddressInfo.args)
       expect(script.hashType).toEqual(fullAddressInfo.hashType)
     })
 
     it('short address', () => {
-      const script = new AddressParser(shortAddressInfo.address).parse()
+      const script = AddressParser.parse(shortAddressInfo.address)
       expect(script.codeHash).toEqual(shortAddressInfo.codeHash)
       expect(script.args).toEqual(shortAddressInfo.args)
       expect(script.hashType).toEqual(shortAddressInfo.hashType)
     })
 
     it ('multi sign short address', () => {
-      const script = new AddressParser(multiSignAddressInfo.address).parse()
+      const script = AddressParser.parse(multiSignAddressInfo.address)
       expect(script.codeHash).toEqual(multiSignAddressInfo.codeHash)
       expect(script.args).toEqual(multiSignAddressInfo.args)
       expect(script.hashType).toEqual(multiSignAddressInfo.hashType)
     })
+  })
+
+  it('batchParse', () => {
+    const result = AddressParser.batchParse([shortAddressInfo.address, fullAddressInfo.address])
+    expect(result.length).toEqual(2)
+    expect(result[0].codeHash).toEqual(shortAddressInfo.codeHash)
+    expect(result[0].args).toEqual(shortAddressInfo.args)
+    expect(result[0].hashType).toEqual(shortAddressInfo.hashType)
+    expect(result[1].codeHash).toEqual(fullAddressInfo.codeHash)
+    expect(result[1].args).toEqual(fullAddressInfo.args)
+    expect(result[1].hashType).toEqual(fullAddressInfo.hashType)
   })
 
 })

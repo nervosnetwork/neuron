@@ -74,6 +74,18 @@ export default class SystemScriptInfo {
     return new Script(SystemScriptInfo.MULTI_SIGN_CODE_HASH, args, SystemScriptInfo.MULTI_SIGN_HASH_TYPE)
   }
 
+  public static isSecpScript(script: Script): boolean {
+    return script.codeHash === SystemScriptInfo.SECP_CODE_HASH && script.hashType === SystemScriptInfo.SECP_HASH_TYPE
+  }
+
+  public static isMultiSignScript(script: Script): boolean {
+    return script.codeHash === SystemScriptInfo.MULTI_SIGN_CODE_HASH && script.hashType === SystemScriptInfo.MULTI_SIGN_HASH_TYPE
+  }
+
+  public static isDaoScript(script: Script): boolean {
+    return script.codeHash === SystemScriptInfo.DAO_CODE_HASH && script.hashType === SystemScriptInfo.DAO_HASH_TYPE
+  }
+
   private async loadInfos(url: string): Promise<void> {
     const rpcService = new RpcService(url)
     const genesisBlock = (await rpcService.getBlockByNumber('0'))!
