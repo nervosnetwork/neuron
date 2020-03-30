@@ -17,6 +17,10 @@ We added several new features with this version:
 
 Thanks to the community we have found and fixed a serious performance issue. Miner wallets usually receive transactions with huge amount of inputs. When syncing this kind of wallets Neuron became very slow and unresponsive, and couldn't calculate the balance correctly. With this release we've tweaked the sync process, making it run faster and handle transactions with many inputs/outputs properly.
 
+### Electron
+
+We updated Electron to 7.1.14.
+
 ### Bug fixes
 
 * Fixed serveral syncing issues causing incorrect balance.
