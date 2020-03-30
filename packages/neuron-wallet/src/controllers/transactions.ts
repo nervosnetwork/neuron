@@ -16,7 +16,12 @@ export default class TransactionsController {
 
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
 
-    const transactions = await TransactionsService.getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+    const transactions = await TransactionsService
+      .getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+      .catch(() => ({
+        totalCount: 0,
+        items: [] as Transaction[]
+      }))
     transactions.items = await Promise.all(transactions.items.map(async tx => {
       const description = await getDescription(walletID, tx.hash!)
       if (description !== '') {
