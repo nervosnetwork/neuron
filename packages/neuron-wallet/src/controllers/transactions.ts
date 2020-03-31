@@ -4,10 +4,10 @@ import WalletsService from 'services/wallets'
 
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet } from 'exceptions'
-import LockUtils from 'models/lock-utils'
 import Transaction from 'models/chain/transaction'
 
 import { set as setDescription, get as getDescription } from 'database/leveldb/transaction-description'
+import AddressParser from 'models/address-parser'
 
 export default class TransactionsController {
   public async getAll(params: Controller.Params.TransactionsByKeywords):
@@ -53,7 +53,7 @@ export default class TransactionsController {
     }
 
     const addresses: string[] = AddressesService.allAddressesByWalletId(wallet.id).map(addr => addr.address)
-    const lockHashes: string[] = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     const outputCapacities: bigint = transaction
       .outputs!.filter(o => lockHashes.includes(o.lockHash!))

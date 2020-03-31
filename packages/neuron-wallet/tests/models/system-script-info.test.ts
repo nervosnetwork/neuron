@@ -6,6 +6,11 @@ describe('SystemScriptInfo', () => {
   const DAO_CODE_HASH = "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e"
   const MULTI_SIGN_CODE_HASH = "0x5c5069eb0857efc65e1bca0c07df34c31663b3622fd3876c876320fc9634e2a8"
 
+
+  const secpScript = SystemScriptInfo.generateSecpScript('0x' + '0'.repeat(40))
+  const multiSignScript = SystemScriptInfo.generateMultiSignScript('0x' + '0'.repeat(40))
+  const daoScript = SystemScriptInfo.generateDaoScript('0x')
+
   it("secp code hash", () => {
     expect(SystemScriptInfo.SECP_CODE_HASH).toEqual(SECP_CODE_HASH)
   })
@@ -16,6 +21,21 @@ describe('SystemScriptInfo', () => {
 
   it("multi sign code hash", () => {
     expect(SystemScriptInfo.MULTI_SIGN_CODE_HASH).toEqual(MULTI_SIGN_CODE_HASH)
+  })
+
+  it('isSecpScript', () => {
+    expect(SystemScriptInfo.isSecpScript(secpScript)).toBeTruthy()
+    expect(SystemScriptInfo.isSecpScript(multiSignScript)).toBeFalsy()
+  })
+
+  it('isMultiSignScript', () => {
+    expect(SystemScriptInfo.isMultiSignScript(multiSignScript)).toBeTruthy()
+    expect(SystemScriptInfo.isMultiSignScript(secpScript)).toBeFalsy()
+  })
+
+  it('isDaoScript', () => {
+    expect(SystemScriptInfo.isDaoScript(daoScript)).toBeTruthy()
+    expect(SystemScriptInfo.isDaoScript(secpScript)).toBeFalsy()
   })
 
   it('getInstance()', () => {

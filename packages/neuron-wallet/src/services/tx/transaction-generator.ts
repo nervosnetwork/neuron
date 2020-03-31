@@ -1,5 +1,4 @@
 import CellsService from 'services/cells'
-import LockUtils from 'models/lock-utils'
 import { CapacityTooSmall } from 'exceptions'
 import FeeMode from 'models/fee-mode'
 import TransactionSize from 'models/transaction-size'
@@ -48,7 +47,7 @@ export class TransactionGenerator {
     const outputs: Output[] = targetOutputs.map(o => {
       const { capacity, address, date } = o
 
-      const lockScript = new AddressParser(address).parse()
+      const lockScript = AddressParser.parse(address)
 
       const output = new Output(capacity, lockScript)
       if (date) {
@@ -98,7 +97,7 @@ export class TransactionGenerator {
 
   // change
   if (hasChangeOutput) {
-    const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+    const changeBlake160: string = AddressParser.toBlake160(changeAddress)
 
     const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
 
@@ -145,7 +144,7 @@ public static generateSendingAllTx = async (
   const outputs: Output[] = targetOutputs.map((o, index) => {
     const { capacity, address, date } = o
 
-    const lockScript: Script = new AddressParser(address).parse()
+    const lockScript: Script = AddressParser.parse(address)
 
     const output = new Output(capacity, lockScript)
     if (date) {
@@ -216,7 +215,7 @@ public static generateSendingAllTx = async (
   ): Promise<Transaction> => {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
-    const blake160: string = LockUtils.addressToBlake160(receiveAddress)
+    const blake160: string = AddressParser.toBlake160(receiveAddress)
 
     const capacityInt: bigint = BigInt(capacity)
 
@@ -263,7 +262,7 @@ public static generateSendingAllTx = async (
 
     // change
     if (hasChangeOutput) {
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
 
       const changeCapacity = BigInt(capacities) - capacityInt - finalFeeInt
 
@@ -288,7 +287,7 @@ public static generateSendingAllTx = async (
   ): Promise<Transaction> => {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const daoCellDep = await SystemScriptInfo.getInstance().getDaoCellDep()
-    const blake160: string = LockUtils.addressToBlake160(receiveAddress)
+    const blake160: string = AddressParser.toBlake160(receiveAddress)
 
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
@@ -413,7 +412,7 @@ public static generateSendingAllTx = async (
 
     // change
     if (hasChangeOutput) {
-      const changeBlake160: string = LockUtils.addressToBlake160(changeAddress)
+      const changeBlake160: string = AddressParser.toBlake160(changeAddress)
       const changeCapacity = BigInt(capacities) - finalFeeInt
 
       const changeOutput = new Output(
@@ -439,7 +438,7 @@ public static generateSendingAllTx = async (
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
-    const lockScript = new AddressParser(receivingAddress).parse()
+    const lockScript = AddressParser.parse(receivingAddress)
 
     // const outputs: Output[] = [output]
     const output = Output.fromObject({

@@ -1,10 +1,10 @@
 import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
-import LockUtils from 'models/lock-utils'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
+import AddressParser from 'models/address-parser'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -153,10 +153,10 @@ export class TransactionsService {
       }
     }
 
-    let lockHashes: string[] = new LockUtils().addressesToAllLockHashes(params.addresses)
+    let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
 
     if (type === SearchType.Address) {
-      const hash = new LockUtils().addressToLockHash(searchValue)
+      const hash = AddressParser.parse(searchValue).computeHash()
       if (lockHashes.includes(hash)) {
         lockHashes = [hash]
       } else {
@@ -293,7 +293,7 @@ export class TransactionsService {
     const addresses: string[] = params.pubkeys.map(pubkey => {
       return pubkeyToAddress(pubkey)
     })
-    const lockHashes = new LockUtils().addressesToAllLockHashes(addresses)
+    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
 
     return TransactionsService.getAll(
       {
@@ -378,7 +378,7 @@ export class TransactionsService {
       return base
     }
     if (type === SearchType.Address) {
-      const lockHash: string = new LockUtils().addressToLockHash(value)
+      const lockHash: string = AddressParser.parse(value).computeHash()
       return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
     }
     if (type === SearchType.TxHash) {
