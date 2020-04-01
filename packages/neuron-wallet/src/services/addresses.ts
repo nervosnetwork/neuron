@@ -37,26 +37,29 @@ export default class AddressService {
       changeAddressCount
     )
     const allAddresses: AddressInterface[] = [
-      ...addresses.testnetReceiving,
       ...addresses.mainnetReceiving,
-      ...addresses.testnetChange,
       ...addresses.mainnetChange,
+      ...addresses.testnetReceiving,
+      ...addresses.testnetChange,
     ]
     AddressDao.create(allAddresses)
 
-    // TODO: notify address created and pass addressWay
     AddressService.notifyAddressCreated(allAddresses, isImporting)
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
-    const addrs = addresses
-      .filter(addr => addr.version ===  AddressService.getAddressVersion())
-      .map(addr => {
-        const address = addr
-        address.isImporting = isImporting
-        return address
-      })
-    AddressCreatedSubject.getSubject().next(addrs)
+    const versionFilter = ((a: AddressInterface) => { return a.version === AddressService.getAddressVersion() })
+
+    // If first receiving address already exists in other wallets, treat as none importing.
+    // This assumes addresses.first is the actual first address.
+    const firstAddress = addresses.filter(versionFilter)[0]
+    const alreadyExist = AddressDao.findByAddresses([firstAddress.address]).length > 1
+    const importing = isImporting && !alreadyExist
+
+    const addressesToNotify = addresses
+      .filter(versionFilter)
+      .map(address => { return { ...address, isImporting: importing } })
+    AddressCreatedSubject.getSubject().next(addressesToNotify)
   }
 
   public static checkAndGenerateSave(
