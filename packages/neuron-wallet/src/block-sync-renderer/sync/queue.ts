@@ -190,6 +190,7 @@ export default class Queue {
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
+        await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
       }
 
       throw new Error(`chain forked: ${checkResult.type}`)

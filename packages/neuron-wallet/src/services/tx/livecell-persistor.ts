@@ -6,6 +6,10 @@ import { ScriptHashType } from 'models/chain/script'
 import LiveCellEntity from 'database/chain/entities/live-cell'
 import Transaction from 'models/chain/transaction'
 
+const CONFIRMATION_THRESHOLD = BigInt(300)
+const DELETE_BATCH = BigInt(50)
+const ZERO = BigInt(0)
+
 export class LiveCellPersistor {
   public static saveTxLiveCells = async (tx: Transaction) => {
     const connection = getConnection()
@@ -15,11 +19,26 @@ export class LiveCellPersistor {
     await queryRunner.startTransaction()
 
     try {
+      const blockNumber = BigInt(tx.blockNumber!)
+      if(blockNumber % DELETE_BATCH === ZERO) {
+        queryRunner.manager
+          .createQueryBuilder()
+          .delete()
+          .from(LiveCellEntity)
+          .where(
+            `usedBlockNumber is not null and usedBlockNumber < :blockNumber`,
+            {
+              blockNumber: (blockNumber - CONFIRMATION_THRESHOLD).toString(),
+            }
+          )
+          .execute()
+      }
+
       tx.inputs.forEach(input => {
-        queryRunner.manager.delete(LiveCellEntity, {
+        queryRunner.manager.update(LiveCellEntity, {
           txHash: Buffer.from(hexToBytes(input.previousOutput!.txHash)),
           outputIndex: BigInt(input.previousOutput!.index).toString(),
-        })
+        }, {usedBlockNumber: tx.blockNumber!})
       })
       const txHash = Buffer.from(hexToBytes(tx.computeHash()))
       for (const [i, output] of tx.outputs.entries()) {
@@ -35,6 +54,7 @@ export class LiveCellPersistor {
           const cellEntity = new LiveCellEntity()
           cellEntity.txHash = txHash
           cellEntity.outputIndex = i
+          cellEntity.createdBlockNumber = tx.blockNumber!
           cellEntity.capacity = BigInt(output.capacity).toString()
           cellEntity.lockHash = Buffer.from(hexToBytes(output.lockHash))
           cellEntity.lockHashType = output.lock.hashType === ScriptHashType.Data ? '1' : '2'
@@ -61,6 +81,29 @@ export class LiveCellPersistor {
     } finally {
       await queryRunner.release()
     }
+  }
+
+  public static resumeWhenFork = async (blockNumber: string) => {
+    const connection = getConnection()
+    const repository = connection.getRepository(LiveCellEntity)
+    await repository.createQueryBuilder('cell')
+      .where(
+        `cell.createdBlockNumber >= :blockNumber`,
+        {
+          blockNumber,
+        }
+      )
+      .delete()
+      .execute()
+    await repository.createQueryBuilder('cell')
+      .where(
+        `cell.usedBlockNumber is not null and cell.usedBlockNumber >= :blockNumber`,
+        {
+          blockNumber,
+        }
+      )
+      .update({usedBlockNumber: null})
+      .execute()
   }
 
   private static waitUntilTransactionFinished = async(queryRunner: QueryRunner, timeout: number = 5000) => {

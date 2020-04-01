@@ -10,6 +10,21 @@ export default class LiveCell extends BaseEntity {
   txHash!: Buffer
 
   @Column({
+    type: "varchar",
+    length: 20,
+  })
+  @Index()
+  createdBlockNumber!: string
+
+  @Column({
+    type: "varchar",
+    length: 20,
+    nullable: true,
+  })
+  @Index()
+  usedBlockNumber?: string | null = null
+
+  @Column({
     type: "integer",
   })
   @PrimaryColumn()
@@ -27,6 +42,7 @@ export default class LiveCell extends BaseEntity {
   @Index()
   lockHash!: Buffer
 
+  // 1 = data, 2 = type
   @Column({
     type: "character",
     length: 1,
@@ -54,6 +70,7 @@ export default class LiveCell extends BaseEntity {
   @Index()
   typeHash: Buffer | null = null
 
+  // 1 = data, 2 = type
   @Column({
     type: "character",
     length: 1,
