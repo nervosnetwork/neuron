@@ -83,7 +83,8 @@ const trackingStatus = async () => {
 export const register = () => {
   // every 5 seconds
   setInterval(async () => {
-    logger.debug("periodically status tracking ...")
+    // Disable debug output as it's too annoying.
+    // logger.debug("periodically status tracking ...")
     try {
       getConnection()
       await trackingStatus()
