@@ -19,8 +19,8 @@
       "settings": "设置",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定义资产",
-      "fail-to-fetch-tip-block-number": "未连接到节点",
-      "sync-not-start": "同步尚未开始"
+      "sync-not-start": "同步尚未开始",
+      "connecting": "正在连接节点"
     },
     "network-status": {
       "tooltip": {

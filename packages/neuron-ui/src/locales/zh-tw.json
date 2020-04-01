@@ -19,8 +19,8 @@
       "settings": "設定",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定義資產",
-      "fail-to-fetch-tip-block-number": "未連接到節點",
-      "sync-not-start": "同步尚未開始"
+      "sync-not-start": "同步尚未開始",
+      "connecting": "正在連接節點"
     },
     "network-status": {
       "tooltip": {
@@ -344,8 +344,8 @@
       "block-number": "區塊高度",
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",
-      "sync-failed": "连接失败, 请检查网络",
-      "sync-not-start": "同步尚未开始, 请尝试重启"
+      "sync-failed": "連接失敗, 請檢查網絡",
+      "sync-not-start": "同步尚未開始, 請嘗試重啟"
     },
     "pagination": {
       "previous-page": "上一頁",

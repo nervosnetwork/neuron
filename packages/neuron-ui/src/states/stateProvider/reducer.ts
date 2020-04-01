@@ -116,7 +116,7 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       Object.assign(state.chain, {
         networkID,
         transactions,
-        connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Offline,
+        connectionStatus: connectionStatus ? ConnectionStatus.Online : ConnectionStatus.Connecting,
         tipBlockNumber: syncedBlockNumber,
       })
       Object.assign(state.settings, { networks, wallets })

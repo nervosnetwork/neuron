@@ -20,7 +20,7 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
-import { ConnectionStatus, ErrorCode } from 'utils/const'
+import { ConnectionStatus, ErrorCode, CONNECTING_DEADLINE } from 'utils/const'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 
 let timer: NodeJS.Timeout
@@ -48,10 +48,11 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
             payload: ErrorCode.NodeDisconnected,
           })
         })
-        .catch((err: Error) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn(err)
-          }
+        .catch(() => {
+          dispatch({
+            type: NeuronWalletActions.UpdateConnectionStatus,
+            payload: Date.now() > CONNECTING_DEADLINE ? ConnectionStatus.Offline : ConnectionStatus.Connecting,
+          })
         })
     }
     clearInterval(timer)
@@ -155,9 +156,13 @@ export const useSubscription = ({
       currentNetworkIDCache.save(currentNetworkID)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
+      let payload = status ? ConnectionStatus.Online : ConnectionStatus.Offline
+      if (payload === ConnectionStatus.Offline && Date.now() <= CONNECTING_DEADLINE) {
+        payload = ConnectionStatus.Connecting
+      }
       dispatch({
         type: NeuronWalletActions.UpdateConnectionStatus,
-        payload: status ? ConnectionStatus.Online : ConnectionStatus.Offline,
+        payload,
       })
     })
 

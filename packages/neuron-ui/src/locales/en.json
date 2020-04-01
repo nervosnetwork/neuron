@@ -19,8 +19,8 @@
       "settings": "Settings",
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
-      "fail-to-fetch-tip-block-number": "Connection error",
-      "sync-not-start": "Sync not started yet"
+      "sync-not-start": "Sync not started yet",
+      "connecting": "Connecting"
     },
     "network-status": {
       "tooltip": {
@@ -245,7 +245,7 @@
       "backup": {
         "title": "Backup the {{name}} wallet"
       },
-      "unlock":{
+      "unlock": {
         "title": "Please input wallet password to claim the asset"
       }
     },
