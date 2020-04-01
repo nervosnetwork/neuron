@@ -15,6 +15,7 @@ import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
+import { LiveCellPersistor } from 'services/tx/livecell-persistor'
 
 export default class Queue {
   private lockHashes: string[]
@@ -141,6 +142,7 @@ export default class Queue {
         logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
+        await LiveCellPersistor.saveTxLiveCells(tx)
         const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
         if (shouldSave) {
           if (i > 0) {
