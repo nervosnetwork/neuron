@@ -137,7 +137,7 @@ declare namespace State {
     readonly balance: string
     readonly addresses: Readonly<Address[]>
   }
-  type ConnectionStatus = 'online' | 'offline'
+  type ConnectionStatus = 'online' | 'offline' | 'connecting'
 
   interface Chain {
     readonly networkID: string

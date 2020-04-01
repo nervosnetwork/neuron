@@ -23,7 +23,7 @@ export const transactionState: Readonly<State.DetailedTransaction> = {
 
 const chainState: Readonly<State.Chain> = {
   networkID: currentNetworkID.load(),
-  connectionStatus: ConnectionStatus.Offline,
+  connectionStatus: ConnectionStatus.Connecting,
   tipBlockNumber: '',
   transactions: {
     pageNo: 1,

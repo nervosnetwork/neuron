@@ -7,7 +7,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, SyncStatus, ConnectionStatus } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT, SyncStatus, SyncStatusThatBalanceUpdating, ConnectionStatus } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import { backToTop } from 'utils/animations'
 import getSyncStatus from 'utils/getSyncStatus'
@@ -273,7 +273,7 @@ const NervosDAO = () => {
         {t('sync.sync-not-start')}
       </span>
     )
-  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 

@@ -24,12 +24,15 @@ export const WITHDRAW_EPOCHS = 180
 export const IMMATURE_EPOCHS = 4
 export const MILLISECONDS_IN_YEAR = 365 * 24 * 3600 * 1000
 
+export const CONNECTING_DEADLINE = Date.now() + 10_000
+
 export const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
 
 export enum ConnectionStatus {
   Online = 'online',
   Offline = 'offline',
+  Connecting = 'connecting',
 }
 
 export enum Routes {
@@ -120,6 +123,8 @@ export enum SyncStatus {
   Syncing,
   SyncCompleted,
 }
+
+export const SyncStatusThatBalanceUpdating = [SyncStatus.Syncing, SyncStatus.SyncPending]
 
 export enum PRESET_SCRIPT {
   Locktime = 'SingleMultiSign',
