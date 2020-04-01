@@ -27,7 +27,9 @@ export default class UpdateController {
   }
 
   public quitAndInstall() {
-    autoUpdater.quitAndInstall()
+    setImmediate(() => {
+      autoUpdater.quitAndInstall()
+    })
   }
 
   public downloadUpdate() {
