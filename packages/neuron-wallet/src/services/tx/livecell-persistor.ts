@@ -23,19 +23,18 @@ export class LiveCellPersistor {
       })
       const txHash = Buffer.from(hexToBytes(tx.computeHash()))
       for (const [i, output] of tx.outputs.entries()) {
-        const outputIndex = i.toString()
         const count = await queryRunner.manager
           .getRepository(LiveCellEntity)
           .createQueryBuilder('cell')
           .where('cell.txHash = :hash and cell.outputIndex = :index', {
             hash: txHash,
-            index: outputIndex,
+            index: i,
           })
           .getCount()
         if (count === 0) {
           const cellEntity = new LiveCellEntity()
           cellEntity.txHash = txHash
-          cellEntity.outputIndex = outputIndex
+          cellEntity.outputIndex = i
           cellEntity.capacity = BigInt(output.capacity).toString()
           cellEntity.lockHash = Buffer.from(hexToBytes(output.lockHash))
           cellEntity.lockHashType = output.lock.hashType === ScriptHashType.Data ? '1' : '2'

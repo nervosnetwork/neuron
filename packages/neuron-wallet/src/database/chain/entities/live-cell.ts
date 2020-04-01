@@ -10,11 +10,10 @@ export default class LiveCell extends BaseEntity {
   txHash!: Buffer
 
   @Column({
-    type: "varchar",
-    length: 5,
+    type: "integer",
   })
   @PrimaryColumn()
-  outputIndex!: string
+  outputIndex!: number
 
   @Column({
     type: "varchar",
