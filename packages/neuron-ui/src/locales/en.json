@@ -345,7 +345,8 @@
       "syncing-balance": "Balance is updating",
       "slow": "Sync is slow",
       "sync-failed": "Sync failed, please check network",
-      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet"
+      "sync-not-start": "Sync not started yet, please try to restart Neuron Wallet",
+      "connecting": "Connecting"
     },
     "pagination": {
       "previous-page": "Previous page",

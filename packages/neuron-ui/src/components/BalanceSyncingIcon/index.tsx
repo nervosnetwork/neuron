@@ -12,6 +12,13 @@ export interface BalanceSyncIconProps {
 
 const BalanceSyncIcon = ({ connectionStatus, syncStatus }: BalanceSyncIconProps) => {
   const [t] = useTranslation()
+  if (ConnectionStatus.Connecting === connectionStatus) {
+    return (
+      <div className={styles.container} data-content={t('sync.connecting')}>
+        <BalanceSyncing />
+      </div>
+    )
+  }
   if (ConnectionStatus.Offline === connectionStatus) {
     return (
       <div className={styles.container} data-content={t('sync.sync-failed')}>
