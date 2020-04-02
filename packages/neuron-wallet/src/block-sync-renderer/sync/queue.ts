@@ -134,15 +134,23 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
+  private skipLiveCell = async (blockNumber: string) => {
+    const lastBlockNumber = await LiveCellPersistor.lastBlockNumber()
+    return BigInt(lastBlockNumber) - LiveCellPersistor.CONFIRMATION_THRESHOLD > BigInt(blockNumber)
+  }
+
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
+    const skipLiveCell = await this.skipLiveCell(blocks[0].header.number)
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        await LiveCellPersistor.saveTxLiveCells(tx)
+        if (!skipLiveCell) {
+          await LiveCellPersistor.saveTxLiveCells(tx)
+        }
         const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
         if (shouldSave) {
           if (i > 0) {

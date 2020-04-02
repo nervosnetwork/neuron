@@ -6,6 +6,7 @@ import logger from 'utils/logger'
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
+  #liveCellblockNumberEntity: SyncInfoEntity | undefined = undefined
   #nextBlock: bigint | undefined = undefined
 
   private static lastSavedBlock: bigint = BigInt(-1)
@@ -36,6 +37,13 @@ export default class SyncedBlockNumber {
       let blockNumberEntity = await this.blockNumber()
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
+
+      let liveCellblockNumberEntity = await this.liveCellblockNumber()
+      if (current > BigInt(liveCellblockNumberEntity.value)) {
+        liveCellblockNumberEntity.value = current.toString()
+        getConnection().manager.save(liveCellblockNumberEntity)
+      }
+
       logger.info("Database:\tsaved synced block #" + current.toString())
     }
   }
@@ -56,5 +64,23 @@ export default class SyncedBlockNumber {
     }
 
     return this.#blockNumberEntity
+  }
+
+  private async liveCellblockNumber(): Promise<SyncInfoEntity> {
+    if (!this.#liveCellblockNumberEntity) {
+      this.#liveCellblockNumberEntity = await getConnection()
+        .getRepository(SyncInfoEntity)
+        .findOne({
+          name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
+        })
+    }
+
+    if (!this.#liveCellblockNumberEntity) {
+      this.#liveCellblockNumberEntity = new SyncInfoEntity()
+      this.#liveCellblockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
+      this.#liveCellblockNumberEntity.value = '0'
+    }
+
+    return this.#liveCellblockNumberEntity
   }
 }

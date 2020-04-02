@@ -4,13 +4,14 @@ import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
 import { ScriptHashType } from 'models/chain/script'
 import LiveCellEntity from 'database/chain/entities/live-cell'
+import SyncInfoEntity from 'database/chain/entities/sync-info'
 import Transaction from 'models/chain/transaction'
 
-const CONFIRMATION_THRESHOLD = BigInt(300)
-const DELETE_BATCH = BigInt(50)
-const ZERO = BigInt(0)
-
 export class LiveCellPersistor {
+  public static CONFIRMATION_THRESHOLD = BigInt(300)
+  public static DELETE_BATCH = BigInt(50)
+  public static ZERO = BigInt(0)
+
   public static saveTxLiveCells = async (tx: Transaction) => {
     const connection = getConnection()
 
@@ -20,7 +21,7 @@ export class LiveCellPersistor {
 
     try {
       const blockNumber = BigInt(tx.blockNumber!)
-      if(blockNumber % DELETE_BATCH === ZERO) {
+      if(blockNumber % LiveCellPersistor.DELETE_BATCH === LiveCellPersistor.ZERO) {
         queryRunner.manager
           .createQueryBuilder()
           .delete()
@@ -28,7 +29,7 @@ export class LiveCellPersistor {
           .where(
             `usedBlockNumber is not null and usedBlockNumber < :blockNumber`,
             {
-              blockNumber: (blockNumber - CONFIRMATION_THRESHOLD).toString(),
+              blockNumber: (blockNumber - LiveCellPersistor.CONFIRMATION_THRESHOLD).toString(),
             }
           )
           .execute()
@@ -104,6 +105,18 @@ export class LiveCellPersistor {
       )
       .update({usedBlockNumber: null})
       .execute()
+  }
+
+  public static lastBlockNumber = async () => {
+    const last = await getConnection()
+      .getRepository(SyncInfoEntity)
+      .findOne({
+        name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
+      })
+    if (last) {
+      return last.value
+    }
+    return '0'
   }
 
   private static waitUntilTransactionFinished = async(queryRunner: QueryRunner, timeout: number = 5000) => {
