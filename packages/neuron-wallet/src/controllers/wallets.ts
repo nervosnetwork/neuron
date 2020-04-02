@@ -181,44 +181,18 @@ export default class WalletsController {
     if (!walletsService.validate({ id, password })) {
       throw new IncorrectPassword()
     }
-    await walletsService.delete(id)
 
-    return {
-      status: ResponseCode.Success,
-    }
+    return this.deleteWallet(id)
   }
 
   public async backup({ id = '', password = '' }: Controller.Params.BackupWallet): Promise<Controller.Response<boolean>> {
     const walletsService = WalletsService.getInstance()
-    const wallet = walletsService.get(id)
 
     if (!walletsService.validate({ id, password })) {
       throw new IncorrectPassword()
     }
 
-    const keystore = wallet.loadKeystore()
-    return dialog.showSaveDialog(
-      BrowserWindow.getFocusedWindow()!,
-      { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
-    ).then((returnValue: SaveDialogReturnValue) => {
-      if (returnValue.canceled) {
-        return {
-          status: ResponseCode.Success,
-          result: true
-        }
-      } else if (returnValue.filePath) {
-        fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
-        return {
-          status: ResponseCode.Success,
-          result: true,
-        }
-      } else {
-        return  {
-          status: ResponseCode.Fail,
-          result: false
-        }
-      }
-    })
+    return this.backupWallet(id)
   }
 
   public async importXPubkey(): Promise<Controller.Response<Wallet>> {
@@ -404,15 +378,26 @@ export default class WalletsController {
     }
   }
 
+  // It would bypass verifying password window/event if wallet is watch only.
   public async requestPassword(walletID: string, action: 'delete-wallet' | 'backup-wallet'){
-    const window = BrowserWindow.getFocusedWindow()
-    if (window) {
-      CommandSubject.next({
-        winID: window.id,
-        type: action,
-        payload: walletID,
-        dispatchToUI: true
-      })
+    const keystore = WalletsService.getInstance().get(walletID).loadKeystore()
+    if (keystore.isEmpty()) {
+      // Watch only wallet imported with xpubkey
+      if (action === 'delete-wallet') {
+        return this.deleteWallet(walletID)
+      } else {
+        return this.backupWallet(walletID)
+      }
+    } else {
+      const window = BrowserWindow.getFocusedWindow()
+      if (window) {
+        CommandSubject.next({
+          winID: window.id,
+          type: action,
+          payload: walletID,
+          dispatchToUI: true
+        })
+      }
     }
   }
 
@@ -459,5 +444,45 @@ export default class WalletsController {
       logger.warn(`verify address error: ${err}`)
       return false
     }
+  }
+
+  // Important: Check password before calling this, unless it's deleting a watch only wallet.
+  private async deleteWallet(id: string): Promise<Controller.Response<any>> {
+    const walletsService = WalletsService.getInstance()
+    await walletsService.delete(id)
+
+    return {
+      status: ResponseCode.Success,
+    }
+  }
+
+  // Important: Check password before calling this, unless it's backing up a watch only wallet.
+  private async backupWallet(id: string): Promise<Controller.Response<boolean>> {
+    const walletsService = WalletsService.getInstance()
+    const wallet = walletsService.get(id)
+
+    const keystore = wallet.loadKeystore()
+    return dialog.showSaveDialog(
+      BrowserWindow.getFocusedWindow()!,
+      { title: i18n.t('messages.save-keystore'), defaultPath: wallet.name + '.json' }
+    ).then((returnValue: SaveDialogReturnValue) => {
+      if (returnValue.canceled) {
+        return {
+          status: ResponseCode.Success,
+          result: true
+        }
+      } else if (returnValue.filePath) {
+        fs.writeFileSync(returnValue.filePath, JSON.stringify(keystore))
+        return {
+          status: ResponseCode.Success,
+          result: true,
+        }
+      } else {
+        return  {
+          status: ResponseCode.Fail,
+          result: false
+        }
+      }
+    })
   }
 }

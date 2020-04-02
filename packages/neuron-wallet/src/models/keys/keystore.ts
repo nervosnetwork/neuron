@@ -118,6 +118,11 @@ export default class Keystore {
     )
   }
 
+  // Imported from xpub with empty private key.
+  isEmpty(): boolean {
+    return this.crypto.ciphertext === "" && this.crypto.mac === ""
+  }
+
   // Decrypt and return serialized extended private key.
   decrypt(password: string): string {
     const derivedKey = this.derivedKey(password)
