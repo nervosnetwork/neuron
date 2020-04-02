@@ -345,7 +345,8 @@
       "syncing-balance": "區塊同步中, 正在獲取最新余額",
       "slow": "同步緩慢，請檢查網絡",
       "sync-failed": "連接失敗, 請檢查網絡",
-      "sync-not-start": "同步尚未開始, 請嘗試重啟"
+      "sync-not-start": "同步尚未開始, 請嘗試重啟",
+      "connecting": "正在連接節點"
     },
     "pagination": {
       "previous-page": "上一頁",

@@ -6,6 +6,10 @@ import BalanceSyncIcon, { BalanceSyncIconProps } from 'components/BalanceSyncing
 const stories = storiesOf('Balance Sync Icon', module)
 
 const propsList: { [index: string]: BalanceSyncIconProps } = {
+  Connecting: {
+    connectionStatus: ConnectionStatus.Connecting,
+    syncStatus: SyncStatus.SyncNotStart,
+  },
   Offline: {
     connectionStatus: ConnectionStatus.Offline,
     syncStatus: SyncStatus.SyncNotStart,
