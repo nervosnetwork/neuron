@@ -6,7 +6,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, SyncStatus, SyncStatusThatBalanceUpdating, ConnectionStatus } from 'utils/const'
+import { MIN_DEPOSIT_AMOUNT } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
@@ -261,26 +261,6 @@ const NervosDAO = () => {
     },
   ]
 
-<<<<<<< HEAD
-  let balancePrompt = null
-  if (ConnectionStatus.Offline === connectionStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red' }}>
-        {t('sync.sync-failed')}
-      </span>
-    )
-  } else if (SyncStatus.SyncNotStart === syncStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
-        {t('sync.sync-not-start')}
-      </span>
-    )
-  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
-    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-  }
-
-=======
->>>>>>> feat: use tooltip to indicate users the balance is under syncing
   return (
     <div className={styles.nervosDAOContainer}>
       <h1 className={styles.title}>Nervos DAO</h1>
