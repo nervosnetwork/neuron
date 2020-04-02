@@ -55,7 +55,7 @@ const navigateTo = (url: string) => {
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
   const window = BrowserWindow.getFocusedWindow()
   if (window) {
-    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID, dispatchToUI: true })
+    CommandSubject.next({ winID: window.id, type: actionType, payload: walletID, dispatchToUI: false })
   }
 }
 
