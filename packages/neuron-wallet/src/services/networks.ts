@@ -7,6 +7,7 @@ import Store from 'models/store'
 import { Validate, Required } from 'utils/validators'
 import { UsedName, NetworkNotFound, InvalidFormat } from 'exceptions'
 import { MAINNET_GENESIS_HASH, EMPTY_GENESIS_HASH, NetworkType, Network } from 'models/network'
+import CommonUtils from 'utils/common'
 
 const presetNetworks: { selected: string, networks: Network[] } = {
   selected: 'mainnet',
@@ -79,10 +80,8 @@ export default class NetworksService extends Store {
       genesisHash: EMPTY_GENESIS_HASH,
       chain: 'ckb_dev'
     }
-    const network = await Promise.race([
-      this.refreshChainInfo(properties),
-      this.returnNetworkDelayed(properties)
-    ])
+    const network = await CommonUtils.timeout(2000, this.refreshChainInfo(properties), properties)
+      .catch(() => properties )
 
     this.updateAll([...list, network])
     return network
@@ -97,10 +96,11 @@ export default class NetworksService extends Store {
     }
 
     Object.assign(network, options)
-    Object.assign(network, await Promise.race([
-      this.refreshChainInfo(network),
-      this.returnNetworkDelayed(network)
-    ]))
+    Object.assign(
+      network,
+      await CommonUtils.timeout(2000, this.refreshChainInfo(network), network)
+        .catch(() => network)
+    )
 
     this.updateAll(list)
   }
@@ -171,11 +171,5 @@ export default class NetworksService extends Store {
     }
 
     return network
-  }
-
-  private async returnNetworkDelayed(network: Network): Promise<Network> {
-    return new Promise((resolve, _) => {
-      setTimeout(() => resolve(network), 2000);
-    })
   }
 }
