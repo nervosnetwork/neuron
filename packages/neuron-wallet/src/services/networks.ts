@@ -149,31 +149,21 @@ export default class NetworksService extends Store {
 
   // Refresh a network's genesis and chain info
   private async refreshChainInfo(network: Network): Promise<Network> {
-    return new Promise((resolve, _) => {
-      const fail = () => {
-        network.genesisHash = EMPTY_GENESIS_HASH
-        network.chain = ''
-        resolve(network)
-      }
+    const ckb = new CKB(network.remote)
 
-      const ckb = new CKB(network.remote)
-      Promise.all([
-        ckb.rpc.getBlockHash('0x0')
-          .then(genesisHash => genesisHash)
-          .catch(() => EMPTY_GENESIS_HASH),
-        ckb.rpc.getBlockchainInfo().
-          then(info => info.chain)
-          .catch(() => '')
-      ]).then(([genesisHash, chain]) => {
-        network.genesisHash = genesisHash
-        network.chain = chain
-        resolve(network)
-      }).catch(() => {
-        fail()
-      })
+    const genesisHash = await ckb.rpc
+      .getBlockHash('0x0')
+      .catch(() => EMPTY_GENESIS_HASH)
+    const chain = await ckb.rpc
+      .getBlockchainInfo()
+      .then(info => info.chain)
+      .catch(() => '')
 
-      // If network.remote is reachable but doesn't respond cancel it early.
-      setTimeout(fail, 2000)
-    })
+    if (genesisHash !== network.genesisHash && chain !== '') {
+      network.genesisHash = genesisHash
+      network.chain = chain
+    }
+
+    return network
   }
 }
