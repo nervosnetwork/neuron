@@ -117,7 +117,6 @@ export enum ErrorCode {
 }
 
 export enum SyncStatus {
-  FailToFetchTipBlock,
   SyncNotStart,
   SyncPending,
   Syncing,

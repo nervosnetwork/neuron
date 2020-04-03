@@ -11,7 +11,7 @@ const SyncStatus = ({
 }>) => {
   const [t] = useTranslation()
 
-  if (ConnectionStatus.Connecting === connectionStatus || SyncStatusEnum.FailToFetchTipBlock === syncStatus) {
+  if (ConnectionStatus.Connecting === connectionStatus) {
     return <span>{t('navbar.connecting')}</span>
   }
 

@@ -25,10 +25,7 @@ export default ({
   }
 
   const now = Math.floor(currentTimestamp / 1000) * 1000
-  if (tipBlockNumber === '') {
-    return SyncStatus.FailToFetchTipBlock
-  }
-  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0') {
+  if (BigInt(syncedBlockNumber) < BigInt(0) || tipBlockNumber === '0' || tipBlockNumber === '') {
     return SyncStatus.SyncNotStart
   }
 
