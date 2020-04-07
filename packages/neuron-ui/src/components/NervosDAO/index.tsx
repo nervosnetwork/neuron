@@ -244,7 +244,15 @@ const NervosDAO = () => {
   }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
 
   const free = BigInt(wallet.balance)
-  const locked = [...withdrawList.values()].reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
+  const locked = records
+    .filter(record => !(record.unlockInfo && record.status === 'dead'))
+    .reduce((acc, record) => {
+      const key = record.depositOutPoint
+        ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
+        : `${record.outPoint.txHash}-${record.outPoint.index}`
+
+      return acc + BigInt(withdrawList.get(key) || 0)
+    }, BigInt(0))
 
   const info = [
     {
