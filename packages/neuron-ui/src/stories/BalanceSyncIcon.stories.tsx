@@ -14,10 +14,6 @@ const propsList: { [index: string]: BalanceSyncIconProps } = {
     connectionStatus: ConnectionStatus.Offline,
     syncStatus: SyncStatus.SyncNotStart,
   },
-  'Fail to fetch tip': {
-    connectionStatus: ConnectionStatus.Online,
-    syncStatus: SyncStatus.FailToFetchTipBlock,
-  },
   Completed: {
     connectionStatus: ConnectionStatus.Online,
     syncStatus: SyncStatus.SyncCompleted,
