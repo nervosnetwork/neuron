@@ -1,4 +1,4 @@
-@import "../../styles/mixin.scss";
+@import '../../styles/mixin.scss';
 
 @mixin textOverflow {
   white-space: nowrap;
@@ -13,7 +13,7 @@
   background-color: #fff;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
   display: grid;
-  grid-template: 'badge badge badge''amount stage action''compensation stage action''apc stage action''transactions transactions transactions';
+  grid-template: 'badge badge badge' 'amount stage action' 'compensation stage action' 'apc stage action' 'transactions transactions transactions';
   grid-template-rows: auto auto auto 1fr auto;
   grid-template-columns: 230px 1fr 147px;
 
@@ -34,6 +34,7 @@
       padding: 0 0 0 10px;
       box-sizing: border-box;
       border: none;
+      background: transparent;
     }
 
     .collapseIcon {
@@ -53,7 +54,7 @@
     justify-content: flex-start;
     padding-bottom: 0.6875rem;
 
-    &>div {
+    & > div {
       font-size: 0.6875rem;
       background-color: #eee;
       border-radius: 3px;
@@ -115,7 +116,7 @@
       pointer-events: none;
     }
 
-    div:first-child:hover+.tooltip {
+    div:first-child:hover + .tooltip {
       opacity: 1;
       transform: translate(-50%, 20px);
     }
@@ -159,8 +160,7 @@
 
   .transactions {
     display: grid;
-    grid-template:
-      'title deposited'auto '. withdrawn'auto '. unlocked'auto/ 205px 1fr;
+    grid-template: 'title deposited' auto '. withdrawn' auto '. unlocked' auto/ 205px 1fr;
 
     box-sizing: border-box;
     visibility: hidden;
@@ -202,6 +202,7 @@
       appearance: none;
       border: none;
       box-sizing: border-box;
+      background: transparent;
 
       &::before {
         position: absolute;
@@ -215,7 +216,7 @@
         height: 100%;
         background: rgba(224, 224, 224, 0.9);
         font-size: 0.75rem;
-        color: #666
+        color: #666;
       }
 
       &:hover::before {
