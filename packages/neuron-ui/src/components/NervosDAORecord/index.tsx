@@ -80,7 +80,7 @@ export const DAORecord = ({
   )
 
   const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
-  const leftDays = Math.round(leftEpochs / EPOCHS_PER_DAY).toString() || ''
+  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) || '').toString()
 
   const compensation = BigInt(withdrawCapacity || capacity) - BigInt(capacity)
 
@@ -107,10 +107,9 @@ export const DAORecord = ({
   } else if (CellStatus.FourEpochsSinceDeposit === cellStatus) {
     message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw')
   } else if (CellStatus.Deposited === cellStatus) {
-    message = leftDays && t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays })
+    message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
   } else if (CellStatus.Locked === cellStatus) {
-    message =
-      leftDays && t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', { days: leftDays })
+    message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', { days: leftDays || '--' })
   } else {
     lockedPeriod =
       unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
