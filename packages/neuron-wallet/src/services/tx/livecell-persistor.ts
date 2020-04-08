@@ -35,23 +35,18 @@ export class LiveCellPersistor {
           .execute()
       }
 
-      tx.inputs.forEach(input => {
-        queryRunner.manager.update(LiveCellEntity, {
+      await Promise.all(tx.inputs.map(input => {
+        return queryRunner.manager.update(LiveCellEntity, {
           txHash: Buffer.from(hexToBytes(input.previousOutput!.txHash)),
           outputIndex: BigInt(input.previousOutput!.index).toString(),
         }, {usedBlockNumber: tx.blockNumber!})
-      })
+      }))
       const txHash = Buffer.from(hexToBytes(tx.computeHash()))
       for (const [i, output] of tx.outputs.entries()) {
-        const count = await queryRunner.manager
-          .getRepository(LiveCellEntity)
-          .createQueryBuilder('cell')
-          .where('cell.txHash = :hash and cell.outputIndex = :index', {
-            hash: txHash,
-            index: i,
-          })
-          .getCount()
-        if (count === 0) {
+        const queryExists = await queryRunner
+          .manager
+          .query(`SELECT EXISTS (SELECT 1 FROM live_cell where txHash = ? and outputIndex = ?) as exist`, [txHash, i])
+        if (queryExists[0].exist === 0) {
           const cellEntity = new LiveCellEntity()
           cellEntity.txHash = txHash
           cellEntity.outputIndex = i
@@ -67,11 +62,7 @@ export class LiveCellPersistor {
             cellEntity.typeCodeHash = Buffer.from(hexToBytes(output.type!.codeHash))
             cellEntity.typeArgs = Buffer.from(hexToBytes(output.type!.args))
           }
-          if (output.data.length > 130) {
-            cellEntity.data = Buffer.from(hexToBytes(output.data.slice(0, 130)))
-          } else {
-            cellEntity.data = Buffer.from(hexToBytes(output.data))
-          }
+          cellEntity.data = Buffer.from(hexToBytes(output.data.slice(0, 130)))
           await queryRunner.manager.save(cellEntity)
         }
       }

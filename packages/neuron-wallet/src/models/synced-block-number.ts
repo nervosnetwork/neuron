@@ -6,7 +6,7 @@ import logger from 'utils/logger'
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
-  #liveCellblockNumberEntity: SyncInfoEntity | undefined = undefined
+  #liveCellBlockNumberEntity: SyncInfoEntity | undefined = undefined
   #nextBlock: bigint | undefined = undefined
 
   private static lastSavedBlock: bigint = BigInt(-1)
@@ -18,10 +18,10 @@ export default class SyncedBlockNumber {
     }
 
     const blockNumber = BigInt((await this.blockNumber()).value)
-    const liveCellblockNumber = BigInt((await this.liveCellblockNumber()).value)
+    const liveCellBlockNumber = BigInt((await this.liveCellBlockNumber()).value)
 
-    if (liveCellblockNumber < blockNumber) {
-      return liveCellblockNumber
+    if (liveCellBlockNumber < blockNumber) {
+      return liveCellBlockNumber
     }
     return blockNumber
   }
@@ -44,10 +44,10 @@ export default class SyncedBlockNumber {
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
 
-      let liveCellblockNumberEntity = await this.liveCellblockNumber()
-      if (current > BigInt(liveCellblockNumberEntity.value)) {
-        liveCellblockNumberEntity.value = current.toString()
-        getConnection().manager.save(liveCellblockNumberEntity)
+      let liveCellBlockNumberEntity = await this.liveCellBlockNumber()
+      if (current > BigInt(liveCellBlockNumberEntity.value)) {
+        liveCellBlockNumberEntity.value = current.toString()
+        await getConnection().manager.save(liveCellBlockNumberEntity)
       }
 
       logger.info("Database:\tsaved synced block #" + current.toString())
@@ -72,21 +72,21 @@ export default class SyncedBlockNumber {
     return this.#blockNumberEntity
   }
 
-  private async liveCellblockNumber(): Promise<SyncInfoEntity> {
-    if (!this.#liveCellblockNumberEntity) {
-      this.#liveCellblockNumberEntity = await getConnection()
+  private async liveCellBlockNumber(): Promise<SyncInfoEntity> {
+    if (!this.#liveCellBlockNumberEntity) {
+      this.#liveCellBlockNumberEntity = await getConnection()
         .getRepository(SyncInfoEntity)
         .findOne({
           name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
         })
     }
 
-    if (!this.#liveCellblockNumberEntity) {
-      this.#liveCellblockNumberEntity = new SyncInfoEntity()
-      this.#liveCellblockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
-      this.#liveCellblockNumberEntity.value = '0'
+    if (!this.#liveCellBlockNumberEntity) {
+      this.#liveCellBlockNumberEntity = new SyncInfoEntity()
+      this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
+      this.#liveCellBlockNumberEntity.value = '0'
     }
 
-    return this.#liveCellblockNumberEntity
+    return this.#liveCellBlockNumberEntity
   }
 }
