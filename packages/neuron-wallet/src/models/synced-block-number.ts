@@ -17,7 +17,13 @@ export default class SyncedBlockNumber {
       return this.#nextBlock
     }
 
-    return BigInt((await this.blockNumber()).value)
+    const blockNumber = BigInt((await this.blockNumber()).value)
+    const liveCellblockNumber = BigInt((await this.liveCellblockNumber()).value)
+
+    if (liveCellblockNumber < blockNumber) {
+      return liveCellblockNumber
+    }
+    return blockNumber
   }
 
   public async setNextBlock(current: bigint): Promise<void> {
