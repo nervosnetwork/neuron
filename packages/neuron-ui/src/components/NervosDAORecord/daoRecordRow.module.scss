@@ -223,6 +223,10 @@
       &:hover::before {
         display: flex;
       }
+
+      &:last-of-type {
+        font-weight: 700;
+      }
     }
   }
 
