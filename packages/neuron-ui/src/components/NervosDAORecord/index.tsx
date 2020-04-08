@@ -96,25 +96,46 @@ export const DAORecord = ({
   let message = ''
   let lockedPeriod: number | undefined
   let compensatedPeriod: number | undefined
-  if (CellStatus.Unlocking === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.unlocking')
-  } else if (CellStatus.Withdrawing === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
-  } else if (CellStatus.Unlockable === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-has-ended')
-  } else if (CellStatus.Depositing === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.pending')
-  } else if (CellStatus.FourEpochsSinceDeposit === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw')
-  } else if (CellStatus.Deposited === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
-  } else if (CellStatus.Locked === cellStatus) {
-    message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', { days: leftDays || '--' })
-  } else {
-    lockedPeriod =
-      unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
-    compensatedPeriod =
-      withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo?.timestamp - +depositInfo?.timestamp : undefined
+
+  switch (cellStatus) {
+    case CellStatus.Unlocking: {
+      message = t('nervos-dao.compensation-period.stage-messages.unlocking')
+      break
+    }
+    case CellStatus.Withdrawing: {
+      message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
+      break
+    }
+    case CellStatus.Unlockable: {
+      message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-has-ended')
+      break
+    }
+    case CellStatus.Depositing: {
+      message = t('nervos-dao.compensation-period.stage-messages.pending')
+      break
+    }
+    case CellStatus.FourEpochsSinceDeposit: {
+      message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw')
+      break
+    }
+    case CellStatus.Deposited: {
+      message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
+      break
+    }
+    case CellStatus.Locked: {
+      message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
+        days: leftDays || '--',
+      })
+      break
+    }
+    default: {
+      lockedPeriod =
+        unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
+      compensatedPeriod =
+        withdrawInfo?.timestamp && depositInfo?.timestamp
+          ? +withdrawInfo?.timestamp - +depositInfo?.timestamp
+          : undefined
+    }
   }
 
   const isActionAvailable =
