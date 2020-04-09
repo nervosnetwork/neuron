@@ -46,7 +46,7 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     blockNumber: undefined as any,
     status: 'sent',
   },
-  'Deposited 3.9 epochs': {
+  'Immature for withdraw': {
     ...basicProps,
     depositEpoch: '0xa000100030a', // 778.1
     currentEpoch: '0xa000000030e', // 782
@@ -103,6 +103,20 @@ const props: { [index: string]: Omit<DAORecordProps, 'onToggle'> } = {
     },
     depositEpoch: '0xa0000000300', // 768
     currentEpoch: '0xa000000030f', // 783
+    // withdrawnEpoch: '0xa0000000305', // 773
+  },
+  'Immature for unlock': {
+    ...basicProps,
+    depositInfo: {
+      txHash: 'deposit tx hash',
+      timestamp: new Date('2020-02-02').getTime().toString(),
+    },
+    withdrawInfo: {
+      txHash: 'withdraw tx hash',
+      timestamp: new Date('2020-02-03').getTime().toString(),
+    },
+    depositEpoch: '0xa0000000300', // 768
+    currentEpoch: '0xa00010003b4', // 948.1
     // withdrawnEpoch: '0xa0000000305', // 773
   },
   Unlockable: {

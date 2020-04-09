@@ -403,7 +403,8 @@
         },
         "stage-messages": {
           "pending": "Pending...",
-          "immature-for-withdraw": "CKB cannot be withdrawn in 16 hours",
+          "immature-for-withdraw": "CKB cannot be withdrawn in {{ hours }} hours",
+          "immature-for-unlock": "CKB cannot be unlocked in {{ hours }} hours",
           "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
           "withdrawing": "Withdrawing...",
           "compensation-cycle-will-end": "Compensation cycle ends in approximately {{days}} days",
