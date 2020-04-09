@@ -295,6 +295,7 @@
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
       "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
+      "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -309,7 +310,10 @@
         "keystore-path": "Keystore 文件",
         "keystore-name": "钱包名称",
         "keystore-password": "密码",
-        "deposit": "存入金额"
+        "deposit": "存入金额",
+        "account-name": "账户名称",
+        "token-name": "Token 名称",
+        "symbol": "Symbol"
       },
       "codes": {
         "-3": "",
@@ -450,6 +454,25 @@
       "release-success": "资产已解锁，可前往交易历史查看详情。",
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室"
+    },
+    "s-udt": {
+      "create-dialog": {
+        "create-asset-account": "创建资产账户",
+        "account-name": "账户名称",
+        "sudt-account": "sUDT 账户",
+        "ckb-account": "CKB 账户",
+        "occupy": "占用 {{ base }} CKB",
+        "set-token-info": "设置 Token 信息",
+        "copy-token-id": "复制 Token ID",
+        "token-id": "Token ID",
+        "token-name": "Token 名称",
+        "symbol": "标志",
+        "decimal": "小数位",
+        "confirm": "确认",
+        "cancel": "取消",
+        "next": "下一步",
+        "back": "上一步"
+      }
     }
   }
 }
