@@ -9,7 +9,6 @@ import Transaction from './entities/transaction'
 import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
-import LiveCell from './entities/live-cell'
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 import { ChangeHasDataDefault1568621556467 } from './migrations/1568621556467-ChangeHasDataDefault'
@@ -21,7 +20,6 @@ import { AddTypeHashToOutput1572852964749 } from './migrations/1572852964749-Add
 import { AddDepositOutPointToOutput1573305225465 } from './migrations/1573305225465-AddDepositOutPointToOutput'
 import { AddInputIndexToInput1573461100330 } from './migrations/1573461100330-AddInputIndexToInput'
 import { AddMultiSignBlake1601581405459272 } from './migrations/1581405459272-AddMultiSignBlake160'
-import { AddLiveCell1585624516932 } from './migrations/1585624516932-AddLiveCell'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -41,7 +39,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, LiveCell],
+    entities: [Transaction, Input, Output, SyncInfo],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
@@ -54,7 +52,6 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddDepositOutPointToOutput1573305225465,
       AddInputIndexToInput1573461100330,
       AddMultiSignBlake1601581405459272,
-      AddLiveCell1585624516932,
     ],
     logging,
     maxQueryExecutionTime: 30
