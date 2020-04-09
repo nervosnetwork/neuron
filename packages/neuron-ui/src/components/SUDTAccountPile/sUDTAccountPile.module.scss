@@ -1,0 +1,96 @@
+.container {
+  background: #fff;
+  width: 310px;
+  display: grid;
+  grid-template:
+    'avatar account-name account-name edit-btn'auto 'avatar token-name symbol .'auto '. footer footer footer'25px/ 33px auto 1fr 15px;
+
+  &>div {
+    overflow: hidden;
+  }
+
+  padding: 10px;
+  gap: 5px;
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+
+  &:hover {
+    .editBtn {
+      button {
+        visibility: visible;
+      }
+    }
+  }
+}
+
+.avatar {
+  grid-area: avatar;
+
+  .avatarIcon {
+    width: 33px;
+    height: 33px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eee;
+    font-size: 20px;
+    text-transform: uppercase;
+  }
+}
+
+.accountName {
+  grid-area: account-name;
+}
+
+.tokenName {
+  grid-area: token-name;
+  font-size: 0.75rem;
+}
+
+.symbol {
+  grid-area: symbol;
+  font-size: 0.75rem;
+}
+
+.editBtn {
+  grid-area: edit-btn;
+
+  button {
+    width: 16px;
+    height: 16px;
+    visibility: hidden;
+    appearance: none;
+    background: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+
+  img {
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+}
+
+
+.balance {
+  grid-area: footer;
+  font-size: 0.875rem;
+  align-self: flex-end;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  grid-area: footer;
+  justify-self: flex-end;
+  align-self: flex-end;
+
+  button {
+    margin-left: 5px;
+    padding: 5px 7px;
+  }
+}
