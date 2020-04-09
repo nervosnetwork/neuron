@@ -81,7 +81,7 @@ export const DAORecord = ({
   )
 
   const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
-  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) || '').toString()
+  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
 
   const compensation = BigInt(withdrawCapacity || capacity) - BigInt(capacity)
 
