@@ -95,8 +95,6 @@ export const DAORecord = ({
   })
 
   let message = ''
-  let lockedPeriod: number | undefined
-  let compensatedPeriod: number | undefined
 
   if (ConnectionStatus.Online === connectionStatus) {
     switch (cellStatus) {
@@ -147,15 +145,15 @@ export const DAORecord = ({
         break
       }
       default: {
-        lockedPeriod =
-          unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
-        compensatedPeriod =
-          withdrawInfo?.timestamp && depositInfo?.timestamp
-            ? +withdrawInfo?.timestamp - +depositInfo?.timestamp
-            : undefined
+        // ignore
       }
     }
   }
+
+  const lockedPeriod =
+    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
+  const compensatedPeriod =
+    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo?.timestamp - +depositInfo?.timestamp : undefined
 
   const isActionAvailable =
     connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)
