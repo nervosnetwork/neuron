@@ -15,7 +15,6 @@ import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
-import { LiveCellPersistor } from 'services/tx/livecell-persistor'
 
 export default class Queue {
   private lockHashes: string[]
@@ -134,23 +133,14 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
-  private skipLiveCell = async (blockNumber: string) => {
-    const lastBlockNumber = await LiveCellPersistor.lastBlockNumber()
-    return BigInt(lastBlockNumber) - LiveCellPersistor.CONFIRMATION_THRESHOLD > BigInt(blockNumber)
-  }
-
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
-    const skipLiveCell = await this.skipLiveCell(blocks[0].header.number)
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        if (!skipLiveCell) {
-          await LiveCellPersistor.saveTxLiveCells(tx)
-        }
         const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
         if (shouldSave) {
           if (i > 0) {
@@ -198,7 +188,6 @@ export default class Queue {
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
       }
 
       throw new Error(`chain forked: ${checkResult.type}`)

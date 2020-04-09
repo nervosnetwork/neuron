@@ -6,7 +6,6 @@ import logger from 'utils/logger'
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
   #blockNumberEntity: SyncInfoEntity | undefined = undefined
-  #liveCellBlockNumberEntity: SyncInfoEntity | undefined = undefined
   #nextBlock: bigint | undefined = undefined
 
   private static lastSavedBlock: bigint = BigInt(-1)
@@ -17,13 +16,7 @@ export default class SyncedBlockNumber {
       return this.#nextBlock
     }
 
-    const blockNumber = BigInt((await this.blockNumber()).value)
-    const liveCellBlockNumber = BigInt((await this.liveCellBlockNumber()).value)
-
-    if (liveCellBlockNumber < blockNumber) {
-      return liveCellBlockNumber
-    }
-    return blockNumber
+    return BigInt((await this.blockNumber()).value)
   }
 
   public async setNextBlock(current: bigint): Promise<void> {
@@ -43,13 +36,6 @@ export default class SyncedBlockNumber {
       let blockNumberEntity = await this.blockNumber()
       blockNumberEntity.value = current.toString()
       getConnection().manager.save(blockNumberEntity)
-
-      let liveCellBlockNumberEntity = await this.liveCellBlockNumber()
-      if (current > BigInt(liveCellBlockNumberEntity.value)) {
-        liveCellBlockNumberEntity.value = current.toString()
-        await getConnection().manager.save(liveCellBlockNumberEntity)
-      }
-
       logger.info("Database:\tsaved synced block #" + current.toString())
     }
   }
@@ -70,23 +56,5 @@ export default class SyncedBlockNumber {
     }
 
     return this.#blockNumberEntity
-  }
-
-  private async liveCellBlockNumber(): Promise<SyncInfoEntity> {
-    if (!this.#liveCellBlockNumberEntity) {
-      this.#liveCellBlockNumberEntity = await getConnection()
-        .getRepository(SyncInfoEntity)
-        .findOne({
-          name: SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER,
-        })
-    }
-
-    if (!this.#liveCellBlockNumberEntity) {
-      this.#liveCellBlockNumberEntity = new SyncInfoEntity()
-      this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
-      this.#liveCellBlockNumberEntity.value = '0'
-    }
-
-    return this.#liveCellBlockNumberEntity
   }
 }
