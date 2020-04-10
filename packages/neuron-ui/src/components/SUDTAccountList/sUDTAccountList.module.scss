@@ -1,0 +1,9 @@
+.container {
+  display: grid;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 330px);
+  gap: 10px 20px;
+}
