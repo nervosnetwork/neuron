@@ -6,6 +6,7 @@ import { shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import { epochParser } from 'utils/parsers'
 import getDAOCellStatus, { CellStatus } from 'utils/getDAOCellStatus'
+import { IMMATURE_EPOCHS, ConnectionStatus, HOURS_PER_EPOCH } from 'utils/const'
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 
 import styles from './daoRecordRow.module.scss'
@@ -80,7 +81,7 @@ export const DAORecord = ({
   )
 
   const leftEpochs = Math.max(compensationEndEpochValue - currentEpochValue, 0)
-  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) || '').toString()
+  const leftDays = (Math.round(leftEpochs / EPOCHS_PER_DAY) ?? '').toString()
 
   const compensation = BigInt(withdrawCapacity || capacity) - BigInt(capacity)
 
@@ -94,49 +95,65 @@ export const DAORecord = ({
   })
 
   let message = ''
-  let lockedPeriod: number | undefined
-  let compensatedPeriod: number | undefined
 
-  switch (cellStatus) {
-    case CellStatus.Unlocking: {
-      message = t('nervos-dao.compensation-period.stage-messages.unlocking')
-      break
-    }
-    case CellStatus.Withdrawing: {
-      message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
-      break
-    }
-    case CellStatus.Unlockable: {
-      message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-has-ended')
-      break
-    }
-    case CellStatus.Depositing: {
-      message = t('nervos-dao.compensation-period.stage-messages.pending')
-      break
-    }
-    case CellStatus.FourEpochsSinceDeposit: {
-      message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw')
-      break
-    }
-    case CellStatus.Deposited: {
-      message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
-      break
-    }
-    case CellStatus.Locked: {
-      message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
-        days: leftDays || '--',
-      })
-      break
-    }
-    default: {
-      lockedPeriod =
-        unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
-      compensatedPeriod =
-        withdrawInfo?.timestamp && depositInfo?.timestamp
-          ? +withdrawInfo?.timestamp - +depositInfo?.timestamp
-          : undefined
+  if (ConnectionStatus.Online === connectionStatus) {
+    switch (cellStatus) {
+      case CellStatus.Unlocking: {
+        message = t('nervos-dao.compensation-period.stage-messages.unlocking')
+        break
+      }
+      case CellStatus.Withdrawing: {
+        message = t('nervos-dao.compensation-period.stage-messages.withdrawing')
+        break
+      }
+      case CellStatus.Unlockable: {
+        message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-has-ended')
+        break
+      }
+      case CellStatus.Depositing: {
+        message = t('nervos-dao.compensation-period.stage-messages.pending')
+        break
+      }
+      case CellStatus.ImmatureForWithdraw: {
+        let hours: string | number = (depositEpochValue + IMMATURE_EPOCHS - currentEpochValue) * HOURS_PER_EPOCH
+        if (Number.isNaN(hours) || hours < 0 || hours > HOURS_PER_EPOCH * IMMATURE_EPOCHS) {
+          hours = '--'
+        } else {
+          hours = hours.toFixed(1)
+        }
+        message = t('nervos-dao.compensation-period.stage-messages.immature-for-withdraw', { hours })
+        break
+      }
+      case CellStatus.Deposited: {
+        message = t('nervos-dao.compensation-period.stage-messages.next-compensation-cycle', { days: leftDays || '--' })
+        break
+      }
+      case CellStatus.ImmatureForUnlock: {
+        let hours: number | string = (compensationEndEpochValue + IMMATURE_EPOCHS - currentEpochValue) * HOURS_PER_EPOCH
+        if (Number.isNaN(hours) || hours < 0 || hours > HOURS_PER_EPOCH * IMMATURE_EPOCHS) {
+          hours = '--'
+        } else {
+          hours = hours.toFixed(1)
+        }
+        message = t('nervos-dao.compensation-period.stage-messages.immature-for-unlock', { hours })
+        break
+      }
+      case CellStatus.Locked: {
+        message = t('nervos-dao.compensation-period.stage-messages.compensation-cycle-will-end', {
+          days: leftDays || '--',
+        })
+        break
+      }
+      default: {
+        // ignore
+      }
     }
   }
+
+  const lockedPeriod =
+    unlockInfo?.timestamp && depositInfo?.timestamp ? +unlockInfo?.timestamp - +depositInfo?.timestamp : undefined
+  const compensatedPeriod =
+    withdrawInfo?.timestamp && depositInfo?.timestamp ? +withdrawInfo?.timestamp - +depositInfo?.timestamp : undefined
 
   const isActionAvailable =
     connectionStatus === 'online' && [CellStatus.Deposited, CellStatus.Unlockable].includes(cellStatus)
@@ -161,7 +178,7 @@ export const DAORecord = ({
       <>
         <div className={styles.stage}>
           <CompensationProgressBar
-            pending={[CellStatus.Depositing, CellStatus.FourEpochsSinceDeposit].includes(cellStatus)}
+            pending={[CellStatus.Depositing, CellStatus.ImmatureForWithdraw].includes(cellStatus)}
             currentEpochValue={currentEpochValue}
             endEpochValue={compensationEndEpochValue}
             withdrawEpochValue={withdrawEpochValue}

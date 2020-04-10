@@ -17,7 +17,7 @@
       "currentEpochValue": 782,
       "withdrawEpoch": ""
     },
-    "expected": "FourEpochsSinceDeposit"
+    "expected": "ImmatureForWithdraw"
   },
   "deposited 4 epochs": {
     "params": {
@@ -62,7 +62,39 @@
     },
     "expected": "Locked"
   },
-  "cannot unlock due to 183.9 epochs": {
+  "locked at 180 epochs": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00000003b4",
+      "currentEpochValue": 948,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "Locked"
+  },
+  "immature for unlock at 180.1 epochs": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00010003b4",
+      "currentEpochValue": 948.1,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "ImmatureForUnlock"
+  },
+  "immature for unlock at 183.9 epochs": {
     "params": {
       "withdrawInfo": {
         "txHash": "withdraw tx hash",
@@ -76,7 +108,7 @@
       "withdrawEpoch": "0xa0000000305",
       "withdrawnEpochValue": 773
     },
-    "expected": "Locked"
+    "expected": "ImmatureForUnlock"
   },
   "unlockable": {
     "params": {

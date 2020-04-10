@@ -403,7 +403,8 @@
         },
         "stage-messages": {
           "pending": "正在存入...",
-          "immature-for-withdraw": "16 小时内无法提取 CKB",
+          "immature-for-withdraw": "{{hours}} 小时内无法提取 CKB",
+          "immature-for-unlock": "{{hours}} 小时内无法解锁 CKB",
           "next-compensation-cycle": "下一补偿周期约在 {{days}} 天后开始",
           "withdrawing": "正在提取...",
           "compensation-cycle-will-end": "补偿周期约在 {{days}} 天后结束",

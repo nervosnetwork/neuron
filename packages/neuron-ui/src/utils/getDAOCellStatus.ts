@@ -1,12 +1,13 @@
-import { IMMATURE_EPOCHS } from 'utils/const'
 import { epochParser } from 'utils/parsers'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
+import { IMMATURE_EPOCHS } from 'utils/const'
 
 export enum CellStatus {
   Depositing,
-  FourEpochsSinceDeposit,
+  ImmatureForWithdraw,
   Deposited,
   Withdrawing,
+  ImmatureForUnlock,
   Locked,
   Unlockable,
   Unlocking,
@@ -44,7 +45,7 @@ export default ({
   }
 
   if (withdrawInfo) {
-    // withdrawing or locked or unlockable
+    // withdrawing or locked or unlockable or immature-for-unlock
     if (status === 'sent') {
       return CellStatus.Withdrawing
     }
@@ -54,10 +55,14 @@ export default ({
       const withdrawEpochInfo = epochParser(withdrawEpoch)
       const depositEpochInfo = epochParser(depositEpoch)
 
-      const unlockEpochValue = calculateClaimEpochValue(depositEpochInfo, withdrawEpochInfo) + IMMATURE_EPOCHS
+      const unlockEpochValue = calculateClaimEpochValue(depositEpochInfo, withdrawEpochInfo)
 
-      if (unlockEpochValue <= currentEpochInfo.value) {
+      if (unlockEpochValue + IMMATURE_EPOCHS <= currentEpochInfo.value) {
         return CellStatus.Unlockable
+      }
+
+      if (unlockEpochValue < currentEpochInfo.value) {
+        return CellStatus.ImmatureForUnlock
       }
     }
 
@@ -73,7 +78,7 @@ export default ({
 
   if (currentEpochInfo.value < depositEpochInfo.value + IMMATURE_EPOCHS) {
     // deposited but immature
-    return CellStatus.FourEpochsSinceDeposit
+    return CellStatus.ImmatureForWithdraw
   }
   return CellStatus.Deposited
 }
