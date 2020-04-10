@@ -2,10 +2,9 @@
   background: #fff;
   width: 310px;
   display: grid;
-  grid-template:
-    'avatar account-name account-name edit-btn'auto 'avatar token-name symbol .'auto '. footer footer footer'25px/ 33px auto 1fr 15px;
+  grid-template: 'avatar account-name account-name edit-btn' auto 'avatar token-name symbol .' auto '. footer footer footer' 25px/ 33px auto 1fr 15px;
 
-  &>div {
+  & > div {
     overflow: hidden;
   }
 
@@ -75,7 +74,6 @@
     pointer-events: none;
   }
 }
-
 
 .balance {
   grid-area: footer;

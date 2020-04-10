@@ -11,9 +11,7 @@ export interface SUDTAccountPileProps {
   balance: string
   tokenId: string
   isSelected: boolean
-  onEditClick: React.EventHandler<React.SyntheticEvent<HTMLElement>>
-  onSendClick: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
-  onReceiveClick: React.EventHandler<React.SyntheticEvent<HTMLButtonElement>>
+  onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }
 
 const SUDTAccountPile = ({
@@ -23,27 +21,31 @@ const SUDTAccountPile = ({
   symbol,
   balance,
   isSelected,
-  onEditClick,
-  onReceiveClick,
-  onSendClick,
+  onClick,
 }: SUDTAccountPileProps) => {
   return (
-    <div className={styles.container}>
+    <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
         <div className={styles.avatarIcon}>{accountName?.[0] ?? '?'}</div>
       </div>
-      <div className={styles.accountName}>{accountName || 'Undefined'}</div>
-      <div className={styles.tokenName}>{tokenName || 'Unknown'}</div>
-      <div className={styles.symbol}>{`(${symbol || 'Unkonw'})`}</div>
+      <div className={styles.accountName}>
+        <span>{accountName || 'Undefined'}</span>
+      </div>
+      <div className={styles.tokenName}>
+        <span>{tokenName || 'Unknown'}</span>
+      </div>
+      <div className={styles.symbol}>
+        <span>{`(${symbol || 'Unkonw'})`}</span>
+      </div>
       <div className={styles.editBtn}>
-        <button onClick={onEditClick} data-id={accountId} type="button">
+        <button data-role="edit" type="button">
           <img src={EditIcon} alt="edit" />
         </button>
       </div>
       {isSelected ? (
         <div className={styles.actions}>
-          <Button type="primary" label="Receive" data-id={accountId} onClick={onReceiveClick} disabled={!accountName} />
-          <Button type="primary" label="Send" data-id={accountId} onClick={onSendClick} disabled={!accountName} />
+          <Button type="primary" label="Receive" data-role="receive" disabled={!accountName} />
+          <Button type="primary" label="Send" data-role="send" disabled={!accountName} />
         </div>
       ) : (
         <div className={styles.balance}>{balance || '--'}</div>

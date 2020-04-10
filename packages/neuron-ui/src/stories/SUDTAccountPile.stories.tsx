@@ -5,9 +5,9 @@ import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPil
 
 const stories = storiesOf('sUD Account Pile', module)
 
-const onEditClick = (e: any) => action('Edit')(e.target.dataset.id)
-const onReceiveClick = (e: any) => action('Receive')(e.target.dataset.id)
-const onSendClick = (e: any) => action('Send')(e.target.dataset.id)
+const eventListeners = {
+  onClick: (e: any) => action('Click')(e.target.dataset.id, e.currentTarget.dataset.role),
+}
 
 const piles: { [accountType: string]: SUDTAccountPileProps } = {
   sUDT: {
@@ -18,9 +18,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
     isSelected: false,
-    onEditClick,
-    onReceiveClick,
-    onSendClick,
+    ...eventListeners,
   },
   Unknown: {
     accountId: 'account id',
@@ -30,9 +28,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     balance: '',
     tokenId: 'token id 2',
     isSelected: false,
-    onEditClick,
-    onReceiveClick,
-    onSendClick,
+    ...eventListeners,
   },
   selected: {
     accountId: 'account id',
@@ -42,9 +38,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
     isSelected: true,
-    onEditClick,
-    onReceiveClick,
-    onSendClick,
+    ...eventListeners,
   },
 }
 
