@@ -494,7 +494,7 @@ public static generateSendingAllTx = async (
 
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
-    const sudtCellDep = assetAccountInfo.getSudtCellDep()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
     const needCapacities = isCKB ? BigInt(61) : BigInt(142)
     const output = Output.fromObject({
       capacity: needCapacities.toString(),
