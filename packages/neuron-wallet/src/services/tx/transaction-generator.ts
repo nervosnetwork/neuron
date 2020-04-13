@@ -495,7 +495,7 @@ public static generateSendingAllTx = async (
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
-    const needCapacities = isCKB ? BigInt(61) : BigInt(142)
+    const needCapacities = isCKB ? BigInt(61 * 10**8) : BigInt(142 * 10**8)
     const output = Output.fromObject({
       capacity: needCapacities.toString(),
       lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
