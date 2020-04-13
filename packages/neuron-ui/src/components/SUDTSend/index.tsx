@@ -5,7 +5,7 @@ import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
 import { verifySUDTAddress, verifySUDTAmount } from 'utils/validators'
 import TransactionFeePanel from 'components/TransactionFeePanel'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
 import { INIT_SEND_PRICE, Routes } from 'utils/const'
 import { generateSUDTTransaction, generateSendAllSUDTTransaction, sendSUDTTransaction } from 'services/remote'
 import styles from './sUDTSend.module.scss'
@@ -61,7 +61,7 @@ const SUDTSend = () => {
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [isPwdDialogOpen, setisPwdDialogOpen] = useState(false)
   const [passwordError, setPasswordError] = useState('')
-  const [isSending] = useState(false)
+  const [isSending, setIsSending] = useState(false)
 
   const breakcrum = [{ label: 'asset account', link: 'asset account' }]
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
@@ -97,6 +97,7 @@ const SUDTSend = () => {
       .then(res => {
         if (res.status === 1) {
           dispatch({ type: Fields.Generated, payload: res.result })
+          // TODO: set the fee
         }
       })
       .catch((err: Error) => {
@@ -114,6 +115,9 @@ const SUDTSend = () => {
       } = e.target as HTMLInputElement
       if (typeof field === 'string' && field in initState) {
         dispatch({ type: field as Fields, payload: value })
+      }
+      if (field === Fields.Password) {
+        setPasswordError('')
       }
     },
     [dispatch]
@@ -155,14 +159,15 @@ const SUDTSend = () => {
       e.preventDefault()
       e.stopPropagation()
       if (isSendable) {
+        setIsSending(true)
+
         sendSUDTTransaction({ walletID: 'id', tx: sendState.generated, password: sendState.password })
           .then(res => {
             if (res.status === 1) {
-              // success
               onDismissPassword()
               history.push(Routes.History)
             } else {
-              // error
+              // TODO: error handler
             }
           })
           .catch((err: Error) => {
@@ -171,9 +176,12 @@ const SUDTSend = () => {
 
             console.error(err)
           })
+          .finally(() => {
+            setIsSending(false)
+          })
       }
     },
-    [sendState.generated, sendState.password, isSendable, onDismissPassword]
+    [sendState.generated, sendState.password, isSendable, onDismissPassword, setIsSending, history]
   )
 
   return (
@@ -183,17 +191,17 @@ const SUDTSend = () => {
       </div>
       <div className={styles.title}>Send</div>
       <form onSubmit={onSubmit}>
-        <div className={styles.cardContainer} data-is-sending-all={sendState.sendAll}>
+        <div className={styles.cardContainer}>
           <div className={styles.info}>
             <div className={styles.avatar}>
               <div className={styles.icon}>C</div>
             </div>
             <div className={styles.accountName}>Account Name</div>
             <div className={styles.tokenName}>Token Name</div>
-            <div className={styles.balance}>1.000000000000000</div>
+            <div className={styles.balance}>{localNumberFormatter('11111111111111111111.000000000000000')}</div>
             <div className={styles.symbol}>SYM</div>
           </div>
-          <div className="sendContainer">
+          <div className={styles.sendContainer}>
             {fields.map(field => {
               return (
                 <TextField
@@ -206,10 +214,13 @@ const SUDTSend = () => {
                   suffix={field.key === Fields.Amount && 'SYM'}
                   disabled={sendState.sendAll}
                   error={errors[field.key]}
+                  className={styles[field.key]}
                 />
               )
             })}
-            <Button type="primary" label="Max" onClick={onToggleSendingAll} disabled={!sendState.address} />
+            <div className={styles.sendAll}>
+              <Button type="primary" label="Max" onClick={onToggleSendingAll} disabled={!sendState.address} />
+            </div>
             <div className={styles.fee}>
               <TransactionFeePanel
                 fee={shannonToCKBFormatter('100')}
@@ -219,16 +230,19 @@ const SUDTSend = () => {
             </div>
             <div className={styles.description}>
               <TextField
-                label="description"
+                label="Description"
                 value={sendState.description}
                 field={Fields.Description}
                 onChange={onInput}
-                // TODO: maxLength?
+                placeholder="Click to edit"
+                className={styles.descriptionField}
               />
             </div>
           </div>
         </div>
-        <Button type="submit" label="Submit" onClick={onSubmit} disabled={!isSubmittable} />
+        <div className={styles.footer}>
+          <Button type="submit" label="Submit" onClick={onSubmit} disabled={!isSubmittable} />
+        </div>
       </form>
       <div className={styles.modal} hidden={!isPwdDialogOpen}>
         <div className={styles.passwordDialog}>
@@ -241,8 +255,10 @@ const SUDTSend = () => {
               onChange={onInput}
               error={passwordError}
             />
-            <Button type="cancel" label="cancel" onClick={onDismissPassword} />
-            <Button type="submit" label="confirm" onClick={onSend} disabled={!isSendable} />
+            <div className={styles.dialogFooter}>
+              <Button type="cancel" label="cancel" onClick={onDismissPassword} />
+              <Button type="submit" label="confirm" onClick={onSend} disabled={!isSendable} />
+            </div>
           </form>
         </div>
       </div>

@@ -22,7 +22,7 @@ const Breadcrum = ({ pages = [] }: BreadcumProps) => {
         history.push(link)
       }
     },
-    [useHistory]
+    [history]
   )
 
   return (

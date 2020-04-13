@@ -1,5 +1,21 @@
+@import '../../styles/mixin.scss';
+
 .container {
   display: grid;
+}
+
+.cardContainer {
+  background: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 6px;
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.12);
+}
+
+.title {
+  height: 0.78em;
+  font-size: 1.375rem;
+  font-weight: 700;
 }
 
 .info {
@@ -7,11 +23,131 @@
   grid-template:
     'avatar account-name account-name account-name' 18px
     'avatar token-name balance symbol' 15px/
-    33px 20px 1fr auto;
+    38px 150px 1fr auto;
+
+  .avatar {
+    grid-area: avatar;
+    .icon {
+      width: 33px;
+      height: 33px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 900;
+      font-size: 2rem;
+      box-sizing: border-box;
+      border: 1px solid #aaa;
+      border-radius: 2px;
+    }
+  }
+  .accountName {
+    grid-area: account-name;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    font-weight: 600;
+    align-self: center;
+  }
+  .tokenName {
+    grid-area: token-name;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    align-self: center;
+  }
+  .balance {
+    grid-area: balance;
+    padding: 0 5px;
+    font-size: 0.875rem;
+    text-align: right;
+    align-self: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .symbol {
+    grid-area: symbol;
+    font-size: 0.875rem;
+  }
+
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 20px;
 }
 
 .sendContainer {
-  // &[data-is-sending-all=true]{
-  //   input
-  // }
+  display: grid;
+  grid-template:
+    'address .' auto 'amount send-all' auto 'fee fee' auto
+    'description description' auto/ 1fr 70px;
+  padding: 20px 30px;
+
+  .address {
+    grid-area: address;
+  }
+  .amount {
+    grid-area: amount;
+  }
+  .sendAll {
+    grid-area: send-all;
+    justify-self: flex-end;
+    padding-top: 22px;
+    button {
+      box-sizing: border-box;
+      width: 60px;
+      height: 25px;
+      padding: 0;
+      line-height: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: unset;
+    }
+  }
+  .fee {
+    grid-area: fee;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+    margin-top: 8px;
+  }
+  .description {
+    grid-area: description;
+  }
+
+  .descriptionField {
+    & > div {
+      border-color: transparent transparent #aaa !important;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal {
+  @include overlay;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &[hidden] {
+    display: none;
+  }
+  h2 {
+    @include dialogTitle;
+  }
+  .passwordDialog {
+    @include dialogContainer;
+    background: #fff;
+    padding: 49px 73px;
+  }
+  .dialogFooter {
+    @include dialogFooter;
+    button {
+      margin-left: 5px;
+    }
+  }
 }
