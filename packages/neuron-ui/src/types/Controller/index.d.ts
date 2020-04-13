@@ -161,4 +161,40 @@ declare namespace Controller {
       data: string
     }
   }
+  /**
+   * sUDT related API
+   */
+  namespace GenerateSUDTTransaction {
+    type SerializedTx = hash
+    interface Params {
+      walletID: string
+      address: string
+      amount: string
+      feeRate: string
+      description?: string
+    }
+
+    type Response = SerializedTx
+  }
+
+  namespace GenerateSendAllSUDTTransaction {
+    type SerializedTx = string
+    interface Params {
+      walletID: string
+      address: string
+      feeRate: string
+      description?: string
+    }
+    type Response = SerializedTx
+  }
+
+  namespace SendSUDTTransaction {
+    type Hash = string
+    interface Params {
+      walletID: string
+      tx: Tx
+      password: string
+    }
+    type Response = Hash
+  }
 }
