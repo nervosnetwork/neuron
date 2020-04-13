@@ -1,22 +1,22 @@
 // font
 @mixin BoldText {
-  font-family: "Montserrat-Bold", "SourceHanSansCN-Bold";
+  font-family: "SourceCodePro-Regular", monospace;
+  font-weight: 900;
 }
 
 @mixin SemiBoldText {
-  font-family: "Montserrat-SemiBold", "SourceHanSansCN-Medium";
+  font-family: "SourceCodePro-Regular", monospace;
+  font-weight: 600;
 }
 
 @mixin MediumText {
-  font-family: "Montserrat-Medium", "SourceHanSansCN-Medium";
+  font-family: "SourceCodePro-Regular", monospace;
+  font-weight: 500;
 }
 
 @mixin RegularText {
-  font-family: "Montserrat-Regular", "SourceHanSansCN-Regular";
-}
-
-@mixin MonoText {
   font-family: "SourceCodePro-Regular", monospace;
+  font-weight: 400;
 }
 
 // layout
