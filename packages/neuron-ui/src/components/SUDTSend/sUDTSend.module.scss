@@ -1,0 +1,17 @@
+.container {
+  display: grid;
+}
+
+.info {
+  display: grid;
+  grid-template:
+    'avatar account-name account-name account-name' 18px
+    'avatar token-name balance symbol' 15px/
+    33px 20px 1fr auto;
+}
+
+.sendContainer {
+  // &[data-is-sending-all=true]{
+  //   input
+  // }
+}

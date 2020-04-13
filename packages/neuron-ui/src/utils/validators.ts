@@ -1,3 +1,4 @@
+// REFACTOR: throw exceptions directly
 import {
   MAX_NETWORK_NAME_LENGTH,
   MIN_PASSWORD_LENGTH,
@@ -15,6 +16,7 @@ const SHORT_ADDR_00_LENGTH = 46
 const SHORT_ADDR_00_PREFIX = '0x0100'
 const LONG_DATA_PREFIX = '0x02'
 const LONG_TYPE_PREFIX = '0x04'
+
 export const verifyAddress = (address: string, isMainnet?: boolean): boolean => {
   if (typeof address !== 'string') {
     return false
@@ -39,6 +41,11 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
 }
 
+export const verifySUDTAddress = (address: string, isMainnet?: boolean): boolean => {
+  // TODO: add sudt address rules
+  return verifyAddress(address, isMainnet)
+}
+
 export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
   return BigInt(CKBToShannonFormatter(amount)) >= BigInt((MIN_AMOUNT + extraSize) * SHANNON_CKB_RATIO)
 }
@@ -57,6 +64,11 @@ export const verifyAmount = (amount: string = '0') => {
     return { code: ErrorCode.NotNegative }
   }
   return true
+}
+
+export const verifySUDTAmount = (amount: string = '0') => {
+  // TODO: add sUDT rules
+  return verifyAmount(amount)
 }
 
 export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
@@ -155,7 +167,9 @@ export const verifyURL = (url: string) => {
 
 export default {
   verifyAddress,
+  verifySUDTAddress,
   verifyAmountRange,
+  verifySUDTAmount,
   verifyTotalAmount,
   verifyPasswordComplexity,
   verifyTransactionOutputs,
