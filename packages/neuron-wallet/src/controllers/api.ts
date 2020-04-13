@@ -22,6 +22,8 @@ import SignMessageController from 'controllers/sign-message'
 import CustomizedAssetsController from './customized-assets'
 import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
+import AssetAccountController from './asset-account'
+import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -31,6 +33,7 @@ export default class ApiController {
   private networksController = new NetworksController()
   private signAndVerifyController = new SignMessageController()
   private customizedAssetsController = new CustomizedAssetsController()
+  private assetAccountController = new AssetAccountController()
 
   public async mount() {
     this.registerHandlers()
@@ -313,6 +316,19 @@ export default class ApiController {
 
     handle('verify-signature', async (_, params: Controller.Params.VerifyParams) => {
       return this.signAndVerifyController.verify(params)
+    })
+
+    // sUDT
+    handle('generate-create-asset-account-tx', async (_, params: GenerateCreateAssetAccountTxParams) => {
+      return this.assetAccountController.generateCreateTx(params)
+    })
+
+    handle('send-create-asset-account-tx', async (_, params: SendCreateAssetAccountTxParams) => {
+      return this.assetAccountController.sendCreateTx(params)
+    })
+
+    handle('update-asset-account', async (_, params: UpdateAssetAccountParams) => {
+      return this.assetAccountController.update(params)
     })
   }
 

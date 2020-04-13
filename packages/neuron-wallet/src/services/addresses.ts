@@ -219,6 +219,11 @@ export default class AddressService {
     return AddressParser.batchToLockHash(addresses)
   }
 
+  public static allLockHashesByWalletId(walletId: string): string[] {
+    const addresses = AddressService.allAddressesByWalletId(walletId).map(addr => addr.address)
+    return AddressParser.batchToLockHash(addresses)
+  }
+
   public static usedAddresses = (walletId: string): AddressInterface[] => {
     return AddressDao.usedAddressesByWalletId(walletId,  AddressService.getAddressVersion())
   }
