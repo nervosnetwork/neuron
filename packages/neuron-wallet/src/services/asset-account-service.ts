@@ -7,6 +7,18 @@ import TransactionSender from "./transaction-sender"
 import Transaction from "models/chain/transaction"
 
 export default class AssetAccountService {
+  public static async getAll(walletID: string): Promise<AssetAccount[]> {
+    const assetAccounts = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('asset_account')
+      .where({
+        walletID,
+      })
+      .getMany()
+
+    return assetAccounts.map(aa => aa.toModel())
+  }
+
   public static async generateCreateTx(
     walletID: string,
     lockHashes: string[],

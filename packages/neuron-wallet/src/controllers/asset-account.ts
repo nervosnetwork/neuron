@@ -4,6 +4,9 @@ import AssetAccountService from "services/asset-account-service"
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
 import AddressService from "services/addresses"
+import NetworksService from "services/networks"
+import AddressGenerator from "models/address-generator"
+import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils"
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -32,6 +35,28 @@ export interface UpdateAssetAccountParams {
 }
 
 export default class AssetAccountController {
+  public async getAll(params: { walletID: string }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
+    const assetAccounts = await AssetAccountService.getAll(params.walletID)
+
+    if (!assetAccounts) {
+      throw new ServiceHasNoResponse('AssetAccount')
+    }
+
+    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+
+    const result = assetAccounts.map(aa => {
+      return {
+        ...aa,
+        address: AddressGenerator.toShortByBlake160(aa.blake160, addressPrefix)
+      }
+    })
+
+    return {
+      status: ResponseCode.Success,
+      result,
+    }
+  }
+
   public async generateCreateTx(params: GenerateCreateAssetAccountTxParams): Promise<Controller.Response<{
     assetAccount: AssetAccount,
     tx: Transaction

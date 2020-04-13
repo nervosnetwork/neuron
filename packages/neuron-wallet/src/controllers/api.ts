@@ -330,6 +330,10 @@ export default class ApiController {
     handle('update-asset-account', async (_, params: UpdateAssetAccountParams) => {
       return this.assetAccountController.update(params)
     })
+
+    handle('asset-accounts', async (_, params: { walletID: string }) => {
+      return this.assetAccountController.getAll(params)
+    })
   }
 
   // Register handler, warp and serialize API response
