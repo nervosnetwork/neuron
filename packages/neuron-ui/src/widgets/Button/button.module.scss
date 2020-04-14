@@ -1,7 +1,4 @@
-@import '../../styles/mixin.scss';
-
 .button {
-  @include MediumText;
   appearance: none;
   min-width: 5.125rem;
   font-size: 0.75rem;
@@ -20,7 +17,7 @@
     border: 1px solid #000;
 
     &:hover {
-      @include SemiBoldText;
+      font-weight: 700;
     }
   }
 
@@ -29,7 +26,7 @@
     color: #000;
 
     &:hover {
-      @include SemiBoldText;
+      font-weight: 700;
       background-color: #d1d1d1;
     }
   }
@@ -42,22 +39,21 @@
     color: #fff;
 
     &:hover {
-      @include SemiBoldText;
+      font-weight: 700;
       background-color: #21b574;
     }
   }
 
   &:active {
-    @include SemiBoldText;
+    font-weight: 700;
     filter: invert(0.2);
   }
 
   &[disabled] {
     border: none !important;
-    font-family: "Montserrat-Medium", "SourceHanSansCN-Medium" !important;
-    background-color: rgb(243, 242, 241) !important;
-    color: rgb(161, 159, 157) !important;
+    opacity: 0.5;
     box-shadow: none !important;
+    pointer-events: none;
   }
 
 }

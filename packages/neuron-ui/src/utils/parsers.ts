@@ -25,10 +25,15 @@ export const queryParsers = { listParams, prompt }
 
 export const epochParser = (epoch: string) => {
   const e = BigInt(epoch)
-  return {
+
+  const res = {
     length: (e >> BigInt(40)) & BigInt(0xffff),
     index: (e >> BigInt(24)) & BigInt(0xffff),
     number: e & BigInt(0xffffff),
+  }
+  return {
+    ...res,
+    value: res.length > 0 ? Number(res.number) + Number(res.index) / Number(res.length) : Number(res.number),
   }
 }
 

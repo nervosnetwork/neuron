@@ -2,7 +2,7 @@
 
 .dialog {
   @include dialogContainer;
-  padding: 51px 73px;
+  padding: 30px 50px;
 
   &::backdrop {
     @include overlay;
@@ -10,22 +10,25 @@
 }
 
 .title {
-  @include dialogTitle;
+  font-weight: 900;
+  font-size: 1.125rem;
 }
 
 .fee {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   font-size: 0.875rem;
   line-height: 1.4;
-  letter-spacing: 0.7px;
-  margin-top: 11px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 
-  &>span:first-of-type:after {
-    display: inline;
-    content: ':';
-    font-weight: 600;
+  &>span:first-of-type {
+    font-weight: 900;
+
+    &:after {
+      display: inline;
+      content: ':';
+      font-weight: 600;
+    }
   }
 }
 
@@ -39,19 +42,20 @@
 }
 
 .notice {
-  h2 {
-    line-height: 1.125rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.7px;
-    padding: 0;
-    margin: 0;
-  }
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  margin: 14px 0 20px 0;
+  color: #666;
 
-  p {
-    font-size: 0.625rem;
-    letter-spacing: 0.5px;
-    margin: 6px 0 28px 0;
+  svg {
+    position: absolute;
+    left: 0;
+    top: 0.13rem;
+    filter: grayscale(1) opacity(0.6);
+    width: 0.625rem;
+    height: 0.625rem;
   }
 }
 

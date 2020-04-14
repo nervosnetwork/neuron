@@ -11,6 +11,7 @@ import OutPoint from 'models/chain/out-point'
 import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
 import MultiSign from 'models/multi-sign'
+import InputEntity from 'database/chain/entities/input'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -68,42 +69,90 @@ export default class CellsService {
     }
   }
 
-  public static getDaoCells = async (
-    lockHashes: string[],
-  ): Promise<Cell[]> => {
+  public static async getDaoCells(lockHashes: string[]): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`(output.status = :liveStatus OR tx.status = :failedStatus) AND output.daoData IS NOT NULL AND output.lockHash in (:...lockHashes) AND tx.blockNumber IS NOT NULL`, {
+      .where(`output.daoData IS NOT NULL AND (output.status = :liveStatus OR output.status = :sentStatus OR tx.status = :failedStatus OR ((output.status = :deadStatus OR output.status = :pendingStatus) AND output.depositTxHash is not null)) AND output.lockHash in (:...lockHashes)`, {
         lockHashes,
         liveStatus: OutputStatus.Live,
+        sentStatus: OutputStatus.Sent,
         failedStatus: TransactionStatus.Failed,
+        deadStatus: OutputStatus.Dead,
+        pendingStatus: OutputStatus.Pending,
       })
       .orderBy(`CASE output.daoData WHEN '0x0000000000000000' THEN 1 ELSE 0 END`, 'ASC')
       .addOrderBy('tx.timestamp', 'ASC')
       .getMany()
 
-    const cells: Cell[] = outputs.map(o => o.toModel())
-
-    const txHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
-
-    const txs = await getConnection()
+    // find deposit info
+    const depositTxHashes = outputs.map(output => output.depositTxHash).filter(hash => !!hash)
+    const depositTxs = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
       .where({
-        hash: In(txHashes)
+        hash: In(depositTxHashes)
       })
       .getMany()
+    const depositTxMap = new Map<string, TransactionEntity>()
+    depositTxs.forEach(tx => {
+      depositTxMap.set(tx.hash, tx)
+    })
 
-    for (const output of cells) {
-      if (output.depositOutPoint) {
-        const tx = txs.filter(t => t.hash === output.depositOutPoint!.txHash)[0]
-        if (tx && tx.timestamp) {
-          output.setDepositTimestamp(tx.timestamp)
+    // find unlock info
+    const unlockTxKeys: string[] = outputs.map(o => o.outPointTxHash + ':' + o.outPointIndex)
+    const inputs: InputEntity[] = await getConnection()
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .leftJoinAndSelect('input.transaction', 'tx')
+      .where(`input.outPointTxHash || ':' || input.outPointIndex IN (:...infos)`, {
+        infos: unlockTxKeys
+      })
+      .getMany()
+    const unlockTxMap = new Map<string, TransactionEntity>()
+    inputs.forEach(i => {
+      const key = i.outPointTxHash + ':' + i.outPointIndex
+      unlockTxMap.set(key, i.transaction!)
+    })
+
+    const cells: Cell[] = outputs.map(output => {
+      const cell = output.toModel()
+      if (!output.depositTxHash) {
+        // if deposit cell, set depositInfo
+        cell.setDepositInfo({
+          txHash: output.transaction!.hash,
+          timestamp: output.transaction!.timestamp!,
+        })
+      } else {
+        // if not deposit cell, set deposit timestamp info, depositInfo, withdrawInfo
+        const depositTx = depositTxMap.get(output.depositTxHash)!
+        cell.setDepositTimestamp(depositTx.timestamp!)
+
+        cell.setDepositInfo({
+          txHash: depositTx.hash,
+          timestamp: depositTx.timestamp!,
+        })
+
+        const withdrawTx = output.transaction
+        cell.setWithdrawInfo({
+          txHash: withdrawTx!.hash,
+          timestamp: withdrawTx!.timestamp!,
+        })
+
+        if (output.status === OutputStatus.Dead || output.status === OutputStatus.Pending) {
+          // if unlocked, set unlockInfo
+          const key = output.outPointTxHash + ':' + output.outPointIndex
+          const unlockTx = unlockTxMap.get(key)!
+          cell.setUnlockInfo({
+            txHash: unlockTx.hash,
+            timestamp: unlockTx.timestamp!,
+          })
         }
       }
-    }
+
+      return cell
+    })
 
     return cells
   }

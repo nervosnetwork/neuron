@@ -1,0 +1,122 @@
+$tile-green: #3cc68a;
+$tile-yellow: #f7ae4d;
+$tile-grey: #e3e3e3;
+$tile-green-hover: #21b574;
+$tile-yellow-hover: #fa8f00;
+$tile-grey-hover: #888;
+$divider-color: #b3b3b3;
+$arrow-size: 10px;
+
+.container {
+  position: relative;
+  background: #fff;
+  width: 320px;
+  margin-top: $arrow-size;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+  border-radius: 2px;
+  font-size: 0.75rem;
+
+  .compensated {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    font-weight: 500;
+
+    span:first-child {
+      font-weight: 900;
+    }
+  }
+
+  .divider {
+    margin: 0 5px;
+    height: 1px;
+    background: $divider-color;
+  }
+
+  .times {
+    padding: 0 15px;
+    color: #666;
+    overflow: hidden;
+
+    .time {
+      color: #000;
+    }
+
+    .normal,
+    .suggested,
+    .ending {
+      position: relative;
+      margin: 15px 0;
+      padding-left: 18px;
+      line-height: 1.15;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        content: '';
+        width: 13px;
+        height: 13px;
+      }
+    }
+
+    .normal::before {
+      background-color: $tile-grey;
+    }
+
+    .suggested::before {
+      background-color: $tile-green;
+    }
+
+    .ending::before {
+      background-color: $tile-yellow;
+    }
+  }
+
+  &[data-stage='normal'] {
+    .normal {
+      font-weight: 900;
+    }
+  }
+
+  &[data-stage='suggested'] {
+    .normal {
+      display: none;
+    }
+
+    .suggested {
+      .time {
+        font-weight: bold;
+      }
+    }
+  }
+
+  &[data-stage='ending'] {
+
+    .normal,
+    .suggested {
+      display: none;
+    }
+
+    .ending {
+      .time {
+        font-weight: bold;
+      }
+    }
+  }
+
+  &::before {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    display: block;
+    content: '';
+    width: 0;
+    height: 0;
+    border: $arrow-size solid transparent;
+    border-bottom-color: #fff;
+    filter: drop-shadow(0px -1px 1px rgba(0, 0, 0, 0.1))
+  }
+}
