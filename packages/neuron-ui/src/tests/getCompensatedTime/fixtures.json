@@ -1,0 +1,20 @@
+[
+  {
+    "depositEpochValue": 1.1,
+    "currentEpochValue": 180,
+    "expected": {
+      "totalHours": 715,
+      "days": 29,
+      "hours": 19
+    }
+  },
+  {
+    "depositEpochValue": 1.1,
+    "currentEpochValue": 280,
+    "expected": {
+      "totalHours": 1115,
+      "days": 46,
+      "hours": 11
+    }
+  }
+]

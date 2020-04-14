@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, TooltipHost } from 'office-ui-fabric-react'
 
 import appState from 'states/initStates/app'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, SyncStatus, SyncStatusThatBalanceUpdating, ConnectionStatus } from 'utils/const'
-import { epochParser } from 'utils/parsers'
+import { MIN_DEPOSIT_AMOUNT, ConnectionStatus, SyncStatus } from 'utils/const'
 import { backToTop } from 'utils/animations'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
@@ -16,15 +14,15 @@ import getCurrentUrl from 'utils/getCurrentUrl'
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
-import CompensationPeriodDialog from 'components/CompensationPeriodDialog'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
-import Spinner from 'widgets/Spinner'
-import { ReactComponent as Info } from 'widgets/Icons/DaoInfo.svg'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
 
 const NervosDAO = () => {
+  const [focusedRecord, setFocusedRecord] = useState('')
+  const [tabIdx, setTabIdx] = useState('0')
   const {
     app: {
       send = appState.send,
@@ -48,14 +46,13 @@ const NervosDAO = () => {
   const [showDepositDialog, setShowDepositDialog] = useState(false)
   const [activeRecord, setActiveRecord] = useState<State.NervosDAORecord | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [withdrawList, setWithdrawList] = useState<(string | null)[]>([])
+  const [withdrawList, setWithdrawList] = useState<Map<string, string | null>>(new Map())
   const [globalAPC, setGlobalAPC] = useState(0)
   const [genesisBlockTimestamp, setGenesisBlockTimestamp] = useState<number | undefined>(undefined)
-  const [blockHashInCompensationDialog, setBlockHashInCompensationPeriodDialog] = useState('')
   const [maxDepositAmount, setMaxDepositAmount] = useState<bigint>(BigInt(wallet.balance))
   const [maxDepositTx, setMaxDepositTx] = useState<any>(undefined)
   const [maxDepositErrorMessage, setMaxDepositErrorMessage] = useState('')
-  const [depositEpochList, setDepositEpochList] = useState<(string | null)[]>([])
+  const [depositEpochList, setDepositEpochList] = useState<Map<string, string | null>>(new Map())
   const clearGeneratedTx = hooks.useClearGeneratedTx(dispatch)
   const updateDepositValue = hooks.useUpdateDepositValue({
     setDepositValue,
@@ -94,12 +91,6 @@ const NervosDAO = () => {
     dispatch,
   })
 
-  const onCompensationPeriodExplanationClick = hooks.useOnCompensationPeriodExplanationClick(
-    setBlockHashInCompensationPeriodDialog
-  )
-  const onCompensationPeriodDialogDismiss = hooks.useOnCompensationPeriodDialogDismiss(
-    setBlockHashInCompensationPeriodDialog
-  )
   const onActionClick = hooks.useOnActionClick({
     records,
     clearGeneratedTx,
@@ -110,7 +101,6 @@ const NervosDAO = () => {
 
   const onSlide = hooks.useOnSlide({ updateDepositValue, maxDepositAmount })
   hooks.useUpdateDepositEpochList({ records, setDepositEpochList, connectionStatus })
-  const compensationPeriods = hooks.useCompensationPeriods({ depositEpochList, currentEpoch: epoch })
 
   const fee = `${shannonToCKBFormatter(
     send.generatedTx ? send.generatedTx.fee || calculateFee(send.generatedTx) : '0'
@@ -130,28 +120,68 @@ const NervosDAO = () => {
   })
 
   const MemoizedRecords = useMemo(() => {
+    const onTabClick = (e: React.SyntheticEvent<HTMLDivElement, MouseEvent>) => {
+      const {
+        dataset: { idx },
+      } = e.target as HTMLDivElement
+      if (idx) {
+        setTabIdx(idx)
+      }
+    }
+    const filteredRecord = records.filter(record => {
+      if (record.status === 'failed') {
+        return false
+      }
+
+      if (tabIdx === '0') {
+        return record.status !== 'dead'
+      }
+      return record.status === 'dead'
+    })
     return (
       <>
-        <h2 className={styles.recordsTitle}>{t('nervos-dao.deposit-records')}</h2>
-        <Stack className={styles.recordsContainer}>
-          {records.map((record, i) => {
+        <div role="presentation" className={styles.recordTab} data-idx={tabIdx} onClick={onTabClick}>
+          <button type="button" role="tab" data-idx="0">
+            {t('nervos-dao.deposit-records')}
+          </button>
+          <button type="button" role="tab" data-idx="1">
+            {t('nervos-dao.completed-records')}
+          </button>
+          <div className={styles.underline} />
+        </div>
+        {filteredRecord.length ? (
+          filteredRecord.map(record => {
+            const key = record.depositOutPoint
+              ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
+              : `${record.outPoint.txHash}-${record.outPoint.index}`
+
             const props = {
               ...record,
               tipBlockTimestamp,
-              compensationPeriod: compensationPeriods[i],
-              withdrawCapacity: withdrawList[i],
-              key: `${record.outPoint.txHash}-${record.outPoint.index}`,
+              withdrawCapacity: withdrawList.get(key) || null,
+              key,
               onClick: onActionClick,
-              onCompensationPeriodExplanationClick,
               tipBlockNumber,
-              depositEpoch: depositEpochList[i] || '',
+              depositEpoch: depositEpochList.get(key) || '',
               currentEpoch: epoch,
               genesisBlockTimestamp,
               connectionStatus,
             }
-            return <DAORecord {...props} />
-          })}
-        </Stack>
+            return (
+              <DAORecord
+                {...props}
+                isCollapsed={focusedRecord !== key}
+                onToggle={() => {
+                  setFocusedRecord(focusedRecord === key ? '' : key)
+                }}
+              />
+            )
+          })
+        ) : (
+          <div className={styles.noRecords}>
+            {t(`nervos-dao.deposit-record.no-${tabIdx === '0' ? 'deposit' : 'completed'}`)}
+          </div>
+        )}
       </>
     )
   }, [
@@ -159,14 +189,16 @@ const NervosDAO = () => {
     withdrawList,
     t,
     onActionClick,
-    onCompensationPeriodExplanationClick,
     tipBlockNumber,
     epoch,
-    compensationPeriods,
     connectionStatus,
     genesisBlockTimestamp,
     tipBlockTimestamp,
     depositEpochList,
+    focusedRecord,
+    setFocusedRecord,
+    tabIdx,
+    setTabIdx,
   ])
 
   const MemoizedDepositDialog = useMemo(() => {
@@ -211,114 +243,66 @@ const NervosDAO = () => {
     ) : null
   }, [activeRecord, onWithdrawDialogDismiss, onWithdrawDialogSubmit, tipBlockHash, epoch])
 
-  const MemoizedCompensationPeriodDialog = useMemo(() => {
-    const index = records.findIndex(r => r.blockHash === blockHashInCompensationDialog)
-    const compensationPeriod = compensationPeriods[index] || null
-    return (
-      <CompensationPeriodDialog compensationPeriod={compensationPeriod} onDismiss={onCompensationPeriodDialogDismiss} />
-    )
-  }, [records, blockHashInCompensationDialog, onCompensationPeriodDialogDismiss, compensationPeriods])
-
   const free = BigInt(wallet.balance)
-  const locked = withdrawList.reduce((acc, w) => acc + BigInt(w || 0), BigInt(0))
+  const locked = records
+    .filter(record => !(record.unlockInfo && record.status === 'dead'))
+    .reduce((acc, record) => {
+      const key = record.depositOutPoint
+        ? `${record.depositOutPoint.txHash}-${record.depositOutPoint.index}`
+        : `${record.outPoint.txHash}-${record.outPoint.index}`
 
-  const EpochInfo = useMemo(() => {
-    if (!epoch) {
-      return <Spinner />
-    }
-    const epochInfo = epochParser(epoch)
-    return (
-      <Stack className={styles.info}>
-        <div>
-          <span>Epoch number</span>
-          <span>{`${epochInfo.number}`}</span>
-        </div>
-        <div>
-          <span>Epoch index</span>
-          <span>{`${epochInfo.index}`}</span>
-        </div>
-        <div>
-          <span>Epoch length</span>
-          <span>{`${epochInfo.length}`}</span>
-        </div>
-        <div>
-          <span>APC</span>
-          <span>{`~${globalAPC}%`}</span>
-        </div>
-      </Stack>
-    )
-  }, [epoch, globalAPC])
+      return acc + BigInt(withdrawList.get(key) || 0)
+    }, BigInt(0))
 
-  const lockAndFreeProperties = [
+  const onlineAndSynced = ConnectionStatus.Online === connectionStatus && SyncStatus.SyncCompleted === syncStatus
+
+  const info = [
     {
-      label: t('nervos-dao.free'),
+      key: 'free',
       value: `${shannonToCKBFormatter(`${free}`)} CKB`,
     },
     {
-      label: t('nervos-dao.locked'),
-      value: `${shannonToCKBFormatter(`${locked}`)} CKB`,
+      key: 'locked',
+      value: onlineAndSynced ? `${shannonToCKBFormatter(`${locked}`)} CKB` : `-- CKB`,
+    },
+    {
+      key: 'apc',
+      value: `~${globalAPC}%`,
     },
   ]
 
-  let balancePrompt = null
-  if (ConnectionStatus.Offline === connectionStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red' }}>
-        {t('sync.sync-failed')}
-      </span>
-    )
-  } else if (SyncStatus.SyncNotStart === syncStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}>
-        {t('sync.sync-not-start')}
-      </span>
-    )
-  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
-    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-  }
-
   return (
     <div className={styles.nervosDAOContainer}>
-      <h1 className={styles.walletName}>{wallet.name}</h1>
-      <div className={styles.amount}>
-        {lockAndFreeProperties.map(({ label, value }) => (
-          <div key={label} title={label} aria-label={label} className={styles.amountProperty}>
+      <h1 className={styles.title}>Nervos DAO</h1>
+      {info.map(({ key, value }) => {
+        const label = t(`nervos-dao.${key}`)
+        return (
+          <div key={key} title={label} aria-label={label} className={styles[key]}>
             <span>{label}</span>
-            <span>{value}</span>
+            <span
+              style={{
+                color: onlineAndSynced ? '#000' : '#888',
+              }}
+            >
+              {value}
+            </span>
           </div>
-        ))}
-        {balancePrompt}
+        )
+      })}
+      <div className={styles.networkAlert}>
+        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
       <div className={styles.deposit}>
-        <div>
-          <Button
-            type="primary"
-            disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
-            onClick={() => setShowDepositDialog(true)}
-            label={t('nervos-dao.deposit')}
-          />
-          <TooltipHost
-            calloutProps={{
-              gapSpace: 7,
-            }}
-            content={EpochInfo}
-            styles={{
-              root: {
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 9,
-              },
-            }}
-          >
-            <Info />
-          </TooltipHost>
-        </div>
+        <Button
+          type="primary"
+          disabled={connectionStatus === 'offline' || sending || !maxDepositTx}
+          onClick={() => setShowDepositDialog(true)}
+          label={t('nervos-dao.deposit')}
+        />
       </div>
       <div className={styles.records}>{MemoizedRecords}</div>
       {MemoizedDepositDialog}
       {MemoizedWithdrawDialog}
-      {MemoizedCompensationPeriodDialog}
     </div>
   )
 }

@@ -15,8 +15,12 @@
 }
 
 @mixin RegularText {
-  font-family: "SourceCodePro-Regular", monospace;
+  font-family: "SourceCodePro-Regular", "SourceHanSansCN-Regular", monospace;
   font-weight: 400;
+}
+
+@mixin MonoText {
+  font-family: "SourceCodePro-Regular", "SourceHanSansCN-Regular", monospace;
 }
 
 // layout
