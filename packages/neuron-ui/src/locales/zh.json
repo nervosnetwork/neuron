@@ -396,6 +396,7 @@
         "tooltip": {
           "compensated-period": "已锁定时间",
           "days-hours": "{{days}} 天 {{hours}} 小时",
+          "immature-for-withdraw": "Nervos DAO 要求至少约 16 小时 (4 个 Epochs) 才能进行下一步操作",
           "normal": "补偿数量较低，不建议发起提现交易",
           "suggested": "建议在此区间提取以获得最大化补偿",
           "ending": "提取请求可能被推迟并锁定 30 天",
