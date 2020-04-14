@@ -27,8 +27,6 @@ export interface SendCreateAssetAccountTxParams {
 
 export interface UpdateAssetAccountParams {
   id: number
-  walletID?: string
-  tokenID?: string
   fullName?: string,
   symbol?: string
   decimal?: string

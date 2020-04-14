@@ -71,7 +71,7 @@ export default class AssetAccountService {
     }
   }
 
-  public static async update(id: number, params: { walletID?: string, tokenID?: string, fullName?: string, symbol?: string, decimal?: string }) {
+  public static async update(id: number, params: { fullName?: string, symbol?: string, decimal?: string }) {
     return getConnection()
       .createQueryBuilder()
       .update(AssetAccountEntity)
