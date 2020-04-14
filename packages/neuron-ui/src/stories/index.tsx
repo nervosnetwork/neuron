@@ -1,5 +1,6 @@
 import 'theme'
 import 'styles/index.scss'
+import 'styles/layout.scss'
 import 'utils/i18n'
 import './styles.scss'
 import './Overview.stories'
@@ -28,3 +29,5 @@ import './NervosDAORecord.stories'
 import './CompensationPeriodTooltip.stories'
 import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
+
+import './Navbar.stories'
