@@ -51,7 +51,6 @@ const History = () => {
               border: 'none',
               borderRadius: 0,
               fontSize: '1rem',
-              fontFamily: 'Montserrat-Regular',
             },
           }}
           placeholder={t('history.search.placeholder')}

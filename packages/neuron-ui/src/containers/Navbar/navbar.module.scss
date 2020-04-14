@@ -46,17 +46,16 @@ $left-padding: 15px;
     background: transparent;
     font-size: 1rem;
     line-height: 2.5rem;
-    font-weight: bold;
     text-align: left;
     padding: 1px 0 1px $left-padding;
 
     &:hover {
-      @include SemiBoldText;
+      font-weight: 600;
       background-color: $hover-bg-color;
     }
 
     &[data-active='true'] {
-      @include MediumText;
+      font-weight: 600;
       background-color: var(--nervos-green);
     }
   }

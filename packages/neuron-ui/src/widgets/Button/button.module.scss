@@ -1,4 +1,7 @@
+@import '../../styles/mixin.scss';
+
 .button {
+  @include MediumText;
   appearance: none;
   min-width: 5.125rem;
   font-size: 0.75rem;
@@ -17,35 +20,35 @@
     border: 1px solid #000;
 
     &:hover {
-      font-weight: 700;
+      @include SemiBoldText;
     }
   }
 
-  &[data-type="cancel"] {
+  &[data-type='cancel'] {
     background-color: #e3e3e3;
     color: #000;
 
     &:hover {
-      font-weight: 700;
+      @include SemiBoldText;
       background-color: #d1d1d1;
     }
   }
 
   &[data-type='primary'],
   &[data-type='ok'],
-  &[data-type="submit"],
-  &[data-type="confirm"] {
+  &[data-type='submit'],
+  &[data-type='confirm'] {
     background-color: var(--nervos-green);
     color: #fff;
 
     &:hover {
-      font-weight: 700;
+      @include SemiBoldText;
       background-color: #21b574;
     }
   }
 
   &:active {
-    font-weight: 700;
+    @include SemiBoldText;
     filter: invert(0.2);
   }
 
@@ -55,5 +58,4 @@
     box-shadow: none !important;
     pointer-events: none;
   }
-
 }

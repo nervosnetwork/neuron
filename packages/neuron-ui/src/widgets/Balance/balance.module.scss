@@ -1,9 +1,9 @@
 @import '../../styles/mixin.scss';
 
 .balance {
+  @include RegularText;
   display: block;
   font-size: 1rem;
-  font-family: 'Montserrat-Regular';
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
