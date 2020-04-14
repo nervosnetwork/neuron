@@ -17,6 +17,8 @@ import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
 import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
+import AssetAccountInfo from 'models/asset-account-info'
+import BufferUtils from 'utils/buffer'
 
 export interface TargetOutput {
   address: string
@@ -474,6 +476,71 @@ public static generateSendingAllTx = async (
     }
 
     tx.outputs[0].setCapacity((BigInt(output.capacity) - BigInt(tx.fee)).toString())
+
+    return tx
+  }
+
+  // sUDT
+  public static async generateCreateAnyoneCanPayTx(
+    tokenID: string,
+    lockHashes: string[],
+    blake160: string,
+    changeBlake160: string,
+    feeRate: string,
+    fee: string
+  ): Promise<Transaction> {
+    // if tokenID === '' or 'CKBytes', create ckb cell
+    const isCKB = tokenID === 'CKBytes' || tokenID === ''
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const needCapacities = isCKB ? BigInt(61 * 10**8) : BigInt(142 * 10**8)
+    const output = Output.fromObject({
+      capacity: needCapacities.toString(),
+      lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
+      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep],
+      inputs: [],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+    const baseSize: number = TransactionSize.tx(tx)
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput
+    } = await CellsService.gatherInputs(
+      needCapacities.toString(),
+      lockHashes,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+    tx.fee = finalFee
+
+    // change
+    if (hasChangeOutput) {
+      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
+
+      const output = Output.fromObject({
+        capacity: changeCapacity.toString(),
+        lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+      })
+
+      tx.addOutput(output)
+    }
 
     return tx
   }
