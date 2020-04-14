@@ -1,0 +1,15 @@
+$default-color: #666;
+.container {
+  display: flex;
+  user-select: none;
+  color: $default-color;
+  .page {
+    &:after {
+      content: '/';
+      color: $default-color !important;
+    }
+    &:hover {
+      color: var(--nervos-green);
+    }
+  }
+}
