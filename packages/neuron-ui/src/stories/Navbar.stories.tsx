@@ -18,7 +18,7 @@ stories.add('Basic', () => {
       value={{
         state: {
           ...initStates,
-          wallet: { ...initStates.wallet, id: 'wallet id', name: 'wallet name' },
+          wallet: { ...initStates.wallet, id: 'wallet id', name: '中文钱包的名字最多可以达到二十个中文字符' },
           settings: { ...initStates.settings, wallets },
         },
         dispatch,

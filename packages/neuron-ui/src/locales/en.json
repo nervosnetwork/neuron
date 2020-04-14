@@ -20,7 +20,8 @@
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
-      "connecting": "Connecting"
+      "connecting": "Connecting",
+      "experimental-functions": "Experimental"
     },
     "network-status": {
       "tooltip": {

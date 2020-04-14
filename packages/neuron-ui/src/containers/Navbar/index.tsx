@@ -14,14 +14,13 @@ import { Routes, FULL_SCREENS } from 'utils/const'
 import styles from './navbar.module.scss'
 
 const menuItems = [
-  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview },
-  { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send },
-  { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive },
-  { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History },
-  { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO },
-  { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets },
-  { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses },
-  { name: 'navbar.settings', key: Routes.Settings.slice(1), url: Routes.SettingsGeneral },
+  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview, experimental: false },
+  { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send, experimental: false },
+  { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive, experimental: false },
+  { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History, experimental: false },
+  { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO, experimental: false },
+  { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets, experimental: true },
+  { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses, experimental: false },
 ]
 
 const Navbar = () => {
@@ -51,20 +50,40 @@ const Navbar = () => {
     return null
   }
 
-  const menus = menuItems.map(item => (
-    <button
-      type="button"
-      key={item.key}
-      title={t(item.name)}
-      name={t(item.name)}
-      aria-label={t(item.name)}
-      data-link={item.url}
-      data-active={item.key === selectedKey}
-      onClick={() => history.push(item.url)}
-    >
-      {t(item.name)}
-    </button>
-  ))
+  const normalMenus = menuItems
+    .filter(item => !item.experimental)
+    .map(item => (
+      <button
+        type="button"
+        key={item.key}
+        title={t(item.name)}
+        name={t(item.name)}
+        aria-label={t(item.name)}
+        data-link={item.url}
+        data-active={item.key === selectedKey}
+        onClick={() => history.push(item.url)}
+      >
+        {t(item.name)}
+      </button>
+    ))
+
+  const experimentalMenus = menuItems
+    .filter(item => item.experimental)
+    .map(item => (
+      <button
+        type="button"
+        key={item.key}
+        title={t(item.name)}
+        name={t(item.name)}
+        aria-label={t(item.name)}
+        data-link={item.url}
+        data-active={item.key === selectedKey}
+        onClick={() => history.push(item.url)}
+      >
+        {t(item.name)}
+      </button>
+    ))
+
   const currentNetwork = networks.find(n => n.id === networkID)
 
   const networkName = currentNetwork ? currentNetwork.name : null
@@ -81,7 +100,9 @@ const Navbar = () => {
         {name}
       </button>
       <nav role="navigation" className={styles.navs}>
-        {menus}
+        {normalMenus}
+        <div className={styles.experimentalDivider}>{t('navbar.experimental-functions')}</div>
+        {experimentalMenus}
       </nav>
       <div className={styles.network}>
         <NetworkStatus
