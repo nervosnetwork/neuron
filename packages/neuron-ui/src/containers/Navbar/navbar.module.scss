@@ -88,10 +88,18 @@ $left-padding: 15px;
 
 .experimentalDivider {
   color: var(--nervos-green);
-  margin: 4px $left-padding;
+  margin: 5px $left-padding;
   border-bottom: 1px solid currentColor;
-  padding: 5px 0;
+  padding: 4px 0;
   user-select: none;
   pointer-events: none;
   font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
 }

@@ -6,6 +6,7 @@ import { useState as useGlobalState } from 'states/stateProvider'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
+import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
@@ -101,7 +102,10 @@ const Navbar = () => {
       </button>
       <nav role="navigation" className={styles.navs}>
         {normalMenus}
-        <div className={styles.experimentalDivider}>{t('navbar.experimental-functions')}</div>
+        <div className={styles.experimentalDivider}>
+          <ExperimentalIcon />
+          {t('navbar.experimental-functions')}
+        </div>
         {experimentalMenus}
       </nav>
       <div className={styles.network}>
