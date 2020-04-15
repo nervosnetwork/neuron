@@ -396,6 +396,7 @@
         "tooltip": {
           "compensated-period": "Compensated Period",
           "days-hours": "{{days}} days {{hours}} hours",
+          "immature-for-withdraw": "It takes at least about 16 hours (4epochs) to proceed the next action",
           "normal": "Compensation amount is low, withdraw action is not recommended",
           "suggested": "Suggested withdraw period for maximized compensation",
           "ending": "Requested withdraw may be postponed and locked for an extra cycle of 30 days",
