@@ -396,6 +396,133 @@ export default class CellsService {
     return inputs
   }
 
+  public static async gatherAnyoneCanPayCKBInputs(
+    // amount: 'all' | string,
+    capacity: 'all' | string,
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    // typeHash: string,
+    changeBlake160: string,
+    fee: string = '0',
+    feeRate: string = '0',
+    baseSize: number = 0,
+    changeOutputSize: number = 0,
+    changeOutputDataSize: number = 0,
+  ) {
+    // const amountInt = BigInt(amount)
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    let needFee = BigInt(0)
+
+    // only live cells, skip which has data or type
+    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
+    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
+      .getRepository(LiveCellEntity)
+      .find({
+        where: {
+          lockHash: In(anyoneCanPayLockHashBuffers),
+          typeHash: null,
+        },
+      })
+    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+
+    // const allAmount: bigint = anyoneCanPayLockLiveCells.map(c => BufferUtils.readBigUInt128LE(c.data)).reduce((result, c) => result + c, BigInt(0))
+    const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
+    const capacityInt = capacity === 'all' ? allCapacity : BigInt(capacity)
+
+    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const inputs: Input[] = []
+    const inputOriginCells: LiveCell[] = []
+    let inputCapacities: bigint = BigInt(0)
+    // let inputAmount: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    anyoneCanPayLockLiveCells.every(cell => {
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock(),
+        cell.lockHash
+      )
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.emptyWitness()
+      } else {
+        totalSize += TransactionSize.secpLockWitness()
+      }
+      inputs.push(input)
+      inputOriginCells.push(cell)
+
+      // capacity - 142CKB, 142CKB remaining for change
+      inputCapacities += BigInt(cell.capacity) - BigInt(61 * 10**8)
+      // inputAmount += BigInt(cell.data)
+      totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
+
+      needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
+
+      const diffCapacity = inputCapacities - capacityInt
+      if (diffCapacity >= BigInt(0)) {
+        return false
+      }
+    })
+
+    if (inputCapacities < capacityInt) {
+      throw new CapacityNotEnough()
+    }
+
+    const anyoneCanPayOutputs = inputOriginCells.map(cell => {
+      const output = Output.fromObject({
+        capacity: '6100000000',
+        lock: cell.lock(),
+        type: cell.type(),
+        data: cell.data,
+      })
+      return output
+    })
+    anyoneCanPayOutputs[anyoneCanPayOutputs.length - 1].capacity = (inputCapacities - capacityInt - needFee).toString()
+
+    // if anyone-can-pay not enough for fee, using normal cell
+    let finalFee: bigint = needFee
+    let changeOutput: Output | undefined
+    let changeInputs: Input[] = []
+    if (inputCapacities < needFee) {
+      const normalCellInputsInfo = await CellsService.gatherInputs(
+        (-inputCapacities).toString(),
+        defaultLockHashes,
+        fee,
+        feeRate,
+        totalSize,
+        changeOutputSize,
+        changeOutputDataSize
+      )
+
+      changeInputs = normalCellInputsInfo.inputs
+
+      if (normalCellInputsInfo.hasChangeOutput) {
+        const changeCapacity = BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + inputCapacities
+
+        changeOutput = Output.fromObject({
+          capacity: changeCapacity.toString(),
+          lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+        })
+      }
+
+      finalFee = BigInt(normalCellInputsInfo.finalFee)
+    }
+
+    return {
+      anyoneCanPayInputs: inputs,
+      changeInputs,
+      anyoneCanPayOutputs,
+      changeOutput,
+      finalFee: finalFee.toString(),
+    }
+  }
+
   // gather inputs for sUDT
   // CKB for fee
   // sUDT for amount
