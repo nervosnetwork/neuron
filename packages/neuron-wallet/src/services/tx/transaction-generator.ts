@@ -547,7 +547,8 @@ public static generateSendingAllTx = async (
 
   // anyone-can-pay lock, CKB
   public static async generateAnyoneCanPayToCKBTx(
-    lockHashes: string[],
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
     targetOutput: Output,
     capacity: string,
     changeBlake160: string,
@@ -581,35 +582,26 @@ public static generateSendingAllTx = async (
     })
 
     const baseSize: number = TransactionSize.tx(tx)
-    const {
-      inputs,
-      capacities,
-      finalFee,
-      hasChangeOutput
-    } = await CellsService.gatherInputs(
-      needCapacities.toString(),
-      lockHashes,
+    const result = await CellsService.gatherAnyoneCanPayCKBInputs(
+      capacity,
+      defaultLockHashes,
+      anyoneCanPayLockHashes,
+      changeBlake160,
       fee,
       feeRate,
       baseSize,
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
     )
-    const finalFeeInt = BigInt(finalFee)
-    tx.inputs = inputs
-    tx.fee = finalFee
-
-    // change
-    if (hasChangeOutput) {
-      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
-
-      const output = Output.fromObject({
-        capacity: changeCapacity.toString(),
-        lock: SystemScriptInfo.generateSecpScript(changeBlake160)
-      })
-
-      tx.addOutput(output)
+    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
+    if (result.changeOutput) {
+      tx.outputs.push(result.changeOutput)
     }
+    tx.outputsData = tx.outputs.map(o => o.data)
+    tx.fee = result.finalFee
+
+    return tx
   }
 
   // anyone-can-pay lock, sUDT
