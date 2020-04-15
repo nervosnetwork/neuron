@@ -400,7 +400,7 @@ export default class CellsService {
   // CKB for fee
   // sUDT for amount
   public static async gatherSudtInputs(
-    amount: string,
+    amount: 'all' | string,
     defaultLockHashes: string[],
     anyoneCanPayLockHashes: string[],
     typeHash: string,
@@ -411,7 +411,7 @@ export default class CellsService {
     changeOutputSize: number = 0,
     changeOutputDataSize: number = 0,
   ) {
-    const amountInt = BigInt(amount)
+    // const amountInt = BigInt(amount)
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
@@ -429,6 +429,9 @@ export default class CellsService {
         },
       })
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+
+    const allAmount: bigint = anyoneCanPayLockLiveCells.map(c => BufferUtils.readBigUInt128LE(c.data)).reduce((result, c) => result + c, BigInt(0))
+    const amountInt = amount === 'all' ? allAmount : BigInt(amount)
 
     if (anyoneCanPayLockLiveCellEntities.length === 0) {
       throw new CapacityNotEnough()
