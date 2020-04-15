@@ -5,8 +5,10 @@ import Output from './chain/output'
 import WitnessArgs from './chain/witness-args'
 import Transaction from './chain/transaction'
 import MultiSign from './multi-sign'
+import Script, { ScriptHashType } from './chain/script'
+import BufferUtils from 'utils/buffer'
 
-export default class TransactionSize {
+export default class  TransactionSize {
   public static SERIALIZED_OFFSET_BYTESIZE = 4
 
   public static base(): number {
@@ -30,9 +32,37 @@ export default class TransactionSize {
     return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
   }
 
+  public static ckbAnyoneCanPayOutput(): number {
+    const hash32 = '0x' + '0'.repeat(64)
+    const hash20 = '0x' + '0'.repeat(40)
+    const sudtOutput = Output.fromObject({
+      capacity: '61',
+      lock: new Script(hash32, hash20, ScriptHashType.Type),
+    })
+    return TransactionSize.output(sudtOutput)
+  }
+
+  // TODO: refactor and use constant here
+  public static sudtAnyoneCanPayOutput(): number {
+    const hash32 = '0x' + '0'.repeat(64)
+    const hash20 = '0x' + '0'.repeat(40)
+    const sudtOutput = Output.fromObject({
+      capacity: '142',
+      lock: new Script(hash32, hash20, ScriptHashType.Type),
+      type: new Script(hash32, hash32, ScriptHashType.Type),
+    })
+    return TransactionSize.output(sudtOutput)
+  }
+
   public static outputData(data: string): number {
     const bytes = serializeFixVec(data)
     return HexUtils.byteLength(bytes) + TransactionSize.SERIALIZED_OFFSET_BYTESIZE
+  }
+
+  // TODO: and here
+  public static sudtData(): number {
+    const data = BufferUtils.writeBigUInt128LE(BigInt(0))
+    return TransactionSize.outputData(data)
   }
 
   public static witness(witness: WitnessArgs | string): number {
