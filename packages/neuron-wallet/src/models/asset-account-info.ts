@@ -60,4 +60,12 @@ export default class AssetAccountInfo {
     const info = this.anyoneCanPayInfo
     return new Script(info.codeHash, args, info.hashType)
   }
+
+  public isSudtScript(script: Script): boolean {
+    return script.codeHash === this.sudtInfo.codeHash && script.hashType === this.sudtInfo.hashType
+  }
+
+  public isAnyoneCanPayScript(script: Script): boolean {
+    return script.codeHash === this.anyoneCanPayInfo.codeHash && script.hashType === this.anyoneCanPayInfo.hashType
+  }
 }
