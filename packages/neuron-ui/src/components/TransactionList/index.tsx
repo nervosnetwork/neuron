@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Icon } from 'office-ui-fabric-react'
+import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
 import TextField from 'widgets/TextField'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
@@ -83,14 +85,28 @@ const TransactionList = ({
     [isMainnet, t]
   )
 
-  const onDoubleClick = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => {
-    const {
-      dataset: { hash },
-    } = e.target as HTMLDivElement
-    if (hash) {
-      showTransactionDetails(hash)
-    }
-  }, [])
+  const onActionBtnClick = useCallback(
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const btn = (e.target as HTMLButtonElement)?.closest('button')
+      if (btn?.dataset?.hash && btn?.dataset?.action) {
+        switch (btn.dataset.action) {
+          case 'explorer': {
+            const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
+            openExternal(`${explorerUrl}/transaction/${btn.dataset.hash}`)
+            break
+          }
+          case 'detail': {
+            showTransactionDetails(btn.dataset.hash)
+            break
+          }
+          default: {
+            // ignore
+          }
+        }
+      }
+    },
+    [isMainnet]
+  )
 
   return (
     <>
@@ -117,7 +133,6 @@ const TransactionList = ({
               data-status={status}
               onClick={onTxClick}
               onContextMenu={onContextMenu}
-              onDoubleClick={onDoubleClick}
               onKeyPress={() => {}}
             >
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
@@ -148,22 +163,44 @@ const TransactionList = ({
               </div>
               <div title={tx.description} className={styles.description}>
                 <span>{t('history.description')}</span>
-                <span>
-                  <TextField
-                    field="description"
-                    data-description-key={tx.hash}
-                    data-description-value={tx.description}
-                    title={tx.description}
-                    value={isSelected ? localDescription.description : tx.description || ''}
-                    onBlur={isSelected ? onDescriptionFieldBlur : undefined}
-                    onKeyPress={isSelected ? onDescriptionPress : undefined}
-                    onChange={isSelected ? onDescriptionChange : undefined}
-                    readOnly={!isSelected}
-                    onClick={onDescriptionSelected}
-                    className={styles.descriptionField}
-                    placeholder={t('common.click-to-edit')}
-                  />
-                </span>
+                <TextField
+                  field="description"
+                  data-description-key={tx.hash}
+                  data-description-value={tx.description}
+                  title={tx.description}
+                  value={isSelected ? localDescription.description : tx.description || ''}
+                  onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                  onKeyPress={isSelected ? onDescriptionPress : undefined}
+                  onChange={isSelected ? onDescriptionChange : undefined}
+                  readOnly={!isSelected}
+                  onClick={onDescriptionSelected}
+                  className={styles.descriptionField}
+                  placeholder={t('common.click-to-edit')}
+                />
+              </div>
+              <div className={styles.footer}>
+                <button
+                  type="button"
+                  className={styles.detailNavButton}
+                  title={t('history.view-detail-button-title')}
+                  onClick={onActionBtnClick}
+                  data-hash={tx.hash}
+                  data-action="detail"
+                >
+                  <Detail />
+                  <span>{t('history.view-detail')}</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.explorerNavButton}
+                  title={t('history.view-in-explorer-button-title')}
+                  onClick={onActionBtnClick}
+                  data-hash={tx.hash}
+                  data-action="explorer"
+                >
+                  <Icon iconName="Explorer" />
+                  <span>{t('history.view-in-explorer')}</span>
+                </button>
               </div>
             </div>
           </div>

@@ -161,7 +161,11 @@
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
       "copy-transaction-hash": "複製交易雜湊",
-      "no-txs": "沒有交易記錄"
+      "no-txs": "沒有交易記錄",
+      "view-in-explorer": "瀏覽器",
+      "view-in-explorer-button-title": "瀏覽器中查看詳情",
+      "view-detail": "詳情",
+      "view-detail-button-title": "查看詳情"
     },
     "transaction": {
       "date": "時間",
@@ -174,8 +178,6 @@
       "amount": "數量",
       "inputs": "輸入",
       "outputs": "輸出",
-      "view-in-explorer": "瀏覽器",
-      "view-in-explorer-button-title": "瀏覽器中查看詳情",
       "cell-from-cellbase": "來自 Cellbase"
     },
     "addresses": {

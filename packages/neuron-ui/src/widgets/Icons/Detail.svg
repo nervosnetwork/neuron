@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M49,0 C51.209139,0 53,1.790861 53,4 L53,56 C53,58.209139 51.209139,60 49,60 L11,60 C8.790861,60 7,58.209139 7,56 L7,4 C7,1.790861 8.790861,0 11,0 L49,0 Z M48,4 L12,4 C11.4871642,4 11.0644928,4.38604019 11.0067277,4.88337887 L11,5 L11,55 C11,55.5128358 11.3860402,55.9355072 11.8833789,55.9932723 L12,56 L48,56 C48.5128358,56 48.9355072,55.6139598 48.9932723,55.1166211 L49,55 L49,5 C49,4.44771525 48.5522847,4 48,4 Z M35,37 L35,41 L15,41 L15,37 L35,37 Z M45,24 L45,28 L15,28 L15,24 L45,24 Z M45,11 L45,15 L15,15 L15,11 L45,11 Z" id="path-detail"></path>
+    </defs>
+    <g id="detail" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="Combined-Shape" fill="#fff" fill-rule="nonzero" xlink:href="#path-detail"></use>
+    </g>
+</svg>

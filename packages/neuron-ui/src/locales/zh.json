@@ -161,7 +161,11 @@
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "copy-transaction-hash": "复制交易哈希",
-      "no-txs": "没有交易记录"
+      "no-txs": "没有交易记录",
+      "view-in-explorer": "浏览器",
+      "view-in-explorer-button-title": "浏览器中查看详情",
+      "view-detail": "详情",
+      "view-detail-button-title": "查看详情"
     },
     "transaction": {
       "date": "时间",
@@ -174,8 +178,6 @@
       "amount": "数量",
       "inputs": "输入",
       "outputs": "输出",
-      "view-in-explorer": "浏览器",
-      "view-in-explorer-button-title": "浏览器中查看详情",
       "cell-from-cellbase": "来自 Cellbase"
     },
     "addresses": {
