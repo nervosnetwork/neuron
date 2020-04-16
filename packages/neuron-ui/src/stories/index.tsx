@@ -30,9 +30,10 @@ import './CompensationPeriodTooltip.stories'
 import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
 
+// SUDT
 import './SUDTCreateDialog.stories'
 import './SUDTAccountPile.stories'
 import './SUDTAccountList.stories'
 import './SUDTSend.stories'
 import './Breadcrum.stories'
-import './Navbar.stories'
+import './SUDTReceive.stories'
