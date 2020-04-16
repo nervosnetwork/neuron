@@ -184,13 +184,15 @@ export const DAORecord = ({
             withdrawEpochValue={withdrawEpochValue}
           />
           <div className={styles.tooltip}>
-            <CompensationPeriodTooltip
-              depositEpochValue={depositEpochValue}
-              baseEpochTimestamp={withdrawEpochValue ? +withdrawTimestamp : tipBlockTimestamp}
-              baseEpochValue={withdrawEpochValue || currentEpochValue}
-              endEpochValue={compensationEndEpochValue}
-              isWithdrawn={!!withdrawEpochValue}
-            />
+            {CellStatus.Depositing === cellStatus ? null : (
+              <CompensationPeriodTooltip
+                depositEpochValue={depositEpochValue}
+                baseEpochTimestamp={withdrawEpochValue ? +withdrawTimestamp : tipBlockTimestamp}
+                baseEpochValue={withdrawEpochValue || currentEpochValue}
+                endEpochValue={compensationEndEpochValue}
+                isWithdrawn={!!withdrawEpochValue}
+              />
+            )}
           </div>
           <span className={styles.message}>{message}</span>
         </div>

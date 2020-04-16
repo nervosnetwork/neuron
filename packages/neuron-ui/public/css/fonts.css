@@ -1,39 +1,9 @@
 @font-face {
-  font-family: 'Montserrat-Regular';
-  src: url('../fonts/Montserrat-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Montserrat-Medium';
-  src: url('../fonts/Montserrat-Medium.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Montserrat-SemiBold';
-  src: url('../fonts/Montserrat-SemiBold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Montserrat-Bold';
-  src: url('../fonts/Montserrat-Bold.ttf') format('truetype');
-}
-
-@font-face {
   font-family: 'SourceHanSansCN-Regular';
   src: url('../fonts/SourceHanSansCN-Regular.otf') format('truetype');
 }
 
 @font-face {
-  font-family: 'SourceHanSansCN-Medium';
-  src: url('../fonts/SourceHanSansCN-Medium.otf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SourceHanSansCN-Bold';
-  src: url('../fonts/SourceHanSansCN-Bold.otf') format('truetype');
-}
-
-@font-face {
   font-family: 'SourceCodePro-Regular';
-  src: url('../fonts/SourceCodePro-Regular.ttf') format('truetype')
+  src: url('../fonts/SourceCodePro-Regular.ttf') format('truetype');
 }

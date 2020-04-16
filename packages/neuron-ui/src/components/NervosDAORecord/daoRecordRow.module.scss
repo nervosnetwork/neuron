@@ -193,7 +193,7 @@
     .deposited,
     .withdrawn,
     .unlocked {
-      @include MonoText;
+      @include RegularText;
       position: relative;
       display: flex;
       justify-content: space-between;
@@ -225,7 +225,7 @@
       }
 
       &:last-of-type {
-        font-weight: 700;
+        @include SemiBoldText;
       }
     }
   }
