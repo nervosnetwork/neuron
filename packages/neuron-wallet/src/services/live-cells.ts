@@ -12,8 +12,6 @@ export default class LiveCellsService {
     const hashData: Buffer[] = []
     lockHashes.forEach((lockHash: string) => hashData.push(Buffer.from(hexToBytes(lockHash))))
 
-    console.log(lockHashes)
-
     const cells: { usedBlockNumber: string, lockHash: Buffer, sumOfCapacity: string }[] = await getConnection()
       .getRepository(LiveCellEntity)
       .createQueryBuilder('cell')
