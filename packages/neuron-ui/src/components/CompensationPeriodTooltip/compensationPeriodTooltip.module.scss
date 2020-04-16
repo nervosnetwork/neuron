@@ -42,6 +42,7 @@ $arrow-size: 10px;
       color: #000;
     }
 
+    .immature,
     .normal,
     .suggested,
     .ending {
@@ -60,8 +61,11 @@ $arrow-size: 10px;
         height: 13px;
       }
     }
+    .immature{
+      font-weight: 900;
+    }
 
-    .normal::before {
+    .normal::before,.immature::before {
       background-color: $tile-grey;
     }
 
@@ -93,7 +97,6 @@ $arrow-size: 10px;
   }
 
   &[data-stage='ending'] {
-
     .normal,
     .suggested {
       display: none;
@@ -117,6 +120,6 @@ $arrow-size: 10px;
     height: 0;
     border: $arrow-size solid transparent;
     border-bottom-color: #fff;
-    filter: drop-shadow(0px -1px 1px rgba(0, 0, 0, 0.1))
+    filter: drop-shadow(0px -1px 1px rgba(0, 0, 0, 0.1));
   }
 }

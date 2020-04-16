@@ -95,7 +95,7 @@ $infoHeight: 1.75rem;
     border-bottom: 1px solid #ccc;
 
     button {
-      @include MonoText;
+      @include BoldText;
       appearance: none;
       flex: 1;
       display: flex;
@@ -107,7 +107,6 @@ $infoHeight: 1.75rem;
       padding: 0 0 6px 0;
       margin: 0;
       border: none;
-      font-weight: 900;
 
       &:hover {
         color: var(--nervos-green);
