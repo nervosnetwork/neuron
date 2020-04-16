@@ -458,7 +458,7 @@ export default class CellsService {
       inputOriginCells.push(cell)
 
       // capacity - 142CKB, 142CKB remaining for change
-      inputCapacities += BigInt(cell.capacity) - BigInt(61 * 10**8)
+      inputCapacities += (BigInt(cell.capacity) - BigInt(61 * 10**8))
       // inputAmount += BigInt(cell.data)
       totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
 
@@ -468,6 +468,7 @@ export default class CellsService {
       if (diffCapacity >= BigInt(0)) {
         return false
       }
+      return true
     })
 
     if (inputCapacities < capacityInt) {
@@ -596,6 +597,7 @@ export default class CellsService {
       if (diffAmount >= BigInt(0)) {
         return false
       }
+      return true
     })
 
     if (inputAmount < amountInt) {

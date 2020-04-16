@@ -55,6 +55,7 @@ export default class AnyoneCanPayService {
       lock: targetOutputLiveCell.lock(),
       type: targetOutputLiveCell.type(),
       data: targetOutputLiveCell.data,
+      outPoint: targetOutputLiveCell.outPoint(),
     })
 
     const changeBlake160: string = AddressService.nextUnusedChangeAddress(walletID)!.blake160
