@@ -483,6 +483,9 @@
       "experimental": "实验室"
     },
     "s-udt": {
+      "account-list": {
+        "no-asset-accounts": "没有账户"
+      },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
         "account-name": "账户名称",

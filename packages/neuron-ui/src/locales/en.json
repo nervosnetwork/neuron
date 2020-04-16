@@ -483,6 +483,9 @@
       "experimental": "Experimental"
     },
     "s-udt": {
+      "account-list": {
+        "no-asset-accounts": "No asset accounts"
+      },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
