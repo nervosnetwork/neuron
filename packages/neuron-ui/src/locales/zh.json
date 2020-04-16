@@ -20,7 +20,8 @@
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
-      "connecting": "正在连接节点"
+      "connecting": "正在连接节点",
+      "experimental-functions": "实验性功能"
     },
     "network-status": {
       "tooltip": {

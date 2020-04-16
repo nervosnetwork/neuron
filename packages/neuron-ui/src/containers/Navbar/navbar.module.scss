@@ -6,7 +6,11 @@ $left-padding: 15px;
 .sidebar {
   display: grid;
   grid-template:
-    'name'75px 'navs'1fr 'network'22px 'sync'3.125rem / var(--sidebar-width);
+    'name' 75px
+    'navs' 1fr
+    'network' 3rem
+    'sync' 3rem /
+    var(--sidebar-width);
   height: 100vh;
   background: black;
 }
@@ -32,6 +36,7 @@ $left-padding: 15px;
   display: flex;
   flex-direction: column;
   grid-area: navs;
+  background-color: #191919;
 
   button {
     @include MediumText;
@@ -43,14 +48,14 @@ $left-padding: 15px;
     line-height: 2.5rem;
     font-weight: bold;
     text-align: left;
-    padding-left: $left-padding;
+    padding: 1px 0 1px $left-padding;
 
     &:hover {
       @include SemiBoldText;
       background-color: $hover-bg-color;
     }
 
-    &[data-active=true] {
+    &[data-active='true'] {
       @include MediumText;
       background-color: var(--nervos-green);
     }
@@ -59,9 +64,12 @@ $left-padding: 15px;
 
 .network {
   grid-area: network;
+  align-self: flex-end;
 
-  &>div {
+  & > div {
+    align-items: flex-end;
     padding-left: $left-padding * 2;
+    padding-bottom: 5px;
   }
 }
 
@@ -72,10 +80,26 @@ $left-padding: 15px;
   grid-area: sync;
   font-size: 0.8rem;
 
-  &>span {
+  & > span {
     padding-left: $left-padding * 2;
-    padding-bottom: 12px;
     color: var(--nervos-green);
   }
+}
 
+.experimentalDivider {
+  color: var(--nervos-green);
+  margin: 5px $left-padding;
+  border-bottom: 1px solid currentColor;
+  padding: 4px 0;
+  user-select: none;
+  pointer-events: none;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
 }
