@@ -1,6 +1,6 @@
 import { AddressType } from 'models/keys/address'
 import { TransactionsService } from 'services/tx'
-import CellsService from 'services/cells'
+import LiveCellsService from 'services/live-cells'
 import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
@@ -70,7 +70,7 @@ export default class AddressDao {
       lockHashes.add(lockHash)
     })
 
-    const balanceInfo = await CellsService.getBalance(lockHashes)
+    const balanceInfo = await LiveCellsService.getBalance(lockHashes)
     const txCountInfo = await TransactionsService.getCountByLockHashesAndStatus(lockHashes, new Set([
       TransactionStatus.Pending,
       TransactionStatus.Success,
