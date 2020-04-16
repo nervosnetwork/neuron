@@ -34,7 +34,7 @@ export default class LiveCellsService {
     cells.forEach(c => {
       const lockHash: string = `0x${c.lockHash.toString('hex')}`
       const sumOfCapacity: string = c.sumOfCapacity
-      if (c.usedBlockNumber != null) {
+      if (c.usedBlockNumber === null) {
         liveBalance.set(lockHash, sumOfCapacity)
       } else {
         sentBalance.set(lockHash, sumOfCapacity)
