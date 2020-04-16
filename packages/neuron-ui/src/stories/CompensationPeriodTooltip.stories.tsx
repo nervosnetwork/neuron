@@ -8,7 +8,7 @@ const props: { [index: string]: CompensationPeriodTooltipProps } = {
   normalStart: {
     depositEpochValue: 0,
     baseEpochTimestamp: Date.now(),
-    baseEpochValue: 0,
+    baseEpochValue: 4,
     endEpochValue: 180,
   },
   normalEnd: {
@@ -55,6 +55,12 @@ const props: { [index: string]: CompensationPeriodTooltipProps } = {
     baseEpochValue: 174.25,
     endEpochValue: 180,
     isWithdrawn: true,
+  },
+  'immature for withdraw': {
+    depositEpochValue: 1,
+    baseEpochTimestamp: Date.now(),
+    baseEpochValue: 4.9,
+    endEpochValue: 181,
   },
   'base less than deposit': {
     depositEpochValue: 1,
