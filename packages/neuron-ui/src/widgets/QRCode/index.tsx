@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { ReactComponent as CopyIcon } from 'widgets/Icons/Copy.svg'
+import { ReactComponent as Copy } from 'widgets/Icons/TinyCopy.svg'
+import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
 import styles from './qrcode.module.scss'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
@@ -156,10 +157,10 @@ const QRCode = ({
       </div>
       <div className={styles.actions}>
         <Button type="default" label={t('qrcode.copy')} onClick={onCopy}>
-          <CopyIcon />
+          <Copy />
         </Button>
         <Button type="default" label={t('qrcode.save')} onClick={onDownload}>
-          <CopyIcon />
+          <Download />
         </Button>
       </div>
     </div>

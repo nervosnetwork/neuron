@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M56,0 C58.209139,0 60,1.790861 60,4 L60,43 C60,45.209139 58.209139,47 56,47 L47,47 L47,56 C47,58.209139 45.209139,60 43,60 L4,60 C1.790861,60 0,58.209139 0,56 L0,17 C0,14.790861 1.790861,13 4,13 L13,13 L13,4 C13,1.790861 14.790861,0 17,0 L56,0 Z M41,19 L6,19 L6,54 L41,54 L41,19 Z M54,6 L19,6 L19,13 L43,13 C45.209139,13 47,14.790861 47,17 L47,41 L54,41 L54,6 Z" id="path-1"></path>
+    </defs>
+    <g id="copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="Combined-Shape" fill="#979797" fill-rule="nonzero" xlink:href="#path-1"></use>
+    </g>
+</svg>
