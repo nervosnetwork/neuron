@@ -493,7 +493,6 @@
         "ckb-account": "CKB Account",
         "occupy": "occupy {{}} CKB",
         "set-token-info": "Set Token Info",
-        "copy-token-id": "Copy Token ID",
         "token-id": "Token ID",
         "token-name": "Token Name",
         "symbol": "Symbol",
@@ -505,6 +504,16 @@
       },
       "receive": {
         "notation": "Accept sUDT only"
+      },
+      "update-dialog": {
+        "update-asset-account": "Account setup",
+        "account-name": "Account Name",
+        "token-id": "Token ID",
+        "token-name": "Token Name",
+        "symbol": "Symbol",
+        "decimal": "Decimal",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
       }
     }
   }
