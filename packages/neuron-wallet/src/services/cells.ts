@@ -30,6 +30,9 @@ export enum CustomizedLock {
 }
 
 export default class CellsService {
+  private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10**8)
+  private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10**8)
+
   // exclude hasData = true and typeScript != null
   public static async getBalance(lockHashes: Set<string>): Promise<{
     liveBalance: Map<string, string>
@@ -397,11 +400,9 @@ export default class CellsService {
   }
 
   public static async gatherAnyoneCanPayCKBInputs(
-    // amount: 'all' | string,
     capacity: 'all' | string,
     defaultLockHashes: string[],
     anyoneCanPayLockHashes: string[],
-    // typeHash: string,
     changeBlake160: string,
     fee: string = '0',
     feeRate: string = '0',
@@ -409,7 +410,6 @@ export default class CellsService {
     changeOutputSize: number = 0,
     changeOutputDataSize: number = 0,
   ) {
-    // const amountInt = BigInt(amount)
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
@@ -428,7 +428,6 @@ export default class CellsService {
       })
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
 
-    // const allAmount: bigint = anyoneCanPayLockLiveCells.map(c => BufferUtils.readBigUInt128LE(c.data)).reduce((result, c) => result + c, BigInt(0))
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
     const capacityInt = capacity === 'all' ? allCapacity : BigInt(capacity)
 
@@ -439,7 +438,6 @@ export default class CellsService {
     const inputs: Input[] = []
     const inputOriginCells: LiveCell[] = []
     let inputCapacities: bigint = BigInt(0)
-    // let inputAmount: bigint = BigInt(0)
     let totalSize: number = baseSize
     anyoneCanPayLockLiveCells.every(cell => {
       const input: Input = new Input(
@@ -457,8 +455,8 @@ export default class CellsService {
       inputs.push(input)
       inputOriginCells.push(cell)
 
-      // capacity - 142CKB, 142CKB remaining for change
-      inputCapacities += (BigInt(cell.capacity) - BigInt(61 * 10**8))
+      // capacity - 61CKB, 61CKB remaining for change
+      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_CKB_CELL_MIN
       // inputAmount += BigInt(cell.data)
       totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
 
@@ -477,7 +475,7 @@ export default class CellsService {
 
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
       const output = Output.fromObject({
-        capacity: '6100000000',
+        capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
         lock: cell.lock(),
         type: cell.type(),
         data: cell.data,
@@ -539,14 +537,12 @@ export default class CellsService {
     changeOutputSize: number = 0,
     changeOutputDataSize: number = 0,
   ) {
-    // const amountInt = BigInt(amount)
     const feeInt = BigInt(fee)
     const feeRateInt = BigInt(feeRate)
     const mode = new FeeMode(feeRateInt)
 
     let needFee = BigInt(0)
 
-    // only live cells, skip which has data or type
     const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
     const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
       .getRepository(LiveCellEntity)
@@ -587,7 +583,7 @@ export default class CellsService {
       inputOriginCells.push(cell)
 
       // capacity - 142CKB, 142CKB remaining for change
-      inputCapacities += BigInt(cell.capacity) - BigInt(142 * 10**8)
+      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN
       inputAmount += BigInt(cell.data)
       totalSize += (TransactionSize.input() + TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData())
 
@@ -607,12 +603,12 @@ export default class CellsService {
     let currentFee: bigint = needFee
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
       let capacity: bigint = BigInt(0)
-      if (BigInt(cell.capacity) - BigInt(142 * 10**8) >= currentFee) {
+      if (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {
         capacity = BigInt(cell.capacity) - currentFee
         currentFee = BigInt(0)
       } else {
-        capacity = BigInt(142 * 10**8)
-        currentFee = currentFee - (BigInt(cell.capacity) - BigInt(142 * 10**8))
+        capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+        currentFee = currentFee - (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
       }
       const output = Output.fromObject({
         capacity: capacity.toString(),
