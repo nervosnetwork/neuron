@@ -483,6 +483,9 @@
       "experimental": "實驗室"
     },
     "s-udt": {
+      "account-list": {
+        "no-asset-accounts": "沒有賬戶"
+      },
       "create-dialog": {
         "create-asset-account": "創建資產賬戶",
         "account-name": "賬戶名稱",

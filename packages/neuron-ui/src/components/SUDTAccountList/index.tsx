@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
+import { SearchBox } from 'office-ui-fabric-react'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -35,6 +36,7 @@ const mock: SUDTAccount[] = [
 const SUDTAccountList = () => {
   const [accounts] = useState<SUDTAccount[]>(mock)
   const [selectedId, setSelectedId] = useState('')
+  const [keyword, setKeyword] = useState('')
 
   const onClick = (e: any) => {
     const {
@@ -66,18 +68,56 @@ const SUDTAccountList = () => {
     }
   }
 
+  const onKeywordChange = useCallback(
+    (_e?: React.ChangeEvent<HTMLInputElement>, newValue?: string) => {
+      if (newValue !== undefined) {
+        setKeyword(newValue)
+      }
+    },
+    [setKeyword]
+  )
+
+  const filteredAccounts = keyword
+    ? accounts.filter(
+        account =>
+          account.accountName?.includes(keyword) ||
+          account.tokenName?.includes(keyword) ||
+          account.symbol === keyword ||
+          account.tokenId === keyword
+      )
+    : accounts
+
   return (
     <div className={styles.container}>
-      <input type="text" />
+      <div className={styles.header}>
+        <SearchBox
+          value={keyword}
+          styles={{
+            root: {
+              background: '#e3e3e3',
+              border: 'none',
+              borderRadius: 0,
+              fontSize: '1rem',
+            },
+          }}
+          placeholder="search"
+          onChange={onKeywordChange}
+          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
+        />
+      </div>
       <div className={styles.list}>
-        {accounts.map(account => (
-          <SUDTAccountPile
-            key={account.accountId}
-            {...account}
-            isSelected={selectedId === account.accountId}
-            onClick={onClick}
-          />
-        ))}
+        {filteredAccounts.length ? (
+          filteredAccounts.map(account => (
+            <SUDTAccountPile
+              key={account.accountId}
+              {...account}
+              isSelected={selectedId === account.accountId}
+              onClick={onClick}
+            />
+          ))
+        ) : (
+          <div className={styles.notice}>No asset accounts</div>
+        )}
       </div>
     </div>
   )
