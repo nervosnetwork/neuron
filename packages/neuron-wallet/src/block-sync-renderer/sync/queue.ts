@@ -16,6 +16,7 @@ import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import { LiveCellPersistor } from 'services/tx/livecell-persistor'
+import AssetAccountInfo from 'models/asset-account-info'
 
 export default class Queue {
   private lockHashes: string[]
@@ -37,6 +38,8 @@ export default class Queue {
 
   private multiSignBlake160s: string[]
 
+  private assetAccountInfo: AssetAccountInfo | undefined
+
   constructor(url: string, lockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
@@ -44,6 +47,12 @@ export default class Queue {
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
     this.multiSignBlake160s = multiSignBlake160s
+
+    try {
+      this.assetAccountInfo = new AssetAccountInfo()
+    } catch(e) {
+      logger.info(`instance AssetAccountInfo error: ${e}`)
+    }
   }
 
   public start = async () => {
@@ -135,6 +144,9 @@ export default class Queue {
   }
 
   private skipLiveCell = async (blockNumber: string) => {
+    if (!this.assetAccountInfo) {
+      return true
+    }
     const lastBlockNumber = await LiveCellPersistor.lastBlockNumber()
     return BigInt(lastBlockNumber) - LiveCellPersistor.CONFIRMATION_THRESHOLD > BigInt(blockNumber)
   }
@@ -149,7 +161,7 @@ export default class Queue {
       }
       for (const [i, tx] of block.transactions.entries()) {
         if (!skipLiveCell) {
-          await LiveCellPersistor.saveTxLiveCells(tx)
+          await LiveCellPersistor.saveTxLiveCells(tx, this.assetAccountInfo!.anyoneCanPayCodeHash)
         }
         const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
         if (shouldSave) {
@@ -198,7 +210,9 @@ export default class Queue {
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
-        await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
+        if (!this.assetAccountInfo) {
+          await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
+        }
       }
 
       throw new Error(`chain forked: ${checkResult.type}`)

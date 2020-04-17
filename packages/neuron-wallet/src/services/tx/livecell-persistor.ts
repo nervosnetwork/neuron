@@ -1,4 +1,3 @@
-import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils'
 import { QueryRunner, getConnection } from 'typeorm'
 import CommonUtils from 'utils/common'
 import logger from 'utils/logger'
@@ -12,7 +11,7 @@ export class LiveCellPersistor {
   public static DELETE_BATCH = BigInt(50)
   public static ZERO = BigInt(0)
 
-  public static saveTxLiveCells = async (tx: Transaction) => {
+  public static saveTxLiveCells = async (tx: Transaction, codeHash: string) => {
     const connection = getConnection()
 
     const queryRunner = connection.createQueryRunner()
@@ -37,12 +36,16 @@ export class LiveCellPersistor {
 
       await Promise.all(tx.inputs.map(input => {
         return queryRunner.manager.update(LiveCellEntity, {
-          txHash: Buffer.from(hexToBytes(input.previousOutput!.txHash)),
+          txHash: Buffer.from(input.previousOutput!.txHash.slice(2), 'hex'),
           outputIndex: BigInt(input.previousOutput!.index).toString(),
         }, {usedBlockNumber: tx.blockNumber!})
       }))
-      const txHash = Buffer.from(hexToBytes(tx.computeHash()))
+      const txHash = Buffer.from(tx.computeHash().slice(2), 'hex')
       for (const [i, output] of tx.outputs.entries()) {
+        if (output.lock.codeHash !== codeHash) {
+          continue
+        }
+
         const queryExists = await queryRunner
           .manager
           .query(`SELECT EXISTS (SELECT 1 FROM live_cell where txHash = ? and outputIndex = ?) as exist`, [txHash, i])
@@ -52,17 +55,17 @@ export class LiveCellPersistor {
           cellEntity.outputIndex = i
           cellEntity.createdBlockNumber = tx.blockNumber!
           cellEntity.capacity = BigInt(output.capacity).toString()
-          cellEntity.lockHash = Buffer.from(hexToBytes(output.lockHash))
+          cellEntity.lockHash = Buffer.from(output.lockHash.slice(2), 'hex')
           cellEntity.lockHashType = output.lock.hashType === ScriptHashType.Data ? '1' : '2'
-          cellEntity.lockCodeHash = Buffer.from(hexToBytes(output.lock.codeHash))
-          cellEntity.lockArgs = Buffer.from(hexToBytes(output.lock.args))
+          cellEntity.lockCodeHash = Buffer.from(output.lock.codeHash.slice(2), 'hex')
+          cellEntity.lockArgs = Buffer.from(output.lock.args.slice(2), 'hex')
           if (output.type) {
-            cellEntity.typeHash = Buffer.from(hexToBytes(output.typeHash!))
+            cellEntity.typeHash = Buffer.from(output.typeHash!.slice(2), 'hex')
             cellEntity.typeHashType = output.type!.hashType === ScriptHashType.Data ? '1' : '2'
-            cellEntity.typeCodeHash = Buffer.from(hexToBytes(output.type!.codeHash))
-            cellEntity.typeArgs = Buffer.from(hexToBytes(output.type!.args))
+            cellEntity.typeCodeHash = Buffer.from(output.type!.codeHash.slice(2), 'hex')
+            cellEntity.typeArgs = Buffer.from(output.type!.args.slice(2), 'hex')
           }
-          cellEntity.data = Buffer.from(hexToBytes(tx.outputsData[i].slice(0, 130)))
+          cellEntity.data = Buffer.from(tx.outputsData[i].slice(2, 130), 'hex')
           await queryRunner.manager.save(cellEntity)
         }
       }

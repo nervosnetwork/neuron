@@ -52,6 +52,10 @@ export default class AssetAccountInfo {
     return this.anyoneCanPayInfo.cellDep
   }
 
+  public get anyoneCanPayCodeHash(): string {
+    return this.anyoneCanPayInfo.codeHash
+  }
+
   public generateSudtScript(args: string): Script {
     return new Script(this.sudtInfo.codeHash, args, this.sudtInfo.hashType)
   }
