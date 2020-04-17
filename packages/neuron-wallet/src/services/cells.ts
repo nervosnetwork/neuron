@@ -556,7 +556,7 @@ export default class CellsService {
       .find({
         where: {
           lockHash: In(anyoneCanPayLockHashBuffers),
-          typeHash,
+          typeHash: Buffer.from(typeHash.slice(2), 'hex'),
           usedBlockNumber: null,
         },
       })
@@ -592,7 +592,7 @@ export default class CellsService {
 
       // capacity - 142CKB, 142CKB remaining for change
       inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN
-      inputAmount += BigInt(cell.data)
+      inputAmount += BufferUtils.readBigUInt128LE(cell.data)
       totalSize += (TransactionSize.input() + TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData())
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
