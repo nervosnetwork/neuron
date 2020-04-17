@@ -463,7 +463,7 @@ export default class CellsService {
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
 
-      const diffCapacity = inputCapacities - capacityInt
+      const diffCapacity = inputCapacities - capacityInt - needFee
       if (diffCapacity >= BigInt(0)) {
         return false
       }
@@ -474,6 +474,9 @@ export default class CellsService {
       throw new CapacityNotEnough()
     }
 
+    let extraNeedFee: bigint = capacityInt + needFee - inputCapacities
+    extraNeedFee = extraNeedFee > BigInt(0) ? extraNeedFee : BigInt(0)
+
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
       const output = Output.fromObject({
         capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
@@ -483,15 +486,18 @@ export default class CellsService {
       })
       return output
     })
-    anyoneCanPayOutputs[anyoneCanPayOutputs.length - 1].capacity = (inputCapacities - capacityInt - needFee).toString()
+    anyoneCanPayOutputs[anyoneCanPayOutputs.length - 1].capacity =
+        extraNeedFee === BigInt(0) ?
+          (this.ANYONE_CAN_PAY_CKB_CELL_MIN + inputCapacities - capacityInt - needFee).toString() :
+          (this.ANYONE_CAN_PAY_CKB_CELL_MIN + inputCapacities - capacityInt).toString()
 
     // if anyone-can-pay not enough for fee, using normal cell
     let finalFee: bigint = needFee
     let changeOutput: Output | undefined
     let changeInputs: Input[] = []
-    if (inputCapacities < needFee) {
+    if (extraNeedFee > BigInt(0)) {
       const normalCellInputsInfo = await CellsService.gatherInputs(
-        (-inputCapacities).toString(),
+        (-extraNeedFee).toString(),
         defaultLockHashes,
         fee,
         feeRate,
@@ -503,7 +509,7 @@ export default class CellsService {
       changeInputs = normalCellInputsInfo.inputs
 
       if (normalCellInputsInfo.hasChangeOutput) {
-        const changeCapacity = BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + inputCapacities
+        const changeCapacity = BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + (needFee - extraNeedFee)
 
         changeOutput = Output.fromObject({
           capacity: changeCapacity.toString(),
