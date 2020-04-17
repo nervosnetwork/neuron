@@ -15,9 +15,10 @@ import LiveCellEntity from '../../../src/database/chain/entities/live-cell'
 import AssetAccountInfo from '../../../src/models/asset-account-info'
 import BufferUtils from '../../../src/utils/buffer'
 import WitnessArgs from '../../../src/models/chain/witness-args'
-import { serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils'
+import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { CapacityNotEnough } from '../../../src/exceptions/wallet'
 import LiveCell from '../../../src/models/chain/live-cell'
+import AddressGenerator from '../../../src/models/address-generator'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -29,36 +30,31 @@ const randomHex = (length: number = 64): string => {
 
 const toShannon = (ckb: string) => `${ckb}00000000`
 
+const bobLockScript: Script = SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
 const bob = {
-  lockScript: {
-    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-    args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x27161d1287c4b472bdff08a9510591d6cb5caa5b4ad7af451dbcd01e10efefac',
-  address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
-  blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+  lockScript: bobLockScript,
+  lockHash: bobLockScript.computeHash(),
+  address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
+  blake160: bobLockScript.args,
 }
 
+const aliceLockScript: Script = SystemScriptInfo.generateSecpScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
 const alice = {
-  lockScript: {
-    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-    args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x154d47f1f2f2b30f6377ba80dd92f61a7ff3a005ec79e01113e09359dbdb31ac',
-  address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
-  blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+  lockScript: aliceLockScript,
+  lockHash: aliceLockScript.computeHash(),
+  address: AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
+  blake160: aliceLockScript.args,
 }
 
+const fullAddressLockScript: Script = new Script(
+  '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '0x1234',
+  ScriptHashType.Type
+)
 const fullAddressInfo = {
-  lockScript: {
-    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    args: '0x1234',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x00e823d538d9a390faff0e0f0210fb8220f5a28a810603039fe23f556150ad89',
-  address: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy35nl24gm',
+  lockScript: fullAddressLockScript,
+  lockHash: fullAddressLockScript.computeHash(),
+  address: AddressGenerator.generate(fullAddressLockScript, AddressPrefix.Testnet),
 }
 
 // diff = 1000min
@@ -1202,7 +1198,7 @@ describe('TransactionGenerator', () => {
         expect(tx.outputs.map(o => o.lockHash)).toEqual([
           bobAnyoneCanPayLockScript.computeHash(),
           aliceAnyoneCanPayLockScript.computeHash(),
-          SystemScriptInfo.generateSecpScript(bob.blake160).computeHash(),
+          bob.lockHash,
         ])
         expect(tx.outputsData).toEqual([BufferUtils.writeBigUInt128LE(BigInt(900)), BufferUtils.writeBigUInt128LE(BigInt(200)), '0x'])
 
