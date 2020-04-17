@@ -502,6 +502,9 @@
         "cancel": "Cancel",
         "next": "Next",
         "back": "Back"
+      },
+      "receive": {
+        "notation": "Accept sUDT only"
       }
     }
   }

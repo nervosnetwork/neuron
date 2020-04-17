@@ -1,0 +1,86 @@
+.title {
+  height: 28px;
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.info {
+  margin: 30px auto;
+  margin-bottom: -49px; // TODO: refactor with normal receive component
+  display: grid;
+  width: 220px;
+  display: grid;
+  grid-template:
+    'avatar account-name' 18px
+    'avatar token-name' 15px /
+    auto 1fr;
+  .avatar {
+    grid-area: avatar;
+    padding-right: 5px;
+  }
+  .accountName {
+    font-size: 0.875rem;
+    font-weight: 600;
+    grid-area: account-name;
+    white-space: nowrap;
+  }
+  .tokenName {
+    font-size: 0.75rem;
+    grid-area: token-name;
+    white-space: nowrap;
+  }
+}
+
+.address {
+  display: flex;
+  width: 520px;
+  margin: 14px auto 0;
+
+  & > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+  }
+
+  input {
+    flex: 1;
+    padding: 6px 17px;
+    border: none;
+    color: #000;
+    font-size: 1rem;
+    letter-spacing: 0.6px;
+    background: none;
+  }
+}
+
+.copyBtn {
+  appearance: none;
+  border: none;
+  background: transparent;
+
+  &:hover {
+    g,
+    path {
+      stroke: var(--nervos-green);
+      fill: var(--nervos-green);
+    }
+  }
+}
+
+.notation {
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  margin: 4px auto 0;
+  text-align: center;
+  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 5px;
+    filter: grayscale(1) brightness(2);
+  }
+}
