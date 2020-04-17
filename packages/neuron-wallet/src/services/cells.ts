@@ -424,6 +424,7 @@ export default class CellsService {
         where: {
           lockHash: In(anyoneCanPayLockHashBuffers),
           typeHash: null,
+          usedBlockNumber: null,
         },
       })
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
@@ -550,6 +551,7 @@ export default class CellsService {
         where: {
           lockHash: In(anyoneCanPayLockHashBuffers),
           typeHash,
+          usedBlockNumber: null,
         },
       })
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))

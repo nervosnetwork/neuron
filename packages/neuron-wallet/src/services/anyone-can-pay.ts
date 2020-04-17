@@ -43,6 +43,7 @@ export default class AnyoneCanPayService {
           'hex'
         ),
         typeHash,
+        usedBlockNumber: null, // live cells
       })
       .getOne()
 
