@@ -557,7 +557,6 @@ public static generateSendingAllTx = async (
   ) {
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
-    const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
     const needCapacities: bigint = BigInt(targetOutput.capacity) + BigInt(capacity)
     const output = Output.fromObject({
@@ -574,7 +573,7 @@ public static generateSendingAllTx = async (
     const tx =  Transaction.fromObject({
       version: '0',
       headerDeps: [],
-      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      cellDeps: [secpCellDep, anyoneCanPayDep],
       inputs: [targetInput],
       outputs: [output],
       outputsData: [output.data],
