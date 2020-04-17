@@ -1,9 +1,9 @@
 .address {
   display: flex;
   width: 520px;
-  margin: 20px auto 0;
+  margin: 14px auto 0;
 
-  &>div {
+  & > div {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,10 +13,11 @@
   input {
     flex: 1;
     padding: 6px 17px;
-    border: 1px solid #000;
+    border: none;
     color: #000;
     font-size: 1rem;
     letter-spacing: 0.6px;
+    background: none;
   }
 }
 
@@ -26,10 +27,8 @@
   background: transparent;
 
   &:hover {
-
     g,
     path {
-
       stroke: var(--nervos-green);
       fill: var(--nervos-green);
     }
@@ -40,5 +39,6 @@
   width: 450px;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
-  margin: 20px auto 0;
+  margin: 4px auto 0;
+  color: #666;
 }

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TooltipHost } from 'office-ui-fabric-react'
 import { ReactComponent as Copy } from 'widgets/Icons/Copy.svg'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
@@ -32,19 +31,10 @@ const Receive = () => {
   const Address = useMemo(
     () => (
       <div className={styles.address}>
-        <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
-          <>
-            <input readOnly value={accountAddress} onClick={copyAddress} />
-            <button
-              type="button"
-              aria-label={t('receive.click-to-copy')}
-              onClick={copyAddress}
-              className={styles.copyBtn}
-            >
-              <Copy />
-            </button>
-          </>
-        </TooltipHost>
+        <input readOnly value={accountAddress} onClick={copyAddress} />
+        <button type="button" aria-label={t('receive.click-to-copy')} onClick={copyAddress} className={styles.copyBtn}>
+          <Copy />
+        </button>
       </div>
     ),
     [copyAddress, accountAddress, t]
@@ -61,7 +51,7 @@ const Receive = () => {
         e.preventDefault()
       }}
     >
-      <QRCode value={accountAddress} size={256} includeMargin dispatch={dispatch} />
+      <QRCode value={accountAddress} size={220} includeMargin dispatch={dispatch} />
       {Address}
       <p className={styles.notation}>{t('receive.prompt')}</p>
     </div>

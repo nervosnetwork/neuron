@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
+import { ReactComponent as Copy } from 'widgets/Icons/TinyCopy.svg'
+import { ReactComponent as Download } from 'widgets/Icons/Download.svg'
 import styles from './qrcode.module.scss'
 
 const QRCodeImpl = require('qr.js/lib/QRCode')
@@ -74,7 +76,7 @@ const generatePath = (cells: boolean[][], margin: number = 0): string => {
 
 const QRCode = ({
   value,
-  size = 128,
+  size = 110,
   scale = 4,
   level = ErrorCorrectLevel.Q,
   bgColor = '#FFF',
@@ -141,7 +143,7 @@ const QRCode = ({
         ignoreMouse: true,
         renderCallback: () => {
           if (canvasRef.current) {
-            canvasRef.current.setAttribute(`style`, `width:${size}p;height:${size}px`)
+            canvasRef.current.setAttribute(`style`, `width:${size}px;height:${size}px`)
           }
         },
       })
@@ -154,8 +156,12 @@ const QRCode = ({
         <canvas ref={canvasRef} width={size} height={size} />
       </div>
       <div className={styles.actions}>
-        <Button type="primary" label={t('qrcode.copy')} onClick={onCopy} />
-        <Button type="primary" label={t('qrcode.save')} onClick={onDownload} />
+        <Button type="default" label={t('qrcode.copy')} onClick={onCopy}>
+          <Copy />
+        </Button>
+        <Button type="default" label={t('qrcode.save')} onClick={onDownload}>
+          <Download />
+        </Button>
       </div>
     </div>
   )

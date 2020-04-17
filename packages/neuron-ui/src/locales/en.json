@@ -20,7 +20,8 @@
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
-      "connecting": "Connecting"
+      "connecting": "Connecting",
+      "experimental-functions": "Experimental"
     },
     "network-status": {
       "tooltip": {
@@ -400,6 +401,7 @@
         "tooltip": {
           "compensated-period": "Compensated Period",
           "days-hours": "{{days}} days {{hours}} hours",
+          "immature-for-withdraw": "It takes at least about 16 hours (4epochs) to proceed the next action",
           "normal": "Compensation amount is low, withdraw action is not recommended",
           "suggested": "Suggested withdraw period for maximized compensation",
           "ending": "Requested withdraw may be postponed and locked for an extra cycle of 30 days",
@@ -481,6 +483,9 @@
       "experimental": "Experimental"
     },
     "s-udt": {
+      "account-list": {
+        "no-asset-accounts": "No asset accounts"
+      },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
         "account-name": "Account Name",
@@ -497,6 +502,9 @@
         "cancel": "Cancel",
         "next": "Next",
         "back": "Back"
+      },
+      "receive": {
+        "notation": "Accept sUDT only"
       }
     }
   }

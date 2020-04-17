@@ -1,5 +1,6 @@
 import 'theme'
 import 'styles/index.scss'
+import 'styles/layout.scss'
 import 'utils/i18n'
 import './styles.scss'
 import './Overview.stories'
@@ -29,8 +30,10 @@ import './CompensationPeriodTooltip.stories'
 import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
 
+// SUDT
 import './SUDTCreateDialog.stories'
 import './SUDTAccountPile.stories'
 import './SUDTAccountList.stories'
 import './SUDTSend.stories'
 import './Breadcrum.stories'
+import './SUDTReceive.stories'

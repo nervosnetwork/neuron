@@ -1,6 +1,13 @@
 .container {
   display: grid;
 }
+.header {
+  display: flex;
+  padding-bottom: 10px;
+  & > div:first-child {
+    flex: 1;
+  }
+}
 
 .list {
   display: grid;

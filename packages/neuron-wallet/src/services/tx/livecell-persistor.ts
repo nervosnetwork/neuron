@@ -62,7 +62,7 @@ export class LiveCellPersistor {
             cellEntity.typeCodeHash = Buffer.from(hexToBytes(output.type!.codeHash))
             cellEntity.typeArgs = Buffer.from(hexToBytes(output.type!.args))
           }
-          cellEntity.data = Buffer.from(hexToBytes(output.data.slice(0, 130)))
+          cellEntity.data = Buffer.from(hexToBytes(tx.outputsData[i].slice(0, 130)))
           await queryRunner.manager.save(cellEntity)
         }
       }

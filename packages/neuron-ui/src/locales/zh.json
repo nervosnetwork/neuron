@@ -20,7 +20,8 @@
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
-      "connecting": "正在连接节点"
+      "connecting": "正在连接节点",
+      "experimental-functions": "实验性功能"
     },
     "network-status": {
       "tooltip": {
@@ -400,6 +401,7 @@
         "tooltip": {
           "compensated-period": "已锁定时间",
           "days-hours": "{{days}} 天 {{hours}} 小时",
+          "immature-for-withdraw": "Nervos DAO 要求至少约 16 小时 (4 个 Epochs) 才能进行下一步操作",
           "normal": "补偿数量较低，不建议发起提现交易",
           "suggested": "建议在此区间提取以获得最大化补偿",
           "ending": "提取请求可能被推迟并锁定 30 天",
@@ -481,6 +483,9 @@
       "experimental": "实验室"
     },
     "s-udt": {
+      "account-list": {
+        "no-asset-accounts": "没有账户"
+      },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
         "account-name": "账户名称",
@@ -497,6 +502,9 @@
         "cancel": "取消",
         "next": "下一步",
         "back": "上一步"
+      },
+      "receive": {
+        "notation": "只接收 sUDT"
       }
     }
   }

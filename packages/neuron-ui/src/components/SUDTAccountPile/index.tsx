@@ -1,4 +1,5 @@
 import React from 'react'
+import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
 import styles from './sUDTAccountPile.module.scss'
@@ -26,7 +27,7 @@ const SUDTAccountPile = ({
   return (
     <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
-        <div className={styles.avatarIcon}>{accountName?.[0] ?? '?'}</div>
+        <SUDTAvatar accountName={accountName} />
       </div>
       <div className={styles.accountName}>
         <span>{accountName || 'Undefined'}</span>
