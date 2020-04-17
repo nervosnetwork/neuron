@@ -17,6 +17,7 @@ export default class AnyoneCanPayService {
     tokenID: string,
     feeRate: string = '0',
     fee: string = '0',
+    description?: string,
   ): Promise<Transaction> {
     const isCKB = tokenID === 'CKBytes' || tokenID === ''
 
@@ -78,6 +79,8 @@ export default class AnyoneCanPayService {
       feeRate,
       fee
     )
+
+    tx.description = description || ''
 
     return tx
   }
