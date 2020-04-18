@@ -18,19 +18,19 @@ export default class AssetAccountInfo {
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     // dev chain: using testnet config
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
-      // TODO: not set yet, set before release
-      throw new Error('Not support mainnet yet!')
-      // this.sudtInfo = {
-      //   cellDep: new CellDep(new OutPoint('', '0'), DepType.Code),
-      //   codeHash: '',
-      //   hashType: ScriptHashType.Type
-      // }
-      // this.anyoneCanPayInfo = {
-      //   cellDep: new CellDep(new OutPoint('', '0'), DepType.DepGroup),
-      //   codeHash: '',
-      //   hashType: ScriptHashType.Type
-      // }
+      // TODO: Update for mainnet!!!
+      this.sudtInfo = {
+        cellDep: new CellDep(new OutPoint('0x0e7153f243ba4c980bfd7cd77a90568bb70fd393cb572b211a2f884de63d103d', '0'), DepType.Code),
+        codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
+        hashType: ScriptHashType.Data
+      }
+      this.anyoneCanPayInfo = {
+        cellDep: new CellDep(new OutPoint('0x9af66408df4703763acb10871365e4a21f2c3d3bdc06b0ae634a3ad9f18a6525', '0'), DepType.DepGroup),
+        codeHash: '0x6a3982f9d018be7e7228f9e0b765f28ceff6d36e634490856d2b186acf78e79b',
+        hashType: ScriptHashType.Type
+      }
     } else {
+      // TODO: Update for testnet!!!
       this.sudtInfo = {
         cellDep: new CellDep(new OutPoint('0x0e7153f243ba4c980bfd7cd77a90568bb70fd393cb572b211a2f884de63d103d', '0'), DepType.Code),
         codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
