@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
 import { SearchBox } from 'office-ui-fabric-react'
+import SUDTCreateDialog, { TokenInfo } from 'components/SUDTCreateDialog'
+
+import { Routes } from 'utils/const'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -14,6 +18,7 @@ const mock: SUDTAccount[] = [
     symbol: 'symbol',
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
+    address: 'account 0 address',
   },
   {
     accountId: 'account id 1',
@@ -22,6 +27,7 @@ const mock: SUDTAccount[] = [
     symbol: undefined,
     balance: '',
     tokenId: 'token id 2',
+    address: 'account 1 address',
   },
   {
     accountId: 'account id 2',
@@ -30,13 +36,16 @@ const mock: SUDTAccount[] = [
     symbol: 'symbol',
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
+    address: 'account 2 address',
   },
 ]
 
 const SUDTAccountList = () => {
+  const history = useHistory()
   const [accounts] = useState<SUDTAccount[]>(mock)
   const [selectedId, setSelectedId] = useState('')
   const [keyword, setKeyword] = useState('')
+  const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
 
   const onClick = (e: any) => {
     const {
@@ -50,15 +59,26 @@ const SUDTAccountList = () => {
 
     switch (role) {
       case 'edit': {
-        console.info('Edit', id)
+        if (id) {
+          setDialog({ id, action: 'update' })
+        }
         break
       }
       case 'receive': {
-        console.info('Receive', id)
+        const account = accounts.find(a => a.accountId === id)
+        if (!account) {
+          break
+        }
+        const query = new URLSearchParams({
+          address: account.address,
+          accountName: account.accountName || '',
+          tokenName: account.tokenName || '',
+        })
+        history.push(`${Routes.SUDTReceive}?${query}`)
         break
       }
       case 'send': {
-        console.info('Send', id)
+        history.push(`${Routes.SUDTSend}/${id}`)
         break
       }
       default: {
@@ -76,6 +96,21 @@ const SUDTAccountList = () => {
     },
     [setKeyword]
   )
+
+  const onCreateAccount = useCallback(
+    (info: TokenInfo) => {
+      console.info(info)
+      return Promise.resolve(true).then(() => {
+        setDialog(null)
+        return true
+      })
+    },
+    [setDialog]
+  )
+
+  const onOpenCreateDialog = useCallback(() => {
+    setDialog({ id: '', action: 'create' })
+  }, [setDialog])
 
   const filteredAccounts = keyword
     ? accounts.filter(
@@ -104,6 +139,7 @@ const SUDTAccountList = () => {
           onChange={onKeywordChange}
           iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
         />
+        <div role="presentation" onClick={onOpenCreateDialog} className={styles.add} />
       </div>
       <div className={styles.list}>
         {filteredAccounts.length ? (
@@ -119,6 +155,15 @@ const SUDTAccountList = () => {
           <div className={styles.notice}>No asset accounts</div>
         )}
       </div>
+      {dialog?.action === 'update' ? <></> : null}
+      {dialog?.action === 'create' ? (
+        <SUDTCreateDialog
+          onSubmit={onCreateAccount}
+          onCancel={() => {
+            setDialog(null)
+          }}
+        />
+      ) : null}
     </div>
   )
 }

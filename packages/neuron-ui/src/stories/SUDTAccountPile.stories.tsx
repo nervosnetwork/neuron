@@ -17,6 +17,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     symbol: 'symbol',
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
+    address: 'account address',
     isSelected: false,
     ...eventListeners,
   },
@@ -28,6 +29,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     balance: '',
     tokenId: 'token id 2',
     isSelected: false,
+    address: 'account address',
     ...eventListeners,
   },
   selected: {
@@ -38,6 +40,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     balance: '1.1111111111111111111111111111111111111111111111',
     tokenId: 'token id 1',
     isSelected: true,
+    address: 'account address',
     ...eventListeners,
   },
 }

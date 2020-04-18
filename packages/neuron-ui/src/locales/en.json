@@ -21,7 +21,8 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
-      "experimental-functions": "Experimental"
+      "experimental-functions": "Experimental",
+      "s-udt": "Asset Accounts"
     },
     "network-status": {
       "tooltip": {
