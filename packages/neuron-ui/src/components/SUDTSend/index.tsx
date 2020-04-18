@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useReducer, useMemo, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
@@ -58,12 +59,20 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string |
 
 const SUDTSend = () => {
   const history = useHistory()
+  const [t] = useTranslation()
+  const { accountId } = useParams<{ accountId: string }>()
   const [sendState, dispatch] = useReducer(reducer, initState)
   const [isPwdDialogOpen, setisPwdDialogOpen] = useState(false)
   const [passwordError, setPasswordError] = useState('')
   const [isSending, setIsSending] = useState(false)
 
-  const breakcrum = [{ label: 'asset account', link: 'asset account' }]
+  useEffect(() => {
+    if (accountId) {
+      console.info(`Fetching info of account id`)
+    }
+  }, [accountId])
+
+  const breakcrum = [{ label: t('navbar.s-udt'), link: Routes.SUDTAccountList }]
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
     { key: Fields.Address, label: 'Send to' },
     { key: Fields.Amount, label: 'Amount' },

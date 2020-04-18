@@ -118,6 +118,12 @@ body {
 }
 
 // hack search field
+.ms-SearchBox {
+  height: 26px;
+  input {
+    font-size: 0.75rem;
+  }
+}
 .ms-SearchBox.is-active,
 .ms-TextField.is-active {
   border-color: var(--nervos-green) !important;

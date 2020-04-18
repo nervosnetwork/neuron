@@ -22,6 +22,7 @@ const menuItems = [
   { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO, experimental: false },
   { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets, experimental: true },
   { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses, experimental: false },
+  { name: 'navbar.s-udt', key: Routes.SUDTAccountList.slice(1), url: Routes.SUDTAccountList, experimental: true },
 ]
 
 const Navbar = () => {
