@@ -12,6 +12,11 @@ import Input from 'models/chain/input'
 import WitnessArgs from 'models/chain/witness-args'
 import MultiSign from 'models/multi-sign'
 import InputEntity from 'database/chain/entities/input'
+import BufferUtils from 'utils/buffer'
+import LiveCell from 'models/chain/live-cell'
+import LiveCellEntity from 'database/chain/entities/live-cell'
+import Output from 'models/chain/output'
+import SystemScriptInfo from 'models/system-script-info'
 
 export const MIN_CELL_CAPACITY = '6100000000'
 
@@ -25,6 +30,9 @@ export enum CustomizedLock {
 }
 
 export default class CellsService {
+  private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10**8)
+  private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10**8)
+
   // exclude hasData = true and typeScript != null
   public static async getBalance(lockHashes: Set<string>): Promise<{
     liveBalance: Map<string, string>
@@ -389,6 +397,273 @@ export default class CellsService {
     })
 
     return inputs
+  }
+
+  public static async gatherAnyoneCanPayCKBInputs(
+    capacity: 'all' | string,
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    changeBlake160: string,
+    fee: string = '0',
+    feeRate: string = '0',
+    baseSize: number = 0,
+    changeOutputSize: number = 0,
+    changeOutputDataSize: number = 0,
+  ) {
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    let needFee = BigInt(0)
+
+    // only live cells, skip which has data or type
+    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
+    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
+      .getRepository(LiveCellEntity)
+      .find({
+        where: {
+          lockHash: In(anyoneCanPayLockHashBuffers),
+          typeHash: null,
+          usedBlockNumber: null,
+        },
+      })
+    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+
+    const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
+    const capacityInt = capacity === 'all' ? allCapacity : BigInt(capacity)
+
+    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const inputs: Input[] = []
+    const inputOriginCells: LiveCell[] = []
+    let inputCapacities: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    anyoneCanPayLockLiveCells.every(cell => {
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock(),
+        cell.lockHash
+      )
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.emptyWitness()
+      } else {
+        totalSize += TransactionSize.secpLockWitness()
+      }
+      inputs.push(input)
+      inputOriginCells.push(cell)
+
+      // capacity - 61CKB, 61CKB remaining for change
+      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_CKB_CELL_MIN
+      // inputAmount += BigInt(cell.data)
+      totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
+
+      needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
+
+      const diffCapacity = inputCapacities - capacityInt - needFee
+      if (diffCapacity >= BigInt(0)) {
+        return false
+      }
+      return true
+    })
+
+    if (inputCapacities < capacityInt) {
+      throw new CapacityNotEnough()
+    }
+
+    let extraNeedFee: bigint = capacityInt + needFee - inputCapacities
+    extraNeedFee = extraNeedFee > BigInt(0) ? extraNeedFee : BigInt(0)
+
+    const anyoneCanPayOutputs = inputOriginCells.map(cell => {
+      const output = Output.fromObject({
+        capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
+        lock: cell.lock(),
+        type: cell.type(),
+        data: cell.data,
+      })
+      return output
+    })
+    anyoneCanPayOutputs[anyoneCanPayOutputs.length - 1].capacity =
+        extraNeedFee === BigInt(0) ?
+          (this.ANYONE_CAN_PAY_CKB_CELL_MIN + inputCapacities - capacityInt - needFee).toString() :
+          (this.ANYONE_CAN_PAY_CKB_CELL_MIN + inputCapacities - capacityInt).toString()
+
+    // if anyone-can-pay not enough for fee, using normal cell
+    let finalFee: bigint = needFee
+    let changeOutput: Output | undefined
+    let changeInputs: Input[] = []
+    if (extraNeedFee > BigInt(0)) {
+      const normalCellInputsInfo = await CellsService.gatherInputs(
+        (-extraNeedFee).toString(),
+        defaultLockHashes,
+        fee,
+        feeRate,
+        totalSize,
+        changeOutputSize,
+        changeOutputDataSize
+      )
+
+      changeInputs = normalCellInputsInfo.inputs
+
+      if (normalCellInputsInfo.hasChangeOutput) {
+        const changeCapacity = BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + (needFee - extraNeedFee)
+
+        changeOutput = Output.fromObject({
+          capacity: changeCapacity.toString(),
+          lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+        })
+      }
+
+      finalFee = BigInt(normalCellInputsInfo.finalFee)
+    }
+
+    return {
+      anyoneCanPayInputs: inputs,
+      changeInputs,
+      anyoneCanPayOutputs,
+      changeOutput,
+      finalFee: finalFee.toString(),
+    }
+  }
+
+  // gather inputs for sUDT
+  // CKB for fee
+  // sUDT for amount
+  public static async gatherSudtInputs(
+    amount: 'all' | string,
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    typeHash: string,
+    changeBlake160: string,
+    fee: string = '0',
+    feeRate: string = '0',
+    baseSize: number = 0,
+    changeOutputSize: number = 0,
+    changeOutputDataSize: number = 0,
+  ) {
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    let needFee = BigInt(0)
+
+    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
+    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
+      .getRepository(LiveCellEntity)
+      .find({
+        where: {
+          lockHash: In(anyoneCanPayLockHashBuffers),
+          typeHash: Buffer.from(typeHash.slice(2), 'hex'),
+          usedBlockNumber: null,
+        },
+      })
+    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+
+    const allAmount: bigint = anyoneCanPayLockLiveCells.map(c => BufferUtils.readBigUInt128LE(c.data)).reduce((result, c) => result + c, BigInt(0))
+    const amountInt = amount === 'all' ? allAmount : BigInt(amount)
+
+    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const inputs: Input[] = []
+    const inputOriginCells: LiveCell[] = []
+    let inputCapacities: bigint = BigInt(0)
+    let inputAmount: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    anyoneCanPayLockLiveCells.every(cell => {
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock(),
+        cell.lockHash
+      )
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.emptyWitness()
+      } else {
+        totalSize += TransactionSize.secpLockWitness()
+      }
+      inputs.push(input)
+      inputOriginCells.push(cell)
+
+      // capacity - 142CKB, 142CKB remaining for change
+      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+      inputAmount += BufferUtils.readBigUInt128LE(cell.data)
+      totalSize += (TransactionSize.input() + TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData())
+
+      needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
+
+      const diffAmount = inputAmount - amountInt
+      if (diffAmount >= BigInt(0)) {
+        return false
+      }
+      return true
+    })
+
+    if (inputAmount < amountInt) {
+      throw new CapacityNotEnough()
+    }
+
+    let currentFee: bigint = needFee
+    const anyoneCanPayOutputs = inputOriginCells.map(cell => {
+      let capacity: bigint = BigInt(0)
+      if (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {
+        capacity = BigInt(cell.capacity) - currentFee
+        currentFee = BigInt(0)
+      } else {
+        capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+        currentFee = currentFee - (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
+      }
+      const output = Output.fromObject({
+        capacity: capacity.toString(),
+        lock: cell.lock(),
+        type: cell.type(),
+        data: BufferUtils.writeBigUInt128LE(BigInt(0)),
+      })
+      return output
+    })
+    anyoneCanPayOutputs[anyoneCanPayOutputs.length - 1].data = BufferUtils.writeBigUInt128LE(inputAmount - amountInt)
+
+    // if anyone-can-pay not enough for fee, using normal cell
+    let finalFee: bigint = needFee
+    let changeOutput: Output | undefined
+    let changeInputs: Input[] = []
+    if (inputCapacities < needFee) {
+      const normalCellInputsInfo = await CellsService.gatherInputs(
+        (-inputCapacities).toString(),
+        defaultLockHashes,
+        fee,
+        feeRate,
+        totalSize,
+        changeOutputSize,
+        changeOutputDataSize
+      )
+
+      changeInputs = normalCellInputsInfo.inputs
+
+      if (normalCellInputsInfo.hasChangeOutput) {
+        const changeCapacity = BigInt(normalCellInputsInfo.capacities) - BigInt(normalCellInputsInfo.finalFee) + inputCapacities
+
+        changeOutput = Output.fromObject({
+          capacity: changeCapacity.toString(),
+          lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+        })
+      }
+
+      finalFee = BigInt(normalCellInputsInfo.finalFee)
+    }
+
+    return {
+      anyoneCanPayInputs: inputs,
+      changeInputs,
+      anyoneCanPayOutputs,
+      changeOutput,
+      finalFee: finalFee.toString(),
+    }
   }
 
   public static allBlake160s = async (): Promise<string[]> => {

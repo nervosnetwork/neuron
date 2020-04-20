@@ -544,6 +544,124 @@ public static generateSendingAllTx = async (
 
     return tx
   }
+
+  // anyone-can-pay lock, CKB
+  public static async generateAnyoneCanPayToCKBTx(
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    targetOutput: Output,
+    capacity: string,
+    changeBlake160: string,
+    feeRate: string = '0',
+    fee: string = '0',
+  ) {
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const needCapacities: bigint = BigInt(targetOutput.capacity) + BigInt(capacity)
+    const output = Output.fromObject({
+      ...targetOutput,
+      capacity: needCapacities.toString(),
+    })
+    const targetInput = Input.fromObject({
+      previousOutput: targetOutput.outPoint!,
+      since: '0',
+      capacity: targetOutput.capacity,
+      lock: targetOutput.lock,
+      lockHash: targetOutput.lockHash,
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, anyoneCanPayDep],
+      inputs: [targetInput],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+
+    const baseSize: number = TransactionSize.tx(tx)
+    const result = await CellsService.gatherAnyoneCanPayCKBInputs(
+      capacity,
+      defaultLockHashes,
+      anyoneCanPayLockHashes,
+      changeBlake160,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
+    if (result.changeOutput) {
+      tx.outputs.push(result.changeOutput)
+    }
+    tx.outputsData = tx.outputs.map(o => o.data)
+    tx.fee = result.finalFee
+
+    return tx
+  }
+
+  // anyone-can-pay lock, sUDT
+  public static async generateAnyoneCanPayToSudtTx(
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    targetOutput: Output,
+    amount: string,
+    changeBlake160: string,
+    feeRate: string = '0',
+    fee: string = '0',
+  ) {
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const targetAmount: bigint = BufferUtils.readBigUInt128LE(targetOutput.data) + BigInt(amount)
+    const output = Output.fromObject({
+      ...targetOutput,
+      data: BufferUtils.writeBigUInt128LE(targetAmount),
+    })
+    const targetInput = Input.fromObject({
+      previousOutput: targetOutput.outPoint!,
+      since: '0',
+      capacity: targetOutput.capacity,
+      lock: targetOutput.lock,
+      lockHash: targetOutput.lockHash,
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      inputs: [targetInput],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+
+    const baseSize: number = TransactionSize.tx(tx)
+    const result = await CellsService.gatherSudtInputs(
+      amount,
+      defaultLockHashes,
+      anyoneCanPayLockHashes,
+      targetOutput.typeHash!,
+      changeBlake160,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
+    if (result.changeOutput) {
+      tx.outputs.push(result.changeOutput)
+    }
+    tx.outputsData = tx.outputs.map(o => o.data)
+    tx.fee = result.finalFee
+
+    return tx
+  }
 }
 
 export default TransactionGenerator

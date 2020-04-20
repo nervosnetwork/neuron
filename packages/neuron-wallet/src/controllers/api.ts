@@ -24,6 +24,8 @@ import SystemScriptInfo from 'models/system-script-info'
 import logger from 'utils/logger'
 import AssetAccountController from './asset-account'
 import { GenerateCreateAssetAccountTxParams, SendCreateAssetAccountTxParams, UpdateAssetAccountParams } from './asset-account'
+import AnyoneCanPayController from './anyone-can-pay'
+import { GenerateAnyoneCanPayTxParams, GenerateAnyoneCanPayAllTxParams, SendAnyoneCanPayTxParams } from './anyone-can-pay'
 
 // Handle channel messages from neuron react UI renderer process and user actions.
 export default class ApiController {
@@ -34,6 +36,7 @@ export default class ApiController {
   private signAndVerifyController = new SignMessageController()
   private customizedAssetsController = new CustomizedAssetsController()
   private assetAccountController = new AssetAccountController()
+  private anyoneCanPayController = new AnyoneCanPayController()
 
   public async mount() {
     this.registerHandlers()
@@ -333,6 +336,18 @@ export default class ApiController {
 
     handle('asset-accounts', async (_, params: { walletID: string }) => {
       return this.assetAccountController.getAll(params)
+    })
+
+    handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {
+      return this.anyoneCanPayController.generateTx(params)
+    })
+
+    handle('generate-send-all-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayAllTxParams) => {
+      return this.anyoneCanPayController.generateSendAllTx(params)
+    })
+
+    handle('send-to-anyone-can-pay', async (_, params: SendAnyoneCanPayTxParams) => {
+      return this.anyoneCanPayController.sendTx(params)
     })
   }
 

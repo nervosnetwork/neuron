@@ -11,6 +11,14 @@ import Output, { OutputStatus } from '../../../src/models/chain/output'
 import BlockHeader from '../../../src/models/chain/block-header'
 import MultiSign from '../../../src/models/multi-sign'
 import SystemScriptInfo from '../../../src/models/system-script-info'
+import LiveCellEntity from '../../../src/database/chain/entities/live-cell'
+import AssetAccountInfo from '../../../src/models/asset-account-info'
+import BufferUtils from '../../../src/utils/buffer'
+import WitnessArgs from '../../../src/models/chain/witness-args'
+import { serializeWitnessArgs, AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
+import { CapacityNotEnough } from '../../../src/exceptions/wallet'
+import LiveCell from '../../../src/models/chain/live-cell'
+import AddressGenerator from '../../../src/models/address-generator'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -22,36 +30,31 @@ const randomHex = (length: number = 64): string => {
 
 const toShannon = (ckb: string) => `${ckb}00000000`
 
+const bobLockScript: Script = SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c')
 const bob = {
-  lockScript: {
-    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-    args: '0x36c329ed630d6ce750712a477543672adab57f4c',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x27161d1287c4b472bdff08a9510591d6cb5caa5b4ad7af451dbcd01e10efefac',
-  address: 'ckt1qyqrdsefa43s6m882pcj53m4gdnj4k440axqswmu83',
-  blake160: '0x36c329ed630d6ce750712a477543672adab57f4c',
+  lockScript: bobLockScript,
+  lockHash: bobLockScript.computeHash(),
+  address: AddressGenerator.generate(bobLockScript, AddressPrefix.Testnet),
+  blake160: bobLockScript.args,
 }
 
+const aliceLockScript: Script = SystemScriptInfo.generateSecpScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
 const alice = {
-  lockScript: {
-    codeHash: '0x1892ea40d82b53c678ff88312450bbb17e164d7a3e0a90941aa58839f56f8df2',
-    args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x154d47f1f2f2b30f6377ba80dd92f61a7ff3a005ec79e01113e09359dbdb31ac',
-  address: 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txct0gqfvmy2v',
-  blake160: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
+  lockScript: aliceLockScript,
+  lockHash: aliceLockScript.computeHash(),
+  address: AddressGenerator.generate(aliceLockScript, AddressPrefix.Testnet),
+  blake160: aliceLockScript.args,
 }
 
+const fullAddressLockScript: Script = new Script(
+  '0x0000000000000000000000000000000000000000000000000000000000000000',
+  '0x1234',
+  ScriptHashType.Type
+)
 const fullAddressInfo = {
-  lockScript: {
-    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-    args: '0x1234',
-    hashType: ScriptHashType.Type,
-  },
-  lockHash: '0x00e823d538d9a390faff0e0f0210fb8220f5a28a810603039fe23f556150ad89',
-  address: 'ckt1qsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy35nl24gm',
+  lockScript: fullAddressLockScript,
+  lockHash: fullAddressLockScript.computeHash(),
+  address: AddressGenerator.generate(fullAddressLockScript, AddressPrefix.Testnet),
 }
 
 // diff = 1000min
@@ -880,6 +883,434 @@ describe('TransactionGenerator', () => {
         expect(expectedFee).toEqual(BigInt(355 + 24))
         expect(inputCapacities - outputCapacities).toEqual(expectedFee)
         expect(tx.fee).toEqual(expectedFee.toString())
+      })
+    })
+  })
+
+  describe('AnyoneCanPay', () => {
+    const assetAccountInfo = new AssetAccountInfo()
+    const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
+    const aliceAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
+
+    // generate anyone-can-pay live cell
+    const generateLiveCell = (
+      capacity: string,
+      amount: string | undefined = undefined,
+      tokenID: string | undefined = undefined,
+      lockScript: Script = bobAnyoneCanPayLockScript,
+      blockNumber: string = '1',
+    ) => {
+      const liveCell = new LiveCellEntity()
+      liveCell.txHash = Buffer.from(randomHex().slice(2), 'hex')
+      liveCell.outputIndex = 0
+      liveCell.capacity = capacity
+      liveCell.lockCodeHash = Buffer.from(lockScript.codeHash.slice(2), 'hex')
+      liveCell.lockArgs = Buffer.from(lockScript.args.slice(2), 'hex')
+      liveCell.lockHashType = lockScript.hashType === 'data' ? '1' : '2'
+      liveCell.lockHash = Buffer.from(lockScript.computeHash().slice(2), 'hex')
+      liveCell.createdBlockNumber = blockNumber
+      const data = amount ? BufferUtils.writeBigUInt128LE(BigInt(amount)) : '0x'
+      liveCell.data = Buffer.from(data.slice(2), 'hex')
+
+      if (tokenID) {
+        const typeScript = assetAccountInfo.generateSudtScript(tokenID)
+        liveCell.typeCodeHash = Buffer.from(typeScript.codeHash.slice(2), 'hex')
+        liveCell.typeArgs = Buffer.from(typeScript.args.slice(2), 'hex')
+        liveCell.typeHashType = typeScript.hashType === 'data' ? '1' : '2'
+        liveCell.typeHash = Buffer.from(typeScript.computeHash().slice(2), 'hex')
+      }
+
+      return liveCell
+    }
+    beforeEach(async done => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('1000'), OutputStatus.Live, false, null),
+        generateCell(toShannon('2000'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+      done()
+    })
+
+    describe('generateAnyoneCanPayToCKBTx, with feeRate 1000', () => {
+      const feeRate = '1000'
+      it('capacity 70, enough for fee', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('70')),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          (1 * 10**8).toString(),
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(2)
+        expect(tx.outputs.length).toEqual(2)
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('2 capacity 62, enough for send, 1 not enough for fee', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('62')),
+          generateLiveCell(toShannon('62')),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          (1 * 10**8).toString(),
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        tx.witnesses[1] = '0x'
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(3)
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('1 capacity 62, enough for send, not enough for fee, need normal cell', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('62')),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          (1 * 10**8).toString(),
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(3)
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('capacity 61, not enough for send', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('61')),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        let error
+        try {
+          await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            [bob.lockHash],
+            [bobAnyoneCanPayLockScript.computeHash()],
+            targetOutput,
+            (1 * 10**8).toString(),
+            bob.blake160,
+            feeRate,
+            '0'
+          )
+        } catch (e) {
+          error = e
+        }
+        expect(error).toBeInstanceOf(CapacityNotEnough)
+      })
+    })
+
+    describe('generateAnyoneCanPayToSudtTx, with feeRate 1000', () => {
+      const tokenID = bob.lockHash
+      const feeRate = '1000'
+      it('capacity 150, enough for fee', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('150'), '1000', tokenID),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          '100',
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(2)
+        expect(tx.outputs.length).toEqual(2)
+
+        const expectedOutputCapacities: bigint[] = [BigInt(toShannon('150')) - BigInt(tx.fee), BigInt(toShannon('142'))]
+        expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
+        expect(tx.outputs.map(o => o.lockHash)).toEqual([bobAnyoneCanPayLockScript.computeHash(), aliceAnyoneCanPayLockScript.computeHash()])
+        expect(tx.outputsData).toEqual([BufferUtils.writeBigUInt128LE(BigInt(900)), BufferUtils.writeBigUInt128LE(BigInt(200))])
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('capacity 142 , enough for send, 1 not enough for fee', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('142'), '1000', tokenID),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          '100',
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        tx.witnesses[1] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(3)
+
+        const expectedOutputCapacities: bigint[] = [BigInt(toShannon('142')), BigInt(toShannon('142')), BigInt(toShannon('1000')) - BigInt(tx.fee)]
+        expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
+        expect(tx.outputs.map(o => o.lockHash)).toEqual([
+          bobAnyoneCanPayLockScript.computeHash(),
+          aliceAnyoneCanPayLockScript.computeHash(),
+          bob.lockHash,
+        ])
+        expect(tx.outputsData).toEqual([BufferUtils.writeBigUInt128LE(BigInt(900)), BufferUtils.writeBigUInt128LE(BigInt(200)), '0x'])
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('capacity 143 / 142 , enough for send, 1 not enough for fee', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('143'), '50', tokenID),
+          generateLiveCell(toShannon('142'), '1000', tokenID),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          '100',
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+        tx.witnesses[1] = '0x'
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(3)
+
+        const expectedOutputCapacities: bigint[] = [
+          BigInt(toShannon('143')) - BigInt(tx.fee),
+          BigInt(toShannon('142')),
+          BigInt(toShannon('142'))
+        ]
+        expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
+        expect(tx.outputs.map(o => o.lockHash)).toEqual([
+          bobAnyoneCanPayLockScript.computeHash(),
+          bobAnyoneCanPayLockScript.computeHash(),
+          aliceAnyoneCanPayLockScript.computeHash(),
+        ])
+        expect(tx.outputsData).toEqual([
+          BufferUtils.writeBigUInt128LE(BigInt(0)),
+          BufferUtils.writeBigUInt128LE(BigInt(950)),
+          BufferUtils.writeBigUInt128LE(BigInt(200)),
+        ])
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+
+      it('amount 50, not enough for send', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('142'), '50', tokenID),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        let error
+        try {
+          await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+            [bob.lockHash],
+            [bobAnyoneCanPayLockScript.computeHash()],
+            targetOutput,
+            '100',
+            bob.blake160,
+            feeRate,
+            '0'
+          )
+        } catch (e) {
+          error = e
+        }
+        expect(error).toBeInstanceOf(CapacityNotEnough)
       })
     })
   })

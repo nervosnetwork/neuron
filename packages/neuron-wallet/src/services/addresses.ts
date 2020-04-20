@@ -214,6 +214,10 @@ export default class AddressService {
     return AddressDao.allAddressesByWalletId(walletId, addressVersion)
   }
 
+  public static allBlake160sByWalletId(walletId: string): string[] {
+    return AddressService.allAddressesByWalletId(walletId).map(addr => addr.blake160)
+  }
+
   public static allLockHashes(): string[] {
     const addresses = AddressService.allAddresses().map(address => address.address)
     return AddressParser.batchToLockHash(addresses)
