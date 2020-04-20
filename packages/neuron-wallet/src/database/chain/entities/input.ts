@@ -36,10 +36,22 @@ export default class Input extends BaseEntity {
 
   // cellbase input has no previous output lock script
   @Column({
-    type: 'simple-json',
+    type: 'varchar',
     nullable: true,
   })
-  lock: Script | null = null
+  lockCodeHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  lockArgs: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  lockHashType: ScriptHashType | null = null
 
   @Column({
     type: 'varchar',
@@ -103,15 +115,31 @@ export default class Input extends BaseEntity {
     )
   }
 
+  public lockScript(): Script | undefined {
+    if (this.lockCodeHash && this.lockArgs && this.lockHashType) {
+      return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType)
+    }
+    return undefined
+  }
+
+  public typeScript(): Script | undefined {
+    if (this.typeCodeHash && this.typeArgs && this.typeHashType) {
+      return new Script(this.typeCodeHash, this.typeArgs, this.typeHashType)
+    }
+    return undefined
+  }
+
   public toModel(): InputModel {
     return new InputModel(
       this.previousOutput(),
       this.since,
       this.capacity,
-      this.lock,
+      this.lockScript(),
       this.lockHash,
       this.inputIndex,
-      this.multiSignBlake160
+      this.multiSignBlake160,
+      this.typeScript(),
+      this.typeHash,
     )
   }
 }

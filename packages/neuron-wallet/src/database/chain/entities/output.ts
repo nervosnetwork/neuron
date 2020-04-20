@@ -1,6 +1,6 @@
 import { Entity, BaseEntity, Column, PrimaryColumn, ManyToOne } from 'typeorm'
 import TransactionEntity from './transaction'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 import OutPoint from 'models/chain/out-point'
 import OutputModel, { OutputStatus } from 'models/chain/output'
 
@@ -22,9 +22,19 @@ export default class Output extends BaseEntity {
   capacity!: string
 
   @Column({
-    type: 'simple-json',
+    type: 'varchar',
   })
-  lock!: Script
+  lockCodeHash!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  lockArgs!: string
+
+  @Column({
+    type: 'varchar',
+  })
+  lockHashType!: ScriptHashType
 
   @Column({
     type: 'varchar',
@@ -37,10 +47,22 @@ export default class Output extends BaseEntity {
   status!: string
 
   @Column({
-    type: 'simple-json',
+    type: 'varchar',
     nullable: true,
   })
-  typeScript: Script | null = null
+  typeCodeHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeArgs: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeHashType: ScriptHashType | null = null
 
   @Column({
     type: 'varchar',
@@ -101,6 +123,17 @@ export default class Output extends BaseEntity {
     return undefined
   }
 
+  public lockScript(): Script {
+    return new Script(this.lockCodeHash, this.lockArgs, this.lockHashType)
+  }
+
+  public typeScript(): Script | undefined {
+    if (this.typeCodeHash && this.typeArgs && this.typeHashType) {
+      return new Script(this.typeCodeHash, this.typeArgs, this.typeHashType)
+    }
+    return undefined
+  }
+
   @ManyToOne(_type => TransactionEntity, transaction => transaction.outputs, { onDelete: 'CASCADE' })
   transaction!: TransactionEntity
 
@@ -109,11 +142,11 @@ export default class Output extends BaseEntity {
 
     return OutputModel.fromObject({
       capacity: this.capacity,
-      lock: new Script(this.lock.codeHash, this.lock.args, this.lock.hashType),
+      lock: this.lockScript(),
       lockHash: this.lockHash,
       outPoint: this.outPoint(),
       status: this.status as OutputStatus,
-      type: this.typeScript ? new Script(this.typeScript.codeHash, this.typeScript.args, this.typeScript.hashType) : this.typeScript,
+      type: this.typeScript(),
       typeHash: this.typeHash ? this.typeHash : undefined,
       daoData: this.daoData,
       timestamp,

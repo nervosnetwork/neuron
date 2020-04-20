@@ -26,6 +26,7 @@ import { CreateAssetAccount1586420715474 } from './migrations/1586420715474-Crea
 import AssetAccount from './entities/asset-account'
 import { UpdateAssetAccount1587368167604 } from './migrations/1587368167604-UpdateAssetAccount'
 import { AddTypeToInput1587371249814 } from './migrations/1587371249814-AddTypeToInput'
+import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-FlattenLockAndType'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -62,6 +63,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       AddLiveCell1585624516932,
       UpdateAssetAccount1587368167604,
       AddTypeToInput1587371249814,
+      FlattenLockAndType1587375230126,
     ],
     logging,
     maxQueryExecutionTime: 30
