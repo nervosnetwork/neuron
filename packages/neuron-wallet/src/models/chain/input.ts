@@ -87,6 +87,10 @@ export default class Input {
     this.typeHash = this.type.computeHash()
   }
 
+  public setData(value: string) {
+    this.data = value
+  }
+
   public setInputIndex(value: string) {
     this.inputIndex = BigInt(value).toString()
   }

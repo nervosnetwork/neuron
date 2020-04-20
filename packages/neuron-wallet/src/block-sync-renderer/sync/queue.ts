@@ -175,7 +175,10 @@ export default class Queue {
               }
               const previousTx = previousTxWithStatus!.transaction
               const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
               input.setLock(previousOutput.lock)
+              previousOutput.type && input.setType(previousOutput.type)
+              input.setData(previousOutputData)
               input.setCapacity(previousOutput.capacity)
               input.setInputIndex(inputIndex.toString())
 

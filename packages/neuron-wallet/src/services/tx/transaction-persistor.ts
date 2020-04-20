@@ -48,20 +48,23 @@ export class TransactionPersistor {
       .getRepository(TransactionEntity)
       .findOne(transaction.hash)
 
-    // update multiSignBlake160
+    // update multiSignBlake160 / input.type / input.data / output.data
     if (txEntity) {
-      const outputsToUpdate: Output[] = transaction.outputs.filter(o => !!o.multiSignBlake160)
-      const inputsToUpdate: Input[] = transaction.inputs.filter(i => !!i.multiSignBlake160)
+      const outputsToUpdate: Output[] = transaction.outputs.filter((o, i) => !!o.multiSignBlake160 || transaction.outputsData[i].length > 2)
+      const inputsToUpdate: Input[] = transaction.inputs.filter(i => !!i.multiSignBlake160 || (i.data && i.data.length > 2) || i.type)
+
       if (outputsToUpdate.length || inputsToUpdate.length) {
         // update multiSignBlake160Info
         // also update input which previous output in outputsToUpdate
         await getConnection().manager.transaction(async transactionalEntityManager => {
           for (const o of outputsToUpdate) {
+            const data = transaction.outputsData[+o.outPoint!.index].slice(0, 130)
             await transactionalEntityManager
               .createQueryBuilder()
               .update(OutputEntity)
               .set({
-                multiSignBlake160: o.multiSignBlake160
+                multiSignBlake160: o.multiSignBlake160,
+                data,
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
@@ -73,7 +76,8 @@ export class TransactionPersistor {
               .createQueryBuilder()
               .update(InputEntity)
               .set({
-                multiSignBlake160: o.multiSignBlake160
+                multiSignBlake160: o.multiSignBlake160,
+                data,
               })
               .where({
                 outPointTxHash: o.outPoint!.txHash,
@@ -87,7 +91,12 @@ export class TransactionPersistor {
               .createQueryBuilder()
               .update(InputEntity)
               .set({
-                multiSignBlake160: i.multiSignBlake160
+                multiSignBlake160: i.multiSignBlake160,
+                data: i.data?.slice(0, 130) || '0x',
+                typeCodeHash: i.type?.codeHash,
+                typeArgs: i.type?.args,
+                typeHashType: i.type?.hashType,
+                typeHash: i.typeHash,
               })
               .where({
                 outPointTxHash: i.previousOutput!.txHash,
@@ -224,6 +233,15 @@ export class TransactionPersistor {
         input.lockArgs = i.lock.args
         input.lockHashType = i.lock.hashType
       }
+      if (i.type) {
+        input.typeCodeHash = i.type?.codeHash
+        input.typeArgs = i.type?.args
+        input.typeHashType = i.type?.hashType
+        input.typeHash = i.typeHash || null
+      }
+      if (i.data) {
+        input.data = i.data.slice(0, 130)
+      }
       input.since = i.since!
       input.multiSignBlake160 = i.multiSignBlake160 || null
       if (i.inputIndex) {
@@ -265,6 +283,7 @@ export class TransactionPersistor {
         output.typeHash = o.typeHash || null
       }
       const data = outputsData[index]
+      output.data = data.slice(0, 130)
       if (data && data !== '0x') {
         output.hasData = true
       } else {

@@ -33,7 +33,7 @@ export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10**8)
   private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10**8)
 
-  // exclude hasData = true and typeScript != null
+  // exclude hasData = true and typeHash != null
   public static async getBalance(lockHashes: Set<string>): Promise<{
     liveBalance: Map<string, string>
     sentBalance: Map<string, string>
@@ -176,7 +176,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeScript IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
+      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeHash IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
         liveStatus: OutputStatus.Live,
         multiSignHashes,
       })
