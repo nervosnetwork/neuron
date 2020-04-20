@@ -338,6 +338,10 @@ export default class ApiController {
       return this.assetAccountController.getAll(params)
     })
 
+    handle("get-asset-account", async (_, params: { walletID: string, id: string }) => {
+      return this.assetAccountController.getAccount(params)
+    })
+
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {
       return this.anyoneCanPayController.generateTx(params)
     })
