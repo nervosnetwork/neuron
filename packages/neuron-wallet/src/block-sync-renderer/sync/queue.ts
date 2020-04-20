@@ -55,45 +55,13 @@ export default class Queue {
       }
     })
 
-    // while (!this.stopped) {
-    //   try {
-    //     this.inProcess = true
-
-    //     if (this.lockHashes.length !== 0) {
-    //       const startNumber = this.currentBlockNumber
-    //       const endNumber = this.currentBlockNumber + BigInt(this.fetchSize)
-    //       const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
-
-    //       if (realEndNumber >= this.endBlockNumber) {
-    //         this.yieldTime = 1000
-    //       } else {
-    //         this.yieldTime = 1
-    //       }
-
-    //       if (realEndNumber >= startNumber) {
-    //         const rangeArr = ArrayUtils.rangeForBigInt(startNumber, realEndNumber).map(num => num.toString())
-    //         await this.pipeline(rangeArr)
-    //       }
-    //     }
-    //   } catch (err) {
-    //     if (err.message.startsWith('connect ECONNREFUSED')) {
-    //       logger.debug(`Sync:\terror:`, err)
-    //     } else {
-    //       logger.error(`Sync:\terror:`, err)
-    //     }
-    //   } finally {
-    //     await CommonUtils.sleep(this.yieldTime)
-    //     this.inProcess = false
-    //   }
-    // }
-    setTimeout(async()=>{
+    while (!this.stopped) {
       try {
-        console.log(this.stopped)
         this.inProcess = true
 
         if (this.lockHashes.length !== 0) {
           const startNumber = this.currentBlockNumber
-          const endNumber = this.currentBlockNumber + BigInt(100||this.fetchSize)
+          const endNumber = this.currentBlockNumber + BigInt(this.fetchSize)
           const realEndNumber: bigint = endNumber < this.endBlockNumber ? endNumber : this.endBlockNumber
 
           if (realEndNumber >= this.endBlockNumber) {
@@ -117,7 +85,7 @@ export default class Queue {
         await CommonUtils.sleep(this.yieldTime)
         this.inProcess = false
       }
-    },10000)
+    }
   }
 
   public stop = () => {
