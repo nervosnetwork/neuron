@@ -23,9 +23,16 @@ export default class AssetAccount {
   symbol!: string
 
   @Column({
-    type: 'varchar'
+    type: 'varchar',
+    default: '',
   })
-  fullName!: string
+  accountName!: string
+
+  @Column({
+    type: 'varchar',
+    default: '',
+  })
+  tokenName!: string
 
   @Column({
     type: 'varchar'
@@ -47,7 +54,8 @@ export default class AssetAccount {
     assetAccount.walletID = info.walletID
     assetAccount.tokenID = info.tokenID
     assetAccount.symbol = info.symbol
-    assetAccount.fullName = info.fullName
+    assetAccount.accountName = info.accountName
+    assetAccount.tokenName = info.tokenName
     assetAccount.decimal = info.decimal
     assetAccount.balance = info.balance
     assetAccount.blake160 = info.blake160
@@ -59,7 +67,8 @@ export default class AssetAccount {
       this.walletID,
       this.tokenID,
       this.symbol,
-      this.fullName,
+      this.accountName,
+      this.tokenName,
       this.decimal,
       this.balance,
       this.blake160,

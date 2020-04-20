@@ -24,7 +24,8 @@ export default class AssetAccountService {
     lockHashes: string[],
     tokenID: string,
     symbol: string,
-    fullName: string,
+    accountName: string,
+    tokenName: string,
     decimal: string,
     feeRate: string,
     fee: string,
@@ -35,7 +36,7 @@ export default class AssetAccountService {
     // 1. find next unused address
     const addrObj = AddressService.nextUnusedAddress(walletID)!
     // 2. generate AssetAccount object
-    const assetAccount = new AssetAccount(walletID, tokenID, symbol, fullName, decimal, '0', addrObj.blake160)
+    const assetAccount = new AssetAccount(walletID, tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
     const changeAddrObj = AddressService.nextUnusedChangeAddress(walletID)!
@@ -71,7 +72,7 @@ export default class AssetAccountService {
     }
   }
 
-  public static async update(id: number, params: { fullName?: string, symbol?: string, decimal?: string }) {
+  public static async update(id: number, params: { accountName?: string, tokenName?: string, symbol?: string, decimal?: string }) {
     return getConnection()
       .createQueryBuilder()
       .update(AssetAccountEntity)

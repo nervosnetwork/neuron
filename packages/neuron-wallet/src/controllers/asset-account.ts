@@ -11,7 +11,8 @@ import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils"
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
   tokenID: string
-  fullName: string
+  accountName: string
+  tokenName: string
   symbol: string
   decimal: string
   feeRate: string
@@ -27,7 +28,8 @@ export interface SendCreateAssetAccountTxParams {
 
 export interface UpdateAssetAccountParams {
   id: number
-  fullName?: string,
+  accountName?: string,
+  tokenName?: string,
   symbol?: string
   decimal?: string
 }
@@ -65,7 +67,8 @@ export default class AssetAccountController {
       lockHashes,
       params.tokenID,
       params.symbol,
-      params.fullName,
+      params.accountName,
+      params.tokenName,
       params.decimal,
       params.feeRate,
       params.fee
