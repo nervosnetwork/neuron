@@ -495,7 +495,6 @@
         "ckb-account": "CKB 賬戶",
         "occupy": "佔用 {{ base }} CKB",
         "set-token-info": "設置 Token 信息",
-        "copy-token-id": "複製 Token ID",
         "token-id": "Token ID",
         "token-name": "Token 名稱",
         "symbol": "標誌",
@@ -507,6 +506,16 @@
       },
       "receive": {
         "notation": "只接收 sUDT"
+      },
+      "update-dialog": {
+        "update-asset-account": "賬戶設置",
+        "account-name": "賬戶名稱",
+        "token-id": "Token ID",
+        "token-name": "Token 名稱",
+        "symbol": "標誌",
+        "decimal": "小數位",
+        "confirm": "確認",
+        "cancel": "取消"
       }
     }
   }

@@ -32,6 +32,7 @@ import './BalanceSyncIcon.stories'
 
 // SUDT
 import './SUDTCreateDialog.stories'
+import './SUDTUpdateDialog.stories'
 import './SUDTAccountPile.stories'
 import './SUDTAccountList.stories'
 import './SUDTSend.stories'
