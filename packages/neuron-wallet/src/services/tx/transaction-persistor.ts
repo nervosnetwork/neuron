@@ -218,7 +218,12 @@ export class TransactionPersistor {
       input.transaction = tx
       input.capacity = i.capacity || null
       input.lockHash = i.lockHash || null
-      input.lock = i.lock || null
+      // input.lock = i.lock || null
+      if (i.lock) {
+        input.lockCodeHash = i.lock.codeHash
+        input.lockArgs = i.lock.args
+        input.lockHashType = i.lock.hashType
+      }
       input.since = i.since!
       input.multiSignBlake160 = i.multiSignBlake160 || null
       if (i.inputIndex) {
@@ -246,14 +251,18 @@ export class TransactionPersistor {
       output.outPointTxHash = transaction.hash || transaction.computeHash()
       output.outPointIndex = index.toString()
       output.capacity = o.capacity
-      output.lock = o.lock
+      output.lockCodeHash = o.lock.codeHash
+      output.lockArgs = o.lock.args
+      output.lockHashType = o.lock.hashType
       output.lockHash = o.lockHash!
       output.transaction = tx
       output.status = outputStatus
       output.multiSignBlake160 = o.multiSignBlake160 || null
       if (o.type) {
-        output.typeScript = o.type
-        output.typeHash = o.typeHash ? o.typeHash : null
+        output.typeCodeHash = o.type.codeHash
+        output.typeArgs = o.type.args
+        output.typeHashType = o.type.hashType
+        output.typeHash = o.typeHash || null
       }
       const data = outputsData[index]
       if (data && data !== '0x') {

@@ -76,11 +76,11 @@ export default class TxAddressFinder {
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
         addresses.push(
-          AddressGenerator.generate(output.lock, prefix)
+          AddressGenerator.generate(output.lockScript(), prefix)
         )
       }
-      if (output && SystemScriptInfo.isMultiSignScript(output.lock)) {
-        const multiSignBlake160 = output.lock.args.slice(0, 42)
+      if (output && SystemScriptInfo.isMultiSignScript(output.lockScript())) {
+        const multiSignBlake160 = output.lockScript().args.slice(0, 42)
         if (this.multiSignBlake160s.has(multiSignBlake160)) {
           shouldSync = true
           input.setMultiSignBlake160(multiSignBlake160)

@@ -309,7 +309,7 @@ export default class CellsService {
         cell.outPoint(),
         '0',
         cell.capacity,
-        cell.lock,
+        cell.lockScript(),
         cell.lockHash
       )
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
@@ -391,7 +391,7 @@ export default class CellsService {
         cell.outPoint(),
         '0',
         cell.capacity,
-        cell.lock,
+        cell.lockScript(),
         cell.lockHash,
       )
     })
@@ -673,7 +673,7 @@ export default class CellsService {
       .getMany()
     const blake160s: string[] = outputEntities
       .map(output => {
-        const { lock } = output
+        const lock = output.lockScript()
         if (!lock) {
           return undefined
         }
