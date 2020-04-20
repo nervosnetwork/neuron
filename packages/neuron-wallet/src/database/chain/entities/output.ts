@@ -48,6 +48,13 @@ export default class Output extends BaseEntity {
   })
   typeHash: string | null = null
 
+  // only first 130 chars
+  @Column({
+    type: 'varchar',
+    default: '0x',
+  })
+  data: string = '0x'
+
   @Column({
     type: 'varchar',
     nullable: true,

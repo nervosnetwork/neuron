@@ -11,6 +11,9 @@ export default class Input {
   public lockHash?: string | null
   public inputIndex?: string | null
   public multiSignBlake160?: string | null
+  public type?: Script | null
+  public typeHash?: string | null
+  public data?: string | null
 
   // don't using = directly, using setXxx instead
   // check hex string
@@ -21,7 +24,10 @@ export default class Input {
     lock?: Script | null,
     lockHash?: string | null,
     inputIndex?: string | null,
-    multiSignBlake160?: string | null
+    multiSignBlake160?: string | null,
+    type?: Script | null,
+    typeHash?: string | null,
+    data?: string | null,
   ) {
     this.previousOutput = previousOutput
     this.since = since ? BigInt(since).toString() : since
@@ -32,18 +38,26 @@ export default class Input {
 
     this.lockHash = lockHash || this.lock?.computeHash()
 
-    TypeChecker.hashChecker(this.lockHash)
+    this.type = type
+    this.typeHash = typeHash || this.type?.computeHash()
+
+    this.data = data
+
+    TypeChecker.hashChecker(this.lockHash, this.typeHash)
     TypeChecker.numberChecker(this.since, this.capacity, this.inputIndex)
   }
 
-  public static fromObject({ previousOutput, since, capacity, lock, lockHash, inputIndex, multiSignBlake160 }: {
+  public static fromObject({ previousOutput, since, capacity, lock, lockHash, inputIndex, multiSignBlake160, type, typeHash, data }: {
     previousOutput: OutPoint | null,
     since?: string,
     capacity?: string | null,
     lock?: Script | null,
     lockHash?: string | null,
     inputIndex?: string | null,
-    multiSignBlake160?: string | null
+    multiSignBlake160?: string | null,
+    type?: Script | null,
+    typeHash?: string | null,
+    data?: string | null,
   }): Input {
     return new Input(
       previousOutput ? OutPoint.fromObject(previousOutput) : previousOutput,
@@ -52,7 +66,10 @@ export default class Input {
       lock ? Script.fromObject(lock) : lock,
       lockHash,
       inputIndex,
-      multiSignBlake160
+      multiSignBlake160,
+      type ? Script.fromObject(type) : type,
+      typeHash,
+      data
     )
   }
 
@@ -63,6 +80,11 @@ export default class Input {
   public setLock(value: Script) {
     this.lock = value
     this.lockHash = this.lock.computeHash()
+  }
+
+  public setType(value: Script) {
+    this.type = value
+    this.typeHash = this.type.computeHash()
   }
 
   public setInputIndex(value: string) {

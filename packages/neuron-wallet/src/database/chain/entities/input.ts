@@ -2,7 +2,7 @@ import { Entity, BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 't
 import Transaction from './transaction'
 import OutPoint from 'models/chain/out-point'
 import InputModel from 'models/chain/input'
-import Script from 'models/chain/script'
+import Script, { ScriptHashType } from 'models/chain/script'
 
 // cellbase input may have same OutPoint
 @Entity()
@@ -40,6 +40,37 @@ export default class Input extends BaseEntity {
     nullable: true,
   })
   lock: Script | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeCodeHash: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeArgs: string | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeHashType: ScriptHashType | null = null
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  typeHash: string | null = null
+
+  // only first 130 chars
+  @Column({
+    type: 'varchar',
+    default: '0x'
+  })
+  data: string = '0x'
 
   @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
   transaction!: Transaction
