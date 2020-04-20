@@ -48,7 +48,7 @@ export default class CellsService {
       .where({
         lockHash: In([...lockHashes]),
         hasData: false,
-        typeScript: null,
+        typeHash: null,
       })
       .groupBy('output.lockHash')
       .addGroupBy('output.status')
@@ -265,7 +265,7 @@ export default class CellsService {
           lockHash: In(lockHashes),
           status: In([OutputStatus.Live, OutputStatus.Sent]),
           hasData: false,
-          typeScript: null,
+          typeHash: null,
         },
       })
     const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
@@ -382,7 +382,7 @@ export default class CellsService {
           lockHash: In(lockHashes),
           status: OutputStatus.Live,
           hasData: false,
-          typeScript: null,
+          typeHash: null,
         },
       })
 
