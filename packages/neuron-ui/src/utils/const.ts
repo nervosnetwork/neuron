@@ -29,6 +29,8 @@ export const HOURS_PER_DAY = 24
 export const CONNECTING_DEADLINE = Date.now() + 10_000
 
 export const INIT_SEND_PRICE = '1000'
+export const MIN_CKB_REQUIRED_BY_CKB_SUDT = 61
+export const MIN_CKB_REQUIRED_BY_NORMAL_SUDT = 142
 
 export const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
@@ -142,8 +144,12 @@ export enum CompensationPeriod {
   REQUEST_END = 1,
 }
 
-export const defaultSUDTFields = {
+export const DEFAULT_SUDT_FIELDS = {
   accountName: 'Undefined',
   tokenName: 'Unknown',
   symbol: 'Unknown',
+  CKBTokenId: 'CKBytes',
+  CKBTokenName: 'CKBytes',
+  CKBSymbol: 'CKB',
+  CKBDecimal: '8',
 }

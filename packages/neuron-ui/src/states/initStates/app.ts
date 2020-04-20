@@ -24,7 +24,6 @@ const appState: Readonly<State.App> = {
   passwordRequest: {
     actionType: null,
     walletID: '',
-    password: '',
   },
   messages: {
     networks: null,

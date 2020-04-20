@@ -19,6 +19,7 @@ const initStates = {
   settings,
   nervosDAO,
   updater,
+  experimental: null,
 }
 
 export default initStates

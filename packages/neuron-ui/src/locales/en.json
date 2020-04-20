@@ -251,6 +251,9 @@
       },
       "unlock": {
         "title": "Please input wallet password to claim the asset"
+      },
+      "create-sudt-account": {
+        "title": "Create Asset Account"
       }
     },
     "qrcode": {
@@ -317,6 +320,7 @@
         "deposit": "Deposit",
         "account-name": "Account Name",
         "token-name": "Token Name",
+        "token-id": "Token ID",
         "symbol": "Symbol"
       },
       "codes": {
@@ -487,7 +491,8 @@
     },
     "s-udt": {
       "account-list": {
-        "no-asset-accounts": "No asset accounts"
+        "no-asset-accounts": "No asset accounts",
+        "search": "Account Name, Token Name or Symbol"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",

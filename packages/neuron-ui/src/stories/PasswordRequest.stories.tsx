@@ -16,7 +16,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '',
       },
     },
   },
@@ -31,7 +30,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '',
       },
     },
   },
@@ -46,7 +44,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '123456',
       },
     },
   },
@@ -61,7 +58,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'backup',
-        password: '',
       },
     },
   },
@@ -76,7 +72,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'backup',
-        password: '123456',
       },
     },
   },
@@ -91,7 +86,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'unlock',
-        password: '',
       },
     },
   },
@@ -106,7 +100,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'send',
-        password: '123456',
       },
     },
   },

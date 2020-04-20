@@ -251,6 +251,9 @@
       },
       "unlock": {
         "title": "請輸入錢包密碼提取資產"
+      },
+      "create-sudt-account": {
+        "title": "創建資產賬戶"
       }
     },
     "qrcode": {
@@ -317,6 +320,7 @@
         "deposit": "存入金額",
         "account-name": "賬戶名稱",
         "token-name": "Token 名稱",
+        "token-id": "Token ID",
         "symbol": "Symbol"
       },
       "codes": {
@@ -487,7 +491,8 @@
     },
     "s-udt": {
       "account-list": {
-        "no-asset-accounts": "沒有賬戶"
+        "no-asset-accounts": "沒有賬戶",
+        "search": "賬戶名稱, Token 名稱或 Symbol"
       },
       "create-dialog": {
         "create-asset-account": "創建資產賬戶",

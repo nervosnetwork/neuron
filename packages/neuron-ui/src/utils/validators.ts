@@ -8,6 +8,7 @@ import {
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
   ErrorCode,
+  DEFAULT_SUDT_FIELDS,
 } from 'utils/const'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
@@ -165,6 +166,16 @@ export const verifyURL = (url: string) => {
   return true
 }
 
+export const verifyTokenId = (tokenId: string, isCKB = false) => {
+  if (isCKB && tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId) {
+    return true
+  }
+  if (tokenId.startsWith('0x') && tokenId.length === 42 && !Number.isNaN(+tokenId)) {
+    return true
+  }
+  return false
+}
+
 export default {
   verifyAddress,
   verifySUDTAddress,
@@ -174,4 +185,5 @@ export default {
   verifyPasswordComplexity,
   verifyTransactionOutputs,
   verifyNetworkName,
+  verifyTokenId,
 }

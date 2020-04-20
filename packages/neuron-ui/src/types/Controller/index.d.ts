@@ -164,8 +164,63 @@ declare namespace Controller {
   /**
    * sUDT related API
    */
+  interface SUDTAccount {
+    public id?: number
+    public walletID: string
+    public tokenID: string
+    public symbol: string
+    public accountName: string
+    public tokenName: string
+    public decimal: string
+    public balance: string
+    public blake160: string
+    public address: string
+  }
+  namespace GetSUDTAccountList {
+    interface Params {
+      walletID: string
+    }
+
+    type Response = SUDTAccount[]
+  }
+
+  namespace GenerateCreateSUDTAccountTransaction {
+    interface Params {
+      walletID: string
+      tokenID: string
+      tokenName: string
+      accountName: string
+      symbol: string
+      decimal: string
+      feeRate: string
+    }
+    interface Response {
+      assetAccount: any
+      tx: any
+    }
+  }
+
+  namespace SendCreateSUDTAccountTransaction {
+    interface Params {
+      walletID: string
+      assetAccount: Pick<SUDTAccount, 'symbol' | 'tokenName' | 'accountName' | 'decimal' | 'tokenID'>
+      tx: any
+      password: string
+    }
+  }
+
+  namespace UpdateSUDTAccount {
+    interface Params {
+      id: number
+      tokenName?: string
+      accountName?: string
+      symbol?: string
+      decimal?: string
+    }
+  }
+
   namespace GenerateSUDTTransaction {
-    type SerializedTx = hash
+    type SerializedTx = any
     interface Params {
       walletID: string
       address: string
@@ -192,7 +247,7 @@ declare namespace Controller {
     type Hash = string
     interface Params {
       walletID: string
-      tx: Tx
+      tx: any
       password: string
     }
     type Response = Hash

@@ -77,6 +77,10 @@ type Action =
   // Settings
   | 'clear-cache'
   // SUDT
+  | 'asset-accounts'
+  | 'send-create-asset-account-tx'
+  | 'update-asset-account'
+  | 'generate-create-asset-account-tx'
   | 'generate-send-to-anyone-can-pay-tx'
   | 'generate-send-all-to-anyone-can-pay-tx'
   | 'send-to-anyone-can-pay'

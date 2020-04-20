@@ -2,7 +2,8 @@ import React from 'react'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
-import { defaultSUDTFields } from 'utils/const'
+import { DEFAULT_SUDT_FIELDS } from 'utils/const'
+import { sudtValueToAmount } from 'utils/formatters'
 import styles from './sUDTAccountPile.module.scss'
 
 export interface SUDTAccountPileProps {
@@ -14,6 +15,7 @@ export interface SUDTAccountPileProps {
   tokenId: string
   address: string
   isSelected: boolean
+  decimal: string
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }
 
@@ -24,6 +26,7 @@ const SUDTAccountPile = ({
   symbol,
   balance,
   isSelected,
+  decimal,
   onClick,
 }: SUDTAccountPileProps) => {
   return (
@@ -32,13 +35,13 @@ const SUDTAccountPile = ({
         <SUDTAvatar accountName={accountName} />
       </div>
       <div className={styles.accountName}>
-        <span>{accountName || defaultSUDTFields.accountName}</span>
+        <span>{accountName || DEFAULT_SUDT_FIELDS.accountName}</span>
       </div>
       <div className={styles.tokenName}>
-        <span>{tokenName || defaultSUDTFields.tokenName}</span>
+        <span>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</span>
       </div>
       <div className={styles.symbol}>
-        <span>{`(${symbol || defaultSUDTFields.symbol})`}</span>
+        <span>{`(${symbol || DEFAULT_SUDT_FIELDS.symbol})`}</span>
       </div>
       <div className={styles.editBtn}>
         <button data-role="edit" type="button">
@@ -51,7 +54,7 @@ const SUDTAccountPile = ({
           <Button type="primary" label="Send" data-role="send" disabled={!accountName} />
         </div>
       ) : (
-        <div className={styles.balance}>{balance || '--'}</div>
+        <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>
       )}
     </div>
   )

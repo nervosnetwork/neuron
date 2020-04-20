@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { ErrorCode } from 'utils/const'
+import { ErrorCode, DEFAULT_SUDT_FIELDS } from 'utils/const'
+import { verifyTokenId } from 'utils/validators'
 import styles from './sUDTCreateDialog.module.scss'
 
 const MAX_NAME_LENGTH = 16
@@ -81,7 +82,13 @@ const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'res
       return state
     }
     case 'isCKB': {
-      return { accountName: state.accountName, tokenId: 'ckb token id', tokenName: 'CKB', symbol: 'CKB', decimal: '8' }
+      return {
+        accountName: state.accountName,
+        tokenId: DEFAULT_SUDT_FIELDS.CKBTokenId,
+        tokenName: DEFAULT_SUDT_FIELDS.CKBTokenName,
+        symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
+        decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
+      }
     }
     case 'resetToken': {
       return { accountName: state.accountName, tokenId: '', tokenName: '', symbol: '', decimal: '' }
@@ -120,7 +127,10 @@ const SUDTCreateDialog = ({
 
   const tokenErrors = {
     accountName: accountNameError,
-    tokenId: '',
+    tokenId:
+      info.tokenId && !verifyTokenId(info.tokenId, accountType === AccountType.CKB)
+        ? t(`messages.codes.${ErrorCode.FieldInvalid}`, { fieldName: 'token-id' })
+        : '',
     tokenName:
       !info.tokenName || info.tokenName.length <= MAX_NAME_LENGTH
         ? ''

@@ -1,12 +1,19 @@
-import React, { useRef, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
+import Spinner from 'widgets/Spinner'
 import { useDialog } from 'utils/hooks'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { AppActions } from 'states/stateProvider/reducer'
-import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
+import {
+  sendTransaction,
+  deleteWallet,
+  backupWallet,
+  sendCreateSUDTAccountTransaction,
+} from 'states/stateProvider/actionCreators'
+import { ErrorCode } from 'utils/const'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -14,14 +21,24 @@ const PasswordRequest = () => {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { walletID = '', actionType = null, password = '' },
+      passwordRequest: { walletID = '', actionType = null },
     },
     settings: { wallets = [] },
+    experimental,
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
+
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setPassword('')
+    setError('')
+  }, [actionType, setError])
+
   const onDismiss = useCallback(() => {
     dispatch({
       type: AppActions.DismissPasswordRequest,
@@ -31,7 +48,8 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const disabled = !password || (actionType === 'send' && isSending)
+  const isLoading = ['send', 'unlock', 'create-sudt-account'].includes(actionType || '') && isSending
+  const disabled = !password || isSending
 
   const onSubmit = useCallback(
     (e?: React.FormEvent): void => {
@@ -40,6 +58,11 @@ const PasswordRequest = () => {
       }
       if (disabled) {
         return
+      }
+      const setErrorIfPasswordIncorrect = (code: any) => {
+        if (code === ErrorCode.PasswordIncorrect) {
+          setError(t('messages.codes.103'))
+        }
       }
       switch (actionType) {
         case 'send': {
@@ -51,21 +74,21 @@ const PasswordRequest = () => {
             tx: generatedTx,
             description,
             password,
-          })(dispatch, history)
+          })(dispatch, history).then(setErrorIfPasswordIncorrect)
           break
         }
         case 'delete': {
           deleteWallet({
             id: walletID,
             password,
-          })(dispatch)
+          })(dispatch).then(setErrorIfPasswordIncorrect)
           break
         }
         case 'backup': {
           backupWallet({
             id: walletID,
             password,
-          })(dispatch)
+          })(dispatch).then(setErrorIfPasswordIncorrect)
           break
         }
         case 'unlock': {
@@ -77,7 +100,21 @@ const PasswordRequest = () => {
             tx: generatedTx,
             description,
             password,
-          })(dispatch, history, { type: 'unlock' })
+          })(dispatch, history, { type: 'unlock' }).then(setErrorIfPasswordIncorrect)
+          break
+        }
+        case 'create-sudt-account': {
+          const params: Controller.SendCreateSUDTAccountTransaction.Params = {
+            walletID,
+            assetAccount: experimental?.assetAccount,
+            tx: experimental?.tx,
+            password,
+          }
+          sendCreateSUDTAccountTransaction(params)(dispatch, history).then(code => {
+            if (code === ErrorCode.PasswordIncorrect) {
+              setError(t('messages.codes.103'))
+            }
+          })
           break
         }
         default: {
@@ -85,18 +122,29 @@ const PasswordRequest = () => {
         }
       }
     },
-    [dispatch, walletID, password, actionType, description, history, isSending, generatedTx, disabled]
+    [
+      dispatch,
+      walletID,
+      password,
+      actionType,
+      description,
+      history,
+      isSending,
+      generatedTx,
+      disabled,
+      experimental,
+      setError,
+      t,
+    ]
   )
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
-      dispatch({
-        type: AppActions.UpdatePassword,
-        payload: value,
-      })
+      setPassword(value)
+      setError('')
     },
-    [dispatch]
+    [setPassword, setError]
   )
 
   if (!wallet) {
@@ -118,10 +166,13 @@ const PasswordRequest = () => {
           autoFocus
           required
           className={styles.passwordInput}
+          error={error}
         />
         <div className={styles.footer}>
           <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled} />
+          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+            {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+          </Button>
         </div>
       </form>
     </dialog>
