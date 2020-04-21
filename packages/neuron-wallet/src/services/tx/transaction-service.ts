@@ -9,6 +9,7 @@ import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
 import AssetAccount from 'models/asset-account'
 import AssetAccountService from 'services/asset-account-service'
+import AssetAccountEntity from 'database/chain/entities/asset-account'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -39,6 +40,7 @@ export enum SearchType {
   TxHash = 'txHash',
   Date = 'date',
   Empty = 'empty',
+  TokenInfo = 'tokenInfo',
   Unknown = 'unknown',
 }
 
@@ -60,12 +62,12 @@ export class TransactionsService {
     if (value.match(/^(\d+|-\d+)$/)) {
       // Amount search is not supported
     }
-    return SearchType.Unknown
+    return SearchType.TokenInfo
   }
 
   public static async getAll(params: TransactionsByLockHashesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
+    if (type === SearchType.TokenInfo) {
       return {
         totalCount: 0,
         items: [],
@@ -151,18 +153,13 @@ export class TransactionsService {
 
   public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
-      return {
-        totalCount: 0,
-        items: []
-      }
-    }
 
     let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHashes: string[] = AddressParser
       .batchParse(params.addresses)
       .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
+    const allLockHashes: string[] = lockHashes.concat(anyoneCanPayLockHashes)
 
     if (type === SearchType.Address) {
       const hash = AddressParser.parse(searchValue).computeHash()
@@ -190,7 +187,32 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
-          { lockHashes, beginTimestamp, endTimestamp }
+          { lockHashes: allLockHashes, beginTimestamp, endTimestamp }
+        )
+        .orderBy('tx.timestamp', 'DESC')
+        .getRawMany())
+        .map(tx => tx.txHash)
+    } else if (type === SearchType.TokenInfo) {
+      const assetAccount = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .where(`aa.symbol = :searchValue OR aa.tokenName = :searchValue OR aa.accountName = :searchValue`, { searchValue })
+        .getOne()
+
+      if (!assetAccount) {
+        return {
+          totalCount: 0,
+          items: []
+        }
+      }
+
+      const tokenID = assetAccount.tokenID
+      allTxHashes = (await repository
+        .createQueryBuilder('tx')
+        .select("tx.hash", "txHash")
+        .where(
+          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) AND output.typeArgs = :tokenID union select input.transactionHash from input where input.lockHash in (:...lockHashes) AND input.typeArgs = :tokenID)`,
+          { lockHashes: anyoneCanPayLockHashes, tokenID }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -201,7 +223,7 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes))`,
-          { lockHashes }
+          { lockHashes: allLockHashes }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
