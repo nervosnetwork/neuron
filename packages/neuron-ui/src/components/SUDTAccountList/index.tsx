@@ -11,7 +11,9 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { AppActions } from 'states/stateProvider/reducer'
 import { getSUDTAccountList, generateCreateSUDTAccountTransaction, updateSUDTAccount } from 'services/remote'
 import isMainnetUtil from 'utils/isMainnet'
-import { MEDIUM_FEE_RATE, Routes, DEFAULT_SUDT_FIELDS } from 'utils/const'
+import { MEDIUM_FEE_RATE, Routes, DEFAULT_SUDT_FIELDS, SyncStatus } from 'utils/const'
+import getSyncStatus from 'utils/getSyncStatus'
+import getCurrentUrl from 'utils/getCurrentUrl'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -22,15 +24,16 @@ const SUDTAccountList = () => {
   const history = useHistory()
   const {
     wallet: { id: walletId },
-    settings: { networks },
-    chain: { networkID },
+    app: { tipBlockNumber = '0', tipBlockTimestamp },
+    chain: { networkID, tipBlockNumber: syncedBlockNumber = '0' },
+    settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
   const [accounts, setAccounts] = useState<SUDTAccount[]>([])
   const [selectedId, setSelectedId] = useState('')
   const [keyword, setKeyword] = useState('')
   const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const isMainnet = isMainnetUtil(networks, networkID)
   const existingAccountNames = accounts.map(a => a.accountName || '')
@@ -60,9 +63,9 @@ const SUDTAccountList = () => {
       })
       .catch((err: Error) => console.error(err))
       .finally(() => {
-        setLoaded(true)
+        setIsLoaded(true)
       })
-  }, [walletId, setAccounts, setLoaded])
+  }, [walletId, setAccounts, setIsLoaded])
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined
@@ -218,13 +221,28 @@ const SUDTAccountList = () => {
       }
     : undefined
 
-  if (!loaded) {
+  if (!isLoaded) {
     return (
       <div className={styles.loading}>
         <Spinner size={SpinnerSize.large} />
       </div>
     )
   }
+  const syncStatus = getSyncStatus({
+    syncedBlockNumber,
+    tipBlockNumber,
+    tipBlockTimestamp,
+    currentTimestamp: Date.now(),
+    url: getCurrentUrl(networkID, networks),
+  })
+
+  let prompt = ''
+  if (SyncStatus.SyncCompleted !== syncStatus) {
+    prompt = t('s-udt.account-list.syncing')
+  } else if (!filteredAccounts.length) {
+    prompt = t('s-udt.account-list.no-asset-accounts')
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -244,19 +262,16 @@ const SUDTAccountList = () => {
         />
         <div role="presentation" onClick={onOpenCreateDialog} className={styles.add} />
       </div>
+      <div className={styles.notice}>{prompt}</div>
       <div className={styles.list}>
-        {filteredAccounts.length ? (
-          filteredAccounts.map(account => (
-            <SUDTAccountPile
-              key={account.accountId}
-              {...account}
-              isSelected={selectedId === account.accountId}
-              onClick={onClick}
-            />
-          ))
-        ) : (
-          <div className={styles.notice}>No asset accounts</div>
-        )}
+        {filteredAccounts.map(account => (
+          <SUDTAccountPile
+            key={account.accountId}
+            {...account}
+            isSelected={selectedId === account.accountId}
+            onClick={onClick}
+          />
+        ))}
       </div>
       {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}
       {dialog?.action === 'create' ? (

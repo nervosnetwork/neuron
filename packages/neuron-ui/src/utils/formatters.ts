@@ -214,14 +214,18 @@ export const difficultyFormatter = (value: bigint) => {
 }
 
 export const sudtAmountToValue = (amount: string = '0', decimal: string = '0') => {
-  if (Number.isNaN(+amount)) {
-    console.warn(`Amount is not a valid number`)
-    return `0`
+  try {
+    if (Number.isNaN(+amount)) {
+      console.warn(`Amount is not a valid number`)
+      return `0`
+    }
+    const [integer = '0', decimalFraction = ''] = amount.split('.')
+    const decimalLength = 10 ** decimalFraction.length
+    const num = integer + decimalFraction
+    return (BigInt(num) * BigInt(10 ** +decimal / decimalLength)).toString()
+  } catch {
+    return undefined
   }
-  const [integer = '0', decimalFraction = ''] = amount.split('.')
-  const decimalLength = 10 ** decimalFraction.length
-  const num = integer + decimalFraction
-  return (BigInt(num) * BigInt(10 ** +decimal / decimalLength)).toString()
 }
 export const sudtValueToAmount = (value: string = '0', decimal: string = '0', showPositiveSign = false) => {
   const dec = +decimal

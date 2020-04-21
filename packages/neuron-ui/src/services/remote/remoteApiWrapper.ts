@@ -77,7 +77,9 @@ type Action =
   // Settings
   | 'clear-cache'
   // SUDT
+  | 'get-anyone-can-pay-script'
   | 'asset-accounts'
+  | 'get-asset-account'
   | 'send-create-asset-account-tx'
   | 'update-asset-account'
   | 'generate-create-asset-account-tx'
@@ -95,7 +97,7 @@ export const remoteApi = <T = any>(action: Action) => async (params: T): Promise
       },
     }))
 
-  if (process.env.NODE_ENV === 'development' && window.localStorage.getItem('log-response')) {
+  if (process.env.NODE_ENV === 'development' && action === window.localStorage.getItem('log-response')) {
     console.group(action)
     console.info(`params: ${JSON.stringify(params, null, 2)}`)
     console.info(`res: ${JSON.stringify(res, null, 2)}`)

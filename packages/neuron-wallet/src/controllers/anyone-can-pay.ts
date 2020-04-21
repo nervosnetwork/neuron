@@ -1,3 +1,4 @@
+import AssetAccountInfo from 'models/asset-account-info'
 import Transaction from "models/chain/transaction"
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
@@ -30,6 +31,7 @@ export interface SendAnyoneCanPayTxParams {
 }
 
 export default class AnyoneCanPayController {
+
   public async generateTx(params: GenerateAnyoneCanPayTxParams): Promise<Controller.Response<Transaction>> {
     const tx = await AnyoneCanPayService.generateAnyoneCanPayTx(
       params.walletID,
@@ -72,6 +74,13 @@ export default class AnyoneCanPayController {
     return {
       status: ResponseCode.Success,
       result: txHash,
+    }
+  }
+
+  public getScript() {
+    return {
+      status: ResponseCode.Success,
+      result: new AssetAccountInfo().infos.anyoneCanPay
     }
   }
 }

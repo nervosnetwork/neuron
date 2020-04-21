@@ -101,7 +101,6 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => (
   return sendTx(params)
     .then(res => {
       if (res.status === 1) {
-        dispatch({ type: AppActions.ClearNotificationsOfCode, payload: ErrorCode.PasswordIncorrect })
         dispatch({ type: AppActions.DismissPasswordRequest })
         if (options && options.type === 'unlock') {
           dispatch({
@@ -116,10 +115,7 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => (
           type: 'alert',
           timestamp: +new Date(),
           code: res.status,
-          content: (typeof res.message === 'string' ? res.message : res.message.content || '').replace(
-            /(\b"|"\b)/g,
-            ''
-          ),
+          content: typeof res.message === 'string' ? res.message : res.message.content,
           meta: typeof res.message === 'string' ? undefined : res.message.meta,
         })(dispatch)
         dispatch({
@@ -190,7 +186,6 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch
     .then(res => {
       if (res.status === 1) {
         addPopup('delete-wallet-successfully')(dispatch)
-        dispatch({ type: AppActions.ClearNotificationsOfCode, payload: ErrorCode.PasswordIncorrect })
         dispatch({ type: AppActions.DismissPasswordRequest })
       } else if (res.status !== ErrorCode.PasswordIncorrect) {
         addNotification(failureResToNotification(res))(dispatch)
@@ -213,7 +208,6 @@ export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch
   return backupRemoteWallet(params)
     .then(res => {
       if (res.status === 1) {
-        dispatch({ type: AppActions.ClearNotificationsOfCode, payload: ErrorCode.PasswordIncorrect })
         dispatch({ type: AppActions.DismissPasswordRequest })
       } else if (res.status !== ErrorCode.PasswordIncorrect) {
         addNotification(failureResToNotification(res))(dispatch)

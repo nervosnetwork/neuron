@@ -322,6 +322,11 @@ export default class ApiController {
     })
 
     // sUDT
+
+    handle('get-anyone-can-pay-script', () => {
+      return this.anyoneCanPayController.getScript()
+    })
+
     handle('generate-create-asset-account-tx', async (_, params: GenerateCreateAssetAccountTxParams) => {
       return this.assetAccountController.generateCreateTx(params)
     })

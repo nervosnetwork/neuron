@@ -9,9 +9,11 @@ import {
   SHANNON_CKB_RATIO,
   ErrorCode,
   DEFAULT_SUDT_FIELDS,
+  TOKEN_ID_LENGTH,
 } from 'utils/const'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
+import { sudtAmountToValue } from './formatters'
 
 const SHORT_ADDR_00_LENGTH = 46
 const SHORT_ADDR_00_PREFIX = '0x0100'
@@ -42,9 +44,31 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
 }
 
-export const verifySUDTAddress = (address: string, isMainnet?: boolean): boolean => {
+export const verifySUDTAddress = (address: string, codeHash: string, isMainnet?: boolean): boolean => {
   // TODO: add sudt address rules
-  return verifyAddress(address, isMainnet)
+  if (!verifyAddress(address, isMainnet)) {
+    return false
+  }
+  try {
+    // verify anyone can pay for now
+    const parsed = ckbCore.utils.parseAddress(address, 'hex')
+    if (!parsed.startsWith(LONG_TYPE_PREFIX)) {
+      return false
+    }
+    const CODE_HASH_LENGTH = 64
+    const codeHashOfAddr = parsed.slice(4, 4 + CODE_HASH_LENGTH)
+    if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
+      return false
+    }
+    const ARGS_LENGTH = 40
+    const minimums = parsed.slice(4 + CODE_HASH_LENGTH + ARGS_LENGTH)
+    if (minimums && ((minimums.length !== 2 && minimums.length !== 4) || Number.isNaN(+`0x${minimums}`))) {
+      return false
+    }
+    return true
+  } catch {
+    return false
+  }
 }
 
 export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
@@ -67,9 +91,16 @@ export const verifyAmount = (amount: string = '0') => {
   return true
 }
 
-export const verifySUDTAmount = (amount: string = '0') => {
+export const verifySUDTAmount = (amount: string, decimal: string) => {
   // TODO: add sUDT rules
-  return verifyAmount(amount)
+  if (Number.isNaN(+amount) || +amount < 0) {
+    return false
+  }
+  try {
+    return sudtAmountToValue(amount, decimal) !== undefined
+  } catch {
+    return false
+  }
 }
 
 export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
@@ -170,7 +201,7 @@ export const verifyTokenId = (tokenId: string, isCKB = false) => {
   if (isCKB && tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId) {
     return true
   }
-  if (tokenId.startsWith('0x') && tokenId.length === 42 && !Number.isNaN(+tokenId)) {
+  if (tokenId.startsWith('0x') && tokenId.length === TOKEN_ID_LENGTH && !Number.isNaN(+tokenId)) {
     return true
   }
   return false

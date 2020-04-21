@@ -117,6 +117,14 @@ body {
   background: var(--nervos-green) !important;
 }
 
+// hack fabric dropdown
+.ms-Dropdown-title {
+  border-color: #000 !important;
+}
+.ms-Dropdown-item {
+  color: #000 !important;
+}
+
 // hack search field
 .ms-SearchBox {
   height: 26px;

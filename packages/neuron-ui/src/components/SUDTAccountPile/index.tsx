@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
@@ -29,6 +30,7 @@ const SUDTAccountPile = ({
   decimal,
   onClick,
 }: SUDTAccountPileProps) => {
+  const [t] = useTranslation()
   return (
     <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
@@ -50,8 +52,8 @@ const SUDTAccountPile = ({
       </div>
       {isSelected ? (
         <div className={styles.actions}>
-          <Button type="primary" label="Receive" data-role="receive" disabled={!accountName} />
-          <Button type="primary" label="Send" data-role="send" disabled={!accountName} />
+          <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={!accountName} />
+          <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={!accountName} />
         </div>
       ) : (
         <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>

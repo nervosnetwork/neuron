@@ -164,6 +164,13 @@ declare namespace Controller {
   /**
    * sUDT related API
    */
+  namespace GetScript {
+    interface Response {
+      cellDep: any
+      codeHash: string
+      hashType: 'data' | 'type'
+    }
+  }
   interface SUDTAccount {
     public id?: number
     public walletID: string
@@ -176,6 +183,15 @@ declare namespace Controller {
     public blake160: string
     public address: string
   }
+
+  namespace GetSUDTAccount {
+    interface Params {
+      walletID: string
+      id: string
+    }
+    type Response = SUDTAccount
+  }
+
   namespace GetSUDTAccountList {
     interface Params {
       walletID: string

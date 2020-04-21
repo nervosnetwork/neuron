@@ -12,6 +12,7 @@ import {
   deleteWallet,
   backupWallet,
   sendCreateSUDTAccountTransaction,
+  sendSUDTTransaction,
 } from 'states/stateProvider/actionCreators'
 import { ErrorCode } from 'utils/const'
 import styles from './passwordRequest.module.scss'
@@ -48,7 +49,7 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const isLoading = ['send', 'unlock', 'create-sudt-account'].includes(actionType || '') && isSending
+  const isLoading = ['send', 'unlock', 'create-sudt-account', 'send-sudt'].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -110,11 +111,16 @@ const PasswordRequest = () => {
             tx: experimental?.tx,
             password,
           }
-          sendCreateSUDTAccountTransaction(params)(dispatch, history).then(code => {
-            if (code === ErrorCode.PasswordIncorrect) {
-              setError(t('messages.codes.103'))
-            }
-          })
+          sendCreateSUDTAccountTransaction(params)(dispatch, history).then(setErrorIfPasswordIncorrect)
+          break
+        }
+        case 'send-sudt': {
+          const params: Controller.SendSUDTTransaction.Params = {
+            walletID,
+            tx: experimental?.tx,
+            password,
+          }
+          sendSUDTTransaction(params)(dispatch, history).then(setErrorIfPasswordIncorrect)
           break
         }
         default: {
@@ -155,7 +161,9 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
+        {['unlock', 'create-sudt-account', 'send-sudt'].includes(actionType || '') ? null : (
+          <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
+        )}
         <TextField
           label={t('password-request.password')}
           value={password}

@@ -16,6 +16,7 @@ export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'
 
 export const MIN_DEPOSIT_AMOUNT = 102
+export const TOKEN_ID_LENGTH = 66
 
 export const SHANNON_CKB_RATIO = 1e8
 
