@@ -5,11 +5,16 @@ import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
+import AssetAccountInfo from 'models/asset-account-info'
+import BufferUtils from 'utils/buffer'
+import AssetAccount from 'models/asset-account'
+import AssetAccountService from 'services/asset-account-service'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
   addresses: string[]
+  walletID: string
 }
 
 export interface TransactionsByLockHashesParam {
@@ -154,6 +159,10 @@ export class TransactionsService {
     }
 
     let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHashes: string[] = AddressParser
+      .batchParse(params.addresses)
+      .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
 
     if (type === SearchType.Address) {
       const hash = AddressParser.parse(searchValue).computeHash()
@@ -230,6 +239,18 @@ export class TransactionsService {
       .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
       .getRawMany()
 
+    const anyoneCanPayInputs = await connection
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where(`input.transactionHash IN (:...txHashes) AND input.typeHash IS NOT NULL AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
+
+    const anyoneCanPayOutputs = await connection
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`output.transactionHash IN (:...txHashes) AND output.typeHash IS NOT NULL AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
+
     const inputPreviousTxHashes: string[] = inputs
       .map(i => i.outPointTxHash)
       .filter(h => !!h) as string[]
@@ -266,22 +287,60 @@ export class TransactionsService {
       }
     })
 
-    const txs = transactions.map(tx => {
-      const value = sums.get(tx.hash!) || BigInt(0)
-      return Transaction.fromObject({
-        timestamp: tx.timestamp,
-        value: value.toString(),
-        hash: tx.hash,
-        version: tx.version,
-        type: value > BigInt(0) ? 'receive' : 'send',
-        nervosDao: daoFlag.get(tx.hash!),
-        status: tx.status,
-        description: tx.description,
-        createdAt: tx.createdAt,
-        updatedAt: tx.updatedAt,
-        blockNumber: tx.blockNumber,
+    const txs = await Promise.all(
+      transactions.map(async tx => {
+        const value = sums.get(tx.hash!) || BigInt(0)
+
+        let typeArgs: string | undefined | null
+        const sudtInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!))
+        if (sudtInput) {
+          typeArgs = sudtInput.typeArgs
+        } else {
+          const sudtOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!))
+          if (sudtOutput) {
+            typeArgs = sudtOutput.typeArgs
+          }
+        }
+
+        let sudtInfo: { sUDT: AssetAccount, amount: string } | undefined
+
+        if (typeArgs) {
+          // const typeArgs = sudtInput.typeArgs
+          const inputAmount = anyoneCanPayInputs
+            .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
+            .map(i => BufferUtils.readBigUInt128LE(i.data))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputAmount = anyoneCanPayOutputs
+            .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
+            .map(o => BufferUtils.readBigUInt128LE(o.data))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          const amount = outputAmount - inputAmount
+          const assetAccounts = await AssetAccountService.getByTokenID(params.walletID, typeArgs)
+          const assetAccount = assetAccounts[0]
+
+          sudtInfo = {
+            sUDT: assetAccount,
+            amount: amount.toString(),
+          }
+        }
+
+        return Transaction.fromObject({
+          timestamp: tx.timestamp,
+          value: value.toString(),
+          hash: tx.hash,
+          version: tx.version,
+          type: value > BigInt(0) ? 'receive' : 'send',
+          nervosDao: daoFlag.get(tx.hash!),
+          status: tx.status,
+          description: tx.description,
+          createdAt: tx.createdAt,
+          updatedAt: tx.updatedAt,
+          blockNumber: tx.blockNumber,
+          sudtInfo: sudtInfo,
+        })
       })
-    })
+    )
 
     return {
       totalCount,

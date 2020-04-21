@@ -17,7 +17,7 @@ export default class TransactionsController {
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
 
     const transactions = await TransactionsService
-      .getAllByAddresses({ pageNo, pageSize, addresses }, keywords.trim())
+      .getAllByAddresses({ walletID, pageNo, pageSize, addresses }, keywords.trim())
       .catch(() => ({
         totalCount: 0,
         items: [] as Transaction[]

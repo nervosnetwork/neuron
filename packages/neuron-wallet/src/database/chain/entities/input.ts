@@ -84,6 +84,11 @@ export default class Input extends BaseEntity {
   })
   data: string = '0x'
 
+  @Column({
+    type: 'varchar'
+  })
+  transactionHash!: string
+
   @ManyToOne(_type => Transaction, transaction => transaction.inputs, { onDelete: 'CASCADE' })
   transaction!: Transaction
 
