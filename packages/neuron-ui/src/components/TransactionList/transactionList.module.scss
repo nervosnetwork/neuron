@@ -78,24 +78,10 @@ $pending-color: #b3b3b3;
       grid-area: indicator;
       align-self: center;
       justify-self: center;
+      line-height: 0;
       img {
         width: 16px;
         height: 16px;
-      }
-    }
-
-    &[data-status='confirming'],
-    &[data-status='pending'] {
-      .indicator {
-        animation: pending 3s linear infinite;
-      }
-    }
-    @keyframes pending {
-      from {
-        transform: rotate(0);
-      }
-      to {
-        transform: rotate(360deg);
       }
     }
   }
