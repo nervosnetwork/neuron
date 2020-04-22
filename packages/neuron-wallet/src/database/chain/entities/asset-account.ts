@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
 import AssetAccountModel from 'models/asset-account'
 import SudtTokenInfo from './sudt-token-info'
 
@@ -35,6 +35,10 @@ export default class AssetAccount {
   blake160!: string
 
   @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE' })
+  @JoinColumn([
+    { name: 'walletID', referencedColumnName: 'walletID' },
+    { name: 'tokenID', referencedColumnName: 'tokenID' },
+  ])
   sudtTokenInfo!: SudtTokenInfo
 
   public static fromModel(info: AssetAccountModel): AssetAccount {

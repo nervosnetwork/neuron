@@ -1,18 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, OneToMany } from "typeorm";
+import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm";
 import AssetAccount from "./asset-account";
 
 @Entity()
 @Index(['walletID', 'tokenID'], { unique: true })
 export default class SudtTokenInfo {
-  @PrimaryGeneratedColumn()
-  id!: number
-
-  @Column({
+  @PrimaryColumn({
     type: 'varchar'
   })
   walletID!: string
 
-  @Column({
+  @PrimaryColumn({
     type: 'varchar'
   })
   tokenID!: string
