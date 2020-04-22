@@ -122,6 +122,7 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             },
             root: {
               fontSize: '1rem',
+              marginBottom: '10px',
             },
           }}
         />
