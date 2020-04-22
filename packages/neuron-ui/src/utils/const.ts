@@ -61,6 +61,9 @@ export enum Routes {
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
   SpecialAssets = '/special-assets',
+  SUDTAccountList = '/s-udt/accounts',
+  SUDTSend = '/s-udt/send',
+  SUDTReceive = '/s-udt/receive',
 }
 
 export enum CapacityUnit {
@@ -137,4 +140,10 @@ export enum CompensationPeriod {
   SUGGEST_START = 0.767,
   REQUEST_START = 0.967,
   REQUEST_END = 1,
+}
+
+export const defaultSUDTFields = {
+  accountName: 'Undefined',
+  tokenName: 'Unknown',
+  symbol: 'Unknown',
 }

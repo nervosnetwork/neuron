@@ -7,6 +7,7 @@ import AddressService from "services/addresses"
 import NetworksService from "services/networks"
 import AddressGenerator from "models/address-generator"
 import { AddressPrefix } from "@nervosnetwork/ckb-sdk-utils"
+import AssetAccountInfo from "models/asset-account-info"
 
 export interface GenerateCreateAssetAccountTxParams {
   walletID: string
@@ -42,18 +43,44 @@ export default class AssetAccountController {
       throw new ServiceHasNoResponse('AssetAccount')
     }
 
+    const assetAccountInfo = new AssetAccountInfo()
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
     const result = assetAccounts.map(aa => {
       return {
         ...aa,
-        address: AddressGenerator.toShortByBlake160(aa.blake160, addressPrefix)
+        address: AddressGenerator.generate(
+          assetAccountInfo.generateAnyoneCanPayScript(aa.blake160),
+          addressPrefix,
+        )
       }
     })
 
     return {
       status: ResponseCode.Success,
       result,
+    }
+  }
+
+  public async getAccount(params: { walletID:string, id: string }): Promise<Controller.Response<AssetAccount & { address: string }>> {
+    const account = await AssetAccountService.getAccount(params)
+
+    if (!account) {
+      throw new ServiceHasNoResponse('AssetAccount')
+    }
+
+    const assetAccountInfo = new AssetAccountInfo()
+    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+
+    return {
+      status: ResponseCode.Success,
+      result: {
+        ...account,
+        address: AddressGenerator.generate(
+          assetAccountInfo.generateAnyoneCanPayScript(account.blake160),
+          addressPrefix,
+        )
+      }
     }
   }
 

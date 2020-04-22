@@ -21,7 +21,8 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
-      "experimental-functions": "Experimental"
+      "experimental-functions": "Experimental",
+      "s-udt": "Asset Accounts"
     },
     "network-status": {
       "tooltip": {
@@ -274,7 +275,9 @@
       "edit": "Edit",
       "delete": "Delete",
       "click-to-edit": "Click to edit",
-      "notice": "Notice"
+      "notice": "Notice",
+      "experimental": "Experimental",
+      "close": "Close"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -299,6 +302,7 @@
       "no-valid-addresses-found": "No valid addresses found",
       "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",

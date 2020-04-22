@@ -7,11 +7,13 @@ $pending-color: #b3b3b3;
 .itemContainer {
   @include RegularText;
   font-size: 0.875rem;
-  letter-spacing: 0.7px;
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #b3b3b3;
+  margin: 10px auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12);
+  padding: 15px;
 
   &:last-of-type {
     border-bottom: none;
@@ -21,10 +23,12 @@ $pending-color: #b3b3b3;
     @include MediumText;
     position: relative;
     display: grid;
-    grid-template: 'time status' auto 'amount confirmations' auto/ 1fr 130px;
-    justify-items: start;
-    grid-gap: 3px;
-    padding: 15px 0 15px 33px;
+    grid-template:
+      'avatar wallet-name amount indicator' auto
+      'toggle type time indicator' auto/
+      33px minmax(130px, 300px) 1fr 40px;
+    grid-gap: 7px 10px;
+    font-size: 0.875rem;
 
     time,
     span {
@@ -33,77 +37,70 @@ $pending-color: #b3b3b3;
 
     time {
       grid-area: time;
+      justify-self: flex-end;
+      color: #666;
     }
 
-    .status {
-      grid-area: status;
-      text-align: right;
+    .type {
+      grid-area: type;
     }
 
     .amount {
       grid-area: amount;
-      color: var(--nervos-green);
+      justify-self: flex-end;
+      align-self: center;
+      text-align: right;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .confirmations {
-      grid-area: confirmations;
-      text-align: right;
-      font-size: 0.625rem;
-      color: #434343;
-      letter-spacing: 0.5px;
+    .walletName {
+      grid-area: wallet-name;
+      font-weight: 600;
+      align-self: center;
     }
 
     &:before {
-      position: absolute;
-      top: 50%;
-      left: 13px;
-      transform: translateY(-50%);
-      transform-origin: 0 5px;
+      grid-area: toggle;
+      transform: translateX(15px);
+      transform-origin: 0 6px;
       transition: transform 0.3s;
       display: block;
       content: '';
       width: 0;
       height: 0;
-      border: 5px solid transparent;
+      border: 6px solid transparent;
       border-left-color: #000;
     }
-
-    &:after {
-      position: absolute;
-      top: calc(15px + 0.4375rem);
-      right: 0;
-      display: block;
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    &[data-status='confirming'],
-    &[data-status='pending'] {
-      &:after {
-        background-color: $pending-color;
+    .indicator {
+      grid-area: indicator;
+      align-self: center;
+      justify-self: center;
+      line-height: 0;
+      img {
+        width: 16px;
+        height: 16px;
       }
-    }
-
-    &[data-status='success']:after {
-      background-color: $success-color;
-    }
-
-    &[data-status='failed']:after {
-      background-color: $failed-color;
     }
   }
 
   .detail {
-    padding: 0 33px;
+    @include RegularText;
+    margin: 15px 50px 0 43px;
     display: none;
     color: #434343;
+    border-top: 1px dashed #b3b3b3;
+    padding-top: 15px;
+    font-size: 0.875rem;
 
     & > div {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 10px;
+      min-height: 18px;
 
       & > span:first-of-type {
         @include MediumText;
@@ -180,8 +177,9 @@ $pending-color: #b3b3b3;
 
   &[data-is-open='true'] {
     .summary:before {
-      transform: translateY(-50%) rotate(90deg);
+      transform: translateX(15px) rotate(90deg);
     }
+    padding-bottom: 0;
 
     .detail {
       display: block;

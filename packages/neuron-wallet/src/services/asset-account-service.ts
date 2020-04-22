@@ -20,6 +20,10 @@ export default class AssetAccountService {
     return assetAccounts.map(aa => aa.toModel())
   }
 
+  public static async getAccount(params: { walletID: string, id: string }): Promise<AssetAccount | undefined> {
+    return getConnection().getRepository(AssetAccountEntity).findOne(params.id).then(account => account?.toModel())
+  }
+
   public static async generateCreateTx(
     walletID: string,
     lockHashes: string[],

@@ -3,7 +3,7 @@ import Script, { ScriptHashType } from "./chain/script"
 import OutPoint from "./chain/out-point"
 import NetworksService from "services/networks"
 
-interface ScriptCellInfo {
+export interface ScriptCellInfo {
   cellDep: CellDep
   codeHash: string
   hashType: ScriptHashType
@@ -14,6 +14,13 @@ export default class AssetAccountInfo {
   private anyoneCanPayInfo: ScriptCellInfo
 
   private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
+
+  public get infos(): {[name: string]: ScriptCellInfo} {
+    return {
+      sudt: this.sudtInfo,
+      anyoneCanPay: this.anyoneCanPayInfo
+    }
+  }
 
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     // dev chain: using testnet config
