@@ -10,7 +10,8 @@ export default class AssetAccountService {
   public static async getAll(walletID: string): Promise<AssetAccount[]> {
     const assetAccounts = await getConnection()
       .getRepository(AssetAccountEntity)
-      .createQueryBuilder('asset_account')
+      .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
       .where({
         walletID,
       })
