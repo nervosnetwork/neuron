@@ -251,6 +251,9 @@
       },
       "unlock": {
         "title": "Please input wallet password to claim the asset"
+      },
+      "create-sudt-account": {
+        "title": "Create Asset Account"
       }
     },
     "qrcode": {
@@ -320,6 +323,7 @@
         "deposit": "Deposit",
         "account-name": "Account Name",
         "token-name": "Token Name",
+        "token-id": "Token ID",
         "symbol": "Symbol"
       },
       "codes": {
@@ -490,7 +494,11 @@
     },
     "s-udt": {
       "account-list": {
-        "no-asset-accounts": "No asset accounts"
+        "no-asset-accounts": "No sUDT asset has been detected",
+        "search": "Account Name, Token Name or Symbol",
+        "syncing": "Syncing, current data may be inaccurate",
+        "send": "Send",
+        "receive": "Receive"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
@@ -507,6 +515,13 @@
         "cancel": "Cancel",
         "next": "Next",
         "back": "Back"
+      },
+      "send": {
+        "address": "Address",
+        "amount": "Amount",
+        "description": "Description",
+        "submit": "Submit",
+        "click-to-edit": "Click to edit"
       },
       "receive": {
         "notation": "Accept sUDT only"
