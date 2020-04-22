@@ -213,6 +213,61 @@ export const difficultyFormatter = (value: bigint) => {
   return `${localNumberFormatter(value)} H`
 }
 
+export const sudtAmountToValue = (amount: string = '0', decimal: string = '0') => {
+  try {
+    if (Number.isNaN(+amount)) {
+      console.warn(`Amount is not a valid number`)
+      return `0`
+    }
+    const [integer = '0', decimalFraction = ''] = amount.split('.')
+    const decimalLength = 10 ** decimalFraction.length
+    const num = integer + decimalFraction
+    return (BigInt(num) * BigInt(10 ** +decimal / decimalLength)).toString()
+  } catch {
+    return undefined
+  }
+}
+
+export const sudtValueToAmount = (value: string = '0', decimal: string = '0', showPositiveSign = false) => {
+  const dec = +decimal
+  if (Number.isNaN(+value)) {
+    console.warn(`sUDT value is not a valid number`)
+    return '0'
+  }
+  if (value === null) {
+    return '0'
+  }
+  let sign = ''
+  if (value.startsWith('-')) {
+    sign = '-'
+  } else if (showPositiveSign) {
+    sign = '+'
+  }
+  const unsignedValue = value.replace(/^-?0*/, '')
+  if (dec === 0) {
+    return +unsignedValue ? `${sign}${unsignedValue}` : '0'
+  }
+  let unsignedCKB = ''
+  if (unsignedValue.length <= dec) {
+    unsignedCKB = `0.${unsignedValue.padStart(dec, '0')}`.replace(/\.?0+$/, '')
+  } else {
+    const decimalFraction = `.${unsignedValue.slice(-dec)}`.replace(/\.?0+$/, '')
+    const int = unsignedValue.slice(0, -dec).replace(/\^0+/, '')
+    unsignedCKB = `${(
+      int
+        .split('')
+        .reverse()
+        .join('')
+        .match(/\d{1,3}/g) || ['0']
+    )
+      .join(',')
+      .split('')
+      .reverse()
+      .join('')}${decimalFraction}`
+  }
+  return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
@@ -224,4 +279,6 @@ export default {
   addressesToBalance,
   outputsToTotalAmount,
   failureResToNotification,
+  sudtAmountToValue,
+  sudtValueToAmount,
 }
