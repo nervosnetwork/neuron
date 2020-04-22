@@ -8,7 +8,7 @@ import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
+import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter, sudtValueToAmount } from 'utils/formatters'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
 import {
@@ -157,16 +157,24 @@ const Overview = () => {
           }
         }
 
-        typeLabel = genTypeLabel(item.type, status)
+        typeLabel = t(`overview.${genTypeLabel(item.type, status)}`)
+      }
+      let amount = `${shannonToCKBFormatter(item.value)} CKB`
+      if (item.nervosDao) {
+        typeLabel = 'Nervos DAO'
+      } else if (item.sudtInfo?.sUDT) {
+        typeLabel = `UDT ${typeLabel}`
+        amount = `${sudtValueToAmount(item.sudtInfo?.amount, item.sudtInfo?.sUDT.decimal)} ${item.sudtInfo?.sUDT
+          .symbol || '?'}`
       }
 
       return {
         ...item,
         status,
         statusLabel: t(`overview.statusLabel.${status}`),
-        value: item.value.replace(/^-/, ''),
+        amount,
         confirmations,
-        typeLabel: t(`overview.${typeLabel}`),
+        typeLabel,
       }
     })
     return (
@@ -186,24 +194,14 @@ const Overview = () => {
           </thead>
           <tbody>
             {activities.map(item => {
-              const {
-                confirmations,
-                createdAt,
-                status,
-                hash,
-                statusLabel,
-                timestamp,
-                typeLabel,
-                value,
-                nervosDao,
-              } = item
+              const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, amount } = item
               const time = uniformTimeFormatter(timestamp || createdAt)
 
               return (
                 <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
                   <td title={time}>{time.split(' ')[0]}</td>
-                  <td>{nervosDao ? 'Nervos DAO' : typeLabel}</td>
-                  <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
+                  <td>{typeLabel}</td>
+                  <td>{amount}</td>
                   <td className={styles.txStatus} data-status={status}>
                     <div>
                       <span>{statusLabel}</span>
