@@ -43,14 +43,19 @@ export default class AssetAccount {
 
   public static fromModel(info: AssetAccountModel): AssetAccount {
     const assetAccount = new AssetAccount()
+
     assetAccount.walletID = info.walletID
     assetAccount.tokenID = info.tokenID
-    // assetAccount.symbol = info.symbol
     assetAccount.accountName = info.accountName
-    // assetAccount.tokenName = info.tokenName
-    // assetAccount.decimal = info.decimal
     assetAccount.balance = info.balance
     assetAccount.blake160 = info.blake160
+
+    const sudtTokenInfo = new SudtTokenInfo()
+    sudtTokenInfo.symbol = info.symbol
+    sudtTokenInfo.tokenName = info.tokenName
+    sudtTokenInfo.decimal = info.decimal
+    assetAccount.sudtTokenInfo = sudtTokenInfo
+
     return assetAccount
   }
 
@@ -58,10 +63,10 @@ export default class AssetAccount {
     return new AssetAccountModel(
       this.walletID,
       this.tokenID,
-      '',
+      this.sudtTokenInfo.symbol,
       this.accountName,
-      '',
-      '',
+      this.sudtTokenInfo.tokenName,
+      this.sudtTokenInfo.decimal,
       this.balance,
       this.blake160,
       this.id
