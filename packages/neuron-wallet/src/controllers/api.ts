@@ -343,7 +343,7 @@ export default class ApiController {
       return this.assetAccountController.getAll(params)
     })
 
-    handle("get-asset-account", async (_, params: { walletID: string, id: string }) => {
+    handle("get-asset-account", async (_, params: { walletID: string, id: number }) => {
       return this.assetAccountController.getAccount(params)
     })
 
