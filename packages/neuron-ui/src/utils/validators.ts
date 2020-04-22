@@ -8,9 +8,27 @@ import {
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
   ErrorCode,
+  DEFAULT_SUDT_FIELDS,
+  TOKEN_ID_LENGTH,
 } from 'utils/const'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
+import { FieldRequiredException } from 'exceptions'
+import {
+  MIN_DECIMAL,
+  MAX_DECIMAL,
+  MAX_SUDT_TOKEN_NAME_LENGTH,
+  MAX_SYMBOL_LENGTH,
+  MAX_SUDT_ACCOUNT_NAME_LENGTH,
+} from './const'
+import {
+  DecimalRangeError,
+  FieldInvalidException,
+  FieldUsedException,
+  FieldTooLongException,
+} from '../exceptions/index'
+
+import { sudtAmountToValue } from './formatters'
 
 const SHORT_ADDR_00_LENGTH = 46
 const SHORT_ADDR_00_PREFIX = '0x0100'
@@ -41,9 +59,31 @@ export const verifyAddress = (address: string, isMainnet?: boolean): boolean => 
   }
 }
 
-export const verifySUDTAddress = (address: string, isMainnet?: boolean): boolean => {
+export const verifySUDTAddress = (address: string, codeHash: string, isMainnet?: boolean): boolean => {
   // TODO: add sudt address rules
-  return verifyAddress(address, isMainnet)
+  if (!verifyAddress(address, isMainnet)) {
+    return false
+  }
+  try {
+    // verify anyone can pay for now
+    const parsed = ckbCore.utils.parseAddress(address, 'hex')
+    if (!parsed.startsWith(LONG_TYPE_PREFIX)) {
+      return false
+    }
+    const CODE_HASH_LENGTH = 64
+    const codeHashOfAddr = parsed.slice(4, 4 + CODE_HASH_LENGTH)
+    if (codeHash && codeHashOfAddr !== codeHash.slice(2)) {
+      return false
+    }
+    const ARGS_LENGTH = 40
+    const minimums = parsed.slice(4 + CODE_HASH_LENGTH + ARGS_LENGTH)
+    if (minimums && ((minimums.length !== 2 && minimums.length !== 4) || Number.isNaN(+`0x${minimums}`))) {
+      return false
+    }
+    return true
+  } catch {
+    return false
+  }
 }
 
 export const verifyAmountRange = (amount: string = '', extraSize: number = 0) => {
@@ -66,9 +106,16 @@ export const verifyAmount = (amount: string = '0') => {
   return true
 }
 
-export const verifySUDTAmount = (amount: string = '0') => {
+export const verifySUDTAmount = (amount: string, decimal: string) => {
   // TODO: add sUDT rules
-  return verifyAmount(amount)
+  if (Number.isNaN(+amount) || +amount < 0) {
+    return false
+  }
+  try {
+    return sudtAmountToValue(amount, decimal) !== undefined
+  } catch {
+    return false
+  }
 }
 
 export const verifyTotalAmount = (totalAmount: string, fee: string, balance: string) => {
@@ -165,6 +212,90 @@ export const verifyURL = (url: string) => {
   return true
 }
 
+export const verifyTokenId = ({
+  tokenId,
+  isCKB = false,
+  required = false,
+}: {
+  tokenId: string
+  isCKB: boolean
+  required: boolean
+}) => {
+  if (!tokenId && required) {
+    throw new FieldRequiredException('token-id')
+  }
+
+  if (isCKB && tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId) {
+    return true
+  }
+
+  if (tokenId.startsWith('0x') && tokenId.length === TOKEN_ID_LENGTH && !Number.isNaN(+tokenId)) {
+    return true
+  }
+
+  if (tokenId) {
+    throw new FieldInvalidException('token-id')
+  }
+  return true
+}
+
+export const verifyTokenName = ({ tokenName, required = false }: { tokenName: string; required?: boolean }) => {
+  const fieldName = 'token-name'
+  if (!tokenName && required) {
+    throw new FieldRequiredException(fieldName)
+  }
+  if (tokenName.length > MAX_SUDT_TOKEN_NAME_LENGTH) {
+    throw new FieldTooLongException(fieldName, MAX_SUDT_TOKEN_NAME_LENGTH)
+  }
+}
+
+export const verifySUDTAccountName = ({
+  name = '',
+  exists = [],
+  required = false,
+}: {
+  name: string
+  exists?: string[]
+  required?: boolean
+}) => {
+  const fieldName = 'account-name'
+  if (!name && required) {
+    throw new FieldRequiredException(fieldName)
+  }
+  if (name.length > MAX_SUDT_ACCOUNT_NAME_LENGTH) {
+    throw new FieldTooLongException(fieldName, MAX_SUDT_ACCOUNT_NAME_LENGTH)
+  }
+  if (exists.includes(name)) {
+    throw new FieldUsedException(fieldName)
+  }
+}
+
+export const verifySymbol = ({ symbol, required = false }: { symbol: string; required?: boolean }) => {
+  const fieldName = 'symbol'
+  if (!symbol && required) {
+    throw new FieldRequiredException(fieldName)
+  }
+  if (symbol.length > MAX_SYMBOL_LENGTH) {
+    throw new FieldTooLongException(fieldName, MAX_SYMBOL_LENGTH)
+  }
+  if ([...symbol].some(char => char.charCodeAt(0) > 127)) {
+    throw new FieldInvalidException(fieldName)
+  }
+}
+
+export const verifyDecimal = ({ decimal, required = false }: { decimal: string; required: boolean }) => {
+  const fieldName = 'decimal'
+  if (!decimal && required) {
+    throw new FieldRequiredException(fieldName)
+  }
+  if (Number.isNaN(+decimal) || !Number.isInteger(+decimal)) {
+    throw new FieldInvalidException(fieldName)
+  }
+  if (+decimal < MIN_DECIMAL || +decimal > MAX_DECIMAL) {
+    throw new DecimalRangeError()
+  }
+}
+
 export default {
   verifyAddress,
   verifySUDTAddress,
@@ -174,4 +305,8 @@ export default {
   verifyPasswordComplexity,
   verifyTransactionOutputs,
   verifyNetworkName,
+  verifyTokenId,
+  verifySUDTAccountName,
+  verifySymbol,
+  verifyDecimal,
 }
