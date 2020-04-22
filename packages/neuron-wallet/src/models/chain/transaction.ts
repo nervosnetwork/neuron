@@ -7,12 +7,24 @@ import { serializeWitnessArgs, rawTransactionToHash } from '@nervosnetwork/ckb-s
 import BlockHeader from './block-header'
 import TypeCheckerUtils from 'utils/type-checker'
 import OutPoint from './out-point'
-import AssetAccount from 'models/asset-account'
 
 export enum TransactionStatus {
   Pending = 'pending',
   Success = 'success',
   Failed = 'failed',
+}
+
+interface SudtTokenInfo {
+  symbol: string
+  tokenID: string
+  tokenName: string
+  walletID: string
+  decimal: string
+}
+
+export interface SudtInfo {
+  sUDT: SudtTokenInfo
+  amount: string
 }
 
 export default class Transaction {
@@ -43,10 +55,7 @@ export default class Transaction {
   public createdAt?: string
   public updatedAt?: string
 
-  public sudtInfo?: {
-    sUDT: AssetAccount,
-    amount: string
-  }
+  public sudtInfo?: SudtInfo
 
   constructor(
     version: string,
@@ -69,10 +78,7 @@ export default class Transaction {
     nervosDao: boolean = false, // Default to false
     createdAt?: string,
     updatedAt?: string,
-    sudtInfo?: {
-      sUDT: AssetAccount,
-      amount: string
-    }
+    sudtInfo?: SudtInfo
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -153,10 +159,7 @@ export default class Transaction {
     nervosDao?: boolean, // Default to false
     createdAt?: string,
     updatedAt?: string,
-    sudtInfo?: {
-      sUDT: AssetAccount,
-      amount: string
-    }
+    sudtInfo?: SudtInfo
   }): Transaction {
     return new Transaction(
       version,

@@ -2,14 +2,13 @@ import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
 import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
-import AssetAccount from 'models/asset-account'
-import AssetAccountService from 'services/asset-account-service'
 import AssetAccountEntity from 'database/chain/entities/asset-account'
+import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -196,7 +195,8 @@ export class TransactionsService {
       const assetAccount = await getConnection()
         .getRepository(AssetAccountEntity)
         .createQueryBuilder('aa')
-        .where(`aa.symbol = :searchValue OR aa.tokenName = :searchValue OR aa.accountName = :searchValue`, { searchValue })
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .where(`info.symbol = :searchValue OR info.tokenName = :searchValue OR aa.accountName = :searchValue`, { searchValue })
         .getOne()
 
       if (!assetAccount) {
@@ -324,7 +324,7 @@ export class TransactionsService {
           }
         }
 
-        let sudtInfo: { sUDT: AssetAccount, amount: string } | undefined
+        let sudtInfo: SudtInfo | undefined
 
         if (typeArgs) {
           // const typeArgs = sudtInput.typeArgs
@@ -338,12 +338,20 @@ export class TransactionsService {
             .reduce((result, c) => result + c, BigInt(0))
 
           const amount = outputAmount - inputAmount
-          const assetAccounts = await AssetAccountService.getByTokenID(params.walletID, typeArgs)
-          const assetAccount = assetAccounts[0]
+          const tokenInfo = await getConnection()
+            .getRepository(SudtTokenInfoEntity)
+            .createQueryBuilder('info')
+            .where({
+              walletID: params.walletID,
+              tokenID: typeArgs,
+            })
+            .getOne()
 
-          sudtInfo = {
-            sUDT: assetAccount,
-            amount: amount.toString(),
+          if (tokenInfo) {
+            sudtInfo = {
+              sUDT: tokenInfo,
+              amount: amount.toString(),
+            }
           }
         }
 

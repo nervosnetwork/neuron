@@ -97,16 +97,4 @@ export default class AssetAccountService {
     }
     return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
   }
-
-  public static async getByTokenID(walletID: string, tokenID: string): Promise<AssetAccount[]> {
-    const entities = await getConnection()
-      .getRepository(AssetAccountEntity)
-      .createQueryBuilder('aa')
-      .where({
-        walletID,
-        tokenID,
-      })
-      .getMany()
-    return entities.map(e => e.toModel())
-  }
 }
