@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm'
 import AssetAccountModel from 'models/asset-account'
+import SudtTokenInfo from './sudt-token-info'
 
 @Entity()
 @Index(['walletID', 'tokenID', 'blake160'], { unique: true })
@@ -18,26 +19,10 @@ export default class AssetAccount {
   tokenID!: string
 
   @Column({
-    type: 'varchar'
-  })
-  symbol!: string
-
-  @Column({
     type: 'varchar',
     default: '',
   })
   accountName!: string
-
-  @Column({
-    type: 'varchar',
-    default: '',
-  })
-  tokenName!: string
-
-  @Column({
-    type: 'varchar'
-  })
-  decimal!: string
 
   @Column({
     type: 'varchar'
@@ -49,16 +34,30 @@ export default class AssetAccount {
   })
   blake160!: string
 
+  @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE' })
+  @JoinColumn([
+    { name: 'walletID', referencedColumnName: 'walletID' },
+    { name: 'tokenID', referencedColumnName: 'tokenID' },
+  ])
+  sudtTokenInfo!: SudtTokenInfo
+
   public static fromModel(info: AssetAccountModel): AssetAccount {
     const assetAccount = new AssetAccount()
+
     assetAccount.walletID = info.walletID
     assetAccount.tokenID = info.tokenID
-    assetAccount.symbol = info.symbol
     assetAccount.accountName = info.accountName
-    assetAccount.tokenName = info.tokenName
-    assetAccount.decimal = info.decimal
     assetAccount.balance = info.balance
     assetAccount.blake160 = info.blake160
+
+    const sudtTokenInfo = new SudtTokenInfo()
+    sudtTokenInfo.walletID = info.walletID
+    sudtTokenInfo.tokenID = info.tokenID
+    sudtTokenInfo.symbol = info.symbol
+    sudtTokenInfo.tokenName = info.tokenName
+    sudtTokenInfo.decimal = info.decimal
+    assetAccount.sudtTokenInfo = sudtTokenInfo
+
     return assetAccount
   }
 
@@ -66,10 +65,10 @@ export default class AssetAccount {
     return new AssetAccountModel(
       this.walletID,
       this.tokenID,
-      this.symbol,
+      this.sudtTokenInfo.symbol,
       this.accountName,
-      this.tokenName,
-      this.decimal,
+      this.sudtTokenInfo.tokenName,
+      this.sudtTokenInfo.decimal,
       this.balance,
       this.blake160,
       this.id

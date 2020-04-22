@@ -25,6 +25,8 @@ import { AddLiveCell1585624516932 } from './migrations/1585624516932-AddLiveCell
 import { CreateAssetAccount1586420715474 } from './migrations/1586420715474-CreateAssetAccount'
 import AssetAccount from './entities/asset-account'
 import { UpdateAssetAccount1587368167604 } from './migrations/1587368167604-UpdateAssetAccount'
+import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
+import SudtTokenInfo from './entities/sudt-token-info'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -44,7 +46,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell],
+    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell, SudtTokenInfo],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
@@ -60,6 +62,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       CreateAssetAccount1586420715474,
       AddLiveCell1585624516932,
       UpdateAssetAccount1587368167604,
+      AddSudtTokenInfo1587523557249,
     ],
     logging,
     maxQueryExecutionTime: 30

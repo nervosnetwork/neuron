@@ -10,7 +10,8 @@ export default class AssetAccountService {
   public static async getAll(walletID: string): Promise<AssetAccount[]> {
     const assetAccounts = await getConnection()
       .getRepository(AssetAccountEntity)
-      .createQueryBuilder('asset_account')
+      .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
       .where({
         walletID,
       })
@@ -19,8 +20,14 @@ export default class AssetAccountService {
     return assetAccounts.map(aa => aa.toModel())
   }
 
-  public static async getAccount(params: { walletID: string, id: string }): Promise<AssetAccount | undefined> {
-    return getConnection().getRepository(AssetAccountEntity).findOne(params.id).then(account => account?.toModel())
+  public static async getAccount(params: { walletID: string, id: number }): Promise<AssetAccount | undefined> {
+    return getConnection()
+    .getRepository(AssetAccountEntity)
+    .createQueryBuilder('aa')
+    .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+    .where({ id: +params.id })
+    .getOne()
+    .then(account => account?.toModel())
   }
 
   public static async generateCreateTx(
@@ -63,7 +70,7 @@ export default class AssetAccountService {
     // 1. save AssetAccount
     const connection = getConnection()
     const entity = AssetAccountEntity.fromModel(assetAccount)
-    const savedEntity = await connection.manager.save(entity)
+    const savedEntity = await connection.manager.save([entity.sudtTokenInfo, entity])
 
     // 2. send tx
     // if failed, remove saved entity
@@ -77,10 +84,27 @@ export default class AssetAccountService {
   }
 
   public static async update(id: number, params: { accountName?: string, tokenName?: string, symbol?: string, decimal?: string }) {
-    return getConnection()
-      .createQueryBuilder()
-      .update(AssetAccountEntity)
-      .set(params).where("id = :id", { id })
-      .execute()
+    const assetAccount = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+      .where({ id })
+      .getOne()
+    if (!assetAccount) {
+      return undefined
+    }
+    if (params.accountName) {
+      assetAccount.accountName = params.accountName
+    }
+    if (params.tokenName) {
+      assetAccount.sudtTokenInfo.tokenName = params.tokenName
+    }
+    if (params.symbol) {
+      assetAccount.sudtTokenInfo.symbol = params.symbol
+    }
+    if (params.decimal) {
+      assetAccount.sudtTokenInfo.decimal = params.decimal
+    }
+    return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
   }
 }

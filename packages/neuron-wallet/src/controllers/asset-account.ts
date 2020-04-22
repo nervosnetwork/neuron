@@ -62,7 +62,7 @@ export default class AssetAccountController {
     }
   }
 
-  public async getAccount(params: { walletID:string, id: string }): Promise<Controller.Response<AssetAccount & { address: string }>> {
+  public async getAccount(params: { walletID: string, id: number }): Promise<Controller.Response<AssetAccount & { address: string }>> {
     const account = await AssetAccountService.getAccount(params)
 
     if (!account) {
