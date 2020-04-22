@@ -62,6 +62,28 @@ export default class AssetAccountController {
     }
   }
 
+  public async getAccount(params: { walletID:string, id: string }): Promise<Controller.Response<AssetAccount & { address: string }>> {
+    const account = await AssetAccountService.getAccount(params)
+
+    if (!account) {
+      throw new ServiceHasNoResponse('AssetAccount')
+    }
+
+    const assetAccountInfo = new AssetAccountInfo()
+    const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
+
+    return {
+      status: ResponseCode.Success,
+      result: {
+        ...account,
+        address: AddressGenerator.generate(
+          assetAccountInfo.generateAnyoneCanPayScript(account.blake160),
+          addressPrefix,
+        )
+      }
+    }
+  }
+
   public async generateCreateTx(params: GenerateCreateAssetAccountTxParams): Promise<Controller.Response<{
     assetAccount: AssetAccount,
     tx: Transaction
