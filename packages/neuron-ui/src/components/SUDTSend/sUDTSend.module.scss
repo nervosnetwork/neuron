@@ -76,7 +76,7 @@
   display: grid;
   grid-template:
     'address .' auto 'amount send-all' auto 'fee fee' auto
-    'description description' auto/ 1fr 70px;
+    'description .' auto/ 1fr 70px;
   padding: 20px 30px;
 
   .address {
@@ -92,7 +92,7 @@
     button {
       box-sizing: border-box;
       width: 60px;
-      height: 26px;
+      height: 27px;
       padding: 0;
       line-height: 1;
       display: flex;
@@ -106,6 +106,7 @@
     padding-top: 20px;
     border-top: 1px dashed #ccc;
     margin-top: 8px;
+    padding-right: 70px;
   }
   .description {
     grid-area: description;
