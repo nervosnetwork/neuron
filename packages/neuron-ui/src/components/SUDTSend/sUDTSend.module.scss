@@ -75,8 +75,12 @@
 .sendContainer {
   display: grid;
   grid-template:
-    'address .' auto 'amount send-all' auto 'fee fee' auto
-    'description description' auto/ 1fr 70px;
+    'address .' auto
+    'amount send-all' auto
+    'fee fee' auto
+    'description description' auto
+    'remote-error remote-error' 15px /
+    1fr 70px;
   padding: 20px 30px;
 
   .address {
@@ -114,6 +118,19 @@
   .descriptionField {
     & > div {
       border-color: transparent transparent #aaa !important;
+    }
+  }
+  .remoteError {
+    grid-area: remote-error;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #d50000;
+    svg {
+      width: 0.75rem;
+      height: 0.75rem;
+      margin-right: 5px;
     }
   }
 }

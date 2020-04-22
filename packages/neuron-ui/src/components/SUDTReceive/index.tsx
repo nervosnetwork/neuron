@@ -9,7 +9,7 @@ import Breadcrum from 'widgets/Breadcrum'
 import { useDispatch } from 'states/stateProvider'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
-import { Routes, DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
+import { Routes, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTReceive.module.scss'
 
 const SUDTReceive = () => {
@@ -18,8 +18,8 @@ const SUDTReceive = () => {
   const { search } = useLocation()
   const {
     address,
-    accountName = defaultSUDTFields.accountName,
-    tokenName = defaultSUDTFields.tokenName,
+    accountName = DEFAULT_SUDT_FIELDS.accountName,
+    tokenName = DEFAULT_SUDT_FIELDS.tokenName,
   } = Object.fromEntries([...new URLSearchParams(search)])
   const breakcrum = [{ label: t('navbar.s-udt'), link: Routes.SUDTAccountList }]
 

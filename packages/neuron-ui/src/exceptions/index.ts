@@ -68,4 +68,11 @@ export class DecimalRangeError extends RangeError {
   }
 }
 
+export class AmountNotEnoughException extends Error {
+  public code = ErrorCode.AmountNotEnough
+  constructor() {
+    super(`messages.codes.${ErrorCode.AmountNotEnough}`)
+  }
+}
+
 export default undefined

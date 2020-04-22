@@ -41,7 +41,6 @@ export enum AppActions {
   CleanTransactions = 'cleanTransactions',
   RequestPassword = 'requestPassword',
   DismissPasswordRequest = 'dismissPasswordRequest',
-  UpdatePassword = 'updatePassword',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
   UpdateAlertDialog = 'updateAlertDialog',
@@ -52,6 +51,8 @@ export enum AppActions {
   ToggleAllNotificationVisibility = 'toggleAllNotificationVisibility',
   ToggleIsAllowedToFetchList = 'toggleIsAllowedToFetchList',
   Ignore = 'ignore',
+  // Experimentals
+  UpdateExperimentalParams = 'updateExperimentalParams',
 }
 
 export type StateAction =
@@ -72,7 +73,6 @@ export type StateAction =
   | { type: AppActions.CleanTransactions }
   | { type: AppActions.RequestPassword; payload: Omit<State.PasswordRequest, 'password'> }
   | { type: AppActions.DismissPasswordRequest }
-  | { type: AppActions.UpdatePassword; payload: string }
   | { type: AppActions.UpdateChainInfo; payload: Partial<State.App> }
   | { type: AppActions.UpdateLoadings; payload: any }
   | { type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }
@@ -82,6 +82,7 @@ export type StateAction =
   | { type: AppActions.ToggleAllNotificationVisibility; payload?: boolean }
   | { type: AppActions.ToggleIsAllowedToFetchList; payload?: boolean }
   | { type: AppActions.Ignore; payload?: any }
+  | { type: AppActions.UpdateExperimentalParams; payload: { tx: any; assetAccount?: any } | null }
   | { type: NeuronWalletActions.InitAppState; payload: any }
   | { type: NeuronWalletActions.UpdateCurrentWallet; payload: Partial<State.Wallet> }
   | { type: NeuronWalletActions.UpdateWalletList; payload: State.WalletIdentity[] }
@@ -236,15 +237,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       break
     }
     case AppActions.RequestPassword: {
-      state.app.passwordRequest = { ...action.payload, password: '' }
+      state.app.passwordRequest = action.payload
       break
     }
     case AppActions.DismissPasswordRequest: {
       state.app.passwordRequest = initStates.app.passwordRequest
-      break
-    }
-    case AppActions.UpdatePassword: {
-      state.app.passwordRequest.password = action.payload
       break
     }
     case AppActions.UpdateMessage: {
@@ -332,6 +329,10 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
     }
     case AppActions.ToggleIsAllowedToFetchList: {
       state.app.isAllowedToFetchList = action.payload === undefined ? !state.app.isAllowedToFetchList : action.payload
+      break
+    }
+    case AppActions.UpdateExperimentalParams: {
+      state.experimental = action.payload
       break
     }
     default: {
