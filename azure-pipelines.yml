@@ -4,7 +4,6 @@ trigger:
     include:
       - master
       - develop
-      - e2e-tests
       - rc/*
   tags:
     include:
@@ -88,27 +87,6 @@ stages:
     - script: |
         set CI=true
         yarn test
-      name: Test
-
-- stage: e2e_tests
-  displayName: Integration Tests
-  dependsOn: []
-  condition: false # eq(variables['build.sourceBranch'], 'refs/heads/master')
-  jobs:
-  - job: Integration
-    displayName: Integration Tests
-    pool:
-      vmImage: 'macos-10.14'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: 12.x
-      displayName: 'Install Node.js'
-    - script: |
-        yarn global add lerna
-        yarn bootstrap
-      name: Bootstrap
-    - script: yarn test:e2e
       name: Test
 
 - stage: release
