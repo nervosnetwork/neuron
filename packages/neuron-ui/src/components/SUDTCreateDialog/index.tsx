@@ -101,7 +101,8 @@ const SUDTCreateDialog = ({
   onSubmit,
   onCancel,
   existingAccountNames = [],
-}: SUDTCreateDialogProps) => {
+}: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
+  Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>) => {
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
   const [accountType, setAccountType] = useState(AccountType.SUDT)

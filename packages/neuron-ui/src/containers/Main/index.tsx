@@ -19,6 +19,9 @@ import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 import SpecialAssetList from 'components/SpecialAssetList'
+import SUDTAccountList from 'components/SUDTAccountList'
+import SUDTSend from 'components/SUDTSend'
+import SUDTReceive from 'components/SUDTReceive'
 
 import { Routes } from 'utils/const'
 import { useOnDefaultContextMenu } from 'utils/hooks'
@@ -120,6 +123,25 @@ export const mainContents: CustomRouter.Route[] = [
     path: Routes.SpecialAssets,
     exact: false,
     component: SpecialAssetList,
+  },
+  {
+    name: `SUDTAccountList`,
+    path: Routes.SUDTAccountList,
+    exact: true,
+    component: SUDTAccountList,
+  },
+  {
+    name: `SUDTSend`,
+    path: Routes.SUDTSend,
+    params: `/:accountId?`,
+    exact: false,
+    component: SUDTSend,
+  },
+  {
+    name: `SUDTReceive`,
+    path: Routes.SUDTReceive,
+    exact: false,
+    component: SUDTReceive,
   },
 ]
 

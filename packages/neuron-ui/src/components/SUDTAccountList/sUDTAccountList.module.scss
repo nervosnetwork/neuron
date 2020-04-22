@@ -1,6 +1,7 @@
 .container {
   display: grid;
 }
+
 .header {
   display: flex;
   padding-bottom: 10px;
@@ -13,4 +14,30 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 330px);
   gap: 10px 20px;
+}
+
+.add {
+  position: relative;
+  border-radius: 2px;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  margin: 0 0 0 10px;
+  background-color: var(--nervos-green);
+  &:before,
+  &:after {
+    display: block;
+    content: '';
+    height: 2px;
+    width: 16px;
+    background-color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    border-radius: 1px;
+  }
+  &:after {
+    transform: translateY(-50%) rotate(90deg);
+  }
 }
