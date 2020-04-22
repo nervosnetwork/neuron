@@ -2,7 +2,7 @@ import React from 'react'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
-import { defaultSUDTFields } from 'utils/const'
+import { DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
 import styles from './sUDTAccountPile.module.scss'
 
 export interface SUDTAccountPileProps {

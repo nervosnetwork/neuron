@@ -9,7 +9,7 @@ import Breadcrum from 'widgets/Breadcrum'
 import { useDispatch } from 'states/stateProvider'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
-import { Routes, defaultSUDTFields } from 'utils/const'
+import { Routes, DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
 import styles from './sUDTReceive.module.scss'
 
 const SUDTReceive = () => {
