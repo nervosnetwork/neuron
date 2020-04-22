@@ -4,9 +4,9 @@ import { Icon } from 'office-ui-fabric-react'
 import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
 import TextField from 'widgets/TextField'
 import CKBAvatar from 'widgets/Icons/CKBAvatar.png'
-import Success from 'widgets/Icons/Success.png'
-import Pending from 'widgets/Icons/Pending.png'
-import Failure from 'widgets/Icons/Failure.png'
+import { ReactComponent as Success } from 'widgets/Icons/Success.svg'
+import { ReactComponent as Pending } from 'widgets/Icons/Pending.svg'
+import { ReactComponent as Failure } from 'widgets/Icons/Failure.svg'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
@@ -146,14 +146,14 @@ const TransactionList = ({
           amount = `${sudtValueToAmount(value, tx.sudtInfo?.sUDT.decimal)} ${tx.sudtInfo?.sUDT.symbol || '?'}`
         }
 
-        let indicator: string = Pending
+        let indicator = <Pending />
         switch (status) {
           case 'success': {
-            indicator = Success
+            indicator = <Success />
             break
           }
           case 'failed': {
-            indicator = Failure
+            indicator = <Failure />
             break
           }
           default: {
@@ -183,9 +183,7 @@ const TransactionList = ({
                 {typeLabel}
               </span>
               <span className={styles.walletName}>{name}</span>
-              <div className={styles.indicator}>
-                <img src={indicator} alt={status} />
-              </div>
+              <div className={styles.indicator}>{indicator}</div>
             </div>
             <div className={styles.detail}>
               <div title={statusLabel}>
