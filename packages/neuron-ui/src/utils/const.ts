@@ -16,6 +16,7 @@ export const MAX_DECIMAL_DIGITS = 8
 export const MAINNET_TAG = 'ckb'
 
 export const MIN_DEPOSIT_AMOUNT = 102
+export const TOKEN_ID_LENGTH = 66
 
 export const SHANNON_CKB_RATIO = 1e8
 
@@ -29,6 +30,13 @@ export const HOURS_PER_DAY = 24
 export const CONNECTING_DEADLINE = Date.now() + 10_000
 
 export const INIT_SEND_PRICE = '1000'
+export const MIN_CKB_REQUIRED_BY_CKB_SUDT = 61
+export const MIN_CKB_REQUIRED_BY_NORMAL_SUDT = 142
+export const MAX_SUDT_ACCOUNT_NAME_LENGTH = 16
+export const MAX_SUDT_TOKEN_NAME_LENGTH = 16
+export const MAX_SYMBOL_LENGTH = 8
+export const MIN_DECIMAL = 0
+export const MAX_DECIMAL = 32
 
 export const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
@@ -142,8 +150,12 @@ export enum CompensationPeriod {
   REQUEST_END = 1,
 }
 
-export const defaultSUDTFields = {
+export const DEFAULT_SUDT_FIELDS = {
   accountName: 'Undefined',
   tokenName: 'Unknown',
   symbol: 'Unknown',
+  CKBTokenId: 'CKBytes',
+  CKBTokenName: 'CKBytes',
+  CKBSymbol: 'CKB',
+  CKBDecimal: '8',
 }
