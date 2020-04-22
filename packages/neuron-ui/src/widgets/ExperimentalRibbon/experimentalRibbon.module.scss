@@ -1,0 +1,55 @@
+@import '../../styles/mixin.scss';
+
+$height: 26px;
+
+.container {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+
+  img {
+    height: $height;
+  }
+
+  .text {
+    position: absolute;
+    top: 0px;
+    right: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: $height;
+    width: 100px;
+    font-size: 0.625rem;
+  }
+}
+
+.dialog {
+  @include dialogContainer;
+  width: 500px;
+  padding: 30px 50px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  &::backdrop {
+    @include overlay;
+  }
+
+  .icon {
+    display: block;
+    margin: 0 auto;
+    width: 54px;
+    height: 54px;
+  }
+
+  .message {
+    @include RegularText;
+    padding: 25px 0;
+  }
+
+  .footer {
+    @include dialogFooter;
+    justify-content: center;
+  }
+}

@@ -21,7 +21,8 @@
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
       "connecting": "正在连接节点",
-      "experimental-functions": "实验性功能"
+      "experimental-functions": "实验性功能",
+      "s-udt": "资产账户"
     },
     "network-status": {
       "tooltip": {
@@ -250,6 +251,9 @@
       },
       "unlock": {
         "title": "请输入钱包密码提取资产"
+      },
+      "create-sudt-account": {
+        "title": "创建资产账户"
       }
     },
     "qrcode": {
@@ -274,7 +278,9 @@
       "edit": "编辑",
       "delete": "删除",
       "click-to-edit": "点击编辑",
-      "notice": "注意事项"
+      "notice": "注意事项",
+      "experimental": "实验室",
+      "close": "关闭"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -299,6 +305,7 @@
       "no-valid-addresses-found": "未找到有效地址",
       "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
       "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
+      "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -316,6 +323,7 @@
         "deposit": "存入金额",
         "account-name": "账户名称",
         "token-name": "Token 名称",
+        "token-id": "Token ID",
         "symbol": "Symbol"
       },
       "codes": {
@@ -486,7 +494,11 @@
     },
     "s-udt": {
       "account-list": {
-        "no-asset-accounts": "没有账户"
+        "no-asset-accounts": "尚未检索到您持有的 sUDT 资产",
+        "search": "账户名称 Token 名称或 Symbol",
+        "syncing": "正在同步, 当前数据可能不准确",
+        "send": "转账",
+        "receive": "收款"
       },
       "create-dialog": {
         "create-asset-account": "创建资产账户",
@@ -503,6 +515,13 @@
         "cancel": "取消",
         "next": "下一步",
         "back": "上一步"
+      },
+      "send": {
+        "address": "地址",
+        "amount": "金额",
+        "description": "备注",
+        "submit": "提交",
+        "click-to-edit": "点击编辑"
       },
       "receive": {
         "notation": "只接收 sUDT"

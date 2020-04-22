@@ -2,6 +2,7 @@ import React from 'react'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
+import { DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
 import styles from './sUDTAccountPile.module.scss'
 
 export interface SUDTAccountPileProps {
@@ -11,6 +12,7 @@ export interface SUDTAccountPileProps {
   symbol?: string
   balance: string
   tokenId: string
+  address: string
   isSelected: boolean
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }
@@ -30,13 +32,13 @@ const SUDTAccountPile = ({
         <SUDTAvatar accountName={accountName} />
       </div>
       <div className={styles.accountName}>
-        <span>{accountName || 'Undefined'}</span>
+        <span>{accountName || defaultSUDTFields.accountName}</span>
       </div>
       <div className={styles.tokenName}>
-        <span>{tokenName || 'Unknown'}</span>
+        <span>{tokenName || defaultSUDTFields.tokenName}</span>
       </div>
       <div className={styles.symbol}>
-        <span>{`(${symbol || 'Unkonw'})`}</span>
+        <span>{`(${symbol || defaultSUDTFields.symbol})`}</span>
       </div>
       <div className={styles.editBtn}>
         <button data-role="edit" type="button">

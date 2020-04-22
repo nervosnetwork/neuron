@@ -9,19 +9,28 @@ import Breadcrum from 'widgets/Breadcrum'
 import { useDispatch } from 'states/stateProvider'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
+import { Routes, DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
 import styles from './sUDTReceive.module.scss'
 
 const SUDTReceive = () => {
   const dispatch = useDispatch()
   const [t] = useTranslation()
   const { search } = useLocation()
-  const { address, accountName, tokenName } = Object.fromEntries([...new URLSearchParams(search)])
-  const breakcrum = [{ label: 'asset account', link: 'asset account' }]
+  const {
+    address,
+    accountName = defaultSUDTFields.accountName,
+    tokenName = defaultSUDTFields.tokenName,
+  } = Object.fromEntries([...new URLSearchParams(search)])
+  const breakcrum = [{ label: t('navbar.s-udt'), link: Routes.SUDTAccountList }]
 
   const copyAddress = useCallback(() => {
     window.navigator.clipboard.writeText(address)
     addPopup('addr-copied')(dispatch)
   }, [address, dispatch])
+
+  if (!address) {
+    return <div>Not Found</div>
+  }
 
   return (
     <div

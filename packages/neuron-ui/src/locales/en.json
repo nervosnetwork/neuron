@@ -21,7 +21,8 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
-      "experimental-functions": "Experimental"
+      "experimental-functions": "Experimental",
+      "s-udt": "Asset Accounts"
     },
     "network-status": {
       "tooltip": {
@@ -250,6 +251,9 @@
       },
       "unlock": {
         "title": "Please input wallet password to claim the asset"
+      },
+      "create-sudt-account": {
+        "title": "Create Asset Account"
       }
     },
     "qrcode": {
@@ -274,7 +278,9 @@
       "edit": "Edit",
       "delete": "Delete",
       "click-to-edit": "Click to edit",
-      "notice": "Notice"
+      "notice": "Notice",
+      "experimental": "Experimental",
+      "close": "Close"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -299,6 +305,7 @@
       "no-valid-addresses-found": "No valid addresses found",
       "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
       "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -316,6 +323,7 @@
         "deposit": "Deposit",
         "account-name": "Account Name",
         "token-name": "Token Name",
+        "token-id": "Token ID",
         "symbol": "Symbol"
       },
       "codes": {
@@ -486,7 +494,11 @@
     },
     "s-udt": {
       "account-list": {
-        "no-asset-accounts": "No asset accounts"
+        "no-asset-accounts": "No sUDT asset has been detected",
+        "search": "Account Name, Token Name or Symbol",
+        "syncing": "Syncing, current data may be inaccurate",
+        "send": "Send",
+        "receive": "Receive"
       },
       "create-dialog": {
         "create-asset-account": "Create Asset Account",
@@ -503,6 +515,13 @@
         "cancel": "Cancel",
         "next": "Next",
         "back": "Back"
+      },
+      "send": {
+        "address": "Address",
+        "amount": "Amount",
+        "description": "Description",
+        "submit": "Submit",
+        "click-to-edit": "Click to edit"
       },
       "receive": {
         "notation": "Accept sUDT only"

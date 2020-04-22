@@ -113,7 +113,7 @@ const SUDTUpdateDialog = ({
         : t('messages.decimal-range', { range: `${MIN_DECIMAL}-${MAX_DECIMAL}` }),
   }
 
-  const isTokenReady = Object.values(info).every(v => v) && Object.values(tokenErrors).every(e => !e)
+  const isTokenReady = Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
   const onInput = useCallback(
     e => {
@@ -126,11 +126,6 @@ const SUDTUpdateDialog = ({
     [dispatch]
   )
 
-  const onDialogClick = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation()
-    e.preventDefault()
-  }, [])
-
   const onConfirm = (e: any) => {
     e.stopPropagation()
     e.preventDefault()
@@ -141,8 +136,8 @@ const SUDTUpdateDialog = ({
   }
 
   return (
-    <div role="presentation" className={styles.container} onClick={onCancel}>
-      <div role="presentation" className={styles.dialogContainer} onClick={onDialogClick}>
+    <div className={styles.container}>
+      <div role="presentation" className={styles.dialogContainer}>
         <div className={styles.title}>{t('s-udt.update-dialog.update-asset-account')}</div>
         <form onSubmit={onConfirm}>
           {fields.map((field, idx) => {

@@ -322,6 +322,11 @@ export default class ApiController {
     })
 
     // sUDT
+
+    handle('get-anyone-can-pay-script', () => {
+      return this.anyoneCanPayController.getScript()
+    })
+
     handle('generate-create-asset-account-tx', async (_, params: GenerateCreateAssetAccountTxParams) => {
       return this.assetAccountController.generateCreateTx(params)
     })
@@ -336,6 +341,10 @@ export default class ApiController {
 
     handle('asset-accounts', async (_, params: { walletID: string }) => {
       return this.assetAccountController.getAll(params)
+    })
+
+    handle("get-asset-account", async (_, params: { walletID: string, id: number }) => {
+      return this.assetAccountController.getAccount(params)
     })
 
     handle('generate-send-to-anyone-can-pay-tx', async (_, params: GenerateAnyoneCanPayTxParams) => {

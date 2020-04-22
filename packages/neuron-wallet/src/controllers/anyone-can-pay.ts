@@ -1,3 +1,4 @@
+import AssetAccountInfo from 'models/asset-account-info'
 import Transaction from "models/chain/transaction"
 import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
@@ -72,6 +73,13 @@ export default class AnyoneCanPayController {
     return {
       status: ResponseCode.Success,
       result: txHash,
+    }
+  }
+
+  public getScript() {
+    return {
+      status: ResponseCode.Success,
+      result: new AssetAccountInfo().infos.anyoneCanPay
     }
   }
 }

@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from 'office-ui-fabric-react'
 import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
 import TextField from 'widgets/TextField'
+import CKBAvatar from 'widgets/Icons/CKBAvatar.png'
+import Success from 'widgets/Icons/Success.png'
+import Pending from 'widgets/Icons/Pending.png'
+import Failure from 'widgets/Icons/Failure.png'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
@@ -16,11 +20,13 @@ import styles from './transactionList.module.scss'
 const TransactionList = ({
   items: txs,
   tipBlockNumber,
+  walletName,
   walletID,
   isMainnet,
   dispatch,
 }: {
   isLoading?: boolean
+  walletName: string
   walletID: string
   items: State.Transaction[]
   tipBlockNumber: string
@@ -119,10 +125,23 @@ const TransactionList = ({
           status = 'confirming'
         }
         const statusLabel = t(`history.${status}`)
-        const confirmationsLabel = t('history.confirming-with-count', {
-          confirmations: localNumberFormatter(confirmations),
-        })
+        const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
         const typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+        // const indicator = status === 'success' ? 'success' : s
+        let indicator: string = Pending
+        switch (status) {
+          case 'success': {
+            indicator = Success
+            break
+          }
+          case 'failed': {
+            indicator = Failure
+            break
+          }
+          default: {
+            // ignore
+          }
+        }
         return (
           <div key={tx.hash} data-is-open={txHash === tx.hash} className={styles.itemContainer}>
             <div
@@ -135,23 +154,33 @@ const TransactionList = ({
               onContextMenu={onContextMenu}
               onKeyPress={() => {}}
             >
+              <div className={styles.avatar}>
+                <img src={CKBAvatar} alt="avatar" />
+              </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <span className={styles.amount} title={`${tx.value} shannons`}>
+              <div className={styles.amount} title={`${tx.value} shannons`}>
                 {`${shannonToCKBFormatter(tx.value, true)} CKB`}
+              </div>
+              <span className={styles.type} title={typeLabel}>
+                {typeLabel}
               </span>
-              <span className={styles.status} title={statusLabel}>
-                {statusLabel}
-              </span>
-              {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
-                <span className={styles.confirmations} title={confirmationsLabel}>
-                  {confirmationsLabel}
-                </span>
-              ) : null}
+              <span className={styles.walletName}>{walletName}</span>
+              <div className={styles.indicator}>
+                <img src={indicator} alt={status} />
+              </div>
             </div>
             <div className={styles.detail}>
-              <div title={typeLabel}>
-                <span>{t('history.type')}</span>
-                <span className={styles.type}>{typeLabel}</span>
+              <div title={statusLabel}>
+                <span>{t('history.status')}</span>
+                <span>{statusLabel}</span>
+              </div>
+              <div>
+                <span>{t('history.confirmations')}</span>
+                {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
+                  <span className={styles.confirmations} title={confirmationsLabel}>
+                    {confirmationsLabel}
+                  </span>
+                ) : null}
               </div>
               <div title={tx.hash} className={styles.txHash}>
                 <span>{t('history.transaction-hash')}</span>
