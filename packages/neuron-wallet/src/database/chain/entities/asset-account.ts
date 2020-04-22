@@ -34,7 +34,7 @@ export default class AssetAccount {
   })
   blake160!: string
 
-  @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(_type => SudtTokenInfo, sudtTokenInfo => sudtTokenInfo.assetAccounts, { onDelete: 'CASCADE' })
   @JoinColumn([
     { name: 'walletID', referencedColumnName: 'walletID' },
     { name: 'tokenID', referencedColumnName: 'tokenID' },
@@ -51,6 +51,8 @@ export default class AssetAccount {
     assetAccount.blake160 = info.blake160
 
     const sudtTokenInfo = new SudtTokenInfo()
+    sudtTokenInfo.walletID = info.walletID
+    sudtTokenInfo.tokenID = info.tokenID
     sudtTokenInfo.symbol = info.symbol
     sudtTokenInfo.tokenName = info.tokenName
     sudtTokenInfo.decimal = info.decimal

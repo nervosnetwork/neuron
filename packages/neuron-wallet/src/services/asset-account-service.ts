@@ -59,7 +59,7 @@ export default class AssetAccountService {
     // 1. save AssetAccount
     const connection = getConnection()
     const entity = AssetAccountEntity.fromModel(assetAccount)
-    const savedEntity = await connection.manager.save(entity)
+    const savedEntity = await connection.manager.save([entity.sudtTokenInfo, entity])
 
     // 2. send tx
     // if failed, remove saved entity
@@ -76,6 +76,7 @@ export default class AssetAccountService {
     const assetAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
       .where({ id })
       .getOne()
     if (!assetAccount) {
@@ -93,6 +94,6 @@ export default class AssetAccountService {
     if (params.decimal) {
       assetAccount.sudtTokenInfo.decimal = params.decimal
     }
-    return getConnection().manager.save(assetAccount)
+    return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
   }
 }
