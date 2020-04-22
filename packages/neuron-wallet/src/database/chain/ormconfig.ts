@@ -27,6 +27,8 @@ import AssetAccount from './entities/asset-account'
 import { UpdateAssetAccount1587368167604 } from './migrations/1587368167604-UpdateAssetAccount'
 import { AddTypeToInput1587371249814 } from './migrations/1587371249814-AddTypeToInput'
 import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-FlattenLockAndType'
+import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
+import SudtTokenInfo from './entities/sudt-token-info'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
@@ -46,7 +48,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell],
+    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell, SudtTokenInfo],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
@@ -64,6 +66,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       UpdateAssetAccount1587368167604,
       AddTypeToInput1587371249814,
       FlattenLockAndType1587375230126,
+      AddSudtTokenInfo1587523557249,
     ],
     logging,
     maxQueryExecutionTime: 30
