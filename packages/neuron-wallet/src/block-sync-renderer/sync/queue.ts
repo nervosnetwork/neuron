@@ -166,7 +166,7 @@ export default class Queue {
         if (!skipLiveCell) {
           await LiveCellPersistor.saveTxLiveCells(tx, this.assetAccountInfo!.anyoneCanPayCodeHash)
         }
-        const [shouldSave, addresses] = await new TxAddressFinder(
+        const [shouldSave, addresses, anyoneCanPayBlake160s] = await new TxAddressFinder(
           this.lockHashes,
           this.anyoneCanPayLockHashes,
           tx,
@@ -205,7 +205,7 @@ export default class Queue {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          await WalletService.updateUsedAddresses(addresses)
+          await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
         }
       }
     }

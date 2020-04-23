@@ -9,6 +9,8 @@ import OutputEntity from "database/chain/entities/output"
 import AssetAccountInfo from "models/asset-account-info"
 import BufferUtils from "utils/buffer"
 import { OutputStatus } from "models/chain/output"
+import { AddressVersion } from "database/address/address-dao"
+import NetworksService from "./networks"
 
 export default class AssetAccountService {
   public static async getAll(walletID: string, anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
@@ -128,13 +130,19 @@ export default class AssetAccountService {
 
     // 2. send tx
     // if failed, remove saved entity
+    let txHash: string | undefined
     try {
-      const txHash = await new TransactionSender().sendTx(walletID, tx, password)
-      return txHash
+      txHash = await new TransactionSender().sendTx(walletID, tx, password)
     } catch (err) {
       await connection.manager.remove(savedEntity)
       throw err
     }
+
+    // 3. update address for usedByAnyoneCanPay
+    const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+    AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
+
+    return txHash
   }
 
   public static async update(id: number, params: { accountName?: string, tokenName?: string, symbol?: string, decimal?: string }) {
