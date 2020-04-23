@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <desc>Created with Sketch.</desc>
+    <g id="history/icon/success" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M8,0 C12.418278,0 16,3.581722 16,8 C16,12.418278 12.418278,16 8,16 C3.581722,16 0,12.418278 0,8 C0,3.581722 3.581722,0 8,0 Z M12.4073429,3.6848052 L6.49013333,9.60186667 L3.75396689,7.03733377 L2.11269977,8.78840266 L6.54421937,12.9420413 L14.1043992,5.38186147 L12.4073429,3.6848052 Z" id="success-shape" fill="#3CC68A"></path>
+    </g>
+</svg>

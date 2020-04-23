@@ -79,9 +79,26 @@ $pending-color: #b3b3b3;
       align-self: center;
       justify-self: center;
       line-height: 0;
-      img {
+      svg {
         width: 16px;
         height: 16px;
+      }
+    }
+    &[data-status='confirming'],
+    &[data-status='pending'] {
+      .indicator {
+        svg {
+          animation: rotation 1.2s linear infinite;
+        }
+      }
+    }
+
+    @keyframes rotation {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
       }
     }
   }
