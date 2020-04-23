@@ -1,4 +1,3 @@
-// TODO: figure out how to mock context
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
