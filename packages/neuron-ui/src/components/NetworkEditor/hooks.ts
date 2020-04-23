@@ -6,15 +6,25 @@ import { createNetwork, updateNetwork, addNotification } from 'states/stateProvi
 
 import { MAX_NETWORK_NAME_LENGTH, ErrorCode } from 'utils/const'
 
-export const useOnSubmit = (
-  id: string = '',
-  name: string = '',
-  remote: string = '',
-  networks: Readonly<State.Network[]> = [],
-  history: ReturnType<typeof useHistory>,
-  dispatch: StateDispatch,
+export const useOnSubmit = ({
+  id = '',
+  name = '',
+  remote = '',
+  networks = [],
+  history,
+  dispatch,
+  disabled,
+  setIsUpdating,
+}: {
+  id: string
+  name: string
+  remote: string
+  networks: Readonly<State.Network[]>
+  history: ReturnType<typeof useHistory>
+  dispatch: StateDispatch
   disabled: boolean
-) =>
+  setIsUpdating: React.Dispatch<boolean>
+}) =>
   useCallback(
     (e: React.FormEvent): void => {
       e.preventDefault()
@@ -110,15 +120,16 @@ export const useOnSubmit = (
         addNotification(errorMessage)(dispatch)
         return
       }
+      setIsUpdating(true)
       updateNetwork({
         networkID: id!,
         options: {
           name,
           remote,
         },
-      })(dispatch, history)
+      })(dispatch, history).then(() => setIsUpdating(false))
     },
-    [id, name, remote, networks, history, dispatch, disabled]
+    [id, name, remote, networks, history, dispatch, disabled, setIsUpdating]
   )
 
 export default {

@@ -41,7 +41,6 @@ const appState: Readonly<State.App> = {
     sending: false,
     addressList: false,
     transactionList: false,
-    network: false,
   },
   showTopAlert: false,
   showAllNotifications: false,
