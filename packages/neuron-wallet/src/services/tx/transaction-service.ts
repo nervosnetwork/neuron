@@ -2,14 +2,19 @@ import { getConnection, ObjectLiteral } from 'typeorm'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
+import AssetAccountInfo from 'models/asset-account-info'
+import BufferUtils from 'utils/buffer'
+import AssetAccountEntity from 'database/chain/entities/asset-account'
+import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
   addresses: string[]
+  walletID: string
 }
 
 export interface TransactionsByLockHashesParam {
@@ -34,6 +39,7 @@ export enum SearchType {
   TxHash = 'txHash',
   Date = 'date',
   Empty = 'empty',
+  TokenInfo = 'tokenInfo',
   Unknown = 'unknown',
 }
 
@@ -55,12 +61,12 @@ export class TransactionsService {
     if (value.match(/^(\d+|-\d+)$/)) {
       // Amount search is not supported
     }
-    return SearchType.Unknown
+    return SearchType.TokenInfo
   }
 
   public static async getAll(params: TransactionsByLockHashesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
+    if (type === SearchType.TokenInfo) {
       return {
         totalCount: 0,
         items: [],
@@ -146,14 +152,13 @@ export class TransactionsService {
 
   public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
-      return {
-        totalCount: 0,
-        items: []
-      }
-    }
 
     let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHashes: string[] = AddressParser
+      .batchParse(params.addresses)
+      .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
+    const allLockHashes: string[] = lockHashes.concat(anyoneCanPayLockHashes)
 
     if (type === SearchType.Address) {
       const hash = AddressParser.parse(searchValue).computeHash()
@@ -181,7 +186,33 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
-          { lockHashes, beginTimestamp, endTimestamp }
+          { lockHashes: allLockHashes, beginTimestamp, endTimestamp }
+        )
+        .orderBy('tx.timestamp', 'DESC')
+        .getRawMany())
+        .map(tx => tx.txHash)
+    } else if (type === SearchType.TokenInfo) {
+      const assetAccount = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .where(`info.symbol = :searchValue OR info.tokenName = :searchValue OR aa.accountName = :searchValue`, { searchValue })
+        .getOne()
+
+      if (!assetAccount) {
+        return {
+          totalCount: 0,
+          items: []
+        }
+      }
+
+      const tokenID = assetAccount.tokenID
+      allTxHashes = (await repository
+        .createQueryBuilder('tx')
+        .select("tx.hash", "txHash")
+        .where(
+          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) AND output.typeArgs = :tokenID union select input.transactionHash from input where input.lockHash in (:...lockHashes) AND input.typeArgs = :tokenID)`,
+          { lockHashes: anyoneCanPayLockHashes, tokenID }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -192,7 +223,7 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes))`,
-          { lockHashes }
+          { lockHashes: allLockHashes }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -230,6 +261,18 @@ export class TransactionsService {
       .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
       .getRawMany()
 
+    const anyoneCanPayInputs = await connection
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where(`input.transactionHash IN (:...txHashes) AND input.typeHash IS NOT NULL AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
+
+    const anyoneCanPayOutputs = await connection
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`output.transactionHash IN (:...txHashes) AND output.typeHash IS NOT NULL AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
+
     const inputPreviousTxHashes: string[] = inputs
       .map(i => i.outPointTxHash)
       .filter(h => !!h) as string[]
@@ -266,22 +309,68 @@ export class TransactionsService {
       }
     })
 
-    const txs = transactions.map(tx => {
-      const value = sums.get(tx.hash!) || BigInt(0)
-      return Transaction.fromObject({
-        timestamp: tx.timestamp,
-        value: value.toString(),
-        hash: tx.hash,
-        version: tx.version,
-        type: value > BigInt(0) ? 'receive' : 'send',
-        nervosDao: daoFlag.get(tx.hash!),
-        status: tx.status,
-        description: tx.description,
-        createdAt: tx.createdAt,
-        updatedAt: tx.updatedAt,
-        blockNumber: tx.blockNumber,
+    const txs = await Promise.all(
+      transactions.map(async tx => {
+        const value = sums.get(tx.hash!) || BigInt(0)
+
+        let typeArgs: string | undefined | null
+        const sudtInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!))
+        if (sudtInput) {
+          typeArgs = sudtInput.typeArgs
+        } else {
+          const sudtOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!))
+          if (sudtOutput) {
+            typeArgs = sudtOutput.typeArgs
+          }
+        }
+
+        let sudtInfo: SudtInfo | undefined
+
+        if (typeArgs) {
+          // const typeArgs = sudtInput.typeArgs
+          const inputAmount = anyoneCanPayInputs
+            .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
+            .map(i => BufferUtils.readBigUInt128LE(i.data))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputAmount = anyoneCanPayOutputs
+            .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
+            .map(o => BufferUtils.readBigUInt128LE(o.data))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          const amount = outputAmount - inputAmount
+          const tokenInfo = await getConnection()
+            .getRepository(SudtTokenInfoEntity)
+            .createQueryBuilder('info')
+            .where({
+              walletID: params.walletID,
+              tokenID: typeArgs,
+            })
+            .getOne()
+
+          if (tokenInfo) {
+            sudtInfo = {
+              sUDT: tokenInfo,
+              amount: amount.toString(),
+            }
+          }
+        }
+
+        return Transaction.fromObject({
+          timestamp: tx.timestamp,
+          value: value.toString(),
+          hash: tx.hash,
+          version: tx.version,
+          type: value > BigInt(0) ? 'receive' : 'send',
+          nervosDao: daoFlag.get(tx.hash!),
+          status: tx.status,
+          description: tx.description,
+          createdAt: tx.createdAt,
+          updatedAt: tx.updatedAt,
+          blockNumber: tx.blockNumber,
+          sudtInfo: sudtInfo,
+        })
       })
-    })
+    )
 
     return {
       totalCount,

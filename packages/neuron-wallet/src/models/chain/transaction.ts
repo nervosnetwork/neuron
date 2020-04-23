@@ -14,6 +14,19 @@ export enum TransactionStatus {
   Failed = 'failed',
 }
 
+interface SudtTokenInfo {
+  symbol: string
+  tokenID: string
+  tokenName: string
+  walletID: string
+  decimal: string
+}
+
+export interface SudtInfo {
+  sUDT: SudtTokenInfo
+  amount: string
+}
+
 export default class Transaction {
   public version: string
   public cellDeps: CellDep[] = []
@@ -42,6 +55,8 @@ export default class Transaction {
   public createdAt?: string
   public updatedAt?: string
 
+  public sudtInfo?: SudtInfo
+
   constructor(
     version: string,
     cellDeps: CellDep[] = [],
@@ -62,7 +77,8 @@ export default class Transaction {
     description: string = '', // Default to ''
     nervosDao: boolean = false, // Default to false
     createdAt?: string,
-    updatedAt?: string
+    updatedAt?: string,
+    sudtInfo?: SudtInfo
   ) {
     this.cellDeps = cellDeps
     this.headerDeps = headerDeps
@@ -84,6 +100,8 @@ export default class Transaction {
     this.createdAt = createdAt ? BigInt(createdAt).toString() : createdAt
     this.updatedAt = updatedAt ? BigInt(updatedAt).toString() : updatedAt
     this.outputsData = outputsData || this.outputs.map(o => o.data || '0x')
+
+    this.sudtInfo = sudtInfo
 
     TypeCheckerUtils.hashChecker(...this.headerDeps, this.blockHash)
     TypeCheckerUtils.numberChecker(
@@ -119,6 +137,7 @@ export default class Transaction {
     nervosDao = false,
     createdAt,
     updatedAt,
+    sudtInfo,
   }: {
     version: string,
     cellDeps?: CellDep[],
@@ -139,7 +158,8 @@ export default class Transaction {
     description?: string, // Default to ''
     nervosDao?: boolean, // Default to false
     createdAt?: string,
-    updatedAt?: string
+    updatedAt?: string,
+    sudtInfo?: SudtInfo
   }): Transaction {
     return new Transaction(
       version,
@@ -167,6 +187,7 @@ export default class Transaction {
       nervosDao || false,
       createdAt,
       updatedAt,
+      sudtInfo,
     )
   }
 

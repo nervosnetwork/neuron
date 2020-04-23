@@ -25,6 +25,8 @@ import { AddLiveCell1585624516932 } from './migrations/1585624516932-AddLiveCell
 import { CreateAssetAccount1586420715474 } from './migrations/1586420715474-CreateAssetAccount'
 import AssetAccount from './entities/asset-account'
 import { UpdateAssetAccount1587368167604 } from './migrations/1587368167604-UpdateAssetAccount'
+import { AddTypeToInput1587371249814 } from './migrations/1587371249814-AddTypeToInput'
+import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-FlattenLockAndType'
 import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
 import SudtTokenInfo from './entities/sudt-token-info'
 
@@ -62,6 +64,8 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
       CreateAssetAccount1586420715474,
       AddLiveCell1585624516932,
       UpdateAssetAccount1587368167604,
+      AddTypeToInput1587371249814,
+      FlattenLockAndType1587375230126,
       AddSudtTokenInfo1587523557249,
     ],
     logging,

@@ -105,11 +105,17 @@ describe('TransactionGenerator', () => {
     output.outPointTxHash = randomHex()
     output.outPointIndex = '0'
     output.capacity = capacity
-    output.lock = who.lockScript
+    output.lockCodeHash = who.lockScript.codeHash
+    output.lockArgs = who.lockScript.args
+    output.lockHashType = who.lockScript.hashType
     output.lockHash = who.lockHash
     output.status = status
     output.hasData = hasData
-    output.typeScript = typeScript
+    if (typeScript) {
+      output.typeCodeHash = typeScript.codeHash
+      output.typeArgs = typeScript.args
+      output.typeHashType = typeScript.hashType
+    }
     if (daoData) {
       output.daoData = daoData
     }

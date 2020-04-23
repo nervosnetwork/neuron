@@ -33,7 +33,7 @@ export default class CellsService {
   private static ANYONE_CAN_PAY_CKB_CELL_MIN = BigInt(61 * 10**8)
   private static ANYONE_CAN_PAY_SUDT_CELL_MIN = BigInt(142 * 10**8)
 
-  // exclude hasData = true and typeScript != null
+  // exclude hasData = true and typeHash != null
   public static async getBalance(lockHashes: Set<string>): Promise<{
     liveBalance: Map<string, string>
     sentBalance: Map<string, string>
@@ -48,7 +48,7 @@ export default class CellsService {
       .where({
         lockHash: In([...lockHashes]),
         hasData: false,
-        typeScript: null,
+        typeHash: null,
       })
       .groupBy('output.lockHash')
       .addGroupBy('output.status')
@@ -176,7 +176,7 @@ export default class CellsService {
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .leftJoinAndSelect('output.transaction', 'tx')
-      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeScript IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
+      .where(`output.status = :liveStatus AND output.hasData = 0 AND output.typeHash IS NULL AND output.multiSignBlake160 IN (:...multiSignHashes)`, {
         liveStatus: OutputStatus.Live,
         multiSignHashes,
       })
@@ -265,7 +265,7 @@ export default class CellsService {
           lockHash: In(lockHashes),
           status: In([OutputStatus.Live, OutputStatus.Sent]),
           hasData: false,
-          typeScript: null,
+          typeHash: null,
         },
       })
     const liveCells = cellEntities.filter(c => c.status === OutputStatus.Live)
@@ -309,7 +309,7 @@ export default class CellsService {
         cell.outPoint(),
         '0',
         cell.capacity,
-        cell.lock,
+        cell.lockScript(),
         cell.lockHash
       )
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
@@ -382,7 +382,7 @@ export default class CellsService {
           lockHash: In(lockHashes),
           status: OutputStatus.Live,
           hasData: false,
-          typeScript: null,
+          typeHash: null,
         },
       })
 
@@ -391,7 +391,7 @@ export default class CellsService {
         cell.outPoint(),
         '0',
         cell.capacity,
-        cell.lock,
+        cell.lockScript(),
         cell.lockHash,
       )
     })
@@ -673,7 +673,7 @@ export default class CellsService {
       .getMany()
     const blake160s: string[] = outputEntities
       .map(output => {
-        const { lock } = output
+        const lock = output.lockScript()
         if (!lock) {
           return undefined
         }
