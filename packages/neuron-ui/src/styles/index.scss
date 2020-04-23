@@ -113,6 +113,11 @@ body {
 }
 
 // hack fabric toggle
+.ms-Toggle {
+  label {
+    color: #000 !important;
+  }
+}
 .ms-Toggle.is-checked .ms-Toggle-background {
   background: var(--nervos-green) !important;
 }
@@ -123,6 +128,12 @@ body {
 }
 .ms-Dropdown-item {
   color: #000 !important;
+}
+.ms-Dropdown-container {
+  label {
+    font-size: 0.875rem !important;
+    color: #000 !important;
+  }
 }
 
 // hack search field

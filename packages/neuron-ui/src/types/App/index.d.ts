@@ -81,9 +81,8 @@ declare namespace State {
   }
 
   interface PasswordRequest {
-    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | null
+    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | 'create-sudt-account' | 'send-sudt' | null
     readonly walletID: string
-    readonly password: string
   }
 
   type AlertDialog = Readonly<{ title: string; message: string }> | null
@@ -228,6 +227,7 @@ declare namespace State {
     readonly wallet: Wallet
     readonly nervosDAO: NervosDAO
     readonly updater: AppUpdater
+    readonly experimental: { tx: any; assetAccount?: any } | null
   }
 }
 

@@ -19,6 +19,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     tokenId: 'token id 1',
     address: 'account address',
     isSelected: false,
+    decimal: '10',
     ...eventListeners,
   },
   Unknown: {
@@ -30,6 +31,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     tokenId: 'token id 2',
     isSelected: false,
     address: 'account address',
+    decimal: '10',
     ...eventListeners,
   },
   selected: {
@@ -41,6 +43,7 @@ const piles: { [accountType: string]: SUDTAccountPileProps } = {
     tokenId: 'token id 1',
     isSelected: true,
     address: 'account address',
+    decimal: '10',
     ...eventListeners,
   },
 }

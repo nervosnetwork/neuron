@@ -1,8 +1,10 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import EditIcon from 'widgets/Icons/Edit.png'
 import Button from 'widgets/Button'
-import { DEFAULT_SUDT_FIELDS as defaultSUDTFields } from 'utils/const'
+import { DEFAULT_SUDT_FIELDS } from 'utils/const'
+import { sudtValueToAmount } from 'utils/formatters'
 import styles from './sUDTAccountPile.module.scss'
 
 export interface SUDTAccountPileProps {
@@ -14,6 +16,7 @@ export interface SUDTAccountPileProps {
   tokenId: string
   address: string
   isSelected: boolean
+  decimal: string
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }
 
@@ -24,21 +27,23 @@ const SUDTAccountPile = ({
   symbol,
   balance,
   isSelected,
+  decimal,
   onClick,
 }: SUDTAccountPileProps) => {
+  const [t] = useTranslation()
   return (
     <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
         <SUDTAvatar accountName={accountName} />
       </div>
       <div className={styles.accountName}>
-        <span>{accountName || defaultSUDTFields.accountName}</span>
+        <span>{accountName || DEFAULT_SUDT_FIELDS.accountName}</span>
       </div>
       <div className={styles.tokenName}>
-        <span>{tokenName || defaultSUDTFields.tokenName}</span>
+        <span>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</span>
       </div>
       <div className={styles.symbol}>
-        <span>{`(${symbol || defaultSUDTFields.symbol})`}</span>
+        <span>{`(${symbol || DEFAULT_SUDT_FIELDS.symbol})`}</span>
       </div>
       <div className={styles.editBtn}>
         <button data-role="edit" type="button">
@@ -47,11 +52,11 @@ const SUDTAccountPile = ({
       </div>
       {isSelected ? (
         <div className={styles.actions}>
-          <Button type="primary" label="Receive" data-role="receive" disabled={!accountName} />
-          <Button type="primary" label="Send" data-role="send" disabled={!accountName} />
+          <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={!accountName} />
+          <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={!accountName} />
         </div>
       ) : (
-        <div className={styles.balance}>{balance || '--'}</div>
+        <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>
       )}
     </div>
   )

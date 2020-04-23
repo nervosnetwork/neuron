@@ -3,13 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { ErrorCode } from 'utils/const'
+import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
+import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
-
-const MAX_NAME_LENGTH = 16
-const MAX_SYMBOL_LENGTH = 8
-const MIN_DECIMAL = 0
-const MAX_DECIMAL = 32
 
 export interface BasicInfo {
   accountName: string
@@ -81,7 +77,13 @@ const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'res
       return state
     }
     case 'isCKB': {
-      return { accountName: state.accountName, tokenId: 'ckb token id', tokenName: 'CKB', symbol: 'CKB', decimal: '8' }
+      return {
+        accountName: state.accountName,
+        tokenId: DEFAULT_SUDT_FIELDS.CKBTokenId,
+        tokenName: DEFAULT_SUDT_FIELDS.CKBTokenName,
+        symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
+        decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
+      }
     }
     case 'resetToken': {
       return { accountName: state.accountName, tokenId: '', tokenName: '', symbol: '', decimal: '' }
@@ -108,39 +110,29 @@ const SUDTCreateDialog = ({
   const [accountType, setAccountType] = useState(AccountType.SUDT)
   const [step, setStep] = useState(DialogSection.Account)
 
-  let accountNameError = ''
-  if (info.accountName && info.accountName.length > MAX_NAME_LENGTH) {
-    accountNameError = t(`messages.codes.${ErrorCode.FieldTooLong}`, {
-      fieldName: 'account-name',
-      length: MAX_NAME_LENGTH,
-    })
-  } else if (existingAccountNames.includes(info.accountName)) {
-    accountNameError = t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: 'account-name' })
+  const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
+  const tokenErrors = { accountName: '', tokenId: '', tokenName: '', symbol: '', decimal: '' }
+
+  const dataToValidate = {
+    accountName: { params: { name: info.accountName, exists: existingAccountNames }, validator: verifySUDTAccountName },
+    symbol: { params: { symbol: info.symbol }, validator: verifySymbol },
+    tokenId: { params: { tokenId: info.tokenId, isCKB: accountType === AccountType.CKB }, validator: verifyTokenId },
+    tokenName: { params: { tokenName: info.tokenName }, validator: verifyTokenName },
+    decimal: { params: { decimal: info.decimal }, validator: verifyDecimal },
   }
 
-  const tokenErrors = {
-    accountName: accountNameError,
-    tokenId: '',
-    tokenName:
-      !info.tokenName || info.tokenName.length <= MAX_NAME_LENGTH
-        ? ''
-        : t(`messages.codes.${ErrorCode.FieldTooLong}`, { fieldName: 'token-name', length: MAX_NAME_LENGTH }),
-    symbol:
-      !info.symbol || info.symbol.length <= MAX_SYMBOL_LENGTH
-        ? ''
-        : t(`messages.codes.${ErrorCode.FieldTooLong}`, { fieldName: 'symbol', length: MAX_SYMBOL_LENGTH }),
-    decimal:
-      !info.decimal || (+info.decimal >= 0 && +info.decimal <= 32 && Math.floor(+info.decimal) === +info.decimal)
-        ? ''
-        : t('messages.decimal-range', { range: `${MIN_DECIMAL}-${MAX_DECIMAL}` }),
-  }
+  Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
+    try {
+      validator(params)
+    } catch (err) {
+      tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
+    }
+  })
 
-  const isAccountNameReady = info.accountName && !tokenErrors.accountName
+  const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName
 
   const isTokenReady =
-    isAccountNameReady && Object.values(info).every(v => v) && Object.values(tokenErrors).every(e => !e)
-
-  const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
+    isAccountNameReady && Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
   const onInput = useCallback(
     e => {
@@ -152,15 +144,6 @@ const SUDTCreateDialog = ({
     },
     [dispatch]
   )
-
-  const onDismiss = useCallback(() => {
-    onCancel()
-  }, [onCancel])
-
-  const onDialogClick = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation()
-    e.preventDefault()
-  }, [])
 
   const onAccountTypeSelect = useCallback(
     (_, option?: IChoiceGroupOption) => {
@@ -176,24 +159,22 @@ const SUDTCreateDialog = ({
     e.preventDefault()
     switch (step) {
       case DialogSection.Account: {
-        if (!isAccountNameReady) {
-          break
+        if (isAccountNameReady) {
+          if (accountType === AccountType.CKB) {
+            dispatch({ type: 'isCKB' })
+          }
+          setStep(s => s + 1)
         }
-        if (accountType === AccountType.CKB) {
-          dispatch({ type: 'isCKB' })
-        }
-        setStep(s => s + 1)
         break
       }
       case DialogSection.Token: {
-        if (!isTokenReady) {
-          break
+        if (isTokenReady) {
+          onSubmit({ ...info, accountName: info.accountName.trim(), tokenName: info.tokenName.trim() })
         }
-        onSubmit({ ...info, accountName: info.accountName.trim(), tokenName: info.tokenName.trim() })
         break
       }
       default: {
-        break
+        // ignore
       }
     }
   }
@@ -210,15 +191,15 @@ const SUDTCreateDialog = ({
         break
       }
       default: {
-        break
+        // ignore
       }
     }
   }
 
   return (
-    <div role="presentation" className={styles.container} onClick={onDismiss}>
+    <div className={styles.container}>
       {step === 0 ? (
-        <div role="presentation" className={styles.dialogContainer} onClick={onDialogClick}>
+        <div className={styles.dialogContainer}>
           <div className={styles.title}>{t('s-udt.create-dialog.create-asset-account')}</div>
           <form onSubmit={onNext}>
             {fields
@@ -263,7 +244,7 @@ const SUDTCreateDialog = ({
           </form>
         </div>
       ) : (
-        <div role="presentation" className={styles.dialogContainer} onClick={onDialogClick}>
+        <div className={styles.dialogContainer}>
           <div className={styles.title}>{t('s-udt.create-dialog.set-token-info')}</div>
           <form onSubmit={onNext}>
             {fields

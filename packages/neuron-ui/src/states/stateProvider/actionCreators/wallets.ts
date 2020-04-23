@@ -1,3 +1,4 @@
+import { useHistory } from 'react-router-dom'
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
@@ -20,7 +21,7 @@ import { addressesToBalance, failureResToNotification } from 'utils/formatters'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
-export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any) => {
+export const updateCurrentWallet = () => (dispatch: StateDispatch, history: ReturnType<typeof useHistory>) => {
   getCurrentWallet().then(res => {
     if (res.status === 1) {
       const payload = res.result || emptyWallet
@@ -38,7 +39,7 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch, history: any)
   })
 }
 
-export const updateWalletList = () => (dispatch: StateDispatch, history: any) => {
+export const updateWalletList = () => (dispatch: StateDispatch, history: ReturnType<typeof useHistory>) => {
   getWalletList().then(res => {
     if (res.status === 1) {
       const payload = res.result || []
@@ -58,7 +59,7 @@ export const updateWalletList = () => (dispatch: StateDispatch, history: any) =>
 
 export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
   dispatch: StateDispatch,
-  history?: any
+  history?: ReturnType<typeof useHistory>
 ) => {
   updateWallet(params).then(res => {
     if (res.status === 1) {
@@ -84,63 +85,38 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   })
 }
 
-export const sendTransaction = (params: Controller.SendTransactionParams) => (
+export const sendTransaction = (params: Controller.SendTransactionParams) => async (
   dispatch: StateDispatch,
-  history: any,
-  options?: {
-    type: 'unlock'
-  }
+  history: ReturnType<typeof useHistory>,
+  options?: { type: 'unlock' }
 ) => {
-  dispatch({
-    type: AppActions.UpdateLoadings,
-    payload: {
-      sending: true,
-    },
-  })
-  setTimeout(() => {
-    sendTx(params)
-      .then(res => {
-        if (res.status === 1) {
-          dispatch({
-            type: AppActions.ClearNotificationsOfCode,
-            payload: ErrorCode.PasswordIncorrect,
-          })
-          if (options && options.type === 'unlock') {
-            dispatch({
-              type: AppActions.SetGlobalDialog,
-              payload: 'unlock-success',
-            })
-          } else {
-            history.push(Routes.History)
-          }
-        } else {
-          addNotification({
-            type: 'alert',
-            timestamp: +new Date(),
-            code: res.status,
-            content: (typeof res.message === 'string' ? res.message : res.message.content || '').replace(
-              /(\b"|"\b)/g,
-              ''
-            ),
-            meta: typeof res.message === 'string' ? undefined : res.message.meta,
-          })(dispatch)
-        }
-        dispatch({
-          type: AppActions.DismissPasswordRequest,
-        })
-      })
-      .catch(err => {
-        console.warn(err)
-      })
-      .finally(() => {
-        dispatch({
-          type: AppActions.UpdateLoadings,
-          payload: {
-            sending: false,
-          },
-        })
-      })
-  }, 0)
+  dispatch({ type: AppActions.UpdateLoadings, payload: { sending: true } })
+  try {
+    const res = await sendTx(params)
+    if (res.status === 1) {
+      dispatch({ type: AppActions.DismissPasswordRequest })
+      if (options && options.type === 'unlock') {
+        dispatch({ type: AppActions.SetGlobalDialog, payload: 'unlock-success' })
+      } else {
+        history.push(Routes.History)
+      }
+    } else if (res.status !== ErrorCode.PasswordIncorrect) {
+      addNotification({
+        type: 'alert',
+        timestamp: +new Date(),
+        code: res.status,
+        content: typeof res.message === 'string' ? res.message : res.message.content,
+        meta: typeof res.message === 'string' ? undefined : res.message.meta,
+      })(dispatch)
+      dispatch({ type: AppActions.DismissPasswordRequest })
+    }
+    return res.status
+  } catch (err) {
+    console.warn(err)
+    return 0
+  } finally {
+    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+  }
 }
 
 export const updateAddressListAndBalance = (params: Controller.GetAddressesByWalletIDParams) => (
@@ -183,37 +159,50 @@ export const updateAddressDescription = (params: Controller.UpdateAddressDescrip
   })
 }
 
-export const deleteWallet = (params: Controller.DeleteWalletParams) => (dispatch: StateDispatch) => {
+export const deleteWallet = (params: Controller.DeleteWalletParams) => async (dispatch: StateDispatch) => {
   dispatch({
-    type: AppActions.DismissPasswordRequest,
+    type: AppActions.UpdateLoadings,
+    payload: { sending: true },
   })
-  deleteRemoteWallet(params).then(res => {
-    if (res.status === 1) {
-      addPopup('delete-wallet-successfully')(dispatch)
-      dispatch({
-        type: AppActions.ClearNotificationsOfCode,
-        payload: ErrorCode.PasswordIncorrect,
-      })
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
+  try {
+    const res = await deleteRemoteWallet(params)
+    if (res.status !== ErrorCode.PasswordIncorrect) {
+      dispatch({ type: AppActions.DismissPasswordRequest })
+      if (res.status === 1) {
+        addPopup('delete-wallet-successfully')(dispatch)
+      } else {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
     }
-  })
+    return res.status
+  } catch (err) {
+    console.warn(err)
+    return 0
+  } finally {
+    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+  }
 }
 
-export const backupWallet = (params: Controller.BackupWalletParams) => (dispatch: StateDispatch) => {
+export const backupWallet = (params: Controller.BackupWalletParams) => async (dispatch: StateDispatch) => {
   dispatch({
-    type: AppActions.DismissPasswordRequest,
+    type: AppActions.UpdateLoadings,
+    payload: { sending: true },
   })
-  backupRemoteWallet(params).then(res => {
-    if (res.status === 1) {
-      dispatch({
-        type: AppActions.ClearNotificationsOfCode,
-        payload: ErrorCode.PasswordIncorrect,
-      })
-    } else {
-      addNotification(failureResToNotification(res))(dispatch)
+  try {
+    const res = await backupRemoteWallet(params)
+    if (res.status !== ErrorCode.PasswordIncorrect) {
+      dispatch({ type: AppActions.DismissPasswordRequest })
+      if (res.status !== 1) {
+        addNotification(failureResToNotification(res))(dispatch)
+      }
     }
-  })
+    return res.status
+  } catch (err) {
+    console.warn(err)
+    return 0
+  } finally {
+    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+  }
 }
 
 export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
