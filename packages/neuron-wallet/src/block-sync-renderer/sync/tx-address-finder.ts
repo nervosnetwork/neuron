@@ -15,9 +15,11 @@ export default class TxAddressFinder {
   private lockHashes: Set<string>
   private tx: Transaction
   private multiSignBlake160s: Set<string>
+  private anyoneCanPayLockHashes: Set<string>
 
-  constructor(lockHashes: string[], tx: Transaction, multiSignBlake160s: string[]) {
+  constructor(lockHashes: string[], anyoneCanPayLockHashes: string[], tx: Transaction, multiSignBlake160s: string[]) {
     this.lockHashes = new Set(lockHashes)
+    this.anyoneCanPayLockHashes = new Set(anyoneCanPayLockHashes)
     this.tx = tx
     this.multiSignBlake160s = new Set(multiSignBlake160s)
   }
@@ -43,6 +45,9 @@ export default class TxAddressFinder {
           shouldSync = true
           output.setMultiSignBlake160(multiSignBlake160)
         }
+      }
+      if (this.anyoneCanPayLockHashes.has(output.lockHash!)) {
+        shouldSync = true
       }
       if (this.lockHashes.has(output.lockHash!)) {
         if (output.type) {
@@ -73,6 +78,9 @@ export default class TxAddressFinder {
           outPointTxHash: outPoint.txHash,
           outPointIndex: outPoint.index,
         })
+      if (output && this.anyoneCanPayLockHashes.has(output.lockHash)) {
+        shouldSync = true
+      }
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
         addresses.push(

@@ -40,13 +40,16 @@ export default class Queue {
 
   private assetAccountInfo: AssetAccountInfo | undefined
 
-  constructor(url: string, lockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
+  private anyoneCanPayLockHashes: string[]
+
+  constructor(url: string, lockHashes: string[], anyoneCanPayLockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
     this.multiSignBlake160s = multiSignBlake160s
+    this.anyoneCanPayLockHashes = anyoneCanPayLockHashes
 
     try {
       this.assetAccountInfo = new AssetAccountInfo()
@@ -163,7 +166,12 @@ export default class Queue {
         if (!skipLiveCell) {
           await LiveCellPersistor.saveTxLiveCells(tx, this.assetAccountInfo!.anyoneCanPayCodeHash)
         }
-        const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
+        const [shouldSave, addresses] = await new TxAddressFinder(
+          this.lockHashes,
+          this.anyoneCanPayLockHashes,
+          tx,
+          this.multiSignBlake160s
+        ).addresses()
         if (shouldSave) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {

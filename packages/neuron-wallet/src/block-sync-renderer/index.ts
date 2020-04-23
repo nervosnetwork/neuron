@@ -11,6 +11,7 @@ import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import MultiSign from 'models/multi-sign'
+import AssetAccountInfo from 'models/asset-account-info'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
@@ -96,11 +97,16 @@ export const createBlockSyncTask = async (rescan = false) => {
         const blake160s = AddressService.allAddresses().map(address => address.blake160)
         const multiSign = new MultiSign()
         const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+        const assetAccountInfo = new AssetAccountInfo(network.genesisHash)
+        const anyoneCanPayLockHashes: string[] = blake160s
+          .map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+
         backgroundWindow.webContents.send(
           "block-sync:start",
           network.remote,
           network.genesisHash,
           lockHashes,
+          anyoneCanPayLockHashes,
           startBlockNumber,
           multiSignBlake160s
         )
