@@ -12,7 +12,12 @@ import { StateDispatch } from 'states/stateProvider/reducer'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'
-import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, localNumberFormatter } from 'utils/formatters'
+import {
+  shannonToCKBFormatter,
+  uniformTimeFormatter as timeFormatter,
+  localNumberFormatter,
+  sudtValueToAmount,
+} from 'utils/formatters'
 import getExplorerUrl from 'utils/getExplorerUrl'
 import { CONFIRMATION_THRESHOLD } from 'utils/const'
 import styles from './transactionList.module.scss'
@@ -126,8 +131,21 @@ const TransactionList = ({
         }
         const statusLabel = t(`history.${status}`)
         const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
-        const typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
-        // const indicator = status === 'success' ? 'success' : s
+
+        let name = walletName
+        let value = `${tx.value} shannons`
+        let amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
+
+        let typeLabel = t(`history.${tx.type}`)
+        if (tx.nervosDao) {
+          typeLabel = 'Nervos DAO'
+        } else if (tx.sudtInfo?.sUDT) {
+          name = tx.sudtInfo?.sUDT.tokenName || '?'
+          typeLabel = `UDT ${typeLabel}`
+          value = tx.sudtInfo?.amount
+          amount = `${sudtValueToAmount(value, tx.sudtInfo?.sUDT.decimal)} ${tx.sudtInfo?.sUDT.symbol || '?'}`
+        }
+
         let indicator: string = Pending
         switch (status) {
           case 'success': {
@@ -158,13 +176,13 @@ const TransactionList = ({
                 <img src={CKBAvatar} alt="avatar" />
               </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <div className={styles.amount} title={`${tx.value} shannons`}>
-                {`${shannonToCKBFormatter(tx.value, true)} CKB`}
+              <div className={styles.amount} title={value}>
+                {amount}
               </div>
               <span className={styles.type} title={typeLabel}>
                 {typeLabel}
               </span>
-              <span className={styles.walletName}>{walletName}</span>
+              <span className={styles.walletName}>{name}</span>
               <div className={styles.indicator}>
                 <img src={indicator} alt={status} />
               </div>

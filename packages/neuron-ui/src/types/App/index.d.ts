@@ -10,6 +10,15 @@ declare namespace State {
     readonly blockNumber: string
     readonly status: 'pending' | 'success' | 'failed'
     readonly nervosDao: boolean
+    readonly sudtInfo?: Readonly<{
+      sUDT: {
+        tokenID: string
+        tokenName: string
+        symbol: string
+        decimal: string
+      }
+      amount: string
+    }>
   }
 
   interface DetailedInput {
