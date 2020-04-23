@@ -5,10 +5,18 @@ import AddressService from "./addresses"
 import { TransactionGenerator } from "./tx"
 import TransactionSender from "./transaction-sender"
 import Transaction from "models/chain/transaction"
+import OutputEntity from "database/chain/entities/output"
+import AssetAccountInfo from "models/asset-account-info"
+import BufferUtils from "utils/buffer"
+import { OutputStatus } from "models/chain/output"
 
 export default class AssetAccountService {
-  public static async getAll(walletID: string): Promise<AssetAccount[]> {
-    const assetAccounts = await getConnection()
+  public static async getAll(walletID: string, anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
+    const sudtHashType = assetAccountInfo.infos.sudt.hashType
+
+    const assetAccountEntities = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
       .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
@@ -17,7 +25,53 @@ export default class AssetAccountService {
       })
       .getMany()
 
-    return assetAccounts.map(aa => aa.toModel())
+    // calculate balances
+    // anyone-can-pay & sudt
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select(`output.lockArgs`, 'lockArgs')
+      .addSelect(`output.typeArgs`, 'typeArgs')
+      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
+      .addSelect(`group_concat(output.data)`, 'dataArray')
+      .where(`output.status = :liveStatus AND output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`, {
+        liveStatus: OutputStatus.Live,
+        lockHashes: anyoneCanPayLockHashes,
+        typeCodeHash: sudtCodeHash,
+        typeHashType: sudtHashType,
+      })
+      .groupBy('output.lockArgs')
+      .addGroupBy('output.typeArgs')
+      .getRawMany()
+
+    // key: blake160:tokenID(typeArgs | CKBytes)
+    // value: total balance
+    const sumOfAmountMap = new Map<string, bigint>()
+    outputs.forEach(output => {
+      const blake160 = output.lockArgs
+      const tokenID = output.typeArgs || 'CKBytes'
+      const isCKB = !output.typeArgs
+      const key = blake160 + ":" + tokenID
+      const old = sumOfAmountMap.get(key) || BigInt(0)
+      if (isCKB) {
+        sumOfAmountMap.set(key, old + BigInt(output.sumOfCapacity))
+      } else {
+        const sumOfAmount = (output.dataArray as string)
+          .split(',')
+          .map(data => BufferUtils.readBigUInt128LE(data.trim()))
+          .reduce((result, c) => result + c, BigInt(0))
+        sumOfAmountMap.set(key, old + sumOfAmount)
+      }
+    })
+
+    const assetAccounts = assetAccountEntities.map(aa => {
+      const model = aa.toModel()
+      const tokenID = aa.tokenID.startsWith('0x') ? aa.tokenID : 'CKBytes'
+      model.balance = sumOfAmountMap.get(aa.blake160 + ":" + tokenID)?.toString() || '0'
+      return model
+    })
+
+    return assetAccounts
   }
 
   public static async getAccount(params: { walletID: string, id: number }): Promise<AssetAccount | undefined> {

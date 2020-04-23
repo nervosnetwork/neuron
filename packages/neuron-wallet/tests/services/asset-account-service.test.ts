@@ -4,6 +4,10 @@ import AssetAccount from "../../src/models/asset-account"
 import AssetAccountEntity from "../../src/database/chain/entities/asset-account"
 import SudtTokenInfo from "../../src/database/chain/entities/sudt-token-info"
 import AssetAccountService from "../../src/services/asset-account-service"
+import OutputEntity from "../../src/database/chain/entities/output"
+import AssetAccountInfo from "../../src/models/asset-account-info"
+import BufferUtils from "../../src/utils/buffer"
+import { OutputStatus } from "../../src/models/chain/output"
 
 describe('AssetAccountService', () => {
   beforeAll(async done => {
@@ -110,5 +114,93 @@ describe('AssetAccountService', () => {
 
     expect(result!.accountName).toEqual('1')
     expect(result!.sudtTokenInfo.tokenName).toEqual('2')
+  })
+
+  describe('getAll', () => {
+    const randomHex = (length: number = 64): string => {
+      const str: string = Array.from({ length })
+        .map(() => Math.floor(Math.random() * 16).toString(16))
+        .join('')
+
+      return `0x${str}`
+    }
+
+    const blake160 = '0x' + '0'.repeat(40)
+    const assetAccountInfo = new AssetAccountInfo()
+    const generateOutput = (tokenID: string = 'CKBytes') => {
+      const outputEntity = new OutputEntity()
+      outputEntity.outPointTxHash = randomHex()
+      outputEntity.outPointIndex = '0'
+      outputEntity.capacity = '1000'
+      const lock = assetAccountInfo.generateAnyoneCanPayScript(blake160)
+      outputEntity.lockCodeHash = lock.codeHash
+      outputEntity.lockArgs = lock.args
+      outputEntity.lockHashType = lock.hashType
+      outputEntity.lockHash = lock.computeHash()
+      outputEntity.status = OutputStatus.Live
+      outputEntity.hasData = false
+      if (tokenID !== 'CKBytes') {
+        const type = assetAccountInfo.generateSudtScript(tokenID)
+        outputEntity.typeCodeHash = type.codeHash
+        outputEntity.typeArgs = type.args
+        outputEntity.typeHashType = type.hashType
+        outputEntity.typeHash = type.computeHash()
+        outputEntity.data = BufferUtils.writeBigUInt128LE(BigInt(100))
+      }
+      return outputEntity
+    }
+
+    it('check balance', async () => {
+      const walletID = '1'
+      const tokenID = '0x' + '0'.repeat(64)
+      const assetAccounts = [
+        AssetAccount.fromObject({
+          walletID,
+          tokenID,
+          symbol: 'sUDT',
+          tokenName: 'sUDT',
+          decimal: '0',
+          balance: '0',
+          accountName: 'sUDT',
+          blake160,
+        }),
+        AssetAccount.fromObject({
+          walletID,
+          tokenID: 'CKBytes',
+          symbol: 'ckb',
+          tokenName: 'ckb',
+          decimal: '0',
+          balance: '0',
+          accountName: 'ckb',
+          blake160,
+        }),
+      ]
+      const entities = assetAccounts.map(aa => AssetAccountEntity.fromModel(aa))
+      for (const entity of entities) {
+        await getConnection().manager.save([
+          entity.sudtTokenInfo,
+          entity,
+        ])
+      }
+
+      // create outputs
+      const outputEntities = [
+        generateOutput(),
+        generateOutput(),
+        generateOutput(tokenID),
+        generateOutput(tokenID),
+      ]
+      await getConnection().manager.save(outputEntities)
+
+      const anyoneCanPayLockHashes: string[] = [
+        assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
+      ]
+
+      const result = await AssetAccountService.getAll(walletID, anyoneCanPayLockHashes)
+
+      expect(result.length).toEqual(2)
+      expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('200')
+      expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual('2000')
+    })
   })
 })
