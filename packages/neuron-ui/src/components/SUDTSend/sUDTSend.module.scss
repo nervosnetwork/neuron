@@ -1,9 +1,5 @@
 @import '../../styles/mixin.scss';
 
-.container {
-  display: grid;
-}
-
 .cardContainer {
   background: #fff;
   padding: 20px;
@@ -13,7 +9,6 @@
 }
 
 .title {
-  height: 0.78em;
   font-size: 1.375rem;
   font-weight: 700;
 }
@@ -75,9 +70,13 @@
 .sendContainer {
   display: grid;
   grid-template:
-    'address .' auto 'amount send-all' auto 'fee fee' auto
-    'description description' auto/ 1fr 70px;
-  padding: 20px 30px;
+    'remote-error remote-error' auto
+    'address .' auto
+    'amount send-all' auto
+    'fee fee' auto
+    'description description' auto /
+    1fr 70px;
+  padding: 15px 30px 20px;
 
   .address {
     grid-area: address;
@@ -92,7 +91,7 @@
     button {
       box-sizing: border-box;
       width: 60px;
-      height: 26px;
+      height: 27px;
       padding: 0;
       line-height: 1;
       display: flex;
@@ -106,6 +105,7 @@
     padding-top: 20px;
     border-top: 1px dashed #ccc;
     margin-top: 8px;
+    padding-right: 70px;
   }
   .description {
     grid-area: description;
@@ -114,6 +114,20 @@
   .descriptionField {
     & > div {
       border-color: transparent transparent #aaa !important;
+    }
+  }
+  .remoteError {
+    display: flex;
+    align-items: center;
+    height: 15px;
+    padding-bottom: 15px;
+    grid-area: remote-error;
+    font-size: 0.75rem;
+    color: #d50000;
+    svg {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
     }
   }
 }
