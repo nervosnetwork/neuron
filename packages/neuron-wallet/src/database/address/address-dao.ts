@@ -148,6 +148,19 @@ export default class AddressDao {
     })[0]
   }
 
+  public static allUnusedReceivingAddresses(walletId: string, version: AddressVersion): Address[] {
+    const addresses = AddressStore.getAll().filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Receiving
+        && value.txCount === 0
+        && !value.usedByAnyoneCanPay
+    })
+    return addresses.sort((lhs, rhs) => {
+      return lhs.addressIndex - rhs.addressIndex
+    })
+  }
+
   public static unusedAddressesCount(walletId: string, version: AddressVersion): [number, number] {
     const addresses = AddressStore.getAll()
     const receivingCount = addresses.filter(value => {

@@ -199,6 +199,10 @@ export default class AddressService {
     return addressEntity
   }
 
+  public static allUnusedReceivingAddresses(walletId: string): AddressInterface[] {
+    return AddressDao.allUnusedReceivingAddresses(walletId,  AddressService.getAddressVersion())
+  }
+
   public static nextUnusedChangeAddress = (walletId: string): AddressInterface | undefined => {
     const addressEntity = AddressDao.nextUnusedChangeAddress(walletId,  AddressService.getAddressVersion())
     if (!addressEntity) {

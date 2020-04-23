@@ -101,7 +101,10 @@ export default class AssetAccountService {
     tx: Transaction
   }> {
     // 1. find next unused address
-    const addrObj = AddressService.nextUnusedAddress(walletID)!
+    const addresses = AddressService.allUnusedReceivingAddresses(walletID)
+    const usedBlake160s = new Set(await this.blake160sOfAssetAccounts(walletID))
+    const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
+
     // 2. generate AssetAccount object
     const assetAccount = new AssetAccount(walletID, tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
@@ -120,6 +123,18 @@ export default class AssetAccountService {
       assetAccount,
       tx,
     }
+  }
+
+  private static async blake160sOfAssetAccounts(walletID: string): Promise<string[]> {
+    const assetAccounts = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .where({
+        walletID,
+      })
+      .getMany()
+
+    return assetAccounts.map(aa => aa.blake160)
   }
 
   public static async sendTx(walletID: string, assetAccount: AssetAccount, tx: Transaction, password: string): Promise<string> {
