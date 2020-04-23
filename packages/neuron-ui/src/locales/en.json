@@ -479,6 +479,7 @@
       "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
     },
     "special-assets": {
+      "title": "Customized Assets",
       "date": "Date",
       "capacity": "Capacity",
       "type-script-tooltip": "Type Script",
@@ -495,6 +496,7 @@
     },
     "s-udt": {
       "account-list": {
+        "title": "Asset Accounts",
         "no-asset-accounts": "No sUDT asset has been detected",
         "search": "Account Name, Token Name or Symbol",
         "syncing": "Syncing, current data may be inaccurate",
@@ -515,9 +517,12 @@
         "confirm": "Confirm",
         "cancel": "Cancel",
         "next": "Next",
-        "back": "Back"
+        "back": "Back",
+        "occupy-142-ckb": "occupy 142 CKBytes",
+        "occupy-61-ckb": "occupy 61 CKBytes"
       },
       "send": {
+        "title": "Send",
         "address": "Address",
         "amount": "Amount",
         "description": "Description",

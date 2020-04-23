@@ -3,6 +3,7 @@
 .container {
   .title {
     @include viewTitle;
+    margin-bottom: 20px;
   }
 
   .listContainer {
@@ -36,5 +37,4 @@
 
 .noItems {
   @include MediumText;
-  padding: 20px 0;
 }

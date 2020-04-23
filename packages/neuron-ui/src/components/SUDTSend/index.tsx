@@ -267,7 +267,7 @@ const SUDTSend = () => {
       <div className={styles.breadcrum}>
         <Breadcrum pages={breakcrum} />
       </div>
-      <div className={styles.title}>Send</div>
+      <div className={styles.title}>{t('s-udt.send.title')}</div>
       <form onSubmit={onSubmit}>
         <div className={styles.cardContainer}>
           <div className={styles.info}>

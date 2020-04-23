@@ -224,8 +224,13 @@ const SUDTCreateDialog = ({
                 checked: accountType === accType.key,
                 onRenderLabel: ({ text }: IChoiceGroupOption) => {
                   return (
-                    <span className="ms-ChoiceFieldLabel" style={{ pointerEvents: 'none' }}>
+                    <span className="ms-ChoiceFieldLabel">
                       {text}
+                      <span className={styles.capacityRequired}>
+                        {t(
+                          `s-udt.create-dialog.${AccountType.CKB === accType.key ? 'occupy-61-ckb' : 'occupy-142-ckb'}`
+                        )}
+                      </span>
                     </span>
                   )
                 },
