@@ -1,5 +1,12 @@
+@import '../../styles//mixin.scss';
+
 .container {
   display: grid;
+}
+
+.title {
+  @include viewTitle;
+  margin-bottom: 20px;
 }
 
 .header {
@@ -46,9 +53,15 @@
 }
 
 .loading {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100vh;
+  .title {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }

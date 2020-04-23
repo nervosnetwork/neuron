@@ -3,7 +3,9 @@
 $height: 26px;
 
 .container {
-  position: relative;
+  position: fixed;
+  top: 20px;
+  right: 0;
   display: flex;
   justify-content: flex-end;
 
@@ -44,8 +46,10 @@ $height: 26px;
   }
 
   .message {
-    @include RegularText;
+    @include MediumText;
+    font-size: 0.875rem;
     padding: 25px 0;
+    text-align: center;
   }
 
   .footer {

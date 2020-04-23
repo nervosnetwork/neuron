@@ -100,3 +100,8 @@
     border-color: #333 !important;
   }
 }
+
+@mixin viewTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+}

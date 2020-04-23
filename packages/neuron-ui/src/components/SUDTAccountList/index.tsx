@@ -5,6 +5,7 @@ import { SpinnerSize, SearchBox } from 'office-ui-fabric-react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
 import SUDTCreateDialog, { TokenInfo } from 'components/SUDTCreateDialog'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
+import Experimental from 'widgets/ExperimentalRibbon'
 import Spinner from 'widgets/Spinner'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
@@ -226,6 +227,8 @@ const SUDTAccountList = () => {
   if (!isLoaded) {
     return (
       <div className={styles.loading}>
+        <div className={styles.title}>{t('s-udt.account-list.title')}</div>
+        <Experimental tag="customized-assset" />
         <Spinner size={SpinnerSize.large} />
       </div>
     )
@@ -247,6 +250,8 @@ const SUDTAccountList = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.title}>{t('s-udt.account-list.title')}</div>
+      <Experimental tag="sudt-accounts" />
       <div className={styles.header}>
         <SearchBox
           value={keyword}
