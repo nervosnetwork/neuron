@@ -78,7 +78,6 @@ export default class CellsService {
   }
 
   public static async usedByAnyoneCanPayBlake160s(anyoneCanPayLockHashes: string[], blake160s: string[]): Promise<string[]> {
-    // const anyoneCanPayLockHashBuffers = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
     const liveCells = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
