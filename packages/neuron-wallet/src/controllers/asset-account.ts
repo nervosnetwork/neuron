@@ -37,13 +37,17 @@ export interface UpdateAssetAccountParams {
 
 export default class AssetAccountController {
   public async getAll(params: { walletID: string }): Promise<Controller.Response<(AssetAccount & { address: string })[]>> {
-    const assetAccounts = await AssetAccountService.getAll(params.walletID)
+    const assetAccountInfo = new AssetAccountInfo()
+    const blake160s = AddressService.allBlake160sByWalletId(params.walletID)
+    const anyoneCanPayLockHashes: string[] = blake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+
+    const assetAccounts = await AssetAccountService.getAll(params.walletID, anyoneCanPayLockHashes)
 
     if (!assetAccounts) {
       throw new ServiceHasNoResponse('AssetAccount')
     }
 
-    const assetAccountInfo = new AssetAccountInfo()
+
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
     const result = assetAccounts.map(aa => {

@@ -77,6 +77,19 @@ export default class CellsService {
     }
   }
 
+  public static async usedByAnyoneCanPayBlake160s(anyoneCanPayLockHashes: string[], blake160s: string[]): Promise<string[]> {
+    const liveCells = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where({
+        lockHash: In(anyoneCanPayLockHashes),
+        lockArgs: In(blake160s),
+      })
+      .getMany()
+
+    return liveCells.map(c => c.lockArgs)
+  }
+
   public static async getDaoCells(lockHashes: string[]): Promise<Cell[]> {
     const outputs: OutputEntity[] = await getConnection()
       .getRepository(OutputEntity)

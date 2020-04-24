@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron'
 import path from 'path'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
-import { Address } from 'database/address/address-dao'
+import { Address, AddressVersion } from 'database/address/address-dao'
 import DataUpdateSubject from 'models/subjects/data-update'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import SyncedBlockNumberSubject from 'models/subjects/node'
@@ -11,13 +11,19 @@ import AddressService from 'services/addresses'
 import logger from 'utils/logger'
 import CommonUtils from 'utils/common'
 import MultiSign from 'models/multi-sign'
+import AssetAccountInfo from 'models/asset-account-info'
 
 let backgroundWindow: BrowserWindow | null
 let network: Network | null
 
-const updateAllAddressesTxCount = async () => {
-  const addresses = AddressService.allAddresses().map(addr => addr.address)
+const updateAllAddressesTxCountAndUsedByAnyoneCanPay = async (genesisBlockHash: string) => {
+  const addrs = AddressService.allAddresses()
+  const addresses = addrs.map(addr => addr.address)
+  const assetAccountInfo = new AssetAccountInfo(genesisBlockHash)
+  const anyoneCanPayLockHashes = addrs.map(a => assetAccountInfo.generateAnyoneCanPayScript(a.blake160).computeHash())
   await AddressService.updateTxCountAndBalances(addresses)
+  const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
+  await AddressService.updateUsedByAnyoneCanPayByBlake160s(anyoneCanPayLockHashes, addressVersion)
 }
 
 AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
@@ -90,17 +96,22 @@ export const createBlockSyncTask = async (rescan = false) => {
 
     if (network.genesisHash !== EMPTY_GENESIS_HASH) {
       // re init txCount in addresses if switch network
-      await updateAllAddressesTxCount()
+      await updateAllAddressesTxCountAndUsedByAnyoneCanPay(network.genesisHash)
       if (backgroundWindow) {
         const lockHashes = AddressService.allLockHashes()
         const blake160s = AddressService.allAddresses().map(address => address.blake160)
         const multiSign = new MultiSign()
         const multiSignBlake160s = blake160s.map(blake160 => multiSign.hash(blake160))
+        const assetAccountInfo = new AssetAccountInfo(network.genesisHash)
+        const anyoneCanPayLockHashes: string[] = blake160s
+          .map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+
         backgroundWindow.webContents.send(
           "block-sync:start",
           network.remote,
           network.genesisHash,
           lockHashes,
+          anyoneCanPayLockHashes,
           startBlockNumber,
           multiSignBlake160s
         )

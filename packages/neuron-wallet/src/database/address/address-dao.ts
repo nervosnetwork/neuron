@@ -5,6 +5,7 @@ import Store from 'models/store'
 import AddressDbChangedSubject from 'models/subjects/address-db-changed-subject'
 import { TransactionStatus } from 'models/chain/transaction'
 import AddressParser from 'models/address-parser'
+import AssetAccountInfo from 'models/asset-account-info'
 
 export enum AddressVersion {
   Testnet = 'testnet',
@@ -26,6 +27,7 @@ export interface Address {
   version: AddressVersion
   description?: string
   isImporting?: boolean | undefined
+  usedByAnyoneCanPay?: boolean | undefined
 }
 
 export default class AddressDao {
@@ -95,6 +97,32 @@ export default class AddressDao {
     return updated
   }
 
+  public static async updateUsedByAnyoneCanPayByBlake160s(blake160s: string[], addressVersion: AddressVersion): Promise<Address[]> {
+    const blake160Set = new Set(blake160s)
+    const all = AddressStore.getAll()
+    const toUpdate = all.filter(value => {
+      return blake160Set.has(value.blake160) && value.version === addressVersion
+    })
+    const others = all.filter(value => {
+      return !(blake160Set.has(value.blake160) && value.version === addressVersion)
+    })
+
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHashes: string[] = blake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+    const usedBlake160s = await CellsService.usedByAnyoneCanPayBlake160s(anyoneCanPayLockHashes, blake160s)
+    const usedBlake160Set = new Set(usedBlake160s)
+
+    const updated: Address[] = toUpdate.map(addr => {
+      return {
+        ...addr,
+        usedByAnyoneCanPay: usedBlake160Set.has(addr.blake160)
+      }
+    })
+
+    AddressStore.updateAll(updated.concat(others))
+    return updated
+  }
+
   public static resetAddresses = () => {
     const all = AddressStore.getAll()
     all.forEach(addr => {
@@ -113,10 +141,24 @@ export default class AddressDao {
         && value.version === version
         && value.addressType == AddressType.Receiving
         && value.txCount === 0
+        && !value.usedByAnyoneCanPay
     })
     return addresses.sort((lhs, rhs) => {
       return lhs.addressIndex - rhs.addressIndex
     })[0]
+  }
+
+  public static allUnusedReceivingAddresses(walletId: string, version: AddressVersion): Address[] {
+    const addresses = AddressStore.getAll().filter(value => {
+      return value.walletId === walletId
+        && value.version === version
+        && value.addressType == AddressType.Receiving
+        && value.txCount === 0
+        && !value.usedByAnyoneCanPay
+    })
+    return addresses.sort((lhs, rhs) => {
+      return lhs.addressIndex - rhs.addressIndex
+    })
   }
 
   public static unusedAddressesCount(walletId: string, version: AddressVersion): [number, number] {
@@ -126,12 +168,14 @@ export default class AddressDao {
         && value.version === version
         && value.addressType == AddressType.Receiving
         && value.txCount === 0
+        && !value.usedByAnyoneCanPay
     }).length
     const changeCount = addresses.filter(value => {
       return value.walletId === walletId
         && value.version === version
         && value.addressType == AddressType.Change
         && value.txCount === 0
+        && !value.usedByAnyoneCanPay
     }).length
 
     return [receivingCount, changeCount]
@@ -143,6 +187,7 @@ export default class AddressDao {
         && value.version === version
         && value.addressType == AddressType.Change
         && value.txCount === 0
+        && !value.usedByAnyoneCanPay
     })
     return addresses.sort((lhs, rhs) => {
       return lhs.addressIndex - rhs.addressIndex
@@ -199,6 +244,24 @@ export default class AddressDao {
       return undefined
     }
     item.description = description
+    return AddressStore.update(item)
+  }
+
+  public static updateUsedByAnyoneCanPay(
+    walletId: string,
+    blake160: string,
+    addressVersion: AddressVersion,
+    usedByAnyoneCanPay: boolean,
+  ): Address | undefined {
+    const item = AddressStore.getAll().find(value => {
+      return value.walletId === walletId
+        && value.version === addressVersion
+        && value.blake160 === blake160
+    })
+    if (!item) {
+      return undefined
+    }
+    item.usedByAnyoneCanPay = usedByAnyoneCanPay
     return AddressStore.update(item)
   }
 

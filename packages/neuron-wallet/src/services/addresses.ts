@@ -99,6 +99,10 @@ export default class AddressService {
     return AddressDao.updateTxCountAndBalances(addresses)
   }
 
+  public static async updateUsedByAnyoneCanPayByBlake160s(blake160s: string[], addressVersion: AddressVersion): Promise<AddressInterface[]> {
+    return AddressDao.updateUsedByAnyoneCanPayByBlake160s(blake160s, addressVersion)
+  }
+
   // Generate both receiving and change addresses.
   public static generateAddresses = (
     walletId: string,
@@ -195,6 +199,10 @@ export default class AddressService {
     return addressEntity
   }
 
+  public static allUnusedReceivingAddresses(walletId: string): AddressInterface[] {
+    return AddressDao.allUnusedReceivingAddresses(walletId,  AddressService.getAddressVersion())
+  }
+
   public static nextUnusedChangeAddress = (walletId: string): AddressInterface | undefined => {
     const addressEntity = AddressDao.nextUnusedChangeAddress(walletId,  AddressService.getAddressVersion())
     if (!addressEntity) {
@@ -234,6 +242,15 @@ export default class AddressService {
 
   public static updateDescription = (walletId: string, address: string, description: string): AddressInterface | undefined => {
     return AddressDao.updateDescription(walletId, address, description)
+  }
+
+  public static updateUsedByAnyoneCanPay(
+    walletId: string,
+    blake160: string,
+    addressVersion: AddressVersion,
+    usedByAnyoneCanPay: boolean,
+  ): AddressInterface | undefined {
+    return AddressDao.updateUsedByAnyoneCanPay(walletId, blake160, addressVersion, usedByAnyoneCanPay)
   }
 
   public static deleteByWalletId = (walletId: string): AddressInterface[] => {
