@@ -678,6 +678,8 @@ public static generateSendingAllTx = async (
     tx.outputsData = tx.outputs.map(o => o.data)
     tx.fee = result.finalFee
 
+    tx.sudtInfo = amount === 'all' ? { amount: result.amount }: { amount }
+
     return tx
   }
 }

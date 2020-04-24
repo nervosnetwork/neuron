@@ -1413,6 +1413,8 @@ describe('TransactionGenerator', () => {
           .reduce((result, c) => result + c, BigInt(0))
 
         expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+
+        expect(tx.sudtInfo!.amount).toEqual('1000')
       })
     })
   })
