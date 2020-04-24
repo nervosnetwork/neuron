@@ -443,7 +443,7 @@ export default class CellsService {
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
 
     const allCapacity: bigint = anyoneCanPayLockLiveCells.map(c => BigInt(c.capacity)).reduce((result, c) => result + c, BigInt(0))
-    const capacityInt = capacity === 'all' ? allCapacity : BigInt(capacity)
+    const capacityInt = capacity === 'all' ? (allCapacity - BigInt(anyoneCanPayLockLiveCells.length) * BigInt(61 * 10**8)) : BigInt(capacity)
 
     if (anyoneCanPayLockLiveCellEntities.length === 0) {
       throw new CapacityNotEnough()
@@ -539,6 +539,85 @@ export default class CellsService {
       anyoneCanPayOutputs,
       changeOutput,
       finalFee: finalFee.toString(),
+      sendCapacity: capacityInt.toString(),
+    }
+  }
+
+  public static async gatherAnyoneCanPaySendAllCKBInputs(
+    anyoneCanPayLockHashes: string[],
+    fee: string = '0',
+    feeRate: string = '0',
+    baseSize: number = 0,
+  ) {
+    const feeInt = BigInt(fee)
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    let needFee = BigInt(0)
+
+    // only live cells, skip which has data or type
+    const anyoneCanPayLockHashBuffers: Buffer[] = anyoneCanPayLockHashes.map(h => Buffer.from(h.slice(2), 'hex'))
+    const anyoneCanPayLockLiveCellEntities: LiveCellEntity[] = await getConnection()
+      .getRepository(LiveCellEntity)
+      .find({
+        where: {
+          lockHash: In(anyoneCanPayLockHashBuffers),
+          typeHash: null,
+          usedBlockNumber: null,
+        },
+      })
+    const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
+
+    if (anyoneCanPayLockLiveCellEntities.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const inputs: Input[] = []
+    const inputOriginCells: LiveCell[] = []
+    let inputCapacities: bigint = BigInt(0)
+    let totalSize: number = baseSize
+    anyoneCanPayLockLiveCells.forEach(cell => {
+      const input: Input = new Input(
+        cell.outPoint(),
+        '0',
+        cell.capacity,
+        cell.lock(),
+        cell.lockHash
+      )
+      if (inputs.find(el => el.lockHash === cell.lockHash!)) {
+        totalSize += TransactionSize.emptyWitness()
+      } else {
+        totalSize += TransactionSize.secpLockWitness()
+      }
+      inputs.push(input)
+      inputOriginCells.push(cell)
+
+      // capacity - 61CKB, 61CKB remaining for change
+      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_CKB_CELL_MIN
+      totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
+
+      needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
+    })
+
+    const capacityInt: bigint = inputCapacities - needFee
+
+    const anyoneCanPayOutputs = inputOriginCells.map(cell => {
+      const output = Output.fromObject({
+        capacity: this.ANYONE_CAN_PAY_CKB_CELL_MIN.toString(),
+        lock: cell.lock(),
+        type: cell.type(),
+        data: cell.data,
+      })
+      return output
+    })
+
+    return {
+      anyoneCanPayInputs: inputs,
+      anyoneCanPayOutputs,
+      finalFee: needFee.toString(),
+      sendCapacity: capacityInt.toString(),
+      changeInputs: [],
+      changeOutput: undefined,
     }
   }
 
@@ -676,6 +755,7 @@ export default class CellsService {
       anyoneCanPayOutputs,
       changeOutput,
       finalFee: finalFee.toString(),
+      amount: amountInt.toString(),
     }
   }
 

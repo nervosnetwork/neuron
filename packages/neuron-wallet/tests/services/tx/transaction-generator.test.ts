@@ -1104,6 +1104,50 @@ describe('TransactionGenerator', () => {
         }
         expect(error).toBeInstanceOf(CapacityNotEnough)
       })
+
+      it('capacity 70, send all', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('70')),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          'all',
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(2)
+        expect(tx.outputs.length).toEqual(2)
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
     })
 
     describe('generateAnyoneCanPayToSudtTx, with feeRate 1000', () => {
@@ -1317,6 +1361,60 @@ describe('TransactionGenerator', () => {
           error = e
         }
         expect(error).toBeInstanceOf(CapacityNotEnough)
+      })
+
+      it('capacity 1000, amount = all', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('1000'), '1000', tokenID),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        const tx: Transaction = await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+          [bob.lockHash],
+          [bobAnyoneCanPayLockScript.computeHash()],
+          targetOutput,
+          'all',
+          bob.blake160,
+          feeRate,
+          '0'
+        )
+
+        tx.witnesses[0] = serializeWitnessArgs(WitnessArgs.emptyLock().toSDK())
+
+        const expectedTxSize: number = TransactionSize.tx(tx)
+        const expectedTxFee: string = TransactionFee.fee(expectedTxSize, BigInt(feeRate)).toString()
+
+        expect(tx.fee).toEqual(expectedTxFee)
+
+        expect(tx.inputs.length).toEqual(2)
+        expect(tx.outputs.length).toEqual(2)
+
+        const expectedOutputCapacities: bigint[] = [BigInt(toShannon('1000')) - BigInt(tx.fee), BigInt(toShannon('142'))]
+        expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
+        expect(tx.outputs.map(o => o.lockHash)).toEqual([bobAnyoneCanPayLockScript.computeHash(), aliceAnyoneCanPayLockScript.computeHash()])
+        expect(tx.outputsData).toEqual([BufferUtils.writeBigUInt128LE(BigInt(0)), BufferUtils.writeBigUInt128LE(BigInt(1100))])
+
+        const inputCapacities = tx.inputs
+          .map(input => BigInt(input.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(output => BigInt(output.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+
+        expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+
+        expect(tx.sudtInfo!.amount).toEqual('1000')
       })
     })
   })
