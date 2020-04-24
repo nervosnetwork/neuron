@@ -15,9 +15,6 @@ import styles from './networkEditor.module.scss'
 
 const NetworkEditor = () => {
   const {
-    app: {
-      loadings: { network: isUpdating = false },
-    },
     settings: { networks = [] },
   } = useGlobalState()
   const dispatch = useDispatch()
@@ -36,6 +33,7 @@ const NetworkEditor = () => {
     url: '',
     urlError: '',
   })
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const disabled = !!(
     !editor.name ||
@@ -89,7 +87,16 @@ const NetworkEditor = () => {
   )
   const goBack = useGoBack(history)
 
-  const onSubmit = useOnSubmit(id, editor.name, editor.url, networks, history, dispatch, disabled)
+  const onSubmit = useOnSubmit({
+    id: id!,
+    name: editor.name,
+    remote: editor.url,
+    networks,
+    history,
+    dispatch,
+    disabled,
+    setIsUpdating,
+  })
 
   return (
     <Stack tokens={{ childrenGap: 15 }}>

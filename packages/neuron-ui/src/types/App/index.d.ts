@@ -100,7 +100,6 @@ declare namespace State {
       sending: boolean
       addressList: boolean
       transactionList: boolean
-      network: boolean
     }>
     readonly showTopAlert: boolean
     readonly showAllNotifications: boolean
