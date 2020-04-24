@@ -209,8 +209,11 @@ const SUDTSend = () => {
   ])
 
   useEffect(() => {
-    if (sendState.sendAll && experimental?.tx?.value && accountInfo?.decimal) {
-      dispatch({ type: Fields.Amount, payload: sudtValueToAmount(experimental.tx.value, accountInfo.decimal) })
+    if (sendState.sendAll && experimental?.tx?.sudtInfo?.amount && accountInfo?.decimal) {
+      dispatch({
+        type: Fields.Amount,
+        payload: sudtValueToAmount(experimental.tx.sudtInfo.amount, accountInfo.decimal),
+      })
     }
   }, [sendState.sendAll, experimental, accountInfo])
 
