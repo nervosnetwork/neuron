@@ -245,7 +245,7 @@ export const DAORecord = ({
       <div className={styles.compensation}>
         <span>
           {CellStatus.Depositing !== cellStatus && compensation >= BigInt(0)
-            ? `${isWithdrawn ? '' : '+'}${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
+            ? `+${shannonToCKBFormatter(compensation.toString()).toString()} CKB`
             : '- CKB'}
         </span>
       </div>
