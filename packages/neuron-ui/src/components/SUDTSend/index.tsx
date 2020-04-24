@@ -208,6 +208,15 @@ const SUDTSend = () => {
     accountInfo,
   ])
 
+  useEffect(() => {
+    if (sendState.sendAll && experimental?.tx?.sudtInfo?.amount && accountInfo?.decimal) {
+      dispatch({
+        type: Fields.Amount,
+        payload: sudtValueToAmount(experimental.tx.sudtInfo.amount, accountInfo.decimal),
+      })
+    }
+  }, [sendState.sendAll, experimental, accountInfo])
+
   const onInput = useCallback(
     e => {
       const {
@@ -297,7 +306,12 @@ const SUDTSend = () => {
               )
             })}
             <div className={styles.sendAll}>
-              <Button type="primary" label="Max" onClick={onToggleSendingAll} disabled={!sendState.address} />
+              <Button
+                type="primary"
+                label="Max"
+                onClick={onToggleSendingAll}
+                disabled={!sendState.address || !!errors.address}
+              />
             </div>
             <div className={styles.fee}>
               <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} />
