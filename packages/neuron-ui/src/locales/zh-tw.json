@@ -15,7 +15,6 @@
       "send": "轉帳",
       "receive": "收款",
       "history": "交易歷史",
-      "addresses": "地址管理",
       "settings": "設定",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定義資產",
@@ -124,6 +123,8 @@
       "release-on": "鎖定至"
     },
     "receive": {
+      "title": "收款",
+      "address-book": "地址簿",
       "click-to-copy": "點擊複製地址",
       "address-not-found": "未找到地址",
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址管理頁面。",
@@ -182,6 +183,7 @@
       "cell-from-cellbase": "來自 Cellbase"
     },
     "addresses": {
+      "title": "地址簿",
       "addresses": "地址",
       "type": "類型",
       "address": "地址",
