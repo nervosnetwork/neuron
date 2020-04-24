@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
+import Breadcrum from 'widgets/Breadcrum'
 
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { openExternal, openContextMenu } from 'services/remote'
@@ -26,6 +27,7 @@ const Addresses = () => {
   const history = useHistory()
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const breakcrum = [{ label: t('navbar.receive'), link: Routes.Receive }]
 
   useEffect(() => {
     backToTop()
@@ -73,71 +75,75 @@ const Addresses = () => {
 
   return (
     <div className={styles.container}>
-      <table className={styles.addressList}>
-        <thead>
-          <tr>
-            {['type', 'address', 'description', 'balance', 'transactions'].map(field => (
-              <th key={field}>{t(`addresses.${field}`)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {addresses.map(addr => {
-            const isSelected = localDescription.key === addr.address
-            const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
-            return (
-              <tr key={addr.address} onContextMenu={onContextMenu(addr)}>
-                <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
-                  {typeLabel}
-                </td>
-                <td className={`${styles.address} monospacedFont`}>
-                  <div data-address={addr.address}>
-                    <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
-                    <span className={styles.ellipsis}>...</span>
-                    <span>{addr.address.slice(-6)}</span>
-                  </div>
-                </td>
-                <td title={addr.description} className={styles.description}>
-                  <TextField
-                    field="description"
-                    data-description-key={addr.address}
-                    data-description-value={addr.description}
-                    title={addr.description}
-                    value={isSelected ? localDescription.description : addr.description || ''}
-                    onBlur={isSelected ? onDescriptionFieldBlur : undefined}
-                    onKeyPress={isSelected ? onDescriptionPress : undefined}
-                    onChange={isSelected ? onDescriptionChange : undefined}
-                    readOnly={!isSelected}
-                    onDoubleClick={onDescriptionSelected}
-                    className={styles.descriptionField}
-                    suffix={
-                      isSelected ? (
-                        undefined
-                      ) : (
-                        <button
-                          type="button"
-                          data-description-key={addr.address}
-                          data-description-value={addr.description}
-                          onClick={onDescriptionSelected}
-                          className={styles.editBtn}
-                        >
-                          <Edit size="0.875rem" />
-                        </button>
-                      )
-                    }
-                  />
-                </td>
-                <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
-                  <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
-                </td>
-                <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
-                  {localNumberFormatter(addr.txCount)}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <Breadcrum pages={breakcrum} />
+      <div className={styles.title}>{t('addresses.title')}</div>
+      <div className={styles.tableContainer}>
+        <table className={styles.addressList}>
+          <thead>
+            <tr>
+              {['type', 'address', 'description', 'balance', 'transactions'].map(field => (
+                <th key={field}>{t(`addresses.${field}`)}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {addresses.map(addr => {
+              const isSelected = localDescription.key === addr.address
+              const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
+              return (
+                <tr key={addr.address} onContextMenu={onContextMenu(addr)}>
+                  <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
+                    {typeLabel}
+                  </td>
+                  <td className={`${styles.address} monospacedFont`}>
+                    <div data-address={addr.address}>
+                      <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                      <span className={styles.ellipsis}>...</span>
+                      <span>{addr.address.slice(-6)}</span>
+                    </div>
+                  </td>
+                  <td title={addr.description} className={styles.description}>
+                    <TextField
+                      field="description"
+                      data-description-key={addr.address}
+                      data-description-value={addr.description}
+                      title={addr.description}
+                      value={isSelected ? localDescription.description : addr.description || ''}
+                      onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                      onKeyPress={isSelected ? onDescriptionPress : undefined}
+                      onChange={isSelected ? onDescriptionChange : undefined}
+                      readOnly={!isSelected}
+                      onDoubleClick={onDescriptionSelected}
+                      className={styles.descriptionField}
+                      suffix={
+                        isSelected ? (
+                          undefined
+                        ) : (
+                          <button
+                            type="button"
+                            data-description-key={addr.address}
+                            data-description-value={addr.description}
+                            onClick={onDescriptionSelected}
+                            className={styles.editBtn}
+                          >
+                            <Edit size="0.875rem" />
+                          </button>
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
+                    <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
+                  </td>
+                  <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
+                    {localNumberFormatter(addr.txCount)}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

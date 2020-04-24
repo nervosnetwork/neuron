@@ -15,7 +15,6 @@
       "send": "Send",
       "receive": "Receive",
       "history": "History",
-      "addresses": "Addresses",
       "settings": "Settings",
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
@@ -124,6 +123,8 @@
       "release-on": "Release on"
     },
     "receive": {
+      "title": "Receive",
+      "address-book": "Address Book",
       "click-to-copy": "Click to copy the address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
@@ -182,13 +183,14 @@
       "cell-from-cellbase": "From cellbase"
     },
     "addresses": {
+      "title": "Address Book",
       "addresses": "Addresses",
       "type": "Type",
       "address": "Address",
       "identifier": "Identifier",
       "description": "Description",
       "balance": "Balance",
-      "transactions": "Transactions",
+      "transactions": "TXs",
       "receiving-address": "Receiving",
       "change-address": "Change",
       "copy-address": "Copy Address",
