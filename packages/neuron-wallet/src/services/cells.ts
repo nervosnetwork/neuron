@@ -563,7 +563,7 @@ export default class CellsService {
     const inputOriginCells: LiveCell[] = []
     let inputCapacities: bigint = BigInt(0)
     let totalSize: number = baseSize
-    anyoneCanPayLockLiveCells.every(cell => {
+    anyoneCanPayLockLiveCells.forEach(cell => {
       const input: Input = new Input(
         cell.outPoint(),
         '0',
@@ -584,8 +584,6 @@ export default class CellsService {
       totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
-
-      return true
     })
 
     const capacityInt: bigint = inputCapacities - needFee
