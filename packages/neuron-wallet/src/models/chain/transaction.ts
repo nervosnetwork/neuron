@@ -23,7 +23,7 @@ interface SudtTokenInfo {
 }
 
 export interface SudtInfo {
-  sUD?: SudtTokenInfo
+  sUDT?: SudtTokenInfo
   amount: string
 }
 
