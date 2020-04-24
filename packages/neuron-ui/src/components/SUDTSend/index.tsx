@@ -90,6 +90,7 @@ const SUDTSend = () => {
   > | null>(null)
 
   const isMainnet = isMainnetUtil(networks, networkID)
+  const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)} CKB` : '0 CKB'
 
   useEffect(() => {
     if (accountId && walletId) {
@@ -189,7 +190,6 @@ const SUDTSend = () => {
     generator(params)
       .then(res => {
         if (res.status === 1) {
-          // TODO: set the fee
           globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx: res.result } })
           return
         }
@@ -260,8 +260,6 @@ const SUDTSend = () => {
     )
   }
 
-  console.info(remoteError)
-
   return (
     <div>
       <div className={styles.breadcrum}>
@@ -302,11 +300,7 @@ const SUDTSend = () => {
               <Button type="primary" label="Max" onClick={onToggleSendingAll} disabled={!sendState.address} />
             </div>
             <div className={styles.fee}>
-              <TransactionFeePanel
-                fee={shannonToCKBFormatter('100')} // todo
-                price={sendState.price}
-                onPriceChange={onPriceChange}
-              />
+              <TransactionFeePanel fee={fee} price={sendState.price} onPriceChange={onPriceChange} />
             </div>
             <div className={styles.description}>
               <TextField
