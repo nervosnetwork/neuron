@@ -479,6 +479,7 @@
       "address-not-found": "當前錢包地址列表中不包含輸入地址，請檢查錢包設置或等待同步完成。"
     },
     "special-assets": {
+      "title": "自定義資產",
       "date": "日期",
       "capacity": "金额",
       "type-script-tooltip": "Type Script",
@@ -495,6 +496,7 @@
     },
     "s-udt": {
       "account-list": {
+        "title": "資產賬戶",
         "no-asset-accounts": "尚未檢索到您持有的 sUDT 資產",
         "search": "賬戶名稱, Token 名稱或 Symbol",
         "syncing": "正在同步, 當前數據可能不準確",
@@ -515,9 +517,12 @@
         "confirm": "確認",
         "cancel": "取消",
         "next": "下一步",
-        "back": "上一步"
+        "back": "上一步",
+        "occupy-142-ckb": "佔用 142 CKBytes",
+        "occupy-61-ckb": "佔用 61 CKBytes"
       },
       "send": {
+        "title": "發起交易",
         "address": "地址",
         "amount": "金額",
         "description": "備註",

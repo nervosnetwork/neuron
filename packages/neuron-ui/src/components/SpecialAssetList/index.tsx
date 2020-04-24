@@ -2,12 +2,12 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
-import ExperimentalIcon from 'widgets/Icons/Experimental.png'
 import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
 import { PAGE_SIZE, Routes, PRESET_SCRIPT, MEDIUM_FEE_RATE } from 'utils/const'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { AppActions } from 'states/stateProvider/reducer'
 import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
+import Experimental from 'widgets/ExperimentalRibbon'
 import isMainnetUtil from 'utils/isMainnet'
 import { queryParsers, epochParser } from 'utils/parsers'
 import { ckbCore } from 'services/chain'
@@ -198,10 +198,8 @@ const SpecialAssetList = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.experimental}>
-        <img src={ExperimentalIcon} alt="experimental" />
-        <span className={styles.text}>{t('special-assets.experimental')}</span>
-      </div>
+      <Experimental tag="customized-assset" />
+      <div className={styles.title}>{t('special-assets.title')}</div>
       {totalCount ? (
         <div className={styles.listContainer}>
           <div className={styles.listHeader}>

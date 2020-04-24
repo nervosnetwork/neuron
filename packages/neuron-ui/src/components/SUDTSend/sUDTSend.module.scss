@@ -9,8 +9,7 @@
 }
 
 .title {
-  font-size: 1.375rem;
-  font-weight: 700;
+  @include viewTitle;
 }
 
 .info {

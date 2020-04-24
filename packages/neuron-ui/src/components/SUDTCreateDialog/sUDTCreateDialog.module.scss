@@ -11,7 +11,7 @@
   justify-content: center;
   align-items: center;
 
-  form>div {
+  form > div {
     margin-bottom: 10px;
 
     input:disabled {
@@ -19,11 +19,10 @@
       color: #666;
       border-color: transparent !important;
     }
-
   }
 
   .ckbField {
-    &>div {
+    & > div {
       border-color: transparent;
     }
   }
@@ -56,10 +55,8 @@
       }
 
       &:hover {
-
         g,
         path {
-
           stroke: var(--nervos-green);
           fill: var(--nervos-green);
         }
@@ -79,5 +76,16 @@
 .accountTypes {
   label {
     pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.capacityRequired {
+  color: #666;
+  font-size: 0.6875rem;
+  margin-left: 5px;
+  &:before {
+    content: '*';
   }
 }

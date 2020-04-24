@@ -1,30 +1,9 @@
 @import '../../styles/mixin.scss';
 
 .container {
-
-  .experimental {
-    padding: 3px 0 19px;
-    margin-right: -30px;
-    display: flex;
-    justify-content: flex-end;
-
-    position: relative;
-
-    img {
-      height: 26px;
-    }
-
-    .text {
-      position: absolute;
-      top: 3px;
-      right: 0;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      height: 26px;
-      width: 100px;
-      font-size: 0.625rem;
-    }
+  .title {
+    @include viewTitle;
+    margin-bottom: 20px;
   }
 
   .listContainer {
@@ -41,10 +20,9 @@
       letter-spacing: 0.7px;
       border-bottom: 1px solid #b3b3b3;
 
-      &>span {
+      & > span {
         flex-basis: 135px;
       }
-
     }
   }
 
@@ -53,11 +31,10 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    justify-content: flex-end
+    justify-content: flex-end;
   }
 }
 
 .noItems {
   @include MediumText;
-  padding: 20px 13px;
 }
