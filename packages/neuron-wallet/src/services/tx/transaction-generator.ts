@@ -550,7 +550,7 @@ public static generateSendingAllTx = async (
     defaultLockHashes: string[],
     anyoneCanPayLockHashes: string[],
     targetOutput: Output,
-    capacity: string,
+    capacity: 'all' | string,
     changeBlake160: string,
     feeRate: string = '0',
     fee: string = '0',
@@ -558,7 +558,7 @@ public static generateSendingAllTx = async (
     const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
-    const needCapacities: bigint = BigInt(targetOutput.capacity) + BigInt(capacity)
+    const needCapacities: bigint = capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
     const output = Output.fromObject({
       ...targetOutput,
       capacity: needCapacities.toString(),
@@ -581,17 +581,29 @@ public static generateSendingAllTx = async (
     })
 
     const baseSize: number = TransactionSize.tx(tx)
-    const result = await CellsService.gatherAnyoneCanPayCKBInputs(
-      capacity,
-      defaultLockHashes,
-      anyoneCanPayLockHashes,
-      changeBlake160,
-      fee,
-      feeRate,
-      baseSize,
-      TransactionGenerator.CHANGE_OUTPUT_SIZE,
-      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
-    )
+    const result = await (capacity === 'all' ?
+      CellsService.gatherAnyoneCanPaySendAllCKBInputs(
+        anyoneCanPayLockHashes,
+        fee,
+        feeRate,
+        baseSize,
+      ) :
+      CellsService.gatherAnyoneCanPayCKBInputs(
+        capacity,
+        defaultLockHashes,
+        anyoneCanPayLockHashes,
+        changeBlake160,
+        fee,
+        feeRate,
+        baseSize,
+        TransactionGenerator.CHANGE_OUTPUT_SIZE,
+        TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      ))
+
+    if (capacity === 'all') {
+      tx.outputs[0].capacity = (BigInt(result.sendCapacity) + BigInt(targetOutput.capacity)).toString()
+    }
+
     tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
     tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
     if (result.changeOutput) {
@@ -604,11 +616,12 @@ public static generateSendingAllTx = async (
   }
 
   // anyone-can-pay lock, sUDT
+  // amount: 'all' or integer
   public static async generateAnyoneCanPayToSudtTx(
     defaultLockHashes: string[],
     anyoneCanPayLockHashes: string[],
     targetOutput: Output,
-    amount: string,
+    amount: 'all' | string,
     changeBlake160: string,
     feeRate: string = '0',
     fee: string = '0',
@@ -617,7 +630,7 @@ public static generateSendingAllTx = async (
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
-    const targetAmount: bigint = BufferUtils.readBigUInt128LE(targetOutput.data) + BigInt(amount)
+    const targetAmount: bigint = amount === 'all' ? BigInt(0) : BufferUtils.readBigUInt128LE(targetOutput.data) + BigInt(amount)
     const output = Output.fromObject({
       ...targetOutput,
       data: BufferUtils.writeBigUInt128LE(targetAmount),
@@ -652,6 +665,11 @@ public static generateSendingAllTx = async (
       TransactionGenerator.CHANGE_OUTPUT_SIZE,
       TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
     )
+
+    if (amount === 'all') {
+      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(result.amount) + BufferUtils.readBigUInt128LE(targetOutput.data))
+    }
+
     tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
     tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
     if (result.changeOutput) {
