@@ -1,4 +1,4 @@
-import { app as electronApp, remote } from 'electron'
+import env from 'env'
 import path from 'path'
 import fs from 'fs'
 import { ChildProcess, spawn } from 'child_process'
@@ -17,7 +17,7 @@ const platform = (): string => {
   }
 }
 
-const app = electronApp || remote.app
+const { app } = env
 let ckb: ChildProcess | null = null
 
 const ckbPath = (): string => {
