@@ -158,7 +158,7 @@ export default class NetworksController {
     await this.connectToNetwork()
 
     if (!env.isTestMode) {
-      NodeService.getInstance().tryStartNodeOnConnection()
+      NodeService.getInstance().tryStartNodeOnDefaultURI()
     }
 
     return {

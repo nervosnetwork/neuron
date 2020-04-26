@@ -127,7 +127,7 @@ class NodeService {
       )
   }
 
-  public async tryStartNodeOnConnection(): Promise<boolean> {
+  public async tryStartNodeOnDefaultURI(): Promise<boolean> {
     let network = NetworksService.getInstance().getCurrent()
     if (network.remote !== BUNDLED_CKB_URL) {
       return false
