@@ -3,6 +3,7 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import { NetworkType, Network } from 'models/network'
 import NetworksService from 'services/networks'
 import NodeService from 'services/node'
+import env from 'env'
 import { ResponseCode } from 'utils/const'
 import { IsRequired, InvalidName, NetworkNotFound, CurrentNetworkNotSet } from 'exceptions'
 import { switchToNetwork } from 'block-sync-renderer'
@@ -155,6 +156,10 @@ export default class NetworksController {
     this.notifyListChange()
     this.notifyCurrentNetworkChange()
     await this.connectToNetwork()
+
+    if (!env.isTestMode) {
+      NodeService.getInstance().tryStartNodeOnConnection()
+    }
 
     return {
       status: ResponseCode.Success,
