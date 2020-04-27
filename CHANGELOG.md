@@ -21,10 +21,6 @@ We added several new features with this version:
 * Optimized the status warning message when launch.
 * Added operation system info in the Debug info.
 
-### Electron
-
-We updated Electron to 7.2.1.
-
 
 # 0.29.0 (2020-03-31)
 
