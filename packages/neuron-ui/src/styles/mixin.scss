@@ -1,22 +1,22 @@
 // font
 @mixin BoldText {
-  font-family: "Montserrat-Bold", "SourceHanSansCN-Bold";
+  font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+  font-weight: 900;
 }
 
 @mixin SemiBoldText {
-  font-family: "Montserrat-SemiBold", "SourceHanSansCN-Medium";
+  font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+  font-weight: 700;
 }
 
 @mixin MediumText {
-  font-family: "Montserrat-Medium", "SourceHanSansCN-Medium";
+  font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+  font-weight: 500;
 }
 
 @mixin RegularText {
-  font-family: "Montserrat-Regular", "SourceHanSansCN-Regular";
-}
-
-@mixin MonoText {
-  font-family: "SourceCodePro-Regular", monospace;
+  font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
+  font-weight: 400;
 }
 
 // layout
@@ -83,7 +83,7 @@
 @mixin descriptionField {
   display: flex;
 
-  &>div {
+  & > div {
     border-color: transparent !important;
 
     input::-webkit-input-placeholder {
@@ -92,11 +92,11 @@
     }
   }
 
-  &:hover>div {
+  &:hover > div {
     border-color: #b3b3b3 !important;
   }
 
-  &:focus-within>div {
+  &:focus-within > div {
     border-color: #333 !important;
   }
 }

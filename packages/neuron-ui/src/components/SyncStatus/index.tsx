@@ -11,12 +11,12 @@ const SyncStatus = ({
 }>) => {
   const [t] = useTranslation()
 
-  if (connectionStatus === ConnectionStatus.Offline) {
-    return <span style={{ color: 'red' }}>{t('sync.sync-failed')}</span>
+  if (ConnectionStatus.Connecting === connectionStatus) {
+    return <span>{t('navbar.connecting')}</span>
   }
 
-  if (SyncStatusEnum.FailToFetchTipBlock === syncStatus) {
-    return <span>{t('navbar.fail-to-fetch-tip-block-number')}</span>
+  if (connectionStatus === ConnectionStatus.Offline) {
+    return <span style={{ color: 'red' }}>{t('sync.sync-failed')}</span>
   }
 
   if (SyncStatusEnum.SyncNotStart === syncStatus) {

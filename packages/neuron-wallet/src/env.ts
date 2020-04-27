@@ -2,14 +2,15 @@ import { app as electronApp, remote } from 'electron'
 import os from 'os'
 import * as path from 'path'
 
-const app = electronApp || (remote && remote.app) || {
+const app = electronApp ?? (remote?.app) ?? {
   getPath(aPath: string): string {
     return path.join(os.tmpdir(), aPath)
   },
+  getApppath: () => os.tmpdir(),
   name: 'Fake App',
   getLocale(): string {
     return 'en'
-  }
+  },
 }
 
 const isTestMode = process.env.NODE_ENV === 'test'
@@ -26,6 +27,7 @@ const fileBase = (() => {
 })()
 
 const env = {
+  app,
   isDevMode,
   isTestMode,
   fileBasePath: path.resolve(app.getPath('userData'), fileBase),

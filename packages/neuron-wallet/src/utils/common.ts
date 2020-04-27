@@ -18,4 +18,13 @@ export default class CommonUtils {
     }
     return callback()
   }
+
+  public static timeout<T>(time: number, promise: Promise<T>, value: T): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((resolve, _) => {
+        setTimeout(() => resolve(value), time)
+      })
+    ])
+  }
 }

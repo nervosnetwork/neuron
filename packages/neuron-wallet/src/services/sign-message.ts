@@ -5,8 +5,8 @@ import Keychain from "models/keys/keychain"
 import Blake2b from "models/blake2b"
 import ECPair from "@nervosnetwork/ckb-sdk-utils/lib/ecpair"
 import { ec as EC } from 'elliptic'
-import LockUtils from "models/lock-utils"
 import { AddressNotFound } from "exceptions"
+import AddressParser from "models/address-parser"
 
 export default class SignMessage {
   static GENERATE_COUNT = 100
@@ -55,7 +55,7 @@ export default class SignMessage {
     const msgBuffer = Buffer.from(digest.slice(2), 'hex')
     const publicKey = '0x' + this.ec.recoverPubKey(msgBuffer, options, options.recoveryParam).encode('hex', true)
 
-    const recoverBlake160 = LockUtils.addressToBlake160(address)
+    const recoverBlake160 = AddressParser.toBlake160(address)
 
     return Blake2b.digest(publicKey).slice(0, 42) === recoverBlake160
   }

@@ -5,7 +5,7 @@
   appearance: none;
   min-width: 5.125rem;
   font-size: 0.75rem;
-  line-height: 0.9375rem;
+  line-height: 1rem;
   font-weight: 500;
   letter-spacing: 0.6px;
   padding: 7px 7px;
@@ -24,7 +24,7 @@
     }
   }
 
-  &[data-type="cancel"] {
+  &[data-type='cancel'] {
     background-color: #e3e3e3;
     color: #000;
 
@@ -36,8 +36,8 @@
 
   &[data-type='primary'],
   &[data-type='ok'],
-  &[data-type="submit"],
-  &[data-type="confirm"] {
+  &[data-type='submit'],
+  &[data-type='confirm'] {
     background-color: var(--nervos-green);
     color: #fff;
 
@@ -54,10 +54,8 @@
 
   &[disabled] {
     border: none !important;
-    font-family: "Montserrat-Medium", "SourceHanSansCN-Medium" !important;
-    background-color: rgb(243, 242, 241) !important;
-    color: rgb(161, 159, 157) !important;
+    opacity: 0.5;
     box-shadow: none !important;
+    pointer-events: none;
   }
-
 }

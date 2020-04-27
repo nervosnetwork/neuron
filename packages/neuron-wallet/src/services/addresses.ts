@@ -1,10 +1,10 @@
 import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils'
 import { AccountExtendedPublicKey, DefaultAddressNumber } from 'models/keys/key'
 import Address, { AddressType } from 'models/keys/address'
-import LockUtils from 'models/lock-utils'
 import AddressDao, { Address as AddressInterface, AddressVersion } from 'database/address/address-dao'
 import AddressCreatedSubject from 'models/subjects/address-created-subject'
 import NetworksService from 'services/networks'
+import AddressParser from 'models/address-parser'
 
 const MAX_ADDRESS_COUNT = 100
 
@@ -37,26 +37,29 @@ export default class AddressService {
       changeAddressCount
     )
     const allAddresses: AddressInterface[] = [
-      ...addresses.testnetReceiving,
       ...addresses.mainnetReceiving,
-      ...addresses.testnetChange,
       ...addresses.mainnetChange,
+      ...addresses.testnetReceiving,
+      ...addresses.testnetChange,
     ]
     AddressDao.create(allAddresses)
 
-    // TODO: notify address created and pass addressWay
     AddressService.notifyAddressCreated(allAddresses, isImporting)
   }
 
   private static notifyAddressCreated = (addresses: AddressInterface[], isImporting: boolean | undefined) => {
-    const addrs = addresses
-      .filter(addr => addr.version ===  AddressService.getAddressVersion())
-      .map(addr => {
-        const address = addr
-        address.isImporting = isImporting
-        return address
-      })
-    AddressCreatedSubject.getSubject().next(addrs)
+    const versionFilter = ((a: AddressInterface) => { return a.version === AddressService.getAddressVersion() })
+
+    // If first receiving address already exists in other wallets, treat as none importing.
+    // This assumes addresses.first is the actual first address.
+    const firstAddress = addresses.filter(versionFilter)[0]
+    const alreadyExist = AddressDao.findByAddresses([firstAddress.address]).length > 1
+    const importing = isImporting && !alreadyExist
+
+    const addressesToNotify = addresses
+      .filter(versionFilter)
+      .map(address => { return { ...address, isImporting: importing } })
+    AddressCreatedSubject.getSubject().next(addressesToNotify)
   }
 
   public static checkAndGenerateSave(
@@ -158,7 +161,7 @@ export default class AddressService {
     ).address
 
     const addressToParse = NetworksService.getInstance().isMainnet() ? mainnetAddress : testnetAddress
-    const blake160: string = LockUtils.addressToBlake160(addressToParse)
+    const blake160: string = AddressParser.toBlake160(addressToParse)
 
     const testnetAddressInfo: AddressInterface = {
       walletId: addressMetaInfo.walletId,
@@ -212,9 +215,8 @@ export default class AddressService {
   }
 
   public static allLockHashes(): string[] {
-    const lockUtils = new LockUtils()
     const addresses = AddressService.allAddresses().map(address => address.address)
-    return lockUtils.addressesToAllLockHashes(addresses)
+    return AddressParser.batchToLockHash(addresses)
   }
 
   public static usedAddresses = (walletId: string): AddressInterface[] => {

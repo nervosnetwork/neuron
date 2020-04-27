@@ -26,6 +26,7 @@ import {
   MAX_DECIMAL_DIGITS,
   MAINNET_TAG,
   SyncStatus,
+  SyncStatusThatBalanceUpdating,
   ConnectionStatus,
   SINCE_FIELD_SIZE,
 } from 'utils/const'
@@ -164,7 +165,7 @@ const Send = () => {
         {t('sync.sync-not-start')}
       </span>
     )
-  } else if ([SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus)) {
+  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 

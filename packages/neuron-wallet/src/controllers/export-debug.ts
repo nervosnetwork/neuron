@@ -1,3 +1,4 @@
+import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import archiver from 'archiver'
@@ -60,6 +61,8 @@ export default class ExportDebugController {
         .then(n => BigInt(n).toString())
         .catch(() => '')
     ])
+    const { platform, arch } = process
+    const release = os.release()
     const status = {
       neuron: {
         version: neuronVersion,
@@ -69,6 +72,11 @@ export default class ExportDebugController {
         url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : 'http://****:port',
         version: ckbVersion,
         blockNumber: tipBlockNumber
+      },
+      client: {
+        platform,
+        arch,
+        release,
       }
     }
     this.archive.append(JSON.stringify(status), {

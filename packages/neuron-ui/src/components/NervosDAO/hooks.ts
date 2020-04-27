@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
-import { verifyAmount } from 'utils/validators'
-import { epochParser } from 'utils/parsers'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import calculateAPC from 'utils/calculateAPC'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
+
+import { verifyAmount } from 'utils/validators'
+import calculateAPC from 'utils/calculateAPC'
 
 import { CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import {
@@ -28,6 +27,10 @@ import {
 import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 
 let timer: NodeJS.Timeout
+
+const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
+  return depositOutPoint ? `${depositOutPoint.txHash}-${depositOutPoint.index}` : `${outPoint.txHash}-${outPoint.index}`
+}
 
 export const useUpdateMaxDeposit = ({
   wallet,
@@ -79,6 +82,9 @@ export const useInitData = ({
 }) =>
   useEffect(() => {
     updateNervosDaoData({ walletID: wallet.id })(dispatch)
+    const intervalId = setInterval(() => {
+      updateNervosDaoData({ walletID: wallet.id })(dispatch)
+    }, 3000)
     updateDepositValue(
       `${
         BigInt(wallet.balance) > BigInt(CKBToShannonFormatter(`${MIN_DEPOSIT_AMOUNT}`))
@@ -90,6 +96,7 @@ export const useInitData = ({
       .then(header => setGenesisBlockTimestamp(+header.timestamp))
       .catch(err => console.error(err))
     return () => {
+      clearInterval(intervalId)
       clearNervosDaoData()(dispatch)
       clearGeneratedTx()
     }
@@ -224,35 +231,6 @@ export const useUpdateGlobalAPC = ({
     }
   }, [tipBlockTimestamp, genesisBlockTimestamp, setGlobalAPC])
 
-export const useCompensationPeriods = ({
-  depositEpochList,
-  currentEpoch,
-}: {
-  depositEpochList: (string | null)[]
-  currentEpoch: string
-}) =>
-  useMemo(() => {
-    return depositEpochList.map(depositEpoch => {
-      if (!depositEpoch) {
-        return null
-      }
-      try {
-        const depositEpochInfo = epochParser(depositEpoch)
-        const currentEpochInfo = epochParser(currentEpoch)
-        const targetEpochValue = calculateClaimEpochValue(depositEpochInfo, currentEpochInfo)
-        return {
-          depositEpochValue:
-            Number(depositEpochInfo.number) + Number(depositEpochInfo.index) / Number(depositEpochInfo.length),
-          targetEpochValue,
-          currentEpochValue:
-            Number(currentEpochInfo.number) + Number(currentEpochInfo.index) / Number(currentEpochInfo.length),
-        }
-      } catch {
-        return null
-      }
-    })
-  }, [depositEpochList, currentEpoch])
-
 export const useOnDepositDialogDismiss = ({
   setShowDepositDialog,
   setDepositValue,
@@ -348,22 +326,6 @@ export const useOnWithdrawDialogSubmit = ({
     setActiveRecord(null)
   }, [activeRecord, setActiveRecord, clearGeneratedTx, walletID, dispatch])
 
-export const useOnCompensationPeriodExplanationClick = (setBlockHash: React.Dispatch<React.SetStateAction<string>>) =>
-  useCallback(
-    (e: React.SyntheticEvent<HTMLSpanElement, MouseEvent>) => {
-      const { dataset } = e.target as HTMLSpanElement
-      if (dataset.blockHash) {
-        setBlockHash(dataset.blockHash)
-      }
-    },
-    [setBlockHash]
-  )
-
-export const useOnCompensationPeriodDialogDismiss = (setBlockHash: React.Dispatch<''>) =>
-  useCallback(() => {
-    setBlockHash('')
-  }, [setBlockHash])
-
 export const useOnActionClick = ({
   records,
   clearGeneratedTx,
@@ -454,7 +416,7 @@ export const useUpdateWithdrawList = ({
 }: {
   records: Readonly<State.NervosDAORecord[]>
   tipBlockHash: string
-  setWithdrawList: React.Dispatch<React.SetStateAction<(string | null)[]>>
+  setWithdrawList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
 }) =>
   useEffect(() => {
     Promise.all(
@@ -476,7 +438,14 @@ export const useUpdateWithdrawList = ({
       })
     )
       .then(res => {
-        setWithdrawList(res)
+        const withdrawList = new Map()
+        if (tipBlockHash) {
+          records.forEach((record, idx) => {
+            const key = getRecordKey(record)
+            withdrawList.set(key, res[idx])
+          })
+        }
+        setWithdrawList(withdrawList)
       })
       .catch(console.error)
   }, [records, tipBlockHash, setWithdrawList])
@@ -487,7 +456,7 @@ export const useUpdateDepositEpochList = ({
   connectionStatus,
 }: {
   records: Readonly<State.NervosDAORecord[]>
-  setDepositEpochList: React.Dispatch<React.SetStateAction<(string | null)[]>>
+  setDepositEpochList: React.Dispatch<React.SetStateAction<Map<string, string | null>>>
   connectionStatus: State.ConnectionStatus
 }) =>
   useEffect(() => {
@@ -495,11 +464,21 @@ export const useUpdateDepositEpochList = ({
       Promise.all(
         records.map(({ daoData, depositOutPoint, blockNumber }) => {
           const depositBlockNumber = depositOutPoint ? ckbCore.utils.toHexInLittleEndian(daoData) : blockNumber
+          if (!depositBlockNumber) {
+            return null
+          }
           return getHeaderByNumber(BigInt(depositBlockNumber))
             .then(header => header.epoch)
             .catch(() => null)
         })
-      ).then(epochsList => setDepositEpochList(epochsList))
+      ).then(res => {
+        const epochList = new Map()
+        records.forEach((record, idx) => {
+          const key = getRecordKey(record)
+          epochList.set(key, res[idx])
+        })
+        setDepositEpochList(epochList)
+      })
     }
   }, [records, setDepositEpochList, connectionStatus])
 
@@ -510,13 +489,10 @@ export default {
   useClearGeneratedTx,
   useUpdateDepositValue,
   useOnDepositValueChange,
-  useCompensationPeriods,
   useOnDepositDialogDismiss,
   useOnDepositDialogSubmit,
   useOnWithdrawDialogDismiss,
   useOnWithdrawDialogSubmit,
-  useOnCompensationPeriodExplanationClick,
-  useOnCompensationPeriodDialogDismiss,
   useOnActionClick,
   useOnSlide,
   useUpdateWithdrawList,

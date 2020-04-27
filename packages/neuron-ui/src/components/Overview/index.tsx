@@ -11,7 +11,14 @@ import { updateTransactionList } from 'states/stateProvider/actionCreators'
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
-import { SyncStatus as SyncStatusEnum, ConnectionStatus, PAGE_SIZE, Routes, CONFIRMATION_THRESHOLD } from 'utils/const'
+import {
+  SyncStatus as SyncStatusEnum,
+  SyncStatusThatBalanceUpdating,
+  ConnectionStatus,
+  PAGE_SIZE,
+  Routes,
+  CONFIRMATION_THRESHOLD,
+} from 'utils/const'
 import { backToTop } from 'utils/animations'
 import styles from './overview.module.scss'
 
@@ -86,7 +93,9 @@ const Overview = () => {
   const balanceProperties: Property[] = useMemo(() => {
     const balanceValue = shannonToCKBFormatter(balance)
     let prompt = null
-    if (ConnectionStatus.Offline === connectionStatus) {
+    if (ConnectionStatus.Connecting === connectionStatus) {
+      prompt = <span className={styles.balancePrompt}>{t('sync.connecting')}</span>
+    } else if (ConnectionStatus.Offline === connectionStatus) {
       prompt = (
         <span className={styles.balancePrompt} style={{ color: 'red' }}>
           {t('sync.sync-failed')}
@@ -98,7 +107,7 @@ const Overview = () => {
           {t('sync.sync-not-start')}
         </span>
       )
-    } else if ([SyncStatusEnum.Syncing, SyncStatusEnum.SyncPending].includes(syncStatus)) {
+    } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
       prompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
     }
     return [

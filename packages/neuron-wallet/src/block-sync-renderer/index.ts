@@ -21,9 +21,10 @@ const updateAllAddressesTxCount = async () => {
 }
 
 AddressCreatedSubject.getSubject().subscribe(async (addresses: Address[]) => {
-  const hasUsedAddresses = addresses.some(address => address.isImporting === true)
+  // Force rescan when address is imported and there's no previous records (from existing identical wallet)
+  const shouldRescan = addresses.some(address => address.isImporting === true)
   killBlockSyncTask()
-  await createBlockSyncTask(hasUsedAddresses)
+  await createBlockSyncTask(shouldRescan)
 })
 
 export const switchToNetwork = async (newNetwork: Network, reconnected = false, shouldSync = true) => {

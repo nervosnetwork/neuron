@@ -24,10 +24,6 @@ export default class AppController {
   }
 
   public start = async () => {
-    if (!env.isTestMode) {
-      await new NodeController().startNode()
-    }
-
     registerListeners()
 
     WalletsService.getInstance().generateAddressesIfNecessary()

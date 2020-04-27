@@ -1,0 +1,165 @@
+{
+  "depositing": {
+    "params": {
+      "status": "sent",
+      "currentEpoch": "",
+      "withdrawEpoch": "",
+      "depositEpoch": ""
+    },
+    "expected": "Depositing"
+  },
+  "deposited 3.9 epochs": {
+    "params": {
+      "status": "live",
+      "depositEpoch": "0xa000100030a",
+      "depositEpochValue": 778.1,
+      "currentEpoch": "0xa000000030e",
+      "currentEpochValue": 782,
+      "withdrawEpoch": ""
+    },
+    "expected": "ImmatureForWithdraw"
+  },
+  "deposited 4 epochs": {
+    "params": {
+      "status": "live",
+      "depositEpoch": "0xa000000030a",
+      "depositEpochValue": 778,
+      "currentEpoch": "0xa000000030e",
+      "currentEpochValue": 782,
+      "withdrawEpoch": ""
+    },
+    "expected": "Deposited"
+  },
+  "withdrawing": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "sent",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa000000030f",
+      "currentEpochValue": 783,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "Withdrawing"
+  },
+  "locked": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa000000030f",
+      "currentEpochValue": 783,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "Locked"
+  },
+  "locked at 180 epochs": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00000003b4",
+      "currentEpochValue": 948,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "Locked"
+  },
+  "immature for unlock at 180.1 epochs": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00010003b4",
+      "currentEpochValue": 948.1,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "ImmatureForUnlock"
+  },
+  "immature for unlock at 183.9 epochs": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00090003b7",
+      "currentEpochValue": 951.9,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "ImmatureForUnlock"
+  },
+  "unlockable": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "status": "live",
+      "depositEpoch": "0xa0000000300",
+      "depositEpochValue": 768,
+      "currentEpoch": "0xa00000003b8",
+      "currentEpochValue": 952,
+      "withdrawEpoch": "0xa0000000305",
+      "withdrawnEpochValue": 773
+    },
+    "expected": "Unlockable"
+  },
+  "unlocking": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "unlockInfo": {
+        "txHash": "unlock tx hash",
+        "timestamp": ""
+      },
+      "depositEpoch": "0xa000900030a",
+      "depositEpochValue": 778.9,
+      "currentEpoch": "0xa0009000476",
+      "currentEpochValue": 1142.9,
+      "status": "pending"
+    },
+    "expected": "Unlocking"
+  },
+  "unlocked": {
+    "params": {
+      "withdrawInfo": {
+        "txHash": "withdraw tx hash",
+        "timestamp": ""
+      },
+      "unlockInfo": {
+        "txHash": "unlock tx hash",
+        "timestamp": ""
+      },
+      "depositEpoch": "0xa000900030a",
+      "depositEpochValue": 778.9,
+      "currentEpoch": "0xa0009000476",
+      "currentEpochValue": 1142.9,
+      "status": "dead"
+    },
+    "expected": "Completed"
+  }
+}

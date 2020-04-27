@@ -3,6 +3,7 @@
 $error-red: #d50000;
 
 .textField {
+  @include RegularText;
   display: grid;
   grid-template:
     'label input'auto 'blank message'minmax(0.6875rem, auto) / auto 1fr;
@@ -12,7 +13,7 @@ $error-red: #d50000;
     label::after {
       display: inline;
       content: '*';
-      color: red;
+      padding-left: 5px;
     }
   }
 
@@ -23,20 +24,19 @@ $error-red: #d50000;
   }
 
   label {
-    @include MediumText;
     grid-area: label;
     font-size: 0.875rem;
     line-height: 1.125rem;
-    letter-spacing: 0.7px;
     color: #000000;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    font-family: inherit;
   }
 
   .input {
+    font-family: inherit;
     grid-area: input;
-    letter-spacing: 0.6px;
     color: #434343;
     border: solid 1px #000000;
     display: flex;
@@ -45,11 +45,11 @@ $error-red: #d50000;
     box-sizing: border-box;
 
     input {
-      @include RegularText;
-      font-size: 1rem;
+      font-family: inherit;
+      font-size: 0.75rem;
       flex: 1;
       border: none;
-      padding: 4.5px;
+      padding: 5px 10px;
       overflow: hidden;
       text-overflow: ellipsis;
       word-break: keep-all;
@@ -61,13 +61,13 @@ $error-red: #d50000;
 
 
     .suffix {
+      font-family: inherit;
       display: flex;
       justify-content: center;
       align-items: center;
       color: #434343;
-      letter-spacing: 0.6px;
       padding: 0 10px;
-      font-size: 1rem;
+      font-size: 0.75rem;
     }
 
     &:focus-within {
@@ -83,20 +83,18 @@ $error-red: #d50000;
 }
 
 .hint {
-  @include RegularText;
+  font-family: inherit;
   grid-area: message;
-  letter-spacing: 0.45px;
   font-size: 0.5625rem;
 }
 
 .errorMessage {
-  @include RegularText;
+  font-family: inherit;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
   grid-area: message;
   color: $error-red;
-  letter-spacing: 0.45px;
   font-size: 0.5625rem;
   line-height: 0.6875rem;
   word-break: break-all;
