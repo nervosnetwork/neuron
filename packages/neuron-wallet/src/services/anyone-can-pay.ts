@@ -19,7 +19,7 @@ export default class AnyoneCanPayService {
     fee: string = '0',
     description?: string,
   ): Promise<Transaction> {
-    const isCKB = !tokenID || tokenID === 'CKBytes' || tokenID === ''
+    const isCKB = !tokenID || tokenID === 'CKBytes'
 
     const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
     const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
