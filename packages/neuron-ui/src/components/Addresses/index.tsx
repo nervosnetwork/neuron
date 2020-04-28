@@ -90,7 +90,7 @@ const Addresses = () => {
                 <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
                   {typeLabel}
                 </td>
-                <td className={`${styles.address} monospacedFont`}>
+                <td className={styles.address}>
                   <div data-address={addr.address}>
                     <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
                     <span className={styles.ellipsis}>...</span>
