@@ -63,10 +63,6 @@ body {
   }
 }
 
-.monospacedFont {
-  font-family: monospace;
-}
-
 .ms-DetailsHeader-cell:hover {
   background-color: inherit;
 }
@@ -118,6 +114,7 @@ body {
     color: #000 !important;
   }
 }
+
 .ms-Toggle.is-checked .ms-Toggle-background {
   background: var(--nervos-green) !important;
 }

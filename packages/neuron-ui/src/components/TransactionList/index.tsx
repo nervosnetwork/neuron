@@ -200,7 +200,7 @@ const TransactionList = ({
               </div>
               <div title={tx.hash} className={styles.txHash}>
                 <span>{t('history.transaction-hash')}</span>
-                <div className="monospacedFont">
+                <div>
                   <span className={styles.hashOverflow}>{tx.hash.slice(0, -6)}</span>
                   <span className={styles.ellipsis}>...</span>
                   <span>{tx.hash.slice(-6)}</span>

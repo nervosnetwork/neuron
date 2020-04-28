@@ -145,7 +145,7 @@ const Transaction = () => {
         return (
           <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
-            <td title={address} className={`monospacedFont ${styles.addressCell}`}>
+            <td title={address} className={styles.addressCell}>
               {address}
             </td>
             <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
@@ -173,10 +173,10 @@ const Transaction = () => {
         {t('history.basic-information')}
       </h2>
       <div className={styles.infoDetail}>
-        {basicInfoItems.map(({ label, value }, idx) => (
+        {basicInfoItems.map(({ label, value }) => (
           <div key={label}>
             <span>{label}</span>
-            <span className={!idx ? 'monospacedFont' : ''}>{value}</span>
+            <span>{value}</span>
           </div>
         ))}
       </div>

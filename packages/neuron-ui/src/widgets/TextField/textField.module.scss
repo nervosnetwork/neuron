@@ -3,6 +3,7 @@
 $error-red: #d50000;
 
 .textField {
+  @include RegularText;
   display: grid;
   grid-template:
     'label input'auto 'blank message'minmax(0.6875rem, auto) / auto 1fr;
@@ -30,9 +31,11 @@ $error-red: #d50000;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    font-family: inherit;
   }
 
   .input {
+    font-family: inherit;
     grid-area: input;
     color: #434343;
     border: solid 1px #000000;
@@ -42,7 +45,7 @@ $error-red: #d50000;
     box-sizing: border-box;
 
     input {
-      @include RegularText;
+      font-family: inherit;
       font-size: 0.75rem;
       flex: 1;
       border: none;
@@ -58,6 +61,7 @@ $error-red: #d50000;
 
 
     .suffix {
+      font-family: inherit;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -79,13 +83,13 @@ $error-red: #d50000;
 }
 
 .hint {
-  @include RegularText;
+  font-family: inherit;
   grid-area: message;
   font-size: 0.5625rem;
 }
 
 .errorMessage {
-  @include RegularText;
+  font-family: inherit;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;

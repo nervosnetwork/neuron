@@ -8,8 +8,6 @@ import logger from 'utils/logger'
 import { subscribe } from './subscribe'
 import { register as registerListeners } from 'listeners/main'
 import WalletsService from 'services/wallets'
-import RpcService from 'services/rpc-service'
-import NetworksService from 'services/networks'
 import ApiController from 'controllers/api'
 import NodeController from 'controllers/node'
 import SyncApiController from 'controllers/sync-api'
@@ -26,17 +24,6 @@ export default class AppController {
   }
 
   public start = async () => {
-    if (!env.isTestMode) {
-      const rpcService = new RpcService(NetworksService.getInstance().defaultOne().remote)
-      const chain = await rpcService.getChain().catch(() => '')
-      if (chain === '') {
-        // Pinging default network fail; assume no external CKB is running.
-        await new NodeController().startNode()
-      } else {
-        logger.info('CKB:\texternal RPC detected, skip starting bundled CKB node.')
-      }
-    }
-
     registerListeners()
 
     WalletsService.getInstance().generateAddressesIfNecessary()

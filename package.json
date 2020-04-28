@@ -2,7 +2,7 @@
   "name": "neuron",
   "productName": "Neuron",
   "description": "CKB Neuron Wallet",
-  "version": "0.29.0",
+  "version": "0.30.0-rc1",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",
@@ -31,7 +31,6 @@
     "build": "lerna run --stream build",
     "release": "yarn build && ./scripts/copy-ui-files.sh && ./scripts/release.sh",
     "test": "lerna run --parallel test",
-    "test:e2e": "yarn build && ./scripts/copy-ui-files.sh && lerna run --parallel test:e2e",
     "lint": "lerna run --stream lint",
     "postinstall": "lerna run rebuild:nativemodules",
     "db:chain": "node ./node_modules/.bin/typeorm"

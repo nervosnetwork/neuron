@@ -236,7 +236,7 @@ const SignAndVerify = () => {
           <div role="presentation" className={styles.addrList} onClick={onAddrSelected}>
             {wallet.addresses.map(addr => (
               <div key={addr.address} className={styles.addrOpt} data-addr={addr.address}>
-                <span className="monospacedFont">{addr.address}</span>
+                <span>{addr.address}</span>
                 <Balance balance={shannonToCKBFormatter(addr.balance)} />
                 <span className={styles.addrType} data-type={addr.type}>
                   {addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')}
