@@ -20,8 +20,9 @@ import {
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
-import { ConnectionStatus, ErrorCode, CONNECTING_DEADLINE } from 'utils/const'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
+import { WalletWizardPath } from 'components/WalletWizard'
+import { ConnectionStatus, ErrorCode, CONNECTING_DEADLINE, Routes } from 'utils/const'
 
 let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 4000
@@ -119,21 +120,25 @@ export const useSubscription = ({
           if (!isAllowedToFetchList) {
             break
           }
-          updateTransactionList({
-            walletID,
-            keywords,
-            pageNo,
-            pageSize,
-          })(dispatch)
+          updateTransactionList({ walletID, keywords, pageNo, pageSize })(dispatch)
           break
         }
         case 'current-wallet': {
-          updateCurrentWallet()(dispatch, history)
+          updateCurrentWallet()(dispatch).then(hasCurrent => {
+            if (!hasCurrent) {
+              history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+            }
+          })
           break
         }
         case 'wallets': {
-          updateWalletList()(dispatch, history)
-          updateCurrentWallet()(dispatch, history)
+          Promise.all([updateWalletList, updateCurrentWallet].map(request => request()(dispatch))).then(
+            ([hasList, hasCurrent]) => {
+              if (!hasList || !hasCurrent) {
+                history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+              }
+            }
+          )
           break
         }
         default: {

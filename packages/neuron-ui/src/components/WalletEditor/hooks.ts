@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import { updateWalletProperty } from 'states/stateProvider/actionCreators'
 import { StateDispatch } from 'states/stateProvider/reducer'
-import { ErrorCode, MAX_WALLET_NAME_LENGTH } from 'utils/const'
+import { ErrorCode, MAX_WALLET_NAME_LENGTH, ResponseCode, Routes } from 'utils/const'
 import i18n from 'utils/i18n'
 
 export const useWalletEditor = () => {
@@ -55,7 +55,11 @@ export const useOnSubmit = (
       updateWalletProperty({
         id,
         name,
-      })(dispatch, history)
+      })(dispatch).then(status => {
+        if (status === ResponseCode.SUCCESS) {
+          history.push(Routes.SettingsWallets)
+        }
+      })
     },
     [name, id, history, dispatch, disabled]
   )

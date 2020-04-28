@@ -4,19 +4,20 @@ import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
 import { importKeystore, showOpenDialogModal, showErrorMessage } from 'services/remote'
 import { useState as useGlobalState } from 'states/stateProvider'
-import { useGoBack } from 'utils/hooks'
-import generateWalletName from 'utils/generateWalletName'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { Routes, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import { useGoBack } from 'utils/hooks'
+import generateWalletName from 'utils/generateWalletName'
+import isSuccessResponse from 'utils/isSuccessResponse'
 import styles from './importKeystore.module.scss'
 
 export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return importKeystore(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))

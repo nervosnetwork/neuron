@@ -74,7 +74,6 @@ declare namespace State {
   interface PasswordRequest {
     readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | null
     readonly walletID: string
-    readonly password: string
   }
 
   type AlertDialog = Readonly<{ title: string; message: string }> | null

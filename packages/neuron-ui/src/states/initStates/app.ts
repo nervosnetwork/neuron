@@ -1,4 +1,4 @@
-import { CapacityUnit } from 'utils/const'
+import { CapacityUnit, INIT_SEND_PRICE } from 'utils/const'
 
 const appState: Readonly<State.App> = {
   tipBlockNumber: '',
@@ -17,14 +17,13 @@ const appState: Readonly<State.App> = {
         date: undefined,
       },
     ],
-    price: '1000',
+    price: INIT_SEND_PRICE,
     description: '',
     generatedTx: '',
   },
   passwordRequest: {
     actionType: null,
     walletID: '',
-    password: '',
   },
   messages: {
     networks: null,

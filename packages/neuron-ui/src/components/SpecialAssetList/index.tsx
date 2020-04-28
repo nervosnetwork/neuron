@@ -9,6 +9,7 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { AppActions } from 'states/stateProvider/reducer'
 import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
 import isMainnetUtil from 'utils/isMainnet'
+import isSuccessResponse from 'utils/isSuccessResponse'
 import { queryParsers, epochParser } from 'utils/parsers'
 import { ckbCore } from 'services/chain'
 import styles from './specialAssetList.module.scss'
@@ -73,7 +74,7 @@ const SpecialAssetList = () => {
         pageSize: PAGE_SIZE,
       })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             const { items, totalCount: count } = res.result as { items: SpecialAssetCell[]; totalCount: string }
             setCells(items.sort((i1, i2) => +i2.timestamp - +i1.timestamp))
             setTotalCount(+count)
@@ -129,7 +130,7 @@ const SpecialAssetList = () => {
           feeRate: `${MEDIUM_FEE_RATE}`,
           customizedAssetInfo: cell.customizedAssetInfo,
         }).then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             dispatch({
               type: AppActions.UpdateGeneratedTx,
               payload: res.result,

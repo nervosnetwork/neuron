@@ -5,11 +5,12 @@ import {
   updateTransactionDescription as updateRemoteTransactionDescription,
 } from 'services/remote'
 import { failureResToNotification } from 'utils/formatters'
+import isSuccessResponse from 'utils/isSuccessResponse'
 import { addNotification } from './app'
 
 export const updateTransactionList = (params: GetTransactionListParams) => (dispatch: StateDispatch) => {
   getTransactionList(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       dispatch({
         type: NeuronWalletActions.UpdateTransactionList,
         payload: res.result,

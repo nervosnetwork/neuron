@@ -4,8 +4,7 @@ $textfieldWidth: calc(100vw - 370px);
 .outputContainer {
   position: relative;
   display: grid;
-  grid-template:
-    'address scanner add-or-remove'auto 'amount max add-or-remove'auto 'locktime locktime locktime'auto/ $textfieldWidth 50px 30px;
+  grid-template: 'address scanner add-or-remove' auto 'amount max add-or-remove' auto 'locktime locktime locktime' auto/ $textfieldWidth 50px 30px;
   grid-gap: 15px;
   padding: 28px 0 34px;
   box-sizing: border-box;
@@ -15,7 +14,7 @@ $textfieldWidth: calc(100vw - 370px);
     grid-area: address;
   }
 
-  button[aria-label="qr-btn"] {
+  button[aria-label='qr-btn'] {
     display: none;
     position: relative;
     padding-top: 10px;
@@ -63,7 +62,6 @@ $textfieldWidth: calc(100vw - 370px);
       margin-right: 5px;
       margin-top: 0.125rem;
     }
-
   }
 
   .amountField {
@@ -83,7 +81,7 @@ $textfieldWidth: calc(100vw - 370px);
 .info {
   width: $textfieldWidth;
   display: grid;
-  grid-template: 'textfield'auto;
+  grid-template: 'textfield' auto;
   grid-gap: 15px;
   padding: 24px 0 34px;
 }
@@ -94,7 +92,7 @@ $textfieldWidth: calc(100vw - 370px);
   justify-content: flex-start;
   align-items: center;
 
-  &>div {
+  & > div {
     position: relative;
   }
 
@@ -103,7 +101,7 @@ $textfieldWidth: calc(100vw - 370px);
 
     &:after {
       display: inline;
-      content: ':'
+      content: ':';
     }
   }
 
@@ -149,11 +147,9 @@ $textfieldWidth: calc(100vw - 370px);
     width: 100%;
   }
 
-
-
   &[disabled] {
     img[data-type='add'] {
-      filter: brightness(1.2) grayscale(1)
+      filter: brightness(1.2) grayscale(1);
     }
 
     img[data-type='remove'] {
@@ -170,13 +166,11 @@ $textfieldWidth: calc(100vw - 370px);
   padding: 0;
   line-height: auto;
 
-  &[data-is-on=true] {
+  &[data-is-on='true'] {
     color: rgba(255, 255, 255, 0.8) !important;
     box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5) !important;
   }
-
 }
-
 
 .actions {
   @include formFooter;
@@ -193,7 +187,6 @@ $textfieldWidth: calc(100vw - 370px);
   }
 
   &:hover {
-
     g,
     path {
       stroke: var(--nervos-green);
@@ -220,11 +213,11 @@ $textfieldWidth: calc(100vw - 370px);
     width: 15px;
     pointer-events: none;
 
-    &[alt$="calendar"] {
+    &[alt$='calendar'] {
       margin-right: 6px;
     }
 
-    &[data-status="active"] {
+    &[data-status='active'] {
       display: none;
     }
   }
@@ -242,33 +235,33 @@ $textfieldWidth: calc(100vw - 370px);
     border: none;
 
     &:hover {
-      img[data-status="inactive"] {
-        display: none
+      img[data-status='inactive'] {
+        display: none;
       }
 
-      img[data-status="active"] {
+      img[data-status='active'] {
         display: block;
       }
     }
   }
 
-  &[data-status="unset"]:hover {
+  &[data-status='unset']:hover {
     button {
       color: var(--nervos-green);
     }
 
     .icon {
-      &[data-status="active"] {
+      &[data-status='active'] {
         display: block;
       }
 
-      &[data-status="inactive"] {
+      &[data-status='inactive'] {
         display: none;
       }
     }
   }
 
-  &[data-status="set"] {
+  &[data-status='set'] {
     button {
       margin-left: 13px;
 
