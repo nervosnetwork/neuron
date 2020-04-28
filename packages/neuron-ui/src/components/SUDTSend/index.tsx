@@ -179,7 +179,7 @@ const SUDTSend = () => {
       return
     }
     const params = {
-      walletID: 'id',
+      walletID: walletId,
       address: sendState.address,
       amount,
       feeRate: MEDIUM_FEE_RATE.toString(),
@@ -199,6 +199,7 @@ const SUDTSend = () => {
         setRemoteError(err.message)
       })
   }, [
+    walletId,
     sendState.address,
     sendState.amount,
     sendState.description,
