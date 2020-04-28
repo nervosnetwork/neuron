@@ -74,6 +74,7 @@ const SUDTAccountList = () => {
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined
     if (walletId) {
+      fetchAndUpdateList()
       timer = setInterval(() => {
         fetchAndUpdateList()
       }, 10000)
