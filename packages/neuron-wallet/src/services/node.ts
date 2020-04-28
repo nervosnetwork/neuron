@@ -1,3 +1,4 @@
+import { remote } from 'electron'
 import CKB from '@nervosnetwork/ckb-sdk-core'
 import { interval, BehaviorSubject, merge } from 'rxjs'
 import { distinctUntilChanged, sampleTime, flatMap, delay, retry, debounceTime } from 'rxjs/operators'
@@ -7,9 +8,12 @@ import { ShouldBeTypeOf } from 'exceptions'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import { CurrentNetworkIDSubject } from 'models/subjects/networks'
 import NetworksService from 'services/networks'
+import RpcService from 'services/rpc-service'
+import { startCkbNode } from 'services/ckb-runner'
 import HexUtils from 'utils/hex'
 import ProcessUtils from 'utils/process'
-import { remote } from 'electron'
+import { BUNDLED_CKB_URL } from 'utils/const'
+import logger from 'utils/logger'
 
 class NodeService {
   private static instance: NodeService
@@ -121,6 +125,25 @@ class NodeService {
           this.stop = unsubscribe
         }
       )
+  }
+
+  public async tryStartNodeOnDefaultURI(): Promise<boolean> {
+    let network = NetworksService.getInstance().getCurrent()
+    if (network.remote !== BUNDLED_CKB_URL) {
+      return false
+    }
+    try {
+      await new RpcService(network.remote).getChain()
+      logger.info('CKB:\texternal RPC on default uri detected, skip starting bundled CKB node.')
+      return false
+    } catch (err) {
+      logger.info('CKB:\texternal RPC on default uri not detected, starting bundled CKB node.')
+      return startCkbNode().then(()=> true).catch(err => {
+        logger.info('CKB:\tfail to start bundled CKB with error:')
+        logger.error(err)
+        return false
+      })
+    }
   }
 }
 

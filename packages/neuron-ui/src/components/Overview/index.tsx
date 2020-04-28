@@ -93,7 +93,9 @@ const Overview = () => {
   const balanceProperties: Property[] = useMemo(() => {
     const balanceValue = shannonToCKBFormatter(balance)
     let prompt = null
-    if (ConnectionStatus.Offline === connectionStatus) {
+    if (ConnectionStatus.Connecting === connectionStatus) {
+      prompt = <span className={styles.balancePrompt}>{t('sync.connecting')}</span>
+    } else if (ConnectionStatus.Offline === connectionStatus) {
       prompt = (
         <span className={styles.balancePrompt} style={{ color: 'red' }}>
           {t('sync.sync-failed')}
