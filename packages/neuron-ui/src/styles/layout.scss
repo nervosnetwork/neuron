@@ -1,4 +1,4 @@
-:root{
+:root {
   --sidebar-width: 200px;
 }
 
@@ -25,7 +25,7 @@ footer {
 .main-content {
   grid-area: content;
   overflow: auto;
-  padding: 15px 30px;
+  padding: 22px 30px;
 }
 
 .notification {
@@ -33,7 +33,7 @@ footer {
   z-index: 1;
 }
 
-.dialog{
+.dialog {
   grid-area: 1/1/5/5;
   dialog {
     margin: 0;
