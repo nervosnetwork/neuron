@@ -1,11 +1,11 @@
-# 0.30.0-rc1 (2020-04-28)
+# 0.30.0-rc2 (2020-04-29)
 
 This is an RC version to preview the changes in the next release.
 
 ### Bundled CKB node
 
-CKB v0.31.0 was released on Apr 17th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
-CKB v0.31.0 includes a performance enhancement patch. It may speed up Neuron sync speed.
+CKB v0.31.1 was released on Apr 24th, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+CKB v0.31.1 includes a performance enhancement patch. It may speed up Neuron sync speed.
 
 ### New features
 
