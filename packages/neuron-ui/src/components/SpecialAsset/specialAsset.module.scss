@@ -31,7 +31,6 @@
   }
 
   &:hover {
-
     &:before,
     &:after {
       display: block;
@@ -111,8 +110,15 @@
     width: 150px;
     font-size: 0.8125rem;
     padding: 0;
+    pointer-events: unset !important;
 
-    &.hasTooltip[disabled][data-tooltip] {
+    &:disabled {
+      opacity: 1 !important;
+      background-color: #3cc68a80!important;
+      color: #ffffff80!important;
+    }
+
+    &.hasTooltip:disabled[data-tooltip] {
       @include tooltip;
       position: relative;
 
@@ -121,7 +127,6 @@
         text-align: left;
         box-sizing: border-box;
       }
-
     }
   }
 }
