@@ -77,13 +77,52 @@ export default class AssetAccountService {
   }
 
   public static async getAccount(params: { walletID: string, id: number }): Promise<AssetAccount | undefined> {
-    return getConnection()
-    .getRepository(AssetAccountEntity)
-    .createQueryBuilder('aa')
-    .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
-    .where({ id: +params.id })
-    .getOne()
-    .then(account => account?.toModel())
+    const assetAccount = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+      .where({ id: +params.id })
+      .getOne()
+      .then(account => account?.toModel())
+
+    if (!assetAccount) {
+      return assetAccount
+    }
+
+    const isCKB = !assetAccount.tokenID.startsWith('0x')
+
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()
+    const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(assetAccount.tokenID)
+
+    // calculate balances
+    // anyone-can-pay & sudt
+    const output = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .select(`output.lockArgs`, 'lockArgs')
+      .addSelect(`output.typeArgs`, 'typeArgs')
+      .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
+      .addSelect(`group_concat(output.data)`, 'dataArray')
+      .where({
+        status: OutputStatus.Live,
+        lockHash: anyoneCanPayLockHash,
+        typeHash,
+      })
+      .groupBy('output.lockArgs')
+      .addGroupBy('output.typeArgs')
+      .getRawOne()
+
+    const sumOfAmount = isCKB ?
+      BigInt(output.sumOfCapacity) :
+      (output.dataArray as string)
+        .split(',')
+        .map(data => BufferUtils.readBigUInt128LE(data.trim()))
+        .reduce((result, c) => result + c, BigInt(0))
+
+    assetAccount.balance = sumOfAmount.toString()
+
+    return assetAccount
   }
 
   public static async generateCreateTx(
