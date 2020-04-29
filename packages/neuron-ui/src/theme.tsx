@@ -64,7 +64,7 @@ registerIcons({
     LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     NextPage: <LinkDownIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
-    ArrowDown: <ArrowDownIcon size="small" />,
+    ArrowDown: <ArrowDownIcon size="16px" />,
     ChevronRightMed: <ExpandIcon size="16px" style={{ transform: 'rotate(90deg) translate(2px, 0px)' }} />,
     Scan: <ScanIcon />,
     Import: <ImportIcon color="white" />,
