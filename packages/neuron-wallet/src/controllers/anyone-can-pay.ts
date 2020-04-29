@@ -4,6 +4,7 @@ import { ServiceHasNoResponse } from "exceptions"
 import { ResponseCode } from "utils/const"
 import AnyoneCanPayService from "services/anyone-can-pay"
 import TransactionSender from "services/transaction-sender"
+import { set as setDescription } from 'database/leveldb/transaction-description'
 
 export interface GenerateAnyoneCanPayTxParams {
   walletID: string
@@ -60,14 +61,20 @@ export default class AnyoneCanPayController {
   }
 
   public async sendTx(params: SendAnyoneCanPayTxParams): Promise<Controller.Response<string>> {
+    const txModel = Transaction.fromObject(params.tx)
     const txHash = await new TransactionSender().sendTx(
       params.walletID,
-      Transaction.fromObject(params.tx),
+      txModel,
       params.password
     )
 
     if (!txHash) {
       throw new ServiceHasNoResponse('AnyoneCanPay')
+    }
+
+    const description = txModel.description
+    if (description !== '') {
+      await setDescription(params.walletID, txHash, description)
     }
 
     return {
