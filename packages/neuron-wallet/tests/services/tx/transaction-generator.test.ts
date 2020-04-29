@@ -897,6 +897,15 @@ describe('TransactionGenerator', () => {
     const assetAccountInfo = new AssetAccountInfo()
     const bobAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x36c329ed630d6ce750712a477543672adab57f4c')
     const aliceAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0xe2193df51d78411601796b35b17b4f8f2cd85bd0')
+    const davidAnyoneCanPayLockScript = assetAccountInfo.generateAnyoneCanPayScript('0x' + '0'.repeat(40))
+
+    const davidLockScript: Script = SystemScriptInfo.generateSecpScript('0x' + '0'.repeat(40))
+    const david = {
+      lockScript: davidLockScript,
+      lockHash: davidLockScript.computeHash(),
+      address: AddressGenerator.generate(davidLockScript, AddressPrefix.Testnet),
+      blake160: davidLockScript.args,
+    }
 
     // generate anyone-can-pay live cell
     const generateLiveCell = (
@@ -981,6 +990,38 @@ describe('TransactionGenerator', () => {
           .reduce((result, c) => result + c, BigInt(0))
 
         expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('send from one account', async () => {
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('70')),
+          generateLiveCell(toShannon('70'), undefined, undefined, davidAnyoneCanPayLockScript),
+          generateLiveCell(toShannon('61'), undefined, undefined, aliceAnyoneCanPayLockScript),
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: toShannon('61'),
+          lock: aliceAnyoneCanPayLockScript,
+          type: null,
+          data: '0x',
+        })
+
+        let error
+        try {
+          await TransactionGenerator.generateAnyoneCanPayToCKBTx(
+            [bob.lockHash, david.lockHash],
+            [bobAnyoneCanPayLockScript.computeHash()],
+            targetOutput,
+            (10 * 10**8).toString(),
+            bob.blake160,
+            feeRate,
+            '0'
+          )
+        } catch (e) {
+          error = e
+        }
+        expect(error).toBeInstanceOf(CapacityNotEnough)
       })
 
       it('2 capacity 62, enough for send, 1 not enough for fee', async () => {
@@ -1203,6 +1244,42 @@ describe('TransactionGenerator', () => {
           .reduce((result, c) => result + c, BigInt(0))
 
         expect(inputCapacities - outputCapacities).toEqual(BigInt(expectedTxFee))
+      })
+
+      it('send from one account', async () => {
+        const targetLiveCellEntity = generateLiveCell(toShannon('142'), '100', tokenID, aliceAnyoneCanPayLockScript)
+        const liveCells: LiveCellEntity[] = [
+          generateLiveCell(toShannon('150'), '100', tokenID),
+          generateLiveCell(toShannon('150'), '100', tokenID, davidAnyoneCanPayLockScript),
+          targetLiveCellEntity
+        ]
+        await getConnection().manager.save(liveCells)
+
+        const targetLiveCell: LiveCell = LiveCell.fromEntity(targetLiveCellEntity)
+
+        const targetOutput: Output = Output.fromObject({
+          capacity: targetLiveCell.capacity,
+          lock: targetLiveCell.lock(),
+          type: targetLiveCell.type(),
+          data: targetLiveCell.data,
+        })
+
+        let error
+        try {
+          await TransactionGenerator.generateAnyoneCanPayToSudtTx(
+            [bob.lockHash, david.lockHash],
+            [bobAnyoneCanPayLockScript.computeHash()],
+            targetOutput,
+            '101',
+            bob.blake160,
+            feeRate,
+            '0'
+          )
+        } catch (e) {
+          error = e
+        }
+        expect(error).toBeInstanceOf(CapacityNotEnough)
+
       })
 
       it('capacity 142 , enough for send, 1 not enough for fee', async () => {

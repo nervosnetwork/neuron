@@ -8,23 +8,36 @@ import { getConnection } from "typeorm"
 import Output from "models/chain/output"
 import LiveCell from "models/chain/live-cell"
 import Transaction from "models/chain/transaction"
+import AssetAccountEntity from "database/chain/entities/asset-account"
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
     walletID: string,
     targetAddress: string,
     capacityOrAmount: string,
-    tokenID: string,
+    assetAccountID: number,
     feeRate: string = '0',
     fee: string = '0',
     description?: string,
   ): Promise<Transaction> {
+    const assetAccount = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .where({
+        id: assetAccountID,
+      })
+      .getOne()
+    if (!assetAccount) {
+      throw new Error(`Asset Account not found!`)
+    }
+    const tokenID = assetAccount.tokenID
+
     const isCKB = !tokenID || tokenID === 'CKBytes'
 
     const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
     const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
     const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHashes: string[] = allBlake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
+    const anyoneCanPayLockHashes: string[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()]
 
     const targetAnyoneCanPayLockScript = AddressParser.parse(targetAddress)
     // verify targetAnyoneCanPay codeHash & hashType
