@@ -44,6 +44,10 @@ $change-color: #6666cc;
     letter-spacing: 0.6px;
     color: #000;
     padding: 18px 0;
+
+    @media screen and (max-width: 900px) {
+      font-size: 0.875rem;
+    }
   }
 
   td {
@@ -134,6 +138,9 @@ $change-color: #6666cc;
         width: 20vw;
       }
 
+      @media screen and (max-width: 1000px) {
+        width: 15vw;
+      }
 
     }
   }
