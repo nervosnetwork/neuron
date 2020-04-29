@@ -179,6 +179,7 @@ const SUDTSend = () => {
       return
     }
     const params = {
+      assetAccountID: accountInfo?.accountId,
       walletID: walletId,
       address: sendState.address,
       amount,
