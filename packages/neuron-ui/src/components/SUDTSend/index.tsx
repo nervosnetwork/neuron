@@ -90,7 +90,7 @@ const SUDTSend = () => {
   > | null>(null)
 
   const isMainnet = isMainnetUtil(networks, networkID)
-  const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)} CKB` : '0 CKB'
+  const fee = experimental?.tx?.fee ? `${shannonToCKBFormatter(experimental.tx.fee)}` : '0'
 
   useEffect(() => {
     if (accountId && walletId) {
