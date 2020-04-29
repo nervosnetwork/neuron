@@ -9,7 +9,7 @@ export interface GenerateAnyoneCanPayTxParams {
   walletID: string
   address: string
   amount: string
-  tokenID: string
+  assetAccountID: number
   feeRate: string
   fee: string
   description?: string
@@ -18,7 +18,7 @@ export interface GenerateAnyoneCanPayTxParams {
 export interface GenerateAnyoneCanPayAllTxParams {
   walletID: string
   address: string
-  tokenID: string
+  assetAccountID: number
   feeRate: string
   fee: string
   description?: string
@@ -36,7 +36,7 @@ export default class AnyoneCanPayController {
       params.walletID,
       params.address,
       params.amount,
-      params.tokenID,
+      params.assetAccountID,
       params.feeRate,
       params.fee,
       params.description
