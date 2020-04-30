@@ -8,6 +8,11 @@ import Transaction from 'models/chain/transaction'
 import SystemScriptInfo from 'models/system-script-info'
 import AddressGenerator from 'models/address-generator'
 
+export interface AnyoneCanPayInfo {
+  tokenID: string
+  blake160: string
+}
+
 // Search for all addresses related to a transaction. These addresses include:
 //   * Addresses for previous outputs of this transaction's inputs. (Addresses that send something to this tx)
 //   * Addresses for this transaction's outputs. (Addresses that receive something from this tx)
@@ -24,10 +29,10 @@ export default class TxAddressFinder {
     this.multiSignBlake160s = new Set(multiSignBlake160s)
   }
 
-  public addresses = async (): Promise<[boolean, string[], string[]]> => {
+  public addresses = async (): Promise<[boolean, string[], AnyoneCanPayInfo[]]> => {
     const inputAddressesResult = await this.selectInputAddresses()
 
-    const outputsResult: [boolean, Output[], string[]] = this.selectOutputs()
+    const outputsResult: [boolean, Output[], AnyoneCanPayInfo[]] = this.selectOutputs()
     const addressPrefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const outputAddresses: string[] = outputsResult[1].map(output => {
       return AddressGenerator.toShort(output.lock, addressPrefix)
@@ -40,9 +45,11 @@ export default class TxAddressFinder {
     ]
   }
 
-  private selectOutputs = (): [boolean, Output[], string[]] => {
+  // [shouldSync, addresses, anyoneCanPayBlake160s]
+  private selectOutputs = (): [boolean, Output[], AnyoneCanPayInfo[]] => {
     let shouldSync = false
-    const anyoneCanPayBlake160s: string[] = []
+    // const anyoneCanPayBlake160s: string[] = []
+    const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
     const outputs: Output[] = this.tx.outputs!.map((output, index) => {
       if (SystemScriptInfo.isMultiSignScript(output.lock)) {
         const multiSignBlake160 = output.lock.args.slice(0, 42)
@@ -53,7 +60,11 @@ export default class TxAddressFinder {
       }
       if (this.anyoneCanPayLockHashes.has(output.lockHash!)) {
         shouldSync = true
-        anyoneCanPayBlake160s.push(output.lock.args)
+        // anyoneCanPayBlake160s.push(output.lock.args)
+        anyoneCanPayInfos.push({
+          blake160: output.lock.args,
+          tokenID: output.type?.args || "CKBytes"
+        })
       }
       if (this.lockHashes.has(output.lockHash!)) {
         if (output.type) {
@@ -67,12 +78,13 @@ export default class TxAddressFinder {
       return false
     }).filter(output => !!output) as Output[]
 
-    return [shouldSync, outputs, anyoneCanPayBlake160s]
+    return [shouldSync, outputs, anyoneCanPayInfos]
   }
 
-  private selectInputAddresses = async (): Promise<[boolean, string[], string[]]> => {
+  private selectInputAddresses = async (): Promise<[boolean, string[], AnyoneCanPayInfo[]]> => {
     const addresses: string[] = []
-    const anyoneCanPayBlake160s: string[] = []
+    // const anyoneCanPayBlake160s: string[] = []
+    const anyoneCanPayInfos: AnyoneCanPayInfo[] = []
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
@@ -87,7 +99,11 @@ export default class TxAddressFinder {
         })
       if (output && this.anyoneCanPayLockHashes.has(output.lockHash)) {
         shouldSync = true
-        anyoneCanPayBlake160s.push(output.lockArgs)
+        // anyoneCanPayBlake160s.push(output.lockArgs)
+        anyoneCanPayInfos.push({
+          blake160: output.lockArgs,
+          tokenID: output.typeArgs || 'CKBytes'
+        })
       }
       if (output && this.lockHashes.has(output.lockHash)) {
         shouldSync = true
@@ -104,6 +120,6 @@ export default class TxAddressFinder {
       }
     }
 
-    return [shouldSync, addresses, anyoneCanPayBlake160s]
+    return [shouldSync, addresses, anyoneCanPayInfos]
   }
 }
