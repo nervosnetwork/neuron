@@ -11,6 +11,7 @@ import BufferUtils from "utils/buffer"
 import { OutputStatus } from "models/chain/output"
 import { AddressVersion } from "database/address/address-dao"
 import NetworksService from "./networks"
+import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 
 export default class AssetAccountService {
   public static async getAll(walletID: string, anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
@@ -162,6 +163,27 @@ export default class AssetAccountService {
       assetAccount,
       tx,
     }
+  }
+
+  public static async checkAndSaveAssetAccountWhenSync(walletID: string, tokenID: string, blake160: string) {
+    const assetAccount = new AssetAccount(walletID, tokenID, '???', '???', '???', '0', '0', blake160)
+    const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
+    const sudtTokenInfoEntity = assetAccountEntity.sudtTokenInfo
+    await getConnection()
+      .createQueryBuilder()
+      .insert()
+      .into(SudtTokenInfoEntity)
+      .values(sudtTokenInfoEntity)
+      .onConflict(`("walletID", "tokenID") DO NOTHING`)
+      .execute()
+
+    await getConnection()
+      .createQueryBuilder()
+      .insert()
+      .into(AssetAccountEntity)
+      .values(assetAccountEntity)
+      .onConflict(`("walletID", "tokenID", "blake160") DO NOTHING`)
+      .execute()
   }
 
   private static async blake160sOfAssetAccounts(walletID: string): Promise<string[]> {

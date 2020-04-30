@@ -8,6 +8,7 @@ import OutputEntity from "../../src/database/chain/entities/output"
 import AssetAccountInfo from "../../src/models/asset-account-info"
 import BufferUtils from "../../src/utils/buffer"
 import { OutputStatus } from "../../src/models/chain/output"
+import SudtTokenInfoEntity from "../../src/database/chain/entities/sudt-token-info"
 
 describe('AssetAccountService', () => {
   beforeAll(async done => {
@@ -201,6 +202,86 @@ describe('AssetAccountService', () => {
       expect(result.length).toEqual(2)
       expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('200')
       expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual('2000')
+    })
+  })
+
+  describe('checkAndSaveAssetAccountWhenSync', () => {
+    it('not exists', async () => {
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+
+      const all = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .getMany()
+
+      expect(all.length).toEqual(1)
+      const entity = all[0]
+      expect(entity.sudtTokenInfo).not.toBeNull()
+      expect(entity.walletID).toEqual(assetAccount.walletID)
+      expect(entity.tokenID).toEqual(assetAccount.tokenID)
+      expect(entity.sudtTokenInfo.symbol).toEqual('???')
+    })
+
+    it('sudtTokenInfo exists', async () => {
+      const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
+      await getConnection().manager.save(assetAccountEntity.sudtTokenInfo)
+      const tokenInfo = await getConnection()
+        .getRepository(SudtTokenInfoEntity)
+        .createQueryBuilder('info')
+        .where({
+          walletID: assetAccount.walletID,
+          tokenID: assetAccount.tokenID,
+        })
+        .getOne()
+      expect(tokenInfo).not.toBeNull()
+
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+
+      const all = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .getMany()
+
+      expect(all.length).toEqual(1)
+      const entity = all[0]
+      expect(entity.sudtTokenInfo).not.toBeNull()
+      expect(entity.walletID).toEqual(assetAccount.walletID)
+      expect(entity.tokenID).toEqual(assetAccount.tokenID)
+      expect(entity.sudtTokenInfo.symbol).toEqual(assetAccount.symbol)
+    })
+
+    it('assetAccount exists', async () => {
+      const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
+      await getConnection().manager.save([assetAccountEntity.sudtTokenInfo, assetAccount])
+      const aae = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .where({
+          walletID: assetAccount.walletID,
+          tokenID: assetAccount.tokenID,
+        })
+        .getOne()
+      expect(aae).not.toBeNull()
+      expect(aae!.sudtTokenInfo).not.toBeNull()
+
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+
+      const all = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .getMany()
+
+      expect(all.length).toEqual(1)
+      const entity = all[0]
+      expect(entity.sudtTokenInfo).not.toBeNull()
+      expect(entity.walletID).toEqual(assetAccount.walletID)
+      expect(entity.tokenID).toEqual(assetAccount.tokenID)
+      expect(entity.accountName).toEqual(assetAccount.accountName)
+      expect(entity.sudtTokenInfo.symbol).toEqual(assetAccount.symbol)
     })
   })
 })
