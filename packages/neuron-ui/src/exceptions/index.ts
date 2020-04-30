@@ -63,4 +63,11 @@ export class AmountNotEnoughException extends Error {
   }
 }
 
+export class PasswordIncorrectException extends Error {
+  public code = ErrorCode.PasswordIncorrect
+  constructor() {
+    super(`messages.codes.${ErrorCode.PasswordIncorrect}`)
+  }
+}
+
 export default undefined

@@ -5,6 +5,7 @@ import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/ac
 
 import { verifyAmount } from 'utils/validators'
 import calculateAPC from 'utils/calculateAPC'
+import isSuccessResponse from 'utils/isSuccessResponse'
 
 import { CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import {
@@ -49,7 +50,7 @@ export const useUpdateMaxDeposit = ({
       feeRate: `${MEDIUM_FEE_RATE}`,
     })
       .then(res => {
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           const fee = BigInt(res.result.fee)
           const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
           setMaxDepositAmount(maxValue)
@@ -160,7 +161,7 @@ export const useUpdateDepositValue = ({
             capacity,
             walletID,
           }).then(res => {
-            if (res.status === 1) {
+            if (isSuccessResponse(res)) {
               dispatch({
                 type: AppActions.UpdateGeneratedTx,
                 payload: res.result,
@@ -295,7 +296,7 @@ export const useOnWithdrawDialogSubmit = ({
         feeRate: `${MEDIUM_FEE_RATE}`,
       })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             dispatch({
               type: AppActions.UpdateGeneratedTx,
               payload: res.result,
@@ -356,7 +357,7 @@ export const useOnActionClick = ({
             feeRate: `${MEDIUM_FEE_RATE}`,
           })
             .then(res => {
-              if (res.status === 1) {
+              if (isSuccessResponse(res)) {
                 dispatch({
                   type: AppActions.UpdateGeneratedTx,
                   payload: res.result,

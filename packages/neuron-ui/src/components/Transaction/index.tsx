@@ -14,6 +14,7 @@ import { ckbCore } from 'services/chain'
 
 import { transactionState } from 'states/initStates/chain'
 
+import isSuccessResponse from 'utils/isSuccessResponse'
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import { ErrorCode, MAINNET_TAG } from 'utils/const'
 import { useOnDefaultContextMenu, useExitOnWalletChange } from 'utils/hooks'
@@ -32,13 +33,13 @@ const Transaction = () => {
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setSystemCodeHash(res.result)
       }
     })
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
       .then(([networksRes, idRes]) => {
-        if (networksRes.status === 1 && idRes.status === 1) {
+        if (isSuccessResponse(networksRes) && isSuccessResponse(idRes)) {
           const network = networksRes.result.find((n: any) => n.id === idRes.result)
           if (!network) {
             throw new Error('Cannot find current network in the network list')
@@ -61,7 +62,7 @@ const Transaction = () => {
       }
       getTransaction({ hash, walletID: currentWallet.id })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             setTransaction(res.result)
           } else {
             showErrorMessage(

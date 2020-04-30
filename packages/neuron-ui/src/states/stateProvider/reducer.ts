@@ -41,7 +41,6 @@ export enum AppActions {
   CleanTransactions = 'cleanTransactions',
   RequestPassword = 'requestPassword',
   DismissPasswordRequest = 'dismissPasswordRequest',
-  UpdatePassword = 'updatePassword',
   UpdateChainInfo = 'updateChainInfo',
   UpdateLoadings = 'updateLoadings',
   UpdateAlertDialog = 'updateAlertDialog',
@@ -72,7 +71,6 @@ export type StateAction =
   | { type: AppActions.CleanTransactions }
   | { type: AppActions.RequestPassword; payload: Omit<State.PasswordRequest, 'password'> }
   | { type: AppActions.DismissPasswordRequest }
-  | { type: AppActions.UpdatePassword; payload: string }
   | { type: AppActions.UpdateChainInfo; payload: Partial<State.App> }
   | { type: AppActions.UpdateLoadings; payload: any }
   | { type: AppActions.UpdateAlertDialog; payload: State.AlertDialog }
@@ -236,15 +234,11 @@ export const reducer = produce((state: Draft<State.AppWithNeuronWallet>, action:
       break
     }
     case AppActions.RequestPassword: {
-      state.app.passwordRequest = { ...action.payload, password: '' }
+      state.app.passwordRequest = action.payload
       break
     }
     case AppActions.DismissPasswordRequest: {
       state.app.passwordRequest = initStates.app.passwordRequest
-      break
-    }
-    case AppActions.UpdatePassword: {
-      state.app.passwordRequest.password = action.payload
       break
     }
     case AppActions.UpdateMessage: {

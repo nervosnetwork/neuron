@@ -1,9 +1,13 @@
-interface SuccessFromController {
-  status: 1
+import { ResponseCode, ErrorCode } from 'utils/const'
+import isSuccessResponse from 'utils/isSuccessResponse'
+
+export interface SuccessFromController {
+  status: ResponseCode.SUCCESS
   result: any
 }
-interface FailureFromController {
-  status: 0 | 105
+
+export interface FailureFromController {
+  status: ResponseCode.FAILURE | ErrorCode.CapacityNotEnoughForChange | number
   message:
     | string
     | {
@@ -15,7 +19,7 @@ interface FailureFromController {
 export type ControllerResponse = SuccessFromController | FailureFromController
 
 export const RemoteNotLoadError = {
-  status: 0 as 0,
+  status: ResponseCode.FAILURE,
   message: {
     content: 'The remote module is not found, please make sure the UI is running inside the Electron App',
   },
@@ -81,7 +85,7 @@ export const remoteApi = <T = any>(action: Action) => async (params: T): Promise
   const res: SuccessFromController | FailureFromController = await window.ipcRenderer
     .invoke(action, params)
     .catch(() => ({
-      status: 0,
+      status: ResponseCode.FAILURE,
       message: {
         content: 'Invalid response format',
       },
@@ -96,20 +100,20 @@ export const remoteApi = <T = any>(action: Action) => async (params: T): Promise
 
   if (!res) {
     return {
-      status: 1,
+      status: ResponseCode.SUCCESS,
       result: null,
     }
   }
 
-  if (res.status === 1) {
+  if (isSuccessResponse(res)) {
     return {
-      status: 1,
+      status: ResponseCode.SUCCESS,
       result: res.result || null,
     }
   }
 
   return {
-    status: res.status || 0,
+    status: res.status || ResponseCode.FAILURE,
     message: typeof res.message === 'string' ? { content: res.message } : res.message || '',
   }
 }

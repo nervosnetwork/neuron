@@ -14,13 +14,14 @@ import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD
 import { buttonGrommetIconStyles } from 'utils/icons'
 import { verifyPasswordComplexity } from 'utils/validators'
 import generateWalletName from 'utils/generateWalletName'
+import isSuccessResponse from 'utils/isSuccessResponse'
 import styles from './walletWizard.module.scss'
 
 const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return createWallet(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
@@ -37,7 +38,7 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return importMnemonic(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       history.push(Routes.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
@@ -160,8 +161,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
   useEffect(() => {
     if (type === MnemonicAction.Create) {
       generateMnemonic().then(res => {
-        // Should always succeed
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           dispatch({
             type: 'generated',
             payload: res.result,
@@ -201,7 +201,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
       })
       validateMnemonic(trimmedMnemonic).then(res => {
         let isMnemonicValid = false
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           isMnemonicValid = res.result
         }
         if (isMnemonicValid) {

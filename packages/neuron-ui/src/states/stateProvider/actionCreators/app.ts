@@ -4,6 +4,7 @@ import initStates from 'states/initStates'
 import { Routes, ErrorCode } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { addressesToBalance } from 'utils/formatters'
+import isSuccessResponse from 'utils/isSuccessResponse'
 import {
   wallets as walletsCache,
   addresses as addressesCache,
@@ -15,7 +16,7 @@ import {
 export const initAppState = () => (dispatch: StateDispatch, history: any) => {
   getNeuronWalletState()
     .then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         const {
           wallets = [],
           currentWallet: wallet = initStates.wallet,
