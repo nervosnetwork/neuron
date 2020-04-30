@@ -93,7 +93,7 @@ export default class AssetAccountService {
 
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHash = assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()
-    const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(assetAccount.tokenID)
+    const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(assetAccount.tokenID).computeHash()
 
     // calculate balances
     // anyone-can-pay & sudt
