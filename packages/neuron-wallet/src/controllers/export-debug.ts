@@ -47,7 +47,7 @@ export default class ExportDebugController {
     const url = NetworksService.getInstance().getCurrent().remote
     const ckb = new CKB(url)
 
-    const [syncedBlockNumber, ckbVersion, tipBlockNumber] = await Promise.all([
+    const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
@@ -59,7 +59,10 @@ export default class ExportDebugController {
       ckb.rpc
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
-        .catch(() => '')
+        .catch(() => ''),
+      ckb.rpc
+        .getPeers()
+        .catch(() => [])
     ])
     const { platform, arch } = process
     const release = os.release()
@@ -71,7 +74,8 @@ export default class ExportDebugController {
       ckb: {
         url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : 'http://****:port',
         version: ckbVersion,
-        blockNumber: tipBlockNumber
+        blockNumber: tipBlockNumber,
+        peers,
       },
       client: {
         platform,
