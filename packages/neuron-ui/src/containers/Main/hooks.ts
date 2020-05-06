@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-
+import { useHistory } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -22,13 +22,15 @@ import {
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ConnectionStatus, ErrorCode, CONNECTING_DEADLINE, Routes } from 'utils/const'
+import { ConnectionStatus, ErrorCode, Routes } from 'utils/const'
 
-let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 4000
+const CONNECTING_BUFFER = 15_000
+let CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
+    let timer: NodeJS.Timeout
     const syncBlockchainInfo = () => {
       Promise.all([getTipHeader(), getBlockchainInfo()])
         .then(([header, chainInfo]) => {
@@ -56,7 +58,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
           })
         })
     }
-    clearInterval(timer)
+    clearInterval(timer!)
     if (chainURL) {
       ckbCore.setNode(chainURL)
       syncBlockchainInfo()
@@ -79,7 +81,7 @@ export const useOnCurrentWalletChange = ({
 }: {
   walletID: string
   chain: State.Chain
-  history: any
+  history: ReturnType<typeof useHistory>
 
   dispatch: StateDispatch
 }) => {
@@ -99,7 +101,7 @@ export const useSubscription = ({
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
-  history: any
+  history: ReturnType<typeof useHistory>
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
@@ -158,6 +160,7 @@ export const useSubscription = ({
         type: NeuronWalletActions.UpdateCurrentNetworkID,
         payload: currentNetworkID,
       })
+      CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
       currentNetworkIDCache.save(currentNetworkID)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
@@ -189,7 +192,9 @@ export const useSubscription = ({
       if (winID && getWinID() === winID) {
         switch (type) {
           case 'navigate-to-url': {
-            history.push(payload)
+            if (payload) {
+              history.push(payload)
+            }
             break
           }
           case 'delete-wallet': {
