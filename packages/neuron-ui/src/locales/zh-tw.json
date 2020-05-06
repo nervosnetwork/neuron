@@ -256,6 +256,9 @@
       },
       "create-sudt-account": {
         "title": "創建資產賬戶"
+      },
+      "send-sudt": {
+        "title": "發起 sUDT 交易"
       }
     },
     "qrcode": {
