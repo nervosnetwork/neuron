@@ -611,6 +611,7 @@ public static generateSendingAllTx = async (
     }
     tx.outputsData = tx.outputs.map(o => o.data)
     tx.fee = result.finalFee
+    tx.anyoneCanPaySendAmount = result.sendCapacity
 
     return tx
   }
@@ -679,6 +680,7 @@ public static generateSendingAllTx = async (
     tx.fee = result.finalFee
 
     tx.sudtInfo = amount === 'all' ? { amount: result.amount }: { amount }
+    tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
     return tx
   }
