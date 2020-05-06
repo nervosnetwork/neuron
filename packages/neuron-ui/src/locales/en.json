@@ -256,6 +256,9 @@
       },
       "create-sudt-account": {
         "title": "Create Asset Account"
+      },
+      "send-sudt": {
+        "title": "Send sUDT"
       }
     },
     "qrcode": {
