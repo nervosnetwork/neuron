@@ -243,6 +243,7 @@ export default class Queue {
         const rangeFirstBlockHeader: BlockHeader = range[0]
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
+        await AssetAccountService.checkAndDeleteWhenFork(rangeFirstBlockHeader.number, this.anyoneCanPayLockHashes)
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
         if (!this.assetAccountInfo) {
           await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)

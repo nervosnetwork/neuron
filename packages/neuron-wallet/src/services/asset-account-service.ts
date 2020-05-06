@@ -4,7 +4,7 @@ import { getConnection } from "typeorm"
 import AddressService from "./addresses"
 import { TransactionGenerator } from "./tx"
 import TransactionSender from "./transaction-sender"
-import Transaction from "models/chain/transaction"
+import Transaction, { TransactionStatus } from "models/chain/transaction"
 import OutputEntity from "database/chain/entities/output"
 import AssetAccountInfo from "models/asset-account-info"
 import BufferUtils from "utils/buffer"
@@ -184,6 +184,55 @@ export default class AssetAccountService {
       .values(assetAccountEntity)
       .onConflict(`("walletID", "tokenID", "blake160") DO NOTHING`)
       .execute()
+  }
+
+  public static async checkAndDeleteWhenFork(startBlockNumber: string, anyoneCanPayLockHashes: string[]) {
+    const startBlockNumberInt = BigInt(startBlockNumber)
+
+    const assetAccountInfo = new AssetAccountInfo()
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .leftJoinAndSelect('output.transaction', 'tx')
+      .select('output.lockHash', 'lockHash')
+      .addSelect('output.lockArgs', 'lockArgs')
+      .addSelect('output.typeArgs', 'typeArgs')
+      .addSelect('group_concat(tx.status)', 'txStatusArray')
+      .addSelect('group_concat(tx.blockNumber)', 'blockNumberArray')
+      .where(`output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR (output.typeCodeHash = :sudtCodeHash AND output.typeHashType = :sudtHashType))`, {
+        lockHashes: anyoneCanPayLockHashes,
+        sudtCodeHash: assetAccountInfo.infos.sudt.codeHash,
+        sudtHashType: assetAccountInfo.infos.sudt.hashType,
+      })
+      .groupBy('output.lockHash')
+      .addGroupBy('output.typeArgs')
+      .getRawMany()
+
+    const result = outputs
+      .filter(o => {
+        const status = (o.txStatusArray as string).split(',').map(a => a.trim())
+        const blockNumbers: bigint[] = (o.blockNumberArray as string).split(',').map(a => BigInt(a.trim())).sort()
+        if (
+          blockNumbers[blockNumbers.length - 1] >= startBlockNumberInt &&
+          !(blockNumbers[0] < startBlockNumberInt) &&
+          !status.includes(TransactionStatus.Pending)
+        ) {
+          return o
+        }
+        return undefined
+      })
+
+    for (const output of result) {
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(AssetAccountEntity)
+        .where("tokenID = :tokenID AND blake160 = :blake160", {
+          tokenID: output.typeArgs || 'CKBytes',
+          blake160: output.lockArgs,
+        })
+        .execute()
+    }
   }
 
   private static async blake160sOfAssetAccounts(walletID: string): Promise<string[]> {
