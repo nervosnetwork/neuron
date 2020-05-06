@@ -57,6 +57,8 @@ export default class Transaction {
 
   public sudtInfo?: SudtInfo
 
+  public anyoneCanPaySendAmount?: string
+
   constructor(
     version: string,
     cellDeps: CellDep[] = [],
