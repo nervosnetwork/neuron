@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import appState from 'states/initStates/app'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import appState from 'states/init/app'
+import { useState as useGlobalState, useDispatch } from 'states'
 
 import calculateFee from 'utils/calculateFee'
 import { shannonToCKBFormatter } from 'utils/formatters'

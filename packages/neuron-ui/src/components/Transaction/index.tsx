@@ -12,7 +12,7 @@ import {
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
-import { transactionState } from 'states/initStates/chain'
+import { transactionState } from 'states/init/chain'
 
 import isSuccessResponse from 'utils/isSuccessResponse'
 import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'

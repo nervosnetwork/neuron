@@ -6,7 +6,7 @@ import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { verifyNetworkName, verifyURL } from 'utils/validators'
 import { useGoBack } from 'utils/hooks'
 import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'

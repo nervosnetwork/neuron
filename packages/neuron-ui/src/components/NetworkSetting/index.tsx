@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 
-import chainState from 'states/initStates/chain'
+import chainState from 'states/init/chain'
 import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
 import { Routes } from 'utils/const'

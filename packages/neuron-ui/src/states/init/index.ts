@@ -5,14 +5,7 @@ import settings from './settings'
 import nervosDAO from './nervosDAO'
 import updater from './updater'
 
-export * from './app'
-export * from './chain'
-export * from './wallet'
-export * from './settings'
-export * from './nervosDAO'
-export * from './updater'
-
-const initStates = {
+export const initStates = {
   app,
   chain,
   wallet,

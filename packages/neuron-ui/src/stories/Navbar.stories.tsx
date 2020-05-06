@@ -3,8 +3,7 @@ import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
 import { action } from '@storybook/addon-actions'
 import Navbar from 'containers/Navbar'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 
 const wallets: State.WalletIdentity[] = [{ id: 'wallet id', name: 'wallet name' }]
 

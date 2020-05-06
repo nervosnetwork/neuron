@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Route, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 
 import Overview from 'components/Overview'
 import WalletWizard from 'components/WalletWizard'

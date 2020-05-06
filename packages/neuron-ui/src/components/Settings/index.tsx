@@ -3,7 +3,7 @@ import { Route, useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, Pivot, PivotItem } from 'office-ui-fabric-react'
 
-import { useState as useGloablState, useDispatch } from 'states/stateProvider'
+import { useState as useGloablState, useDispatch } from 'states'
 
 import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'

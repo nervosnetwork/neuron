@@ -5,7 +5,7 @@ import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
 
 import TransactionList from 'components/TransactionList'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 
 import { Routes } from 'utils/const'
 import isMainnetUtil from 'utils/isMainnet'
