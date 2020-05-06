@@ -13,7 +13,7 @@ import { AppActions } from 'states/stateProvider/reducer'
 import isMainnetUtil from 'utils/isMainnet'
 import { verifySUDTAddress, verifySUDTAmount } from 'utils/validators'
 import TransactionFeePanel from 'components/TransactionFeePanel'
-import { shannonToCKBFormatter, sudtValueToAmount, sudtAmountToValue } from 'utils/formatters'
+import { shannonToCKBFormatter, sudtValueToAmount, sudtAmountToValue, localNumberFormatter } from 'utils/formatters'
 import { INIT_SEND_PRICE, Routes, DEFAULT_SUDT_FIELDS, MEDIUM_FEE_RATE } from 'utils/const'
 import { AmountNotEnoughException } from 'exceptions'
 import {
@@ -47,7 +47,7 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string |
       return { ...state, [Fields.Address]: action.payload.toString() }
     }
     case Fields.Amount: {
-      return { ...state, [Fields.Amount]: action.payload.toString() }
+      return { ...state, [Fields.Amount]: action.payload.toString().replace(/,/g, '') }
     }
     case Fields.SendAll: {
       return { ...state, [Fields.SendAll]: !!action.payload }
@@ -209,13 +209,24 @@ const SUDTSend = () => {
       .catch((err: Error) => {
         setRemoteError(err.message)
       })
-  }, [walletId, sendState, errors, globalDispatch, setRemoteError, accountInfo])
+  }, [
+    walletId,
+    sendState.address,
+    sendState.amount,
+    sendState.sendAll,
+    sendState.description,
+    errors,
+    globalDispatch,
+    setRemoteError,
+    accountInfo,
+  ])
 
   useEffect(() => {
-    if (sendState.sendAll && experimental?.tx?.sudtInfo?.amount && accountInfo?.decimal) {
+    const amount = experimental?.tx?.sudtInfo?.amount || experimental?.tx?.anyoneCanPaySendAmount
+    if (sendState.sendAll && amount && accountInfo?.decimal) {
       dispatch({
         type: Fields.Amount,
-        payload: sudtValueToAmount(experimental.tx.sudtInfo.amount, accountInfo.decimal),
+        payload: sudtValueToAmount(amount, accountInfo.decimal),
       })
     }
   }, [sendState.sendAll, experimental, accountInfo])
@@ -296,7 +307,9 @@ const SUDTSend = () => {
               return (
                 <TextField
                   label={field.label}
-                  value={sendState[field.key]}
+                  value={
+                    field.key === Fields.Amount ? localNumberFormatter(sendState[field.key]) : sendState[field.key]
+                  }
                   key={field.label}
                   required
                   field={field.key}
