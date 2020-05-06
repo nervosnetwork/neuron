@@ -74,7 +74,7 @@ const Addresses = () => {
   )
 
   return (
-    <div className={styles.container}>
+    <div>
       <Breadcrum pages={breakcrum} />
       <div className={styles.title}>{t('addresses.title')}</div>
       <div className={styles.tableContainer}>
