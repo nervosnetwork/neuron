@@ -87,8 +87,8 @@ export class FlattenLockAndType1587375230126 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-      await queryRunner.dropIndex("output", new TableIndex({ columnNames: ["typeHash"] }))
-      await queryRunner.dropIndex("output", new TableIndex({ columnNames: ["typeCodeHash"] }))
+      await queryRunner.dropIndex("output", 'IDX_77f58dbdfbe8c9ba64d6c9429f')
+      await queryRunner.dropIndex("output", 'IDX_1ed5d6c6f97066013a22ca4adb')
 
       await queryRunner.addColumn('output', new TableColumn({
         name: 'lock',
