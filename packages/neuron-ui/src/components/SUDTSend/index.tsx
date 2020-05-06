@@ -222,7 +222,7 @@ const SUDTSend = () => {
   ])
 
   useEffect(() => {
-    const amount = experimental?.tx?.sudtInfo?.amount || experimental?.tx?.anyoneCanPaySendAmount
+    const amount = experimental?.tx?.anyoneCanPaySendAmount
     if (sendState.sendAll && amount && accountInfo?.decimal) {
       dispatch({
         type: Fields.Amount,
