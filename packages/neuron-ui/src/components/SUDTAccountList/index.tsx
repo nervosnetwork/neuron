@@ -125,7 +125,7 @@ const SUDTAccountList = () => {
         break
       }
       default: {
-        setSelectedId(id)
+        setSelectedId(selected => (selected === id ? '' : id))
       }
     }
   }
