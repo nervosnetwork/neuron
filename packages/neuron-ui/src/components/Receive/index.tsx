@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { TooltipHost } from 'office-ui-fabric-react'
 import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 import QRCode from 'widgets/QRCode'
 import { addPopup } from 'states/stateProvider/actionCreators'
 import styles from './receive.module.scss'

@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { Route } from 'react-router-dom'
-import { useState as useGlobalState } from 'states/stateProvider'
+import { useState as useGlobalState } from 'states'
 
 export interface Element {
   path: string

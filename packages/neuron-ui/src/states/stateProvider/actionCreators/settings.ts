@@ -42,8 +42,3 @@ export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispat
     return res.status
   })
 }
-
-export default {
-  createNetwork,
-  updateNetwork,
-}

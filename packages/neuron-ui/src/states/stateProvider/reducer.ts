@@ -1,5 +1,5 @@
 import produce, { Draft } from 'immer'
-import initStates from 'states/initStates'
+import initStates from 'states/init'
 import { ConnectionStatus, ErrorCode } from 'utils/const'
 
 export enum NeuronWalletActions {

@@ -44,7 +44,3 @@ export const updateTransactionDescription = (params: Controller.UpdateTransactio
     }
   })
 }
-
-export default {
-  updateTransactionList,
-}

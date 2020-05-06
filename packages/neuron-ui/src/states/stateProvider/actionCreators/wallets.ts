@@ -11,8 +11,8 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { emptyWallet } from 'states/initStates/wallet'
-import { emptyNervosDaoData } from 'states/initStates/nervosDAO'
+import { emptyWallet } from 'states/init/wallet'
+import { emptyNervosDaoData } from 'states/init/nervosDAO'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
 import { ErrorCode, ResponseCode } from 'utils/const'
 import { addressesToBalance, failureResToNotification } from 'utils/formatters'
@@ -218,17 +218,4 @@ export const clearNervosDaoData = () => (dispatch: StateDispatch) => {
     type: NeuronWalletActions.UpdateNervosDaoData,
     payload: emptyNervosDaoData,
   })
-}
-
-export default {
-  updateCurrentWallet,
-  updateWalletList,
-  updateWallet,
-  setCurrentWallet,
-  sendTransaction,
-  updateAddressListAndBalance,
-  updateAddressDescription,
-  deleteWallet,
-  backupWallet,
-  updateNervosDaoData,
 }

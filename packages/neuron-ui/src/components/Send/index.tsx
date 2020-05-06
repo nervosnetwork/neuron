@@ -17,8 +17,8 @@ import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import appState from 'states/initStates/app'
+import { useState as useGlobalState, useDispatch } from 'states'
+import appState from 'states/init/app'
 
 import {
   PlaceHolders,

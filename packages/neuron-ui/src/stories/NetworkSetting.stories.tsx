@@ -2,7 +2,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import StoryRouter from 'storybook-react-router'
 import NetworkSetting from 'components/NetworkSetting'
-import initStates from 'states/initStates'
+import { initStates } from 'states'
 
 const states: { [title: string]: State.Network[] } = {
   'Empty List': [],

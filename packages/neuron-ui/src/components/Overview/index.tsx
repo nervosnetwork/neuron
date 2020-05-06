@@ -5,7 +5,7 @@ import PropertyList, { Property } from 'widgets/PropertyList'
 import Balance from 'widgets/Balance'
 
 import { showTransactionDetails } from 'services/remote'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
 import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'

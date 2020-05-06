@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, PanelType, SpinnerSize } from 'office-ui-fabric-react'
-import { useState as useGlobalState } from 'states/stateProvider'
+import { useState as useGlobalState } from 'states'
 import Spinner from 'widgets/Spinner'
 
 import { Routes } from 'utils/const'

@@ -1,6 +1,6 @@
 import { NeuronWalletActions, AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { getNeuronWalletState } from 'services/remote'
-import initStates from 'states/initStates'
+import initStates from 'states/init'
 import { Routes, ErrorCode } from 'utils/const'
 import { WalletWizardPath } from 'components/WalletWizard'
 import { addressesToBalance } from 'utils/formatters'
@@ -130,17 +130,4 @@ export const toggleIsAllowedToFetchList = (allowed?: boolean) => (dispatch: Stat
     type: AppActions.ToggleIsAllowedToFetchList,
     payload: allowed,
   })
-}
-
-export default {
-  initAppState,
-  addNotification,
-  addPopup,
-  dismissGlobalDialog,
-  dismissNotification,
-  showAlertDialog,
-  dismissAlertDialog,
-  toggleTopAlertVisibility,
-  toggleAllNotificationVisibility,
-  toggleIsAllowedToFetchList,
 }

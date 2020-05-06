@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { openExternal, openContextMenu } from 'services/remote'
 
 import { useLocalDescription } from 'utils/hooks'

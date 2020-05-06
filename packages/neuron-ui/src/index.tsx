@@ -12,7 +12,7 @@ import Main from 'containers/Main'
 import Transaction from 'components/Transaction'
 import SignAndVerify from 'components/SignAndVerify'
 import ErrorBoundary from 'components/ErrorBoundary'
-import withProviders from 'states/stateProvider'
+import { withProvider } from 'states'
 
 export const containers: CustomRouter.Route[] = [
   {
@@ -35,7 +35,7 @@ export const containers: CustomRouter.Route[] = [
   },
 ]
 
-const App = withProviders(() => (
+const App = withProvider(() => (
   <ErrorBoundary>
     <Router>
       {containers.map(container => {

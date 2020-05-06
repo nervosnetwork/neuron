@@ -5,7 +5,7 @@ import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 
 import { Routes, ErrorCode } from 'utils/const'
 
