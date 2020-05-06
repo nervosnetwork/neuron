@@ -153,7 +153,7 @@ const SUDTSend = () => {
     try {
       verifySUDTAmount({ amount: sendState.amount, decimal: accountInfo?.decimal ?? '32', required: false })
       const value = sudtAmountToValue(sendState.amount, accountInfo?.decimal ?? '32')
-      const total = sudtAmountToValue(accountInfo?.balance ?? '0', accountInfo?.decimal ?? '32')
+      const total = accountInfo?.balance ?? '0'
       if (total && value && BigInt(total) < BigInt(value)) {
         throw new AmountNotEnoughException()
       }
@@ -178,6 +178,16 @@ const SUDTSend = () => {
     if (amount === undefined) {
       return
     }
+    if (sendState.sendAll) {
+      if (!sendState.address || errors.address) {
+        return
+      }
+    } else if (
+      [Fields.Address, Fields.Amount].some(key => !sendState[key as Fields.Address | Fields.Amount].trim()) ||
+      Object.values(errors).some(v => v)
+    ) {
+      return
+    }
     const params = {
       assetAccountID: accountInfo?.accountId,
       walletID: walletId,
@@ -199,16 +209,7 @@ const SUDTSend = () => {
       .catch((err: Error) => {
         setRemoteError(err.message)
       })
-  }, [
-    walletId,
-    sendState.address,
-    sendState.amount,
-    sendState.description,
-    sendState.sendAll,
-    globalDispatch,
-    setRemoteError,
-    accountInfo,
-  ])
+  }, [walletId, sendState, errors, globalDispatch, setRemoteError, accountInfo])
 
   useEffect(() => {
     if (sendState.sendAll && experimental?.tx?.sudtInfo?.amount && accountInfo?.decimal) {
