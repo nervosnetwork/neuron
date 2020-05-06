@@ -41,8 +41,8 @@ export class AddTypeToInput1587371249814 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-      await queryRunner.dropIndex("input", new TableIndex({ columnNames: ["typeHash"] }))
-      await queryRunner.dropIndex("input", new TableIndex({ columnNames: ["typeCodeHash"] }))
+      await queryRunner.dropIndex("input", 'IDX_d8f1dbfd18f00e3e9a5874b5ee')
+      await queryRunner.dropIndex("input", 'IDX_c28a64a4f086c90190152e6b0e')
 
       await queryRunner.dropColumn('input', 'typeCodeHash')
       await queryRunner.dropColumn('input', 'typeArgs')
