@@ -15,13 +15,13 @@ import { Routes, FULL_SCREENS } from 'utils/const'
 import styles from './navbar.module.scss'
 
 const menuItems = [
-  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview, experimental: false },
-  { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send, experimental: false },
-  { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive, experimental: false },
-  { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History, experimental: false },
-  { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO, experimental: false },
-  { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets, experimental: true },
-  { name: 'navbar.s-udt', key: Routes.SUDTAccountList.slice(1), url: Routes.SUDTAccountList, experimental: true },
+  { name: 'navbar.overview', key: Routes.Overview, url: Routes.Overview, experimental: false },
+  { name: 'navbar.send', key: Routes.Send, url: Routes.Send, experimental: false },
+  { name: 'navbar.receive', key: Routes.Receive, url: Routes.Receive, experimental: false },
+  { name: 'navbar.history', key: Routes.History, url: Routes.History, experimental: false },
+  { name: 'navbar.nervos-dao', key: Routes.NervosDAO, url: Routes.NervosDAO, experimental: false },
+  { name: 'navbar.special-assets', key: Routes.SpecialAssets, url: Routes.SpecialAssets, experimental: true },
+  { name: 'navbar.s-udt', key: Routes.SUDTAccountList, url: Routes.SUDTAccountList, experimental: true },
 ]
 
 const Navbar = () => {
@@ -36,8 +36,7 @@ const Navbar = () => {
   } = neuronWallet
   const [t] = useTranslation()
 
-  const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
-  const selectedKey: string | null = selectedTab ? selectedTab.key : null
+  const selectedKey = menuItems.find(item => item.key === pathname)?.key ?? null
 
   const syncStatus = getSyncStatus({
     syncedBlockNumber,
@@ -85,9 +84,7 @@ const Navbar = () => {
       </button>
     ))
 
-  const currentNetwork = networks.find(n => n.id === networkID)
-
-  const networkName = currentNetwork ? currentNetwork.name : null
+  const networkName = networks.find(n => n.id === networkID)?.name ?? null
 
   return (
     <aside className={styles.sidebar}>
