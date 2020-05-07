@@ -167,8 +167,8 @@ export default class AssetAccountService {
 
   public static async checkAndSaveAssetAccountWhenSync(walletID: string, tokenID: string, blake160: string) {
     const isCKB = tokenID === 'CKBytes'
-    const decimal = isCKB ? '8' : '0'
-    const assetAccount = new AssetAccount(walletID, tokenID, '???', '???', '???', decimal, '0', blake160)
+    const decimal = isCKB ? '8' : ''
+    const assetAccount = new AssetAccount(walletID, tokenID, '', '', '', decimal, '0', blake160)
     const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
     const sudtTokenInfoEntity = assetAccountEntity.sudtTokenInfo
     await getConnection()

@@ -234,7 +234,8 @@ describe('AssetAccountService', () => {
       expect(entity.sudtTokenInfo).not.toBeNull()
       expect(entity.walletID).toEqual(assetAccount.walletID)
       expect(entity.tokenID).toEqual(assetAccount.tokenID)
-      expect(entity.sudtTokenInfo.symbol).toEqual('???')
+      expect(entity.sudtTokenInfo.symbol).toEqual('')
+      expect(entity.sudtTokenInfo.decimal).toEqual('')
     })
 
     it('create CKB', async () => {
