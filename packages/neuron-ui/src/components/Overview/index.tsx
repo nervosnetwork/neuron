@@ -8,19 +8,23 @@ import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
 import {
+  localNumberFormatter,
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+  backToTop,
+  CONSTANTS,
   SyncStatus as SyncStatusEnum,
   SyncStatusThatBalanceUpdating,
   ConnectionStatus,
-  PAGE_SIZE,
-  Routes,
-  CONFIRMATION_THRESHOLD,
-} from 'utils/const'
-import { backToTop } from 'utils/animations'
+  RoutePath,
+  getCurrentUrl,
+  getSyncStatus,
+} from 'utils'
+
 import styles from './overview.module.scss'
+
+const { PAGE_SIZE, CONFIRMATION_THRESHOLD } = CONSTANTS
 
 const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming' | 'success' | 'failed') => {
   switch (type) {
@@ -87,7 +91,7 @@ const Overview = () => {
     })(dispatch)
   }, [id, dispatch])
   const onGoToHistory = useCallback(() => {
-    history.push(Routes.History)
+    history.push(RoutePath.History)
   }, [history])
 
   const balanceProperties: Property[] = useMemo(() => {

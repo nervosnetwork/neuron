@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { updateTransactionList } from 'states/stateProvider/actionCreators/transactions'
-import { queryParsers } from 'utils/parsers'
-import { backToTop } from 'utils/animations'
+import { queryParsers, backToTop } from 'utils'
 
 export const useSearch = (search: string = '', walletID: string = '', dispatch: React.Dispatch<any>) => {
   const [keywords, setKeywords] = useState('')

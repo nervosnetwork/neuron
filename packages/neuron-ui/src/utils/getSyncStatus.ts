@@ -1,11 +1,12 @@
-import { SyncStatus, BUFFER_BLOCK_NUMBER, MAX_TIP_BLOCK_DELAY } from 'utils/const'
+import { SyncStatus } from 'utils/enums'
+import { BUFFER_BLOCK_NUMBER, MAX_TIP_BLOCK_DELAY } from 'utils/const'
 
 const TEN_MINS = 10 * 60 * 1000
 let blockNumber10MinAgo: string = ''
 let timestamp10MinAgo: number | undefined
 let prevUrl: string | undefined
 
-export default ({
+export const getSyncStatus = ({
   syncedBlockNumber,
   tipBlockNumber,
   tipBlockTimestamp,
@@ -44,3 +45,5 @@ export default ({
   }
   return SyncStatus.Syncing
 }
+
+export default getSyncStatus

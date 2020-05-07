@@ -191,11 +191,3 @@ export const useExitOnWalletChange = () => {
     }
   }, [])
 }
-export default {
-  useGoBack,
-  useLocalDescription,
-  useCalculateEpochs,
-  useDialog,
-  useOnDefaultContextMenu,
-  useExitOnWalletChange,
-}

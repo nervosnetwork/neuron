@@ -4,15 +4,22 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
 import ExperimentalIcon from 'widgets/Icons/Experimental.png'
 import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
-import { PAGE_SIZE, Routes, PRESET_SCRIPT, MEDIUM_FEE_RATE } from 'utils/const'
+import {
+  CONSTANTS,
+  RoutePath,
+  PresetScript,
+  isMainnet as isMainnetUtil,
+  isSuccessResponse,
+  queryParsers,
+  epochParser,
+} from 'utils'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { AppActions } from 'states/stateProvider/reducer'
 import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
-import isMainnetUtil from 'utils/isMainnet'
-import isSuccessResponse from 'utils/isSuccessResponse'
-import { queryParsers, epochParser } from 'utils/parsers'
 import { ckbCore } from 'services/chain'
 import styles from './specialAssetList.module.scss'
+
+const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
 
 export interface SpecialAssetCell {
   blockHash: string
@@ -20,7 +27,7 @@ export interface SpecialAssetCell {
   capacity: string
   customizedAssetInfo: {
     data: string
-    lock: PRESET_SCRIPT.Locktime | string
+    lock: PresetScript.Locktime | string
     type: string
   }
   daoData: string | null
@@ -162,7 +169,7 @@ const SpecialAssetList = () => {
     return cells.map(cell => {
       let status: SpecialAssetProps['status'] = 'user-defined-asset'
       let epochInfo: { target: number; current: number } | undefined
-      if (cell.customizedAssetInfo.lock === PRESET_SCRIPT.Locktime) {
+      if (cell.customizedAssetInfo.lock === PresetScript.Locktime) {
         const targetEpochInfo = epochParser(ckbCore.utils.toHexInLittleEndian(`0x${cell.lock.args.slice(-16)}`))
         const currentEpochInfo = epochParser(epoch)
         const targetEpochFraction =
@@ -233,7 +240,7 @@ const SpecialAssetList = () => {
             lastPageIconProps={{ iconName: 'LastPage' }}
             format="buttons"
             onPageChange={(idx: number) => {
-              history.push(`${Routes.SpecialAssets}?pageNo=${idx + 1}`)
+              history.push(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
             }}
           />
         ) : null}

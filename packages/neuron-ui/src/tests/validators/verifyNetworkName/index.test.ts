@@ -1,5 +1,5 @@
 import { verifyNetworkName } from 'utils/validators'
-import { ErrorCode } from 'utils/const'
+import { ErrorCode } from 'utils/enums'
 import fixtures from './fixtures'
 
 const fixtureTable = Object.entries(fixtures).map(([title, { name, usedNames, expected }]) => [

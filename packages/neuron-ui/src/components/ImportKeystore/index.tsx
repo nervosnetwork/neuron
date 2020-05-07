@@ -7,18 +7,18 @@ import { useState as useGlobalState } from 'states'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { Routes, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
-import { useGoBack } from 'utils/hooks'
-import generateWalletName from 'utils/generateWalletName'
-import isSuccessResponse from 'utils/isSuccessResponse'
+import { generateWalletName, RoutePath, ErrorCode, CONSTANTS, useGoBack, isSuccessResponse } from 'utils'
+
 import styles from './importKeystore.module.scss'
+
+const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
 export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return importKeystore(params).then(res => {
     if (isSuccessResponse(res)) {
-      history.push(Routes.Overview)
+      history.push(RoutePath.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {

@@ -1,4 +1,4 @@
-import { ErrorCode } from 'utils/const'
+import { ErrorCode } from 'utils/enums'
 
 export class FieldInvalidException extends Error {
   public code = ErrorCode.FieldInvalid

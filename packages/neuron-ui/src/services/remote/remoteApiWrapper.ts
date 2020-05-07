@@ -1,5 +1,4 @@
-import { ResponseCode, ErrorCode } from 'utils/const'
-import isSuccessResponse from 'utils/isSuccessResponse'
+import { ResponseCode, ErrorCode, isSuccessResponse } from 'utils'
 
 export interface SuccessFromController {
   status: ResponseCode.SUCCESS

@@ -29,7 +29,7 @@ const apcInPeriod = ({ startYearNumber, endYearNumber }: { startYearNumber: numb
   return rate
 }
 
-const calculateAPC = (
+export const calculateAPC = (
   { startYearNumber, endYearNumber }: { startYearNumber: number; endYearNumber: number },
   scale: boolean = true
 ) => {

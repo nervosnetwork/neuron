@@ -22,7 +22,7 @@ import {
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { ConnectionStatus, ErrorCode, Routes } from 'utils/const'
+import { ConnectionStatus, ErrorCode, RoutePath } from 'utils'
 
 const SYNC_INTERVAL_TIME = 4000
 const CONNECTING_BUFFER = 15_000
@@ -128,7 +128,7 @@ export const useSubscription = ({
         case 'current-wallet': {
           updateCurrentWallet()(dispatch).then(hasCurrent => {
             if (!hasCurrent) {
-              history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+              history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
             }
           })
           break
@@ -137,7 +137,7 @@ export const useSubscription = ({
           Promise.all([updateWalletList, updateCurrentWallet].map(request => request()(dispatch))).then(
             ([hasList, hasCurrent]) => {
               if (!hasList || !hasCurrent) {
-                history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+                history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
               }
             }
           )

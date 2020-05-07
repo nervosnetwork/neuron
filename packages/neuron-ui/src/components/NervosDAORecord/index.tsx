@@ -2,15 +2,22 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CompensationProgressBar from 'components/CompensationProgressBar'
 import Button from 'widgets/Button'
-import { shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import { epochParser } from 'utils/parsers'
-import getDAOCellStatus, { CellStatus } from 'utils/getDAOCellStatus'
-import { IMMATURE_EPOCHS, ConnectionStatus, HOURS_PER_EPOCH } from 'utils/const'
+import {
+  calculateClaimEpochValue,
+  ConnectionStatus,
+  CONSTANTS,
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+  getDAOCellStatus,
+  CellStatus,
+  epochParser,
+} from 'utils'
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
+
+const { IMMATURE_EPOCHS, HOURS_PER_EPOCH } = CONSTANTS
 
 const EPOCHS_PER_DAY = 6
 

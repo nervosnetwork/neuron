@@ -2,7 +2,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
 import NetworkStatus, { NetworkStatusProps } from 'components/NetworkStatus'
-import { SyncStatus } from 'utils/const'
+import { SyncStatus } from 'utils'
 
 const states: { [index: string]: NetworkStatusProps } = {
   Online: {

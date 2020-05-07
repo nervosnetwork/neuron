@@ -7,12 +7,16 @@ import TextField from 'widgets/TextField'
 import { useState as useGlobalState, useDispatch } from 'states'
 import { openExternal, openContextMenu } from 'services/remote'
 
-import { useLocalDescription } from 'utils/hooks'
-import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { Routes } from 'utils/const'
-import { backToTop } from 'utils/animations'
-import getExplorerUrl from 'utils/getExplorerUrl'
-import isMainnetUtil from 'utils/isMainnet'
+import {
+  useLocalDescription,
+  backToTop,
+  RoutePath,
+  localNumberFormatter,
+  shannonToCKBFormatter,
+  getExplorerUrl,
+  isMainnet as isMainnetUtil,
+} from 'utils'
+
 import styles from './addresses.module.scss'
 
 const Addresses = () => {
@@ -54,7 +58,7 @@ const Addresses = () => {
           {
             label: t('addresses.request-payment'),
             click: () => {
-              history.push(`${Routes.Receive}/${item.address}`)
+              history.push(`${RoutePath.Receive}/${item.address}`)
             },
           },
           {

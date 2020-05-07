@@ -1,10 +1,8 @@
 import { NeuronWalletActions, AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { getNeuronWalletState } from 'services/remote'
 import initStates from 'states/init'
-import { Routes, ErrorCode } from 'utils/const'
+import { RoutePath, ErrorCode, addressesToBalance, isSuccessResponse } from 'utils'
 import { WalletWizardPath } from 'components/WalletWizard'
-import { addressesToBalance } from 'utils/formatters'
-import isSuccessResponse from 'utils/isSuccessResponse'
 import {
   wallets as walletsCache,
   addresses as addressesCache,
@@ -40,9 +38,9 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
           },
         })
         if (!wallet) {
-          history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+          history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
         } else {
-          history.push(Routes.Overview)
+          history.push(RoutePath.Overview)
         }
 
         currentWalletCache.save(wallet)
@@ -51,11 +49,11 @@ export const initAppState = () => (dispatch: StateDispatch, history: any) => {
         networksCache.save(networks)
         currentNetworkIDCache.save(currentNetworkID)
       } else {
-        history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+        history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
       }
     })
     .catch(() => {
-      history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
+      history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
     })
 }
 

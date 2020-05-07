@@ -7,8 +7,7 @@ import { Pagination } from '@uifabric/experiments'
 import TransactionList from 'components/TransactionList'
 import { useState as useGlobalState, useDispatch } from 'states'
 
-import { Routes } from 'utils/const'
-import isMainnetUtil from 'utils/isMainnet'
+import { RoutePath, isMainnet as isMainnetUtil } from 'utils'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
@@ -34,7 +33,7 @@ const History = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
-  const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
+  const onSearch = useCallback(() => history.push(`${RoutePath.History}?keywords=${keywords}`), [history, keywords])
 
   const tipBlockNumber = useMemo(() => {
     return Math.max(+syncedBlockNumber, +chainBlockNumber).toString()
@@ -90,7 +89,7 @@ const History = () => {
               lastPageIconProps={{ iconName: 'LastPage' }}
               format="buttons"
               onPageChange={(idx: number) => {
-                history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
+                history.push(`${RoutePath.History}?pageNo=${idx + 1}&keywords=${keywords}`)
               }}
             />
           ) : null}

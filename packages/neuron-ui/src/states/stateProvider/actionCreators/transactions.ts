@@ -4,8 +4,7 @@ import {
   getTransactionList,
   updateTransactionDescription as updateRemoteTransactionDescription,
 } from 'services/remote'
-import { failureResToNotification } from 'utils/formatters'
-import isSuccessResponse from 'utils/isSuccessResponse'
+import { failureResToNotification, isSuccessResponse } from 'utils'
 import { addNotification } from './app'
 
 export const updateTransactionList = (params: GetTransactionListParams) => (dispatch: StateDispatch) => {

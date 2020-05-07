@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils/const'
+import { SyncStatus as SyncStatusEnum, ConnectionStatus } from 'utils'
 
 const SyncStatus = ({
   syncStatus,

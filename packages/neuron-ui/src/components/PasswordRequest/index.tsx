@@ -4,11 +4,16 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
-import { useDialog } from 'utils/hooks'
-import { ResponseCode, ErrorCode, Routes } from 'utils/const'
-import { useState as useGlobalState, useDispatch } from 'states'
-import { AppActions } from 'states/stateProvider/reducer'
-import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
+import { useDialog, ResponseCode, ErrorCode, RoutePath } from 'utils'
+
+import {
+  useState as useGlobalState,
+  useDispatch,
+  AppActions,
+  sendTransaction,
+  deleteWallet,
+  backupWallet,
+} from 'states'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
 
@@ -62,7 +67,7 @@ const PasswordRequest = () => {
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
               if (status === ResponseCode.SUCCESS) {
-                history.push(Routes.History)
+                history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }

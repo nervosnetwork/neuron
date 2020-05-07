@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConnectionStatus, SyncStatus } from 'utils/const'
+import { ConnectionStatus, SyncStatus } from 'utils'
 import { ReactComponent as BalanceSyncing } from 'widgets/Icons/BalanceSyncing.svg'
 import { ReactComponent as BalanceSyncFailed } from 'widgets/Icons/BalanceSyncFailed.svg'
 import styles from './balanceSyncIcon.module.scss'
