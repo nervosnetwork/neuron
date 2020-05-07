@@ -237,6 +237,22 @@ describe('AssetAccountService', () => {
       expect(entity.sudtTokenInfo.symbol).toEqual('???')
     })
 
+    it('create CKB', async () => {
+      const ckbTokenID = 'CKBytes'
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, ckbTokenID, assetAccount.blake160)
+
+      const all = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .getMany()
+
+      expect(all.length).toEqual(1)
+      const entity = all[0]
+      expect(entity.tokenID).toEqual(ckbTokenID)
+      expect(entity.sudtTokenInfo!.decimal).toEqual('8')
+    })
+
     it('sudtTokenInfo exists', async () => {
       const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
       await getConnection().manager.save(assetAccountEntity.sudtTokenInfo)
