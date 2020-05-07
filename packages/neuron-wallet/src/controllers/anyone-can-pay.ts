@@ -65,7 +65,8 @@ export default class AnyoneCanPayController {
     const txHash = await new TransactionSender().sendTx(
       params.walletID,
       txModel,
-      params.password
+      params.password,
+      1,
     )
 
     if (!txHash) {
