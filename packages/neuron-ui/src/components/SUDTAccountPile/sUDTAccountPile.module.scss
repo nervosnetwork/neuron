@@ -1,8 +1,9 @@
 .container {
   background: #fff;
-  width: 310px;
+  width: 305px;
   display: grid;
   grid-template: 'avatar account-name account-name edit-btn' auto 'avatar token-name symbol .' auto '. footer footer footer' 25px/ 33px auto 1fr 15px;
+  box-sizing: border-box;
 
   & > div {
     overflow: hidden;
