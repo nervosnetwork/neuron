@@ -15,7 +15,6 @@ export interface SUDTAccountPileProps {
   balance: string
   tokenId: string
   address: string
-  isSelected: boolean
   decimal: string
   onClick: React.EventHandler<React.SyntheticEvent<HTMLDivElement>>
 }
@@ -26,7 +25,6 @@ const SUDTAccountPile = ({
   tokenName,
   symbol,
   balance,
-  isSelected,
   decimal,
   onClick,
 }: SUDTAccountPileProps) => {
@@ -50,14 +48,11 @@ const SUDTAccountPile = ({
           <img src={EditIcon} alt="edit" />
         </button>
       </div>
-      {isSelected ? (
-        <div className={styles.actions}>
-          <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={!accountName} />
-          <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={!accountName} />
-        </div>
-      ) : (
-        <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>
-      )}
+      <div className={styles.actions}>
+        <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={!accountName} />
+        <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={!accountName} />
+      </div>
+      <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>
     </div>
   )
 }
