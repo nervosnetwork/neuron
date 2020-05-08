@@ -461,18 +461,18 @@ export default class CellsService {
         cell.lock(),
         cell.lockHash
       )
+      inputCapacities += BigInt(cell.capacity)
+      totalSize += TransactionSize.input()
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
         totalSize += TransactionSize.secpLockWitness()
+        inputOriginCells.push(cell)
+        // capacity - 61CKB, 61CKB remaining for change
+        inputCapacities -= this.ANYONE_CAN_PAY_CKB_CELL_MIN
+        totalSize += TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x')
       }
       inputs.push(input)
-      inputOriginCells.push(cell)
-
-      // capacity - 61CKB, 61CKB remaining for change
-      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_CKB_CELL_MIN
-      // inputAmount += BigInt(cell.data)
-      totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
 
@@ -584,17 +584,18 @@ export default class CellsService {
         cell.lock(),
         cell.lockHash
       )
+      inputCapacities += BigInt(cell.capacity)
+      totalSize += TransactionSize.input()
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
         totalSize += TransactionSize.secpLockWitness()
+        inputOriginCells.push(cell)
+        // capacity - 61CKB, 61CKB remaining for change
+        inputCapacities -= this.ANYONE_CAN_PAY_CKB_CELL_MIN
+        totalSize += TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x')
       }
       inputs.push(input)
-      inputOriginCells.push(cell)
-
-      // capacity - 61CKB, 61CKB remaining for change
-      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_CKB_CELL_MIN
-      totalSize += (TransactionSize.input() + TransactionSize.ckbAnyoneCanPayOutput() + TransactionSize.outputData('0x'))
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
     })
@@ -674,18 +675,20 @@ export default class CellsService {
         cell.lock(),
         cell.lockHash
       )
+      inputCapacities += BigInt(cell.capacity)
+      totalSize += TransactionSize.input()
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {
         totalSize += TransactionSize.emptyWitness()
       } else {
         totalSize += TransactionSize.secpLockWitness()
+        inputOriginCells.push(cell)
+        // capacity - 142CKB, 142CKB remaining for change
+        inputCapacities -= this.ANYONE_CAN_PAY_SUDT_CELL_MIN
+        totalSize += TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData()
       }
       inputs.push(input)
-      inputOriginCells.push(cell)
 
-      // capacity - 142CKB, 142CKB remaining for change
-      inputCapacities += BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN
       inputAmount += BufferUtils.readBigUInt128LE(cell.data)
-      totalSize += (TransactionSize.input() + TransactionSize.sudtAnyoneCanPayOutput() + TransactionSize.sudtData())
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
 
@@ -702,13 +705,17 @@ export default class CellsService {
 
     let currentFee: bigint = needFee
     const anyoneCanPayOutputs = inputOriginCells.map(cell => {
+      const cellCapacity: bigint = inputs
+        .filter(i => i.lockHash === cell.lockHash)
+        .map(i => BigInt(i.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
       let capacity: bigint = BigInt(0)
-      if (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {
-        capacity = BigInt(cell.capacity) - currentFee
+      if (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN >= currentFee) {
+        capacity = BigInt(cellCapacity) - currentFee
         currentFee = BigInt(0)
       } else {
         capacity = this.ANYONE_CAN_PAY_SUDT_CELL_MIN
-        currentFee = currentFee - (BigInt(cell.capacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
+        currentFee = currentFee - (BigInt(cellCapacity) - this.ANYONE_CAN_PAY_SUDT_CELL_MIN)
       }
       const output = Output.fromObject({
         capacity: capacity.toString(),

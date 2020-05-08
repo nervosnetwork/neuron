@@ -1058,7 +1058,7 @@ describe('TransactionGenerator', () => {
         expect(tx.fee).toEqual(expectedTxFee)
 
         expect(tx.inputs.length).toEqual(3)
-        expect(tx.outputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(2)
 
         const inputCapacities = tx.inputs
           .map(input => BigInt(input.capacity))
@@ -1376,21 +1376,18 @@ describe('TransactionGenerator', () => {
         expect(tx.fee).toEqual(expectedTxFee)
 
         expect(tx.inputs.length).toEqual(3)
-        expect(tx.outputs.length).toEqual(3)
+        expect(tx.outputs.length).toEqual(2)
 
         const expectedOutputCapacities: bigint[] = [
-          BigInt(toShannon('143')) - BigInt(tx.fee),
+          BigInt(toShannon('143')) + BigInt(toShannon('142')) - BigInt(tx.fee),
           BigInt(toShannon('142')),
-          BigInt(toShannon('142'))
         ]
         expect(tx.outputs.map(o => BigInt(o.capacity))).toEqual(expectedOutputCapacities)
         expect(tx.outputs.map(o => o.lockHash)).toEqual([
           bobAnyoneCanPayLockScript.computeHash(),
-          bobAnyoneCanPayLockScript.computeHash(),
           aliceAnyoneCanPayLockScript.computeHash(),
         ])
         expect(tx.outputsData).toEqual([
-          BufferUtils.writeBigUInt128LE(BigInt(0)),
           BufferUtils.writeBigUInt128LE(BigInt(950)),
           BufferUtils.writeBigUInt128LE(BigInt(200)),
         ])
