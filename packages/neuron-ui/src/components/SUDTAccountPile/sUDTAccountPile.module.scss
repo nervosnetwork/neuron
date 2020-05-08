@@ -1,6 +1,6 @@
 .container {
   background: #fff;
-  width: 305px;
+  width: 290px;
   display: grid;
   grid-template: 'avatar account-name account-name edit-btn' auto 'avatar token-name symbol .' auto '. footer footer footer' 25px/ 33px auto 1fr 15px;
   box-sizing: border-box;
