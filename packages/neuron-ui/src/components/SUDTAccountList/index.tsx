@@ -196,7 +196,7 @@ const SUDTAccountList = () => {
         accountName: accountToUpdate.accountName || DEFAULT_SUDT_FIELDS.accountName,
         tokenName: accountToUpdate.tokenName || DEFAULT_SUDT_FIELDS.tokenName,
         symbol: accountToUpdate.symbol || DEFAULT_SUDT_FIELDS.symbol,
-        isCKB: false,
+        isCKB: accountToUpdate.tokenId === DEFAULT_SUDT_FIELDS.CKBTokenId,
         onSubmit: (info: Omit<TokenInfo, 'isCKB'>) => {
           const params: any = { id: accountToUpdate.accountId }
           Object.keys(info).forEach(key => {
