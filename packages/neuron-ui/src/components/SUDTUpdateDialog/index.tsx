@@ -57,7 +57,7 @@ const reducer: React.Reducer<
       return { ...state, tokenName: action.payload ?? state.tokenName }
     }
     case 'symbol': {
-      return { ...state, symbol: (action.payload ?? state.symbol).trim() }
+      return { ...state, symbol: (action.payload ?? state.symbol).trim().toUpperCase() }
     }
     case 'decimal': {
       if (!Number.isNaN(+action.payload!)) {

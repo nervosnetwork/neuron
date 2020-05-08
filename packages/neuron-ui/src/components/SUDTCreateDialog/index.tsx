@@ -53,6 +53,7 @@ const fields: { key: keyof TokenInfo; label: string }[] = [
   { key: 'decimal', label: 'decimal' },
 ]
 
+// TODO: reuse in update dialog
 const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'resetToken'; payload?: string }> = (
   state,
   action
@@ -68,7 +69,7 @@ const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'res
       return { ...state, tokenName: action.payload ?? state.tokenName }
     }
     case 'symbol': {
-      return { ...state, symbol: (action.payload ?? state.symbol).trim() }
+      return { ...state, symbol: (action.payload ?? state.symbol).trim().toUpperCase() }
     }
     case 'decimal': {
       if (!Number.isNaN(+action.payload!)) {
