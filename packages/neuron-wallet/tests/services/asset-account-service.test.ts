@@ -83,6 +83,17 @@ describe('AssetAccountService', () => {
     blake160: '0x' + '0'.repeat(40)
   })
 
+  const ckbAssetAccount = AssetAccount.fromObject({
+    walletID: 'walletID',
+    tokenID: 'CKBytes',
+    symbol: 'CKB',
+    tokenName: 'CKBytes',
+    decimal: '8',
+    balance: '0',
+    accountName: 'accountName',
+    blake160: '0x' + '0'.repeat(40)
+  })
+
   it("test for save relation", async () => {
     const entity = AssetAccountEntity.fromModel(assetAccount)
     const saved = await getConnection().manager.save([entity.sudtTokenInfo, entity])
@@ -142,6 +153,25 @@ describe('AssetAccountService', () => {
       .getOne()
 
     expect(result!.sudtTokenInfo.tokenName).toEqual('1')
+  })
+
+  it('update tokenName & symbol & decimal when ckb', async () => {
+    const entity = AssetAccountEntity.fromModel(ckbAssetAccount)
+    const [, e] = await getConnection().manager.save([entity.sudtTokenInfo, entity])
+    const saved = e as AssetAccountEntity
+
+    await AssetAccountService.update(saved.id, { tokenName: '1', symbol: '2', decimal: '3' })
+
+    const result = await getConnection()
+      .getRepository(AssetAccountEntity)
+      .createQueryBuilder('aa')
+      .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+      .where({ id: saved.id })
+      .getOne()
+
+    expect(result!.sudtTokenInfo.tokenName).toEqual(ckbAssetAccount.tokenName)
+    expect(result!.sudtTokenInfo.symbol).toEqual(ckbAssetAccount.symbol)
+    expect(result!.sudtTokenInfo.decimal).toEqual(ckbAssetAccount.decimal)
   })
 
   it('update accountName & tokenName', async () => {
@@ -240,6 +270,9 @@ describe('AssetAccountService', () => {
 
     it('create CKB', async () => {
       const ckbTokenID = 'CKBytes'
+      const ckbSymbol = 'CKB'
+      const ckbTokenName = 'CKBytes'
+      const ckbDecimal = '8'
       await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, ckbTokenID, assetAccount.blake160)
 
       const all = await getConnection()
@@ -251,7 +284,9 @@ describe('AssetAccountService', () => {
       expect(all.length).toEqual(1)
       const entity = all[0]
       expect(entity.tokenID).toEqual(ckbTokenID)
-      expect(entity.sudtTokenInfo!.decimal).toEqual('8')
+      expect(entity.sudtTokenInfo.tokenName).toEqual(ckbTokenName)
+      expect(entity.sudtTokenInfo.symbol).toEqual(ckbSymbol)
+      expect(entity.sudtTokenInfo!.decimal).toEqual(ckbDecimal)
     })
 
     it('sudtTokenInfo exists', async () => {
