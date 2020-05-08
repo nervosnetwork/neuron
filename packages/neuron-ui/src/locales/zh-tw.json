@@ -327,10 +327,10 @@
         "keystore-password": "密碼",
         "deposit": "存入金額",
         "account-name": "賬戶名稱",
-        "token-name": "Token 名稱",
-        "token-id": "Token ID",
-        "symbol": "Symbol",
-        "decimal": "Decimal"
+        "token-name": "代幣名稱",
+        "token-id": "代幣 ID",
+        "symbol": "簡稱",
+        "decimal": "小數位"
       },
       "codes": {
         "-3": "",
@@ -503,7 +503,7 @@
       "account-list": {
         "title": "資產賬戶",
         "no-asset-accounts": "尚未檢索到您持有的 sUDT 資產",
-        "search": "賬戶名稱, Token 名稱或 Symbol",
+        "search": "賬戶名稱、代幣名稱或簡稱",
         "syncing": "正在同步, 當前數據可能不準確",
         "send": "轉帳",
         "receive": "收款"
@@ -514,10 +514,10 @@
         "sudt-account": "sUDT 賬戶",
         "ckb-account": "CKB 賬戶",
         "occupy": "佔用 {{ base }} CKB",
-        "set-token-info": "設置 Token 信息",
-        "token-id": "Token ID",
-        "token-name": "Token 名稱",
-        "symbol": "標誌",
+        "set-token-info": "設置代幣信息",
+        "token-id": "代幣 ID",
+        "token-name": "代幣名稱",
+        "symbol": "簡稱",
         "decimal": "小數位",
         "confirm": "確認",
         "cancel": "取消",
@@ -540,9 +540,9 @@
       "update-dialog": {
         "update-asset-account": "賬戶設置",
         "account-name": "賬戶名稱",
-        "token-id": "Token ID",
-        "token-name": "Token 名稱",
-        "symbol": "標誌",
+        "token-id": "代幣 ID",
+        "token-name": "代幣名稱",
+        "symbol": "簡稱",
         "decimal": "小數位",
         "confirm": "確認",
         "cancel": "取消"
