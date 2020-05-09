@@ -168,7 +168,9 @@ export default class AssetAccountService {
   public static async checkAndSaveAssetAccountWhenSync(walletID: string, tokenID: string, blake160: string) {
     const isCKB = tokenID === 'CKBytes'
     const decimal = isCKB ? '8' : ''
-    const assetAccount = new AssetAccount(walletID, tokenID, '', '', '', decimal, '0', blake160)
+    const symbol = isCKB ? 'CKB' : ''
+    const tokenName = isCKB ? 'CKBytes' : ''
+    const assetAccount = new AssetAccount(walletID, tokenID, symbol, '', tokenName, decimal, '0', blake160)
     const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
     const sudtTokenInfoEntity = assetAccountEntity.sudtTokenInfo
     await getConnection()
@@ -282,16 +284,19 @@ export default class AssetAccountService {
     if (!assetAccount) {
       return undefined
     }
+
+    const isCKB = assetAccount.tokenID === 'CKBytes'
+
     if (params.accountName) {
       assetAccount.accountName = params.accountName
     }
-    if (params.tokenName) {
+    if (params.tokenName && !isCKB) {
       assetAccount.sudtTokenInfo.tokenName = params.tokenName
     }
-    if (params.symbol) {
+    if (params.symbol && !isCKB) {
       assetAccount.sudtTokenInfo.symbol = params.symbol
     }
-    if (params.decimal) {
+    if (params.decimal && !isCKB) {
       assetAccount.sudtTokenInfo.decimal = params.decimal
     }
     return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
