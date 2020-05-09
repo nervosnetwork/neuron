@@ -18,7 +18,7 @@ import getCurrentUrl from 'utils/getCurrentUrl'
 
 import styles from './sUDTAccountList.module.scss'
 
-export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick' | 'isSelected'>
+export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
 const SUDTAccountList = () => {
   const [t] = useTranslation()
@@ -32,7 +32,6 @@ const SUDTAccountList = () => {
   const dispatch = useDispatch()
 
   const [accounts, setAccounts] = useState<SUDTAccount[]>([])
-  const [selectedId, setSelectedId] = useState('')
   const [keyword, setKeyword] = useState('')
   const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -125,7 +124,7 @@ const SUDTAccountList = () => {
         break
       }
       default: {
-        setSelectedId(selected => (selected === id ? '' : id))
+        // ignore
       }
     }
   }
@@ -273,12 +272,7 @@ const SUDTAccountList = () => {
       <div className={styles.notice}>{prompt}</div>
       <div className={styles.list}>
         {filteredAccounts.map(account => (
-          <SUDTAccountPile
-            key={account.accountId}
-            {...account}
-            isSelected={selectedId === account.accountId}
-            onClick={onClick}
-          />
+          <SUDTAccountPile key={account.accountId} {...account} onClick={onClick} />
         ))}
       </div>
       {accountToUpdate ? <SUDTUpdateDialog {...updateDialogProps!} /> : null}

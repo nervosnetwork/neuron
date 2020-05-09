@@ -20,6 +20,12 @@
         visibility: visible;
       }
     }
+    .balance{
+      display: none;
+    }
+    .actions{
+      display: flex;
+    }
   }
 }
 
@@ -73,6 +79,7 @@
 
 .actions {
   grid-area: footer;
+  display: none;
   justify-self: flex-end;
   align-self: flex-end;
 
