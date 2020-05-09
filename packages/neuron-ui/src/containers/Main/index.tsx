@@ -20,86 +20,85 @@ import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 import SpecialAssetList from 'components/SpecialAssetList'
 
-import { Routes } from 'utils/const'
-import { useOnDefaultContextMenu } from 'utils/hooks'
+import { RoutePath, useOnDefaultContextMenu } from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
 export const mainContents: CustomRouter.Route[] = [
   {
     name: `Launch`,
-    path: Routes.Launch,
+    path: RoutePath.Launch,
     exact: true,
     component: LaunchScreen,
   },
   {
     name: `General`,
-    path: Routes.Overview,
+    path: RoutePath.Overview,
     exact: true,
     component: Overview,
   },
   {
     name: `Send`,
-    path: Routes.Send,
+    path: RoutePath.Send,
     params: `/:address?`,
     exact: false,
     component: Send,
   },
   {
     name: `Receive`,
-    path: Routes.Receive,
+    path: RoutePath.Receive,
     params: `/:address?`,
     exact: false,
     component: Receive,
   },
   {
     name: `History`,
-    path: Routes.History,
+    path: RoutePath.History,
     exact: false,
     component: History,
   },
   {
     name: `Transaction`,
-    path: Routes.Transaction,
+    path: RoutePath.Transaction,
     params: `/:hash`,
     exact: false,
     component: Transaction,
   },
   {
     name: `Addresses`,
-    path: Routes.Addresses,
+    path: RoutePath.Addresses,
     exact: false,
     component: Addresses,
   },
   {
     name: `Settings`,
-    path: Routes.Settings,
+    path: RoutePath.Settings,
     exact: false,
     component: Settings,
   },
   {
     name: `NetworkEditor`,
-    path: Routes.NetworkEditor,
+    path: RoutePath.NetworkEditor,
     params: '/:id',
     exact: false,
     component: NetworkEditor,
   },
   {
     name: `WalletEditor`,
-    path: Routes.WalletEditor,
+    path: RoutePath.WalletEditor,
     params: '/:id',
     exact: false,
     component: WalletEditor,
   },
   {
     name: `WalletWizard`,
-    path: Routes.WalletWizard,
+    path: RoutePath.WalletWizard,
     exact: false,
     component: WalletWizard,
   },
   {
     name: `ImportKeystore`,
-    path: Routes.ImportKeystore,
+    path: RoutePath.ImportKeystore,
     exact: false,
     component: ImportKeystore,
   },
@@ -111,13 +110,13 @@ export const mainContents: CustomRouter.Route[] = [
   },
   {
     name: `NervosDAO`,
-    path: Routes.NervosDAO,
+    path: RoutePath.NervosDAO,
     exact: true,
     component: NervosDAO,
   },
   {
     name: `SpecialAssets`,
-    path: Routes.SpecialAssets,
+    path: RoutePath.SpecialAssets,
     exact: false,
     component: SpecialAssetList,
   },

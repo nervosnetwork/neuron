@@ -14,9 +14,7 @@ import {
 import { emptyWallet } from 'states/init/wallet'
 import { emptyNervosDaoData } from 'states/init/nervosDAO'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
-import { ErrorCode, ResponseCode } from 'utils/const'
-import { addressesToBalance, failureResToNotification } from 'utils/formatters'
-import isSuccessResponse from 'utils/isSuccessResponse'
+import { ErrorCode, ResponseCode, addressesToBalance, failureResToNotification, isSuccessResponse } from 'utils'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 

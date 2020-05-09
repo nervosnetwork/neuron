@@ -6,8 +6,8 @@ import {
   SINCE_FIELD_SIZE,
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
-  ErrorCode,
 } from 'utils/const'
+import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 
@@ -151,13 +151,4 @@ export const verifyURL = (url: string) => {
     }
   }
   return true
-}
-
-export default {
-  verifyAddress,
-  verifyAmountRange,
-  verifyTotalAmount,
-  verifyPasswordComplexity,
-  verifyTransactionOutputs,
-  verifyNetworkName,
 }

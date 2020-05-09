@@ -5,11 +5,18 @@ import TextField from 'widgets/TextField'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
-import { useLocalDescription } from 'utils/hooks'
-import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, localNumberFormatter } from 'utils/formatters'
-import getExplorerUrl from 'utils/getExplorerUrl'
-import { CONFIRMATION_THRESHOLD } from 'utils/const'
+import {
+  CONSTANTS,
+  shannonToCKBFormatter,
+  uniformTimeFormatter as timeFormatter,
+  localNumberFormatter,
+  getExplorerUrl,
+  useLocalDescription,
+} from 'utils'
+
 import styles from './transactionList.module.scss'
+
+const { CONFIRMATION_THRESHOLD } = CONSTANTS
 
 const TransactionList = ({
   items: txs,

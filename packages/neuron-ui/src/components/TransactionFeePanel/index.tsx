@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { Stack, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
-import { Price } from 'utils/const'
-import { localNumberFormatter } from 'utils/formatters'
+import { Price, localNumberFormatter } from 'utils'
 
 interface TransactionFee {
   fee: string

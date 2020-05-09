@@ -9,30 +9,30 @@ import GeneralSetting from 'components/GeneralSetting'
 import Wallets from 'components/WalletSetting'
 import NetworkSetting from 'components/NetworkSetting'
 
-import { Routes } from 'utils/const'
+import { RoutePath } from 'utils'
 
 const pivotItems = [
-  { label: 'settings.setting-tabs.general', url: Routes.SettingsGeneral },
-  { label: 'settings.setting-tabs.wallets', url: Routes.SettingsWallets },
-  { label: 'settings.setting-tabs.network', url: Routes.SettingsNetworks },
+  { label: 'settings.setting-tabs.general', url: RoutePath.SettingsGeneral },
+  { label: 'settings.setting-tabs.wallets', url: RoutePath.SettingsWallets },
+  { label: 'settings.setting-tabs.network', url: RoutePath.SettingsNetworks },
 ]
 
 const settingPanels: CustomRouter.Route[] = [
   {
     name: `GeneralSetting`,
-    path: Routes.SettingsGeneral,
+    path: RoutePath.SettingsGeneral,
     exact: false,
     component: GeneralSetting,
   },
   {
     name: `WalletsSetting`,
-    path: Routes.SettingsWallets,
+    path: RoutePath.SettingsWallets,
     exact: false,
     component: Wallets,
   },
   {
     name: `NetworkSetting`,
-    path: Routes.SettingsNetworks,
+    path: RoutePath.SettingsNetworks,
     exact: true,
     component: NetworkSetting,
   },

@@ -36,5 +36,3 @@ export const epochParser = (epoch: string) => {
     value: res.length > 0 ? Number(res.number) + Number(res.index) / Number(res.length) : Number(res.number),
   }
 }
-
-export default { queryParsers, epochParser }

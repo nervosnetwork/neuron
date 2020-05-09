@@ -3,9 +3,8 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, PanelType, SpinnerSize } from 'office-ui-fabric-react'
 import { useState as useGlobalState } from 'states'
+import { RoutePath } from 'utils'
 import Spinner from 'widgets/Spinner'
-
-import { Routes } from 'utils/const'
 
 export const LaunchScreen = () => {
   const {
@@ -16,7 +15,7 @@ export const LaunchScreen = () => {
 
   useEffect(() => {
     if (id) {
-      history.push(Routes.Overview)
+      history.push(RoutePath.Overview)
     }
   }, [id, history])
 

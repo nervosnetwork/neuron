@@ -1,5 +1,5 @@
 import { currentNetworkID } from 'services/localCache'
-import { ConnectionStatus } from 'utils/const'
+import { ConnectionStatus } from 'utils'
 
 export const transactionState: Readonly<State.DetailedTransaction> = {
   value: '',

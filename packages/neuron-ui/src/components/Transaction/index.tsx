@@ -14,11 +14,19 @@ import { ckbCore } from 'services/chain'
 
 import { transactionState } from 'states/init/chain'
 
-import isSuccessResponse from 'utils/isSuccessResponse'
-import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { ErrorCode, MAINNET_TAG } from 'utils/const'
-import { useOnDefaultContextMenu, useExitOnWalletChange } from 'utils/hooks'
+import {
+  ErrorCode,
+  CONSTANTS,
+  localNumberFormatter,
+  uniformTimeFormatter,
+  shannonToCKBFormatter,
+  useOnDefaultContextMenu,
+  useExitOnWalletChange,
+  isSuccessResponse,
+} from 'utils'
 import styles from './transaction.module.scss'
+
+const { MAINNET_TAG } = CONSTANTS
 
 const Transaction = () => {
   const [t] = useTranslation()

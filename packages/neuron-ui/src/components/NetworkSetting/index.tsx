@@ -7,8 +7,7 @@ import Button from 'widgets/Button'
 import chainState from 'states/init/chain'
 import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
 
-import { Routes } from 'utils/const'
-import { backToTop } from 'utils/animations'
+import { backToTop, RoutePath } from 'utils'
 import styles from './networkSetting.module.scss'
 
 const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
@@ -39,7 +38,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
   }, [])
 
   const goToCreateNetwork = useCallback(() => {
-    history.push(`${Routes.NetworkEditor}/new`)
+    history.push(`${RoutePath.NetworkEditor}/new`)
   }, [history])
 
   const onContextMenu = useCallback(
@@ -63,7 +62,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
             label: t('common.edit'),
             enabled: true,
             click: () => {
-              history.push(`${Routes.NetworkEditor}/${item.id}`)
+              history.push(`${RoutePath.NetworkEditor}/${item.id}`)
             },
           },
           {
