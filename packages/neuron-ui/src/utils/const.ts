@@ -123,6 +123,7 @@ export enum ErrorCode {
   NotNegative = 207,
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
+  ValueReserved = 210,
   FieldIrremovable = 301,
   FieldNotFound = 303,
   CameraUnavailable = 304,
@@ -153,7 +154,7 @@ export enum CompensationPeriod {
 export const DEFAULT_SUDT_FIELDS = {
   accountName: 'Undefined',
   tokenName: 'Unknown',
-  symbol: 'Unknown',
+  symbol: 'UNKNOWN',
   CKBTokenId: 'CKBytes',
   CKBTokenName: 'CKBytes',
   CKBSymbol: 'CKB',

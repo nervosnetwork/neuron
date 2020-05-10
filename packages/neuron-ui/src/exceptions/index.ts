@@ -57,7 +57,7 @@ export class FieldUsedException extends Error {
   }
 }
 
-export class DecimalRangeError extends RangeError {
+export class DecimalRangeException extends RangeError {
   public code = ErrorCode.FieldInvalid
   public i18n = {
     range: `${MIN_DECIMAL}-${MAX_DECIMAL}`,
@@ -75,4 +75,14 @@ export class AmountNotEnoughException extends Error {
   }
 }
 
-export default undefined
+export class ValueReservedException extends Error {
+  public code = ErrorCode.ValueReserved
+  public i18n = {
+    value: '',
+  }
+
+  constructor(value: string) {
+    super(`messages.codes.${ErrorCode.ValueReserved}`)
+    this.i18n.value = value
+  }
+}

@@ -21,7 +21,13 @@ import {
   MAX_SYMBOL_LENGTH,
   MAX_SUDT_ACCOUNT_NAME_LENGTH,
 } from './const'
-import { DecimalRangeError, FieldInvalidException, FieldUsedException, FieldTooLongException } from '../exceptions'
+import {
+  DecimalRangeException,
+  FieldInvalidException,
+  FieldUsedException,
+  FieldTooLongException,
+  ValueReservedException,
+} from '../exceptions'
 
 import { sudtAmountToValue } from './formatters'
 
@@ -260,10 +266,21 @@ export const verifyTokenId = ({
   }
 }
 
-export const verifyTokenName = ({ tokenName, required = false }: { tokenName: string; required?: boolean }) => {
+export const verifyTokenName = ({
+  tokenName,
+  required = false,
+  isCKB = false,
+}: {
+  tokenName: string
+  required?: boolean
+  isCKB?: boolean
+}) => {
   const fieldName = 'token-name'
   if (!tokenName && required) {
     throw new FieldRequiredException(fieldName)
+  }
+  if (!isCKB && [DEFAULT_SUDT_FIELDS.tokenName, DEFAULT_SUDT_FIELDS.CKBTokenName].includes(tokenName)) {
+    throw new ValueReservedException(tokenName)
   }
   if (tokenName.length > MAX_SUDT_TOKEN_NAME_LENGTH) {
     throw new FieldTooLongException(fieldName, MAX_SUDT_TOKEN_NAME_LENGTH)
@@ -283,6 +300,9 @@ export const verifySUDTAccountName = ({
   if (!name && required) {
     throw new FieldRequiredException(fieldName)
   }
+  if (name === DEFAULT_SUDT_FIELDS.accountName) {
+    throw new ValueReservedException(name)
+  }
   if (name.length > MAX_SUDT_ACCOUNT_NAME_LENGTH) {
     throw new FieldTooLongException(fieldName, MAX_SUDT_ACCOUNT_NAME_LENGTH)
   }
@@ -291,10 +311,21 @@ export const verifySUDTAccountName = ({
   }
 }
 
-export const verifySymbol = ({ symbol, required = false }: { symbol: string; required?: boolean }) => {
+export const verifySymbol = ({
+  symbol,
+  required = false,
+  isCKB = false,
+}: {
+  symbol: string
+  required?: boolean
+  isCKB?: boolean
+}) => {
   const fieldName = 'symbol'
   if (!symbol && required) {
     throw new FieldRequiredException(fieldName)
+  }
+  if (!isCKB && [DEFAULT_SUDT_FIELDS.symbol, DEFAULT_SUDT_FIELDS.CKBSymbol].includes(symbol)) {
+    throw new ValueReservedException(symbol)
   }
   if (symbol.length > MAX_SYMBOL_LENGTH) {
     throw new FieldTooLongException(fieldName, MAX_SYMBOL_LENGTH)
@@ -313,7 +344,7 @@ export const verifyDecimal = ({ decimal, required = false }: { decimal: string; 
     throw new FieldInvalidException(fieldName)
   }
   if (+decimal < MIN_DECIMAL || +decimal > MAX_DECIMAL) {
-    throw new DecimalRangeError()
+    throw new DecimalRangeException()
   }
 }
 

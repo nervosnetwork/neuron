@@ -2,13 +2,8 @@ import React, { useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { ErrorCode } from 'utils/const'
+import { useSUDTAccountInfoErrors } from 'utils/hooks'
 import styles from './sUDTUpdateDialog.module.scss'
-
-const MAX_NAME_LENGTH = 16
-const MAX_SYMBOL_LENGTH = 8
-const MIN_DECIMAL = 0
-const MAX_DECIMAL = 32
 
 export interface BasicInfo {
   accountName: string
@@ -86,32 +81,7 @@ const SUDTUpdateDialog = ({
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
 
-  let accountNameError = ''
-  if (info.accountName && info.accountName.length > MAX_NAME_LENGTH) {
-    accountNameError = t(`messages.codes.${ErrorCode.FieldTooLong}`, {
-      fieldName: 'account-name',
-      length: MAX_NAME_LENGTH,
-    })
-  } else if (existingAccountNames.filter(name => name !== accountName).includes(info.accountName)) {
-    accountNameError = t(`messages.codes.${ErrorCode.FieldUsed}`, { fieldName: 'account-name' })
-  }
-
-  const tokenErrors = {
-    accountName: accountNameError,
-    tokenId: '',
-    tokenName:
-      !info.tokenName || info.tokenName.length <= MAX_NAME_LENGTH
-        ? ''
-        : t(`messages.codes.${ErrorCode.FieldTooLong}`, { fieldName: 'token-name', length: MAX_NAME_LENGTH }),
-    symbol:
-      !info.symbol || info.symbol.length <= MAX_SYMBOL_LENGTH
-        ? ''
-        : t(`messages.codes.${ErrorCode.FieldTooLong}`, { fieldName: 'symbol', length: MAX_SYMBOL_LENGTH }),
-    decimal:
-      !info.decimal || (+info.decimal >= 0 && +info.decimal <= 32 && Math.floor(+info.decimal) === +info.decimal)
-        ? ''
-        : t('messages.decimal-range', { range: `${MIN_DECIMAL}-${MAX_DECIMAL}` }),
-  }
+  const tokenErrors = useSUDTAccountInfoErrors({ info, isCKB, existingAccountNames, t })
 
   const isTokenReady = Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 

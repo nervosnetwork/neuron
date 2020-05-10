@@ -351,6 +351,7 @@
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative.",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
         "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
+        "210": "\"{{value}}\" is reserved, please use another one.",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
