@@ -21,6 +21,7 @@ export interface SUDTAccountPileProps {
 
 const SUDTAccountPile = ({
   accountId,
+  tokenId,
   accountName,
   tokenName,
   symbol,
@@ -29,6 +30,9 @@ const SUDTAccountPile = ({
   onClick,
 }: SUDTAccountPileProps) => {
   const [t] = useTranslation()
+  const isCKB = DEFAULT_SUDT_FIELDS.CKBTokenId === tokenId
+  const disabled = !isCKB && !decimal
+
   return (
     <div role="presentation" className={styles.container} onClick={onClick} data-id={accountId} data-role="container">
       <div className={styles.avatar}>
@@ -49,8 +53,8 @@ const SUDTAccountPile = ({
         </button>
       </div>
       <div className={styles.actions}>
-        <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={!accountName} />
-        <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={!accountName} />
+        <Button type="primary" label={t('s-udt.account-list.receive')} data-role="receive" disabled={disabled} />
+        <Button type="primary" label={t('s-udt.account-list.send')} data-role="send" disabled={disabled} />
       </div>
       <div className={styles.balance}>{sudtValueToAmount(balance, decimal) || '--'}</div>
     </div>
