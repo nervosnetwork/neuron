@@ -535,7 +535,7 @@
         "click-to-edit": "點擊編輯"
       },
       "receive": {
-        "notation": "只接收 sUDT"
+        "notation": "只接收 {{symbol}} 轉賬"
       },
       "update-dialog": {
         "update-asset-account": "賬戶設置",

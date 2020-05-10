@@ -113,8 +113,9 @@ const SUDTAccountList = () => {
         }
         const query = new URLSearchParams({
           address: account.address,
-          accountName: account.accountName || '',
-          tokenName: account.tokenName || '',
+          accountName: account.accountName ?? DEFAULT_SUDT_FIELDS.accountName,
+          tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
+          symbol: account.symbol ?? DEFAULT_SUDT_FIELDS.symbol,
         })
         history.push(`${Routes.SUDTReceive}?${query}`)
         break

@@ -535,7 +535,7 @@
         "click-to-edit": "Click to edit"
       },
       "receive": {
-        "notation": "Accept sUDT only"
+        "notation": "Accept {{symbol}} only"
       },
       "update-dialog": {
         "update-asset-account": "Account setup",
