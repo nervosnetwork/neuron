@@ -11,8 +11,8 @@ describe('AssetAccountInfo', () => {
   }
 
   const testnetAnyoneCanPayInfo = {
-    cellDep: new CellDep(new OutPoint('0x9af66408df4703763acb10871365e4a21f2c3d3bdc06b0ae634a3ad9f18a6525', '0'), DepType.DepGroup),
-    codeHash: '0x6a3982f9d018be7e7228f9e0b765f28ceff6d36e634490856d2b186acf78e79b',
+    cellDep: new CellDep(new OutPoint('0xd28eb9114053e24c950b061b1e102f70697510c1dbfcb191d1a556d68d196428', '0'), DepType.DepGroup),
+    codeHash: '0x98e12a104d00f21d436efdbfd3991033aebefc29fed69f3dc015fe5333a6abd6',
     hashType: ScriptHashType.Type
   }
 
