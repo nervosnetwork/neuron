@@ -31,3 +31,4 @@ import './CompensationProgressBar.stories'
 import './BalanceSyncIcon.stories'
 
 import './Navbar.stories'
+import './CopyZone.stories'
