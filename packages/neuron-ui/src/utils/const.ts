@@ -154,7 +154,7 @@ export enum CompensationPeriod {
 export const DEFAULT_SUDT_FIELDS = {
   accountName: 'Undefined',
   tokenName: 'Unknown',
-  symbol: 'UNKNOWN',
+  symbol: 'Unknown',
   CKBTokenId: 'CKBytes',
   CKBTokenName: 'CKBytes',
   CKBSymbol: 'CKB',

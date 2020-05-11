@@ -69,7 +69,7 @@ const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'res
       return { ...state, tokenName: action.payload ?? state.tokenName }
     }
     case 'symbol': {
-      return { ...state, symbol: (action.payload ?? state.symbol).trim().toUpperCase() }
+      return { ...state, symbol: (action.payload ?? state.symbol).trim() }
     }
     case 'decimal': {
       if (!Number.isNaN(+action.payload!)) {
