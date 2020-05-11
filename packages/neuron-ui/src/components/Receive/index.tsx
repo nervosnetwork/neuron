@@ -1,12 +1,10 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TooltipHost } from 'office-ui-fabric-react'
-import { ReactComponent as Copy } from 'widgets/Icons/ReceiveCopy.svg'
 
 import { useState as useGlobalState, useDispatch } from 'states'
 import QRCode from 'widgets/QRCode'
-import { addPopup } from 'states/stateProvider/actionCreators'
+import CopyZone from 'widgets/CopyZone'
 import styles from './receive.module.scss'
 
 const Receive = () => {
@@ -20,34 +18,8 @@ const Receive = () => {
   } = useRouteMatch()
 
   const accountAddress = useMemo(
-    () => address || (addresses.find(addr => addr.type === 0 && addr.txCount === 0) || { address: '' }).address || '',
+    () => (address || addresses.find(addr => addr.type === 0 && addr.txCount === 0)?.address) ?? '',
     [address, addresses]
-  )
-
-  const copyAddress = useCallback(() => {
-    window.navigator.clipboard.writeText(accountAddress)
-    addPopup('addr-copied')(dispatch)
-  }, [accountAddress, dispatch])
-
-  const Address = useMemo(
-    () => (
-      <div className={styles.address}>
-        <TooltipHost content={t('receive.click-to-copy')} calloutProps={{ gapSpace: 0 }}>
-          <>
-            <input readOnly value={accountAddress} onClick={copyAddress} />
-            <button
-              type="button"
-              aria-label={t('receive.click-to-copy')}
-              onClick={copyAddress}
-              className={styles.copyBtn}
-            >
-              <Copy />
-            </button>
-          </>
-        </TooltipHost>
-      </div>
-    ),
-    [copyAddress, accountAddress, t]
   )
 
   if (!accountAddress) {
@@ -62,7 +34,15 @@ const Receive = () => {
       }}
     >
       <QRCode value={accountAddress} size={256} includeMargin dispatch={dispatch} />
-      {Address}
+      <div className={styles.address}>
+        <CopyZone
+          content={accountAddress}
+          name={t('receive.copy-address')}
+          style={{ lineHeight: '1.625rem', padding: '0 3px' }}
+        >
+          {accountAddress}
+        </CopyZone>
+      </div>
       <p className={styles.notation}>{t('receive.prompt')}</p>
     </div>
   )

@@ -123,7 +123,7 @@
       "release-on": "鎖定至"
     },
     "receive": {
-      "click-to-copy": "點擊複製地址",
+      "copy-address": "複製地址",
       "address-not-found": "未找到地址",
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址管理頁面。",
       "address-qrcode": "地址二維碼",
@@ -272,7 +272,9 @@
       "edit": "編輯",
       "delete": "删除",
       "click-to-edit": "點擊編輯",
-      "notice": "注意事項"
+      "notice": "注意事項",
+      "copy": "複製",
+      "copied": "已複製"
     },
     "notification-panel": {
       "title": "通知中心"

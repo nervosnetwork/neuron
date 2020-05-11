@@ -13,8 +13,9 @@
     align-items: center;
     content: attr(data-prompt);
     font-size: 0.875rem;
+    font-weight: 500;
     color: #666;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(224, 224, 224, 0.9);
     backdrop-filter: blur(1px);
     user-select: none;
   }

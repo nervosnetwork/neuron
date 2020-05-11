@@ -123,7 +123,7 @@
       "release-on": "Release on"
     },
     "receive": {
-      "click-to-copy": "Click to copy the address",
+      "copy-address": "Copy Address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code",
@@ -272,7 +272,9 @@
       "edit": "Edit",
       "delete": "Delete",
       "click-to-edit": "Click to edit",
-      "notice": "Notice"
+      "notice": "Notice",
+      "copy": "Copy",
+      "copied": "Copied"
     },
     "notification-panel": {
       "title": "Notifications"
