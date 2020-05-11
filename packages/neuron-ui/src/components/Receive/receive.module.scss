@@ -1,23 +1,7 @@
 .address {
-  display: flex;
-  width: 520px;
   margin: 20px auto 0;
-
-  &>div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1;
-  }
-
-  input {
-    flex: 1;
-    padding: 6px 17px;
-    border: 1px solid #000;
-    color: #000;
-    font-size: 1rem;
-    letter-spacing: 0.6px;
-  }
+  display: flex;
+  justify-content: center;
 }
 
 .copyBtn {
@@ -26,10 +10,8 @@
   background: transparent;
 
   &:hover {
-
     g,
     path {
-
       stroke: var(--nervos-green);
       fill: var(--nervos-green);
     }
@@ -39,6 +21,5 @@
 .notation {
   width: 450px;
   font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  margin: 20px auto 0;
+  margin: 6px auto 0;
 }

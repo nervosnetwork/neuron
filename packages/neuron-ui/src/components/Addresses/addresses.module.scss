@@ -14,14 +14,14 @@ $change-color: #6666cc;
   border-collapse: collapse;
 
   tbody {
-    input+span {
+    input + span {
       display: none !important;
     }
 
     tr:hover {
       background-color: #f5f5f5;
 
-      input+span {
+      input + span {
         display: flex !important;
       }
     }
@@ -36,19 +36,16 @@ $change-color: #6666cc;
     border-bottom: 1px solid #b3b3b3;
   }
 
-
   th {
     @include SemiBoldText;
     font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.6px;
     color: #000;
     padding: 18px 0;
   }
 
   td {
     font-size: 0.875rem;
-    letter-spacing: 0.5px;
     color: #000;
     padding: 10px 0;
 
@@ -65,7 +62,6 @@ $change-color: #6666cc;
     }
   }
 
-
   .type {
     width: 100px;
     word-wrap: none;
@@ -80,6 +76,8 @@ $change-color: #6666cc;
   }
 
   .address {
+    user-select: none;
+    line-height: 1.625rem;
     &:hover {
       div::after {
         display: block;
@@ -95,7 +93,7 @@ $change-color: #6666cc;
       .addressOverflow {
         word-break: break-all;
         text-align: right;
-        height: 1rem;
+        height: 1.625rem;
         overflow: hidden;
         text-align: right;
       }
@@ -105,7 +103,6 @@ $change-color: #6666cc;
       }
 
       @media screen and (max-width: 1365px) {
-
         .ellipsis {
           display: inline;
         }
@@ -118,9 +115,9 @@ $change-color: #6666cc;
           position: absolute;
           top: 150%;
           left: 50%;
+          z-index: 1;
           content: attr(data-address);
           font-size: 0.875rem;
-          letter-spacing: 0.5px;
           color: #000;
           box-shadow: 1px 2px 6px 0 rgba(97, 97, 97, 0.5);
           background: #fff;
@@ -133,8 +130,6 @@ $change-color: #6666cc;
       @media screen and (max-width: 1350px) {
         width: 20vw;
       }
-
-
     }
   }
 
@@ -166,7 +161,7 @@ $change-color: #6666cc;
       font-size: 0.875rem;
     }
 
-    &>div {
+    & > div {
       border: none;
     }
 
@@ -178,11 +173,16 @@ $change-color: #6666cc;
   }
 
   .balance {
+    div {
+      display: flex;
+      align-items: center;
+      height: 1.625rem;
+    }
     span {
       display: inline-block;
       min-width: 200px;
 
-      @media screen and (max-width:1160px) {
+      @media screen and (max-width: 1160px) {
         min-width: auto;
         width: 8vw;
       }
@@ -192,5 +192,4 @@ $change-color: #6666cc;
   .txCount {
     min-width: 100px;
   }
-
 }

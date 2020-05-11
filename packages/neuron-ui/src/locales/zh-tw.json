@@ -123,7 +123,7 @@
       "release-on": "鎖定至"
     },
     "receive": {
-      "click-to-copy": "點擊複製地址",
+      "copy-address": "複製地址",
       "address-not-found": "未找到地址",
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址管理頁面。",
       "address-qrcode": "地址二維碼",
@@ -161,7 +161,10 @@
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
       "copy-transaction-hash": "複製交易雜湊",
-      "no-txs": "沒有交易記錄"
+      "no-txs": "沒有交易記錄",
+      "copy-tx-hash": "複製交易 Hash",
+      "copy-balance": "複製餘額",
+      "copy-address": "複製地址"
     },
     "transaction": {
       "date": "時間",
@@ -272,7 +275,9 @@
       "edit": "編輯",
       "delete": "删除",
       "click-to-edit": "點擊編輯",
-      "notice": "注意事項"
+      "notice": "注意事項",
+      "copy": "複製",
+      "copied": "已複製"
     },
     "notification-panel": {
       "title": "通知中心"

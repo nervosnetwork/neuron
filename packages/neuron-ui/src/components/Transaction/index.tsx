@@ -13,6 +13,7 @@ import {
 import { ckbCore } from 'services/chain'
 
 import { transactionState } from 'states/init/chain'
+import CopyZone from 'widgets/CopyZone'
 
 import {
   ErrorCode,
@@ -96,9 +97,19 @@ const Transaction = () => {
     openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
   }, [transaction.hash, isMainnet])
 
-  const basicInfoItems = useMemo(
-    () => [
-      { label: t('transaction.transaction-hash'), value: transaction.hash || 'none' },
+  const basicInfoItems = useMemo(() => {
+    const balance = shannonToCKBFormatter(transaction.value)
+
+    return [
+      {
+        label: t('transaction.transaction-hash'),
+        value:
+          (
+            <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')}>
+              {transaction.hash}
+            </CopyZone>
+          ) || 'none',
+      },
       {
         label: t('transaction.block-number'),
         value: transaction.blockNumber ? localNumberFormatter(transaction.blockNumber) : 'none',
@@ -111,11 +122,14 @@ const Transaction = () => {
       },
       {
         label: t('transaction.income'),
-        value: `${shannonToCKBFormatter(transaction.value)} CKB`,
+        value: (
+          <CopyZone content={balance.replace(/,/g, '')} name={t('history.copy-balance')}>
+            {`${balance} CKB`}
+          </CopyZone>
+        ),
       },
-    ],
-    [t, transaction]
-  )
+    ]
+  }, [t, transaction])
 
   const inputsTitle = useMemo(
     () => `${t('transaction.inputs')} (${transaction.inputs.length}/${localNumberFormatter(transaction.inputsCount)})`,
@@ -157,14 +171,21 @@ const Transaction = () => {
             console.error(err)
           }
         }
+        const capacity = shannonToCKBFormatter(cell.capacity || '0')
 
         return (
           <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
             <td title={address} className={styles.addressCell}>
-              {address}
+              <CopyZone content={address} name={t('history.copy-address')}>
+                {address}
+              </CopyZone>
             </td>
-            <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
+            <td>
+              <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
+                {`${capacity} CKB`}
+              </CopyZone>
+            </td>
           </tr>
         )
       }),
