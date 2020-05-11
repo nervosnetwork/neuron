@@ -9,6 +9,7 @@ import Output from "models/chain/output"
 import LiveCell from "models/chain/live-cell"
 import Transaction from "models/chain/transaction"
 import AssetAccountEntity from "database/chain/entities/asset-account"
+import { TargetOutputNotFoundError } from "exceptions"
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -62,7 +63,7 @@ export default class AnyoneCanPayService {
       .getOne()
 
     if (!targetOutputEntity) {
-      throw new Error('Target output not found.')
+      throw new TargetOutputNotFoundError()
     }
     const targetOutputLiveCell: LiveCell = LiveCell.fromEntity(targetOutputEntity)
     const targetOutput: Output = Output.fromObject({
