@@ -180,10 +180,10 @@ const SUDTAccountList = () => {
   const filteredAccounts = keyword
     ? accounts.filter(
         account =>
-          account.accountName?.includes(keyword) ||
-          account.tokenName?.includes(keyword) ||
-          account.symbol?.includes(keyword) ||
-          account.tokenId === keyword
+          account.accountName?.toLowerCase().includes(keyword.toLowerCase()) ||
+          account.tokenName?.toLowerCase().includes(keyword.toLowerCase()) ||
+          account.symbol?.toLowerCase().includes(keyword.toLowerCase()) ||
+          account.tokenId.toLowerCase() === keyword.toLowerCase()
       )
     : accounts
 
