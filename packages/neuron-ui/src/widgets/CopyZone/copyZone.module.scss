@@ -19,6 +19,7 @@
     background-color: rgba(224, 224, 224, 0.9);
     backdrop-filter: blur(1px);
     user-select: none;
+    white-space: nowrap;
   }
 
   &:hover::before {

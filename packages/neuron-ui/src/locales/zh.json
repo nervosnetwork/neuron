@@ -162,7 +162,9 @@
       "view-on-explorer": "在浏览器中查看",
       "copy-transaction-hash": "复制交易哈希",
       "no-txs": "没有交易记录",
-      "copy-tx-hash": "复制交易 Hash"
+      "copy-tx-hash": "复制交易 Hash",
+      "copy-balance": "复制余额",
+      "copy-address": "复制地址"
     },
     "transaction": {
       "date": "时间",

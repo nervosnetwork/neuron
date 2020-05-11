@@ -162,7 +162,9 @@
       "view-on-explorer": "View on Explorer",
       "copy-transaction-hash": "Copy Transaction Hash",
       "no-txs": "No Transaction History",
-      "copy-tx-hash": "Copy Transaction Hash"
+      "copy-tx-hash": "Copy Transaction Hash",
+      "copy-balance": "Copy Balance",
+      "copy-address": "Copy Address"
     },
     "transaction": {
       "date": "Date",
