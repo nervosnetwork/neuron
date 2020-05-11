@@ -351,6 +351,7 @@
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其值不能為負數。",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 無效，其值應以http(s)：//開始。",
         "209": "$t(messages.fields.{{fieldName}}) 不能包含空格。",
+        "210": "\"{{value}}\" 是特殊值, 請重新輸入。",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "監視器不可用或被禁用。",

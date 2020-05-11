@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
+import { useSUDTAccountInfoErrors } from 'utils/hooks'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
@@ -112,24 +112,13 @@ const SUDTCreateDialog = ({
   const [step, setStep] = useState(DialogSection.Account)
 
   const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
-  const tokenErrors = { accountName: '', tokenId: '', tokenName: '', symbol: '', decimal: '' }
 
-  const dataToValidate = {
-    accountName: { params: { name: info.accountName, exists: existingAccountNames }, validator: verifySUDTAccountName },
-    symbol: { params: { symbol: info.symbol }, validator: verifySymbol },
-    tokenId: { params: { tokenId: info.tokenId, isCKB: accountType === AccountType.CKB }, validator: verifyTokenId },
-    tokenName: { params: { tokenName: info.tokenName }, validator: verifyTokenName },
-    decimal: { params: { decimal: info.decimal }, validator: verifyDecimal },
-  }
-
-  Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
-    try {
-      validator(params)
-    } catch (err) {
-      tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
-    }
+  const tokenErrors = useSUDTAccountInfoErrors({
+    info,
+    isCKB: AccountType.CKB === accountType,
+    existingAccountNames,
+    t,
   })
-
   const isAccountNameReady = info.accountName.trim() && !tokenErrors.accountName
 
   const isTokenReady =

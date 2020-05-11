@@ -5,6 +5,7 @@ import { updateTransactionDescription, updateAddressDescription } from 'states/s
 import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import { epochParser } from 'utils/parsers'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
+import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
 
 export const useGoBack = (history: any) => {
   return useCallback(() => {
@@ -191,6 +192,55 @@ export const useExitOnWalletChange = () => {
     }
   }, [])
 }
+
+export const useSUDTAccountInfoErrors = ({
+  info: { accountName, tokenName, tokenId, symbol, decimal },
+  existingAccountNames,
+  isCKB,
+  t,
+}: {
+  info: {
+    accountName: string
+    tokenName: string
+    tokenId: string
+    symbol: string
+    decimal: string
+  }
+  existingAccountNames: string[]
+  isCKB: boolean
+  t: TFunction
+}) =>
+  useMemo(() => {
+    const tokenErrors = {
+      accountName: '',
+      tokenId: '',
+      tokenName: '',
+      symbol: '',
+      decimal: '',
+    }
+
+    const dataToValidate = {
+      accountName: {
+        params: { name: accountName, exists: existingAccountNames },
+        validator: verifySUDTAccountName,
+      },
+      symbol: { params: { symbol, isCKB }, validator: verifySymbol },
+      tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
+      tokenName: { params: { tokenName, isCKB }, validator: verifyTokenName },
+      decimal: { params: { decimal }, validator: verifyDecimal },
+    }
+
+    Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
+      try {
+        validator(params)
+      } catch (err) {
+        tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
+      }
+    })
+
+    return tokenErrors
+  }, [accountName, tokenName, tokenId, symbol, decimal, isCKB, existingAccountNames, t])
+
 export default {
   useGoBack,
   useLocalDescription,
