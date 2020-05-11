@@ -22,6 +22,7 @@ export interface SUDTCreateDialogProps extends TokenInfo {
   onSubmit: (info: TokenInfo) => Promise<boolean>
   onCancel: () => void
   existingAccountNames: string[]
+  existingTokenInfos: Omit<TokenInfo, 'accountName'>[]
 }
 
 export enum AccountType {
@@ -54,13 +55,14 @@ const fields: { key: keyof TokenInfo; label: string }[] = [
 ]
 
 // TODO: reuse in update dialog
-const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'resetToken'; payload?: string }> = (
-  state,
-  action
-) => {
+const reducer: React.Reducer<
+  TokenInfo,
+  | { type: keyof TokenInfo | 'isCKB' | 'resetToken'; payload?: string }
+  | { type: 'import'; payload: Omit<TokenInfo, 'accountName'> }
+> = (state, action) => {
   switch (action.type) {
     case 'tokenId': {
-      return { ...state, tokenId: (action.payload ?? state.tokenId).trim() }
+      return { ...state, tokenId: (action.payload ?? state.tokenId).trim().toLowerCase() }
     }
     case 'accountName': {
       return { ...state, accountName: action.payload ?? state.accountName }
@@ -86,6 +88,12 @@ const reducer: React.Reducer<TokenInfo, { type: keyof TokenInfo | 'isCKB' | 'res
         decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
       }
     }
+    case 'import': {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    }
     case 'resetToken': {
       return { accountName: state.accountName, tokenId: '', tokenName: '', symbol: '', decimal: '' }
     }
@@ -104,6 +112,7 @@ const SUDTCreateDialog = ({
   onSubmit,
   onCancel,
   existingAccountNames = [],
+  existingTokenInfos = [],
 }: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
   Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>) => {
   const [t] = useTranslation()
@@ -130,9 +139,14 @@ const SUDTCreateDialog = ({
         value: payload,
         dataset: { field: type },
       } = e.target
-      dispatch({ type, payload })
+      const existingTokenInfo = existingTokenInfos.find(ti => payload === ti.tokenId)
+      if (type === 'tokenId' && existingTokenInfo) {
+        dispatch({ type: 'import', payload: existingTokenInfo })
+      } else {
+        dispatch({ type, payload })
+      }
     },
-    [dispatch]
+    [dispatch, existingTokenInfos]
   )
 
   const onAccountTypeSelect = useCallback(
