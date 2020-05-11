@@ -161,7 +161,8 @@
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "copy-transaction-hash": "复制交易哈希",
-      "no-txs": "没有交易记录"
+      "no-txs": "没有交易记录",
+      "copy-tx-hash": "复制交易 Hash"
     },
     "transaction": {
       "date": "时间",

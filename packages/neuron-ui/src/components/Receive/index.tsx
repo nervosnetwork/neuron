@@ -35,11 +35,7 @@ const Receive = () => {
     >
       <QRCode value={accountAddress} size={256} includeMargin dispatch={dispatch} />
       <div className={styles.address}>
-        <CopyZone
-          content={accountAddress}
-          name={t('receive.copy-address')}
-          style={{ lineHeight: '1.625rem', padding: '0 3px' }}
-        >
+        <CopyZone content={accountAddress} name={t('receive.copy-address')} style={{ lineHeight: '1.625rem' }}>
           {accountAddress}
         </CopyZone>
       </div>
