@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Edit } from 'grommet-icons'
 import TextField from 'widgets/TextField'
+import CopyZone from 'widgets/CopyZone'
 
 import { useState as useGlobalState, useDispatch } from 'states'
 import { openExternal, openContextMenu } from 'services/remote'
@@ -89,6 +90,8 @@ const Addresses = () => {
           {addresses.map(addr => {
             const isSelected = localDescription.key === addr.address
             const typeLabel = addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')
+            const balance = `${shannonToCKBFormatter(addr.balance)} CKB`
+
             return (
               <tr key={addr.address} onContextMenu={onContextMenu(addr)}>
                 <td className={styles.type} data-type={addr.type === 0 ? 'receiving' : 'change'} title={typeLabel}>
@@ -96,9 +99,11 @@ const Addresses = () => {
                 </td>
                 <td className={styles.address}>
                   <div data-address={addr.address}>
-                    <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
-                    <span className={styles.ellipsis}>...</span>
-                    <span>{addr.address.slice(-6)}</span>
+                    <CopyZone content={addr.address} name={t('addresses.copy-address')}>
+                      <span className={styles.addressOverflow}>{addr.address.slice(0, -6)}</span>
+                      <span className={styles.ellipsis}>...</span>
+                      <span>{addr.address.slice(-6)}</span>
+                    </CopyZone>
                   </div>
                 </td>
                 <td title={addr.description} className={styles.description}>
@@ -131,8 +136,10 @@ const Addresses = () => {
                     }
                   />
                 </td>
-                <td className={styles.balance} title={`${shannonToCKBFormatter(addr.balance)} CKB`}>
-                  <span className="textOverflow">{`${shannonToCKBFormatter(addr.balance)} CKB`}</span>
+                <td className={styles.balance} title={balance}>
+                  <CopyZone content={balance.slice(0, -4).replace(/,/g, '')}>
+                    <span className="textOverflow">{balance}</span>
+                  </CopyZone>
                 </td>
                 <td className={styles.txCount} title={localNumberFormatter(addr.txCount)}>
                   {localNumberFormatter(addr.txCount)}
