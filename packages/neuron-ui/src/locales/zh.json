@@ -536,7 +536,7 @@
         "click-to-edit": "点击编辑"
       },
       "receive": {
-        "notation": "只接收 sUDT"
+        "notation": "只接收 {{symbol}} 转账"
       },
       "update-dialog": {
         "update-asset-account": "账户设置",

@@ -20,6 +20,7 @@ const SUDTReceive = () => {
     address,
     accountName = DEFAULT_SUDT_FIELDS.accountName,
     tokenName = DEFAULT_SUDT_FIELDS.tokenName,
+    symbol = DEFAULT_SUDT_FIELDS.symbol,
   } = Object.fromEntries([...new URLSearchParams(search)])
   const breakcrum = [{ label: t('navbar.s-udt'), link: Routes.SUDTAccountList }]
 
@@ -57,7 +58,7 @@ const SUDTReceive = () => {
       </div>
       <p className={styles.notation}>
         <Attention />
-        {t('s-udt.receive.notation')}
+        {t('s-udt.receive.notation', { symbol })}
       </p>
     </div>
   )
