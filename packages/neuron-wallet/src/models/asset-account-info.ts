@@ -12,6 +12,7 @@ export interface ScriptCellInfo {
 export default class AssetAccountInfo {
   private sudtInfo: ScriptCellInfo
   private anyoneCanPayInfo: ScriptCellInfo
+  public sudtDeployHeight: bigint
 
   private static MAINNET_GENESIS_BLOCK_HASH: string = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5'
 
@@ -36,6 +37,7 @@ export default class AssetAccountInfo {
         codeHash: '0x6a3982f9d018be7e7228f9e0b765f28ceff6d36e634490856d2b186acf78e79b',
         hashType: ScriptHashType.Type
       }
+      this.sudtDeployHeight = BigInt(14922)
     } else {
       // TODO: Update for testnet!!!
       this.sudtInfo = {
@@ -48,6 +50,7 @@ export default class AssetAccountInfo {
         codeHash: '0x98e12a104d00f21d436efdbfd3991033aebefc29fed69f3dc015fe5333a6abd6',
         hashType: ScriptHashType.Type
       }
+      this.sudtDeployHeight = BigInt(14922)
     }
   }
 
