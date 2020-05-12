@@ -1,7 +1,8 @@
 import { getConnection } from 'typeorm'
 import SyncInfoEntity from 'database/chain/entities/sync-info'
-import SyncedBlockNumberSubject from "models/subjects/node"
+import SyncedBlockNumberSubject from 'models/subjects/node'
 import logger from 'utils/logger'
+import AssetAccountInfo from 'models/asset-account-info'
 
 // Keep track of synced block number.
 export default class SyncedBlockNumber {
@@ -73,6 +74,8 @@ export default class SyncedBlockNumber {
   }
 
   private async liveCellBlockNumber(): Promise<SyncInfoEntity> {
+    const assetAccountInfo = new AssetAccountInfo()
+
     if (!this.#liveCellBlockNumberEntity) {
       this.#liveCellBlockNumberEntity = await getConnection()
         .getRepository(SyncInfoEntity)
@@ -84,7 +87,7 @@ export default class SyncedBlockNumber {
     if (!this.#liveCellBlockNumberEntity) {
       this.#liveCellBlockNumberEntity = new SyncInfoEntity()
       this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
-      this.#liveCellBlockNumberEntity.value = '0'
+      this.#liveCellBlockNumberEntity.value = assetAccountInfo.sudtDeployHeight.toString()
     }
 
     return this.#liveCellBlockNumberEntity
