@@ -6,6 +6,13 @@ export class TargetOutputNotFoundError extends Error {
   }
 }
 
+export class AcpSendSameAccountError extends Error {
+  constructor() {
+    super(i18n.t('messages.acp-same-account'))
+  }
+}
+
 export default {
-  TargetOutputNotFoundError
+  TargetOutputNotFoundError,
+  AcpSendSameAccountError
 }
