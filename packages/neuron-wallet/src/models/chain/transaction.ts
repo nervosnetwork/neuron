@@ -18,7 +18,6 @@ interface SudtTokenInfo {
   symbol: string
   tokenID: string
   tokenName: string
-  walletID: string
   decimal: string
 }
 

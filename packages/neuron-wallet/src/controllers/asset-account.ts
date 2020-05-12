@@ -41,7 +41,7 @@ export default class AssetAccountController {
     const blake160s = AddressService.allBlake160sByWalletId(params.walletID)
     const anyoneCanPayLockHashes: string[] = blake160s.map(b => assetAccountInfo.generateAnyoneCanPayScript(b).computeHash())
 
-    const assetAccounts = await AssetAccountService.getAll(params.walletID, anyoneCanPayLockHashes)
+    const assetAccounts = await AssetAccountService.getAll(blake160s, anyoneCanPayLockHashes)
 
     if (!assetAccounts) {
       throw new ServiceHasNoResponse('AssetAccount')

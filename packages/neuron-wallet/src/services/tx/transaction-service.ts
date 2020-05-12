@@ -153,7 +153,9 @@ export class TransactionsService {
   public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
 
-    let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
+    const lockScripts = AddressParser.batchParse(params.addresses)
+    let lockHashes: string[] = lockScripts.map(s => s.computeHash())
+    const blake160s: string[] = lockScripts.map(s => s.args)
     const assetAccountInfo = new AssetAccountInfo()
     const anyoneCanPayLockHashes: string[] = AddressParser
       .batchParse(params.addresses)
@@ -341,9 +343,10 @@ export class TransactionsService {
           const tokenInfo = await getConnection()
             .getRepository(SudtTokenInfoEntity)
             .createQueryBuilder('info')
-            .where({
-              walletID: params.walletID,
-              tokenID: typeArgs,
+            .leftJoinAndSelect('info.assetAccounts', 'aa')
+            .where(`info.tokenID = :typeArgs AND aa.blake160 IN (:...blake160s)`, {
+              typeArgs,
+              blake160s,
             })
             .getOne()
 

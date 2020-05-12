@@ -14,7 +14,7 @@ import NetworksService from "./networks"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
 
 export default class AssetAccountService {
-  public static async getAll(walletID: string, anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
+  public static async getAll(blake160s: string[], anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
     const sudtHashType = assetAccountInfo.infos.sudt.hashType
@@ -23,9 +23,7 @@ export default class AssetAccountService {
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
       .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
-      .where({
-        walletID,
-      })
+      .where(`aa.blake160 IN (:...blake160s)`, { blake160s })
       .getMany()
 
     // calculate balances
@@ -146,7 +144,7 @@ export default class AssetAccountService {
     const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
 
     // 2. generate AssetAccount object
-    const assetAccount = new AssetAccount(walletID, tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
+    const assetAccount = new AssetAccount(tokenID, symbol, accountName, tokenName, decimal, '0', addrObj.blake160)
 
     // 3. generate tx
     const changeAddrObj = AddressService.nextUnusedChangeAddress(walletID)!
@@ -165,12 +163,12 @@ export default class AssetAccountService {
     }
   }
 
-  public static async checkAndSaveAssetAccountWhenSync(walletID: string, tokenID: string, blake160: string) {
+  public static async checkAndSaveAssetAccountWhenSync(tokenID: string, blake160: string) {
     const isCKB = tokenID === 'CKBytes'
     const decimal = isCKB ? '8' : ''
     const symbol = isCKB ? 'CKB' : ''
     const tokenName = isCKB ? 'CKBytes' : ''
-    const assetAccount = new AssetAccount(walletID, tokenID, symbol, '', tokenName, decimal, '0', blake160)
+    const assetAccount = new AssetAccount(tokenID, symbol, '', tokenName, decimal, '0', blake160)
     const assetAccountEntity = AssetAccountEntity.fromModel(assetAccount)
     const sudtTokenInfoEntity = assetAccountEntity.sudtTokenInfo
     await getConnection()
@@ -178,7 +176,7 @@ export default class AssetAccountService {
       .insert()
       .into(SudtTokenInfoEntity)
       .values(sudtTokenInfoEntity)
-      .onConflict(`("walletID", "tokenID") DO NOTHING`)
+      .onConflict(`("tokenID") DO NOTHING`)
       .execute()
 
     await getConnection()
@@ -186,7 +184,7 @@ export default class AssetAccountService {
       .insert()
       .into(AssetAccountEntity)
       .values(assetAccountEntity)
-      .onConflict(`("walletID", "tokenID", "blake160") DO NOTHING`)
+      .onConflict(`("tokenID", "blake160") DO NOTHING`)
       .execute()
   }
 

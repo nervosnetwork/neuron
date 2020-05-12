@@ -2,13 +2,8 @@ import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm";
 import AssetAccount from "./asset-account";
 
 @Entity()
-@Index(['walletID', 'tokenID'], { unique: true })
+@Index(['tokenID'], { unique: true })
 export default class SudtTokenInfo {
-  @PrimaryColumn({
-    type: 'varchar'
-  })
-  walletID!: string
-
   @PrimaryColumn({
     type: 'varchar'
   })

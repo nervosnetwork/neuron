@@ -73,7 +73,6 @@ describe('AssetAccountService', () => {
   })
 
   const assetAccount = AssetAccount.fromObject({
-    walletID: 'walletID',
     tokenID: 'tokenID',
     symbol: 'symbol',
     tokenName: 'tokenName',
@@ -84,7 +83,6 @@ describe('AssetAccountService', () => {
   })
 
   const ckbAssetAccount = AssetAccount.fromObject({
-    walletID: 'walletID',
     tokenID: 'CKBytes',
     symbol: 'CKB',
     tokenName: 'CKBytes',
@@ -194,11 +192,9 @@ describe('AssetAccountService', () => {
 
   describe('getAll', () => {
     it('check balance', async () => {
-      const walletID = '1'
       const tokenID = '0x' + '0'.repeat(64)
       const assetAccounts = [
         AssetAccount.fromObject({
-          walletID,
           tokenID,
           symbol: 'sUDT',
           tokenName: 'sUDT',
@@ -208,7 +204,6 @@ describe('AssetAccountService', () => {
           blake160,
         }),
         AssetAccount.fromObject({
-          walletID,
           tokenID: 'CKBytes',
           symbol: 'ckb',
           tokenName: 'ckb',
@@ -241,7 +236,7 @@ describe('AssetAccountService', () => {
         assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
       ]
 
-      const result = await AssetAccountService.getAll(walletID, anyoneCanPayLockHashes)
+      const result = await AssetAccountService.getAll([blake160], anyoneCanPayLockHashes)
 
       expect(result.length).toEqual(2)
       expect(result.find(a => a.tokenID === tokenID)?.balance).toEqual('200')
@@ -251,7 +246,7 @@ describe('AssetAccountService', () => {
 
   describe('checkAndSaveAssetAccountWhenSync', () => {
     it('not exists', async () => {
-      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.tokenID, assetAccount.blake160)
 
       const all = await getConnection()
         .getRepository(AssetAccountEntity)
@@ -262,7 +257,6 @@ describe('AssetAccountService', () => {
       expect(all.length).toEqual(1)
       const entity = all[0]
       expect(entity.sudtTokenInfo).not.toBeNull()
-      expect(entity.walletID).toEqual(assetAccount.walletID)
       expect(entity.tokenID).toEqual(assetAccount.tokenID)
       expect(entity.sudtTokenInfo.symbol).toEqual('')
       expect(entity.sudtTokenInfo.decimal).toEqual('')
@@ -273,7 +267,7 @@ describe('AssetAccountService', () => {
       const ckbSymbol = 'CKB'
       const ckbTokenName = 'CKBytes'
       const ckbDecimal = '8'
-      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, ckbTokenID, assetAccount.blake160)
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(ckbTokenID, assetAccount.blake160)
 
       const all = await getConnection()
         .getRepository(AssetAccountEntity)
@@ -296,13 +290,12 @@ describe('AssetAccountService', () => {
         .getRepository(SudtTokenInfoEntity)
         .createQueryBuilder('info')
         .where({
-          walletID: assetAccount.walletID,
           tokenID: assetAccount.tokenID,
         })
         .getOne()
       expect(tokenInfo).not.toBeNull()
 
-      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.tokenID, assetAccount.blake160)
 
       const all = await getConnection()
         .getRepository(AssetAccountEntity)
@@ -313,7 +306,6 @@ describe('AssetAccountService', () => {
       expect(all.length).toEqual(1)
       const entity = all[0]
       expect(entity.sudtTokenInfo).not.toBeNull()
-      expect(entity.walletID).toEqual(assetAccount.walletID)
       expect(entity.tokenID).toEqual(assetAccount.tokenID)
       expect(entity.sudtTokenInfo.symbol).toEqual(assetAccount.symbol)
     })
@@ -326,14 +318,13 @@ describe('AssetAccountService', () => {
         .createQueryBuilder('aa')
         .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
         .where({
-          walletID: assetAccount.walletID,
           tokenID: assetAccount.tokenID,
         })
         .getOne()
       expect(aae).not.toBeNull()
       expect(aae!.sudtTokenInfo).not.toBeNull()
 
-      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.walletID, assetAccount.tokenID, assetAccount.blake160)
+      await AssetAccountService.checkAndSaveAssetAccountWhenSync(assetAccount.tokenID, assetAccount.blake160)
 
       const all = await getConnection()
         .getRepository(AssetAccountEntity)
@@ -344,7 +335,6 @@ describe('AssetAccountService', () => {
       expect(all.length).toEqual(1)
       const entity = all[0]
       expect(entity.sudtTokenInfo).not.toBeNull()
-      expect(entity.walletID).toEqual(assetAccount.walletID)
       expect(entity.tokenID).toEqual(assetAccount.tokenID)
       expect(entity.accountName).toEqual(assetAccount.accountName)
       expect(entity.sudtTokenInfo.symbol).toEqual(assetAccount.symbol)
@@ -357,7 +347,6 @@ describe('AssetAccountService', () => {
     beforeEach(async done => {
       const assetAccounts = [
         AssetAccount.fromObject({
-          walletID: 'walletID',
           tokenID: 'CKBytes',
           symbol: 'ckb',
           tokenName: 'ckb',
@@ -367,7 +356,6 @@ describe('AssetAccountService', () => {
           blake160,
         }),
         AssetAccount.fromObject({
-          walletID: 'walletID',
           tokenID: tokenID,
           symbol: 'udt',
           tokenName: 'udt',

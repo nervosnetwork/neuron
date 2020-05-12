@@ -1,6 +1,5 @@
 export default class AssetAccount {
   public id?: number
-  public walletID: string
   public tokenID: string
   public symbol: string
   public accountName: string
@@ -10,7 +9,6 @@ export default class AssetAccount {
   public blake160: string
 
   constructor(
-    walletID: string,
     tokenID: string,
     symbol: string,
     accountName: string,
@@ -20,7 +18,6 @@ export default class AssetAccount {
     blake160: string,
     id?: number
   ) {
-    this.walletID = walletID
     this.tokenID = tokenID
     this.symbol = symbol
     this.accountName = accountName
@@ -32,7 +29,6 @@ export default class AssetAccount {
   }
 
   public static fromObject(params: {
-    walletID: string,
     tokenID: string,
     symbol: string,
     accountName: string,
@@ -43,7 +39,6 @@ export default class AssetAccount {
     id?: number
   }): AssetAccount {
     return new AssetAccount(
-      params.walletID,
       params.tokenID,
       params.symbol,
       params.accountName,
