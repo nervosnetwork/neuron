@@ -12,7 +12,7 @@ import SyncedBlockNumber from 'models/synced-block-number'
 
 export default class ExportDebugController {
   archive: archiver.Archiver
-  constructor() {
+  constructor () {
     this.archive = archiver('zip', {
       zlib: { level: 9 }
     })
@@ -103,8 +103,15 @@ export default class ExportDebugController {
       fs.open(logPath, 'r', (openErr, fd) => {
         if (openErr) { return reject(openErr) }
         fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
-          if (readErr) { return reject(readErr) }
-          return resolve(buffer.toString('utf8'))
+          if (readErr) {
+            reject(readErr)
+          } else {
+            resolve(buffer.toString('utf8'))
+          }
+          fs.close(fd, closeErr => {
+            logger.error(closeErr)
+          })
+          return
         })
       })
 
