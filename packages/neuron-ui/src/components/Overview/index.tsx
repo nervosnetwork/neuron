@@ -137,8 +137,10 @@ const Overview = () => {
   const RecentActivites = useMemo(() => {
     const activities = recentItems.map(item => {
       let confirmations = ''
-      let typeLabel: string = item.type
+      let typeLabel: string = '--'
+      let amount = '--'
       let { status } = item
+
       if (item.blockNumber !== undefined) {
         const confirmationCount =
           item.blockNumber === null || item.status === 'failed'
@@ -159,15 +161,19 @@ const Overview = () => {
           }
         }
 
-        typeLabel = t(`overview.${genTypeLabel(item.type, status)}`)
-      }
-      let amount = `${shannonToCKBFormatter(item.value)} CKB`
-      if (item.nervosDao) {
-        typeLabel = 'Nervos DAO'
-      } else if (item.sudtInfo?.sUDT) {
-        typeLabel = `UDT ${typeLabel}`
-        amount = `${sudtValueToAmount(item.sudtInfo?.amount, item.sudtInfo?.sUDT.decimal)} ${item.sudtInfo?.sUDT
-          .symbol || '?'}`
+        if (item.sudtInfo?.sUDT) {
+          const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
+          typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
+
+          if (item.sudtInfo.sUDT.decimal) {
+            amount = `${sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal)} ${
+              item.sudtInfo.sUDT.symbol
+            }`
+          }
+        } else {
+          amount = `${shannonToCKBFormatter(item.value)} CKB`
+          typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
+        }
       }
 
       return {

@@ -19,7 +19,7 @@ import {
   sudtValueToAmount,
 } from 'utils/formatters'
 import getExplorerUrl from 'utils/getExplorerUrl'
-import { CONFIRMATION_THRESHOLD } from 'utils/const'
+import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './transactionList.module.scss'
 
 const TransactionList = ({
@@ -132,18 +132,25 @@ const TransactionList = ({
         const statusLabel = t(`history.${status}`)
         const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
 
-        let name = walletName
-        let value = `${tx.value} shannons`
-        let amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
+        let name = '--'
+        let value = '--'
+        let amount = '--'
+        let typeLabel = '--'
 
-        let typeLabel = t(`history.${tx.type}`)
-        if (tx.nervosDao) {
-          typeLabel = 'Nervos DAO'
-        } else if (tx.sudtInfo?.sUDT) {
-          name = tx.sudtInfo?.sUDT.tokenName || '?'
-          typeLabel = `UDT ${typeLabel}`
-          value = tx.sudtInfo?.amount
-          amount = `${sudtValueToAmount(value, tx.sudtInfo?.sUDT.decimal)} ${tx.sudtInfo?.sUDT.symbol || '?'}`
+        if (tx.sudtInfo?.sUDT) {
+          name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
+          const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
+          typeLabel = `UDT ${t(`history.${type}`)}`
+          value = tx.sudtInfo.amount
+
+          if (tx.sudtInfo.sUDT.decimal) {
+            amount = `${sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal)} ${tx.sudtInfo.sUDT.symbol}`
+          }
+        } else {
+          name = walletName
+          value = `${tx.value} shannons`
+          amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
+          typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
         }
 
         let indicator = <Pending />
