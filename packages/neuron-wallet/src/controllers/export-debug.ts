@@ -95,16 +95,16 @@ export default class ExportDebugController {
 
     return new Promise((resolve, reject) => {
       const logPath = path.resolve(ckbPath(), 'data', 'logs', 'run.log')
-      if (!fs.existsSync(logPath)) { reject(new Error("File not found")) }
+      if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
 
       const fileStats = fs.statSync(logPath)
       const position = fileStats.size - SIZE_TO_READ
 
       fs.open(logPath, 'r', (openErr, fd) => {
-        if (openErr) { reject(openErr) }
+        if (openErr) { return reject(openErr) }
         fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
-          if (readErr) { reject(readErr) }
-          resolve(buffer.toString('utf8'))
+          if (readErr) { return reject(readErr) }
+          return resolve(buffer.toString('utf8'))
         })
       })
 
