@@ -6,12 +6,13 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from 'electron-log'
 import i18n from 'locales/i18n'
+import { ckbPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 
 export default class ExportDebugController {
   archive: archiver.Archiver
-  constructor() {
+  constructor () {
     this.archive = archiver('zip', {
       zlib: { level: 9 }
     })
@@ -30,7 +31,7 @@ export default class ExportDebugController {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await this.addStatusFile()
+      await Promise.all([this.addStatusFile(), this.addBundledCKBLog()])
       this.addLogFiles()
       await this.archive.finalize()
       dialog.showMessageBox({
@@ -85,6 +86,39 @@ export default class ExportDebugController {
     }
     this.archive.append(JSON.stringify(status), {
       name: 'status.json'
+    })
+  }
+
+  private addBundledCKBLog = () => {
+    const name = 'bundled-ckb-log.json'
+    const SIZE_TO_READ = 32_000
+
+    return new Promise((resolve, reject) => {
+      const logPath = path.resolve(ckbPath(), 'data', 'logs', 'run.log')
+      if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
+
+      const fileStats = fs.statSync(logPath)
+      const position = fileStats.size - SIZE_TO_READ
+
+      fs.open(logPath, 'r', (openErr, fd) => {
+        if (openErr) { return reject(openErr) }
+        fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
+          if (readErr) {
+            reject(readErr)
+          } else {
+            resolve(buffer.toString('utf8'))
+          }
+          fs.close(fd, closeErr => {
+            logger.error(closeErr)
+          })
+          return
+        })
+      })
+
+    }).then((log: string) => {
+      this.archive.append(log, { name })
+    }).catch(err => {
+      this.archive.append(err.message, { name })
     })
   }
 

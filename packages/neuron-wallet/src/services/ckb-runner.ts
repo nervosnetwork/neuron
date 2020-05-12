@@ -20,7 +20,7 @@ const platform = (): string => {
 const { app } = env
 let ckb: ChildProcess | null = null
 
-const ckbPath = (): string => {
+export const ckbPath = (): string => {
   return app.isPackaged ?
     path.join(path.dirname(app.getAppPath()), '..', './bin') :
     path.join(__dirname, '../../bin',)
