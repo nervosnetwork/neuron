@@ -668,13 +668,16 @@ export default class CellsService {
     let inputAmount: bigint = BigInt(0)
     let totalSize: number = baseSize
     anyoneCanPayLockLiveCells.every(cell => {
-      const input: Input = new Input(
-        cell.outPoint(),
-        '0',
-        cell.capacity,
-        cell.lock(),
-        cell.lockHash
-      )
+      const input: Input = Input.fromObject({
+        previousOutput: cell.outPoint(),
+        since: '0',
+        capacity: cell.capacity,
+        lock: cell.lock(),
+        lockHash: cell.lockHash,
+        type: cell.type(),
+        typeHash: cell.typeHash,
+        data: cell.data,
+      })
       inputCapacities += BigInt(cell.capacity)
       totalSize += TransactionSize.input()
       if (inputs.find(el => el.lockHash === cell.lockHash!)) {

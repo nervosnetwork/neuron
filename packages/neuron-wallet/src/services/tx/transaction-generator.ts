@@ -642,6 +642,8 @@ public static generateSendingAllTx = async (
       capacity: targetOutput.capacity,
       lock: targetOutput.lock,
       lockHash: targetOutput.lockHash,
+      type: targetOutput.type,
+      data: targetOutput.data,
     })
     const tx =  Transaction.fromObject({
       version: '0',
