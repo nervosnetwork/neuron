@@ -353,7 +353,7 @@ const SUDTSend = () => {
           </div>
         </div>
         <div className={styles.footer}>
-          <Button type="submit" label="Submit" onClick={onSubmit} disabled={!isSubmittable} />
+          <Button type="submit" label={t('s-udt.send.submit')} onClick={onSubmit} disabled={!isSubmittable} />
         </div>
       </form>
     </div>
