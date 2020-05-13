@@ -100,7 +100,8 @@ export default {
       'transaction-is-not-committed-yet': '無法在鏈上找到交易所需要的 cell，請確保相關的交易已經被區塊鏈確認。',
       'mainnet-address-required': '{{address}} 不是主網地址。',
       'testnet-address-required': '{{address}} 不是測試網地址。',
-      'target-output-not-found': "There isn't an account wallet associated with this address."
+      'target-output-not-found': "There isn't an account wallet associated with this address.",
+      'acp-same-account': "The payment account and receive account shouldn't be the same."
     },
     messageBox: {
       button: {

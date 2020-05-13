@@ -10,6 +10,7 @@ import LiveCell from "models/chain/live-cell"
 import Transaction from "models/chain/transaction"
 import AssetAccountEntity from "database/chain/entities/asset-account"
 import { TargetOutputNotFoundError } from "exceptions"
+import { AcpSendSameAccountError } from "exceptions"
 
 export default class AnyoneCanPayService {
   public static async generateAnyoneCanPayTx(
@@ -33,18 +34,22 @@ export default class AnyoneCanPayService {
     }
     const tokenID = assetAccount.tokenID
 
-    const isCKB = !tokenID || tokenID === 'CKBytes'
-
-    const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
-    const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
-    const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHashes: string[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()]
-
     const targetAnyoneCanPayLockScript = AddressParser.parse(targetAddress)
+    if (assetAccount.blake160 === targetAnyoneCanPayLockScript.args) {
+      throw new AcpSendSameAccountError()
+    }
+
+    const assetAccountInfo = new AssetAccountInfo()
     // verify targetAnyoneCanPay codeHash & hashType
     if (!assetAccountInfo.isAnyoneCanPayScript(targetAnyoneCanPayLockScript)) {
       throw new Error(`Invalid anyone-can-pay lock script address`)
     }
+
+    const isCKB = !tokenID || tokenID === 'CKBytes'
+
+    const allBlake160s = AddressService.allBlake160sByWalletId(walletID)
+    const defaultLockHashes: string[] = allBlake160s.map(b => SystemScriptInfo.generateSecpScript(b).computeHash())
+    const anyoneCanPayLockHashes: string[] = [assetAccountInfo.generateAnyoneCanPayScript(assetAccount.blake160).computeHash()]
 
     const typeHash = isCKB ? null : assetAccountInfo.generateSudtScript(tokenID).computeHash()
 

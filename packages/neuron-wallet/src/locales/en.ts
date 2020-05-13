@@ -102,7 +102,8 @@ export default {
       'mainnet-address-required': '{{address}} is not a mainnet address.',
       'testnet-address-required': '{{address}} is not a testnet address.',
       'address-not-found': 'The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete.',
-      'target-output-not-found': "There isn't an account wallet associated with this address."
+      'target-output-not-found': "There isn't an account wallet associated with this address.",
+      'acp-same-account': "The payment account and receive account shouldn't be the same."
     },
     messageBox: {
       button: {
