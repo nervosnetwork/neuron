@@ -18,7 +18,6 @@ import SystemScriptInfo from 'models/system-script-info'
 import { LiveCellPersistor } from 'services/tx/livecell-persistor'
 import AssetAccountInfo from 'models/asset-account-info'
 import AssetAccountService from 'services/asset-account-service'
-import AddressService from 'services/addresses'
 
 export default class Queue {
   private lockHashes: string[]
@@ -44,8 +43,6 @@ export default class Queue {
 
   private anyoneCanPayLockHashes: string[]
 
-  private addressWalletIDMap: Map<string, string[]>
-
   constructor(url: string, lockHashes: string[], anyoneCanPayLockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
@@ -54,18 +51,6 @@ export default class Queue {
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
     this.multiSignBlake160s = multiSignBlake160s
     this.anyoneCanPayLockHashes = anyoneCanPayLockHashes
-
-    const addresses = AddressService.allAddresses()
-    this.addressWalletIDMap = new Map<string, string[]>()
-    addresses.map(addr => {
-      const blake160 = addr.blake160
-      const value = this.addressWalletIDMap.get(blake160)
-      if (value) {
-        this.addressWalletIDMap.set(blake160, value.concat(addr.walletId))
-      } else {
-        this.addressWalletIDMap.set(blake160, [addr.walletId])
-      }
-    })
 
     try {
       this.assetAccountInfo = new AssetAccountInfo()
@@ -224,10 +209,7 @@ export default class Queue {
           const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
           await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
           for (const info of anyoneCanPayInfos) {
-            const walletIDs = this.addressWalletIDMap.get(info.blake160) || []
-            for (const walletID of walletIDs) {
-              await AssetAccountService.checkAndSaveAssetAccountWhenSync(walletID, info.tokenID, info.blake160)
-            }
+            await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
           }
         }
       }
