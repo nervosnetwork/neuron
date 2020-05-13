@@ -27,6 +27,7 @@ import {
   FieldUsedException,
   FieldTooLongException,
   ValueReservedException,
+  AmountZeroException,
 } from '../exceptions'
 
 import { sudtAmountToValue } from './formatters'
@@ -133,6 +134,9 @@ export const verifySUDTAmount = ({
   const fieldName = 'amount'
   if (!amount && required) {
     throw new FieldRequiredException(fieldName)
+  }
+  if (amount === '0') {
+    throw new AmountZeroException()
   }
   if (Number.isNaN(+amount) || +amount < 0) {
     throw new FieldInvalidException(fieldName)

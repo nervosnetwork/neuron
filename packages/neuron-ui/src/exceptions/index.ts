@@ -75,6 +75,13 @@ export class AmountNotEnoughException extends Error {
   }
 }
 
+export class AmountZeroException extends Error {
+  public code = ErrorCode.AmountZero
+  constructor() {
+    super(`messages.codes.${ErrorCode.AmountZero}`)
+  }
+}
+
 export class ValueReservedException extends Error {
   public code = ErrorCode.ValueReserved
   public i18n = {

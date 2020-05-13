@@ -352,6 +352,7 @@
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值应以 http(s):// 开始。",
         "209": "$t(messages.fields.{{fieldName}})不能包含空格。",
         "210": "\"{{value}}\" 是特殊值, 请重新输入。",
+        "211": "金额不能为 0",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "摄像头不可用或被禁用。",
