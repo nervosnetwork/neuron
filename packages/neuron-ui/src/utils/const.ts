@@ -124,6 +124,7 @@ export enum ErrorCode {
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
   ValueReserved = 210,
+  AmountZero = 211,
   FieldIrremovable = 301,
   FieldNotFound = 303,
   CameraUnavailable = 304,
