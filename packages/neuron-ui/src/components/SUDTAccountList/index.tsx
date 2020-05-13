@@ -15,6 +15,7 @@ import isMainnetUtil from 'utils/isMainnet'
 import { MEDIUM_FEE_RATE, Routes, DEFAULT_SUDT_FIELDS, SyncStatus } from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
+import sortAccounts from 'utils/sortAccounts'
 
 import styles from './sUDTAccountList.module.scss'
 
@@ -56,6 +57,7 @@ const SUDTAccountList = () => {
         setAccounts(
           list
             .filter(account => account.id !== undefined)
+            .sort(sortAccounts)
             .map(({ id, accountName, tokenName, symbol, tokenID, balance, address, decimal }) => ({
               accountId: id!.toString(),
               accountName,
