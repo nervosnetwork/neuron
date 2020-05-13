@@ -15,6 +15,9 @@ declare interface Window {
     removeListener(channel: string, listener: Function)
     removeAllListeners(channel: string)
   }
+  neuron: {
+    role: 'main' | 'settings'
+  }
 }
 
 declare module '*.json' {

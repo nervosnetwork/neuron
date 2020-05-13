@@ -8,7 +8,7 @@ import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import { ResponseCode } from 'utils/const'
+import { ResponseCode, SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -301,6 +301,10 @@ export default class ApiController {
     })
 
     // Settings
+
+    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
+      showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE))
+    })
 
     handle('clear-cache', async () => {
       return new SyncController().clearCache()

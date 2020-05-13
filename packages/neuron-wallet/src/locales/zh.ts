@@ -32,7 +32,7 @@ export default {
         paste: '粘贴',
         selectall: '全部选中',
       },
-      tools:{
+      tools: {
         label: "工具",
         "sign-and-verify": "签名/验证信息",
       },
@@ -126,7 +126,7 @@ export default {
       transaction: {
         title: '交易: {{hash}}',
       },
-      'sign-and-verify':{
+      'sign-and-verify': {
         title: '签名/验证信息'
       },
     },
@@ -146,7 +146,7 @@ export default {
       ok: '确定',
       error: '错误'
     },
-    'export-debug-info':{
+    'export-debug-info': {
       'export-debug-info': '导出调试信息',
       'debug-info-exported': '调试信息已被导出至 {{ file }}'
     },

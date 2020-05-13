@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Route, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -11,16 +11,13 @@ import Send from 'components/Send'
 import Receive from 'components/Receive'
 import History from 'components/History'
 import Transaction from 'components/Transaction'
-import Settings from 'components/Settings'
 import Addresses from 'components/Addresses'
-import NetworkEditor from 'components/NetworkEditor'
-import WalletEditor from 'components/WalletEditor'
 import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 import SpecialAssetList from 'components/SpecialAssetList'
 
-import { RoutePath, useOnDefaultContextMenu } from 'utils'
+import { RoutePath, useOnDefaultContextMenu, useRoutes } from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -69,26 +66,6 @@ export const mainContents: CustomRouter.Route[] = [
     path: RoutePath.Addresses,
     exact: false,
     component: Addresses,
-  },
-  {
-    name: `Settings`,
-    path: RoutePath.Settings,
-    exact: false,
-    component: Settings,
-  },
-  {
-    name: `NetworkEditor`,
-    path: RoutePath.NetworkEditor,
-    params: '/:id',
-    exact: false,
-    component: NetworkEditor,
-  },
-  {
-    name: `WalletEditor`,
-    path: RoutePath.WalletEditor,
-    params: '/:id',
-    exact: false,
-    component: WalletEditor,
   },
   {
     name: `WalletWizard`,
@@ -159,19 +136,9 @@ const MainContent = () => {
     dispatch,
   })
   const onContextMenu = useOnDefaultContextMenu(t)
+  const routes = useRoutes(mainContents)
 
-  return (
-    <div onContextMenu={onContextMenu}>
-      {mainContents.map(container => (
-        <Route
-          exact={container.exact}
-          path={`${container.path}${container.params || ''}`}
-          key={container.name}
-          component={container.component}
-        />
-      ))}
-    </div>
-  )
+  return <div onContextMenu={onContextMenu}>{routes}</div>
 }
 
 MainContent.displayName = 'Main'

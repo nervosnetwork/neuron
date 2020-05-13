@@ -21,6 +21,7 @@ const SubjectConstructor = <T>(
     | 'synced-block-number-updated'
     | 'command'
     | 'app-updater-updated'
+    | 'navigation'
 ) => {
   return window.ipcRenderer
     ? {
@@ -46,6 +47,7 @@ export const ConnectionStatus = SubjectConstructor<Subject.ConnectionStatus>('co
 export const SyncedBlockNumber = SubjectConstructor<Subject.BlockNumber>('synced-block-number-updated')
 export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
+export const Navigation = SubjectConstructor<Subject.URL>('navigation')
 
 export default {
   DataUpdate,
@@ -57,4 +59,5 @@ export default {
   SyncedBlockNumber,
   AppUpdater,
   Command,
+  Navigation,
 }

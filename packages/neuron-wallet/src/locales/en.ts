@@ -127,7 +127,7 @@ export default {
       transaction: {
         title: 'Transaction: {{hash}}',
       },
-      'sign-and-verify':{
+      'sign-and-verify': {
         title: 'Sign/verify message'
       },
     },
@@ -147,7 +147,7 @@ export default {
       ok: 'OK',
       error: 'Error',
     },
-    'export-debug-info':{
+    'export-debug-info': {
       'export-debug-info': 'Export Debug Information',
       'debug-info-exported': 'Debug information has been exported to {{ file }}'
     },

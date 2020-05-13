@@ -196,3 +196,12 @@ export const useExitOnWalletChange = () => {
     }
   }, [])
 }
+
+export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
+  return useEffect(() => {
+    window.addEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
+  }, [handler])
+}

@@ -32,6 +32,7 @@ type Action =
   | 'load-init-data'
   | 'open-in-window'
   | 'handle-view-error'
+  | 'show-settings'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

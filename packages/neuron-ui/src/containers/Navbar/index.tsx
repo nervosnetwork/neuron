@@ -4,6 +4,8 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useState as useGlobalState } from 'states'
 
+import { showSettings } from 'services/remote'
+
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
@@ -101,7 +103,7 @@ const Navbar = () => {
         className={styles.name}
         title={name}
         aria-label={name}
-        onClick={() => history.push(RoutePath.SettingsWallets)}
+        onClick={() => showSettings({ tab: 'wallets' })}
       >
         {name}
       </button>
@@ -120,7 +122,7 @@ const Navbar = () => {
           syncedBlockNumber={syncedBlockNumber}
           networkName={networkName}
           connectionStatus={connectionStatus}
-          onAction={() => history.push(RoutePath.SettingsNetworks)}
+          onAction={() => showSettings({ tab: 'networks' })}
         />
       </div>
       <div className={styles.sync}>

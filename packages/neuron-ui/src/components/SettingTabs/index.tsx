@@ -38,7 +38,7 @@ const settingPanels: CustomRouter.Route[] = [
   },
 ]
 
-const Settings = () => {
+const SettingsTabs = () => {
   const globalState = useGloablState()
   const dispatch = useDispatch()
   const history = useHistory()
@@ -73,6 +73,6 @@ const Settings = () => {
   )
 }
 
-Settings.displayName = 'Settings'
+SettingsTabs.displayName = 'SettingsTabs'
 
-export default Settings
+export default SettingsTabs
