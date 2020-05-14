@@ -30,6 +30,7 @@ enum NetworksKey {
 
 export default class NetworksService extends Store {
   private static instance: NetworksService
+  private caches: Map<NetworksKey, any> = new Map()
 
   public static getInstance = () => {
     if (!NetworksService.instance) {
@@ -45,8 +46,25 @@ export default class NetworksService extends Store {
     this.update(currentNetwork.id, {}) // Update to trigger chain/genesis hash refresh
   }
 
+  private readSyncWithCache = <T>(key: NetworksKey): T => {
+    const cached = this.caches.get(key)
+    if (cached) {
+      return cached
+    }
+
+    const data:T = this.readSync<T>(key)
+    this.caches.set(key, data)
+
+    return this.caches.get(key)
+  }
+
+  private writeSyncWithCache = (key: NetworksKey, data: any) => {
+    this.writeSync(key, data)
+    this.caches.set(key, data)
+  }
+
   public getAll = () => {
-    return this.readSync<Network[]>(NetworksKey.List) || presetNetworks.networks
+    return this.readSyncWithCache<Network[]>(NetworksKey.List) || presetNetworks.networks
   }
 
   public getCurrent(): Network {
@@ -62,7 +80,7 @@ export default class NetworksService extends Store {
     if (!Array.isArray(networks)) {
       throw new InvalidFormat('Networks')
     }
-    this.writeSync(NetworksKey.List, networks)
+    this.writeSyncWithCache(NetworksKey.List, networks)
   }
 
   @Validate
@@ -116,7 +134,7 @@ export default class NetworksService extends Store {
     }
 
     if (this.getCurrentID() === id) {
-      this.writeSync(NetworksKey.Current, null)
+      this.writeSyncWithCache(NetworksKey.Current, null)
     }
 
     const list = this.getAll().filter(item => item.id !== id)
@@ -131,11 +149,11 @@ export default class NetworksService extends Store {
     }
     this.update(id, {}) // Trigger chain info refresh
 
-    this.writeSync(NetworksKey.Current, id)
+    this.writeSyncWithCache(NetworksKey.Current, id)
   }
 
   public getCurrentID = () => {
-    return this.readSync<string>(NetworksKey.Current) || 'mainnet'
+    return this.readSyncWithCache<string>(NetworksKey.Current) || 'mainnet'
   }
 
   public defaultOne = () => {

@@ -121,6 +121,52 @@ describe(`Unit tests of networks service`, () => {
       const currentID = service.getCurrentID()
       expect(currentID).toBe('mainnet')
     })
+
+    describe('caches', () => {
+      let networkService: NetworksService
+      let fileServiceSpy: any
+      beforeEach(() => {
+        networkService = new NetworksService()
+        fileServiceSpy = jest.spyOn(service.service, 'readFileSync')
+      });
+      afterEach(() => {
+        fileServiceSpy.mockRestore()
+      })
+      it('#constructor inits caches', () => {
+        const cachedNetwork = networkService.getCurrent()
+        expect(fileServiceSpy).not.toHaveBeenCalled()
+        expect(cachedNetwork.id).toEqual('mainnet')
+      });
+      describe('#create', () => {
+        let createdNetwork : Network
+        beforeEach(async () => {
+          createdNetwork = await networkService.create(newNetwork.name, newNetwork.remote, newNetwork.type)
+        });
+        it('update the underlying file data store', () => {
+          expect(fileServiceSpy).toHaveBeenCalled()
+        })
+        it('updates cache', () => {
+          fileServiceSpy.mockReset()
+          const cachedNetwork = networkService.get(createdNetwork.id)
+          expect(fileServiceSpy).not.toHaveBeenCalled()
+          expect(cachedNetwork).toEqual(createdNetwork)
+        })
+        describe('#activate', () => {
+          beforeEach(async () => {
+            await networkService.activate(createdNetwork.id)
+          });
+          it('updates the underlying file data store', () => {
+            expect(fileServiceSpy).toHaveBeenCalled()
+          })
+          it('updates cache', () => {
+            fileServiceSpy.mockReset()
+            const id = networkService.getCurrentID()
+            expect(fileServiceSpy).not.toHaveBeenCalled()
+            expect(id).toEqual(createdNetwork.id)
+          })
+        })
+      })
+    });
   })
 
   describe(`validation on parameters`, () => {
