@@ -39,7 +39,7 @@ const SUDTAccountList = () => {
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
-  const existingAccountNames = accounts.map(a => a.accountName || '')
+  const existingAccountNames = accounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
   const existingTokenInfos = [...new Set(accounts.map(a => a.tokenId))].map(tokenId => {
     const { tokenName = '', symbol = '', decimal = '' } = accounts.find(a => tokenId === a.tokenId)!
     return { tokenName, tokenId, symbol, decimal }
