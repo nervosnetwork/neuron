@@ -14,7 +14,7 @@ import isMainnetUtil from 'utils/isMainnet'
 import { verifySUDTAddress, verifySUDTAmount } from 'utils/validators'
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import { shannonToCKBFormatter, sudtValueToAmount, sudtAmountToValue, localNumberFormatter } from 'utils/formatters'
-import { INIT_SEND_PRICE, Routes, DEFAULT_SUDT_FIELDS, MEDIUM_FEE_RATE } from 'utils/const'
+import { INIT_SEND_PRICE, Routes, DEFAULT_SUDT_FIELDS } from 'utils/const'
 import { AmountNotEnoughException } from 'exceptions'
 import {
   getSUDTAccount,
@@ -193,7 +193,7 @@ const SUDTSend = () => {
       walletID: walletId,
       address: sendState.address,
       amount,
-      feeRate: MEDIUM_FEE_RATE.toString(),
+      feeRate: sendState.price,
       description: sendState.description,
     }
     globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: null })
@@ -215,6 +215,7 @@ const SUDTSend = () => {
     sendState.amount,
     sendState.sendAll,
     sendState.description,
+    sendState.price,
     errors,
     globalDispatch,
     setRemoteError,
