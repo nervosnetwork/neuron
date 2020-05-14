@@ -127,7 +127,7 @@ describe(`Unit tests of networks service`, () => {
       let fileServiceSpy: any
       beforeEach(() => {
         networkService = new NetworksService()
-        fileServiceSpy = jest.spyOn(service.service, 'readFileSync')
+        fileServiceSpy = jest.spyOn(networkService.service, 'readFileSync')
       });
       afterEach(() => {
         fileServiceSpy.mockRestore()
