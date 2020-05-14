@@ -17,6 +17,7 @@ import {
   uniformTimeFormatter as timeFormatter,
   localNumberFormatter,
   sudtValueToAmount,
+  sUDTAmountFormatter,
 } from 'utils/formatters'
 import getExplorerUrl from 'utils/getExplorerUrl'
 import { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } from 'utils/const'
@@ -144,7 +145,9 @@ const TransactionList = ({
           value = tx.sudtInfo.amount
 
           if (tx.sudtInfo.sUDT.decimal) {
-            amount = `${sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal)} ${tx.sudtInfo.sUDT.symbol}`
+            amount = `${sUDTAmountFormatter(sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal))} ${
+              tx.sudtInfo.sUDT.symbol
+            }`
           }
         } else {
           name = walletName

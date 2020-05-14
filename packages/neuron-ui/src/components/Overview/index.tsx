@@ -8,7 +8,13 @@ import { showTransactionDetails } from 'services/remote'
 import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { updateTransactionList } from 'states/stateProvider/actionCreators'
 
-import { localNumberFormatter, shannonToCKBFormatter, uniformTimeFormatter, sudtValueToAmount } from 'utils/formatters'
+import {
+  localNumberFormatter,
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+  sudtValueToAmount,
+  sUDTAmountFormatter,
+} from 'utils/formatters'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
 import {
@@ -166,7 +172,7 @@ const Overview = () => {
           typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
 
           if (item.sudtInfo.sUDT.decimal) {
-            amount = `${sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal)} ${
+            amount = `${sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))} ${
               item.sudtInfo.sUDT.symbol
             }`
           }

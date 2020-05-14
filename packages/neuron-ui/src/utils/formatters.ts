@@ -268,6 +268,11 @@ export const sudtValueToAmount = (value: string = '0', decimal: string = '0', sh
   return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
 }
 
+export const sUDTAmountFormatter = (amount: string) => {
+  const fmtted = amount.substr(0, (amount.split('.')[0]?.length ?? 0) + 9)
+  return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
+}
+
 export default {
   queryFormatter,
   currencyFormatter,
@@ -281,4 +286,5 @@ export default {
   failureResToNotification,
   sudtAmountToValue,
   sudtValueToAmount,
+  sUDTAmountFormatter,
 }
