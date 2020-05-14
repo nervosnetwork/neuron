@@ -8,6 +8,7 @@ import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
+import SettingsService, { Locale } from 'services/settings'
 import { ResponseCode, SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 import WalletsController from 'controllers/wallets'
@@ -135,6 +136,10 @@ export default class ApiController {
       if (env.isDevMode) {
         console.error(error)
       }
+    })
+
+    handle('set-locale', async (_, locale: Locale) => {
+      return SettingsService.getInstance().locale = locale
     })
 
     // Wallets

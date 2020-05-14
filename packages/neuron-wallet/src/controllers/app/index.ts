@@ -133,7 +133,7 @@ export default class AppController {
     this.updateMenu()
   }
 
-  public clearOnClosed = () => {
+  private clearOnClosed = () => {
     const windowsToClose = [i18n.t(SETTINGS_WINDOW_TITLE)]
     BrowserWindow.getAllWindows().forEach(bw => {
       if (windowsToClose.includes(bw.getTitle())) {
