@@ -1,12 +1,15 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, Text, ProgressIndicator } from 'office-ui-fabric-react'
+import { Stack, Text, ProgressIndicator, Dropdown } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
-import { StateDispatch } from 'states/stateProvider/reducer'
-import { addPopup } from 'states/stateProvider/actionCreators'
-import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache } from 'services/remote'
+import { StateDispatch, addPopup } from 'states'
+import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache, setLocale } from 'services/remote'
+import { CONSTANTS } from 'utils'
+
 import styles from './style.module.scss'
+
+const { LOCALES } = CONSTANTS
 
 const UpdateDownloadStatus = ({
   progress = 0,
@@ -87,7 +90,7 @@ const UpdateDownloadStatus = ({
 }
 
 const GeneralSetting = ({ updater, dispatch }: { updater: State.AppUpdater; dispatch: StateDispatch }) => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [clearingCache, setClearingCache] = useState(false)
 
   const checkUpdates = useCallback(() => {
@@ -157,6 +160,19 @@ const GeneralSetting = ({ updater, dispatch }: { updater: State.AppUpdater; disp
             )}
           </Button>
         </Stack>
+      </Stack>
+
+      <Stack>
+        <Dropdown
+          label="Language"
+          options={LOCALES.map(locale => ({ key: locale, text: t(`settings.locale.${locale}`) }))}
+          selectedKey={i18n.language}
+          onChange={(_, item) => {
+            if (item) {
+              setLocale(item.key as any)
+            }
+          }}
+        />
       </Stack>
     </Stack>
   )

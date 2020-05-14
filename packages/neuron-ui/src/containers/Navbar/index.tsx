@@ -10,7 +10,7 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import { RoutePath, getCurrentUrl, getSyncStatus } from 'utils'
+import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange } from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -41,7 +41,8 @@ const Navbar = () => {
     chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
 
   const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
   const selectedKey: string | null = selectedTab ? selectedTab.key : null

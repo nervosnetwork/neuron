@@ -16,7 +16,6 @@
       "receive": "Receive",
       "history": "History",
       "addresses": "Addresses",
-      "settings": "Settings",
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
@@ -197,6 +196,7 @@
       "view-on-explorer": "View on Explorer"
     },
     "settings": {
+      "title": "Settings",
       "go-to-overview": "Go to Overview",
       "setting-tabs": {
         "general": "General",
@@ -236,6 +236,12 @@
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "devnet": "Devnet"
+      },
+      "locale": {
+        "en": "English",
+        "en-US": "English(United States)",
+        "zh": "中文(简体)",
+        "zh-TW": "中文(繁體)"
       }
     },
     "password-request": {

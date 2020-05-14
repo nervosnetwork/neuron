@@ -1,7 +1,10 @@
+import { BrowserWindow } from 'electron'
 import env from 'env'
 import Store from 'models/store'
+import { changeLanguage } from 'locales/i18n'
+import { updateApplicationMenu } from 'controllers/app/menu'
 
-export const locales = ['zh', 'zh-TW', 'en'] as const
+export const locales = ['zh', 'zh-TW', 'en', 'en-US'] as const
 export type Locale = typeof locales[number]
 
 export default class SettingsService extends Store {
@@ -21,6 +24,8 @@ export default class SettingsService extends Store {
   set locale(lng: Locale) {
     if (locales.includes(lng)) {
       this.writeSync('locale', lng)
+      changeLanguage(lng)
+      this.onLocaleChanged(lng)
     } else {
       throw new Error(`Locale ${lng} not supported`)
     }
@@ -28,5 +33,10 @@ export default class SettingsService extends Store {
 
   constructor () {
     super('', 'settings.json', JSON.stringify({ locale: env.app.getLocale() }))
+  }
+
+  private onLocaleChanged = (lng: Locale) => {
+    BrowserWindow.getAllWindows().forEach(bw => bw.webContents.send('set-locale', lng))
+    updateApplicationMenu(null)
   }
 }

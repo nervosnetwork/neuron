@@ -16,7 +16,6 @@
       "receive": "收款",
       "history": "交易歷史",
       "addresses": "地址管理",
-      "settings": "設定",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定義資產",
       "sync-not-start": "同步尚未開始",
@@ -197,6 +196,7 @@
       "view-on-explorer": "在瀏覽器中查看"
     },
     "settings": {
+      "title": "設定",
       "go-to-overview": "返回總覽畫面",
       "setting-tabs": {
         "general": "通用",
@@ -236,6 +236,12 @@
         "mainnet": "主網",
         "testnet": "測試網",
         "devnet": "開發網"
+      },
+      "locale": {
+        "en": "English",
+        "en-US": "English(United States)",
+        "zh": "中文(简体)",
+        "zh-TW": "中文(繁體)"
       }
     },
     "password-request": {

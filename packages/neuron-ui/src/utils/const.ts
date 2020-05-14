@@ -30,3 +30,5 @@ export const INIT_SEND_PRICE = '1000'
 
 export const NERVOS_DAO_RFC_URL =
   'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
+
+export const LOCALES = ['zh', 'zh-TW', 'en', 'en-US'] as const

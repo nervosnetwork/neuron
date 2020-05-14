@@ -1,3 +1,7 @@
+import { CONSTANTS } from 'utils'
+
+const { LOCALES } = CONSTANTS
+
 const FallbackSubject = {
   subscribe: (args: any) => {
     console.warn('The remote module is not found, please make sure the UI is running inside the Electron App')
@@ -22,6 +26,7 @@ const SubjectConstructor = <T>(
     | 'command'
     | 'app-updater-updated'
     | 'navigation'
+    | 'set-locale'
 ) => {
   return window.ipcRenderer
     ? {
@@ -48,6 +53,7 @@ export const SyncedBlockNumber = SubjectConstructor<Subject.BlockNumber>('synced
 export const AppUpdater = SubjectConstructor<Subject.AppUpdater>('app-updater-updated')
 export const Command = SubjectConstructor<Subject.CommandMetaInfo>('command')
 export const Navigation = SubjectConstructor<Subject.URL>('navigation')
+export const SetLocale = SubjectConstructor<typeof LOCALES[number]>('set-locale')
 
 export default {
   DataUpdate,
@@ -60,4 +66,5 @@ export default {
   AppUpdater,
   Command,
   Navigation,
+  SetLocale,
 }

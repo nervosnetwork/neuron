@@ -33,6 +33,7 @@ type Action =
   | 'open-in-window'
   | 'handle-view-error'
   | 'show-settings'
+  | 'set-locale'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'

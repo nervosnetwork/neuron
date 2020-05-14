@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { TFunction } from 'i18next'
 import { openContextMenu } from 'services/remote'
-import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
-import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
-import { epochParser } from 'utils/parsers'
+import { SetLocale as SetLocaleSubject } from 'services/subjects'
+import { StateDispatch, AppActions, updateTransactionDescription, updateAddressDescription } from 'states'
+import { epochParser } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 
 export const useGoBack = (history: any) => {
@@ -204,4 +204,15 @@ export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
       window.removeEventListener('storage', handler)
     }
   }, [handler])
+}
+
+export const useOnLocaleChange = (i18n: any) => {
+  return useEffect(() => {
+    const subcription = SetLocaleSubject.subscribe(lng => {
+      i18n.changeLanguage(lng)
+    })
+    return () => {
+      subcription.unsubscribe()
+    }
+  }, [i18n])
 }

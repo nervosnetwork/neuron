@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import SettingTabs from 'components/SettingTabs'
 import NetworkEditor from 'components/NetworkEditor'
@@ -16,7 +17,7 @@ import {
   Navigation as NavigationSubject,
   Command as CommandSubject,
 } from 'services/subjects'
-import { RoutePath, useRoutes, useOnLocalStorageChange } from 'utils'
+import { RoutePath, useRoutes, useOnLocalStorageChange, useOnLocaleChange } from 'utils'
 
 export const settingContents: CustomRouter.Route[] = [
   { name: `SettingTabs`, path: RoutePath.Settings, exact: false, component: SettingTabs },
@@ -30,6 +31,11 @@ export const settingContents: CustomRouter.Route[] = [
 const Settings = () => {
   const dispatch = useDispatch()
   const history = useHistory()
+  const [, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
+  useEffect(() => {
+    window.document.title = i18n.t('settings.title')
+  }, [i18n.language])
 
   useEffect(() => {
     const onNavigate = (url: string) => history.push(url)

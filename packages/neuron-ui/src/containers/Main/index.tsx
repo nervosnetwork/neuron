@@ -17,7 +17,7 @@ import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 import SpecialAssetList from 'components/SpecialAssetList'
 
-import { RoutePath, useOnDefaultContextMenu, useRoutes } from 'utils'
+import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -109,7 +109,7 @@ const MainContent = () => {
   } = useGlobalState()
   const dispatch = useDispatch()
   const { networkID } = chain
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
 
   useSubscription({
     walletID,
@@ -135,6 +135,7 @@ const MainContent = () => {
     history,
     dispatch,
   })
+  useOnLocaleChange(i18n)
   const onContextMenu = useOnDefaultContextMenu(t)
   const routes = useRoutes(mainContents)
 
