@@ -88,15 +88,20 @@ export default class TxAddressFinder {
     const inputs = this.tx.inputs!.filter(i => i.previousOutput !== null)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
 
+    const outputs = await getConnection()
+      .getRepository(OutputEntity)
+      .createQueryBuilder()
+      .getMany()
+
+    const outputsMap = new Map()
+    for (const output of outputs) {
+      outputsMap.set(`${output.outPointTxHash}_${output.outPointIndex}`, output)
+    }
+
     let shouldSync = false
     for (const input of inputs) {
       const outPoint: OutPoint = input.previousOutput!
-      const output = await getConnection()
-        .getRepository(OutputEntity)
-        .findOne({
-          outPointTxHash: outPoint.txHash,
-          outPointIndex: outPoint.index,
-        })
+      const output = outputsMap.get(`${outPoint.txHash}_${outPoint.index}`)
       if (output && this.anyoneCanPayLockHashes.has(output.lockHash)) {
         shouldSync = true
         // anyoneCanPayBlake160s.push(output.lockArgs)
