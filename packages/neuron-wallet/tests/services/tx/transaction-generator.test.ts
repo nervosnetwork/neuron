@@ -1491,5 +1491,156 @@ describe('TransactionGenerator', () => {
         expect(tx.sudtInfo!.amount).toEqual('1000')
       })
     })
+
+    describe('generateCreateAnyoneCanPayTx', () => {
+      const feeRate = '1000'
+      it('create ckb', async () => {
+        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
+          'CKBytes',
+          [bob.lockHash],
+          alice.blake160,
+          bob.blake160,
+          feeRate,
+          '0',
+        )
+
+        // check fee
+        const inputCapacities = tx.inputs
+          .map(i => BigInt(i.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(o => BigInt(o.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
+
+        const expectedFee = TransactionFee.fee(
+          TransactionSize.tx(tx) + TransactionSize.secpLockWitness(),
+          BigInt(feeRate)
+        ).toString()
+        expect(tx.fee).toEqual(expectedFee)
+
+        // check output
+        expect(tx.outputs.length).toEqual(2)
+
+        const output = tx.outputs[0]
+        expect(output.capacity).toEqual(BigInt(61 * 10**8).toString())
+        expect(!!output.type).toBe(false)
+        expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
+        expect(output.data).toEqual('0x')
+
+        const changeOutput = tx.outputs[1]
+        expect(SystemScriptInfo.isSecpScript(changeOutput.lock)).toBe(true)
+      })
+
+      it('create sudt', async () => {
+        const tokenID = '0x' + '0'.repeat(64)
+        const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
+          tokenID,
+          [bob.lockHash],
+          alice.blake160,
+          bob.blake160,
+          feeRate,
+          '0',
+        )
+
+        // check fee
+        const inputCapacities = tx.inputs
+          .map(i => BigInt(i.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        const outputCapacities = tx.outputs
+          .map(o => BigInt(o.capacity))
+          .reduce((result, c) => result + c, BigInt(0))
+        expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
+
+        // check output
+        expect(tx.outputs.length).toEqual(2)
+
+        const output = tx.outputs[0]
+        expect(output.capacity).toEqual(BigInt(142 * 10**8).toString())
+        expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
+        expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
+        expect(output.data).toEqual('0x' + '0'.repeat(32))
+
+        const changeOutput = tx.outputs[1]
+        expect(SystemScriptInfo.isSecpScript(changeOutput.lock)).toBe(true)
+      })
+    })
+  })
+
+  describe('generateCreateAnyoneCanPayTxUseAllBalance', () => {
+    const assetAccountInfo = new AssetAccountInfo()
+    const feeRate = '1000'
+    it('create ckb', async () => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('100'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+
+      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
+        'CKBytes',
+        [bob.lockHash],
+        alice.blake160,
+        feeRate,
+        '0',
+      )
+
+      // check fee
+      const inputCapacities = tx.inputs
+        .map(i => BigInt(i.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs
+        .map(o => BigInt(o.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
+
+      const expectedFee = TransactionFee.fee(
+        TransactionSize.tx(tx) + TransactionSize.secpLockWitness(),
+        BigInt(feeRate)
+      ).toString()
+      expect(tx.fee).toEqual(expectedFee)
+
+      // check output
+      expect(tx.outputs.length).toEqual(1)
+
+      const output = tx.outputs[0]
+      expect(output.capacity).toEqual((BigInt(100 * 10**8) - BigInt(tx.fee)).toString())
+      expect(!!output.type).toBe(false)
+      expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
+      expect(output.data).toEqual('0x')
+    })
+
+    it('create sudt', async () => {
+      const cells: OutputEntity[] = [
+        generateCell(toShannon('143'), OutputStatus.Live, false, null),
+      ]
+      await getConnection().manager.save(cells)
+
+      const tokenID = '0x' + '0'.repeat(64)
+      const tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
+        tokenID,
+        [bob.lockHash],
+        alice.blake160,
+        feeRate,
+        '0',
+      )
+
+      // check fee
+      const inputCapacities = tx.inputs
+        .map(i => BigInt(i.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      const outputCapacities = tx.outputs
+        .map(o => BigInt(o.capacity))
+        .reduce((result, c) => result + c, BigInt(0))
+      expect(tx.fee).toEqual((inputCapacities - outputCapacities).toString())
+
+      // check output
+      expect(tx.outputs.length).toEqual(1)
+
+      const output = tx.outputs[0]
+      expect(output.capacity).toEqual((BigInt(143 * 10**8) - BigInt(tx.fee)).toString())
+      expect(assetAccountInfo.isSudtScript(output.type!)).toBe(true)
+      expect(assetAccountInfo.isAnyoneCanPayScript(output.lock)).toBe(true)
+      expect(output.data).toEqual('0x' + '0'.repeat(32))
+    })
   })
 })
