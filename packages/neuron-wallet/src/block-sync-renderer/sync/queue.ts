@@ -27,7 +27,7 @@ export default class Queue {
   private endBlockNumber = BigInt(0)
   private rangeForCheck: RangeForCheck
 
-  private fetchSize: number = 4
+  private fetchSize: number = 50
 
   private tipNumberSubject: BehaviorSubject<string>
   private tipNumberListener: Subscription | undefined
