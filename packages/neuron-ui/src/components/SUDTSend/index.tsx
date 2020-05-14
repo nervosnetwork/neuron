@@ -53,7 +53,7 @@ const reducer: React.Reducer<typeof initState, { type: Fields; payload: string |
       return { ...state, [Fields.SendAll]: !!action.payload }
     }
     case Fields.Price: {
-      return { ...state, [Fields.Price]: action.payload.toString() }
+      return { ...state, [Fields.Price]: action.payload.toString().replace(/,/g, '') }
     }
     case Fields.Description: {
       return { ...state, [Fields.Description]: action.payload.toString() }
