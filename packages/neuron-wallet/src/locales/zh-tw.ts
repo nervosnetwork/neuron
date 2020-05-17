@@ -153,5 +153,11 @@ export default {
   about: {
     "app-version": "{{name}} 版本: {{version}}",
     "ckb-client-version": "CKB 節點版本: {{version}}"
+  },
+  settings: {
+    title: {
+      normal: '設置',
+      mac: '偏好設置'
+    }
   }
 }

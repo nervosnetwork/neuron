@@ -59,6 +59,11 @@ export default class ApiController {
   private registerHandlers() {
     const handle = this.handleChannel
 
+    // sync messages
+    ipcMain.on('get-locale', e => {
+      e.returnValue = SettingsService.getInstance().locale
+    })
+
     // App
     handle('get-system-codehash', async () => {
       return {

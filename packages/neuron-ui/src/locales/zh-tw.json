@@ -196,7 +196,10 @@
       "view-on-explorer": "在瀏覽器中查看"
     },
     "settings": {
-      "title": "設定",
+      "title": {
+        "normal": "設定",
+        "mac": "偏好設置"
+      },
       "go-to-overview": "返回總覽畫面",
       "setting-tabs": {
         "general": "通用",
@@ -208,7 +211,10 @@
         "clearing-cache": "清空中…",
         "clear-cache-description": "當資料同步或顯示出現問題時，可以清空緩存，Neuron 會重新同步所有塊數據。",
         "show": "顯示",
-        "hide": "隱藏"
+        "hide": "隱藏",
+        "version": "版本",
+        "language": "語言",
+        "cache-cleared-on": "上次清空緩存時間 {{date}}"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -433,8 +439,7 @@
       "checking-updates": "正在檢查…",
       "downloading-update": "正在下載更新…",
       "update-not-available": "已經在使用最新版本",
-      "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載。要下載和安裝嗎？",
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載",
       "download-update": "下載安裝",
       "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
       "quit-and-install": "安裝並重啓應用"

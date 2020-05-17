@@ -17,6 +17,7 @@ import {
   Navigation as NavigationSubject,
   Command as CommandSubject,
 } from 'services/subjects'
+import { getPlatform } from 'services/remote'
 import { RoutePath, useRoutes, useOnLocalStorageChange, useOnLocaleChange } from 'utils'
 
 export const settingContents: CustomRouter.Route[] = [
@@ -34,7 +35,8 @@ const Settings = () => {
   const [, i18n] = useTranslation()
   useOnLocaleChange(i18n)
   useEffect(() => {
-    window.document.title = i18n.t('settings.title')
+    const isMac = getPlatform() === 'darwin'
+    window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
   }, [i18n.language])
 
   useEffect(() => {

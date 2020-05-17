@@ -196,7 +196,10 @@
       "view-on-explorer": "View on Explorer"
     },
     "settings": {
-      "title": "Settings",
+      "title": {
+        "normal": "Settings",
+        "mac": "Preference"
+      },
       "go-to-overview": "Go to Overview",
       "setting-tabs": {
         "general": "General",
@@ -208,7 +211,10 @@
         "clearing-cache": "Clearing...",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
-        "hide": "Hide"
+        "hide": "Hide",
+        "version": "Version",
+        "language": "Language",
+        "cache-cleared-on": "Cache cleared on {{date}}"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -433,8 +439,7 @@
       "checking-updates": "Checking...",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
-      "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and install now?",
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
       "download-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"

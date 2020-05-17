@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Stack, Dropdown, Toggle, Icon, IDropdownOption } from 'office-ui-fabric-react'
+import { Stack, Toggle, IDropdownOption } from 'office-ui-fabric-react'
+import Dropdown from 'widgets/Dropdown'
 import TextField from 'widgets/TextField'
 import { useTranslation } from 'react-i18next'
 import { Price, localNumberFormatter } from 'utils'
@@ -78,9 +79,6 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             { key: Price.HundredBlocks, text: '~ 100 blocks' },
             { key: Price.FiveHundredsBlocks, text: '~ 500 blocks' },
           ]}
-          onRenderCaretDown={() => {
-            return <Icon iconName="ArrowDown" />
-          }}
           onChange={(e: any, item?: IDropdownOption) => {
             if (item) {
               e.target.value = item.key
@@ -88,37 +86,6 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             }
           }}
           aria-label="expected speed"
-          styles={{
-            label: {
-              fontSize: '0.75rem',
-              fontWeight: 500,
-            },
-
-            title: {
-              fontSize: '0.75rem!important',
-              fontWeight: 500,
-              height: '1.625rem',
-              lineHeight: '1.625rem',
-            },
-            dropdownOptionText: {
-              fontSize: '0.75rem!important',
-              boxShadow: 'border-box',
-            },
-            dropdownItem: {
-              fontSize: '0.75rem!important',
-              boxShadow: 'border-box',
-              minHeight: 'auto',
-            },
-            dropdownItemSelected: {
-              fontSize: '0.75rem!important',
-              minHeight: 'auto',
-              backgroundColor: '#e3e3e3',
-            },
-            root: {
-              fontSize: '0.75rem',
-              marginBottom: '10px',
-            },
-          }}
         />
       </Stack>
     </Stack>

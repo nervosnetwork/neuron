@@ -1,0 +1,9 @@
+@import '../../styles/mixin.scss';
+
+.title {
+  @include BoldText;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  margin: 0 0 5px;
+  padding: 0;
+}
