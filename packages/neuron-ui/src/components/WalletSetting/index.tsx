@@ -6,6 +6,7 @@ import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import { WalletWizardPath } from 'components/WalletWizard'
 import Button from 'widgets/Button'
 import { ReactComponent as EditWallet } from 'widgets/Icons/Edit.svg'
+import { ReactComponent as BackupWallet } from 'widgets/Icons/BackupWallet.svg'
 import { ReactComponent as DeleteWallet } from 'widgets/Icons/Delete.svg'
 
 import { StateDispatch, setCurrentWallet } from 'states'
@@ -102,11 +103,11 @@ const WalletSetting = ({
                 <button type="button" data-action="edit">
                   <EditWallet />
                 </button>
-                <button type="button" data-action="backup">
-                  <EditWallet />
-                </button>
                 <button type="button" data-action="delete">
                   <DeleteWallet />
+                </button>
+                <button type="button" data-action="backup">
+                  <BackupWallet />
                 </button>
               </span>
             )
