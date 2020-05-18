@@ -1,11 +1,11 @@
 @import '../../styles//mixin.scss';
 
 .alertDialog {
-  @include dialogContainer;
+  @include DialogContainer;
   padding: 60px 72px;
 
   &::backdrop {
-    @include overlay;
+    @include Overlay;
   }
 
   .title {
@@ -28,6 +28,6 @@
   }
 
   &::backdrop {
-    @include overlay
+    @include Overlay;
   }
 }

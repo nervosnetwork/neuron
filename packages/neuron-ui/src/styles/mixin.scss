@@ -20,7 +20,7 @@
 }
 
 // layout
-@mixin dialogContainer {
+@mixin DialogContainer {
   border: none;
   border-radius: 2px;
   box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
@@ -29,19 +29,19 @@
   box-sizing: border-box;
 }
 
-@mixin dialogTitle {
+@mixin DialogTitle {
   @include BoldText;
   font-size: 1.125rem;
   letter-spacing: 0.9px;
   margin-bottom: 25px;
 }
 
-@mixin dialogFooter {
+@mixin DialogFooter {
   display: flex;
   justify-content: flex-end;
 }
 
-@mixin dialogConfirmButton {
+@mixin DialogConfirmButton {
   border: none;
   width: 5.125rem;
   height: 1.875rem;
@@ -55,17 +55,17 @@
   }
 }
 
-@mixin overlay {
+@mixin Overlay {
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
 }
 
-@mixin disabledBtn {
+@mixin DisabledBtn {
   background-color: #e3e3e3;
   color: #666;
 }
 
-@mixin formFooter {
+@mixin FormFooter {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -80,7 +80,7 @@
   }
 }
 
-@mixin descriptionField {
+@mixin DescriptionField {
   display: flex;
 
   & > div {
@@ -99,4 +99,12 @@
   &:focus-within > div {
     border-color: #333 !important;
   }
+}
+
+@mixin PageTitle {
+  @include BoldText;
+  font-size: 1.375rem;
+  color: #000;
+  padding: 0;
+  margin: 0 0 23px 0;
 }

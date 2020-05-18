@@ -8,85 +8,50 @@ $confirming-color: #b3b3b3;
 .overview {
   display: grid;
   grid-template:
-    'wallet-name wallet-name'auto 'balance balance'auto 'activities-title activities-title'auto 'activities activities'auto 'more-link more-link'auto/ 1fr auto;
-  // padding: 39px 11px 0; this size is from design, but not used now.
-  padding: 39px 0 0;
+    'page-title page-title' auto
+    'balance balance' auto
+    'activities-title activities-title' auto
+    'activities activities' auto
+    'more-link more-link' auto/
+    1fr auto;
 }
 
-.walletName,
+.pageTitle,
 .recentActivitiesTitle {
   @include BoldText;
   font-size: 1.375rem;
-  line-height: 1.22em;
-  letter-spacing: 1.1px;
   color: #000;
   margin: 0;
 }
 
-.walletName {
-  grid-area: wallet-name;
-  margin-bottom: 11px;
+.pageTitle {
+  @include PageTitle;
+  grid-area: page-title;
 }
 
 .recentActivitiesTitle {
   grid-area: activities-title;
-  margin-top: 45px;
-  margin-bottom: 17px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .balance {
   grid-area: balance;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .balanceValue {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.balancePrompt {
-  @include BoldText;
-  color: var(--nervos-green);
-  font-size: 0.8rem;
-  margin-top: 3px;
-}
-
-.balanceInt {
-  @include BoldText;
-  font-size: 1.125rem;
-}
-
-section {
-  position: absolute;
-  left: 0;
-  top: 100%;
-  width: 100%;
-  background-color: #f5f5f5;
-  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.12);
-  padding: 6px 0;
-  z-index: 1;
-
-  &>div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 11px;
-
-    &:hover {
-      background-color: #e3e3e3;
-    }
-
-    &>span {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.45px;
-      color: #000;
-
-      &:last-child {
-        font-weight: normal;
-      }
-    }
-
+  font-weight: 500;
+  max-width: 60%;
+  padding: 0 5px 0 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:after {
+    content: ' CKB';
   }
 }
 
@@ -116,7 +81,6 @@ section {
     text-align: left;
     font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: 0.7px;
     color: #000;
     line-height: 1em;
     padding: 16px 0;
@@ -126,60 +90,58 @@ section {
     font-size: 0.875rem;
     line-height: 1em;
     padding: 2px 0;
-    letter-spacing: 0.7px;
     color: #000;
   }
 
   .txStatus {
-    &>div::after {
+    & > div::after {
       position: absolute;
       display: block;
       content: '';
       border-radius: 50%;
       width: 8px;
       height: 8px;
-      left: 100%;
+      left: 0;
       top: 50%;
       transform: translateY(-50%);
     }
 
-    &[data-status="pending"]>div::after {
+    &[data-status='pending'] > div::after {
       background-color: $pending-color;
       filter: drop-shadow(0 0 1px $pending-color);
       animation: blink 5s infinite;
     }
 
-    &[data-status="confirming"]>div::after {
+    &[data-status='confirming'] > div::after {
       background-color: $pending-color;
       filter: drop-shadow(0 0 1px $pending-color);
       animation: blink 5s infinite;
     }
 
-    &[data-status="success"]>div::after {
+    &[data-status='success'] > div::after {
       background-color: $success-color;
       filter: drop-shadow(0 0 1px $success-color);
     }
 
-    &[data-status="failed"]>div::after {
+    &[data-status='failed'] > div::after {
       background-color: $failed-color;
       filter: drop-shadow(0 0 1px $failed-color);
     }
 
-    &>div {
+    & > div {
       display: flex;
       flex-direction: column;
       position: relative;
-      width: 150px;
+      padding-left: 20px;
 
-      &>span:first-child {
-        flex: 1
+      & > span:first-child {
+        flex: 1;
       }
 
-      &>span:nth-child(2) {
+      & > span:nth-child(2) {
         color: #626262;
         font-size: 0.625rem;
         line-height: 0.8125rem;
-        letter-spacing: 0.5px;
         margin-top: 3px;
       }
     }
@@ -188,22 +150,22 @@ section {
 
 .linkToHistory {
   grid-area: more-link;
-  font-size: 0.625rem;
-  letter-spacing: 0.5px;
+  font-size: 0.75rem;
   color: #000;
   margin-top: 13px;
 
-  &>span:hover {
+  & > span:hover {
     color: var(--nervos-green);
   }
 }
 
 .noActivities {
   grid-area: more-link;
+  font-size: 0.75rem;
+  color: #000;
 }
 
 @keyframes blink {
-
   from,
   to {
     opacity: 0.5;

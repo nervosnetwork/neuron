@@ -4,7 +4,6 @@ $width: 374px;
 :global {
   .p-calendar {
     @include RegularText;
-    user-select: none;
 
     width: $width;
     padding: 20px 0;
@@ -26,7 +25,7 @@ $width: 374px;
       margin-bottom: 16px;
 
       .p-datepicker-next.p-link {
-        order: 1
+        order: 1;
       }
 
       @mixin chevron-line {
@@ -66,7 +65,6 @@ $width: 374px;
         }
       }
 
-
       .pi-chevron-right {
         &::before {
           @include chevron-line;
@@ -85,7 +83,6 @@ $width: 374px;
           transform: rotate(45deg) translateY(50%);
         }
       }
-
 
       .p-datepicker-month {
         margin-right: 5px;
@@ -115,7 +112,6 @@ $width: 374px;
         height: 30px;
         border-radius: 50%;
         color: #000;
-        user-select: none;
 
         font-size: 12px;
         margin: auto 3px;
@@ -124,7 +120,6 @@ $width: 374px;
           color: #fff;
           background-color: var(--nervos-green);
         }
-
       }
     }
   }
@@ -146,7 +141,6 @@ $width: 374px;
     display: none;
   }
 
-
   .popup {
     display: flex;
     flex-direction: column;
@@ -158,7 +152,7 @@ $width: 374px;
     box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
 
     .title {
-      @include dialogTitle;
+      @include DialogTitle;
     }
 
     .timezone {
@@ -170,7 +164,6 @@ $width: 374px;
       @include RegularText;
       margin-bottom: 8px;
     }
-
 
     input,
     .displayedTime {
@@ -197,21 +190,20 @@ $width: 374px;
       border-color: var(--nervos-green);
     }
 
-    &[data-status="edit"] {
+    &[data-status='edit'] {
       .calendar {
         display: flex;
       }
     }
-
   }
 
   .actions {
-    @include dialogFooter;
+    @include DialogFooter;
     width: $width;
     margin-top: 28px;
 
     button:last-child {
-      @include dialogConfirmButton;
+      @include DialogConfirmButton;
       margin-left: 9px;
     }
   }
@@ -237,5 +229,4 @@ $width: 374px;
     font-size: 0.75rem;
     margin-top: 5px;
   }
-
 }

@@ -53,7 +53,8 @@
         "failed": "失败",
         "pending": "已提交",
         "confirming": "确认中"
-      }
+      },
+      "copy-balance": "复制余额"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",

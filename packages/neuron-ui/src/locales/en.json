@@ -53,7 +53,8 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      }
+      },
+      "copy-balance": "Copy Balance"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",

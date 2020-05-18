@@ -1,7 +1,7 @@
 @import '../../styles/mixin.scss';
 
 .dialogContainer {
-  @include overlay;
+  @include Overlay;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,11 +12,10 @@
   height: 100vh;
 
   .dialog {
-    @include dialogContainer;
+    @include DialogContainer;
     padding: 57px 73px;
     background-color: #fff;
     min-width: auto;
-    user-select: none;
 
     img {
       width: 54px;

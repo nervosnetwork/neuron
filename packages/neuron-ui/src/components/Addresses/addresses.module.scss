@@ -80,7 +80,6 @@ $change-color: #6666cc;
   }
 
   .address {
-    user-select: none;
     line-height: 1.625rem;
     &:hover {
       div::after {
@@ -138,7 +137,6 @@ $change-color: #6666cc;
       @media screen and (max-width: 1000px) {
         width: 15vw;
       }
-
     }
   }
 
@@ -164,7 +162,7 @@ $change-color: #6666cc;
   }
 
   .descriptionField {
-    @include descriptionField;
+    @include DescriptionField;
 
     input {
       font-size: 0.875rem;

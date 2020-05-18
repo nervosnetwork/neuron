@@ -173,7 +173,7 @@ $textfieldWidth: calc(100vw - 370px);
 }
 
 .actions {
-  @include formFooter;
+  @include FormFooter;
 }
 
 .scanBtn {
