@@ -12,6 +12,7 @@ import { OutputStatus } from "models/chain/output"
 import { AddressVersion } from "database/address/address-dao"
 import NetworksService from "./networks"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
+import { CapacityNotEnoughForChange } from "exceptions"
 
 export default class AssetAccountService {
   public static async getAll(blake160s: string[], anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
@@ -138,9 +139,13 @@ export default class AssetAccountService {
     assetAccount: AssetAccount,
     tx: Transaction
   }> {
+    if (tokenID !== 'CKBytes' && !tokenID.startsWith('0x')) {
+      throw new Error('TokenID must be CKBytes or start with 0x')
+    }
+
     // 1. find next unused address
     const addresses = AddressService.allUnusedReceivingAddresses(walletID)
-    const usedBlake160s = new Set(await this.blake160sOfAssetAccounts(walletID))
+    const usedBlake160s = new Set(await this.blake160sOfAssetAccounts())
     const addrObj = addresses.find(a => !usedBlake160s.has(a.blake160))!
 
     // 2. generate AssetAccount object
@@ -148,14 +153,28 @@ export default class AssetAccountService {
 
     // 3. generate tx
     const changeAddrObj = AddressService.nextUnusedChangeAddress(walletID)!
-    const tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
-      tokenID,
-      lockHashes,
-      addrObj.blake160,
-      changeAddrObj.blake160,
-      feeRate,
-      fee
-    )
+    let tx: Transaction | undefined
+    try {
+      tx = await TransactionGenerator.generateCreateAnyoneCanPayTx(
+        tokenID,
+        lockHashes,
+        addrObj.blake160,
+        changeAddrObj.blake160,
+        feeRate,
+        fee
+      )
+    } catch (err) {
+      if (!(err instanceof CapacityNotEnoughForChange)) {
+        throw err
+      }
+      tx = await TransactionGenerator.generateCreateAnyoneCanPayTxUseAllBalance(
+        tokenID,
+        lockHashes,
+        addrObj.blake160,
+        feeRate,
+        fee
+      )
+    }
 
     return {
       assetAccount,
@@ -237,14 +256,12 @@ export default class AssetAccountService {
     }
   }
 
-  private static async blake160sOfAssetAccounts(walletID: string): Promise<string[]> {
+  private static async blake160sOfAssetAccounts(): Promise<string[]> {
     const assetAccounts = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')
-      .where({
-        walletID,
-      })
-      .getMany()
+      .select('aa.blake160', 'blake160')
+      .getRawMany()
 
     return assetAccounts.map(aa => aa.blake160)
   }

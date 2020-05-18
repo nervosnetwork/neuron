@@ -118,7 +118,7 @@ export class TransactionGenerator {
 }
 
 // rest of capacity all send to last target output.
-public static generateSendingAllTx = async (
+  public static generateSendingAllTx = async (
   lockHashes: string[],
   targetOutputs: TargetOutput[],
   fee: string = '0',
@@ -541,6 +541,59 @@ public static generateSendingAllTx = async (
 
       tx.addOutput(output)
     }
+
+    return tx
+  }
+
+  public static async generateCreateAnyoneCanPayTxUseAllBalance(
+    tokenID: string,
+    lockHashes: string[],
+    blake160: string,
+    feeRate: string,
+    fee: string
+  ): Promise<Transaction> {
+    // if tokenID === '' or 'CKBytes', create ckb cell
+    const isCKB = tokenID === 'CKBytes' || tokenID === ''
+
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+
+    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+
+    if (allInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const totalCapacity = allInputs
+      .map(i => BigInt(i.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const output = Output.fromObject({
+      capacity: totalCapacity.toString(),
+      lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
+      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+    })
+
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep],
+      inputs: allInputs,
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+    const keyCount = new Set(allInputs.map(i => i.lockHash!)).size
+    const txSize: number = TransactionSize.tx(tx) +
+      TransactionSize.secpLockWitness() * keyCount +
+      TransactionSize.emptyWitness() * (allInputs.length - keyCount)
+    tx.fee = mode.isFeeMode() ? fee : TransactionFee.fee(txSize, feeRateInt).toString()
+    tx.outputs[0].capacity = (totalCapacity - BigInt(tx.fee)).toString()
 
     return tx
   }
