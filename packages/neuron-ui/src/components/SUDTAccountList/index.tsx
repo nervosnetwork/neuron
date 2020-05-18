@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SpinnerSize, SearchBox } from 'office-ui-fabric-react'
 import SUDTAccountPile, { SUDTAccountPileProps } from 'components/SUDTAccountPile'
-import SUDTCreateDialog, { TokenInfo } from 'components/SUDTCreateDialog'
+import SUDTCreateDialog, { TokenInfo, AccountType } from 'components/SUDTCreateDialog'
 import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDialog'
 import Experimental from 'widgets/ExperimentalRibbon'
 import Spinner from 'widgets/Spinner'
@@ -12,7 +12,16 @@ import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
 import { AppActions } from 'states/stateProvider/reducer'
 import { getSUDTAccountList, generateCreateSUDTAccountTransaction, updateSUDTAccount } from 'services/remote'
 import isMainnetUtil from 'utils/isMainnet'
-import { MEDIUM_FEE_RATE, Routes, DEFAULT_SUDT_FIELDS, SyncStatus } from 'utils/const'
+import {
+  Routes,
+  SyncStatus,
+  ErrorCode,
+  MEDIUM_FEE_RATE,
+  DEFAULT_SUDT_FIELDS,
+  MIN_CKB_REQUIRED_BY_NORMAL_SUDT,
+  MIN_CKB_REQUIRED_BY_CKB_SUDT,
+  SHANNON_CKB_RATIO,
+} from 'utils/const'
 import getSyncStatus from 'utils/getSyncStatus'
 import getCurrentUrl from 'utils/getCurrentUrl'
 import sortAccounts from 'utils/sortAccounts'
@@ -25,7 +34,7 @@ const SUDTAccountList = () => {
   const [t] = useTranslation()
   const history = useHistory()
   const {
-    wallet: { id: walletId },
+    wallet: { id: walletId, balance },
     app: { tipBlockNumber = '0', tipBlockTimestamp },
     chain: { networkID, tipBlockNumber: syncedBlockNumber = '0' },
     settings: { networks = [] },
@@ -36,6 +45,7 @@ const SUDTAccountList = () => {
   const [keyword, setKeyword] = useState('')
   const [dialog, setDialog] = useState<{ id: string; action: 'create' | 'update' } | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [insufficient, setInsufficient] = useState({ [AccountType.CKB]: false, [AccountType.SUDT]: false })
 
   const isMainnet = isMainnetUtil(networks, networkID)
 
@@ -44,6 +54,52 @@ const SUDTAccountList = () => {
     const { tokenName = '', symbol = '', decimal = '' } = accounts.find(a => tokenId === a.tokenId)!
     return { tokenName, tokenId, symbol, decimal }
   })
+
+  useEffect(() => {
+    const ckbBalance = BigInt(balance)
+    const isInsufficient = (res: { status: number }) =>
+      [ErrorCode.CapacityNotEnough, ErrorCode.CapacityNotEnoughForChange].includes(res.status)
+    const createSUDTAccount = () => {
+      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_NORMAL_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
+        return true
+      }
+      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
+        walletID: walletId,
+        tokenID: `0x${'0'.repeat(64)}`,
+        tokenName: DEFAULT_SUDT_FIELDS.tokenName,
+        accountName: DEFAULT_SUDT_FIELDS.accountName,
+        symbol: DEFAULT_SUDT_FIELDS.symbol,
+        decimal: '0',
+        feeRate: `${MEDIUM_FEE_RATE}`,
+      }
+      return generateCreateSUDTAccountTransaction(params)
+        .then(isInsufficient)
+        .catch(() => false)
+    }
+    const createCKBAccount = () => {
+      if (ckbBalance <= BigInt(MIN_CKB_REQUIRED_BY_CKB_SUDT) * BigInt(SHANNON_CKB_RATIO)) {
+        return true
+      }
+      const params: Controller.GenerateCreateSUDTAccountTransaction.Params = {
+        walletID: walletId,
+        tokenID: DEFAULT_SUDT_FIELDS.CKBTokenId,
+        tokenName: DEFAULT_SUDT_FIELDS.CKBTokenName,
+        accountName: DEFAULT_SUDT_FIELDS.accountName,
+        symbol: DEFAULT_SUDT_FIELDS.CKBSymbol,
+        decimal: DEFAULT_SUDT_FIELDS.CKBDecimal,
+        feeRate: `${MEDIUM_FEE_RATE}`,
+      }
+      return generateCreateSUDTAccountTransaction(params)
+        .then(isInsufficient)
+        .catch(() => false)
+    }
+    Promise.all([createSUDTAccount(), createCKBAccount()]).then(([insufficientForSUDT, insufficientForCKB]) => {
+      setInsufficient({
+        [AccountType.CKB]: insufficientForCKB,
+        [AccountType.SUDT]: insufficientForSUDT,
+      })
+    })
+  }, [balance, walletId])
 
   const fetchAndUpdateList = useCallback(() => {
     getSUDTAccountList({ walletID: walletId })
@@ -58,12 +114,12 @@ const SUDTAccountList = () => {
           list
             .filter(account => account.id !== undefined)
             .sort(sortAccounts)
-            .map(({ id, accountName, tokenName, symbol, tokenID, balance, address, decimal }) => ({
+            .map(({ id, accountName, tokenName, symbol, tokenID, balance: accountBalance, address, decimal }) => ({
               accountId: id!.toString(),
               accountName,
               tokenName,
               symbol,
-              balance,
+              balance: accountBalance,
               address,
               decimal,
               tokenId: tokenID,
@@ -291,6 +347,7 @@ const SUDTAccountList = () => {
           }}
           existingAccountNames={existingAccountNames}
           existingTokenInfos={existingTokenInfos}
+          insufficient={insufficient}
         />
       ) : null}
     </div>

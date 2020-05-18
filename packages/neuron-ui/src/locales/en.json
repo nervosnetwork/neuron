@@ -515,7 +515,6 @@
         "account-name": "Account Name",
         "sudt-account": "sUDT Account",
         "ckb-account": "CKB Account",
-        "occupy": "occupy {{}} CKB",
         "set-token-info": "Set Token Info",
         "token-id": "Token ID",
         "token-name": "Token Name",
@@ -525,8 +524,8 @@
         "cancel": "Cancel",
         "next": "Next",
         "back": "Back",
-        "occupy-142-ckb": "occupy 142 CKBytes",
-        "occupy-61-ckb": "occupy 61 CKBytes"
+        "occupy-142-ckb": "Occupies at least 142 CKBytes",
+        "occupy-61-ckb": "Occupies at least 61 CKBytes"
       },
       "send": {
         "title": "Send",

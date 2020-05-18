@@ -7,6 +7,11 @@ import { useSUDTAccountInfoErrors } from 'utils/hooks'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
+export enum AccountType {
+  SUDT = 'sudt',
+  CKB = 'ckb',
+}
+
 export interface BasicInfo {
   accountName: string
 }
@@ -21,13 +26,9 @@ export interface TokenInfo extends BasicInfo {
 export interface SUDTCreateDialogProps extends TokenInfo {
   onSubmit: (info: TokenInfo) => Promise<boolean>
   onCancel: () => void
-  existingAccountNames: string[]
-  existingTokenInfos: Omit<TokenInfo, 'accountName'>[]
-}
-
-export enum AccountType {
-  SUDT = 'sudt',
-  CKB = 'ckb',
+  existingAccountNames?: string[]
+  existingTokenInfos?: Omit<TokenInfo, 'accountName'>[]
+  insufficient?: { [AccountType.CKB]: boolean; [AccountType.SUDT]: boolean }
 }
 
 enum DialogSection {
@@ -113,11 +114,12 @@ const SUDTCreateDialog = ({
   onCancel,
   existingAccountNames = [],
   existingTokenInfos = [],
+  insufficient = { [AccountType.CKB]: false, [AccountType.SUDT]: false },
 }: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
-  Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>) => {
+  Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel' | 'insufficient'>) => {
   const [t] = useTranslation()
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
-  const [accountType, setAccountType] = useState(AccountType.SUDT)
+  const [accountType, setAccountType] = useState([AccountType.SUDT, AccountType.CKB].find(at => !insufficient[at]))
   const [step, setStep] = useState(DialogSection.Account)
 
   const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
@@ -226,11 +228,12 @@ const SUDTCreateDialog = ({
                 key: accType.key,
                 text: t(accType.label),
                 checked: accountType === accType.key,
+                disabled: insufficient[accType.key],
                 onRenderLabel: ({ text }: IChoiceGroupOption) => {
                   return (
                     <span className="ms-ChoiceFieldLabel">
-                      {text}
-                      <span className={styles.capacityRequired}>
+                      <div>{text}</div>
+                      <span className={styles.capacityRequired} data-insufficient={insufficient[accType.key]}>
                         {t(
                           `s-udt.create-dialog.${AccountType.CKB === accType.key ? 'occupy-61-ckb' : 'occupy-142-ckb'}`
                         )}

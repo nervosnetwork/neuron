@@ -84,8 +84,11 @@
 .capacityRequired {
   color: #666;
   font-size: 0.6875rem;
-  margin-left: 5px;
-  &:before {
-    content: '*';
+  &[data-insufficient='true'] {
+    color: #d50000;
+    font-weight: 600;
+    &:before {
+      content: '*';
+    }
   }
 }
