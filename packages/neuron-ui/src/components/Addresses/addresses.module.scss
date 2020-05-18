@@ -37,7 +37,7 @@ $change-color: #6666cc;
   }
 
   th {
-    @include SemiBoldText;
+    @include semi-bold-text;
     font-size: 1rem;
     font-weight: 600;
     color: #000;
@@ -162,7 +162,7 @@ $change-color: #6666cc;
   }
 
   .descriptionField {
-    @include DescriptionField;
+    @include description-field;
 
     input {
       font-size: 0.875rem;

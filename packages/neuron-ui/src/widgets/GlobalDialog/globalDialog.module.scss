@@ -1,7 +1,7 @@
 @import '../../styles/mixin.scss';
 
 .dialogContainer {
-  @include Overlay;
+  @include overlay;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,7 +12,7 @@
   height: 100vh;
 
   .dialog {
-    @include DialogContainer;
+    @include dialog-container;
     padding: 57px 73px;
     background-color: #fff;
     min-width: auto;
@@ -23,7 +23,7 @@
       margin-bottom: 15px;
     }
 
-    @include SemiBoldText;
+    @include semi-bold-text;
     display: flex;
     flex-direction: column;
     justify-content: center;

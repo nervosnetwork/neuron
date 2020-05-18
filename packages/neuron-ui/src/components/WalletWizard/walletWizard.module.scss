@@ -47,7 +47,7 @@ $line-gap: 15px;
   @include center;
 
   .actions {
-    @include FormFooter;
+    @include form-footer;
   }
 }
 
@@ -63,7 +63,7 @@ $line-gap: 15px;
   }
 
   .actions {
-    @include FormFooter;
+    @include form-footer;
   }
 
   .submissionField {

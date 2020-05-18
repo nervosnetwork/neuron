@@ -13,7 +13,7 @@ $infoHeight: 1.75rem;
 }
 
 .title {
-  @include PageTitle;
+  @include page-title;
   grid-area: title;
 }
 
@@ -74,7 +74,7 @@ $infoHeight: 1.75rem;
     border: none;
 
     &[disabled] {
-      @include DisabledBtn;
+      @include disabled-button;
     }
   }
 }
@@ -94,7 +94,7 @@ $infoHeight: 1.75rem;
     border-bottom: 1px solid #ccc;
 
     button {
-      @include BoldText;
+      @include bold-text;
       appearance: none;
       flex: 1;
       display: flex;

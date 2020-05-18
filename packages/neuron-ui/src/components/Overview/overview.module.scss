@@ -18,14 +18,14 @@ $confirming-color: #b3b3b3;
 
 .pageTitle,
 .recentActivitiesTitle {
-  @include BoldText;
+  @include bold-text;
   font-size: 1.375rem;
   color: #000;
   margin: 0;
 }
 
 .pageTitle {
-  @include PageTitle;
+  @include page-title;
   grid-area: page-title;
 }
 

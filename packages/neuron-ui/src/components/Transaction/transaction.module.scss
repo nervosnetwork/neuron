@@ -25,7 +25,7 @@
   }
 
   th {
-    @include BoldText;
+    @include bold-text;
     height: 2.625rem;
     text-align: left;
   }
@@ -71,7 +71,7 @@
 .infoTitle,
 .inputsTitle,
 .outputsTitle {
-  @include BoldText;
+  @include bold-text;
   line-height: 1.125rem;
   font-size: 1.125rem;
   letter-spacing: 0.9px;

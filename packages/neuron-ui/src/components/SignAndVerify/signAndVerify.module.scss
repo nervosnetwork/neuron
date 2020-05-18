@@ -3,18 +3,18 @@ $inputHeight: 26px;
 
 .container {
   .title {
-    @include BoldText;
+    @include bold-text;
   }
 
   .label {
-    @include MediumText;
+    @include medium-text;
     margin: 0 0 4px 0;
     padding: 0;
   }
 
   input,
   textarea {
-    @include RegularText;
+    @include regular-text;
     font-size: 12px !important;
     display: block;
     resize: unset;
@@ -35,7 +35,7 @@ $inputHeight: 26px;
 }
 
 .actions {
-  @include DialogFooter;
+  @include dialog-footer;
   margin-top: 35px;
 
   button {
@@ -66,7 +66,7 @@ $inputHeight: 26px;
   }
 
   .addrList {
-    @include SemiBoldText;
+    @include semi-bold-text;
     box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.23);
     background-color: #ffffff;
     overflow: auto;
@@ -95,7 +95,7 @@ $inputHeight: 26px;
       }
 
       & > span:nth-child(2) {
-        @include SemiBoldText;
+        @include semi-bold-text;
         padding: 0px 5px;
         flex: 1;
 
@@ -109,7 +109,7 @@ $inputHeight: 26px;
       }
 
       .addrType {
-        @include RegularText;
+        @include regular-text;
         color: var(--nervos-green);
         display: block;
         width: 65px;
@@ -139,7 +139,7 @@ $inputHeight: 26px;
 }
 
 .dialogContainer {
-  @include Overlay;
+  @include overlay;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -150,7 +150,7 @@ $inputHeight: 26px;
   height: 100vh;
 
   .dialog {
-    @include DialogContainer;
+    @include dialog-container;
     padding: 57px 73px;
     background-color: #fff;
     min-width: auto;
@@ -161,7 +161,7 @@ $inputHeight: 26px;
   width: 400px;
 
   h2 {
-    @include BoldText;
+    @include bold-text;
     font-size: 18px;
     font-weight: bold;
     letter-spacing: 0.9px;
@@ -173,7 +173,7 @@ $inputHeight: 26px;
   }
 
   .actions {
-    @include DialogFooter;
+    @include dialog-footer;
   }
 }
 
@@ -185,7 +185,7 @@ $inputHeight: 26px;
     margin-bottom: 15px;
   }
 
-  @include SemiBoldText;
+  @include semi-bold-text;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -195,7 +195,7 @@ $inputHeight: 26px;
 }
 
 .addressNotFound {
-  @include MediumText;
+  @include medium-text;
   font-size: 0.875rem;
   letter-spacing: 0.7px;
 

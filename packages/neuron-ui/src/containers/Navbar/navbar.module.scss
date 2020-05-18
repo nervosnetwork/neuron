@@ -16,7 +16,7 @@ $left-padding: 15px;
 }
 
 .name {
-  @include RegularText;
+  @include regular-text;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -39,7 +39,7 @@ $left-padding: 15px;
   background-color: #191919;
 
   button {
-    @include MediumText;
+    @include medium-text;
     appearance: none;
     border: none;
     color: white;

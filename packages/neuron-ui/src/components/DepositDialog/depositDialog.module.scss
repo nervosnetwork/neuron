@@ -1,11 +1,11 @@
 @import '../../styles/mixin.scss';
 
 .dialog {
-  @include DialogContainer;
+  @include dialog-container;
   padding: 30px 50px;
 
   &::backdrop {
-    @include Overlay;
+    @include overlay;
   }
 }
 
@@ -69,7 +69,7 @@
 }
 
 .footer {
-  @include DialogFooter;
+  @include dialog-footer;
 
   button:last-of-type {
     margin-left: 9px;

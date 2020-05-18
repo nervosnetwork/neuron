@@ -3,7 +3,7 @@ $width: 374px;
 
 :global {
   .p-calendar {
-    @include RegularText;
+    @include regular-text;
 
     width: $width;
     padding: 20px 0;
@@ -152,16 +152,16 @@ $width: 374px;
     box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
 
     .title {
-      @include DialogTitle;
+      @include dialog-title;
     }
 
     .timezone {
       span:first-child {
-        @include SemiBoldText;
+        @include semi-bold-text;
         margin-right: 5px;
       }
 
-      @include RegularText;
+      @include regular-text;
       margin-bottom: 8px;
     }
 
@@ -177,12 +177,12 @@ $width: 374px;
 
     .displayedTime {
       span:first-child {
-        @include RegularText;
+        @include regular-text;
         margin-right: 5px;
       }
 
       span:last-child {
-        @include SemiBoldText;
+        @include semi-bold-text;
       }
     }
 
@@ -198,18 +198,18 @@ $width: 374px;
   }
 
   .actions {
-    @include DialogFooter;
+    @include dialog-footer;
     width: $width;
     margin-top: 28px;
 
     button:last-child {
-      @include DialogConfirmButton;
+      @include dialog-confirm-button;
       margin-left: 9px;
     }
   }
 
   .notice {
-    @include RegularText;
+    @include regular-text;
     width: $width;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
@@ -224,7 +224,7 @@ $width: 374px;
   }
 
   .error {
-    @include RegularText;
+    @include regular-text;
     color: red;
     font-size: 0.75rem;
     margin-top: 5px;

@@ -193,7 +193,7 @@
     .deposited,
     .withdrawn,
     .unlocked {
-      @include RegularText;
+      @include regular-text;
       position: relative;
       display: flex;
       justify-content: space-between;
@@ -225,7 +225,7 @@
       }
 
       &:last-of-type {
-        @include SemiBoldText;
+        @include semi-bold-text;
       }
     }
   }

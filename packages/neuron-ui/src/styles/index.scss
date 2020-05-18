@@ -26,7 +26,7 @@ html {
 }
 
 body {
-  @include RegularText;
+  @include regular-text;
   margin: 0;
   padding: 0;
   background: #f8f8f8;

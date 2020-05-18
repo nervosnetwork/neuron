@@ -52,7 +52,7 @@ $hover-bg-color: #3cc68a4d;
 }
 
 .tooltip {
-  @include MediumText;
+  @include medium-text;
   display: none;
   position: absolute;
   bottom: calc(100% + 10px);
