@@ -113,6 +113,7 @@ export enum ErrorCode {
   CapacityNotEnoughForChange = 105,
   LocktimeAmountTooSmall = 107,
   AddressNotFound = 108,
+  CapacityNotEnough = 109,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
