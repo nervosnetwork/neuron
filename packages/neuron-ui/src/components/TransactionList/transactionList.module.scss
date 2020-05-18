@@ -92,6 +92,13 @@ $pending-color: #b3b3b3;
         }
       }
     }
+    &[data-status='confirming'] {
+      .indicator {
+        g {
+          fill: var(--nervos-green);
+        }
+      }
+    }
 
     @keyframes rotation {
       from {
