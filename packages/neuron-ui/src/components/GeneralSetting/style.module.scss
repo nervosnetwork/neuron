@@ -21,7 +21,7 @@ $action-button-width: 11.25rem;
   grid-gap: 30px 10px;
 }
 .label {
-  @include RegularText;
+  @include regular-text;
   font-weight: 600;
   align-self: center;
   &:after {

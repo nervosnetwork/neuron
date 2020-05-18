@@ -185,7 +185,7 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
         />
       </div>
       <div className={`${styles.language} ${styles.action}`}>
-        <Button label="Apply" onClick={onApplyLanguage} disabled={lng === i18n.language} />
+        <Button label={t('settings.general.apply')} onClick={onApplyLanguage} disabled={lng === i18n.language} />
       </div>
     </div>
   )

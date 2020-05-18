@@ -214,7 +214,8 @@
         "hide": "隱藏",
         "version": "版本",
         "language": "語言",
-        "cache-cleared-on": "上次清空緩存時間 {{date}}"
+        "cache-cleared-on": "上次清空緩存時間 {{date}}",
+        "apply": "應用"
       },
       "wallet-manager": {
         "edit-wallet": {

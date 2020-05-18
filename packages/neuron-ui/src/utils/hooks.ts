@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { TFunction } from 'i18next'
+import { TFunction, i18n as i18nType } from 'i18next'
 import { openContextMenu, requestPassword, setCurrentNetowrk, deleteNetwork } from 'services/remote'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
@@ -13,7 +13,7 @@ import {
 import { epochParser, RoutePath } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 
-export const useGoBack = (history: any) => {
+export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
     history.goBack()
   }, [history])
@@ -213,7 +213,7 @@ export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
   }, [handler])
 }
 
-export const useOnLocaleChange = (i18n: any) => {
+export const useOnLocaleChange = (i18n: i18nType) => {
   return useEffect(() => {
     const subcription = SetLocaleSubject.subscribe(lng => {
       i18n.changeLanguage(lng)
@@ -224,7 +224,13 @@ export const useOnLocaleChange = (i18n: any) => {
   }, [i18n])
 }
 
-export const useOnHandleWallet = ({ history, dispatch }: { history: ReturnType<typeof useHistory>; dispatch: any }) =>
+export const useOnHandleWallet = ({
+  history,
+  dispatch,
+}: {
+  history: ReturnType<typeof useHistory>
+  dispatch: StateDispatch
+}) =>
   useCallback(
     (e: React.SyntheticEvent) => {
       const {

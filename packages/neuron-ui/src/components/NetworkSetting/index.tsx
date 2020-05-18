@@ -87,11 +87,16 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                     <Label type={network.chain} t={t} />
                   </span>
 
-                  <button type="button" data-action="edit">
+                  <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
                     <EditNetwork />
                   </button>
                   {isDefault ? null : (
-                    <button type="button" data-action="delete">
+                    <button
+                      type="button"
+                      data-action="delete"
+                      aria-label={t('common.delete')}
+                      title={t('common.delete')}
+                    >
                       <DeleteNetwork />
                     </button>
                   )}

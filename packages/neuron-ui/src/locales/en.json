@@ -214,7 +214,8 @@
         "hide": "Hide",
         "version": "Version",
         "language": "Language",
-        "cache-cleared-on": "Cache cleared on {{date}}"
+        "cache-cleared-on": "Cache cleared on {{date}}",
+        "apply": "Apply"
       },
       "wallet-manager": {
         "edit-wallet": {

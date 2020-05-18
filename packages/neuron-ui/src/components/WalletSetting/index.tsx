@@ -100,13 +100,13 @@ const WalletSetting = ({
               >
                 <span className={styles.walletName}>{text}</span>
 
-                <button type="button" data-action="edit">
+                <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
                   <EditWallet />
                 </button>
-                <button type="button" data-action="delete">
+                <button type="button" data-action="delete" aria-label={t('common-delete')} title={t('common.delete')}>
                   <DeleteWallet />
                 </button>
-                <button type="button" data-action="backup">
+                <button type="button" data-action="backup" aria-label={t('common.backup')} title={t('common.backup')}>
                   <BackupWallet />
                 </button>
               </span>
