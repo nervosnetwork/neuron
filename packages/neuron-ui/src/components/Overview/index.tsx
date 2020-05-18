@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import PropertyList, { Property } from 'widgets/PropertyList'
-import Balance from 'widgets/Balance'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
+import CopyZone from 'widgets/CopyZone'
 
 import { showTransactionDetails } from 'services/remote'
-import { useState as useGlobalState, useDispatch } from 'states'
-import { updateTransactionList } from 'states/stateProvider/actionCreators'
+import { useState as useGlobalState, useDispatch, updateTransactionList } from 'states'
 
 import {
   localNumberFormatter,
@@ -14,9 +13,6 @@ import {
   uniformTimeFormatter,
   backToTop,
   CONSTANTS,
-  SyncStatus as SyncStatusEnum,
-  SyncStatusThatBalanceUpdating,
-  ConnectionStatus,
   RoutePath,
   getCurrentUrl,
   getSyncStatus,
@@ -55,7 +51,7 @@ const genTypeLabel = (type: 'send' | 'receive', status: 'pending' | 'confirming'
 const Overview = () => {
   const {
     app: { tipBlockNumber, tipBlockTimestamp },
-    wallet: { id, name, balance = '' },
+    wallet: { id, balance = '' },
     chain: {
       tipBlockNumber: syncedBlockNumber,
       transactions: { items = [] },
@@ -93,39 +89,6 @@ const Overview = () => {
   const onGoToHistory = useCallback(() => {
     history.push(RoutePath.History)
   }, [history])
-
-  const balanceProperties: Property[] = useMemo(() => {
-    const balanceValue = shannonToCKBFormatter(balance)
-    let prompt = null
-    if (ConnectionStatus.Connecting === connectionStatus) {
-      prompt = <span className={styles.balancePrompt}>{t('sync.connecting')}</span>
-    } else if (ConnectionStatus.Offline === connectionStatus) {
-      prompt = (
-        <span className={styles.balancePrompt} style={{ color: 'red' }}>
-          {t('sync.sync-failed')}
-        </span>
-      )
-    } else if (SyncStatusEnum.SyncNotStart === syncStatus) {
-      prompt = (
-        <span className={styles.balancePrompt} style={{ color: 'red', wordBreak: 'break-all', whiteSpace: 'pre-line' }}>
-          {t('sync.sync-not-start')}
-        </span>
-      )
-    } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
-      prompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-    }
-    return [
-      {
-        label: t('overview.balance'),
-        value: (
-          <div className={styles.balanceValue}>
-            <Balance balance={balanceValue} style={{ width: '280px' }} />
-            {prompt}
-          </div>
-        ),
-      },
-    ]
-  }, [t, balance, syncStatus, connectionStatus])
 
   const onRecentActivityDoubleClick = useCallback((e: React.SyntheticEvent) => {
     const cellElement = e.target as HTMLTableCellElement
@@ -225,10 +188,19 @@ const Overview = () => {
     )
   }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 
+  const ckbBalance = shannonToCKBFormatter(balance)
+
   return (
     <div className={styles.overview}>
-      <h1 className={styles.walletName}>{name}</h1>
-      <PropertyList properties={balanceProperties} />
+      {/* <h1 className={styles.walletName}>{name}</h1> */}
+      <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
+      <div className={styles.balance}>
+        <span>{`${t('overview.balance')}:`}</span>
+        <CopyZone content={ckbBalance.replace(/,/g, '')} name={t('overview.copy-balance')}>
+          <span className={styles.balanceValue}>{`${ckbBalance}`}</span>
+        </CopyZone>
+        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
+      </div>
 
       <h2 className={styles.recentActivitiesTitle}>{t('overview.recent-activities')}</h2>
       {items.length ? (

@@ -3,13 +3,12 @@
 $error-red: #d50000;
 
 .textField {
-  @include RegularText;
+  @include regular-text;
   display: grid;
-  grid-template:
-    'label input'auto 'blank message'minmax(0.6875rem, auto) / auto 1fr;
+  grid-template: 'label input' auto 'blank message' minmax(0.6875rem, auto) / auto 1fr;
   grid-gap: 4px;
 
-  &[data-required="true"] {
+  &[data-required='true'] {
     label::after {
       display: inline;
       content: '*';
@@ -17,7 +16,7 @@ $error-red: #d50000;
     }
   }
 
-  &[data-has-error="true"] {
+  &[data-has-error='true'] {
     .input {
       border-color: $error-red !important;
     }
@@ -59,7 +58,6 @@ $error-red: #d50000;
       }
     }
 
-
     .suffix {
       font-family: inherit;
       display: flex;
@@ -74,12 +72,10 @@ $error-red: #d50000;
       border-color: var(--nervos-green);
     }
   }
-
 }
 
 .stack {
-  grid-template:
-    'label'auto 'input'auto 'message'minmax(0.6875rem, auto) /auto;
+  grid-template: 'label' auto 'input' auto 'message' minmax(0.6875rem, auto) / auto;
 }
 
 .hint {
