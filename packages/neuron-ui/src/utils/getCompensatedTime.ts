@@ -5,7 +5,7 @@ export interface CompensatedTimeParams {
   depositEpochValue: number
 }
 
-export default ({ currentEpochValue, depositEpochValue }: CompensatedTimeParams) => {
+export const getCompensatedTime = ({ currentEpochValue, depositEpochValue }: CompensatedTimeParams) => {
   const totalHours = Math.floor((currentEpochValue - depositEpochValue) * HOURS_PER_EPOCH)
   const days = Math.floor(totalHours / HOURS_PER_DAY)
   const hours = totalHours % HOURS_PER_DAY
@@ -15,3 +15,5 @@ export default ({ currentEpochValue, depositEpochValue }: CompensatedTimeParams)
     hours,
   }
 }
+
+export default getCompensatedTime

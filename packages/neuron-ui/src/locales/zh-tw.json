@@ -53,7 +53,8 @@
         "failed": "失敗",
         "pending": "已提交",
         "confirming": "確認中"
-      }
+      },
+      "copy-balance": "複製餘額"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "歡迎使用 Neuron",
@@ -126,6 +127,7 @@
       "title": "收款",
       "address-book": "地址簿",
       "click-to-copy": "點擊複製地址",
+      "copy-address": "複製地址",
       "address-not-found": "未找到地址",
       "prompt": "為了保護隱私，Neuron 會自動選擇一個新收款地址。如果您想使用舊的收款地址，請訪問地址管理頁面。",
       "address-qrcode": "地址二維碼",
@@ -167,7 +169,10 @@
       "view-in-explorer": "瀏覽器",
       "view-in-explorer-button-title": "瀏覽器中查看詳情",
       "view-detail": "詳情",
-      "view-detail-button-title": "查看詳情"
+      "view-detail-button-title": "查看詳情",
+      "copy-tx-hash": "複製交易 Hash",
+      "copy-balance": "複製餘額",
+      "copy-address": "複製地址"
     },
     "transaction": {
       "date": "時間",
@@ -285,7 +290,9 @@
       "click-to-edit": "點擊編輯",
       "notice": "注意事項",
       "experimental": "實驗室",
-      "close": "關閉"
+      "close": "關閉",
+      "copy": "複製",
+      "copied": "已複製"
     },
     "notification-panel": {
       "title": "通知中心"

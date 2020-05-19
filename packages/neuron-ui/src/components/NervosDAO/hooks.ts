@@ -3,20 +3,16 @@ import { TFunction } from 'i18next'
 import { AppActions, StateAction } from 'states/stateProvider/reducer'
 import { updateNervosDaoData, clearNervosDaoData } from 'states/stateProvider/actionCreators'
 
-import { verifyAmount } from 'utils/validators'
-import calculateAPC from 'utils/calculateAPC'
-
-import { CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
 import {
-  MIN_AMOUNT,
-  MILLISECONDS_IN_YEAR,
-  MIN_DEPOSIT_AMOUNT,
-  MEDIUM_FEE_RATE,
-  SHANNON_CKB_RATIO,
-  MAX_DECIMAL_DIGITS,
+  calculateAPC,
   ErrorCode,
   CapacityUnit,
-} from 'utils/const'
+  CONSTANTS,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+  isSuccessResponse,
+  verifyAmount,
+} from 'utils'
 
 import {
   generateDaoWithdrawTx,
@@ -26,6 +22,14 @@ import {
 } from 'services/remote'
 import { ckbCore, getHeaderByNumber, calculateDaoMaximumWithdraw } from 'services/chain'
 
+const {
+  MIN_AMOUNT,
+  MILLISECONDS_IN_YEAR,
+  MIN_DEPOSIT_AMOUNT,
+  MEDIUM_FEE_RATE,
+  SHANNON_CKB_RATIO,
+  MAX_DECIMAL_DIGITS,
+} = CONSTANTS
 let timer: NodeJS.Timeout
 
 const getRecordKey = ({ depositOutPoint, outPoint }: State.NervosDAORecord) => {
@@ -49,7 +53,7 @@ export const useUpdateMaxDeposit = ({
       feeRate: `${MEDIUM_FEE_RATE}`,
     })
       .then(res => {
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           const fee = BigInt(res.result.fee)
           const maxValue = fee < BigInt(wallet.balance) ? BigInt(wallet.balance) - fee : BigInt(0)
           setMaxDepositAmount(maxValue)
@@ -160,7 +164,7 @@ export const useUpdateDepositValue = ({
             capacity,
             walletID,
           }).then(res => {
-            if (res.status === 1) {
+            if (isSuccessResponse(res)) {
               dispatch({
                 type: AppActions.UpdateGeneratedTx,
                 payload: res.result,
@@ -295,7 +299,7 @@ export const useOnWithdrawDialogSubmit = ({
         feeRate: `${MEDIUM_FEE_RATE}`,
       })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             dispatch({
               type: AppActions.UpdateGeneratedTx,
               payload: res.result,
@@ -356,7 +360,7 @@ export const useOnActionClick = ({
             feeRate: `${MEDIUM_FEE_RATE}`,
           })
             .then(res => {
-              if (res.status === 1) {
+              if (isSuccessResponse(res)) {
                 dispatch({
                   type: AppActions.UpdateGeneratedTx,
                   payload: res.result,

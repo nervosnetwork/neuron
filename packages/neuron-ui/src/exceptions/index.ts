@@ -1,5 +1,5 @@
-import { ErrorCode } from 'utils/const'
-import { MIN_DECIMAL, MAX_DECIMAL } from '../utils/const'
+import { ErrorCode } from 'utils/enums'
+import { MIN_DECIMAL, MAX_DECIMAL } from 'utils/const'
 
 export class FieldInvalidException extends Error {
   public code = ErrorCode.FieldInvalid
@@ -91,5 +91,12 @@ export class ValueReservedException extends Error {
   constructor(value: string) {
     super(`messages.codes.${ErrorCode.ValueReserved}`)
     this.i18n.value = value
+  }
+}
+
+export class PasswordIncorrectException extends Error {
+  public code = ErrorCode.PasswordIncorrect
+  constructor() {
+    super(`messages.codes.${ErrorCode.PasswordIncorrect}`)
   }
 }

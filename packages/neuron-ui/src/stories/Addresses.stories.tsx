@@ -4,8 +4,7 @@ import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import Addresses from 'components/Addresses'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 import addressesStates from './data/addresses'
 
 const stories = storiesOf('Addresses', module).addDecorator(StoryRouter())

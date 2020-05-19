@@ -1,5 +1,5 @@
 import { currentNetworkID } from 'services/localCache'
-import { ConnectionStatus } from 'utils/const'
+import { ConnectionStatus } from 'utils'
 
 export const transactionState: Readonly<State.DetailedTransaction> = {
   value: '',
@@ -21,7 +21,7 @@ export const transactionState: Readonly<State.DetailedTransaction> = {
   nervosDao: false,
 }
 
-const chainState: Readonly<State.Chain> = {
+export const chainState: Readonly<State.Chain> = {
   networkID: currentNetworkID.load(),
   connectionStatus: ConnectionStatus.Connecting,
   tipBlockNumber: '',

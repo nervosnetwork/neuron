@@ -2,28 +2,37 @@ import React, { useState, useCallback, useReducer, useMemo, useEffect } from 're
 import { useParams } from 'react-router-dom'
 import { SpinnerSize } from 'office-ui-fabric-react'
 import { useTranslation } from 'react-i18next'
+import { SUDTAccount } from 'components/SUDTAccountList'
+import TransactionFeePanel from 'components/TransactionFeePanel'
 import SUDTAvatar from 'widgets/SUDTAvatar'
 import TextField from 'widgets/TextField'
 import Breadcrum from 'widgets/Breadcrum'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { AppActions } from 'states/stateProvider/reducer'
-import isMainnetUtil from 'utils/isMainnet'
-import { verifySUDTAddress, verifySUDTAmount } from 'utils/validators'
-import TransactionFeePanel from 'components/TransactionFeePanel'
-import { shannonToCKBFormatter, sudtValueToAmount, sudtAmountToValue, localNumberFormatter } from 'utils/formatters'
-import { INIT_SEND_PRICE, Routes, DEFAULT_SUDT_FIELDS } from 'utils/const'
-import { AmountNotEnoughException } from 'exceptions'
 import {
   getSUDTAccount,
   generateSUDTTransaction,
   generateSendAllSUDTTransaction,
   getAnyoneCanPayScript,
 } from 'services/remote'
-import { SUDTAccount } from 'components/SUDTAccountList'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
+import {
+  verifySUDTAddress,
+  verifySUDTAmount,
+  isMainnet as isMainnetUtil,
+  shannonToCKBFormatter,
+  sudtValueToAmount,
+  sudtAmountToValue,
+  localNumberFormatter,
+  RoutePath,
+  CONSTANTS,
+  isSuccessResponse,
+} from 'utils'
+import { AmountNotEnoughException } from 'exceptions'
 import styles from './sUDTSend.module.scss'
+
+const { INIT_SEND_PRICE, DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 enum Fields {
   Address = 'address',
@@ -96,7 +105,7 @@ const SUDTSend = () => {
     if (accountId && walletId) {
       getSUDTAccount({ walletID: walletId, id: accountId })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             const account: Controller.GetSUDTAccount.Response = res.result
             if (!account.decimal) {
               throw new Error('Decimal is undefiend')
@@ -126,13 +135,13 @@ const SUDTSend = () => {
   }, [walletId, accountId, setIsLoaded])
   useEffect(() => {
     getAnyoneCanPayScript().then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setAnyoneCanPayScript({ codeHash: res.result.codeHash, hashType: res.result.hashType })
       }
     })
   }, [])
 
-  const breakcrum = [{ label: t('navbar.s-udt'), link: Routes.SUDTAccountList }]
+  const breakcrum = [{ label: t('navbar.s-udt'), link: RoutePath.SUDTAccountList }]
   const fields: { key: Fields.Address | Fields.Amount; label: string }[] = [
     { key: Fields.Address, label: t('s-udt.send.address') },
     { key: Fields.Amount, label: t('s-udt.send.amount') },
@@ -200,7 +209,7 @@ const SUDTSend = () => {
     const generator = sendState.sendAll ? generateSendAllSUDTTransaction : generateSUDTTransaction
     generator(params)
       .then(res => {
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           globalDispatch({ type: AppActions.UpdateExperimentalParams, payload: { tx: res.result } })
           return
         }

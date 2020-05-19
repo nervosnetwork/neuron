@@ -1,15 +1,19 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import appState from 'states/initStates/app'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import appState from 'states/init/app'
+import { useState as useGlobalState, useDispatch } from 'states'
 
-import calculateFee from 'utils/calculateFee'
-import { shannonToCKBFormatter } from 'utils/formatters'
-import { MIN_DEPOSIT_AMOUNT, ConnectionStatus, SyncStatus } from 'utils/const'
-import { backToTop } from 'utils/animations'
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
+import {
+  CONSTANTS,
+  backToTop,
+  calculateFee,
+  ConnectionStatus,
+  SyncStatus,
+  shannonToCKBFormatter,
+  getCurrentUrl,
+  getSyncStatus,
+} from 'utils'
 
 import DepositDialog from 'components/DepositDialog'
 import WithdrawDialog from 'components/WithdrawDialog'
@@ -19,6 +23,8 @@ import Button from 'widgets/Button'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
+
+const { MIN_DEPOSIT_AMOUNT } = CONSTANTS
 
 const NervosDAO = () => {
   const [focusedRecord, setFocusedRecord] = useState('')

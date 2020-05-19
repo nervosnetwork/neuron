@@ -1,6 +1,5 @@
 import { createNetwork as createRemoteNetwork, updateNetwork as updateRemoteNetwork } from 'services/remote'
-import { Routes } from 'utils/const'
-import { failureResToNotification } from 'utils/formatters'
+import { RoutePath, failureResToNotification } from 'utils'
 import { addNotification, addPopup } from './app'
 
 import { AppActions, StateDispatch } from '../reducer'
@@ -16,7 +15,7 @@ export const createNetwork = (params: Controller.CreateNetworkParams) => (dispat
     .then(res => {
       if (res.status === 1) {
         addPopup('create-network-successfully')(dispatch)
-        history.push(Routes.SettingsNetworks)
+        history.push(RoutePath.SettingsNetworks)
       } else {
         addNotification(failureResToNotification(res))(dispatch)
       }
@@ -35,15 +34,10 @@ export const updateNetwork = (params: Controller.UpdateNetworkParams) => (dispat
   return updateRemoteNetwork(params).then(res => {
     if (res.status === 1) {
       addPopup('update-network-successfully')(dispatch)
-      history.push(Routes.SettingsNetworks)
+      history.push(RoutePath.SettingsNetworks)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
     return res.status
   })
-}
-
-export default {
-  createNetwork,
-  updateNetwork,
 }

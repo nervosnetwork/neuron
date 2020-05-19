@@ -1,4 +1,4 @@
-@import '../../styles//mixin.scss';
+@import '../../styles/mixin.scss';
 $button-gap: 10px;
 $line-gap: 15px;
 
@@ -47,7 +47,7 @@ $line-gap: 15px;
   @include center;
 
   .actions {
-    @include formFooter;
+    @include form-footer;
   }
 }
 
@@ -63,7 +63,7 @@ $line-gap: 15px;
   }
 
   .actions {
-    @include formFooter;
+    @include form-footer;
   }
 
   .submissionField {
@@ -72,7 +72,7 @@ $line-gap: 15px;
       line-height: 1.5rem;
     }
 
-    input+span {
+    input + span {
       background: #fff !important;
       font-size: 0.8rem !important;
       justify-content: flex-end !important;

@@ -12,7 +12,7 @@ export * from './settings'
 export * from './nervosDAO'
 export * from './updater'
 
-const initStates = {
+export const initStates = {
   app,
   chain,
   wallet,

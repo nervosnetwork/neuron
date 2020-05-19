@@ -5,7 +5,6 @@ $arrow: 10px;
   position: relative;
   font-size: 0.75rem;
   color: var(--nervos-green);
-  user-select: none;
   border-radius: 2px;
   z-index: 1;
 
@@ -13,8 +12,9 @@ $arrow: 10px;
     width: 1rem;
     height: 0.75rem;
     pointer-events: none;
+    position: relative;
+    top: 1px;
   }
-
 
   &::after {
     display: none;
@@ -47,7 +47,6 @@ $arrow: 10px;
   }
 
   &:hover {
-
     &::after,
     &::before {
       display: block;

@@ -53,7 +53,8 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      }
+      },
+      "copy-balance": "Copy Balance"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -126,6 +127,7 @@
       "title": "Receive",
       "address-book": "Address Book",
       "click-to-copy": "Click to copy the address",
+      "copy-address": "Copy Address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code",
@@ -167,7 +169,10 @@
       "view-in-explorer": "Explorer",
       "view-in-explorer-button-title": "View on explorer",
       "view-detail": "Detail",
-      "view-detail-button-title": "View Detail"
+      "view-detail-button-title": "View Detail",
+      "copy-tx-hash": "Copy Transaction Hash",
+      "copy-balance": "Copy Balance",
+      "copy-address": "Copy Address"
     },
     "transaction": {
       "date": "Date",
@@ -285,7 +290,9 @@
       "click-to-edit": "Click to edit",
       "notice": "Notice",
       "experimental": "Experimental",
-      "close": "Close"
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -427,8 +434,8 @@
         },
         "stage-messages": {
           "pending": "Pending...",
-          "immature-for-withdraw": "CKB cannot be withdrawn in {{ hours }} hours",
-          "immature-for-unlock": "CKB cannot be unlocked in {{ hours }} hours",
+          "immature-for-withdraw": "CKB cannot be withdrawn for the next {{ hours }} hours",
+          "immature-for-unlock": "CKB cannot be unlocked for the next {{ hours }} hours",
           "next-compensation-cycle": "The next compensation cycle will start in approximately {{days}} days",
           "withdrawing": "Withdrawing...",
           "compensation-cycle-will-end": "Compensation cycle ends in approximately {{days}} days",

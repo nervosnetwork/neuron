@@ -1,8 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConnectionStatus, SyncStatus } from 'utils/const'
-import { localNumberFormatter } from 'utils/formatters'
-
+import { ConnectionStatus, SyncStatus, localNumberFormatter } from 'utils'
 import styles from './networkStatus.module.scss'
 
 export interface NetworkStatusProps {

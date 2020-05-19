@@ -48,17 +48,19 @@ $change-color: #6666cc;
   }
 
   th {
-    @include SemiBoldText;
+    @include semi-bold-text;
     font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.6px;
     color: #000;
     padding: 18px 0;
+
+    @media screen and (max-width: 900px) {
+      font-size: 0.875rem;
+    }
   }
 
   td {
     font-size: 0.875rem;
-    letter-spacing: 0.5px;
     color: #000;
     padding: 10px 0;
 
@@ -89,6 +91,7 @@ $change-color: #6666cc;
   }
 
   .address {
+    line-height: 1.625rem;
     &:hover {
       div::after {
         display: block;
@@ -104,7 +107,7 @@ $change-color: #6666cc;
       .addressOverflow {
         word-break: break-all;
         text-align: right;
-        height: 1rem;
+        height: 1.625rem;
         overflow: hidden;
         text-align: right;
       }
@@ -126,9 +129,9 @@ $change-color: #6666cc;
           position: absolute;
           top: 150%;
           left: 50%;
+          z-index: 1;
           content: attr(data-address);
           font-size: 0.875rem;
-          letter-spacing: 0.5px;
           color: #000;
           box-shadow: 1px 2px 6px 0 rgba(97, 97, 97, 0.5);
           background: #fff;
@@ -140,6 +143,10 @@ $change-color: #6666cc;
 
       @media screen and (max-width: 1350px) {
         width: 20vw;
+      }
+
+      @media screen and (max-width: 1000px) {
+        width: 15vw;
       }
     }
   }
@@ -166,7 +173,7 @@ $change-color: #6666cc;
   }
 
   .descriptionField {
-    @include descriptionField;
+    @include description-field;
 
     input {
       font-size: 0.875rem;
@@ -184,6 +191,11 @@ $change-color: #6666cc;
   }
 
   .balance {
+    div {
+      display: flex;
+      align-items: center;
+      height: 1.625rem;
+    }
     span {
       display: inline-block;
       min-width: 200px;

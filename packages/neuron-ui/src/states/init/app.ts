@@ -1,6 +1,8 @@
-import { CapacityUnit, INIT_SEND_PRICE } from 'utils/const'
+import { CapacityUnit, CONSTANTS } from 'utils'
 
-const appState: Readonly<State.App> = {
+const { INIT_SEND_PRICE } = CONSTANTS
+
+export const appState: Readonly<State.App> = {
   tipBlockNumber: '',
   tipBlockHash: '',
   tipBlockTimestamp: 0,

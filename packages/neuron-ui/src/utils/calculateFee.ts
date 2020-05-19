@@ -1,4 +1,4 @@
-export default (tx: any) => {
+export const calculateFee = (tx: any) => {
   if (!tx) {
     return '0'
   }
@@ -13,3 +13,5 @@ export default (tx: any) => {
 
   return (inputCapacities - outputCapacities).toString()
 }
+
+export default calculateFee

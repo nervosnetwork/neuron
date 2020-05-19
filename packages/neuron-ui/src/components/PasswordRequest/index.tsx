@@ -4,17 +4,19 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
-import { useDialog } from 'utils/hooks'
-import { ErrorCode } from 'utils/const'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { AppActions } from 'states/stateProvider/reducer'
+import { useDialog, ErrorCode, RoutePath, isSuccessResponse } from 'utils'
+
 import {
+  useState as useGlobalState,
+  useDispatch,
+  AppActions,
   sendTransaction,
   deleteWallet,
   backupWallet,
   sendCreateSUDTAccountTransaction,
   sendSUDTTransaction,
-} from 'states/stateProvider/actionCreators'
+} from 'states'
+import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -38,7 +40,7 @@ const PasswordRequest = () => {
   useEffect(() => {
     setPassword('')
     setError('')
-  }, [actionType, setError])
+  }, [actionType, setError, setPassword])
 
   const onDismiss = useCallback(() => {
     dispatch({
@@ -53,78 +55,98 @@ const PasswordRequest = () => {
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
-    (e?: React.FormEvent): void => {
+    async (e?: React.FormEvent) => {
       if (e) {
         e.preventDefault()
       }
       if (disabled) {
         return
       }
-      const setErrorIfPasswordIncorrect = (code: any) => {
-        if (code === ErrorCode.PasswordIncorrect) {
-          setError(t('messages.codes.103'))
-        }
-      }
-      switch (actionType) {
-        case 'send': {
-          if (isSending) {
+      try {
+        switch (actionType) {
+          case 'send': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
             break
           }
-          sendTransaction({
-            walletID,
-            tx: generatedTx,
-            description,
-            password,
-          })(dispatch, history).then(setErrorIfPasswordIncorrect)
-          break
-        }
-        case 'delete': {
-          deleteWallet({
-            id: walletID,
-            password,
-          })(dispatch).then(setErrorIfPasswordIncorrect)
-          break
-        }
-        case 'backup': {
-          backupWallet({
-            id: walletID,
-            password,
-          })(dispatch).then(setErrorIfPasswordIncorrect)
-          break
-        }
-        case 'unlock': {
-          if (isSending) {
+          case 'delete': {
+            await deleteWallet({ id: walletID, password })(dispatch).then(status => {
+              if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
             break
           }
-          sendTransaction({
-            walletID,
-            tx: generatedTx,
-            description,
-            password,
-          })(dispatch, history, { type: 'unlock' }).then(setErrorIfPasswordIncorrect)
-          break
-        }
-        case 'create-sudt-account': {
-          const params: Controller.SendCreateSUDTAccountTransaction.Params = {
-            walletID,
-            assetAccount: experimental?.assetAccount,
-            tx: experimental?.tx,
-            password,
+          case 'backup': {
+            await backupWallet({ id: walletID, password })(dispatch).then(status => {
+              if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
           }
-          sendCreateSUDTAccountTransaction(params)(dispatch, history).then(setErrorIfPasswordIncorrect)
-          break
-        }
-        case 'send-sudt': {
-          const params: Controller.SendSUDTTransaction.Params = {
-            walletID,
-            tx: experimental?.tx,
-            password,
+          case 'unlock': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                dispatch({
+                  type: AppActions.SetGlobalDialog,
+                  payload: 'unlock-success',
+                })
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
           }
-          sendSUDTTransaction(params)(dispatch, history).then(setErrorIfPasswordIncorrect)
-          break
+          case 'create-sudt-account': {
+            const params: Controller.SendCreateSUDTAccountTransaction.Params = {
+              walletID,
+              assetAccount: experimental?.assetAccount,
+              tx: experimental?.tx,
+              password,
+            }
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'send-sudt': {
+            const params: Controller.SendSUDTTransaction.Params = {
+              walletID,
+              tx: experimental?.tx,
+              password,
+            }
+            await sendSUDTTransaction(params)(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          default: {
+            break
+          }
         }
-        default: {
-          break
+      } catch (err) {
+        if (err.code === ErrorCode.PasswordIncorrect) {
+          setError(t(err.message))
         }
       }
     },

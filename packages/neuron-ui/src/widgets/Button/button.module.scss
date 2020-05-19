@@ -1,7 +1,7 @@
 @import '../../styles/mixin.scss';
 
 .button {
-  @include MediumText;
+  @include medium-text;
   appearance: none;
   min-width: 5.125rem;
   font-size: 0.75rem;
@@ -21,7 +21,7 @@
     border: 1px solid #000;
 
     &:hover {
-      @include SemiBoldText;
+      @include semi-bold-text;
     }
   }
 
@@ -30,7 +30,7 @@
     color: #000;
 
     &:hover {
-      @include SemiBoldText;
+      @include semi-bold-text;
       background-color: #d1d1d1;
     }
   }
@@ -43,13 +43,13 @@
     color: #fff;
 
     &:hover {
-      @include SemiBoldText;
+      @include semi-bold-text;
       background-color: #21b574;
     }
   }
 
   &:active {
-    @include SemiBoldText;
+    @include semi-bold-text;
     filter: invert(0.2);
   }
 

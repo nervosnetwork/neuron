@@ -5,11 +5,10 @@ import { Stack } from 'office-ui-fabric-react'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 
-import { Routes, ErrorCode } from 'utils/const'
+import { RoutePath, ErrorCode, useGoBack } from 'utils'
 
-import { useGoBack } from 'utils/hooks'
 import { useHint, useOnSubmit, useInputs, useWalletEditor } from './hooks'
 
 const WalletNotFound = () => {
@@ -17,7 +16,7 @@ const WalletNotFound = () => {
   return (
     <div>
       <p>{t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' })}</p>
-      <Link to={Routes.SettingsWallets} className="btn btn-primary">
+      <Link to={RoutePath.SettingsWallets} className="btn btn-primary">
         {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
       </Link>
     </div>

@@ -4,8 +4,7 @@ import StoryRouter from 'storybook-react-router'
 import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import SUDTReceive from 'components/SUDTReceive'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 
 const dispatch = action('Dispatch')
 

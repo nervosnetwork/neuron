@@ -53,7 +53,8 @@
         "failed": "失败",
         "pending": "已提交",
         "confirming": "确认中"
-      }
+      },
+      "copy-balance": "复制余额"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -126,6 +127,7 @@
       "title": "收款",
       "address-book": "地址簿",
       "click-to-copy": "点击复制地址",
+      "copy-address": "复制地址",
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
       "address-qrcode": "地址二维码",
@@ -167,7 +169,10 @@
       "view-in-explorer": "浏览器",
       "view-in-explorer-button-title": "浏览器中查看详情",
       "view-detail": "详情",
-      "view-detail-button-title": "查看详情"
+      "view-detail-button-title": "查看详情",
+      "copy-tx-hash": "复制交易 Hash",
+      "copy-balance": "复制余额",
+      "copy-address": "复制地址"
     },
     "transaction": {
       "date": "时间",
@@ -285,7 +290,9 @@
       "click-to-edit": "点击编辑",
       "notice": "注意事项",
       "experimental": "实验室",
-      "close": "关闭"
+      "close": "关闭",
+      "copy": "复制",
+      "copied": "已复制"
     },
     "notification-panel": {
       "title": "通知中心"

@@ -10,12 +10,22 @@ import {
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
-import { transactionState } from 'states/initStates/chain'
+import { transactionState } from 'states'
+import CopyZone from 'widgets/CopyZone'
 
-import { localNumberFormatter, uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { ErrorCode, MAINNET_TAG } from 'utils/const'
-import { useOnDefaultContextMenu, useExitOnWalletChange } from 'utils/hooks'
+import {
+  ErrorCode,
+  CONSTANTS,
+  localNumberFormatter,
+  uniformTimeFormatter,
+  shannonToCKBFormatter,
+  useOnDefaultContextMenu,
+  useExitOnWalletChange,
+  isSuccessResponse,
+} from 'utils'
 import styles from './transaction.module.scss'
+
+const { MAINNET_TAG } = CONSTANTS
 
 const Transaction = () => {
   const [t] = useTranslation()
@@ -30,13 +40,13 @@ const Transaction = () => {
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setSystemCodeHash(res.result)
       }
     })
     Promise.all([getAllNetworks(), getCurrentNetworkID()])
       .then(([networksRes, idRes]) => {
-        if (networksRes.status === 1 && idRes.status === 1) {
+        if (isSuccessResponse(networksRes) && isSuccessResponse(idRes)) {
           const network = networksRes.result.find((n: any) => n.id === idRes.result)
           if (!network) {
             throw new Error('Cannot find current network in the network list')
@@ -59,7 +69,7 @@ const Transaction = () => {
       }
       getTransaction({ hash, walletID: currentWallet.id })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             setTransaction(res.result)
           } else {
             showErrorMessage(
@@ -80,9 +90,19 @@ const Transaction = () => {
 
   useExitOnWalletChange()
 
-  const basicInfoItems = useMemo(
-    () => [
-      { label: t('transaction.transaction-hash'), value: transaction.hash || 'none' },
+  const basicInfoItems = useMemo(() => {
+    const balance = shannonToCKBFormatter(transaction.value)
+
+    return [
+      {
+        label: t('transaction.transaction-hash'),
+        value:
+          (
+            <CopyZone content={transaction.hash} name={t('history.copy-tx-hash')}>
+              {transaction.hash}
+            </CopyZone>
+          ) || 'none',
+      },
       {
         label: t('transaction.block-number'),
         value: transaction.blockNumber ? localNumberFormatter(transaction.blockNumber) : 'none',
@@ -95,11 +115,14 @@ const Transaction = () => {
       },
       {
         label: t('transaction.income'),
-        value: `${shannonToCKBFormatter(transaction.value)} CKB`,
+        value: (
+          <CopyZone content={balance.replace(/,/g, '')} name={t('history.copy-balance')}>
+            {`${balance} CKB`}
+          </CopyZone>
+        ),
       },
-    ],
-    [t, transaction]
-  )
+    ]
+  }, [t, transaction])
 
   const inputsTitle = useMemo(
     () => `${t('transaction.inputs')} (${transaction.inputs.length}/${localNumberFormatter(transaction.inputsCount)})`,
@@ -141,14 +164,21 @@ const Transaction = () => {
             console.error(err)
           }
         }
+        const capacity = shannonToCKBFormatter(cell.capacity || '0')
 
         return (
           <tr key={cell.lockHash || ''} data-address={address}>
             <td title={`${index}`}>{index}</td>
             <td title={address} className={styles.addressCell}>
-              {address}
+              <CopyZone content={address} name={t('history.copy-address')}>
+                {address}
+              </CopyZone>
             </td>
-            <td>{`${shannonToCKBFormatter(cell.capacity || '0')} CKB`}</td>
+            <td>
+              <CopyZone content={capacity.replace(/,/g, '')} name={t('history.copy-balance')}>
+                {`${capacity} CKB`}
+              </CopyZone>
+            </td>
           </tr>
         )
       }),

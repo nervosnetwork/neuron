@@ -8,25 +8,30 @@ import SUDTUpdateDialog, { SUDTUpdateDialogProps } from 'components/SUDTUpdateDi
 import Experimental from 'widgets/ExperimentalRibbon'
 import Spinner from 'widgets/Spinner'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { AppActions } from 'states/stateProvider/reducer'
-import { getSUDTAccountList, generateCreateSUDTAccountTransaction, updateSUDTAccount } from 'services/remote'
-import isMainnetUtil from 'utils/isMainnet'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import {
-  Routes,
+  isMainnet as isMainnetUtil,
+  RoutePath,
   SyncStatus,
   ErrorCode,
+  CONSTANTS,
+  getSyncStatus,
+  getCurrentUrl,
+  sortAccounts,
+  isSuccessResponse,
+} from 'utils'
+
+import { getSUDTAccountList, generateCreateSUDTAccountTransaction, updateSUDTAccount } from 'services/remote'
+
+import styles from './sUDTAccountList.module.scss'
+
+const {
   MEDIUM_FEE_RATE,
   DEFAULT_SUDT_FIELDS,
   MIN_CKB_REQUIRED_BY_NORMAL_SUDT,
   MIN_CKB_REQUIRED_BY_CKB_SUDT,
   SHANNON_CKB_RATIO,
-} from 'utils/const'
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
-import sortAccounts from 'utils/sortAccounts'
-
-import styles from './sUDTAccountList.module.scss'
+} = CONSTANTS
 
 export type SUDTAccount = Omit<SUDTAccountPileProps, 'onClick'>
 
@@ -104,7 +109,7 @@ const SUDTAccountList = () => {
   const fetchAndUpdateList = useCallback(() => {
     getSUDTAccountList({ walletID: walletId })
       .then(res => {
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           return res.result
         }
         throw new Error(res.message.toString())
@@ -179,11 +184,11 @@ const SUDTAccountList = () => {
           tokenName: account.tokenName ?? DEFAULT_SUDT_FIELDS.tokenName,
           symbol: account.symbol ?? DEFAULT_SUDT_FIELDS.symbol,
         })
-        history.push(`${Routes.SUDTReceive}?${query}`)
+        history.push(`${RoutePath.SUDTReceive}?${query}`)
         break
       }
       case 'send': {
-        history.push(`${Routes.SUDTSend}/${id}`)
+        history.push(`${RoutePath.SUDTSend}/${id}`)
         break
       }
       default: {
@@ -213,7 +218,7 @@ const SUDTAccountList = () => {
         feeRate: `${MEDIUM_FEE_RATE}`,
       })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             return res.result
           }
           throw new Error(res.message.toString())
@@ -268,7 +273,7 @@ const SUDTAccountList = () => {
           })
           return updateSUDTAccount(params)
             .then(res => {
-              if (res.status === 1) {
+              if (isSuccessResponse(res)) {
                 fetchAndUpdateList()
                 setDialog(null)
                 return true

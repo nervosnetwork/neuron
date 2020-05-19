@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { StateDispatch } from 'states/stateProvider/reducer'
-import { createNetwork, updateNetwork, addNotification } from 'states/stateProvider/actionCreators'
+import { StateDispatch, createNetwork, updateNetwork, addNotification } from 'states'
+import { ErrorCode, CONSTANTS } from 'utils'
 
-import { MAX_NETWORK_NAME_LENGTH, ErrorCode } from 'utils/const'
+const { MAX_NETWORK_NAME_LENGTH } = CONSTANTS
 
 export const useOnSubmit = ({
   id = '',

@@ -17,33 +17,30 @@ import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import appState from 'states/initStates/app'
+import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
   ErrorCode,
-  MAX_DECIMAL_DIGITS,
-  MAINNET_TAG,
   SyncStatus,
-  SyncStatusThatBalanceUpdating,
   ConnectionStatus,
-  SINCE_FIELD_SIZE,
-} from 'utils/const'
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
-import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import {
+  CONSTANTS,
+  shannonToCKBFormatter,
+  localNumberFormatter,
+  getCurrentUrl,
+  getSyncStatus,
   verifyTotalAmount,
   verifyTransactionOutputs,
   verifyAmount,
   verifyAmountRange,
   verifyAddress,
-} from 'utils/validators'
+} from 'utils'
 
 import DatetimePicker from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
+
+const { MAX_DECIMAL_DIGITS, MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -165,7 +162,10 @@ const Send = () => {
         {t('sync.sync-not-start')}
       </span>
     )
-  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
+  } else if (
+    [SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ||
+    ConnectionStatus.Connecting === connectionStatus
+  ) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 

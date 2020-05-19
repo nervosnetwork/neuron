@@ -107,13 +107,13 @@ $textfieldWidth: calc(100vw - 370px);
 
   label,
   span {
-    @include BoldText;
+    @include bold-text;
     font-size: 1.375rem;
     letter-spacing: 1.1;
   }
 
   .balancePrompt {
-    @include BoldText;
+    @include bold-text;
     position: absolute;
     top: 100%;
     left: 0;
@@ -173,7 +173,7 @@ $textfieldWidth: calc(100vw - 370px);
 }
 
 .actions {
-  @include formFooter;
+  @include form-footer;
 }
 
 .scanBtn {
@@ -223,7 +223,7 @@ $textfieldWidth: calc(100vw - 370px);
   }
 
   button {
-    @include RegularText;
+    @include regular-text;
     appearance: none;
     display: flex;
     justify-content: center;

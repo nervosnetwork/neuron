@@ -27,7 +27,7 @@ $height: 26px;
 }
 
 .dialog {
-  @include dialogContainer;
+  @include dialog-container;
   width: 500px;
   padding: 30px 50px;
   position: absolute;
@@ -46,14 +46,14 @@ $height: 26px;
   }
 
   .message {
-    @include MediumText;
+    @include medium-text;
     font-size: 0.875rem;
     padding: 25px 0;
     text-align: center;
   }
 
   .footer {
-    @include dialogFooter;
+    @include dialog-footer;
     justify-content: center;
   }
 }

@@ -1,4 +1,4 @@
-import { CapacityUnit } from './const'
+import { CapacityUnit } from './enums'
 
 const base = 10e9
 const numberParser = (value: string, exchange: string) => {
@@ -271,20 +271,4 @@ export const sudtValueToAmount = (value: string = '0', decimal: string = '0', sh
 export const sUDTAmountFormatter = (amount: string) => {
   const fmtted = amount.substr(0, (amount.split('.')[0]?.length ?? 0) + 9)
   return `${fmtted}${fmtted.length < amount.length ? '...' : ''}`
-}
-
-export default {
-  queryFormatter,
-  currencyFormatter,
-  CKBToShannonFormatter,
-  shannonToCKBFormatter,
-  localNumberFormatter,
-  uniformTimeFormatter,
-  difficultyFormatter,
-  addressesToBalance,
-  outputsToTotalAmount,
-  failureResToNotification,
-  sudtAmountToValue,
-  sudtValueToAmount,
-  sUDTAmountFormatter,
 }

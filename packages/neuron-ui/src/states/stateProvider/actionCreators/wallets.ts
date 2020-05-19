@@ -1,5 +1,3 @@
-import { useHistory } from 'react-router-dom'
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
   getCurrentWallet,
@@ -12,22 +10,17 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { emptyWallet } from 'states/initStates/wallet'
-import { emptyNervosDaoData } from 'states/initStates/nervosDAO'
-import { WalletWizardPath } from 'components/WalletWizard'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
-import { Routes, ErrorCode } from 'utils/const'
-import { addressesToBalance, failureResToNotification } from 'utils/formatters'
+
+import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
+import { ErrorCode, ResponseCode, addressesToBalance, failureResToNotification, isSuccessResponse } from 'utils'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'
 
-export const updateCurrentWallet = () => (dispatch: StateDispatch, history: ReturnType<typeof useHistory>) => {
-  getCurrentWallet().then(res => {
-    if (res.status === 1) {
+export const updateCurrentWallet = () => (dispatch: StateDispatch) => {
+  return getCurrentWallet().then(res => {
+    if (isSuccessResponse(res)) {
       const payload = res.result || emptyWallet
-      if (!payload || !payload.id) {
-        history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-      }
       dispatch({
         type: NeuronWalletActions.UpdateCurrentWallet,
         payload,
@@ -36,45 +29,36 @@ export const updateCurrentWallet = () => (dispatch: StateDispatch, history: Retu
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
+    return !!(res as any)?.result?.id
   })
 }
 
-export const updateWalletList = () => (dispatch: StateDispatch, history: ReturnType<typeof useHistory>) => {
-  getWalletList().then(res => {
-    if (res.status === 1) {
+export const updateWalletList = () => (dispatch: StateDispatch) => {
+  return getWalletList().then(res => {
+    if (isSuccessResponse(res)) {
       const payload = res.result || []
-      if (!payload.length) {
-        history.push(`${Routes.WalletWizard}${WalletWizardPath.Welcome}`)
-      }
-      dispatch({
-        type: NeuronWalletActions.UpdateWalletList,
-        payload,
-      })
+      dispatch({ type: NeuronWalletActions.UpdateWalletList, payload })
       walletsCache.save(payload)
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
+    return !!(res as any)?.result?.length
   })
 }
 
-export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (
-  dispatch: StateDispatch,
-  history?: ReturnType<typeof useHistory>
-) => {
-  updateWallet(params).then(res => {
-    if (res.status === 1) {
+export const updateWalletProperty = (params: Controller.UpdateWalletParams) => (dispatch: StateDispatch) => {
+  return updateWallet(params).then(res => {
+    if (isSuccessResponse(res)) {
       addPopup('update-wallet-successfully')(dispatch)
-      if (history) {
-        history.push(Routes.SettingsWallets)
-      }
     } else {
       addNotification(failureResToNotification(res))(dispatch)
     }
+    return res.status
   })
 }
 export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   setRemoteCurrentWallet(id).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       dispatch({
         type: AppActions.Ignore,
         payload: null,
@@ -85,21 +69,17 @@ export const setCurrentWallet = (id: string) => (dispatch: StateDispatch) => {
   })
 }
 
-export const sendTransaction = (params: Controller.SendTransactionParams) => async (
-  dispatch: StateDispatch,
-  history: ReturnType<typeof useHistory>,
-  options?: { type: 'unlock' }
-) => {
-  dispatch({ type: AppActions.UpdateLoadings, payload: { sending: true } })
+export const sendTransaction = (params: Controller.SendTransactionParams) => async (dispatch: StateDispatch) => {
+  dispatch({
+    type: AppActions.UpdateLoadings,
+    payload: {
+      sending: true,
+    },
+  })
   try {
     const res = await sendTx(params)
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       dispatch({ type: AppActions.DismissPasswordRequest })
-      if (options && options.type === 'unlock') {
-        dispatch({ type: AppActions.SetGlobalDialog, payload: 'unlock-success' })
-      } else {
-        history.push(Routes.History)
-      }
     } else if (res.status !== ErrorCode.PasswordIncorrect) {
       addNotification({
         type: 'alert',
@@ -108,14 +88,19 @@ export const sendTransaction = (params: Controller.SendTransactionParams) => asy
         content: typeof res.message === 'string' ? res.message : res.message.content,
         meta: typeof res.message === 'string' ? undefined : res.message.meta,
       })(dispatch)
-      dispatch({ type: AppActions.DismissPasswordRequest })
+      dispatch({
+        type: AppActions.DismissPasswordRequest,
+      })
     }
     return res.status
   } catch (err) {
     console.warn(err)
-    return 0
+    return ResponseCode.FAILURE
   } finally {
-    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
   }
 }
 
@@ -123,7 +108,7 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
   dispatch: StateDispatch
 ) => {
   getAddressesByWalletID(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       const addresses = res.result || []
       const balance = addressesToBalance(addresses)
       dispatch({
@@ -139,16 +124,13 @@ export const updateAddressListAndBalance = (params: Controller.GetAddressesByWal
 export const updateAddressDescription = (params: Controller.UpdateAddressDescriptionParams) => (
   dispatch: StateDispatch
 ) => {
-  const descriptionParams = {
-    address: params.address,
-    description: params.description,
-  }
+  const descriptionParams = { address: params.address, description: params.description }
   dispatch({
     type: NeuronWalletActions.UpdateAddressDescription,
     payload: descriptionParams,
   })
   updateRemoteAddressDescription(params).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       dispatch({
         type: NeuronWalletActions.UpdateAddressDescription,
         payload: descriptionParams,
@@ -167,8 +149,10 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => async (di
   try {
     const res = await deleteRemoteWallet(params)
     if (res.status !== ErrorCode.PasswordIncorrect) {
-      dispatch({ type: AppActions.DismissPasswordRequest })
-      if (res.status === 1) {
+      dispatch({
+        type: AppActions.DismissPasswordRequest,
+      })
+      if (isSuccessResponse(res)) {
         addPopup('delete-wallet-successfully')(dispatch)
       } else {
         addNotification(failureResToNotification(res))(dispatch)
@@ -179,7 +163,10 @@ export const deleteWallet = (params: Controller.DeleteWalletParams) => async (di
     console.warn(err)
     return 0
   } finally {
-    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
   }
 }
 
@@ -191,8 +178,10 @@ export const backupWallet = (params: Controller.BackupWalletParams) => async (di
   try {
     const res = await backupRemoteWallet(params)
     if (res.status !== ErrorCode.PasswordIncorrect) {
-      dispatch({ type: AppActions.DismissPasswordRequest })
-      if (res.status !== 1) {
+      dispatch({
+        type: AppActions.DismissPasswordRequest,
+      })
+      if (!isSuccessResponse(res)) {
         addNotification(failureResToNotification(res))(dispatch)
       }
     }
@@ -201,13 +190,16 @@ export const backupWallet = (params: Controller.BackupWalletParams) => async (di
     console.warn(err)
     return 0
   } finally {
-    dispatch({ type: AppActions.UpdateLoadings, payload: { sending: false } })
+    dispatch({
+      type: AppActions.UpdateLoadings,
+      payload: { sending: false },
+    })
   }
 }
 
 export const updateNervosDaoData = (walletID: Controller.GetNervosDaoDataParams) => (dispatch: StateDispatch) => {
   getDaoData(walletID).then(res => {
-    if (res.status === 1) {
+    if (isSuccessResponse(res)) {
       dispatch({
         type: NeuronWalletActions.UpdateNervosDaoData,
         payload: { records: res.result },
@@ -223,17 +215,4 @@ export const clearNervosDaoData = () => (dispatch: StateDispatch) => {
     type: NeuronWalletActions.UpdateNervosDaoData,
     payload: emptyNervosDaoData,
   })
-}
-
-export default {
-  updateCurrentWallet,
-  updateWalletList,
-  updateWallet,
-  setCurrentWallet,
-  sendTransaction,
-  updateAddressListAndBalance,
-  updateAddressDescription,
-  deleteWallet,
-  backupWallet,
-  updateNervosDaoData,
 }

@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { StateDispatch } from 'states/stateProvider/reducer'
 import {
   toggleAllNotificationVisibility,

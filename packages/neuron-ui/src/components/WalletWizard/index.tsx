@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import i18n from 'utils/i18n'
 import { Stack, Icon, Text, TextField, FontSizes } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
 import CustomTextField from 'widgets/TextField'
@@ -10,18 +9,27 @@ import Spinner from 'widgets/Spinner'
 import withWizard, { WizardElementProps, WithWizardState } from 'components/withWizard'
 import { createWallet, importMnemonic, generateMnemonic, validateMnemonic, showErrorMessage } from 'services/remote'
 
-import { Routes, MnemonicAction, ErrorCode, MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } from 'utils/const'
+import {
+  generateWalletName,
+  RoutePath,
+  MnemonicAction,
+  ErrorCode,
+  CONSTANTS,
+  isSuccessResponse,
+  verifyPasswordComplexity,
+} from 'utils'
 import { buttonGrommetIconStyles } from 'utils/icons'
-import { verifyPasswordComplexity } from 'utils/validators'
-import generateWalletName from 'utils/generateWalletName'
+import i18n from 'utils/i18n'
 import styles from './walletWizard.module.scss'
+
+const { MAX_WALLET_NAME_LENGTH, MAX_PASSWORD_LENGTH } = CONSTANTS
 
 const createWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return createWallet(params).then(res => {
-    if (res.status === 1) {
-      history.push(Routes.Overview)
+    if (isSuccessResponse(res)) {
+      history.push(RoutePath.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
@@ -37,8 +45,8 @@ const importWalletWithMnemonic = (params: Controller.ImportMnemonicParams) => (
   history: ReturnType<typeof useHistory>
 ) => {
   return importMnemonic(params).then(res => {
-    if (res.status === 1) {
-      history.push(Routes.Overview)
+    if (isSuccessResponse(res)) {
+      history.push(RoutePath.Overview)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {
@@ -93,7 +101,7 @@ const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => 
   const history = useHistory()
   useEffect(() => {
     if (wallets.length) {
-      history.push(Routes.Overview)
+      history.push(RoutePath.Overview)
     }
   }, [wallets, history])
 
@@ -120,7 +128,7 @@ const Welcome = ({ rootPath = '/wizard', wallets = [] }: WizardElementProps) => 
           </>
         </Button>
         <span>{t('common.or')}</span>
-        <Button type="primary" label={t('wizard.import-keystore')} onClick={next(Routes.ImportKeystore)}>
+        <Button type="primary" label={t('wizard.import-keystore')} onClick={next(RoutePath.ImportKeystore)}>
           <>
             <Icon iconName="Keystore" styles={buttonGrommetIconStyles} />
             {t('wizard.import-keystore')}
@@ -160,8 +168,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
   useEffect(() => {
     if (type === MnemonicAction.Create) {
       generateMnemonic().then(res => {
-        // Should always succeed
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           dispatch({
             type: 'generated',
             payload: res.result,
@@ -201,7 +208,7 @@ const Mnemonic = ({ state = initState, rootPath = '/wizard', dispatch }: WizardE
       })
       validateMnemonic(trimmedMnemonic).then(res => {
         let isMnemonicValid = false
-        if (res.status === 1) {
+        if (isSuccessResponse(res)) {
           isMnemonicValid = res.result
         }
         if (isMnemonicValid) {

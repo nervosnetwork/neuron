@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
 import Button from 'widgets/Button'
 import DownArrow from 'widgets/Icons/DownArrow.png'
-import { useExitOnWalletChange } from 'utils/hooks'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { ErrorCode, shannonToCKBFormatter, useExitOnWalletChange, isSuccessResponse } from 'utils'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
 import Spinner from 'widgets/Spinner'
 
-import { ErrorCode } from 'utils/const'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import styles from './signAndVerify.module.scss'
 
@@ -119,7 +117,7 @@ const SignAndVerify = () => {
   useEffect(() => {
     const id = window.location.href.split('/').pop()
     getAddressesByWalletID(id || '').then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setWallet({
           id: id!,
           addresses: res.result,
@@ -206,7 +204,7 @@ const SignAndVerify = () => {
         message,
         password,
       })
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setSignature(res.result)
         setStatus('edit')
       } else if (res.status === ErrorCode.PasswordIncorrect) {
