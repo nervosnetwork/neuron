@@ -29,21 +29,24 @@ export default class AssetAccountService {
 
     // calculate balances
     // anyone-can-pay & sudt
+    // balance = live + sent
     const outputs = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .select(`output.lockArgs`, 'lockArgs')
       .addSelect(`output.typeArgs`, 'typeArgs')
+      .addSelect(`output.status`, 'status')
       .addSelect('CAST(SUM(CAST(output.capacity AS UNSIGNED BIG INT)) AS VARCHAR)', 'sumOfCapacity')
       .addSelect(`group_concat(output.data)`, 'dataArray')
-      .where(`output.status = :liveStatus AND output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`, {
-        liveStatus: OutputStatus.Live,
+      .where(`output.status IN (:...status) AND output.lockHash IN (:...lockHashes) AND (output.typeCodeHash IS NULL OR output.typeCodeHash = :typeCodeHash) AND (output.typeHashType IS NULL OR output.typeHashType = :typeHashType)`, {
+        status: [OutputStatus.Live, OutputStatus.Sent],
         lockHashes: anyoneCanPayLockHashes,
         typeCodeHash: sudtCodeHash,
         typeHashType: sudtHashType,
       })
       .groupBy('output.lockArgs')
       .addGroupBy('output.typeArgs')
+      .addGroupBy('output.status')
       .getRawMany()
 
     // key: blake160:tokenID(typeArgs | CKBytes)
@@ -66,12 +69,13 @@ export default class AssetAccountService {
       }
     })
 
-    const assetAccounts = assetAccountEntities.map(aa => {
-      const model = aa.toModel()
-      const tokenID = aa.tokenID.startsWith('0x') ? aa.tokenID : 'CKBytes'
-      model.balance = sumOfAmountMap.get(aa.blake160 + ":" + tokenID)?.toString() || '0'
-      return model
-    })
+    const assetAccounts = assetAccountEntities
+      .map(aa => {
+        const model = aa.toModel()
+        const tokenID = aa.tokenID.startsWith('0x') ? aa.tokenID : 'CKBytes'
+        model.balance = sumOfAmountMap.get(aa.blake160 + ":" + tokenID)?.toString() || ''
+        return model
+      }).filter(aa => aa.balance !== '')
 
     return assetAccounts
   }
