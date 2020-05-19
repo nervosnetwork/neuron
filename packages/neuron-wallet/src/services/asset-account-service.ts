@@ -271,22 +271,27 @@ export default class AssetAccountService {
   }
 
   public static async sendTx(walletID: string, assetAccount: AssetAccount, tx: Transaction, password: string): Promise<string> {
-    // 1. save AssetAccount
+    // 1. check AssetAccount exists
     const connection = getConnection()
-    const entity = AssetAccountEntity.fromModel(assetAccount)
-    const savedEntity = await connection.manager.save([entity.sudtTokenInfo, entity])
+    const exists = await connection
+      .manager
+      .query(
+        `SELECT EXISTS (SELECT 1 FROM asset_account where tokenID = ? AND blake160 = ?) as exist`,
+        [assetAccount.tokenID, assetAccount.blake160]
+      )
 
-    // 2. send tx
-    // if failed, remove saved entity
-    let txHash: string | undefined
-    try {
-      txHash = await new TransactionSender().sendTx(walletID, tx, password)
-    } catch (err) {
-      await connection.manager.remove(savedEntity)
-      throw err
+    if (exists[0].exist === 1) {
+      throw new Error(`Asset account already exists!`)
     }
 
-    // 3. update address for usedByAnyoneCanPay
+    // 2. send tx
+    const txHash = await new TransactionSender().sendTx(walletID, tx, password)
+
+    // 3. save asset account
+    const entity = AssetAccountEntity.fromModel(assetAccount)
+    await connection.manager.save([entity.sudtTokenInfo, entity])
+
+    // 4. update address for usedByAnyoneCanPay
     const addressVersion = NetworksService.getInstance().isMainnet() ? AddressVersion.Mainnet : AddressVersion.Testnet
     AddressService.updateUsedByAnyoneCanPay(walletID, assetAccount.blake160, addressVersion, true)
 
