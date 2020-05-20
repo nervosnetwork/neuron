@@ -1,6 +1,6 @@
 {
   "name": "neuron-ui",
-  "version": "0.30.0-rc1",
+  "version": "0.30.0",
   "private": true,
   "author": {
     "name": "Nervos Core Dev",

@@ -4,8 +4,7 @@ import StoryRouter from 'storybook-react-router'
 import { withKnobs, text, number, boolean } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import History from 'components/History'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 import transactions from './data/transactions'
 
 const dispatch = (a: any) => action('Dispatch')(JSON.stringify(a, null, 2))

@@ -4,8 +4,7 @@ import { storiesOf } from '@storybook/react'
 import { withKnobs, text, number } from '@storybook/addon-knobs'
 import { action } from '@storybook/addon-actions'
 import Receive from 'components/Receive'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 import addresses from './data/addresses'
 
 const dispatch = action('Dispatch')

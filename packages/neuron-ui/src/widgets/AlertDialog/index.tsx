@@ -2,7 +2,7 @@ import React, { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { dismissAlertDialog } from 'states/stateProvider/actionCreators'
 import { AppActions } from 'states/stateProvider/reducer'
-import { useDialog } from 'utils/hooks'
+import { useDialog } from 'utils'
 import Button from 'widgets/Button'
 import styles from './alertDialog.module.scss'
 

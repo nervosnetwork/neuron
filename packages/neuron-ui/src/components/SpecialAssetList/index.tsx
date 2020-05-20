@@ -2,16 +2,23 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
-import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
-import { PAGE_SIZE, Routes, PRESET_SCRIPT, MEDIUM_FEE_RATE } from 'utils/const'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { AppActions } from 'states/stateProvider/reducer'
 import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
 import Experimental from 'widgets/ExperimentalRibbon'
-import isMainnetUtil from 'utils/isMainnet'
-import { queryParsers, epochParser } from 'utils/parsers'
+import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
 import { ckbCore } from 'services/chain'
+import {
+  CONSTANTS,
+  RoutePath,
+  PresetScript,
+  isMainnet as isMainnetUtil,
+  isSuccessResponse,
+  queryParsers,
+  epochParser,
+} from 'utils'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import styles from './specialAssetList.module.scss'
+
+const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
 
 export interface SpecialAssetCell {
   blockHash: string
@@ -19,7 +26,7 @@ export interface SpecialAssetCell {
   capacity: string
   customizedAssetInfo: {
     data: string
-    lock: PRESET_SCRIPT.Locktime | string
+    lock: PresetScript.Locktime | string
     type: string
   }
   daoData: string | null
@@ -73,7 +80,7 @@ const SpecialAssetList = () => {
         pageSize: PAGE_SIZE,
       })
         .then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             const { items, totalCount: count } = res.result as { items: SpecialAssetCell[]; totalCount: string }
             setCells(items.sort((i1, i2) => +i2.timestamp - +i1.timestamp))
             setTotalCount(+count)
@@ -129,7 +136,7 @@ const SpecialAssetList = () => {
           feeRate: `${MEDIUM_FEE_RATE}`,
           customizedAssetInfo: cell.customizedAssetInfo,
         }).then(res => {
-          if (res.status === 1) {
+          if (isSuccessResponse(res)) {
             dispatch({
               type: AppActions.UpdateGeneratedTx,
               payload: res.result,
@@ -161,7 +168,7 @@ const SpecialAssetList = () => {
     return cells.map(cell => {
       let status: SpecialAssetProps['status'] = 'user-defined-asset'
       let epochInfo: { target: number; current: number } | undefined
-      if (cell.customizedAssetInfo.lock === PRESET_SCRIPT.Locktime) {
+      if (cell.customizedAssetInfo.lock === PresetScript.Locktime) {
         const targetEpochInfo = epochParser(ckbCore.utils.toHexInLittleEndian(`0x${cell.lock.args.slice(-16)}`))
         const currentEpochInfo = epochParser(epoch)
         const targetEpochFraction =
@@ -230,7 +237,7 @@ const SpecialAssetList = () => {
             lastPageIconProps={{ iconName: 'LastPage' }}
             format="buttons"
             onPageChange={(idx: number) => {
-              history.push(`${Routes.SpecialAssets}?pageNo=${idx + 1}`)
+              history.push(`${RoutePath.SpecialAssets}?pageNo=${idx + 1}`)
             }}
           />
         ) : null}

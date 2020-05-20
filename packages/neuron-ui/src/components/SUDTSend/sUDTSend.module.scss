@@ -9,7 +9,7 @@
 }
 
 .title {
-  @include viewTitle;
+  @include page-title;
 }
 
 .info {
@@ -150,15 +150,15 @@
     display: none;
   }
   h2 {
-    @include dialogTitle;
+    @include dialog-title;
   }
   .passwordDialog {
-    @include dialogContainer;
+    @include dialog-container;
     background: #fff;
     padding: 49px 73px;
   }
   .dialogFooter {
-    @include dialogFooter;
+    @include dialog-footer;
     button {
       margin-left: 5px;
     }

@@ -7,10 +7,10 @@ import {
   SINCE_FIELD_SIZE,
   MAX_DECIMAL_DIGITS,
   SHANNON_CKB_RATIO,
-  ErrorCode,
   DEFAULT_SUDT_FIELDS,
   TOKEN_ID_LENGTH,
 } from 'utils/const'
+import { ErrorCode } from 'utils/enums'
 import { CKBToShannonFormatter } from 'utils/formatters'
 import { ckbCore } from 'services/chain'
 import { FieldRequiredException } from 'exceptions'
@@ -350,19 +350,4 @@ export const verifyDecimal = ({ decimal, required = false }: { decimal: string; 
   if (+decimal < MIN_DECIMAL || +decimal > MAX_DECIMAL) {
     throw new DecimalRangeException()
   }
-}
-
-export default {
-  verifyAddress,
-  verifySUDTAddress,
-  verifyAmountRange,
-  verifySUDTAmount,
-  verifyTotalAmount,
-  verifyPasswordComplexity,
-  verifyTransactionOutputs,
-  verifyNetworkName,
-  verifyTokenId,
-  verifySUDTAccountName,
-  verifySymbol,
-  verifyDecimal,
 }

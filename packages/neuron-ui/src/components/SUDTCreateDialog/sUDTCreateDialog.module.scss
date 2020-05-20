@@ -34,7 +34,7 @@
   }
 
   .dialogContainer {
-    @include dialogContainer;
+    @include dialog-container;
     width: 500px;
     box-sizing: border-box;
     background: #fff;
@@ -65,7 +65,7 @@
   }
 
   .footer {
-    @include dialogFooter;
+    @include dialog-footer;
 
     button {
       margin-left: 10px;

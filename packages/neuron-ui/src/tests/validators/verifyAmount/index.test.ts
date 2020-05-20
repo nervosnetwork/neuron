@@ -1,5 +1,5 @@
 import { verifyAmount } from 'utils/validators'
-import { ErrorCode } from '../../../utils/const'
+import { ErrorCode } from 'utils/enums'
 import fixtures from './fixtures'
 
 const fixtureTable = Object.entries(fixtures).map(([title, { amount, expected }]) => [title, amount, expected])

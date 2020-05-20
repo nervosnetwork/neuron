@@ -1,6 +1,6 @@
 @import '../../styles/mixin.scss';
 
-@mixin textOverflow {
+@mixin text-overflow {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -67,7 +67,7 @@
   }
 
   .amount {
-    @include textOverflow;
+    @include text-overflow;
     grid-area: amount;
     box-sizing: border-box;
     justify-self: flex-end;
@@ -77,7 +77,7 @@
   }
 
   .compensation {
-    @include textOverflow;
+    @include text-overflow;
     grid-area: compensation;
     box-sizing: border-box;
     justify-self: flex-end;
@@ -193,7 +193,7 @@
     .deposited,
     .withdrawn,
     .unlocked {
-      @include RegularText;
+      @include regular-text;
       position: relative;
       display: flex;
       justify-content: space-between;
@@ -225,7 +225,7 @@
       }
 
       &:last-of-type {
-        @include SemiBoldText;
+        @include semi-bold-text;
       }
     }
   }

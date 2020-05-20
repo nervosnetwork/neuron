@@ -2,7 +2,14 @@
 
 .container {
   display: grid;
-  grid-template: 'info-title' auto 'info-detail' auto 'inputs-title' auto 'inputs' auto 'outputs-title' auto 'outputs' auto / 1fr;
+  grid-template:
+    'info-title' auto
+    'info-detail' auto
+    'inputs-title' auto
+    'inputs' auto
+    'outputs-title' auto
+    'outputs' auto /
+    1fr;
   grid-row-gap: 15px;
 
   table {
@@ -18,7 +25,7 @@
   }
 
   th {
-    @include BoldText;
+    @include bold-text;
     height: 2.625rem;
     text-align: left;
   }
@@ -27,8 +34,11 @@
     height: 1.75rem;
     word-wrap: none;
     word-break: keep-all;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    & > div {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+    }
   }
 
   span,
@@ -61,7 +71,7 @@
 .infoTitle,
 .inputsTitle,
 .outputsTitle {
-  @include BoldText;
+  @include bold-text;
   line-height: 1.125rem;
   font-size: 1.125rem;
   letter-spacing: 0.9px;
@@ -82,7 +92,6 @@
   & > div {
     display: flex;
     justify-content: space-between;
-    pointer-events: none;
     margin-bottom: 17px;
 
     &:last-of-type {

@@ -1,12 +1,11 @@
-@import '../../styles//mixin.scss';
+@import '../../styles/mixin.scss';
 
 .container {
   display: grid;
 }
 
 .title {
-  @include viewTitle;
-  margin-bottom: 20px;
+  @include page-title;
 }
 
 .header {

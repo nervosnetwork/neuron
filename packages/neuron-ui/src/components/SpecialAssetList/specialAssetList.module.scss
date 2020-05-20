@@ -2,7 +2,7 @@
 
 .container {
   .title {
-    @include viewTitle;
+    @include page-title;
     margin-bottom: 20px;
   }
 
@@ -11,7 +11,7 @@
     padding: 2px 15px 48px;
 
     .listHeader {
-      @include SemiBoldText;
+      @include semi-bold-text;
       display: flex;
       justify-content: flex-start;
       align-items: center;
@@ -36,5 +36,6 @@
 }
 
 .noItems {
-  @include MediumText;
+  @include medium-text;
+  padding: 20px 13px;
 }

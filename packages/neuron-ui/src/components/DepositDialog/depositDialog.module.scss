@@ -1,7 +1,7 @@
-@import "../../styles/mixin.scss";
+@import '../../styles/mixin.scss';
 
 .dialog {
-  @include dialogContainer;
+  @include dialog-container;
   padding: 30px 50px;
 
   &::backdrop {
@@ -21,7 +21,7 @@
   line-height: 1.4;
   margin-bottom: 25px;
 
-  &>span:first-of-type {
+  & > span:first-of-type {
     font-weight: 900;
 
     &:after {
@@ -31,7 +31,6 @@
     }
   }
 }
-
 
 .errorMessage {
   display: flex;
@@ -70,7 +69,7 @@
 }
 
 .footer {
-  @include dialogFooter;
+  @include dialog-footer;
 
   button:last-of-type {
     margin-left: 9px;

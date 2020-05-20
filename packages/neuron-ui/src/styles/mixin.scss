@@ -1,26 +1,26 @@
 // font
-@mixin BoldText {
+@mixin bold-text {
   font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
   font-weight: 900;
 }
 
-@mixin SemiBoldText {
+@mixin semi-bold-text {
   font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
   font-weight: 700;
 }
 
-@mixin MediumText {
+@mixin medium-text {
   font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
   font-weight: 500;
 }
 
-@mixin RegularText {
+@mixin regular-text {
   font-family: 'SourceCodePro-Regular', 'SourceHanSansCN-Regular', monospace;
   font-weight: 400;
 }
 
 // layout
-@mixin dialogContainer {
+@mixin dialog-container {
   border: none;
   border-radius: 2px;
   box-shadow: 4px 7px 10px 0 rgba(0, 0, 0, 0.22);
@@ -29,19 +29,19 @@
   box-sizing: border-box;
 }
 
-@mixin dialogTitle {
-  @include BoldText;
+@mixin dialog-title {
+  @include bold-text;
   font-size: 1.125rem;
   letter-spacing: 0.9px;
   margin-bottom: 25px;
 }
 
-@mixin dialogFooter {
+@mixin dialog-footer {
   display: flex;
   justify-content: flex-end;
 }
 
-@mixin dialogConfirmButton {
+@mixin dialog-confirm-button {
   border: none;
   width: 5.125rem;
   height: 1.875rem;
@@ -60,12 +60,12 @@
   backdrop-filter: blur(1px);
 }
 
-@mixin disabledBtn {
+@mixin disabled-button {
   background-color: #e3e3e3;
   color: #666;
 }
 
-@mixin formFooter {
+@mixin form-footer {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -80,7 +80,7 @@
   }
 }
 
-@mixin descriptionField {
+@mixin description-field {
   display: flex;
 
   & > div {
@@ -101,7 +101,10 @@
   }
 }
 
-@mixin viewTitle {
+@mixin page-title {
+  @include semi-bold-text;
   font-size: 1.375rem;
-  font-weight: 700;
+  color: #000;
+  padding: 0;
+  margin: 0 0 23px 0;
 }

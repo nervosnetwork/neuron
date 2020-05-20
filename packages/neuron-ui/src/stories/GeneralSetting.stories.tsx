@@ -2,7 +2,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { withKnobs } from '@storybook/addon-knobs'
 import GeneralSetting from 'components/GeneralSetting'
-import initStates from 'states/initStates'
+import { initStates } from 'states'
 
 const states: { [title: string]: boolean } = {
   'Clear cell cache on': true,

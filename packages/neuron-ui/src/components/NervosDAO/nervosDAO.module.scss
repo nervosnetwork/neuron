@@ -1,21 +1,20 @@
-@import "../../styles/mixin.scss";
+@import '../../styles/mixin.scss';
 $infoHeight: 1.75rem;
 
 .nervosDAOContainer {
   display: grid;
   grid-template:
-    'title title title'auto 'free network-alert deposit'auto 'locked . deposit'auto 'apc . .'auto 'records records records'auto/ minmax(350px, 500px) 35px 1fr;
+    'title title title' auto
+    'free network-alert deposit' auto
+    'locked . deposit' auto
+    'apc . .' auto
+    'records records records' auto/
+    minmax(350px, 500px) 35px 1fr;
 }
 
 .title {
+  @include page-title;
   grid-area: title;
-  font-size: 1.375rem;
-  font-weight: 900;
-  line-height: 1.75rem;
-  color: #000;
-  padding-top: 5px;
-  padding-bottom: 12px;
-  margin: 0;
 }
 
 .free {
@@ -75,7 +74,7 @@ $infoHeight: 1.75rem;
     border: none;
 
     &[disabled] {
-      @include disabledBtn;
+      @include disabled-button;
     }
   }
 }
@@ -95,7 +94,7 @@ $infoHeight: 1.75rem;
     border-bottom: 1px solid #ccc;
 
     button {
-      @include BoldText;
+      @include bold-text;
       appearance: none;
       flex: 1;
       display: flex;
@@ -112,8 +111,6 @@ $infoHeight: 1.75rem;
         color: var(--nervos-green);
         opacity: 0.8;
       }
-
-
     }
 
     .underline {
@@ -136,7 +133,7 @@ $infoHeight: 1.75rem;
     }
   }
 
-  &>div {
+  & > div {
     margin: 10px auto;
   }
 
@@ -144,5 +141,4 @@ $infoHeight: 1.75rem;
     font-size: 0.875rem;
     font-weight: 600;
   }
-
 }

@@ -3,8 +3,7 @@ import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import StoryRouter from 'storybook-react-router'
 import PasswordRequest from 'components/PasswordRequest'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 
 const dispatch = action('Dispatch')
 

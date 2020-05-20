@@ -10,25 +10,24 @@ import { setCurrentWallet } from 'states/stateProvider/actionCreators'
 import { WalletWizardPath } from 'components/WalletWizard'
 
 import { openContextMenu, requestPassword } from 'services/remote'
-import { Routes, MnemonicAction } from 'utils/const'
-import { backToTop } from 'utils/animations'
+import { backToTop, RoutePath, MnemonicAction } from 'utils'
 import styles from './walletSetting.module.scss'
 
 const buttons = [
   {
     label: 'wizard.create-new-wallet',
     ariaLabel: 'create a wallet',
-    url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
+    url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Create}`,
   },
   {
     label: 'wizard.import-mnemonic',
     ariaLabel: 'import wallet seed',
-    url: `${Routes.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
+    url: `${RoutePath.WalletWizard}${WalletWizardPath.Mnemonic}/${MnemonicAction.Import}`,
   },
   {
     label: 'wizard.import-keystore',
     ariaLabel: 'import from keystore',
-    url: Routes.ImportKeystore,
+    url: RoutePath.ImportKeystore,
   },
 ]
 
@@ -76,7 +75,7 @@ const WalletSetting = ({
           {
             label: t('common.edit'),
             click: () => {
-              history.push(`${Routes.WalletEditor}/${id}`)
+              history.push(`${RoutePath.WalletEditor}/${id}`)
             },
           },
           {

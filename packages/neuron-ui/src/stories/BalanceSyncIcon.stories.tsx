@@ -1,6 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import { ConnectionStatus, SyncStatus } from 'utils/const'
+import { ConnectionStatus, SyncStatus } from 'utils'
 import BalanceSyncIcon, { BalanceSyncIconProps } from 'components/BalanceSyncingIcon'
 
 const stories = storiesOf('Balance Sync Icon', module)

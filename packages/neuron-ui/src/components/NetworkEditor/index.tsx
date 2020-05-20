@@ -6,12 +6,12 @@ import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
 import Spinner from 'widgets/Spinner'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { verifyNetworkName, verifyURL } from 'utils/validators'
-import { useGoBack } from 'utils/hooks'
-import { MAX_NETWORK_NAME_LENGTH } from 'utils/const'
+import { CONSTANTS, useGoBack, verifyNetworkName, verifyURL } from 'utils'
+import { useState as useGlobalState, useDispatch } from 'states'
 import { useOnSubmit } from './hooks'
 import styles from './networkEditor.module.scss'
+
+const { MAX_NETWORK_NAME_LENGTH } = CONSTANTS
 
 const NetworkEditor = () => {
   const {

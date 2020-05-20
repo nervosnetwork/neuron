@@ -6,10 +6,13 @@ import Spinner from 'widgets/Spinner'
 import Button from 'widgets/Button'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { openExternal } from 'services/remote'
-import { SHANNON_CKB_RATIO, NERVOS_DAO_RFC_URL } from 'utils/const'
-import { localNumberFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { useDialog } from 'utils/hooks'
+import { CONSTANTS, localNumberFormatter, shannonToCKBFormatter, useDialog } from 'utils'
 import styles from './depositDialog.module.scss'
+
+const { SHANNON_CKB_RATIO } = CONSTANTS
+
+const NERVOS_DAO_RFC_URL =
+  'https://www.github.com/nervosnetwork/rfcs/blob/master/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md'
 
 interface DepositDialogProps {
   show: boolean

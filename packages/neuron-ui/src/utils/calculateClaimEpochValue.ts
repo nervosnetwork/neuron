@@ -6,7 +6,7 @@ interface EpochInfo {
   length: bigint
 }
 
-export default (depositEpochInfo: EpochInfo, withdrawingEpochInfo: EpochInfo) => {
+export const calculateClaimEpochValue = (depositEpochInfo: EpochInfo, withdrawingEpochInfo: EpochInfo) => {
   let depositedEpochs = withdrawingEpochInfo.number - depositEpochInfo.number
   const depositEpochFraction = depositEpochInfo.index * withdrawingEpochInfo.length
   const currentEpochFraction = withdrawingEpochInfo.index * depositEpochInfo.length
@@ -21,3 +21,5 @@ export default (depositEpochInfo: EpochInfo, withdrawingEpochInfo: EpochInfo) =>
     Number(depositEpochInfo.number + minLockEpochs) + Number(depositEpochInfo.index) / Number(depositEpochInfo.length)
   return targetEpochValue
 }
+
+export default calculateClaimEpochValue
