@@ -20,7 +20,7 @@ const platform = (): string => {
 const { app } = env
 let ckb: ChildProcess | null = null
 
-export const ckbPath = (): string => {
+const ckbPath = (): string => {
   return app.isPackaged ?
     path.join(path.dirname(app.getAppPath()), '..', './bin') :
     path.join(__dirname, '../../bin',)
@@ -33,7 +33,7 @@ const ckbBinary = (): string => {
   return platform() === 'win' ? binary + '.exe' : binary
 }
 
-const ckbDataPath = (): string => {
+export const ckbDataPath = (): string => {
   return path.resolve(app.getPath('userData',), 'chains/mainnet')
 }
 
