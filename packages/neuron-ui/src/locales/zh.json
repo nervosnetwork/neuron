@@ -209,7 +209,7 @@
       "general": {
         "clear-cache": "清空缓存",
         "clearing-cache": "清空中...",
-        "clear-cache-description": "当数据同步或显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
+        "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "show": "显示",
         "hide": "隐藏",
         "version": "版本",
