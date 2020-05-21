@@ -156,27 +156,32 @@ export const useDialog = ({
 }
 
 export const useOnDefaultContextMenu = (t: TFunction) =>
-  useCallback(() => {
-    const contextMenuTemplate = [
-      { label: t('contextmenu.cut'), role: 'cut' },
-      {
-        label: t('contextmenu.copy'),
-        role: 'copy',
-      },
-      {
-        label: t('contextmenu.paste'),
-        role: 'paste',
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: t('contextmenu.selectall'),
-        role: 'selectAll',
-      },
-    ]
-    openContextMenu(contextMenuTemplate)
-  }, [t])
+  useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') {
+        const contextMenuTemplate = [
+          { label: t('contextmenu.cut'), role: 'cut' },
+          {
+            label: t('contextmenu.copy'),
+            role: 'copy',
+          },
+          {
+            label: t('contextmenu.paste'),
+            role: 'paste',
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: t('contextmenu.selectall'),
+            role: 'selectAll',
+          },
+        ]
+        openContextMenu(contextMenuTemplate)
+      }
+    },
+    [t]
+  )
 
 export const useExitOnWalletChange = () => {
   const listener = (e: StorageEvent) => {

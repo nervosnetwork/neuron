@@ -21,7 +21,6 @@ import {
   localNumberFormatter,
   uniformTimeFormatter,
   shannonToCKBFormatter,
-  useOnDefaultContextMenu,
   useExitOnWalletChange,
   isSuccessResponse,
 } from 'utils'
@@ -37,8 +36,6 @@ const Transaction = () => {
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
-
-  const onContextMenu = useOnDefaultContextMenu(t)
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -201,7 +198,7 @@ const Transaction = () => {
   }
 
   return (
-    <div className={styles.container} onContextMenu={onContextMenu}>
+    <div className={styles.container}>
       <h2
         className={styles.infoTitle}
         title={t('history.basic-information')}
