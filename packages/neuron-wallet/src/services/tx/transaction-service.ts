@@ -251,7 +251,10 @@ export class TransactionsService {
       .addSelect('input.transactionHash', 'transactionHash')
       .addSelect('input.outPointTxHash', 'outPointTxHash')
       .addSelect('input.outPointIndex', 'outPointIndex')
-      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes })
+      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, {
+        txHashes,
+        lockHashes: allLockHashes,
+      })
       .getRawMany()
 
     const outputs = await connection
@@ -260,7 +263,10 @@ export class TransactionsService {
       .select('output.capacity', 'capacity')
       .addSelect('output.transactionHash', 'transactionHash')
       .addSelect('output.daoData', 'daoData')
-      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
+      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, {
+        txHashes,
+        lockHashes: allLockHashes,
+      })
       .getRawMany()
 
     const anyoneCanPayInputs = await connection
