@@ -59,6 +59,7 @@ type Action =
   | 'get-transaction'
   | 'show-transaction-details'
   | 'update-transaction-description'
+  | 'export-transactions'
   // Dao
   | 'get-dao-data'
   | 'generate-dao-deposit-tx'

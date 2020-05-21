@@ -155,8 +155,10 @@
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
+        "button": "Search",
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
+      "export-history": "Export Transaction History",
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",

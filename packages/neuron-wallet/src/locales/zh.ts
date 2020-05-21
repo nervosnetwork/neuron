@@ -159,6 +159,18 @@ export default {
         normal: '设置',
         mac: '偏好设置'
       }
+    },
+    'export-transactions': {
+      'export-transactions': '导出交易历史',
+      'transactions-exported': '{{total}} 条交易记录已被导出至 {{file}}',
+      column: {
+        "time": "时间",
+        "block-number": "区块高度",
+        "tx-hash": "交易哈希",
+        "tx-type": "交易类型",
+        "amount": "金额",
+        "description": "备注"
+      }
     }
   },
 }
