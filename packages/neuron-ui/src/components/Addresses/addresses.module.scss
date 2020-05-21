@@ -112,7 +112,7 @@ $change-color: #6666cc;
       }
 
       @media screen and (max-width: 1680px) {
-        width: 30vw;
+        width: 20vw;
 
         &::after {
           position: absolute;
@@ -128,10 +128,6 @@ $change-color: #6666cc;
           transform: translateX(-50%);
           display: none;
         }
-      }
-
-      @media screen and (max-width: 1350px) {
-        width: 20vw;
       }
 
       @media screen and (max-width: 1000px) {

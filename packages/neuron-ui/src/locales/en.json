@@ -367,6 +367,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
+      "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",
       "apc": "Current APC",

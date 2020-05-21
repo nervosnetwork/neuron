@@ -367,6 +367,7 @@
       "free": "當前可用",
       "locked": "已鎖定",
       "deposit": "存入",
+      "copy-balance": "複製餘額",
       "deposit-records": "存入",
       "completed-records": "已解鎖",
       "apc": "當前年化鎖定補貼率",

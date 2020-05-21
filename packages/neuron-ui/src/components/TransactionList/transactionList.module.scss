@@ -41,7 +41,9 @@ $pending-color: #b3b3b3;
     }
 
     .amount {
+      @include text-overflow-ellipsis;
       grid-area: amount;
+      width: 90%;
       color: var(--nervos-green);
     }
 

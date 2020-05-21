@@ -44,19 +44,24 @@ $infoHeight: 1.75rem;
   height: $infoHeight;
   font-size: 0.875rem;
 
-  span:first-child {
+  & > span {
     font-weight: 600;
     padding-right: 15px;
+    white-space: nowrap;
 
     &:after {
       content: ':';
     }
   }
 
-  span:last-child {
-    text-overflow: ellipsis;
-    overflow: hidden;
+  & > div {
+    width: 70%;
     white-space: nowrap;
+    text-align: right;
+  }
+  .balance {
+    @include text-overflow-ellipsis;
+    padding: 0;
   }
 }
 
