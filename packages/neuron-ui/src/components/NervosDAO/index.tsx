@@ -20,6 +20,7 @@ import WithdrawDialog from 'components/WithdrawDialog'
 import DAORecord from 'components/NervosDAORecord'
 import BalanceSyncIcon from 'components/BalanceSyncingIcon'
 import Button from 'widgets/Button'
+import CopyZone from 'widgets/CopyZone'
 
 import hooks from './hooks'
 import styles from './nervosDAO.module.scss'
@@ -262,14 +263,35 @@ const NervosDAO = () => {
 
   const onlineAndSynced = ConnectionStatus.Online === connectionStatus && SyncStatus.SyncCompleted === syncStatus
 
+  const freeBalance = shannonToCKBFormatter(`${free}`)
+  const lockedBalance = shannonToCKBFormatter(`${locked}`)
+
   const info = [
     {
       key: 'free',
-      value: `${shannonToCKBFormatter(`${free}`)} CKB`,
+      value: (
+        <CopyZone
+          content={freeBalance.replace(/,/g, '')}
+          name={t('nervos-dao.copy-balance')}
+          className={styles.balance}
+        >
+          {`${freeBalance} CKB`}
+        </CopyZone>
+      ),
     },
     {
       key: 'locked',
-      value: onlineAndSynced ? `${shannonToCKBFormatter(`${locked}`)} CKB` : `-- CKB`,
+      value: onlineAndSynced ? (
+        <CopyZone
+          content={lockedBalance.replace(/,/g, '')}
+          name={t('nervos-dao.copy-balance')}
+          className={styles.balance}
+        >
+          {`${lockedBalance} CKB`}
+        </CopyZone>
+      ) : (
+        `-- CKB`
+      ),
     },
     {
       key: 'apc',
@@ -285,13 +307,13 @@ const NervosDAO = () => {
         return (
           <div key={key} title={label} aria-label={label} className={styles[key]}>
             <span>{label}</span>
-            <span
+            <div
               style={{
                 color: onlineAndSynced ? '#000' : '#888',
               }}
             >
               {value}
-            </span>
+            </div>
           </div>
         )
       })}

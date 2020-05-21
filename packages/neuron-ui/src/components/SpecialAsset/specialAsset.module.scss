@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 @mixin tooltip {
   &:before {
     position: absolute;
@@ -42,7 +44,8 @@
 .container {
   display: grid;
   grid-template:
-    'datetime capacity indicators actions'1fr / 120px 1fr 50px 300px;
+    'datetime capacity indicators actions' 1fr /
+    120px minmax(100px, 1fr) 50px 300px;
   grid-column-gap: 15px;
   box-sizing: border-box;
   border-bottom: 1px solid #b3b3b3;
@@ -69,12 +72,7 @@
 
 .capacity {
   grid-area: capacity;
-  overflow: hidden;
-
-  &>span {
-    transform: scale(0.875);
-    transform-origin: left center;
-  }
+  @include text-overflow-ellipsis;
 }
 
 .indicators {

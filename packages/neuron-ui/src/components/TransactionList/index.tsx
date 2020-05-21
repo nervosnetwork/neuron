@@ -125,9 +125,9 @@ const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, disp
               onKeyPress={() => {}}
             >
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <span className={styles.amount} title={`${tx.value} shannons`}>
+              <CopyZone className={styles.amount} content={shannonToCKBFormatter(tx.value).replace(/,/g, '')}>
                 {`${shannonToCKBFormatter(tx.value, true)} CKB`}
-              </span>
+              </CopyZone>
               <span className={styles.status} title={statusLabel}>
                 {statusLabel}
               </span>

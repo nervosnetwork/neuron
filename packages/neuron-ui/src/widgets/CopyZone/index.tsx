@@ -2,8 +2,13 @@ import React, { useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './copyZone.module.scss'
 
-type CopyZoneProps = React.PropsWithChildren<{ name?: string; content: string; style?: React.CSSProperties }>
-const CopyZone = ({ children, content, name, style }: CopyZoneProps) => {
+type CopyZoneProps = React.PropsWithChildren<{
+  name?: string
+  content: string
+  style?: React.CSSProperties
+  className?: string
+}>
+const CopyZone = ({ children, content, name, style, className = '' }: CopyZoneProps) => {
   const [t] = useTranslation()
   const [copied, setCopied] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>()
@@ -24,8 +29,9 @@ const CopyZone = ({ children, content, name, style }: CopyZoneProps) => {
       data-copied={copied}
       data-prompt={prompt}
       onClick={onCopy}
-      className={styles.container}
+      className={`${styles.container} ${className}`}
       style={style}
+      title={content}
     >
       {children}
     </div>
