@@ -155,8 +155,10 @@
       "blockNumber": "区块高度",
       "basic-information": "基本信息",
       "search": {
+        "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",

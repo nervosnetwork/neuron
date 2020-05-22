@@ -12,4 +12,5 @@ export const getTransaction = remoteApi<{ walletID: string; hash: string }>('get
 export const updateTransactionDescription = remoteApi<Controller.UpdateTransactionDescriptionParams>(
   'update-transaction-description'
 )
+export const exportTransactions = remoteApi<Controller.ExportTransactions.Params>('export-transactions')
 export const showTransactionDetails = remoteApi<string>('show-transaction-details')

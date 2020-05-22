@@ -239,6 +239,10 @@ export default class ApiController {
       showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
     })
 
+    handle('export-transactions', async (_, params: { walletID: string }) => {
+      return this.transactionsController.exportTransactions(params)
+    })
+
     // Dao
 
     handle('get-dao-data', async (_, params: Controller.Params.GetDaoCellsParams) => {

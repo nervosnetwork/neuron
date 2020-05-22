@@ -59,7 +59,7 @@ registerIcons({
     completed: <SuccessIcon size="16px" />,
     cancel: <DismissIcon size="16px" />,
     MiniCopy: <CopyIcon size="small" color={semanticColors.primaryButtonBackground} />,
-    Search: <SearchIcon size="16px" color="#000" />,
+    Search: <SearchIcon size="14px" color="#000" />,
     FirstPage: <LinkTopIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     LastPage: <LinkBottomIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,
     PrevPage: <LinkUpIcon size="16px" color={semanticColors.menuIcon} style={{ transform: 'rotate(-90deg)' }} />,

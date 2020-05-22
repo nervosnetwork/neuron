@@ -155,8 +155,10 @@
       "blockNumber": "區塊高度",
       "basic-information": "基本資訊",
       "search": {
+        "button": "蒐索",
         "placeholder": "使用交易雜湊、地址或日期(yyyy-mm-dd)進行蒐索"
       },
+      "export-history": "導出交易歷史",
       "confirmations": "確認次數",
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",

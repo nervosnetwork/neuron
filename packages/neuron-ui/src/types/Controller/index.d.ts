@@ -166,4 +166,10 @@ declare namespace Controller {
       data: string
     }
   }
+
+  namespace ExportTransactions {
+    interface Params {
+      walletID: string
+    }
+  }
 }

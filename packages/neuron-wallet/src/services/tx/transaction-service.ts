@@ -1,10 +1,12 @@
 import { getConnection, ObjectLiteral } from 'typeorm'
+import AddressesService from 'services/addresses'
 import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
+import exportTransactions from 'utils/export-history'
 
 export interface TransactionsByAddressesParam {
   pageNo: number
@@ -366,6 +368,15 @@ export class TransactionsService {
     }
     transactionEntity.description = description
     return getConnection().manager.save(transactionEntity)
+  }
+
+  public static async exportTransactions({ walletID, filePath }: { walletID: string, filePath: string }) {
+    const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
+    const lockHashList = AddressParser.batchToLockHash(addresses)
+    const connection = getConnection()
+    const dbPath = connection.options.database as string
+    const total = await exportTransactions({ walletID, dbPath, lockHashList, filePath })
+    return total
   }
 
   // only deal with address / txHash / Date

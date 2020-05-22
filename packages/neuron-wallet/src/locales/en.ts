@@ -160,6 +160,22 @@ export default {
         normal: 'Settings',
         mac: 'Preference'
       }
+    },
+    'export-transactions': {
+      'export-transactions': 'Export Transaction History',
+      'transactions-exported': '{{total}} transaction records have been exported to {{file}}',
+      column: {
+        "time": "Time",
+        "block-number": "Block Number",
+        "tx-hash": "Transaction Hash",
+        "tx-type": "Transaction Type",
+        "amount": "Amount",
+        "description": "Description"
+      },
+      "tx-type": {
+        "send": "Send",
+        "receive": "Receive"
+      }
     }
   },
 }
