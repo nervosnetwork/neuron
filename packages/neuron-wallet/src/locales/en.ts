@@ -150,6 +150,10 @@ export default {
     'export-debug-info':{
       'export-debug-info': 'Export Debug Information',
       'debug-info-exported': 'Debug information has been exported to {{ file }}'
+    },
+    about: {
+      "app-version": "{{name}} Version: {{version}}",
+      "ckb-client-version": "CKB Client Version: {{version}}"
     }
   },
 }
