@@ -1,21 +1,74 @@
 .container {
   display: grid;
-  grid-template:
-    'wallets'auto 'actions'auto;
+  grid-template: 'wallets' auto 'actions' auto;
   grid-row-gap: 15px;
-
 }
 
 .wallets {
   grid-area: wallets;
-
+  height: calc(100vh - 200px);
+  overflow: auto;
+  padding: 0 0 5px 8px;
 }
 
 .actions {
   grid-area: actions;
+  justify-self: flex-end;
 
   button {
     min-width: 9.375rem;
     margin-right: 15px;
   }
+}
+
+.choiceLabel {
+  display: flex !important;
+  align-items: center;
+  border: 1px solid transparent;
+  padding: 3px;
+  box-sizing: border-box;
+
+  .walletName {
+    display: inline-block;
+    width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  button {
+    visibility: hidden;
+    appearance: none;
+    margin: 0 0 0 10px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      pointer-events: none;
+      path,
+      g {
+        fill: #888;
+      }
+    }
+    &:hover {
+      svg {
+        path,
+        g {
+          fill: var(--nervos-green);
+        }
+      }
+    }
+  }
+  &:hover,
+  &:focus {
+    border-color: #aeaeae;
+    button {
+      visibility: visible;
+    }
+  }
+}
+
+.hasBottomBorder {
+  border-bottom: 0.5px solid #ccc;
 }

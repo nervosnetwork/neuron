@@ -4,6 +4,7 @@ export enum LocalCacheKey {
   Wallets = 'wallets',
   CurrentWallet = 'currentWallet',
   CurrentNetworkID = 'currentNetworkID',
+  CacheClearDate = 'cacheClearDate',
 }
 
 export const addresses = {
@@ -105,6 +106,16 @@ export const currentNetworkID = {
   },
 }
 
+export const cacheClearDate = {
+  save: (date: string) => {
+    window.localStorage.setItem(LocalCacheKey.CacheClearDate, date)
+    return true
+  },
+  load: () => {
+    return window.localStorage.getItem(LocalCacheKey.CacheClearDate) ?? ''
+  },
+}
+
 export default {
   LocalCacheKey,
   addresses,
@@ -112,4 +123,5 @@ export default {
   wallets,
   currentWallet,
   currentNetworkID,
+  cacheClearDate,
 }

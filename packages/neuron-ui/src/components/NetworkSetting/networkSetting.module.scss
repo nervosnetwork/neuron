@@ -1,24 +1,69 @@
 .container {
   display: grid;
-  grid-template:
-    'networks'auto 'actions'auto;
+  grid-template: 'networks' auto 'actions' auto;
   grid-row-gap: 15px;
 }
 
 .networks {
   grid-area: networks;
+  height: calc(100vh - 200px);
+  overflow: auto;
+  padding: 0 0 5px 8px;
 }
 
-.network {
-  span:nth-of-type(2) {
-    margin: 0 5px;
+.choiceLabel {
+  display: flex !important;
+  align-items: center;
+  border: 1px solid transparent;
+  padding: 3px;
+  box-sizing: border-box;
+
+  .networkLabel {
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    width: 500px;
+  }
+  button {
+    visibility: hidden;
+    appearance: none;
+    margin: 0 0 0 10px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    svg {
+      pointer-events: none;
+      path,
+      g {
+        fill: #888;
+      }
+    }
+    &:hover {
+      svg {
+        path,
+        g {
+          fill: var(--nervos-green);
+        }
+      }
+    }
+  }
+  &:hover,
+  &:focus {
+    border-color: #aeaeae;
+    button {
+      visibility: visible;
+    }
   }
 }
 
 .actions {
   grid-area: actions;
-
+  justify-self: flex-end;
   button {
     width: 9.375rem;
   }
+}
+
+.hasBottomBorder {
+  border-bottom: 0.5px solid #ccc;
 }

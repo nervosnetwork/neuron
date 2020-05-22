@@ -11,11 +11,19 @@ const REMOTE_MODULE_NOT_FOUND =
 const LIMITED_TO_ELECTRON = 'This function is limited to Electron'
 
 export const getLocale = () => {
-  if (!window.remote) {
+  if (!window.ipcRenderer) {
     console.warn(REMOTE_MODULE_NOT_FOUND)
     return window.navigator.language
   }
-  return window.remote.require('electron').app.getLocale()
+  return window.ipcRenderer.sendSync('get-locale')
+}
+
+export const getVersion = () => {
+  return window.remote?.app?.getVersion() ?? ''
+}
+
+export const getPlatform = () => {
+  return window.remote?.process?.platform ?? 'Unknown'
 }
 
 export const getWinID = () => {

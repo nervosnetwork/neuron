@@ -3,6 +3,11 @@ declare namespace Controller {
     url: string
     title: string
   }
+
+  interface ShowSettingsParams {
+    tab: 'general' | 'wallets' | 'networks'
+  }
+
   interface CreateWalletParams {
     name: string
     mnemonic: string

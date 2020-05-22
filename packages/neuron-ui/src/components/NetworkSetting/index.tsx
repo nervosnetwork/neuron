@@ -1,16 +1,19 @@
 import React, { useEffect, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { TFunction } from 'i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
 import Button from 'widgets/Button'
+import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
+import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
 
 import chainState from 'states/init/chain'
-import { setCurrentNetowrk, openContextMenu, deleteNetwork } from 'services/remote'
+import { setCurrentNetowrk } from 'services/remote'
 
-import { backToTop, RoutePath } from 'utils'
+import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
 import styles from './networkSetting.module.scss'
 
-const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: any }) => {
+const Label = ({ type, t }: { type: 'ckb' | 'ckb_testnet' | 'ckb_dev' | string; t: TFunction }) => {
   switch (type) {
     case 'ckb': {
       return <span className="label primary">{t('settings.network.mainnet')}</span>
@@ -31,53 +34,32 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
     backToTop()
   }, [])
 
-  const onChoiceChange = useCallback((_e, option?: IChoiceGroupOption) => {
-    if (option) {
-      setCurrentNetowrk(option.key)
-    }
-  }, [])
+  const { networkID: currentId } = chain
+
+  const onChoiceChange = useCallback(
+    (_e, option?: IChoiceGroupOption) => {
+      if (option && option.key !== currentId) {
+        setCurrentNetowrk(option.key)
+      }
+    },
+    [currentId]
+  )
 
   const goToCreateNetwork = useCallback(() => {
     history.push(`${RoutePath.NetworkEditor}/new`)
   }, [history])
 
-  const onContextMenu = useCallback(
-    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      e.stopPropagation()
-      e.preventDefault()
-      const { networkId } = (e.target as HTMLElement).dataset
-      const item = networks.find(n => n.id === networkId)
-      if (item) {
-        const isCurrent = item.id === chain.networkID
-        const isDefault = item.type === 0
-        const menuTemplate = [
-          {
-            label: t('common.select'),
-            enabled: !isCurrent,
-            click: () => {
-              setCurrentNetowrk(item.id)
-            },
-          },
-          {
-            label: t('common.edit'),
-            enabled: true,
-            click: () => {
-              history.push(`${RoutePath.NetworkEditor}/${item.id}`)
-            },
-          },
-          {
-            label: t('common.delete'),
-            enabled: !isDefault,
-            click: () => {
-              deleteNetwork(item.id)
-            },
-          },
-        ]
-        openContextMenu(menuTemplate)
-      }
-    },
-    [chain.networkID, networks, history, t]
-  )
+  const toggleBottomBorder = useToggleChoiceGroupBorder(`.${styles.networks}`, styles.hasBottomBorder)
+
+  useEffect(() => {
+    if (networks.length) {
+      toggleBottomBorder()
+    }
+  }, [toggleBottomBorder, networks.length])
+
+  useOnWindowResize(toggleBottomBorder)
+
+  const onHandleNetwork = useOnHandleNetwork({ history })
 
   return (
     <div className={styles.container}>
@@ -89,18 +71,35 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
             text: network.name,
             checked: chain.networkID === network.id,
             onRenderLabel: ({ text }: IChoiceGroupOption) => {
+              const isDefault = network.type === 0
               return (
                 <div
-                  className={styles.network}
-                  data-network-id={network.id}
-                  onContextMenu={onContextMenu}
+                  role="presentation"
+                  className={`ms-ChoiceFieldLabel ${styles.choiceLabel}`}
+                  data-id={network.id}
+                  data-action="select"
+                  onClick={onHandleNetwork}
                   title={`${text}: ${network.remote}`}
                 >
-                  <span className="ms-ChoiceFieldLabel" style={{ pointerEvents: 'none' }}>
+                  <span className={styles.networkLabel}>
                     {text}
+                    <span style={{ color: '#999', pointerEvents: 'none' }}>{`(${network.remote})`}</span>
+                    <Label type={network.chain} t={t} />
                   </span>
-                  <span style={{ color: '#999', pointerEvents: 'none' }}>{`(${network.remote})`}</span>
-                  <Label type={network.chain} t={t} />
+
+                  <button type="button" data-action="edit" aria-label={t('common.edit')} title={t('common.edit')}>
+                    <EditNetwork />
+                  </button>
+                  {isDefault ? null : (
+                    <button
+                      type="button"
+                      data-action="delete"
+                      aria-label={t('common.delete')}
+                      title={t('common.delete')}
+                    >
+                      <DeleteNetwork />
+                    </button>
+                  )}
                 </div>
               )
             },

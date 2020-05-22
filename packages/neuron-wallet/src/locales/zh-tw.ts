@@ -125,7 +125,7 @@ export default {
       transaction: {
         title: '交易: {{hash}}',
       },
-      'sign-and-verify':{
+      'sign-and-verify': {
         title: '簽名/驗證信息'
       },
     },
@@ -146,12 +146,18 @@ export default {
       error: '錯誤'
     },
   },
-  'export-debug-info':{
+  'export-debug-info': {
     'export-debug-info': '導出調試信息',
     'debug-info-exported': '調試信息已被導出至 {{ file }}'
   },
   about: {
     "app-version": "{{name}} 版本: {{version}}",
     "ckb-client-version": "CKB 節點版本: {{version}}"
+  },
+  settings: {
+    title: {
+      normal: '設置',
+      mac: '偏好設置'
+    }
   }
 }
