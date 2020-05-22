@@ -19,7 +19,7 @@ const exportHistory = ({
 }: ExportHistoryParms): Promise<number> => {
   return new Promise((resolve, reject) => {
     if (!dbPath) {
-      return reject(new Error(`Database is not required`))
+      return reject(new Error(`Database is required`))
     }
 
     if (!Array.isArray(lockHashList)) {
