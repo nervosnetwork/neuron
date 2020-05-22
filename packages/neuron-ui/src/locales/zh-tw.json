@@ -115,7 +115,7 @@
       "fee": "交易費",
       "advanced-fee-settings": "交易費高級設定",
       "price": "單價",
-      "expected-speed": "預期成交速度",
+      "pick-price": "快速選擇單價",
       "total-cycles": "RISC-V Cycles 總數",
       "scan-screen-qr-code": "掃描荧幕上的二維碼",
       "set-locktime": "設置鎖定時間",

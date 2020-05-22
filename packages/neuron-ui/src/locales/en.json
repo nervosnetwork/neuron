@@ -115,7 +115,7 @@
       "fee": "Transaction Fee",
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
-      "expected-speed": "Expected speed",
+      "pick-price": "Quick Pick Price",
       "total-cycles": "Total RISC-V Cycles",
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",

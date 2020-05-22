@@ -35,10 +35,10 @@ export enum CapacityUnit {
 }
 
 export enum Price {
-  Immediately = '18000',
-  TenBlocks = '6000',
-  HundredBlocks = '3000',
-  FiveHundredsBlocks = '0',
+  High = '5000',
+  Medium = '2000',
+  Low = '1000',
+  Zero = '0',
 }
 
 export const PlaceHolders = {
