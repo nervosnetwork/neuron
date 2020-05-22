@@ -171,6 +171,10 @@ export default {
         "tx-type": "Transaction Type",
         "amount": "Amount",
         "description": "Description"
+      },
+      "tx-type": {
+        "send": "Send",
+        "receive": "Receive"
       }
     }
   },

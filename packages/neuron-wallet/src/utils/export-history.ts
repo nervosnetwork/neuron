@@ -37,6 +37,9 @@ const exportHistory = ({
     let total: number | undefined
     let inserted = 0
 
+    const SEND_TYPE = i18n.t('export-transactions.tx-type.send')
+    const RECEIVE_TYPE = i18n.t('export-transactions.tx-type.receive')
+
     const writeStream = fs.createWriteStream(filePath)
     writeStream.write(
       `${['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'description']
@@ -78,9 +81,9 @@ const exportHistory = ({
             const totalOutput = BigInt(outputShannon || `0`)
             let txType = `-`
             if (totalInput > totalOutput) {
-              txType = 'Send'
+              txType = SEND_TYPE
             } else if (totalInput < totalOutput) {
-              txType = 'Receive'
+              txType = RECEIVE_TYPE
             }
             const amount = shannonToCKB(totalOutput - totalInput)
             writeStream.write(

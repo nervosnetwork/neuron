@@ -169,7 +169,12 @@ export default {
         "tx-type": "交易類型",
         "amount": "金額",
         "description": "備註"
+      },
+      "tx-type": {
+        "send": "轉賬",
+        "receive": "收款"
       }
     }
   },
 }
+

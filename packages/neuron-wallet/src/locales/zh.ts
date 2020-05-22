@@ -170,6 +170,10 @@ export default {
         "tx-type": "交易类型",
         "amount": "金额",
         "description": "备注"
+      },
+      "tx-type": {
+        "send": "转账",
+        "receive": "收款"
       }
     }
   },
