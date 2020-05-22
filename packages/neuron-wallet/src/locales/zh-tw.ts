@@ -149,5 +149,9 @@ export default {
   'export-debug-info':{
     'export-debug-info': '導出調試信息',
     'debug-info-exported': '調試信息已被導出至 {{ file }}'
+  },
+  about: {
+    "app-version": "{{name}} 版本: {{version}}",
+    "ckb-client-version": "CKB 節點版本: {{version}}"
   }
 }

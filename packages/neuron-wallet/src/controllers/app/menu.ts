@@ -1,8 +1,9 @@
+import fs from 'fs'
+import path from 'path'
 import {
   app,
   shell,
   BrowserWindow,
-  dialog,
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
@@ -13,6 +14,7 @@ import ExportDebugController from 'controllers/export-debug'
 import { showWindow } from 'controllers/app/show-window'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
+import logger from 'utils/logger'
 
 enum URL {
   Preference = '/settings/general',
@@ -34,15 +36,20 @@ const separator: MenuItemConstructorOptions = {
 }
 
 const showAbout = () => {
-  const options = {
-    type: 'info',
-    title: app.name,
-    message: app.name,
-    detail: app.getVersion(),
-    buttons: ['OK'],
-    cancelId: 0,
+  let applicationVersion = i18n.t('about.app-version', { name: app.name, version: app.getVersion() })
+
+  const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
+  const ckbVersionPath = path.join(appPath, '.ckb-version')
+  if (fs.existsSync(ckbVersionPath)) {
+    try {
+      const ckbVersion = fs.readFileSync(ckbVersionPath, 'utf8')
+      applicationVersion += `\n${i18n.t('about.ckb-client-version', { version: ckbVersion })}`
+    } catch (err) {
+      logger.error(`[Menu]: `, err)
+    }
   }
-  dialog.showMessageBox(options)
+  app.setAboutPanelOptions({ applicationVersion, version: '' })
+  app.showAboutPanel()
 }
 
 const navigateTo = (url: string) => {
@@ -77,16 +84,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: i18n.t('application-menu.neuron.about', {
           app: app.name,
         }),
-        role: 'about',
         click: () => { showAbout() },
       },
       {
         label: i18n.t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
-           new UpdateController().checkUpdates()
-           navigateTo(URL.Preference)
-         }
+          new UpdateController().checkUpdates()
+          navigateTo(URL.Preference)
+        }
       },
       separator,
       {
@@ -295,7 +301,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: i18n.t('application-menu.neuron.about', {
         app: app.name
       }),
-      role: 'about',
       click: () => { showAbout() }
     })
   }
