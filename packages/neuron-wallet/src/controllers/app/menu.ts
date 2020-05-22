@@ -4,6 +4,7 @@ import {
   app,
   shell,
   BrowserWindow,
+  dialog,
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
@@ -48,6 +49,22 @@ const showAbout = () => {
       logger.error(`[Menu]: `, err)
     }
   }
+
+  const isWin = process.platform === 'win32'
+
+  if (isWin) {
+    const options = {
+      type: 'info',
+      title: app.name,
+      message: app.name,
+      detail: applicationVersion,
+      buttons: ['OK'],
+      cancelId: 0,
+    }
+    dialog.showMessageBox(options)
+    return
+  }
+
   app.setAboutPanelOptions({ applicationVersion, version: '' })
   app.showAboutPanel()
 }
