@@ -72,7 +72,7 @@ const exportHistory = ({
             output.transactionHash
           `,
           [row.hash],
-          async (err, { outputShannon }) => {
+          async (err, { outputShannon } = { outputShannon: '0' }) => {
             if (err) {
               return reject(err)
             }
