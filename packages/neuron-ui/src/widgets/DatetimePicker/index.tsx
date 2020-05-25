@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Calendar } from '@bit/primefaces.primereact.calendar'
 import Button from 'widgets/Button'
 import { useTranslation } from 'react-i18next'
@@ -38,8 +38,8 @@ const DatetimePicker = ({
 }: DatetimePickerProps) => {
   const [t] = useTranslation()
   const [status, setStatus] = useState<'done' | 'edit'>('done')
-  const [datetime, setDatetime] = useState<any>(preset ? new Date(+preset) : null)
-  const [display, setDisplay] = useState<any>(formatDate(new Date(datetime)))
+  const [display, setDisplay] = useState<string>(preset ? formatDate(new Date(+preset)) : '')
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const locale: any = {
     firstDayOfWeek: 0,
@@ -65,29 +65,29 @@ const DatetimePicker = ({
     ].map(monname => t(`datetime.${monname}.short`)),
   }
 
-  let selected: Date | undefined = new Date(display)
-  if (selected.toString() === 'Invalid Date') {
+  let selected: Date | undefined = display ? new Date(display) : undefined
+  if (selected?.toString() === 'Invalid Date') {
     selected = undefined
   }
 
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const isSinceTomorrow = new Date(display).getTime() >= new Date(tomorrow.toDateString()).getTime()
+  const isSinceTomorrow = display ? new Date(display).getTime() >= new Date(tomorrow.toDateString()).getTime() : false
   const disabled = !selected || !isSinceTomorrow
 
   const onEdit = () => {
     setStatus('edit')
   }
 
-  const onSelected = useCallback(
-    e => {
-      if (e.target.tagName === 'SPAN' && e.target.className !== 'p-disabled') {
-        setDisplay(formatDate(new Date(datetime)))
-        setStatus('done')
-      }
-    },
-    [setDisplay, datetime]
-  )
+  useEffect(() => {
+    if (status === 'edit' && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [status, inputRef])
+
+  const onInputBlur = useCallback(() => {
+    setStatus('done')
+  }, [setStatus])
 
   const onInput = useCallback(
     e => {
@@ -98,13 +98,14 @@ const DatetimePicker = ({
 
   const onCalendarChange = useCallback(
     e => {
-      setDatetime(e.value)
+      setDisplay(formatDate(new Date(+e.value)))
+      setStatus('done')
     },
-    [setDatetime]
+    [setDisplay, setStatus]
   )
 
   const onSubmit = useCallback(() => {
-    if (disabled) {
+    if (disabled || !display) {
       return
     }
     onConfirm(new Date(display).getTime())
@@ -125,13 +126,11 @@ const DatetimePicker = ({
     <div className={styles.container} onClick={onCancel} role="presentation">
       <div
         role="presentation"
-        onDoubleClick={onSelected}
         className={styles.popup}
         onClick={e => {
           e.stopPropagation()
           e.preventDefault()
         }}
-        data-status={status}
       >
         {title ? <div className={styles.title}>{title}</div> : null}
         <div className={styles.timezone}>
@@ -144,7 +143,14 @@ const DatetimePicker = ({
             <span>{display}</span>
           </div>
         ) : (
-          <input placeholder={t('send.release-on')} value={display} onChange={onInput} onKeyPress={onKeyPress} />
+          <input
+            ref={inputRef}
+            placeholder={t('send.release-on')}
+            value={display}
+            onChange={onInput}
+            onBlur={onInputBlur}
+            onKeyPress={onKeyPress}
+          />
         )}
         <Calendar
           value={selected}
