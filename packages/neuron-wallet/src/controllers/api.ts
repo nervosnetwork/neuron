@@ -112,11 +112,11 @@ export default class ApiController {
 
       const transactions = currentWallet
         ? await this.transactionsController.getAll({
-            pageNo: 1,
-            pageSize: 15,
-            keywords: '',
-            walletID: currentWallet.id,
-          }).then(res => res.result)
+          pageNo: 1,
+          pageSize: 15,
+          keywords: '',
+          walletID: currentWallet.id,
+        }).then(res => res.result)
         : []
 
       const initState = {
@@ -236,7 +236,9 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }), {
+        height: 750
+      })
     })
 
     handle('export-transactions', async (_, params: { walletID: string }) => {
