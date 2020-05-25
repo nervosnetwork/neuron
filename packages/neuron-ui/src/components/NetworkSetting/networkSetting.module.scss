@@ -25,6 +25,9 @@
     width: 500px;
   }
   button {
+    display: flex;
+    height: 1.25rem;
+    align-items: center;
     visibility: hidden;
     appearance: none;
     margin: 0 0 0 10px;

@@ -112,11 +112,11 @@ export default class ApiController {
 
       const transactions = currentWallet
         ? await this.transactionsController.getAll({
-          pageNo: 1,
-          pageSize: 15,
-          keywords: '',
-          walletID: currentWallet.id,
-        }).then(res => res.result)
+            pageNo: 1,
+            pageSize: 15,
+            keywords: '',
+            walletID: currentWallet.id,
+          }).then(res => res.result)
         : []
 
       const initState = {
