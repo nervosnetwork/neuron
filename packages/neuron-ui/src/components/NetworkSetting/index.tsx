@@ -83,7 +83,7 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                 >
                   <span className={styles.networkLabel}>
                     {text}
-                    <span style={{ color: '#999', pointerEvents: 'none' }}>{`(${network.remote})`}</span>
+                    <span className={styles.url}>{`(${network.remote}`}</span>
                     <Label type={network.chain} t={t} />
                   </span>
 

@@ -36,6 +36,9 @@
     white-space: nowrap;
   }
   button {
+    display: flex;
+    align-items: center;
+    height: 1.25rem;
     visibility: hidden;
     appearance: none;
     margin: 0 0 0 10px;

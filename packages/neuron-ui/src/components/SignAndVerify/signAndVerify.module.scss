@@ -4,12 +4,19 @@ $inputHeight: 26px;
 .container {
   .title {
     @include bold-text;
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+    margin: 0 0 5px;
+    padding: 0;
   }
 
   .label {
     @include medium-text;
-    margin: 0 0 4px 0;
     padding: 0;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 44px;
+    font-weight: 600;
   }
 
   input,
