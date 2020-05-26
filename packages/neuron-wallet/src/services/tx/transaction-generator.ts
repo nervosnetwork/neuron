@@ -19,6 +19,7 @@ import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
 import AssetAccountInfo from 'models/asset-account-info'
 import BufferUtils from 'utils/buffer'
+import assert from 'assert'
 
 export interface TargetOutput {
   address: string
@@ -542,6 +543,9 @@ export class TransactionGenerator {
       tx.addOutput(output)
     }
 
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateCreateAnyoneCanPayTx capacity not match!')
+
     return tx
   }
 
@@ -594,6 +598,9 @@ export class TransactionGenerator {
       TransactionSize.emptyWitness() * (allInputs.length - keyCount)
     tx.fee = mode.isFeeMode() ? fee : TransactionFee.fee(txSize, feeRateInt).toString()
     tx.outputs[0].capacity = (totalCapacity - BigInt(tx.fee)).toString()
+
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateCreateAnyoneCanPayTxUseAllBalance capacity not match!')
 
     return tx
   }
@@ -666,6 +673,9 @@ export class TransactionGenerator {
     tx.fee = result.finalFee
     tx.anyoneCanPaySendAmount = result.sendCapacity
 
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateAnyoneCanPayToCKBTx capacity not match!')
+
     return tx
   }
 
@@ -737,7 +747,31 @@ export class TransactionGenerator {
     tx.sudtInfo = amount === 'all' ? { amount: result.amount }: { amount }
     tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
 
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateAnyoneCanPayToSudtTx capacity not match!')
+    TransactionGenerator.checkTxSudtAmount(tx, 'generateAnyoneCanPayToSudtTx sUDT amount not match!', assetAccountInfo)
+
     return tx
+  }
+
+  private static checkTxCapacity(tx: Transaction, msg: string) {
+    const inputCapacity = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
+    const outputCapacity = tx.outputs.map(o => BigInt(o.capacity!)).reduce((result, c) => result + c, BigInt(0))
+    assert.equal(inputCapacity.toString(), (outputCapacity + BigInt(tx.fee!)).toString(), `${msg}: ${JSON.stringify(tx)}`)
+  }
+
+  private static checkTxSudtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {
+    const inputAmount = tx.inputs
+      .filter(i => i.type && assetAccountInfo.isSudtScript(i.type))
+      .map(i => BufferUtils.readBigUInt128LE(i.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const outputAmount = tx.outputs
+      .filter(o => o.type && assetAccountInfo.isSudtScript(o.type))
+      .map(o => BufferUtils.readBigUInt128LE(o.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    assert.equal(inputAmount.toString(), outputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
   }
 }
 
