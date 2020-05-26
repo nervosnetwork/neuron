@@ -37,6 +37,7 @@ const Settings = () => {
   useEffect(() => {
     const isMac = getPlatform() === 'darwin'
     window.document.title = i18n.t(`settings.title.${isMac ? 'mac' : 'normal'}`)
+    // eslint-disable-next-line
   }, [i18n.language])
 
   useEffect(() => {

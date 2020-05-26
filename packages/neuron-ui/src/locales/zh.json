@@ -169,6 +169,7 @@
       "copy-address": "复制地址"
     },
     "transaction": {
+      "window-title": "交易: {{hash}}",
       "date": "时间",
       "transaction-hash": "交易哈希",
       "block-number": "区块高度",
@@ -471,6 +472,7 @@
       "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {
+      "window-title": "签名/验签信息",
       "sign-or-verify-message": "签名/验签信息",
       "message": "信息",
       "address": "地址",
