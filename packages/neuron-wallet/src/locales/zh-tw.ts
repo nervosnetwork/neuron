@@ -126,7 +126,7 @@ export default {
         title: '交易: {{hash}}',
       },
       'sign-and-verify': {
-        title: '簽名/驗證信息'
+        title: '簽名/驗簽信息'
       },
     },
     prompt: {

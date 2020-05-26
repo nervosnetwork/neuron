@@ -13,9 +13,8 @@ import {
 import { ckbCore } from 'services/chain'
 
 import { transactionState } from 'states/init/chain'
-import CopyZone from 'widgets/CopyZone'
-
 import {
+  useOnLocaleChange,
   ErrorCode,
   CONSTANTS,
   localNumberFormatter,
@@ -24,18 +23,28 @@ import {
   useExitOnWalletChange,
   isSuccessResponse,
 } from 'utils'
+import CopyZone from 'widgets/CopyZone'
+
 import styles from './transaction.module.scss'
 
 const { MAINNET_TAG } = CONSTANTS
 
 const Transaction = () => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [systemCodeHash, setSystemCodeHash] = useState<string>('')
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
+  const hash = useMemo(() => window.location.href.split('/').pop(), [])
+
+  useOnLocaleChange(i18n)
+
+  useEffect(() => {
+    window.document.title = i18n.t(`transaction.window-title`, { hash })
+    // eslint-disable-next-line
+  }, [i18n.language, hash])
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -58,7 +67,6 @@ const Transaction = () => {
 
     const currentWallet = currentWalletCache.load()
     if (currentWallet) {
-      const hash = window.location.href.split('/').pop()
       if (!hash) {
         showErrorMessage(
           t(`messages.error`),
@@ -85,7 +93,7 @@ const Transaction = () => {
           })
         })
     }
-  }, [t])
+  }, [t, hash])
 
   useExitOnWalletChange()
 

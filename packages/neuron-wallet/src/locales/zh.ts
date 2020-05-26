@@ -34,7 +34,7 @@ export default {
       },
       tools: {
         label: "工具",
-        "sign-and-verify": "签名/验证信息",
+        "sign-and-verify": "签名/验签信息",
       },
       window: {
         label: '窗口',

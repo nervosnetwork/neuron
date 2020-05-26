@@ -169,6 +169,7 @@
       "copy-address": "Copy Address"
     },
     "transaction": {
+      "window-title": "Transaction: {{hash}}",
       "date": "Date",
       "transaction-hash": "Transaction Hash",
       "block-number": "Block Number",
@@ -471,6 +472,7 @@
       "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
+      "window-title": "Sign or Verify Message",
       "sign-or-verify-message": "Sign or Verify Message",
       "message": "Message",
       "address": "Address",
