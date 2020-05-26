@@ -12,6 +12,16 @@ if (UTC > 0) {
   UTC = `UTC${UTC}`
 }
 
+export const formatDate = (datetime: Date) => {
+  const month = (datetime.getMonth() + 1).toString().padStart(2, '0')
+  const date = datetime
+    .getDate()
+    .toString()
+    .padStart(2, '0')
+  const year = datetime.getFullYear()
+  return `${month}/${date}/${year}`
+}
+
 export interface DatetimePickerProps {
   title?: string
   preset?: Date | string | number | null
@@ -29,7 +39,7 @@ const DatetimePicker = ({
   const [t] = useTranslation()
   const [status, setStatus] = useState<'done' | 'edit'>('done')
   const [datetime, setDatetime] = useState<any>(preset ? new Date(+preset) : null)
-  const [display, setDisplay] = useState<any>(new Date(datetime).toLocaleDateString())
+  const [display, setDisplay] = useState<any>(formatDate(new Date(datetime)))
 
   const locale: any = {
     firstDayOfWeek: 0,
@@ -72,7 +82,7 @@ const DatetimePicker = ({
   const onSelected = useCallback(
     e => {
       if (e.target.tagName === 'SPAN' && e.target.className !== 'p-disabled') {
-        setDisplay(new Date(datetime).toLocaleDateString())
+        setDisplay(formatDate(new Date(datetime)))
         setStatus('done')
       }
     },

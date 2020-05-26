@@ -38,7 +38,7 @@ import {
   verifyAddress,
 } from 'utils'
 
-import DatetimePicker from 'widgets/DatetimePicker'
+import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -304,7 +304,7 @@ const Send = () => {
                   <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
-                    {item.date ? `${t('send.release-on')}: ${new Date(+item.date).toLocaleDateString()}` : null}
+                    {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
                     <button type="button" data-index={idx} onClick={onLocktimeClick}>
                       {item.date ? (
                         <>
