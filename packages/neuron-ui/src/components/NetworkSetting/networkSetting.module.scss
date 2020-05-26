@@ -1,3 +1,5 @@
+@import '../../styles/mixin.scss';
+
 .container {
   display: grid;
   grid-template: 'networks' auto 'actions' auto;
@@ -22,7 +24,19 @@
     display: flex;
     align-items: center;
     pointer-events: none;
-    width: 500px;
+    .url {
+      position: relative;
+      @include text-overflow-ellipsis;
+      max-width: 650px;
+      color: #999;
+      pointer-events: none;
+      padding-right: 0.6em;
+      &:before {
+        position: absolute;
+        right: 0;
+        content: ')';
+      }
+    }
   }
   button {
     display: flex;

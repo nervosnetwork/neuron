@@ -14,6 +14,7 @@ $hover-bg-color: #3cc68a4d;
     display: flex;
     align-items: center;
     line-height: 1em;
+    word-break: break-all;
 
     &::before {
       position: absolute;
