@@ -17,33 +17,32 @@ import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import appState from 'states/initStates/app'
+import { useState as useGlobalState, useDispatch } from 'states'
+import appState from 'states/init/app'
 
 import {
   PlaceHolders,
   ErrorCode,
-  MAX_DECIMAL_DIGITS,
-  MAINNET_TAG,
   SyncStatus,
   SyncStatusThatBalanceUpdating,
   ConnectionStatus,
-  SINCE_FIELD_SIZE,
-} from 'utils/const'
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
-import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
-import {
+  CONSTANTS,
+  shannonToCKBFormatter,
+  localNumberFormatter,
+  getCurrentUrl,
+  getSyncStatus,
   verifyTotalAmount,
   verifyTransactionOutputs,
   verifyAmount,
   verifyAmountRange,
   verifyAddress,
-} from 'utils/validators'
+} from 'utils'
 
-import DatetimePicker from 'widgets/DatetimePicker'
+import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
+
+const { MAX_DECIMAL_DIGITS, MAINNET_TAG, SINCE_FIELD_SIZE } = CONSTANTS
 
 const Send = () => {
   const {
@@ -305,7 +304,7 @@ const Send = () => {
                   <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
-                    {item.date ? `${t('send.release-on')}: ${new Date(+item.date).toLocaleDateString()}` : null}
+                    {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
                     <button type="button" data-index={idx} onClick={onLocktimeClick}>
                       {item.date ? (
                         <>

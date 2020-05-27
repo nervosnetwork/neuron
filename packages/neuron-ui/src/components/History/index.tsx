@@ -1,14 +1,16 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, SearchBox } from 'office-ui-fabric-react'
 import { Pagination } from '@uifabric/experiments'
 
 import TransactionList from 'components/TransactionList'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
+import { useState as useGlobalState, useDispatch } from 'states'
+import Button from 'widgets/Button'
+import { exportTransactions } from 'services/remote'
+import { ReactComponent as Export } from 'widgets/Icons/ExportHistory.svg'
 
-import { Routes } from 'utils/const'
-import isMainnetUtil from 'utils/isMainnet'
+import { RoutePath, isMainnet as isMainnetUtil } from 'utils'
 
 import { useSearch } from './hooks'
 import styles from './history.module.scss'
@@ -31,10 +33,21 @@ const History = () => {
   const [t] = useTranslation()
   const history = useHistory()
   const { search } = useLocation()
+  const [isExporting, setIsExporting] = useState(false)
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const { keywords, onKeywordsChange } = useSearch(search, id, dispatch)
-  const onSearch = useCallback(() => history.push(`${Routes.History}?keywords=${keywords}`), [history, keywords])
+  const onSearch = useCallback(() => history.push(`${RoutePath.History}?keywords=${keywords}`), [history, keywords])
+  const onExport = useCallback(() => {
+    setIsExporting(true)
+    const timer = setTimeout(() => {
+      setIsExporting(false)
+    }, 3000)
+    exportTransactions({ walletID: id }).finally(() => {
+      clearTimeout(timer)
+      setIsExporting(false)
+    })
+  }, [id, setIsExporting])
 
   const tipBlockNumber = useMemo(() => {
     return Math.max(+syncedBlockNumber, +chainBlockNumber).toString()
@@ -43,21 +56,36 @@ const History = () => {
   const List = useMemo(() => {
     return (
       <Stack className={styles.history}>
-        <SearchBox
-          value={keywords}
-          styles={{
-            root: {
-              background: '#e3e3e3',
-              border: 'none',
-              borderRadius: 0,
-              fontSize: '1rem',
-            },
-          }}
-          placeholder={t('history.search.placeholder')}
-          onChange={onKeywordsChange}
-          onSearch={onSearch}
-          iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
-        />
+        <div className={styles.tools}>
+          <SearchBox
+            value={keywords}
+            className={styles.searchBox}
+            styles={{
+              root: {
+                background: '#e3e3e3',
+                borderRadius: 0,
+                fontSize: '1rem',
+                border: '1px solid rgb(204, 204, 204)',
+                borderTopLeftRadius: 2,
+                borderBottomLeftRadius: 2,
+              },
+            }}
+            placeholder={t('history.search.placeholder')}
+            onChange={onKeywordsChange}
+            onSearch={onSearch}
+            iconProps={{ iconName: 'Search', styles: { root: { height: '18px' } } }}
+          />
+          <Button className={styles.searchBtn} type="default" label={t('history.search.button')} onClick={onSearch} />
+          <Button
+            className={styles.exportBtn}
+            type="primary"
+            disabled={isExporting}
+            onClick={onExport}
+            label={t('history.export-history')}
+          >
+            <Export />
+          </Button>
+        </div>
         <div className={styles.listContainer}>
           {totalCount ? (
             <TransactionList
@@ -90,7 +118,7 @@ const History = () => {
               lastPageIconProps={{ iconName: 'LastPage' }}
               format="buttons"
               onPageChange={(idx: number) => {
-                history.push(`${Routes.History}?pageNo=${idx + 1}&keywords=${keywords}`)
+                history.push(`${RoutePath.History}?pageNo=${idx + 1}&keywords=${keywords}`)
               }}
             />
           ) : null}
@@ -112,6 +140,8 @@ const History = () => {
     history,
     isMainnet,
     t,
+    isExporting,
+    onExport,
   ])
 
   return List

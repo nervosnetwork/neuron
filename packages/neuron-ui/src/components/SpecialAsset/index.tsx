@@ -1,11 +1,9 @@
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import Balance from 'widgets/Balance'
+import CopyZone from 'widgets/CopyZone'
 import { openExternal } from 'services/remote'
-import { uniformTimeFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import getExplorerUrl from 'utils/getExplorerUrl'
-import { ConnectionStatus } from 'utils/const'
+import { ConnectionStatus, uniformTimeFormatter, shannonToCKBFormatter, getExplorerUrl } from 'utils'
 import styles from './specialAsset.module.scss'
 
 const MS_PER_EPOCHS = 4 * 60 * 60 * 1000
@@ -55,15 +53,15 @@ const SpecialAsset = ({
     openExternal(`${explorerUrl}/transaction/${txHash}#${index}`)
   }, [isMainnet, txHash, index])
 
+  const balance = shannonToCKBFormatter(capacity)
+
   return (
     <div className={styles.container}>
       <div className={styles.datetime}>
         <span>{date}</span>
         <span>{time}</span>
       </div>
-      <div className={styles.capacity}>
-        <Balance balance={shannonToCKBFormatter(capacity)} />
-      </div>
+      <CopyZone className={styles.capacity} content={balance.replace(/,/g, '')}>{`${balance} CKB`}</CopyZone>
       <div className={styles.indicators}>
         <div data-on={hasTypeScript} data-tooltip="Type">
           T

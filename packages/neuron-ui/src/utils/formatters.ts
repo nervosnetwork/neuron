@@ -1,4 +1,4 @@
-import { CapacityUnit } from './const'
+import { CapacityUnit } from './enums'
 
 const base = 10e9
 const numberParser = (value: string, exchange: string) => {
@@ -211,17 +211,4 @@ export const difficultyFormatter = (value: bigint) => {
   /* eslint-enable no-restricted-syntax */
 
   return `${localNumberFormatter(value)} H`
-}
-
-export default {
-  queryFormatter,
-  currencyFormatter,
-  CKBToShannonFormatter,
-  shannonToCKBFormatter,
-  localNumberFormatter,
-  uniformTimeFormatter,
-  difficultyFormatter,
-  addressesToBalance,
-  outputsToTotalAmount,
-  failureResToNotification,
 }

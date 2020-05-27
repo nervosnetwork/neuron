@@ -16,7 +16,6 @@
       "receive": "收款",
       "history": "交易历史",
       "addresses": "地址管理",
-      "settings": "设置",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
@@ -53,7 +52,8 @@
         "failed": "失败",
         "pending": "已提交",
         "confirming": "确认中"
-      }
+      },
+      "copy-balance": "复制余额"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "欢迎使用 Neuron",
@@ -115,7 +115,7 @@
       "fee": "交易费",
       "advanced-fee-settings": "交易费高级设置",
       "price": "单价",
-      "expected-speed": "预期成交速度",
+      "pick-price": " 快速选择单价",
       "total-cycles": "RISC-V Cycles 总数",
       "scan-screen-qr-code": "扫描屏幕上的二维码",
       "set-locktime": "设置锁定时间",
@@ -123,7 +123,7 @@
       "release-on": "锁定至"
     },
     "receive": {
-      "click-to-copy": "点击复制地址",
+      "copy-address": "复制地址",
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
       "address-qrcode": "地址二维码",
@@ -155,15 +155,21 @@
       "blockNumber": "区块高度",
       "basic-information": "基本信息",
       "search": {
+        "button": "搜索",
         "placeholder": "使用交易哈希、地址或日期(yyyy-mm-dd)进行搜索"
       },
+      "export-history": "导出交易历史",
       "confirmations": "确认次数",
       "confirming-with-count": " 已确认 {{confirmations}} 次",
       "view-on-explorer": "在浏览器中查看",
       "copy-transaction-hash": "复制交易哈希",
-      "no-txs": "没有交易记录"
+      "no-txs": "没有交易记录",
+      "copy-tx-hash": "复制交易 Hash",
+      "copy-balance": "复制余额",
+      "copy-address": "复制地址"
     },
     "transaction": {
+      "window-title": "交易: {{hash}}",
       "date": "时间",
       "transaction-hash": "交易哈希",
       "block-number": "区块高度",
@@ -193,6 +199,10 @@
       "view-on-explorer": "在浏览器中查看"
     },
     "settings": {
+      "title": {
+        "normal": "设置",
+        "mac": "偏好设置"
+      },
       "go-to-overview": "返回总览画面",
       "setting-tabs": {
         "general": "通用",
@@ -202,9 +212,13 @@
       "general": {
         "clear-cache": "清空缓存",
         "clearing-cache": "清空中...",
-        "clear-cache-description": "当数据同步或显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
+        "clear-cache-description": "当数据同步或余额显示出现问题时，可以清空缓存，Neuron 会重新同步所有块数据。",
         "show": "显示",
-        "hide": "隐藏"
+        "hide": "隐藏",
+        "version": "版本",
+        "language": "语言",
+        "cache-cleared-on": "上次清空缓存时间 {{date}}",
+        "apply": "应用"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -232,6 +246,12 @@
         "mainnet": "主网",
         "testnet": "测试网",
         "devnet": "开发网"
+      },
+      "locale": {
+        "en": "English",
+        "en-US": "English(United States)",
+        "zh": "中文(简体)",
+        "zh-TW": "中文(繁體)"
       }
     },
     "password-request": {
@@ -272,7 +292,9 @@
       "edit": "编辑",
       "delete": "删除",
       "click-to-edit": "点击编辑",
-      "notice": "注意事项"
+      "notice": "注意事项",
+      "copy": "复制",
+      "copied": "已复制"
     },
     "notification-panel": {
       "title": "通知中心"
@@ -361,6 +383,7 @@
       "free": "当前可用",
       "locked": "已锁定",
       "deposit": "存入",
+      "copy-balance": "复制余额",
       "deposit-records": "存入",
       "completed-records": "已解锁",
       "apc": "当前年化锁定补贴率",
@@ -420,8 +443,7 @@
       "checking-updates": "正在检查...",
       "downloading-update": "正在下载更新...",
       "update-not-available": "已经在使用最新版本",
-      "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载。要下载和安装吗？",
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下载",
       "download-update": "下载安装",
       "updates-downloaded-about-to-quit-and-install": "下载完成。请安装新版本。",
       "quit-and-install": "安装并重启应用"
@@ -450,6 +472,7 @@
       "start-tomorrow": "所选时间不能早于明天。"
     },
     "sign-and-verify": {
+      "window-title": "签名/验签信息",
       "sign-or-verify-message": "签名/验签信息",
       "message": "信息",
       "address": "地址",

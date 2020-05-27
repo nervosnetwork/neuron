@@ -5,7 +5,7 @@ export interface CompensationPeriodParams {
   endEpochValue: number
 }
 
-const getCompensationPeriod = ({ currentEpochValue, endEpochValue }: CompensationPeriodParams) => {
+export const getCompensationPeriod = ({ currentEpochValue, endEpochValue }: CompensationPeriodParams) => {
   const pastEpochs = currentEpochValue - endEpochValue + WITHDRAW_EPOCHS
   const totalHours = Math.ceil((WITHDRAW_EPOCHS - pastEpochs) * HOURS_PER_EPOCH)
   const leftDays = Math.floor(totalHours / HOURS_PER_DAY)

@@ -13,7 +13,7 @@ afterSign: scripts/notarize.js
 files:
   - from: "../.."
     to: "."
-    filter: ["!**/*", "ormconfig.json"]
+    filter: ["!**/*", ".ckb-version", "ormconfig.json"]
   - package.json
   - dist
   - "!**/*.map"

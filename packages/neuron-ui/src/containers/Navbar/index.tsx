@@ -2,26 +2,33 @@ import React from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useState as useGlobalState } from 'states/stateProvider'
+import { useState as useGlobalState } from 'states'
+
+import { showSettings } from 'services/remote'
 
 import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import getSyncStatus from 'utils/getSyncStatus'
-import getCurrentUrl from 'utils/getCurrentUrl'
-import { Routes, FULL_SCREENS } from 'utils/const'
+import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange } from 'utils'
 
 import styles from './navbar.module.scss'
 
+export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`]
+
 const menuItems = [
-  { name: 'navbar.overview', key: Routes.Overview.slice(1), url: Routes.Overview, experimental: false },
-  { name: 'navbar.send', key: Routes.Send.slice(1), url: Routes.Send, experimental: false },
-  { name: 'navbar.receive', key: Routes.Receive.slice(1), url: Routes.Receive, experimental: false },
-  { name: 'navbar.history', key: Routes.History.slice(1), url: Routes.History, experimental: false },
-  { name: 'navbar.nervos-dao', key: Routes.NervosDAO.slice(1), url: Routes.NervosDAO, experimental: false },
-  { name: 'navbar.special-assets', key: Routes.SpecialAssets.slice(1), url: Routes.SpecialAssets, experimental: true },
-  { name: 'navbar.addresses', key: Routes.Addresses.slice(1), url: Routes.Addresses, experimental: false },
+  { name: 'navbar.overview', key: RoutePath.Overview.slice(1), url: RoutePath.Overview, experimental: false },
+  { name: 'navbar.send', key: RoutePath.Send.slice(1), url: RoutePath.Send, experimental: false },
+  { name: 'navbar.receive', key: RoutePath.Receive.slice(1), url: RoutePath.Receive, experimental: false },
+  { name: 'navbar.history', key: RoutePath.History.slice(1), url: RoutePath.History, experimental: false },
+  { name: 'navbar.nervos-dao', key: RoutePath.NervosDAO.slice(1), url: RoutePath.NervosDAO, experimental: false },
+  {
+    name: 'navbar.special-assets',
+    key: RoutePath.SpecialAssets.slice(1),
+    url: RoutePath.SpecialAssets,
+    experimental: true,
+  },
+  { name: 'navbar.addresses', key: RoutePath.Addresses.slice(1), url: RoutePath.Addresses, experimental: false },
 ]
 
 const Navbar = () => {
@@ -34,7 +41,8 @@ const Navbar = () => {
     chain: { connectionStatus, networkID, tipBlockNumber: syncedBlockNumber = '0' },
     settings: { wallets = [], networks = [] },
   } = neuronWallet
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
 
   const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
   const selectedKey: string | null = selectedTab ? selectedTab.key : null
@@ -96,7 +104,7 @@ const Navbar = () => {
         className={styles.name}
         title={name}
         aria-label={name}
-        onClick={() => history.push(Routes.SettingsWallets)}
+        onClick={() => showSettings({ tab: 'wallets' })}
       >
         {name}
       </button>
@@ -115,7 +123,7 @@ const Navbar = () => {
           syncedBlockNumber={syncedBlockNumber}
           networkName={networkName}
           connectionStatus={connectionStatus}
-          onAction={() => history.push(Routes.SettingsNetworks)}
+          onAction={() => showSettings({ tab: 'networks' })}
         />
       </div>
       <div className={styles.sync}>

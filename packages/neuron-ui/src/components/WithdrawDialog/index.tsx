@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
-import { shannonToCKBFormatter, localNumberFormatter } from 'utils/formatters'
+
+import { CONSTANTS, shannonToCKBFormatter, localNumberFormatter, useCalculateEpochs, useDialog } from 'utils'
 import { calculateDaoMaximumWithdraw, getHeader } from 'services/chain'
-import { useCalculateEpochs, useDialog } from 'utils/hooks'
-import { WITHDRAW_EPOCHS } from 'utils/const'
 
 import styles from './withdrawDialog.module.scss'
+
+const { WITHDRAW_EPOCHS } = CONSTANTS
 
 const WithdrawDialog = ({
   onDismiss,

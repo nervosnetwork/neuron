@@ -1,4 +1,4 @@
-import { ErrorCode } from 'utils/const'
+import { ErrorCode } from 'utils/enums'
 
 const fixtures: {
   [title: string]: {

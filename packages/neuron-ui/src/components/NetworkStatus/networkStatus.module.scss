@@ -14,6 +14,7 @@ $hover-bg-color: #3cc68a4d;
     display: flex;
     align-items: center;
     line-height: 1em;
+    word-break: break-all;
 
     &::before {
       position: absolute;
@@ -52,7 +53,7 @@ $hover-bg-color: #3cc68a4d;
 }
 
 .tooltip {
-  @include MediumText;
+  @include medium-text;
   display: none;
   position: absolute;
   bottom: calc(100% + 10px);
@@ -69,7 +70,6 @@ $hover-bg-color: #3cc68a4d;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.22);
   transition: all 0.2s ease-in-out;
   opacity: 0;
-  user-select: none;
   pointer-events: none;
   font-size: 0.75rem;
   line-height: 1.5em;

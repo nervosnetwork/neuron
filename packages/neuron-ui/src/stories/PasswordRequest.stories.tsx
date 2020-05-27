@@ -3,8 +3,7 @@ import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 import StoryRouter from 'storybook-react-router'
 import PasswordRequest from 'components/PasswordRequest'
-import initStates from 'states/initStates'
-import { NeuronWalletContext } from 'states/stateProvider'
+import { initStates, NeuronWalletContext } from 'states'
 
 const dispatch = action('Dispatch')
 
@@ -16,7 +15,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '',
       },
     },
   },
@@ -31,7 +29,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '',
       },
     },
   },
@@ -46,7 +43,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'delete',
-        password: '123456',
       },
     },
   },
@@ -61,7 +57,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'backup',
-        password: '',
       },
     },
   },
@@ -76,7 +71,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'backup',
-        password: '123456',
       },
     },
   },
@@ -91,7 +85,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'unlock',
-        password: '',
       },
     },
   },
@@ -106,7 +99,6 @@ const states: { [title: string]: State.AppWithNeuronWallet } = {
       passwordRequest: {
         walletID: '1',
         actionType: 'send',
-        password: '123456',
       },
     },
   },

@@ -32,9 +32,9 @@ export default {
         paste: '粘贴',
         selectall: '全部选中',
       },
-      tools:{
+      tools: {
         label: "工具",
-        "sign-and-verify": "签名/验证信息",
+        "sign-and-verify": "签名/验签信息",
       },
       window: {
         label: '窗口',
@@ -126,8 +126,8 @@ export default {
       transaction: {
         title: '交易: {{hash}}',
       },
-      'sign-and-verify':{
-        title: '签名/验证信息'
+      'sign-and-verify': {
+        title: '签名/验签信息'
       },
     },
     prompt: {
@@ -146,9 +146,35 @@ export default {
       ok: '确定',
       error: '错误'
     },
-    'export-debug-info':{
+    'export-debug-info': {
       'export-debug-info': '导出调试信息',
       'debug-info-exported': '调试信息已被导出至 {{ file }}'
+    },
+    about: {
+      "app-version": "{{name}} 版本: {{version}}",
+      "ckb-client-version": "CKB 节点版本: {{version}}"
+    },
+    settings: {
+      title: {
+        normal: '设置',
+        mac: '偏好设置'
+      }
+    },
+    'export-transactions': {
+      'export-transactions': '导出交易历史',
+      'transactions-exported': '{{total}} 条交易记录已被导出至 {{file}}',
+      column: {
+        "time": "时间",
+        "block-number": "区块高度",
+        "tx-hash": "交易哈希",
+        "tx-type": "交易类型",
+        "amount": "金额",
+        "description": "备注"
+      },
+      "tx-type": {
+        "send": "转账",
+        "receive": "收款"
+      }
     }
   },
 }

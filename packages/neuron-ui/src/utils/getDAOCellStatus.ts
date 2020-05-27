@@ -28,7 +28,7 @@ export interface DAOCellStatusParams {
   depositEpoch: string
 }
 
-export default ({
+export const getDAOCellStatus = ({
   unlockInfo,
   withdrawInfo,
   status,
@@ -82,3 +82,5 @@ export default ({
   }
   return CellStatus.Deposited
 }
+
+export default getDAOCellStatus

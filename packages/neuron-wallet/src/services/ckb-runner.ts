@@ -33,7 +33,7 @@ const ckbBinary = (): string => {
   return platform() === 'win' ? binary + '.exe' : binary
 }
 
-const ckbDataPath = (): string => {
+export const ckbDataPath = (): string => {
   return path.resolve(app.getPath('userData',), 'chains/mainnet')
 }
 

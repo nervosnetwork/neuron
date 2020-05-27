@@ -5,7 +5,7 @@ $failed-color: #d50000;
 $pending-color: #b3b3b3;
 
 .itemContainer {
-  @include RegularText;
+  @include regular-text;
   font-size: 0.875rem;
   letter-spacing: 0.7px;
   background-color: #fff;
@@ -18,11 +18,10 @@ $pending-color: #b3b3b3;
   }
 
   .summary {
-    @include MediumText;
+    @include medium-text;
     position: relative;
     display: grid;
-    grid-template:
-      'time status'auto 'amount confirmations'auto/ 1fr 130px;
+    grid-template: 'time status' auto 'amount confirmations' auto/ 1fr 130px;
     justify-items: start;
     grid-gap: 3px;
     padding: 15px 0 15px 33px;
@@ -42,7 +41,9 @@ $pending-color: #b3b3b3;
     }
 
     .amount {
+      @include text-overflow-ellipsis;
       grid-area: amount;
+      width: 90%;
       color: var(--nervos-green);
     }
 
@@ -88,7 +89,6 @@ $pending-color: #b3b3b3;
     }
 
     &[data-status='success']:after {
-
       background-color: $success-color;
     }
 
@@ -97,30 +97,30 @@ $pending-color: #b3b3b3;
     }
   }
 
-
   .detail {
     padding: 0 33px;
     display: none;
     color: #434343;
 
-    &>div {
+    & > div {
       display: flex;
       justify-content: space-between;
       margin-bottom: 15px;
+      line-height: 1.625rem;
 
-      &>span:first-of-type {
-        @include MediumText;
+      & > span:first-of-type {
+        @include medium-text;
       }
     }
 
     .txHash {
-      &>div {
+      & > div {
         display: flex;
 
         .hashOverflow {
           word-break: break-all;
           text-align: right;
-          height: 1rem;
+          height: 1.625rem;
           overflow: hidden;
           text-align: right;
         }
@@ -135,7 +135,7 @@ $pending-color: #b3b3b3;
           }
 
           .ellipsis {
-            display: inline
+            display: inline;
           }
         }
 
@@ -154,9 +154,9 @@ $pending-color: #b3b3b3;
     }
 
     .descriptionField {
-      @include descriptionField;
+      @include description-field;
 
-      &>div {
+      & > div {
         border-top: none !important;
         border-left: none !important;
         border-right: none !important;
@@ -176,7 +176,7 @@ $pending-color: #b3b3b3;
     }
   }
 
-  &[data-is-open="true"] {
+  &[data-is-open='true'] {
     .summary:before {
       transform: translateY(-50%) rotate(90deg);
     }

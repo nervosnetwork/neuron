@@ -34,7 +34,7 @@ export default {
       },
       tools: {
         label: "工具",
-        "sign-and-verify": "簽名/驗證信息",
+        "sign-and-verify": "簽名/驗簽信息",
       },
       window: {
         label: '視窗',
@@ -125,8 +125,8 @@ export default {
       transaction: {
         title: '交易: {{hash}}',
       },
-      'sign-and-verify':{
-        title: '簽名/驗證信息'
+      'sign-and-verify': {
+        title: '簽名/驗簽信息'
       },
     },
     prompt: {
@@ -145,9 +145,36 @@ export default {
       ok: '確定',
       error: '錯誤'
     },
+    'export-debug-info': {
+      'export-debug-info': '導出調試信息',
+      'debug-info-exported': '調試信息已被導出至 {{ file }}'
+    },
+    about: {
+      "app-version": "{{name}} 版本: {{version}}",
+      "ckb-client-version": "CKB 節點版本: {{version}}"
+    },
+    settings: {
+      title: {
+        normal: '設置',
+        mac: '偏好設置'
+      }
+    },
+    'export-transactions': {
+      'export-transactions': '導出交易歷史',
+      'transactions-exported': '{{total}} 條交易記錄已被導出至 {{file}}',
+      column: {
+        "time": "時間",
+        "block-number": "區塊高度",
+        "tx-hash": "交易哈希",
+        "tx-type": "交易類型",
+        "amount": "金額",
+        "description": "備註"
+      },
+      "tx-type": {
+        "send": "轉賬",
+        "receive": "收款"
+      }
+    }
   },
-  'export-debug-info':{
-    'export-debug-info': '導出調試信息',
-    'debug-info-exported': '調試信息已被導出至 {{ file }}'
-  }
 }
+

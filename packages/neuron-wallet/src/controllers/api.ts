@@ -8,7 +8,8 @@ import { NetworkType, Network } from 'models/network'
 import { ConnectionStatusSubject } from 'models/subjects/node'
 import NetworksService from 'services/networks'
 import WalletsService from 'services/wallets'
-import { ResponseCode } from 'utils/const'
+import SettingsService, { Locale } from 'services/settings'
+import { ResponseCode, SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 import WalletsController from 'controllers/wallets'
 import TransactionsController from 'controllers/transactions'
@@ -57,6 +58,11 @@ export default class ApiController {
 
   private registerHandlers() {
     const handle = this.handleChannel
+
+    // sync messages
+    ipcMain.on('get-locale', e => {
+      e.returnValue = SettingsService.getInstance().locale
+    })
 
     // App
     handle('get-system-codehash', async () => {
@@ -135,6 +141,10 @@ export default class ApiController {
       if (env.isDevMode) {
         console.error(error)
       }
+    })
+
+    handle('set-locale', async (_, locale: Locale) => {
+      return SettingsService.getInstance().locale = locale
     })
 
     // Wallets
@@ -226,7 +236,13 @@ export default class ApiController {
     })
 
     handle('show-transaction-details', async (_, hash: string) => {
-      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }))
+      showWindow(`#/transaction/${hash}`, i18n.t(`messageBox.transaction.title`, { hash }), {
+        height: 750
+      })
+    })
+
+    handle('export-transactions', async (_, params: { walletID: string }) => {
+      return this.transactionsController.exportTransactions(params)
     })
 
     // Dao
@@ -301,6 +317,10 @@ export default class ApiController {
     })
 
     // Settings
+
+    handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
+      showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE))
+    })
 
     handle('clear-cache', async () => {
       return new SyncController().clearCache()

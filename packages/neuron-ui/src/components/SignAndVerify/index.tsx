@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
 import Button from 'widgets/Button'
 import DownArrow from 'widgets/Icons/DownArrow.png'
-import { useExitOnWalletChange } from 'utils/hooks'
-import { shannonToCKBFormatter } from 'utils/formatters'
+import { ErrorCode, shannonToCKBFormatter, useExitOnWalletChange, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
 import Spinner from 'widgets/Spinner'
 
-import { ErrorCode } from 'utils/const'
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
 import styles from './signAndVerify.module.scss'
 
@@ -24,9 +22,11 @@ const PasswordRequest = ({
   onSubmit: (pwd: string) => Promise<void>
   error: string
 }) => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useOnLocaleChange(i18n)
 
   const onChange = useCallback(
     e => {
@@ -106,7 +106,7 @@ const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
 }
 
 const SignAndVerify = () => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [status, setStatus] = useState<
     'edit' | 'request-password' | 'verify-success' | 'verify-failure' | 'address-not-found'
   >('edit')
@@ -116,10 +116,16 @@ const SignAndVerify = () => {
   const [address, setAddress] = useState('')
   const [pwdErr, setPwdErr] = useState('')
 
+  useOnLocaleChange(i18n)
+  useEffect(() => {
+    window.document.title = i18n.t(`sign-and-verify.window-title`)
+    // eslint-disable-next-line
+  }, [i18n.language])
+
   useEffect(() => {
     const id = window.location.href.split('/').pop()
     getAddressesByWalletID(id || '').then(res => {
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setWallet({
           id: id!,
           addresses: res.result,
@@ -206,7 +212,7 @@ const SignAndVerify = () => {
         message,
         password,
       })
-      if (res.status === 1) {
+      if (isSuccessResponse(res)) {
         setSignature(res.result)
         setStatus('edit')
       } else if (res.status === ErrorCode.PasswordIncorrect) {
@@ -236,7 +242,7 @@ const SignAndVerify = () => {
           <div role="presentation" className={styles.addrList} onClick={onAddrSelected}>
             {wallet.addresses.map(addr => (
               <div key={addr.address} className={styles.addrOpt} data-addr={addr.address}>
-                <span className="monospacedFont">{addr.address}</span>
+                <span>{addr.address}</span>
                 <Balance balance={shannonToCKBFormatter(addr.balance)} />
                 <span className={styles.addrType} data-type={addr.type}>
                   {addr.type === 0 ? t('addresses.receiving-address') : t('addresses.change-address')}

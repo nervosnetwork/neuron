@@ -1,8 +1,9 @@
 import { useEffect, useCallback } from 'react'
 import { showTransactionDetails } from 'services/remote'
 import { getHeaderByNumber } from 'services/chain'
-import { MILLISECONDS_IN_YEAR } from 'utils/const'
-import calculateAPC from 'utils/calculateAPC'
+import { calculateAPC, CONSTANTS } from 'utils'
+
+const { MILLISECONDS_IN_YEAR } = CONSTANTS
 
 export const useUpdateWithdrawEpochs = ({
   isWithdrawn,

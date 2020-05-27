@@ -5,7 +5,8 @@ declare interface Window {
     getCurrentWindow: Function
     getGlobal: (name: string) => any
     require: (module: string) => any
-    process?: any
+    process: any
+    app: any
   }
   require: any
   nativeImage: any
@@ -14,6 +15,10 @@ declare interface Window {
     on(channel: string, listener: Function)
     removeListener(channel: string, listener: Function)
     removeAllListeners(channel: string)
+    sendSync(channel: string, ...args: any[]): any
+  }
+  neuron: {
+    role: 'main' | 'settings'
   }
 }
 

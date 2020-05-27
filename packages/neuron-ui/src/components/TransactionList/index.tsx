@@ -1,30 +1,34 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import TextField from 'widgets/TextField'
+import CopyZone from 'widgets/CopyZone'
 
 import { StateDispatch } from 'states/stateProvider/reducer'
 import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
-import { useLocalDescription } from 'utils/hooks'
-import { shannonToCKBFormatter, uniformTimeFormatter as timeFormatter, localNumberFormatter } from 'utils/formatters'
-import getExplorerUrl from 'utils/getExplorerUrl'
-import { CONFIRMATION_THRESHOLD } from 'utils/const'
+import {
+  CONSTANTS,
+  shannonToCKBFormatter,
+  uniformTimeFormatter as timeFormatter,
+  localNumberFormatter,
+  getExplorerUrl,
+  useLocalDescription,
+} from 'utils'
+
 import styles from './transactionList.module.scss'
 
-const TransactionList = ({
-  items: txs,
-  tipBlockNumber,
-  walletID,
-  isMainnet,
-  dispatch,
-}: {
+const { CONFIRMATION_THRESHOLD } = CONSTANTS
+
+interface TransactionListProps {
   isLoading?: boolean
   walletID: string
   items: State.Transaction[]
   tipBlockNumber: string
   isMainnet: boolean
   dispatch: StateDispatch
-}) => {
+}
+
+const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, dispatch }: TransactionListProps) => {
   const [txHash, setTxHash] = useState('')
   const [t] = useTranslation()
 
@@ -121,9 +125,9 @@ const TransactionList = ({
               onKeyPress={() => {}}
             >
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <span className={styles.amount} title={`${tx.value} shannons`}>
+              <CopyZone className={styles.amount} content={shannonToCKBFormatter(tx.value).replace(/,/g, '')}>
                 {`${shannonToCKBFormatter(tx.value, true)} CKB`}
-              </span>
+              </CopyZone>
               <span className={styles.status} title={statusLabel}>
                 {statusLabel}
               </span>
@@ -140,11 +144,11 @@ const TransactionList = ({
               </div>
               <div title={tx.hash} className={styles.txHash}>
                 <span>{t('history.transaction-hash')}</span>
-                <div className="monospacedFont">
+                <CopyZone content={tx.hash} name={t('history.copy-tx-hash')}>
                   <span className={styles.hashOverflow}>{tx.hash.slice(0, -6)}</span>
                   <span className={styles.ellipsis}>...</span>
                   <span>{tx.hash.slice(-6)}</span>
-                </div>
+                </CopyZone>
               </div>
               <div title={tx.description} className={styles.description}>
                 <span>{t('history.description')}</span>

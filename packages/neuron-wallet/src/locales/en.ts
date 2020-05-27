@@ -127,7 +127,7 @@ export default {
       transaction: {
         title: 'Transaction: {{hash}}',
       },
-      'sign-and-verify':{
+      'sign-and-verify': {
         title: 'Sign/verify message'
       },
     },
@@ -147,9 +147,35 @@ export default {
       ok: 'OK',
       error: 'Error',
     },
-    'export-debug-info':{
+    'export-debug-info': {
       'export-debug-info': 'Export Debug Information',
       'debug-info-exported': 'Debug information has been exported to {{ file }}'
+    },
+    about: {
+      "app-version": "{{name}} Version: {{version}}",
+      "ckb-client-version": "CKB Client Version: {{version}}"
+    },
+    settings: {
+      title: {
+        normal: 'Settings',
+        mac: 'Preference'
+      }
+    },
+    'export-transactions': {
+      'export-transactions': 'Export Transaction History',
+      'transactions-exported': '{{total}} transaction records have been exported to {{file}}',
+      column: {
+        "time": "Time",
+        "block-number": "Block Number",
+        "tx-hash": "Transaction Hash",
+        "tx-type": "Transaction Type",
+        "amount": "Amount",
+        "description": "Description"
+      },
+      "tx-type": {
+        "send": "Send",
+        "receive": "Receive"
+      }
     }
   },
 }

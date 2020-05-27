@@ -1,12 +1,20 @@
-import React, { useRef, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
-import { useDialog } from 'utils/hooks'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { AppActions } from 'states/stateProvider/reducer'
-import { sendTransaction, deleteWallet, backupWallet } from 'states/stateProvider/actionCreators'
+import Spinner from 'widgets/Spinner'
+import { useDialog, ResponseCode, ErrorCode, RoutePath } from 'utils'
+
+import {
+  useState as useGlobalState,
+  useDispatch,
+  AppActions,
+  sendTransaction,
+  deleteWallet,
+  backupWallet,
+} from 'states'
+import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
 
 const PasswordRequest = () => {
@@ -14,7 +22,7 @@ const PasswordRequest = () => {
     app: {
       send: { description, generatedTx },
       loadings: { sending: isSending = false },
-      passwordRequest: { walletID = '', actionType = null, password = '' },
+      passwordRequest: { walletID = '', actionType = null },
     },
     settings: { wallets = [] },
   } = useGlobalState()
@@ -22,6 +30,15 @@ const PasswordRequest = () => {
   const [t] = useTranslation()
   const history = useHistory()
   const dialogRef = useRef<HTMLDialogElement | null>(null)
+
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setPassword('')
+    setError('')
+  }, [actionType, setError, setPassword])
+
   const onDismiss = useCallback(() => {
     dispatch({
       type: AppActions.DismissPasswordRequest,
@@ -31,72 +48,84 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const disabled = !password || (actionType === 'send' && isSending)
+  const isLoading = ['send', 'unlock'].includes(actionType || '') && isSending
+  const disabled = !password || isSending
 
   const onSubmit = useCallback(
-    (e?: React.FormEvent): void => {
+    async (e?: React.FormEvent) => {
       if (e) {
         e.preventDefault()
       }
       if (disabled) {
         return
       }
-      switch (actionType) {
-        case 'send': {
-          if (isSending) {
+      try {
+        switch (actionType) {
+          case 'send': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+              if (status === ResponseCode.SUCCESS) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
             break
           }
-          sendTransaction({
-            walletID,
-            tx: generatedTx,
-            description,
-            password,
-          })(dispatch, history)
-          break
-        }
-        case 'delete': {
-          deleteWallet({
-            id: walletID,
-            password,
-          })(dispatch)
-          break
-        }
-        case 'backup': {
-          backupWallet({
-            id: walletID,
-            password,
-          })(dispatch)
-          break
-        }
-        case 'unlock': {
-          if (isSending) {
+          case 'delete': {
+            await deleteWallet({ id: walletID, password })(dispatch).then(status => {
+              if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
             break
           }
-          sendTransaction({
-            walletID,
-            tx: generatedTx,
-            description,
-            password,
-          })(dispatch, history, { type: 'unlock' })
-          break
+          case 'backup': {
+            await backupWallet({ id: walletID, password })(dispatch).then(status => {
+              if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'unlock': {
+            if (isSending) {
+              break
+            }
+            await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
+              if (status === ResponseCode.SUCCESS) {
+                dispatch({
+                  type: AppActions.SetGlobalDialog,
+                  payload: 'unlock-success',
+                })
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          default: {
+            break
+          }
         }
-        default: {
-          break
+      } catch (err) {
+        if (err.code === ErrorCode.PasswordIncorrect) {
+          setError(t(err.message))
         }
       }
     },
-    [dispatch, walletID, password, actionType, description, history, isSending, generatedTx, disabled]
+    [dispatch, walletID, password, actionType, description, history, isSending, generatedTx, disabled, setError, t]
   )
 
   const onChange = useCallback(
     (e: React.SyntheticEvent<HTMLInputElement>) => {
       const { value } = e.target as HTMLInputElement
-      dispatch({
-        type: AppActions.UpdatePassword,
-        payload: value,
-      })
+      setPassword(value)
+      setError('')
     },
-    [dispatch]
+    [setPassword, setError]
   )
 
   if (!wallet) {
@@ -118,10 +147,13 @@ const PasswordRequest = () => {
           autoFocus
           required
           className={styles.passwordInput}
+          error={error}
         />
         <div className={styles.footer}>
           <Button label={t('common.cancel')} type="cancel" onClick={onDismiss} />
-          <Button label={t('common.confirm')} type="submit" disabled={disabled} />
+          <Button label={t('common.confirm')} type="submit" disabled={disabled}>
+            {isLoading ? <Spinner /> : (t('common.confirm') as string)}
+          </Button>
         </div>
       </form>
     </dialog>

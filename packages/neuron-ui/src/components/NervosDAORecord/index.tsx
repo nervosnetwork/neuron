@@ -2,15 +2,23 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CompensationProgressBar from 'components/CompensationProgressBar'
 import Button from 'widgets/Button'
-import { shannonToCKBFormatter, uniformTimeFormatter } from 'utils/formatters'
-import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
-import { epochParser } from 'utils/parsers'
-import getDAOCellStatus, { CellStatus } from 'utils/getDAOCellStatus'
-import { IMMATURE_EPOCHS, ConnectionStatus, HOURS_PER_EPOCH } from 'utils/const'
+import CopyZone from 'widgets/CopyZone'
+import {
+  calculateClaimEpochValue,
+  ConnectionStatus,
+  CONSTANTS,
+  shannonToCKBFormatter,
+  uniformTimeFormatter,
+  getDAOCellStatus,
+  CellStatus,
+  epochParser,
+} from 'utils'
 import CompensationPeriodTooltip from 'components/CompensationPeriodTooltip'
 
 import styles from './daoRecordRow.module.scss'
 import hooks from './hooks'
+
+const { IMMATURE_EPOCHS, HOURS_PER_EPOCH } = CONSTANTS
 
 const EPOCHS_PER_DAY = 6
 
@@ -232,6 +240,8 @@ export const DAORecord = ({
     )
   }
 
+  const amount = shannonToCKBFormatter(capacity)
+
   return (
     <div className={styles.container} data-is-collapsed={isCollapsed}>
       <div className={styles.badge}>{badge}</div>
@@ -250,9 +260,7 @@ export const DAORecord = ({
         </span>
       </div>
 
-      <div className={styles.amount}>
-        <span>{`${shannonToCKBFormatter(capacity)} CKB`}</span>
-      </div>
+      <CopyZone className={styles.amount} content={amount.replace(/,/g, '')}>{`${amount} CKB`}</CopyZone>
       {progressOrPeriod}
 
       <div className={styles.apc}>

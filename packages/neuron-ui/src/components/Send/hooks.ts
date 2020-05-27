@@ -1,15 +1,21 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { TFunction } from 'i18next'
-import i18n from 'utils/i18n'
 import jsQR from 'jsqr'
 
 import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import { captureScreenshot, showErrorMessage } from 'services/remote'
 import { generateTx, generateSendingAllTx } from 'services/remote/wallets'
 
-import { outputsToTotalAmount, CKBToShannonFormatter, shannonToCKBFormatter } from 'utils/formatters'
-import { verifyTransactionOutputs, verifyAddress } from 'utils/validators'
-import calculateFee from 'utils/calculateFee'
+import {
+  outputsToTotalAmount,
+  CKBToShannonFormatter,
+  shannonToCKBFormatter,
+  calculateFee,
+  verifyTransactionOutputs,
+  verifyAddress,
+} from 'utils'
+import i18n from 'utils/i18n'
+
 import styles from './send.module.scss'
 
 let generateTxTimer: ReturnType<typeof setTimeout>

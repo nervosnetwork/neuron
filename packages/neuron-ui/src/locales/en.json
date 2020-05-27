@@ -16,7 +16,6 @@
       "receive": "Receive",
       "history": "History",
       "addresses": "Addresses",
-      "settings": "Settings",
       "nervos-dao": "Nervos DAO",
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
@@ -53,7 +52,8 @@
         "failed": "Failed",
         "pending": "Pending",
         "confirming": "Confirming"
-      }
+      },
+      "copy-balance": "Copy Balance"
     },
     "wizard": {
       "welcome-to-nervos-neuron": "Welcome to Neuron",
@@ -115,7 +115,7 @@
       "fee": "Transaction Fee",
       "advanced-fee-settings": "Advanced fee settings",
       "price": "Price",
-      "expected-speed": "Expected speed",
+      "pick-price": "Quick Pick Price",
       "total-cycles": "Total RISC-V Cycles",
       "scan-screen-qr-code": "Scan the QR Code on the screen",
       "set-locktime": "Set Locktime",
@@ -123,7 +123,7 @@
       "release-on": "Release on"
     },
     "receive": {
-      "click-to-copy": "Click to copy the address",
+      "copy-address": "Copy Address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
       "address-qrcode": "Address QR Code",
@@ -155,15 +155,21 @@
       "blockNumber": "Block Number",
       "basic-information": "Basic Information",
       "search": {
+        "button": "Search",
         "placeholder": "Search tx hash, address or date (yyyy-mm-dd)"
       },
+      "export-history": "Export Transaction History",
       "confirmations": "Confirmations",
       "confirming-with-count": "{{confirmations}} Confirmations",
       "view-on-explorer": "View on Explorer",
       "copy-transaction-hash": "Copy Transaction Hash",
-      "no-txs": "No Transaction History"
+      "no-txs": "No Transaction History",
+      "copy-tx-hash": "Copy Transaction Hash",
+      "copy-balance": "Copy Balance",
+      "copy-address": "Copy Address"
     },
     "transaction": {
+      "window-title": "Transaction: {{hash}}",
       "date": "Date",
       "transaction-hash": "Transaction Hash",
       "block-number": "Block Number",
@@ -193,6 +199,10 @@
       "view-on-explorer": "View on Explorer"
     },
     "settings": {
+      "title": {
+        "normal": "Settings",
+        "mac": "Preference"
+      },
       "go-to-overview": "Go to Overview",
       "setting-tabs": {
         "general": "General",
@@ -204,7 +214,11 @@
         "clearing-cache": "Clearing...",
         "clear-cache-description": "Clear cache if you encounter data sync or balance display problems. Neuron will rescan block data.",
         "show": "Show",
-        "hide": "Hide"
+        "hide": "Hide",
+        "version": "Version",
+        "language": "Language",
+        "cache-cleared-on": "Cache cleared on {{date}}",
+        "apply": "Apply"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -232,6 +246,12 @@
         "mainnet": "Mainnet",
         "testnet": "Testnet",
         "devnet": "Devnet"
+      },
+      "locale": {
+        "en": "English",
+        "en-US": "English(United States)",
+        "zh": "中文(简体)",
+        "zh-TW": "中文(繁體)"
       }
     },
     "password-request": {
@@ -272,7 +292,9 @@
       "edit": "Edit",
       "delete": "Delete",
       "click-to-edit": "Click to edit",
-      "notice": "Notice"
+      "notice": "Notice",
+      "copy": "Copy",
+      "copied": "Copied"
     },
     "notification-panel": {
       "title": "Notifications"
@@ -361,6 +383,7 @@
       "free": "Available",
       "locked": "Locked",
       "deposit": "Deposit",
+      "copy-balance": "Copy Balance",
       "deposit-records": "Deposits",
       "completed-records": "Completed",
       "apc": "Current APC",
@@ -420,8 +443,7 @@
       "checking-updates": "Checking...",
       "downloading-update": "Downloading update...",
       "update-not-available": "There are currently no updates available.",
-      "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "An update ({{version}}) is available, do you want to download and install now?",
+      "updates-found-do-you-want-to-update": "An update ({{version}}) is available",
       "download-update": "Install Update",
       "updates-downloaded-about-to-quit-and-install": "Update downloaded. Ready to install and relaunch.",
       "quit-and-install": "Install and relaunch"
@@ -450,6 +472,7 @@
       "start-tomorrow": "Selected time should start from tomorrow."
     },
     "sign-and-verify": {
+      "window-title": "Sign or Verify Message",
       "sign-or-verify-message": "Sign or Verify Message",
       "message": "Message",
       "address": "Address",

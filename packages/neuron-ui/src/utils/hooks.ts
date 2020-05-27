@@ -1,12 +1,19 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { TFunction } from 'i18next'
-import { openContextMenu } from 'services/remote'
-import { updateTransactionDescription, updateAddressDescription } from 'states/stateProvider/actionCreators'
-import { StateDispatch, AppActions } from 'states/stateProvider/reducer'
-import { epochParser } from 'utils/parsers'
+import { useHistory } from 'react-router-dom'
+import { TFunction, i18n as i18nType } from 'i18next'
+import { openContextMenu, requestPassword, setCurrentNetowrk, deleteNetwork } from 'services/remote'
+import { SetLocale as SetLocaleSubject } from 'services/subjects'
+import {
+  StateDispatch,
+  AppActions,
+  updateTransactionDescription,
+  updateAddressDescription,
+  setCurrentWallet,
+} from 'states'
+import { epochParser, RoutePath } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 
-export const useGoBack = (history: any) => {
+export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
     history.goBack()
   }, [history])
@@ -156,27 +163,32 @@ export const useDialog = ({
 }
 
 export const useOnDefaultContextMenu = (t: TFunction) =>
-  useCallback(() => {
-    const contextMenuTemplate = [
-      { label: t('contextmenu.cut'), role: 'cut' },
-      {
-        label: t('contextmenu.copy'),
-        role: 'copy',
-      },
-      {
-        label: t('contextmenu.paste'),
-        role: 'paste',
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: t('contextmenu.selectall'),
-        role: 'selectAll',
-      },
-    ]
-    openContextMenu(contextMenuTemplate)
-  }, [t])
+  useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') {
+        const contextMenuTemplate = [
+          { label: t('contextmenu.cut'), role: 'cut' },
+          {
+            label: t('contextmenu.copy'),
+            role: 'copy',
+          },
+          {
+            label: t('contextmenu.paste'),
+            role: 'paste',
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: t('contextmenu.selectall'),
+            role: 'selectAll',
+          },
+        ]
+        openContextMenu(contextMenuTemplate)
+      }
+    },
+    [t]
+  )
 
 export const useExitOnWalletChange = () => {
   const listener = (e: StorageEvent) => {
@@ -191,11 +203,136 @@ export const useExitOnWalletChange = () => {
     }
   }, [])
 }
-export default {
-  useGoBack,
-  useLocalDescription,
-  useCalculateEpochs,
-  useDialog,
-  useOnDefaultContextMenu,
-  useExitOnWalletChange,
+
+export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
+  return useEffect(() => {
+    window.addEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
+  }, [handler])
 }
+
+export const useOnLocaleChange = (i18n: i18nType) => {
+  return useEffect(() => {
+    const subcription = SetLocaleSubject.subscribe(lng => {
+      i18n.changeLanguage(lng)
+    })
+    return () => {
+      subcription.unsubscribe()
+    }
+  }, [i18n])
+}
+
+export const useOnHandleWallet = ({
+  history,
+  dispatch,
+}: {
+  history: ReturnType<typeof useHistory>
+  dispatch: StateDispatch
+}) =>
+  useCallback(
+    (e: React.SyntheticEvent) => {
+      const {
+        target: {
+          dataset: { action },
+        },
+        currentTarget: {
+          dataset: { id },
+        },
+      } = e as any
+      switch (action) {
+        case 'edit': {
+          history.push(`${RoutePath.WalletEditor}/${id}`)
+          break
+        }
+        case 'delete': {
+          requestPassword({ walletID: id, action: 'delete-wallet' })
+          break
+        }
+        case 'backup': {
+          requestPassword({
+            walletID: id,
+            action: 'backup-wallet',
+          })
+          break
+        }
+        case 'select': {
+          setCurrentWallet(id)(dispatch)
+          break
+        }
+        default: {
+          // ignore
+        }
+      }
+    },
+    [dispatch, history]
+  )
+
+export const useOnWindowResize = (handler: () => void) => {
+  useEffect(() => {
+    let rAFTimer: number | null = null
+    const listener = () => {
+      if (rAFTimer) {
+        window.cancelAnimationFrame(rAFTimer)
+      }
+      rAFTimer = window.requestAnimationFrame(handler)
+    }
+
+    window.addEventListener('resize', listener)
+    return () => {
+      window.removeEventListener('resize', listener)
+    }
+  }, [handler])
+}
+
+export const useToggleChoiceGroupBorder = (containerSelector: string, borderClassName: string) =>
+  useCallback(() => {
+    const walletListContainer = document.querySelector(containerSelector)
+    if (!walletListContainer) {
+      return
+    }
+    const walletList = walletListContainer.querySelector('[role=radiogroup]')
+    if (!walletList) {
+      return
+    }
+    const containerHeight = +window.getComputedStyle(walletListContainer).height.slice(0, -2)
+    const listHeight = +window.getComputedStyle(walletList).height.slice(0, -2)
+    if (containerHeight > listHeight + 5) {
+      walletListContainer.classList.remove(borderClassName)
+    } else {
+      walletListContainer.classList.add(borderClassName)
+    }
+  }, [containerSelector, borderClassName])
+
+export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof useHistory> }) =>
+  useCallback(
+    (e: React.SyntheticEvent) => {
+      const {
+        target: {
+          dataset: { action },
+        },
+        currentTarget: {
+          dataset: { id },
+        },
+      } = e as any
+      switch (action) {
+        case 'edit': {
+          history.push(`${RoutePath.NetworkEditor}/${id}`)
+          break
+        }
+        case 'delete': {
+          deleteNetwork(id)
+          break
+        }
+        case 'select': {
+          setCurrentNetowrk(id)
+          break
+        }
+        default: {
+          // ignore
+        }
+      }
+    },
+    [history]
+  )

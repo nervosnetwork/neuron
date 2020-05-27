@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-
+import { useHistory } from 'react-router-dom'
 import { NeuronWalletActions, StateDispatch, AppActions } from 'states/stateProvider/reducer'
 import {
   updateTransactionList,
@@ -16,18 +16,20 @@ import {
   CurrentNetworkID as CurrentNetworkIDSubject,
   ConnectionStatus as ConnectionStatusSubject,
   SyncedBlockNumber as SyncedBlockNumberSubject,
-  AppUpdater as AppUpdaterSubject,
   Command as CommandSubject,
 } from 'services/subjects'
 import { ckbCore, getBlockchainInfo, getTipHeader } from 'services/chain'
-import { ConnectionStatus, ErrorCode, CONNECTING_DEADLINE } from 'utils/const'
 import { networks as networksCache, currentNetworkID as currentNetworkIDCache } from 'services/localCache'
+import { WalletWizardPath } from 'components/WalletWizard'
+import { ConnectionStatus, ErrorCode, RoutePath } from 'utils'
 
-let timer: NodeJS.Timeout
 const SYNC_INTERVAL_TIME = 4000
+const CONNECTING_BUFFER = 15_000
+let CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
 
 export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dispatch: StateDispatch }) => {
   useEffect(() => {
+    let timer: NodeJS.Timeout
     const syncBlockchainInfo = () => {
       Promise.all([getTipHeader(), getBlockchainInfo()])
         .then(([header, chainInfo]) => {
@@ -55,7 +57,7 @@ export const useSyncChainData = ({ chainURL, dispatch }: { chainURL: string; dis
           })
         })
     }
-    clearInterval(timer)
+    clearInterval(timer!)
     if (chainURL) {
       ckbCore.setNode(chainURL)
       syncBlockchainInfo()
@@ -78,7 +80,7 @@ export const useOnCurrentWalletChange = ({
 }: {
   walletID: string
   chain: State.Chain
-  history: any
+  history: ReturnType<typeof useHistory>
 
   dispatch: StateDispatch
 }) => {
@@ -98,7 +100,7 @@ export const useSubscription = ({
   walletID: string
   chain: State.Chain
   isAllowedToFetchList: boolean
-  history: any
+  history: ReturnType<typeof useHistory>
   dispatch: StateDispatch
 }) => {
   const { pageNo, pageSize, keywords } = chain.transactions
@@ -119,21 +121,25 @@ export const useSubscription = ({
           if (!isAllowedToFetchList) {
             break
           }
-          updateTransactionList({
-            walletID,
-            keywords,
-            pageNo,
-            pageSize,
-          })(dispatch)
+          updateTransactionList({ walletID, keywords, pageNo, pageSize })(dispatch)
           break
         }
         case 'current-wallet': {
-          updateCurrentWallet()(dispatch, history)
+          updateCurrentWallet()(dispatch).then(hasCurrent => {
+            if (!hasCurrent) {
+              history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+            }
+          })
           break
         }
         case 'wallets': {
-          updateWalletList()(dispatch, history)
-          updateCurrentWallet()(dispatch, history)
+          Promise.all([updateWalletList, updateCurrentWallet].map(request => request()(dispatch))).then(
+            ([hasList, hasCurrent]) => {
+              if (!hasList || !hasCurrent) {
+                history.push(`${RoutePath.WalletWizard}${WalletWizardPath.Welcome}`)
+              }
+            }
+          )
           break
         }
         default: {
@@ -153,6 +159,7 @@ export const useSubscription = ({
         type: NeuronWalletActions.UpdateCurrentNetworkID,
         payload: currentNetworkID,
       })
+      CONNECTING_DEADLINE = Date.now() + CONNECTING_BUFFER
       currentNetworkIDCache.save(currentNetworkID)
     })
     const connectionStatusSubscription = ConnectionStatusSubject.subscribe(status => {
@@ -173,18 +180,14 @@ export const useSubscription = ({
       })
     })
 
-    const appUpdaterSubscription = AppUpdaterSubject.subscribe(appUpdaterInfo => {
-      dispatch({
-        type: NeuronWalletActions.UpdateAppUpdaterStatus,
-        payload: appUpdaterInfo,
-      })
-    })
-
     const commandSubscription = CommandSubject.subscribe(({ winID, type, payload }: Subject.CommandMetaInfo) => {
       if (winID && getWinID() === winID) {
         switch (type) {
+          // TODO: is this used anymore?
           case 'navigate-to-url': {
-            history.push(payload)
+            if (payload) {
+              history.push(payload)
+            }
             break
           }
           case 'delete-wallet': {
@@ -219,7 +222,6 @@ export const useSubscription = ({
       currentNetworkIDSubscription.unsubscribe()
       connectionStatusSubscription.unsubscribe()
       syncedBlockNumberSubscription.unsubscribe()
-      appUpdaterSubscription.unsubscribe()
       commandSubscription.unsubscribe()
     }
   }, [walletID, pageNo, pageSize, keywords, isAllowedToFetchList, history, dispatch])

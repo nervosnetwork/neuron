@@ -3,6 +3,11 @@ declare namespace Controller {
     url: string
     title: string
   }
+
+  interface ShowSettingsParams {
+    tab: 'general' | 'wallets' | 'networks'
+  }
+
   interface CreateWalletParams {
     name: string
     mnemonic: string
@@ -159,6 +164,12 @@ declare namespace Controller {
       lock: string
       type: string
       data: string
+    }
+  }
+
+  namespace ExportTransactions {
+    interface Params {
+      walletID: string
     }
   }
 }

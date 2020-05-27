@@ -2,14 +2,17 @@ import React, { useMemo, useCallback, MouseEventHandler } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Stack, MessageBar, MessageBarType, IconButton, Panel, PanelType, Text } from 'office-ui-fabric-react'
-import { useState as useGlobalState, useDispatch } from 'states/stateProvider'
-import { StateDispatch } from 'states/stateProvider/reducer'
 import {
+  useState as useGlobalState,
+  useDispatch,
+  StateDispatch,
   toggleAllNotificationVisibility,
   toggleTopAlertVisibility,
   dismissNotification,
   dismissGlobalDialog,
-} from 'states/stateProvider/actionCreators'
+} from 'states'
+import { useOnLocaleChange } from 'utils'
+
 import GlobalDialog from 'widgets/GlobalDialog'
 import AlertDialog from 'widgets/AlertDialog'
 import styles from './Notification.module.scss'
@@ -71,7 +74,8 @@ export const NoticeContent = () => {
     },
   } = useGlobalState()
   const dispatch = useDispatch()
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
+  useOnLocaleChange(i18n)
 
   const notificationsInDesc = useMemo(() => [...notifications].reverse(), [notifications])
   const notification: State.Message | undefined = notificationsInDesc[0]

@@ -6,12 +6,13 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from 'electron-log'
 import i18n from 'locales/i18n'
+import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 
 export default class ExportDebugController {
   archive: archiver.Archiver
-  constructor() {
+  constructor () {
     this.archive = archiver('zip', {
       zlib: { level: 9 }
     })
@@ -30,7 +31,7 @@ export default class ExportDebugController {
         return
       }
       this.archive.pipe(fs.createWriteStream(filePath))
-      await this.addStatusFile()
+      await Promise.all([this.addStatusFile(), this.addBundledCKBLog()])
       this.addLogFiles()
       await this.archive.finalize()
       dialog.showMessageBox({
@@ -47,7 +48,7 @@ export default class ExportDebugController {
     const url = NetworksService.getInstance().getCurrent().remote
     const ckb = new CKB(url)
 
-    const [syncedBlockNumber, ckbVersion, tipBlockNumber] = await Promise.all([
+    const [syncedBlockNumber, ckbVersion, tipBlockNumber, peers] = await Promise.all([
       new SyncedBlockNumber()
         .getNextBlock()
         .then(n => n.toString())
@@ -59,7 +60,10 @@ export default class ExportDebugController {
       ckb.rpc
         .getTipBlockNumber()
         .then(n => BigInt(n).toString())
-        .catch(() => '')
+        .catch(() => ''),
+      ckb.rpc
+        .getPeers()
+        .catch(() => [])
     ])
     const { platform, arch } = process
     const release = os.release()
@@ -71,7 +75,8 @@ export default class ExportDebugController {
       ckb: {
         url: /https?:\/\/(localhost|127.0.0.1)/.test(url) ? url : 'http://****:port',
         version: ckbVersion,
-        blockNumber: tipBlockNumber
+        blockNumber: tipBlockNumber,
+        peers,
       },
       client: {
         platform,
@@ -81,6 +86,39 @@ export default class ExportDebugController {
     }
     this.archive.append(JSON.stringify(status), {
       name: 'status.json'
+    })
+  }
+
+  private addBundledCKBLog = () => {
+    const name = 'bundled-ckb-log.json'
+    const SIZE_TO_READ = 32_000
+
+    return new Promise((resolve, reject) => {
+      const logPath = path.resolve(ckbDataPath(), 'data', 'logs', 'run.log')
+      if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
+
+      const fileStats = fs.statSync(logPath)
+      const position = fileStats.size - SIZE_TO_READ
+
+      fs.open(logPath, 'r', (openErr, fd) => {
+        if (openErr) { return reject(openErr) }
+        fs.read(fd, Buffer.alloc(SIZE_TO_READ), 0, SIZE_TO_READ, position, (readErr, _, buffer) => {
+          if (readErr) {
+            reject(readErr)
+          } else {
+            resolve(buffer.toString('utf8'))
+          }
+          fs.close(fd, closeErr => {
+            logger.error(closeErr)
+          })
+          return
+        })
+      })
+
+    }).then((log: string) => {
+      this.archive.append(log, { name })
+    }).catch(err => {
+      this.archive.append(err.message, { name })
     })
   }
 
