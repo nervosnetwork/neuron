@@ -8,6 +8,7 @@ import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
 import VerificationFailureIcon from 'widgets/Icons/VerificationFailure.png'
+import VerificationWarningIcon from 'widgets/Icons/VerificationWarning.png'
 import Spinner from 'widgets/Spinner'
 
 import { ControllerResponse } from 'services/remote/remoteApiWrapper'
@@ -99,6 +100,7 @@ const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
   const [t] = useTranslation()
   return (
     <div className={styles.addressNotFound}>
+      <img src={VerificationWarningIcon} alt="warning" />
       <span>{t('sign-and-verify.address-not-found')}</span>
       <Button label="OK" type="primary" onClick={onDismiss} />
     </div>
