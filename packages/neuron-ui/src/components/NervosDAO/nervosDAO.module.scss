@@ -15,6 +15,7 @@ $infoHeight: 1.75rem;
 .title {
   @include page-title;
   grid-area: title;
+  margin-bottom: 10px;
 }
 
 .free {
@@ -86,12 +87,13 @@ $infoHeight: 1.75rem;
 
 .records {
   grid-area: records;
+  margin-top: 12px;
 
   .recordTab {
     position: relative;
     display: flex;
     box-sizing: border-box;
-    margin: 0 0 19px 0;
+    margin: 0 0 10px 0;
     padding: 0;
     line-height: 1.6875rem;
     font-size: 1.375rem;
