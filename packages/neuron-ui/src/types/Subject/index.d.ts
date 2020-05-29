@@ -24,7 +24,7 @@ declare namespace Subject {
     type: Command.Type
     payload: Command.Payload
   }
-  type ConnectionStatus = boolean
+  type ConnectionStatus = { url: string; connected: boolean }
   type BlockNumber = string
   interface AppUpdater {
     checking: boolean

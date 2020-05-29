@@ -58,8 +58,11 @@ class NodeService {
     const realtimeSync = this.connectionStatusSubject.pipe(distinctUntilChanged())
     merge(periodSync, realtimeSync)
       .pipe(debounceTime(500))
-      .subscribe(connectionStatus => {
-        ConnectionStatusSubject.next(connectionStatus)
+      .subscribe(connected => {
+        ConnectionStatusSubject.next({
+          url: this.ckb.node.url,
+          connected,
+        })
       })
   }
 
