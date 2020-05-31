@@ -5,14 +5,14 @@ import { ScriptHashType } from "../../src/models/chain/script"
 
 describe('AssetAccountInfo', () => {
   const testnetSudtInfo = {
-    cellDep: new CellDep(new OutPoint('0x0e7153f243ba4c980bfd7cd77a90568bb70fd393cb572b211a2f884de63d103d', '0'), DepType.Code),
+    cellDep: new CellDep(new OutPoint('0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958', '0'), DepType.Code),
     codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
     hashType: ScriptHashType.Data
   }
 
   const testnetAnyoneCanPayInfo = {
-    cellDep: new CellDep(new OutPoint('0xd28eb9114053e24c950b061b1e102f70697510c1dbfcb191d1a556d68d196428', '0'), DepType.DepGroup),
-    codeHash: '0x98e12a104d00f21d436efdbfd3991033aebefc29fed69f3dc015fe5333a6abd6',
+    cellDep: new CellDep(new OutPoint('0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c', '0'), DepType.DepGroup),
+    codeHash: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
     hashType: ScriptHashType.Type
   }
 
