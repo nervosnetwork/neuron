@@ -75,7 +75,7 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
-      "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
+      "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
       "same-password": "The password and confirm password should match"
     },
     "import-keystore": {
