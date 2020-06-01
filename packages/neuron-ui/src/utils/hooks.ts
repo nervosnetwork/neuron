@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
-import { openContextMenu, requestPassword, setCurrentNetowrk, deleteNetwork } from 'services/remote'
+import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
   StateDispatch,
@@ -323,10 +323,6 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
         }
         case 'delete': {
           deleteNetwork(id)
-          break
-        }
-        case 'select': {
-          setCurrentNetowrk(id)
           break
         }
         default: {
