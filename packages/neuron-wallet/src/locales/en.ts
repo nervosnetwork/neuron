@@ -130,6 +130,15 @@ export default {
       'sign-and-verify': {
         title: 'Sign/verify message'
       },
+      'ckb-dependency': {
+        title: 'Bundled CKB Node',
+        message: 'Dependency Required',
+        detail: `The embedded CKB node in Neuron requires Microsoft Visual C++ Redistributable component to be installed to work properly. You have to install it to enable the internal node. If you'd like to use a remote CKB node, you can skip this step.`,
+        buttons: {
+          'skip': 'Skip',
+          'install-and-exit': 'Install and Exit'
+        }
+      }
     },
     prompt: {
       password: {
