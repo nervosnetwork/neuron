@@ -25,7 +25,7 @@ export default class BufferUtils {
 
   public static parseAmountFromSUDTData(leHex: string): bigint {
     try {
-      return this.readBigUInt128LE(leHex)
+      return this.readBigUInt128LE(leHex.slice(0, 34))
     } catch (error) {
       return BigInt(0)
     }

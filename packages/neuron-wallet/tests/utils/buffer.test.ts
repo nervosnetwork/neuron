@@ -57,8 +57,13 @@ describe('BufferUtils', () => {
 
   describe('#parseAmountFromSUDTData', () => {
     describe('when the format of hex string aligns with the protocol', () => {
-      it('converts to a BigInt value', () => {
+      it('converts whole hex string to a BigInt value if the length of hex string equals 34', () => {
         const result = BufferUtils.parseAmountFromSUDTData(leHex)
+        expect(result).toEqual(num)
+      })
+      it('converts to a BigInt value based on the first 34 chars of the hex string', () => {
+        const overflowHex = leHex + '12345'
+        const result = BufferUtils.parseAmountFromSUDTData(overflowHex)
         expect(result).toEqual(num)
       })
     });
@@ -73,9 +78,9 @@ describe('BufferUtils', () => {
         const result = BufferUtils.parseAmountFromSUDTData(shortedHex)
         expect(result).toEqual(BigInt(0))
       })
-      it('throws an error if the length of hex string is greater than 34', () => {
-        const overflowHex = '0x010000000000000000000100000000000'
-        const result = BufferUtils.parseAmountFromSUDTData(overflowHex)
+      it('throws an error if invalid hex string', () => {
+        const shortedHex = '0x0100000000000000000001000000000z'
+        const result = BufferUtils.parseAmountFromSUDTData(shortedHex)
         expect(result).toEqual(BigInt(0))
       })
     });
