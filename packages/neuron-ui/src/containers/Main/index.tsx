@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useMemo, useCallback } from 'react'
+import { useHistory, useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -20,7 +20,14 @@ import SUDTAccountList from 'components/SUDTAccountList'
 import SUDTSend from 'components/SUDTSend'
 import SUDTReceive from 'components/SUDTReceive'
 
-import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
+import {
+  RoutePath,
+  useOnDefaultContextMenu,
+  useRoutes,
+  useOnLocaleChange,
+  useChainTypeByGenesisBlockHash,
+  ChainType,
+} from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -132,6 +139,20 @@ const MainContent = () => {
   const dispatch = useDispatch()
   const { networkID } = chain
   const [t, i18n] = useTranslation()
+  const isCurrentSUDT = !!useRouteMatch(mainContents.filter(c => c.name.startsWith('SUDT')).map(c => c.path))
+
+  const toggleSUDT = useCallback(
+    (chainType: ChainType) => {
+      if (ChainType.TESTNET !== chainType && isCurrentSUDT) {
+        history.replace(mainContents[0].path)
+      }
+    },
+    [isCurrentSUDT, history]
+  )
+
+  const networkURL = networks.find(n => n.id === networkID)?.remote ?? null
+
+  useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
 
   useSubscription({
     walletID,
