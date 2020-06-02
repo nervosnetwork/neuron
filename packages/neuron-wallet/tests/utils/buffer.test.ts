@@ -54,4 +54,30 @@ describe('BufferUtils', () => {
       })
     });
   });
+
+  describe('#parseAmountFromSUDTData', () => {
+    describe('when the format of hex string aligns with the protocol', () => {
+      it('converts to a BigInt value', () => {
+        const result = BufferUtils.parseAmountFromSUDTData(leHex)
+        expect(result).toEqual(num)
+      })
+    });
+    describe('when the format of hex string does not align with the protocol', () => {
+      it('throws an error if hex string does not start with 0x', () => {
+        const hexWithout0x = '0100000000000000000001000000000000'
+        const result = BufferUtils.parseAmountFromSUDTData(hexWithout0x)
+        expect(result).toEqual(BigInt(0))
+      })
+      it('throws an error if the length of hex string is less than 34', () => {
+        const shortedHex = '0x0100000000000000000001000000000'
+        const result = BufferUtils.parseAmountFromSUDTData(shortedHex)
+        expect(result).toEqual(BigInt(0))
+      })
+      it('throws an error if the length of hex string is greater than 34', () => {
+        const overflowHex = '0x010000000000000000000100000000000'
+        const result = BufferUtils.parseAmountFromSUDTData(overflowHex)
+        expect(result).toEqual(BigInt(0))
+      })
+    });
+  });
 })

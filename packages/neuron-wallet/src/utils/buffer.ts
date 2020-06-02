@@ -22,4 +22,12 @@ export default class BufferUtils {
     const buf = Buffer.from(leHex.slice(2), 'hex')
     return (buf.readBigUInt64LE(8) << BigInt(64)) + buf.readBigUInt64LE(0)
   }
+
+  public static parseAmountFromSUDTData(leHex: string): bigint {
+    try {
+      return this.readBigUInt128LE(leHex)
+    } catch (error) {
+      return BigInt(0)
+    }
+  }
 }

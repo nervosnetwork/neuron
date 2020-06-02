@@ -63,7 +63,7 @@ export default class AssetAccountService {
       } else {
         const sumOfAmount = (output.dataArray as string)
           .split(',')
-          .map(data => BufferUtils.readBigUInt128LE(data.trim()))
+          .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
           .reduce((result, c) => result + c, BigInt(0))
         sumOfAmountMap.set(key, old + sumOfAmount)
       }
@@ -121,7 +121,7 @@ export default class AssetAccountService {
       BigInt(output.sumOfCapacity) :
       (output.dataArray as string)
         .split(',')
-        .map(data => BufferUtils.readBigUInt128LE(data.trim()))
+        .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
         .reduce((result, c) => result + c, BigInt(0))
 
     assetAccount.balance = sumOfAmount.toString()

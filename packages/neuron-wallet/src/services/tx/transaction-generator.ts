@@ -694,7 +694,7 @@ export class TransactionGenerator {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCellDep = assetAccountInfo.sudtCellDep
     const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
-    const targetAmount: bigint = amount === 'all' ? BigInt(0) : BufferUtils.readBigUInt128LE(targetOutput.data) + BigInt(amount)
+    const targetAmount: bigint = amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
     const output = Output.fromObject({
       ...targetOutput,
       data: BufferUtils.writeBigUInt128LE(targetAmount),
@@ -733,7 +733,7 @@ export class TransactionGenerator {
     )
 
     if (amount === 'all') {
-      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(result.amount) + BufferUtils.readBigUInt128LE(targetOutput.data))
+      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(result.amount) + BufferUtils.parseAmountFromSUDTData(targetOutput.data))
     }
 
     tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
@@ -763,12 +763,12 @@ export class TransactionGenerator {
   private static checkTxSudtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {
     const inputAmount = tx.inputs
       .filter(i => i.type && assetAccountInfo.isSudtScript(i.type))
-      .map(i => BufferUtils.readBigUInt128LE(i.data!))
+      .map(i => BufferUtils.parseAmountFromSUDTData(i.data!))
       .reduce((result, c) => result + c, BigInt(0))
 
     const outputAmount = tx.outputs
       .filter(o => o.type && assetAccountInfo.isSudtScript(o.type))
-      .map(o => BufferUtils.readBigUInt128LE(o.data!))
+      .map(o => BufferUtils.parseAmountFromSUDTData(o.data!))
       .reduce((result, c) => result + c, BigInt(0))
 
     assert.equal(inputAmount.toString(), outputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
