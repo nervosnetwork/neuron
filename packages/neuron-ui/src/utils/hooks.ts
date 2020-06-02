@@ -1,6 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { openContextMenu, requestPassword, setCurrentNetowrk, deleteNetwork } from 'services/remote'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
@@ -10,7 +11,7 @@ import {
   updateAddressDescription,
   setCurrentWallet,
 } from 'states'
-import { epochParser, RoutePath } from 'utils'
+import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
 import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
 
@@ -393,3 +394,46 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
     },
     [history]
   )
+
+export const useChainTypeByGenesisBlockHash = (url: string | null, cb: (chainType: ChainType) => void) => {
+  const timerRef = useRef<NodeJS.Timeout | undefined>()
+  const BUFFER_TIME = 200
+
+  useEffect(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+
+    if (url) {
+      timerRef.current = setTimeout(() => {
+        new CKB(url).rpc
+          .getHeaderByNumber('0x0')
+          .then(header => {
+            switch (header?.hash) {
+              case GenesisBlockHash.MAINNET: {
+                cb(ChainType.MAINNET)
+                break
+              }
+              case GenesisBlockHash.TESTNET: {
+                cb(ChainType.TESTNET)
+                break
+              }
+              default: {
+                cb(ChainType.DEVNET)
+              }
+            }
+          })
+          .catch(() => {
+            cb(ChainType.DEVNET)
+          })
+      }, BUFFER_TIME)
+    } else {
+      cb(ChainType.DEVNET)
+    }
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [url, cb])
+}
