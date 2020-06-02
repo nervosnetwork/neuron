@@ -68,6 +68,7 @@ $left-padding: 15px;
   & > div {
     align-items: flex-end;
     padding-left: $left-padding * 2;
+    padding-right: $left-padding;
     padding-bottom: 5px;
   }
 }

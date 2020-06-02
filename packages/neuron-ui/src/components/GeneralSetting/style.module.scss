@@ -1,27 +1,124 @@
+@import '../../styles/mixin.scss';
+
+$action-button-width: 11.25rem;
 .container {
+  font-size: 0.875rem;
+  margin-top: 1.25rem;
   button {
-    width: 9.375rem;
+    min-width: auto;
+    width: $action-button-width;
+    box-sizing: border-box;
+    height: 1.625rem;
+    padding: 0;
+  }
+
+  display: grid;
+  grid-template:
+    'version-label version-value version-action' auto
+    'language-label language-select language-action' auto
+    'clear-cache-detail clear-cache-detail clear-cache-action' auto/
+    120px 1fr $action-button-width;
+  grid-gap: 30px 10px;
+}
+.label {
+  @include regular-text;
+  font-weight: 600;
+  align-self: center;
+  &:after {
+    content: ':';
   }
 }
 
-.releaseNotesStyle {
-  overflow: scroll;
-  height: 200px;
-  margin-bottom: 20px;
-  padding: 10px 15px 15px 15px;
-  border: solid 1px #ccc;
+.version {
+  &.label {
+    grid-area: version-label;
+  }
 
-  ul {
-    list-style-type: disc;
-    padding-left: 30px;
+  &.value {
+    align-self: center;
+    grid-area: version-value;
+  }
 
-    li {
-      margin: 5px 0;
+  &.action {
+    grid-area: version-action;
+  }
+}
+
+.newVersion {
+  grid-area: 1/2/2/4;
+}
+
+.language {
+  &.label {
+    grid-area: language-label;
+  }
+  &.select {
+    grid-area: language-select;
+    max-width: 300px;
+    & > div {
+      margin: 0;
     }
   }
 
-  a {
-    text-decoration: none;
-    pointer-events: none;
+  &.action {
+    grid-area: language-action;
+  }
+}
+.clearCache {
+  &.detail {
+    grid-area: clear-cache-detail;
+    .date {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      height: 1.125rem;
+      margin-bottom: 5px;
+    }
+    .desc {
+      display: flex;
+      font-size: 0.6875rem;
+      color: #666;
+    }
+    svg {
+      height: 0.6875rem;
+      width: 0.6875rem;
+      filter: grayscale(1) opacity(0.6);
+      margin: 2px 5px 0 0;
+    }
+  }
+  &.action {
+    grid-area: clear-cache-action;
+  }
+}
+
+.install {
+  display: grid;
+  grid-template:
+    'note action' auto
+    'release-note release-note'/
+    1fr $action-button-width;
+
+  .releaseNotesStyle {
+    grid-area: release-note;
+    overflow: scroll;
+    min-height: 200px;
+    height: calc(100vh - 400px);
+    margin: 6px auto 20px;
+    padding: 10px 15px 15px 15px;
+    border: solid 1px #ccc;
+
+    ul {
+      list-style-type: disc;
+      padding-left: 30px;
+
+      li {
+        margin: 5px 0;
+      }
+    }
+
+    a {
+      text-decoration: none;
+      pointer-events: none;
+    }
   }
 }

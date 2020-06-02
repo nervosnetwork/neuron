@@ -17,7 +17,7 @@ const WalletNotFound = () => {
     <div>
       <p>{t(`messages.codes.${ErrorCode.FieldNotFound}`, { fieldName: 'wallet' })}</p>
       <Link to={RoutePath.SettingsWallets} className="btn btn-primary">
-        {`${t('navbar.settings')}-${t('settings.setting-tabs.wallets')}`}
+        {`${t('settings.title')}-${t('settings.setting-tabs.wallets')}`}
       </Link>
     </div>
   )

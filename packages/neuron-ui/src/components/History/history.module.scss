@@ -1,6 +1,59 @@
 @import '../../styles/mixin.scss';
 
 .history {
+  .tools {
+    display: grid;
+    grid-template:
+      'search-input search-button export-button' auto/
+      1fr auto auto;
+    margin-bottom: 15px;
+    .searchBox {
+      grid-area: search-input;
+      button:hover {
+        background: rgb(220, 220, 220);
+      }
+    }
+
+    .searchBtn,
+    .exportBtn {
+      height: 1.625rem;
+      min-width: unset;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+    }
+
+    .searchBtn {
+      grid-area: search-button;
+      padding: 0 15px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      background-color: rgb(204, 204, 204);
+      color: rgb(97, 97, 97);
+      border: none;
+    }
+
+    .exportBtn {
+      grid-area: export-button;
+      width: 1.625rem;
+      margin-left: 10px;
+      svg {
+        width: 16px;
+        height: 16px;
+        path {
+          fill: #fff;
+        }
+      }
+    }
+  }
+
+  .listContainer {
+    background-color: #fff;
+    padding: 0 15px;
+  }
+
   .pagination {
     margin-top: 12px;
     display: flex;

@@ -2,6 +2,7 @@ import path from 'path'
 import { app as electronApp, remote, BrowserWindow } from 'electron'
 import windowStateKeeper from 'electron-window-state'
 
+import i18n from 'locales/i18n'
 import env from 'env'
 import { updateApplicationMenu } from './menu'
 import logger from 'utils/logger'
@@ -11,6 +12,7 @@ import WalletsService from 'services/wallets'
 import ApiController from 'controllers/api'
 import NodeController from 'controllers/node'
 import SyncApiController from 'controllers/sync-api'
+import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 const app = electronApp || (remote && remote.app)
 
@@ -116,10 +118,7 @@ export default class AppController {
       if (process.platform !== 'darwin') {
         app.quit()
       }
-      if (this.mainWindow) {
-        this.mainWindow.removeAllListeners()
-        this.mainWindow = null
-      }
+      this.clearOnClosed()
     })
 
     this.mainWindow.on('focus', () => {
@@ -132,5 +131,19 @@ export default class AppController {
 
     this.mainWindow.loadURL(env.mainURL)
     this.updateMenu()
+  }
+
+  private clearOnClosed = () => {
+    const windowsToClose = [i18n.t(SETTINGS_WINDOW_TITLE)]
+    BrowserWindow.getAllWindows().forEach(bw => {
+      if (windowsToClose.includes(bw.getTitle())) {
+        bw.close()
+      }
+    })
+
+    if (this.mainWindow) {
+      this.mainWindow.removeAllListeners()
+      this.mainWindow = null
+    }
   }
 }

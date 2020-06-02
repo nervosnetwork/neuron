@@ -108,3 +108,10 @@
   padding: 0;
   margin: 0 0 23px 0;
 }
+
+@mixin text-overflow-ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

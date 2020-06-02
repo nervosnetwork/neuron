@@ -15,7 +15,7 @@
       "send": "轉帳",
       "receive": "收款",
       "history": "交易歷史",
-      "settings": "設定",
+      "addresses": "地址管理",
       "nervos-dao": "Nervos DAO",
       "special-assets": "自定義資產",
       "sync-not-start": "同步尚未開始",
@@ -116,7 +116,7 @@
       "fee": "交易費",
       "advanced-fee-settings": "交易費高級設定",
       "price": "單價",
-      "expected-speed": "預期成交速度",
+      "pick-price": "快速選擇單價",
       "total-cycles": "RISC-V Cycles 總數",
       "scan-screen-qr-code": "掃描荧幕上的二維碼",
       "set-locktime": "設置鎖定時間",
@@ -159,8 +159,10 @@
       "blockNumber": "區塊高度",
       "basic-information": "基本資訊",
       "search": {
+        "button": "蒐索",
         "placeholder": "使用交易雜湊、地址或日期(yyyy-mm-dd)進行蒐索"
       },
+      "export-history": "導出交易歷史",
       "confirmations": "確認次數",
       "confirming-with-count": "已確認 {{confirmations}} 次",
       "view-on-explorer": "在瀏覽器中查看",
@@ -175,6 +177,7 @@
       "copy-address": "複製地址"
     },
     "transaction": {
+      "window-title": "交易: {{hash}}",
       "date": "時間",
       "transaction-hash": "交易雜湊",
       "block-number": "區塊高度",
@@ -203,6 +206,10 @@
       "view-on-explorer": "在瀏覽器中查看"
     },
     "settings": {
+      "title": {
+        "normal": "設定",
+        "mac": "偏好設置"
+      },
       "go-to-overview": "返回總覽畫面",
       "setting-tabs": {
         "general": "通用",
@@ -212,9 +219,13 @@
       "general": {
         "clear-cache": "清空緩存",
         "clearing-cache": "清空中…",
-        "clear-cache-description": "當資料同步或顯示出現問題時，可以清空緩存，Neuron 會重新同步所有塊數據。",
+        "clear-cache-description": "當資料同步或餘額顯示出現問題時，可以清空緩存，Neuron 會重新同步所有塊數據。",
         "show": "顯示",
-        "hide": "隱藏"
+        "hide": "隱藏",
+        "version": "版本",
+        "language": "語言",
+        "cache-cleared-on": "上次清空緩存時間 {{date}}",
+        "apply": "應用"
       },
       "wallet-manager": {
         "edit-wallet": {
@@ -242,6 +253,12 @@
         "mainnet": "主網",
         "testnet": "測試網",
         "devnet": "開發網"
+      },
+      "locale": {
+        "en": "English",
+        "en-US": "English(United States)",
+        "zh": "中文(简体)",
+        "zh-TW": "中文(繁體)"
       }
     },
     "password-request": {
@@ -390,6 +407,7 @@
       "free": "當前可用",
       "locked": "已鎖定",
       "deposit": "存入",
+      "copy-balance": "複製餘額",
       "deposit-records": "存入",
       "completed-records": "已解鎖",
       "apc": "當前年化鎖定補貼率",
@@ -449,8 +467,7 @@
       "checking-updates": "正在檢查…",
       "downloading-update": "正在下載更新…",
       "update-not-available": "已經在使用最新版本",
-      "release-notes": "Release Notes:",
-      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載。要下載和安裝嗎？",
+      "updates-found-do-you-want-to-update": "新版本 {{version}} 可供下載",
       "download-update": "下載安裝",
       "updates-downloaded-about-to-quit-and-install": "下載完成。請安裝新版本。",
       "quit-and-install": "安裝並重啓應用"
@@ -479,6 +496,7 @@
       "start-tomorrow": "所選時間不能早於明天。"
     },
     "sign-and-verify": {
+      "window-title": "簽名/驗簽信息",
       "sign-or-verify-message": "簽名/驗簽信息",
       "message": "信息",
       "address": "地址",

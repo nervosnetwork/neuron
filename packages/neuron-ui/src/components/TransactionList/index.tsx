@@ -191,9 +191,9 @@ const TransactionList = ({
                 <img src={CKBAvatar} alt="avatar" />
               </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <div className={styles.amount} title={value}>
+              <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.]/g, '')}>
                 {amount}
-              </div>
+              </CopyZone>
               <span className={styles.type} title={typeLabel}>
                 {typeLabel}
               </span>

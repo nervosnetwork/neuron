@@ -10,3 +10,7 @@ body {
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
   display: block !important;
 }
+
+#root {
+  grid-area: 1/1/5/5;
+}

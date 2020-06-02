@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CompensationProgressBar from 'components/CompensationProgressBar'
 import Button from 'widgets/Button'
+import CopyZone from 'widgets/CopyZone'
 import {
   calculateClaimEpochValue,
   ConnectionStatus,
@@ -239,6 +240,8 @@ export const DAORecord = ({
     )
   }
 
+  const amount = shannonToCKBFormatter(capacity)
+
   return (
     <div className={styles.container} data-is-collapsed={isCollapsed}>
       <div className={styles.badge}>{badge}</div>
@@ -257,9 +260,7 @@ export const DAORecord = ({
         </span>
       </div>
 
-      <div className={styles.amount}>
-        <span>{`${shannonToCKBFormatter(capacity)} CKB`}</span>
-      </div>
+      <CopyZone className={styles.amount} content={amount.replace(/,/g, '')}>{`${amount} CKB`}</CopyZone>
       {progressOrPeriod}
 
       <div className={styles.apc}>

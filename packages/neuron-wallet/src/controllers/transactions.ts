@@ -1,7 +1,9 @@
+import { dialog } from 'electron'
 import { TransactionsService, PaginationResult } from 'services/tx'
 import AddressesService from 'services/addresses'
 import WalletsService from 'services/wallets'
 
+import i18n from 'locales/i18n'
 import { ResponseCode } from 'utils/const'
 import { TransactionNotFound, CurrentWalletNotSet } from 'exceptions'
 import Transaction from 'models/chain/transaction'
@@ -95,6 +97,36 @@ export default class TransactionsController {
     return {
       status: ResponseCode.Success,
       result: { hash, description }
+    }
+  }
+
+  public async exportTransactions({ walletID }: { walletID: string }) {
+    const wallet = WalletsService.getInstance().get(walletID)
+
+    if (!wallet) {
+      throw new CurrentWalletNotSet()
+    }
+
+    try {
+      const { canceled, filePath } = await dialog.showSaveDialog({
+        title: i18n.t('export-transactions.export-transactions'),
+        defaultPath: `transactions_${Date.now()}.csv`
+      })
+      if (canceled || !filePath) {
+        return
+      }
+      const total = await TransactionsService.exportTransactions({ walletID, filePath })
+      dialog.showMessageBox({
+        type: 'info',
+        message: i18n.t('export-transactions.transactions-exported', { file: filePath, total })
+      })
+      return {
+        status: ResponseCode.Success,
+        result: total
+      }
+    } catch (err) {
+      dialog.showErrorBox(i18n.t('common.error'), err.message)
+      throw err
     }
   }
 }

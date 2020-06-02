@@ -66,6 +66,10 @@ declare module Controller {
       signature: string
       message: string
     }
+
+    interface ShowSettings {
+      tab: 'general' | 'wallets' | 'networks'
+    }
   }
 
   interface Wallet {
