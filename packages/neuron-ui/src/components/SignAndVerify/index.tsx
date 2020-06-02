@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { showErrorMessage, signMessage, verifyMessage, getAddressesByWalletID } from 'services/remote'
 import Button from 'widgets/Button'
 import DownArrow from 'widgets/Icons/DownArrow.png'
-import { ErrorCode, shannonToCKBFormatter, useExitOnWalletChange, isSuccessResponse } from 'utils'
+import { ErrorCode, shannonToCKBFormatter, useExitOnWalletChange, isSuccessResponse, useOnLocaleChange } from 'utils'
 import Balance from 'widgets/Balance'
 import TextField from 'widgets/TextField'
 import VerificationSuccessIcon from 'widgets/Icons/VerificationSuccess.png'
@@ -22,9 +22,11 @@ const PasswordRequest = ({
   onSubmit: (pwd: string) => Promise<void>
   error: string
 }) => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useOnLocaleChange(i18n)
 
   const onChange = useCallback(
     e => {
@@ -104,7 +106,7 @@ const AddressNotFound = ({ onDismiss }: { onDismiss: () => void }) => {
 }
 
 const SignAndVerify = () => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [status, setStatus] = useState<
     'edit' | 'request-password' | 'verify-success' | 'verify-failure' | 'address-not-found'
   >('edit')
@@ -113,6 +115,12 @@ const SignAndVerify = () => {
   const [signature, setSignature] = useState('')
   const [address, setAddress] = useState('')
   const [pwdErr, setPwdErr] = useState('')
+
+  useOnLocaleChange(i18n)
+  useEffect(() => {
+    window.document.title = i18n.t(`sign-and-verify.window-title`)
+    // eslint-disable-next-line
+  }, [i18n.language])
 
   useEffect(() => {
     const id = window.location.href.split('/').pop()

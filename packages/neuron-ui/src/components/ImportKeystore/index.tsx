@@ -18,7 +18,7 @@ export const importWalletWithKeystore = (params: Controller.ImportKeystoreParams
 ) => {
   return importKeystore(params).then(res => {
     if (isSuccessResponse(res)) {
-      history.push(RoutePath.Overview)
+      history.push(window.neuron.role === 'main' ? RoutePath.Overview : RoutePath.SettingsWallets)
     } else if (res.status > 0) {
       showErrorMessage(i18n.t(`messages.error`), i18n.t(`messages.codes.${res.status}`))
     } else if (res.message) {

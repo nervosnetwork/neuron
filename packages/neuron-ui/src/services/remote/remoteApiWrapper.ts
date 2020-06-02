@@ -32,6 +32,8 @@ type Action =
   | 'load-init-data'
   | 'open-in-window'
   | 'handle-view-error'
+  | 'show-settings'
+  | 'set-locale'
   // Wallets
   | 'get-all-wallets'
   | 'get-current-wallet'
@@ -57,6 +59,7 @@ type Action =
   | 'get-transaction'
   | 'show-transaction-details'
   | 'update-transaction-description'
+  | 'export-transactions'
   // Dao
   | 'get-dao-data'
   | 'generate-dao-deposit-tx'

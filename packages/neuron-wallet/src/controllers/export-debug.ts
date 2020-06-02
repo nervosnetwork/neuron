@@ -6,7 +6,7 @@ import CKB from '@nervosnetwork/ckb-sdk-core'
 import { app, dialog } from 'electron'
 import logger from 'electron-log'
 import i18n from 'locales/i18n'
-import { ckbPath } from 'services/ckb-runner'
+import { ckbDataPath } from 'services/ckb-runner'
 import NetworksService from 'services/networks'
 import SyncedBlockNumber from 'models/synced-block-number'
 
@@ -94,7 +94,7 @@ export default class ExportDebugController {
     const SIZE_TO_READ = 32_000
 
     return new Promise((resolve, reject) => {
-      const logPath = path.resolve(ckbPath(), 'data', 'logs', 'run.log')
+      const logPath = path.resolve(ckbDataPath(), 'data', 'logs', 'run.log')
       if (!fs.existsSync(logPath)) { return reject(new Error("File not found")) }
 
       const fileStats = fs.statSync(logPath)

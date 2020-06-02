@@ -46,6 +46,7 @@ $pending-color: #b3b3b3;
     }
 
     .amount {
+      @include text-overflow-ellipsis;
       grid-area: amount;
       justify-self: flex-end;
       align-self: center;
@@ -54,6 +55,8 @@ $pending-color: #b3b3b3;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      width: 90%;
+      color: var(--nervos-green);
     }
 
     .walletName {
@@ -127,7 +130,7 @@ $pending-color: #b3b3b3;
       min-height: 18px;
 
       & > span:first-of-type {
-        @include medium-text;
+        @include bold-text;
       }
     }
 

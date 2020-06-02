@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import {
   app,
   shell,
@@ -13,9 +15,11 @@ import ExportDebugController from 'controllers/export-debug'
 import { showWindow } from 'controllers/app/show-window'
 import WalletsService from 'services/wallets'
 import CommandSubject from 'models/subjects/command'
+import logger from 'utils/logger'
+import { SETTINGS_WINDOW_TITLE } from 'utils/const'
 
 enum URL {
-  Preference = '/settings/general',
+  Settings = '/settings/general',
   CreateWallet = '/wizard/mnemonic/create',
   ImportMnemonic = '/wizard/mnemonic/import',
   ImportKeystore = '/keystore/import',
@@ -34,15 +38,36 @@ const separator: MenuItemConstructorOptions = {
 }
 
 const showAbout = () => {
-  const options = {
-    type: 'info',
-    title: app.name,
-    message: app.name,
-    detail: app.getVersion(),
-    buttons: ['OK'],
-    cancelId: 0,
+  let applicationVersion = i18n.t('about.app-version', { name: app.name, version: app.getVersion() })
+
+  const appPath = app.isPackaged ? app.getAppPath() : path.join(__dirname, '../../../../..')
+  const ckbVersionPath = path.join(appPath, '.ckb-version')
+  if (fs.existsSync(ckbVersionPath)) {
+    try {
+      const ckbVersion = fs.readFileSync(ckbVersionPath, 'utf8')
+      applicationVersion += `\n${i18n.t('about.ckb-client-version', { version: ckbVersion })}`
+    } catch (err) {
+      logger.error(`[Menu]: `, err)
+    }
   }
-  dialog.showMessageBox(options)
+
+  const isWin = process.platform === 'win32'
+
+  if (isWin) {
+    const options = {
+      type: 'info',
+      title: app.name,
+      message: app.name,
+      detail: applicationVersion,
+      buttons: ['OK'],
+      cancelId: 0,
+    }
+    dialog.showMessageBox(options)
+    return
+  }
+
+  app.setAboutPanelOptions({ applicationVersion, version: '' })
+  app.showAboutPanel()
 }
 
 const navigateTo = (url: string) => {
@@ -50,6 +75,10 @@ const navigateTo = (url: string) => {
   if (window) {
     CommandSubject.next({ winID: window.id, type: 'navigate-to-url', payload: url, dispatchToUI: true })
   }
+}
+
+const showSettings = () => {
+  showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE))
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
@@ -77,16 +106,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         label: i18n.t('application-menu.neuron.about', {
           app: app.name,
         }),
-        role: 'about',
         click: () => { showAbout() },
       },
       {
         label: i18n.t('application-menu.neuron.check-updates'),
         enabled: isMainWindow && !UpdateController.isChecking,
         click: () => {
-           new UpdateController().checkUpdates()
-           navigateTo(URL.Preference)
-         }
+          new UpdateController().checkUpdates()
+          showSettings()
+        }
       },
       separator,
       {
@@ -94,7 +122,7 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: isMainWindow,
         label: i18n.t('application-menu.neuron.preferences'),
         accelerator: 'CmdOrCtrl+,',
-        click: () => { navigateTo(URL.Preference) }
+        click: showSettings
       },
       separator,
       {
@@ -279,15 +307,15 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
     helpSubmenu.push(separator)
     helpSubmenu.push({
       id: 'preference',
-      label: i18n.t('application-menu.help.settings'),
-      click: () => { navigateTo(URL.Preference) }
+      label: i18n.t(SETTINGS_WINDOW_TITLE),
+      click: showSettings,
     })
     helpSubmenu.push({
       label: i18n.t('application-menu.neuron.check-updates'),
       enabled: isMainWindow && !UpdateController.isChecking,
       click: () => {
         new UpdateController().checkUpdates()
-        navigateTo(URL.Preference)
+        showSettings()
       }
     })
     helpSubmenu.push({
@@ -295,7 +323,6 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
       label: i18n.t('application-menu.neuron.about', {
         app: app.name
       }),
-      role: 'about',
       click: () => { showAbout() }
     })
   }

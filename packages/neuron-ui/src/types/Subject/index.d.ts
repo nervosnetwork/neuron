@@ -32,4 +32,5 @@ declare namespace Subject {
     version: string
     releaseNotes: string
   }
+  type URL = string
 }
