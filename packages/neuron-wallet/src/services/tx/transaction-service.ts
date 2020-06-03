@@ -242,11 +242,11 @@ export class TransactionsService {
           // const typeArgs = sudtInput.typeArgs
           const inputAmount = anyoneCanPayInputs
             .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
-            .map(i => BufferUtils.readBigUInt128LE(i.data))
+            .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
             .reduce((result, c) => result + c, BigInt(0))
           const outputAmount = anyoneCanPayOutputs
             .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
-            .map(o => BufferUtils.readBigUInt128LE(o.data))
+            .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
             .reduce((result, c) => result + c, BigInt(0))
 
           const amount = outputAmount - inputAmount

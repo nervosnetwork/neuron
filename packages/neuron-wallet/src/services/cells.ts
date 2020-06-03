@@ -655,7 +655,9 @@ export default class CellsService {
       })
     const anyoneCanPayLockLiveCells: LiveCell[] = anyoneCanPayLockLiveCellEntities.map(entity => LiveCell.fromEntity(entity))
 
-    const allAmount: bigint = anyoneCanPayLockLiveCells.map(c => BufferUtils.readBigUInt128LE(c.data)).reduce((result, c) => result + c, BigInt(0))
+    const allAmount: bigint = anyoneCanPayLockLiveCells.map(
+      c => BufferUtils.parseAmountFromSUDTData(c.data)).reduce((result, c) => result + c, BigInt(0)
+    )
     const amountInt = amount === 'all' ? allAmount : BigInt(amount)
 
     if (anyoneCanPayLockLiveCellEntities.length === 0) {
@@ -691,7 +693,7 @@ export default class CellsService {
       }
       inputs.push(input)
 
-      inputAmount += BufferUtils.readBigUInt128LE(cell.data)
+      inputAmount += BufferUtils.parseAmountFromSUDTData(cell.data)
 
       needFee = mode.isFeeRateMode() ? TransactionFee.fee(totalSize, feeRateInt) : feeInt
 
