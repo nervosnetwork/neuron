@@ -77,7 +77,6 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                   role="presentation"
                   className={`ms-ChoiceFieldLabel ${styles.choiceLabel}`}
                   data-id={network.id}
-                  data-action="select"
                   onClick={onHandleNetwork}
                   title={`${text}: ${network.remote}`}
                 >

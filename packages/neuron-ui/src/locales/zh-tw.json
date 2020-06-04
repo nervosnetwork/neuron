@@ -76,7 +76,7 @@
       "wallet-suffix": "錢包 {{suffix}}",
       "write-down-seed": "請記下您的助記詞並保存到安全的地方",
       "new-name": "輸入新的錢包名稱",
-      "complex-password": "密碼為 8 至 50 比特由大寫字母、小寫字母、數位、特殊符號中至少三類字元組成的字串，且必須以字母或者數位開頭",
+      "complex-password": "密碼為 8 至 50 比特由大寫字母、小寫字母、數位、特殊符號中至少三類字元組成的字串。",
       "same-password": "兩次輸入密碼應一致"
     },
     "import-keystore": {
