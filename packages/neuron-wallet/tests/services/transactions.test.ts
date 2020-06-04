@@ -29,7 +29,7 @@ describe('transactions service', () => {
     it('-', () => {
       const value = '-'
       const type = TransactionsService.filterSearchType(value)
-      expect(type).toBe(SearchType.Unknown)
+      expect(type).toBe(SearchType.TokenInfo)
     })
 
     it('empty string', () => {
@@ -41,7 +41,7 @@ describe('transactions service', () => {
     it('2019-2-18', () => {
       const value = '2019-2-18'
       const type = TransactionsService.filterSearchType(value)
-      expect(type).toBe(SearchType.Unknown)
+      expect(type).toBe(SearchType.TokenInfo)
     })
   })
 })

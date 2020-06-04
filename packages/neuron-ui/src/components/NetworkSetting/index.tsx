@@ -7,7 +7,7 @@ import Button from 'widgets/Button'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
 
-import chainState from 'states/init/chain'
+import { chainState } from 'states'
 import { setCurrentNetowrk } from 'services/remote'
 
 import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'

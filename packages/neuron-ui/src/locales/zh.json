@@ -20,7 +20,8 @@
       "special-assets": "自定义资产",
       "sync-not-start": "同步尚未开始",
       "connecting": "正在连接节点",
-      "experimental-functions": "实验性功能"
+      "experimental-functions": "实验性功能",
+      "s-udt": "资产账户"
     },
     "network-status": {
       "tooltip": {
@@ -123,6 +124,9 @@
       "release-on": "锁定至"
     },
     "receive": {
+      "title": "收款",
+      "address-book": "地址簿",
+      "click-to-copy": "点击复制地址",
       "copy-address": "复制地址",
       "address-not-found": "未找到地址",
       "prompt": "为了保护隐私，Neuron 会自动选择一个新收款地址。如果您想使用旧的收款地址，请访问地址管理页面。",
@@ -164,6 +168,10 @@
       "view-on-explorer": "在浏览器中查看",
       "copy-transaction-hash": "复制交易哈希",
       "no-txs": "没有交易记录",
+      "view-in-explorer": "浏览器",
+      "view-in-explorer-button-title": "浏览器中查看详情",
+      "view-detail": "详情",
+      "view-detail-button-title": "查看详情",
       "copy-tx-hash": "复制交易 Hash",
       "copy-balance": "复制余额",
       "copy-address": "复制地址"
@@ -180,11 +188,10 @@
       "amount": "数量",
       "inputs": "输入",
       "outputs": "输出",
-      "view-in-explorer": "浏览器",
-      "view-in-explorer-button-title": "浏览器中查看详情",
       "cell-from-cellbase": "来自 Cellbase"
     },
     "addresses": {
+      "title": "地址簿",
       "addresses": "地址",
       "type": "类型",
       "address": "地址",
@@ -268,6 +275,12 @@
       },
       "unlock": {
         "title": "请输入钱包密码提取资产"
+      },
+      "create-sudt-account": {
+        "title": "创建资产账户"
+      },
+      "send-sudt": {
+        "title": "发起 sUDT 交易"
       }
     },
     "qrcode": {
@@ -293,6 +306,8 @@
       "delete": "删除",
       "click-to-edit": "点击编辑",
       "notice": "注意事项",
+      "experimental": "实验室",
+      "close": "关闭",
       "copy": "复制",
       "copied": "已复制"
     },
@@ -318,6 +333,8 @@
       "remain-ckb-for-withdraw": "建议保留部分 CKB 作为提现手续费",
       "no-valid-addresses-found": "未找到有效地址",
       "full-addr-info": "收款方可能需要第三方软件才能操作该地址资产, 请再次确认地址有效性",
+      "decimal-range": "小数位应为 {{range}}(包括) 之间的整数",
+      "experimental-message": "本页面为实验性功能，可能随时变更。请谨慎使用。",
       "fields": {
         "wallet": "钱包",
         "name": "名称",
@@ -332,7 +349,12 @@
         "keystore-path": "Keystore 文件",
         "keystore-name": "钱包名称",
         "keystore-password": "密码",
-        "deposit": "存入金额"
+        "deposit": "存入金额",
+        "account-name": "账户名称",
+        "token-name": "代币名称",
+        "token-id": "代币 ID",
+        "symbol": "简称",
+        "decimal": "小数位"
       },
       "codes": {
         "-3": "",
@@ -353,6 +375,8 @@
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值不能为负数。",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 无效, 其值应以 http(s):// 开始。",
         "209": "$t(messages.fields.{{fieldName}})不能包含空格。",
+        "210": "\"{{value}}\" 是特殊值, 请重新输入。",
+        "211": "金额不能为 0",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} 不可删除。",
         "303": "未找到$t(messages.fields.{{fieldName}})。",
         "304": "摄像头不可用或被禁用。",
@@ -487,6 +511,7 @@
       "address-not-found": "当前钱包地址列表中不包含输入地址，请检查钱包设置或等待同步完成。"
     },
     "special-assets": {
+      "title": "自定义资产",
       "date": "日期",
       "capacity": "金额",
       "type-script-tooltip": "Type Script",
@@ -500,6 +525,54 @@
       "release-success": "资产已解锁，可前往交易历史查看详情。",
       "no-special-assets": "没有自定义资产",
       "experimental": "实验室"
+    },
+    "s-udt": {
+      "account-list": {
+        "title": "资产账户",
+        "no-asset-accounts": "尚未检索到您持有的 sUDT 资产",
+        "search": "账户名称、代币名称或简称",
+        "syncing": "正在同步, 当前数据可能不准确",
+        "send": "转账",
+        "receive": "收款"
+      },
+      "create-dialog": {
+        "create-asset-account": "创建资产账户",
+        "account-name": "账户名称",
+        "sudt-account": "sUDT 账户",
+        "ckb-account": "CKB 账户",
+        "set-token-info": "设置代币信息",
+        "token-id": "代币 ID",
+        "token-name": "代币名称",
+        "symbol": "简称",
+        "decimal": "小数位",
+        "confirm": "确认",
+        "cancel": "取消",
+        "next": "下一步",
+        "back": "上一步",
+        "occupy-142-ckb": "至少占用 142 CKBytes",
+        "occupy-61-ckb": "至少占用 61 CKBytes"
+      },
+      "send": {
+        "title": "发起交易",
+        "address": "地址",
+        "amount": "金额",
+        "description": "备注",
+        "submit": "提交",
+        "click-to-edit": "点击编辑"
+      },
+      "receive": {
+        "notation": "只接收 {{symbol}} 转账"
+      },
+      "update-dialog": {
+        "update-asset-account": "账户设置",
+        "account-name": "账户名称",
+        "token-id": "代币 ID",
+        "token-name": "代币名称",
+        "symbol": "简称",
+        "decimal": "小数位",
+        "confirm": "确认",
+        "cancel": "取消"
+      }
     }
   }
 }

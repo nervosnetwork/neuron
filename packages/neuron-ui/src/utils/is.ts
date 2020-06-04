@@ -6,6 +6,6 @@ export const isMainnet = (networks: Readonly<State.Network[]>, networkID: string
   return (networks.find(n => n.id === networkID) || {}).chain === MAINNET_TAG
 }
 
-export const isSuccessResponse = (res: ControllerResponse): res is SuccessFromController => {
+export const isSuccessResponse = (res: Pick<ControllerResponse, 'status'>): res is SuccessFromController => {
   return res.status === ResponseCode.SUCCESS
 }

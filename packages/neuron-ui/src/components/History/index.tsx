@@ -21,7 +21,7 @@ const History = () => {
       tipBlockNumber: chainBlockNumber,
       loadings: { transactionList: isLoading },
     },
-    wallet: { id },
+    wallet: { id, name: walletName },
     chain: {
       networkID,
       tipBlockNumber: syncedBlockNumber,
@@ -91,6 +91,7 @@ const History = () => {
             <TransactionList
               isLoading={isLoading}
               walletID={id}
+              walletName={walletName}
               items={items as State.Transaction[]}
               tipBlockNumber={tipBlockNumber}
               isMainnet={isMainnet}
@@ -131,6 +132,7 @@ const History = () => {
     onSearch,
     isLoading,
     id,
+    walletName,
     items,
     tipBlockNumber,
     dispatch,

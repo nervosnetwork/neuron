@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Icon } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import {
   getSystemCodeHash,
@@ -8,11 +7,11 @@ import {
   showErrorMessage,
   getAllNetworks,
   getCurrentNetworkID,
-  openExternal,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
-import { transactionState } from 'states/init/chain'
+import { transactionState } from 'states'
+
 import {
   useOnLocaleChange,
   ErrorCode,
@@ -96,11 +95,6 @@ const Transaction = () => {
   }, [t, hash])
 
   useExitOnWalletChange()
-
-  const onExplorerBtnClick = useCallback(() => {
-    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
-    openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
-  }, [transaction.hash, isMainnet])
 
   const basicInfoItems = useMemo(() => {
     const balance = shannonToCKBFormatter(transaction.value)
@@ -248,16 +242,6 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
-
-      <button
-        type="button"
-        className={styles.explorerNavButton}
-        title={t('transaction.view-in-explorer-button-title')}
-        onClick={onExplorerBtnClick}
-      >
-        <Icon iconName="Explorer" />
-        <span>{t('transaction.view-in-explorer')}</span>
-      </button>
     </div>
   )
 }

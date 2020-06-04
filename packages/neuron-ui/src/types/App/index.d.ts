@@ -10,6 +10,15 @@ declare namespace State {
     readonly blockNumber: string
     readonly status: 'pending' | 'success' | 'failed'
     readonly nervosDao: boolean
+    readonly sudtInfo?: Readonly<{
+      sUDT: {
+        tokenID: string
+        tokenName: string
+        symbol: string
+        decimal: string
+      }
+      amount: string
+    }>
   }
 
   interface DetailedInput {
@@ -72,7 +81,7 @@ declare namespace State {
   }
 
   interface PasswordRequest {
-    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | null
+    readonly actionType: 'send' | 'backup' | 'delete' | 'unlock' | 'create-sudt-account' | 'send-sudt' | null
     readonly walletID: string
   }
 
@@ -217,6 +226,7 @@ declare namespace State {
     readonly wallet: Wallet
     readonly nervosDAO: NervosDAO
     readonly updater: AppUpdater
+    readonly experimental: { tx: any; assetAccount?: any } | null
   }
 }
 

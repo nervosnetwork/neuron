@@ -26,6 +26,9 @@ export enum RoutePath {
   Prompt = '/prompt',
   NervosDAO = '/nervos-dao',
   SpecialAssets = '/special-assets',
+  SUDTAccountList = '/s-udt/accounts',
+  SUDTSend = '/s-udt/send',
+  SUDTReceive = '/s-udt/receive',
 }
 
 export enum CapacityUnit {
@@ -65,6 +68,7 @@ export enum ErrorCode {
   CapacityNotEnoughForChange = 105,
   LocktimeAmountTooSmall = 107,
   AddressNotFound = 108,
+  CapacityNotEnough = 109,
   // Parameter validation errors from neuron-ui
   FieldRequired = 201,
   FieldUsed = 202,
@@ -75,6 +79,8 @@ export enum ErrorCode {
   NotNegative = 207,
   ProtocolRequired = 208,
   NoWhiteSpaces = 209,
+  ValueReserved = 210,
+  AmountZero = 211,
   FieldIrremovable = 301,
   FieldNotFound = 303,
   CameraUnavailable = 304,
@@ -90,8 +96,6 @@ export enum SyncStatus {
   SyncCompleted,
 }
 
-export const SyncStatusThatBalanceUpdating = [SyncStatus.Syncing, SyncStatus.SyncPending]
-
 export enum PresetScript {
   Locktime = 'SingleMultiSign',
 }
@@ -105,4 +109,15 @@ export enum CompensationPeriod {
 export enum ResponseCode {
   FAILURE,
   SUCCESS,
+}
+
+export enum GenesisBlockHash {
+  MAINNET = '0x92b197aa1fba0f63633922c61c92375c9c074a93e85963554f5499fe1450d0e5',
+  TESTNET = '0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606',
+}
+
+export enum ChainType {
+  MAINNET,
+  TESTNET,
+  DEVNET,
 }

@@ -15,6 +15,9 @@ import logger from 'utils/logger'
 import RangeForCheck, { CheckResultType } from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
+import { LiveCellPersistor } from 'services/tx/livecell-persistor'
+import AssetAccountInfo from 'models/asset-account-info'
+import AssetAccountService from 'services/asset-account-service'
 
 export default class Queue {
   private lockHashes: string[]
@@ -36,13 +39,24 @@ export default class Queue {
 
   private multiSignBlake160s: string[]
 
-  constructor(url: string, lockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
+  private assetAccountInfo: AssetAccountInfo | undefined
+
+  private anyoneCanPayLockHashes: string[]
+
+  constructor(url: string, lockHashes: string[], anyoneCanPayLockHashes: string[], multiSignBlake160s: string[], startBlockNumber: bigint) {
     this.lockHashes = lockHashes
     this.currentBlockNumber = startBlockNumber
     this.rpcService = new RpcService(url)
     this.rangeForCheck = new RangeForCheck(url)
     this.tipNumberSubject = NodeService.getInstance().tipNumberSubject
     this.multiSignBlake160s = multiSignBlake160s
+    this.anyoneCanPayLockHashes = anyoneCanPayLockHashes
+
+    try {
+      this.assetAccountInfo = new AssetAccountInfo()
+    } catch(e) {
+      logger.info(`instance AssetAccountInfo error: ${e}`)
+    }
   }
 
   public start = async () => {
@@ -133,15 +147,32 @@ export default class Queue {
     this.rangeForCheck.pushRange(blockHeaders)
   }
 
+  private skipLiveCell = async (blockNumber: string) => {
+    if (!this.assetAccountInfo) {
+      return true
+    }
+    const lastBlockNumber = await LiveCellPersistor.lastBlockNumber()
+    return BigInt(lastBlockNumber) - LiveCellPersistor.CONFIRMATION_THRESHOLD > BigInt(blockNumber)
+  }
+
   private checkAndSave = async (blocks: Block[]): Promise<void> => {
     const cachedPreviousTxs = new Map()
+    const skipLiveCell = await this.skipLiveCell(blocks[0].header.number)
 
     for (const block of blocks) {
       if (BigInt(block.header.number) % BigInt(1000) === BigInt(0)) {
         logger.info(`Sync:\tscanning from block #${block.header.number}`)
       }
       for (const [i, tx] of block.transactions.entries()) {
-        const [shouldSave, addresses] = await new TxAddressFinder(this.lockHashes, tx, this.multiSignBlake160s).addresses()
+        if (!skipLiveCell) {
+          await LiveCellPersistor.saveTxLiveCells(tx, this.assetAccountInfo!.anyoneCanPayCodeHash)
+        }
+        const [shouldSave, addresses, anyoneCanPayInfos] = await new TxAddressFinder(
+          this.lockHashes,
+          this.anyoneCanPayLockHashes,
+          tx,
+          this.multiSignBlake160s
+        ).addresses()
         if (shouldSave) {
           if (i > 0) {
             for (const [inputIndex, input] of tx.inputs.entries()) {
@@ -153,7 +184,10 @@ export default class Queue {
               }
               const previousTx = previousTxWithStatus!.transaction
               const previousOutput = previousTx.outputs![+input.previousOutput!.index]
+              const previousOutputData = previousTx.outputsData![+input.previousOutput!.index]
               input.setLock(previousOutput.lock)
+              previousOutput.type && input.setType(previousOutput.type)
+              input.setData(previousOutputData)
               input.setCapacity(previousOutput.capacity)
               input.setInputIndex(inputIndex.toString())
 
@@ -172,7 +206,11 @@ export default class Queue {
             }
           }
           await TransactionPersistor.saveFetchTx(tx)
-          await WalletService.updateUsedAddresses(addresses)
+          const anyoneCanPayBlake160s = anyoneCanPayInfos.map(info => info.blake160)
+          await WalletService.updateUsedAddresses(addresses, anyoneCanPayBlake160s)
+          for (const info of anyoneCanPayInfos) {
+            await AssetAccountService.checkAndSaveAssetAccountWhenSync(info.tokenID, info.blake160)
+          }
         }
       }
     }
@@ -187,7 +225,11 @@ export default class Queue {
         const rangeFirstBlockHeader: BlockHeader = range[0]
         this.updateCurrentBlockNumber(BigInt(rangeFirstBlockHeader.number))
         this.rangeForCheck.clearRange()
+        await AssetAccountService.checkAndDeleteWhenFork(rangeFirstBlockHeader.number, this.anyoneCanPayLockHashes)
         await TransactionPersistor.deleteWhenFork(rangeFirstBlockHeader.number)
+        if (!this.assetAccountInfo) {
+          await LiveCellPersistor.resumeWhenFork(rangeFirstBlockHeader.number)
+        }
       }
 
       throw new Error(`chain forked: ${checkResult.type}`)

@@ -1,0 +1,48 @@
+{
+  "basic": {
+    "accounts": [
+      {
+        "tokenName": "token name",
+        "accountName": "account name"
+      },
+      {
+        "tokenName": "another token name",
+        "accountName": "account name"
+      },
+      {
+        "tokenName": "token name",
+        "accountName": "another account name"
+      },
+      {
+        "tokenName": "",
+        "accountName": ""
+      },
+      {
+        "tokenName": "CKB",
+        "accountName": ""
+      }
+    ],
+    "expected": [
+      {
+        "tokenName": "another token name",
+        "accountName": "account name"
+      },
+      {
+        "tokenName": "CKB",
+        "accountName": ""
+      },
+      {
+        "tokenName": "token name",
+        "accountName": "account name"
+      },
+      {
+        "tokenName": "token name",
+        "accountName": "another account name"
+      },
+      {
+        "tokenName": "",
+        "accountName": ""
+      }
+    ]
+  }
+}

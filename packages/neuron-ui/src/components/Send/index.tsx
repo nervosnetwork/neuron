@@ -17,14 +17,12 @@ import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states'
-import appState from 'states/init/app'
+import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
   ErrorCode,
   SyncStatus,
-  SyncStatusThatBalanceUpdating,
   ConnectionStatus,
   CONSTANTS,
   shannonToCKBFormatter,
@@ -164,7 +162,10 @@ const Send = () => {
         {t('sync.sync-not-start')}
       </span>
     )
-  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
+  } else if (
+    [SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ||
+    ConnectionStatus.Connecting === connectionStatus
+  ) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 

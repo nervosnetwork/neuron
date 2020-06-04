@@ -18,5 +18,6 @@ export * from './renderHooks'
 export * from './is'
 export * from './parsers'
 export * from './validators'
+export * from './sortAccounts'
 
 export { CONSTANTS }

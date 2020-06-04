@@ -21,7 +21,7 @@ export const transactionState: Readonly<State.DetailedTransaction> = {
   nervosDao: false,
 }
 
-const chainState: Readonly<State.Chain> = {
+export const chainState: Readonly<State.Chain> = {
   networkID: currentNetworkID.load(),
   connectionStatus: ConnectionStatus.Connecting,
   tipBlockNumber: '',

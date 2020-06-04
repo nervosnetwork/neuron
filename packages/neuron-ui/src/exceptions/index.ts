@@ -1,4 +1,5 @@
 import { ErrorCode } from 'utils/enums'
+import { MIN_DECIMAL, MAX_DECIMAL } from 'utils/const'
 
 export class FieldInvalidException extends Error {
   public code = ErrorCode.FieldInvalid
@@ -56,10 +57,40 @@ export class FieldUsedException extends Error {
   }
 }
 
+export class DecimalRangeException extends RangeError {
+  public code = ErrorCode.FieldInvalid
+  public i18n = {
+    range: `${MIN_DECIMAL}-${MAX_DECIMAL}`,
+  }
+
+  constructor() {
+    super(`messages.decimal-range`)
+  }
+}
+
 export class AmountNotEnoughException extends Error {
   public code = ErrorCode.AmountNotEnough
   constructor() {
     super(`messages.codes.${ErrorCode.AmountNotEnough}`)
+  }
+}
+
+export class AmountZeroException extends Error {
+  public code = ErrorCode.AmountZero
+  constructor() {
+    super(`messages.codes.${ErrorCode.AmountZero}`)
+  }
+}
+
+export class ValueReservedException extends Error {
+  public code = ErrorCode.ValueReserved
+  public i18n = {
+    value: '',
+  }
+
+  constructor(value: string) {
+    super(`messages.codes.${ErrorCode.ValueReserved}`)
+    this.i18n.value = value
   }
 }
 
@@ -69,5 +100,3 @@ export class PasswordIncorrectException extends Error {
     super(`messages.codes.${ErrorCode.PasswordIncorrect}`)
   }
 }
-
-export default undefined
