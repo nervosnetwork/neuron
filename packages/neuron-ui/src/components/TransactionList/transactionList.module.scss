@@ -39,6 +39,8 @@ $pending-color: #b3b3b3;
       grid-area: time;
       justify-self: flex-end;
       color: #666;
+      text-align: right;
+      white-space: nowrap;
     }
 
     .type {
