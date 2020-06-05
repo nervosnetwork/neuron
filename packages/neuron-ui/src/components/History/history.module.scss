@@ -6,7 +6,6 @@
     grid-template:
       'search-input search-button export-button' auto/
       1fr auto auto;
-    margin-bottom: 15px;
     .searchBox {
       grid-area: search-input;
       button:hover {
@@ -47,11 +46,6 @@
         }
       }
     }
-  }
-
-  .listContainer {
-    background-color: #fff;
-    padding: 0 15px;
   }
 
   .pagination {

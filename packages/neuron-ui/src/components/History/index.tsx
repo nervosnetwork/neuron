@@ -86,7 +86,7 @@ const History = () => {
             <Export />
           </Button>
         </div>
-        <div className={styles.listContainer}>
+        <div>
           {totalCount ? (
             <TransactionList
               isLoading={isLoading}
