@@ -1,0 +1,18 @@
+$default-color: #666;
+.container {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  user-select: none;
+  color: $default-color;
+  font-size: 0.875rem;
+  .page {
+    &:after {
+      content: '/';
+      color: $default-color !important;
+    }
+    &:hover {
+      color: var(--nervos-green);
+    }
+  }
+}

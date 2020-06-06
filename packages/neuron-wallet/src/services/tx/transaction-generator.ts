@@ -17,6 +17,9 @@ import NodeService from 'services/node'
 import BlockHeader from 'models/chain/block-header'
 import SystemScriptInfo from 'models/system-script-info'
 import ArrayUtils from 'utils/array'
+import AssetAccountInfo from 'models/asset-account-info'
+import BufferUtils from 'utils/buffer'
+import assert from 'assert'
 
 export interface TargetOutput {
   address: string
@@ -116,7 +119,7 @@ export class TransactionGenerator {
 }
 
 // rest of capacity all send to last target output.
-public static generateSendingAllTx = async (
+  public static generateSendingAllTx = async (
   lockHashes: string[],
   targetOutputs: TargetOutput[],
   fee: string = '0',
@@ -476,6 +479,299 @@ public static generateSendingAllTx = async (
     tx.outputs[0].setCapacity((BigInt(output.capacity) - BigInt(tx.fee)).toString())
 
     return tx
+  }
+
+  // sUDT
+  public static async generateCreateAnyoneCanPayTx(
+    tokenID: string,
+    lockHashes: string[],
+    blake160: string,
+    changeBlake160: string,
+    feeRate: string,
+    fee: string
+  ): Promise<Transaction> {
+    // if tokenID === '' or 'CKBytes', create ckb cell
+    const isCKB = tokenID === 'CKBytes' || tokenID === ''
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const needCapacities = isCKB ? BigInt(61 * 10**8) : BigInt(142 * 10**8)
+    const output = Output.fromObject({
+      capacity: needCapacities.toString(),
+      lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
+      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep],
+      inputs: [],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+    const baseSize: number = TransactionSize.tx(tx)
+    const {
+      inputs,
+      capacities,
+      finalFee,
+      hasChangeOutput
+    } = await CellsService.gatherInputs(
+      needCapacities.toString(),
+      lockHashes,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+    const finalFeeInt = BigInt(finalFee)
+    tx.inputs = inputs
+    tx.fee = finalFee
+
+    // change
+    if (hasChangeOutput) {
+      const changeCapacity = BigInt(capacities) - needCapacities - finalFeeInt
+
+      const output = Output.fromObject({
+        capacity: changeCapacity.toString(),
+        lock: SystemScriptInfo.generateSecpScript(changeBlake160)
+      })
+
+      tx.addOutput(output)
+    }
+
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateCreateAnyoneCanPayTx capacity not match!')
+
+    return tx
+  }
+
+  public static async generateCreateAnyoneCanPayTxUseAllBalance(
+    tokenID: string,
+    lockHashes: string[],
+    blake160: string,
+    feeRate: string,
+    fee: string
+  ): Promise<Transaction> {
+    // if tokenID === '' or 'CKBytes', create ckb cell
+    const isCKB = tokenID === 'CKBytes' || tokenID === ''
+
+    const feeRateInt = BigInt(feeRate)
+    const mode = new FeeMode(feeRateInt)
+
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+
+    const allInputs: Input[] = await CellsService.gatherAllInputs(lockHashes)
+
+    if (allInputs.length === 0) {
+      throw new CapacityNotEnough()
+    }
+
+    const totalCapacity = allInputs
+      .map(i => BigInt(i.capacity))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const output = Output.fromObject({
+      capacity: totalCapacity.toString(),
+      lock: assetAccountInfo.generateAnyoneCanPayScript(blake160),
+      type: isCKB ? null : assetAccountInfo.generateSudtScript(tokenID),
+      data: isCKB ? '0x' : BufferUtils.writeBigUInt128LE(BigInt(0)),
+    })
+
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep],
+      inputs: allInputs,
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+    const keyCount = new Set(allInputs.map(i => i.lockHash!)).size
+    const txSize: number = TransactionSize.tx(tx) +
+      TransactionSize.secpLockWitness() * keyCount +
+      TransactionSize.emptyWitness() * (allInputs.length - keyCount)
+    tx.fee = mode.isFeeMode() ? fee : TransactionFee.fee(txSize, feeRateInt).toString()
+    tx.outputs[0].capacity = (totalCapacity - BigInt(tx.fee)).toString()
+
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateCreateAnyoneCanPayTxUseAllBalance capacity not match!')
+
+    return tx
+  }
+
+  // anyone-can-pay lock, CKB
+  public static async generateAnyoneCanPayToCKBTx(
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    targetOutput: Output,
+    capacity: 'all' | string,
+    changeBlake160: string,
+    feeRate: string = '0',
+    fee: string = '0',
+  ) {
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const needCapacities: bigint = capacity === 'all' ? BigInt(targetOutput.capacity) : BigInt(targetOutput.capacity) + BigInt(capacity)
+    const output = Output.fromObject({
+      ...targetOutput,
+      capacity: needCapacities.toString(),
+    })
+    const targetInput = Input.fromObject({
+      previousOutput: targetOutput.outPoint!,
+      since: '0',
+      capacity: targetOutput.capacity,
+      lock: targetOutput.lock,
+      lockHash: targetOutput.lockHash,
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, anyoneCanPayDep],
+      inputs: [targetInput],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+
+    const baseSize: number = TransactionSize.tx(tx)
+    const result = await (capacity === 'all' ?
+      CellsService.gatherAnyoneCanPaySendAllCKBInputs(
+        anyoneCanPayLockHashes,
+        fee,
+        feeRate,
+        baseSize,
+      ) :
+      CellsService.gatherAnyoneCanPayCKBInputs(
+        capacity,
+        defaultLockHashes,
+        anyoneCanPayLockHashes,
+        changeBlake160,
+        fee,
+        feeRate,
+        baseSize,
+        TransactionGenerator.CHANGE_OUTPUT_SIZE,
+        TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+      ))
+
+    if (capacity === 'all') {
+      tx.outputs[0].capacity = (BigInt(result.sendCapacity) + BigInt(targetOutput.capacity)).toString()
+    }
+
+    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
+    if (result.changeOutput) {
+      tx.outputs.push(result.changeOutput)
+    }
+    tx.outputsData = tx.outputs.map(o => o.data)
+    tx.fee = result.finalFee
+    tx.anyoneCanPaySendAmount = result.sendCapacity
+
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateAnyoneCanPayToCKBTx capacity not match!')
+
+    return tx
+  }
+
+  // anyone-can-pay lock, sUDT
+  // amount: 'all' or integer
+  public static async generateAnyoneCanPayToSudtTx(
+    defaultLockHashes: string[],
+    anyoneCanPayLockHashes: string[],
+    targetOutput: Output,
+    amount: 'all' | string,
+    changeBlake160: string,
+    feeRate: string = '0',
+    fee: string = '0',
+  ) {
+    const secpCellDep = await SystemScriptInfo.getInstance().getSecpCellDep()
+    const assetAccountInfo = new AssetAccountInfo()
+    const sudtCellDep = assetAccountInfo.sudtCellDep
+    const anyoneCanPayDep = assetAccountInfo.anyoneCanPayCellDep
+    const targetAmount: bigint = amount === 'all' ? BigInt(0) : BufferUtils.parseAmountFromSUDTData(targetOutput.data) + BigInt(amount)
+    const output = Output.fromObject({
+      ...targetOutput,
+      data: BufferUtils.writeBigUInt128LE(targetAmount),
+    })
+    const targetInput = Input.fromObject({
+      previousOutput: targetOutput.outPoint!,
+      since: '0',
+      capacity: targetOutput.capacity,
+      lock: targetOutput.lock,
+      lockHash: targetOutput.lockHash,
+      type: targetOutput.type,
+      data: targetOutput.data,
+    })
+    const tx =  Transaction.fromObject({
+      version: '0',
+      headerDeps: [],
+      cellDeps: [secpCellDep, sudtCellDep, anyoneCanPayDep],
+      inputs: [targetInput],
+      outputs: [output],
+      outputsData: [output.data],
+      witnesses: []
+    })
+
+    const baseSize: number = TransactionSize.tx(tx)
+    const result = await CellsService.gatherSudtInputs(
+      amount,
+      defaultLockHashes,
+      anyoneCanPayLockHashes,
+      targetOutput.typeHash!,
+      changeBlake160,
+      fee,
+      feeRate,
+      baseSize,
+      TransactionGenerator.CHANGE_OUTPUT_SIZE,
+      TransactionGenerator.CHANGE_OUTPUT_DATA_SIZE,
+    )
+
+    if (amount === 'all') {
+      tx.outputs[0].data = BufferUtils.writeBigUInt128LE(BigInt(result.amount) + BufferUtils.parseAmountFromSUDTData(targetOutput.data))
+    }
+
+    tx.inputs = result.anyoneCanPayInputs.concat(result.changeInputs).concat(tx.inputs)
+    tx.outputs = result.anyoneCanPayOutputs.concat(tx.outputs)
+    if (result.changeOutput) {
+      tx.outputs.push(result.changeOutput)
+    }
+    tx.outputsData = tx.outputs.map(o => o.data)
+    tx.fee = result.finalFee
+
+    tx.sudtInfo = amount === 'all' ? { amount: result.amount }: { amount }
+    tx.anyoneCanPaySendAmount = tx.sudtInfo.amount
+
+    // amount assertion
+    TransactionGenerator.checkTxCapacity(tx, 'generateAnyoneCanPayToSudtTx capacity not match!')
+    TransactionGenerator.checkTxSudtAmount(tx, 'generateAnyoneCanPayToSudtTx sUDT amount not match!', assetAccountInfo)
+
+    return tx
+  }
+
+  private static checkTxCapacity(tx: Transaction, msg: string) {
+    const inputCapacity = tx.inputs.map(i => BigInt(i.capacity!)).reduce((result, c) => result + c, BigInt(0))
+    const outputCapacity = tx.outputs.map(o => BigInt(o.capacity!)).reduce((result, c) => result + c, BigInt(0))
+    assert.equal(inputCapacity.toString(), (outputCapacity + BigInt(tx.fee!)).toString(), `${msg}: ${JSON.stringify(tx)}`)
+  }
+
+  private static checkTxSudtAmount(tx: Transaction, msg: string, assetAccountInfo: AssetAccountInfo) {
+    const inputAmount = tx.inputs
+      .filter(i => i.type && assetAccountInfo.isSudtScript(i.type))
+      .map(i => BufferUtils.parseAmountFromSUDTData(i.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    const outputAmount = tx.outputs
+      .filter(o => o.type && assetAccountInfo.isSudtScript(o.type))
+      .map(o => BufferUtils.parseAmountFromSUDTData(o.data!))
+      .reduce((result, c) => result + c, BigInt(0))
+
+    assert.equal(inputAmount.toString(), outputAmount.toString(), `${msg}: ${JSON.stringify(tx)}`)
   }
 }
 

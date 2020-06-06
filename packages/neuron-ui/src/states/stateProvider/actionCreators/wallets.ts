@@ -1,4 +1,3 @@
-import { AppActions, StateDispatch } from 'states/stateProvider/reducer'
 import {
   getWalletList,
   getCurrentWallet,
@@ -11,9 +10,9 @@ import {
   deleteWallet as deleteRemoteWallet,
   backupWallet as backupRemoteWallet,
 } from 'services/remote'
-import { emptyWallet } from 'states/init/wallet'
-import { emptyNervosDaoData } from 'states/init/nervosDAO'
 import { wallets as walletsCache, currentWallet as currentWalletCache } from 'services/localCache'
+
+import { AppActions, StateDispatch, emptyWallet, emptyNervosDaoData } from 'states'
 import { ErrorCode, ResponseCode, addressesToBalance, failureResToNotification, isSuccessResponse } from 'utils'
 import { NeuronWalletActions } from '../reducer'
 import { addNotification, addPopup } from './app'

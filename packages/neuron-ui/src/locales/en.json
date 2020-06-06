@@ -20,7 +20,8 @@
       "special-assets": "Customized Assets",
       "sync-not-start": "Sync not started yet",
       "connecting": "Connecting",
-      "experimental-functions": "Experimental"
+      "experimental-functions": "Experimental",
+      "s-udt": "Asset Accounts"
     },
     "network-status": {
       "tooltip": {
@@ -75,7 +76,7 @@
       "wallet-suffix": "Wallet {{suffix}}",
       "write-down-seed": "Write down your wallet seed and save it in a safe place",
       "new-name": "Use an unused name for the new wallet",
-      "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols, and must start with a letter or a number.",
+      "complex-password": "The password should be 8 to 50 characters long containing at least three character categories among the following: uppercase letters, lowercase letters, numbers, and special symbols.",
       "same-password": "The password and confirm password should match"
     },
     "import-keystore": {
@@ -123,6 +124,9 @@
       "release-on": "Release on"
     },
     "receive": {
+      "title": "Receive",
+      "address-book": "Address Book",
+      "click-to-copy": "Click to copy the address",
       "copy-address": "Copy Address",
       "address-not-found": "Address not found",
       "prompt": "Neuron picks a new receiving address for better privacy. Please go to the Address Book if you want to use a previously used receiving address.",
@@ -164,6 +168,10 @@
       "view-on-explorer": "View on Explorer",
       "copy-transaction-hash": "Copy Transaction Hash",
       "no-txs": "No Transaction History",
+      "view-in-explorer": "Explorer",
+      "view-in-explorer-button-title": "View on explorer",
+      "view-detail": "Detail",
+      "view-detail-button-title": "View Detail",
       "copy-tx-hash": "Copy Transaction Hash",
       "copy-balance": "Copy Balance",
       "copy-address": "Copy Address"
@@ -180,18 +188,17 @@
       "amount": "Amount",
       "inputs": "Inputs",
       "outputs": "Outputs",
-      "view-in-explorer": "Explorer",
-      "view-in-explorer-button-title": "View on explorer",
       "cell-from-cellbase": "From cellbase"
     },
     "addresses": {
+      "title": "Address Book",
       "addresses": "Addresses",
       "type": "Type",
       "address": "Address",
       "identifier": "Identifier",
       "description": "Description",
       "balance": "Balance",
-      "transactions": "Transactions",
+      "transactions": "TXs",
       "receiving-address": "Receiving",
       "change-address": "Change",
       "copy-address": "Copy Address",
@@ -268,6 +275,12 @@
       },
       "unlock": {
         "title": "Please input wallet password to claim the asset"
+      },
+      "create-sudt-account": {
+        "title": "Create Asset Account"
+      },
+      "send-sudt": {
+        "title": "Send sUDT"
       }
     },
     "qrcode": {
@@ -293,6 +306,8 @@
       "delete": "Delete",
       "click-to-edit": "Click to edit",
       "notice": "Notice",
+      "experimental": "Experimental",
+      "close": "Close",
       "copy": "Copy",
       "copied": "Copied"
     },
@@ -318,6 +333,8 @@
       "remain-ckb-for-withdraw": "It's suggested to reserve some CKBytes for withdraw operation",
       "no-valid-addresses-found": "No valid addresses found",
       "full-addr-info": "Additional software or dApp interface might be required to operate the assets on this address. Please double check its validity.",
+      "decimal-range": "Decimal should be an interger of {{range}}(inclusive)",
+      "experimental-message": "This is an experimental feature, it could change at any time. Please use with caution.",
       "fields": {
         "wallet": "Wallet",
         "name": "Name",
@@ -332,7 +349,12 @@
         "keystore-path": "Keystore File",
         "keystore-name": "Wallet name",
         "keystore-password": "Password",
-        "deposit": "Deposit"
+        "deposit": "Deposit",
+        "account-name": "Account Name",
+        "token-name": "Token Name",
+        "token-id": "Token ID",
+        "symbol": "Symbol",
+        "decimal": "Decimal"
       },
       "codes": {
         "-3": "",
@@ -353,6 +375,8 @@
         "207": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it cannot be negative.",
         "208": "$t(messages.fields.{{fieldName}}) {{fieldValue}} is invalid, it should start with http(s)://",
         "209": "$t(messages.fields.{{fieldName}}) should have no whitespaces.",
+        "210": "\"{{value}}\" is reserved, please use another one.",
+        "211": "The amount cannot be 0",
         "301": "$t(messages.fields.{{fieldName}}) {{fieldValue}} cannot be removed.",
         "303": "$t(messages.fields.{{fieldName}}) is not found.",
         "304": "Camera is unavailable or disabled.",
@@ -487,6 +511,7 @@
       "address-not-found": "The given address does not belong to current wallet. Please check your wallet or wait for synchronizing complete."
     },
     "special-assets": {
+      "title": "Customized Assets",
       "date": "Date",
       "capacity": "Capacity",
       "type-script-tooltip": "Type Script",
@@ -500,6 +525,54 @@
       "release-success": "Asset was released, view details in History.",
       "no-special-assets": "No customized assets",
       "experimental": "Experimental"
+    },
+    "s-udt": {
+      "account-list": {
+        "title": "Asset Accounts",
+        "no-asset-accounts": "No sUDT asset has been detected",
+        "search": "Account Name, Token Name or Symbol",
+        "syncing": "Syncing, current data may be inaccurate",
+        "send": "Send",
+        "receive": "Receive"
+      },
+      "create-dialog": {
+        "create-asset-account": "Create Asset Account",
+        "account-name": "Account Name",
+        "sudt-account": "sUDT Account",
+        "ckb-account": "CKB Account",
+        "set-token-info": "Set Token Info",
+        "token-id": "Token ID",
+        "token-name": "Token Name",
+        "symbol": "Symbol",
+        "decimal": "Decimal",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "next": "Next",
+        "back": "Back",
+        "occupy-142-ckb": "Occupies at least 142 CKBytes",
+        "occupy-61-ckb": "Occupies at least 61 CKBytes"
+      },
+      "send": {
+        "title": "Send",
+        "address": "Address",
+        "amount": "Amount",
+        "description": "Description",
+        "submit": "Submit",
+        "click-to-edit": "Click to edit"
+      },
+      "receive": {
+        "notation": "Accept {{symbol}} only"
+      },
+      "update-dialog": {
+        "update-asset-account": "Account setup",
+        "account-name": "Account Name",
+        "token-id": "Token ID",
+        "token-name": "Token Name",
+        "symbol": "Symbol",
+        "decimal": "Decimal",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      }
     }
   }
 }

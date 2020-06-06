@@ -11,6 +11,8 @@ import {
   localNumberFormatter,
   shannonToCKBFormatter,
   uniformTimeFormatter,
+  sudtValueToAmount,
+  sUDTAmountFormatter,
   backToTop,
   CONSTANTS,
   RoutePath,
@@ -104,8 +106,10 @@ const Overview = () => {
   const RecentActivites = useMemo(() => {
     const activities = recentItems.map(item => {
       let confirmations = ''
-      let typeLabel: string = item.type
+      let typeLabel: string = '--'
+      let amount = '--'
       let { status } = item
+
       if (item.blockNumber !== undefined) {
         const confirmationCount =
           item.blockNumber === null || item.status === 'failed'
@@ -126,16 +130,28 @@ const Overview = () => {
           }
         }
 
-        typeLabel = genTypeLabel(item.type, status)
+        if (item.sudtInfo?.sUDT) {
+          const type = +item.sudtInfo.amount <= 0 ? 'send' : 'receive'
+          typeLabel = `UDT ${t(`overview.${genTypeLabel(type, status)}`)}`
+
+          if (item.sudtInfo.sUDT.decimal) {
+            amount = `${sUDTAmountFormatter(sudtValueToAmount(item.sudtInfo.amount, item.sudtInfo.sUDT.decimal))} ${
+              item.sudtInfo.sUDT.symbol
+            }`
+          }
+        } else {
+          amount = `${shannonToCKBFormatter(item.value)} CKB`
+          typeLabel = item.nervosDao ? 'Nervos DAO' : t(`overview.${genTypeLabel(item.type, status)}`)
+        }
       }
 
       return {
         ...item,
         status,
         statusLabel: t(`overview.statusLabel.${status}`),
-        value: item.value.replace(/^-/, ''),
+        amount,
         confirmations,
-        typeLabel: t(`overview.${typeLabel}`),
+        typeLabel,
       }
     })
     return (
@@ -155,24 +171,14 @@ const Overview = () => {
           </thead>
           <tbody>
             {activities.map(item => {
-              const {
-                confirmations,
-                createdAt,
-                status,
-                hash,
-                statusLabel,
-                timestamp,
-                typeLabel,
-                value,
-                nervosDao,
-              } = item
+              const { confirmations, createdAt, status, hash, statusLabel, timestamp, typeLabel, amount } = item
               const time = uniformTimeFormatter(timestamp || createdAt)
 
               return (
                 <tr data-hash={hash} onDoubleClick={onRecentActivityDoubleClick} key={hash}>
                   <td title={time}>{time.split(' ')[0]}</td>
-                  <td>{nervosDao ? 'Nervos DAO' : typeLabel}</td>
-                  <td>{`${shannonToCKBFormatter(value)} CKB`}</td>
+                  <td>{typeLabel}</td>
+                  <td>{amount}</td>
                   <td className={styles.txStatus} data-status={status}>
                     <div>
                       <span>{statusLabel}</span>
@@ -192,7 +198,6 @@ const Overview = () => {
 
   return (
     <div className={styles.overview}>
-      {/* <h1 className={styles.walletName}>{name}</h1> */}
       <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
       <div className={styles.balance}>
         <span>{`${t('overview.balance')}:`}</span>

@@ -48,8 +48,8 @@ export default class TransactionSender {
     this.walletService = WalletsService.getInstance()
   }
 
-  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '') {
-    const tx = this.sign(walletID, transaction, password)
+  public async sendTx(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
+    const tx = this.sign(walletID, transaction, password, skipLastInputs)
 
     const { ckb } = NodeService.getInstance()
     await ckb.rpc.sendTransaction(tx.toSDKRawTransaction(), 'passthrough')
@@ -61,11 +61,11 @@ export default class TransactionSender {
     const blake160s = TransactionsService.blake160sOfTx(tx)
     const prefix = NetworksService.getInstance().isMainnet() ? AddressPrefix.Mainnet : AddressPrefix.Testnet
     const usedAddresses = blake160s.map(blake160 => AddressGenerator.toShortByBlake160(blake160, prefix))
-    await WalletService.updateUsedAddresses(usedAddresses)
+    await WalletService.updateUsedAddresses(usedAddresses, blake160s)
     return txHash
   }
 
-  private sign(walletID: string = '', transaction: Transaction, password: string = '') {
+  private sign(walletID: string = '', transaction: Transaction, password: string = '', skipLastInputs: number = 0) {
     const wallet = this.walletService.get(walletID)
 
     if (password === '') {
@@ -103,7 +103,7 @@ export default class TransactionSender {
       return pathAndPrivateKey.privateKey
     }
 
-    const witnessSigningEntries: SignInfo[] = tx.inputs.map((input: Input, index: number) => {
+    const witnessSigningEntries: SignInfo[] = tx.inputs.slice(0, tx.inputs.length - skipLastInputs).map((input: Input, index: number) => {
       const lockArgs: string = input.lock!.args!
       const wit: WitnessArgs | string = tx.witnesses[index]
       const witnessArgs: WitnessArgs = (wit instanceof WitnessArgs) ? wit : WitnessArgs.generateEmpty()

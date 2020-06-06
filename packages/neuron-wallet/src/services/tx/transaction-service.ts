@@ -1,29 +1,22 @@
-import { getConnection, ObjectLiteral } from 'typeorm'
+import { getConnection } from 'typeorm'
 import AddressesService from 'services/addresses'
-import { pubkeyToAddress } from '@nervosnetwork/ckb-sdk-utils'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
-import Transaction, { TransactionStatus } from 'models/chain/transaction'
+import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
 import InputEntity from 'database/chain/entities/input'
 import AddressParser from 'models/address-parser'
+import AssetAccountInfo from 'models/asset-account-info'
+import BufferUtils from 'utils/buffer'
+import AssetAccountEntity from 'database/chain/entities/asset-account'
+import SudtTokenInfoEntity from 'database/chain/entities/sudt-token-info'
 import exportTransactions from 'utils/export-history'
+
 
 export interface TransactionsByAddressesParam {
   pageNo: number
   pageSize: number
   addresses: string[]
-}
-
-export interface TransactionsByLockHashesParam {
-  pageNo: number
-  pageSize: number
-  lockHashes: string[]
-}
-
-export interface TransactionsByPubkeysParams {
-  pageNo: number
-  pageSize: number
-  pubkeys: string[]
+  walletID: string
 }
 
 export interface PaginationResult<T = any> {
@@ -36,6 +29,7 @@ export enum SearchType {
   TxHash = 'txHash',
   Date = 'date',
   Empty = 'empty',
+  TokenInfo = 'tokenInfo',
   Unknown = 'unknown',
 }
 
@@ -57,105 +51,20 @@ export class TransactionsService {
     if (value.match(/^(\d+|-\d+)$/)) {
       // Amount search is not supported
     }
-    return SearchType.Unknown
-  }
-
-  public static async getAll(params: TransactionsByLockHashesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
-    const type = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
-      return {
-        totalCount: 0,
-        items: [],
-      }
-    }
-
-    const searchParams = await TransactionsService.searchSQL(params, type, searchValue)
-    const query = getConnection()
-      .getRepository(TransactionEntity)
-      .createQueryBuilder('tx')
-      .leftJoinAndSelect('tx.inputs', 'input')
-      .leftJoinAndSelect('tx.outputs', 'output')
-      .where(searchParams[0], searchParams[1] as ObjectLiteral)
-
-    const totalCount: number = await query.getCount()
-
-    const transactions: TransactionEntity[] = await query
-      .orderBy(`tx.timestamp`, 'DESC')
-      .skip((params.pageNo - 1) * params.pageSize)
-      .take(params.pageSize)
-      .getMany()
-
-    const inputPreviousTxHashes: string[] = transactions
-      .map(tx => tx.inputs)
-      .reduce((acc, val) => acc.concat(val), [])
-      .map(i => i.outPointTxHash)
-      .filter(h => !!h) as string[]
-
-    const daoCellOutPoints: { txHash: string, index: string }[] = (await getConnection()
-      .getRepository(OutputEntity)
-      .createQueryBuilder('output')
-      .select("output.outPointTxHash", "txHash")
-      .addSelect("output.outPointIndex", "index")
-      .where('output.daoData IS NOT NULL')
-      .getRawMany())
-      .filter(o => inputPreviousTxHashes.includes(o.txHash))
-
-    const txs: Transaction[] = transactions!.map(tx => {
-      const outputCapacities: bigint = tx.outputs
-        .filter(o => params.lockHashes.includes(o.lockHash))
-        .map(o => BigInt(o.capacity))
-        .reduce((result, c) => result + c, BigInt(0))
-      const inputCapacities: bigint = tx.inputs
-        .filter(i => {
-          if (i.lockHash) {
-            return params.lockHashes.includes(i.lockHash)
-          }
-          return false
-        })
-        .map(i => BigInt(i.capacity || 0))
-        .reduce((result, c) => result + c, BigInt(0))
-      const value: bigint = outputCapacities - inputCapacities
-
-      let nervosDao: boolean = false
-      if (
-        tx.outputs.some(o => !!o.daoData) ||
-        tx.inputs.some(i => daoCellOutPoints.some(dc => {
-          return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
-        }))
-      ) {
-        nervosDao = true
-      }
-      return Transaction.fromObject({
-        timestamp: tx.timestamp,
-        value: value.toString(),
-        hash: tx.hash,
-        version: tx.version,
-        type: value > BigInt(0) ? 'receive' : 'send',
-        nervosDao,
-        status: tx.status,
-        description: tx.description,
-        createdAt: tx.createdAt,
-        updatedAt: tx.updatedAt,
-        blockNumber: tx.blockNumber,
-      })
-    })
-
-    return {
-      totalCount: totalCount || 0,
-      items: txs,
-    }
+    return SearchType.TokenInfo
   }
 
   public static async getAllByAddresses(params: TransactionsByAddressesParam, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
     const type: SearchType = TransactionsService.filterSearchType(searchValue)
-    if (type === SearchType.Unknown) {
-      return {
-        totalCount: 0,
-        items: []
-      }
-    }
 
-    let lockHashes: string[] = AddressParser.batchToLockHash(params.addresses)
+    const lockScripts = AddressParser.batchParse(params.addresses)
+    let lockHashes: string[] = lockScripts.map(s => s.computeHash())
+    const blake160s: string[] = lockScripts.map(s => s.args)
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHashes: string[] = AddressParser
+      .batchParse(params.addresses)
+      .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
+    const allLockHashes: string[] = lockHashes.concat(anyoneCanPayLockHashes)
 
     if (type === SearchType.Address) {
       const hash = AddressParser.parse(searchValue).computeHash()
@@ -183,7 +92,33 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes)) AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
-          { lockHashes, beginTimestamp, endTimestamp }
+          { lockHashes: allLockHashes, beginTimestamp, endTimestamp }
+        )
+        .orderBy('tx.timestamp', 'DESC')
+        .getRawMany())
+        .map(tx => tx.txHash)
+    } else if (type === SearchType.TokenInfo) {
+      const assetAccount = await getConnection()
+        .getRepository(AssetAccountEntity)
+        .createQueryBuilder('aa')
+        .leftJoinAndSelect('aa.sudtTokenInfo', 'info')
+        .where(`info.symbol = :searchValue OR info.tokenName = :searchValue OR aa.accountName = :searchValue`, { searchValue })
+        .getOne()
+
+      if (!assetAccount) {
+        return {
+          totalCount: 0,
+          items: []
+        }
+      }
+
+      const tokenID = assetAccount.tokenID
+      allTxHashes = (await repository
+        .createQueryBuilder('tx')
+        .select("tx.hash", "txHash")
+        .where(
+          `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) AND output.typeArgs = :tokenID union select input.transactionHash from input where input.lockHash in (:...lockHashes) AND input.typeArgs = :tokenID)`,
+          { lockHashes: anyoneCanPayLockHashes, tokenID }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -194,7 +129,7 @@ export class TransactionsService {
         .select("tx.hash", "txHash")
         .where(
           `tx.hash in (select output.transactionHash from output where output.lockHash in (:...lockHashes) union select input.transactionHash from input where input.lockHash in (:...lockHashes))`,
-          { lockHashes }
+          { lockHashes: allLockHashes }
         )
         .orderBy('tx.timestamp', 'DESC')
         .getRawMany())
@@ -220,7 +155,10 @@ export class TransactionsService {
       .addSelect('input.transactionHash', 'transactionHash')
       .addSelect('input.outPointTxHash', 'outPointTxHash')
       .addSelect('input.outPointIndex', 'outPointIndex')
-      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes })
+      .where(`input.transactionHash IN (:...txHashes) AND input.lockHash in (:...lockHashes)`, {
+        txHashes,
+        lockHashes: allLockHashes,
+      })
       .getRawMany()
 
     const outputs = await connection
@@ -229,8 +167,23 @@ export class TransactionsService {
       .select('output.capacity', 'capacity')
       .addSelect('output.transactionHash', 'transactionHash')
       .addSelect('output.daoData', 'daoData')
-      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes })
+      .where(`output.transactionHash IN (:...txHashes) AND output.lockHash IN (:...lockHashes)`, {
+        txHashes,
+        lockHashes: allLockHashes,
+      })
       .getRawMany()
+
+    const anyoneCanPayInputs = await connection
+      .getRepository(InputEntity)
+      .createQueryBuilder('input')
+      .where(`input.transactionHash IN (:...txHashes) AND input.typeHash IS NOT NULL AND input.lockHash in (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
+
+    const anyoneCanPayOutputs = await connection
+      .getRepository(OutputEntity)
+      .createQueryBuilder('output')
+      .where(`output.transactionHash IN (:...txHashes) AND output.typeHash IS NOT NULL AND output.lockHash IN (:...lockHashes)`, { txHashes, lockHashes: anyoneCanPayLockHashes })
+      .getMany()
 
     const inputPreviousTxHashes: string[] = inputs
       .map(i => i.outPointTxHash)
@@ -268,43 +221,74 @@ export class TransactionsService {
       }
     })
 
-    const txs = transactions.map(tx => {
-      const value = sums.get(tx.hash!) || BigInt(0)
-      return Transaction.fromObject({
-        timestamp: tx.timestamp,
-        value: value.toString(),
-        hash: tx.hash,
-        version: tx.version,
-        type: value > BigInt(0) ? 'receive' : 'send',
-        nervosDao: daoFlag.get(tx.hash!),
-        status: tx.status,
-        description: tx.description,
-        createdAt: tx.createdAt,
-        updatedAt: tx.updatedAt,
-        blockNumber: tx.blockNumber,
+    const txs = await Promise.all(
+      transactions.map(async tx => {
+        const value = sums.get(tx.hash!) || BigInt(0)
+
+        let typeArgs: string | undefined | null
+        const sudtInput = anyoneCanPayInputs.find(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!))
+        if (sudtInput) {
+          typeArgs = sudtInput.typeArgs
+        } else {
+          const sudtOutput = anyoneCanPayOutputs.find(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!))
+          if (sudtOutput) {
+            typeArgs = sudtOutput.typeArgs
+          }
+        }
+
+        let sudtInfo: SudtInfo | undefined
+
+        if (typeArgs) {
+          // const typeArgs = sudtInput.typeArgs
+          const inputAmount = anyoneCanPayInputs
+            .filter(i => i.transactionHash === tx.hash && assetAccountInfo.isSudtScript(i.typeScript()!) && i.typeArgs === typeArgs)
+            .map(i => BufferUtils.parseAmountFromSUDTData(i.data))
+            .reduce((result, c) => result + c, BigInt(0))
+          const outputAmount = anyoneCanPayOutputs
+            .filter(o => o.outPointTxHash === tx.hash && assetAccountInfo.isSudtScript(o.typeScript()!) && o.typeArgs === typeArgs)
+            .map(o => BufferUtils.parseAmountFromSUDTData(o.data))
+            .reduce((result, c) => result + c, BigInt(0))
+
+          const amount = outputAmount - inputAmount
+          const tokenInfo = await getConnection()
+            .getRepository(SudtTokenInfoEntity)
+            .createQueryBuilder('info')
+            .leftJoinAndSelect('info.assetAccounts', 'aa')
+            .where(`info.tokenID = :typeArgs AND aa.blake160 IN (:...blake160s)`, {
+              typeArgs,
+              blake160s,
+            })
+            .getOne()
+
+          if (tokenInfo) {
+            sudtInfo = {
+              sUDT: tokenInfo,
+              amount: amount.toString(),
+            }
+          }
+        }
+
+        return Transaction.fromObject({
+          timestamp: tx.timestamp,
+          value: value.toString(),
+          hash: tx.hash,
+          version: tx.version,
+          type: value > BigInt(0) ? 'receive' : 'send',
+          nervosDao: daoFlag.get(tx.hash!),
+          status: tx.status,
+          description: tx.description,
+          createdAt: tx.createdAt,
+          updatedAt: tx.updatedAt,
+          blockNumber: tx.blockNumber,
+          sudtInfo: sudtInfo,
+        })
       })
-    })
+    )
 
     return {
       totalCount,
       items: txs,
     }
-  }
-
-  public static async getAllByPubkeys(params: TransactionsByPubkeysParams, searchValue: string = ''): Promise<PaginationResult<Transaction>> {
-    const addresses: string[] = params.pubkeys.map(pubkey => {
-      return pubkeyToAddress(pubkey)
-    })
-    const lockHashes: string[] = AddressParser.batchToLockHash(addresses)
-
-    return TransactionsService.getAll(
-      {
-        pageNo: params.pageNo,
-        pageSize: params.pageSize,
-        lockHashes,
-      },
-      searchValue
-    )
   }
 
   public static async get(hash: string): Promise<Transaction | undefined> {
@@ -377,39 +361,6 @@ export class TransactionsService {
     const dbPath = connection.options.database as string
     const total = await exportTransactions({ walletID, dbPath, lockHashList, filePath })
     return total
-  }
-
-  // only deal with address / txHash / Date
-  private static async searchSQL(params: TransactionsByLockHashesParam, type: SearchType, value: string = '') {
-    const base = [
-      '(input.lockHash in (:...lockHashes) OR output.lockHash in (:...lockHashes))',
-      { lockHashes: params.lockHashes },
-    ]
-    if (type === SearchType.Empty) {
-      return base
-    }
-    if (type === SearchType.Address) {
-      const lockHash: string = AddressParser.parse(value).computeHash()
-      return ['input.lockHash = :lockHash OR output.lockHash = :lockHash', { lockHash }]
-    }
-    if (type === SearchType.TxHash) {
-      return [`${base[0]} AND tx.hash = :hash`, { lockHashes: params.lockHashes, hash: value }]
-    }
-    if (type === SearchType.Date) {
-      const beginTimestamp = +new Date(new Date(value).toDateString())
-      const endTimestamp = beginTimestamp + 86400000 // 24 * 60 * 60 * 1000
-      return [
-        `${
-          base[0]
-        } AND (CAST("tx"."timestamp" AS UNSIGNED BIG INT) >= :beginTimestamp AND CAST("tx"."timestamp" AS UNSIGNED BIG INT) < :endTimestamp)`,
-        {
-          lockHashes: params.lockHashes,
-          beginTimestamp,
-          endTimestamp,
-        },
-      ]
-    }
-    return base
   }
 }
 

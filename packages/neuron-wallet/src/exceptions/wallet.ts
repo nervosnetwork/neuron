@@ -31,6 +31,7 @@ export class CodeHashNotLoaded extends Error {
 }
 
 export class CapacityNotEnough extends Error {
+  public code = 109
   constructor() {
     super(i18n.t('messages.capacity-not-enough'))
   }

@@ -164,7 +164,7 @@ $textfieldWidth: calc(100vw - 370px);
   min-width: auto;
   margin-top: 22px;
   padding: 0;
-  line-height: auto;
+  line-height: 0;
 
   &[data-is-on='true'] {
     color: rgba(255, 255, 255, 0.8) !important;

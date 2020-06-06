@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useMemo, useCallback } from 'react'
+import { useHistory, useRouteMatch } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useState as useGlobalState, useDispatch } from 'states'
@@ -16,8 +16,18 @@ import LaunchScreen from 'components/LaunchScreen'
 import PasswordRequest from 'components/PasswordRequest'
 import NervosDAO from 'components/NervosDAO'
 import SpecialAssetList from 'components/SpecialAssetList'
+import SUDTAccountList from 'components/SUDTAccountList'
+import SUDTSend from 'components/SUDTSend'
+import SUDTReceive from 'components/SUDTReceive'
 
-import { RoutePath, useOnDefaultContextMenu, useRoutes, useOnLocaleChange } from 'utils'
+import {
+  RoutePath,
+  useOnDefaultContextMenu,
+  useRoutes,
+  useOnLocaleChange,
+  useChainTypeByGenesisBlockHash,
+  ChainType,
+} from 'utils'
 
 import { useSubscription, useSyncChainData, useOnCurrentWalletChange } from './hooks'
 
@@ -97,6 +107,25 @@ export const mainContents: CustomRouter.Route[] = [
     exact: false,
     component: SpecialAssetList,
   },
+  {
+    name: `SUDTAccountList`,
+    path: RoutePath.SUDTAccountList,
+    exact: true,
+    component: SUDTAccountList,
+  },
+  {
+    name: `SUDTSend`,
+    path: RoutePath.SUDTSend,
+    params: `/:accountId?`,
+    exact: false,
+    component: SUDTSend,
+  },
+  {
+    name: `SUDTReceive`,
+    path: RoutePath.SUDTReceive,
+    exact: false,
+    component: SUDTReceive,
+  },
 ]
 
 const MainContent = () => {
@@ -110,6 +139,20 @@ const MainContent = () => {
   const dispatch = useDispatch()
   const { networkID } = chain
   const [t, i18n] = useTranslation()
+  const isCurrentSUDT = !!useRouteMatch(mainContents.filter(c => c.name.startsWith('SUDT')).map(c => c.path))
+
+  const toggleSUDT = useCallback(
+    (chainType: ChainType) => {
+      if (ChainType.TESTNET !== chainType && isCurrentSUDT) {
+        history.replace(mainContents[0].path)
+      }
+    },
+    [isCurrentSUDT, history]
+  )
+
+  const networkURL = networks.find(n => n.id === networkID)?.remote ?? null
+
+  useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
 
   useSubscription({
     walletID,
