@@ -37,7 +37,7 @@ export default class AssetAccountInfo {
         codeHash: '0x6a3982f9d018be7e7228f9e0b765f28ceff6d36e634490856d2b186acf78e79b',
         hashType: ScriptHashType.Type
       }
-      this.sudtDeployHeight = BigInt(14922)
+      this.sudtDeployHeight = BigInt(-1)
     } else {
       // TODO: Update for testnet!!!
       this.sudtInfo = {
