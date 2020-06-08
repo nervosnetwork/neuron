@@ -26,31 +26,33 @@ export default class AssetAccountInfo {
   constructor(genesisBlockHash: string = NetworksService.getInstance().getCurrent().genesisHash) {
     // dev chain: using testnet config
     if (genesisBlockHash === AssetAccountInfo.MAINNET_GENESIS_BLOCK_HASH) {
-      // TODO: Update for mainnet!!!
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint('0x0e7153f243ba4c980bfd7cd77a90568bb70fd393cb572b211a2f884de63d103d', '0'), DepType.Code),
-        codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
-        hashType: ScriptHashType.Data
+        cellDep: new CellDep(new OutPoint(process.env.mainnet_sudt_dep_txhash!, process.env.mainnet_sudt_dep_index!), 
+          process.env.mainnet_sudt_dep_type! as DepType),
+        codeHash: process.env.mainnet_sudt_script_codehash!,
+        hashType: process.env.mainnet_sudt_script_hashtype! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint('0x9af66408df4703763acb10871365e4a21f2c3d3bdc06b0ae634a3ad9f18a6525', '0'), DepType.DepGroup),
-        codeHash: '0x6a3982f9d018be7e7228f9e0b765f28ceff6d36e634490856d2b186acf78e79b',
-        hashType: ScriptHashType.Type
+        cellDep: new CellDep(new OutPoint(process.env.mainnet_acp_dep_txhash!, process.env.mainnet_acp_dep_index!),
+          process.env.mainnet_acp_dep_type! as DepType),
+        codeHash: process.env.mainnet_acp_script_codehash!,
+        hashType: process.env.mainnet_acp_script_hashtype! as ScriptHashType
       }
-      this.sudtDeployHeight = BigInt(-1)
+      this.sudtDeployHeight = BigInt(process.env.mainnet_sudt_height!)
     } else {
-      // TODO: Update for testnet!!!
       this.sudtInfo = {
-        cellDep: new CellDep(new OutPoint('0xc1b2ae129fad7465aaa9acc9785f842ba3e6e8b8051d899defa89f5508a77958', '0'), DepType.Code),
-        codeHash: '0x48dbf59b4c7ee1547238021b4869bceedf4eea6b43772e5d66ef8865b6ae7212',
-        hashType: ScriptHashType.Data
+        cellDep: new CellDep(new OutPoint(process.env.testnet_sudt_dep_txhash!, process.env.testnet_sudt_dep_index!), 
+          process.env.testnet_sudt_dep_type! as DepType),
+        codeHash: process.env.testnet_sudt_script_codehash!,
+        hashType: process.env.testnet_sudt_script_hashtype! as ScriptHashType
       }
       this.anyoneCanPayInfo = {
-        cellDep: new CellDep(new OutPoint('0x4f32b3e39bd1b6350d326fdfafdfe05e5221865c3098ae323096f0bfc69e0a8c', '0'), DepType.DepGroup),
-        codeHash: '0x86a1c6987a4acbe1a887cca4c9dd2ac9fcb07405bbeda51b861b18bbf7492c4b',
-        hashType: ScriptHashType.Type
+        cellDep: new CellDep(new OutPoint(process.env.testnet_acp_dep_txhash!, process.env.testnet_acp_dep_index!),
+          process.env.testnet_acp_dep_type! as DepType),
+        codeHash: process.env.testnet_acp_script_codehash!,
+        hashType: process.env.testnet_acp_script_hashtype! as ScriptHashType
       }
-      this.sudtDeployHeight = BigInt(20913)
+      this.sudtDeployHeight = BigInt(process.env.testnet_sudt_height!)
     }
   }
 
