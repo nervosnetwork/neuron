@@ -1,6 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import { TFunction, i18n as i18nType } from 'i18next'
+import CKB from '@nervosnetwork/ckb-sdk-core'
 import { openContextMenu, requestPassword, deleteNetwork } from 'services/remote'
 import { SetLocale as SetLocaleSubject } from 'services/subjects'
 import {
@@ -10,8 +11,9 @@ import {
   updateAddressDescription,
   setCurrentWallet,
 } from 'states'
-import { epochParser, RoutePath } from 'utils'
+import { epochParser, RoutePath, GenesisBlockHash, ChainType } from 'utils'
 import calculateClaimEpochValue from 'utils/calculateClaimEpochValue'
+import { verifyTokenId, verifySUDTAccountName, verifySymbol, verifyTokenName, verifyDecimal } from 'utils/validators'
 
 export const useGoBack = (history: ReturnType<typeof useHistory>) => {
   return useCallback(() => {
@@ -204,6 +206,62 @@ export const useExitOnWalletChange = () => {
   }, [])
 }
 
+export const useSUDTAccountInfoErrors = ({
+  info: { accountName, tokenName, tokenId, symbol, decimal },
+  existingAccountNames,
+  isCKB,
+  t,
+}: {
+  info: {
+    accountName: string
+    tokenName: string
+    tokenId: string
+    symbol: string
+    decimal: string
+  }
+  existingAccountNames: string[]
+  isCKB: boolean
+  t: TFunction
+}) =>
+  useMemo(() => {
+    const tokenErrors = {
+      accountName: '',
+      tokenId: '',
+      tokenName: '',
+      symbol: '',
+      decimal: '',
+    }
+
+    const dataToValidate = {
+      accountName: {
+        params: { name: accountName, exists: existingAccountNames },
+        validator: verifySUDTAccountName,
+      },
+      symbol: { params: { symbol, isCKB }, validator: verifySymbol },
+      tokenId: { params: { tokenId, isCKB }, validator: verifyTokenId },
+      tokenName: { params: { tokenName, isCKB }, validator: verifyTokenName },
+      decimal: { params: { decimal }, validator: verifyDecimal },
+    }
+
+    Object.entries(dataToValidate).forEach(([name, { params, validator }]: [string, any]) => {
+      try {
+        validator(params)
+      } catch (err) {
+        tokenErrors[name as keyof typeof tokenErrors] = t(err.message, err.i18n)
+      }
+    })
+
+    return tokenErrors
+  }, [accountName, tokenName, tokenId, symbol, decimal, isCKB, existingAccountNames, t])
+
+export default {
+  useGoBack,
+  useLocalDescription,
+  useCalculateEpochs,
+  useDialog,
+  useOnDefaultContextMenu,
+  useExitOnWalletChange,
+}
 export const useOnLocalStorageChange = (handler: (e: StorageEvent) => void) => {
   return useEffect(() => {
     window.addEventListener('storage', handler)
@@ -332,3 +390,46 @@ export const useOnHandleNetwork = ({ history }: { history: ReturnType<typeof use
     },
     [history]
   )
+
+export const useChainTypeByGenesisBlockHash = (url: string | null, cb: (chainType: ChainType) => void) => {
+  const timerRef = useRef<NodeJS.Timeout | undefined>()
+  const BUFFER_TIME = 200
+
+  useEffect(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+
+    if (url) {
+      timerRef.current = setTimeout(() => {
+        new CKB(url).rpc
+          .getHeaderByNumber('0x0')
+          .then(header => {
+            switch (header?.hash) {
+              case GenesisBlockHash.MAINNET: {
+                cb(ChainType.MAINNET)
+                break
+              }
+              case GenesisBlockHash.TESTNET: {
+                cb(ChainType.TESTNET)
+                break
+              }
+              default: {
+                cb(ChainType.DEVNET)
+              }
+            }
+          })
+          .catch(() => {
+            cb(ChainType.DEVNET)
+          })
+      }, BUFFER_TIME)
+    } else {
+      cb(ChainType.DEVNET)
+    }
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [url, cb])
+}

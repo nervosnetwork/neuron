@@ -17,14 +17,12 @@ import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 
-import { useState as useGlobalState, useDispatch } from 'states'
-import appState from 'states/init/app'
+import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
   ErrorCode,
   SyncStatus,
-  SyncStatusThatBalanceUpdating,
   ConnectionStatus,
   CONSTANTS,
   shannonToCKBFormatter,
@@ -38,7 +36,7 @@ import {
   verifyAddress,
 } from 'utils'
 
-import DatetimePicker from 'widgets/DatetimePicker'
+import DatetimePicker, { formatDate } from 'widgets/DatetimePicker'
 import { useInitialize } from './hooks'
 import styles from './send.module.scss'
 
@@ -164,7 +162,10 @@ const Send = () => {
         {t('sync.sync-not-start')}
       </span>
     )
-  } else if (SyncStatusThatBalanceUpdating.includes(syncStatus) || ConnectionStatus.Connecting === connectionStatus) {
+  } else if (
+    [SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ||
+    ConnectionStatus.Connecting === connectionStatus
+  ) {
     balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
   }
 
@@ -304,7 +305,7 @@ const Send = () => {
                   <div className={styles.locktime} data-status={item.date ? 'set' : 'unset'}>
                     <img data-status="inactive" className={styles.icon} src={Calendar} alt="calendar" />
                     <img data-status="active" className={styles.icon} src={ActiveCalendar} alt="active-calendar" />
-                    {item.date ? `${t('send.release-on')}: ${new Date(+item.date).toLocaleDateString()}` : null}
+                    {item.date ? `${t('send.release-on')}: ${formatDate(new Date(+item.date))}` : null}
                     <button type="button" data-index={idx} onClick={onLocktimeClick}>
                       {item.date ? (
                         <>

@@ -63,7 +63,8 @@ const exportHistory = ({
         db.get(
           `
           SELECT
-            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG ING)) AS VARCHAR) outputShannon
+            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG ING)) AS VARCHAR) outputShannon,
+            COUNT(output.daoData) daoCellCount
           FROM
             output
           WHERE
@@ -72,7 +73,7 @@ const exportHistory = ({
             output.transactionHash
           `,
           [row.hash],
-          async (err, { outputShannon } = { outputShannon: '0' }) => {
+          async (err, { outputShannon, daoCellCount } = { outputShannon: '0', daoCellCount: 0 }) => {
             if (err) {
               return reject(err)
             }
@@ -80,7 +81,9 @@ const exportHistory = ({
             const totalInput = BigInt(row.inputShannon || `0`)
             const totalOutput = BigInt(outputShannon || `0`)
             let txType = `-`
-            if (totalInput > totalOutput) {
+            if (daoCellCount > 0) {
+              txType = 'Nervos DAO'
+            } else if (totalInput > totalOutput) {
               txType = SEND_TYPE
             } else if (totalInput < totalOutput) {
               txType = RECEIVE_TYPE

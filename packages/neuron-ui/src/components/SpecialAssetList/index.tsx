@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Pagination } from '@uifabric/experiments'
-import ExperimentalIcon from 'widgets/Icons/Experimental.png'
+import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
+import Experimental from 'widgets/ExperimentalRibbon'
 import { unlockSpecialAsset, getSpecialAssets } from 'services/remote'
+import { ckbCore } from 'services/chain'
 import {
   CONSTANTS,
   RoutePath,
@@ -13,10 +15,7 @@ import {
   queryParsers,
   epochParser,
 } from 'utils'
-import { useState as useGlobalState, useDispatch } from 'states'
-import { AppActions } from 'states/stateProvider/reducer'
-import SpecialAsset, { SpecialAssetProps } from 'components/SpecialAsset'
-import { ckbCore } from 'services/chain'
+import { useState as useGlobalState, useDispatch, AppActions } from 'states'
 import styles from './specialAssetList.module.scss'
 
 const { PAGE_SIZE, MEDIUM_FEE_RATE } = CONSTANTS
@@ -190,7 +189,7 @@ const SpecialAssetList = () => {
           key={`${cell.outPoint.txHash}-${cell.outPoint.index}`}
           datetime={+cell.timestamp}
           capacity={cell.capacity}
-          hasTypeScript={cell.type !== null}
+          hasTypeScript={!!cell.type}
           hasData={cell.data !== '0x'}
           outPoint={cell.outPoint}
           isMainnet={isMainnet}
@@ -206,10 +205,8 @@ const SpecialAssetList = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.experimental}>
-        <img src={ExperimentalIcon} alt="experimental" />
-        <span className={styles.text}>{t('special-assets.experimental')}</span>
-      </div>
+      <Experimental tag="customized-assset" />
+      <div className={styles.title}>{t('special-assets.title')}</div>
       {totalCount ? (
         <div className={styles.listContainer}>
           <div className={styles.listHeader}>

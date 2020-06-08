@@ -27,4 +27,8 @@ export default class HexUtils {
   public static byteLength(hex: string): number {
     return Buffer.byteLength(HexUtils.removePrefix(hex), 'hex')
   }
+
+  public static fromBuffer(buffer: Buffer): string {
+    return '0x' + buffer.toString('hex')
+  }
 }

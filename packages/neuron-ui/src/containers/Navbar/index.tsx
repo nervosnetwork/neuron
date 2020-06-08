@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,14 @@ import NetworkStatus from 'components/NetworkStatus'
 import SyncStatus from 'components/SyncStatus'
 import { ReactComponent as ExperimentalIcon } from 'widgets/Icons/Flask.svg'
 
-import { RoutePath, getCurrentUrl, getSyncStatus, useOnLocaleChange } from 'utils'
+import {
+  RoutePath,
+  getCurrentUrl,
+  getSyncStatus,
+  useOnLocaleChange,
+  useChainTypeByGenesisBlockHash,
+  ChainType,
+} from 'utils'
 
 import styles from './navbar.module.scss'
 
@@ -28,7 +35,7 @@ const menuItems = [
     url: RoutePath.SpecialAssets,
     experimental: true,
   },
-  { name: 'navbar.addresses', key: RoutePath.Addresses.slice(1), url: RoutePath.Addresses, experimental: false },
+  { name: 'navbar.s-udt', key: RoutePath.SUDTAccountList.slice(1), url: RoutePath.SUDTAccountList, experimental: true },
 ]
 
 const Navbar = () => {
@@ -42,10 +49,23 @@ const Navbar = () => {
     settings: { wallets = [], networks = [] },
   } = neuronWallet
   const [t, i18n] = useTranslation()
+  const [showSUDT, setShowSUDT] = useState(false)
   useOnLocaleChange(i18n)
 
-  const selectedTab = menuItems.find(item => item.key === pathname.split('/')[1])
-  const selectedKey: string | null = selectedTab ? selectedTab.key : null
+  const network = networks.find(n => n.id === networkID)
+  const networkName = network?.name ?? null
+  const networkURL = network?.remote ?? null
+
+  const toggleSUDT = useCallback(
+    (chainType: ChainType) => {
+      setShowSUDT(ChainType.TESTNET === chainType)
+    },
+    [setShowSUDT]
+  )
+
+  useChainTypeByGenesisBlockHash(networkURL, toggleSUDT)
+
+  const selectedKey = menuItems.find(item => item.key === pathname)?.key ?? null
 
   const syncStatus = getSyncStatus({
     syncedBlockNumber,
@@ -77,7 +97,7 @@ const Navbar = () => {
     ))
 
   const experimentalMenus = menuItems
-    .filter(item => item.experimental)
+    .filter(item => item.experimental && (showSUDT || item.key !== RoutePath.SUDTAccountList.slice(1)))
     .map(item => (
       <button
         type="button"
@@ -92,10 +112,6 @@ const Navbar = () => {
         {t(item.name)}
       </button>
     ))
-
-  const currentNetwork = networks.find(n => n.id === networkID)
-
-  const networkName = currentNetwork ? currentNetwork.name : null
 
   return (
     <aside className={styles.sidebar}>

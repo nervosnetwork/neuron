@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import Button from 'widgets/Button'
 import TextField from 'widgets/TextField'
 import Spinner from 'widgets/Spinner'
-import { useDialog, ResponseCode, ErrorCode, RoutePath } from 'utils'
+import { useDialog, ErrorCode, RoutePath, isSuccessResponse } from 'utils'
 
 import {
   useState as useGlobalState,
@@ -13,6 +13,8 @@ import {
   sendTransaction,
   deleteWallet,
   backupWallet,
+  sendCreateSUDTAccountTransaction,
+  sendSUDTTransaction,
 } from 'states'
 import { PasswordIncorrectException } from 'exceptions'
 import styles from './passwordRequest.module.scss'
@@ -25,6 +27,7 @@ const PasswordRequest = () => {
       passwordRequest: { walletID = '', actionType = null },
     },
     settings: { wallets = [] },
+    experimental,
   } = useGlobalState()
   const dispatch = useDispatch()
   const [t] = useTranslation()
@@ -48,7 +51,7 @@ const PasswordRequest = () => {
 
   const wallet = useMemo(() => wallets.find(w => w.id === walletID), [walletID, wallets])
 
-  const isLoading = ['send', 'unlock'].includes(actionType || '') && isSending
+  const isLoading = ['send', 'unlock', 'create-sudt-account', 'send-sudt'].includes(actionType || '') && isSending
   const disabled = !password || isSending
 
   const onSubmit = useCallback(
@@ -66,7 +69,7 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
-              if (status === ResponseCode.SUCCESS) {
+              if (isSuccessResponse({ status })) {
                 history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
@@ -95,11 +98,42 @@ const PasswordRequest = () => {
               break
             }
             await sendTransaction({ walletID, tx: generatedTx, description, password })(dispatch).then(status => {
-              if (status === ResponseCode.SUCCESS) {
+              if (isSuccessResponse({ status })) {
                 dispatch({
                   type: AppActions.SetGlobalDialog,
                   payload: 'unlock-success',
                 })
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'create-sudt-account': {
+            const params: Controller.SendCreateSUDTAccountTransaction.Params = {
+              walletID,
+              assetAccount: experimental?.assetAccount,
+              tx: experimental?.tx,
+              password,
+            }
+            await sendCreateSUDTAccountTransaction(params)(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
+              } else if (status === ErrorCode.PasswordIncorrect) {
+                throw new PasswordIncorrectException()
+              }
+            })
+            break
+          }
+          case 'send-sudt': {
+            const params: Controller.SendSUDTTransaction.Params = {
+              walletID,
+              tx: experimental?.tx,
+              password,
+            }
+            await sendSUDTTransaction(params)(dispatch).then(status => {
+              if (isSuccessResponse({ status })) {
+                history.push(RoutePath.History)
               } else if (status === ErrorCode.PasswordIncorrect) {
                 throw new PasswordIncorrectException()
               }
@@ -116,7 +150,20 @@ const PasswordRequest = () => {
         }
       }
     },
-    [dispatch, walletID, password, actionType, description, history, isSending, generatedTx, disabled, setError, t]
+    [
+      dispatch,
+      walletID,
+      password,
+      actionType,
+      description,
+      history,
+      isSending,
+      generatedTx,
+      disabled,
+      experimental,
+      setError,
+      t,
+    ]
   )
 
   const onChange = useCallback(
@@ -136,7 +183,9 @@ const PasswordRequest = () => {
     <dialog ref={dialogRef} className={styles.dialog}>
       <form onSubmit={onSubmit}>
         <h2 className={styles.title}>{t(`password-request.${actionType}.title`)}</h2>
-        {actionType === 'unlock' ? null : <div className={styles.walletName}>{wallet ? wallet.name : null}</div>}
+        {['unlock', 'create-sudt-account', 'send-sudt'].includes(actionType ?? '') ? null : (
+          <div className={styles.walletName}>{wallet ? wallet.name : null}</div>
+        )}
         <TextField
           label={t('password-request.password')}
           value={password}

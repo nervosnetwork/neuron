@@ -7,7 +7,7 @@ import Button from 'widgets/Button'
 import { ReactComponent as EditNetwork } from 'widgets/Icons/Edit.svg'
 import { ReactComponent as DeleteNetwork } from 'widgets/Icons/Delete.svg'
 
-import chainState from 'states/init/chain'
+import { chainState } from 'states'
 import { setCurrentNetowrk } from 'services/remote'
 
 import { backToTop, RoutePath, useOnHandleNetwork, useOnWindowResize, useToggleChoiceGroupBorder } from 'utils'
@@ -77,13 +77,12 @@ const NetworkSetting = ({ chain = chainState, settings: { networks = [] } }: Sta
                   role="presentation"
                   className={`ms-ChoiceFieldLabel ${styles.choiceLabel}`}
                   data-id={network.id}
-                  data-action="select"
                   onClick={onHandleNetwork}
                   title={`${text}: ${network.remote}`}
                 >
                   <span className={styles.networkLabel}>
                     {text}
-                    <span style={{ color: '#999', pointerEvents: 'none' }}>{`(${network.remote})`}</span>
+                    <span className={styles.url}>{`(${network.remote}`}</span>
                     <Label type={network.chain} t={t} />
                   </span>
 

@@ -1,26 +1,34 @@
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Icon } from 'office-ui-fabric-react'
+import { ReactComponent as Detail } from 'widgets/Icons/Detail.svg'
 import TextField from 'widgets/TextField'
+import CKBAvatar from 'widgets/Icons/CKBAvatar.png'
+import { ReactComponent as Success } from 'widgets/Icons/Success.svg'
+import { ReactComponent as Pending } from 'widgets/Icons/Pending.svg'
+import { ReactComponent as Failure } from 'widgets/Icons/Failure.svg'
 import CopyZone from 'widgets/CopyZone'
-
-import { StateDispatch } from 'states/stateProvider/reducer'
-import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
 import {
   CONSTANTS,
   shannonToCKBFormatter,
   uniformTimeFormatter as timeFormatter,
   localNumberFormatter,
+  sudtValueToAmount,
+  sUDTAmountFormatter,
   getExplorerUrl,
   useLocalDescription,
 } from 'utils'
+import { StateDispatch } from 'states'
+import { showTransactionDetails, openContextMenu, openExternal } from 'services/remote'
 
 import styles from './transactionList.module.scss'
 
-const { CONFIRMATION_THRESHOLD } = CONSTANTS
+const { CONFIRMATION_THRESHOLD, DEFAULT_SUDT_FIELDS } = CONSTANTS
 
 interface TransactionListProps {
   isLoading?: boolean
+  walletName: string
   walletID: string
   items: State.Transaction[]
   tipBlockNumber: string
@@ -28,7 +36,14 @@ interface TransactionListProps {
   dispatch: StateDispatch
 }
 
-const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, dispatch }: TransactionListProps) => {
+const TransactionList = ({
+  items: txs,
+  tipBlockNumber,
+  walletID,
+  walletName,
+  isMainnet,
+  dispatch,
+}: TransactionListProps) => {
   const [txHash, setTxHash] = useState('')
   const [t] = useTranslation()
 
@@ -87,14 +102,28 @@ const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, disp
     [isMainnet, t]
   )
 
-  const onDoubleClick = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => {
-    const {
-      dataset: { hash },
-    } = e.target as HTMLDivElement
-    if (hash) {
-      showTransactionDetails(hash)
-    }
-  }, [])
+  const onActionBtnClick = useCallback(
+    (e: React.SyntheticEvent<HTMLButtonElement>) => {
+      const btn = (e.target as HTMLButtonElement)?.closest('button')
+      if (btn?.dataset?.hash && btn?.dataset?.action) {
+        switch (btn.dataset.action) {
+          case 'explorer': {
+            const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
+            openExternal(`${explorerUrl}/transaction/${btn.dataset.hash}`)
+            break
+          }
+          case 'detail': {
+            showTransactionDetails(btn.dataset.hash)
+            break
+          }
+          default: {
+            // ignore
+          }
+        }
+      }
+    },
+    [isMainnet]
+  )
 
   return (
     <>
@@ -107,10 +136,45 @@ const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, disp
           status = 'confirming'
         }
         const statusLabel = t(`history.${status}`)
-        const confirmationsLabel = t('history.confirming-with-count', {
-          confirmations: localNumberFormatter(confirmations),
-        })
-        const typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+        const confirmationsLabel = confirmations > 1000 ? '1,000+' : localNumberFormatter(confirmations)
+
+        let name = '--'
+        let value = '--'
+        let amount = '--'
+        let typeLabel = '--'
+
+        if (tx.sudtInfo?.sUDT) {
+          name = tx.sudtInfo.sUDT.tokenName || DEFAULT_SUDT_FIELDS.tokenName
+          const type = +tx.sudtInfo.amount <= 0 ? 'send' : 'receive'
+          typeLabel = `UDT ${t(`history.${type}`)}`
+          value = tx.sudtInfo.amount
+
+          if (tx.sudtInfo.sUDT.decimal) {
+            amount = `${sUDTAmountFormatter(sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal))} ${
+              tx.sudtInfo.sUDT.symbol
+            }`
+          }
+        } else {
+          name = walletName
+          value = `${tx.value} shannons`
+          amount = `${shannonToCKBFormatter(tx.value, true)} CKB`
+          typeLabel = tx.nervosDao ? 'Nervos DAO' : t(`history.${tx.type}`)
+        }
+
+        let indicator = <Pending />
+        switch (status) {
+          case 'success': {
+            indicator = <Success />
+            break
+          }
+          case 'failed': {
+            indicator = <Failure />
+            break
+          }
+          default: {
+            // ignore
+          }
+        }
         return (
           <div key={tx.hash} data-is-open={txHash === tx.hash} className={styles.itemContainer}>
             <div
@@ -121,26 +185,33 @@ const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, disp
               data-status={status}
               onClick={onTxClick}
               onContextMenu={onContextMenu}
-              onDoubleClick={onDoubleClick}
               onKeyPress={() => {}}
             >
+              <div className={styles.avatar}>
+                <img src={CKBAvatar} alt="avatar" />
+              </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <CopyZone className={styles.amount} content={shannonToCKBFormatter(tx.value).replace(/,/g, '')}>
-                {`${shannonToCKBFormatter(tx.value, true)} CKB`}
+              <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.]/g, '')}>
+                {amount}
               </CopyZone>
-              <span className={styles.status} title={statusLabel}>
-                {statusLabel}
+              <span className={styles.type} title={typeLabel}>
+                {typeLabel}
               </span>
-              {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
-                <span className={styles.confirmations} title={confirmationsLabel}>
-                  {confirmationsLabel}
-                </span>
-              ) : null}
+              <span className={styles.walletName}>{name}</span>
+              <div className={styles.indicator}>{indicator}</div>
             </div>
             <div className={styles.detail}>
-              <div title={typeLabel}>
-                <span>{t('history.type')}</span>
-                <span className={styles.type}>{typeLabel}</span>
+              <div title={statusLabel}>
+                <span>{t('history.status')}</span>
+                <span>{statusLabel}</span>
+              </div>
+              <div>
+                <span>{t('history.confirmations')}</span>
+                {confirmations >= 0 && (status === 'success' || status === 'confirming') ? (
+                  <span className={styles.confirmations} title={confirmationsLabel}>
+                    {confirmationsLabel}
+                  </span>
+                ) : null}
               </div>
               <div title={tx.hash} className={styles.txHash}>
                 <span>{t('history.transaction-hash')}</span>
@@ -152,22 +223,44 @@ const TransactionList = ({ items: txs, tipBlockNumber, walletID, isMainnet, disp
               </div>
               <div title={tx.description} className={styles.description}>
                 <span>{t('history.description')}</span>
-                <span>
-                  <TextField
-                    field="description"
-                    data-description-key={tx.hash}
-                    data-description-value={tx.description}
-                    title={tx.description}
-                    value={isSelected ? localDescription.description : tx.description || ''}
-                    onBlur={isSelected ? onDescriptionFieldBlur : undefined}
-                    onKeyPress={isSelected ? onDescriptionPress : undefined}
-                    onChange={isSelected ? onDescriptionChange : undefined}
-                    readOnly={!isSelected}
-                    onClick={onDescriptionSelected}
-                    className={styles.descriptionField}
-                    placeholder={t('common.click-to-edit')}
-                  />
-                </span>
+                <TextField
+                  field="description"
+                  data-description-key={tx.hash}
+                  data-description-value={tx.description}
+                  title={tx.description}
+                  value={isSelected ? localDescription.description : tx.description || ''}
+                  onBlur={isSelected ? onDescriptionFieldBlur : undefined}
+                  onKeyPress={isSelected ? onDescriptionPress : undefined}
+                  onChange={isSelected ? onDescriptionChange : undefined}
+                  readOnly={!isSelected}
+                  onClick={onDescriptionSelected}
+                  className={styles.descriptionField}
+                  placeholder={t('common.click-to-edit')}
+                />
+              </div>
+              <div className={styles.footer}>
+                <button
+                  type="button"
+                  className={styles.detailNavButton}
+                  title={t('history.view-detail-button-title')}
+                  onClick={onActionBtnClick}
+                  data-hash={tx.hash}
+                  data-action="detail"
+                >
+                  <Detail />
+                  <span>{t('history.view-detail')}</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.explorerNavButton}
+                  title={t('history.view-in-explorer-button-title')}
+                  onClick={onActionBtnClick}
+                  data-hash={tx.hash}
+                  data-action="explorer"
+                >
+                  <Icon iconName="Explorer" />
+                  <span>{t('history.view-in-explorer')}</span>
+                </button>
               </div>
             </div>
           </div>

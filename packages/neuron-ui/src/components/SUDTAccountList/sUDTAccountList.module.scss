@@ -1,0 +1,66 @@
+@import '../../styles/mixin.scss';
+
+.container {
+  display: grid;
+}
+
+.title {
+  @include page-title;
+}
+
+.header {
+  display: flex;
+  padding-bottom: 10px;
+  & > div:first-child {
+    flex: 1;
+  }
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 290px);
+  gap: 10px 20px;
+}
+
+.add {
+  position: relative;
+  border-radius: 2px;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  margin: 0 0 0 10px;
+  background-color: var(--nervos-green);
+  &:before,
+  &:after {
+    display: block;
+    content: '';
+    height: 2px;
+    width: 16px;
+    background-color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    border-radius: 1px;
+  }
+  &:after {
+    transform: translateY(-50%) rotate(90deg);
+  }
+}
+.notice {
+  margin-bottom: 10px;
+}
+
+.loading {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  .title {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}

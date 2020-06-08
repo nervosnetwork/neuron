@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Icon } from 'office-ui-fabric-react'
 import { currentWallet as currentWalletCache } from 'services/localCache'
 import {
   getSystemCodeHash,
@@ -8,14 +7,13 @@ import {
   showErrorMessage,
   getAllNetworks,
   getCurrentNetworkID,
-  openExternal,
 } from 'services/remote'
 import { ckbCore } from 'services/chain'
 
-import { transactionState } from 'states/init/chain'
-import CopyZone from 'widgets/CopyZone'
+import { transactionState } from 'states'
 
 import {
+  useOnLocaleChange,
   ErrorCode,
   CONSTANTS,
   localNumberFormatter,
@@ -24,18 +22,28 @@ import {
   useExitOnWalletChange,
   isSuccessResponse,
 } from 'utils'
+import CopyZone from 'widgets/CopyZone'
+
 import styles from './transaction.module.scss'
 
 const { MAINNET_TAG } = CONSTANTS
 
 const Transaction = () => {
-  const [t] = useTranslation()
+  const [t, i18n] = useTranslation()
   const [systemCodeHash, setSystemCodeHash] = useState<string>('')
   const [transaction, setTransaction] = useState(transactionState)
   const [isMainnet, setIsMainnet] = useState(false)
   const [error, setError] = useState({ code: '', message: '' })
 
   const addressPrefix = isMainnet ? ckbCore.utils.AddressPrefix.Mainnet : ckbCore.utils.AddressPrefix.Testnet
+  const hash = useMemo(() => window.location.href.split('/').pop(), [])
+
+  useOnLocaleChange(i18n)
+
+  useEffect(() => {
+    window.document.title = i18n.t(`transaction.window-title`, { hash })
+    // eslint-disable-next-line
+  }, [i18n.language, hash])
 
   useEffect(() => {
     getSystemCodeHash().then(res => {
@@ -58,7 +66,6 @@ const Transaction = () => {
 
     const currentWallet = currentWalletCache.load()
     if (currentWallet) {
-      const hash = window.location.href.split('/').pop()
       if (!hash) {
         showErrorMessage(
           t(`messages.error`),
@@ -85,14 +92,9 @@ const Transaction = () => {
           })
         })
     }
-  }, [t])
+  }, [t, hash])
 
   useExitOnWalletChange()
-
-  const onExplorerBtnClick = useCallback(() => {
-    const explorerUrl = isMainnet ? 'https://explorer.nervos.org' : 'https://explorer.nervos.org/aggron'
-    openExternal(`${explorerUrl}/transaction/${transaction.hash}`)
-  }, [transaction.hash, isMainnet])
 
   const basicInfoItems = useMemo(() => {
     const balance = shannonToCKBFormatter(transaction.value)
@@ -240,16 +242,6 @@ const Transaction = () => {
         </thead>
         <tbody>{renderList(transaction.outputs)}</tbody>
       </table>
-
-      <button
-        type="button"
-        className={styles.explorerNavButton}
-        title={t('transaction.view-in-explorer-button-title')}
-        onClick={onExplorerBtnClick}
-      >
-        <Icon iconName="Explorer" />
-        <span>{t('transaction.view-in-explorer')}</span>
-      </button>
     </div>
   )
 }
