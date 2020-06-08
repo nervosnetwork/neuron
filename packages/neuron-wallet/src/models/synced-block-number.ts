@@ -92,10 +92,10 @@ export default class SyncedBlockNumber {
         this.#liveCellBlockNumberEntity.value = sudtDeployHeight
       } else {
         const currentBlockNumber = await getConnection()
-        .getRepository(SyncInfoEntity)
-        .findOne({
-          name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
-        })
+          .getRepository(SyncInfoEntity)
+          .findOne({
+            name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
+          })
         if (currentBlockNumber) {
           this.#liveCellBlockNumberEntity.value = currentBlockNumber.value
         } else {
