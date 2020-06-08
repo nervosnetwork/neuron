@@ -88,7 +88,7 @@ export default class SyncedBlockNumber {
       this.#liveCellBlockNumberEntity = new SyncInfoEntity()
       this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
       const sudtDeployHeight = assetAccountInfo.sudtDeployHeight.toString()
-      if (sudtDeployHeight != "-1") {
+      if (sudtDeployHeight !== "-1") {
         this.#liveCellBlockNumberEntity.value = sudtDeployHeight
       } else {
         const currentBlockNumber = await getConnection()
