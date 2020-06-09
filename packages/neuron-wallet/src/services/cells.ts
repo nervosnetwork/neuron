@@ -78,16 +78,21 @@ export default class CellsService {
   }
 
   public static async usedByAnyoneCanPayBlake160s(anyoneCanPayLockHashes: string[], blake160s: string[]): Promise<string[]> {
+    const blake160Set = new Set(blake160s)
     const liveCells = await getConnection()
       .getRepository(OutputEntity)
       .createQueryBuilder('output')
       .where({
-        lockHash: In(anyoneCanPayLockHashes),
-        lockArgs: In(blake160s),
+        lockHash: In(anyoneCanPayLockHashes)
       })
       .getMany()
 
-    return liveCells.map(c => c.lockArgs)
+    const lockArgs = liveCells
+      .filter(c => blake160Set.has(c.lockArgs))
+      .map(c => c.lockArgs)
+
+    const uniqueLockArgs = [...new Set(lockArgs)]
+    return uniqueLockArgs
   }
 
   public static async getDaoCells(lockHashes: string[]): Promise<Cell[]> {
