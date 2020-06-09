@@ -93,9 +93,9 @@ const DepositDialog = ({
             onChange={onChange}
             suffix="CKB"
             required
+            error={errorMessage}
           />
           <Slider value={value} min={0} max={maxValue} step={1} showValue={false} onChange={onSlide} />
-          <div className={styles.errorMessage}>{errorMessage}</div>
           <div className={styles.notice}>
             <Attention />
             <Trans i18nKey="nervos-dao.deposit-terms" components={[rfcLink]} />
