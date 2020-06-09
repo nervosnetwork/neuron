@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Label, Text, List } from 'office-ui-fabric-react'
+import { List } from 'office-ui-fabric-react'
 import { ckbCore } from 'services/chain'
 import TransactionFeePanel from 'components/TransactionFeePanel'
 import TextField from 'widgets/TextField'
@@ -16,14 +16,14 @@ import ActiveTrash from 'widgets/Icons/ActiveTrash.png'
 import Calendar from 'widgets/Icons/Calendar.png'
 import ActiveCalendar from 'widgets/Icons/ActiveCalendar.png'
 import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
+import BalanceSyncIcon from 'components/BalanceSyncingIcon'
+import CopyZone from 'widgets/CopyZone'
 
 import { useState as useGlobalState, useDispatch, appState } from 'states'
 
 import {
   PlaceHolders,
   ErrorCode,
-  SyncStatus,
-  ConnectionStatus,
   CONSTANTS,
   shannonToCKBFormatter,
   localNumberFormatter,
@@ -149,36 +149,15 @@ const Send = () => {
     })
   }, [outputs, network])
 
-  let balancePrompt = null
-  if (ConnectionStatus.Offline === connectionStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red' }}>
-        {t('sync.sync-failed')}
-      </span>
-    )
-  } else if (SyncStatus.SyncNotStart === syncStatus) {
-    balancePrompt = (
-      <span className={styles.balancePrompt} style={{ color: 'red' }}>
-        {t('sync.sync-not-start')}
-      </span>
-    )
-  } else if (
-    [SyncStatus.Syncing, SyncStatus.SyncPending].includes(syncStatus) ||
-    ConnectionStatus.Connecting === connectionStatus
-  ) {
-    balancePrompt = <span className={styles.balancePrompt}>{t('sync.syncing-balance')}</span>
-  }
-
   return (
-    <form style={{ padding: '39px 0 0 0' }} onSubmit={disabled ? undefined : onSubmit} data-wallet-id={walletID}>
+    <form onSubmit={disabled ? undefined : onSubmit} data-wallet-id={walletID}>
+      <h1 className={styles.pageTitle}>{t('navbar.send')}</h1>
       <div className={styles.balance}>
-        <div>
-          <Label>{t('send.balance')}</Label>
-        </div>
-        <div>
-          <Text>{`${shannonToCKBFormatter(balance)} CKB`}</Text>
-          {balancePrompt}
-        </div>
+        <span>{`${t('overview.balance')}:`}</span>
+        <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
+          <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
+        </CopyZone>
+        <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
       <div>
         <List

@@ -194,15 +194,13 @@ const Overview = () => {
     )
   }, [recentItems, syncedBlockNumber, tipBlockNumber, t, onRecentActivityDoubleClick])
 
-  const ckbBalance = shannonToCKBFormatter(balance)
-
   return (
     <div className={styles.overview}>
       <h1 className={styles.pageTitle}>{t('navbar.overview')}</h1>
       <div className={styles.balance}>
         <span>{`${t('overview.balance')}:`}</span>
-        <CopyZone content={ckbBalance.replace(/,/g, '')} name={t('overview.copy-balance')}>
-          <span className={styles.balanceValue}>{`${ckbBalance}`}</span>
+        <CopyZone content={shannonToCKBFormatter(balance, false, '')} name={t('overview.copy-balance')}>
+          <span className={styles.balanceValue}>{shannonToCKBFormatter(balance)}</span>
         </CopyZone>
         <BalanceSyncIcon connectionStatus={connectionStatus} syncStatus={syncStatus} />
       </div>
