@@ -87,21 +87,7 @@ export default class SyncedBlockNumber {
     if (!this.#liveCellBlockNumberEntity) {
       this.#liveCellBlockNumberEntity = new SyncInfoEntity()
       this.#liveCellBlockNumberEntity.name = SyncInfoEntity.CURRENT_LIVE_CELL_BLOCK_NUMBER
-      const sudtDeployHeight = assetAccountInfo.sudtDeployHeight.toString()
-      if (sudtDeployHeight !== "-1") {
-        this.#liveCellBlockNumberEntity.value = sudtDeployHeight
-      } else {
-        const currentBlockNumber = await getConnection()
-          .getRepository(SyncInfoEntity)
-          .findOne({
-            name: SyncInfoEntity.CURRENT_BLOCK_NUMBER,
-          })
-        if (currentBlockNumber) {
-          this.#liveCellBlockNumberEntity.value = currentBlockNumber.value
-        } else {
-          this.#liveCellBlockNumberEntity.value = "0"
-        }
-      }
+      this.#liveCellBlockNumberEntity.value = assetAccountInfo.sudtDeployHeight.toString()
     }
 
     return this.#liveCellBlockNumberEntity
