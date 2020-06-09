@@ -8,6 +8,7 @@ import { ReactComponent as Success } from 'widgets/Icons/Success.svg'
 import { ReactComponent as Pending } from 'widgets/Icons/Pending.svg'
 import { ReactComponent as Failure } from 'widgets/Icons/Failure.svg'
 import CopyZone from 'widgets/CopyZone'
+import SUDTAvatar from 'widgets/SUDTAvatar'
 
 import {
   CONSTANTS,
@@ -150,7 +151,7 @@ const TransactionList = ({
           value = tx.sudtInfo.amount
 
           if (tx.sudtInfo.sUDT.decimal) {
-            amount = `${sUDTAmountFormatter(sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal))} ${
+            amount = `${sUDTAmountFormatter(sudtValueToAmount(value, tx.sudtInfo.sUDT.decimal, true))} ${
               tx.sudtInfo.sUDT.symbol
             }`
           }
@@ -188,10 +189,10 @@ const TransactionList = ({
               onKeyPress={() => {}}
             >
               <div className={styles.avatar}>
-                <img src={CKBAvatar} alt="avatar" />
+                {tx.sudtInfo?.sUDT ? <SUDTAvatar name={name} type="token" /> : <img src={CKBAvatar} alt="avatar" />}
               </div>
               <time title={tx.timestamp}>{timeFormatter(tx.timestamp)}</time>
-              <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.]/g, '')}>
+              <CopyZone className={styles.amount} content={amount.replace(/[^\d\\.+-]/g, '')}>
                 {amount}
               </CopyZone>
               <span className={styles.type} title={typeLabel}>

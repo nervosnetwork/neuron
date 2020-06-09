@@ -36,7 +36,7 @@ const SUDTReceive = () => {
       <div className={styles.title}>Receive</div>
       <div className={styles.info}>
         <div className={styles.avatar}>
-          <SUDTAvatar accountName={accountName || DEFAULT_SUDT_FIELDS.accountName} />
+          <SUDTAvatar name={accountName} />
         </div>
         <div className={styles.accountName}>{accountName || DEFAULT_SUDT_FIELDS.accountName}</div>
         <div className={styles.tokenName}>{tokenName || DEFAULT_SUDT_FIELDS.tokenName}</div>
