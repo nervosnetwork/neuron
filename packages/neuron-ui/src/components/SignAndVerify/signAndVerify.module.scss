@@ -19,7 +19,7 @@ $inputHeight: 26px;
     font-weight: 600;
   }
 
-  input,
+  .addrInput,
   textarea {
     @include regular-text;
     font-size: 12px !important;
@@ -36,8 +36,11 @@ $inputHeight: 26px;
     height: 74px;
   }
 
-  input {
+  .addrInput {
     height: $inputHeight;
+  }
+  .signatureField [class^='textField_input']:focus-within {
+    border-color: #000;
   }
 }
 

@@ -253,7 +253,7 @@ const SignAndVerify = () => {
         ) : null}
       </div>
       <h2 className={styles.label}>{t('sign-and-verify.signature')}</h2>
-      <textarea data-field="signature" value={signature} onChange={onInputChange} />
+      <TextField field="signature" value={signature} onChange={onInputChange} className={styles.signatureField} />
       <div className={styles.actions}>
         <Button type="cancel" label={t('sign-and-verify.cancel')} onClick={onCancel} />
         <Button
