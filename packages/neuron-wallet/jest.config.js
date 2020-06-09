@@ -17,5 +17,10 @@ module.exports = {
     "js",
     "json",
     "node"
-  ]
+  ],
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
+  }
 };

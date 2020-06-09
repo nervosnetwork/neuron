@@ -338,6 +338,10 @@ export class TransactionsService {
     return result
   }
 
+  public static checkNonExistTransactionsByHashes(transactionHashes: string[]) {
+    getConnection()
+  }
+
   public static async updateDescription(hash: string, description: string) {
     const transactionEntity = await getConnection()
       .getRepository(TransactionEntity)
