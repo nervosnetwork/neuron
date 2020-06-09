@@ -62,6 +62,7 @@ describe('transactions service', () => {
   })
   describe('#checkNonExistTransactionsByHashes', () => {
     let txs: TransactionEntity[]
+    let hashes: string[]
 
     beforeAll(async () => {
       await initConnection('0x1234')
@@ -84,24 +85,30 @@ describe('transactions service', () => {
     })
 
     describe('when none of the transaction hashes exists', () => {
-      const hashes = ['0x4']
+      beforeEach(() => {
+        hashes = ['0x4']
+      });
       it('returns all hashes', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual(hashes)
       });
     });
     describe('when all of the transaction hashes exists', () => {
-      const hashes = txs.map(tx => tx.hash)
+      beforeEach(() => {
+        hashes = txs.map(tx => tx.hash)
+      });
       it('returns empty array', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
         expect(nonExistHashes).toEqual([])
       })
     });
     describe('when some of the transaction hashes exists', () => {
-      const hashes = [txs[1].hash]
-      it('returns the ones not exsiting', async () => {
+      beforeEach(() => {
+        hashes = ['0x4', txs[1].hash, '0x5']
+      });
+      it('returns the ones not exsit', async () => {
         const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
-        expect(nonExistHashes).toEqual([txs[0].hash, txs[2].hash])
+        expect(nonExistHashes).toEqual(['0x4', '0x5'])
       })
     });
   });
