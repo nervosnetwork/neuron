@@ -1,4 +1,20 @@
+import { getConnection } from 'typeorm'
+import { initConnection } from '../../src/database/chain/ormconfig'
 import TransactionsService, { SearchType } from '../../src/services/tx/transaction-service'
+import TransactionEntity from '../../src/database/chain/entities/transaction'
+import { TransactionStatus } from '../../src/models/chain/transaction'
+
+const generateTx = (hash: string, timestamp: string) => {
+  const tx = new TransactionEntity()
+  tx.hash = hash
+  tx.version = '0x0'
+  tx.timestamp = timestamp
+  tx.status = TransactionStatus.Success
+  tx.witnesses = []
+  tx.blockNumber = '1'
+  tx.blockHash = '0x' + '10'.repeat(32)
+  return tx
+}
 
 describe('transactions service', () => {
   describe('filterSearchType', () => {
@@ -44,4 +60,49 @@ describe('transactions service', () => {
       expect(type).toBe(SearchType.TokenInfo)
     })
   })
+  describe('#checkNonExistTransactionsByHashes', () => {
+    let txs: TransactionEntity[]
+
+    beforeAll(async () => {
+      await initConnection('0x1234')
+    })
+
+    afterAll(async () => {
+      await getConnection().close()
+    })
+
+    beforeEach(async () => {
+      const connection = getConnection()
+      await connection.synchronize(true)
+
+      txs = [
+        generateTx('0x1', '1'),
+        generateTx('0x2', '2'),
+        generateTx('0x3', '3'),
+      ]
+      await getConnection().manager.save(txs)
+    })
+
+    describe('when none of the transaction hashes exists', () => {
+      const hashes = ['0x4']
+      it('returns all hashes', async () => {
+        const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
+        expect(nonExistHashes).toEqual(hashes)
+      });
+    });
+    describe('when all of the transaction hashes exists', () => {
+      const hashes = txs.map(tx => tx.hash)
+      it('returns empty array', async () => {
+        const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
+        expect(nonExistHashes).toEqual([])
+      })
+    });
+    describe('when some of the transaction hashes exists', () => {
+      const hashes = [txs[1].hash]
+      it('returns the ones not exsiting', async () => {
+        const nonExistHashes = await TransactionsService.checkNonExistTransactionsByHashes(hashes)
+        expect(nonExistHashes).toEqual([txs[0].hash, txs[2].hash])
+      })
+    });
+  });
 })
