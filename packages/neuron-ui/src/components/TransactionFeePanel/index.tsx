@@ -62,7 +62,6 @@ const TransactionFee: React.FunctionComponent<TransactionFee> = ({ price, fee, o
             { key: Price.High, text: Price.High },
             { key: Price.Medium, text: Price.Medium },
             { key: Price.Low, text: Price.Low },
-            { key: Price.Zero, text: Price.Zero },
           ]}
           onChange={(e: any, item?: IDropdownOption) => {
             if (item) {
