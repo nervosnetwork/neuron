@@ -347,6 +347,10 @@ export default class ApiController {
       return this.anyoneCanPayController.getScript()
     })
 
+    handle('get-token-info-list', () => {
+      return this.assetAccountController.getTokenInfoList()
+    })
+
     handle('generate-create-asset-account-tx', async (_, params: GenerateCreateAssetAccountTxParams) => {
       return this.assetAccountController.generateCreateTx(params)
     })

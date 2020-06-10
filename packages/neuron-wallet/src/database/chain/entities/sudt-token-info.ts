@@ -1,5 +1,5 @@
-import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm";
-import AssetAccount from "./asset-account";
+import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm"
+import AssetAccount from "./asset-account"
 
 @Entity()
 @Index(['tokenID'], { unique: true })
@@ -26,4 +26,13 @@ export default class SudtTokenInfo {
 
   @OneToMany(_type => AssetAccount, assetAccount => assetAccount.sudtTokenInfo)
   assetAccounts!: AssetAccount[]
+
+  public toModel() {
+    return {
+      tokenID: this.tokenID,
+      tokenName: this.tokenName,
+      symbol: this.symbol,
+      decimal: this.decimal,
+    }
+  }
 }
