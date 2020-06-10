@@ -20,6 +20,8 @@ export default class AssetAccountService {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
     const sudtHashType = assetAccountInfo.infos.sudt.hashType
+    const generateSumAmountMapKey = (blake160: string, tokenID: string) => blake160 + ":" + tokenID
+    const determineTokenID = (account: AssetAccountEntity) => account.tokenID.startsWith('0x') ? account.tokenID : 'CKBytes'
 
     const assetAccountEntities = await getConnection()
       .getRepository(AssetAccountEntity)
@@ -57,7 +59,7 @@ export default class AssetAccountService {
       const blake160 = output.lockArgs
       const tokenID = output.typeArgs || 'CKBytes'
       const isCKB = !output.typeArgs
-      const key = blake160 + ":" + tokenID
+      const key = generateSumAmountMapKey(blake160, tokenID)
       const old = sumOfAmountMap.get(key) || BigInt(0)
       if (isCKB) {
         sumOfAmountMap.set(key, old + BigInt(output.sumOfCapacity))
@@ -71,10 +73,16 @@ export default class AssetAccountService {
     })
 
     const assetAccounts = assetAccountEntities
+      .filter(aa => {
+        const tokenID = determineTokenID(aa)
+        const key = generateSumAmountMapKey(aa.blake160, tokenID)
+        return sumOfAmountMap.get(key)
+      })
       .map(aa => {
         const model = aa.toModel()
-        const tokenID = aa.tokenID.startsWith('0x') ? aa.tokenID : 'CKBytes'
-        const totalBalance = sumOfAmountMap.get(aa.blake160 + ":" + tokenID) || BigInt(0)
+        const tokenID = determineTokenID(aa)
+        const key = generateSumAmountMapKey(aa.blake160, tokenID)
+        const totalBalance = sumOfAmountMap.get(key) || BigInt(0)
 
         if (tokenID === 'CKBytes') {
           const reservedBalance = BigInt(MIN_CELL_CAPACITY)
