@@ -297,11 +297,10 @@ describe('AssetAccountService', () => {
         const outputs: OutputEntity[] = []
         await createAccounts(assetAccounts, outputs)
       });
-      it('available balance equals to 0', async () => {
+      it('ignores the asset account', async () => {
         const result = await AssetAccountService.getAll([blake160], anyoneCanPayLockHashes)
 
-        expect(result.length).toEqual(1)
-        expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual('0')
+        expect(result.length).toEqual(0)
       });
     });
 
