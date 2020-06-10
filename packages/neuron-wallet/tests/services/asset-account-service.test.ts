@@ -478,7 +478,7 @@ describe('AssetAccountService', () => {
     });
 
     describe('with no asset account found', () => {
-      it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
+      it('returns undefined', async () => {
         const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: 1})
         expect(ckbAccount).toBeUndefined()
       });
