@@ -94,7 +94,7 @@ export default class AssetAccountService {
         }
 
         return model
-      }).filter(aa => aa.balance !== '')
+      })
 
     return assetAccounts
   }
