@@ -92,6 +92,7 @@ type Action =
   | 'generate-send-to-anyone-can-pay-tx'
   | 'generate-send-all-to-anyone-can-pay-tx'
   | 'send-to-anyone-can-pay'
+  | 'get-token-info-list'
 
 export const remoteApi = <T = any>(action: Action) => async (params: T): Promise<ControllerResponse> => {
   const res: SuccessFromController | FailureFromController = await window.ipcRenderer

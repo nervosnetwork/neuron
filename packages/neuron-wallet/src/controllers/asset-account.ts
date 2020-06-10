@@ -138,4 +138,12 @@ export default class AssetAccountController {
       result: undefined,
     }
   }
+
+  public async getTokenInfoList() {
+    const result = await AssetAccountService.getTokenInfoList()
+    return {
+      status: ResponseCode.Success,
+      result,
+    }
+  }
 }

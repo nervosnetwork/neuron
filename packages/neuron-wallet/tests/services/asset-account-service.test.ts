@@ -482,4 +482,43 @@ describe('AssetAccountService', () => {
       expect(result.length).toEqual(2)
     })
   })
+
+  describe('Test Token Info List', () => {
+    beforeEach(async () => {
+      const assetAccounts = [
+        AssetAccount.fromObject({
+          tokenID: 'CKBytes',
+          symbol: 'ckb',
+          tokenName: 'ckb',
+          decimal: '0',
+          balance: '0',
+          accountName: 'ckb',
+          blake160,
+        }),
+        AssetAccount.fromObject({
+          tokenID: tokenID,
+          symbol: 'udt',
+          tokenName: 'udt',
+          decimal: '0',
+          balance: '0',
+          accountName: 'udt',
+          blake160,
+        })
+      ]
+
+      for (const aa of assetAccounts) {
+        const e = AssetAccountEntity.fromModel(aa)
+        await getConnection().manager.save([e.sudtTokenInfo, e])
+      }
+    })
+
+    it('Get token info list', async () => {
+      
+      const list = await AssetAccountService.getTokenInfoList()
+      expect(list.length).toEqual(2)
+      expect(list.find(item => item.tokenID === 'CKBytes')).toBeTruthy()
+      expect(list.find(item => item.tokenID === tokenID)).toBeTruthy()
+    })
+
+  })
 })

@@ -325,4 +325,9 @@ export default class AssetAccountService {
     }
     return getConnection().manager.save([assetAccount.sudtTokenInfo, assetAccount])
   }
+
+  public static getTokenInfoList() {
+    const repo = getConnection().getRepository(SudtTokenInfoEntity)
+    return repo.find().then(list => list.map(item => item.toModel()))
+  }
 }
