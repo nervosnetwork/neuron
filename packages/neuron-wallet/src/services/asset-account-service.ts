@@ -1,24 +1,27 @@
-import AssetAccount from "models/asset-account"
-import AssetAccountEntity from "database/chain/entities/asset-account"
 import { getConnection } from "typeorm"
-import AddressService from "./addresses"
-import { TransactionGenerator } from "./tx"
-import TransactionSender from "./transaction-sender"
-import Transaction, { TransactionStatus } from "models/chain/transaction"
-import OutputEntity from "database/chain/entities/output"
-import AssetAccountInfo from "models/asset-account-info"
 import BufferUtils from "utils/buffer"
+import OutputEntity from "database/chain/entities/output"
+import Transaction, { TransactionStatus } from "models/chain/transaction"
+import AssetAccountInfo from "models/asset-account-info"
 import { OutputStatus } from "models/chain/output"
-import { AddressVersion } from "database/address/address-dao"
-import NetworksService from "./networks"
+import AssetAccount from "models/asset-account"
 import SudtTokenInfoEntity from "database/chain/entities/sudt-token-info"
+import AssetAccountEntity from "database/chain/entities/asset-account"
+import { AddressVersion } from "database/address/address-dao"
 import { CapacityNotEnoughForChange } from "exceptions"
+import { MIN_CELL_CAPACITY } from 'services/cells'
+import TransactionSender from "./transaction-sender"
+import { TransactionGenerator } from "./tx"
+import NetworksService from "./networks"
+import AddressService from "./addresses"
 
 export default class AssetAccountService {
   public static async getAll(blake160s: string[], anyoneCanPayLockHashes: string[]): Promise<AssetAccount[]> {
     const assetAccountInfo = new AssetAccountInfo()
     const sudtCodeHash = assetAccountInfo.infos.sudt.codeHash
     const sudtHashType = assetAccountInfo.infos.sudt.hashType
+    const generateSumAmountMapKey = (blake160: string, tokenID: string) => blake160 + ":" + tokenID
+    const determineTokenID = (account: AssetAccountEntity) => account.tokenID.startsWith('0x') ? account.tokenID : 'CKBytes'
 
     const assetAccountEntities = await getConnection()
       .getRepository(AssetAccountEntity)
@@ -56,7 +59,7 @@ export default class AssetAccountService {
       const blake160 = output.lockArgs
       const tokenID = output.typeArgs || 'CKBytes'
       const isCKB = !output.typeArgs
-      const key = blake160 + ":" + tokenID
+      const key = generateSumAmountMapKey(blake160, tokenID)
       const old = sumOfAmountMap.get(key) || BigInt(0)
       if (isCKB) {
         sumOfAmountMap.set(key, old + BigInt(output.sumOfCapacity))
@@ -70,12 +73,28 @@ export default class AssetAccountService {
     })
 
     const assetAccounts = assetAccountEntities
+      .filter(aa => {
+        const tokenID = determineTokenID(aa)
+        const key = generateSumAmountMapKey(aa.blake160, tokenID)
+        return sumOfAmountMap.get(key)
+      })
       .map(aa => {
         const model = aa.toModel()
-        const tokenID = aa.tokenID.startsWith('0x') ? aa.tokenID : 'CKBytes'
-        model.balance = sumOfAmountMap.get(aa.blake160 + ":" + tokenID)?.toString() || ''
+        const tokenID = determineTokenID(aa)
+        const key = generateSumAmountMapKey(aa.blake160, tokenID)
+        const totalBalance = sumOfAmountMap.get(key) || BigInt(0)
+
+        if (tokenID === 'CKBytes') {
+          const reservedBalance = BigInt(MIN_CELL_CAPACITY)
+          const availableBalance = totalBalance - reservedBalance
+          model.balance = availableBalance >= 0 ? availableBalance.toString() : '0'
+        }
+        else {
+          model.balance = totalBalance.toString()
+        }
+
         return model
-      }).filter(aa => aa.balance !== '')
+      })
 
     return assetAccounts
   }
