@@ -1,6 +1,7 @@
 @import '../../styles/mixin.scss';
 
 $error-red: #d50000;
+$secondary-font-size: 0.63rem;
 
 .textField {
   @include regular-text;
@@ -81,7 +82,7 @@ $error-red: #d50000;
 .hint {
   font-family: inherit;
   grid-area: message;
-  font-size: 0.5625rem;
+  font-size: $secondary-font-size;
 }
 
 .errorMessage {
@@ -91,7 +92,7 @@ $error-red: #d50000;
   align-items: flex-start;
   grid-area: message;
   color: $error-red;
-  font-size: 0.5625rem;
+  font-size: $secondary-font-size;
   line-height: 0.6875rem;
   word-break: break-all;
 
