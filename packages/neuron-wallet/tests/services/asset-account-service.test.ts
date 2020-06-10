@@ -56,16 +56,18 @@ const generateOutput = (tokenID: string = 'CKBytes', txStatus: TransactionStatus
 }
 const createAccounts = async (assetAccounts: AssetAccount[], outputEntities: OutputEntity[]) => {
   const entities = assetAccounts.map(aa => AssetAccountEntity.fromModel(aa))
+  const accountIds = []
   for (const entity of entities) {
-    await getConnection().manager.save([
-      entity.sudtTokenInfo,
-      entity,
-    ])
+    await getConnection().manager.save([entity.sudtTokenInfo])
+    const [assetAccount] = await getConnection().manager.save([entity])
+    accountIds.push(assetAccount.id)
   }
 
   for (const o of outputEntities) {
     await getConnection().manager.save([o.transaction, o])
   }
+
+  return accountIds
 }
 const tokenID = '0x' + '0'.repeat(64)
 
@@ -204,9 +206,9 @@ describe('AssetAccountService', () => {
     expect(result!.sudtTokenInfo.tokenName).toEqual('2')
   })
 
-  describe('getAll', () => {
+  describe('#getAll', () => {
+    let anyoneCanPayLockHashes: string[]
     describe('with both sUDT and CKB accounts', () => {
-      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         const tokenID = '0x' + '0'.repeat(64)
         anyoneCanPayLockHashes = [
@@ -250,7 +252,6 @@ describe('AssetAccountService', () => {
     });
 
     describe('with only one newly created CKB cell under a ACP lock', () => {
-      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         const minCapacity = toShannon(61)
         anyoneCanPayLockHashes = [
@@ -278,7 +279,6 @@ describe('AssetAccountService', () => {
       })
     });
     describe('with no CKB cells under a ACP lock', () => {
-      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         anyoneCanPayLockHashes = [
           assetAccountInfo.generateAnyoneCanPayScript(blake160).computeHash(),
@@ -305,7 +305,6 @@ describe('AssetAccountService', () => {
     });
 
     describe('with more than one CKB cells under a ACP lock', () => {
-      let anyoneCanPayLockHashes: string[]
       beforeEach(async () => {
         const minCapacity = toShannon(61)
         anyoneCanPayLockHashes = [
@@ -333,6 +332,155 @@ describe('AssetAccountService', () => {
 
         expect(result.length).toEqual(1)
         expect(result.find(a => a.tokenID === 'CKBytes')?.balance).toEqual(toShannon(100))
+      });
+    });
+  })
+
+  describe('#getAccount', () => {
+    let accountIds: number[]
+    describe('with both sUDT and CKB accounts', () => {
+      beforeEach(async () => {
+        const tokenID = '0x' + '0'.repeat(64)
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID,
+            symbol: 'sUDT',
+            tokenName: 'sUDT',
+            decimal: '0',
+            balance: '0',
+            accountName: 'sUDT',
+            blake160,
+          }),
+          AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160,
+          }),
+        ]
+        const outputs = [
+          generateOutput(undefined, undefined, undefined, toShannon(1000)),
+          generateOutput(undefined, undefined, undefined, toShannon(1000)),
+          generateOutput(tokenID),
+          generateOutput(tokenID),
+        ]
+        accountIds = await createAccounts(assetAccounts, outputs)
+      });
+      it('includes balance calculations for both sUDT and CKB accounts', async () => {
+        const [sudtAccountId, ckbAccountId] = accountIds
+        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+        const sudtAccount = await AssetAccountService.getAccount({id: sudtAccountId})
+
+        if (!ckbAccount) {
+          throw new Error('should find ckb account')
+        }
+        expect(ckbAccount.tokenID).toEqual('CKBytes')
+        expect(ckbAccount.balance).toEqual(toShannon(2000 - 61).toString())
+
+        if (!sudtAccount) {
+          throw new Error('should find sudt account')
+        }
+        expect(sudtAccount.tokenID).toEqual(tokenID)
+        expect(sudtAccount.balance).toEqual('200')
+      })
+    });
+
+    describe('with only one newly created CKB cell under a ACP lock', () => {
+      beforeEach(async () => {
+        const minCapacity = toShannon(61)
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160,
+          }),
+        ]
+        const outputs = [generateOutput(undefined, undefined, undefined, minCapacity)]
+        accountIds = await createAccounts(assetAccounts, outputs)
+      });
+      it('available balance equals to 0', async () => {
+        const [ckbAccountId] = accountIds
+        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+
+        if (!ckbAccount) {
+          throw new Error('should find ckb account')
+        }
+        expect(ckbAccount.tokenID).toEqual('CKBytes')
+        expect(ckbAccount.balance).toEqual('0')
+      })
+    });
+    describe('with no CKB cells under a ACP lock', () => {
+      beforeEach(async () => {
+        const minCapacity = toShannon(61)
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160,
+          }),
+        ]
+        const outputs = [generateOutput(undefined, undefined, undefined, minCapacity)]
+        accountIds = await createAccounts(assetAccounts, outputs)
+      });
+      it('available balance equals to 0', async () => {
+        const [ckbAccountId] = accountIds
+        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+
+        if (!ckbAccount) {
+          throw new Error('should find ckb account')
+        }
+        expect(ckbAccount.tokenID).toEqual('CKBytes')
+        expect(ckbAccount.balance).toEqual('0')
+      })
+    });
+
+    describe('with more than one CKB cells under a ACP lock', () => {
+      beforeEach(async () => {
+        const minCapacity = toShannon(61)
+        const assetAccounts = [
+          AssetAccount.fromObject({
+            tokenID: 'CKBytes',
+            symbol: 'ckb',
+            tokenName: 'ckb',
+            decimal: '0',
+            balance: '0',
+            accountName: 'ckb',
+            blake160,
+          }),
+        ]
+        const outputs = [
+          generateOutput(undefined, undefined, undefined, minCapacity),
+          generateOutput(undefined, undefined, undefined, toShannon(100)),
+        ]
+        accountIds = await createAccounts(assetAccounts, outputs)
+      });
+      it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
+        const [ckbAccountId] = accountIds
+        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+
+        if (!ckbAccount) {
+          throw new Error('should find ckb account')
+        }
+        expect(ckbAccount.tokenID).toEqual('CKBytes')
+        expect(ckbAccount.balance).toEqual(toShannon(100))
+      });
+    });
+
+    describe('with no asset account found', () => {
+      it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
+        const ckbAccount = await AssetAccountService.getAccount({id: 1})
+        expect(ckbAccount).toBeUndefined()
       });
     });
   })
