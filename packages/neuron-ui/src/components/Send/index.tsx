@@ -170,7 +170,12 @@ const Send = () => {
   }
 
   return (
-    <form style={{ padding: '39px 0 0 0' }} onSubmit={disabled ? undefined : onSubmit} data-wallet-id={walletID}>
+    <form
+      style={{ padding: '39px 0 0 0' }}
+      onSubmit={onSubmit}
+      data-wallet-id={walletID}
+      data-status={disabled ? 'not-ready' : 'ready'}
+    >
       <div className={styles.balance}>
         <div>
           <Label>{t('send.balance')}</Label>
