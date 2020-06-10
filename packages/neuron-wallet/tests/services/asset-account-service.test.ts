@@ -485,35 +485,25 @@ describe('AssetAccountService', () => {
 
   describe('Test Token Info List', () => {
     beforeEach(async () => {
-      const assetAccounts = [
-        AssetAccount.fromObject({
+      const tokens = [
+        {
           tokenID: 'CKBytes',
           symbol: 'ckb',
           tokenName: 'ckb',
           decimal: '0',
-          balance: '0',
-          accountName: 'ckb',
-          blake160,
-        }),
-        AssetAccount.fromObject({
+        },
+        {
           tokenID: tokenID,
           symbol: 'udt',
           tokenName: 'udt',
           decimal: '0',
-          balance: '0',
-          accountName: 'udt',
-          blake160,
-        })
+        }
       ]
-
-      for (const aa of assetAccounts) {
-        const e = AssetAccountEntity.fromModel(aa)
-        await getConnection().manager.save([e.sudtTokenInfo, e])
-      }
+      const repo = getConnection().getRepository(SudtTokenInfoEntity)
+      await repo.save(tokens)
     })
 
     it('Get token info list', async () => {
-      
       const list = await AssetAccountService.getTokenInfoList()
       expect(list.length).toEqual(2)
       expect(list.find(item => item.tokenID === 'CKBytes')).toBeTruthy()
