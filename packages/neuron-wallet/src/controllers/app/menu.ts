@@ -78,7 +78,7 @@ const navigateTo = (url: string) => {
 }
 
 const showSettings = () => {
-  showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE))
+  showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE), { width: 900 })
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {

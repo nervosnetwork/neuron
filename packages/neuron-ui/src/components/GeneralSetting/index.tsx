@@ -8,7 +8,7 @@ import { ReactComponent as Attention } from 'widgets/Icons/Attention.svg'
 import { StateDispatch, addPopup } from 'states'
 import { checkForUpdates, downloadUpdate, installUpdate, clearCellCache, setLocale, getVersion } from 'services/remote'
 import { cacheClearDate } from 'services/localCache'
-import { CONSTANTS } from 'utils'
+import { CONSTANTS, isSuccessResponse } from 'utils'
 
 import styles from './style.module.scss'
 
@@ -88,15 +88,18 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
 
   const clearCache = useCallback(() => {
     setClearingCache(true)
-    setTimeout(() => {
-      clearCellCache().finally(() => {
-        addPopup('clear-cache-successfully')(dispatch)
-        const date = new Date().toISOString().slice(0, 10)
-        cacheClearDate.save(date)
-        setClearedDate(date)
+    clearCellCache()
+      .then(res => {
+        if (isSuccessResponse(res) && res.result) {
+          addPopup('clear-cache-successfully')(dispatch)
+          const date = new Date().toISOString().slice(0, 10)
+          cacheClearDate.save(date)
+          setClearedDate(date)
+        }
+      })
+      .finally(() => {
         setClearingCache(false)
       })
-    }, 100)
   }, [dispatch, setClearedDate])
 
   const onApplyLanguage = useCallback(() => {
@@ -155,16 +158,11 @@ const GeneralSetting = ({ updater, dispatch }: GeneralSettingProps) => {
         </div>
       </div>
       <div className={`${styles.clearCache} ${styles.action}`}>
-        <Button
-          type="default"
-          label={t(`settings.general.${clearingCache ? 'clearing-cache' : 'clear-cache'}`)}
-          onClick={clearCache}
-          disabled={clearingCache}
-        >
+        <Button type="default" label={t(`settings.general.clear-cache`)} onClick={clearCache} disabled={clearingCache}>
           {clearingCache ? (
             <Spinner
               styles={{ root: { marginRight: 5 } }}
-              label={t('settings.general.clearing-cache')}
+              label={t('settings.general.clear-cache')}
               labelPosition="right"
             />
           ) : (

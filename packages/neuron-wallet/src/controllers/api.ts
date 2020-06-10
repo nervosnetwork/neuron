@@ -325,7 +325,7 @@ export default class ApiController {
     // Settings
 
     handle('show-settings', (_, params: Controller.Params.ShowSettings) => {
-      showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE))
+      showWindow(`#/settings/${params.tab}`, i18n.t(SETTINGS_WINDOW_TITLE), { width: 900 })
     })
 
     handle('clear-cache', async () => {

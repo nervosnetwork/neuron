@@ -27,7 +27,7 @@
     .url {
       position: relative;
       @include text-overflow-ellipsis;
-      max-width: 650px;
+      max-width: 350px;
       color: #999;
       pointer-events: none;
       padding-right: 0.6em;

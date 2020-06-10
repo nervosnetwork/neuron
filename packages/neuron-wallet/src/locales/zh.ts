@@ -139,6 +139,15 @@ export default {
           'skip': '跳过',
           'install-and-exit': '安装并退出'
         }
+      },
+      'clear-cache': {
+        title: '清除缓存',
+        message: '清除缓存',
+        detail: '是否确认清除缓存？需要至少两小时重建缓存。',
+        buttons: {
+          cancel: '取消',
+          ok: '确认'
+        }
       }
     },
     prompt: {
