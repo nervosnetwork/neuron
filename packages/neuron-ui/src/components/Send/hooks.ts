@@ -180,9 +180,12 @@ const useOnSubmit = (items: Readonly<State.Output[]>, dispatch: StateDispatch) =
   useCallback(
     (e: React.FormEvent) => {
       const {
-        dataset: { walletId },
+        dataset: { walletId, status },
       } = e.target as HTMLFormElement
       e.preventDefault()
+      if (status !== 'ready') {
+        return
+      }
       if (verifyTransactionOutputs(items)) {
         dispatch({
           type: AppActions.RequestPassword,
