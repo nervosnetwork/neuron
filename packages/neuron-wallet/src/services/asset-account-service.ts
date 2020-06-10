@@ -99,7 +99,7 @@ export default class AssetAccountService {
     return assetAccounts
   }
 
-  public static async getAccount(params: { id: number }): Promise<AssetAccount | undefined> {
+  public static async getAccount(params: {walletID: string, id: number }): Promise<AssetAccount | undefined> {
     const assetAccount = await getConnection()
       .getRepository(AssetAccountEntity)
       .createQueryBuilder('aa')

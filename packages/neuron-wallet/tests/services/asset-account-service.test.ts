@@ -371,8 +371,8 @@ describe('AssetAccountService', () => {
       });
       it('includes balance calculations for both sUDT and CKB accounts', async () => {
         const [sudtAccountId, ckbAccountId] = accountIds
-        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
-        const sudtAccount = await AssetAccountService.getAccount({id: sudtAccountId})
+        const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: ckbAccountId})
+        const sudtAccount = await AssetAccountService.getAccount({walletID: '', id: sudtAccountId})
 
         if (!ckbAccount) {
           throw new Error('should find ckb account')
@@ -407,7 +407,7 @@ describe('AssetAccountService', () => {
       });
       it('available balance equals to 0', async () => {
         const [ckbAccountId] = accountIds
-        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+        const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: ckbAccountId})
 
         if (!ckbAccount) {
           throw new Error('should find ckb account')
@@ -435,7 +435,7 @@ describe('AssetAccountService', () => {
       });
       it('available balance equals to 0', async () => {
         const [ckbAccountId] = accountIds
-        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+        const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: ckbAccountId})
 
         if (!ckbAccount) {
           throw new Error('should find ckb account')
@@ -467,7 +467,7 @@ describe('AssetAccountService', () => {
       });
       it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
         const [ckbAccountId] = accountIds
-        const ckbAccount = await AssetAccountService.getAccount({id: ckbAccountId})
+        const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: ckbAccountId})
 
         if (!ckbAccount) {
           throw new Error('should find ckb account')
@@ -479,7 +479,7 @@ describe('AssetAccountService', () => {
 
     describe('with no asset account found', () => {
       it('available balance equals to total balance substracts reserved balance (61 CKB)', async () => {
-        const ckbAccount = await AssetAccountService.getAccount({id: 1})
+        const ckbAccount = await AssetAccountService.getAccount({walletID: '', id: 1})
         expect(ckbAccount).toBeUndefined()
       });
     });
