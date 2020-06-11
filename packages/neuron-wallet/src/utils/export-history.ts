@@ -4,6 +4,11 @@ import { get as getDescription } from 'database/leveldb/transaction-description'
 import i18n from 'locales/i18n'
 import shannonToCKB from 'utils/shannonToCKB'
 
+const formatDatetime = (datetime: Date) => {
+  const isoFmt = datetime.toISOString()
+  return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
+}
+
 
 interface ExportHistoryParms {
   walletID: string
@@ -90,7 +95,7 @@ const exportHistory = ({
             }
             const amount = shannonToCKB(totalOutput - totalInput)
             writeStream.write(
-              `${new Date(+row.timestamp).toISOString()},${row.blockNumber},${
+              `${formatDatetime(new Date(+row.timestamp))},${row.blockNumber},${
               row.hash
               },${txType},${amount},"${description}"\n`,
               err => {
