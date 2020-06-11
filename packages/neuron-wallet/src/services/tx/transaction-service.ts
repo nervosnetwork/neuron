@@ -357,9 +357,13 @@ export class TransactionsService {
   public static async exportTransactions({ walletID, filePath }: { walletID: string, filePath: string }) {
     const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
     const lockHashList = AddressParser.batchToLockHash(addresses)
+    const assetAccountInfo = new AssetAccountInfo()
+    const anyoneCanPayLockHashList: string[] = AddressParser
+      .batchParse(addresses)
+      .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
     const connection = getConnection()
     const dbPath = connection.options.database as string
-    const total = await exportTransactions({ walletID, dbPath, lockHashList, filePath })
+    const total = await exportTransactions({ walletID, dbPath, lockHashList, anyoneCanPayLockHashList, filePath })
     return total
   }
 }

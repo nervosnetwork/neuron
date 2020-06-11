@@ -9,17 +9,18 @@ const formatDatetime = (datetime: Date) => {
   return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
 }
 
-
 interface ExportHistoryParms {
   walletID: string
   dbPath: string
   lockHashList?: string[]
+  anyoneCanPayLockHashList?: string[]
   filePath: string
 }
 const exportHistory = ({
   walletID,
   dbPath,
   lockHashList = [],
+  anyoneCanPayLockHashList = [],
   filePath
 }: ExportHistoryParms): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -52,7 +53,7 @@ const exportHistory = ({
     )
 
     const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY)
-    const serializedlockHashList = lockHashList.map(l => `'${l}'`).join(`,`)
+    const serializedlockHashList = [...lockHashList, ...anyoneCanPayLockHashList].map(l => `'${l}'`).join(`,`)
 
     const onRowLoad = (err: Error, row: {
       hash: string,
