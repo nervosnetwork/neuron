@@ -1,4 +1,5 @@
 import { getConnection } from 'typeorm'
+import NetworksService from 'services/networks'
 import AddressesService from 'services/addresses'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
@@ -295,7 +296,7 @@ export class TransactionsService {
     const tx = await getConnection()
       .getRepository(TransactionEntity)
       .createQueryBuilder('transaction')
-      .where('transaction.hash is :hash', {hash})
+      .where('transaction.hash is :hash', { hash })
       .leftJoinAndSelect('transaction.inputs', 'input')
       .leftJoinAndSelect('transaction.outputs', 'output')
       .orderBy({
@@ -363,7 +364,16 @@ export class TransactionsService {
       .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
     const connection = getConnection()
     const dbPath = connection.options.database as string
-    const total = await exportTransactions({ walletID, dbPath, lockHashList, anyoneCanPayLockHashList, filePath })
+    const chainType = NetworksService.getInstance().getCurrent().chain
+
+    const total = await exportTransactions({
+      walletID,
+      dbPath,
+      lockHashList,
+      anyoneCanPayLockHashList,
+      filePath,
+      chainType,
+    })
     return total
   }
 }

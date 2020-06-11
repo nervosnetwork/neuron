@@ -172,6 +172,7 @@ export default {
         "tx-hash": "Transaction Hash",
         "tx-type": "Transaction Type",
         "amount": "CKB Amount",
+        "udt-amount": "UDT Amount",
         "description": "Description"
       },
       "tx-type": {
