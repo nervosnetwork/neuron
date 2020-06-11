@@ -136,14 +136,21 @@ export default class AssetAccountService {
       .addGroupBy('output.typeArgs')
       .getRawOne()
 
-    const sumOfAmount = isCKB ?
+    const totalBalance = isCKB ?
       BigInt(output.sumOfCapacity) :
       (output.dataArray as string)
         .split(',')
         .map(data => BufferUtils.parseAmountFromSUDTData(data.trim()))
         .reduce((result, c) => result + c, BigInt(0))
 
-    assetAccount.balance = sumOfAmount.toString()
+    if (isCKB) {
+      const reservedBalance = BigInt(MIN_CELL_CAPACITY)
+      const availableBalance = totalBalance - reservedBalance
+      assetAccount.balance = availableBalance >= 0 ? availableBalance.toString() : '0'
+    }
+    else {
+      assetAccount.balance = totalBalance.toString()
+    }
 
     return assetAccount
   }
