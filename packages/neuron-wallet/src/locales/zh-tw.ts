@@ -169,7 +169,7 @@ export default {
         "block-number": "區塊高度",
         "tx-hash": "交易哈希",
         "tx-type": "交易類型",
-        "amount": "金額",
+        "amount": "CKB 金額",
         "description": "備註"
       },
       "tx-type": {

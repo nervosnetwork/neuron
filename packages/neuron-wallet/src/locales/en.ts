@@ -171,7 +171,7 @@ export default {
         "block-number": "Block Number",
         "tx-hash": "Transaction Hash",
         "tx-type": "Transaction Type",
-        "amount": "Amount",
+        "amount": "CKB Amount",
         "description": "Description"
       },
       "tx-type": {
