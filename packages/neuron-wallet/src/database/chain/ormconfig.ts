@@ -33,17 +33,18 @@ import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
 
-const dbPath = (name: string): string => {
+export const dbPath = (name: string): string => {
+  if (env.isTestMode) {
+    return ':memory:'
+  }
   const filename = `cell-${name}.sqlite`
   return path.join(env.fileBasePath, 'cells', filename)
 }
 
-const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectionOptions> => {
+const connectOptions = async (database: string): Promise<SqliteConnectionOptions> => {
   const connectionOptions = await getConnectionOptions()
-  const database = env.isTestMode ? ':memory:' : dbPath(genesisBlockHash)
 
   const logging: boolean | ('query' | 'schema' | 'error' | 'warn' | 'info' | 'log' | 'migration')[] = ['warn', 'error']
-    // (env.isDevMode) ? ['warn', 'error', 'log', 'info', 'schema', 'migration'] : ['warn', 'error']
 
   return {
     ...connectionOptions,
@@ -75,14 +76,15 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
   }
 }
 
-export const initConnection = async (genesisBlockHash: string) => {
+export const initConnection = async (database: string) => {
   // try to close connection, if not exist, will throw ConnectionNotFoundError when call getConnection()
   try {
     await getConnection().close()
   } catch (err) {
     // do nothing
   }
-  const connectionOptions = await connectOptions(genesisBlockHash)
+
+  const connectionOptions = await connectOptions(database)
 
   try {
     await createConnection(connectionOptions)

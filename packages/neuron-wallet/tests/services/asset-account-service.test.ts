@@ -73,7 +73,7 @@ const tokenID = '0x' + '0'.repeat(64)
 
 describe('AssetAccountService', () => {
   beforeAll(async done => {
-    await initConnection('0x1234')
+    await initConnection(':memory:')
     done()
   })
 

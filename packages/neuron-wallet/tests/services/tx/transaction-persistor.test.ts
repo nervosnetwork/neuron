@@ -9,7 +9,7 @@ import initConnection from "../../../src/database/chain/ormconfig"
 import TransactionEntity from "../../../src/database/chain/entities/transaction"
 import { getConnection } from "typeorm"
 
-const tx = Transaction .fromObject({
+const tx = Transaction.fromObject({
   "version": "0x0",
   "cellDeps": [
     CellDep.fromObject({
@@ -67,7 +67,7 @@ const tx = Transaction .fromObject({
   "hash": "0x230ab250ee0ae681e88e462102e5c01a9994ac82bf0effbfb58d6c11a86579f1"
 })
 
-const tx2 = Transaction .fromObject({
+const tx2 = Transaction.fromObject({
   "version": "0x0",
   "cellDeps": [
     CellDep.fromObject({
@@ -116,7 +116,7 @@ const tx2 = Transaction .fromObject({
 
 describe('TransactionPersistor', () => {
   beforeAll(async done => {
-    await initConnection('0x1234')
+    await initConnection(':memory:')
     done()
   })
 

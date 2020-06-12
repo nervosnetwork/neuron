@@ -1,7 +1,7 @@
 import shannonToCKB from 'utils/shannonToCKB'
 import sudtValueToAmount from 'utils/sudt-value-to-amount'
 
-const formatDatetime = (datetime: Date) => {
+export const formatDatetime = (datetime: Date) => {
   const isoFmt = datetime.toISOString()
   return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
 }
