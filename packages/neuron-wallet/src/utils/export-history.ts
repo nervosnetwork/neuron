@@ -4,15 +4,9 @@ import sqlite3 from 'sqlite3'
 import { get as getDescription } from 'database/leveldb/transaction-description'
 import i18n from 'locales/i18n'
 import AssetAccountInfo from 'models/asset-account-info'
-import shannonToCKB from 'utils/shannonToCKB'
-import sudtValueToAmount from 'utils/sudt-value-to-amount'
 import BufferUtils from 'utils/buffer'
 import { ChainType } from 'models/network'
-
-const formatDatetime = (datetime: Date) => {
-  const isoFmt = datetime.toISOString()
-  return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
-}
+import toCSVRow from 'utils/to-csv-row'
 
 interface ExportHistoryParms {
   walletID: string
@@ -58,7 +52,6 @@ namespace QueryResponse {
     daoCellCount: number
   }
 }
-
 
 const exportHistory = async ({
   walletID,
@@ -177,9 +170,7 @@ const exportHistory = async ({
       sudt_token_info
     `
   )
-
-  return new Promise((resolve, reject) => {
-
+  const queryAndExport = (): Promise<number> => new Promise((resolve, reject) => {
     const handleTransaction = async (
       {
         hash,
@@ -198,30 +189,21 @@ const exportHistory = async ({
       }
     ) => {
       const description = await getDescription(walletID, hash)
-      const totalInput = BigInt(inputShannon || `0`)
-      const totalOutput = BigInt(outputShannon || `0`)
-      let txType = `-`
-      if (includeSUDT && sUDTValue !== '') {
-        txType = 'UDT ' + (BigInt(sUDTValue) > 0 ? RECEIVE_TYPE : SEND_TYPE)
-      } else if (daoCellCount > 0) {
-        txType = 'Nervos DAO'
-      } else if (totalInput >= totalOutput) {
-        txType = SEND_TYPE
-      } else {
-        txType = RECEIVE_TYPE
-      }
-
-      const DEFAULT_SYMBOL = 'Unknown'
-      const amount = includeSUDT && sUDTValue !== '' ? '' : shannonToCKB(totalOutput - totalInput)
-
-      const tokenInfo = tokenInfoList.find((info: { tokenID: string }) => info.tokenID === typeArgs)
-      const decimal = tokenInfo?.decimal
-      const symbol = tokenInfo?.symbol || DEFAULT_SYMBOL
-      const sUDTAmount = sUDTValue === '' ? '' : `${sudtValueToAmount(sUDTValue, decimal)} ${symbol}`
-
-      const data = includeSUDT
-        ? `${formatDatetime(new Date(+timestamp))},${blockNumber},${hash},${txType},${amount},${sUDTAmount},"${description}"\n`
-        : `${formatDatetime(new Date(+timestamp))},${blockNumber},${hash},${txType},${amount},"${description}"\n`
+      const data = toCSVRow({
+        description,
+        hash,
+        inputShannon,
+        outputShannon,
+        includeSUDT,
+        sUDTValue,
+        daoCellCount,
+        RECEIVE_TYPE,
+        SEND_TYPE,
+        tokenInfoList,
+        timestamp,
+        blockNumber,
+        typeArgs,
+      })
 
       writeStream.write(data, err => {
         if (err) {
@@ -241,7 +223,11 @@ const exportHistory = async ({
           return reject(err)
         }
         try {
-          const [sUDTInputs, sUDTOutputs, { outputShannon, daoCellCount }] = await Promise.all([
+          const [
+            sUDTInputs = [],
+            sUDTOutputs = [],
+            { outputShannon, daoCellCount } = { outputShannon: '0', daoCellCount: 0 }
+          ] = await Promise.all([
             queryInputs({ hash: row.hash, codeHash: sudt.codeHash, hashType: sudt.hashType }),
             queryOutputs({ hash: row.hash, codeHash: sudt.codeHash, hashType: sudt.hashType }),
             aggrQuery({ hash: row.hash }),
@@ -311,6 +297,8 @@ const exportHistory = async ({
     })
 
   })
+
+  return queryAndExport()
 }
 
 export default exportHistory

@@ -1,0 +1,168 @@
+{
+  "0 CKB": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "1000000000",
+      "includeSUDT": false,
+      "sUDTValue": "",
+      "daoCellCount": 0,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,+0.00000000,\"description\"\n"
+  },
+  "Receive CKB": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "100000000",
+      "outputShannon": "1000000000",
+      "includeSUDT": false,
+      "sUDTValue": "",
+      "daoCellCount": 0,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Receive,+9.00000000,\"description\"\n"
+  },
+  "SEND CKB": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": false,
+      "sUDTValue": "",
+      "daoCellCount": 0,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Send,-9.00000000,\"description\"\n"
+  },
+  "Nervos DAO": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": false,
+      "sUDTValue": "",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,\"description\"\n"
+  },
+  "Show sUDT without sUDT tx": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": true,
+      "sUDTValue": "",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,Nervos DAO,-9.00000000,,\"description\"\n"
+  },
+  "Receive unknown UDT": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": true,
+      "sUDTValue": "100000",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,+100000 Unknown,\"description\"\n"
+  },
+  "Send unknown UDT": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": true,
+      "sUDTValue": "-100000",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": ""
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,-100000 Unknown,\"description\"\n"
+  },
+  "Receive known UDT": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": true,
+      "sUDTValue": "100000",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [
+        { "tokenID": "tokenID", "decimal": "10", "symbol": "UDT" }
+      ],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": "tokenID"
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Receive,,+0.00001 UDT,\"description\"\n"
+  },
+  "Send known UDT": {
+    "data": {
+      "description": "description",
+      "hash": "hash",
+      "inputShannon": "1000000000",
+      "outputShannon": "100000000",
+      "includeSUDT": true,
+      "sUDTValue": "-100000",
+      "daoCellCount": 1,
+      "RECEIVE_TYPE": "Receive",
+      "SEND_TYPE": "Send",
+      "tokenInfoList": [
+        { "tokenID": "tokenID", "decimal": "10", "symbol": "UDT" }
+      ],
+      "timestamp": "1591954855123",
+      "blockNumber": "0",
+      "typeArgs": "tokenID"
+    },
+    "expected": "2020-06-12 09:40:55.123,0,hash,UDT Send,,-0.00001 UDT,\"description\"\n"
+  }
+}
