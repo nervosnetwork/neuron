@@ -5,6 +5,7 @@ import TransactionsService from 'services/tx/transaction-service'
 import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
 import toCSVRow from 'utils/to-csv-row'
+import { get as getDescription } from 'database/leveldb/transaction-description'
 
 const exportHistory = async ({
   walletID,
@@ -47,7 +48,8 @@ const exportHistory = async ({
 
   for (const tx of items.reverse()) {
     if (tx.status !== 'success') { continue }
-    const data = toCSVRow(tx, includeSUDT)
+    const description = await getDescription(walletID, tx.hash!)
+    const data = toCSVRow({ ...tx, description }, includeSUDT)
     await wsPromises.write(data)
   }
 
