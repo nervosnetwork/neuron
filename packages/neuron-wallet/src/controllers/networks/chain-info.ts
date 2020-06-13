@@ -1,4 +1,4 @@
-import initConnection, { dbPath } from 'database/chain/ormconfig'
+import initConnection from 'database/chain/ormconfig'
 import logger from 'utils/logger'
 import { Network, EMPTY_GENESIS_HASH } from 'models/network'
 import RpcService from 'services/rpc-service'
@@ -20,13 +20,13 @@ export default class ChainInfo {
       genesisHash = await new RpcService(this.network.remote).genesisBlockHash()
       // If fetched genesis hash doesn't match that of the network, still initalize DB.
       // This would mostly only happens when using default mainnet network but connected to a wrong node.
-      await initConnection(dbPath(genesisHash))
+      await initConnection(genesisHash)
 
       return genesisHash === this.network.genesisHash
     } catch (err) {
       logger.error('Network:\tfail to connect to the network. Is CKB node running?')
 
-      await initConnection(dbPath(this.network.genesisHash))
+      await initConnection(this.network.genesisHash)
 
       return false
     }

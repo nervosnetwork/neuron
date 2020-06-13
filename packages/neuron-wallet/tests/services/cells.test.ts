@@ -27,7 +27,7 @@ const randomHex = (length: number = 64): string => {
 
 describe('CellsService', () => {
   beforeAll(async () => {
-    await initConnection(':memory:')
+    await initConnection('0x1234')
   })
 
   afterAll(async () => {

@@ -116,7 +116,7 @@ const tx2 = Transaction.fromObject({
 
 describe('TransactionPersistor', () => {
   beforeAll(async done => {
-    await initConnection(':memory:')
+    await initConnection('0x1234')
     done()
   })
 

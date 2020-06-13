@@ -66,7 +66,7 @@ const blockHeader = new BlockHeader('0', tipTimestamp, '0x' + '0'.repeat(64), '0
 
 describe('TransactionGenerator', () => {
   beforeAll(async () => {
-    await initConnection(':memory:')
+    await initConnection('0x1234')
 
     // @ts-ignore: Private method
     SystemScriptInfo.getInstance().secpOutPointInfo = new Map<string, OutPoint>([

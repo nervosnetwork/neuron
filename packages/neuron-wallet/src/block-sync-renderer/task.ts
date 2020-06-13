@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import initConnection, { dbPath } from 'database/chain/ormconfig'
+import initConnection from 'database/chain/ormconfig'
 import Queue from './sync/queue'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import logger from 'utils/logger'
@@ -11,7 +11,7 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
     await syncQueue.stopAndWait()
   }
 
-  await initConnection(dbPath(genesisHash))
+  await initConnection(genesisHash)
 
   logger.info("Sync:\tstart block sync queue")
   syncQueue = new Queue(url, lockHashes, anyoneCanPayLockHashes, multiSignBlake160s, BigInt(startBlockNumber))
