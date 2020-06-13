@@ -4,6 +4,7 @@ import i18n from 'locales/i18n'
 import TransactionsService from 'services/tx/transaction-service'
 import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
+import Transaction from 'models/chain/transaction'
 import toCSVRow from 'utils/to-csv-row'
 import { get as getDescription } from 'database/leveldb/transaction-description'
 
@@ -43,18 +44,26 @@ const exportHistory = async ({
   )
 
   const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)
-  const { totalCount } = await TransactionsService.getAllByAddresses({ pageNo: 1, pageSize: 1, addresses, walletID })
-  const { items } = await TransactionsService.getAllByAddresses({ pageNo: 1, pageSize: totalCount, addresses, walletID })
+  const PAGE_SIZE = 100
+  let count = Infinity
+  let txs: Transaction[] = []
+  let pageNo = 1
 
-  for (const tx of items.reverse()) {
-    if (tx.status !== 'success') { continue }
+  while (pageNo <= Math.ceil(count / PAGE_SIZE)) {
+    const { totalCount, items } = await TransactionsService.getAllByAddresses({ pageNo, pageSize: PAGE_SIZE, addresses, walletID })
+    count = totalCount
+    txs.push(...items.filter(item => item.status === 'success'))
+    pageNo++
+  }
+
+  for (const tx of txs.reverse()) {
     const description = await getDescription(walletID, tx.hash!)
     const data = toCSVRow({ ...tx, description }, includeSUDT)
     await wsPromises.write(data)
   }
 
   wsPromises.end()
-  return totalCount
+  return count
 }
 
 export default exportHistory
