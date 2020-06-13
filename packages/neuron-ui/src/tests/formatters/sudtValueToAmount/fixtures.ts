@@ -1,4 +1,14 @@
 export default {
+  'invalid value': {
+    value: 'ckb',
+    decimal: '0',
+    expected: '0',
+  },
+  'null value': {
+    value: null,
+    decimal: '0',
+    expected: '0',
+  },
   '0 decimal': {
     value: '1',
     decimal: '0',

@@ -170,7 +170,8 @@ export default {
         "block-number": "区块高度",
         "tx-hash": "交易哈希",
         "tx-type": "交易类型",
-        "amount": "金额",
+        "amount": "CKB 金额",
+        "udt-amount": "UDT 金额",
         "description": "备注"
       },
       "tx-type": {

@@ -3,7 +3,7 @@ import shannonToCKB from '../../src/utils/shannonToCKB'
 const fixtures: { shannon: bigint, expected: string }[] = [
   {
     shannon: BigInt(0),
-    expected: '0.00000000'
+    expected: '+0.00000000'
   },
   {
     shannon: BigInt(1234567),
