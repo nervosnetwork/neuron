@@ -1,17 +1,12 @@
-import path from 'path'
-import fs from 'fs'
-import os from 'os'
-import { getConnection, In } from 'typeorm'
-import exportHistory from '../../../src/utils/export-history'
-import { formatDatetime } from '../../../src/utils/to-csv-row'
+import { getConnection } from 'typeorm'
 import i18n from '../../../src/locales/i18n'
 import TransactionPersistor from '../../../src/services/tx/transaction-persistor'
 import { initConnection } from '../../../src/database/chain/ormconfig'
-import TransactionEntity from '../../../src/database/chain/entities/transaction'
 import Transaction from '../../../src/models/chain/transaction'
 import fixtures from './fixtures.json'
 
-describe('Test exporting history', () => {
+describe.skip('Test exporting history', () => {
+  // TODO: reuse test cases of TransactionsService#getAllByAddresses
   beforeAll(async () => {
     i18n.changeLanguage('en')
     await initConnection(":memory:")
@@ -30,6 +25,5 @@ describe('Test exporting history', () => {
   })
 
   it.skip('Test export to csv', async () => {
-    // TODO: reuse test cases of TransactionsService#getAllByAddresses
   })
 })
