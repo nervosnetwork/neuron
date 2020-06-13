@@ -9,7 +9,10 @@ export const formatDatetime = (datetime: Date) => {
   return `${isoFmt.substr(0, 10)} ${isoFmt.substr(11, 12)}`
 }
 
-const toCSVRow = (tx: Transaction, includeSUDT: boolean = false) => {
+const toCSVRow = (
+  tx: Pick<Transaction, 'blockNumber' | 'hash' | 'description' | 'timestamp' | 'sudtInfo' | 'nervosDao' | 'value'>,
+  includeSUDT: boolean = false
+) => {
 
   const SEND_TYPE = i18n.t('export-transactions.tx-type.send')
   const RECEIVE_TYPE = i18n.t('export-transactions.tx-type.receive')
