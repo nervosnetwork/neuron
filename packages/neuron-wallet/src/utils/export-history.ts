@@ -1,73 +1,18 @@
 import fs from 'fs'
 import { promisify } from 'util'
-import sqlite3 from 'sqlite3'
-import { get as getDescription } from 'database/leveldb/transaction-description'
 import i18n from 'locales/i18n'
-import AssetAccountInfo from 'models/asset-account-info'
-import BufferUtils from 'utils/buffer'
+import TransactionsService from 'services/tx/transaction-service'
+import AddressService from 'services/addresses'
 import { ChainType } from 'models/network'
 import toCSVRow from 'utils/to-csv-row'
 
-interface ExportHistoryParms {
-  walletID: string
-  dbPath: string
-  lockHashList?: string[]
-  anyoneCanPayLockHashList?: string[]
-  filePath: string
-  chainType?: ChainType | string
-}
-
-namespace QueryParams {
-  export interface Inputs {
-    hash: CKBComponents.Hash
-    codeHash: CKBComponents.Hash
-    hashType: CKBComponents.ScriptHashType
-  }
-  export type Outputs = Inputs
-  export interface Aggr {
-    hash: CKBComponents.Hash
-  }
-}
-
-namespace QueryResponse {
-  export interface Transaction {
-    hash: string,
-    inputShannon: string | null,
-    timestamp: string,
-    blockNumber: string,
-    description: string
-  }
-
-  interface Input {
-    typeCodeHash: string | null
-    typeArgs: string | null
-    typeHashType: CKBComponents.ScriptHashType | null
-    data: string | null
-  }
-  type Output = Input
-  export type Inputs = Input[]
-  export type Outputs = Output[]
-  export interface Aggr {
-    outputShannon: string | null,
-    daoCellCount: number
-  }
-}
-
 const exportHistory = async ({
   walletID,
-  dbPath,
-  lockHashList = [],
-  anyoneCanPayLockHashList = [],
   filePath,
   chainType = 'ckb',
-}: ExportHistoryParms): Promise<number> => {
-
-  if (!dbPath) {
-    throw new Error(`Database is required`)
-  }
-
-  if (!Array.isArray(lockHashList)) {
-    throw new Error(`Lock hash list is expected to be an array`)
+}: { walletID: string, filePath: string, chainType: ChainType | string }) => {
+  if (!walletID) {
+    throw new Error("Wallet ID is required")
   }
 
   if (!filePath) {
@@ -82,223 +27,32 @@ const exportHistory = async ({
   const headers = includeSUDT
     ? ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'udt-amount', 'description']
     : ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'description']
-  const SEND_TYPE = i18n.t('export-transactions.tx-type.send')
-  const RECEIVE_TYPE = i18n.t('export-transactions.tx-type.receive')
 
-  const serializedlockHashList = [...lockHashList, ...anyoneCanPayLockHashList].map(l => `'${l}'`).join(`,`)
-  const { sudt } = new AssetAccountInfo().infos
-
-  const writeStream = fs.createWriteStream(filePath)
-  writeStream.write(
-    `${headers.map(label => i18n.t(`export-transactions.column.${label}`))}\n`
-  )
-
-  const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY)
-  const dbPromises: any = new Proxy(db, {
-    get(target, key: keyof typeof db, receiver) {
+  const ws = fs.createWriteStream(filePath)
+  const wsPromises: any = new Proxy(ws, {
+    get(target, key: keyof typeof ws, receiver) {
       if (typeof target[key] === 'function') {
         return promisify(Reflect.get(target, key, receiver)).bind(target)
       }
       return Reflect.get(target, key, receiver)
     }
   })
-
-  let total: number | undefined
-  let inserted = 0
-
-  const queryInputs = ({ hash, codeHash, hashType }: QueryParams.Inputs): Promise<QueryResponse.Inputs> =>
-    dbPromises.all(
-      `
-      SELECT
-        typeCodeHash,
-        typeArgs,
-        typeHashType,
-        data
-      FROM
-        input
-      WHERE
-        input.transactionHash = ?
-        AND input.typeCodeHash = ?
-        AND input.typeHashType = ?
-        AND input.lockHash IN (${serializedlockHashList})
-      `,
-      [hash, codeHash, hashType]
-    )
-
-  const queryOutputs = ({ hash, codeHash, hashType }: QueryParams.Outputs): Promise<QueryResponse.Outputs> => dbPromises.all(
-    `
-    SELECT
-      typeCodeHash,
-      typeArgs,
-      typeHashType,
-      data
-    FROM
-      output
-    WHERE
-      output.transactionHash = ?
-      AND output.typeCodeHash = ?
-      AND output.typeHashType = ?
-      AND output.lockHash IN (${serializedlockHashList})
-    `,
-    [hash, codeHash, hashType]
+  await wsPromises.write(
+    `${headers.map(label => i18n.t(`export-transactions.column.${label}`))}\n`
   )
 
-  const aggrQuery = ({ hash }: QueryParams.Aggr): Promise<QueryResponse.Aggr> =>
-    dbPromises.get(
-      `
-      SELECT
-        CAST(SUM(CAST(output.capacity AS UNSIGNED BIG ING)) AS VARCHAR) outputShannon,
-        COUNT(output.daoData) daoCellCount
-      FROM
-        output
-      WHERE
-        output.transactionHash = ?
-        AND output.lockHash IN (${serializedlockHashList})
-      GROUP BY
-        output.transactionHash
-      `,
-      [hash]
-    )
+  const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)
+  const { totalCount } = await TransactionsService.getAllByAddresses({ pageNo: 1, pageSize: 1, addresses, walletID })
+  const { items } = await TransactionsService.getAllByAddresses({ pageNo: 1, pageSize: totalCount, addresses, walletID })
 
-  const tokenInfoList: { tokenID: string, symbol: string | null, decimal: string | null }[] = await dbPromises.all(
-    `
-    SELECT
-      tokenID,
-      symbol,
-      decimal
-    FROM
-      sudt_token_info
-    `
-  )
-  const queryAndExport = (): Promise<number> => new Promise((resolve, reject) => {
-    const handleTransaction = async (
-      {
-        hash,
-        outputShannon = '0',
-        inputShannon = '0',
-        sUDTValue = '',
-        daoCellCount = 0,
-        blockNumber,
-        timestamp,
-        typeArgs,
-      }: QueryResponse.Transaction & {
-        outputShannon: string | null,
-        daoCellCount: number,
-        sUDTValue: string,
-        typeArgs: string | null
-      }
-    ) => {
-      const description = await getDescription(walletID, hash)
-      const data = toCSVRow({
-        description,
-        hash,
-        inputShannon,
-        outputShannon,
-        includeSUDT,
-        sUDTValue,
-        daoCellCount,
-        RECEIVE_TYPE,
-        SEND_TYPE,
-        tokenInfoList,
-        timestamp,
-        blockNumber,
-        typeArgs,
-      })
+  for (const tx of items.reverse()) {
+    if (tx.status !== 'success') { continue }
+    const data = toCSVRow(tx, includeSUDT)
+    await wsPromises.write(data)
+  }
 
-      writeStream.write(data, err => {
-        if (err) {
-          return reject(err)
-        }
-        if (++inserted === total) {
-          writeStream.end()
-          return resolve(total)
-        }
-      }
-      )
-    }
-
-    const onRowLoad = (err: Error, row: QueryResponse.Transaction) => {
-      db.serialize(async () => {
-        if (err) {
-          return reject(err)
-        }
-        try {
-          const [
-            sUDTInputs = [],
-            sUDTOutputs = [],
-            { outputShannon, daoCellCount } = { outputShannon: '0', daoCellCount: 0 }
-          ] = await Promise.all([
-            queryInputs({ hash: row.hash, codeHash: sudt.codeHash, hashType: sudt.hashType }),
-            queryOutputs({ hash: row.hash, codeHash: sudt.codeHash, hashType: sudt.hashType }),
-            aggrQuery({ hash: row.hash }),
-          ])
-
-          const typeArgs = sUDTInputs[0]?.typeArgs ?? sUDTOutputs[0]?.typeArgs
-          let sUDTValue = ''
-          if (typeArgs) {
-
-            const sumSUDT = (cells: QueryResponse.Inputs | QueryResponse.Outputs) =>
-              cells
-                .filter(c => c.typeArgs === typeArgs)
-                .reduce((sum, c) => {
-                  return c.data ? sum + BufferUtils.parseAmountFromSUDTData(c.data) : sum
-                }, BigInt(0))
-
-            sUDTValue = `${sumSUDT(sUDTOutputs) - sumSUDT(sUDTInputs)}`
-          }
-          return handleTransaction({ ...row, outputShannon, daoCellCount, sUDTValue, typeArgs })
-        } catch (err) {
-          return reject(err)
-        }
-      })
-    }
-
-    const onCompleted = (err: Error, retrieved: number) => {
-      if (err) {
-        return reject(err)
-      }
-      db.close()
-      if (!retrieved) {
-        writeStream.end()
-        return resolve(0)
-      }
-      total = retrieved
-    }
-
-    db.serialize(() => {
-      db.each(
-        `
-        SELECT
-          tx.hash,
-          tx.timestamp,
-          tx.blockNumber,
-          CAST(SUM(CAST(input.capacity AS UNSIGNED BIG INT)) AS VARCHAR) inputShannon
-        FROM 'transaction' AS tx
-        LEFT JOIN
-          input ON (input.transactionHash = tx.hash AND input.lockHash in (${serializedlockHashList}))
-        WHERE
-          tx.timestamp IS NOT NULL
-        AND
-          tx.status = 'success'
-        AND
-          tx.hash IN (
-            SELECT output.transactionHash FROM output WHERE output.lockHash IN (${serializedlockHashList})
-            UNION
-            SELECT input.transactionHash FROM input WHERE input.lockHash IN (${serializedlockHashList})
-          )
-        GROUP BY
-          tx.hash
-        ORDER BY
-          CAST(tx.timestamp AS UNSIGNED BIG INT)
-        `,
-        onRowLoad,
-        onCompleted
-      )
-    })
-
-  })
-
-  return queryAndExport()
+  wsPromises.end()
+  return totalCount
 }
 
 export default exportHistory

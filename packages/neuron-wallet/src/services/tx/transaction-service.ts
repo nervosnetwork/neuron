@@ -1,6 +1,5 @@
 import { getConnection } from 'typeorm'
 import NetworksService from 'services/networks'
-import AddressesService from 'services/addresses'
 import TransactionEntity from 'database/chain/entities/transaction'
 import OutputEntity from 'database/chain/entities/output'
 import Transaction, { TransactionStatus, SudtInfo } from 'models/chain/transaction'
@@ -356,24 +355,8 @@ export class TransactionsService {
   }
 
   public static async exportTransactions({ walletID, filePath }: { walletID: string, filePath: string }) {
-    const addresses = AddressesService.allAddressesByWalletId(walletID).map(addr => addr.address)
-    const lockHashList = AddressParser.batchToLockHash(addresses)
-    const assetAccountInfo = new AssetAccountInfo()
-    const anyoneCanPayLockHashList: string[] = AddressParser
-      .batchParse(addresses)
-      .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
-    const connection = getConnection()
-    const dbPath = connection.options.database as string
     const chainType = NetworksService.getInstance().getCurrent().chain
-
-    const total = await exportTransactions({
-      walletID,
-      dbPath,
-      lockHashList,
-      anyoneCanPayLockHashList,
-      filePath,
-      chainType,
-    })
+    const total = await exportTransactions({ walletID, filePath, chainType })
     return total
   }
 }
