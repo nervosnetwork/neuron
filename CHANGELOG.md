@@ -1,3 +1,29 @@
+# 0.31.0 (2020-06-15)
+
+### Bundled CKB node
+
+[CKB v0.32.0](https://github.com/nervosnetwork/ckb/releases/tag/v0.32.0) was released on May 22nd, 2020. This version of CKB node is now bundled and preconfigured in Neuron. 
+
+### New features
+
+We added several new features with this version:
+
+* New style of logo.
+* Make the `Settings` window to be independent with new style.
+* Add Language Switching function in `Settings` - `General` page.
+* Export more bundled CKB logs for debug info.
+* Include the bundled CKB version on the `About Neuron` window.
+* Replace the `Expected speed` drop-down box with `Quick Pick Price` in `Advanced fee settings`.
+* Add `Asset Account` feature for `Aggron Testnet` only.
+
+### User Experience
+
+We also make some improvements for better user expeierence:
+
+* Optimize the `Copy` component, also remove unnecessary normal context menu (right-click menu).
+* Display password error in password dialog.
+
+
 # 0.31.0-rc2 (2020-06-08)
 
 ### Bundled CKB node
