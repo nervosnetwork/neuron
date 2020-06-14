@@ -1,155 +1,69 @@
 import fs from 'fs'
-import sqlite3 from 'sqlite3'
-import { get as getDescription } from 'database/leveldb/transaction-description'
+import { promisify } from 'util'
 import i18n from 'locales/i18n'
-import shannonToCKB from 'utils/shannonToCKB'
+import TransactionsService from 'services/tx/transaction-service'
+import AddressService from 'services/addresses'
+import { ChainType } from 'models/network'
+import Transaction from 'models/chain/transaction'
+import toCSVRow from 'utils/to-csv-row'
+import { get as getDescription } from 'database/leveldb/transaction-description'
 
-
-interface ExportHistoryParms {
-  walletID: string
-  dbPath: string
-  lockHashList?: string[]
-  filePath: string
-}
-const exportHistory = ({
+const exportHistory = async ({
   walletID,
-  dbPath,
-  lockHashList = [],
-  filePath
-}: ExportHistoryParms): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    if (!dbPath) {
-      return reject(new Error(`Database is required`))
-    }
+  filePath,
+  chainType = 'ckb',
+}: { walletID: string, filePath: string, chainType: ChainType | string }) => {
+  if (!walletID) {
+    throw new Error("Wallet ID is required")
+  }
 
-    if (!Array.isArray(lockHashList)) {
-      return reject(new Error(`Lock hash list is expected to be an array`))
-    }
+  if (!filePath) {
+    throw new Error(`File Path is required`)
+  }
 
-    if (!filePath) {
-      return reject(new Error(`File Path is required`))
-    }
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath)
+  }
 
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath)
-    }
+  const includeSUDT = chainType === 'ckb_testnet'
+  const headers = includeSUDT
+    ? ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'udt-amount', 'description']
+    : ['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'description']
 
-    let total: number | undefined
-    let inserted = 0
-
-    const SEND_TYPE = i18n.t('export-transactions.tx-type.send')
-    const RECEIVE_TYPE = i18n.t('export-transactions.tx-type.receive')
-
-    const writeStream = fs.createWriteStream(filePath)
-    writeStream.write(
-      `${['time', 'block-number', 'tx-hash', 'tx-type', 'amount', 'description']
-        .map(label => i18n.t(`export-transactions.column.${label}`))}\n`
-    )
-
-    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY)
-    const serializedlockHashList = lockHashList.map(l => `'${l}'`).join(`,`)
-
-    const onRowLoad = (err: Error, row: {
-      hash: string,
-      inputShannon: string | null,
-      timestamp: string,
-      blockNumber: string,
-      description: string
-    }) => {
-      db.serialize(() => {
-        if (err) {
-          return reject(err)
-        }
-        db.get(
-          `
-          SELECT
-            CAST(SUM(CAST(output.capacity AS UNSIGNED BIG ING)) AS VARCHAR) outputShannon,
-            COUNT(output.daoData) daoCellCount
-          FROM
-            output
-          WHERE
-            (output.transactionHash = ? AND output.lockHash IN (${serializedlockHashList}))
-          GROUP BY
-            output.transactionHash
-          `,
-          [row.hash],
-          async (err, { outputShannon, daoCellCount } = { outputShannon: '0', daoCellCount: 0 }) => {
-            if (err) {
-              return reject(err)
-            }
-            const description = await getDescription(walletID, row.hash)
-            const totalInput = BigInt(row.inputShannon || `0`)
-            const totalOutput = BigInt(outputShannon || `0`)
-            let txType = `-`
-            if (daoCellCount > 0) {
-              txType = 'Nervos DAO'
-            } else if (totalInput > totalOutput) {
-              txType = SEND_TYPE
-            } else if (totalInput < totalOutput) {
-              txType = RECEIVE_TYPE
-            }
-            const amount = shannonToCKB(totalOutput - totalInput)
-            writeStream.write(
-              `${new Date(+row.timestamp).toISOString()},${row.blockNumber},${
-              row.hash
-              },${txType},${amount},"${description}"\n`,
-              err => {
-                if (err) {
-                  return reject(err)
-                }
-                if (++inserted === total) {
-                  writeStream.end()
-                  return resolve(total)
-                }
-              }
-            )
-          }
-        )
-      })
-    }
-
-    const onCompleted = (err: Error, retrieved: number) => {
-      if (err) {
-        return reject(err)
+  const ws = fs.createWriteStream(filePath)
+  const wsPromises: any = new Proxy(ws, {
+    get(target, key: keyof typeof ws, receiver) {
+      if (typeof target[key] === 'function') {
+        return promisify(Reflect.get(target, key, receiver)).bind(target)
       }
-      db.close()
-      if (!retrieved) {
-        writeStream.end()
-        return resolve(0)
-      }
-      total = retrieved
+      return Reflect.get(target, key, receiver)
     }
-
-    db.serialize(() => {
-      db.each(
-        `
-        SELECT
-          tx.hash,
-          tx.timestamp,
-          tx.blockNumber,
-          CAST(SUM(CAST(input.capacity AS UNSIGNED BIG INT)) AS VARCHAR) inputShannon
-        FROM 'transaction' AS tx
-        LEFT JOIN
-          input ON (input.transactionHash = tx.hash AND input.lockHash in (${serializedlockHashList}))
-        WHERE
-          tx.hash IN (
-            SELECT output.transactionHash FROM output WHERE output.lockHash IN (${serializedlockHashList})
-            UNION
-            SELECT input.transactionHash FROM input WHERE input.lockHash IN (${serializedlockHashList})
-          )
-        AND
-          tx.timestamp IS NOT NULL
-        GROUP BY
-          tx.hash
-        ORDER BY
-          CAST(tx.timestamp AS UNSIGNED BIG INT)
-        `,
-        onRowLoad,
-        onCompleted
-      )
-    })
-
   })
+  await wsPromises.write(
+    `${headers.map(label => i18n.t(`export-transactions.column.${label}`))}\n`
+  )
+
+  const addresses = AddressService.allAddressesByWalletId(walletID).map(addr => addr.address)
+  const PAGE_SIZE = 100
+  let count = Infinity
+  let txs: Transaction[] = []
+  let pageNo = 1
+
+  while (pageNo <= Math.ceil(count / PAGE_SIZE)) {
+    const { totalCount, items } = await TransactionsService.getAllByAddresses({ pageNo, pageSize: PAGE_SIZE, addresses, walletID })
+    count = totalCount
+    txs.push(...items.filter(item => item.status === 'success'))
+    pageNo++
+  }
+
+  for (const tx of txs.reverse()) {
+    const description = await getDescription(walletID, tx.hash!)
+    const data = toCSVRow({ ...tx, description }, includeSUDT)
+    await wsPromises.write(data)
+  }
+
+  wsPromises.end()
+  return count
 }
 
 export default exportHistory

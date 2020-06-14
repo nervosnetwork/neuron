@@ -645,4 +645,46 @@ describe('CellsService', () => {
       })
     })
   })
+
+  describe('#usedByAnyoneCanPayBlake160s', () => {
+    const fakeArgs1 = '0x1'
+    const fakeArgs2 = '0x2'
+    const fakeArgs3 = '0x3'
+    const codeHash = randomHex()
+    const lockScript1 = new Script(codeHash, fakeArgs1, ScriptHashType.Type)
+    const lockScript2 = new Script(codeHash, fakeArgs2, ScriptHashType.Type)
+    const lockScript3 = new Script(codeHash, fakeArgs3, ScriptHashType.Type)
+
+    const owner1 = {lockScript: lockScript1, lockHash: lockScript1.computeHash()}
+    const owner2 = {lockScript: lockScript2, lockHash: lockScript2.computeHash()}
+    const owner3 = {lockScript: lockScript3, lockHash: lockScript3.computeHash()}
+
+    beforeEach(async () => {
+      await createCell('1000', OutputStatus.Live, false, null, owner1)
+      await createCell('1000', OutputStatus.Sent, false, null, owner1)
+      await createCell('3000', OutputStatus.Dead, false, null, owner2)
+    });
+
+    it('returns unique lock args', async () => {
+      const lockHashes = [owner1.lockHash, owner2.lockHash]
+      const blake160s = [owner1.lockScript.args, owner3.lockScript.args]
+
+      const lockArgs = await CellsService.usedByAnyoneCanPayBlake160s(lockHashes, blake160s)
+      expect(lockArgs).toEqual([owner1.lockScript.args])
+    })
+    it('matches different lock args for different combinations of lock hashes and blake160s', async () => {
+      const lockHashes = [owner1.lockHash, owner2.lockHash]
+      const blake160s = [owner1.lockScript.args, owner2.lockScript.args]
+
+      const lockArgs = await CellsService.usedByAnyoneCanPayBlake160s(lockHashes, blake160s)
+      expect(lockArgs).toEqual(blake160s)
+    })
+    it('returns empty array when no matches', async () => {
+      const lockHashes = [owner3.lockHash]
+      const blake160s = [owner3.lockScript.args]
+
+      const lockArgs = await CellsService.usedByAnyoneCanPayBlake160s(lockHashes, blake160s)
+      expect(lockArgs).toEqual([])
+    })
+  });
 })

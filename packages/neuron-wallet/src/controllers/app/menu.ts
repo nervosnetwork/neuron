@@ -8,6 +8,8 @@ import {
   MenuItemConstructorOptions,
   Menu,
 } from 'electron'
+import { Subject } from 'rxjs'
+import { throttleTime } from 'rxjs/operators'
 import i18n from 'locales/i18n'
 import env from 'env'
 import UpdateController from 'controllers/update'
@@ -77,8 +79,14 @@ const navigateTo = (url: string) => {
   }
 }
 
-const showSettings = () => {
+const showSettings$ = new Subject()
+
+showSettings$.pipe(throttleTime(1000)).subscribe(() => {
   showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE))
+})
+
+const showSettings = () => {
+  showSettings$.next()
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
