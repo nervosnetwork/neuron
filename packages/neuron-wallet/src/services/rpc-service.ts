@@ -6,7 +6,6 @@ import CommonUtils from 'utils/common'
 import Block from 'models/chain/block'
 import BlockHeader from 'models/chain/block-header'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
-import Transaction from 'models/chain/transaction'
 import OutPoint from 'models/chain/out-point'
 import CellWithStatus from 'models/chain/cell-with-status'
 
@@ -105,11 +104,6 @@ export default class RpcService {
       return BlockHeader.fromSDK(header)
     }
     return undefined
-  }
-
-  public formatRPCTransaction(transaction) {
-    const tx = this.ckb.rpc.resultFormatter.toTransaction(transaction)
-    return Transaction.fromSDK(tx)
   }
 
   public async genesisBlockHash(): Promise<string> {

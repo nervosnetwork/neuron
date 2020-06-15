@@ -1,12 +1,13 @@
 import { ipcRenderer } from 'electron'
 import initConnection from 'database/chain/ormconfig'
+import { Address as AddressInterface } from 'database/address/address-dao'
 import Queue from './sync/queue'
 import { register as registerTxStatusListener, unregister as unregisterTxStatusListener } from './tx-status-listener'
 import logger from 'utils/logger'
 
 let syncQueue: Queue | null
 
-ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, lockHashes: string[], anyoneCanPayLockHashes: string[], startBlockNumber: string, multiSignBlake160s: string[]) => {
+ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, addressesMetas: AddressInterface[]) => {
   if (syncQueue) {
     await syncQueue.stopAndWait()
   }
@@ -14,7 +15,7 @@ ipcRenderer.on('block-sync:start', async (_, url: string, genesisHash: string, l
   await initConnection(genesisHash)
 
   logger.info("Sync:\tstart block sync queue")
-  syncQueue = new Queue(url, lockHashes, anyoneCanPayLockHashes, multiSignBlake160s, BigInt(startBlockNumber))
+  syncQueue = new Queue(url, addressesMetas)
   syncQueue.start()
 })
 
