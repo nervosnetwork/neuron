@@ -20,7 +20,7 @@ const isDevMode = !app.isPackaged && !isTestMode
 if (isDevMode) {
   dotenv.config({ path: path.resolve(__dirname, '..', '.env.development.local') })
 }
-dotenv.config()
+dotenv.config({ path: path.join(__dirname, '..', '.env') })
 
 const fileBase = (() => {
   if (isTestMode) {
