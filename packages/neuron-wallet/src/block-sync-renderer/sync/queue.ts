@@ -66,7 +66,7 @@ export default class Queue {
     )
 
     this.indexerConnector = new IndexerConnector(
-      this.addresses.map(obj => obj.address),
+      this.addresses,
       this.url,
       indexedDataPath
     )

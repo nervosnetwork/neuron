@@ -4,18 +4,19 @@ import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import AddressParser from "models/address-parser"
 import TransactionWithStatus from 'models/chain/transaction-with-status'
+import { Address } from 'database/address/address-dao'
 
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
   private stop: boolean = true
-  private addressesToWatch: string[] = []
+  private addressesMetas: Address[] = []
   public blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
-  constructor(addresses: string[], nodeUrl: string, indexerFolderPath: string) {
+  constructor(addresses: Address[], nodeUrl: string, indexerFolderPath: string) {
     this.indexer = new Indexer(nodeUrl, indexerFolderPath)
-    this.addressesToWatch = addresses
+    this.addressesMetas = addresses
     this.rpcService = new RpcService(nodeUrl)
   }
 
@@ -38,12 +39,13 @@ export default class IndexerConnector {
 
   private async fetchNewTransactions() {
     const transactions = await Promise.all(
-      this.addressesToWatch.map(async address => {
-        const lockScript = AddressParser.parse(address)
+      this.addressesMetas.map(async meta => {
+        const defaultLockScript = AddressParser.parse(meta.address)
+
         const txHashes = this.indexer.getTransactionsByLockScript({
-          code_hash: lockScript.codeHash,
-          hash_type: lockScript.hashType,
-          args: lockScript.args
+          code_hash: defaultLockScript.codeHash,
+          hash_type: defaultLockScript.hashType,
+          args: defaultLockScript.args
         })
 
         if (!txHashes) {

@@ -100,7 +100,11 @@ describe('unit tests for IndexerConnector', () => {
         lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
       }
       const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
-      const addressesToWatch = [address, address]
+      const addressMeta = {
+        address,
+        blake160: '0x'
+      }
+      const addressesToWatch = [addressMeta, addressMeta]
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
     });
     it('starts indexer', async () => {

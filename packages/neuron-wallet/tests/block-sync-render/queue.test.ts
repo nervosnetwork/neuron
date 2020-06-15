@@ -156,9 +156,8 @@ describe('queue', () => {
       await queue.start()
     });
     it('inits IndexerConnector', () => {
-      const [addressMeta] = addresses
       expect(stubbedIndexerConnectorConstructor).toHaveBeenCalledWith(
-        [addressMeta.address],
+        addresses,
         fakeNodeUrl,
         expect.stringMatching(/test\/indexer_data/)
       )
