@@ -55,10 +55,6 @@ const SUDTAccountList = () => {
   const isMainnet = isMainnetUtil(networks, networkID)
 
   const existingAccountNames = accounts.filter(acc => acc.accountName).map(acc => acc.accountName || '')
-  const existingTokenInfos = [...new Set(accounts.map(a => a.tokenId))].map(tokenId => {
-    const { tokenName = '', symbol = '', decimal = '' } = accounts.find(a => tokenId === a.tokenId)!
-    return { tokenName, tokenId, symbol, decimal }
-  })
 
   useEffect(() => {
     const ckbBalance = BigInt(balance)
@@ -351,7 +347,6 @@ const SUDTAccountList = () => {
             setDialog(null)
           }}
           existingAccountNames={existingAccountNames}
-          existingTokenInfos={existingTokenInfos}
           insufficient={insufficient}
         />
       ) : null}

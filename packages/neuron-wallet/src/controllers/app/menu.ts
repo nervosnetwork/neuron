@@ -78,7 +78,7 @@ const navigateTo = (url: string) => {
 }
 
 const showSettings = () => {
-  showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE))
+  showWindow(`#${URL.Settings}`, i18n.t(SETTINGS_WINDOW_TITLE), { width: 900 })
 }
 
 const requestPassword = (walletID: string, actionType: 'delete-wallet' | 'backup-wallet') => {
@@ -254,7 +254,9 @@ const updateApplicationMenu = (mainWindow: BrowserWindow | null) => {
         enabled: hasCurrentWallet,
         click: () => {
           const currentWallet = walletsService.getCurrent()
-          showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`))
+          showWindow(`#/sign-verify/${currentWallet!.id}`, i18n.t(`messageBox.sign-and-verify.title`), {
+            width: 900,
+          })
         }
       }
     ]

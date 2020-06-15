@@ -1,9 +1,10 @@
-import React, { useState, useReducer, useCallback } from 'react'
+import React, { useState, useEffect, useReducer, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react'
+import { getTokenInfoList } from 'services/remote'
 import TextField from 'widgets/TextField'
 import Button from 'widgets/Button'
-import { useSUDTAccountInfoErrors } from 'utils/hooks'
+import { useSUDTAccountInfoErrors, isSuccessResponse } from 'utils'
 import { DEFAULT_SUDT_FIELDS } from 'utils/const'
 import styles from './sUDTCreateDialog.module.scss'
 
@@ -27,7 +28,6 @@ export interface SUDTCreateDialogProps extends TokenInfo {
   onSubmit: (info: TokenInfo) => Promise<boolean>
   onCancel: () => void
   existingAccountNames?: string[]
-  existingTokenInfos?: Omit<TokenInfo, 'accountName'>[]
   insufficient?: { [AccountType.CKB]: boolean; [AccountType.SUDT]: boolean }
 }
 
@@ -113,7 +113,6 @@ const SUDTCreateDialog = ({
   onSubmit,
   onCancel,
   existingAccountNames = [],
-  existingTokenInfos = [],
   insufficient = { [AccountType.CKB]: false, [AccountType.SUDT]: false },
 }: Partial<Omit<SUDTCreateDialogProps, 'onSubmit' | 'onCancel'>> &
   Pick<SUDTCreateDialogProps, 'onSubmit' | 'onCancel' | 'insufficient'>) => {
@@ -121,6 +120,7 @@ const SUDTCreateDialog = ({
   const [info, dispatch] = useReducer(reducer, { accountName, tokenId, tokenName, symbol, decimal })
   const [accountType, setAccountType] = useState([AccountType.SUDT, AccountType.CKB].find(at => !insufficient[at]))
   const [step, setStep] = useState(DialogSection.Account)
+  const [tokenInfoList, setTokenInfoList] = useState<Controller.GetTokenInfoList.TokenInfo[]>([])
 
   const tokenInfoFields: (keyof TokenInfo)[] = ['tokenId', 'tokenName', 'symbol', 'decimal']
 
@@ -135,20 +135,33 @@ const SUDTCreateDialog = ({
   const isTokenReady =
     isAccountNameReady && Object.values(info).every(v => v.trim()) && Object.values(tokenErrors).every(e => !e)
 
+  useEffect(() => {
+    getTokenInfoList()
+      .then(res => {
+        if (isSuccessResponse(res)) {
+          setTokenInfoList(res.result)
+        }
+      })
+      .catch(() => {
+        console.warn('Fail to fetch the token info list')
+      })
+  }, [setTokenInfoList])
+
   const onInput = useCallback(
     e => {
       const {
         value: payload,
         dataset: { field: type },
       } = e.target
-      const existingTokenInfo = existingTokenInfos.find(ti => payload === ti.tokenId)
-      if (type === 'tokenId' && existingTokenInfo) {
-        dispatch({ type: 'import', payload: existingTokenInfo })
+      const tokenInfo = tokenInfoList.find(ti => payload === ti.tokenID)
+      if (type === 'tokenId' && tokenInfo) {
+        const { tokenID, ...rest } = tokenInfo
+        dispatch({ type: 'import', payload: { ...rest, tokenId: tokenID } })
       } else {
         dispatch({ type, payload })
       }
     },
-    [dispatch, existingTokenInfos]
+    [dispatch, tokenInfoList]
   )
 
   const onAccountTypeSelect = useCallback(
