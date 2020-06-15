@@ -1424,10 +1424,10 @@
   resolved "https://node.bit.dev/primefaces.primereact.utils.dom-handler/-/primefaces.primereact.utils.dom-handler-3.1.8.tgz#02a740dbe15d1f47aa412ade327e394d425a412f"
   integrity sha1-AqdA2+FdH0eqQSreMn45TUJaQS8=
 
-"@ckb-lumos/indexer@^0.2.0":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/indexer/-/indexer-0.2.4.tgz#2cdadba86141c7c3822d39aedae2c14fcf76e7a8"
-  integrity sha512-SAXJbENucsUlSrZtL8wo5OJim8YNev2GqzjRo5S26fvjJs0ceThdR7NG4KqDCP1pMCyU8powAoi0TYRXDcTpZw==
+"@ckb-lumos/indexer@0.2.5-rc.3":
+  version "0.2.5-rc.3"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/indexer/-/indexer-0.2.5-rc.3.tgz#2e1c25d5e67c4dcf70223d548680baba7258b13c"
+  integrity sha512-azDDJXPwQVZJQIt91prSZjGO2sD/lWd2P3IF3gOoyRY3xreWl2iotRq9tbThL3krqng2/qDJdmpmJ/KCSYpwpQ==
   dependencies:
     ckb-js-toolkit "^0.9.1"
     immutable "^4.0.0-rc.12"
@@ -5163,6 +5163,11 @@ async@^2.6.2, async@^2.6.3:
   integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
   dependencies:
     lodash "^4.17.14"
+
+async@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
+  integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -12262,12 +12267,7 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-jsbi@3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.1.2.tgz#7502ed36fb2b32bb37efb3d2d0b3806a0d771780"
-  integrity sha512-5nDXo1X9QVaXK/Cpb5VECV9ss1QPbjUuk1qSruHB1PK/g39Sd414K4nci99ElFDZv0vzxDEnKn3o49/Tn9Yagw==
-
-jsbi@^3.1.2:
+jsbi@3.1.2, jsbi@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.1.2.tgz#7502ed36fb2b32bb37efb3d2d0b3806a0d771780"
   integrity sha512-5nDXo1X9QVaXK/Cpb5VECV9ss1QPbjUuk1qSruHB1PK/g39Sd414K4nci99ElFDZv0vzxDEnKn3o49/Tn9Yagw==
