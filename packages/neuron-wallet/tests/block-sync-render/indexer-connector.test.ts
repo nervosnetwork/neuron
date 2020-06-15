@@ -34,8 +34,13 @@ const resetMocks = () => {
 }
 
 const connectIndexer = async (indexerConnector: IndexerConnector) => {
-  indexerConnector.connect()
+  const connectPromise = indexerConnector.connect()
   await Promise.resolve()
+  const errSpy = jest.fn()
+  connectPromise.catch(err => {
+    errSpy(err)
+  })
+  return errSpy
 }
 
 describe('unit tests for IndexerConnector', () => {
@@ -143,6 +148,36 @@ describe('unit tests for IndexerConnector', () => {
             it('emits new transactions in batch by block number', async () => {
               expect(txObserver).toHaveBeenCalledWith([fakeTx1])
               expect(txObserver).toHaveBeenCalledWith([fakeTx2, fakeTx3])
+            });
+          });
+          describe('when there are no transactions matched', () => {
+            let txObserver: any
+            let errSpy: any
+            beforeEach(async () => {
+              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
+
+              txObserver = jest.fn()
+              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+              errSpy = await connectIndexer(indexerConnector)
+            });
+            it('should not emit transactions', async () => {
+              expect(errSpy).toHaveBeenCalledTimes(0)
+              expect(txObserver).toHaveBeenCalledTimes(0)
+            });
+          });
+          describe('when there no transaction matched to a hash', () => {
+            let txObserver: any
+            let errSpy: any
+            beforeEach(async () => {
+              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+              stubbedGetTransactionFn.mockReturnValueOnce(undefined)
+
+              txObserver = jest.fn()
+              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+              errSpy = await connectIndexer(indexerConnector)
+            });
+            it('throws error', async () => {
+              expect(errSpy).toHaveBeenCalledWith(new Error(`failed to fetch transaction for hash ${fakeTx3.transaction.hash}`))
             });
           });
         });

@@ -1,4 +1,4 @@
-import { Subject, ReplaySubject } from 'rxjs'
+import { Subject } from 'rxjs'
 import { Indexer, Tip } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -10,7 +10,7 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private stop: boolean = true
   private addressesToWatch: string[] = []
-  public blockTipSubject: ReplaySubject<Tip> = new ReplaySubject<Tip>(3)
+  public blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
   constructor(addresses: string[], nodeUrl: string, indexerFolderPath: string) {
@@ -24,19 +24,15 @@ export default class IndexerConnector {
     this.stop = false
 
     while (!this.stop) {
-      try {
-        const lastIndexerTip = this.indexer.tip()
-        this.blockTipSubject.next(lastIndexerTip)
+      const lastIndexerTip = this.indexer.tip()
+      this.blockTipSubject.next(lastIndexerTip)
 
-        const sortedGroupedTransactions = await this.fetchNewTransactions()
-        for (const txs of sortedGroupedTransactions) {
-          this.transactionsSubject.next(txs)
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        await CommonUtils.sleep(5000)
+      const sortedGroupedTransactions = await this.fetchNewTransactions()
+      for (const txs of sortedGroupedTransactions) {
+        this.transactionsSubject.next(txs)
       }
+
+      await CommonUtils.sleep(5000)
     }
   }
 
@@ -50,9 +46,16 @@ export default class IndexerConnector {
           args: lockScript.args
         })
 
+        if (!txHashes) {
+          return []
+        }
+
         const txs = await Promise.all(
           txHashes.map(async hash => {
             const txWithStatus = await this.rpcService.getTransaction(hash)
+            if (!txWithStatus) {
+              throw new Error(`failed to fetch transaction for hash ${hash}`)
+            }
             const blockHeader = await this.rpcService.getHeader(txWithStatus!.txStatus.blockHash!)
             txWithStatus!.transaction.blockNumber = blockHeader?.number
             txWithStatus!.transaction.blockHash = txWithStatus!.txStatus.blockHash!
