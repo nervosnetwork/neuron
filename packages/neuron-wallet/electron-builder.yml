@@ -16,6 +16,7 @@ files:
     filter: ["!**/*", ".ckb-version", "ormconfig.json"]
   - package.json
   - dist
+  - '.env'
   - "!**/*.map"
   - "!**/src/"
 
