@@ -228,14 +228,13 @@ export const sudtAmountToValue = (amount: string = '0', decimal: string = '0') =
   }
 }
 
-export const sudtValueToAmount = (value: string = '0', decimal: string = '0', showPositiveSign = false) => {
-  const dec = +decimal
+export const sudtValueToAmount = (value: string | null = '0', decimal: string = '0', showPositiveSign = false) => {
+  if (value === null) {
+    return showPositiveSign ? '+0' : '0'
+  }
   if (Number.isNaN(+value)) {
     console.warn(`sUDT value is not a valid number`)
-    return '0'
-  }
-  if (value === null) {
-    return '0'
+    return showPositiveSign ? '+0' : '0'
   }
   let sign = ''
   if (value.startsWith('-')) {
@@ -244,16 +243,17 @@ export const sudtValueToAmount = (value: string = '0', decimal: string = '0', sh
     sign = '+'
   }
   const unsignedValue = value.replace(/^-?0*/, '')
+  const dec = +decimal
   if (dec === 0) {
     return +unsignedValue ? `${sign}${unsignedValue}` : '0'
   }
-  let unsignedCKB = ''
+  let unsignedSUDTValue = ''
   if (unsignedValue.length <= dec) {
-    unsignedCKB = `0.${unsignedValue.padStart(dec, '0')}`.replace(/\.?0+$/, '')
+    unsignedSUDTValue = `0.${unsignedValue.padStart(dec, '0')}`.replace(/\.?0+$/, '')
   } else {
     const decimalFraction = `.${unsignedValue.slice(-dec)}`.replace(/\.?0+$/, '')
     const int = unsignedValue.slice(0, -dec).replace(/\^0+/, '')
-    unsignedCKB = `${(
+    unsignedSUDTValue = `${(
       int
         .split('')
         .reverse()
@@ -265,7 +265,7 @@ export const sudtValueToAmount = (value: string = '0', decimal: string = '0', sh
       .reverse()
       .join('')}${decimalFraction}`
   }
-  return +unsignedCKB === 0 ? '0' : `${sign}${unsignedCKB}`
+  return `${sign}${+unsignedSUDTValue === 0 ? '0' : unsignedSUDTValue}`
 }
 
 export const sUDTAmountFormatter = (amount: string) => {

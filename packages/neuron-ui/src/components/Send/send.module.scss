@@ -1,6 +1,10 @@
 @import '../../styles/mixin.scss';
 $textfieldWidth: calc(100vw - 370px);
 
+.pageTitle {
+  @include page-title;
+}
+
 .outputContainer {
   position: relative;
   display: grid;
@@ -27,7 +31,6 @@ $textfieldWidth: calc(100vw - 370px);
         bottom: -20px;
         right: -45px;
         font-size: 0.875rem;
-        letter-spacing: 0.5px;
         color: #000;
         box-shadow: 1px 2px 6px 0 rgba(97, 97, 97, 0.5);
         background: #fff;
@@ -49,7 +52,6 @@ $textfieldWidth: calc(100vw - 370px);
 
     span {
       display: block;
-      letter-spacing: 0.45px;
       font-size: 0.5625rem;
       line-height: 0.6875rem;
       word-break: break-all;
@@ -87,41 +89,22 @@ $textfieldWidth: calc(100vw - 370px);
 }
 
 .balance {
-  margin-bottom: 29px;
+  grid-area: balance;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 
-  & > div {
-    position: relative;
-  }
-
-  label {
-    margin-right: 25px;
-
-    &:after {
-      display: inline;
-      content: ':';
-    }
-  }
-
-  label,
-  span {
-    @include bold-text;
-    font-size: 1.375rem;
-    letter-spacing: 1.1;
-  }
-
-  .balancePrompt {
-    @include bold-text;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    color: var(--nervos-green);
-    font-size: 0.8rem;
-    margin-top: 3px;
-    word-break: keep-all;
-    white-space: nowrap;
+.balanceValue {
+  font-weight: 500;
+  max-width: 60%;
+  padding: 0 5px 0 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:after {
+    content: ' CKB';
   }
 }
 
