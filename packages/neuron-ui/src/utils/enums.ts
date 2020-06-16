@@ -41,7 +41,6 @@ export enum Price {
   High = '5000',
   Medium = '2000',
   Low = '1000',
-  Zero = '0',
 }
 
 export const PlaceHolders = {

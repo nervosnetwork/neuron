@@ -23,6 +23,18 @@ import styles from './navbar.module.scss'
 
 export const FULL_SCREENS = [`${RoutePath.Transaction}/`, `/wizard/`, `/keystore/`]
 
+const throttledShowSettings = (() => {
+  const THROTTLE_TIME = 1000
+  let lastRun = 0
+  return (params: Parameters<typeof showSettings>[0]) => {
+    if (Date.now() - lastRun < THROTTLE_TIME) {
+      return false
+    }
+    lastRun = Date.now()
+    return showSettings(params)
+  }
+})()
+
 const menuItems = [
   { name: 'navbar.overview', key: RoutePath.Overview.slice(1), url: RoutePath.Overview, experimental: false },
   { name: 'navbar.send', key: RoutePath.Send.slice(1), url: RoutePath.Send, experimental: false },
@@ -120,7 +132,7 @@ const Navbar = () => {
         className={styles.name}
         title={name}
         aria-label={name}
-        onClick={() => showSettings({ tab: 'wallets' })}
+        onClick={() => throttledShowSettings({ tab: 'wallets' })}
       >
         {name}
       </button>
@@ -139,7 +151,7 @@ const Navbar = () => {
           syncedBlockNumber={syncedBlockNumber}
           networkName={networkName}
           connectionStatus={connectionStatus}
-          onAction={() => showSettings({ tab: 'networks' })}
+          onAction={() => throttledShowSettings({ tab: 'networks' })}
         />
       </div>
       <div className={styles.sync}>

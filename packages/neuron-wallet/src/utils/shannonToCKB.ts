@@ -3,7 +3,7 @@ const DECIMAL = 8
 
 const shannonToCKB = (shannon: bigint) => {
   if (shannon === BigInt(0)) {
-    return `0.${'0'.repeat(DECIMAL)}`
+    return `+0.${'0'.repeat(DECIMAL)}`
   }
 
   const isNegative = shannon < 0

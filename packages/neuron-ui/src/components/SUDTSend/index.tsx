@@ -303,7 +303,7 @@ const SUDTSend = () => {
         <div className={styles.cardContainer}>
           <div className={styles.info}>
             <div className={styles.avatar}>
-              <SUDTAvatar accountName={accountInfo?.accountName} />
+              <SUDTAvatar name={accountInfo?.accountName} />
             </div>
             <div className={styles.accountName}>{accountInfo?.accountName}</div>
             <div className={styles.tokenName}>{accountInfo?.tokenName}</div>

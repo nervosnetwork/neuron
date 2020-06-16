@@ -39,7 +39,9 @@ $confirming-color: #b3b3b3;
 
 .balance {
   grid-area: balance;
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
