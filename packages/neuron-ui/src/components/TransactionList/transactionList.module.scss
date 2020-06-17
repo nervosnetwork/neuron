@@ -26,7 +26,7 @@ $pending-color: #b3b3b3;
     grid-template:
       'avatar wallet-name amount indicator' auto
       'toggle type time indicator' auto/
-      33px minmax(130px, 300px) 1fr 40px;
+      30px minmax(130px, 300px) 1fr 30px;
     grid-gap: 7px 10px;
     font-size: 0.875rem;
 
@@ -41,6 +41,11 @@ $pending-color: #b3b3b3;
       color: #666;
       text-align: right;
       white-space: nowrap;
+    }
+
+    .avatar {
+      grid-area: avatar;
+      height: 30px;
     }
 
     .type {
@@ -69,20 +74,21 @@ $pending-color: #b3b3b3;
 
     &:before {
       grid-area: toggle;
+      align-self: center;
       transform: translateX(15px);
-      transform-origin: 0 6px;
+      transform-origin: 0 5px;
       transition: transform 0.3s;
       display: block;
       content: '';
       width: 0;
       height: 0;
-      border: 6px solid transparent;
+      border: 5px solid transparent;
       border-left-color: #000;
     }
     .indicator {
       grid-area: indicator;
       align-self: center;
-      justify-self: center;
+      justify-self: flex-end;
       line-height: 0;
       svg {
         width: 16px;
@@ -117,19 +123,19 @@ $pending-color: #b3b3b3;
 
   .detail {
     @include regular-text;
-    margin: 15px 50px 0 43px;
+    margin: 15px 40px 6px 40px;
     display: none;
     color: #434343;
     border-top: 1px dashed #b3b3b3;
-    padding-top: 15px;
+    padding-top: 8px;
     font-size: 0.875rem;
 
     & > div {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      min-height: 18px;
+      margin-bottom: 4px;
+      min-height: 23px;
 
       & > span:first-of-type {
         @include bold-text;
@@ -188,7 +194,6 @@ $pending-color: #b3b3b3;
         border-left: none !important;
         border-right: none !important;
         border-bottom: 1px solid #aaaaaa !important;
-        padding-bottom: 3px;
         width: 100%;
       }
 
@@ -220,9 +225,10 @@ $pending-color: #b3b3b3;
 .footer {
   display: flex;
   justify-content: flex-end !important;
+  padding-top: 4px;
   @mixin nav-button {
-    height: 30px;
-    width: 30px;
+    height: 24px;
+    width: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -233,6 +239,7 @@ $pending-color: #b3b3b3;
     border-radius: 15px;
     transition: all 0.2s;
     margin-left: 10px;
+    padding: 3px;
 
     span {
       display: none;
