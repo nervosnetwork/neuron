@@ -33,13 +33,15 @@ const resetMocks = () => {
   stubbedGetTransactionsByLockScriptFn.mockReset()
 }
 
+const flushPromises = () => new Promise(setImmediate);
+
 const connectIndexer = async (indexerConnector: IndexerConnector) => {
   const connectPromise = indexerConnector.connect()
-  await Promise.resolve()
   const errSpy = jest.fn()
   connectPromise.catch(err => {
     errSpy(err)
   })
+  await flushPromises()
   return errSpy
 }
 
@@ -119,70 +121,81 @@ describe('unit tests for IndexerConnector', () => {
         beforeEach(() => {
           transactionsSubject = indexerConnector.transactionsSubject
         });
-        describe('check if new transactions are available for an address', () => {
-          //Use ckb-indexer's last cursor to facilitate
-          describe('when there are no new transactions', () => {
-            let txObserver: any
-            beforeEach(async () => {
-              stubbedGetTransactionsByLockScriptFn.mockReturnValue([])
-              txObserver = jest.fn()
-              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-              await connectIndexer(indexerConnector)
-            });
-            it('should not emit new transactions for the address', () => {
-              expect(txObserver).toHaveBeenCalledTimes(0)
-            })
-          });
-          describe('when there are new transactions', () => {
-            let txObserver: any
-            beforeEach(async () => {
-              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
-              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
-              stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
-              stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
-              stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
-              stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
-              stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
-              stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
 
-              txObserver = jest.fn()
-              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-              await connectIndexer(indexerConnector)
-            });
-            it('emits new transactions in batch by block number', async () => {
-              expect(txObserver).toHaveBeenCalledWith([fakeTx1])
-              expect(txObserver).toHaveBeenCalledWith([fakeTx2, fakeTx3])
-            });
+        //Use ckb-indexer's last cursor to facilitate
+        describe('when there are no transactions for an address', () => {
+          let txObserver: any
+          beforeEach(async () => {
+            stubbedGetTransactionsByLockScriptFn.mockReturnValue([])
+            txObserver = jest.fn()
+            transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+            await connectIndexer(indexerConnector)
           });
-          describe('when there are no transactions matched', () => {
-            let txObserver: any
-            let errSpy: any
-            beforeEach(async () => {
-              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
+          it('should not emit new transactions for the address', () => {
+            expect(txObserver).toHaveBeenCalledTimes(0)
+          })
+        });
+        describe('when there are transactions for an address', () => {
+          let txObserver: any
+          beforeEach(async () => {
+            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
+            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
+            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
+            stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
+            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
+            stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
 
-              txObserver = jest.fn()
-              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-              errSpy = await connectIndexer(indexerConnector)
+            txObserver = jest.fn()
+            transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+            await connectIndexer(indexerConnector)
+          });
+          it('emits new transactions in batch by block number', () => {
+            expect(txObserver).toHaveBeenCalledWith([fakeTx1])
+            expect(txObserver).toHaveBeenCalledWith([fakeTx2, fakeTx3])
+          });
+          describe('caches transaction hashes', () => {
+            describe('when the count of hashes is different from cache', () => {
+              it('caches', () => {
+
+              });
             });
-            it('should not emit transactions', async () => {
-              expect(errSpy).toHaveBeenCalledTimes(0)
-              expect(txObserver).toHaveBeenCalledTimes(0)
+            describe('when the count of hashes is equal to the ones in cache', () => {
+              it('ignores', () => {
+
+              })
             });
           });
-          describe('when there no transaction matched to a hash', () => {
-            let txObserver: any
-            let errSpy: any
-            beforeEach(async () => {
-              stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
-              stubbedGetTransactionFn.mockReturnValueOnce(undefined)
+        });
+        describe('when there are no transactions matched', () => {
+          let txObserver: any
+          let errSpy: any
+          beforeEach(async () => {
+            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
 
-              txObserver = jest.fn()
-              transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-              errSpy = await connectIndexer(indexerConnector)
-            });
-            it('throws error', async () => {
-              expect(errSpy).toHaveBeenCalledWith(new Error(`failed to fetch transaction for hash ${fakeTx3.transaction.hash}`))
-            });
+            txObserver = jest.fn()
+            transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+            errSpy = await connectIndexer(indexerConnector)
+          });
+          it('should not emit transactions', () => {
+            expect(errSpy).toHaveBeenCalledTimes(0)
+            expect(txObserver).toHaveBeenCalledTimes(0)
+          });
+        });
+        describe('failure cases', () => {
+          let txObserver: any
+          let errSpy: any
+          beforeEach(async () => {
+            stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            stubbedGetTransactionFn.mockReturnValueOnce(undefined)
+
+            txObserver = jest.fn()
+            transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
+            errSpy = await connectIndexer(indexerConnector)
+          });
+          it('throws error when there no transaction matched to a hash', () => {
+            expect(errSpy).toHaveBeenCalledWith(new Error(`failed to fetch transaction for hash ${fakeTx3.transaction.hash}`))
           });
         });
       });
@@ -201,7 +214,7 @@ describe('unit tests for IndexerConnector', () => {
           it('observed new tips', async () => {
             for (let second = 1; second <= 1; second++) {
               jest.advanceTimersByTime(5000)
-              await Promise.resolve()
+              await flushPromises()
             }
             expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
             expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
