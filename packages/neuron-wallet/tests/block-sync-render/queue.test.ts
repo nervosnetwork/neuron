@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs'
 import { Tip } from '@ckb-lumos/indexer'
+import { AddressType } from '../../src/models/keys/address'
 import AddressGenerator from "../../src/models/address-generator"
 import { AddressPrefix } from '../../src/models/keys/address'
 import SystemScriptInfo from '../../src/models/system-script-info'
@@ -86,7 +87,7 @@ describe('queue', () => {
     blake160: '0xfakeblake160',
     walletId: '',
     path: '',
-    addressType: '',
+    addressType: AddressType.Receiving,
     addressIndex: 0,
     txCount: 0,
     liveBalance: '',
@@ -97,8 +98,8 @@ describe('queue', () => {
   }
   const addresses = [addressMeta]
 
-  let stubbedBlockTipSubject
-  let stubbedTransactionsSubject
+  let stubbedBlockTipSubject: any
+  let stubbedTransactionsSubject: any
 
   beforeEach(async () => {
     resetMocks()
