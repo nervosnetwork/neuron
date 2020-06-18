@@ -13,6 +13,7 @@ const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
 const stubbedUpsertTxHashesFn = jest.fn()
 const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
+const stubbedLoggerErrorFn = jest.fn()
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(
   () => ({
@@ -44,6 +45,7 @@ const resetMocks = () => {
   stubbedGetTransactionsByLockScriptFn.mockReset()
   stubbedUpsertTxHashesFn.mockReset()
   stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
+  stubbedLoggerErrorFn.mockReset()
 }
 
 const flushPromises = () => new Promise(setImmediate);
@@ -70,6 +72,9 @@ describe('unit tests for IndexerConnector', () => {
     });
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
+    });
+    jest.doMock('electron-log', () => {
+      return {error: stubbedLoggerErrorFn}
     });
     jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
       return stubbedIndexerCacheService
@@ -118,9 +123,15 @@ describe('unit tests for IndexerConnector', () => {
       txStatus: {status: 'committed', blockHash: fakeBlock2.hash}
     }
 
-    const fakeTxHashCache1 = {txHash: fakeTx1.transaction.hash, blockNumber: fakeTx1.transaction.blockNumber, blockTimestamp: fakeTx1.transaction.blockTimestamp}
-    const fakeTxHashCache2 = {txHash: fakeTx2.transaction.hash, blockNumber: fakeTx2.transaction.blockNumber, blockTimestamp: fakeTx2.transaction.blockTimestamp}
-    const fakeTxHashCache3 = {txHash: fakeTx3.transaction.hash, blockNumber: fakeTx3.transaction.blockNumber, blockTimestamp: fakeTx3.transaction.blockTimestamp}
+    const fakeTxHashCache1 = {
+      txHash: fakeTx1.transaction.hash, blockNumber: fakeTx1.transaction.blockNumber, blockTimestamp: fakeTx1.transaction.blockTimestamp
+    }
+    const fakeTxHashCache2 = {
+      txHash: fakeTx2.transaction.hash, blockNumber: fakeTx2.transaction.blockNumber, blockTimestamp: fakeTx2.transaction.blockTimestamp
+    }
+    const fakeTxHashCache3 = {
+      txHash: fakeTx3.transaction.hash, blockNumber: fakeTx3.transaction.blockNumber, blockTimestamp: fakeTx3.transaction.blockTimestamp
+    }
 
     let indexerConnector: IndexerConnector
     const shortAddressInfo = {
@@ -149,11 +160,15 @@ describe('unit tests for IndexerConnector', () => {
 
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
     });
-    it('starts indexer', async () => {
-      stubbedGetTransactionFn.mockReturnValue(fakeTx1)
-      stubbedGetTransactionsByLockScriptFn.mockReturnValue([fakeTx1.transaction.hash])
-      await connectIndexer(indexerConnector)
-      expect(stubbedStartForeverFn).toHaveBeenCalled()
+    describe('starts lumos indexer', () => {
+      beforeEach(async () => {
+        stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([])
+        await connectIndexer(indexerConnector)
+        expect(stubbedLoggerErrorFn).toHaveBeenCalledTimes(0)
+      });
+      it('starts indexer', async () => {
+        expect(stubbedStartForeverFn).toHaveBeenCalled()
+      });
     });
     describe('polls for new data', () => {
       describe('#transactionsSubject', () => {
@@ -162,19 +177,6 @@ describe('unit tests for IndexerConnector', () => {
           transactionsSubject = indexerConnector.transactionsSubject
         });
 
-        //Use ckb-indexer's last cursor to facilitate
-        describe('when there are no transactions for an address', () => {
-          let txObserver: any
-          beforeEach(async () => {
-            stubbedGetTransactionsByLockScriptFn.mockReturnValue([])
-            txObserver = jest.fn()
-            transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-            await connectIndexer(indexerConnector)
-          });
-          it('should not emit new transactions for the address', () => {
-            expect(txObserver).toHaveBeenCalledTimes(0)
-          })
-        });
         describe('when there are transactions for an address', () => {
           let txObserver: any
           beforeEach(() => {
@@ -276,6 +278,7 @@ describe('unit tests for IndexerConnector', () => {
             errSpy = await connectIndexer(indexerConnector)
           });
           it('throws error when there no transaction matched to a hash', () => {
+            expect(stubbedLoggerErrorFn).toHaveBeenCalled()
             expect(errSpy).toHaveBeenCalledWith(new Error(`failed to fetch transaction for hash ${fakeTx3.transaction.hash}`))
           });
         });

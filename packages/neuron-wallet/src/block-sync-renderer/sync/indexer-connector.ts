@@ -1,4 +1,5 @@
 import { Subject } from 'rxjs'
+import logger from 'electron-log'
 import { Indexer, Tip } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
@@ -11,7 +12,6 @@ import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
-  private stop: boolean = true
   private addressesMetas: AddressMeta[] = []
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
@@ -24,17 +24,18 @@ export default class IndexerConnector {
 
   public async connect() {
     this.indexer.startForever()
-    this.stop = false
 
-    while (!this.stop) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
       const lastIndexerTip = this.indexer.tip()
       this.blockTipSubject.next(lastIndexerTip)
 
-      await this.upsertTxHashes()
-
-      const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
-      if (txsInNextUnprocessedBlockNumber.length) {
-        this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
+      try {
+        await this.upsertTxHashes()
+        await this.processNextBlockNumber()
+      } catch (error) {
+        logger.error(error)
+        throw error
       }
 
       await CommonUtils.sleep(5000)
@@ -96,6 +97,13 @@ export default class IndexerConnector {
         await indexerCacheService.upsertTxHashes(txHashes, defaultLockScript)
       })
     )
+  }
+
+  private async processNextBlockNumber() {
+    const txsInNextUnprocessedBlockNumber = await this.getTxsInNextUnprocessedBlockNumber()
+    if (txsInNextUnprocessedBlockNumber.length) {
+      this.transactionsSubject.next(txsInNextUnprocessedBlockNumber)
+    }
   }
 
   private async fetchTxsWithStatus(txHashes: string[]) {
