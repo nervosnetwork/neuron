@@ -1,19 +1,21 @@
 import { Subject } from 'rxjs'
 import logger from 'electron-log'
+import { queue } from 'async'
 import { Indexer, Tip } from '@ckb-lumos/indexer'
 import CommonUtils from 'utils/common'
 import RpcService from 'services/rpc-service'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import { Address } from 'database/address/address-dao'
 import AddressMeta from 'database/address/meta'
-import IndexerCacheService from './indexer-cache-service'
 import IndexerTxHashCache from 'database/chain/entities/indexer-tx-hash-cache'
+import IndexerCacheService from './indexer-cache-service'
 
 export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
   private addressesMetas: AddressMeta[] = []
   private pollingIndexer: boolean = false
+  private processNextBlockNumberQueue: any
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
@@ -28,12 +30,20 @@ export default class IndexerConnector {
       this.indexer.startForever()
       this.pollingIndexer = true
 
+      this.processNextBlockNumberQueue = queue(async () => this.processNextBlockNumber())
+      this.processNextBlockNumberQueue.error((err: any, task: any) => {
+        logger.error(err, task)
+      })
+
       while (this.pollingIndexer) {
         const lastIndexerTip = this.indexer.tip()
         this.blockTipSubject.next(lastIndexerTip)
 
         const newInserts = await this.upsertTxHashes()
-        newInserts.length && await this.processNextBlockNumber()
+        if (newInserts.length) {
+          this.processNextBlockNumberQueue.push()
+          await this.processNextBlockNumberQueue.drain()
+        }
 
         await CommonUtils.sleep(5000)
       }
@@ -124,8 +134,7 @@ export default class IndexerConnector {
     )
   }
 
-  // public async notifyTxsProcessed(blockNumber: string) {
-    //get txhashes from map by blockNumber
-    //update isProcessed for the addresses
-  // }
+  public notifyCurrentBlockNumberProcessed() {
+    this.processNextBlockNumberQueue.push()
+  }
 }

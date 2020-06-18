@@ -271,7 +271,7 @@ describe('unit tests for IndexerConnector', () => {
         });
         describe('failure cases', () => {
           let txObserver: any
-          let errSpy: any
+          // let errSpy: any
           beforeEach(async () => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
             stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([fakeTxHashCache3])
@@ -279,11 +279,11 @@ describe('unit tests for IndexerConnector', () => {
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-            errSpy = await connectIndexer(indexerConnector)
+            await connectIndexer(indexerConnector)
+            await flushPromises()
           });
           it('throws error when there no transaction matched to a hash', () => {
-            expect(stubbedLoggerErrorFn).toHaveBeenCalled()
-            expect(errSpy).toHaveBeenCalledWith(new Error(`failed to fetch transaction for hash ${fakeTx3.transaction.hash}`))
+            expect(stubbedLoggerErrorFn).toHaveBeenCalledWith(new Error('failed to fetch transaction for hash hash3'), undefined)
           });
         });
       });
@@ -298,13 +298,13 @@ describe('unit tests for IndexerConnector', () => {
           stubbedGetTransactionsByLockScriptFn.mockReturnValue([fakeTx3.transaction.hash])
           stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([])
           await connectIndexer(indexerConnector)
+          await flushPromises()
         });
         describe('when the block tip is higher than previous one', () => {
           it('observed new tips', async () => {
-            for (let second = 1; second <= 1; second++) {
-              jest.advanceTimersByTime(5000)
-              await flushPromises()
-            }
+            jest.advanceTimersByTime(5000)
+            await flushPromises()
+
             expect(tipObserver).toHaveBeenCalledWith(fakeTip1)
             expect(tipObserver).toHaveBeenCalledWith(fakeTip2)
           })
