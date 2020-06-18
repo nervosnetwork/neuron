@@ -24,22 +24,22 @@ export default class IndexerConnector {
   }
 
   public async connect() {
-    this.indexer.startForever()
-    this.pollingIndexer = true
+    try {
+      this.indexer.startForever()
+      this.pollingIndexer = true
 
-    while (this.pollingIndexer) {
-      const lastIndexerTip = this.indexer.tip()
-      this.blockTipSubject.next(lastIndexerTip)
+      while (this.pollingIndexer) {
+        const lastIndexerTip = this.indexer.tip()
+        this.blockTipSubject.next(lastIndexerTip)
 
-      try {
         const newInserts = await this.upsertTxHashes()
         newInserts.length && await this.processNextBlockNumber()
-      } catch (error) {
-        logger.error(error)
-        throw error
-      }
 
-      await CommonUtils.sleep(5000)
+        await CommonUtils.sleep(5000)
+      }
+    } catch (error) {
+      logger.error(error)
+      throw error
     }
   }
 
