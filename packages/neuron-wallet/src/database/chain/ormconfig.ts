@@ -10,6 +10,10 @@ import Input from './entities/input'
 import Output from './entities/output'
 import SyncInfo from './entities/sync-info'
 import LiveCell from './entities/live-cell'
+import AssetAccount from './entities/asset-account'
+import SudtTokenInfo from './entities/sudt-token-info'
+import IndexerTxHashCache from './entities/indexer-tx-hash-cache'
+
 import { InitMigration1566959757554 } from './migrations/1566959757554-InitMigration'
 import { AddTypeAndHasData1567144517514 } from './migrations/1567144517514-AddTypeAndHasData'
 import { ChangeHasDataDefault1568621556467 } from './migrations/1568621556467-ChangeHasDataDefault'
@@ -23,12 +27,10 @@ import { AddInputIndexToInput1573461100330 } from './migrations/1573461100330-Ad
 import { AddMultiSignBlake1601581405459272 } from './migrations/1581405459272-AddMultiSignBlake160'
 import { AddLiveCell1585624516932 } from './migrations/1585624516932-AddLiveCell'
 import { CreateAssetAccount1586420715474 } from './migrations/1586420715474-CreateAssetAccount'
-import AssetAccount from './entities/asset-account'
 import { UpdateAssetAccount1587368167604 } from './migrations/1587368167604-UpdateAssetAccount'
 import { AddTypeToInput1587371249814 } from './migrations/1587371249814-AddTypeToInput'
 import { FlattenLockAndType1587375230126 } from './migrations/1587375230126-FlattenLockAndType'
 import { AddSudtTokenInfo1587523557249 } from './migrations/1587523557249-AddSudtTokenInfo'
-import SudtTokenInfo from './entities/sudt-token-info'
 import { RemoveAssetAccountWalletID1589273902050 } from './migrations/1589273902050-RemoveAssetAccountWalletID'
 
 export const CONNECTION_NOT_FOUND_NAME = 'ConnectionNotFoundError'
@@ -49,7 +51,7 @@ const connectOptions = async (genesisBlockHash: string): Promise<SqliteConnectio
     ...connectionOptions,
     type: 'sqlite',
     database,
-    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell, SudtTokenInfo],
+    entities: [Transaction, Input, Output, SyncInfo, AssetAccount, LiveCell, SudtTokenInfo, IndexerTxHashCache],
     migrations: [
       InitMigration1566959757554,
       AddTypeAndHasData1567144517514,
