@@ -13,7 +13,7 @@ export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
   private addressesMetas: AddressMeta[] = []
-  private run: boolean = false
+  private pollingIndexer: boolean = false
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
@@ -25,9 +25,9 @@ export default class IndexerConnector {
 
   public async connect() {
     this.indexer.startForever()
-    this.run = true
+    this.pollingIndexer = true
 
-    while (this.run) {
+    while (this.pollingIndexer) {
       const lastIndexerTip = this.indexer.tip()
       this.blockTipSubject.next(lastIndexerTip)
 
