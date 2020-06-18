@@ -13,6 +13,7 @@ export default class IndexerConnector {
   private indexer: Indexer
   private rpcService: RpcService
   private addressesMetas: AddressMeta[] = []
+  private run: boolean = false
   public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
   public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
@@ -24,15 +25,15 @@ export default class IndexerConnector {
 
   public async connect() {
     this.indexer.startForever()
+    this.run = true
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
+    while (this.run) {
       const lastIndexerTip = this.indexer.tip()
       this.blockTipSubject.next(lastIndexerTip)
 
       try {
-        await this.upsertTxHashes()
-        await this.processNextBlockNumber()
+        const newInserts = await this.upsertTxHashes()
+        newInserts.length && await this.processNextBlockNumber()
       } catch (error) {
         logger.error(error)
         throw error
@@ -79,7 +80,7 @@ export default class IndexerConnector {
   }
 
   private async upsertTxHashes() {
-    await Promise.all(
+    const arrayOfInsertedTxHashes = await Promise.all(
       this.addressesMetas.map(async addressMeta => {
         const defaultLockScript = addressMeta.generateDefaultLockScript()
 
@@ -94,9 +95,10 @@ export default class IndexerConnector {
         }
 
         const indexerCacheService = new IndexerCacheService(addressMeta, this.rpcService)
-        await indexerCacheService.upsertTxHashes(txHashes, defaultLockScript)
+        return await indexerCacheService.upsertTxHashes(txHashes, defaultLockScript)
       })
     )
+    return arrayOfInsertedTxHashes.flat()
   }
 
   private async processNextBlockNumber() {

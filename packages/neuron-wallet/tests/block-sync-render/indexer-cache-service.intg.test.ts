@@ -81,7 +81,7 @@ describe('indexer cache service', () => {
   describe('#upsertTxHashes', () => {
     describe('when no tx hashes cache exists', () => {
       it('saves all tx hashes', async () => {
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
         const caches = await getConnection()
           .getRepository(IndexerTxHashCache)
           .find()
@@ -89,6 +89,7 @@ describe('indexer cache service', () => {
         expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
         expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
         expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
+        expect(savedTxHashes).toEqual(txHashes)
       });
     });
     describe('when some of tx hashes cache exists', () => {
@@ -101,14 +102,15 @@ describe('indexer cache service', () => {
         expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
       });
       it('saves the new ones', async () => {
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
         const caches = await getConnection()
-          .getRepository(IndexerTxHashCache)
-          .find()
+        .getRepository(IndexerTxHashCache)
+        .find()
         expect(caches).toHaveLength(3)
         expect(caches.filter(cache => cache.txHash === txHashes[0])).toHaveLength(1)
         expect(caches.filter(cache => cache.txHash === txHashes[1])).toHaveLength(1)
         expect(caches.filter(cache => cache.txHash === txHashes[2])).toHaveLength(1)
+        expect(savedTxHashes).toEqual([txHashes[1], txHashes[2]])
       });
     });
     describe('when all of tx hashes cache exists', () => {
@@ -121,7 +123,7 @@ describe('indexer cache service', () => {
       });
       it('should not do any new inserts', async () => {
         resetMocks()
-        await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
+        const savedTxHashes = await indexerCacheService.upsertTxHashes(txHashes, addressMeta.generateDefaultLockScript())
         const caches = await getConnection()
           .getRepository(IndexerTxHashCache)
           .find()
@@ -129,6 +131,7 @@ describe('indexer cache service', () => {
 
         expect(stubbedGetTransactionFn).toHaveBeenCalledTimes(0)
         expect(stubbedGetHeaderFn).toHaveBeenCalledTimes(0)
+        expect(savedTxHashes).toEqual([])
       });
     });
   });

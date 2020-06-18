@@ -34,10 +34,10 @@ export default class IndexerCacheService {
       .getMany()
   }
 
-  public async upsertTxHashes(txHashes: string[], lockScript: Script) {
+  public async upsertTxHashes(txHashes: string[], lockScript: Script): Promise<string[]> {
     const txCount = await this.countTxHashes(lockScript)
     if (txHashes.length === txCount) {
-      return
+      return []
     }
     const txMetasCaches = await this.getTxHashes(lockScript)
     const cachedTxHashes = txMetasCaches.map(meta => meta.txHash.toString())
@@ -46,7 +46,7 @@ export default class IndexerCacheService {
     const newTxHashes = txHashes.filter(hash => !cachedTxHashesSet.has(hash))
 
     if (!newTxHashes.length) {
-      return
+      return []
     }
 
     const arrayOfTxWithStatus = await Promise.all(
@@ -80,6 +80,7 @@ export default class IndexerCacheService {
         .execute()
     }
 
+    return newTxHashes
   }
 
   public async updateProcessedTxHashes(blockNumber: string) {

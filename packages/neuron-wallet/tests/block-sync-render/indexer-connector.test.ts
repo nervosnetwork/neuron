@@ -183,6 +183,9 @@ describe('unit tests for IndexerConnector', () => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
 
+            stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
+            stubbedUpsertTxHashesFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
@@ -254,16 +257,17 @@ describe('unit tests for IndexerConnector', () => {
           let errSpy: any
           beforeEach(async () => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
-            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([])
-            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([])
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             errSpy = await connectIndexer(indexerConnector)
+            expect(errSpy).toHaveBeenCalledTimes(0)
           });
           it('should not emit transactions', () => {
-            expect(errSpy).toHaveBeenCalledTimes(0)
             expect(txObserver).toHaveBeenCalledTimes(0)
           });
+          it('should not attempt getting transactions in next unprocessed block number', () => {
+            expect(stubbedNextUnprocessedTxsGroupedByBlockNumberFn).toHaveBeenCalledTimes(0)
+          })
         });
         describe('failure cases', () => {
           let txObserver: any
