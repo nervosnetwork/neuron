@@ -65,6 +65,7 @@
     "@types/levelup": "4.3.0",
     "@types/sqlite3": "3.1.5",
     "@types/uuid": "3.4.5",
+    "@types/async": "3.2.3",
     "axios": "0.19.0",
     "devtron": "1.4.0",
     "electron": "7.1.14",
