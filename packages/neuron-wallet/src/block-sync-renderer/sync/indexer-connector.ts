@@ -13,8 +13,8 @@ export default class IndexerConnector {
   private rpcService: RpcService
   private stop: boolean = true
   private addressesMetas: AddressMeta[] = []
-  public blockTipSubject: Subject<Tip> = new Subject<Tip>()
-  public transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
+  public readonly blockTipSubject: Subject<Tip> = new Subject<Tip>()
+  public readonly transactionsSubject: Subject<Array<TransactionWithStatus>> = new Subject<Array<TransactionWithStatus>>()
 
   constructor(addresses: Address[], nodeUrl: string, indexerFolderPath: string) {
     this.indexer = new Indexer(nodeUrl, indexerFolderPath)
