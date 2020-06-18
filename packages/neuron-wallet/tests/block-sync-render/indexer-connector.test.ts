@@ -1,20 +1,31 @@
 import path from 'path'
 import AddressGenerator from "../../src/models/address-generator"
-import { AddressPrefix } from '../../src/models/keys/address'
+import { AddressPrefix, AddressType } from '../../src/models/keys/address'
+import { Address, AddressVersion } from '../../src/database/address/address-dao'
 import SystemScriptInfo from '../../src/models/system-script-info'
 import IndexerConnector from '../../src/block-sync-renderer/sync/indexer-connector'
+import AddressMeta from '../../src/database/address/meta'
 
 const stubbedStartForeverFn = jest.fn()
 const stubbedTipFn = jest.fn()
 const stubbedGetTransactionsByLockScriptFn = jest.fn()
 const stubbedGetTransactionFn = jest.fn()
 const stubbedGetHeaderFn = jest.fn()
+const stubbedUpsertTxHashesFn = jest.fn()
+const stubbedNextUnprocessedTxsGroupedByBlockNumberFn = jest.fn()
 
 const stubbedIndexerConstructor = jest.fn().mockImplementation(
   () => ({
     startForever: stubbedStartForeverFn,
     tip: stubbedTipFn,
     getTransactionsByLockScript: stubbedGetTransactionsByLockScriptFn
+  })
+)
+
+const stubbedIndexerCacheService = jest.fn().mockImplementation(
+  () => ({
+    upsertTxHashes: stubbedUpsertTxHashesFn,
+    nextUnprocessedTxsGroupedByBlockNumber: stubbedNextUnprocessedTxsGroupedByBlockNumberFn,
   })
 )
 
@@ -31,6 +42,8 @@ const resetMocks = () => {
   stubbedGetTransactionFn.mockReset()
   stubbedGetHeaderFn.mockReset()
   stubbedGetTransactionsByLockScriptFn.mockReset()
+  stubbedUpsertTxHashesFn.mockReset()
+  stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReset()
 }
 
 const flushPromises = () => new Promise(setImmediate);
@@ -57,6 +70,9 @@ describe('unit tests for IndexerConnector', () => {
     });
     jest.doMock('services/rpc-service', () => {
       return stubbedRPCServiceConstructor
+    });
+    jest.doMock('../../src/block-sync-renderer/sync/indexer-cache-service', () => {
+      return stubbedIndexerCacheService
     });
     stubbedIndexerConnector = require('../../src/block-sync-renderer/sync/indexer-connector').default
     resetMocks()
@@ -89,24 +105,48 @@ describe('unit tests for IndexerConnector', () => {
     const fakeTip2 = {block_number: '2', block_hash: 'hash2'}
     const fakeBlock1 = {number: '1', hash: '1', timestamp: '1'}
     const fakeBlock2 = {number: '2', hash: '2', timestamp: '2'}
-    const fakeTx1 = {transaction: {hash: 'hash1', blockNumber: fakeBlock1.number}, txStatus: {status: 'committed', blockHash: fakeBlock1.hash}}
-    const fakeTx2 = {transaction: {hash: 'hash2', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
-    const fakeTx3 = {transaction: {hash: 'hash3', blockNumber: fakeBlock2.number}, txStatus: {status: 'committed', blockHash: fakeBlock2.hash}}
+    const fakeTx1 = {
+      transaction: {hash: 'hash1', blockNumber: fakeBlock1.number, blockTimestamp: new Date(1)},
+      txStatus: {status: 'committed', blockHash: fakeBlock1.hash}
+    }
+    const fakeTx2 = {
+      transaction: {hash: 'hash2', blockNumber: fakeBlock2.number, blockTimestamp: new Date(2)},
+      txStatus: {status: 'committed', blockHash: fakeBlock2.hash}
+    }
+    const fakeTx3 = {
+      transaction: {hash: 'hash3', blockNumber: fakeBlock2.number, blockTimestamp: new Date(3)},
+      txStatus: {status: 'committed', blockHash: fakeBlock2.hash}
+    }
+
+    const fakeTxHashCache1 = {txHash: fakeTx1.transaction.hash, blockNumber: fakeTx1.transaction.blockNumber, blockTimestamp: fakeTx1.transaction.blockTimestamp}
+    const fakeTxHashCache2 = {txHash: fakeTx2.transaction.hash, blockNumber: fakeTx2.transaction.blockNumber, blockTimestamp: fakeTx2.transaction.blockTimestamp}
+    const fakeTxHashCache3 = {txHash: fakeTx3.transaction.hash, blockNumber: fakeTx3.transaction.blockNumber, blockTimestamp: fakeTx3.transaction.blockTimestamp}
 
     let indexerConnector: IndexerConnector
+    const shortAddressInfo = {
+      lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
+    }
+    const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
+    const addressObj: Address = {
+      address,
+      blake160: '0x',
+      walletId: '',
+      path: '',
+      addressType: AddressType.Receiving,
+      addressIndex: 0,
+      txCount: 0,
+      liveBalance: '',
+      sentBalance: '',
+      pendingBalance: '',
+      balance: '',
+      version: AddressVersion.Testnet
+    }
+    const addressesToWatch = [addressObj, addressObj]
+
     beforeEach(() => {
       stubbedTipFn.mockReturnValueOnce(fakeTip1)
       stubbedTipFn.mockReturnValueOnce(fakeTip2)
 
-      const shortAddressInfo = {
-        lock: SystemScriptInfo.generateSecpScript('0x36c329ed630d6ce750712a477543672adab57f4c'),
-      }
-      const address = AddressGenerator.toShort(shortAddressInfo.lock, AddressPrefix.Testnet)
-      const addressMeta = {
-        address,
-        blake160: '0x'
-      }
-      const addressesToWatch = [addressMeta, addressMeta]
       indexerConnector = new stubbedIndexerConnector(addressesToWatch, '', '')
     });
     it('starts indexer', async () => {
@@ -137,34 +177,73 @@ describe('unit tests for IndexerConnector', () => {
         });
         describe('when there are transactions for an address', () => {
           let txObserver: any
-          beforeEach(async () => {
+          beforeEach(() => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx1.transaction.hash, fakeTx2.transaction.hash])
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx1)
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx2)
             stubbedGetTransactionFn.mockReturnValueOnce(fakeTx3)
+
             stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock1)
             stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
             stubbedGetHeaderFn.mockReturnValueOnce(fakeBlock2)
 
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
-            await connectIndexer(indexerConnector)
           });
-          it('emits new transactions in batch by block number', () => {
-            expect(txObserver).toHaveBeenCalledWith([fakeTx1])
-            expect(txObserver).toHaveBeenCalledWith([fakeTx2, fakeTx3])
-          });
-          describe('caches transaction hashes', () => {
-            describe('when the count of hashes is different from cache', () => {
-              it('caches', () => {
+          describe('when loaded block number is already in order', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
+                fakeTxHashCache1,
+                fakeTxHashCache2,
+              ])
+              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
+                fakeTxHashCache3
+              ])
 
-              });
+              await connectIndexer(indexerConnector)
             });
-            describe('when the count of hashes is equal to the ones in cache', () => {
-              it('ignores', () => {
+            it('upserts tx hash caches', () => {
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
+                [fakeTx1.transaction.hash, fakeTx2.transaction.hash],
+                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
+              )
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
+                [fakeTx3.transaction.hash],
+                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
+              )
+            })
+            it('emits new transactions in batch by the next unprocessed block number', () => {
+              expect(txObserver).toHaveBeenCalledTimes(1)
+              expect(txObserver).toHaveBeenCalledWith([fakeTx1])
+            });
+          });
+          describe('when loaded block number is not in order', () => {
+            beforeEach(async () => {
+              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
+                fakeTxHashCache3
+              ])
+              stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([
+                fakeTxHashCache1,
+                fakeTxHashCache2
+              ])
 
-              })
+              await connectIndexer(indexerConnector)
+            });
+            it('upserts tx hash caches', () => {
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
+                [fakeTx1.transaction.hash, fakeTx2.transaction.hash],
+                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
+              )
+              expect(stubbedUpsertTxHashesFn).toHaveBeenCalledWith(
+                [fakeTx3.transaction.hash],
+                AddressMeta.fromObject(addressObj).generateDefaultLockScript()
+              )
+            })
+            it('emits new transactions in batch by the next unprocessed block number', () => {
+              expect(txObserver).toHaveBeenCalledTimes(1)
+              expect(txObserver).toHaveBeenCalledWith([fakeTx1])
             });
           });
         });
@@ -173,7 +252,8 @@ describe('unit tests for IndexerConnector', () => {
           let errSpy: any
           beforeEach(async () => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce(undefined)
-
+            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([])
+            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValueOnce([])
             txObserver = jest.fn()
             transactionsSubject.subscribe((transactions: any) => txObserver(transactions))
             errSpy = await connectIndexer(indexerConnector)
@@ -188,6 +268,7 @@ describe('unit tests for IndexerConnector', () => {
           let errSpy: any
           beforeEach(async () => {
             stubbedGetTransactionsByLockScriptFn.mockReturnValueOnce([fakeTx3.transaction.hash])
+            stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([fakeTxHashCache3])
             stubbedGetTransactionFn.mockReturnValueOnce(undefined)
 
             txObserver = jest.fn()
@@ -208,6 +289,7 @@ describe('unit tests for IndexerConnector', () => {
           })
           stubbedGetTransactionFn.mockReturnValue(fakeTx3)
           stubbedGetTransactionsByLockScriptFn.mockReturnValue([fakeTx3.transaction.hash])
+          stubbedNextUnprocessedTxsGroupedByBlockNumberFn.mockReturnValue([])
           await connectIndexer(indexerConnector)
         });
         describe('when the block tip is higher than previous one', () => {
