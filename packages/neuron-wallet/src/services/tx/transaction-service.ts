@@ -139,8 +139,6 @@ export class TransactionsService {
     const skip = (params.pageNo - 1) * params.pageSize
     const txHashes = allTxHashes.slice(skip, skip + params.pageSize)
 
-    const totalCount: number = allTxHashes.length
-
     const transactions = await connection
       .getRepository(TransactionEntity)
       .createQueryBuilder('tx')
@@ -211,7 +209,7 @@ export class TransactionsService {
 
     inputs.map(i => {
       const s = sums.get(i.transactionHash) || BigInt(0)
-      sums.set(i.transactionHash, s - BigInt(i.capacity))
+      sums.set(i.transactionHash, s - BigInt(i.capacity || 0))
 
       const result = daoCellOutPoints.some(dc => {
         return dc.txHash === i.outPointTxHash && dc.index === i.outPointIndex
@@ -284,6 +282,8 @@ export class TransactionsService {
         })
       })
     )
+
+    const totalCount: number = SearchType.TxHash === type ? txs.length : allTxHashes.length
 
     return {
       totalCount,

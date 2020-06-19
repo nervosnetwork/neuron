@@ -11,6 +11,7 @@ import { OutputStatus } from "../../src/models/chain/output"
 import SudtTokenInfoEntity from "../../src/database/chain/entities/sudt-token-info"
 import TransactionEntity from "../../src/database/chain/entities/transaction"
 import { TransactionStatus } from "../../src/models/chain/transaction"
+import { createAccounts, loadAccounts } from '../setupAndTeardown'
 
 const randomHex = (length: number = 64): string => {
   const str: string = Array.from({ length })
@@ -54,21 +55,7 @@ const generateOutput = (tokenID: string = 'CKBytes', txStatus: TransactionStatus
   outputEntity.transaction = tx
   return outputEntity
 }
-const createAccounts = async (assetAccounts: AssetAccount[], outputEntities: OutputEntity[]) => {
-  const entities = assetAccounts.map(aa => AssetAccountEntity.fromModel(aa))
-  const accountIds = []
-  for (const entity of entities) {
-    await getConnection().manager.save([entity.sudtTokenInfo])
-    const [assetAccount] = await getConnection().manager.save([entity])
-    accountIds.push(assetAccount.id)
-  }
 
-  for (const o of outputEntities) {
-    await getConnection().manager.save([o.transaction, o])
-  }
-
-  return accountIds
-}
 const tokenID = '0x' + '0'.repeat(64)
 
 describe('AssetAccountService', () => {
@@ -88,25 +75,7 @@ describe('AssetAccountService', () => {
     done()
   })
 
-  const assetAccount = AssetAccount.fromObject({
-    tokenID: 'tokenID',
-    symbol: 'symbol',
-    tokenName: 'tokenName',
-    decimal: '0',
-    balance: '0',
-    accountName: 'accountName',
-    blake160: '0x' + '0'.repeat(40)
-  })
-
-  const ckbAssetAccount = AssetAccount.fromObject({
-    tokenID: 'CKBytes',
-    symbol: 'CKB',
-    tokenName: 'CKBytes',
-    decimal: '8',
-    balance: '0',
-    accountName: 'accountName',
-    blake160: '0x' + '0'.repeat(40)
-  })
+  const [assetAccount, ckbAssetAccount] = loadAccounts()
 
   it("test for save relation", async () => {
     const entity = AssetAccountEntity.fromModel(assetAccount)
