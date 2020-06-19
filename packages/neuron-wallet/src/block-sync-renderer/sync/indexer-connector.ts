@@ -63,7 +63,9 @@ export default class IndexerConnector {
 
     const groupedTxHashCaches = txHashCachesByNextBlockNumberAndAddress
       .flat()
-      .sort((a, b) => a.blockTimestamp.getTime() - b.blockTimestamp.getTime())
+      .sort((a, b) => {
+        return parseInt(a.blockTimestamp) - parseInt(b.blockTimestamp)
+      })
       .reduce((grouped, txHashCache) => {
         if (!grouped.get(txHashCache.blockNumber)) {
           grouped.set(txHashCache.blockNumber, [])

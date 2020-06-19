@@ -44,7 +44,7 @@ export default class IndexerTxHashCache extends BaseEntity {
     type: 'varchar',
   })
   @Index()
-  blockTimestamp!: Date
+  blockTimestamp!: string
 
   @Column()
   @Index()
