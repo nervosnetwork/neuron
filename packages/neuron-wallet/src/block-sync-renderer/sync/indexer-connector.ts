@@ -134,7 +134,11 @@ export default class IndexerConnector {
     )
   }
 
-  public notifyCurrentBlockNumberProcessed() {
+  public async notifyCurrentBlockNumberProcessed(blockNumber: string) {
+    for (const addressMeta of this.addressesMetas) {
+      const indexerCacheService = new IndexerCacheService(addressMeta, this.rpcService)
+      await indexerCacheService.updateProcessedTxHashes(blockNumber)
+    }
     this.processNextBlockNumberQueue.push()
   }
 }

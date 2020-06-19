@@ -2,7 +2,7 @@ import env from 'env'
 import { ipcRenderer } from 'electron'
 
 import path from 'path'
-import { queue } from 'async'
+import { queue, AsyncQueue } from 'async'
 
 import { TransactionPersistor } from 'services/tx'
 import WalletService from 'services/wallets'
@@ -11,7 +11,6 @@ import OutPoint from 'models/chain/out-point'
 import Transaction from 'models/chain/transaction'
 import TransactionWithStatus from 'models/chain/transaction-with-status'
 import CommonUtils from 'utils/common'
-import RangeForCheck from './range-for-check'
 import TxAddressFinder from './tx-address-finder'
 import SystemScriptInfo from 'models/system-script-info'
 import AssetAccountInfo from 'models/asset-account-info'
@@ -27,10 +26,8 @@ export default class Queue {
   private addresses: AddressInterface[]
   private rpcService: RpcService
   private indexerConnector: IndexerConnector | undefined
+  private checkAndSaveQueue: AsyncQueue<{transactions: Transaction[]}> | undefined
   private currentBlockNumber = BigInt(0)
-  private rangeForCheck: RangeForCheck
-
-  private stopped: boolean = false
   private inProcess: boolean = false
 
   private multiSignBlake160s: string[]
@@ -41,7 +38,6 @@ export default class Queue {
     this.url = url
     this.addresses = addresses
     this.rpcService = new RpcService(url)
-    this.rangeForCheck = new RangeForCheck(url)
     this.assetAccountInfo = new AssetAccountInfo()
 
     this.lockHashes = AddressParser.batchToLockHash(
@@ -75,12 +71,17 @@ export default class Queue {
       this.updateCurrentBlockNumber(BigInt(tip.block_number))
     });
 
-    const checkAndSaveQueue = queue(async (task: any) => {
+    this.checkAndSaveQueue = queue(async (task: any) => {
       const {transactions} = task
       await this.checkAndSave(transactions)
+
+      const firstTx = transactions.shift()
+      if (firstTx) {
+        await this.indexerConnector!.notifyCurrentBlockNumberProcessed(firstTx.blockNumber!)
+      }
     })
 
-    checkAndSaveQueue.error((err: any, task: any) => {
+    this.checkAndSaveQueue.error((err: any, task: any) => {
       console.error(err, task)
     })
 
@@ -91,7 +92,7 @@ export default class Queue {
             transactionWithStatus => transactionWithStatus.transaction
           )
         }
-        checkAndSaveQueue.push(task)
+        this.checkAndSaveQueue!.push(task)
       })
 
   }

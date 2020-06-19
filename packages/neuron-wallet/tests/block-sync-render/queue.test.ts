@@ -24,6 +24,7 @@ const stubbedIpcRenderInvokeFn = jest.fn()
 const stubbedAddressesFn = jest.fn()
 const stubbedSaveFetchFn = jest.fn()
 const stubbedUpdateUsedAddressesFn = jest.fn()
+const stubbedNotifyCurrentBlockNumberProcessedFn = jest.fn()
 
 const stubbedTxAddressFinder = jest.fn().mockImplementation(
   (...args) => {
@@ -50,6 +51,7 @@ const resetMocks = () => {
   stubbedSaveFetchFn.mockReset()
   stubbedUpdateUsedAddressesFn.mockReset()
   stubbedGetTransactionFn.mockReset()
+  stubbedNotifyCurrentBlockNumberProcessedFn.mockReset()
 }
 
 const flushPromises = () => new Promise(setImmediate);
@@ -67,6 +69,7 @@ const generateFakeTx = (id: string) => {
       )
     })
   ]
+  fakeTx.blockNumber = '1'
   const fakeTxWithStatus = {
     transaction: fakeTx,
     txStatus: new TxStatus('0x' + id.repeat(64), TxStatusType.Committed)
@@ -112,7 +115,8 @@ describe('queue', () => {
         return {
           connect: stubbedConnectFn,
           blockTipSubject: stubbedBlockTipSubject,
-          transactionsSubject: stubbedTransactionsSubject
+          transactionsSubject: stubbedTransactionsSubject,
+          notifyCurrentBlockNumberProcessed: stubbedNotifyCurrentBlockNumberProcessedFn,
         }
       }
     )
@@ -216,6 +220,11 @@ describe('queue', () => {
               addresses.map(addressMeta => addressMeta.address), []
             )
           }
+        });
+        it('notify indexer connector of processed block number', () => {
+          expect(stubbedNotifyCurrentBlockNumberProcessedFn).toHaveBeenCalledWith(
+            fakeTxWithStatus1.transaction.blockNumber
+          )
         });
         describe('when involves ACP', () => {
           it('updates ACP blake160s', () => {
