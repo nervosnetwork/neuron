@@ -1424,10 +1424,10 @@
   resolved "https://node.bit.dev/primefaces.primereact.utils.dom-handler/-/primefaces.primereact.utils.dom-handler-3.1.8.tgz#02a740dbe15d1f47aa412ade327e394d425a412f"
   integrity sha1-AqdA2+FdH0eqQSreMn45TUJaQS8=
 
-"@ckb-lumos/indexer@0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@ckb-lumos/indexer/-/indexer-0.2.4.tgz#2cdadba86141c7c3822d39aedae2c14fcf76e7a8"
-  integrity sha512-SAXJbENucsUlSrZtL8wo5OJim8YNev2GqzjRo5S26fvjJs0ceThdR7NG4KqDCP1pMCyU8powAoi0TYRXDcTpZw==
+"@ckb-lumos/indexer@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@ckb-lumos/indexer/-/indexer-0.3.0.tgz#f803a3084625ea21446796af8925fce8b55126e0"
+  integrity sha512-nINQPewEiYAEfjilNjbL5BLdKqyydXt0aEVlck6xZNMSUyTrTbRk0o1PvUwYe0XKjUNIhRmupoUQjdSDkG4ssQ==
   dependencies:
     ckb-js-toolkit "^0.9.1"
     immutable "^4.0.0-rc.12"
