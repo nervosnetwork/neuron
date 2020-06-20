@@ -148,6 +148,10 @@ const basicTx1 = {
 
 /**
  * ACP Transaction
+ * from
+ *   - ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5
+ * to
+ *   - ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
  */
 const ACPTx0 = {
   version: '0x0',
@@ -159,6 +163,7 @@ const ACPTx0 = {
         index: '0x1'
       },
       since: '0x0',
+      // address: ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5
       lock: {
         codeHash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',
         args: DEPLOY_KEY.blake160,
@@ -168,6 +173,7 @@ const ACPTx0 = {
   ],
   outputs: [
     {
+      // address: ckt1qyq9t2w0l0u7rnylrxmj2uq6a28sstnctcwfu4vnst4n3u0p2luawfsmjrmsz
       lock: {
         args: '0xe2193df51d78411601796b35b17b4f8f2cd85bd0',
         codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',

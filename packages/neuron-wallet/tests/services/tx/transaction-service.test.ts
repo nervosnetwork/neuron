@@ -175,14 +175,13 @@ describe('Test transaction service', () => {
     })
 
     describe('Search with address', () => {
-      // FIXME: to fix the method
-      it.skip('Should return transactions', async () => {
+      it('Should return transactions', async () => {
         const ADDRESS = 'ckt1qyqwyxfa75whssgkq9ukkdd30d8c7txcqqqqtrnpa5'
         const actual = await TransactionService.getAllByAddresses(
           { pageNo: 1, pageSize: 15, addresses, walletID: '' },
           ADDRESS
         )
-        expect(actual.totalCount).toBe(1)
+        expect(actual.totalCount).toBe(2)
       })
 
       it('Should return empty', async () => {

@@ -66,23 +66,38 @@ export class TransactionsService {
       .map(s => assetAccountInfo.generateAnyoneCanPayScript(s.args).computeHash())
     const allLockHashes: string[] = lockHashes.concat(anyoneCanPayLockHashes)
 
+    const connection = getConnection()
+    const repository = connection.getRepository(TransactionEntity)
+
+    let allTxHashes: string[] = []
+
     if (type === SearchType.Address) {
-      const hash = AddressParser.parse(searchValue).computeHash()
-      if (lockHashes.includes(hash)) {
-        lockHashes = [hash]
+      const lockHashToSearch = AddressParser.parse(searchValue).computeHash()
+      if (lockHashes.includes(lockHashToSearch)) {
+        lockHashes = [lockHashToSearch]
+        allTxHashes = await repository.createQueryBuilder('tx').select('tx.hash', 'txHash').where(
+          `tx.hash
+          IN
+            (
+              SELECT output.transactionHash FROM output WHERE output.lockHash in (:...lockHashes)
+              UNION
+              SELECT input.transactionHash FROM input WHERE input.lockHash in (:...lockHashes)
+            )
+          `,
+          { lockHashes }
+        )
+          .orderBy('tx.timestamp', 'DESC')
+          .getRawMany().then(txs => txs.map(tx => tx.txHash))
+        console.log({
+          allTxHashes, lockHashes
+        })
       } else {
         return {
           totalCount: 0,
           items: []
         }
       }
-    }
-
-    const connection = getConnection()
-    const repository = connection.getRepository(TransactionEntity)
-
-    let allTxHashes: string[] = []
-    if (type === SearchType.TxHash) {
+    } else if (type === SearchType.TxHash) {
       allTxHashes = [searchValue]
     } else if (type === SearchType.Date) {
       const beginTimestamp = +new Date(new Date(searchValue).toDateString())
